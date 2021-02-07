@@ -116,7 +116,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	public void save() {
 		double mwf = machineWidth.getValue();
 		double mhf = machineHeight.getValue();
-		float accel = acceleration.getValue();
+		double accel = acceleration.getValue();
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {

@@ -10,12 +10,10 @@ import java.awt.geom.PathIterator;
 import java.util.Locale;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_Text_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
 import com.marginallyclever.convenience.nodes.NodeConnectorString;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -90,11 +88,6 @@ public class Generator_Text extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("YourMsgHereName");
-	}
-	
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_Text_Panel(this);
 	}
 	/*
 	@Deprecated

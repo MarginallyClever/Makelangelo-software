@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.select.SelectButton;
@@ -34,10 +35,10 @@ public class ArtPanel2 {
 		rootPanel.setLayout(new BoxLayout(rootPanel,BoxLayout.LINE_AXIS));
 		
 		SelectPanel firstLayer = new SelectPanel();
-		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
+		ServiceLoader<ImageConverter> imageConverters = ServiceLoader.load(ImageConverter.class);
 		HashMap<SelectButton,JPanel> mani = new HashMap<SelectButton,JPanel>(); 
 		
-		for( Node generator : imageGenerators ) {
+		for( Node generator : imageConverters ) {
 			SelectButton b = new SelectButton(generator.getName()); 
 			mani.put(b,generator.getPanel().getInteriorPanel());
 			firstLayer.add(b);

@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.robot;
 
 import javax.vecmath.Vector3d;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.core.StringHelper;
 
 class MakelangeloFirmwareSimulationSegment {
 	public static int counter=0;

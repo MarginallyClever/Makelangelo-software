@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.MathHelper;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.core.Clipper2D;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.LineSegment2D;
+import com.marginallyclever.core.MathHelper;
+import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
 /**

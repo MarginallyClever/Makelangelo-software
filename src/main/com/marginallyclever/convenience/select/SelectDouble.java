@@ -11,7 +11,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import com.marginallyclever.convenience.StringHelper;
+
+import com.marginallyclever.core.StringHelper;
 
 
 /**

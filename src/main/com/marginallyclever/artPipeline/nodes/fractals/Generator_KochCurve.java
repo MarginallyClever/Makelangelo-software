@@ -1,10 +1,8 @@
 package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_KochCurve_Panel;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -35,11 +33,6 @@ public class Generator_KochCurve extends Node {
 		return Translator.get("KochTreeName");
 	}
 
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_KochCurve_Panel(this);
-	}
-	
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();

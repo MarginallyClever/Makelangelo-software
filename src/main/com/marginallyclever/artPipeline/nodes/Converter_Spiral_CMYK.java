@@ -1,14 +1,12 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Spiral_CMYK_Panel;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -39,11 +37,6 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("SpiralCMYKName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_Spiral_CMYK_Panel(this);
 	}
 	
 	@Override

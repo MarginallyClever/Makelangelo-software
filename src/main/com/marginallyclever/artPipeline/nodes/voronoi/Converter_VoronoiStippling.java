@@ -8,13 +8,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.artPipeline.nodes.panels.Converter_VoronoiStippling_Panel;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
 
@@ -168,11 +166,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	@Override
 	public String getName() {
 		return Translator.get("voronoiStipplingName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_VoronoiStippling_Panel(this);
 	}
 
 	@Override

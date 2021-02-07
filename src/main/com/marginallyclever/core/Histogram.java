@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

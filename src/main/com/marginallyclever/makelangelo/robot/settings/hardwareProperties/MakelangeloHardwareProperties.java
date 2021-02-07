@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 

@@ -11,7 +11,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
@@ -115,11 +114,5 @@ public class SaveGCode extends Node implements LoadAndSaveFile {
 		
 		Log.message("done.");
 		return true;
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

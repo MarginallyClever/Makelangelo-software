@@ -2,11 +2,11 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Clipper2D;
+import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.TransformedImage;
 
 /**
  * Converts a BufferedImage to Turtle
@@ -19,7 +19,7 @@ import com.marginallyclever.convenience.turtle.Turtle;
  *
  */
 public abstract class ImageConverter extends Node {
-	protected NodeConnectorTransformedImage inputImage = new NodeConnectorTransformedImage("ImageConverter.inputImage");
+	public NodeConnectorTransformedImage inputImage = new NodeConnectorTransformedImage("ImageConverter.inputImage");
 	protected NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	

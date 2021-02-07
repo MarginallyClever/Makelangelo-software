@@ -3,16 +3,14 @@ package com.marginallyclever.artPipeline.nodes;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Moire_Panel;
-import com.marginallyclever.convenience.LineInterpolator;
-import com.marginallyclever.convenience.LineInterpolatorSinCurve;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.LineInterpolator;
+import com.marginallyclever.core.LineInterpolatorSinCurve;
+import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -34,11 +32,6 @@ public class Converter_Moire extends ImageConverter {
 		return Translator.get("MoireName");
 	}
 
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_Moire_Panel(this);
-	}
-	
 	public String[] getDirections() {
 		return directionChoices;
 	}

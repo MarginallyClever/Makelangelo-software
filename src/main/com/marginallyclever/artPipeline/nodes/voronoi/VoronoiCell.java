@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.voronoi;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.core.Point2D;
 
 
 public class VoronoiCell implements Comparable<VoronoiCell> {

@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 /** 
  * line segments with color 

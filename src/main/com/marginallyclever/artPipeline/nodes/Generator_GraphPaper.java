@@ -1,13 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_GraphPaper_Panel;
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Clipper2D;
+import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -30,11 +28,6 @@ public class Generator_GraphPaper extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("GraphPaperName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_GraphPaper_Panel(this);
 	}
 	
 	@Override

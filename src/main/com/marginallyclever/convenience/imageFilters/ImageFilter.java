@@ -2,7 +2,7 @@ package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.Color;
 
-import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.core.TransformedImage;
 
 /**
  * Filters modify a BufferedImage.

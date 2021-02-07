@@ -9,8 +9,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.TransformedImage;
 
 
 /**

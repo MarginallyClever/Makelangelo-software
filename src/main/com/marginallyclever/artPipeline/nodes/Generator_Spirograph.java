@@ -1,12 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_Spirograph_Panel;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -47,11 +45,6 @@ public class Generator_Spirograph extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("SpirographName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_Spirograph_Panel(this);
 	}
 		
 	@Override

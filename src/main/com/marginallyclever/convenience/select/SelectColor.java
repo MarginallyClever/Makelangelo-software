@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.core.ColorRGB;
 
 /**
  * A color selection dialog

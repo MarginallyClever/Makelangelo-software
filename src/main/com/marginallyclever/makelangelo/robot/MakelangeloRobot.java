@@ -26,14 +26,14 @@ import com.marginallyclever.artPipeline.ArtPipeline;
 import com.marginallyclever.artPipeline.ArtPipelineListener;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.CommandLineOptions;
+import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
@@ -633,7 +633,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return true;
 	}
 
-	public void setCurrentFeedRate(float feedRate) {
+	public void setCurrentFeedRate(double feedRate) {
 		// remember it
 		settings.setCurrentFeedRate(feedRate);
 		// get it again in case it was capped.

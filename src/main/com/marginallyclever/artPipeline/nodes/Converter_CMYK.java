@@ -2,14 +2,12 @@ package com.marginallyclever.artPipeline.nodes;
 
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Converter_CMYK_Panel;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -43,11 +41,6 @@ public class Converter_CMYK extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("ConverterCMYKName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_CMYK_Panel(this);
 	}
 	
 	@Override

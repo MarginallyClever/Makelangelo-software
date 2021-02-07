@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 

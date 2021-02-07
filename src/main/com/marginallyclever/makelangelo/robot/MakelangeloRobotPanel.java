@@ -684,8 +684,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 
 	private void changeGeneratorPanel(int index) {
-		NodePanel.makelangeloRobotPanel = this;
-		
 		Turtle t = makelangeloApp.getSelectedTurtle();
 		
 		Node chosenGenerator = getGenerator(index);

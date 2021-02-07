@@ -1,12 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Crosshatch_Panel;
-import com.marginallyclever.convenience.Histogram;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Histogram;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -20,11 +18,6 @@ public class Converter_Crosshatch extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("Crosshatch");
-	}
-	
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_Crosshatch_Panel(this);
 	}
 
 	@Override

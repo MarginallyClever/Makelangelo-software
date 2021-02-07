@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 import java.util.ArrayList;
 import java.util.Collections;

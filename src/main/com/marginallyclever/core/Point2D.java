@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 public class Point2D {
 	public double x,y;

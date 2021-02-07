@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.TransformedImage;
 
 
 /**

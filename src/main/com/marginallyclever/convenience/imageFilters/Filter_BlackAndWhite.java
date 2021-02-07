@@ -2,8 +2,8 @@ package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.TransformedImage;
 
 /**
  * Converts an image to N shades of grey.

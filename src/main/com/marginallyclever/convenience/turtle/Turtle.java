@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.Point2D;
 
 
 /**

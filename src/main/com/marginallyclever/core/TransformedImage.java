@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -95,9 +95,7 @@ public class TransformedImage {
 
 	public boolean canSampleAt(double x, double y) {
 		Point3d p = new Point3d(x,y,1);
-		inverseMatrix.transform(p);
-		p.x+= sourceImage.getWidth()/2;
-		p.y+= sourceImage.getHeight()/2;
+		reverseTransform(p);
 		
 		if (p.x < 0 || p.x >= sourceImage.getWidth()) return false;
 		if (p.y < 0 || p.y >= sourceImage.getHeight()) return false;
@@ -420,5 +418,18 @@ public class TransformedImage {
 			gl2.glTexCoord2d(0, 1);	gl2.glVertex2d(corners[3].x,corners[3].y);
 			gl2.glEnd();
 		}
+	}
+
+	private void reverseTransform(Point3d p) {
+		inverseMatrix.transform(p);
+		p.x+= sourceImage.getWidth()/2;
+		p.y+= sourceImage.getHeight()/2;
+	}
+
+	public void setRGB(float x, float y, int c) {
+		Point3d p = new Point3d(x,y,1);
+		reverseTransform(p);
+
+		getSourceImage().setRGB((int)p.x, (int)p.y, c);
 	}
 }

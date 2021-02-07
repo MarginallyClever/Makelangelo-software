@@ -1,12 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Pulse_Panel;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -25,11 +23,6 @@ public class Converter_Pulse extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_Pulse_Panel(this);
 	}
 	
 	public String[] getDirections() {

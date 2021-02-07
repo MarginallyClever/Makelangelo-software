@@ -894,10 +894,4 @@ public class LoadScratch3 extends Node implements LoadAndSaveFile {
 	public String getName() {
 		return Translator.get("LoadScratch3");
 	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -1,10 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_RandomLines_Panel;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -20,10 +18,6 @@ public class Converter_RandomLines extends ImageConverter {
 		return Translator.get("ConverterRandomLinesName");
 	}
 
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_RandomLines_Panel(this);
-	}
 	
 	@Override
 	public boolean iterate() {

@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 /**
  * Convenience methods for clipping shapes in 2D

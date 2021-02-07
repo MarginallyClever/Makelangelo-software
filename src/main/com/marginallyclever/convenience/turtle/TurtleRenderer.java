@@ -1,6 +1,6 @@
 package com.marginallyclever.convenience.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.core.ColorRGB;
 
 public abstract interface TurtleRenderer {
 	abstract void start();

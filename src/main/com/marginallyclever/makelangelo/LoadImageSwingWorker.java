@@ -12,7 +12,6 @@ import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
 
 /**
  * 
@@ -47,7 +46,6 @@ public class LoadImageSwingWorker extends SwingWorker<ArrayList<Turtle>,Void> {
 		Log.message("Starting thread 2");
 		
 		loopCount=0;
-		chosenConverter.setThreadWorker(this);
 
 		boolean keepIterating=false;
 		
@@ -75,11 +73,9 @@ public class LoadImageSwingWorker extends SwingWorker<ArrayList<Turtle>,Void> {
 	public void done() {
 		if(progressMonitor!=null) progressMonitor.close();
 
-		ArrayList<Turtle> list = get();
-
 		Log.message("Thread ended after "+loopCount+" iteration(s).");
 		
-		MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
-		if(panel!=null) panel.updateButtonAccess();
+		//MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
+		//if(panel!=null) panel.updateButtonAccess();
 	}
 }

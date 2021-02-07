@@ -3,11 +3,9 @@ package com.marginallyclever.artPipeline.nodes.fractals;
 import java.util.Stack;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_FibonacciSpiral_Panel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -35,11 +33,6 @@ public class Generator_FibonacciSpiral extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("FibonacciSpiralName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_FibonacciSpiral_Panel(this);
 	}
 
 	private void buildFibonacciSequence(int order) {

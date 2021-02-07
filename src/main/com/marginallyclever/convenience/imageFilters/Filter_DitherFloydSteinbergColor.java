@@ -2,9 +2,9 @@ package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.convenience.ColorPalette;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.core.ColorPalette;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.TransformedImage;
 
 
 /**

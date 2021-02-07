@@ -2,7 +2,7 @@ package com.marginallyclever.convenience.imageFilters;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyclever.convenience.TransformedImage;
+import com.marginallyclever.core.TransformedImage;
 
 /**
  * Floyd/Steinberg dithering

@@ -1,12 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Boxes_Panel;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -30,12 +28,6 @@ public class Converter_Boxes extends ImageConverter {
 		return Translator.get("BoxGeneratorName");
 	}
 
-
-	@Override
-	public NodePanel getPanel() {
-		return (NodePanel)new Converter_Boxes_Panel(this);
-	}
-	
 	@Override
 	public void restart() {
 		turtle = new Turtle();

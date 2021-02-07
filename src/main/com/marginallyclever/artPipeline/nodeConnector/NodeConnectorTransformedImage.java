@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodeConnector;
 
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.nodes.NodeConnector;
+import com.marginallyclever.core.TransformedImage;
 
 public class NodeConnectorTransformedImage extends NodeConnector<TransformedImage> {
 	public NodeConnectorTransformedImage(String newName) {

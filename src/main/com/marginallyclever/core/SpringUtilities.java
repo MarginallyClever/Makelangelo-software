@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
  
 import javax.swing.*;
 import javax.swing.SpringLayout;

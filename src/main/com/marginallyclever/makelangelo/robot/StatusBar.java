@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 
 // manages the status bar at the bottom of the application window

@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.core;
 
 import java.io.BufferedInputStream;
 import java.io.File;

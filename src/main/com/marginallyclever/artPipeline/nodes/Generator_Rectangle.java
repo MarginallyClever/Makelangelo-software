@@ -1,10 +1,8 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_Empty_Panel;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -31,11 +29,6 @@ public class Generator_Rectangle extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("BorderName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_Empty_Panel(this);
 	}
 
 	@Override

@@ -1,15 +1,12 @@
 package com.marginallyclever.artPipeline.nodes.polyhedron;
 
-
 import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_Polyeder_Panel;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -88,13 +85,6 @@ public class Generator_Polyeder extends Node {
 		}
 		return result;
 
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		// rebuild the list of models here if you want to dynamically add more.
-		
-		return new Generator_Polyeder_Panel(this);
 	}
 
 	void geneneratePolygonStep(Turtle turtle,PolyederTransform t) {

@@ -7,13 +7,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.imageFilters.Filter_DitherFloydSteinberg;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.StringHelper;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
 
@@ -334,20 +333,6 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		list.add(turtle);
 		setTurtleResult(list);
 		return false;
-	}
-
-
-	@Override
-	public void setImage(TransformedImage img) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
 

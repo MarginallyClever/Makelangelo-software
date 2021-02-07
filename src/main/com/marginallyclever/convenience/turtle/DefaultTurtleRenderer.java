@@ -1,7 +1,7 @@
 package com.marginallyclever.convenience.turtle;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 
 /**

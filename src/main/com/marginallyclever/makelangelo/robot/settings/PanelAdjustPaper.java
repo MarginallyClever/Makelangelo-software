@@ -159,8 +159,8 @@ public class PanelAdjustPaper extends SelectPanel {
 				ph.setValue(sh);
 			}
 		} else if(o == isLandscape) {
-			float sw = pw.getValue();
-			float sh = ph.getValue();
+			double sw = pw.getValue();
+			double sh = ph.getValue();
 			pw.setValue(sh);
 			ph.setValue(sw);
 		} else if( o == pw || o == ph ) {

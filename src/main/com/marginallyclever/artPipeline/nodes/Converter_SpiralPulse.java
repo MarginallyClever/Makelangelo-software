@@ -1,13 +1,11 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_SpiralPulse_Panel;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -35,12 +33,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 	public String getName() {
 		return Translator.get("SpiralPulseName");
 	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_SpiralPulse_Panel(this);
-	}
-
 
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas

@@ -3,11 +3,9 @@ package com.marginallyclever.artPipeline.nodes;
 import java.security.SecureRandom;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_LSystemTree_Panel;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -52,11 +50,6 @@ public class Generator_LSystemTree extends Node {
 	@Override
 	public String getName() {
 		return Translator.get("LSystemTreeName");
-	}
-	
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_LSystemTree_Panel(this);
 	}
 	
 	@Override

@@ -2,10 +2,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.panels.Generator_Package_Panel;
 import com.marginallyclever.convenience.nodes.Node;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -37,12 +35,6 @@ public class Generator_Package extends Node {
 		return Translator.get("Package");
 	}
 
-	@Override
-	public NodePanel getPanel() {
-		return new Generator_Package_Panel(this);
-	}
-
-	
 	void drawRect(Turtle turtle,int x1,int y1,int x2,int y2) {
 		turtle.moveTo(x1,y1);
 		turtle.penDown();

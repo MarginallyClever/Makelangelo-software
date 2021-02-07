@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodes.polyhedron;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.Point2D;
 
 /**
  * Helper class for making relative movements along a path to draw each solid

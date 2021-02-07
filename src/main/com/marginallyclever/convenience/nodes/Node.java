@@ -46,10 +46,12 @@ public abstract class Node implements MakelangeloRobotDecorator {
 	abstract public String getName();
 
 	/**
+	 * TODO Do we even need this ability?
 	 * @return the gui panel with options for this manipulator
 	 */
-	public abstract NodePanel getPanel();
-	
+	public NodePanel getPanel() {
+		return new NodePanel(this);
+	}
 	
 	/**
 	 * Inputs have been updated, please start over.

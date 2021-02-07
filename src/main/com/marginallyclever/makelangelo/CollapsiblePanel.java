@@ -41,7 +41,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.select.SelectBoolean;
 import com.marginallyclever.convenience.select.SelectButton;
 import com.marginallyclever.convenience.select.SelectColor;
@@ -53,6 +52,7 @@ import com.marginallyclever.convenience.select.SelectPanel;
 import com.marginallyclever.convenience.select.SelectReadOnlyText;
 import com.marginallyclever.convenience.select.SelectSlider;
 import com.marginallyclever.convenience.select.SelectTextArea;
+import com.marginallyclever.core.ColorRGB;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

@@ -17,8 +17,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**

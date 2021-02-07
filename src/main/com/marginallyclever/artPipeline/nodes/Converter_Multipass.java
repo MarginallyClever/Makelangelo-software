@@ -1,12 +1,10 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodes.panels.Converter_Multipass_Panel;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
 import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 
@@ -23,11 +21,6 @@ public class Converter_Multipass extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("ConverterMultipassName");
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		return new Converter_Multipass_Panel(this);
 	}
 	
 	/**

@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -74,7 +74,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		for (float y = y0; y < y1; ++y) {
 			for (float x = x0; x < x1; ++x) {
 				if(imgMask.canSampleAt(x, y)) {
-					imgMask.getSourceImage().setRGB(imgMask.getTransformedX(x), imgMask.getTransformedY(y), c);
+					imgMask.setRGB(x,y,c);
 				}
 			}
 		}

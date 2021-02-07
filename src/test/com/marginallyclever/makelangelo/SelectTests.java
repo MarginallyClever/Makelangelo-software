@@ -8,7 +8,6 @@ import javax.swing.JFrame;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.select.SelectBoolean;
 import com.marginallyclever.convenience.select.SelectButton;
 import com.marginallyclever.convenience.select.SelectColor;
@@ -19,6 +18,7 @@ import com.marginallyclever.convenience.select.SelectOneOfMany;
 import com.marginallyclever.convenience.select.SelectPanel;
 import com.marginallyclever.convenience.select.SelectSlider;
 import com.marginallyclever.convenience.select.SelectTextArea;
+import com.marginallyclever.core.ColorRGB;
 
 public class SelectTests {
 	private static JFrame frame;

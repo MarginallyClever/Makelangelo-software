@@ -11,7 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * A container for all Select elements, to facilitate formating as a group.
@@ -68,6 +70,8 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	 * @param args ignored
 	 */
 	public static void main(String[] args) {
+		Log.start();
+		Translator.start();
 		JFrame frame = new JFrame("Select Look and feel");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

@@ -1,6 +1,6 @@
 package com.marginallyclever.convenience.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.core.ColorRGB;
 
 /**
  * TurtleMoves describe the path of turtle motion.

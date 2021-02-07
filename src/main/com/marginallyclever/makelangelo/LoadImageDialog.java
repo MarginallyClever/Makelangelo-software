@@ -9,15 +9,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.prefs.Preferences;
@@ -28,19 +24,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.convenience.TransformedImage;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodePanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -222,7 +213,7 @@ public class LoadImageDialog implements LoadAndSaveFile {
 		}
 
 		if (!GraphicsEnvironment.isHeadless()) {
-			runDialog(robot.getControlPanel());
+			//runDialog(robot.getControlPanel());
 		}
 
 		return true;
@@ -269,21 +260,19 @@ public class LoadImageDialog implements LoadAndSaveFile {
 		pm.setMillisToPopup(0);
 
 		//chosenConverter.setProgressMonitor(pm);
-		chosenConverter.setImage(img);
+		chosenConverter.inputImage.setValue(img);
 
 		threadWorker = new LoadImageSwingWorker(chosenConverter, pm);
 
 		threadWorker.execute();
 	}
 
-	@SuppressWarnings("deprecation")
 	private void setPreferredDrawStyle(int style) {
 		Preferences prefs = PreferencesHelper
 				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		prefs.putInt("Draw Style", style);
 	}
 
-	@SuppressWarnings("deprecation")
 	private int getPreferredDrawStyle() {
 		Preferences prefs = PreferencesHelper
 				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
