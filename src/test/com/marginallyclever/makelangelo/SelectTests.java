@@ -8,17 +8,17 @@ import javax.swing.JFrame;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 
-import com.marginallyclever.convenience.select.SelectBoolean;
-import com.marginallyclever.convenience.select.SelectButton;
-import com.marginallyclever.convenience.select.SelectColor;
-import com.marginallyclever.convenience.select.SelectFile;
-import com.marginallyclever.convenience.select.SelectDouble;
-import com.marginallyclever.convenience.select.SelectInteger;
-import com.marginallyclever.convenience.select.SelectOneOfMany;
-import com.marginallyclever.convenience.select.SelectPanel;
-import com.marginallyclever.convenience.select.SelectSlider;
-import com.marginallyclever.convenience.select.SelectTextArea;
 import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.select.SelectBoolean;
+import com.marginallyclever.core.select.SelectButton;
+import com.marginallyclever.core.select.SelectColor;
+import com.marginallyclever.core.select.SelectDouble;
+import com.marginallyclever.core.select.SelectFile;
+import com.marginallyclever.core.select.SelectInteger;
+import com.marginallyclever.core.select.SelectOneOfMany;
+import com.marginallyclever.core.select.SelectPanel;
+import com.marginallyclever.core.select.SelectSlider;
+import com.marginallyclever.core.select.SelectTextArea;
 
 public class SelectTests {
 	private static JFrame frame;

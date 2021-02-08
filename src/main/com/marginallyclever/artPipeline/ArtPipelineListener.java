@@ -1,6 +1,6 @@
 package com.marginallyclever.artPipeline;
 
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.turtle.Turtle;
 
 /**
  * Whomsoever uses this listener is waiting to know when the pipeline has prepared a new Turtle

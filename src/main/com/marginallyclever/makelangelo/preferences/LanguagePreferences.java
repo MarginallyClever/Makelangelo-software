@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.preferences;
 
 import javax.swing.JOptionPane;
 
-import com.marginallyclever.convenience.select.SelectOneOfMany;
-import com.marginallyclever.convenience.select.SelectPanel;
+import com.marginallyclever.core.select.SelectOneOfMany;
+import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 
 public class LanguagePreferences {

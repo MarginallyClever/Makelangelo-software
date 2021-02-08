@@ -1,9 +1,9 @@
-com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage
-com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveDXF
-com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode
-com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveSVG
+com.marginallyclever.core.nodes.dxf.LoadDXF
+com.marginallyclever.core.nodes.dxf.SaveDXF
+com.marginallyclever.core.nodes.svg.LoadSVG
+com.marginallyclever.core.nodes.svg.SaveSVG
+com.marginallyclever.core.nodes.gcode.LoadGCode
+com.marginallyclever.core.nodes.gcode.SaveGCode
+com.marginallyclever.core.nodes.scratch.LoadScratch2
 
-com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch2
-
-#Scratch3 not working yet
-#com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch3
+#com.marginallyclever.core.nodes.scratch.LoadScratch3

@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodeConnector;
 
-import com.marginallyclever.convenience.nodes.NodeConnector;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.node.NodeConnector;
+import com.marginallyclever.core.turtle.Turtle;
 
 /**
  * Convenience class

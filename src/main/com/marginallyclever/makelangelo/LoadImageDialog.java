@@ -28,9 +28,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.util.PreferencesHelper;
 

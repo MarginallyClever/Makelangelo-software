@@ -3,10 +3,10 @@ package com.marginallyclever.makelangelo.robot.settings;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import com.marginallyclever.convenience.select.SelectButton;
-import com.marginallyclever.convenience.select.SelectColor;
-import com.marginallyclever.convenience.select.SelectDouble;
-import com.marginallyclever.convenience.select.SelectPanel;
+import com.marginallyclever.core.select.SelectButton;
+import com.marginallyclever.core.select.SelectColor;
+import com.marginallyclever.core.select.SelectDouble;
+import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 

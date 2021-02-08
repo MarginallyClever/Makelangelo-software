@@ -1,9 +1,9 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

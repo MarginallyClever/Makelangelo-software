@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodePanel;
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodePanel;
+import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
@@ -32,7 +32,7 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 	protected double toolMinimumStepSize = 1; //mm
 	
 	@Override
-	public String getName() { return "SVG"; }
+	public String getName() { return "SaveSVG"; }
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -136,11 +136,5 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 		
 		Log.message("done.");
 		return true;
-	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

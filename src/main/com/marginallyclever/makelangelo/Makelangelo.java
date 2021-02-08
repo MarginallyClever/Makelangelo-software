@@ -57,13 +57,13 @@ import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodeConnector;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.log.LogPanel;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnector;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
@@ -132,7 +132,6 @@ public final class Makelangelo extends TransferHandler
 	
 	public static void main(String[] argv) throws Exception {
 		Log.start();
-		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
 		Makelangelo makelangeloProgram = new Makelangelo();
 		

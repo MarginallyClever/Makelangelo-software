@@ -2,12 +2,12 @@ package com.marginallyclever.makelangelo.robot.settings;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.convenience.select.SelectBoolean;
-import com.marginallyclever.convenience.select.SelectColor;
-import com.marginallyclever.convenience.select.SelectDouble;
-import com.marginallyclever.convenience.select.SelectOneOfMany;
-import com.marginallyclever.convenience.select.SelectPanel;
-import com.marginallyclever.convenience.select.SelectSlider;
+import com.marginallyclever.core.select.SelectBoolean;
+import com.marginallyclever.core.select.SelectColor;
+import com.marginallyclever.core.select.SelectDouble;
+import com.marginallyclever.core.select.SelectOneOfMany;
+import com.marginallyclever.core.select.SelectPanel;
+import com.marginallyclever.core.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 

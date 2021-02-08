@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.core.imageFilters.Filter_CMYK;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 

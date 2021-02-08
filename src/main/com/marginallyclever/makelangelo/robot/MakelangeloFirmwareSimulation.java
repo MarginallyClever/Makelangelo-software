@@ -5,8 +5,8 @@ import java.util.LinkedList;
 
 import javax.vecmath.Vector3d;
 
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
 

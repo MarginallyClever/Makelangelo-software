@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -148,7 +148,6 @@ public class MakelangeloAppPreferences {
 				Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 				prefs.removeNode();
 				Preferences.userRoot().flush();
-				PreferencesHelper.start();
 			} catch (BackingStoreException e1) {
 				Log.error(e1.getMessage());
 			}

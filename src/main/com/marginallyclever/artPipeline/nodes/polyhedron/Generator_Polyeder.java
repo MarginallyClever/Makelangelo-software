@@ -3,10 +3,10 @@ package com.marginallyclever.artPipeline.nodes.polyhedron;
 import java.util.ArrayList;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

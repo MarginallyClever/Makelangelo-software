@@ -15,7 +15,7 @@ import javax.vecmath.Point3d;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
-import com.marginallyclever.convenience.imageFilters.ImageFilter;
+import com.marginallyclever.core.imageFilters.ImageFilter;
 
 /**
  * TransformedImage is a BufferedImage, scaled, rotated, and translated

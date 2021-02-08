@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.core.MathHelper;
 import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
@@ -28,7 +28,7 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	
 	@Override
-	public String getName() { return "DXF"; }
+	public String getName() { return "SaveDXF"; }
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

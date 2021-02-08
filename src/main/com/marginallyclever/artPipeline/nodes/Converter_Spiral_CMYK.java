@@ -1,12 +1,12 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.imageFilters.Filter_CMYK;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.NodeConnectorBoolean;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.imageFilters.Filter_CMYK;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodeConnectorBoolean;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

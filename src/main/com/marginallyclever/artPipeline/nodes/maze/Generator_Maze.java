@@ -1,9 +1,9 @@
 package com.marginallyclever.artPipeline.nodes.maze;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -25,6 +25,8 @@ public class Generator_Maze extends Node {
 	
 	public Generator_Maze() {
 		super();
+		inputs.add(inputRows);
+		inputs.add(inputCols);
 		outputs.add(outputTurtle);
 	}
 

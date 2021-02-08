@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 /**

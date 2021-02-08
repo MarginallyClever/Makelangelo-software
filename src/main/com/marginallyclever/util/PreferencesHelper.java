@@ -14,7 +14,7 @@ import java.util.prefs.Preferences;
 import org.json.JSONObject;
 import org.json.Property;
 
-import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.log.Log;
 
 /**
  * Helper class to be used when accessing preferences.
@@ -25,7 +25,7 @@ public final class PreferencesHelper {
 	/**
 	 * Internal mapping of all Makelangelo preference nodes.
 	 */
-	private static Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+	private static final Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
 	/**
 	 * Future Makelagelo root preference node path name.
@@ -71,11 +71,12 @@ public final class PreferencesHelper {
 
 	/**
 	 * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
+	 *
+	 * See <a href="http://stackoverflow.com/a/507658">How can I Initialize a static Map?</a>
 	 */
-	@SuppressWarnings("unchecked")
-	static public void start() {
-		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
-		Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
+	static {
+		final Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
+		final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
 		//FIXME write unit test/tool to view import/export machine configurations.
 		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);
 		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); 

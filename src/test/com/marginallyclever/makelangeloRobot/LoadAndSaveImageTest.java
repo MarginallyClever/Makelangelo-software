@@ -8,7 +8,7 @@ import java.util.ServiceLoader;
 import org.junit.Test;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 
 public class LoadAndSaveImageTest {

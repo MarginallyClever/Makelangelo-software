@@ -1,6 +1,6 @@
 package com.marginallyclever.core;
 
-import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.log.Log;
 
 /**
  * Store command line options for use in the app

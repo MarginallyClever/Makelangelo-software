@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.preferences;
 
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.convenience.select.SelectBoolean;
-import com.marginallyclever.convenience.select.SelectPanel;
+import com.marginallyclever.core.select.SelectBoolean;
+import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 

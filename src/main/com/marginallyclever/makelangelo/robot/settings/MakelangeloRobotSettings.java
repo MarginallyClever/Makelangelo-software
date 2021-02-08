@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
+import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makelangelo2Properties;
 import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;

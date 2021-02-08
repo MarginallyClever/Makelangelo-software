@@ -5,7 +5,7 @@ import org.junit.Test;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.core.log.Log;
 
 import java.util.regex.Pattern;
 import jssc.SerialPortList;

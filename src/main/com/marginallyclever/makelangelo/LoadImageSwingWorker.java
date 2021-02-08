@@ -9,9 +9,9 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.turtle.Turtle;
 
 /**
  * 

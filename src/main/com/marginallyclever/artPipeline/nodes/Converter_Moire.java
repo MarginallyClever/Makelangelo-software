@@ -3,14 +3,14 @@ package com.marginallyclever.artPipeline.nodes;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.marginallyclever.convenience.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.NodeConnectorDouble;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.core.LineInterpolator;
 import com.marginallyclever.core.LineInterpolatorSinCurve;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 

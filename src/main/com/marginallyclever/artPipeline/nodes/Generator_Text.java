@@ -10,11 +10,11 @@ import java.awt.geom.PathIterator;
 import java.util.Locale;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.nodes.NodeConnectorInt;
-import com.marginallyclever.convenience.nodes.NodeConnectorString;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorString;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

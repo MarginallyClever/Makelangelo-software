@@ -8,8 +8,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Locale;
 import org.junit.Test;
 
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.select.SelectDouble;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.select.SelectDouble;
 
 public class FloatFieldTest {
 	protected int testObservation;

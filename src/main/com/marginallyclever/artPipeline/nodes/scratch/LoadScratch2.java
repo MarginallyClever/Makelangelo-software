@@ -24,9 +24,9 @@ import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.nodes.Node;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
@@ -77,6 +77,21 @@ public class LoadScratch2 extends Node implements LoadAndSaveFile {
 	public LoadScratch2() {
 		super();
 		outputs.add(outputTurtle);
+	}
+
+	@Override
+	public String getName() {
+		return Translator.get("LoadScratch2");
+	}
+
+	@Override
+	public boolean canLoad() {
+		return true;
+	}
+
+	@Override
+	public boolean canSave() {
+		return false;
 	}
 	
 	@Override
@@ -753,20 +768,5 @@ public class LoadScratch2 extends Node implements LoadAndSaveFile {
 	@Override
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
 		return true;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
-	}
-
-	@Override
-	public String getName() {
-		return Translator.get("LoadScratch2");
 	}
 }
