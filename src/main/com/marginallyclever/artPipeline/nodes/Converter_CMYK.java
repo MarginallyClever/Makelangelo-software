@@ -6,7 +6,7 @@ import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_CMYK;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -20,7 +20,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_CMYK extends ImageConverter {
 	// TODO explain me
-	private NodeConnectorInt inputStepSize = new NodeConnectorInt("Converter_CMYK.inputStepSize",1);
+	private NodeConnectorBoundedInt inputStepSize = new NodeConnectorBoundedInt("Converter_CMYK.inputStepSize",6,1,1);
 	// cyan channel
 	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle("Converter_CMYK.outputTurtleC");
 	// magenta channel

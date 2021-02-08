@@ -13,7 +13,7 @@ import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.node.NodePanel;
+import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
@@ -26,13 +26,21 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  * @Since 7.25.0
  */
 public class SaveSVG extends Node implements LoadAndSaveFile {
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadSVG.filter"), "svg");
+	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("SaveSVG.inputFile",filter,""); 
 	
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 	
+	public SaveSVG() {
+		super();
+		inputs.add(inputFile);
+	}
+	
 	@Override
-	public String getName() { return "SaveSVG"; }
+	public String getName() {
+		return "SaveSVG";
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

@@ -34,6 +34,7 @@ import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
@@ -44,15 +45,17 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  * @since 7.25.0
  */
 public class LoadDXF extends Node implements LoadAndSaveFile {
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadDXF.filter"), "dxf");
+	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadDXF.inputFile",filter,""); 
 	// results
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
 	
 	public LoadDXF() {
 		super();
+		inputs.add(inputFile);
 		outputs.add(outputTurtle);
 	}
 	

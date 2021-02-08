@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.core;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -17,25 +17,30 @@ import org.junit.Test;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
+import com.marginallyclever.makelangelo.Translator;
 
 public class NodePanelTest {
-	
+
+	/**
+	 * frame > 
+	 *   cards > one card for each {@link NodePanel#NodePanel(Node)}
+	 *   combo box > {@link Node#getName()}
+	 * Do not automate this test.
+	 * @throws Exception
+	 */
 	@Test
-	static public void testOnePanel() throws Exception {
+	public void testOnePanel() throws Exception {
 		System.out.println("testOnePanel() start");
 		Log.start();
 		Translator.start();
 		JFrame frame = new JFrame("Node panel test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//frame > 
-		//  combo box > names of nodes
-		//  cards > one card for each node
 		frame.setLayout(new BorderLayout());
 		JPanel comboBoxPane = new JPanel();
 		JPanel cards = new JPanel(new CardLayout());
-		frame.add(comboBoxPane, BorderLayout.PAGE_START);
 		frame.add(cards, BorderLayout.CENTER);
+		frame.add(comboBoxPane, BorderLayout.PAGE_END);
 
 		// build combo box
 		ArrayList<String> names = new ArrayList<String>();
@@ -57,7 +62,7 @@ public class NodePanelTest {
 		// build cards
 		for( Node n : nodes ) {
 			NodePanel p = new NodePanel(n);
-			p.buildInputPanel();
+			p.buildPanel();
 
 			cards.add(n.getName(),p);
 		}

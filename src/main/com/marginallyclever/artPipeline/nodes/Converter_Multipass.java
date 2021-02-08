@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.core.node.NodeConnectorDouble;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorAngle;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -14,9 +14,15 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Multipass extends ImageConverter {
 	// angle.  0-360
-	private NodeConnectorDouble inputAngle = new NodeConnectorDouble("Converter_Multipass.inputAngle",0.0);
+	private NodeConnectorAngle inputAngle = new NodeConnectorAngle("Converter_Multipass.inputAngle",0.0);
 	// number of graduated passes. >=1
-	private NodeConnectorInt inputPasses = new NodeConnectorInt("Converter_Multipass.inputPasses",4);
+	private NodeConnectorBoundedInt inputPasses = new NodeConnectorBoundedInt("Converter_Multipass.inputPasses",6,1,4);
+	
+	public Converter_Multipass() {
+		super();
+		inputs.add(inputAngle);
+		inputs.add(inputPasses);
+	}
 	
 	@Override
 	public String getName() {

@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
@@ -23,7 +24,13 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  *
  */
 public class SaveGCode extends Node implements LoadAndSaveFile {
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadGCode.filter"), "ngc");
+	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadGCode.inputFile",filter,""); 
+	
+	public SaveGCode() {
+		super();
+		inputs.add(inputFile);
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

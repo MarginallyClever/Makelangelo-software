@@ -13,6 +13,7 @@ import com.marginallyclever.core.MathHelper;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
@@ -25,10 +26,18 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  *
  */
 public class SaveDXF extends Node implements LoadAndSaveFile {
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeDXF"), "dxf");
+	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadDXF.filter"), "dxf");
+	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadDXF.inputFile",filter,""); 
+	
+	public SaveDXF() {
+		super();
+		inputs.add(inputFile);
+	}
 	
 	@Override
-	public String getName() { return "SaveDXF"; }
+	public String getName() {
+		return "SaveDXF";
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

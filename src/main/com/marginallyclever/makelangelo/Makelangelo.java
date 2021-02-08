@@ -906,8 +906,8 @@ public final class Makelangelo extends TransferHandler
 		System.out.println("Node name "+c.getName());
 		
 		for(NodeConnector<?> nc : c.inputs ) {
-			System.out.println("Node input "+nc.getType());
-			if(nc.getType().equals("TransformedImage")) {
+			System.out.println("Node input "+nc.getClass().getSimpleName());
+			if(nc instanceof NodeConnectorTransformedImage) {
 				((NodeConnectorTransformedImage)nc).setValue(owl);
 			};
 		}
@@ -918,8 +918,8 @@ public final class Makelangelo extends TransferHandler
 		}
 		
 		for(NodeConnector<?> nc : c.outputs ) {
-			System.out.println("Node output "+nc.getType());
-			if(nc.getType().equals("Turtle")) {
+			System.out.println("Node output "+nc.getClass().getSimpleName());
+			if(nc instanceof NodeConnectorTurtle) {
 				myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 			}
 		}

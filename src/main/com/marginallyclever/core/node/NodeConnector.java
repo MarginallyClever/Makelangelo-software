@@ -1,6 +1,6 @@
 package com.marginallyclever.core.node;
 
-import java.lang.reflect.ParameterizedType;
+import com.marginallyclever.core.select.Select;
 
 /**
  * {@link NodeConnector} describes the inputs and outputs of each {@link Node}.  One output may connect to many inputs.
@@ -9,35 +9,26 @@ import java.lang.reflect.ParameterizedType;
  * @since 7.25.0
  *
  */
-public class NodeConnector<T> {
+abstract public class NodeConnector<T> {
 	// the name of this connector node, which is also used for the name of each UX dialog element.
 	private String name;
 	
 	// helpful text to explain this input. 
 	private String description = "";
 	
-	// To obtain the name of class T (which is normally erased at run time)
-	private final Class<T> persistentClass;
 
 	// The current value.
 	private T value;
 	
 	// Has this peg been updated recently?
 	public boolean isDirty;
-	
-	public String getType() {
-		return persistentClass.getSimpleName();
-	}
 
 	public void setType(String newTypeName) {}
 	
 	
-	@SuppressWarnings("unchecked")
 	protected NodeConnector(String newName) {
 		super();
 		setName(newName);
-		persistentClass = (Class<T>) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 	
 	protected NodeConnector(String name,T defaultValue) {
@@ -69,4 +60,9 @@ public class NodeConnector<T> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	/**
+	 * Get the {@link Select} component that best represents this {@link NodeConnector}. 
+	 */
+	abstract public Select getSelect();
 }

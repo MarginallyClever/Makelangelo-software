@@ -4,6 +4,8 @@ import java.security.SecureRandom;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorAngle;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
@@ -17,13 +19,13 @@ public class Generator_LSystemTree extends Node {
 	// random seed
 	private NodeConnectorInt inputSeed = new NodeConnectorInt("Generator_LSystemTree.inputSeed",0xDEADBEEF);
 	// resursion depth
-	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_LSystemTree.inputOrder",4);
+	private NodeConnectorInt inputOrder = new NodeConnectorBoundedInt("Generator_LSystemTree.inputOrder",10,1,4);
 	// resursion width
-	private NodeConnectorInt inputBranches = new NodeConnectorInt("Generator_LSystemTree.inputBranches",3);
+	private NodeConnectorInt inputBranches = new NodeConnectorBoundedInt("Generator_LSystemTree.inputBranches",10,1,3);
 	// variation
 	private NodeConnectorInt inputNoise = new NodeConnectorInt("Generator_LSystemTree.inputNoise",0);
 	// how far branches can spread
-	private NodeConnectorDouble inputAngleSpan = new NodeConnectorDouble("Generator_LSystemTree.inputAngleSpan",120.0);
+	private NodeConnectorDouble inputAngleSpan = new NodeConnectorAngle("Generator_LSystemTree.inputAngleSpan",120.0);
 	// how far branches can spread
 	private NodeConnectorDouble inputOrderScale = new NodeConnectorDouble("Generator_LSystemTree.inputOrderScale",0.76);
 	// results

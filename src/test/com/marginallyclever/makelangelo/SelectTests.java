@@ -141,9 +141,9 @@ public class SelectTests {
 	@Test
 	public void testFile() {
 		// test contructor(s)
-		SelectFile b = new SelectFile("test",null);
+		SelectFile b = new SelectFile("test",null,"");
 		assert(b.getText().isEmpty());
-		b = new SelectFile("test2","something");
+		b = new SelectFile("test2",null,"something");
 		assert(b.getText().contentEquals("something"));
 		
 		panel.add(b);

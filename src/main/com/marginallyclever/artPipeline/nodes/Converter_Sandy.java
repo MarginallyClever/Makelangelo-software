@@ -3,6 +3,7 @@ package com.marginallyclever.artPipeline.nodes;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -12,22 +13,26 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Sandy extends ImageConverter {
-	private static int blockScale=150;
+	// pass height
+	private NodeConnectorInt inputBlockScale = new NodeConnectorInt("Converter_Sandy.inputBlockScale",150);
+		
 	private static int direction=0;
-	private String [] directionChoices = new String[]{ 
-			Translator.get("top right"),
-			Translator.get("top left"), 
-			Translator.get("bottom left"), 
-			Translator.get("bottom right"), 
-			Translator.get("center")
-			};
+	private String [] directionChoices = new String[] { 
+		Translator.get("top right"),
+		Translator.get("top left"), 
+		Translator.get("bottom left"), 
+		Translator.get("bottom right"), 
+		Translator.get("center")
+	};
 	
-	public Converter_Sandy() {}
-	
-	
+	public Converter_Sandy() {
+		super();
+		inputs.add(inputBlockScale);
+	}
+		
 	@Override
 	public String getName() {
-		return Translator.get("Sandy Noble Style");
+		return Translator.get("Converter_Sandy");
 	}
 	
 	@Override
@@ -64,6 +69,8 @@ public class Converter_Sandy extends ImageConverter {
 		default:	cx = 0;			cy = 0;			last_x = 0;      	last_y = 0;			break;
 		}
 
+		double blockScale = inputBlockScale.getValue();
+		
 		double x, y, z, scaleZ;
 
 		double dx = xRight - xLeft; 
@@ -142,25 +149,6 @@ public class Converter_Sandy extends ImageConverter {
 
 		outputTurtle.setValue(turtle);
 		return false;
-	}
-
-	public int getScale() {
-		return blockScale;
-	}
-	public void setScale(int value) {
-		if(value<1) value=1;
-		blockScale=value;
-	}
-	public String [] getDirections() {
-		return directionChoices;
-	}
-	public int getDirectionIndex() {
-		return direction;
-	}
-	public void setDirection(int value) {
-		if(value<0) value=0;
-		if(value>=directionChoices.length) value = directionChoices.length-1;
-		direction = value;
 	}
 }
 

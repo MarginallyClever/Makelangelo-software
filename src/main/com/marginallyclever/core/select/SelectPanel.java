@@ -79,7 +79,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		SelectBoolean a = new SelectBoolean("AAAAAAAAAAA",false);
 		SelectButton b = new SelectButton("B");
 		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
-		SelectFile d = new SelectFile("D",null);
+		SelectFile d = new SelectFile("D",null,"");
 		SelectDouble e = new SelectDouble("E",0.0f);
 		SelectInteger f = new SelectInteger("FFF",0);
 		String [] list = {"cars","trains","planes","boats","rockets"};

@@ -22,11 +22,11 @@ public class SoundPreferences {
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.SOUND);
 
 		panel = new SelectPanel();
-		
-		panel.add(sound_connect = new SelectFile(Translator.get("MenuSoundsConnect"),prefs.get("sound_connect", "")));
-		panel.add(sound_disconnect = new SelectFile(Translator.get("MenuSoundsDisconnect"),prefs.get("sound_disconnect", "")));
-		panel.add(sound_conversion_finished = new SelectFile(Translator.get("MenuSoundsFinishConvert"),prefs.get("sound_conversion_finished", "")));
-		panel.add(sound_drawing_finished = new SelectFile(Translator.get("MenuSoundsFinishDraw"),prefs.get("sound_drawing_finished", "")));
+		// TODO allow only valid audio files here.
+		panel.add(sound_connect = new SelectFile(Translator.get("MenuSoundsConnect"),null,prefs.get("sound_connect", "")));
+		panel.add(sound_disconnect = new SelectFile(Translator.get("MenuSoundsDisconnect"),null,prefs.get("sound_disconnect", "")));
+		panel.add(sound_conversion_finished = new SelectFile(Translator.get("MenuSoundsFinishConvert"),null,prefs.get("sound_conversion_finished", "")));
+		panel.add(sound_drawing_finished = new SelectFile(Translator.get("MenuSoundsFinishDraw"),null,prefs.get("sound_drawing_finished", "")));
 		panel.finish();
 		return panel;
 	}

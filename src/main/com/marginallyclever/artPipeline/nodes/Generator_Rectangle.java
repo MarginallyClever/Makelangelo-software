@@ -16,8 +16,8 @@ public class Generator_Rectangle extends Node {
 	NodeConnectorDouble inputWidth = new NodeConnectorDouble("Generator_Rectangle.inputWidth",100.0);
 	// height of box
 	NodeConnectorDouble inputHeight = new NodeConnectorDouble("Generator_Rectangle.inputHeight",100.0);
-	
-	NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("Generator_Rectangle.inputOrder");
+	// results
+	NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public Generator_Rectangle() {
 		super();

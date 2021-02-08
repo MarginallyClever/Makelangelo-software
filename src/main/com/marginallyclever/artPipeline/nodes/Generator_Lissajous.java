@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -16,7 +16,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Lissajous extends Node {
 	// controls complexity of curve
-	private NodeConnectorDouble inputDelta = new NodeConnectorDouble("Generator_Lissajous.inputDelta",1.0/6.0);
+	private NodeConnectorAngle inputDelta = new NodeConnectorAngle("Generator_Lissajous.inputDelta",360.0/6.0);
 	// controls complexity of curve
 	private NodeConnectorInt inputA = new NodeConnectorInt("Generator_Lissajous.inputA",200);
 	// controls complexity of curve
@@ -54,7 +54,7 @@ public class Generator_Lissajous extends Node {
 		
 		a = inputA.getValue();
 		b = inputB.getValue();
-		delta = inputDelta.getValue();
+		delta = Math.toRadians(inputDelta.getValue());
 
 		drawLissajous(turtle,true);
 

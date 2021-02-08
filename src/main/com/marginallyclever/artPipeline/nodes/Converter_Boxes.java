@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -14,9 +14,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_Boxes extends ImageConverter {
 	// only consider intensity above the lowpass value.
-	private NodeConnectorInt inputLowpass = new NodeConnectorInt("Generator_Dragon.inputLowpass",127);
+	private NodeConnectorBoundedInt inputLowpass = new NodeConnectorBoundedInt("Generator_Dragon.inputLowpass",255,0,127);
 	// how big should the largest box be?
-	private NodeConnectorInt inputMaxBoxSize = new NodeConnectorInt("Generator_Dragon.inputMaxBoxSize",4);
+	private NodeConnectorBoundedInt inputMaxBoxSize = new NodeConnectorBoundedInt("Generator_Dragon.inputMaxBoxSize",10,1,4);
 	
 	public int boxMaxSize;
 	public int cutoff;

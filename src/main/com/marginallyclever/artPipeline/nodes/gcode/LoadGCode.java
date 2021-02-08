@@ -12,6 +12,7 @@ import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
@@ -22,12 +23,14 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  *
  */
 public class LoadGCode extends Node implements LoadAndSaveFile {
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadGCode.filter"), "ngc");
+	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadGCode.inputFile",filter,""); 
 
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public LoadGCode() {
 		super();
+		inputs.add(inputFile);
 		outputs.add(outputTurtle);
 	}
 

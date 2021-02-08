@@ -18,9 +18,9 @@ import com.marginallyclever.makelangelo.Translator;
 public class Generator_Spirograph extends Node {
 	// controls complexity of curve
 	private NodeConnectorDouble inputPScale = new NodeConnectorDouble("Generator_Spirograph.inputPScale",80.0);
-	// controls complexity of curve
+	// controls size of pattern. >=0
 	private NodeConnectorInt inputMinorRadius = new NodeConnectorInt("Generator_Spirograph.inputMinorRadius",2);
-	// controls complexity of curve
+	// controls interior size of pattern. >=0
 	private NodeConnectorInt inputMajorRadius = new NodeConnectorInt("Generator_Spirograph.inputMajorRadius",100);
 	// resolution of curve
 	private NodeConnectorInt inputNumSamples = new NodeConnectorInt("Generator_Spirograph.inputNumSamples",2000);

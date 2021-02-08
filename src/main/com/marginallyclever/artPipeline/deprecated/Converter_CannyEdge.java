@@ -5,7 +5,6 @@ import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.imageFilters.Filter_Invert;
-import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 

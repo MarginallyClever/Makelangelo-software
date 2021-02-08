@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * A file selection dialog
@@ -24,7 +25,7 @@ public class SelectFile extends Select {
 	private JTextField field;
 	private JButton chooseButton;
 	
-	public SelectFile(String labelValue,String defaultValue) {
+	public SelectFile(String labelValue,FileNameExtensionFilter filter,String defaultValue) {
 		super();
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
@@ -57,7 +58,7 @@ public class SelectFile extends Select {
 		chooseButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				field.setText(selectFile(field.getText()));
+				field.setText(selectFile(filter,field.getText()));
 			}
 		});
 		
@@ -73,8 +74,9 @@ public class SelectFile extends Select {
 		return field.getText();
 	}
 	
-	static private String selectFile(String cancelValue) {
+	static private String selectFile(FileNameExtensionFilter filter,String cancelValue) {
 		JFileChooser choose = new JFileChooser();
+		choose.setFileFilter(filter);
 		int returnVal = choose.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = choose.getSelectedFile();

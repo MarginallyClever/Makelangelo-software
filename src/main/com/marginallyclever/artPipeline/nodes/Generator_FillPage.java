@@ -4,7 +4,7 @@ import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -14,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_FillPage extends Node {
 	// controls complexity of curve
-	private NodeConnectorDouble inputAngle = new NodeConnectorDouble("Generator_FillPage.inputAngle",0.0);
+	private NodeConnectorAngle inputAngle = new NodeConnectorAngle("Generator_FillPage.inputAngle",0.0);
 	// results
 	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	

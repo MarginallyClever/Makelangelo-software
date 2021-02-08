@@ -79,7 +79,8 @@ public final class PreferencesHelper {
 		final Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
 		//FIXME write unit test/tool to view import/export machine configurations.
 		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);
-		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); 
+		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name());
+
 		final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
 		try {
 			legacyMakelangeloPreferenceNode.sync();
@@ -94,7 +95,8 @@ public final class PreferencesHelper {
 		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
-		
+
+		@SuppressWarnings("unchecked")
 		Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
 		CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
 	}
