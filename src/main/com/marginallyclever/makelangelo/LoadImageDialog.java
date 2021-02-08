@@ -30,6 +30,7 @@ import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.util.PreferencesHelper;
@@ -116,7 +117,7 @@ public class LoadImageDialog implements LoadAndSaveFile {
 		cards = new JPanel(new CardLayout());
 		cards.setPreferredSize(new Dimension(450, 300));
 		for (ImageConverter ici : converters) {
-			cards.add(ici.getPanel().getInteriorPanel(), ici.getName());
+			cards.add(new NodePanel(ici), ici.getName());
 		}
 
 		GridBagConstraints c = new GridBagConstraints();

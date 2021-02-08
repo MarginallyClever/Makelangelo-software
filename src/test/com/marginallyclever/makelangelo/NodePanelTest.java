@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
 
-public class nodePanelTest {
+public class NodePanelTest {
 	
 	@Test
 	static public void testOnePanel() throws Exception {
@@ -60,7 +61,8 @@ public class nodePanelTest {
 
 			cards.add(n.getName(),p);
 		}
-		
+
+		frame.setPreferredSize(new Dimension(400,600));
 		frame.pack();
 		frame.setVisible(true);
 		System.out.println("testOnePanel() end");

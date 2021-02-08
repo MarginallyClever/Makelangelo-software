@@ -649,7 +649,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
 		int i=0;
 		for( Node ici : imageGenerators ) {
-			cards.add(ici.getPanel().getInteriorPanel(),ici.getName());
+			cards.add(new NodePanel(ici),ici.getName());
 			i++;
 		}
 		
@@ -687,7 +687,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		Turtle t = makelangeloApp.getSelectedTurtle();
 		
 		Node chosenGenerator = getGenerator(index);
-		NodePanel chosenGeneratorPanel = chosenGenerator.getPanel();
+		NodePanel chosenGeneratorPanel = new NodePanel(chosenGenerator);
 		if(chosenGeneratorPanel!=null) {
 			Log.message("Generator="+chosenGenerator.getName());
 			JPanel p = chosenGeneratorPanel.getInteriorPanel();

@@ -236,12 +236,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		list.add(turtle);
 		return list;
 	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
 
 

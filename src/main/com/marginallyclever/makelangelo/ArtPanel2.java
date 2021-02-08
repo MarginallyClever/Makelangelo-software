@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
+import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
 
@@ -40,7 +41,7 @@ public class ArtPanel2 {
 		
 		for( Node generator : imageConverters ) {
 			SelectButton b = new SelectButton(generator.getName()); 
-			mani.put(b,generator.getPanel().getInteriorPanel());
+			mani.put(b,new NodePanel(generator));
 			firstLayer.add(b);
 			b.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override

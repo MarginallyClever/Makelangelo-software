@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
 
 
 /**
+ * All {@link Node} should be registered with ./src/main/resources/META-INF/services/{@link Node}
  * @author Dan Royer
  * @since 7.25.0
  */

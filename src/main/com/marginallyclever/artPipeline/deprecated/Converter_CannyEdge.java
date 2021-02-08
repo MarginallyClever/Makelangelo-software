@@ -117,12 +117,6 @@ public class Converter_CannyEdge extends ImageConverter {
 		outputTurtle.setValue(turtle);
 		return false;
 	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
 
 

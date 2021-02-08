@@ -1,29 +1,13 @@
 package com.marginallyclever.core.node;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.ServiceLoader;
 
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.junit.Test;
-
-import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.select.SelectBoolean;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectInteger;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectReadOnlyText;
 import com.marginallyclever.core.select.SelectString;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * All generators have a panel with options.  This is their shared root.
@@ -86,6 +70,5 @@ public class NodePanel extends SelectPanel {
 		}
 		
 		this.finish();
-		this.getInteriorPanel().setPreferredSize(new Dimension(400,600));
 	}
 }

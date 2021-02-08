@@ -130,12 +130,6 @@ public class Converter_MagicCircle extends ImageConverter {
 		setTurtleResult(turtleList);
 		return false;
 	}
-
-	@Override
-	public NodePanel getPanel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
 
 

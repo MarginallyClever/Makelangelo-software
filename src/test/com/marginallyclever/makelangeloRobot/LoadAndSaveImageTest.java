@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.makelangelo.Translator;
 
 public class LoadAndSaveImageTest {
@@ -23,7 +24,7 @@ public class LoadAndSaveImageTest {
 			while(ici.hasNext()) {
 				ImageConverter c = ici.next();
 				Log.message("Creating panel for "+c.getName());
-				c.getPanel();
+				new NodePanel(c);
 			}
 		} catch(Exception e) {
 			fail("Missing panel! "+e.getLocalizedMessage());
