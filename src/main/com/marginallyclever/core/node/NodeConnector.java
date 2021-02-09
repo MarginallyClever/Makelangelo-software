@@ -14,7 +14,7 @@ abstract public class NodeConnector<T> {
 	private String name;
 	
 	// helpful text to explain this input. 
-	private String description = "";
+	private String description = "<i>No description available</i>";
 	
 
 	// The current value.

@@ -58,18 +58,18 @@ public class SelectTextArea extends Select {
 		pane = new JScrollPane(field);
 		
 		// resize the JScrollPane if the containing panel resizes
-		panel.addComponentListener(new ComponentAdapter() {
+		getPanel().addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				pane.setPreferredSize(panel.getSize());
+				pane.setPreferredSize(getPanel().getSize());
 				pane.revalidate();
 			}
 		});
 		pane.setMinimumSize(new Dimension(500, 100));
 		pane.setPreferredSize(new Dimension(200, 350));
 		
-		panel.add(label,BorderLayout.PAGE_START);
-		panel.add(pane,BorderLayout.CENTER);
+		getPanel().add(label,BorderLayout.PAGE_START);
+		getPanel().add(pane,BorderLayout.CENTER);
 	}
 
 	public String getText() {

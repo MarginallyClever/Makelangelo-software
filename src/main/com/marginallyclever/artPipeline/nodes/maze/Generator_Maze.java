@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.nodes.maze;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.core.node.Node;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -11,13 +10,11 @@ import com.marginallyclever.makelangelo.Translator;
  * @see <a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker'>Wikipedia</a>
  * @author Dan Royer
  */
-public class Generator_Maze extends Node {
+public class Generator_Maze extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorInt inputRows = new NodeConnectorInt("Generator_Maze.inputRows",10);
 	// controls complexity of curve
 	private NodeConnectorInt inputCols = new NodeConnectorInt("Generator_Maze.inputCols",10);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
@@ -27,12 +24,11 @@ public class Generator_Maze extends Node {
 		super();
 		inputs.add(inputRows);
 		inputs.add(inputCols);
-		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("MazeName");
+		return Translator.get("Generator_Maze.name");
 	}
 
 	/**

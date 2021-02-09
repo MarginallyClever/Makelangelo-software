@@ -77,8 +77,8 @@ public class SelectDouble extends Select {
 			}
 		});
 
-		panel.add(label, BorderLayout.LINE_START);
-		panel.add(field, BorderLayout.LINE_END);
+		getPanel().add(label, BorderLayout.LINE_START);
+		getPanel().add(field, BorderLayout.LINE_END);
 	}
 
 	public SelectDouble(String labelKey, Locale locale) {

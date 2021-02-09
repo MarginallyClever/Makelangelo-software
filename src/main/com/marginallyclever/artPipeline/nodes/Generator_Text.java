@@ -9,9 +9,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
 import java.util.Locale;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.node.NodeConnectorString;
 import com.marginallyclever.core.turtle.Turtle;
@@ -22,13 +20,11 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Text extends Node {
+public class Generator_Text extends TurtleGenerator {
 	// Unicode text
 	private NodeConnectorString inputMessage = new NodeConnectorString("Generator_Text.inputMessage","");
 	// point size.  default 20.
 	private NodeConnectorInt inputFontPointSize = new NodeConnectorInt("ImageConverter.outputTurtle",20);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 
 	//private double width=100;
 	//private double height=100;
@@ -61,7 +57,6 @@ public class Generator_Text extends Node {
 		super();
 		inputs.add(inputMessage);
 		inputs.add(inputFontPointSize);
-		outputs.add(outputTurtle);
 		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -90,7 +85,7 @@ public class Generator_Text extends Node {
 	
 	@Override
 	public String getName() {
-		return Translator.get("YourMsgHereName");
+		return Translator.get("Generator_Text.name");
 	}
 	/*
 	@Deprecated

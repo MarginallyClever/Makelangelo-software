@@ -2,8 +2,6 @@ package com.marginallyclever.artPipeline.nodes;
 
 import java.security.SecureRandom;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
@@ -15,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * L System fractal
  * @author Dan Royer
  */
-public class Generator_LSystemTree extends Node {
+public class Generator_LSystemTree extends TurtleGenerator {
 	// random seed
 	private NodeConnectorInt inputSeed = new NodeConnectorInt("Generator_LSystemTree.inputSeed",0xDEADBEEF);
 	// resursion depth
@@ -28,8 +26,6 @@ public class Generator_LSystemTree extends Node {
 	private NodeConnectorDouble inputAngleSpan = new NodeConnectorAngle("Generator_LSystemTree.inputAngleSpan",120.0);
 	// how far branches can spread
 	private NodeConnectorDouble inputOrderScale = new NodeConnectorDouble("Generator_LSystemTree.inputOrderScale",0.76);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private int order;
 	private int numBranches;
@@ -46,12 +42,11 @@ public class Generator_LSystemTree extends Node {
 		inputs.add(inputNoise);
 		inputs.add(inputAngleSpan);
 		inputs.add(inputOrderScale);
-		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("LSystemTreeName");
+		return Translator.get("Generator_LSystemTree.name");
 	}
 	
 	@Override

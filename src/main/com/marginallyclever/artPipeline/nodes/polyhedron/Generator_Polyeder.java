@@ -2,10 +2,9 @@ package com.marginallyclever.artPipeline.nodes.polyhedron;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -19,7 +18,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @since 7.24.0
  *
  */
-public class Generator_Polyeder extends Node {
+public class Generator_Polyeder extends TurtleGenerator {
 	// length of a long side
 	protected int size=100;
 	
@@ -31,15 +30,11 @@ public class Generator_Polyeder extends Node {
 	// selected model
 	protected int modelid=0;
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
-
-
 	public int instructionPtr;
 
 	
 	public Generator_Polyeder() {
 		super();
-		outputs.add(outputTurtle);
 		
 		models=new ArrayList<PolyederModel>();
 		addModel("Cube",new int[] {4,4,1,1,1,4,0,1,0,4,1,1,1,4,0,4,0,0,0,0});
@@ -65,7 +60,7 @@ public class Generator_Polyeder extends Node {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Polyeder");
+		return Translator.get("Generator_Polyeder.name");
 	}
 
 	void addModel(String name,int [] instructions)

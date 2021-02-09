@@ -49,8 +49,8 @@ public class SelectString extends Select {
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
 		
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(panel2,BorderLayout.CENTER);
+		getPanel().add(label,BorderLayout.LINE_START);
+		getPanel().add(panel2,BorderLayout.CENTER);
 	}
 	
 	public String getText() {

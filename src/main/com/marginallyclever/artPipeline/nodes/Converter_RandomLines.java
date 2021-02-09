@@ -22,7 +22,7 @@ public class Converter_RandomLines extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Converter_RandomLines");
+		return Translator.get("Converter_RandomLines.name");
 	}
 
 	

@@ -39,7 +39,7 @@ public class SaveGCode extends Node implements LoadAndSaveFile {
 	
 	@Override
 	public String getName() {
-		return "SaveGCode";
+		return Translator.get("SaveGCode.name");
 	}
 	
 	@Override

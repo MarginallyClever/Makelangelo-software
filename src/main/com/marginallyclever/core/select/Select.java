@@ -15,13 +15,10 @@ import javax.swing.JPanel;
  * @since 7.24.0
  */
 public abstract class Select implements FocusListener {
-	protected JPanel panel;
-	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private JPanel panel = new JPanel(new BorderLayout(2,0));
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
-	protected Select() {
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout(2,0));
-	}
+	protected Select() {}
 	
 	@Override
 	public void focusGained(FocusEvent e) {}
@@ -29,7 +26,7 @@ public abstract class Select implements FocusListener {
 	@Override
 	public void focusLost(FocusEvent e) {}
 	
-	JPanel getPanel() {
+	public JPanel getPanel() {
 		return panel;
 	}
 	

@@ -39,7 +39,7 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 	
 	@Override
 	public String getName() {
-		return "SaveSVG";
+		return Translator.get("SaveSVG.name");
 	}
 	
 	@Override

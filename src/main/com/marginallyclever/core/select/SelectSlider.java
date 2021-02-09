@@ -47,9 +47,9 @@ public class SelectSlider extends Select {
 		value.setPreferredSize(dim);
 		value.setMaximumSize(dim);
 		
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.CENTER);
-		panel.add(value,BorderLayout.LINE_END);
+		getPanel().add(label,BorderLayout.LINE_START);
+		getPanel().add(field,BorderLayout.CENTER);
+		getPanel().add(value,BorderLayout.LINE_END);
 	}
 	
 	public int getValue() {

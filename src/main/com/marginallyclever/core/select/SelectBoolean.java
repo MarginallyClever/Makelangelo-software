@@ -36,8 +36,8 @@ public class SelectBoolean extends Select {
 			}
 		});
 
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		getPanel().add(label,BorderLayout.LINE_START);
+		getPanel().add(field,BorderLayout.LINE_END);
 	}
 	
 	public boolean isSelected() {

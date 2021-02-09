@@ -29,6 +29,7 @@ import org.json.simple.parser.JSONParser;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
@@ -46,9 +47,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadScratch3 extends Node implements LoadAndSaveFile {
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
+public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 
 	private final String PROJECT_JSON = "project.json";
 		
@@ -95,12 +94,11 @@ public class LoadScratch3 extends Node implements LoadAndSaveFile {
 	
 	public LoadScratch3() {
 		super();
-		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("LoadScratch3");
+		return Translator.get("LoadScratch3.name");
 	}
 
 	@Override

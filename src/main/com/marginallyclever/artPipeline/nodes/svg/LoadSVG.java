@@ -31,12 +31,11 @@ import org.w3c.dom.svg.SVGPathSegMovetoAbs;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -48,23 +47,23 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
  * @author Dan Royer
  * @Since 7.25.0
  */
-public class LoadSVG extends Node implements LoadAndSaveFile {
+public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadSVG.filter"), "svg");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadSVG.inputFile",filter,""); 
 	
 	protected double scale,imageCenterX,imageCenterY;
 	protected double toolMinimumStepSize = 1; //mm
 
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	public LoadSVG() {
 		super();
 		inputs.add(inputFile);
-		outputs.add(outputTurtle);
 	}
 	
 	@Override
-	public String getName() { return "LoadSVG"; }
+	public String getName() {
+		return Translator.get("LoadSVG.name");
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

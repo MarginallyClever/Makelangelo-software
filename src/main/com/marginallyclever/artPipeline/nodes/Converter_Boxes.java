@@ -25,7 +25,7 @@ public class Converter_Boxes extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("BoxGeneratorName");
+		return Translator.get("Converter_Boxes.name");
 	}
 
 	@Override

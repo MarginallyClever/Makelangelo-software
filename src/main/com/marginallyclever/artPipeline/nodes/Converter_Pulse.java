@@ -22,7 +22,7 @@ public class Converter_Pulse extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("PulseLineName");
+		return Translator.get("Converter_Pulse.name");
 	}
 	
 	public String[] getDirections() {

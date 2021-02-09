@@ -2,9 +2,8 @@ package com.marginallyclever.artPipeline.nodes.fractals;
 
 import java.util.Stack;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -14,11 +13,9 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  *
  */
-public class Generator_FibonacciSpiral extends Node {
+public class Generator_FibonacciSpiral extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_FibonacciSpiral.inputOrder",7);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("Generator_FibonacciSpiral.NodeConnectorTurtle");
 	
 	private float xMax = 100;
 	private float yMax = 100;
@@ -27,12 +24,11 @@ public class Generator_FibonacciSpiral extends Node {
 	public Generator_FibonacciSpiral() {
 		super();
 		inputs.add(inputOrder);
-		outputs.add(outputTurtle);
 	}
 	
 	@Override
 	public String getName() {
-		return Translator.get("FibonacciSpiralName");
+		return Translator.get("Generator_FibonacciSpiral.name");
 	}
 
 	private void buildFibonacciSequence(int order) {

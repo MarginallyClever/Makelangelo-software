@@ -32,9 +32,9 @@ public class SelectOneOfMany extends Select {
 			}
 		});
 
-		panel.setBorder(new EmptyBorder(0,0,0,1));
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		getPanel().setBorder(new EmptyBorder(0,0,0,1));
+		getPanel().add(label,BorderLayout.LINE_START);
+		getPanel().add(field,BorderLayout.LINE_END);
 	}
 	
 	public void setReadOnly() {

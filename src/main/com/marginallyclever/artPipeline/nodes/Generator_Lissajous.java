@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
@@ -14,7 +12,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Lissajous extends Node {
+public class Generator_Lissajous extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorAngle inputDelta = new NodeConnectorAngle("Generator_Lissajous.inputDelta",360.0/6.0);
 	// controls complexity of curve
@@ -23,8 +21,6 @@ public class Generator_Lissajous extends Node {
 	private NodeConnectorInt inputB = new NodeConnectorInt("Generator_Lissajous.inpuinputBtDelta",200);
 	// quality of curve
 	private NodeConnectorInt inputSamples = new NodeConnectorInt("Generator_Lissajous.inputSamples",2000);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	// scale the step size so the curve fits on the paper
 	// TODO make parameter?
@@ -40,12 +36,11 @@ public class Generator_Lissajous extends Node {
 		inputs.add(inputA);
 		inputs.add(inputB);
 		inputs.add(inputSamples);
-		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("LissajousName");
+		return Translator.get("Generator_Lissajous.name");
 	}
 		
 	@Override

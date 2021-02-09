@@ -40,7 +40,7 @@ public class Converter_CMYK extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("ConverterCMYKName");
+		return Translator.get("Converter_CMYK.name");
 	}
 	
 	@Override

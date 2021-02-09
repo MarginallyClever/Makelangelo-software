@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -54,14 +55,18 @@ public class NodePanel extends SelectPanel {
 		// inputs
 		for(NodeConnector<?> nc : myNode.inputs ) {
 			System.out.println("  input "+nc.getName());
-			add(nc.getSelect());
+			Select s = nc.getSelect();
+			s.getPanel().setToolTipText(nc.getDescription());
+			add(s);
 		}
 		// divider
 		add(new JSeparator());
 		// outputs
 		for(NodeConnector<?> nc : myNode.outputs ) {
 			System.out.println("  output "+nc.getName());
-			add(nc.getSelect());
+			Select s = nc.getSelect();
+			s.getPanel().setToolTipText(nc.getDescription());
+			add(s);
 		}
 		
 		finish();

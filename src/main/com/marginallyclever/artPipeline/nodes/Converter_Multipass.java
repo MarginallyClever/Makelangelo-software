@@ -26,7 +26,7 @@ public class Converter_Multipass extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("ConverterMultipassName");
+		return Translator.get("Converter_Multipass.name");
 	}
 	
 	/**

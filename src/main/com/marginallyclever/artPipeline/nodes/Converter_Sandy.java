@@ -32,7 +32,7 @@ public class Converter_Sandy extends ImageConverter {
 		
 	@Override
 	public String getName() {
-		return Translator.get("Converter_Sandy");
+		return Translator.get("Converter_Sandy.name");
 	}
 	
 	@Override

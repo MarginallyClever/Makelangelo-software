@@ -1,7 +1,5 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorBoolean;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInt;
@@ -15,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  *
  */
-public class Generator_Spirograph extends Node {
+public class Generator_Spirograph extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorDouble inputPScale = new NodeConnectorDouble("Generator_Spirograph.inputPScale",80.0);
 	// controls size of pattern. >=0
@@ -26,8 +24,6 @@ public class Generator_Spirograph extends Node {
 	private NodeConnectorInt inputNumSamples = new NodeConnectorInt("Generator_Spirograph.inputNumSamples",2000);
 	// style
 	private NodeConnectorBoolean inputIsEpitrochoid = new NodeConnectorBoolean("Generator_Spirograph.inputIsEpitrochoid",false);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
@@ -39,12 +35,11 @@ public class Generator_Spirograph extends Node {
 		inputs.add(inputMajorRadius);
 		inputs.add(inputNumSamples);
 		inputs.add(inputIsEpitrochoid);
-		outputs.add(outputTurtle);
 	}
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpirographName");
+		return Translator.get("Generator_Spirograph.name");
 	}
 		
 	@Override

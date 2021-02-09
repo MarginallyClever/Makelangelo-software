@@ -1,7 +1,6 @@
 package com.marginallyclever.artPipeline.nodes.fractals;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.core.node.Node;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -10,11 +9,9 @@ import com.marginallyclever.makelangelo.Translator;
  * Koch Curve fractal
  * @author Dan Royer
  */
-public class Generator_KochCurve extends Node {
+public class Generator_KochCurve extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_KochCurve.inputOrder",4);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double xMax = 7;
 	private double xMin = -7;
@@ -25,12 +22,11 @@ public class Generator_KochCurve extends Node {
 	public Generator_KochCurve() {
 		super();
 		inputs.add(inputOrder);
-		outputs.add(outputTurtle);
 	}
 	
 	@Override
 	public String getName() {
-		return Translator.get("KochTreeName");
+		return Translator.get("Generator_KochCurve.name");
 	}
 
 	@Override

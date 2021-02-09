@@ -37,7 +37,7 @@ public class SelectReadOnlyText extends Select {
 		        }
 			}
 		});
-		panel.add(label,BorderLayout.CENTER);
+		getPanel().add(label,BorderLayout.CENTER);
 	}
 	
 

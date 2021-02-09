@@ -31,7 +31,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralPulseName");
+		return Translator.get("Converter_SpiralPulse.name");
 	}
 
 	/**

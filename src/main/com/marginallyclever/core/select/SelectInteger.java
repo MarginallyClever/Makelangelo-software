@@ -75,8 +75,8 @@ public class SelectInteger extends Select {
 			}
 		});
 
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		getPanel().add(label,BorderLayout.LINE_START);
+		getPanel().add(field,BorderLayout.LINE_END);
 	}
 
 	public SelectInteger(String labelKey,Locale locale) {

@@ -36,7 +36,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralCMYKName");
+		return Translator.get("Converter_Spiral_CMYK.name");
 	}
 	
 	@Override

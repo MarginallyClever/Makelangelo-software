@@ -34,7 +34,7 @@ public class SelectButton extends Select {
 			}
 		});
 
-		panel.add(button,BorderLayout.CENTER);
+		getPanel().add(button,BorderLayout.CENTER);
 	}
 	
 	public void doClick() {

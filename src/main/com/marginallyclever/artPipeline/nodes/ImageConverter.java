@@ -24,6 +24,7 @@ public abstract class ImageConverter extends Node {
 	
 	
 	protected ImageConverter() {
+		super();
 		inputs.add(inputImage);
 		outputs.add(outputTurtle);
 	}

@@ -1,9 +1,7 @@
 package com.marginallyclever.artPipeline.nodes;
 
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -12,11 +10,9 @@ import com.marginallyclever.makelangelo.Translator;
  * Completely fills the page with ink.
  * @author Dan Royer
  */
-public class Generator_FillPage extends Node {
+public class Generator_FillPage extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorAngle inputAngle = new NodeConnectorAngle("Generator_FillPage.inputAngle",0.0);
-	// results
-	private NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	private double stepSize = 2.0;
 	private double yBottom = -100;
@@ -27,12 +23,11 @@ public class Generator_FillPage extends Node {
 	public Generator_FillPage() {
 		super();
 		inputs.add(inputAngle);
-		outputs.add(outputTurtle);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("FillPageName");
+		return Translator.get("Generator_FillPage.name");
 	}
 	
 	@Override

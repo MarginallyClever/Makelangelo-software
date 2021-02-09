@@ -17,7 +17,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Crosshatch");
+		return Translator.get("Converter_Crosshatch.name");
 	}
 
 	@Override

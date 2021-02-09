@@ -29,7 +29,7 @@ public class Converter_Moire extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("MoireName");
+		return Translator.get("Converter_Moire.name");
 	}
 
 	public String[] getDirections() {

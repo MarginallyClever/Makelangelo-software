@@ -22,7 +22,7 @@ public class Converter_Spiral extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralName");
+		return Translator.get("Converter_Spiral.name");
 	}
 
 	@Override
