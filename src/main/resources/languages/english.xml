@@ -1752,4 +1752,24 @@
 		<hint>Generator</hint>
 	</string>
 	
+	<string>
+		<key>Makelangelo.menuConvert</key>
+		<value>Convert picture</value>
+	</string>
+
+	<string>
+		<key>Makelangelo.menuGenerate</key>
+		<value>Generate path</value>
+	</string>
+	
+	<string>
+		<key>Makelangelo.menuEdit</key>
+		<value>Edit</value>
+	</string>
+	
+	<string>
+		<key>Makelangelo.capturePhoto</key>
+		<value>Capture photo</value>
+	</string>
+	
 </language>
