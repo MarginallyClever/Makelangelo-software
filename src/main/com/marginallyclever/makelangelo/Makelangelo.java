@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -44,6 +45,7 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -74,6 +76,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
+import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
@@ -193,7 +196,7 @@ public final class Makelangelo extends TransferHandler
 	
 	public void runHeadFirst() {
 		try {
-			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("MenuCaptureImage"));	
+			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("Makelangelo.capturePhoto"));	
 		} catch (FailedToRunRaspistillException e) {
 			Log.message("Raspistill unavailable.");
 		}
@@ -245,7 +248,7 @@ public final class Makelangelo extends TransferHandler
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO add confirm here, just to be safe.
-					myTurtles.clear();
+					newFile();
 				}
 			});
 			menu.add(buttonNew);
@@ -265,7 +268,10 @@ public final class Makelangelo extends TransferHandler
 			buttonAdjustPreferences.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					appPreferences.run();
+					appPreferences.run(getMainFrame());
+					if(robotPanel!=null) {
+						robotPanel.updateButtonAccess();
+					}
 				}
 			});
 			menu.add(buttonAdjustPreferences);
@@ -293,21 +299,28 @@ public final class Makelangelo extends TransferHandler
 
 		// generate
 		{
-			Log.message("  convert...");
+			Log.message("  generate...");
 			menu = new JMenu(Translator.get("Makelangelo.menuGenerate"));
 			menuBar.add(menu);
 			
 			ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
 			for( TurtleGenerator g : service ) {
-				JMenuItem item = new JMenuItem(Translator.get(g.getName()));
+				JMenuItem item = new JMenuItem(g.getName());
 				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						myTurtles.clear();
-						// add the generator to the pool
-						// TODO display the generator panel
+						newFile();
+						// TODO add the generator to the pool
+						
+						// display the generator panel
+						JDialog dialog = new JDialog(getMainFrame(),g.getName());
+						NodePanel np = new NodePanel(g);
+						np.buildPanel();
+						dialog.add(np);
+						dialog.pack();
+						dialog.setVisible(true);
 						
 						// @see makelangeloApp.openFile();
 					}
@@ -323,15 +336,21 @@ public final class Makelangelo extends TransferHandler
 			
 			ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
 			for( ImageConverter g : service ) {
-				JMenuItem item = new JMenuItem(Translator.get(g.getName()));
+				JMenuItem item = new JMenuItem(g.getName());
 				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						myTurtles.clear();
+						newFile();
 						// add the converter to the pool
-						// TODO display the converter panel
+						// display the converter panel
+						JDialog dialog = new JDialog(getMainFrame(),g.getName());
+						NodePanel np = new NodePanel(g);
+						np.buildPanel();
+						dialog.add(np);
+						dialog.pack();
+						dialog.setVisible(true);
 						
 						// @see robot.generateImage();
 					}
@@ -339,10 +358,73 @@ public final class Makelangelo extends TransferHandler
 			}
 		}
 
+		// pi capture action
 		if (piCameraCaptureAction != null) {
 			JMenu item = new JMenu(piCameraCaptureAction);
             menuBar.add(item);
         }
+
+		// edit
+		{
+			Log.message("  edit...");
+			menu = new JMenu(Translator.get("Makelangelo.menuEdit"));
+			menuBar.add(menu);
+			
+			JMenuItem buttonTransform = new JMenuItem(Translator.get("Makelangelo.action.transform"));
+			buttonTransform.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO open transform dialog
+				}
+			});
+			menu.add(buttonTransform);
+
+			
+			JMenuItem buttonFlipV = new JMenuItem(Translator.get("Makelangelo.action.flipVertical"));
+			buttonFlipV.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					flipTurtlesVertically();
+				}
+			});
+			menu.add(buttonFlipV);
+			
+			JMenuItem buttonFlipH = new JMenuItem(Translator.get("Makelangelo.action.flipHorizontal"));
+			buttonFlipV.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					flipTurtlesHorizontally();
+				}
+			});
+			menu.add(buttonFlipH);
+			
+			JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
+			buttonOptimize.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO optimize dialog
+				}
+			});
+			menu.add(buttonOptimize);
+			
+			JMenuItem buttonSimplify = new JMenuItem(Translator.get("Makelangelo.action.simplify"));
+			buttonSimplify.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO simplify dialog
+				}
+			});
+			menu.add(buttonSimplify);
+			
+			JMenuItem buttonCrop = new JMenuItem(Translator.get("Makelangelo.action.crop"));
+			buttonCrop.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO crop dialog
+				}
+			});
+			menu.add(buttonCrop);
+		}
 		
 		// view menu
 		{
@@ -351,7 +433,7 @@ public final class Makelangelo extends TransferHandler
 			menuBar.add(menu);
 			
 			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
-			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomOut.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -361,7 +443,7 @@ public final class Makelangelo extends TransferHandler
 			menu.add(buttonZoomOut);
 	
 			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
-			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomIn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -371,7 +453,7 @@ public final class Makelangelo extends TransferHandler
 			menu.add(buttonZoomIn);
 			
 			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
-			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomToFit.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -555,7 +637,7 @@ public final class Makelangelo extends TransferHandler
 			previewPanel.addListener(robot);
 	
 			Log.message("  assign panel to robot...");
-			robotPanel = robot.createControlPanel(this);
+			robotPanel = new MakelangeloRobotPanel(this,robot);
 	
 			// major layout
 			Log.message("  vertical split...");
@@ -771,7 +853,7 @@ public final class Makelangelo extends TransferHandler
 	 * @param loader the plugin to use
 	 * @return true if load is successful.
 	 */
-	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFile loader) {
+	private boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFile loader) {
 		boolean success = false;
 		try (final InputStream fileInputStream = new FileInputStream(filename)) {
 			success=loader.load(fileInputStream);
@@ -782,8 +864,8 @@ public final class Makelangelo extends TransferHandler
 		// TODO don't rely on success to be true, load may not have finished yet.
 		if (success == true) {
 			SoundSystem.playConversionFinishedSound();
-			if( robot.getControlPanel() != null ) {
-				robot.getControlPanel().updateButtonAccess();
+			if( robotPanel != null ) {
+				robotPanel.updateButtonAccess();
 			}
 		}
 		
@@ -813,52 +895,6 @@ public final class Makelangelo extends TransferHandler
 	}
 
 	
-	public void reopenLastFile() {
-		openFileOnDemand(lastFileIn);
-	}
-
-	public void openFile() {
-		// create the chooser
-		JFileChooser fc = new JFileChooser();
-		
-		// list available loaders
-		ServiceLoader<LoadAndSaveFile> imageLoaders = ServiceLoader.load(LoadAndSaveFile.class);
-		for( LoadAndSaveFile lft : imageLoaders ) {
-			if(lft.canLoad()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-		}
-		
-		// no wild card filter, please.
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last filter used, if any
-		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-		// remember the last path used, if any
-		fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
-		
-		// run the dialog
-		if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-
-			// figure out which of the loaders was requested.
-			for( LoadAndSaveFile loader : imageLoaders ) {
-				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
-				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
-				if(success) {
-					lastFilterIn = selectedFilter;
-					lastFileIn = selectedFile;
-					
-					if( robot.getControlPanel() != null ) {
-						robot.getControlPanel().updateButtonAccess();
-					}
-					break;
-				}
-			}
-		}
-	}
-
 	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
 		if(!a.getDescription().equals(b.getDescription())) return false;
 		String [] aa = a.getExtensions();
@@ -870,7 +906,7 @@ public final class Makelangelo extends TransferHandler
 		return true;
 	}
 	
-	public void saveFile() {
+	private void saveFile() {
 		// list all the known file types that I can save.
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
@@ -926,8 +962,8 @@ public final class Makelangelo extends TransferHandler
 				if(success==true) {
 					lastFileOut = selectedFile;
 					lastFilterOut = selectedFilter;
-					if( robot.getControlPanel() != null ) {
-						robot.getControlPanel().updateButtonAccess();
+					if( robotPanel != null ) {
+						robotPanel.updateButtonAccess();
 					}
 					break;
 				}					
@@ -936,26 +972,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 	
-	public String getLastFileIn() {
-		return lastFileIn;
-	}
-	
-	/**
-	 * Adds a new turtle to the tail of the myTurtles list. 
-	 * @return the newly created Turtle.
-	 */
-	public Turtle addTurtle() {
-		Turtle t = new Turtle();
-		myTurtles.add(t);
-		return t;
-	}
-
-	public Turtle getSelectedTurtle() {
-		return myTurtles.get(myTurtles.size()-1);
-	}
-	
-
-	public void testGeneratorsAndConverters() {
+	private void testGeneratorsAndConverters() {
 		TransformedImage owl = TransformedImage.loadImage(".\\src\\test\\resources\\owl.jpg");
 		owl.rotateAbsolute(-25);
 		owl.setScale(0.5, 0.5);
@@ -1014,6 +1031,24 @@ public final class Makelangelo extends TransferHandler
 			robot.setTurtles(myTurtles);
 		} else {
 			System.out.println("No turtles found!");
+		}
+	}
+	
+	// DO NOT add confirm here, it's too late at this point.
+	private void newFile() {
+		myTurtles.clear();
+		robot.setTurtles(myTurtles);
+	}
+
+	private void flipTurtlesVertically() {
+		for( Turtle t : myTurtles ) {
+			t.scale(1, -1);
+		}
+	}
+
+	private void flipTurtlesHorizontally() {
+		for( Turtle t : myTurtles ) {
+			t.scale(-1, 1);
 		}
 	}
 }

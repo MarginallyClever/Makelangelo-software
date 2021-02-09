@@ -7,8 +7,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,8 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.artPipeline.ArtPipeline;
-import com.marginallyclever.artPipeline.ArtPipelineListener;
+import com.marginallyclever.artPipeline.nodes.gcode.SaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.core.ColorRGB;
@@ -34,7 +37,6 @@ import com.marginallyclever.core.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.core.turtle.TurtleRenderer;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
@@ -50,7 +52,7 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener {
+public class MakelangeloRobot implements NetworkConnectionListener, PreviewListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
@@ -75,9 +77,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private float penX;
 	private float penY;
 
-	protected ArrayList<Turtle> turtles = new ArrayList<Turtle>();
-	
-	private ArtPipeline myPipeline;
+	private ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 
 	// this list of gcode commands is store separate from the Turtle.
 	private ArrayList<String> drawingCommands = new ArrayList<String>();
@@ -94,8 +94,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	public MakelangeloRobot() {
 		super();
 		settings = new MakelangeloRobotSettings();
-		myPipeline = new ArtPipeline();
-		myPipeline.addListener(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -570,9 +568,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		panel.add(message, c);
 
 		Component root = null;
-		MakelangeloRobotPanel p = this.getControlPanel();
-		if (p != null)
-			root = p.getRootPane();
+		if(myPanel != null) {
+			root = myPanel.getRootPane();
+		}
 		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 
@@ -756,33 +754,19 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return settings;
 	}
 
-	public MakelangeloRobotPanel createControlPanel(Makelangelo gui) {
-		myPanel = new MakelangeloRobotPanel(gui, this);
-		return myPanel;
-	}
-
-	public MakelangeloRobotPanel getControlPanel() {
-		return myPanel;
-	}
-
 	public void setTurtles(ArrayList<Turtle> list) {
 		turtles.clear();
 		turtles.addAll(list);
-		//myPipeline.processTurtle(turtle, settings);
+		
+		saveCurrentTurtlesToDrawing();
 	}
 
-	public ArrayList<Turtle> getTurtles() {
-		return turtles;
-	}
-
-	/**
-	 * Copy the most recent turtle to the drawing output buffer.
-	 */
-	public void saveCurrentTurtleToDrawing() {/*
+	// Copy the most recent turtle to the drawing output buffer.
+	public void saveCurrentTurtlesToDrawing() {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
-			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
-			exportForDrawing.save(fileOutputStream, myTurtles, this);
+			SaveGCode saveNGC = new SaveGCode();
+			saveNGC.save(fileOutputStream, turtles, this);
 
 			drawingCommands.clear();
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
@@ -797,12 +781,19 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			e.printStackTrace();
 		}
 
+		// old way
 		Log.message("Old method "+printTimeEstimate(estimateTime()));
-		
+
+		// new way
+		double newEstimate=0;
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
-		double newEstimate= m.getTimeEstimate(turtle, settings);
+		for( Turtle t : turtles ) {
+			newEstimate += m.getTimeEstimate(t, settings);
+		}
 		Log.message("New method "+printTimeEstimate(newEstimate));
-		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);*/
+		
+		// show results
+		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
 	}
 	
 	protected String printTimeEstimate(double seconds) {
@@ -1035,17 +1026,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return x;
 	}
 
-	public ArtPipeline getPipeline() {
-		return myPipeline;
-	}
-
 	public boolean isPenIsUp() {
 		return penIsUp;
-	}
-
-	@Override
-	public void turtleFinished(Turtle t) {
-		// TODO t is not passed to saving?  how does this even work?
-		saveCurrentTurtleToDrawing();		
 	}
 }

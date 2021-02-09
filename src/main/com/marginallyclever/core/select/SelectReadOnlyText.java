@@ -24,16 +24,18 @@ public class SelectReadOnlyText extends Select {
 	public SelectReadOnlyText(String labelKey) {
 		super();
 		
-		label = new JLabel("<html>"+ labelKey+"</html>",JLabel.LEADING);
+		label = new JLabel("<html>"+labelKey+"</html>",JLabel.LEADING);
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-		        JLabel l = (JLabel) evt.getSource();
 		        try {
-		            URI uri = new java.net.URI(getPlainLink(label.getText()));
-		            Desktop.getDesktop().browse(uri);
+		        	String contents = label.getText();
+		        	if(contents.contains("<a href=") && contents.contains("</a>")) {
+		        		URI uri = new java.net.URI(getPlainLink(contents));
+		        		Desktop.getDesktop().browse(uri);
+		        	}
 		        } catch (URISyntaxException | IOException use) {
-		            throw new AssertionError(use + ": " + l.getText()); //NOI18N
+		            throw new AssertionError(use + ": " + label.getText()); //NOI18N
 		        }
 			}
 		});

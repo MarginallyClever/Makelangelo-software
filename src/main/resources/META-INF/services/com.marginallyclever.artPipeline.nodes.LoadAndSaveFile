@@ -1,9 +1,9 @@
-com.marginallyclever.core.nodes.dxf.LoadDXF
-com.marginallyclever.core.nodes.dxf.SaveDXF
-com.marginallyclever.core.nodes.svg.LoadSVG
-com.marginallyclever.core.nodes.svg.SaveSVG
-com.marginallyclever.core.nodes.gcode.LoadGCode
-com.marginallyclever.core.nodes.gcode.SaveGCode
-com.marginallyclever.core.nodes.scratch.LoadScratch2
+com.marginallyclever.artPipeline.nodes.dxf.LoadDXF
+com.marginallyclever.artPipeline.nodes.dxf.SaveDXF
+com.marginallyclever.artPipeline.nodes.svg.LoadSVG
+com.marginallyclever.artPipeline.nodes.svg.SaveSVG
+com.marginallyclever.artPipeline.nodes.gcode.LoadGCode
+com.marginallyclever.artPipeline.nodes.gcode.SaveGCode
+com.marginallyclever.artPipeline.nodes.scratch.LoadScratch2
 
-#com.marginallyclever.core.nodes.scratch.LoadScratch3
+#com.marginallyclever.artPipeline.nodes.scratch.LoadScratch3

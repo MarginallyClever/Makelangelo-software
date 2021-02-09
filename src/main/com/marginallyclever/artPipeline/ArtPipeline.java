@@ -2,9 +2,6 @@ package com.marginallyclever.artPipeline;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
-import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.LineSegment2D;
 import com.marginallyclever.core.MathHelper;
@@ -19,9 +16,7 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * @author Dan Royer
  * 
  */
-public class ArtPipeline {
-	protected ArtPipelinePanel myPanel;
-	
+public class ArtPipeline {	
 	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
 
 	protected MakelangeloRobotSettings lastSettings = null;
@@ -355,67 +350,6 @@ public class ArtPipeline {
 		Log.message("simplify() end (was "+os+" is now "+ns+")");
 	}
 
-
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
-	protected void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
-		turtle.scale(1,-1);
-	}
-
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
-	protected void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
-		turtle.scale(-1,1);
-	}
-	
-	/**
-	 * Offers to resize your loaded image to fill the margins completely.
-	 * @param turtle
-	 * @param settings
-	 */
-	protected void fitToPaper(Turtle turtle, MakelangeloRobotSettings settings,boolean keepAspect) {
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
-		turtle.getBounds(top, bottom); // image bounds
-		
-		// find the scale
-		double iw = top.x-bottom.x; // image width
-		double ih = top.y-bottom.y; // image height
-		double pw = settings.getPaperRight()-settings.getPaperLeft();
-		double ph = settings.getPaperTop()-settings.getPaperBottom();
-		double px = (settings.getPaperRight()+settings.getPaperLeft())*0.5;
-		double py = (settings.getPaperTop()+settings.getPaperBottom())*0.5;
-		double ratioW=1,ratioH=1;
-		ratioH = ph/ih;
-		ratioW = pw/iw;
-		ratioH  *= (1-settings.getPaperMargin()*0.01);
-		ratioW  *= (1-settings.getPaperMargin()*0.01);
-		// use > to fill the page.
-		
-		// and the translation
-		double ix = (top.x+bottom.x)*0.5;
-		double iy = (top.y+bottom.y)*0.5;
-		
-		// and apply
-		turtle.translate(-ix,-iy);
-		if(keepAspect == true)
-		{
-			double ratio=Math.min(ratioW, ratioH);
-			turtle.scale(ratio,ratio);
-		}
-		else
-		{
-			turtle.scale(ratioW,ratioH);
-		}
-		turtle.translate(px,py);
-	}
-	
 	
 	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
 		double ang=settings.getRotation();
@@ -432,67 +366,6 @@ public class ArtPipeline {
 		}
 	}
 	
-	
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
-	protected void cropToPageMargin(Turtle turtle, MakelangeloRobotSettings settings) {
-		if(turtle==null) return;
-		
-		Log.message("cropTurtleToPageMargin() start");
-
-		ArrayList<TurtleMove> oldHistory = turtle.history;
-		turtle.history = new ArrayList<TurtleMove>();
-		
-		// limits we will need for rectangle
-		Point2D rMax = new Point2D(settings.getMarginRight(),settings.getMarginTop());
-		Point2D rMin = new Point2D(settings.getMarginLeft(),settings.getMarginBottom());
-		// working space for clipping
-		Point2D P0 = new Point2D(); 
-		Point2D P1 = new Point2D(); 
-		
-		TurtleMove prev=null;
-		
-		for( TurtleMove m : oldHistory ) {
-			if(prev!=null) {
-				P0.set(prev.x, prev.y);
-				P1.set(m.x, m.y);
-				boolean result = Clipper2D.clipLineToRectangle(P0,P1,rMax,rMin);
-				// !result means full crop, do nothing.
-				if(result) {
-					// partial crop.  Which end(s)?
-					boolean startCropped=MathHelper.lengthSquared(P0.x-prev.x, P0.y-prev.y)>1e-8;
-					boolean   endCropped=MathHelper.lengthSquared(P1.x-   m.x, P1.y-   m.y)>1e-8;
-					
-					if(startCropped && endCropped) {
-						// crosses rectangle, both ends out.
-						turtle.history.add(new TurtleMove(P0.x,P0.y,true));
-						turtle.history.add(m);
-						turtle.history.add(new TurtleMove(P1.x,P1.y,false));
-					} else if(!startCropped && !endCropped) {
-						turtle.history.add(m);
-					} else if(endCropped) {
-						// end cropped, leaving the rectangle
-						turtle.history.add(new TurtleMove(P1.x,P1.y,false));
-					} else {
-						// start cropped, coming back into rectangle
-						turtle.history.add(new TurtleMove(P0.x,P0.y,true));
-						turtle.history.add(m);
-					}
-				}
-			}
-			prev=m;
-		}
-		
-		// There may be some dumb travel moves left. (several travels in a row.)
-		
-		int oldSize= oldHistory.size();
-		int newSize= turtle.history.size();
-		Log.message("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
-	}
-
 	
 	/**
 	 * 
@@ -521,9 +394,9 @@ public class ArtPipeline {
 		turtle.lock();
 		try {
 			rotatePicture(turtle,settings);/*
-			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
-			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
-			if(shouldFlipV()) flipV(turtle,settings);
+			fitToPaper(turtle,settings,false);
+			fitToPaper(turtle,settings,true);
+			flipV(turtle,settings);
 			if(shouldFlipH()) flipH(turtle,settings);
 			if(shouldReorder()) reorder(turtle,settings);
 			if(shouldSimplify()) simplify(turtle,settings);
@@ -533,75 +406,5 @@ public class ArtPipeline {
 			turtle.unlock();
 			notifyListenersTurtleFinished(turtle);
 		}
-	}
-	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldResizeFill() {
-		if(myPanel!=null) return myPanel.shouldResizeFill();
-		int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldResizeFit() {
-		if(myPanel!=null) return myPanel.shouldResizeFit();
-		int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldReorder() {
-		if(myPanel!=null) return myPanel.shouldReorder();
-		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldFlipV() {
-		if(myPanel!=null) return myPanel.shouldFlipV();
-		int result = JOptionPane.showConfirmDialog(null, "Flip vertical?", "Flip", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldFlipH() {
-		if(myPanel!=null) return myPanel.shouldFlipH();
-		int result = JOptionPane.showConfirmDialog(null, "Flip horizonal?", "Flip", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldSimplify() {
-		if(myPanel!=null) return myPanel.shouldSimplify();
-		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
-	}
-	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldCrop() {
-		if(myPanel!=null) return myPanel.shouldCrop();
-		int result = JOptionPane.showConfirmDialog(null, "Crop to margins?", "Crop", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
 	}
 }

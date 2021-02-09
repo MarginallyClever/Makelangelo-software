@@ -10,6 +10,11 @@ import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
+/**
+ * Properties for a cartesian plotter.
+ * @author Dan Royer
+ *
+ */
 public class CartesianProperties extends Makelangelo2Properties {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm

@@ -17,7 +17,6 @@ import java.util.List;
 
 import javax.swing.*;
 
-import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.select.SelectButton;
@@ -29,7 +28,6 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog
 
 /**
  * Control panel for a Makelangelo robot
- *
  * @author Dan Royer
  * @author Peter Colapietro
  * @since 7.1.4
@@ -40,17 +38,17 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = -4703402918904039337L;
 
-	// god objects?
-	protected MakelangeloRobot robot;
-	protected Makelangelo makelangeloApp;
+	// the robot being controlled
+	private MakelangeloRobot robot;
+	
+	// the parent
+	private Makelangelo makelangeloApp;
 
 	// connect menu
 	private SelectPanel connectionPanel;
 	private SelectButton buttonConnect;
 	
 	// machine options
-	protected int generatorChoice = 0;
-	
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
 	private JButton buttonOpenSettings;
@@ -67,11 +65,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	private SelectButton goPaperBorder,penUp,penDown;
 	private SelectButton toggleEngagedMotor;
 
-	// pipeline controls
-	private ArtPipelinePanel myArtPipelinePanel;
+	private boolean isConnected;
 	
-	private boolean isConnected;  // has pressed connect button
-	
+	// progress bar, line count, time estimate 
 	public StatusBar statusBar;
 
 	/**
@@ -104,7 +100,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		con1.gridy++;
 
 		add(createAxisDrivingControls(),con1);		con1.gridy++;
-		add(createArtPipelinePanel(),con1);			con1.gridy++;
 		add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
@@ -291,14 +286,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 	
 
-	private CollapsiblePanel createArtPipelinePanel() {
-		myArtPipelinePanel = new ArtPipelinePanel(makelangeloApp.getMainFrame());
-		myArtPipelinePanel.setPipeline(robot.getPipeline());
-		
-		return myArtPipelinePanel;
-	}
-	
-	
 	private CollapsiblePanel createAxisDrivingControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
 		JPanel driveInterior = drivePanel.getContentPane();
@@ -414,7 +401,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 				m.run();
 				// we can only get here if the robot is connected and not running.
 				// Save the gcode so that updates to settings are applied immediately + automatically.
-				robot.saveCurrentTurtleToDrawing();
+				robot.saveCurrentTurtlesToDrawing();
 			}
 		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
@@ -461,19 +448,20 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 
 	protected void startAt() {
 		StartAtPanel p = new StartAtPanel();
-		if(p.run(makelangeloApp.getMainFrame())==false) return;
-
-		int lineNumber = p.lineNumber;
-		if (lineNumber != -1) {
-			if(p.findPreviousPenDown==false) {
-				robot.drawingProgress=lineNumber;
-				if(p.addPenDownCommand==true) {
-					robot.sendLineToRobot(robot.getSettings().getPenDownString());
+		if(p.run(makelangeloApp.getMainFrame())) {
+			// user hit ok
+			int lineNumber = p.lineNumber;
+			if (lineNumber != -1) {
+				if(p.findPreviousPenDown==false) {
+					robot.drawingProgress=lineNumber;
+					if(p.addPenDownCommand==true) {
+						robot.sendLineToRobot(robot.getSettings().getPenDownString());
+					}
+					robot.startAt(lineNumber);
+				} else {
+					int lineBefore = robot.findLastPenUpBefore(lineNumber);
+					robot.startAt(lineBefore);
 				}
-				robot.startAt(lineNumber);
-			} else {
-				int lineBefore = robot.findLastPenUpBefore(lineNumber);
-				robot.startAt(lineBefore);
 			}
 		}
 	}
