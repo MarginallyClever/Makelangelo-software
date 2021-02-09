@@ -21,9 +21,10 @@ public class NodeConnectorTransformedImage extends NodeConnector<TransformedImag
 
 	@Override
 	public Select getSelect() {
-		// TODO in read-only mode, show a thumbnail.
-		// TODO in read/write mode, show a thumbnail AND a file selection dialog.
+		// TODO in read-only mode, show a thumbnail?
+		// TODO in read/write mode, show a thumbnail? AND a file selection dialog.
 		// TODO SelectTransformedImage(label,source filename)
+		
 		return new SelectReadOnlyText("TransformedImage "+getName());
 	}
 }
