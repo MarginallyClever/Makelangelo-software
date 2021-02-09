@@ -59,6 +59,7 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
@@ -81,6 +82,7 @@ import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobotListener;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangelo.robot.PiCaptureAction;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettingsListener;
 import com.marginallyclever.util.PreferencesHelper;
@@ -131,6 +133,8 @@ public final class Makelangelo extends TransferHandler
 	
 	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
+	
+	private PiCaptureAction piCameraCaptureAction;
 	
 	public static void main(String[] argv) throws Exception {
 		Log.start();
@@ -188,6 +192,12 @@ public final class Makelangelo extends TransferHandler
 	}
 	
 	public void runHeadFirst() {
+		try {
+			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("MenuCaptureImage"));	
+		} catch (FailedToRunRaspistillException e) {
+			Log.message("Raspistill unavailable.");
+		}
+
 		createAppWindow();
 		
 		checkSharingPermission();
@@ -234,10 +244,22 @@ public final class Makelangelo extends TransferHandler
 			buttonNew.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					// TODO add confirm here, just to be safe.
 					myTurtles.clear();
 				}
 			});
 			menu.add(buttonNew);
+			
+			JMenuItem buttonSave = new JMenuItem(Translator.get("Makelangelo.action.save"));
+			buttonSave.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					saveFile();	
+				}
+			});
+			menu.add(buttonSave);
+
+			menu.addSeparator();
 			
 			JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
 			buttonAdjustPreferences.addActionListener(new ActionListener() {
@@ -316,6 +338,11 @@ public final class Makelangelo extends TransferHandler
 				});
 			}
 		}
+
+		if (piCameraCaptureAction != null) {
+			JMenu item = new JMenu(piCameraCaptureAction);
+            menuBar.add(item);
+        }
 		
 		// view menu
 		{
@@ -844,9 +871,10 @@ public final class Makelangelo extends TransferHandler
 	}
 	
 	public void saveFile() {
-		// list all the known savable file types.
+		// list all the known file types that I can save.
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
+		
 		ServiceLoader<LoadAndSaveFile> imageSavers = ServiceLoader.load(LoadAndSaveFile.class);
 		for( LoadAndSaveFile lft : imageSavers ) {
 			if(lft.canSave()) {

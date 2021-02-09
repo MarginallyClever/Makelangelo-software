@@ -20,17 +20,12 @@ import javax.swing.*;
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.communications.NetworkConnection;
-import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
-import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
-import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 
 /**
  * Control panel for a Makelangelo robot
@@ -60,11 +55,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	private JComboBox<String> machineChoices;
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
-	
-	private SelectButton buttonSaveFile;
-
-	private PiCaptureAction piCameraCaptureAction;
-	private SelectButton buttonCapture;
 
     // live controls
     protected SelectButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
@@ -113,15 +103,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		try {
-			piCameraCaptureAction = new PiCaptureAction(gui, Translator.get("MenuCaptureImage"));	
-		} catch (FailedToRunRaspistillException e) {
-			Log.message("Raspistill unavailable.");
-		}
-
 		add(createAxisDrivingControls(),con1);		con1.gridy++;
-		add(createCommonDriveControls(),con1);		con1.gridy++;
-		add(createCreativeControlPanel(), con1);	con1.gridy++;
 		add(createArtPipelinePanel(),con1);			con1.gridy++;
 		add(createAnimationPanel(),con1);			con1.gridy++;
 
@@ -207,22 +189,79 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuAnimate"));
 		SelectPanel animationInterior = animationPanel.getContentPane();
 		
+		goPaperBorder = new SelectButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
+		animationInterior.add(goPaperBorder);
+		
+		penUp    = new SelectButton(Translator.get("PenUp"));
+		animationInterior.add(penUp);
+		penUp.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.raisePen();
+			}
+		});
+		
+		penDown  = new SelectButton(Translator.get("PenDown"));
+		animationInterior.add(penDown);
+		penDown.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.lowerPen();
+			}
+		});
+		
+		
+		goHome   = new SelectButton(Translator.get("GoHome"));
+		animationInterior.add(goHome);
+		goHome.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.goHome();	
+			}
+		});
+		
+		findHome = new SelectButton(Translator.get("FindHome"));
+		animationInterior.add(findHome);
+		findHome.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				robot.findHome();
+			}
+		});
+		
+		toggleEngagedMotor = new SelectButton(Translator.get("DisengageMotors"));
+		animationInterior.add(toggleEngagedMotor);
+		toggleEngagedMotor.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(robot.areMotorsEngaged() ) {
+					robot.disengageMotors();
+				} else {
+					robot.engageMotors();
+				}
+			}
+		});
+		
 		buttonStart = new SelectButton(Translator.get("Start"));
-		buttonStartAt = new SelectButton(Translator.get("StartAtLine"));
-		buttonPause = new SelectButton(Translator.get("Pause"));
-		buttonHalt = new SelectButton(Translator.get("Halt"));
+		animationInterior.add(buttonStart);
 		buttonStart.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.startAt(0);
 			}
 		});
+		
+		buttonStartAt = new SelectButton(Translator.get("StartAtLine"));
+		animationInterior.add(buttonStartAt);
 		buttonStartAt.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				startAt();
 			}
 		});
+		
+		buttonPause = new SelectButton(Translator.get("Pause"));
+		animationInterior.add(buttonPause);
 		buttonPause.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -237,6 +276,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 				}
 			}
 		});
+		
+		buttonHalt = new SelectButton(Translator.get("Halt"));
+		animationInterior.add(buttonHalt);
 		buttonHalt.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -244,10 +286,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			}
 		});
 
-		animationInterior.add(buttonStart);
-		animationInterior.add(buttonStartAt);
-		animationInterior.add(buttonPause);
-		animationInterior.add(buttonHalt);
 		
 		return animationPanel;
 	}
@@ -260,30 +298,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		return myArtPipelinePanel;
 	}
 	
-	private JPanel createCreativeControlPanel() {
-		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
-		SelectPanel panel = creativeControlPanel.getContentPane();
-
-		// TODO move to main menu?
-		if (piCameraCaptureAction != null) {
-            buttonCapture = new SelectButton(piCameraCaptureAction);
-            panel.add(buttonCapture);
-        } else {
-        	buttonCapture = null;
-        }
-		
-		// TODO move to file menu?
-		buttonSaveFile = new SelectButton(Translator.get("MenuSaveGCODEAs"));
-		panel.add(buttonSaveFile);
-		buttonSaveFile.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				makelangeloApp.saveFile();	
-			}
-		});
-		
-		return creativeControlPanel;
-	}
 	
 	private CollapsiblePanel createAxisDrivingControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
@@ -342,66 +356,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		return drivePanel;
 	}
 	
-	private JPanel createCommonDriveControls() {
-		CollapsiblePanel commonControlsPanel = new CollapsiblePanel(Translator.get("MenuCommonDriveControls"));
-		SelectPanel commonInterior = commonControlsPanel.getContentPane();
 
-		goPaperBorder = new SelectButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
-		penUp    = new SelectButton(Translator.get("PenUp"));
-		penDown  = new SelectButton(Translator.get("PenDown"));
-		goHome   = new SelectButton(Translator.get("GoHome"));
-		findHome = new SelectButton(Translator.get("FindHome"));
-		toggleEngagedMotor = new SelectButton(Translator.get("DisengageMotors"));
-		
-		commonInterior.add(goPaperBorder);
-		commonInterior.add(toggleEngagedMotor);
-		commonInterior.add(penUp);
-		commonInterior.add(penDown);
-		commonInterior.add(goHome);
-		commonInterior.add(findHome);
-		
-		toggleEngagedMotor.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				if(robot.areMotorsEngaged() ) {
-					robot.disengageMotors();
-				} else {
-					robot.engageMotors();
-				}
-			}
-		});
-		penUp.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				robot.raisePen();
-			}
-		});
-		penDown.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				robot.lowerPen();
-			}
-		});
-		
-		goHome.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				robot.goHome();	
-			}
-		});
-		findHome.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				robot.findHome();
-			}
-		});
-
-		commonControlsPanel.setCollapsed(true);
-		
-		return commonControlsPanel;
-	}
-
-	
 	/**
 	 * Refresh the list of available known machines. 
 	 * If we are connected to a machine, select that machine number and disable the ability to change selection.
@@ -554,9 +509,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		}
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
-		if(buttonCapture != null) {
-            buttonCapture.setEnabled(!isRunning);
-        }
 
 		down100.setEnabled(isConfirmed && !isRunning);
 		down10.setEnabled(isConfirmed && !isRunning);
@@ -579,34 +531,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
-
-		buttonSaveFile.setEnabled(robot!=null);
 		
 		this.validate();
-	}
-	
-		
-	/**
-	 * restart the Generator
-	 * @param chosenGenerator
-	 * @param t
-	 */
-	private void regenerate(Node chosenGenerator,Turtle t) {
-		robot.setDecorator(chosenGenerator);
-		
-		// do the work
-		t.reset();
-		chosenGenerator.iterate();
-		
-		robot.setDecorator(null);
-		
-		Log.message(Translator.get("Finished"));
-		SoundSystem.playConversionFinishedSound();
-		updateButtonAccess();
-	}
-
-
-	public Makelangelo getGui() {
-		return makelangeloApp;
 	}
 }
