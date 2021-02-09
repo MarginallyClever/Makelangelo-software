@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.robot;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -16,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import javax.swing.*;
 
@@ -25,7 +22,6 @@ import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.turtle.Turtle;
@@ -65,7 +61,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private SelectButton buttonNewFile, buttonOpenFile, buttonReopenFile, buttonGenerate, buttonSaveFile;
+	private SelectButton buttonSaveFile;
 
 	private PiCaptureAction piCameraCaptureAction;
 	private SelectButton buttonCapture;
@@ -268,7 +264,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
 		SelectPanel panel = creativeControlPanel.getContentPane();
 
-
+		// TODO move to main menu?
 		if (piCameraCaptureAction != null) {
             buttonCapture = new SelectButton(piCameraCaptureAction);
             panel.add(buttonCapture);
@@ -276,43 +272,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
         	buttonCapture = null;
         }
 		
-
-		buttonNewFile = new SelectButton(Translator.get("MenuNewFile"));
-		panel.add(buttonNewFile);
-		buttonNewFile.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				newFile();
-			}
-		});
-		
-		buttonOpenFile = new SelectButton(Translator.get("MenuOpenFile"));
-		panel.add(buttonOpenFile);
-		buttonOpenFile.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				makelangeloApp.openFile();
-			}
-		});
-		
-		buttonReopenFile = new SelectButton(Translator.get("MenuReopenFile"));
-		panel.add(buttonReopenFile);
-		buttonReopenFile.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				makelangeloApp.reopenLastFile();
-			}
-		});
-
-		buttonGenerate = new SelectButton(Translator.get("MenuGenerate"));
-		panel.add(buttonGenerate);
-		buttonGenerate.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				generateImage();
-			}
-		});
-
+		// TODO move to file menu?
 		buttonSaveFile = new SelectButton(Translator.get("MenuSaveGCODEAs"));
 		panel.add(buttonSaveFile);
 		buttonSaveFile.addPropertyChangeListener(new PropertyChangeListener() {
@@ -582,9 +542,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			didSetHome = robot.didSetHome();
 		}
 		
-		if (buttonGenerate != null)
-			buttonGenerate.setEnabled(!isRunning);
-
 		buttonOpenSettings.setEnabled(!isRunning);
 
 		buttonStart.setEnabled(isConfirmed && didSetHome && !isRunning);
@@ -597,13 +554,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		}
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
-		buttonNewFile.setEnabled(!isRunning);
 		if(buttonCapture != null) {
             buttonCapture.setEnabled(!isRunning);
         }
-		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && !makelangeloApp.getLastFileIn().isEmpty());
-		buttonGenerate.setEnabled(!isRunning);
 
 		down100.setEnabled(isConfirmed && !isRunning);
 		down10.setEnabled(isConfirmed && !isRunning);
@@ -632,79 +585,13 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		this.validate();
 	}
 	
-
-	private void newFile() {
-		Turtle t = makelangeloApp.getSelectedTurtle();
-		t.reset();
-		robot.setTurtles( new ArrayList<Turtle>() );
-		updateButtonAccess();
-	}
-	
-	private void generateImage() {
-		// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-
-		JPanel cards = new JPanel(new CardLayout());
-		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
-		int i=0;
-		for( Node ici : imageGenerators ) {
-			cards.add(new NodePanel(ici),ici.getName());
-			i++;
-		}
 		
-		String[] imageGeneratorNames = new String[i];
-		
-		i=0;
-		for( Node f : imageGenerators ) {
-			imageGeneratorNames[i++] = f.getName();
-		}
-
-		final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
-		panel.add(options,BorderLayout.PAGE_START);
-		panel.add(cards,BorderLayout.CENTER);
-
-		options.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-			    CardLayout cl = (CardLayout)(cards.getLayout());
-			    cl.show(cards, (String)e.getItem());
-			    
-				changeGeneratorPanel(options.getSelectedIndex());
-			}
-		});
-		options.setSelectedIndex(generatorChoice);
-		
-		
-		JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("MenuGenerate"));
-		dialog.add(panel);
-		dialog.pack();
-		dialog.setVisible(true);
-		// other app buttons are still accessible.
-	}
-
-	private void changeGeneratorPanel(int index) {
-		Turtle t = makelangeloApp.getSelectedTurtle();
-		
-		Node chosenGenerator = getGenerator(index);
-		NodePanel chosenGeneratorPanel = new NodePanel(chosenGenerator);
-		if(chosenGeneratorPanel!=null) {
-			Log.message("Generator="+chosenGenerator.getName());
-			JPanel p = chosenGeneratorPanel.getInteriorPanel();
-			p.setBorder(BorderFactory.createLineBorder(Color.RED));
-			try {
-				regenerate(chosenGenerator,t);
-			} catch(Exception e){}
-		}
-	}
-	
-	
 	/**
 	 * restart the Generator
 	 * @param chosenGenerator
 	 * @param t
 	 */
-	public void regenerate(Node chosenGenerator,Turtle t) {
+	private void regenerate(Node chosenGenerator,Turtle t) {
 		robot.setDecorator(chosenGenerator);
 		
 		// do the work
@@ -718,18 +605,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		updateButtonAccess();
 	}
 
-	private Node getGenerator(int arg0) throws IndexOutOfBoundsException {
-		ServiceLoader<Node> imageGenerators = ServiceLoader.load(Node.class);
-		int i=0;
-		for( Node chosenGenerator : imageGenerators ) {
-			if(i==arg0) {
-				return chosenGenerator;
-			}
-			i++;
-		}
-		
-		throw new IndexOutOfBoundsException();
-	}
 
 	public Makelangelo getGui() {
 		return makelangeloApp;

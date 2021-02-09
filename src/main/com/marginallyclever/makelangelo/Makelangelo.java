@@ -1,11 +1,19 @@
 package com.marginallyclever.makelangelo;
 /**
  * @(#)Makelangelo.java drawbot application with GUI
+ * 
+ * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
+ * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
+ * 
+ * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (TurtleGenerators), or 
+ * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA) into vectors (ImageConverters).
+ * 
+ * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
+ * the mark on the paper.  This knowledge helps the app to create better gcode.  
+ * 
  * @author Dan Royer (dan@marginallyclever.com)
  * @version 1.00 2012/2/28
  */
-
-// io functions
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -53,7 +61,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
+import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
@@ -77,15 +87,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
 /**
- * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
- * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
- * 
- * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (TurtleGenerators), or 
- * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA) into vectors (ImageConverters).
- * 
- * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
- * the mark on the paper.  This knowledge helps the app to create better gcode.  
- * 
+ * Main entry point into the Makelangelo application.
  * @author Dan Royer
  * @since 0.0.1
  */
@@ -228,6 +230,15 @@ public final class Makelangelo extends TransferHandler
 			menu = new JMenu(Translator.get("MenuMakelangelo"));
 			menuBar.add(menu);
 	
+			JMenuItem buttonNew = new JMenuItem(Translator.get("Makelangelo.action.new"));
+			buttonNew.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					myTurtles.clear();
+				}
+			});
+			menu.add(buttonNew);
+			
 			JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
 			buttonAdjustPreferences.addActionListener(new ActionListener() {
 				@Override
@@ -258,6 +269,53 @@ public final class Makelangelo extends TransferHandler
 			menu.add(buttonExit);
 		}
 
+		// generate
+		{
+			Log.message("  convert...");
+			menu = new JMenu(Translator.get("Makelangelo.menuGenerate"));
+			menuBar.add(menu);
+			
+			ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
+			for( TurtleGenerator g : service ) {
+				JMenuItem item = new JMenuItem(Translator.get(g.getName()));
+				// TODO add tooltip text?
+				menu.add(item);
+				item.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						myTurtles.clear();
+						// add the generator to the pool
+						// TODO display the generator panel
+						
+						// @see makelangeloApp.openFile();
+					}
+				});
+			}
+		}
+
+		// convert
+		{
+			Log.message("  convert...");
+			menu = new JMenu(Translator.get("Makelangelo.menuConvert"));
+			menuBar.add(menu);
+			
+			ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
+			for( ImageConverter g : service ) {
+				JMenuItem item = new JMenuItem(Translator.get(g.getName()));
+				// TODO add tooltip text?
+				menu.add(item);
+				item.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						myTurtles.clear();
+						// add the converter to the pool
+						// TODO display the converter panel
+						
+						// @see robot.generateImage();
+					}
+				});
+			}
+		}
 		
 		// view menu
 		{
@@ -405,19 +463,19 @@ public final class Makelangelo extends TransferHandler
 				int comp = line2.compareTo(VERSION);
 				String results;
 				if (comp > 0) {
-					results = Translator.get("UpdateNotice");
-					// TODO downloadUthatpdate(), flashNewFirmwareToRobot();
+					results = Translator.get("Makelangelo.updateNotice");
+					// TODO downloadUpdate(), updateThisApp();
 				} else if (comp < 0)
 					results = "This version is from the future?!";
 				else
-					results = Translator.get("UpToDate");
+					results = Translator.get("Makelangelo.upToDate");
 
 				JOptionPane.showMessageDialog(mainFrame, results);
 			}
 			in.close();
 		} catch (Exception e) {
 			if (announceIfFailure) {
-				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed"));
+				JOptionPane.showMessageDialog(null, Translator.get("Makelangelo.updateCheckFailed"));
 			}
 			e.printStackTrace();
 		}
