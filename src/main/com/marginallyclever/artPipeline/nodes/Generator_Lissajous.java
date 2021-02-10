@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
- * See https://linuxgazette.net/133/luana.html
+ * @see <a href='https://linuxgazette.net/133/luana.html'>https://linuxgazette.net/133/luana.html</a>
  * @author Dan Royer
  *
  */
@@ -18,9 +18,9 @@ public class Generator_Lissajous extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorInt inputA = new NodeConnectorInt("Generator_Lissajous.inputA",200);
 	// controls complexity of curve
-	private NodeConnectorInt inputB = new NodeConnectorInt("Generator_Lissajous.inpuinputBtDelta",200);
+	private NodeConnectorInt inputB = new NodeConnectorInt("Generator_Lissajous.inputB",200);
 	// quality of curve
-	private NodeConnectorInt inputSamples = new NodeConnectorInt("Generator_Lissajous.inputSamples",2000);
+	private NodeConnectorInt inputSamples = new NodeConnectorInt("Generator_Lissajous.inputSamples",10000);
 	
 	// scale the step size so the curve fits on the paper
 	// TODO make parameter?
@@ -28,11 +28,12 @@ public class Generator_Lissajous extends TurtleGenerator {
 
 	private double delta;
 	private double a,b;
-	private int numSamples = 2000;
+	private int numSamples;
 
 	
 	public Generator_Lissajous() {
 		super();
+		inputs.add(inputDelta);
 		inputs.add(inputA);
 		inputs.add(inputB);
 		inputs.add(inputSamples);
@@ -66,9 +67,10 @@ public class Generator_Lissajous extends TurtleGenerator {
 		//x = AX*sin(a*t + delta) + screen_width/2;
 		//y = BX*sin(b*t) + screen_height/2;
 		turtle.reset();
+		numSamples = inputSamples.getValue();
 		
 		for(int t1=0; t1<=numSamples; ++t1) {
-			t = ( Math.PI*2.0 * t1 / (double)numSamples );
+			t = ( Math.PI*2.0 * (double)t1 / (double)numSamples );
 			
 			x = WIDTH * Math.sin(a*t + delta*Math.PI);
 			y = HEIGHT * Math.sin(b*t);

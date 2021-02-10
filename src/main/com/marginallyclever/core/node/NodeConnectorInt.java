@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectInteger;
 
@@ -19,6 +22,14 @@ public class NodeConnectorInt extends NodeConnector<Integer> {
 
 	@Override
 	public Select getSelect() {
-		return new SelectInteger(this.getName(),this.getValue());
+		SelectInteger s = new SelectInteger(this.getName(),this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((int)evt.getNewValue());
+			}
+		});
+		return s;
 	}
 }

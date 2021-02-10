@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectDouble;
 
@@ -19,6 +22,14 @@ public class NodeConnectorDouble extends NodeConnector<Double> {
 
 	@Override
 	public Select getSelect() {
-		return new SelectDouble(this.getName(),this.getValue());
+		SelectDouble s = new SelectDouble(this.getName(),this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((double)evt.getNewValue());
+			}
+		});
+		return s;
 	}
 }

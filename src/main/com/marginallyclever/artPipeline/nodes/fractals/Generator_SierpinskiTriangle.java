@@ -1,6 +1,7 @@
 package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorInt;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -13,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorInt("Generator_SierpinskiTriangle.inputOrder",4);
+	private NodeConnectorInt inputOrder = new NodeConnectorBoundedInt("Generator_SierpinskiTriangle.inputOrder",15,1,4);
 	
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;

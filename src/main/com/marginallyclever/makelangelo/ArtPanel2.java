@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -22,13 +23,13 @@ import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
 
 public class ArtPanel2 {
-	protected JFrame parentFrame;
+	protected Frame parentFrame;
 	
 	public ArtPanel2() {
 		super();
 	}
 	
-	public JPanel buildPanel(JFrame frame) {
+	public JPanel buildPanel(Frame frame) {
 		parentFrame = frame;
 		
 		JPanel rootPanel = new JPanel();

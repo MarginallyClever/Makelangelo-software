@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.preferences;
 
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -17,7 +18,6 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -32,7 +32,7 @@ public class MakelangeloAppPreferences {
 		super();
 	}
 	
-	public void run(JFrame frame) {
+	public void run(Frame frame) {
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();  
 		c.gridx=0;
@@ -98,7 +98,7 @@ public class MakelangeloAppPreferences {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void exportPreferences(JFrame frame) {
+	private void exportPreferences(Frame frame) {
 		final JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showSaveDialog(frame);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -114,7 +114,7 @@ public class MakelangeloAppPreferences {
 	
 
 	@SuppressWarnings("deprecation")
-	private void importPreferences(JFrame frame) {
+	private void importPreferences(Frame frame) {
 		final JFileChooser fc = new JFileChooser();
 		int returnVal = fc.showOpenDialog(frame);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -132,7 +132,7 @@ public class MakelangeloAppPreferences {
 	
 
 	@SuppressWarnings("deprecation")
-	private void resetPreferences(JFrame frame) {
+	private void resetPreferences(Frame frame) {
 		int dialogResult = JOptionPane.showConfirmDialog(frame, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
 		if(dialogResult == JOptionPane.YES_OPTION){
 			try {

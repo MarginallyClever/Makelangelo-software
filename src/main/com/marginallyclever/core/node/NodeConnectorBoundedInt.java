@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectSlider;
 
@@ -29,7 +32,15 @@ public class NodeConnectorBoundedInt extends NodeConnectorInt {
 
 	@Override
 	public Select getSelect() {
-		return new SelectSlider(this.getName(),rangeTop,rangeBottom,this.getValue());
+		SelectSlider s = new SelectSlider(this.getName(),rangeTop,rangeBottom,this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((int)evt.getNewValue());
+			}
+		});
+		return s;
 	}
 	
 	public int getRangeTop() {

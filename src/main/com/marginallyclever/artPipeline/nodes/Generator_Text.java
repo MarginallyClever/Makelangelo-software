@@ -283,7 +283,10 @@ public class Generator_Text extends TurtleGenerator {
 		//textFindCharsPerLine(100);
 		//textSetAlign(AlignH.CENTER);
 		//textSetVAlign(AlignV.MIDDLE);
-		writeBeautifulMessage(turtle,fontNames[lastFont],inputFontPointSize.getValue(),inputMessage.getValue());
+		String myMessage = inputMessage.getValue();
+		if( myMessage != null ) {
+			writeBeautifulMessage(turtle,fontNames[lastFont],inputFontPointSize.getValue(),myMessage);
+		}
 
 		outputTurtle.setValue(turtle);
 		

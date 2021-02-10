@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.makelangelo.Translator;
@@ -25,9 +28,17 @@ public class NodeConnectorAngle extends NodeConnectorDouble {
 		
 	@Override
 	public Select getSelect() {
+		SelectDouble s = new SelectDouble(this.getName(),this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((double)evt.getNewValue());
+			}
+		});
 		// TODO a fancy version with a dial that can be turned?
 		// TODO a slider for doubles?
-		return new SelectDouble(this.getName(),this.getValue());
+		return s;
 	}
 	
 	@Override

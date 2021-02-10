@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.core.select.Select;
@@ -23,6 +26,14 @@ public class NodeConnectorExistingFile extends NodeConnectorString {
 
 	@Override
 	public Select getSelect() {
-		return new SelectFile(this.getName(),myFilter,this.getValue());
+		SelectFile s = new SelectFile(this.getName(),myFilter,this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((String)evt.getNewValue());
+			}
+		});
+		return s;
 	}
 }

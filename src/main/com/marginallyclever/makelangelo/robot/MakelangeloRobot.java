@@ -793,7 +793,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		Log.message("New method "+printTimeEstimate(newEstimate));
 		
 		// show results
-		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
+		if( myPanel != null ) {
+			myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
+		}
 	}
 	
 	protected String printTimeEstimate(double seconds) {

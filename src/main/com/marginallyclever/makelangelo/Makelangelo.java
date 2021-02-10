@@ -45,7 +45,6 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -76,7 +75,6 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
-import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
@@ -145,7 +143,7 @@ public final class Makelangelo extends TransferHandler
 		Makelangelo makelangeloProgram = new Makelangelo();
 		
 		if(GraphicsEnvironment.isHeadless()) {
-			// TODO 
+			// TODO a text-only interface?
 		} else {
 			// Schedule a job for the event-dispatching thread:
 			// creating and showing this application's GUI.
@@ -304,25 +302,44 @@ public final class Makelangelo extends TransferHandler
 			menuBar.add(menu);
 			
 			ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
-			for( TurtleGenerator g : service ) {
-				JMenuItem item = new JMenuItem(g.getName());
+			for( TurtleGenerator node : service ) {
+				JMenuItem item = new JMenuItem(node.getName());
 				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						newFile();
+						menuBar.setEnabled(false);
+						
 						// TODO add the generator to the pool
 						
-						// display the generator panel
-						JDialog dialog = new JDialog(getMainFrame(),g.getName());
-						NodePanel np = new NodePanel(g);
-						np.buildPanel();
-						dialog.add(np);
-						dialog.pack();
-						dialog.setVisible(true);
-						
+						// display the panel
+						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+						dialog.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								System.out.println("Notice received");
+
+								myTurtles.clear();
+
+								for(NodeConnector<?> nc : node.outputs ) {
+									System.out.println("Node output "+nc.getClass().getSimpleName());
+									if(nc instanceof NodeConnectorTurtle) {
+										myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+									}
+								}
+								
+								if(myTurtles.size()>0) {
+									robot.setTurtles(myTurtles);
+								} else {
+									System.out.println("No turtles found!");
+								}
+							}
+						});
+						dialog.run();
 						// @see makelangeloApp.openFile();
+						
+						menuBar.setEnabled(true);
 					}
 				});
 			}
@@ -335,24 +352,42 @@ public final class Makelangelo extends TransferHandler
 			menuBar.add(menu);
 			
 			ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
-			for( ImageConverter g : service ) {
-				JMenuItem item = new JMenuItem(g.getName());
+			for( ImageConverter node : service ) {
+				JMenuItem item = new JMenuItem(node.getName());
 				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						newFile();
-						// add the converter to the pool
-						// display the converter panel
-						JDialog dialog = new JDialog(getMainFrame(),g.getName());
-						NodePanel np = new NodePanel(g);
-						np.buildPanel();
-						dialog.add(np);
-						dialog.pack();
-						dialog.setVisible(true);
+						menuBar.setEnabled(false);
 						
-						// @see robot.generateImage();
+						// add the converter to the pool
+						// display the panel
+						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+						dialog.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								System.out.println("Notice received");
+
+								myTurtles.clear();
+								
+								for(NodeConnector<?> nc : node.outputs ) {
+									System.out.println("Node output "+nc.getClass().getSimpleName());
+									if(nc instanceof NodeConnectorTurtle) {
+										myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+									}
+								}
+								
+								if(myTurtles.size()>0) {
+									robot.setTurtles(myTurtles);
+								} else {
+									System.out.println("No turtles found!");
+								}
+							}
+						});
+						dialog.run();
+						
+						menuBar.setEnabled(true);
 					}
 				});
 			}
@@ -545,8 +580,7 @@ public final class Makelangelo extends TransferHandler
 		try {
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
-			conn.setInstanceFollowRedirects(false); // you still need to handle
-													// redirect manully.
+			conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
 			HttpURLConnection.setFollowRedirects(false);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 

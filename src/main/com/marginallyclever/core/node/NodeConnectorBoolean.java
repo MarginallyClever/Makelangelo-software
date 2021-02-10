@@ -1,5 +1,8 @@
 package com.marginallyclever.core.node;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectBoolean;
 
@@ -19,6 +22,14 @@ public class NodeConnectorBoolean extends NodeConnector<Boolean> {
 
 	@Override
 	public Select getSelect() {
-		return new SelectBoolean(this.getName(),this.getValue());
+		SelectBoolean s = new SelectBoolean(this.getName(),this.getValue());
+		s.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				setValue((boolean)evt.getNewValue());
+			}
+		});
+		return s;
 	}
 }
