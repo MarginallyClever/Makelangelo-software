@@ -3,7 +3,8 @@ package com.marginallyclever.artPipeline.nodes;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
+import com.marginallyclever.core.node.NodeConnectorOneOfMany;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -13,21 +14,21 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Sandy extends ImageConverter {
-	// pass height
-	private NodeConnectorInt inputBlockScale = new NodeConnectorInt("Converter_Sandy.inputBlockScale",150);
-		
-	private static int direction=0;
 	private String [] directionChoices = new String[] { 
-		Translator.get("top right"),
-		Translator.get("top left"), 
-		Translator.get("bottom left"), 
-		Translator.get("bottom right"), 
-		Translator.get("center")
+		Translator.get("Converter_Sandy.inputDirection.topRight"),
+		Translator.get("Converter_Sandy.inputDirection.topLeft"), 
+		Translator.get("Converter_Sandy.inputDirection.bottomLeft"), 
+		Translator.get("Converter_Sandy.inputDirection.bottomRight"), 
+		Translator.get("Converter_Sandy.inputDirection.center")
 	};
+
+	private NodeConnectorInteger inputBlockScale = new NodeConnectorInteger("Converter_Sandy.inputBlockScale",150);
+	private NodeConnectorOneOfMany inputDirection = new NodeConnectorOneOfMany("Converter_Sandy.inputDirection",directionChoices,0);
 	
 	public Converter_Sandy() {
 		super();
 		inputs.add(inputBlockScale);
+		inputs.add(inputDirection);
 	}
 		
 	@Override
@@ -61,7 +62,7 @@ public class Converter_Sandy extends ImageConverter {
 
 		boolean wasDrawing=false;
 		
-		switch(direction) {
+		switch(inputDirection.getValue()) {
 		case 0:		cx = xRight;	cy = yTop;		last_x = pRight; 	last_y = pTop;		break;
 		case 1:		cx = xLeft;		cy = yTop;		last_x = pLeft; 	last_y = pTop;		break;
 		case 2:		cx = xLeft;		cy = yBottom;	last_x = pLeft; 	last_y = pBottom;	break;

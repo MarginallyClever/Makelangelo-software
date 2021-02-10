@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 /**
- * Base class for all Select.  A Select is a UI panel item the user can control.
- * This system provides consistent look and behavior across all elements in the app.
+ * Base class for all {@link Select}.  A {@link Select} is a UI panel item with whom the user can interact.
+ * This system provides consistent look and behavior across all elements in the app.  A {@link SelectPanel}
+ * filled with {@link Select} should look and behave consistently.
  * @author Dan Royer
  * @since 7.24.0
  */

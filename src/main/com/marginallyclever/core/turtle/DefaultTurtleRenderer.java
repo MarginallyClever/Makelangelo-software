@@ -18,13 +18,13 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public float lineWidth=1;
 	public float[] lineWidthBuf = new float[1];
 	
-	public DefaultTurtleRenderer(GL2 gl2) {
+	public DefaultTurtleRenderer(GL2 gl2, boolean showPenUp) {
 		this.gl2=gl2;
+		this.showPenUp=showPenUp;
 	}
 	
 	@Override
 	public void start() {
-		showPenUp = GFXPreferences.getShowPenUp();
 		//colorTravel.set(settings.getPenUpColor());
 		//colorDraw.set(settings.getPenDownColorDefault());
 		float penDiameter = 0.8f;//settings.getPenDiameter();

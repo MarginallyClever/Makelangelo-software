@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Converter_RandomLines extends ImageConverter {
 	// number of graduated passes. >=1
-	private NodeConnectorInt inputLines = new NodeConnectorInt("Converter_Multipass.inputLines",2500);
+	private NodeConnectorInteger inputLines = new NodeConnectorInteger("Converter_Multipass.inputLines",2500);
 	
 	public Converter_RandomLines() {
 		super();

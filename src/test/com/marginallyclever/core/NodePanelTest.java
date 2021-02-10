@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
@@ -25,11 +25,10 @@ public class NodePanelTest {
 	 * frame > 
 	 *   cards > one card for each {@link NodePanel#NodePanel(Node)}
 	 *   combo box > {@link Node#getName()}
-	 * Do not automate this test.
-	 * @throws Exception
+	 * Confirms that all node panels can be created.
 	 */
 	@Test
-	public void testOnePanel() throws Exception {
+	public void testOnePanel() {
 		System.out.println("testOnePanel() start");
 		Log.start();
 		Translator.start();

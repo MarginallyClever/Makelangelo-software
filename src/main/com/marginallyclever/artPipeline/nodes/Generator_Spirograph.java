@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.core.node.NodeConnectorBoolean;
 import com.marginallyclever.core.node.NodeConnectorDouble;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -17,11 +17,11 @@ public class Generator_Spirograph extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorDouble inputPScale = new NodeConnectorDouble("Generator_Spirograph.inputPScale",80.0);
 	// controls size of pattern. >=0
-	private NodeConnectorInt inputMinorRadius = new NodeConnectorInt("Generator_Spirograph.inputMinorRadius",2);
+	private NodeConnectorInteger inputMinorRadius = new NodeConnectorInteger("Generator_Spirograph.inputMinorRadius",2);
 	// controls interior size of pattern. >=0
-	private NodeConnectorInt inputMajorRadius = new NodeConnectorInt("Generator_Spirograph.inputMajorRadius",100);
+	private NodeConnectorInteger inputMajorRadius = new NodeConnectorInteger("Generator_Spirograph.inputMajorRadius",100);
 	// resolution of curve
-	private NodeConnectorInt inputNumSamples = new NodeConnectorInt("Generator_Spirograph.inputNumSamples",2000);
+	private NodeConnectorInteger inputNumSamples = new NodeConnectorInteger("Generator_Spirograph.inputNumSamples",2000);
 	// style
 	private NodeConnectorBoolean inputIsEpitrochoid = new NodeConnectorBoolean("Generator_Spirograph.inputIsEpitrochoid",false);
 	

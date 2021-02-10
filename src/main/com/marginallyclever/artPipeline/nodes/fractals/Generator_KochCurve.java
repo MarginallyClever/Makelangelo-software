@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.nodes.fractals;
 
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_KochCurve extends TurtleGenerator {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorBoundedInt("Generator_KochCurve.inputOrder",15,1,4);
+	private NodeConnectorInteger inputOrder = new NodeConnectorBoundedInt("Generator_KochCurve.inputOrder",15,1,4);
 	
 	private double xMax = 7;
 	private double xMin = -7;

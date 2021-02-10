@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -16,7 +16,7 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Dragon extends TurtleGenerator {
 	// controls complexity of curve
-	private NodeConnectorInt inputOrder = new NodeConnectorBoundedInt("Generator_Dragon.inputOrder",15,1,5);
+	private NodeConnectorInteger inputOrder = new NodeConnectorBoundedInt("Generator_Dragon.inputOrder",15,1,5);
 
 	private List<Integer> sequence;
 

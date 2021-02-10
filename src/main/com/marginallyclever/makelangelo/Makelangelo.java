@@ -137,6 +137,7 @@ public final class Makelangelo extends TransferHandler
 	
 	private PiCaptureAction piCameraCaptureAction;
 	
+	
 	public static void main(String[] argv) throws Exception {
 		Log.start();
 		CommandLineOptions.setFromMain(argv);
@@ -425,7 +426,7 @@ public final class Makelangelo extends TransferHandler
 			menu.add(buttonFlipV);
 			
 			JMenuItem buttonFlipH = new JMenuItem(Translator.get("Makelangelo.action.flipHorizontal"));
-			buttonFlipV.addActionListener(new ActionListener() {
+			buttonFlipH.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					flipTurtlesHorizontally();
@@ -464,10 +465,22 @@ public final class Makelangelo extends TransferHandler
 		// view menu
 		{
 			Log.message("  view...");
-			menu = new JMenu(Translator.get("MenuPreview"));
+			menu = new JMenu(Translator.get("Makelangelo.menuView"));
 			menuBar.add(menu);
 			
-			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
+			JMenuItem buttonShowUp = new JMenuItem(Translator.get("Makelangelo.viewPenUp"), KeyEvent.VK_UP);
+			buttonShowUp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+			buttonShowUp.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if( robot != null ) {
+						robot.setShowPenUp(!robot.getShowPenUp());
+					}
+				};
+			});
+			menu.add(buttonShowUp);
+			
+			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("Makelangelo.ZoomOut"), KeyEvent.VK_MINUS);
 			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomOut.addActionListener(new ActionListener() {
 				@Override
@@ -477,7 +490,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonZoomOut);
 	
-			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("Makelangelo.ZoomIn"), KeyEvent.VK_EQUALS);
 			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomIn.addActionListener(new ActionListener() {
 				@Override
@@ -487,7 +500,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonZoomIn);
 			
-			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("Makelangelo.ZoomFit"), KeyEvent.VK_0);
 			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomToFit.addActionListener(new ActionListener() {
 				@Override
@@ -499,7 +512,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonZoomToFit);
 			
-			JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
+			JMenuItem buttonViewLog = new JMenuItem(Translator.get("Makelangelo.ShowLog"));
 			buttonViewLog.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

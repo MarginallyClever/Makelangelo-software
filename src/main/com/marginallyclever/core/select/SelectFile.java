@@ -49,7 +49,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null,null));
+				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null,field.getText()));
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));

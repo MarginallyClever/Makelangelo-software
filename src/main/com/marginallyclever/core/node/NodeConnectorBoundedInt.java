@@ -11,7 +11,7 @@ import com.marginallyclever.core.select.SelectSlider;
  * @author Dan Royer
  * @since 7.25.0
  */
-public class NodeConnectorBoundedInt extends NodeConnectorInt {
+public class NodeConnectorBoundedInt extends NodeConnectorInteger {
 	private int rangeTop;
 	private int rangeBottom;
 	

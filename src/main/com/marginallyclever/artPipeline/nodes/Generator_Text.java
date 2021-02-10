@@ -10,7 +10,7 @@ import java.awt.geom.PathIterator;
 import java.util.Locale;
 
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.node.NodeConnectorString;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,7 +24,7 @@ public class Generator_Text extends TurtleGenerator {
 	// Unicode text
 	private NodeConnectorString inputMessage = new NodeConnectorString("Generator_Text.inputMessage","");
 	// point size.  default 20.
-	private NodeConnectorInt inputFontPointSize = new NodeConnectorInt("ImageConverter.outputTurtle",20);
+	private NodeConnectorInteger inputFontPointSize = new NodeConnectorInteger("ImageConverter.outputTurtle",20);
 
 	//private double width=100;
 	//private double height=100;

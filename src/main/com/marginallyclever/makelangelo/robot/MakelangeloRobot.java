@@ -88,8 +88,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
 
+	private boolean showPenUp = false;
+	
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
+
 
 	public MakelangeloRobot() {
 		super();
@@ -940,7 +943,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 			decorator.render(gl2);
 		} else {
 			for( Turtle t : turtles ) {
-				TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
+				TurtleRenderer tr = new DefaultTurtleRenderer(gl2,showPenUp);
 				tr.setPenDownColor(t.getColor());
 				t.render(tr);
 			}
@@ -1030,5 +1033,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 
 	public boolean isPenIsUp() {
 		return penIsUp;
+	}
+
+	public boolean getShowPenUp() {
+		return showPenUp;
+	}
+
+	public void setShowPenUp(boolean b) {
+		showPenUp=b;
 	}
 }

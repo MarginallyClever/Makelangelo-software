@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodes;
 
 import com.marginallyclever.core.node.NodeConnectorAngle;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -16,11 +16,11 @@ public class Generator_Lissajous extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorAngle inputDelta = new NodeConnectorAngle("Generator_Lissajous.inputDelta",360.0/6.0);
 	// controls complexity of curve
-	private NodeConnectorInt inputA = new NodeConnectorInt("Generator_Lissajous.inputA",200);
+	private NodeConnectorInteger inputA = new NodeConnectorInteger("Generator_Lissajous.inputA",200);
 	// controls complexity of curve
-	private NodeConnectorInt inputB = new NodeConnectorInt("Generator_Lissajous.inputB",200);
+	private NodeConnectorInteger inputB = new NodeConnectorInteger("Generator_Lissajous.inputB",200);
 	// quality of curve
-	private NodeConnectorInt inputSamples = new NodeConnectorInt("Generator_Lissajous.inputSamples",10000);
+	private NodeConnectorInteger inputSamples = new NodeConnectorInteger("Generator_Lissajous.inputSamples",10000);
 	
 	// scale the step size so the curve fits on the paper
 	// TODO make parameter?

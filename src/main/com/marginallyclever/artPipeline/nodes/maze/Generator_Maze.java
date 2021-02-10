@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodes.maze;
 
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -12,9 +12,9 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Maze extends TurtleGenerator {
 	// controls complexity of curve
-	private NodeConnectorInt inputRows = new NodeConnectorInt("Generator_Maze.inputRows",10);
+	private NodeConnectorInteger inputRows = new NodeConnectorInteger("Generator_Maze.inputRows",10);
 	// controls complexity of curve
-	private NodeConnectorInt inputCols = new NodeConnectorInt("Generator_Maze.inputCols",10);
+	private NodeConnectorInteger inputCols = new NodeConnectorInteger("Generator_Maze.inputCols",10);
 
 	protected float xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;

@@ -11,12 +11,12 @@ import com.marginallyclever.core.select.SelectInteger;
  * @author Dan Royer
  * @since 7.25.0
  */
-public class NodeConnectorInt extends NodeConnector<Integer> {
-	public NodeConnectorInt(String newName) {
+public class NodeConnectorInteger extends NodeConnector<Integer> {
+	public NodeConnectorInteger(String newName) {
 		super(newName);
 	}
 	
-	public NodeConnectorInt(String newName,Integer d) {
+	public NodeConnectorInteger(String newName,Integer d) {
 		super(newName,d);
 	}
 

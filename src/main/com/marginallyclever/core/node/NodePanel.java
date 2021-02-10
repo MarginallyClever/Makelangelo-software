@@ -48,22 +48,24 @@ public class NodePanel extends SelectPanel {
 	}
 	
 	public void buildPanel() {
-		System.out.println("buildPanel "+myNode.getName());
+		//System.out.println("buildPanel "+myNode.getName());
 		
 		getInteriorPanel().removeAll();
 
 		// inputs
 		for(NodeConnector<?> nc : myNode.inputs ) {
-			System.out.println("  input "+nc.getName());
+			//System.out.println("  input "+nc.getName());
 			Select s = nc.getSelect();
 			s.getPanel().setToolTipText(nc.getDescription());
 			add(s);
 		}
+		
 		// divider
 		add(new JSeparator());
+		
 		// outputs
 		for(NodeConnector<?> nc : myNode.outputs ) {
-			System.out.println("  output "+nc.getName());
+			//System.out.println("  output "+nc.getName());
 			Select s = nc.getSelect();
 			s.getPanel().setToolTipText(nc.getDescription());
 			add(s);

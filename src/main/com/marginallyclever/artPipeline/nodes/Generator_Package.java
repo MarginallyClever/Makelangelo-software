@@ -1,7 +1,7 @@
 package com.marginallyclever.artPipeline.nodes;
 
 
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -12,11 +12,11 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_Package extends TurtleGenerator {
 	// shape of box
-	private NodeConnectorInt inputWidth = new NodeConnectorInt("Generator_Package.inputWidth",200);
+	private NodeConnectorInteger inputWidth = new NodeConnectorInteger("Generator_Package.inputWidth",200);
 	// shape of box
-	private NodeConnectorInt inputLength = new NodeConnectorInt("Generator_Package.inputLength",100);
+	private NodeConnectorInteger inputLength = new NodeConnectorInteger("Generator_Package.inputLength",100);
 	// shape of box
-	private NodeConnectorInt inputHeight = new NodeConnectorInt("Generator_Package.inputHeight",50);
+	private NodeConnectorInteger inputHeight = new NodeConnectorInteger("Generator_Package.inputHeight",50);
 	
 	public Generator_Package() {
 		super();

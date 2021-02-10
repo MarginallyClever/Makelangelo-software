@@ -16,7 +16,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
- * A container for all Select elements, to facilitate formating as a group.
+ * A container for all {@link Select} elements, to facilitate formating as a group.
  * @author Dan Royer
  * @since 7.24.0
  */

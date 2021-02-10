@@ -33,7 +33,7 @@ public class TransformedImage {
 	public static final int TOP = 3;
 	
 	private BufferedImage sourceImage;
-	protected Texture texture = null;
+	private Texture texture = null;
 	private Matrix3d matrix = new Matrix3d();
 	private Matrix3d inverseMatrix = new Matrix3d();
 	

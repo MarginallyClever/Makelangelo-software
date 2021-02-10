@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
-import com.marginallyclever.core.node.NodeConnectorInt;
+import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -15,13 +15,13 @@ import com.marginallyclever.makelangelo.Translator;
  */
 public class Generator_LSystemTree extends TurtleGenerator {
 	// random seed
-	private NodeConnectorInt inputSeed = new NodeConnectorInt("Generator_LSystemTree.inputSeed",0xDEADBEEF);
+	private NodeConnectorInteger inputSeed = new NodeConnectorInteger("Generator_LSystemTree.inputSeed",0xDEADBEEF);
 	// resursion depth
-	private NodeConnectorInt inputOrder = new NodeConnectorBoundedInt("Generator_LSystemTree.inputOrder",10,1,4);
+	private NodeConnectorInteger inputOrder = new NodeConnectorBoundedInt("Generator_LSystemTree.inputOrder",10,1,4);
 	// resursion width
-	private NodeConnectorInt inputBranches = new NodeConnectorBoundedInt("Generator_LSystemTree.inputBranches",10,1,3);
+	private NodeConnectorInteger inputBranches = new NodeConnectorBoundedInt("Generator_LSystemTree.inputBranches",10,1,3);
 	// variation
-	private NodeConnectorInt inputNoise = new NodeConnectorInt("Generator_LSystemTree.inputNoise",0);
+	private NodeConnectorInteger inputNoise = new NodeConnectorInteger("Generator_LSystemTree.inputNoise",0);
 	// how far branches can spread
 	private NodeConnectorDouble inputAngleSpan = new NodeConnectorAngle("Generator_LSystemTree.inputAngleSpan",120.0);
 	// how far branches can spread
