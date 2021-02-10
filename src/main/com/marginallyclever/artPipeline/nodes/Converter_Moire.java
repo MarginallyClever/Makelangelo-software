@@ -10,6 +10,8 @@ import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.node.NodeConnectorInteger;
+import com.marginallyclever.core.node.NodeConnectorOneOfMany;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -19,31 +21,25 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Moire extends ImageConverter {
+	private String[] directionChoices = new String[] {
+			Translator.get("Converter_Moire.inputDirection.horizontal"), 
+			Translator.get("Converter_Moire.inputDirection.vertical")
+		}; 
+
 	// height of zigzag.  should probably be less than spacing.  >=1
 	private NodeConnectorDouble inputHeight = new NodeConnectorDouble("Converter_Moire.inputHeight",6.0);
+	private NodeConnectorInteger inputDirection = new NodeConnectorOneOfMany("Converter_Moire.inputDirection.name",directionChoices,0);
 	
-	// TODO select-one-of-many
-	private static int direction = 0;
-	private String[] directionChoices = new String[] {Translator.get("horizontal"), Translator.get("vertical") }; 
-	
+	public Converter_Moire() {
+		super();
+		inputs.add(inputHeight);
+		inputs.add(inputDirection);
+	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("Converter_Moire.name");
 	}
-
-	public String[] getDirections() {
-		return directionChoices;
-	}
-	public int getDirectionIndex() {
-		return direction;
-	}
-	public void setDirectionIndex(int value) {
-		if(value<0) value=0;
-		if(value>=directionChoices.length) value=directionChoices.length-1;
-		direction = value;
-	}
-
 	
 	protected void convertLine(Turtle turtle,TransformedImage img,double spaceBetweenLines,double halfStep,Point2D a,Point2D b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
@@ -189,7 +185,7 @@ public class Converter_Moire extends ImageConverter {
 		turtle = new Turtle();
 		
 		Log.message("Moire start");
-		if (direction == 0) {
+		if (inputDirection.getValue() == 0) {
 			// horizontal
 			yBottom -= h;
 			yTop    += h;

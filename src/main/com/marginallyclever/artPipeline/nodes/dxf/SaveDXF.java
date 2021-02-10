@@ -36,7 +36,7 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 	
 	@Override
 	public String getName() {
-		return "SaveDXF";
+		return Translator.get("SaveDXF.name");
 	}
 	
 	@Override
@@ -82,7 +82,7 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 	 * @return true if save succeeded.
 	 */
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
-		Log.message("saving...");
+		Log.message("Saving...");
 
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			Turtle firstTurtle = turtles.get(0);
@@ -184,11 +184,11 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 			out.flush();
 		}
 		catch(IOException e) {
-			Log.error(Translator.get("SaveError") +" "+ e.getLocalizedMessage());
+			Log.error("Save Error: "+ e.getLocalizedMessage());
 			return false;
 		}
 		
-		Log.message("done.");
+		Log.message("Done.");
 		return true;
 	}
 }

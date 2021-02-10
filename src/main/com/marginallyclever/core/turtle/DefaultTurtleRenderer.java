@@ -2,7 +2,6 @@ package com.marginallyclever.core.turtle;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.ColorRGB;
-import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 
 /**
  * Draws Turtle instructions one line segment at a time.

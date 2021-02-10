@@ -41,7 +41,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 	
 	public String getName() {
-		return Translator.get("ZigZagName");
+		return Translator.get("Converter_ZigZag.name");
 	}
 
 

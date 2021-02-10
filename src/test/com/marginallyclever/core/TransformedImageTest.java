@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class TransformedImageTest {
+	@Test
 	@Disabled("Not really a test")
 	public void ImageIOInformation() {
 		System.out.println("Suffixes:");

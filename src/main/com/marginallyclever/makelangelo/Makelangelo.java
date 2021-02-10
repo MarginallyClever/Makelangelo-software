@@ -65,6 +65,7 @@ import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedIm
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
+import com.marginallyclever.artPipeline.nodes.NodeTransformTurtle;
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
@@ -410,7 +411,38 @@ public final class Makelangelo extends TransferHandler
 			buttonTransform.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO open transform dialog
+					// open transform dialog
+					menuBar.setEnabled(false);
+					
+					// add the converter to the pool
+					// display the panel
+					NodeTransformTurtle node = new NodeTransformTurtle();
+					if(myTurtles.size()>0) {
+						node.inputTurtle.setValue(myTurtles.get(0));
+					}
+					
+					NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+					dialog.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							myTurtles.clear();
+							
+							for(NodeConnector<?> nc : node.outputs ) {
+								if(nc instanceof NodeConnectorTurtle) {
+									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+								}
+							}
+							
+							if(myTurtles.size()>0) {
+								robot.setTurtles(myTurtles);
+							} else {
+								System.out.println("No turtles found!");
+							}
+						}
+					});
+					dialog.run();
+					
+					menuBar.setEnabled(true);
 				}
 			});
 			menu.add(buttonTransform);
@@ -1066,6 +1098,8 @@ public final class Makelangelo extends TransferHandler
 			c.iterate();
 			if(!c.getKeepIterating()) break;
 		}
+		
+		myTurtles.clear();
 		
 		for(NodeConnector<?> nc : c.outputs ) {
 			System.out.println("Node output "+nc.getClass().getSimpleName());

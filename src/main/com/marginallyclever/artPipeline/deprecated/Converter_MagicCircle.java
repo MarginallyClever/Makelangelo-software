@@ -24,7 +24,7 @@ public class Converter_MagicCircle extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return Translator.get("MagicCircleName");
+		return Translator.get("Converter_MagicCircle.name");
 	}
 
 	/**

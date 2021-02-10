@@ -165,7 +165,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	
 	@Override
 	public String getName() {
-		return Translator.get("voronoiStipplingName");
+		return Translator.get("Converter_VoronoiStippling.name");
 	}
 
 	@Override

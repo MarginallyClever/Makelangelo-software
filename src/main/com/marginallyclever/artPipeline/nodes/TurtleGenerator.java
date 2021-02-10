@@ -10,7 +10,7 @@ import com.marginallyclever.core.node.Node;
  */
 abstract public class TurtleGenerator extends Node {
 	// results
-	protected NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageGenerator.outputTurtle");
+	public NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageGenerator.outputTurtle");
 	
 	protected TurtleGenerator() {
 		super();

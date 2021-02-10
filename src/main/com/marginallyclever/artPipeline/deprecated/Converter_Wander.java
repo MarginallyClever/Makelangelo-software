@@ -42,7 +42,7 @@ public class Converter_Wander extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("ConverterWanderName");
+		return Translator.get("Converter_Wander.name");
 	}
 
 	@Override

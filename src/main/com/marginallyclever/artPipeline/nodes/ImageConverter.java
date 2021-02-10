@@ -20,7 +20,7 @@ import com.marginallyclever.core.turtle.Turtle;
  */
 public abstract class ImageConverter extends Node {
 	public NodeConnectorTransformedImage inputImage = new NodeConnectorTransformedImage("ImageConverter.inputImage");
-	protected NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
+	public NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	
 	protected ImageConverter() {

@@ -60,7 +60,9 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	}
 	
 	@Override
-	public String getName() { return "LoadDXF"; }
+	public String getName() {
+		return Translator.get("LoadDXF.name");
+	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -203,7 +205,7 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean load(InputStream in) {
-		Log.message(Translator.get("FileTypeDXF2")+"...");
+		Log.message("Loading...");
 		Turtle turtle = new Turtle();
 		
 		// Read in the DXF file

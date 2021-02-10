@@ -33,5 +33,6 @@ com.marginallyclever.artPipeline.nodes.fractals.Generator_GosperCurve
 com.marginallyclever.artPipeline.nodes.fractals.Generator_HilbertCurve
 com.marginallyclever.artPipeline.nodes.fractals.Generator_KochCurve
 com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle
-com.marginallyclever.artPipeline.nodes.voronoi.Converter_VoronoiStippling
-com.marginallyclever.artPipeline.nodes.voronoi.Converter_VoronoiZigZag
+#com.marginallyclever.artPipeline.nodes.voronoi.Converter_VoronoiStippling
+#com.marginallyclever.artPipeline.nodes.voronoi.Converter_VoronoiZigZag
+com.marginallyclever.artPipeline.nodes.NodeTransformTurtle

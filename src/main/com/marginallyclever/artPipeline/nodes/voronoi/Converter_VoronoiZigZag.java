@@ -49,7 +49,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	
 	@Override
 	public String getName() {
-		return Translator.get("VoronoiZigZagName");
+		return Translator.get("Converter_VoronoiZigZag.name");
 	}
 
 	@Override

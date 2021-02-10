@@ -212,7 +212,7 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 			Log.message("found  " +scripts.size() + " scripts");
 			Log.message("finished scripts");
 		} catch (Exception e) {
-			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
+			Log.error("Load error: "+ e.getLocalizedMessage());
 			e.printStackTrace();
 			return false;
 		}

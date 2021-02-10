@@ -15,7 +15,7 @@ import com.marginallyclever.core.log.Log;
  *
  */
 public class Turtle implements Cloneable {
-	public ArrayList<TurtleMove> history;
+	public ArrayList<TurtleMove> history = new ArrayList<TurtleMove>();
 
 	private ReentrantLock lock;
 
@@ -74,7 +74,7 @@ public class Turtle implements Cloneable {
 		turtleY = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<TurtleMove>();
+		history.clear();
 	}
 	
 	// multithreading lock safety
@@ -343,6 +343,20 @@ public class Turtle implements Cloneable {
 			totalBottom.y = Math.min(bottom.y, totalBottom.y);
 			totalTop.x = Math.max(bottom.x, totalTop.x);
 			totalTop.y = Math.max(bottom.y, totalTop.y);
+		}
+	}
+
+
+	public void rotate(Double degrees) {
+		double r = Math.toRadians(degrees);
+		double c = Math.cos(r);
+		double s = Math.sin(r);
+
+		for( TurtleMove m : history ) {
+			double x=m.x;
+			double y=m.y;
+			m.x = c*x - s*y;
+			m.y = s*x + c*y;
 		}
 	}
 }

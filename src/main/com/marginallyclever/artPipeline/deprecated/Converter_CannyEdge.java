@@ -16,7 +16,7 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_CannyEdge extends ImageConverter {
 	@Override
 	public String getName() {
-		return Translator.get("CannyEdgeConverterName");
+		return Translator.get("Converter_CannyEdge.name");
 	}
 
 	/**
