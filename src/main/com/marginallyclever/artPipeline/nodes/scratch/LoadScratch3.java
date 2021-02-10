@@ -80,7 +80,7 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 		IMAGE_FILE_EXTENSIONS.add("SB3");
 	}
 	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadScratch3.fileType"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private LinkedList<ScratchVariable> scratchVariables;
 	private LinkedList<ScratchList> scratchLists;
@@ -130,7 +130,7 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 	
 	@Override
 	public boolean load(InputStream in) {
-		Log.message(Translator.get("FileTypeSB3")+"...");
+		Log.message(Translator.get("LoadScratch3.fileType"));
 		
 		// reset the turtle object
 		Turtle turtle = new Turtle();
