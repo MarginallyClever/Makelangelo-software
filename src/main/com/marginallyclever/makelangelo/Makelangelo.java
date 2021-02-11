@@ -71,6 +71,7 @@ import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
 import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
@@ -448,6 +449,15 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonScaleToWidth);
 			
+			JMenuItem buttonCenter = new JMenuItem(Translator.get("Makelangelo.action.center"));
+			buttonCenter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					centerToPaper();
+				}
+			});
+			menu.add(buttonCenter);
+						
 			JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
 			buttonOptimize.addActionListener(new ActionListener() {
 				@Override
@@ -1128,6 +1138,7 @@ public final class Makelangelo extends TransferHandler
 		double th=top.y-bottom.y;
 		double ph=robot.getSettings().getPaperHeight();
 		double n = ph/th;
+		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
 			t.scale(n,n);
 		}
@@ -1140,10 +1151,25 @@ public final class Makelangelo extends TransferHandler
 		double tw=top.x-bottom.x;
 		double pw=robot.getSettings().getPaperWidth();
 		double n = pw/tw;
+		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
 			t.scale(n,n);
 		}
 	}
+	
+	private void centerToPaper() {
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		Turtle.getBounds(myTurtles, top, bottom);
+		
+		double tw=(top.x+bottom.x)/2.0;
+		double th=(top.y+bottom.y)/2.0;
+		
+		for( Turtle t : myTurtles ) {
+			t.translate(-tw,-th);
+		}
+	}
+	
 	
 	private void optimizeTurtles() {
 		// TODO finish me
@@ -1151,10 +1177,79 @@ public final class Makelangelo extends TransferHandler
 	
 	private void simplifyTurtles() {
 		// TODO finish me
+		for( Turtle t : myTurtles ) {
+			removeSequentialPenUpMoves(t);
+		}
+	}
+	
+	/**
+	 * If the pen lifts, moves several times, and then puts the pen down, delete all but the pen up and the pen down.
+	 * @param turtle to be simplified.
+	 */
+	private void removeSequentialPenUpMoves(Turtle turtle) {
+		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
+		
+		int len = turtle.history.size();
+		
+		TurtleMove a;
+		TurtleMove b;
+		TurtleMove c=null;
+		toKeep.add(turtle.history.get(0));
+		for(int i=1;i<len-1;++i) {
+			a = turtle.history.get(i-1);
+			b = turtle.history.get(i);
+			c = turtle.history.get(i+1);
+			// if abc are up then b is redundant.
+			if(a.isUp && b.isUp && c.isUp) {
+				// do nothing. lose b.
+			} else {
+				// b not redudant, keep it.
+				toKeep.add(b);
+			}
+		}
+		if(c!=null) {
+			toKeep.add(c);
+		}
+
+		int len2 = toKeep.size();
+		System.out.println("history start="+len+", end="+len2+", saved="+(len-len2));
+		turtle.history.clear();
+		turtle.history.addAll(toKeep);
 	}
 	
 	private void cropTurtles() {
-		// TODO finish me
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		Turtle.getBounds(myTurtles, top, bottom);
+		
+		double pt=robot.getSettings().getPaperTop();
+		double pb=robot.getSettings().getPaperBottom();
+		double pl=robot.getSettings().getPaperLeft();
+		double pr=robot.getSettings().getPaperRight();
+		
+		ArrayList<TurtleMove> toKeep= new ArrayList<TurtleMove>();
+		
+		for( Turtle t : myTurtles ) {
+			int len = t.history.size();
+			
+			for(int i=1;i<len;++i) {
+				TurtleMove prev = t.history.get(i-1);
+				TurtleMove next = t.history.get(i);
+				if(!prev.isUp && !next.isUp) {
+					// we are drawing
+					//boolean pIn = inPaper(prev);
+					//boolean nIn = inPaper(next);
+					//if(pIn != nIn) 
+					{
+						// needs to be cropped
+					}
+					
+				}
+			}
+			//t.history.clear();
+			//t.history.addAll(toKeep);
+			//toKeep.clear();
+		}
 	}
 }
 
