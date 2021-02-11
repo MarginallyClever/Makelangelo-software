@@ -119,7 +119,6 @@ public class SaveGCode extends Node implements LoadAndSaveFile {
 			return false;
 		}
 		
-		Log.message("done.");
 		return true;
 	}
 }

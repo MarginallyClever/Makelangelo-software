@@ -434,7 +434,6 @@ public class MakelangeloFirmwareSimulation {
 				sum += s.end_s;// - s.start_s;
 			}
 		}
-		System.out.println("done");
 		
 		return sum;
 	}

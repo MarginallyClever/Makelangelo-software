@@ -65,7 +65,6 @@ import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedIm
 import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.artPipeline.nodes.NodeTransformTurtle;
 import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
 import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
@@ -314,15 +313,11 @@ public final class Makelangelo extends TransferHandler
 					public void actionPerformed(ActionEvent e) {
 						menuBar.setEnabled(false);
 						
-						// TODO add the generator to the pool
-						
-						// display the panel
+						// Display the panel
 						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
 						dialog.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								System.out.println("Notice received");
-
 								myTurtles.clear();
 
 								for(NodeConnector<?> nc : node.outputs ) {
@@ -370,8 +365,6 @@ public final class Makelangelo extends TransferHandler
 						dialog.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
-								System.out.println("Notice received");
-
 								myTurtles.clear();
 								
 								for(NodeConnector<?> nc : node.outputs ) {
@@ -1135,7 +1128,6 @@ public final class Makelangelo extends TransferHandler
 		double th=top.y-bottom.y;
 		double ph=robot.getSettings().getPaperHeight();
 		double n = ph/th;
-		System.out.println("h p/t/n="+ph+"/"+th+"/"+n);
 		for( Turtle t : myTurtles ) {
 			t.scale(n,n);
 		}
@@ -1148,7 +1140,6 @@ public final class Makelangelo extends TransferHandler
 		double tw=top.x-bottom.x;
 		double pw=robot.getSettings().getPaperWidth();
 		double n = pw/tw;
-		System.out.println("w p/t/n="+pw+"/"+tw+"/"+n);
 		for( Turtle t : myTurtles ) {
 			t.scale(n,n);
 		}

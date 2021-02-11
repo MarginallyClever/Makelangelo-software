@@ -188,7 +188,6 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 			return false;
 		}
 		
-		Log.message("Done.");
 		return true;
 	}
 }

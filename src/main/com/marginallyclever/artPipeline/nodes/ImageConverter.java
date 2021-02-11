@@ -135,7 +135,8 @@ public abstract class ImageConverter extends Node {
 			turtle.moveTo(fx,fy);
 			steps++;
 			
-			if( wasInside && !isInside ) break;  // done
+			// as we finished?
+			if( wasInside && !isInside ) break;
 			wasInside=isInside;
 		}
 		turtle.penUp();

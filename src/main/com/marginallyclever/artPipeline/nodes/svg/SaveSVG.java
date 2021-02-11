@@ -142,7 +142,6 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 			return false;
 		}
 		
-		Log.message("done.");
 		return true;
 	}
 }
