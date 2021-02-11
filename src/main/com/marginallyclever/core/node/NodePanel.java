@@ -61,14 +61,19 @@ public class NodePanel extends SelectPanel {
 		}
 		
 		// divider
-		add(new JSeparator());
+		//JSeparator sep = new JSeparator();
+		//sep.setOrientation(JSeparator.HORIZONTAL);
+		//add(sep);
 		
 		// outputs
-		for(NodeConnector<?> nc : myNode.outputs ) {
-			//System.out.println("  output "+nc.getName());
-			Select s = nc.getSelect();
-			s.getPanel().setToolTipText(nc.getDescription());
-			add(s);
+		boolean showOutputs = false;
+		if(showOutputs) {
+			for(NodeConnector<?> nc : myNode.outputs ) {
+				//System.out.println("  output "+nc.getName());
+				Select s = nc.getSelect();
+				s.getPanel().setToolTipText(nc.getDescription());
+				add(s);
+			}
 		}
 		
 		finish();
