@@ -1,6 +1,7 @@
 package com.marginallyclever.core.turtle;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -209,27 +210,18 @@ public class Turtle implements Cloneable {
 	 * @param bottom minimum limits
 	 */
 	public void getBounds(Point2D top,Point2D bottom) {
-		bottom.x=Float.MAX_VALUE;
-		bottom.y=Float.MAX_VALUE;
-		top.x=-Float.MAX_VALUE;
-		top.y=-Float.MAX_VALUE;
-		TurtleMove old=null;
+		bottom.x=Double.MAX_VALUE;
+		bottom.y=Double.MAX_VALUE;
+		top.x=-Double.MAX_VALUE;
+		top.y=-Double.MAX_VALUE;
 		
 		for( TurtleMove m : history ) {
 			if(!m.isUp) {
-				if(top.x<m.x) top.x=m.x;
-				if(top.y<m.y) top.y=m.y;
-				if(bottom.x>m.x) bottom.x=m.x;
-				if(bottom.y>m.y) bottom.y=m.y;
-				if(old != null)
-				{
-					if(top.x<old.x) top.x=old.x;
-					if(top.y<old.y) top.y=old.y;
-					if(bottom.x>old.x) bottom.x=old.x;
-					if(bottom.y>old.y) bottom.y=old.y;
-				}
+				top.x = Math.max(top.x,m.x);
+				top.y = Math.max(top.y,m.y);
+				bottom.x = Math.min(bottom.x,m.x);
+				bottom.y = Math.min(bottom.y,m.y);
 			}
-			old=m;
 		}
 	}
 
@@ -281,39 +273,34 @@ public class Turtle implements Cloneable {
 		if(isLocked()) return;
 		try {
 			lock();
-			
-			TurtleMove previousMove = null;
-			
+						
 			// the first and last command to show (in case we want to isolate part of the drawing)
 			int first = 0;
 			int last = history.size();
-			// where we're at in the drawing (to check if we're between first & last)
-			int showCount = 0;
-			
-			tr.start();
-			
-			showCount++;
-
-			for (TurtleMove m : history) {
-				boolean inShow = (showCount >= first && showCount < last);
-				if(m.isUp) {
-					// travel move
+			if(last>0) {
+				// where we're at in the drawing (to check if we're between first & last)
+				int showCount = 0;
+				
+				tr.start();
+					
+				Iterator<TurtleMove> i = history.iterator();
+				TurtleMove previousMove = i.next();
+				while(i.hasNext()) {
+					TurtleMove m = i.next();
+					boolean inShow = (showCount >= first && showCount < last);
 					if (inShow && previousMove != null) {
-						tr.travel(previousMove, m);
-					}
-					showCount++;
-					previousMove = m;
-				} else {
-					// draw move
-					if (inShow && previousMove != null) {
-						tr.draw(previousMove, m);
+						if(m.isUp) {
+							tr.travel(previousMove, m);
+						} else {
+							tr.draw(previousMove, m);
+						}
 					}
 					showCount++;
 					previousMove = m;
 				}
+				
+				tr.end();
 			}
-			
-			tr.end();
 		}
 		catch(Exception e) {
 			Log.error(e.getMessage());
@@ -333,7 +320,7 @@ public class Turtle implements Cloneable {
 	 */
 	static public void getBounds(List<Turtle> turtles,Point2D totalTop,Point2D totalBottom) {
 		totalBottom.set(Double.MAX_VALUE,Double.MAX_VALUE);
-		totalTop.set(Double.MIN_VALUE,Double.MIN_VALUE);
+		totalTop.set(-Double.MAX_VALUE,-Double.MAX_VALUE);
 		Point2D bottom = new Point2D();
 		Point2D top = new Point2D();
 
@@ -341,10 +328,11 @@ public class Turtle implements Cloneable {
 			t.getBounds(top, bottom);
 			totalBottom.x = Math.min(bottom.x, totalBottom.x);
 			totalBottom.y = Math.min(bottom.y, totalBottom.y);
-			totalTop.x = Math.max(bottom.x, totalTop.x);
-			totalTop.y = Math.max(bottom.y, totalTop.y);
 			totalBottom.x = Math.min(top.x, totalBottom.x);
 			totalBottom.y = Math.min(top.y, totalBottom.y);
+			
+			totalTop.x = Math.max(bottom.x, totalTop.x);
+			totalTop.y = Math.max(bottom.y, totalTop.y);
 			totalTop.x = Math.max(top.x, totalTop.x);
 			totalTop.y = Math.max(top.y, totalTop.y);
 		}
