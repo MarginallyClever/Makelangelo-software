@@ -17,26 +17,9 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {	
-	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
-
 	protected MakelangeloRobotSettings lastSettings = null;
 	protected Turtle lastTurtle = null;
 
-	
-	public void addListener(ArtPipelineListener arg0) {
-		listeners.add(arg0);
-	}
-	
-	public void removeListener(ArtPipelineListener arg0) {
-		listeners.remove(arg0);
-	}
-	
-	public void notifyListenersTurtleFinished(Turtle t) {
-		for(ArtPipelineListener p : listeners) {
-			p.turtleFinished(t);
-		}
-	}
-	
 	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
 		// extPoint is supposed to be a point which lies (almost) on the infinite extension of targetLine
 		double newLengthA = distanceBetweenPointsSquared(targetLine.a, extPoint);
@@ -404,7 +387,6 @@ public class ArtPipeline {
 		}
 		finally {
 			turtle.unlock();
-			notifyListenersTurtleFinished(turtle);
 		}
 	}
 }
