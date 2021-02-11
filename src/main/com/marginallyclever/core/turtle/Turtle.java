@@ -343,6 +343,10 @@ public class Turtle implements Cloneable {
 			totalBottom.y = Math.min(bottom.y, totalBottom.y);
 			totalTop.x = Math.max(bottom.x, totalTop.x);
 			totalTop.y = Math.max(bottom.y, totalTop.y);
+			totalBottom.x = Math.min(top.x, totalBottom.x);
+			totalBottom.y = Math.min(top.y, totalBottom.y);
+			totalTop.x = Math.max(top.x, totalTop.x);
+			totalTop.y = Math.max(top.y, totalTop.y);
 		}
 	}
 

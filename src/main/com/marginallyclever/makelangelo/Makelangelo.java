@@ -71,6 +71,7 @@ import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTrian
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.CommandLineOptions;
+import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.log.LogPanel;
@@ -406,47 +407,17 @@ public final class Makelangelo extends TransferHandler
 			Log.message("  edit...");
 			menu = new JMenu(Translator.get("Makelangelo.menuEdit"));
 			menuBar.add(menu);
-			
-			JMenuItem buttonTransform = new JMenuItem(Translator.get("Makelangelo.action.transform"));
-			buttonTransform.addActionListener(new ActionListener() {
+
+			JMenuItem buttonRotate90 = new JMenuItem(Translator.get("Makelangelo.action.rotate90"));
+			buttonRotate90.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK));
+			buttonRotate90.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// open transform dialog
-					menuBar.setEnabled(false);
-					
-					// add the converter to the pool
-					// display the panel
-					NodeTransformTurtle node = new NodeTransformTurtle();
-					if(myTurtles.size()>0) {
-						node.inputTurtle.setValue(myTurtles.get(0));
-					}
-					
-					NodeDialog dialog = new NodeDialog(getMainFrame(),node);
-					dialog.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							myTurtles.clear();
-							
-							for(NodeConnector<?> nc : node.outputs ) {
-								if(nc instanceof NodeConnectorTurtle) {
-									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
-								}
-							}
-							
-							if(myTurtles.size()>0) {
-								robot.setTurtles(myTurtles);
-							} else {
-								System.out.println("No turtles found!");
-							}
-						}
-					});
-					dialog.run();
-					
-					menuBar.setEnabled(true);
+					rotateTurtles90();
 				}
 			});
-			menu.add(buttonTransform);
-
+			menu.add(buttonRotate90);
+			
 			
 			JMenuItem buttonFlipV = new JMenuItem(Translator.get("Makelangelo.action.flipVertical"));
 			buttonFlipV.addActionListener(new ActionListener() {
@@ -465,6 +436,24 @@ public final class Makelangelo extends TransferHandler
 				}
 			});
 			menu.add(buttonFlipH);
+
+			JMenuItem buttonScaleToHeight = new JMenuItem(Translator.get("Makelangelo.action.scaleToHeight"));
+			buttonScaleToHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					scaleToFillHeight();
+				}
+			});
+			menu.add(buttonScaleToHeight);
+			
+			JMenuItem buttonScaleToWidth = new JMenuItem(Translator.get("Makelangelo.action.scaleToWidth"));
+			buttonScaleToWidth.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					scaleToFillWidth();
+				}
+			});
+			menu.add(buttonScaleToWidth);
 			
 			JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
 			buttonOptimize.addActionListener(new ActionListener() {
@@ -500,7 +489,7 @@ public final class Makelangelo extends TransferHandler
 			menu = new JMenu(Translator.get("Makelangelo.menuView"));
 			menuBar.add(menu);
 			
-			JMenuItem buttonShowUp = new JMenuItem(Translator.get("Makelangelo.viewPenUp"), KeyEvent.VK_UP);
+			JMenuItem buttonShowUp = new JMenuItem(Translator.get("Makelangelo.viewPenUp"));
 			buttonShowUp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
 			buttonShowUp.addActionListener(new ActionListener() {
 				@Override
@@ -512,7 +501,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonShowUp);
 			
-			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("Makelangelo.ZoomOut"), KeyEvent.VK_MINUS);
+			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("Makelangelo.ZoomOut"));
 			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomOut.addActionListener(new ActionListener() {
 				@Override
@@ -522,7 +511,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonZoomOut);
 	
-			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("Makelangelo.ZoomIn"), KeyEvent.VK_EQUALS);
+			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("Makelangelo.ZoomIn"));
 			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomIn.addActionListener(new ActionListener() {
 				@Override
@@ -532,7 +521,7 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonZoomIn);
 			
-			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("Makelangelo.ZoomFit"), KeyEvent.VK_0);
+			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("Makelangelo.ZoomFit"));
 			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 			buttonZoomToFit.addActionListener(new ActionListener() {
 				@Override
@@ -1121,6 +1110,12 @@ public final class Makelangelo extends TransferHandler
 		robot.setTurtles(myTurtles);
 	}
 
+	private void rotateTurtles90() {
+		for( Turtle t : myTurtles ) {
+			t.rotate(90.0);
+		}
+	}
+	
 	private void flipTurtlesVertically() {
 		for( Turtle t : myTurtles ) {
 			t.scale(1, -1);
@@ -1130,6 +1125,32 @@ public final class Makelangelo extends TransferHandler
 	private void flipTurtlesHorizontally() {
 		for( Turtle t : myTurtles ) {
 			t.scale(-1, 1);
+		}
+	}
+	
+	private void scaleToFillHeight() {
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		Turtle.getBounds(myTurtles, top, bottom);
+		double th=top.y-bottom.y;
+		double ph=robot.getSettings().getPaperHeight();
+		double n = ph/th;
+		System.out.println("h p/t/n="+ph+"/"+th+"/"+n);
+		for( Turtle t : myTurtles ) {
+			t.scale(n,n);
+		}
+	}
+	
+	private void scaleToFillWidth() {
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		Turtle.getBounds(myTurtles, top, bottom);
+		double tw=top.x-bottom.x;
+		double pw=robot.getSettings().getPaperWidth();
+		double n = pw/tw;
+		System.out.println("w p/t/n="+pw+"/"+tw+"/"+n);
+		for( Turtle t : myTurtles ) {
+			t.scale(n,n);
 		}
 	}
 }
