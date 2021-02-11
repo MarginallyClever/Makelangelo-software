@@ -1,0 +1,16 @@
+com.marginallyclever.makelangelo.nodes.Generator_Rectangle
+com.marginallyclever.makelangelo.nodes.fractals.Generator_Dragon
+com.marginallyclever.makelangelo.nodes.fractals.Generator_FibonacciSpiral
+com.marginallyclever.makelangelo.nodes.Generator_FillPage
+com.marginallyclever.makelangelo.nodes.fractals.Generator_GosperCurve
+com.marginallyclever.makelangelo.nodes.Generator_GraphPaper
+com.marginallyclever.makelangelo.nodes.fractals.Generator_HilbertCurve
+com.marginallyclever.makelangelo.nodes.fractals.Generator_KochCurve
+com.marginallyclever.makelangelo.nodes.Generator_Lissajous
+com.marginallyclever.makelangelo.nodes.Generator_LSystemTree
+com.marginallyclever.makelangelo.nodes.maze.Generator_Maze
+com.marginallyclever.makelangelo.nodes.Generator_Package
+com.marginallyclever.makelangelo.nodes.polyhedron.Generator_Polyeder
+com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTriangle
+com.marginallyclever.makelangelo.nodes.Generator_Spirograph
+com.marginallyclever.makelangelo.nodes.Generator_Text

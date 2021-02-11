@@ -8,10 +8,10 @@ import java.util.Objects;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 
-import com.marginallyclever.artPipeline.nodes.ImageConverter;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.makelangelo.nodes.ImageConverter;
 
 /**
  * 

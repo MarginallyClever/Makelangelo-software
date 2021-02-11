@@ -61,12 +61,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTransformedImage;
-import com.marginallyclever.artPipeline.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.artPipeline.nodes.ImageConverter;
-import com.marginallyclever.artPipeline.nodes.LoadAndSaveFile;
-import com.marginallyclever.artPipeline.nodes.TurtleGenerator;
-import com.marginallyclever.artPipeline.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.CommandLineOptions;
@@ -77,6 +71,12 @@ import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
 import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedImage;
+import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
+import com.marginallyclever.makelangelo.nodes.ImageConverter;
+import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
+import com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
@@ -452,7 +452,7 @@ public final class Makelangelo extends TransferHandler
 			buttonOptimize.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO optimize dialog
+					optimizeTurtles();
 				}
 			});
 			menu.add(buttonOptimize);
@@ -461,7 +461,7 @@ public final class Makelangelo extends TransferHandler
 			buttonSimplify.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO simplify dialog
+					simplifyTurtles();
 				}
 			});
 			menu.add(buttonSimplify);
@@ -470,7 +470,7 @@ public final class Makelangelo extends TransferHandler
 			buttonCrop.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO crop dialog
+					cropTurtles();
 				}
 			});
 			menu.add(buttonCrop);
@@ -1143,6 +1143,18 @@ public final class Makelangelo extends TransferHandler
 		for( Turtle t : myTurtles ) {
 			t.scale(n,n);
 		}
+	}
+	
+	private void optimizeTurtles() {
+		// TODO finish me
+	}
+	
+	private void simplifyTurtles() {
+		// TODO finish me
+	}
+	
+	private void cropTurtles() {
+		// TODO finish me
 	}
 }
 

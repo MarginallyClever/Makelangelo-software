@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 
 import com.marginallyclever.core.ColorRGB;
@@ -52,6 +53,11 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		gbc.gridy++;
 		interiorPanel.add(c.getPanel(),gbc);
 		c.addPropertyChangeListener(this);
+	}
+	
+	public void addSeparator() {
+		gbc.gridy++;
+		interiorPanel.add(new JSeparator(),gbc);
 	}
 	
 	public void finish() {

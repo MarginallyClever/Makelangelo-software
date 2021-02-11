@@ -333,23 +333,7 @@ public class ArtPipeline {
 		Log.message("simplify() end (was "+os+" is now "+ns+")");
 	}
 
-	
-	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
-		double ang=settings.getRotation();
-		if(ang == 0.0) return; 
-			
-		double c=Math.cos(ang*Math.PI/180.0);
-		double s=Math.sin(ang*Math.PI/180.0);
-
-		for( TurtleMove m : turtle.history ) { 
-			double x=m.x;
-			double y=m.y;
-			m.x=x*c-y*s;
-			m.y=x*s+y*c;
-		}
-	}
-	
-	
+		
 	/**
 	 * 
 	 * @param turtle
@@ -375,15 +359,10 @@ public class ArtPipeline {
 			}
 		}
 		turtle.lock();
-		try {
-			rotatePicture(turtle,settings);/*
-			fitToPaper(turtle,settings,false);
-			fitToPaper(turtle,settings,true);
-			flipV(turtle,settings);
-			if(shouldFlipH()) flipH(turtle,settings);
-			if(shouldReorder()) reorder(turtle,settings);
-			if(shouldSimplify()) simplify(turtle,settings);
-			if(shouldCrop()) cropToPageMargin(turtle,settings);*/
+		try {/*
+			reorder(turtle,settings);
+			simplify(turtle,settings);
+			cropToPageMargin(turtle,settings);*/
 		}
 		finally {
 			turtle.unlock();

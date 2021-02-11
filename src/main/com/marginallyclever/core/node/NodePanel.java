@@ -60,14 +60,12 @@ public class NodePanel extends SelectPanel {
 			add(s);
 		}
 		
-		// divider
-		//JSeparator sep = new JSeparator();
-		//sep.setOrientation(JSeparator.HORIZONTAL);
-		//add(sep);
-		
 		// outputs
 		boolean showOutputs = false;
 		if(showOutputs) {
+			// divider
+			addSeparator();
+			
 			for(NodeConnector<?> nc : myNode.outputs ) {
 				//System.out.println("  output "+nc.getName());
 				Select s = nc.getSelect();
