@@ -16,6 +16,7 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * @author Dan Royer
  * 
  */
+@Deprecated
 public class ArtPipeline {	
 	protected MakelangeloRobotSettings lastSettings = null;
 	protected Turtle lastTurtle = null;
@@ -331,41 +332,5 @@ public class ArtPipeline {
 		int ns = toKeep.size();
 		turtle.history = toKeep;
 		Log.message("simplify() end (was "+os+" is now "+ns+")");
-	}
-
-		
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
-	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
-		if(turtle == null) turtle=lastTurtle;
-		if(settings == null) settings=lastSettings;
-		lastSettings=settings;
-		lastTurtle=turtle;
-		
-		if(turtle == null) return;
-		if(turtle.history.isEmpty()) return;
-		
-		
-		while(turtle.isLocked()) {
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				//e.printStackTrace();
-				Log.message("processTurtle wait interrupted.");
-				return;
-			}
-		}
-		turtle.lock();
-		try {/*
-			reorder(turtle,settings);
-			simplify(turtle,settings);
-			cropToPageMargin(turtle,settings);*/
-		}
-		finally {
-			turtle.unlock();
-		}
 	}
 }
