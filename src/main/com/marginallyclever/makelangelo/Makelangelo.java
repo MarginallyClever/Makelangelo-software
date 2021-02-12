@@ -59,6 +59,7 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Vector3d;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.communications.ConnectionManager;
@@ -1171,19 +1172,21 @@ public final class Makelangelo extends TransferHandler
 	}
 	
 	
+	// shorten the pen up travels.
 	private void optimizeTurtles() {
-		// TODO finish me
+		
 	}
 	
+	// reduce the total number of commands without altering the output.
 	private void simplifyTurtles() {
-		// TODO finish me
 		for( Turtle t : myTurtles ) {
 			removeSequentialPenUpMoves(t);
+			removeSequentialLinearPenDownMoves(t);
 		}
 	}
 	
 	/**
-	 * If the pen lifts, moves several times, and then puts the pen down, delete all but the pen up and the pen down.
+	 * Any time there are three pen up moves in a row, the middle is not needed.
 	 * @param turtle to be simplified.
 	 */
 	private void removeSequentialPenUpMoves(Turtle turtle) {
@@ -1217,17 +1220,67 @@ public final class Makelangelo extends TransferHandler
 		turtle.history.addAll(toKeep);
 	}
 	
+	/**
+	 * Any time there are three pen up moves in a row, the middle is not needed.
+	 * @param turtle to be simplified.
+	 */
+	private void removeSequentialLinearPenDownMoves(Turtle turtle) {
+		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
+		
+		int len = turtle.history.size();
+
+		Vector3d v0 = new Vector3d();
+		Vector3d v1 = new Vector3d();
+
+		TurtleMove a;
+		TurtleMove b;
+		TurtleMove c=null;
+		toKeep.add(turtle.history.get(0));
+		for(int i=1;i<len-1;++i) {
+			a = turtle.history.get(i-1);
+			b = turtle.history.get(i);
+			c = turtle.history.get(i+1);
+			// if abc are up then b is redundant.
+			if(!a.isUp && !b.isUp && !c.isUp) {
+				// are ABC in a straight line?
+				v0.x = b.x-a.x;
+				v0.y = b.y-a.y;
+				v0.normalize();
+				v1.x = c.x-b.x;
+				v1.y = c.y-b.y;
+				v1.normalize();
+				if(v1.dot(v0)>0.999999) {
+					// do nothing. lose b.
+				} else {
+					// b not redudant, keep it.
+					toKeep.add(b);
+				}
+			} else {
+				// b not redudant, keep it.
+				toKeep.add(b);
+			}
+		}
+		if(c!=null) {
+			toKeep.add(c);
+		}
+
+		int len2 = toKeep.size();
+		System.out.println("history start="+len+", end="+len2+", saved="+(len-len2));
+		turtle.history.clear();
+		turtle.history.addAll(toKeep);
+	}
+	
 	private void cropTurtles() {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		
-		double pt=robot.getSettings().getPaperTop();
-		double pb=robot.getSettings().getPaperBottom();
-		double pl=robot.getSettings().getPaperLeft();
-		double pr=robot.getSettings().getPaperRight();
+		double pt = robot.getSettings().getPaperTop();
+		double pb = robot.getSettings().getPaperBottom();
+		double pl = robot.getSettings().getPaperLeft();
+		double pr = robot.getSettings().getPaperRight();
 		
-		ArrayList<TurtleMove> toKeep= new ArrayList<TurtleMove>();
+		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 		
 		for( Turtle t : myTurtles ) {
 			int len = t.history.size();
