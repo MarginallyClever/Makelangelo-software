@@ -11,8 +11,6 @@ import java.util.ServiceLoader;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectPanel;
