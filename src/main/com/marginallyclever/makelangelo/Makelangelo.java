@@ -39,7 +39,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
@@ -65,6 +67,7 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.CommandLineOptions;
+import com.marginallyclever.core.LineSegment2D;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.log.Log;
@@ -408,11 +411,21 @@ public final class Makelangelo extends TransferHandler
 			buttonRotate90.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					rotateTurtles90();
+					rotateTurtles(90);
 				}
 			});
 			menu.add(buttonRotate90);
-			
+
+			JMenuItem buttonRotate90cw = new JMenuItem(Translator.get("Makelangelo.action.rotate90cw"));
+			buttonRotate90cw.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK));
+			buttonRotate90cw.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					rotateTurtles(-90);
+				}
+			});
+			menu.add(buttonRotate90cw);
+
 			
 			JMenuItem buttonFlipV = new JMenuItem(Translator.get("Makelangelo.action.flipVertical"));
 			buttonFlipV.addActionListener(new ActionListener() {
@@ -1114,9 +1127,9 @@ public final class Makelangelo extends TransferHandler
 		robot.setTurtles(myTurtles);
 	}
 
-	private void rotateTurtles90() {
+	private void rotateTurtles(double degrees) {
 		for( Turtle t : myTurtles ) {
-			t.rotate(90.0);
+			t.rotate(degrees);
 		}
 	}
 	
@@ -1174,19 +1187,290 @@ public final class Makelangelo extends TransferHandler
 	
 	// shorten the pen up travels.
 	private void optimizeTurtles() {
-		
+		for( Turtle t : myTurtles ) {
+			optimizeOneTurtle(t);
+		}
 	}
+
+	private class Polyline extends LinkedList<Integer> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+	}
+
+	private class Segment2D {
+		public int a,b;
+		
+		public Segment2D(int aa,int bb) {
+			a=aa;
+			b=bb;
+		}
+	}
+	private ArrayList<Point2D> points = new ArrayList<Point2D>();
+	private ArrayList<Segment2D> segments = new ArrayList<Segment2D>();
+	private ArrayList<Polyline> polyLines = new ArrayList<Polyline>();
+
+	private int optimizeAddPointToPool(double x,double y,final double EPSILON) {
+		int i=0;
+		for( Point2D p1 : points ) {
+			if(Math.abs(x-p1.x)<EPSILON && Math.abs(y-p1.y)<EPSILON) {
+				// no
+				return i;
+			}
+			++i;
+		}
+		// yes
+		points.add(new Point2D(x,y));
+		return i; // which is the same as points.size()-1;
+	}
+	
+	private void optimizeOneTurtle(Turtle turtle) {
+		points.clear();
+		segments.clear();
+		polyLines.clear();
+		
+		// build a list of unique points (further than EPSILON apart)
+		// and line segments (two points connected by a line)
+		final double EPSILON = 0.01;
+		
+		TurtleMove prev = null;
+		int drawMoves=0;
+		int travelMoves=0;
+
+		for( TurtleMove m : turtle.history ) {
+			// is this point unique in the pool?
+			if( !m.isUp ) {
+				drawMoves++;
+				int a = optimizeAddPointToPool(prev.x,prev.y,EPSILON);
+				int b = optimizeAddPointToPool(m.x,m.y,EPSILON);
+				if(a!=b) {
+					// we keep only segments that are longer than EPSILON.
+					segments.add(new Segment2D(a,b));
+				}
+			} else {
+				travelMoves++;
+			}
+			
+			prev = m;
+		}
+		System.out.println("history = "+turtle.history.size());
+		System.out.println("drawMoves = "+drawMoves);
+		System.out.println("travelMoves = "+travelMoves);
+		System.out.println("points = "+points.size());
+		System.out.println("segments = "+segments.size());
+		assert(segments.size()<=drawMoves);
+		
+		// greedy tours to build sequence of lines with no pen up or down.
+		while( segments.size()>0 ) {
+			Polyline line = new Polyline();
+			polyLines.add(line);
+			
+			Segment2D s0 = segments.remove(0);
+			int head = s0.a;
+			int tail = s0.b;
+			line.add(head);
+			line.add(tail);
+
+			// if a segment meets the head or tail of this snake, take it from the segment pool and add grow the snake. 
+			ArrayList<Segment2D> segmentsToKeep = new ArrayList<Segment2D>();
+			for( Segment2D s : segments ) {
+					 if(s.a==head) {	line.addFirst(s.b);		head=s.b;	}
+				else if(s.b==head) {	line.addFirst(s.a);		head=s.a;	}
+				else if(s.a==tail) {	line.addLast(s.b);		tail=s.b;	}
+				else if(s.b==tail) {	line.addLast(s.a);		tail=s.a;	}
+				else segmentsToKeep.add(s);
+			}
+			segments = segmentsToKeep;
+			//System.out.println("line size="+line.size());
+		}
+		System.out.println("polylines = "+polyLines.size());
+		assert(polyLines.size()<=segments.size());
+		assert(polyLines.size()<=travelMoves);
+
+		// find the bounds of the points
+		Point2D top = new Point2D(-Double.MAX_VALUE,-Double.MAX_VALUE);
+		Point2D bottom = new Point2D(Double.MAX_VALUE,Double.MAX_VALUE);
+		for( Point2D p : points ) {
+			top.x = Math.max(p.x, top.x);
+			top.y = Math.max(p.y, top.y);
+			bottom.x = Math.min(p.x, bottom.x);
+			bottom.y = Math.min(p.y, bottom.y);
+		}
+		top.x+=0.001;
+		top.y+=0.001;
+		double w = top.x-bottom.x;
+		double h = top.y-bottom.y;
+
+		// we have a box from top to bottom.  
+		// let's make a grid bucketsPerSide*bucketsPerSide large.
+		int numEnds = polyLines.size()*2;
+		int bucketsPerSide = (int)Math.ceil(Math.sqrt(numEnds/2));
+		if(bucketsPerSide<1) bucketsPerSide=1;
+		// allocate buckets
+		Polyline[] buckets = new Polyline[bucketsPerSide*bucketsPerSide];
+		for( int b=0;b<buckets.length;b++) {
+			buckets[b] = new Polyline();
+		}
+		
+		// put the head and tail of each polyline into their buckets.
+		for( Polyline line : polyLines ) {
+			for( int index : new int[] { line.peekFirst(), line.peekLast() } ) {
+				Point2D p = points.get(index);
+				int ix = (int)(bucketsPerSide * (p.x-bottom.x) / w);
+				int iy = (int)(bucketsPerSide * (p.y-bottom.y) / h);
+				buckets[iy*bucketsPerSide+ix].add(index);
+			}
+		}
+
+		{//*
+			// some debug info
+			int i=0;
+			System.out.println("buckets=[");
+			for(int y=0;y<bucketsPerSide;++y) {
+				for(int x=0;x<bucketsPerSide;++x) {
+					System.out.print(buckets[i].size()+"\t");
+					i++;
+				}
+				System.out.println();
+			}
+			System.out.println("]");
+		//*/
+		}
+		
+		// sort the polylines by nearest neighbor into newOrder
+		ArrayList<Polyline> newOrder = new ArrayList<Polyline>();
+		ArrayList<Polyline> foundLines = new ArrayList<Polyline>(); 
+		Polyline foundIndexes = new Polyline();
+		int ix,iy;
+		int bx=0;
+		int by=0;
+		while(polyLines.size()>0) {
+			int radius=0;
+			while(foundIndexes.size()==0) {
+				if(radius==0) {
+					foundIndexes.addAll(buckets[by*bucketsPerSide+bx]);
+				} else {
+					//System.out.println("radius="+radius);
+					for(iy=by-radius;iy<=by+radius;++iy) {
+						if(iy<0 || iy >= bucketsPerSide) continue;
+						ix = bx-radius;  if(ix>=0            ) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
+						ix = bx+radius;  if(ix<bucketsPerSide) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
+					}
+					for(ix=bx-radius;ix<=bx+radius;++ix) {
+						if(ix<0 || ix >= bucketsPerSide) continue;
+						iy = by-radius;  if(iy>=0            ) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
+						iy = by+radius;  if(iy<bucketsPerSide) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
+					}
+				}
+				radius++;
+			}
+			
+			// find best line.
+			Polyline bestLine;
+			{
+				//System.out.println("found "+foundIndexes.size()+" candidate point(s).");
+				// we found at least one index, maybe more, and we don't know which bucket the index(es) came from.
+				// figure out to which polyLine they belong.
+				for( Polyline line : polyLines ) {
+					int first=line.peekFirst();
+					int last =line.peekLast();
+					if(foundIndexes.contains(first) || foundIndexes.contains(last)) {
+						// make sure found lines are unique.
+						if(!foundLines.contains(line)) {
+							foundLines.add(line);
+						}
+					}
+				}
+				//System.out.println("found "+foundLines.size()+" unique polyLine(s).");
+				
+				// we know which lines were found.
+				// we know they are pretty close.
+				// We prefer polylines with a head close to their tail
+				// sort based on this preference.
+				foundLines.sort(new Comparator<Polyline>() {
+					@Override
+					public int compare(Polyline o1, Polyline o2) {
+						int a = o1.peekFirst();
+						int b = o1.peekLast();
+						double d1;
+						if(a==b) d1=0;
+						else {
+							Point2D h1=points.get(a);
+							Point2D t1=points.get(b);
+							d1 = (h1.x-t1.x)*(h1.x-t1.x) + (h1.y-t1.y)*(h1.y-t1.y);
+						}
+						
+						int c=o2.peekFirst();
+						int d=o2.peekLast();
+						double d2;
+						if(c==d) d2=0; 
+						else {
+							Point2D h2=points.get(c);
+							Point2D t2=points.get(d);					
+							d2 = (h2.x-t2.x)*(h2.x-t2.x) + (h2.y-t2.y)*(h2.y-t2.y);
+						}
+						
+						return (int)((d2-d1)*1000);
+					}
+				});
+				// the first line is the best line in the list
+				bestLine = foundLines.get(0);
+				foundLines.clear();
+				
+				// set bx/by 
+				int first = bestLine.peekLast();
+				int last = bestLine.peekLast();
+				Point2D p = points.get(foundIndexes.contains(first) ? last : first);
+				bx = (int)(bucketsPerSide * (p.x-bottom.x) / w);
+				by = (int)(bucketsPerSide * (p.y-bottom.y) / h);
+
+				foundIndexes.clear();
+			}
+
+			//System.out.println("cleanup...");
+			polyLines.remove(bestLine);
+			newOrder.add(bestLine);
+			Integer bh = bestLine.peekFirst();
+			Integer bt = bestLine.peekLast();
+			for( Polyline b : buckets ) {
+				b.remove(bh);
+				b.remove(bt);
+			}
+			
+			if((polyLines.size()%1000)==0) {
+				System.out.println(polyLines.size());
+			}
+		}
+		
+		// rebuild the new, more efficient turtle path
+		System.out.println("Rebuilding...");
+		ArrayList<TurtleMove> newHistory = new ArrayList<TurtleMove>();
+		for( Polyline line : newOrder ) {
+			boolean first=true;
+			for( Integer index : line ) {
+				Point2D p = points.get(index);
+				newHistory.add(new TurtleMove(p.x,p.y,first));
+				first=false;
+			}
+		}
+		turtle.history = newHistory;
+	}
+	
 	
 	// reduce the total number of commands without altering the output.
 	private void simplifyTurtles() {
 		for( Turtle t : myTurtles ) {
 			removeSequentialPenUpMoves(t);
+		}
+		
+		for( Turtle t : myTurtles ) {
 			removeSequentialLinearPenDownMoves(t);
 		}
 	}
 	
 	/**
-	 * Any time there are three pen up moves in a row, the middle is not needed.
+	 * Any time there are two pen up moves in a row then the first is not needed.
 	 * @param turtle to be simplified.
 	 */
 	private void removeSequentialPenUpMoves(Turtle turtle) {
@@ -1194,24 +1478,21 @@ public final class Makelangelo extends TransferHandler
 		
 		int len = turtle.history.size();
 		
-		TurtleMove a;
-		TurtleMove b;
-		TurtleMove c=null;
-		toKeep.add(turtle.history.get(0));
-		for(int i=1;i<len-1;++i) {
-			a = turtle.history.get(i-1);
+		TurtleMove a=turtle.history.get(0);
+		TurtleMove b=null;
+		for(int i=1;i<len;++i) {
 			b = turtle.history.get(i);
-			c = turtle.history.get(i+1);
 			// if abc are up then b is redundant.
-			if(a.isUp && b.isUp && c.isUp) {
-				// do nothing. lose b.
+			if(a.isUp && b.isUp) {
+				// do nothing. lose a.
 			} else {
-				// b not redudant, keep it.
-				toKeep.add(b);
+				// a not redudant, keep it.
+				toKeep.add(a);
 			}
+			a = b;
 		}
-		if(c!=null) {
-			toKeep.add(c);
+		if(b!=null) {
+			toKeep.add(b);
 		}
 
 		int len2 = toKeep.size();
@@ -1241,7 +1522,7 @@ public final class Makelangelo extends TransferHandler
 			b = turtle.history.get(i);
 			c = turtle.history.get(i+1);
 			// if abc are up then b is redundant.
-			if(!a.isUp && !b.isUp && !c.isUp) {
+			if(!b.isUp && !c.isUp) {
 				// are ABC in a straight line?
 				v0.x = b.x-a.x;
 				v0.y = b.y-a.y;
