@@ -1225,7 +1225,23 @@ public final class Makelangelo extends TransferHandler
 		return i; // which is the same as points.size()-1;
 	}
 	
+	private void reportTurtleTravel(Turtle turtle) {
+		double travel=0;
+		TurtleMove prev=null;
+		for( TurtleMove mo : turtle.history ) {
+			if(mo.isUp && prev!=null ) {
+				double dx=prev.x-mo.x;
+				double dy=prev.y-mo.y;
+				travel += Math.sqrt(dx*dx+dy*dy);
+			}
+			prev=mo;
+		}
+		System.out.println("Travel (mm)="+travel);
+	}
+
 	private void optimizeOneTurtle(Turtle turtle) {
+		reportTurtleTravel(turtle);
+		
 		points.clear();
 		segments.clear();
 		polyLines.clear();
@@ -1323,7 +1339,7 @@ public final class Makelangelo extends TransferHandler
 			}
 		}
 
-		{//*
+		{/*
 			// some debug info
 			int i=0;
 			System.out.println("buckets=[");
@@ -1342,9 +1358,11 @@ public final class Makelangelo extends TransferHandler
 		ArrayList<Polyline> newOrder = new ArrayList<Polyline>();
 		ArrayList<Polyline> foundLines = new ArrayList<Polyline>(); 
 		Polyline foundIndexes = new Polyline();
+		Point2D lastPoint=null;
 		int ix,iy;
 		int bx=0;
 		int by=0;
+		
 		while(polyLines.size()>0) {
 			int radius=0;
 			while(foundIndexes.size()==0) {
@@ -1384,31 +1402,51 @@ public final class Makelangelo extends TransferHandler
 				}
 				//System.out.println("found "+foundLines.size()+" unique polyLine(s).");
 				
+				if(newOrder.size()>0) {
+					newOrder.get(newOrder.size()-1);
+				}
 				// we know which lines were found.
 				// we know they are pretty close.
+				// We prefer polylines that start and end in the same cell.
+				//   That means we prefer closed polyloops first.
 				// We prefer polylines with a head close to their tail
 				// sort based on this preference.
+				final Point2D testLastPoint = lastPoint;
 				foundLines.sort(new Comparator<Polyline>() {
 					@Override
 					public int compare(Polyline o1, Polyline o2) {
 						int a = o1.peekFirst();
 						int b = o1.peekLast();
-						double d1;
-						if(a==b) d1=0;
+						int c=o2.peekFirst();
+						int d=o2.peekLast();
+						double d1=0;
+						double d2=0;
+						/*
+						if(a==b) d1=0;  // closed
 						else {
 							Point2D h1=points.get(a);
 							Point2D t1=points.get(b);
-							d1 = (h1.x-t1.x)*(h1.x-t1.x) + (h1.y-t1.y)*(h1.y-t1.y);
+							double dx=h1.x-t1.x;
+							double dy=h1.y-t1.y;
+							d1 = dx*dx+dy*dy;
 						}
 						
-						int c=o2.peekFirst();
-						int d=o2.peekLast();
-						double d2;
-						if(c==d) d2=0; 
+						if(c==d) d2=0;  // closed
 						else {
 							Point2D h2=points.get(c);
 							Point2D t2=points.get(d);					
-							d2 = (h2.x-t2.x)*(h2.x-t2.x) + (h2.y-t2.y)*(h2.y-t2.y);
+							double dx=h2.x-t2.x;
+							double dy=h2.y-t2.y;
+							d2 = dx*dx+dy*dy;
+						}*/
+						
+						if(d1==d2 && testLastPoint!=null) {
+							Point2D h1=points.get(a);
+							Point2D t1=points.get(b);
+							Point2D h2=points.get(c);
+							Point2D t2=points.get(d);					
+							d1 = Math.min(testLastPoint.distance(h1), testLastPoint.distance(t1));
+							d1 = Math.min(testLastPoint.distance(h2), testLastPoint.distance(t2));
 						}
 						
 						return (int)((d2-d1)*1000);
@@ -1421,9 +1459,9 @@ public final class Makelangelo extends TransferHandler
 				// set bx/by 
 				int first = bestLine.peekLast();
 				int last = bestLine.peekLast();
-				Point2D p = points.get(foundIndexes.contains(first) ? last : first);
-				bx = (int)(bucketsPerSide * (p.x-bottom.x) / w);
-				by = (int)(bucketsPerSide * (p.y-bottom.y) / h);
+				lastPoint = points.get(foundIndexes.contains(first) ? last : first);
+				bx = (int)(bucketsPerSide * (lastPoint.x-bottom.x) / w);
+				by = (int)(bucketsPerSide * (lastPoint.y-bottom.y) / h);
 
 				foundIndexes.clear();
 			}
@@ -1439,7 +1477,7 @@ public final class Makelangelo extends TransferHandler
 			}
 			
 			if((polyLines.size()%1000)==0) {
-				System.out.println(polyLines.size());
+				//System.out.println(polyLines.size());
 			}
 		}
 		
@@ -1455,6 +1493,8 @@ public final class Makelangelo extends TransferHandler
 			}
 		}
 		turtle.history = newHistory;
+
+		reportTurtleTravel(turtle);
 	}
 	
 	
