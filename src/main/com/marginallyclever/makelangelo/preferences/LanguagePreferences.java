@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 
 import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
+import com.marginallyclever.core.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.Translator;
 
 public class LanguagePreferences {
@@ -17,9 +18,12 @@ public class LanguagePreferences {
 		
 		languageList = Translator.getLanguageList();
 		int currentIndex = Translator.getCurrentLanguageIndex();
-		languageOptions = new SelectOneOfMany("Language",languageList,currentIndex);
+		languageOptions = new SelectOneOfMany(Translator.get("LanguagePreferences.language"),languageList,currentIndex);
 		
 		panel.add(languageOptions);
+		
+		panel.add(new SelectReadOnlyText(Translator.get("LanguagePreferences.notice")));
+		
 		panel.finish();
 
 		return panel;
@@ -39,7 +43,7 @@ public class LanguagePreferences {
 
 		int result;
 		do {
-			result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+			result = JOptionPane.showConfirmDialog(null, panel, Translator.get("LanguagePreferences.language"), JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
 		} while(result != JOptionPane.OK_OPTION);
 		
 		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
