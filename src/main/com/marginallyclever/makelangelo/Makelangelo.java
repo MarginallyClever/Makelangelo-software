@@ -282,15 +282,6 @@ public final class Makelangelo extends TransferHandler
 			});
 			menu.add(buttonAdjustPreferences);
 	
-			JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-			buttonCheckForUpdate.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					checkForUpdate(false);
-				}
-			});
-			menu.add(buttonCheckForUpdate);
-	
 			menu.addSeparator();
 	
 			JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
@@ -604,6 +595,15 @@ public final class Makelangelo extends TransferHandler
 				}
 			});
 			menu.add(buttonForums);
+			
+			JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
+			buttonCheckForUpdate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					checkForUpdate(false);
+				}
+			});
+			menu.add(buttonCheckForUpdate);
 			
 			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
 			buttonAbout.addActionListener(new ActionListener() {
@@ -1600,8 +1600,6 @@ public final class Makelangelo extends TransferHandler
 		double yBottom = robot.getSettings().getPaperBottom();
 		double xLeft   = robot.getSettings().getPaperLeft();
 		double xRight  = robot.getSettings().getPaperRight();
-		Point2D tr = new Point2D(xRight,yTop);
-		Point2D bl = new Point2D(xLeft,yBottom);
 		
 		for( Turtle t : myTurtles ) {
 			cropOneTurtle(t,xRight,yTop,xLeft,yBottom);
@@ -1643,7 +1641,7 @@ public final class Makelangelo extends TransferHandler
 		}
 		// last point
 		if(len>1) {
-			TurtleMove prev = turtle.history.get(len-2);
+			prev = turtle.history.get(len-2);
 			TurtleMove next = turtle.history.get(len-1);
 			p0.set(prev.x,prev.y);
 			p1.set(next.x,next.y);
