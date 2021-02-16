@@ -66,6 +66,7 @@ import javax.vecmath.Vector3d;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.LineSegment2D;
 import com.marginallyclever.core.Point2D;
@@ -1591,39 +1592,74 @@ public final class Makelangelo extends TransferHandler
 		turtle.history.addAll(toKeep);
 	}
 	
-	private void cropTurtles() {
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
-		Turtle.getBounds(myTurtles, top, bottom);
+	/**
+	 * crop a set of {@link Turtle} to the page edges.
+	 */
+	private void cropTurtles() {	
+		double yTop    = robot.getSettings().getPaperTop();
+		double yBottom = robot.getSettings().getPaperBottom();
+		double xLeft   = robot.getSettings().getPaperLeft();
+		double xRight  = robot.getSettings().getPaperRight();
+		Point2D tr = new Point2D(xRight,yTop);
+		Point2D bl = new Point2D(xLeft,yBottom);
 		
-		double pt = robot.getSettings().getPaperTop();
-		double pb = robot.getSettings().getPaperBottom();
-		double pl = robot.getSettings().getPaperLeft();
-		double pr = robot.getSettings().getPaperRight();
+		for( Turtle t : myTurtles ) {
+			cropOneTurtle(t,xRight,yTop,xLeft,yBottom);
+		}
+	}
+	
+	/**
+	 * Crop one {@link Turtle}.
+	 * @param turtle
+	 * @param tl top right corner
+	 * @param bl bottom left corner
+	 */
+	private void cropOneTurtle(Turtle turtle,double xRight,double yTop,double xLeft,double yBottom) {	
+		Point2D tr = new Point2D(xRight,yTop);
+		Point2D bl = new Point2D(xLeft,yBottom);
 		
 		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 		
-		for( Turtle t : myTurtles ) {
-			int len = t.history.size();
-			
-			for(int i=1;i<len;++i) {
-				TurtleMove prev = t.history.get(i-1);
-				TurtleMove next = t.history.get(i);
-				if(!prev.isUp && !next.isUp) {
-					// we are drawing
-					//boolean pIn = inPaper(prev);
-					//boolean nIn = inPaper(next);
-					//if(pIn != nIn) 
-					{
-						// needs to be cropped
-					}
-					
+		Point2D p0 = new Point2D();
+		Point2D p1 = new Point2D();
+		
+		int len = turtle.history.size();
+
+		TurtleMove prev = turtle.history.get(0);
+		for(int i=0;i<len-1;++i) {
+			TurtleMove next = turtle.history.get(i+1);
+			p0.set(prev.x,prev.y);
+			p1.set(next.x,next.y);
+
+			boolean prevIn = (Clipper2D.outCodes(p0, xLeft, xRight, yTop, yBottom)==0);
+			if(Clipper2D.clipLineToRectangle(p0, p1, tr, bl)) {
+				if(prevIn) {
+					toKeep.add(new TurtleMove(p0.x,p0.y,prev.isUp));
+				} else {
+					toKeep.add(new TurtleMove(p0.x,p0.y,true));
 				}
-			}
-			//t.history.clear();
-			//t.history.addAll(toKeep);
-			//toKeep.clear();
+			} // else entire line clipped
+			prev = next;
 		}
+		// last point
+		if(len>1) {
+			TurtleMove prev = turtle.history.get(len-2);
+			TurtleMove next = turtle.history.get(len-1);
+			p0.set(prev.x,prev.y);
+			p1.set(next.x,next.y);
+			boolean nextIn = (Clipper2D.outCodes(p1, xLeft, xRight, yTop, yBottom)==0);
+			if(Clipper2D.clipLineToRectangle(p0, p1, tr, bl)) {
+				if(nextIn) {
+					toKeep.add(new TurtleMove(p1.x,p1.y,next.isUp));
+				} else {
+					toKeep.add(new TurtleMove(p1.x,p1.y,true));
+				}
+			} // else entire line clipped
+		}
+		
+		turtle.history.clear();
+		turtle.history.addAll(toKeep);
+		toKeep.clear();
 	}
 }
 

@@ -21,7 +21,7 @@ public class Clipper2D {
 		double yBottom = rMin.y;
 		double yTop    = rMax.y;
 		
-		int outCode0,outCode1; 
+		int outCode0, outCode1; 
 		
 		while(true) {
 			outCode0 = outCodes(P0,xLeft,xRight,yTop,yBottom);
@@ -70,7 +70,16 @@ public class Clipper2D {
 		return true;  // partially in
 	}
 	
-	private static int outCodes(Point2D P,double xLeft,double xRight,double yTop,double yBottom) {
+	/**
+	 * Is the point inside the rectangle?
+	 * @param P
+	 * @param xLeft
+	 * @param xRight
+	 * @param yTop
+	 * @param yBottom
+	 * @return 0 for in, bit 1 above, bit 2 below, bit 4 right, bit 8 left.
+	 */
+	public static int outCodes(Point2D P,double xLeft,double xRight,double yTop,double yBottom) {
 		int code = 0;
 		     if(P.y > yTop   ) code += 1; // code for above
 		else if(P.y < yBottom) code += 2; // code for below

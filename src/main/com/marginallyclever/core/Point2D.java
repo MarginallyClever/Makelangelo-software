@@ -39,4 +39,9 @@ public class Point2D {
 	public double distance(Point2D p) {
 		return Math.sqrt(distanceSquared(p));
 	}
+	
+	@Override
+	public String toString() {
+		return "("+x+","+y+")";
+	}
 }
