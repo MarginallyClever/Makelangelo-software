@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,18 +25,9 @@ import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makela
  * @author danroyer
  * @since 7.1.4
  */
-public class MakelangeloSettingsDialog
-extends JPanel
-implements ActionListener {
-	/**
-	 * See Serializable
-	 */
-	private static final long serialVersionUID = 1L;
-
-	protected MakelangeloRobot robot;
-	protected Frame parentFrame;
-	protected JTabbedPane panes;
-	protected JButton save, cancel;
+public class MakelangeloSettingsDialog {
+	private MakelangeloRobot robot;
+	private JTabbedPane panes;
 
 	private JComboBox<String> hardwareVersionChoices;
 	private ArrayList<String> availableHardwareVersions;
@@ -45,147 +35,138 @@ implements ActionListener {
 	private String originalHardwareVersion;
 
 	private JPanel modelPanel;
-	protected PanelAdjustMachine panelAdjustMachine;
-	protected PanelAdjustPaper panelAdjustPaper;
-	protected PanelAdjustPen panelAdjustPen;
+	private PanelAdjustMachine panelAdjustMachine;
+	private PanelAdjustPaper panelAdjustPaper;
+	private PanelAdjustPen panelAdjustPen;
 
-	protected int dialogWidth = 450;
-	protected int dialogHeight = 500;
-
-	public MakelangeloSettingsDialog(Frame parent, MakelangeloRobot robot) {
-		super();
-		this.parentFrame = parent;
+	public MakelangeloSettingsDialog(MakelangeloRobot robot) {
 		this.robot = robot;
 	}
 
-  
-  // display settings menu
-  public void run() {
-	  originalHardwareVersion = robot.getSettings().getHardwareVersion();
-	  
-	  this.setLayout(new GridBagLayout());
-	  GridBagConstraints d = new GridBagConstraints();
+	// display settings menu
+	public void run(Frame parent) {
+		JPanel panel = new JPanel();
+		originalHardwareVersion = robot.getSettings().getHardwareVersion();
 
-	  buildModelPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints d = new GridBagConstraints();
 
-	  // hardware model settings
-	  panes = new JTabbedPane(JTabbedPane.TOP);
-	  panes.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-	  //panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
+		buildModelPanel();
 
-	  rebuildTabbedPanes();
+		// hardware model settings
+		panes = new JTabbedPane(JTabbedPane.TOP);
+		panes.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		// panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
 
-	  // now assemble the dialog
-	  d.fill=GridBagConstraints.HORIZONTAL;
-	  d.gridx=0;
-	  d.gridy=0;
-	  d.weightx=0;
-	  d.weighty=0;
-	  d.gridwidth=1;
-	  this.add(modelPanel, d);
-	  d.fill=GridBagConstraints.BOTH;
-	  d.gridy=1;
-	  d.weightx=1;
-	  d.weighty=1;
-	  this.add(panes,d);
-	  
-	  int result = JOptionPane.showConfirmDialog(parentFrame, this, Translator.get("configureMachine"),
-			  JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-	  if (result == JOptionPane.OK_OPTION) {
-		  panelAdjustMachine.save();
-		  panelAdjustPaper.save();
-		  panelAdjustPen.save();
-		  robot.getSettings().saveConfig();
-		  robot.sendConfig();
-	  } else {
-		  robot.getSettings().setHardwareVersion(originalHardwareVersion);
-	  }
-  }
+		rebuildTabbedPanes();
 
-  // hardware model choice
-  private void buildModelPanel() {
-	  modelPanel = new JPanel(new GridBagLayout());
-	  modelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+		// now assemble the dialog
+		d.fill = GridBagConstraints.HORIZONTAL;
+		d.gridx = 0;
+		d.gridy = 0;
+		d.weightx = 0;
+		d.weighty = 0;
+		d.gridwidth = 1;
+		panel.add(modelPanel, d);
+		d.fill = GridBagConstraints.BOTH;
+		d.gridy = 1;
+		d.weightx = 1;
+		d.weighty = 1;
+		panel.add(panes, d);
 
-	  GridBagConstraints d = new GridBagConstraints();
-	  // the panes for the selected machine configuration
-	  d.fill=GridBagConstraints.BOTH;
-	  d.gridx=0;
-	  d.gridy=0;
-	  d.weightx=0;
-	  d.weighty=0;
-	  
-	  JLabel modelLabel = new JLabel(Translator.get("HardwareVersion")); 
-	  modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-	  modelPanel.add(modelLabel, d);
-	  
-	  findAvailableHardwareVersions();
-	  
-	  d.gridx=1;
-	  d.gridwidth=2;
-	  hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
-	  // set the default
-	  String hv = robot.getSettings().getHardwareVersion();
-	  for(int i=0;i<availableHardwareVersions.size();++i) {
-		  if(availableHardwareVersions.get(i).equals(hv)) {
-			  hardwareVersionChoices.setSelectedIndex(i);
-			  break;
-		  }
-	  }
-	  modelPanel.add(hardwareVersionChoices, d);
-	  hardwareVersionChoices.addActionListener(this);
-  }
+		int result = JOptionPane.showConfirmDialog(parent, panel, Translator.get("configureMachine"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (result == JOptionPane.OK_OPTION) {
+			panelAdjustMachine.save();
+			panelAdjustPaper.save();
+			panelAdjustPen.save();
+			robot.getSettings().saveConfig();
+			robot.sendConfig();
+		} else {
+			robot.getSettings().setHardwareVersion(originalHardwareVersion);
+		}
+	}
 
-  private void findAvailableHardwareVersions() {
-	  availableHardwareVersions = new ArrayList<String>();
-	  
-	  // get version numbers
-	  ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
-	  Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
-	  while(i.hasNext()) {
-		  MakelangeloHardwareProperties hw = i.next();
-		  availableHardwareVersions.add(new String(hw.getVersion()));
-	  }
+	// hardware model choice
+	private void buildModelPanel() {
+		modelPanel = new JPanel(new GridBagLayout());
+		modelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
-	  // get names
-	  hardwareVersionNames = new String[availableHardwareVersions.size()];
-	  i = knownHardware.iterator();
-	  int j=0;
-	  while(i.hasNext()) {
-		  MakelangeloHardwareProperties hw = i.next();
-		  hardwareVersionNames[j] = hw.getName();
-		  ++j;
-	  }	  
-  }
-  
-  
-  private void rebuildTabbedPanes() {
-	  // returns tab index or -1 if none selected
-	  int previouslySelectedTab = panes.getSelectedIndex();
-	  panes.removeAll();
-	  
-	  panelAdjustMachine = new PanelAdjustMachine(robot);
-	  panes.addTab(Translator.get("MenuSettingsMachine"),panelAdjustMachine.getInteriorPanel());
+		GridBagConstraints d = new GridBagConstraints();
+		// the panes for the selected machine configuration
+		d.fill = GridBagConstraints.BOTH;
+		d.gridx = 0;
+		d.gridy = 0;
+		d.weightx = 0;
+		d.weighty = 0;
 
-	  panelAdjustPaper = new PanelAdjustPaper(robot);
-	  panes.addTab(Translator.get("MenuAdjustPaper"),panelAdjustPaper.getInteriorPanel());
+		JLabel modelLabel = new JLabel(Translator.get("HardwareVersion"));
+		modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+		modelPanel.add(modelLabel, d);
 
-	  panelAdjustPen = new PanelAdjustPen(robot);
-	  panes.addTab(Translator.get("MenuAdjustTool"),panelAdjustPen.getInteriorPanel());
+		findAvailableHardwareVersions();
 
-	  // if one tab was selected, make sure to reselect it	  
-	  if(previouslySelectedTab!=-1) {
-		  panes.setSelectedIndex(previouslySelectedTab);
-	  }
-  }
-  
-  public void actionPerformed(ActionEvent e) {
-	  Object src = e.getSource();
-	  
-	  if(src == hardwareVersionChoices) {
-		  String newChoice=availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
-		  robot.getSettings().setHardwareVersion(newChoice);
-		  rebuildTabbedPanes();
-	  }
-  }
+		d.gridx = 1;
+		d.gridwidth = 2;
+		hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
+		// set the default
+		String hv = robot.getSettings().getHardwareVersion();
+		for (int i = 0; i < availableHardwareVersions.size(); ++i) {
+			if (availableHardwareVersions.get(i).equals(hv)) {
+				hardwareVersionChoices.setSelectedIndex(i);
+				break;
+			}
+		}
+		modelPanel.add(hardwareVersionChoices, d);
+		hardwareVersionChoices.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String newChoice = availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
+				robot.getSettings().setHardwareVersion(newChoice);
+				rebuildTabbedPanes();
+			}
+		});
+	}
+
+	private void findAvailableHardwareVersions() {
+		availableHardwareVersions = new ArrayList<String>();
+
+		// get version numbers
+		ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
+		Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
+		while (i.hasNext()) {
+			MakelangeloHardwareProperties hw = i.next();
+			availableHardwareVersions.add(new String(hw.getVersion()));
+		}
+
+		// get names
+		hardwareVersionNames = new String[availableHardwareVersions.size()];
+		i = knownHardware.iterator();
+		int j = 0;
+		while (i.hasNext()) {
+			MakelangeloHardwareProperties hw = i.next();
+			hardwareVersionNames[j] = hw.getName();
+			++j;
+		}
+	}
+
+	private void rebuildTabbedPanes() {
+		// returns tab index or -1 if none selected
+		int previouslySelectedTab = panes.getSelectedIndex();
+		panes.removeAll();
+
+		panelAdjustMachine = new PanelAdjustMachine(robot);
+		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine.getInteriorPanel());
+
+		panelAdjustPaper = new PanelAdjustPaper(robot);
+		panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getInteriorPanel());
+
+		panelAdjustPen = new PanelAdjustPen(robot);
+		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen.getInteriorPanel());
+
+		// if one tab was selected, make sure to reselect it
+		if (previouslySelectedTab != -1) {
+			panes.setSelectedIndex(previouslySelectedTab);
+		}
+	}
 }
