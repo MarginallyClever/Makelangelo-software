@@ -121,9 +121,9 @@ public final class MakelangeloRobotSettings implements Serializable {
 		
 		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
 		
-		// paper area
-		double pw = 420 * 0.1; // cm
-		double ph = 594 * 0.1; // cm
+		// paper area (A2=420x594mm)
+		double pw = 420;
+		double ph = 594;
 
 		paperTop = ph/2;
 		paperBottom = -ph/2;
@@ -138,7 +138,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
 		
 		// default hardware version is 2
-		setHardwareVersion("2");
+		setHardwareVersion("5");
 
 		// which configurations are available?
 		try {
