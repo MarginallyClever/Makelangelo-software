@@ -338,8 +338,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
 		c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
 		
-		drivePanel.setCollapsed(true);
-		
 		return drivePanel;
 	}
 	
@@ -396,12 +394,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonOpenSettings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Frame frame = (Frame)getRootPane().getParent();
-				MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
-				m.run();
-				// we can only get here if the robot is connected and not running.
-				// Save the gcode so that updates to settings are applied immediately + automatically.
-				robot.saveCurrentTurtlesToDrawing();
+				MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(robot);
+				m.run(makelangeloApp.getMainFrame());
 			}
 		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());

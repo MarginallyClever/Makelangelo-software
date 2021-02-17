@@ -765,7 +765,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	}
 
 	// Copy the most recent turtle to the drawing output buffer.
-	public void saveCurrentTurtlesToDrawing() {
+	private void saveCurrentTurtlesToDrawing() {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			SaveGCode saveNGC = new SaveGCode();
