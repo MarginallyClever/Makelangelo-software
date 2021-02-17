@@ -13,8 +13,11 @@ import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
  *
  */
 public class Edit_TransformTurtle extends TurtleGenerator {
+	// source of {@link Turtle}
 	public NodeConnectorTurtle inputTurtle = new NodeConnectorTurtle(Translator.get("Edit_TransformTurtle.inputTurtle"),new Turtle()); 
+	// degrees to rotate ccw
 	public NodeConnectorAngle inputAngle = new NodeConnectorAngle(Translator.get("NodeConnectorAngle.inputAngle"),0.0);
+	// amount to scale in all directions.  1.0 remains unchanged.
 	public NodeConnectorDouble inputScale = new NodeConnectorDouble(Translator.get("NodeConnectorAngle.inputScale"),1.0);
 	
 	public Edit_TransformTurtle() {
