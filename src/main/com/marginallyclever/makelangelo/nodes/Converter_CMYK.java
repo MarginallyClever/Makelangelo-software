@@ -12,21 +12,21 @@ import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 
 
 /**
- * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
+ * create parallel lines across the image.  Raise and lower the pen to darken the appropriate areas
  * Color values are from 0...255 inclusive.  255 is white, 0 is black.
  * Lift the pen any time the color value is > cutoff
  * @see http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
  */
 public class Converter_CMYK extends ImageConverter {
-	// TODO explain me
+	// detail level of scan.  1 is the most detailed. 2 is half as much. etc.
 	private NodeConnectorBoundedInt inputStepSize = new NodeConnectorBoundedInt("Converter_CMYK.inputStepSize",6,1,1);
 	// cyan channel
-	protected NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle("Converter_CMYK.outputTurtleC");
+	private NodeConnectorTurtle outputTurtleC = new NodeConnectorTurtle("Converter_CMYK.outputTurtleC");
 	// magenta channel
-	protected NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle("Converter_CMYK.outputTurtleM");
+	private NodeConnectorTurtle outputTurtleM = new NodeConnectorTurtle("Converter_CMYK.outputTurtleM");
 	// yellow channel
-	protected NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle("Converter_CMYK.outputTurtleY");
+	private NodeConnectorTurtle outputTurtleY = new NodeConnectorTurtle("Converter_CMYK.outputTurtleY");
 	
 	public Converter_CMYK() {
 		super();
