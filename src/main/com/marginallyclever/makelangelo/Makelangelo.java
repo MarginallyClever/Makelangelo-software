@@ -47,6 +47,7 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -54,8 +55,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
@@ -68,7 +67,6 @@ import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
-import com.marginallyclever.core.LineSegment2D;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.log.Log;
@@ -93,6 +91,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangelo.robot.PiCaptureAction;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettingsListener;
+import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -135,12 +134,11 @@ public final class Makelangelo extends TransferHandler
 	// only allow one log frame
 	private JFrame logFrame = null;
 	private LogPanel logPanel = null;
+	private JMenuBar menuBar;
+
 	
 	// OpenGL window
 	private PreviewPanel previewPanel;
-	
-	// Context sensitive menu
-	private MakelangeloRobotPanel robotPanel;
 	
 	private PiCaptureAction piCameraCaptureAction;
 	
@@ -239,8 +237,8 @@ public final class Makelangelo extends TransferHandler
 	public JMenuBar createMenuBar() {
 		Log.message("Create menu bar");
 
-		JMenuBar menuBar = new JMenuBar();
-
+		menuBar = new JMenuBar();
+		
 		JMenu menu;
 
 		// File menu
@@ -275,9 +273,6 @@ public final class Makelangelo extends TransferHandler
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					appPreferences.run(getMainFrame());
-					if(robotPanel!=null) {
-						robotPanel.updateButtonAccess();
-					}
 				}
 			});
 			menu.add(buttonAdjustPreferences);
@@ -312,6 +307,7 @@ public final class Makelangelo extends TransferHandler
 						
 						// Display the panel
 						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+				        dialog.setLocation(getMainFrame().getLocation());
 						dialog.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
@@ -359,6 +355,7 @@ public final class Makelangelo extends TransferHandler
 						// add the converter to the pool
 						// display the panel
 						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+				        dialog.setLocation(getMainFrame().getLocation());
 						dialog.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
@@ -577,10 +574,36 @@ public final class Makelangelo extends TransferHandler
 			menu.add(buttonViewLog);
 		}
 		
+		// robot menu
+		{
+			Log.message("  robot...");
+			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
+			
+			JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
+			menu.add(buttonRobotSettings);
+			buttonRobotSettings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(robot);
+					m.run(getMainFrame());
+				}
+			});
+			
+			JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
+			menu.add(buttonShowRobotPanel);
+			buttonShowRobotPanel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					runRobotDialog();
+				}
+			});
+			menuBar.add(menu);
+		}
+		
 		// help menu
 		{
 			Log.message("  help...");
-			menu = new JMenu(Translator.get("Help"));
+			menu = new JMenu(Translator.get("Makelangelo.menuHelp"));
 			menuBar.add(menu);
 	
 			JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
@@ -721,17 +744,8 @@ public final class Makelangelo extends TransferHandler
 			previewPanel = new PreviewPanel();
 			previewPanel.setCamera(camera);
 			previewPanel.addListener(robot);
-	
-			Log.message("  assign panel to robot...");
-			robotPanel = new MakelangeloRobotPanel(this,robot);
-	
-			// major layout
-			Log.message("  vertical split...");
-			MyJSplitPane splitLeftRight = new MyJSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			splitLeftRight.add(previewPanel);
-			splitLeftRight.add(new JScrollPane(robotPanel));
-	
-			contentPane.add(splitLeftRight, BorderLayout.CENTER);
+
+			contentPane.add(previewPanel);
 			mainFrame.setContentPane(contentPane);
 		}
 		
@@ -746,6 +760,20 @@ public final class Makelangelo extends TransferHandler
 
 		Log.message("  adding drag & drop support...");
 		mainFrame.setTransferHandler(this);
+	}
+
+	private void runRobotDialog() {
+		menuBar.setEnabled(false);
+
+		MakelangeloRobotPanel myRobotPanel = new MakelangeloRobotPanel(this,robot);
+		
+		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
+        dialog.setLocation(getMainFrame().getLocation());
+		dialog.setContentPane(myRobotPanel);
+		dialog.pack();
+		dialog.setVisible(true);
+		
+		menuBar.setEnabled(true);
 	}
 
 	private void adjustWindowSize() {
@@ -950,9 +978,6 @@ public final class Makelangelo extends TransferHandler
 		// TODO don't rely on success to be true, load may not have finished yet.
 		if (success == true) {
 			SoundSystem.playConversionFinishedSound();
-			if( robotPanel != null ) {
-				robotPanel.updateButtonAccess();
-			}
 		}
 		
 		return success;
@@ -1048,9 +1073,6 @@ public final class Makelangelo extends TransferHandler
 				if(success==true) {
 					lastFileOut = selectedFile;
 					lastFilterOut = selectedFilter;
-					if( robotPanel != null ) {
-						robotPanel.updateButtonAccess();
-					}
 					break;
 				}					
 			}
