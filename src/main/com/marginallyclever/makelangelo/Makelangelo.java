@@ -84,11 +84,9 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotListener;
 import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangelo.robot.PiCaptureAction;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettingsListener;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
@@ -98,8 +96,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler
-		implements WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
+public final class Makelangelo extends TransferHandler implements WindowListener {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -114,7 +111,6 @@ public final class Makelangelo extends TransferHandler
 	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	private MakelangeloAppPreferences appPreferences;
-	
 	
 	private Camera camera;
 	private MakelangeloRobot robot;
@@ -181,8 +177,6 @@ public final class Makelangelo extends TransferHandler
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
-		robot.addListener(this);
-		robot.getSettings().addListener(this);
 		logPanel.setRobot(robot);
 
 		testGeneratorsAndConverters();
@@ -577,8 +571,10 @@ public final class Makelangelo extends TransferHandler
 			buttonRobotSettings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					menuBar.setEnabled(false);
 					MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(robot);
 					m.run(getMainFrame());
+					menuBar.setEnabled(true);
 				}
 			});
 			
@@ -800,37 +796,6 @@ public final class Makelangelo extends TransferHandler
 		// int locationY = prefs.getInt("Default window location y",
 		// defaultLocationY);
 		// mainFrame.setLocation(locationX,locationY);
-	}
-
-	@Override
-	public void portConfirmed(MakelangeloRobot r) {
-		if (previewPanel != null)
-			previewPanel.repaint();
-	}
-
-	@Override
-	public void firmwareVersionBad(MakelangeloRobot r, long versionFound) {
-		(new DialogBadFirmwareVersion()).display(mainFrame, Long.toString(versionFound));
-	}
-
-	@Override
-	public void dataAvailable(MakelangeloRobot r, String data) {
-		if (data.endsWith("\n"))
-			data = data.substring(0, data.length() - 1);
-		Log.message(data); // #ffa500 = orange
-	}
-
-	@Override
-	public void sendBufferEmpty(MakelangeloRobot r) {}
-
-	@Override
-	public void lineError(MakelangeloRobot r, int lineNumber) {}
-
-	@Override
-	public void disconnected(MakelangeloRobot r) {
-		if (previewPanel != null)
-			previewPanel.repaint();
-		SoundSystem.playDisconnectSound();
 	}
 
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {

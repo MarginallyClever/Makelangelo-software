@@ -24,6 +24,8 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
+import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
+import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
@@ -36,7 +38,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JPanel implements ActionListener {
+public class MakelangeloRobotPanel extends JPanel implements ActionListener, MakelangeloRobotListener {
 	/**
 	 *
 	 */
@@ -44,6 +46,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 
 	// the robot being controlled
 	private MakelangeloRobot robot;
+	private ConnectionManager connectionManager;
 	
 	// the parent
 	private Frame parentFrame;
@@ -116,6 +119,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		
 		// lastly, set the button states
 		updateButtonAccess();
+		
+		connectionManager = new ConnectionManager();
+		robot.addListener(this);
 	}
 
 
@@ -158,16 +164,14 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 					updateButtonAccess();
 				} else {
 					// network connections
-					ConnectionManager connectionManager = new ConnectionManager();
 					NetworkConnection s = connectionManager.requestNewConnection(parentFrame);
 					if(s!=null) {
+						Log.message("Connected.");
 						buttonConnect.setText(Translator.get("ButtonDisconnect"));
 						buttonConnect.setForeground(Color.RED);
 						robot.openConnection( s );
-						//updateMachineNumberPanel();
-						//updateButtonAccess();
-						isConnected=true;
 					}
+					isConnected=true;
 				}
 			}
 		});
@@ -193,7 +197,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		goPaperBorder = new SelectButton(new PaperBorderAction(robot,Translator.get("GoPaperBorder")));
 		animationInterior.add(goPaperBorder);
 		
-		penUp    = new SelectButton(Translator.get("PenUp"));
+		penUp = new SelectButton(Translator.get("PenUp"));
 		animationInterior.add(penUp);
 		penUp.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -202,7 +206,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			}
 		});
 		
-		penDown  = new SelectButton(Translator.get("PenDown"));
+		penDown = new SelectButton(Translator.get("PenDown"));
 		animationInterior.add(penDown);
 		penDown.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -212,7 +216,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		});
 		
 		
-		goHome   = new SelectButton(Translator.get("GoHome"));
+		goHome = new SelectButton(Translator.get("GoHome"));
 		animationInterior.add(goHome);
 		goHome.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -287,7 +291,6 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			}
 		});
 
-		
 		return animationPanel;
 	}
 	
@@ -549,5 +552,40 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 				}
 			});
 		}
+	}
+
+	@Override
+	public void portConfirmed(MakelangeloRobot r) {
+		if (parentFrame != null) {
+			parentFrame.invalidate();
+		}
+		updateMachineNumberPanel();
+		updateButtonAccess();
+	}
+
+	@Override
+	public void firmwareVersionBad(MakelangeloRobot r, long versionFound) {
+		(new DialogBadFirmwareVersion()).display(parentFrame, Long.toString(versionFound));
+	}
+
+	@Override
+	public void dataAvailable(MakelangeloRobot r, String data) {
+		if (data.endsWith("\n"))
+			data = data.substring(0, data.length() - 1);
+		Log.message(data); // #ffa500 = orange
+	}
+
+	@Override
+	public void sendBufferEmpty(MakelangeloRobot r) {}
+
+	@Override
+	public void lineError(MakelangeloRobot r, int lineNumber) {}
+
+	@Override
+	public void disconnected(MakelangeloRobot r) {
+		if (parentFrame != null) {
+			parentFrame.invalidate();
+		}
+		SoundSystem.playDisconnectSound();
 	}
 }

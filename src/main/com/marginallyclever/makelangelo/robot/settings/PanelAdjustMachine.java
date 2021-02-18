@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.robot.settings;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectDouble;
@@ -78,11 +79,36 @@ public class PanelAdjustMachine extends SelectPanel {
 			add(new SelectReadOnlyText(Translator.get("Left")));
 	
 			add(buttonAneg = new SelectButton(Translator.get("JogIn")));
+			buttonAneg.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					robot.jogLeftMotorIn();
+				}
+			});
+			
 			add(buttonApos = new SelectButton(Translator.get("JogOut")));
+			buttonApos.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					robot.jogLeftMotorOut();
+				}
+			});
 
 			add(new SelectReadOnlyText(Translator.get("Right")));
 			add(buttonBneg = new SelectButton(Translator.get("JogIn")));
+			buttonBneg.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					robot.jogRightMotorIn();
+				}
+			});
 			add(buttonBpos = new SelectButton(Translator.get("JogOut")));
+			buttonBpos.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					robot.jogRightMotorOut();
+				}
+			});
 	
 			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
 				interiorPanel.setVisible(false);
@@ -122,22 +148,6 @@ public class PanelAdjustMachine extends SelectPanel {
 		if (isDataSane) {
 			robot.getSettings().setMachineSize(mwf, mhf);
 			robot.getSettings().setAcceleration(accel);
-		}
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		super.propertyChange(evt);
-		Object o = evt.getSource();
-
-		// jog motors
-		     if(o == buttonApos) robot.jogLeftMotorOut();
-		else if(o == buttonAneg) robot.jogLeftMotorIn();
-		else if(o == buttonBpos) robot.jogRightMotorOut();
-		else if(o == buttonBneg) robot.jogRightMotorIn();
-		else {
-			System.out.println("update Length?");
-			//updateLengthNeeded();
 		}
 	}
 }
