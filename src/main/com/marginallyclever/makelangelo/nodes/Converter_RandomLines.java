@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -14,10 +15,13 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_RandomLines extends ImageConverter {
 	// number of graduated passes. >=1
 	private NodeConnectorInteger inputLines = new NodeConnectorInteger("Converter_Multipass.inputLines",2500);
+	// the cutoff value when weighting the line against the source image.
+	protected NodeConnectorBoundedInt inputCutoff = new NodeConnectorBoundedInt("ImageConverter.inputCutoff",255,0,127);
 	
 	public Converter_RandomLines() {
 		super();
 		inputs.add(inputLines);
+		inputs.add(inputCutoff);
 	}
 	
 	@Override
@@ -40,8 +44,9 @@ public class Converter_RandomLines extends ImageConverter {
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
-		double level = 255.0 / 4.0;
 
+		double cutoff = inputCutoff.getValue();
+		
 		// from top to bottom of the margin area...
 		double [] bounds = img.getBounds();
 		double yBottom = bounds[TransformedImage.BOTTOM];
@@ -60,7 +65,7 @@ public class Converter_RandomLines extends ImageConverter {
 		int numLines = inputLines.getValue();
 		int i;
 		for(i=0;i<numLines;++i) {
-			level = 200.0 * (double)i / (double)numLines;
+			double level = cutoff * (double)i / (double)numLines;
 			double endPX = xLeft   + (Math.random() * dx)+0.5; 
 			double endPY = yBottom + (Math.random() * dy)+0.5; 
 

@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.nodes;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.node.NodeConnectorOneOfMany;
 import com.marginallyclever.core.turtle.Turtle;
@@ -24,11 +25,17 @@ public class Converter_Sandy extends ImageConverter {
 
 	private NodeConnectorInteger inputBlockScale = new NodeConnectorInteger("Converter_Sandy.inputBlockScale",150);
 	private NodeConnectorOneOfMany inputDirection = new NodeConnectorOneOfMany("Converter_Sandy.inputDirection",directionChoices,0);
+	// only consider intensity above the low pass value.
+	protected NodeConnectorBoundedInt inputLowPass = new NodeConnectorBoundedInt("ImageConverter.inputLowPass",255,0,0);
+	// only consider intensity below the high pass value.
+	protected NodeConnectorBoundedInt inputHighPass = new NodeConnectorBoundedInt("ImageConverter.inputHighPass",255,0,255);
 	
 	public Converter_Sandy() {
 		super();
 		inputs.add(inputBlockScale);
 		inputs.add(inputDirection);
+		inputs.add(inputLowPass);
+		inputs.add(inputHighPass);
 	}
 		
 	@Override
@@ -71,6 +78,8 @@ public class Converter_Sandy extends ImageConverter {
 		}
 
 		double blockScale = inputBlockScale.getValue();
+		double lowPass = inputLowPass.getValue(); 
+		double highPass = inputHighPass.getValue();
 		
 		double x, y, z, scaleZ;
 
@@ -118,10 +127,13 @@ public class Converter_Sandy extends ImageConverter {
 					last_y=y;
 					// read a block of the image and find the average intensity in this block
 					z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
-					// scale the intensity value
-					if(z<0) z=0;
-					if(z>255) z=255;
-					scaleZ = (255.0 -  z) / 255.0;
+					// invert
+					z = 255.0-z;
+					// low & high pass
+					z = Math.max(lowPass,z);
+					z = Math.min(highPass,z);
+					// scale to 0...1
+					scaleZ= (z-lowPass) / (highPass-lowPass);
 	
 					if(wasDrawing == false) {
 						turtle.jumpTo(last_x,last_y);

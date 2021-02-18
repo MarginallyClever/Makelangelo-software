@@ -3,7 +3,9 @@ package com.marginallyclever.makelangelo.nodes;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
+import com.marginallyclever.core.node.NodeConnectorOneOfMany;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 
@@ -15,26 +17,25 @@ import com.marginallyclever.makelangelo.Translator;
 public class Converter_Pulse extends ImageConverter {
 	// height of zigzag.  should probably be less than spacing.  >=1
 	private NodeConnectorDouble inputHeight = new NodeConnectorDouble("Converter_Pulse.inputHeight",6.0);
+	// direction choice
+	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
+	private NodeConnectorOneOfMany inputDirection = new NodeConnectorOneOfMany("Converter_Pulse.direction", directionChoices, 0);
+	// only consider intensity above the low pass value.
+	protected NodeConnectorBoundedInt inputLowPass = new NodeConnectorBoundedInt("ImageConverter.inputLowPass",255,0,0);
+	// only consider intensity below the high pass value.
+	protected NodeConnectorBoundedInt inputHighPass = new NodeConnectorBoundedInt("ImageConverter.inputHighPass",255,0,255);
 	
-	// TODO select-one-of-many
-	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
+	public Converter_Pulse() {
+		super();
+		inputs.add(inputHeight);
+		inputs.add(inputDirection);
+		inputs.add(inputLowPass);
+		inputs.add(inputHighPass);
+	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("Converter_Pulse.name");
-	}
-	
-	public String[] getDirections() {
-		return directionChoices;
-	}
-	public int getDirectionIndex() {
-		return direction;
-	}
-	public void setDirectionIndex(int value) {
-		if(value<0) value=0;
-		if(value>=directionChoices.length) value=directionChoices.length-1;
-		direction = value;
 	}
 	
 	protected void convertLine(Turtle turtle,TransformedImage img,double zigZagSpacing,double halfStep,Point2D a,Point2D b) {		
@@ -48,16 +49,24 @@ public class Converter_Pulse extends ImageConverter {
 			a.y + ortho.y*halfStep
 		);
 
+		double lowPass = inputLowPass.getValue(); 
+		double highPass = inputHighPass.getValue();
+		
 		int n=1;
 		for (double p = 0; p <= len; p += zigZagSpacing) {
 			double x = a.x + dir.x * p; 
 			double y = a.y + dir.y * p; 
 			// read a block of the image and find the average intensity in this block
 			double z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
-			// scale the intensity value
-			double scale_z = (255.0f - z) / 255.0f;
+			// invert
+			z = 255.0-z;
+			// low & high pass
+			z = Math.max(lowPass,z);
+			z = Math.min(highPass,z);
+			double scaleZ = (z-lowPass) / (highPass-lowPass);
+			
 			//scale_z *= scale_z;  // quadratic curve
-			double pulseSize = halfStep * scale_z;
+			double pulseSize = halfStep * scaleZ;
 			
 			turtle.moveTo(
 				x + ortho.x*pulseSize*n,
@@ -98,7 +107,7 @@ public class Converter_Pulse extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		if (direction == 0) {
+		if (inputDirection.getValue() == 0) {
 			// horizontal
 			for (y = yBottom; y < yTop; y += spaceBetweenLines) {
 				++i;

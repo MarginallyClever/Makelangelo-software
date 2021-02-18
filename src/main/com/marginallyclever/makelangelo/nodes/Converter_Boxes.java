@@ -13,15 +13,23 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class Converter_Boxes extends ImageConverter {
-	// only consider intensity above the lowpass value.
-	private NodeConnectorBoundedInt inputLowpass = new NodeConnectorBoundedInt("Generator_Dragon.inputLowpass",255,0,127);
 	// how big should the largest box be?
 	private NodeConnectorBoundedInt inputMaxBoxSize = new NodeConnectorBoundedInt("Generator_Dragon.inputMaxBoxSize",10,1,4);
+	// the cutoff value when weighting the line against the source image.
+	protected NodeConnectorBoundedInt inputCutoff = new NodeConnectorBoundedInt("ImageConverter.inputCutoff",255,0,127);
+	// only consider intensity above the low pass value.
+	protected NodeConnectorBoundedInt inputLowPass = new NodeConnectorBoundedInt("ImageConverter.inputLowPass",255,0,0);
+	// only consider intensity below the high pass value.
+	protected NodeConnectorBoundedInt inputHighPass = new NodeConnectorBoundedInt("ImageConverter.inputHighPass",255,0,255);
 	
-	public int boxMaxSize;
-	public int cutoff;
-
-	Turtle turtle;
+	
+	public Converter_Boxes() {
+		super();
+		inputs.add(inputMaxBoxSize);
+		inputs.add(inputCutoff);
+		inputs.add(inputLowPass);
+		inputs.add(inputHighPass);
+	}
 	
 	@Override
 	public String getName() {
@@ -29,11 +37,7 @@ public class Converter_Boxes extends ImageConverter {
 	}
 
 	@Override
-	public void restart() {
-		turtle = new Turtle();
-		boxMaxSize = inputMaxBoxSize.getValue();
-		cutoff=  inputLowpass.getValue();
-	}
+	public void restart() {}
 	
 	@Override
 	public boolean iterate() {
@@ -51,6 +55,8 @@ public class Converter_Boxes extends ImageConverter {
 		double xLeft   = bounds[TransformedImage.LEFT];
 		double xRight  = bounds[TransformedImage.RIGHT];
 		double pw = xRight - xLeft;
+
+		int boxMaxSize = inputMaxBoxSize.getValue();
 		
 		// figure out how many lines we're going to have on this image.
 		double fullStep = 2.0*boxMaxSize;
@@ -58,6 +64,10 @@ public class Converter_Boxes extends ImageConverter {
 		
 		double steps = pw / fullStep;
 		if (steps < 1) steps = 1;
+		
+		double cutoff = inputCutoff.getValue();
+		double lowPass = inputLowPass.getValue(); 
+		double highPass = inputHighPass.getValue();
 		
 		// from top to bottom of the image...
 		double x, y, z;
@@ -69,11 +79,17 @@ public class Converter_Boxes extends ImageConverter {
 				for (x = xLeft; x < xRight; x += fullStep) {
 					// read a block of the image and find the average intensity in this block
 					z = img.sample( x, y - halfStep, x + fullStep, y + halfStep );
-					// scale the intensity value
-					double scaleZ =  (255.0f - z) / 255.0;
+
+					// invert
+					z = 255.0-z;
+					// low & high pass
+					z = Math.max(lowPass,z);
+					z = Math.min(highPass,z);
+					double scaleZ = (z-lowPass) / (highPass-lowPass);
+					
 					double pulseSize = (halfStep) * scaleZ *0.9;
 					if (scaleZ > cutoff/255.0) {
-						drawFilledBox(turtle,x,y,halfStep,pulseSize);
+						drawFilledBox(turtle,x,y,halfStep,pulseSize,boxMaxSize);
 					}
 				}
 			} else {
@@ -85,7 +101,7 @@ public class Converter_Boxes extends ImageConverter {
 					double scaleZ = (255.0f - z) / 255.0f;
 					double pulseSize = (halfStep - 0.5f) * scaleZ;
 					if (pulseSize > cutoff/255.0) {
-						drawFilledBox(turtle,x,y,halfStep,pulseSize);
+						drawFilledBox(turtle,x,y,halfStep,pulseSize,boxMaxSize);
 					}
 				}
 			}
@@ -95,7 +111,7 @@ public class Converter_Boxes extends ImageConverter {
 		return false;
 	}
 	
-	protected void drawFilledBox(Turtle turtle,double x,double y,double halfStep,double pulseSize) {
+	protected void drawFilledBox(Turtle turtle,double x,double y,double halfStep,double pulseSize,double boxMaxSize) {
 		double d = 2.0*boxMaxSize;
 		
 		double xmin = x - halfStep - pulseSize;

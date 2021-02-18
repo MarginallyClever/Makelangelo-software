@@ -9,19 +9,19 @@ import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedIm
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 
 /**
- * Converts a BufferedImage to Turtle
+ * Generates a {@link Turtle} and then sets the pen up/down state based on the weight of a {@link TransformedImageImage}.
+ * In effect it walks along the turtle path and raises the pen when the image is lighter than some cutoff value.
+ * It does NOT put the pen down if the image is darker.  So the starting line must already be down.
  * 
- * in order to be found by the ServiceLoader.  This is so that you could write an independent plugin and 
- * drop it in the same folder as makelangelo software to be "found" by the software.
- * 
- * Don't forget http://www.reverb-marketing.com/wiki/index.php/When_a_new_style_has_been_added_to_the_Makelangelo_software
  * @author Dan Royer
  *
  */
 public abstract class ImageConverter extends Node {
+	// the source image
 	public NodeConnectorTransformedImage inputImage = new NodeConnectorTransformedImage("ImageConverter.inputImage");
-	public NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
+	// the end result after the weighting test.
+	public NodeConnectorTurtle outputTurtle = new NodeConnectorTurtle("ImageConverter.outputTurtle");
 	
 	protected ImageConverter() {
 		super();

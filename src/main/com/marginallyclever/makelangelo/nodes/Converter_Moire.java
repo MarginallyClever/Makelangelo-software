@@ -9,6 +9,7 @@ import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.node.NodeConnectorOneOfMany;
@@ -29,11 +30,13 @@ public class Converter_Moire extends ImageConverter {
 	// height of zigzag.  should probably be less than spacing.  >=1
 	private NodeConnectorDouble inputHeight = new NodeConnectorDouble("Converter_Moire.inputHeight",6.0);
 	private NodeConnectorInteger inputDirection = new NodeConnectorOneOfMany("Converter_Moire.inputDirection.name",directionChoices,0);
+	private NodeConnectorBoundedInt inputCutoff = new NodeConnectorBoundedInt("ImageConverter.inputCutoff",255,0,127);
 	
 	public Converter_Moire() {
 		super();
 		inputs.add(inputHeight);
 		inputs.add(inputDirection);
+		inputs.add(inputCutoff);
 	}
 	
 	@Override
@@ -45,7 +48,7 @@ public class Converter_Moire extends ImageConverter {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
 		
-		double CUTOFF = 1.0/255.0;
+		double CUTOFF = inputCutoff.getValue()/255.0;
 		double iterStepSize = 0.002;//turtle.getPenDiameter()/2;
 		
 		// examine the line once.  all Z values will be in the range 0...1
