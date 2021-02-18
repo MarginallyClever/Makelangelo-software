@@ -63,8 +63,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector3d;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.communications.ConnectionManager;
-import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.Point2D;
@@ -117,7 +115,6 @@ public final class Makelangelo extends TransferHandler
 
 	private MakelangeloAppPreferences appPreferences;
 	
-	private ConnectionManager connectionManager;
 	
 	private Camera camera;
 	private MakelangeloRobot robot;
@@ -192,10 +189,6 @@ public final class Makelangelo extends TransferHandler
 		
 		Log.message("Starting camera...");
 		camera = new Camera();
-		
-		// network connections
-		Log.message("Starting connection manager...");
-		connectionManager = new ConnectionManager();
 	}
 	
 	public void runHeadFirst() {
@@ -765,7 +758,7 @@ public final class Makelangelo extends TransferHandler
 	private void runRobotDialog() {
 		menuBar.setEnabled(false);
 
-		MakelangeloRobotPanel myRobotPanel = new MakelangeloRobotPanel(this,robot);
+		MakelangeloRobotPanel myRobotPanel = new MakelangeloRobotPanel(getMainFrame(),robot);
 		
 		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(getMainFrame().getLocation());
@@ -843,10 +836,6 @@ public final class Makelangelo extends TransferHandler
 	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
 		if (previewPanel != null)
 			previewPanel.repaint();
-	}
-
-	public NetworkConnection requestNewConnection() {
-		return connectionManager.requestNewConnection(this.mainFrame);
 	}
 
 	@Override

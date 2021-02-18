@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.robot;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,14 +18,17 @@ import java.util.List;
 
 import javax.swing.*;
 
+import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
+import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
 
 /**
  * Control panel for a Makelangelo robot
@@ -41,7 +46,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	private MakelangeloRobot robot;
 	
 	// the parent
-	private Makelangelo makelangeloApp;
+	private Frame parentFrame;
 
 	// connect menu
 	private SelectPanel connectionPanel;
@@ -73,8 +78,8 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	 * @param gui
 	 * @param robot
 	 */
-	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
-		this.makelangeloApp = gui;
+	public MakelangeloRobotPanel(Frame parent, MakelangeloRobot robot) {
+		this.parentFrame = parent;
 		this.robot = robot;
 		
 		this.removeAll();
@@ -152,7 +157,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 					isConnected=false;
 					updateButtonAccess();
 				} else {
-					NetworkConnection s = makelangeloApp.requestNewConnection();
+					// network connections
+					ConnectionManager connectionManager = new ConnectionManager();
+					NetworkConnection s = connectionManager.requestNewConnection(parentFrame);
 					if(s!=null) {
 						buttonConnect.setText(Translator.get("ButtonDisconnect"));
 						buttonConnect.setForeground(Color.RED);
@@ -394,7 +401,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(robot);
-				m.run(makelangeloApp.getMainFrame());
+				m.run(parentFrame);
 			}
 		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
@@ -441,7 +448,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 
 	protected void startAt() {
 		StartAtPanel p = new StartAtPanel();
-		if(p.run(makelangeloApp.getMainFrame())) {
+		if(p.run(parentFrame)) {
 			// user hit ok
 			int lineNumber = p.lineNumber;
 			if (lineNumber != -1) {
@@ -514,5 +521,33 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		penDown.setEnabled(isConfirmed && !isRunning);
 		
 		this.validate();
+	}
+	
+	
+	public static void main(String[] argv) {
+		Log.start();
+		CommandLineOptions.setFromMain(argv);
+		Translator.start();
+		
+		if(GraphicsEnvironment.isHeadless()) {
+			// TODO a text-only interface?
+		} else {			
+			// Schedule a job for the event-dispatching thread:
+			// creating and showing this application's GUI.
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JFrame mainFrame = new JFrame(Translator.get("Makelangelo.menuRobot"));
+					mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+					MakelangeloRobot robot = new MakelangeloRobot();
+					MakelangeloRobotPanel makelangeloRobotPanel = new MakelangeloRobotPanel(mainFrame, robot);
+
+					mainFrame.setContentPane(makelangeloRobotPanel);
+					mainFrame.pack();
+					mainFrame.setVisible(true);
+				}
+			});
+		}
 	}
 }
