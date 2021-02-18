@@ -555,7 +555,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener, Mak
 	}
 
 	@Override
-	public void portConfirmed(MakelangeloRobot r) {
+	public void connectionConfirmed(MakelangeloRobot r) {
 		if (parentFrame != null) {
 			parentFrame.invalidate();
 		}

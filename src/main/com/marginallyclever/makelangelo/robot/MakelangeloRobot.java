@@ -230,7 +230,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 			}
 
 			// tell everyone I've confirmed connection.
-			notifyPortConfirmed();
+			notifyConnectionConfirmed();
 		}
 	}
 
@@ -262,9 +262,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
-	private void notifyPortConfirmed() {
+	private void notifyConnectionConfirmed() {
 		for (MakelangeloRobotListener listener : listeners) {
-			listener.portConfirmed(this);
+			listener.connectionConfirmed(this);
 		}
 	}
 

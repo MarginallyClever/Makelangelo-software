@@ -9,8 +9,8 @@ public interface MakelangeloRobotListener {
 	public void disconnected(MakelangeloRobot r);
 	// called when live robot has detected an error in the transmission
 	public void lineError(MakelangeloRobot r,int lineNumber);
-	// called when robot connection is confirmed
-	public void portConfirmed(MakelangeloRobot r);
 	// called when the firmware on the robot is detected as out of date
 	public void firmwareVersionBad(MakelangeloRobot r,long versionFound);
+	// called when robot connection is confirmed.  connection is open to a valid robot with good hardware and firmware.
+	public void connectionConfirmed(MakelangeloRobot r);
 }
