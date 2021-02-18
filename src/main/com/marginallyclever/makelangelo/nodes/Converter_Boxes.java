@@ -80,11 +80,12 @@ public class Converter_Boxes extends ImageConverter {
 					// read a block of the image and find the average intensity in this block
 					z = img.sample( x, y - halfStep, x + fullStep, y + halfStep );
 
-					// invert
-					z = 255.0-z;
 					// low & high pass
 					z = Math.max(lowPass,z);
 					z = Math.min(highPass,z);
+					// invert
+					z = 255.0-z;
+					// scale 0...1
 					double scaleZ = (z-lowPass) / (highPass-lowPass);
 					
 					double pulseSize = (halfStep) * scaleZ *0.9;

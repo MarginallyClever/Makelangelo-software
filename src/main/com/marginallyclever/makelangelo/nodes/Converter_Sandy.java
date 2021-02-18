@@ -127,11 +127,11 @@ public class Converter_Sandy extends ImageConverter {
 					last_y=y;
 					// read a block of the image and find the average intensity in this block
 					z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
-					// invert
-					z = 255.0-z;
 					// low & high pass
 					z = Math.max(lowPass,z);
 					z = Math.min(highPass,z);
+					// invert
+					z = 255.0-z;
 					// scale to 0...1
 					scaleZ= (z-lowPass) / (highPass-lowPass);
 	

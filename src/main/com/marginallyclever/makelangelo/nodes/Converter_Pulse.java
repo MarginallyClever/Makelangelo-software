@@ -58,11 +58,12 @@ public class Converter_Pulse extends ImageConverter {
 			double y = a.y + dir.y * p; 
 			// read a block of the image and find the average intensity in this block
 			double z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
-			// invert
-			z = 255.0-z;
 			// low & high pass
 			z = Math.max(lowPass,z);
 			z = Math.min(highPass,z);
+			// invert
+			z = 255.0-z;
+			// scale 0...1
 			double scaleZ = (z-lowPass) / (highPass-lowPass);
 			
 			//scale_z *= scale_z;  // quadratic curve
