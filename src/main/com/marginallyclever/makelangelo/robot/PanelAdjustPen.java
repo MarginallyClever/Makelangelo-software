@@ -16,7 +16,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected Robot robot;
+	protected RobotController robot;
 	
 	protected SelectDouble penDiameter;
 	protected SelectDouble maxFeedRate;
@@ -34,12 +34,12 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	protected SelectColor selectPenUpColor;
 
 	
-	public PanelAdjustPen(Robot robot) {
+	public PanelAdjustPen(RobotController robot) {
 		super();
 		
 		this.robot = robot;
 	    
-	    RobotSettings settings = robot.getSettings();
+	    RobotModel settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
@@ -76,7 +76,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	
 	
 	public void save() {
-	    RobotSettings settings = robot.getSettings();
+	    RobotModel settings = robot.getSettings();
 		settings.setDiameter(penDiameter.getValue());
 		settings.setMaxFeedRate(maxFeedRate.getValue());
 		settings.setCurrentFeedRate(currentFeedRate.getValue());

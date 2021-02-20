@@ -13,7 +13,6 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 /**
  * Dithering using a particle system
@@ -22,7 +21,7 @@ import com.marginallyclever.makelangelo.robot.RobotDecorator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends ImageConverter implements RobotDecorator {
+public class Converter_VoronoiZigZag extends ImageConverter {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();

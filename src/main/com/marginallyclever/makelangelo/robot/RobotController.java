@@ -32,22 +32,25 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
 
 /**
- * MakelangeloRobot is the Controller for a physical robot, following a
- * Model-View-Controller design pattern. It also contains non-persistent Model
- * data. MakelangeloRobotPanel is one of the Views. MakelangeloRobotSettings is
- * the persistent Model data (machine configuration).
+ * A Makelangelo robot is made of up a {@link RobotController}, which uses a {@link RobotModel} to update it's internal state.
  * 
- * @author dan
+ * It contains state information, where the {@link RobotModel} contains only the physical properties (configuration).
+ * Classes who implement the {@link RobotListener} interface can obtain state change information in real time (via PropertyChangeEvents)
+ * which allows Views to stay up to date.
+ * 
+ * @see <a href='https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller'>Model-View-Controller design pattern</a>. 
+ * 
+ * @author Dan Royer
  * @since 7.2.10
  */
-public class Robot implements NetworkConnectionListener, PreviewListener {
+public class RobotController implements NetworkConnectionListener, PreviewListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
 	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
-	private RobotSettings settings = null;
+	private RobotModel settings = null;
 
 	// Connection state
 	private NetworkConnection connection = null;
@@ -72,19 +75,16 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 	// what line in drawingCommands is going to be sent next?
 	protected int drawingProgress;
 
-	// rendering stuff
-	private RobotDecorator decorator = null;
-
 	private boolean showPenUp = false;
 	
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<RobotListener> listeners;
 
 
-	public Robot() {
+	public RobotController() {
 		super();
 		listeners = new ArrayList<RobotListener>();
-		settings = new RobotSettings();
+		settings = new RobotModel();
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -448,7 +448,7 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(RobotSettings.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(RobotModel.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -620,8 +620,8 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotSettings.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotModel.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotModel.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
@@ -634,8 +634,8 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotSettings.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotModel.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotModel.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
@@ -692,7 +692,7 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 
-	public RobotSettings getSettings() {
+	public RobotModel getSettings() {
 		return settings;
 	}
 
@@ -855,10 +855,6 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 		return time + accelTime + decelTime;
 	}
 
-	public void setDecorator(RobotDecorator arg0) {
-		decorator = arg0;
-	}
-
 	// from PreviewListener
 	@Override
 	public void render(GL2 gl2) {
@@ -874,16 +870,11 @@ public class Robot implements NetworkConnectionListener, PreviewListener {
 		settings.getHardwareProperties().render(gl2, this);
 
 		gl2.glLineWidth(lineWidthBuf[0]);
-		
-		if (decorator != null) {
-			// filters can also draw WYSIWYG previews while converting.
-			decorator.render(gl2);
-		} else {
-			for( Turtle t : turtles ) {
-				TurtleRenderer tr = new DefaultTurtleRenderer(gl2,showPenUp);
-				tr.setPenDownColor(t.getColor());
-				t.render(tr);
-			}
+
+		for( Turtle t : turtles ) {
+			TurtleRenderer tr = new DefaultTurtleRenderer(gl2,showPenUp);
+			tr.setPenDownColor(t.getColor());
+			t.render(tr);
 		}
 	}
 

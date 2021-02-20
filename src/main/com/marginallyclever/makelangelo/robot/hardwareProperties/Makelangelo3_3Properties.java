@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.robot.Robot;
-import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	@Override
@@ -41,8 +41,8 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,Robot robot) {
-		RobotSettings settings = robot.getSettings();
+	public void render(GL2 gl2,RobotController robot) {
+		RobotModel settings = robot.getSettings();
 
 		paintCalibrationPoint(gl2,settings);
 		paintControlBox(gl2,settings);
@@ -55,7 +55,7 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,RobotSettings settings) {
+	protected void paintControlBox(GL2 gl2,RobotModel settings) {
 		double cy = settings.getLimitTop();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();

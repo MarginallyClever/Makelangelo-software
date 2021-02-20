@@ -8,8 +8,8 @@ import java.util.Date;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
-import com.marginallyclever.makelangelo.robot.Robot;
-import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
@@ -59,7 +59,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 	
 	@Override
-	public Point2D getHome(RobotSettings settings) {
+	public Point2D getHome(RobotModel settings) {
 		return FK(1025,1025);  // default calibration length for M2 belts.
 	}
 	
@@ -107,8 +107,8 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 
 	@Override
-	public void render(GL2 gl2, Robot robot) {
-		RobotSettings settings = robot.getSettings();
+	public void render(GL2 gl2, RobotController robot) {
+		RobotModel settings = robot.getSettings();
 
 		paintCalibrationPoint(gl2, settings);
 		paintMotors(gl2, settings);
@@ -117,7 +117,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 
 	// draw left & right motor
-	protected void paintMotors(GL2 gl2, RobotSettings settings) {
+	protected void paintMotors(GL2 gl2, RobotModel settings) {
 		double top = settings.getLimitTop();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
@@ -162,7 +162,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glEnd();
 	}
 
-	protected void paintControlBox(GL2 gl2, RobotSettings settings) {
+	protected void paintControlBox(GL2 gl2, RobotModel settings) {
 		double cy = settings.getLimitTop();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
@@ -208,8 +208,8 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights(GL2 gl2, Robot robot) {
-		RobotSettings settings = robot.getSettings();
+	protected void paintPenHolderToCounterweights(GL2 gl2, RobotController robot) {
+		RobotModel settings = robot.getSettings();
 		double dx, dy;
 		double gx = robot.getPenX();
 		double gy = robot.getPenY();
@@ -317,7 +317,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	 * 
 	 * @param gl2
 	 */
-	protected void paintCalibrationPoint(GL2 gl2, RobotSettings settings) {
+	protected void paintCalibrationPoint(GL2 gl2, RobotModel settings) {
 		gl2.glColor3f(0.8f, 0.8f, 0.8f);
 		gl2.glPushMatrix();
 		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
@@ -408,7 +408,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	}
 
 	@Override
-	public String getGCodeConfig(RobotSettings settings) {
+	public String getGCodeConfig(RobotModel settings) {
 		String result;
 		String xAxis = "M101 A0 T"+StringHelper.formatDouble(settings.getLimitRight())+" B"+StringHelper.formatDouble(settings.getLimitLeft());
 		String yAxis = "M101 A1 T"+StringHelper.formatDouble(settings.getLimitTop())+" B"+StringHelper.formatDouble(settings.getLimitBottom());

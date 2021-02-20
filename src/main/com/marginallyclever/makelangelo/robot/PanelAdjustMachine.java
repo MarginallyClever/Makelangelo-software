@@ -10,7 +10,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Robot myRobot;
+	private RobotController myRobot;
 
 	private SelectDouble machineWidth, machineHeight;
 	private SelectDouble totalBeltNeeded;
@@ -19,7 +19,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	private SelectDouble acceleration;
 
 
-	public PanelAdjustMachine(Robot robot) {
+	public PanelAdjustMachine(RobotController robot) {
 		super();
 		
 		this.myRobot = robot;

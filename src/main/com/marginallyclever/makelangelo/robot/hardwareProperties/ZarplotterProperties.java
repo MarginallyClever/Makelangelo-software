@@ -7,8 +7,8 @@ import java.util.Date;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.makelangelo.robot.Robot;
-import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 public class ZarplotterProperties extends Makelangelo2Properties {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
@@ -18,7 +18,7 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public Point2D getHome(RobotSettings settings) {
+	public Point2D getHome(RobotModel settings) {
 		return new Point2D(0,0);
 	}
 	
@@ -53,8 +53,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,Robot robot) {
-		RobotSettings settings = robot.getSettings();
+	public void render(GL2 gl2,RobotController robot) {
+		RobotModel settings = robot.getSettings();
 
 		paintCalibrationPoint(gl2,settings);
 		paintMotors(gl2,settings);
@@ -64,8 +64,8 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 
 	
 	@Override
-	protected void paintPenHolderToCounterweights(GL2 gl2, Robot robot) {
-		RobotSettings settings = robot.getSettings();
+	protected void paintPenHolderToCounterweights(GL2 gl2, RobotController robot) {
+		RobotModel settings = robot.getSettings();
 		//double dx, dy;
 		double gx = robot.getPenX();
 		double gy = robot.getPenY();
@@ -116,7 +116,7 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	}
 	
 	@Override
-	protected void paintCalibrationPoint(GL2 gl2, RobotSettings settings) {
+	protected void paintCalibrationPoint(GL2 gl2, RobotModel settings) {
 		gl2.glPushMatrix();
 		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
 
@@ -132,7 +132,7 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	protected void paintMotors(GL2 gl2,RobotSettings settings) {
+	protected void paintMotors(GL2 gl2,RobotModel settings) {
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
 		double right = settings.getLimitRight();
@@ -172,7 +172,7 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,RobotSettings settings) {
+	protected void paintControlBox(GL2 gl2,RobotModel settings) {
 		double cy = settings.getLimitTop();
 		double cx = 0;
 

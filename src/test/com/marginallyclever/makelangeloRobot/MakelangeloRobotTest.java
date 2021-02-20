@@ -2,7 +2,7 @@ package com.marginallyclever.makelangeloRobot;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 
 public class MakelangeloRobotTest {
@@ -21,13 +21,13 @@ public class MakelangeloRobotTest {
 	
 	@Test
 	public void testPaperSettingChanges() {
-		RobotSettings a = new RobotSettings();
+		RobotModel a = new RobotModel();
 		a.loadConfig(0);
 		double w = a.getPaperWidth();
 		double h = a.getPaperHeight();
 		a.setPaperSize(w/2,h/2,0,0);
 		a.saveConfig();
-		RobotSettings b = new RobotSettings();
+		RobotModel b = new RobotModel();
 		b.loadConfig(0);
 		assert(w/2 == b.getPaperWidth());
 		assert(h/2 == b.getPaperHeight());

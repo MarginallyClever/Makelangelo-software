@@ -14,7 +14,6 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 
 /**
@@ -25,7 +24,7 @@ import com.marginallyclever.makelangelo.robot.RobotDecorator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter implements RobotDecorator {
+public class Converter_VoronoiStippling extends ImageConverter {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private TransformedImage img;
@@ -200,13 +199,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 
 	@Override
 	public void render(GL2 gl2) {
-		super.render(gl2);
+		//super.render(gl2);
 		
 		while(lock.isLocked());
 		lock.lock();
 		
 		// draw cell edges
-		if(drawBorders) {/*
+		if(drawBorders) {
 			if(graphEdges != null) {
 				gl2.glColor3f(0.9f, 0.0f, 0.0f);
 				gl2.glBegin(GL2.GL_LINES);
@@ -215,11 +214,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 					gl2.glVertex2d( e.x2, e.y2 );
 				}
 				gl2.glEnd();
-			}*/
+			}
 			if(tree!=null) tree.render(gl2);
 		}
 
-		//enderPolygons(gl2);
+		//renderPolygons(gl2);
 		//renderFirstCellBounds(gl2);  // bounds of first cell
 		renderDots(gl2);  // dots sized by darkness
 		//renderPoints(gl2);  // tiny points
@@ -227,7 +226,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 		lock.unlock();
 	}
 
-	protected void renderPolygons(GL2 gl2) {
+	@SuppressWarnings("unused")
+	private void renderPolygons(GL2 gl2) {
 		gl2.glColor4d(1,1,0,0.25);
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
@@ -246,8 +246,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 			return;
 		}
 	}
-	
-	protected void renderFirstCellBounds(GL2 gl2) {
+
+	@SuppressWarnings("unused")
+	private void renderFirstCellBounds(GL2 gl2) {
 		gl2.glColor3f(1,0,0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		Rectangle2D bounds = cells.get(0).region.getBounds2D();
@@ -259,8 +260,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 		}
 		gl2.glEnd();
 	}
-	
-	protected void renderPoints(GL2 gl2) {
+
+	@SuppressWarnings("unused")
+	private void renderPoints(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL2.GL_POINTS);
 		Iterator<VoronoiCell> ci = cells.iterator();
@@ -271,8 +273,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements RobotD
 		}
 		gl2.glEnd();
 	}
-	
-	protected void renderDots(GL2 gl2) {
+
+	//@SuppressWarnings("unused")
+	private void renderDots(GL2 gl2) {
 		float scale = maxDotSize - minDotSize;
 		gl2.glColor3f(0, 0, 0);
 		Iterator<VoronoiCell> ci = cells.iterator();

@@ -29,9 +29,9 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 	private JPanel dragAndDrive;
 	private boolean mouseInside, mouseOn;
 	private double mouseLastX, mouseLastY;
-	private Robot robot;
+	private RobotController robot;
 	
-	DragAndDrivePanel(Robot robot) {
+	DragAndDrivePanel(RobotController robot) {
 		super(new GridBagLayout());
 
 		this.robot = robot;

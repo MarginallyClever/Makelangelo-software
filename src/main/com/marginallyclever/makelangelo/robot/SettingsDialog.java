@@ -25,7 +25,7 @@ import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHard
  * @since 7.1.4
  */
 public class SettingsDialog {
-	private Robot robot;
+	private RobotController robot;
 	private JTabbedPane panes;
 
 	private JComboBox<String> hardwareVersionChoices;
@@ -38,7 +38,7 @@ public class SettingsDialog {
 	private PanelAdjustPaper panelAdjustPaper;
 	private PanelAdjustPen panelAdjustPen;
 
-	public SettingsDialog(Robot robot) {
+	public SettingsDialog(RobotController robot) {
 		this.robot = robot;
 	}
 

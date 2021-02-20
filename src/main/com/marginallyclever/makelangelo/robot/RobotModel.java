@@ -26,7 +26,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * TODO move tool names into translations and add a color palette system for quantizing colors.
  */
-public final class RobotSettings implements Serializable {
+public final class RobotModel implements Serializable {
 	/**
 	 * 
 	 */
@@ -105,7 +105,7 @@ public final class RobotSettings implements Serializable {
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
-	public RobotSettings() {				
+	public RobotModel() {				
 		double mh = 835; // mm
 		double mw = 835; // mm
 		

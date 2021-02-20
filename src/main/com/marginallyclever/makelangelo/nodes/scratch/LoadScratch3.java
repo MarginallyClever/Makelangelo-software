@@ -35,7 +35,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.Robot;
+import com.marginallyclever.makelangelo.robot.RobotController;
 
 /**
  * LoadAndSaveSB3 loads limited set of Scratch commands into memory. 
@@ -889,7 +889,7 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
 		return true;
 	}
 }

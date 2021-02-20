@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 
 /**
@@ -12,7 +11,7 @@ import com.marginallyclever.makelangelo.robot.RobotDecorator;
  * @author Dan Royer
  * @since 7.25.0
  */
-public abstract class Node implements RobotDecorator {
+public abstract class Node {
 	// TODO make this not public
 	public ArrayList<NodeConnector<?>> inputs = new ArrayList<NodeConnector<?>>(); 
 	// TODO make this not public
@@ -71,7 +70,6 @@ public abstract class Node implements RobotDecorator {
 		keepIterating=state;
 	}
 	
-	@Override
 	public void render(GL2 gl2) {}
 }
 

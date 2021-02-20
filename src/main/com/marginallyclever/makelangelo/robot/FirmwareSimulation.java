@@ -403,7 +403,7 @@ public class FirmwareSimulation {
 	/**
 	 * @return time in seconds to run sequence.
 	 */
-	public double getTimeEstimate(Turtle t,RobotSettings settings) {
+	public double getTimeEstimate(Turtle t,RobotModel settings) {
 		double fu = settings.getPenUpFeedRate();
 		double fd = settings.getPenDownFeedRate();
 		double fz = settings.getZRate();

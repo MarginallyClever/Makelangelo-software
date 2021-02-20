@@ -16,7 +16,7 @@ public class PanelAdjustPaper extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected Robot robot;
+	protected RobotController robot;
 	
 	private SelectOneOfMany paperSizes;
 	private SelectDouble pw, ph,sx,sy,ang;
@@ -70,7 +70,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		new PaperSize("Arch E1",762,1067)
 	};
 
-	public PanelAdjustPaper(Robot robot) {
+	public PanelAdjustPaper(RobotController robot) {
 		this.robot = robot;
 		
 		beingModified=false;
@@ -197,7 +197,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		if( phf<=0 ) data_is_sane=false;
 
 		if (data_is_sane) {
-			RobotSettings s = robot.getSettings();
+			RobotModel s = robot.getSettings();
 			s.setPaperSize(pwf,phf,shiftxf,shiftyf);
 			s.setRotation(rot);
 			s.setPaperColor(paperColor.getColor());

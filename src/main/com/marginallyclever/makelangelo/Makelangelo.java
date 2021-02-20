@@ -83,9 +83,9 @@ import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.robot.Robot;
+import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.RobotPanel;
-import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 import com.marginallyclever.makelangelo.robot.SettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
@@ -112,7 +112,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private MakelangeloAppPreferences appPreferences;
 	
 	private Camera camera;
-	private Robot robot;
+	private RobotController robot;
 
 	private ArrayList<Turtle> myTurtles;
 	
@@ -175,7 +175,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
-		robot = new Robot();
+		robot = new RobotController();
 		logPanel.setRobot(robot);
 
 		testGeneratorsAndConverters();
@@ -797,7 +797,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		// mainFrame.setLocation(locationX,locationY);
 	}
 
-	public void settingsChangedEvent(RobotSettings settings) {
+	public void settingsChangedEvent(RobotModel settings) {
 		if (previewPanel != null)
 			previewPanel.repaint();
 	}
@@ -869,7 +869,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		return mainFrame;
 	}
 
-	public Robot getRobot() {
+	public RobotController getRobot() {
 		return robot;
 	}
 	

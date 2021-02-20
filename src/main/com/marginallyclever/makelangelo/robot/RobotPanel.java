@@ -44,7 +44,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	private static final long serialVersionUID = -4703402918904039337L;
 
 	// the robot being controlled
-	private Robot myRobot;
+	private RobotController myRobot;
 	private ConnectionManager connectionManager;
 	
 	// the parent
@@ -86,7 +86,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	 * @param parent
 	 * @param robot
 	 */
-	public RobotPanel(Frame parent, Robot robot) {
+	public RobotPanel(Frame parent, RobotController robot) {
 		this.parentFrame = parent;
 		this.myRobot = robot;
 		myRobot.addListener(this);
@@ -635,7 +635,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 					JFrame mainFrame = new JFrame(Translator.get("Makelangelo.menuRobot"));
 					mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-					Robot robot = new Robot();
+					RobotController robot = new RobotController();
 					RobotPanel makelangeloRobotPanel = new RobotPanel(mainFrame, robot);
 
 					mainFrame.setContentPane(makelangeloRobotPanel);
@@ -647,7 +647,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	}
 
 	@Override
-	public void connectionConfirmed(Robot r) {
+	public void connectionConfirmed(RobotController r) {
 		String hardwareVersion = r.getSettings().getHardwareVersion();
 		onConnect();
 		r.getSettings().setHardwareVersion(hardwareVersion);
@@ -660,25 +660,25 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	}
 
 	@Override
-	public void firmwareVersionBad(Robot r, long versionFound) {
+	public void firmwareVersionBad(RobotController r, long versionFound) {
 		(new DialogBadFirmwareVersion()).display(parentFrame, Long.toString(versionFound));
 	}
 
 	@Override
-	public void dataAvailable(Robot r, String data) {
+	public void dataAvailable(RobotController r, String data) {
 		if (data.endsWith("\n"))
 			data = data.substring(0, data.length() - 1);
 		Log.message(data); // #ffa500 = orange
 	}
 
 	@Override
-	public void sendBufferEmpty(Robot r) {}
+	public void sendBufferEmpty(RobotController r) {}
 
 	@Override
-	public void lineError(Robot r, int lineNumber) {}
+	public void lineError(RobotController r, int lineNumber) {}
 
 	@Override
-	public void disconnected(Robot r) {
+	public void disconnected(RobotController r) {
 		if (parentFrame != null) {
 			parentFrame.invalidate();
 		}
