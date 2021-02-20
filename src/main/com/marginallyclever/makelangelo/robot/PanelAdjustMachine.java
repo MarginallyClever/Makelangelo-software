@@ -1,14 +1,8 @@
-package com.marginallyclever.makelangelo.robot.settings;
+package com.marginallyclever.makelangelo.robot;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import com.marginallyclever.core.select.SelectButton;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
-import com.marginallyclever.core.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 public class PanelAdjustMachine extends SelectPanel {
 	/**
@@ -16,37 +10,27 @@ public class PanelAdjustMachine extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected MakelangeloRobot robot;
+	private Robot myRobot;
 
-	protected SelectDouble machineWidth, machineHeight;
-	protected SelectDouble totalBeltNeeded;
-	protected SelectDouble totalServoNeeded;
-	protected SelectDouble totalStepperNeeded;
-	protected SelectDouble acceleration;
-
-	protected SelectButton buttonAneg;
-	protected SelectButton buttonApos;
-	protected SelectButton buttonBneg;
-	protected SelectButton buttonBpos;
+	private SelectDouble machineWidth, machineHeight;
+	private SelectDouble totalBeltNeeded;
+	private SelectDouble totalServoNeeded;
+	private SelectDouble totalStepperNeeded;
+	private SelectDouble acceleration;
 
 
-	public PanelAdjustMachine(MakelangeloRobot robot) {
+	public PanelAdjustMachine(Robot robot) {
 		super();
 		
-		this.robot = robot;
+		this.myRobot = robot;
 
 		// adjust machine size
 		{
 			float w = (float)(robot.getSettings().getLimitRight() - robot.getSettings().getLimitLeft());
 			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom());
 			
-			machineWidth = new SelectDouble(Translator.get("MachineWidth"),w);
-			machineHeight = new SelectDouble(Translator.get("MachineHeight"),h);
-
-			add(machineWidth);
-			//add(new JLabel("mm"));
-			add(machineHeight);
-			//add(new JLabel("mm"));
+			add(machineWidth = new SelectDouble(Translator.get("MachineWidth"),w));
+			add(machineHeight = new SelectDouble(Translator.get("MachineHeight"),h));
 			//machineWidth.setPreferredSize(s);
 			//machineHeight.setPreferredSize(s);
 	
@@ -74,46 +58,11 @@ public class PanelAdjustMachine extends SelectPanel {
 			}
 		}
 
-		// Jog motors
-		{
-			add(new SelectReadOnlyText(Translator.get("Left")));
-	
-			add(buttonAneg = new SelectButton(Translator.get("JogIn")));
-			buttonAneg.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					robot.jogLeftMotorIn();
-				}
-			});
-			
-			add(buttonApos = new SelectButton(Translator.get("JogOut")));
-			buttonApos.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					robot.jogLeftMotorOut();
-				}
-			});
-
-			add(new SelectReadOnlyText(Translator.get("Right")));
-			add(buttonBneg = new SelectButton(Translator.get("JogIn")));
-			buttonBneg.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					robot.jogRightMotorIn();
-				}
-			});
-			add(buttonBpos = new SelectButton(Translator.get("JogOut")));
-			buttonBpos.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					robot.jogRightMotorOut();
-				}
-			});
-	
-			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
-				interiorPanel.setVisible(false);
-			}
+		
+		if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
+			interiorPanel.setVisible(false);
 		}
+		
 		finish();
 		updateLengthNeeded();
 	}
@@ -146,8 +95,8 @@ public class PanelAdjustMachine extends SelectPanel {
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
-			robot.getSettings().setMachineSize(mwf, mhf);
-			robot.getSettings().setAcceleration(accel);
+			myRobot.getSettings().setMachineSize(mwf, mhf);
+			myRobot.getSettings().setAcceleration(accel);
 		}
 	}
 }

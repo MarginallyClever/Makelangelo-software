@@ -94,7 +94,7 @@ public class CollapsiblePanel extends JPanel {
     protected JButton arrow = createArrowButton();
 
     // Content Pane
-    protected SelectPanel panel;
+    protected SelectPanel contentPanel;
 
     // Container State
     protected boolean isCollapsed;
@@ -136,9 +136,9 @@ public class CollapsiblePanel extends JPanel {
     private void commonConstructor() {
         setLayout(new BorderLayout());
 
-        panel = new SelectPanel();
+        contentPanel = new SelectPanel();
         add(titleComponent, BorderLayout.CENTER);
-        add(panel, BorderLayout.CENTER);
+        add(contentPanel, BorderLayout.CENTER);
 
         collapeListeners = new Vector<CollapeListener>();
 
@@ -178,7 +178,7 @@ public class CollapsiblePanel extends JPanel {
      * @return panel The content panel
      */
     public SelectPanel getContentPane() {
-        return panel;
+        return contentPanel;
     }
 
     /**
@@ -192,7 +192,7 @@ public class CollapsiblePanel extends JPanel {
         isCollapsed = collapse;
         if (collapse) {
             //collapse the panel, remove content and set border to empty border
-            remove(panel);
+            remove(contentPanel);
             arrow.setIcon(iconArrow[COLLAPSED]);
             border = new CollapsableTitledBorder(collapsedBorderLine, titleComponent);
 
@@ -201,7 +201,7 @@ public class CollapsiblePanel extends JPanel {
             }
         } else {
             //expand the panel, add content and set border to titled border
-            add(panel, BorderLayout.CENTER);
+            add(contentPanel, BorderLayout.CENTER);
             arrow.setIcon(iconArrow[EXPANDED]);
             border = new CollapsableTitledBorder(expandedBorderLine, titleComponent);
 

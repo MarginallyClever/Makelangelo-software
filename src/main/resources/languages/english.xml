@@ -213,16 +213,6 @@
 	</string>
 
 	<string>
-		<key>InvertLeft</key>
-		<value>Invert left</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
-		<key>InvertRight</key>
-		<value>Invert right</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
 		<key>ToolType</key>
 		<value>Tool type</value>
 		<hint>tool settings</hint>
@@ -423,22 +413,17 @@
 	</string>
 
 	<string>
-		<key>MenuAxisDriveControls</key>
-		<value>Manual Driving</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
 		<key>MenuCommonDriveControls</key>
 		<value>Popular Driving Commands</value>
 		<hint>context sensitive menu</hint>
 	</string>
 	<string>
-		<key>MenuCreativeControl</key>
-		<value>Creative control</value>
+		<key>RobotPanel.AxisDriveControls</key>
+		<value>Cartesian (IK)</value>
 		<hint>context sensitive menu</hint>
 	</string>
 	<string>
-		<key>MenuAnimate</key>
+		<key>RobotPanel.Animate</key>
 		<value>Animation control</value>
 		<hint>context sensitive menu</hint>
 	</string>
@@ -646,18 +631,33 @@
 	</string>
 
 	<string>
-		<key>JogMotors</key>
-		<value>Motors</value>
+		<key>Makelangelo.MenuRobot</key>
+		<value>Jog Motors (FK)</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>JogIn</key>
-		<value>IN</value>
+		<key>RobotPanel.JogMotors</key>
+		<value>Jog Motors (FK)</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>JogLeftIn</key>
+		<value>Left in</value>
 		<hint>jog motors dialog</hint>
 	</string>
 	<string>
-		<key>JogOut</key>
-		<value>OUT</value>
+		<key>JogLeftOut</key>
+		<value>Left out</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogRightIn</key>
+		<value>Right in</value>
+		<hint>jog motors dialog</hint>
+	</string>
+	<string>
+		<key>JogRightOut</key>
+		<value>Right out</value>
 		<hint>jog motors dialog</hint>
 	</string>
 	<string>

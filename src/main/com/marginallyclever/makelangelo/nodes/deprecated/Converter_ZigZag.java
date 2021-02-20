@@ -14,7 +14,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 
 /**
@@ -24,7 +24,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
  * @author Dan
  */
 @Deprecated
-public class Converter_ZigZag extends ImageConverter implements MakelangeloRobotDecorator {
+public class Converter_ZigZag extends ImageConverter implements RobotDecorator {
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;

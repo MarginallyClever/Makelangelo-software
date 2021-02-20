@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.settings;
+package com.marginallyclever.makelangelo.robot;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -16,8 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.MakelangeloHardwareProperties;
+import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHardwareProperties;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -25,8 +24,8 @@ import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makela
  * @author danroyer
  * @since 7.1.4
  */
-public class MakelangeloSettingsDialog {
-	private MakelangeloRobot robot;
+public class SettingsDialog {
+	private Robot robot;
 	private JTabbedPane panes;
 
 	private JComboBox<String> hardwareVersionChoices;
@@ -39,7 +38,7 @@ public class MakelangeloSettingsDialog {
 	private PanelAdjustPaper panelAdjustPaper;
 	private PanelAdjustPen panelAdjustPen;
 
-	public MakelangeloSettingsDialog(MakelangeloRobot robot) {
+	public SettingsDialog(Robot robot) {
 		this.robot = robot;
 	}
 

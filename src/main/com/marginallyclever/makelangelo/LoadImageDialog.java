@@ -32,7 +32,7 @@ import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -285,7 +285,7 @@ public class LoadImageDialog implements LoadAndSaveFile {
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream, ArrayList<Turtle> turtles, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream, ArrayList<Turtle> turtles, Robot robot) {
 		return false;
 	}
 

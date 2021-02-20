@@ -7,7 +7,6 @@ import javax.vecmath.Vector3d;
 
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
 
 /**
@@ -15,7 +14,7 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class MakelangeloFirmwareSimulation {
+public class FirmwareSimulation {
 	public static final int MAX_SEGMENTS = 8;
 	public static final double MIN_SEGMENT_TIME = 25000.0/1000000.0;
 	public static final double MAX_FEEDRATE = 200.0;   // mm/s
@@ -29,14 +28,14 @@ public class MakelangeloFirmwareSimulation {
 	// poseNow is the current position.  Roughly equivalent to Sixi2Live.poseReceived.
 	protected Vector3d poseNow;
 	
-	protected LinkedList<MakelangeloFirmwareSimulationSegment> queue = new LinkedList<MakelangeloFirmwareSimulationSegment>();
+	protected LinkedList<FirmwareSimulationSegment> queue = new LinkedList<FirmwareSimulationSegment>();
 	
 	protected boolean readyForCommands;
 
 	protected double [] previousSpeedArray = { 0,0,0 };
 	protected double previousSafeSpeed = 0;
 	
-	public MakelangeloFirmwareSimulation() {
+	public FirmwareSimulation() {
 		readyForCommands = true;
 	}
 	
@@ -145,7 +144,7 @@ public class MakelangeloFirmwareSimulation {
 		
 		Vector3d start = (!queue.isEmpty()) ? queue.getLast().end : poseNow;
 		
-		MakelangeloFirmwareSimulationSegment next = new MakelangeloFirmwareSimulationSegment(start,to);
+		FirmwareSimulationSegment next = new FirmwareSimulationSegment(start,to);
 		poseNow=to;
 
 		// zero distance?  do nothing.
@@ -206,7 +205,7 @@ public class MakelangeloFirmwareSimulation {
 		
 		if(queue.size()>0) { 
 			// look at difference between this move and previous move
-			MakelangeloFirmwareSimulationSegment prev = queue.getLast();
+			FirmwareSimulationSegment prev = queue.getLast();
 			if(prev.nominalSpeed > 1e-6) {				
 				vmax_junction = Math.min(next.nominalSpeed,prev.nominalSpeed);
 				limited=false;
@@ -271,9 +270,9 @@ public class MakelangeloFirmwareSimulation {
 	}
 	
 	protected void recalculateBackwards() {
-		MakelangeloFirmwareSimulationSegment current;
-		MakelangeloFirmwareSimulationSegment next = null;
-		Iterator<MakelangeloFirmwareSimulationSegment> ri = queue.descendingIterator();
+		FirmwareSimulationSegment current;
+		FirmwareSimulationSegment next = null;
+		Iterator<FirmwareSimulationSegment> ri = queue.descendingIterator();
 		while(ri.hasNext()) {
 			current = ri.next();
 			recalculateBackwardsBetween(current,next);
@@ -281,7 +280,7 @@ public class MakelangeloFirmwareSimulation {
 		}
 	}
 	
-	protected void recalculateBackwardsBetween(MakelangeloFirmwareSimulationSegment current,MakelangeloFirmwareSimulationSegment next) {
+	protected void recalculateBackwardsBetween(FirmwareSimulationSegment current,FirmwareSimulationSegment next) {
 		double top = current.entrySpeedMax;
 		if(current.entrySpeed != top || (next!=null && next.recalculate)) {
 			double newEntrySpeed = current.nominalLength 
@@ -293,9 +292,9 @@ public class MakelangeloFirmwareSimulation {
 	}
 	
 	protected void recalculateForwards() {
-		MakelangeloFirmwareSimulationSegment current;
-		MakelangeloFirmwareSimulationSegment prev = null;
-		Iterator<MakelangeloFirmwareSimulationSegment> ri = queue.iterator();
+		FirmwareSimulationSegment current;
+		FirmwareSimulationSegment prev = null;
+		Iterator<FirmwareSimulationSegment> ri = queue.iterator();
 		while(ri.hasNext()) {
 			current = ri.next();
 			recalculateForwardsBetween(prev,current);
@@ -303,7 +302,7 @@ public class MakelangeloFirmwareSimulation {
 		}
 	}
 	
-	protected void recalculateForwardsBetween(MakelangeloFirmwareSimulationSegment prev,MakelangeloFirmwareSimulationSegment current) {
+	protected void recalculateForwardsBetween(FirmwareSimulationSegment prev,FirmwareSimulationSegment current) {
 		if(prev==null) return;
 		if(!prev.nominalLength && prev.entrySpeed < current.entrySpeed) {
 			double newEntrySpeed = maxSpeedAllowed(-prev.acceleration, prev.entrySpeed, prev.distance);
@@ -315,7 +314,7 @@ public class MakelangeloFirmwareSimulation {
 	}
 	
 	protected void recalculateTrapezoids() {
-		MakelangeloFirmwareSimulationSegment current=null;
+		FirmwareSimulationSegment current=null;
 		
 		boolean nextDirty;
 		double currentEntrySpeed=0, nextEntrySpeed=0;
@@ -325,7 +324,7 @@ public class MakelangeloFirmwareSimulation {
 			current = queue.get(i);
 			int j = i+1;
 			if(j<size) {
-				MakelangeloFirmwareSimulationSegment next = queue.get(j);
+				FirmwareSimulationSegment next = queue.get(j);
 				nextEntrySpeed = next.entrySpeed;
 				nextDirty = next.recalculate;
 			} else {
@@ -344,7 +343,7 @@ public class MakelangeloFirmwareSimulation {
 		}
 	}
 	
-	protected void recalculateTrapezoidSegment(MakelangeloFirmwareSimulationSegment seg, double entrySpeed, double exitSpeed) {
+	protected void recalculateTrapezoidSegment(FirmwareSimulationSegment seg, double entrySpeed, double exitSpeed) {
 		if( entrySpeed < MINIMUM_PLANNER_SPEED ) entrySpeed = MINIMUM_PLANNER_SPEED;
 		if( exitSpeed  < MINIMUM_PLANNER_SPEED ) exitSpeed  = MINIMUM_PLANNER_SPEED;
 		
@@ -404,7 +403,7 @@ public class MakelangeloFirmwareSimulation {
 	/**
 	 * @return time in seconds to run sequence.
 	 */
-	public double getTimeEstimate(Turtle t,MakelangeloRobotSettings settings) {
+	public double getTimeEstimate(Turtle t,RobotSettings settings) {
 		double fu = settings.getPenUpFeedRate();
 		double fd = settings.getPenDownFeedRate();
 		double fz = settings.getZRate();
@@ -429,7 +428,7 @@ public class MakelangeloFirmwareSimulation {
 			ly=m.y;
 			
 			while(queue.size()>MAX_SEGMENTS) {
-				MakelangeloFirmwareSimulationSegment s= queue.remove(0);
+				FirmwareSimulationSegment s= queue.remove(0);
 				//s.report();
 				sum += s.end_s;// - s.start_s;
 			}

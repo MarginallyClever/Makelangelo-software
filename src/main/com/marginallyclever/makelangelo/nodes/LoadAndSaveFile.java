@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 /**
  * Interface for the service handler
@@ -61,5 +61,5 @@ public abstract interface LoadAndSaveFile {
 	 * @param robot machine hardware settings to use in loading process
 	 * @return true if save successful.
 	 */
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot);
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot);
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 
 /**
@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
  * @author Dan Royer
  * @since 7.25.0
  */
-public abstract class Node implements MakelangeloRobotDecorator {
+public abstract class Node implements RobotDecorator {
 	// TODO make this not public
 	public ArrayList<NodeConnector<?>> inputs = new ArrayList<NodeConnector<?>>(); 
 	// TODO make this not public

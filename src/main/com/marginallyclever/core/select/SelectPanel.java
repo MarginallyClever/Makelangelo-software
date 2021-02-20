@@ -32,6 +32,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	
 	public SelectPanel() {
 		super();
+		this.setLayout(new GridBagLayout());
 		
 		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		interiorPanel.setLayout(new GridBagLayout());
@@ -46,7 +47,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
-		add(interiorPanel);
+		add(interiorPanel,gbc);
 	}
 	
 	public void add(Select c) {

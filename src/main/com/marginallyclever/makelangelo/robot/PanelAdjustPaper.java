@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.settings;
+package com.marginallyclever.makelangelo.robot;
 
 import java.beans.PropertyChangeEvent;
 
@@ -9,7 +9,6 @@ import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 public class PanelAdjustPaper extends SelectPanel {
 	/**
@@ -17,7 +16,7 @@ public class PanelAdjustPaper extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected MakelangeloRobot robot;
+	protected Robot robot;
 	
 	private SelectOneOfMany paperSizes;
 	private SelectDouble pw, ph,sx,sy,ang;
@@ -71,7 +70,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		new PaperSize("Arch E1",762,1067)
 	};
 
-	public PanelAdjustPaper(MakelangeloRobot robot) {
+	public PanelAdjustPaper(Robot robot) {
 		this.robot = robot;
 		
 		beingModified=false;
@@ -198,7 +197,7 @@ public class PanelAdjustPaper extends SelectPanel {
 		if( phf<=0 ) data_is_sane=false;
 
 		if (data_is_sane) {
-			MakelangeloRobotSettings s = robot.getSettings();
+			RobotSettings s = robot.getSettings();
 			s.setPaperSize(pwf,phf,shiftxf,shiftyf);
 			s.setRotation(rot);
 			s.setPaperColor(paperColor.getColor());

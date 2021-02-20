@@ -17,7 +17,7 @@ import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 /**
  * Saves {@code Turtle} to SVG
@@ -80,7 +80,7 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 	 * @return true if save succeeded.
 	 */
 	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot) {
 		Log.message("saving...");
 
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {

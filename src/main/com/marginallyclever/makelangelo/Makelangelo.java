@@ -83,11 +83,10 @@ import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangelo.robot.PiCaptureAction;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloSettingsDialog;
+import com.marginallyclever.makelangelo.robot.Robot;
+import com.marginallyclever.makelangelo.robot.RobotPanel;
+import com.marginallyclever.makelangelo.robot.RobotSettings;
+import com.marginallyclever.makelangelo.robot.SettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -113,7 +112,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private MakelangeloAppPreferences appPreferences;
 	
 	private Camera camera;
-	private MakelangeloRobot robot;
+	private Robot robot;
 
 	private ArrayList<Turtle> myTurtles;
 	
@@ -176,7 +175,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
-		robot = new MakelangeloRobot();
+		robot = new Robot();
 		logPanel.setRobot(robot);
 
 		testGeneratorsAndConverters();
@@ -572,7 +571,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					menuBar.setEnabled(false);
-					MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(robot);
+					SettingsDialog m = new SettingsDialog(robot);
 					m.run(getMainFrame());
 					menuBar.setEnabled(true);
 				}
@@ -754,7 +753,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private void runRobotDialog() {
 		menuBar.setEnabled(false);
 
-		MakelangeloRobotPanel myRobotPanel = new MakelangeloRobotPanel(getMainFrame(),robot);
+		RobotPanel myRobotPanel = new RobotPanel(getMainFrame(),robot);
 		
 		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(getMainFrame().getLocation());
@@ -798,7 +797,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		// mainFrame.setLocation(locationX,locationY);
 	}
 
-	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
+	public void settingsChangedEvent(RobotSettings settings) {
 		if (previewPanel != null)
 			previewPanel.repaint();
 	}
@@ -870,7 +869,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		return mainFrame;
 	}
 
-	public MakelangeloRobot getRobot() {
+	public Robot getRobot() {
 		return robot;
 	}
 	

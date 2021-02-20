@@ -1,11 +1,6 @@
 package com.marginallyclever.makelangelo.robot;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -20,11 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
@@ -37,11 +27,9 @@ import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.SoundSystem;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a
@@ -52,15 +40,14 @@ import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, PreviewListener {
+public class Robot implements NetworkConnectionListener, PreviewListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
 	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
-	private MakelangeloRobotSettings settings = null;
-	private MakelangeloRobotPanel myPanel = null;
+	private RobotSettings settings = null;
 
 	// Connection state
 	private NetworkConnection connection = null;
@@ -86,17 +73,18 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	protected int drawingProgress;
 
 	// rendering stuff
-	private MakelangeloRobotDecorator decorator = null;
+	private RobotDecorator decorator = null;
 
 	private boolean showPenUp = false;
 	
 	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
+	private ArrayList<RobotListener> listeners;
 
 
-	public MakelangeloRobot() {
+	public Robot() {
 		super();
-		settings = new MakelangeloRobotSettings();
+		listeners = new ArrayList<RobotListener>();
+		settings = new RobotSettings();
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -110,6 +98,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		drawingProgress = 0;
 	}
 
+	
 	public NetworkConnection getConnection() {
 		return connection;
 	}
@@ -222,12 +211,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		if (justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
 			// send whatever config settings I have for this machine.
 			sendConfig();
-
-			if (myPanel != null) {
-				String hardwareVersion = this.settings.getHardwareVersion();
-				myPanel.onConnect();
-				this.settings.setHardwareVersion(hardwareVersion);
-			}
+			
+			String hardwareVersion = settings.getHardwareVersion();
+			settings.setHardwareVersion(hardwareVersion);
 
 			// tell everyone I've confirmed connection.
 			notifyConnectionConfirmed();
@@ -261,28 +247,36 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		settings.loadConfig(newUID);
 	}
 
+	// notify PropertyChangeListeners
+	private void notifyListeners(String propertyName,Object oldValue,Object newValue) {
+		PropertyChangeEvent e = new PropertyChangeEvent(this,propertyName,oldValue,newValue);
+		for(RobotListener ear : listeners) {
+			ear.propertyChange(e);
+		}
+	}
+	
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
 	private void notifyConnectionConfirmed() {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.connectionConfirmed(this);
 		}
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
 	private void notifyFirmwareVersionBad(long versionFound) {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.firmwareVersionBad(this, versionFound);
 		}
 	}
 
 	private void notifyDataAvailable(String data) {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.dataAvailable(this, data);
 		}
 	}
 
 	private void notifyConnectionReady() {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.sendBufferEmpty(this);
 		}
 	}
@@ -294,22 +288,22 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	}
 
 	private void notifyLineError(int lineNumber) {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.lineError(this, lineNumber);
 		}
 	}
 
 	public void notifyDisconnected() {
-		for (MakelangeloRobotListener listener : listeners) {
+		for (RobotListener listener : listeners) {
 			listener.disconnected(this);
 		}
 	}
 
-	public void addListener(MakelangeloRobotListener listener) {
+	public void addListener(RobotListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(MakelangeloRobotListener listener) {
+	public void removeListener(RobotListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -424,17 +418,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		isPaused = false;
 		raisePen();
 		
-		if (myPanel != null)
-			myPanel.updateButtonAccess();
+		notifyListeners("halt", false, true);
 	}
 
 	public void setRunning() {
 		isRunning = true;
-		
-		if (myPanel != null) {
-			myPanel.statusBar.start();
-			myPanel.updateButtonAccess(); // disables all the manual driving buttons
-		}
+
+		notifyListeners("running", false, true);
 	}
 
 	public void raisePen() {
@@ -458,7 +448,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(MakelangeloRobotSettings.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(RobotSettings.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -494,10 +484,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		if (drawingProgress == total) {
 			// no!
 			halt();
-			// bask in the glory
-			if (myPanel != null)
-				myPanel.statusBar.setProgress(total, total);
-
+			notifyListeners("progress",total,total);
 			SoundSystem.playDrawingFinishedSound();
 		} else {
 			String line = drawingCommands.get(drawingProgress);
@@ -519,12 +506,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 				this.setPenX(px);
 				this.setPenY(py);
 			}
-
-			if (myPanel != null)
-				myPanel.statusBar.setProgress(drawingProgress, total);
+			
+			notifyListeners("progress",drawingProgress, total);
 			// loop until we find a line that gets sent to the robot, at which
-			// point we'll
-			// pause for the robot to respond. Also stop at end of file.
+			// point we'll pause for the robot to respond. Also stop at end of file.
 		}
 	}
 
@@ -536,45 +521,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		setLineNumber(lineNumber);
 		setRunning();
 		sendFileCommand();
-	}
-
-	/**
-	 * display a dialog asking the user to change the pen
-	 * 
-	 * @param toolNumber a 24 bit RGB color of the new pen.
-	 */
-	public void requestUserChangeTool(int toolNumber) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.insets = new Insets(10, 10, 10, 10);
-
-		JLabel fieldValue = new JLabel("");
-		fieldValue.setOpaque(true);
-		fieldValue.setMinimumSize(new Dimension(80, 20));
-		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
-		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
-		fieldValue.setSize(fieldValue.getMinimumSize());
-		fieldValue.setBackground(new Color(toolNumber));
-		fieldValue.setBorder(new LineBorder(Color.BLACK));
-		panel.add(fieldValue, c);
-
-		JLabel message = new JLabel(Translator.get("ChangeToolMessage"));
-		c.gridx = 1;
-		c.gridwidth = 3;
-		panel.add(message, c);
-
-		Component root = null;
-		if(myPanel != null) {
-			root = myPanel.getRootPane();
-		}
-		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 
 	/**
@@ -601,21 +547,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 
 		// remember important status changes
 		
-		if (reportedline.startsWith(settings.getPenUpString())) {
+		if(reportedline.startsWith(settings.getPenUpString())) {
 			rememberRaisedPen();
-		}
-		if (reportedline.startsWith(settings.getPenDownString())) {
+		} else if(reportedline.startsWith(settings.getPenDownString())) {
 			rememberLoweredPen();
-		}
-		if (reportedline.startsWith("M17")) {
-			if( myPanel != null ) {
-				myPanel.motorsHaveBeenEngaged();
-			}
-		}
-		if (reportedline.startsWith("M18")) {
-			if( myPanel != null ) {
-				myPanel.motorsHaveBeenDisengaged();
-			}
+		} else if(reportedline.startsWith("M17")) {
+			notifyListeners("motorsEngaged", null, true);
+		} else if(reportedline.startsWith("M18")) {
+			notifyListeners("motorsEngaged", null, false);
 		}
 
 		Log.message(reportedline);
@@ -681,8 +620,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotSettings.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotSettings.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
@@ -695,8 +634,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotSettings.COMMAND_TRAVEL)
+						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotSettings.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
@@ -753,7 +692,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 
-	public MakelangeloRobotSettings getSettings() {
+	public RobotSettings getSettings() {
 		return settings;
 	}
 
@@ -789,16 +728,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 
 		// new way
 		double newEstimate=0;
-		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
+		FirmwareSimulation m = new FirmwareSimulation();
 		for( Turtle t : turtles ) {
 			newEstimate += m.getTimeEstimate(t, settings);
 		}
 		Log.message("New method "+printTimeEstimate(newEstimate));
 		
 		// show results
-		if( myPanel != null ) {
-			myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
-		}
+		notifyListeners("progress",newEstimate, lineCount);
 	}
 	
 	protected String printTimeEstimate(double seconds) {
@@ -918,7 +855,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		return time + accelTime + decelTime;
 	}
 
-	public void setDecorator(MakelangeloRobotDecorator arg0) {
+	public void setDecorator(RobotDecorator arg0) {
 		decorator = arg0;
 	}
 

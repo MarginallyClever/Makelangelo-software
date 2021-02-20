@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.settings;
+package com.marginallyclever.makelangelo.robot;
 
 import java.awt.BasicStroke;
 import java.io.IOException;
@@ -16,8 +16,8 @@ import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makelangelo2Properties;
-import com.marginallyclever.makelangelo.robot.settings.hardwareProperties.MakelangeloHardwareProperties;
+import com.marginallyclever.makelangelo.robot.hardwareProperties.Makelangelo2Properties;
+import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
 
 
@@ -26,7 +26,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * TODO move tool names into translations and add a color palette system for quantizing colors.
  */
-public final class MakelangeloRobotSettings implements Serializable {
+public final class RobotSettings implements Serializable {
 	/**
 	 * 
 	 */
@@ -34,12 +34,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public static final String COMMAND_MOVE = "G0";
 	public static final String COMMAND_TRAVEL = "G1";
-	public static final double INCH_TO_CM = 2.54;
-	public static final int FIRMWARE_MAX_SEGMENTS = 32;
+	private static final int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
 
-	private ArrayList<MakelangeloRobotSettingsListener> listeners;
+	private ArrayList<RobotSettingsListener> listeners;
 
 	// Each robot has a global unique identifier
 	private long robotUID;
@@ -106,7 +105,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
-	public MakelangeloRobotSettings() {				
+	public RobotSettings() {				
 		double mh = 835; // mm
 		double mw = 835; // mm
 		
@@ -119,7 +118,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 		paperColor = new ColorRGB(255,255,255);
 		
-		listeners = new ArrayList<MakelangeloRobotSettingsListener>();
+		listeners = new ArrayList<RobotSettingsListener>();
 		
 		// paper area (A2=420x594mm)
 		double pw = 420;
@@ -154,7 +153,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		//loadConfig(last_machine_id);
 	}
 	
-	public void addListener(MakelangeloRobotSettingsListener listener) {
+	public void addListener(RobotSettingsListener listener) {
 		listeners.add(listener);
 	}
 	
@@ -508,12 +507,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public void notifySettingsChanged() {
-		for( MakelangeloRobotSettingsListener listener : listeners ) {
+		for( RobotSettingsListener listener : listeners ) {
 			listener.settingsChangedEvent(this);
 		}
 	}
 
-	public void removeListener(MakelangeloRobotSettingsListener listener) {
+	public void removeListener(RobotSettingsListener listener) {
 		listeners.remove(listener);
 	}
 	

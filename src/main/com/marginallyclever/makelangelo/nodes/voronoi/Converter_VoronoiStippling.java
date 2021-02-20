@@ -14,7 +14,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangelo.robot.RobotDecorator;
 
 
 /**
@@ -25,7 +25,7 @@ import com.marginallyclever.makelangelo.robot.MakelangeloRobotDecorator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter implements MakelangeloRobotDecorator {
+public class Converter_VoronoiStippling extends ImageConverter implements RobotDecorator {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private TransformedImage img;

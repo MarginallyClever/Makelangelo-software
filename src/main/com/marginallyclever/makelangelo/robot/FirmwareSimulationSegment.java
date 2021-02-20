@@ -4,7 +4,7 @@ import javax.vecmath.Vector3d;
 
 import com.marginallyclever.core.StringHelper;
 
-class MakelangeloFirmwareSimulationSegment {
+class FirmwareSimulationSegment {
 	public static int counter=0;
 	public int id;
 	
@@ -42,7 +42,7 @@ class MakelangeloFirmwareSimulationSegment {
 	
 	
 	// delta is calculated here in the constructor.
-	public MakelangeloFirmwareSimulationSegment(Vector3d startPose,Vector3d endPose) {
+	public FirmwareSimulationSegment(Vector3d startPose,Vector3d endPose) {
 		start  = (Vector3d)startPose.clone();
 		end    = (Vector3d)endPose.clone();
 		delta  = (Vector3d)endPose.clone();

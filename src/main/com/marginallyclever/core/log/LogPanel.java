@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 
 public class LogPanel extends JPanel implements LogListener {
@@ -27,7 +27,7 @@ public class LogPanel extends JPanel implements LogListener {
 
 	public static final int LOG_LENGTH = 5000;
 	
-	protected MakelangeloRobot robot;
+	protected Robot robot;
 	
 	// logging
 	private JList<String> logArea;
@@ -149,7 +149,7 @@ public class LogPanel extends JPanel implements LogListener {
 	}
 	
 
-	public void setRobot(MakelangeloRobot robot) {
+	public void setRobot(Robot robot) {
 		this.robot = robot;
 	}
 	

@@ -9,9 +9,9 @@ public class PaperBorderAction extends AbstractAction {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	MakelangeloRobot robot;
+	Robot robot;
 	
-	public PaperBorderAction(MakelangeloRobot robot,String text) {
+	public PaperBorderAction(Robot robot,String text) {
 		super(text);
 		this.robot=robot;
 	}

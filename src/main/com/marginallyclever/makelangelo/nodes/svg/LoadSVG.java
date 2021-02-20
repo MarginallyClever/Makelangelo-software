@@ -39,7 +39,7 @@ import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 /**
  * Reads in SVG file and converts it to a {@code Turtle}
@@ -578,7 +578,7 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 	 * @return true if save succeeded.
 	 */
 	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot) {
 		return false;
 	}
 }

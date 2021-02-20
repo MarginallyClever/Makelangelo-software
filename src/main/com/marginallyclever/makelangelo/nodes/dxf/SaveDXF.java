@@ -17,7 +17,7 @@ import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 /**
  * Saves a Turtle to DXF format.
@@ -81,7 +81,7 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 	 * @param robot the robot from which the data is obtained
 	 * @return true if save succeeded.
 	 */
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot) {
 		Log.message("Saving...");
 
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {

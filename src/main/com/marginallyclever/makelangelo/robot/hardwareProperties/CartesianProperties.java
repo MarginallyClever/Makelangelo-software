@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.settings.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.hardwareProperties;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -7,8 +7,8 @@ import java.util.Date;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
-import com.marginallyclever.makelangelo.robot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.robot.Robot;
+import com.marginallyclever.makelangelo.robot.RobotSettings;
 
 /**
  * Properties for a cartesian plotter.
@@ -23,7 +23,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public Point2D getHome(MakelangeloRobotSettings settings) {
+	public Point2D getHome(RobotSettings settings) {
 		return new Point2D(0,0);
 	}
 	
@@ -58,8 +58,8 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,MakelangeloRobot robot) {
-		MakelangeloRobotSettings settings = robot.getSettings();
+	public void render(GL2 gl2,Robot robot) {
+		RobotSettings settings = robot.getSettings();
 
 		paintCalibrationPoint(gl2,settings);
 		paintGantryAndHead(gl2,robot);		
@@ -68,8 +68,8 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 
 	
-	protected void paintGantryAndHead(GL2 gl2, MakelangeloRobot robot) {
-		MakelangeloRobotSettings settings = robot.getSettings();
+	protected void paintGantryAndHead(GL2 gl2, Robot robot) {
+		RobotSettings settings = robot.getSettings();
 		//double dx, dy;
 		double gx = robot.getPenX();
 		double gy = robot.getPenY();
@@ -115,7 +115,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 	
 	@Override
-	protected void paintCalibrationPoint(GL2 gl2, MakelangeloRobotSettings settings) {
+	protected void paintCalibrationPoint(GL2 gl2, RobotSettings settings) {
 		gl2.glPushMatrix();
 		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
 
@@ -131,7 +131,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	protected void paintMotors(GL2 gl2,MakelangeloRobotSettings settings) {
+	protected void paintMotors(GL2 gl2,RobotSettings settings) {
 		double top = settings.getLimitTop();
 		//double bottom = settings.getLimitBottom();
 		double right = settings.getLimitRight();
@@ -159,7 +159,7 @@ public class CartesianProperties extends Makelangelo2Properties {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,MakelangeloRobotSettings settings) {
+	protected void paintControlBox(GL2 gl2,RobotSettings settings) {
 		double cy = settings.getLimitTop();
 		double cx = 0;
 

@@ -14,7 +14,7 @@ import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
+import com.marginallyclever.makelangelo.robot.Robot;
 
 /**
  * LoadGCode loads gcode into memory. 
@@ -216,7 +216,7 @@ public class LoadGCode extends TurtleGenerator implements LoadAndSaveFile {
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Robot robot) {
 		return false;
 	}
 }

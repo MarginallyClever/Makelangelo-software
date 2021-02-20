@@ -10,6 +10,6 @@ import com.jogamp.opengl.GL2;
  * @author Dan Royer
  * @since 7.1.4
  */
-public abstract interface MakelangeloRobotDecorator {
+public abstract interface RobotDecorator {
 	void render(GL2 gl2);
 }

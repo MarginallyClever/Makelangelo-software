@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.settings;
+package com.marginallyclever.makelangelo.robot;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,7 +8,6 @@ import com.marginallyclever.core.select.SelectColor;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.robot.MakelangeloRobot;
 
 
 public class PanelAdjustPen extends SelectPanel implements ActionListener {
@@ -17,7 +16,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected MakelangeloRobot robot;
+	protected Robot robot;
 	
 	protected SelectDouble penDiameter;
 	protected SelectDouble maxFeedRate;
@@ -35,12 +34,12 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	protected SelectColor selectPenUpColor;
 
 	
-	public PanelAdjustPen(MakelangeloRobot robot) {
+	public PanelAdjustPen(Robot robot) {
 		super();
 		
 		this.robot = robot;
 	    
-	    MakelangeloRobotSettings settings = robot.getSettings();
+	    RobotSettings settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
@@ -77,7 +76,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	
 	
 	public void save() {
-	    MakelangeloRobotSettings settings = robot.getSettings();
+	    RobotSettings settings = robot.getSettings();
 		settings.setDiameter(penDiameter.getValue());
 		settings.setMaxFeedRate(maxFeedRate.getValue());
 		settings.setCurrentFeedRate(currentFeedRate.getValue());
