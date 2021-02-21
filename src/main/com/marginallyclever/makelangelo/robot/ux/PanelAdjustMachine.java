@@ -1,8 +1,9 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.robot.RobotController;
 
 public class PanelAdjustMachine extends SelectPanel {
 	/**

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +8,8 @@ import com.marginallyclever.core.select.SelectColor;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 
 public class PanelAdjustPen extends SelectPanel implements ActionListener {

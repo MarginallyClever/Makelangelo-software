@@ -22,11 +22,13 @@ import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
+import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.SoundSystem;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
 import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
@@ -43,7 +45,7 @@ import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
  * @author Dan Royer
  * @since 7.2.10
  */
-public class RobotController implements NetworkConnectionListener, RendersInOpenGL {
+public class RobotController extends Node implements NetworkConnectionListener, RendersInOpenGL {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
@@ -96,6 +98,12 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 		setPenX(0);
 		setPenY(0);
 		drawingProgress = 0;
+	}
+
+
+	@Override
+	public String getName() {
+		return Translator.get("RobotController.name");
 	}
 
 	
@@ -224,7 +232,7 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 		return portConfirmed;
 	}
 
-	public void parseRobotUID(String line) {
+	private void parseRobotUID(String line) {
 		settings.saveConfig();
 
 		// get the UID reported by the robot
@@ -245,6 +253,14 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 
 		// load machine specific config
 		settings.loadConfig(newUID);
+	}
+
+	public void addListener(RobotListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(RobotListener listener) {
+		listeners.remove(listener);
 	}
 
 	// notify PropertyChangeListeners
@@ -293,18 +309,10 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 		}
 	}
 
-	public void notifyDisconnected() {
+	private void notifyDisconnected() {
 		for (RobotListener listener : listeners) {
 			listener.disconnected(this);
 		}
-	}
-
-	public void addListener(RobotListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeListener(RobotListener listener) {
-		listeners.remove(listener);
 	}
 
 	/**
@@ -491,10 +499,10 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 			sendLineWithNumberAndChecksum(line, drawingProgress);
 			drawingProgress++;
 
-			// TODO update the simulated position to match the real robot?
+			// update the simulated position to match the real robot?
 			if (line.contains("G0") || line.contains("G1")) {
-				float px = this.getPenX();
-				float py = this.getPenY();
+				float px = getPenX();
+				float py = getPenY();
 
 				String[] tokens = line.split(" ");
 				for (String t : tokens) {
@@ -922,13 +930,13 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 	}
 
 	// in mm
-	public void setPenX(float px) {
-		this.penX = px;
+	public float getPenY() {
+		return penY;
 	}
 
 	// in mm
-	public float getPenY() {
-		return penY;
+	public void setPenX(float px) {
+		this.penX = px;
 	}
 
 	// in mm
@@ -944,8 +952,9 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 		String toMatch = settings.getPenUpString();
 
 		int x = startAtLine;
-		if (x >= total)
+		if (x >= total) {
 			x = total - 1;
+		}
 
 		toMatch = toMatch.trim();
 		while (x > 1) {
@@ -959,7 +968,7 @@ public class RobotController implements NetworkConnectionListener, RendersInOpen
 		return x;
 	}
 
-	public boolean isPenIsUp() {
+	public boolean isPenUp() {
 		return penIsUp;
 	}
 

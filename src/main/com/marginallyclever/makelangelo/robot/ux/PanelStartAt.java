@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
@@ -8,7 +8,7 @@ import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 
-public class StartAtPanel extends SelectPanel {
+public class PanelStartAt extends SelectPanel {
 	/**
 	 * 
 	 */
@@ -21,7 +21,7 @@ public class StartAtPanel extends SelectPanel {
 	protected SelectOneOfMany comboBox;
 	protected String [] optionsList;
 	
-	public StartAtPanel() {
+	public PanelStartAt() {
 		super();
 		
 		findPreviousPenDown = true;

@@ -1,8 +1,10 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+
+import com.marginallyclever.makelangelo.robot.RobotController;
 
 public class PaperBorderAction extends AbstractAction {
 	/**

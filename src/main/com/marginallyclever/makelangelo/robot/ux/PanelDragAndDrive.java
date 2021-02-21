@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,13 +13,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.robot.RobotController;
 /**
  * Drag cursor to drive plotter control. 
  * @author droyer
  * @since 7.4.5
  * @deprecated
  */
-public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMotionListener {
+public class PanelDragAndDrive extends JPanel implements MouseListener, MouseMotionListener {
 	/**
 	 * 
 	 */
@@ -31,7 +32,7 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 	private double mouseLastX, mouseLastY;
 	private RobotController robot;
 	
-	DragAndDrivePanel(RobotController robot) {
+	PanelDragAndDrive(RobotController robot) {
 		super(new GridBagLayout());
 
 		this.robot = robot;

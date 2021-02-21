@@ -84,9 +84,9 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotPanel;
 import com.marginallyclever.makelangelo.robot.RobotModel;
-import com.marginallyclever.makelangelo.robot.SettingsDialog;
+import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
+import com.marginallyclever.makelangelo.robot.ux.SettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -753,7 +753,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private void runRobotDialog() {
 		menuBar.setEnabled(false);
 
-		RobotPanel myRobotPanel = new RobotPanel(getMainFrame(),robot);
+		PanelRobot myRobotPanel = new PanelRobot(getMainFrame(),robot);
 		
 		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(getMainFrame().getLocation());

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHardwareProperties;
 
 /**

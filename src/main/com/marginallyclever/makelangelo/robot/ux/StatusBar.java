@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.Dimension;
 import java.awt.Font;

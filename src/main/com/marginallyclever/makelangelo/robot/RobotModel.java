@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ import com.marginallyclever.util.PreferencesHelper;
 /**
  * All the hardware settings for a single plotter robot.  Does not store state information.  
  * @author Dan Royer
- * TODO move tool names into translations and add a color palette system for quantizing colors.
+ * @since before 7.25.0
  */
 public final class RobotModel implements Serializable {
 	/**
@@ -34,11 +33,8 @@ public final class RobotModel implements Serializable {
 
 	public static final String COMMAND_MOVE = "G0";
 	public static final String COMMAND_TRAVEL = "G1";
-	private static final int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
-
-	private ArrayList<RobotSettingsListener> listeners;
 
 	// Each robot has a global unique identifier
 	private long robotUID;
@@ -49,24 +45,22 @@ public final class RobotModel implements Serializable {
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
+	
 	// paper area, in mm
 	private double paperLeft;
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
-	
+	// landscape/portrait?
 	private double rotation;
-	
 	// % from edge of paper.
 	private double paperMargin;
-
-	private String hardwareVersion;
-	private MakelangeloHardwareProperties hardwareProperties;
-
 	
 	private ColorRGB paperColor;
 	
-	private int lookAheadSegments;  // >0 and power of two.
+
+	private String hardwareVersion;
+	private MakelangeloHardwareProperties hardwareProperties;
 
 	protected ColorRGB penDownColorDefault;
 	protected ColorRGB penDownColor;
@@ -106,37 +100,33 @@ public final class RobotModel implements Serializable {
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
 	public RobotModel() {				
-		double mh = 835; // mm
-		double mw = 835; // mm
+		super();
 		
 		robotUID = 0;
 		isRegistered = false;
+		
+		double mh = 835; // mm
+		double mw = 835; // mm
 		limitTop = mh/2;
 		limitBottom = -mh/2;
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
-		paperColor = new ColorRGB(255,255,255);
-		
-		listeners = new ArrayList<RobotSettingsListener>();
-		
 		// paper area (A2=420x594mm)
 		double pw = 420;
 		double ph = 594;
-
 		paperTop = ph/2;
 		paperBottom = -ph/2;
 		paperLeft = -pw/2;
 		paperRight = pw/2;
 		paperMargin = 0.9;
+		paperColor = new ColorRGB(255,255,255);
 
 		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
 		penUpColor = new ColorRGB(0,255,0); // blue
 		startingPositionIndex = 4;
 
-		setLookAheadSegments(FIRMWARE_MAX_SEGMENTS);  // firmware MAX_SEGMENTS
-		
-		// default hardware version is 2
+		// default hardware version
 		setHardwareVersion("5");
 
 		// which configurations are available?
@@ -152,11 +142,7 @@ public final class RobotModel implements Serializable {
 		// Load most recent config
 		//loadConfig(last_machine_id);
 	}
-	
-	public void addListener(RobotSettingsListener listener) {
-		listeners.add(listener);
-	}
-	
+		
 	public void createNewUID(long newUID) {
 		// make sure a topLevelMachinesPreferenceNode node is created
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -505,23 +491,12 @@ public final class RobotModel implements Serializable {
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
-
-	public void notifySettingsChanged() {
-		for( RobotSettingsListener listener : listeners ) {
-			listener.settingsChangedEvent(this);
-		}
-	}
-
-	public void removeListener(RobotSettingsListener listener) {
-		listeners.remove(listener);
-	}
 	
 	// Save the machine configuration
 	public void saveConfig() {
 		// once cloud logic is finished.
 		//if(GetCanUseCloud() && SaveConfigToCloud() ) return;
 		saveConfigToLocal();
-		notifySettingsChanged();
 	}
 	
 	protected void saveConfigToLocal() {
@@ -847,14 +822,6 @@ public final class RobotModel implements Serializable {
 
 	public void writeRelativeMode(Writer out) throws IOException {
 		out.write(getRelativeMode() + "\n");
-	}
-
-	public int getLookAheadSegments() {
-		return lookAheadSegments;
-	}
-
-	public void setLookAheadSegments(int arg0) {
-		this.lookAheadSegments = arg0;
 	}
 
 

@@ -70,10 +70,10 @@ public class CartesianProperties extends Makelangelo2Properties {
 	
 	protected void paintGantryAndHead(GL2 gl2, RobotController robot) {
 		RobotModel settings = robot.getSettings();
-		//double dx, dy;
+		
 		double gx = robot.getPenX();
 		double gy = robot.getPenY();
-		double gz = (robot.isPenIsUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
+		double gz = (robot.isPenUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -92,7 +92,6 @@ public class CartesianProperties extends Makelangelo2Properties {
 		gl2.glVertex2d(right+ZAR_MOTOR_BODY_SIZE,top);
 		gl2.glVertex2d(right+ZAR_MOTOR_BODY_SIZE,bottom);
 		gl2.glVertex2d(right,bottom);
-
 		// gantry X
 		gl2.glColor3f(1, 0.4f, 0.25f);
 		gl2.glVertex2d(left-ZAR_MOTOR_BODY_SIZE,gy+ZAR_MOTOR_BODY_SIZE);
@@ -109,7 +108,9 @@ public class CartesianProperties extends Makelangelo2Properties {
 		gl2.glColor3f(0, 0, 1);
 		float f;
 		for (f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-			gl2.glVertex2d(gx + Math.cos(f) * (4+gz), gy + Math.sin(f) * (4+gz));
+			gl2.glVertex2d(
+					gx + Math.cos(f) * (4+gz),
+					gy + Math.sin(f) * (4+gz));
 		}
 		gl2.glEnd();
 	}

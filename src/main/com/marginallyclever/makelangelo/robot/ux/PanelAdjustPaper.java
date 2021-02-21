@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.beans.PropertyChangeEvent;
 
@@ -9,6 +9,8 @@ import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotModel;
 
 public class PanelAdjustPaper extends SelectPanel {
 	/**

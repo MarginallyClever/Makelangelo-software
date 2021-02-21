@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot;
+package com.marginallyclever.makelangelo.robot.ux;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,7 +29,9 @@ import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.RobotPanel;
+import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.robot.RobotListener;
+import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
 
 /**
  * Control panel for a Makelangelo robot
@@ -37,7 +39,7 @@ import com.marginallyclever.makelangelo.robot.RobotPanel;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class RobotPanel extends JPanel implements ActionListener, RobotListener {
+public class PanelRobot extends JPanel implements ActionListener, RobotListener {
 	/**
 	 *
 	 */
@@ -86,7 +88,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	 * @param parent
 	 * @param robot
 	 */
-	public RobotPanel(Frame parent, RobotController robot) {
+	public PanelRobot(Frame parent, RobotController robot) {
 		this.parentFrame = parent;
 		this.myRobot = robot;
 		myRobot.addListener(this);
@@ -537,13 +539,12 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 	}
 	
 	protected void startAt() {
-		StartAtPanel p = new StartAtPanel();
+		PanelStartAt p = new PanelStartAt();
 		if(p.run(parentFrame)) {
 			// user hit ok
 			int lineNumber = p.lineNumber;
 			if (lineNumber != -1) {
 				if(p.findPreviousPenDown==false) {
-					myRobot.drawingProgress=lineNumber;
 					if(p.addPenDownCommand==true) {
 						myRobot.sendLineToRobot(myRobot.getSettings().getPenDownString());
 					}
@@ -636,7 +637,7 @@ public class RobotPanel extends JPanel implements ActionListener, RobotListener 
 					mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 					RobotController robot = new RobotController();
-					RobotPanel makelangeloRobotPanel = new RobotPanel(mainFrame, robot);
+					PanelRobot makelangeloRobotPanel = new PanelRobot(mainFrame, robot);
 
 					mainFrame.setContentPane(makelangeloRobotPanel);
 					mainFrame.pack();
