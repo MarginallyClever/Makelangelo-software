@@ -9,7 +9,7 @@ import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotModel;
+import com.marginallyclever.makelangelo.robot.Plotter;
 
 
 public class PanelAdjustPen extends SelectPanel implements ActionListener {
@@ -41,7 +41,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 		
 		this.robot = robot;
 	    
-	    RobotModel settings = robot.getSettings();
+	    Plotter settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
@@ -78,7 +78,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	
 	
 	public void save() {
-	    RobotModel settings = robot.getSettings();
+	    Plotter settings = robot.getSettings();
 		settings.setDiameter(penDiameter.getValue());
 		settings.setMaxFeedRate(maxFeedRate.getValue());
 		settings.setCurrentFeedRate(currentFeedRate.getValue());

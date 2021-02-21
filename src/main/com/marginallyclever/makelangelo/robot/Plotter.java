@@ -16,7 +16,7 @@ import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.robot.hardwareProperties.Makelangelo2Properties;
-import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHardwareProperties;
+import com.marginallyclever.makelangelo.robot.hardwareProperties.HardwareProperties;
 import com.marginallyclever.util.PreferencesHelper;
 
 
@@ -25,7 +25,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * @since before 7.25.0
  */
-public final class RobotModel implements Serializable {
+public final class Plotter implements Serializable {
 	/**
 	 * 
 	 */
@@ -46,25 +46,12 @@ public final class RobotModel implements Serializable {
 	private double limitBottom;
 	private double limitTop;
 	
-	// paper area, in mm
-	private double paperLeft;
-	private double paperRight;
-	private double paperBottom;
-	private double paperTop;
-	// landscape/portrait?
-	private double rotation;
-	// % from edge of paper.
-	private double paperMargin;
-	
-	private ColorRGB paperColor;
-	
-
 	private String hardwareVersion;
-	private MakelangeloHardwareProperties hardwareProperties;
+	private HardwareProperties hardwareProperties;
 
-	protected ColorRGB penDownColorDefault;
-	protected ColorRGB penDownColor;
-	protected ColorRGB penUpColor;
+	private ColorRGB penDownColorDefault;
+	private ColorRGB penDownColor;
+	private ColorRGB penUpColor;
 	
 	// speed control
 	private double feedRateMax;
@@ -99,7 +86,7 @@ public final class RobotModel implements Serializable {
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
-	public RobotModel() {				
+	public Plotter() {				
 		super();
 		
 		robotUID = 0;
@@ -111,16 +98,6 @@ public final class RobotModel implements Serializable {
 		limitBottom = -mh/2;
 		limitRight = mw/2;
 		limitLeft = -mw/2;
-
-		// paper area (A2=420x594mm)
-		double pw = 420;
-		double ph = 594;
-		paperTop = ph/2;
-		paperBottom = -ph/2;
-		paperLeft = -pw/2;
-		paperRight = pw/2;
-		paperMargin = 0.9;
-		paperColor = new ColorRGB(255,255,255);
 
 		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
 		penUpColor = new ColorRGB(0,255,0); // blue
@@ -170,9 +147,10 @@ public final class RobotModel implements Serializable {
 		return configsAvailable;
 	}
 
-	public Point2D getHome() {
+	private Point2D getHome() {
 		return getHardwareProperties().getHome(this);
 	}
+	
 	/**
 	 * @return home X coordinate in mm
 	 */ 
@@ -305,104 +283,9 @@ public final class RobotModel implements Serializable {
 	public int getMachineCount() {
 		return configsAvailable.length;
 	}
-
-	/**
-	 * @return paper height in mm.
-	 */
-	public double getPaperHeight() {
-		return paperTop - paperBottom;
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginHeight() {
-		return getMarginTop() - getMarginBottom();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginWidth() {
-		return getMarginRight() - getMarginLeft();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getPaperWidth() {
-		return paperRight - paperLeft;
-	}
-
-	/**
-	 * @return paper left edge in mm.
-	 */
-	public double getPaperLeft() {
-		return paperLeft;
-	}
-
-	/**
-	 * @return paper right edge in mm.
-	 */
-	public double getPaperRight() {
-		return paperRight;
-	}
-
-	/**
-	 * @return paper top edge in mm.
-	 */
-	public double getPaperTop() {
-		return paperTop;
-	}
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getPaperBottom() {
-		return paperBottom;
-	}
-
-	/**
-	 * @return paper left edge in mm.
-	 */
-	public double getMarginLeft() {
-		return getPaperLeft() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper right edge in mm.
-	 */
-	public double getMarginRight() {
-		return getPaperRight() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper top edge in mm.
-	 */
-	public double getMarginTop() {
-		return getPaperTop() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getMarginBottom() {
-		return getPaperBottom() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper margin %.
-	 */
-	public double getPaperMargin() {
-		return paperMargin;
-	}
 	
 	public long getUID() {
 		return robotUID;
-	}
-
-	public boolean isPaperConfigured() {
-		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
 
 	public boolean isRegistered() {
@@ -429,23 +312,10 @@ public final class RobotModel implements Serializable {
 		limitLeft   = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
 		limitRight  = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
 
-		paperLeft   = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left",Double.toString(paperLeft)));
-		paperRight  = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right",Double.toString(paperRight)));
-		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
-		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
-		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation",Double.toString(rotation)));
-
 		accelerationMax=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(accelerationMax)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
-		int r,g,b;
-		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
-		g = uniqueMachinePreferencesNode.getInt("paperColorG", paperColor.getGreen());
-		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
-		paperColor = new ColorRGB(r,g,b);
-
-		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
 		//setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
 
@@ -509,17 +379,6 @@ public final class RobotModel implements Serializable {
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(accelerationMax));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
-		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
-		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
-		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
-		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
-		uniqueMachinePreferencesNode.putDouble("rotation", rotation);
-		
-		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
-		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
-		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
-
-		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 		
@@ -555,8 +414,6 @@ public final class RobotModel implements Serializable {
 		return feedRateDefault;
 	}
 	
-	
-	
 	public void setLimitBottom(double limitBottom) {
 		this.limitBottom = limitBottom;
 	}
@@ -580,17 +437,6 @@ public final class RobotModel implements Serializable {
 		this.limitTop = height/2.0;
 	}
 	
-	public void setPaperMargin(double paperMargin) {
-		this.paperMargin = paperMargin;	
-	}
-
-	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		this.paperLeft = -width/2 + shiftx;
-		this.paperRight = width/2 + shiftx;
-		this.paperTop = height/2 + shifty;
-		this.paperBottom = -height/2+shifty;
-	}
-	
 	public void setRegistered(boolean isRegistered) {
 		this.isRegistered = isRegistered;
 	}
@@ -600,7 +446,7 @@ public final class RobotModel implements Serializable {
 		return hardwareVersion;
 	}
 
-	public MakelangeloHardwareProperties getHardwareProperties() {
+	public HardwareProperties getHardwareProperties() {
 		return hardwareProperties;
 	}
 
@@ -609,10 +455,10 @@ public final class RobotModel implements Serializable {
 
 		try {
 			// get version numbers
-			ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
-			Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
+			ServiceLoader<HardwareProperties> knownHardware = ServiceLoader.load(HardwareProperties.class);
+			Iterator<HardwareProperties> i = knownHardware.iterator();
 			while(i.hasNext()) {
-				MakelangeloHardwareProperties hw = i.next();
+				HardwareProperties hw = i.next();
 				if(hw.getVersion().equals(version)) {
 					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
 					newVersion = version;
@@ -646,14 +492,6 @@ public final class RobotModel implements Serializable {
 
 		// pen
 		setDiameter(0.8f);
-	}
-	
-	public ColorRGB getPaperColor() {
-		return paperColor;
-	}
-	
-	public void setPaperColor(ColorRGB arg0) {
-		paperColor = arg0;
 	}
 	
 	public ColorRGB getPenDownColorDefault() {
@@ -773,10 +611,6 @@ public final class RobotModel implements Serializable {
 					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
-	public static String padRight(String s, int n) {
-	     return String.format("%1$-" + n + "s", s);  
-	}
-
 	// 7.22.6: feedrate changes here
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
 		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
@@ -855,13 +689,5 @@ public final class RobotModel implements Serializable {
 
 	protected void setzRate(double zRate) {
 		this.zRate = zRate;
-	}
-
-	public double getRotation() {
-		return this.rotation;
-	}
-
-	public void setRotation(double rot) {
-		this.rotation=rot;
 	}
 }

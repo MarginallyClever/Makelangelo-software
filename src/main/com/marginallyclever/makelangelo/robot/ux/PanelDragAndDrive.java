@@ -60,7 +60,7 @@ public class PanelDragAndDrive extends JPanel implements MouseListener, MouseMot
 
 		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
 		Dimension dims = new Dimension();
-		dims.setSize( 150, 150 * (double)robot.getSettings().getPaperWidth()/(double)robot.getSettings().getPaperHeight());
+		dims.setSize( 150, 150 * (double)robot.getPaper().getWidth()/(double)robot.getPaper().getHeight());
 		dragAndDrive.setPreferredSize(dims);
 		dragAndDrive.add(coordinates,c);
 	}
@@ -100,8 +100,8 @@ public class PanelDragAndDrive extends JPanel implements MouseListener, MouseMot
 			double cy = h/2.0;
 			x = x - cx;
 			y = cy - y;
-			x *= 10 * robot.getSettings().getPaperWidth()  / w;
-			y *= 10 * robot.getSettings().getPaperHeight() / h;
+			x *= 10 * robot.getPaper().getWidth()  / w;
+			y *= 10 * robot.getPaper().getHeight() / h;
 			double dx = x-mouseLastX;
 			double dy = y-mouseLastY;
 			if(Math.sqrt(dx*dx+dy*dy)>=1) {

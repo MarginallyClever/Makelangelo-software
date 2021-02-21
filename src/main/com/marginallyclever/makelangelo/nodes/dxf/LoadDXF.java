@@ -199,7 +199,7 @@ public class LoadDXF extends Node implements LoadAndSaveFile {
 	/**
 	 * 
 	 * @param in
-	 * @param robot
+	 * @param robotController
 	 * @return true if load is successful.
 	 */
 	@SuppressWarnings("unchecked")

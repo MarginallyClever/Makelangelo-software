@@ -16,7 +16,7 @@ import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotModel;
+import com.marginallyclever.makelangelo.robot.Plotter;
 
 /**
  * LoadGCode loads gcode into memory. 
@@ -73,7 +73,7 @@ public class SaveGCode extends Node implements LoadAndSaveFile {
 		Log.message("saving...");
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			RobotModel machine = robot.getSettings();
+			Plotter machine = robot.getSettings();
 			machine.writeProgramStart(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);

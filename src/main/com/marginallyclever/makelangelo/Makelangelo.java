@@ -84,7 +84,7 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotModel;
+import com.marginallyclever.makelangelo.robot.Plotter;
 import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
 import com.marginallyclever.makelangelo.robot.ux.SettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
@@ -519,8 +519,8 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					camera.zoomToFit(
-							robot.getSettings().getPaperWidth(),
-							robot.getSettings().getPaperHeight());
+							robot.getPaper().getWidth(),
+							robot.getPaper().getHeight());
 				};
 			});
 			menu.add(buttonZoomToFit);
@@ -740,8 +740,8 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		adjustWindowSize();
 
 		camera.zoomToFit(
-				robot.getSettings().getPaperWidth(),
-				robot.getSettings().getPaperHeight());
+				robot.getPaper().getWidth(),
+				robot.getPaper().getHeight());
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
@@ -797,7 +797,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		// mainFrame.setLocation(locationX,locationY);
 	}
 
-	public void settingsChangedEvent(RobotModel settings) {
+	public void settingsChangedEvent(Plotter settings) {
 		if (previewPanel != null)
 			previewPanel.repaint();
 	}
@@ -1126,7 +1126,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double th=top.y-bottom.y;
-		double ph=robot.getSettings().getPaperHeight();
+		double ph=robot.getPaper().getHeight();
 		double n = ph/th;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1139,7 +1139,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double tw=top.x-bottom.x;
-		double pw=robot.getSettings().getPaperWidth();
+		double pw=robot.getPaper().getWidth();
 		double n = pw/tw;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1571,10 +1571,10 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	 * crop a set of {@link Turtle} to the page edges.
 	 */
 	private void cropTurtles() {	
-		double yTop    = robot.getSettings().getPaperTop();
-		double yBottom = robot.getSettings().getPaperBottom();
-		double xLeft   = robot.getSettings().getPaperLeft();
-		double xRight  = robot.getSettings().getPaperRight();
+		double yTop    = robot.getPaper().getTop();
+		double yBottom = robot.getPaper().getBottom();
+		double xLeft   = robot.getPaper().getLeft();
+		double xRight  = robot.getPaper().getRight();
 		
 		for( Turtle t : myTurtles ) {
 			cropOneTurtle(t,xRight,yTop,xLeft,yBottom);

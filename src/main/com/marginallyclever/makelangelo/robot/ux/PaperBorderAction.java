@@ -20,6 +20,7 @@ public class PaperBorderAction extends AbstractAction {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		
 		robot.movePenToEdgeTop();
 		robot.lowerPen();
 		robot.movePenToEdgeRight();

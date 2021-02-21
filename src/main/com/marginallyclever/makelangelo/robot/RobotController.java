@@ -18,7 +18,6 @@ import java.util.ServiceLoader;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
-import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
@@ -34,10 +33,10 @@ import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
 
 /**
- * A Makelangelo robot is made of up a {@link RobotController}, which uses a {@link RobotModel} to update it's internal state.
+ * A Makelangelo robot is made of up a {@link RobotController}, which uses a {@link Plotter} to update it's internal state.
  * 
- * It contains state information, where the {@link RobotModel} contains only the physical properties (configuration).
- * Classes who implement the {@link RobotListener} interface can obtain state change information in real time (via PropertyChangeEvents)
+ * It contains state information, where the {@link Plotter} contains only the physical properties (configuration).
+ * Classes who implement the {@link RobotControllerListener} interface can obtain state change information in real time (via PropertyChangeEvents)
  * which allows Views to stay up to date.
  * 
  * @see <a href='https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller'>Model-View-Controller design pattern</a>. 
@@ -52,7 +51,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
-	private RobotModel settings = null;
+	private Plotter myPlotter = null;
+	private Paper myPaper = new Paper();
 
 	// Connection state
 	private NetworkConnection connection = null;
@@ -80,13 +80,13 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	private boolean showPenUp = false;
 	
 	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<RobotListener> listeners;
+	private ArrayList<RobotControllerListener> listeners;
 
 
 	public RobotController() {
 		super();
-		listeners = new ArrayList<RobotListener>();
-		settings = new RobotModel();
+		listeners = new ArrayList<RobotControllerListener>();
+		myPlotter = new Plotter();
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -209,7 +209,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 				if (last.startsWith("V")) {
 					String hardwareVersion = last.substring(1);
 
-					this.settings.setHardwareVersion(hardwareVersion);
+					myPlotter.setHardwareVersion(hardwareVersion);
 					hardwareVersionChecked = true;
 					justNow = true;
 				}
@@ -220,9 +220,6 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			// send whatever config settings I have for this machine.
 			sendConfig();
 			
-			String hardwareVersion = settings.getHardwareVersion();
-			settings.setHardwareVersion(hardwareVersion);
-
 			// tell everyone I've confirmed connection.
 			notifyConnectionConfirmed();
 		}
@@ -233,7 +230,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	private void parseRobotUID(String line) {
-		settings.saveConfig();
+		myPlotter.saveConfig();
 
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
@@ -252,47 +249,47 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		}
 
 		// load machine specific config
-		settings.loadConfig(newUID);
+		myPlotter.loadConfig(newUID);
 	}
 
-	public void addListener(RobotListener listener) {
+	public void addListener(RobotControllerListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(RobotListener listener) {
+	public void removeListener(RobotControllerListener listener) {
 		listeners.remove(listener);
 	}
 
 	// notify PropertyChangeListeners
 	private void notifyListeners(String propertyName,Object oldValue,Object newValue) {
 		PropertyChangeEvent e = new PropertyChangeEvent(this,propertyName,oldValue,newValue);
-		for(RobotListener ear : listeners) {
+		for(RobotControllerListener ear : listeners) {
 			ear.propertyChange(e);
 		}
 	}
 	
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
 	private void notifyConnectionConfirmed() {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.connectionConfirmed(this);
 		}
 	}
 
 	// Notify when unknown robot connected so that Makelangelo GUI can respond.
 	private void notifyFirmwareVersionBad(long versionFound) {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.firmwareVersionBad(this, versionFound);
 		}
 	}
 
 	private void notifyDataAvailable(String data) {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.dataAvailable(this, data);
 		}
 	}
 
 	private void notifyConnectionReady() {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.sendBufferEmpty(this);
 		}
 	}
@@ -304,13 +301,13 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	private void notifyLineError(int lineNumber) {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.lineError(this, lineNumber);
 		}
 	}
 
 	private void notifyDisconnected() {
-		for (RobotListener listener : listeners) {
+		for (RobotControllerListener listener : listeners) {
 			listener.disconnected(this);
 		}
 	}
@@ -339,7 +336,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			newUID = Long.parseLong(line);
 			// did read go ok?
 			if (newUID != 0) {
-				settings.createNewUID(newUID);
+				myPlotter.createNewUID(newUID);
 
 				try {
 					// Tell the robot it's new UID.
@@ -374,7 +371,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		if (getConnection() != null && !isPortConfirmed())
 			return;
 
-		String config = settings.getGCodeConfig();
+		String config = myPlotter.getGCodeConfig();
 		String[] lines = config.split("\n");
 
 		try {
@@ -383,8 +380,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			}
 			setHome();
 			sendLineToRobot("G0"
-					+" F" + StringHelper.formatDouble(settings.getPenUpFeedRate()) 
-					+" A" + StringHelper.formatDouble(settings.getAcceleration())
+					+" F" + StringHelper.formatDouble(myPlotter.getPenUpFeedRate()) 
+					+" A" + StringHelper.formatDouble(myPlotter.getAcceleration())
 					+"\n");
 		} catch (Exception e) {
 		}
@@ -436,7 +433,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	public void raisePen() {
-		sendLineToRobot(settings.getPenUpString());
+		sendLineToRobot(myPlotter.getPenUpString());
 		rememberRaisedPen();
 	}
 	
@@ -451,12 +448,12 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	public void lowerPen() {
-		sendLineToRobot(settings.getPenDownString());
+		sendLineToRobot(myPlotter.getPenDownString());
 		rememberLoweredPen();
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(RobotModel.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(Plotter.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -555,9 +552,9 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 		// remember important status changes
 		
-		if(reportedline.startsWith(settings.getPenUpString())) {
+		if(reportedline.startsWith(myPlotter.getPenUpString())) {
 			rememberRaisedPen();
-		} else if(reportedline.startsWith(settings.getPenDownString())) {
+		} else if(reportedline.startsWith(myPlotter.getPenDownString())) {
 			rememberLoweredPen();
 		} else if(reportedline.startsWith("M17")) {
 			notifyListeners("motorsEngaged", null, true);
@@ -583,38 +580,38 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 	public void setCurrentFeedRate(double feedRate) {
 		// remember it
-		settings.setCurrentFeedRate(feedRate);
+		myPlotter.setCurrentFeedRate(feedRate);
 		// get it again in case it was capped.
-		feedRate = settings.getPenDownFeedRate();
+		feedRate = myPlotter.getPenDownFeedRate();
 		// tell the robot
 		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
 	}
 
 	public double getCurrentFeedRate() {
-		return settings.getPenDownFeedRate();
+		return myPlotter.getPenDownFeedRate();
 	}
 
 	public void goHome() {
-		sendLineToRobot("G00 F"+StringHelper.formatDouble(getCurrentFeedRate())+" X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(settings.getHomeY()));
-		setPenX((float) settings.getHomeX());
-		penY = (float) settings.getHomeY();
+		sendLineToRobot("G0 F"+StringHelper.formatDouble(getCurrentFeedRate())+" X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
+				+ StringHelper.formatDouble(myPlotter.getHomeY()));
+		setPenX((float) myPlotter.getHomeX());
+		penY = (float) myPlotter.getHomeY();
 	}
 
 	public void findHome() {
 		this.raisePen();
 		sendLineToRobot("G28");
-		setPenX((float) settings.getHomeX());
-		setPenY((float) settings.getHomeY());
+		setPenX((float) myPlotter.getHomeX());
+		setPenY((float) myPlotter.getHomeY());
 	}
 
 	public void setHome() {
-		sendLineToRobot(settings.getGCodeSetPositionAtHome());
+		sendLineToRobot(myPlotter.getGCodeSetPositionAtHome());
 		// save home position
-		sendLineToRobot("D6 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(settings.getHomeY()));
-		setPenX((float) settings.getHomeX());
-		setPenY((float) settings.getHomeY());
+		sendLineToRobot("D6 X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
+				+ StringHelper.formatDouble(myPlotter.getHomeY()));
+		setPenX((float) myPlotter.getHomeX());
+		setPenY((float) myPlotter.getHomeY());
 		didSetHome = true;
 	}
 
@@ -628,8 +625,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	 */
 	public void movePenAbsolute(float x, float y) {
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotModel.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotModel.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? myPlotter.getPenUpFeedrateString() : Plotter.COMMAND_TRAVEL)
+						: (penJustMoved ? myPlotter.getPenDownFeedrateString() : Plotter.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
@@ -642,8 +639,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : RobotModel.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : RobotModel.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? myPlotter.getPenUpFeedrateString() : Plotter.COMMAND_TRAVEL)
+						: (penJustMoved ? myPlotter.getPenDownFeedrateString() : Plotter.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
@@ -655,19 +652,19 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	public void movePenToEdgeLeft() {
-		movePenAbsolute((float) settings.getPaperLeft(), penY);
+		movePenAbsolute((float) myPaper.getLeft(), penY);
 	}
 
 	public void movePenToEdgeRight() {
-		movePenAbsolute((float) settings.getPaperRight(), penY);
+		movePenAbsolute((float) myPaper.getRight(), penY);
 	}
 
 	public void movePenToEdgeTop() {
-		movePenAbsolute(getPenX(), (float) settings.getPaperTop());
+		movePenAbsolute(getPenX(), (float) myPaper.getTop());
 	}
 
 	public void movePenToEdgeBottom() {
-		movePenAbsolute(getPenX(), (float) settings.getPaperBottom());
+		movePenAbsolute(getPenX(), (float) myPaper.getBottom());
 	}
 
 	public void disengageMotors() {
@@ -700,8 +697,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 
-	public RobotModel getSettings() {
-		return settings;
+	public Plotter getSettings() {
+		return myPlotter;
 	}
 
 	public void setTurtles(ArrayList<Turtle> list) {
@@ -738,7 +735,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		double newEstimate=0;
 		FirmwareSimulation m = new FirmwareSimulation();
 		for( Turtle t : turtles ) {
-			newEstimate += m.getTimeEstimate(t, settings);
+			newEstimate += m.getTimeEstimate(t, myPlotter);
 		}
 		Log.message("New method "+printTimeEstimate(newEstimate));
 		
@@ -761,9 +758,9 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	
 			try {
 				boolean isUp = true;
-				double ox = this.settings.getHomeX();
-				double oy = this.settings.getHomeY();
-				double oz = this.settings.getPenUpAngle();
+				double ox = this.myPlotter.getHomeX();
+				double oy = this.myPlotter.getHomeY();
+				double oz = this.myPlotter.getPenUpAngle();
 	
 				for (TurtleMove m : turtle.history) {
 					double nx = ox;
@@ -772,12 +769,12 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	
 					if(m.isUp) {
 						if (!isUp) {
-							nz = this.settings.getPenUpAngle();
+							nz = this.myPlotter.getPenUpAngle();
 							isUp = true;
 						}
 					} else {
 						if (isUp) {
-							nz = this.settings.getPenDownAngle();
+							nz = this.myPlotter.getPenDownAngle();
 							isUp = false;
 						}
 						nx = m.x;
@@ -789,14 +786,14 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 					double dz = nz - oz;
 					double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
 					if (length > 0) {
-						double accel = settings.getAcceleration();
+						double accel = myPlotter.getAcceleration();
 						double maxV;
 						if (oz != nz) {
-							maxV = settings.getZRate();
-						} else if (nz == settings.getPenDownAngle()) {
-							maxV = settings.getPenDownFeedRate();
+							maxV = myPlotter.getZRate();
+						} else if (nz == myPlotter.getPenDownAngle()) {
+							maxV = myPlotter.getPenDownFeedRate();
 						} else {
-							maxV = settings.getPenUpFeedRate();
+							maxV = myPlotter.getPenUpFeedRate();
 						}
 						totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
 					}
@@ -871,11 +868,10 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		
 		// outside physical limits
 		paintLimits(gl2);
-		paintPaper(gl2);
-		paintMargins(gl2);
+		myPaper.render(gl2);
 		
 		// hardware features
-		settings.getHardwareProperties().render(gl2, this);
+		myPlotter.getHardwareProperties().render(gl2, this);
 
 		gl2.glLineWidth(lineWidthBuf[0]);
 
@@ -891,37 +887,11 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
+		gl2.glVertex2d(myPlotter.getLimitLeft(), myPlotter.getLimitTop());
+		gl2.glVertex2d(myPlotter.getLimitRight(), myPlotter.getLimitTop());
+		gl2.glVertex2d(myPlotter.getLimitRight(), myPlotter.getLimitBottom());
+		gl2.glVertex2d(myPlotter.getLimitLeft(), myPlotter.getLimitBottom());
 		gl2.glEnd();
-	}
-	
-	private void paintPaper(GL2 gl2) {
-		ColorRGB c = settings.getPaperColor();
-		gl2.glColor3d(
-				(double)c.getRed() / 255.0, 
-				(double)c.getGreen() / 255.0, 
-				(double)c.getBlue() / 255.0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperTop());
-		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperTop());
-		gl2.glVertex2d(settings.getPaperRight(), settings.getPaperBottom());
-		gl2.glVertex2d(settings.getPaperLeft(), settings.getPaperBottom());
-		gl2.glEnd();
-	}
-	
-	private void paintMargins(GL2 gl2) {
-		gl2.glPushMatrix();
-		gl2.glColor3f(0.9f, 0.9f, 0.9f);
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getMarginLeft(), settings.getMarginTop());
-		gl2.glVertex2d(settings.getMarginRight(), settings.getMarginTop());
-		gl2.glVertex2d(settings.getMarginRight(), settings.getMarginBottom());
-		gl2.glVertex2d(settings.getMarginLeft(), settings.getMarginBottom());
-		gl2.glEnd();
-		gl2.glPopMatrix();
 	}
 
 	// in mm
@@ -949,7 +919,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		if (total == 0)
 			return 0;
 
-		String toMatch = settings.getPenUpString();
+		String toMatch = myPlotter.getPenUpString();
 
 		int x = startAtLine;
 		if (x >= total) {
@@ -978,5 +948,9 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 	public void setShowPenUp(boolean b) {
 		showPenUp=b;
+	}
+	
+	public Paper getPaper() {
+		return myPaper;
 	}
 }

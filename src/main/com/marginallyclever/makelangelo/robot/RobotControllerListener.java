@@ -2,7 +2,13 @@ package com.marginallyclever.makelangelo.robot;
 
 import java.beans.PropertyChangeListener;
 
-public abstract interface RobotListener extends PropertyChangeListener {
+/**
+ * Implemented by anyone listening to the {@link RobotController}
+ * @author Dan Royer
+ * @since before 7.25.0
+ *
+ */
+public abstract interface RobotControllerListener extends PropertyChangeListener {
 	// called when live robot is ready to receive more commands.
 	public void sendBufferEmpty(RobotController r);
 	// called whenever data arrives from serial connection, regardless of confirmation.

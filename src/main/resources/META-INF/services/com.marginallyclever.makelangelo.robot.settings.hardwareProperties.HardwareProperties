@@ -4,4 +4,4 @@ com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makelangelo3_
 com.marginallyclever.makelangelo.robot.settings.hardwareProperties.Makelangelo5Properties
 com.marginallyclever.makelangelo.robot.settings.hardwareProperties.ZarplotterProperties
 com.marginallyclever.makelangelo.robot.settings.hardwareProperties.CartesianProperties
-com.marginallyclever.makelangelo.robot.settings.hardwareProperties.MakelangeloCustomProperties
+com.marginallyclever.makelangelo.robot.settings.hardwareProperties.CustomProperties

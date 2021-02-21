@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.hardwareProperties.MakelangeloHardwareProperties;
+import com.marginallyclever.makelangelo.robot.hardwareProperties.HardwareProperties;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -132,10 +132,10 @@ public class SettingsDialog {
 		availableHardwareVersions = new ArrayList<String>();
 
 		// get version numbers
-		ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
-		Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
+		ServiceLoader<HardwareProperties> knownHardware = ServiceLoader.load(HardwareProperties.class);
+		Iterator<HardwareProperties> i = knownHardware.iterator();
 		while (i.hasNext()) {
-			MakelangeloHardwareProperties hw = i.next();
+			HardwareProperties hw = i.next();
 			availableHardwareVersions.add(new String(hw.getVersion()));
 		}
 
@@ -144,7 +144,7 @@ public class SettingsDialog {
 		i = knownHardware.iterator();
 		int j = 0;
 		while (i.hasNext()) {
-			MakelangeloHardwareProperties hw = i.next();
+			HardwareProperties hw = i.next();
 			hardwareVersionNames[j] = hw.getName();
 			++j;
 		}
@@ -158,7 +158,7 @@ public class SettingsDialog {
 		panelAdjustMachine = new PanelAdjustMachine(robot);
 		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine.getInteriorPanel());
 
-		panelAdjustPaper = new PanelAdjustPaper(robot);
+		panelAdjustPaper = new PanelAdjustPaper(robot.getPaper());
 		panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getInteriorPanel());
 
 		panelAdjustPen = new PanelAdjustPen(robot);

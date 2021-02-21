@@ -30,7 +30,7 @@ import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotListener;
+import com.marginallyclever.makelangelo.robot.RobotControllerListener;
 import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
 
 /**
@@ -39,7 +39,7 @@ import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PanelRobot extends JPanel implements ActionListener, RobotListener {
+public class PanelRobot extends JPanel implements ActionListener, RobotControllerListener {
 	/**
 	 *
 	 */

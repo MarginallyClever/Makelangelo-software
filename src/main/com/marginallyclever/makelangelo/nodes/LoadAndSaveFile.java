@@ -49,7 +49,7 @@ public abstract interface LoadAndSaveFile {
 	/**
 	 * attempt to load a file into the system from a given stream
 	 * @param inputStream source of image
-	 * @param robot machine hardware settings to use in loading process
+	 * @param robotController machine hardware settings to use in loading process
 	 * @return true if load successful.
 	 */
 	public boolean load(InputStream inputStream);
