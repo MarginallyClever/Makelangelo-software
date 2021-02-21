@@ -14,6 +14,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
+import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 
 
 /**
@@ -24,7 +25,7 @@ import com.marginallyclever.makelangelo.nodes.ImageConverter;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter {
+public class Converter_VoronoiStippling extends ImageConverter implements RendersInOpenGL {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private TransformedImage img;
@@ -198,9 +199,7 @@ public class Converter_VoronoiStippling extends ImageConverter {
 	}
 
 	@Override
-	public void render(GL2 gl2) {
-		//super.render(gl2);
-		
+	public void render(GL2 gl2) {		
 		while(lock.isLocked());
 		lock.lock();
 		

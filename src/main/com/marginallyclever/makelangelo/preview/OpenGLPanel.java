@@ -26,14 +26,14 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  *
  */
-public class PreviewPanel extends GLJPanel implements GLEventListener {
+public class OpenGLPanel extends GLJPanel implements GLEventListener {
 	static final long serialVersionUID = 2;
 
 	// Use debug pipeline?
 	private static final boolean DEBUG_GL_ON = false;
 	private static final boolean TRACE_GL_ON = false;
 
-	private ArrayList<PreviewListener> previewListeners = new ArrayList<PreviewListener>();
+	private ArrayList<RendersInOpenGL> previewListeners = new ArrayList<RendersInOpenGL>();
 	
 	private Camera camera;
 	
@@ -50,7 +50,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private FPSAnimator animator;
 
 
-	public PreviewPanel() {
+	public OpenGLPanel() {
 		super();
 		
 		try {
@@ -124,11 +124,11 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		animator.start();
 	}
 
-	public void addListener(PreviewListener arg0) {
+	public void addListener(RendersInOpenGL arg0) {
 		previewListeners.add(arg0);
 	}
 	
-	public void removeListener(PreviewListener arg0) {
+	public void removeListener(RendersInOpenGL arg0) {
 		previewListeners.remove(arg0);
 	}
 	
@@ -221,7 +221,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		paintCamera(gl2);
 		gl2.glLineWidth((float)camera.getZoom());
 
-		for( PreviewListener p : previewListeners ) {
+		for( RendersInOpenGL p : previewListeners ) {
 			gl2.glPushMatrix();
 			p.render(gl2);
 			gl2.glPopMatrix();

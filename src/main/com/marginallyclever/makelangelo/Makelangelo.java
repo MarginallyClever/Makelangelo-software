@@ -82,7 +82,7 @@ import com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTrian
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.RobotPanel;
 import com.marginallyclever.makelangelo.robot.RobotModel;
@@ -130,7 +130,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 
 	
 	// OpenGL window
-	private PreviewPanel previewPanel;
+	private OpenGLPanel previewPanel;
 	
 	private PiCaptureAction piCameraCaptureAction;
 	
@@ -729,7 +729,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			contentPane.setOpaque(true);
 	
 			Log.message("  create PreviewPanel...");
-			previewPanel = new PreviewPanel();
+			previewPanel = new OpenGLPanel();
 			previewPanel.setCamera(camera);
 			previewPanel.addListener(robot);
 

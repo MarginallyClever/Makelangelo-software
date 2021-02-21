@@ -28,7 +28,7 @@ import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
 
 /**
@@ -43,7 +43,7 @@ import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
  * @author Dan Royer
  * @since 7.2.10
  */
-public class RobotController implements NetworkConnectionListener, PreviewListener {
+public class RobotController implements NetworkConnectionListener, RendersInOpenGL {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;

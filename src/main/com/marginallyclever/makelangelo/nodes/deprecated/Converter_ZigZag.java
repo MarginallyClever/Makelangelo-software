@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.deprecated;
 
-
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
@@ -14,6 +12,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
+import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 
 
 /**
@@ -23,7 +22,7 @@ import com.marginallyclever.makelangelo.nodes.ImageConverter;
  * @author Dan
  */
 @Deprecated
-public class Converter_ZigZag extends ImageConverter {
+public class Converter_ZigZag extends ImageConverter implements RendersInOpenGL {
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;
@@ -327,10 +326,8 @@ public class Converter_ZigZag extends ImageConverter {
 		connectTheDots(turtle,img);
 		// Shorten the line that connects the dots
 		generateTSP(turtle);
-		
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
-		list.add(turtle);
-		setTurtleResult(list);
+
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }

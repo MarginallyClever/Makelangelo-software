@@ -2,9 +2,6 @@ package com.marginallyclever.core.node;
 
 import java.util.ArrayList;
 
-import com.jogamp.opengl.GL2;
-import com.marginallyclever.core.turtle.Turtle;
-
 
 /**
  * All {@link Node} should be registered with ./src/main/resources/META-INF/services/{@link Node}
@@ -12,36 +9,14 @@ import com.marginallyclever.core.turtle.Turtle;
  * @since 7.25.0
  */
 public abstract class Node {
-	// TODO make this not public
 	public ArrayList<NodeConnector<?>> inputs = new ArrayList<NodeConnector<?>>(); 
-	// TODO make this not public
 	public ArrayList<NodeConnector<?>> outputs = new ArrayList<NodeConnector<?>>(); 
 
-	/**
-	 * When this {@link Node} has finished it's task, the result (if any) is stored in turtleResult.
-	 */
-	@Deprecated
-	protected ArrayList<Turtle> turtleResult;
-	
 	// used internally for iterating on long jobs.  Could be promoted to whomsoever manages the thread for this node.
 	private boolean keepIterating=false;
 
 	/**
-	 * Get the results of running this {@link Node}.
-	 * @return
-	 */
-	@Deprecated
-	public ArrayList<Turtle> getTurtleResult() {
-		return turtleResult;
-	}
-
-	@Deprecated
-	protected void setTurtleResult(ArrayList<Turtle> list) {
-		turtleResult = list;
-	}
-	
-	/**
-	 * @return the translated name of the {@code TurtleNode}.
+	 * @return the translated name of the {@link Node}.
 	 */
 	abstract public String getName();
 	
@@ -51,7 +26,7 @@ public abstract class Node {
 	public void restart() {}
 	
 	/**
-	 * run one step of an iterative process.
+	 * Run one step of an iterative process.
 	 * @return true if conversion should iterate again.
 	 */
 	public boolean iterate() {
@@ -69,8 +44,6 @@ public abstract class Node {
 	public void setKeepIterating(boolean state) {
 		keepIterating=state;
 	}
-	
-	public void render(GL2 gl2) {}
 }
 
 /**

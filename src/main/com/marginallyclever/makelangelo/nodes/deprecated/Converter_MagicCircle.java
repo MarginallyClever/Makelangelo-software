@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.deprecated;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -124,9 +123,7 @@ public class Converter_MagicCircle extends ImageConverter {
 		}
 		turtle.penUp();
 
-		ArrayList<Turtle> turtleList = new ArrayList<Turtle>();
-		turtleList.add(turtle);
-		setTurtleResult(turtleList);
+		outputTurtle.setValue(turtle);
 		return false;
 	}
 }
