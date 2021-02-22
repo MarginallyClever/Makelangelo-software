@@ -403,16 +403,16 @@ public class FirmwareSimulation {
 	/**
 	 * @return time in seconds to run sequence.
 	 */
-	public double getTimeEstimate(Turtle t,Plotter settings) {
-		double fu = settings.getPenUpFeedRate();
-		double fd = settings.getPenDownFeedRate();
-		double fz = settings.getZRate();
-		double a = settings.getAcceleration();
+	public double getTimeEstimate(Turtle t,Plotter myPlotter) {
+		double fu = myPlotter.getTravelFeedRate();
+		double fd = myPlotter.getDrawingFeedRate();
+		double fz = myPlotter.getZFeedrate();
+		double a = myPlotter.getAcceleration();
 		boolean isUp=true;
-		double zu = settings.getPenUpAngle();
-		double zd = settings.getPenDownAngle();
+		double zu = myPlotter.getPenUpAngle();
+		double zd = myPlotter.getPenDownAngle();
 		
-		poseNow = new Vector3d(settings.getHomeX(),settings.getHomeY(),zu);
+		poseNow = new Vector3d(myPlotter.getHomeX(),myPlotter.getHomeY(),zu);
 		double lx=poseNow.x;
 		double ly=poseNow.y;
 		double sum=0;
