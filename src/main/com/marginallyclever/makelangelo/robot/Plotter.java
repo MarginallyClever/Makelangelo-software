@@ -49,7 +49,6 @@ public final class Plotter implements Serializable {
 	private String hardwareVersion;
 	private HardwareProperties hardwareProperties;
 
-	private ColorRGB penDownColorDefault;
 	private ColorRGB penDownColor;
 	private ColorRGB penUpColor;
 	
@@ -61,7 +60,7 @@ public final class Plotter implements Serializable {
 	private double diameter;  // pen diameter (mm, >0)
 	private double zOff;	// pen up servo angle (deg,0...180)
 	private double zOn;	// pen down servo angle (deg,0...180)
-	private double zRate;	// pen servo movement speed (deg/s)
+	private double zFeedrate;	// pen servo movement speed (deg/s)
 
 	/**
 	 * top left, bottom center, etc...
@@ -99,7 +98,7 @@ public final class Plotter implements Serializable {
 		limitRight = mw/2;
 		limitLeft = -mw/2;
 
-		penDownColor = penDownColorDefault = new ColorRGB(0,0,0); // BLACK
+		penDownColor = new ColorRGB(0,0,0); // BLACK
 		penUpColor = new ColorRGB(0,255,0); // blue
 		startingPositionIndex = 4;
 
@@ -326,10 +325,10 @@ public final class Plotter implements Serializable {
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setDiameter(Double.parseDouble(prefs.get("diameter", Double.toString(getPenDiameter()))));
-		setzRate(Double.parseDouble(prefs.get("z_rate", Double.toString(getzRate()))));
-		setzOn(Double.parseDouble(prefs.get("z_on", Double.toString(getzOn()))));
-		setzOff(Double.parseDouble(prefs.get("z_off", Double.toString(getzOff()))));
+		setPenDiameter(Double.parseDouble(prefs.get("diameter", Double.toString(getPenDiameter()))));
+		setZFeedrate(Double.parseDouble(prefs.get("z_rate", Double.toString(getZFeedrate()))));
+		setZOn(Double.parseDouble(prefs.get("z_on", Double.toString(getZOn()))));
+		setZOff(Double.parseDouble(prefs.get("z_off", Double.toString(getZOff()))));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
 		feedRateMax = Double.parseDouble(prefs.get("feed_rate", Double.toString(feedRateMax)));
 		feedRateDefault=Double.valueOf(prefs.get("feed_rate_current",Double.toString(feedRateDefault)));
@@ -338,7 +337,7 @@ public final class Plotter implements Serializable {
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
-		penDownColor = penDownColorDefault = new ColorRGB(r,g,b);
+		penDownColor = new ColorRGB(r,g,b);
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
@@ -348,15 +347,12 @@ public final class Plotter implements Serializable {
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		prefs.put("diameter", Double.toString(getPenDiameter()));
-		prefs.put("z_rate", Double.toString(getzRate()));
-		prefs.put("z_on", Double.toString(getzOn()));
-		prefs.put("z_off", Double.toString(getzOff()));
+		prefs.put("z_rate", Double.toString(getZFeedrate()));
+		prefs.put("z_on", Double.toString(getZOn()));
+		prefs.put("z_off", Double.toString(getZOff()));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
 		prefs.put("feed_rate", Double.toString(feedRateMax));
 		prefs.put("feed_rate_current", Double.toString(feedRateDefault));
-		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
-		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
-		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
@@ -391,26 +387,19 @@ public final class Plotter implements Serializable {
 		accelerationMax = f;
 	}
 	
-	public void setMaxFeedRate(double f) {
-		feedRateMax = f;
-		if(feedRateDefault > feedRateMax) {
-			feedRateDefault = feedRateMax;
-		}
+	public void setTravelFeedRate(double f) {
+		feedRateMax = Math.max(f,0.001);
 	}
 	
-	public double getPenUpFeedRate() {
+	public double getTravelFeedRate() {
 		return feedRateMax;
 	}
 	
-	public void setCurrentFeedRate(double f) {
-		if (f < 0.001) f = 0.001f;
-		if( f > feedRateMax) {
-			f = feedRateMax;
-		}
-		feedRateDefault = f;
+	public void setDrawingFeedRate(double f) {
+		feedRateDefault = Math.max(f,0.001);
 	}
 	
-	public double getPenDownFeedRate() {
+	public double getDrawingFeedRate() {
 		return feedRateDefault;
 	}
 	
@@ -486,24 +475,16 @@ public final class Plotter implements Serializable {
 		feedRateDefault = hardwareProperties.getFeedrateDefault();
 		accelerationMax = hardwareProperties.getAccelerationMax();
 		
-		setzRate(hardwareProperties.getZRate());
-		setzOn(hardwareProperties.getZAngleOn());
-		setzOff(hardwareProperties.getZAngleOff());
+		setZFeedrate(hardwareProperties.getZRate());
+		setZOn(hardwareProperties.getZAngleOn());
+		setZOff(hardwareProperties.getZAngleOff());
 
 		// pen
-		setDiameter(0.8f);
-	}
-	
-	public ColorRGB getPenDownColorDefault() {
-		return penDownColorDefault;
+		setPenDiameter(0.8f);
 	}
 	
 	public ColorRGB getPenDownColor() {
 		return penDownColor;
-	}
-	
-	public void setPenDownColorDefault(ColorRGB arg0) {
-		penDownColorDefault=arg0;
 	}
 	
 	public void setPenDownColor(ColorRGB arg0) {
@@ -518,29 +499,20 @@ public final class Plotter implements Serializable {
 		return penUpColor;
 	}
 
-	public double getZRate() {
-		return getzRate();
-	}
-	
-	public void setZRate(double arg0) {
-		setzRate(arg0);
-	}
-	
-
 	public double getPenDownAngle() {
-		return getzOn();
+		return getZOn();
 	}
 
 	public double getPenUpAngle() {
-		return getzOff();
+		return getZOff();
 	}
 
 	public void setPenDownAngle(double arg0) {
-		setzOn(arg0);
+		setZOn(arg0);
 	}
 
 	public void setPenUpAngle(double arg0) {
-		setzOff(arg0);
+		setZOff(arg0);
 	}
 
 	public BasicStroke getStroke() {
@@ -556,19 +528,19 @@ public final class Plotter implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
-	public String getPenUpFeedrateString() {
-		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate());
+	public String getTravelFeedrateString() {
+		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getTravelFeedRate());
 	}
 	
-	public String getPenDownFeedrateString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate());
+	public String getDrawingFeedrateString() {
+		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getDrawingFeedRate());
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
@@ -578,25 +550,21 @@ public final class Plotter implements Serializable {
 		writeChangeToInternal(out);
 	}
 
-	public void writeChangeToDefaultColor(Writer out) throws IOException {
-		penDownColor = penDownColorDefault;
-		writeChangeToInternal(out);
-	}
-	
-	protected void writeChangeToInternal(Writer out) throws IOException {
+	private void writeChangeToInternal(Writer out) throws IOException {
 		int toolNumber = penDownColor.toInt() & 0xffffff;  // ignore alpha channel
 
 		String name="";
-		switch(toolNumber) {
-		case 0xff0000: name="red";		break;
-		case 0x00ff00: name="green";	break;
-		case 0x0000ff: name="blue";		break;
-		case 0x000000: name="black";	break;
-		case 0x00ffff: name="cyan";		break;
-		case 0xff00ff: name="magenta";	break;
-		case 0xffff00: name="yellow";	break;
-		case 0xffffff: name="white";	break;
-		default: name= "0x"+Integer.toHexString(toolNumber);  break;  // display unknown RGB value as hex
+		for( PenColor pc : Pen.commonPenColors ) {
+			if( pc.hexValue==toolNumber ) {
+				// found a common pen color.
+				name = pc.name;
+				break;
+			}
+		}
+
+		if(name.isEmpty()) {
+			// set the name to the color hex value
+			name = "0x"+Integer.toHexString(toolNumber);  
 		}
 		
 		String changeString = String.format("%-20s", "Change to "+name);
@@ -607,7 +575,7 @@ public final class Plotter implements Serializable {
 		out.write("M300 S60 P250\n");  // beep
 		out.write("M226\n");  // pause for user input
 		out.write("M117\n");  // clear message
-		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + 
+		out.write("G00 F" + StringHelper.formatDouble(getTravelFeedRate()) + 
 					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
@@ -616,8 +584,8 @@ public final class Plotter implements Serializable {
 		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
 		if(zMoved) {
 			command = isUp 
-					? getPenUpFeedrateString() 
-					: getPenDownFeedrateString();
+					? getTravelFeedrateString() 
+					: getDrawingFeedrateString();
 			zMoved=false;
 		}
 		out.write(command
@@ -659,7 +627,7 @@ public final class Plotter implements Serializable {
 	}
 
 
-	public void setDiameter(double d) {
+	public void setPenDiameter(double d) {
 		diameter = d;
 	}
 	
@@ -667,27 +635,27 @@ public final class Plotter implements Serializable {
 		return diameter;
 	}
 
-	protected double getzOff() {
+	protected double getZOff() {
 		return zOff;
 	}
 
-	protected void setzOff(double zOff) {
+	protected void setZOff(double zOff) {
 		this.zOff = zOff;
 	}
 
-	protected double getzOn() {
+	protected double getZOn() {
 		return zOn;
 	}
 
-	protected void setzOn(double zOn) {
+	protected void setZOn(double zOn) {
 		this.zOn = zOn;
 	}
 
-	protected double getzRate() {
-		return zRate;
+	public void setZFeedrate(double arg0) {
+		this.zFeedrate = arg0;
 	}
-
-	protected void setzRate(double zRate) {
-		this.zRate = zRate;
+	
+	public double getZFeedrate() {
+		return zFeedrate;
 	}
 }

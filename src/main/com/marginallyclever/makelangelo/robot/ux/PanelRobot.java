@@ -46,10 +46,10 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	private static final long serialVersionUID = -4703402918904039337L;
 
 	// the robot being controlled
-	private RobotController myRobot;
+	private RobotController myRobotController;
 	private ConnectionManager connectionManager;
 	
-	// the parent
+	// the top-most UX element
 	private Frame parentFrame;
 
 	// connect menu
@@ -90,8 +90,8 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	 */
 	public PanelRobot(Frame parent, RobotController robot) {
 		this.parentFrame = parent;
-		this.myRobot = robot;
-		myRobot.addListener(this);
+		this.myRobotController = robot;
+		myRobotController.addListener(this);
 		
 		this.removeAll();
 		this.setBorder(BorderFactory.createEmptyBorder());
@@ -175,7 +175,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonAneg.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobot.jogLeftMotorIn();
+				myRobotController.jogLeftMotorIn();
 			}
 		});
 
@@ -187,7 +187,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonBneg.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobot.jogRightMotorIn();
+				myRobotController.jogRightMotorIn();
 			}
 		});
 		
@@ -197,7 +197,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonApos.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobot.jogLeftMotorOut();
+				myRobotController.jogLeftMotorOut();
 			}
 		});
 		
@@ -209,7 +209,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonBpos.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobot.jogRightMotorOut();
+				myRobotController.jogRightMotorOut();
 			}
 		});
 		
@@ -224,8 +224,8 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
-					myRobot.halt();
-					myRobot.closeConnection();
+					myRobotController.halt();
+					myRobotController.closeConnection();
 					buttonConnect.setText(Translator.get("ButtonConnect"));
 					buttonConnect.setForeground(Color.GREEN);
 					isConnected=false;
@@ -237,7 +237,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 						Log.message("Connected.");
 						buttonConnect.setText(Translator.get("ButtonDisconnect"));
 						buttonConnect.setForeground(Color.RED);
-						myRobot.openConnection( s );
+						myRobotController.openConnection( s );
 					}
 					isConnected=true;
 				}
@@ -254,7 +254,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	protected void updateMachineChoice() {
 		int selectedIndex = machineChoices.getSelectedIndex();
 		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-		myRobot.getSettings().loadConfig(newUID);
+		myRobotController.getSettings().loadConfig(newUID);
 	}
 
 
@@ -272,7 +272,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		gbc.gridwidth=1;
 		
 		
-		goPaperBorder = new JButton(new PaperBorderAction(myRobot,Translator.get("GoPaperBorder")));
+		goPaperBorder = new JButton(new PaperBorderAction(myRobotController,Translator.get("GoPaperBorder")));
 		animationInterior.add(goPaperBorder,gbc);
 		
 		gbc.gridy++;
@@ -284,10 +284,10 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		toggleEngagedMotor.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(myRobot.areMotorsEngaged() ) {
-					myRobot.disengageMotors();
+				if(myRobotController.areMotorsEngaged() ) {
+					myRobotController.disengageMotors();
 				} else {
-					myRobot.engageMotors();
+					myRobotController.engageMotors();
 				}
 			}
 		});
@@ -301,7 +301,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		penUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.raisePen();
+				myRobotController.raisePen();
 			}
 		});
 		
@@ -311,7 +311,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		penDown.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.lowerPen();
+				myRobotController.lowerPen();
 			}
 		});
 		
@@ -324,7 +324,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	    setHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.setHome();
+				myRobotController.setHome();
 				updateButtonAccess();
 			}
 		});
@@ -335,7 +335,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		findHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.findHome();
+				myRobotController.findHome();
 			}
 		});
 
@@ -345,7 +345,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		goHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.goHome();	
+				myRobotController.goHome();	
 			}
 		});
 		
@@ -358,7 +358,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.startAt(0);
+				myRobotController.startAt(0);
 			}
 		});
 
@@ -379,13 +379,13 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// toggle pause
-				if (myRobot.isPaused() == true) {
+				if (myRobotController.isPaused() == true) {
 					buttonPause.setText(Translator.get("Pause"));
-					myRobot.unPause();
-					myRobot.sendFileCommand();
+					myRobotController.unPause();
+					myRobotController.sendFileCommand();
 				} else {
 					buttonPause.setText(Translator.get("Unpause"));
-					myRobot.pause();
+					myRobotController.pause();
 				}
 			}
 		});
@@ -397,7 +397,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonHalt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobot.halt();	
+				myRobotController.halt();	
 			}
 		});
 
@@ -459,7 +459,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	 */
 	public void updateMachineNumberPanel() {
 		machineNumberPanel.removeAll();
-		machineConfigurations = myRobot.getSettings().getKnownMachineNames();
+		machineConfigurations = myRobotController.getSettings().getKnownMachineNames();
 		GridBagConstraints cMachine = new GridBagConstraints();
 		cMachine.fill= GridBagConstraints.HORIZONTAL;
 		cMachine.anchor = GridBagConstraints.CENTER;
@@ -479,9 +479,9 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			
 			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
 			boolean state=false;
-			if( myRobot.getConnection() == null ) state=true;
-			else if( myRobot.getConnection().isOpen() == false ) state=true;
-			else if( myRobot.isPortConfirmed() == false ) state=true;
+			if( myRobotController.getConnection() == null ) state=true;
+			else if( myRobotController.getConnection().isOpen() == false ) state=true;
+			else if( myRobotController.isPortConfirmed() == false ) state=true;
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener(new ItemListener() {
@@ -493,7 +493,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 				}
 			});
 
-			int index = myRobot.getSettings().getKnownMachineIndex();
+			int index = myRobotController.getSettings().getKnownMachineIndex();
 			if( index<0 ) index=0;
 			machineChoices.setSelectedIndex(index);
 
@@ -505,7 +505,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonOpenSettings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				SettingsDialog m = new SettingsDialog(myRobot);
+				SettingsDialog m = new SettingsDialog(myRobotController);
 				m.run(parentFrame);
 			}
 		});
@@ -535,7 +535,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		if (subject == right10) dx = 10;
 		if (subject == right1) dx = 1;
 
-		if(dx!=0 || dy!=0) myRobot.movePenRelative(dx,dy);
+		if(dx!=0 || dy!=0) myRobotController.movePenRelative(dx,dy);
 	}
 	
 	protected void startAt() {
@@ -546,12 +546,12 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			if (lineNumber != -1) {
 				if(p.findPreviousPenDown==false) {
 					if(p.addPenDownCommand==true) {
-						myRobot.sendLineToRobot(myRobot.getSettings().getPenDownString());
+						myRobotController.sendLineToRobot(myRobotController.getSettings().getPenDownString());
 					}
-					myRobot.startAt(lineNumber);
+					myRobotController.startAt(lineNumber);
 				} else {
-					int lineBefore = myRobot.findLastPenUpBefore(lineNumber);
-					myRobot.startAt(lineBefore);
+					int lineBefore = myRobotController.findLastPenUpBefore(lineNumber);
+					myRobotController.startAt(lineBefore);
 				}
 			}
 		}
@@ -562,7 +562,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	public void onConnect() {
 		updateMachineNumberPanel();
 		updateButtonAccess();
-		myRobot.engageMotors();
+		myRobotController.engageMotors();
 	}
 	
 	public void updateButtonAccess() {
@@ -570,10 +570,10 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		boolean isRunning=false;
 		boolean didSetHome=false;
 				
-		if(myRobot!=null) {
-			isConfirmed = myRobot.isPortConfirmed();
-			isRunning = myRobot.isRunning();
-			didSetHome = myRobot.didSetHome();
+		if(myRobotController!=null) {
+			isConfirmed = myRobotController.isPortConfirmed();
+			isRunning = myRobotController.isRunning();
+			didSetHome = myRobotController.didSetHome();
 		}
 		
 		buttonOpenSettings.setEnabled(!isRunning);
@@ -609,8 +609,8 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		right100.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && didSetHome);
-		setHome .setEnabled( isConfirmed && !isRunning && !myRobot.getSettings().getHardwareProperties().canAutoHome() );
-		findHome.setEnabled( isConfirmed && !isRunning &&  myRobot.getSettings().getHardwareProperties().canAutoHome() );
+		setHome .setEnabled( isConfirmed && !isRunning && !myRobotController.getSettings().getHardwareProperties().canAutoHome() );
+		findHome.setEnabled( isConfirmed && !isRunning &&  myRobotController.getSettings().getHardwareProperties().canAutoHome() );
 		goHome.setEnabled(isConfirmed && !isRunning && didSetHome);
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
@@ -688,7 +688,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getSource() == myRobot) {
+		if(evt.getSource() == myRobotController) {
 			switch(evt.getPropertyName()) {
 			case "halt":  updateButtonAccess();  break;
 			case "running":

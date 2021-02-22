@@ -26,7 +26,7 @@ import com.marginallyclever.makelangelo.robot.hardwareProperties.HardwarePropert
  * @since 7.1.4
  */
 public class SettingsDialog {
-	private RobotController robot;
+	private RobotController myRobotController;
 	private JTabbedPane panes;
 
 	private JComboBox<String> hardwareVersionChoices;
@@ -40,13 +40,13 @@ public class SettingsDialog {
 	private PanelAdjustPen panelAdjustPen;
 
 	public SettingsDialog(RobotController robot) {
-		this.robot = robot;
+		this.myRobotController = robot;
 	}
 
 	// display settings menu
 	public void run(Frame parent) {
 		JPanel panel = new JPanel();
-		originalHardwareVersion = robot.getSettings().getHardwareVersion();
+		originalHardwareVersion = myRobotController.getSettings().getHardwareVersion();
 
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints d = new GridBagConstraints();
@@ -80,10 +80,10 @@ public class SettingsDialog {
 			panelAdjustMachine.save();
 			panelAdjustPaper.save();
 			panelAdjustPen.save();
-			robot.getSettings().saveConfig();
-			robot.sendConfig();
+			myRobotController.getSettings().saveConfig();
+			myRobotController.sendConfig();
 		} else {
-			robot.getSettings().setHardwareVersion(originalHardwareVersion);
+			myRobotController.getSettings().setHardwareVersion(originalHardwareVersion);
 		}
 	}
 
@@ -110,7 +110,7 @@ public class SettingsDialog {
 		d.gridwidth = 2;
 		hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
 		// set the default
-		String hv = robot.getSettings().getHardwareVersion();
+		String hv = myRobotController.getSettings().getHardwareVersion();
 		for (int i = 0; i < availableHardwareVersions.size(); ++i) {
 			if (availableHardwareVersions.get(i).equals(hv)) {
 				hardwareVersionChoices.setSelectedIndex(i);
@@ -122,7 +122,7 @@ public class SettingsDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String newChoice = availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
-				robot.getSettings().setHardwareVersion(newChoice);
+				myRobotController.getSettings().setHardwareVersion(newChoice);
 				rebuildTabbedPanes();
 			}
 		});
@@ -155,13 +155,13 @@ public class SettingsDialog {
 		int previouslySelectedTab = panes.getSelectedIndex();
 		panes.removeAll();
 
-		panelAdjustMachine = new PanelAdjustMachine(robot);
+		panelAdjustMachine = new PanelAdjustMachine(myRobotController);
 		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine.getInteriorPanel());
 
-		panelAdjustPaper = new PanelAdjustPaper(robot.getPaper());
+		panelAdjustPaper = new PanelAdjustPaper(myRobotController.getPaper());
 		panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getInteriorPanel());
 
-		panelAdjustPen = new PanelAdjustPen(robot);
+		panelAdjustPen = new PanelAdjustPen(myRobotController);
 		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen.getInteriorPanel());
 
 		// if one tab was selected, make sure to reselect it

@@ -66,8 +66,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
 	private boolean didSetHome;
-	private float penX;
-	private float penY;
+	private double penX;
+	private double penY;
 
 	private ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 
@@ -380,7 +380,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			}
 			setHome();
 			sendLineToRobot("G0"
-					+" F" + StringHelper.formatDouble(myPlotter.getPenUpFeedRate()) 
+					+" F" + StringHelper.formatDouble(myPlotter.getTravelFeedRate()) 
 					+" A" + StringHelper.formatDouble(myPlotter.getAcceleration())
 					+"\n");
 		} catch (Exception e) {
@@ -498,15 +498,15 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 			// update the simulated position to match the real robot?
 			if (line.contains("G0") || line.contains("G1")) {
-				float px = getPenX();
-				float py = getPenY();
+				double px = getPenX();
+				double py = getPenY();
 
 				String[] tokens = line.split(" ");
 				for (String t : tokens) {
 					if (t.startsWith("X"))
-						px = Float.parseFloat(t.substring(1));
+						px = Double.parseDouble(t.substring(1));
 					if (t.startsWith("Y"))
-						py = Float.parseFloat(t.substring(1));
+						py = Double.parseDouble(t.substring(1));
 				}
 				this.setPenX(px);
 				this.setPenY(py);
@@ -578,21 +578,12 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		return true;
 	}
 
-	public void setCurrentFeedRate(double feedRate) {
-		// remember it
-		myPlotter.setCurrentFeedRate(feedRate);
-		// get it again in case it was capped.
-		feedRate = myPlotter.getPenDownFeedRate();
-		// tell the robot
-		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
-	}
-
 	public double getCurrentFeedRate() {
-		return myPlotter.getPenDownFeedRate();
+		return myPlotter.getDrawingFeedRate();
 	}
 
 	public void goHome() {
-		sendLineToRobot("G0 F"+StringHelper.formatDouble(getCurrentFeedRate())+" X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
+		sendLineToRobot("G0 F"+StringHelper.formatDouble(myPlotter.getTravelFeedRate())+" X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
 				+ StringHelper.formatDouble(myPlotter.getHomeY()));
 		setPenX((float) myPlotter.getHomeX());
 		penY = (float) myPlotter.getHomeY();
@@ -623,10 +614,10 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	 * @param x absolute position in mm
 	 * @param y absolute position in mm
 	 */
-	public void movePenAbsolute(float x, float y) {
+	public void movePenAbsolute(double x, double y) {
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? myPlotter.getPenUpFeedrateString() : Plotter.COMMAND_TRAVEL)
-						: (penJustMoved ? myPlotter.getPenDownFeedrateString() : Plotter.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? myPlotter.getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+						: (penJustMoved ? myPlotter.getDrawingFeedrateString() : Plotter.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		penY = y;
@@ -636,11 +627,11 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	 * @param dx relative position in mm
 	 * @param dy relative position in mm
 	 */
-	public void movePenRelative(float dx, float dy) {
+	public void movePenRelative(double dx, double dy) {
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? myPlotter.getPenUpFeedrateString() : Plotter.COMMAND_TRAVEL)
-						: (penJustMoved ? myPlotter.getPenDownFeedrateString() : Plotter.COMMAND_MOVE))
+				(penIsUp ? (penJustMoved ? myPlotter.getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+						: (penJustMoved ? myPlotter.getDrawingFeedrateString() : Plotter.COMMAND_MOVE))
 						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
@@ -789,11 +780,11 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 						double accel = myPlotter.getAcceleration();
 						double maxV;
 						if (oz != nz) {
-							maxV = myPlotter.getZRate();
+							maxV = myPlotter.getZFeedrate();
 						} else if (nz == myPlotter.getPenDownAngle()) {
-							maxV = myPlotter.getPenDownFeedRate();
+							maxV = myPlotter.getDrawingFeedRate();
 						} else {
-							maxV = myPlotter.getPenUpFeedRate();
+							maxV = myPlotter.getTravelFeedRate();
 						}
 						totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
 					}
@@ -895,22 +886,22 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	// in mm
-	public float getPenX() {
+	public double getPenX() {
 		return penX;
 	}
 
 	// in mm
-	public float getPenY() {
+	public double getPenY() {
 		return penY;
 	}
 
 	// in mm
-	public void setPenX(float px) {
+	public void setPenX(double px) {
 		this.penX = px;
 	}
 
 	// in mm
-	public void setPenY(float py) {
+	public void setPenY(double py) {
 		this.penY = py;
 	}
 

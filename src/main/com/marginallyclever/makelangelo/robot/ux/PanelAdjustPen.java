@@ -18,7 +18,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected RobotController robot;
+	protected RobotController myRobotController;
 	
 	protected SelectDouble penDiameter;
 	protected SelectDouble maxFeedRate;
@@ -39,14 +39,14 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	public PanelAdjustPen(RobotController robot) {
 		super();
 		
-		this.robot = robot;
+		this.myRobotController = robot;
 	    
 	    Plotter settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
-	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
-	    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),settings.getPenDownFeedRate()));
-	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getZRate()));
+	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
+	    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),settings.getDrawingFeedRate()));
+	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getZFeedrate()));
 	    add(penUp = new SelectDouble(Translator.get("penToolUp"),settings.getPenUpAngle()));
 	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
 	    add(penDown = new SelectDouble(Translator.get("penToolDown"),settings.getPenDownAngle()));
@@ -62,14 +62,14 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 
 		if (subject == buttonTestUp  ) {
 			// must match MakelangeloRobotSettings.getPenUpString()
-			robot.sendLineToRobot(
+			myRobotController.sendLineToRobot(
 				"G00 F" + penZRate.getValue() + " Z" + penUp.getValue() + ";\n"+
 				"G00 F" + maxFeedRate.getValue() + ";\n"
 				);
 		}
 		if (subject == buttonTestDown) {
 			// must match MakelangeloRobotSettings.getPenDownString()
-			robot.sendLineToRobot(
+			myRobotController.sendLineToRobot(
 					"G01 F" + penZRate.getValue() + " Z" + penDown.getValue() + ";\n"+
 					"G01 F" + currentFeedRate.getValue() + ";\n"
 					);
@@ -78,15 +78,14 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	
 	
 	public void save() {
-	    Plotter settings = robot.getSettings();
-		settings.setDiameter(penDiameter.getValue());
-		settings.setMaxFeedRate(maxFeedRate.getValue());
-		settings.setCurrentFeedRate(currentFeedRate.getValue());
-		settings.setZRate(penZRate.getValue());
+	    Plotter settings = myRobotController.getSettings();
+		settings.setPenDiameter(penDiameter.getValue());
+		settings.setTravelFeedRate(maxFeedRate.getValue());
+		settings.setDrawingFeedRate(currentFeedRate.getValue());
+		settings.setZFeedrate(penZRate.getValue());
 		settings.setPenUpAngle(penUp.getValue());
 		settings.setPenDownAngle(penDown.getValue());
 		settings.setPenDownColor(selectPenDownColor.getColor());
-		settings.setPenDownColorDefault(selectPenDownColor.getColor());
 		settings.setPenUpColor(selectPenUpColor.getColor());
 	}
 }
