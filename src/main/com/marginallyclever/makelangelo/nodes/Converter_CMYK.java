@@ -3,11 +3,11 @@ package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_CMYK;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 
 

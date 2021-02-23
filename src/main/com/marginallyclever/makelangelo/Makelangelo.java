@@ -67,6 +67,7 @@ import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;

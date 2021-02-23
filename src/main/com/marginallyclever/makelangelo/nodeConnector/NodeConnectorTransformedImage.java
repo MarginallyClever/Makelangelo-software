@@ -7,11 +7,11 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnector;
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectFile;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Convenience class

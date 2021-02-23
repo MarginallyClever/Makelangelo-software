@@ -2,10 +2,10 @@ package com.marginallyclever.makelangelo.nodes;
 
 
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * A grid of boxes across the paper, and make the boxes bigger if the image is darker in that area.

@@ -2,13 +2,13 @@ package com.marginallyclever.makelangelo.robot.ux;
 
 import java.beans.PropertyChangeEvent;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectBoolean;
 import com.marginallyclever.core.select.SelectColor;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectSlider;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.robot.Paper;
 import com.marginallyclever.makelangelo.robot.PaperSize;
 

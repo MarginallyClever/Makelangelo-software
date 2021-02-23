@@ -27,6 +27,7 @@ import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;

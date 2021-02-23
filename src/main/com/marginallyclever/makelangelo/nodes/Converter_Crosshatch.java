@@ -2,10 +2,10 @@ package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.Histogram;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * generate crosshatch pattern over an image, with more lines in darker areas.

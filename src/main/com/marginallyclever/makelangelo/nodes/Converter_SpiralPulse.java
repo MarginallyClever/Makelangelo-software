@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorBoolean;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>

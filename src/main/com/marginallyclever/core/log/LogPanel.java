@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.robot.RobotController;
 
 

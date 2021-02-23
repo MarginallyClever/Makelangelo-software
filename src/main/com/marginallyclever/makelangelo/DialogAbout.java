@@ -15,6 +15,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.io.IOUtils;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 
 public class DialogAbout {	

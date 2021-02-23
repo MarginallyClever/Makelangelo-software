@@ -11,6 +11,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
+import com.marginallyclever.core.Translator;
+
 public class DialogBadFirmwareVersion {
 	/**
 	 * <p>

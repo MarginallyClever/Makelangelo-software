@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
 

@@ -27,7 +27,7 @@ import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.core.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.RobotControllerListener;

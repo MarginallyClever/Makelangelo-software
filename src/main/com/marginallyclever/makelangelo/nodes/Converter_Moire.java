@@ -7,6 +7,7 @@ import com.marginallyclever.core.LineInterpolator;
 import com.marginallyclever.core.LineInterpolatorSinCurve;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_BlackAndWhite;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
@@ -14,7 +15,6 @@ import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.node.NodeConnectorOneOfMany;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 
 /**

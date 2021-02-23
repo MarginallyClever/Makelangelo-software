@@ -11,8 +11,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
 import com.marginallyclever.core.StringHelper;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.makelangelo.Translator;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {

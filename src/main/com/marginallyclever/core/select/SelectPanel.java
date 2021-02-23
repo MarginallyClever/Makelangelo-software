@@ -13,8 +13,8 @@ import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 
 import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * A container for all {@link Select} elements, to facilitate formating as a group.

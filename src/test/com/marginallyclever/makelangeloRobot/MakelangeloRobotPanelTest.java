@@ -7,10 +7,10 @@ import java.util.ServiceLoader;
 
 import org.junit.Test;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
-import com.marginallyclever.makelangelo.Translator;
 
 public class MakelangeloRobotPanelTest {
 

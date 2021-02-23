@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 
 /**

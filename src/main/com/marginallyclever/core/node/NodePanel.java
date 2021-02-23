@@ -11,10 +11,11 @@ import java.util.ServiceLoader;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectPanel;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * All generators have a panel with options.  This is their shared root.

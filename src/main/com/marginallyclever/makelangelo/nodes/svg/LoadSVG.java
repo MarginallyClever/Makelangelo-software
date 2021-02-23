@@ -33,10 +33,10 @@ import org.w3c.dom.svg.SVGPointList;
 
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 import com.marginallyclever.makelangelo.robot.RobotController;

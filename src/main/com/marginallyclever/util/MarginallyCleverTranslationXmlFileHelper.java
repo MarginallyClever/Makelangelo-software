@@ -1,6 +1,6 @@
 package com.marginallyclever.util;
 
-import static com.marginallyclever.makelangelo.Translator.WORKING_DIRECTORY;
+import static com.marginallyclever.core.Translator.WORKING_DIRECTORY;
 
 import java.io.File;
 import java.io.FileOutputStream;

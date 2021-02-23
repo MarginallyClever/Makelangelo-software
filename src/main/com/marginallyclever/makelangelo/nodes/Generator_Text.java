@@ -9,11 +9,11 @@ import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
 import java.util.Locale;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.node.NodeConnectorString;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Your message here.  Understands font families, styles, sizes, and alignment

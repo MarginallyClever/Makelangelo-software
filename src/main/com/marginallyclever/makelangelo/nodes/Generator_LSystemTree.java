@@ -2,12 +2,12 @@ package com.marginallyclever.makelangelo.nodes;
 
 import java.security.SecureRandom;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * L System fractal

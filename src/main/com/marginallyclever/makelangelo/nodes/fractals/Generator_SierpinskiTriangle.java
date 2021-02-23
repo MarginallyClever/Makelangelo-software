@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.nodes.fractals;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorBoundedInt;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 
 /**

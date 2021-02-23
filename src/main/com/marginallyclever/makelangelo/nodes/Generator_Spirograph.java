@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.nodes;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorBoolean;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)

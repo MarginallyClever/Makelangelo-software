@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.preferences;
 
 import java.util.prefs.Preferences;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectFile;
 import com.marginallyclever.core.select.SelectPanel;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
 

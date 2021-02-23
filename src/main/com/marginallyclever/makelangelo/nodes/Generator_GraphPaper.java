@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorDouble;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * 1cm and 10cm grid lines

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.nodes.maze;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorInteger;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 
 /**

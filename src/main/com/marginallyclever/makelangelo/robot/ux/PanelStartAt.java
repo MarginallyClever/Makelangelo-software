@@ -3,10 +3,10 @@ package com.marginallyclever.makelangelo.robot.ux;
 import java.awt.Component;
 import javax.swing.JOptionPane;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectInteger;
 import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
-import com.marginallyclever.makelangelo.Translator;
 
 public class PanelStartAt extends SelectPanel {
 	/**

@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.robot.RobotController;
 /**
  * Drag cursor to drive plotter control. 

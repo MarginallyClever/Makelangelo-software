@@ -3,9 +3,9 @@ package com.marginallyclever.core.node;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.Select;
 import com.marginallyclever.core.select.SelectDouble;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Convenience class

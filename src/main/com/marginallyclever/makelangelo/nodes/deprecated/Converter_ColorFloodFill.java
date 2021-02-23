@@ -10,10 +10,10 @@ import java.util.LinkedList;
 
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.TransformedImage;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.imageFilters.Filter_GaussianBlur;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
 
 /**

@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.core.Translator;
 
 /**
  * handles requests between the UI and the various transport layers 

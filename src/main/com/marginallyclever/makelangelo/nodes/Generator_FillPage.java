@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.nodes;
 
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.Point2D;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.node.NodeConnectorAngle;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Completely fills the page with ink.

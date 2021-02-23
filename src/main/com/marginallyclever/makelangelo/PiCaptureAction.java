@@ -26,6 +26,7 @@ import com.hopding.jrpicam.enums.DRC;
 import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
+import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 
 /**
