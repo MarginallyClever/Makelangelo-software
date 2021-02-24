@@ -57,10 +57,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	private SelectButton buttonConnect;
 	
 	// machine options
-	private String[] machineConfigurations;
-	private JComboBox<String> machineChoices;
 	private JButton buttonOpenSettings;
-	private JPanel machineNumberPanel;
 
 	// jog buttons
 	private JButton buttonAneg;
@@ -108,12 +105,6 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		add(createConnectSubPanel(), con1);
 		con1.gridy++;
 		
-		// settings
-		machineNumberPanel = new JPanel(new GridBagLayout());
-		updateMachineNumberPanel();
-		add(machineNumberPanel, con1);
-		con1.gridy++;
-
 		add(createJogMotorsPanel(),con1);			con1.gridy++;
 		add(createAxisDrivingControls(),con1);		con1.gridy++;
 		add(createAnimationPanel(),con1);			con1.gridy++;
@@ -175,7 +166,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonAneg.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobotController.jogLeftMotorIn();
+				myRobotController.myPlotter.jogLeftMotorIn();
 			}
 		});
 
@@ -187,7 +178,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonBneg.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobotController.jogRightMotorIn();
+				myRobotController.myPlotter.jogRightMotorIn();
 			}
 		});
 		
@@ -197,7 +188,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonApos.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobotController.jogLeftMotorOut();
+				myRobotController.myPlotter.jogLeftMotorOut();
 			}
 		});
 		
@@ -209,7 +200,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonBpos.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myRobotController.jogRightMotorOut();
+				myRobotController.myPlotter.jogRightMotorOut();
 			}
 		});
 		
@@ -224,7 +215,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
-					myRobotController.halt();
+					myRobotController.myPlotter.halt();
 					myRobotController.closeConnection();
 					buttonConnect.setText(Translator.get("ButtonConnect"));
 					buttonConnect.setForeground(Color.GREEN);
@@ -247,14 +238,18 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 
         connectionPanel.add(buttonConnect);
 
+		buttonOpenSettings = new JButton(Translator.get("configureMachine"));
+		buttonOpenSettings.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SettingsDialog m = new SettingsDialog(myRobotController);
+				m.run(parentFrame);
+			}
+		});
+		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
+		connectionPanel.add(buttonOpenSettings);
+		
 	    return connectionPanel;
-	}
-
-	
-	protected void updateMachineChoice() {
-		int selectedIndex = machineChoices.getSelectedIndex();
-		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
-		myRobotController.getSettings().loadConfig(newUID);
 	}
 
 
@@ -284,10 +279,10 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		toggleEngagedMotor.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(myRobotController.areMotorsEngaged() ) {
-					myRobotController.disengageMotors();
+				if(myRobotController.myPlotter.areMotorsEngaged() ) {
+					myRobotController.myPlotter.disengageMotors();
 				} else {
-					myRobotController.engageMotors();
+					myRobotController.myPlotter.engageMotors();
 				}
 			}
 		});
@@ -301,7 +296,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		penUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.raisePen();
+				myRobotController.myPlotter.raisePen();
 			}
 		});
 		
@@ -311,7 +306,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		penDown.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.lowerPen();
+				myRobotController.myPlotter.lowerPen();
 			}
 		});
 		
@@ -324,7 +319,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	    setHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.setHome();
+				myRobotController.myPlotter.setHome();
 				updateButtonAccess();
 			}
 		});
@@ -335,7 +330,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		findHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.findHome();
+				myRobotController.myPlotter.findHome();
 			}
 		});
 
@@ -345,7 +340,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		goHome.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.goHome();	
+				myRobotController.myPlotter.goHome();	
 			}
 		});
 		
@@ -379,13 +374,13 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// toggle pause
-				if (myRobotController.isPaused() == true) {
+				if (myRobotController.myPlotter.isPaused() == true) {
 					buttonPause.setText(Translator.get("Pause"));
-					myRobotController.unPause();
+					myRobotController.myPlotter.unPause();
 					myRobotController.sendFileCommand();
 				} else {
 					buttonPause.setText(Translator.get("Unpause"));
-					myRobotController.pause();
+					myRobotController.myPlotter.pause();
 				}
 			}
 		});
@@ -397,7 +392,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		buttonHalt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myRobotController.halt();	
+				myRobotController.myPlotter.halt();	
 			}
 		});
 
@@ -457,9 +452,9 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	 * Refresh the list of available known machines. 
 	 * If we are connected to a machine, select that machine number and disable the ability to change selection.
 	 */
-	public void updateMachineNumberPanel() {
-		machineNumberPanel.removeAll();
-		machineConfigurations = myRobotController.getSettings().getKnownMachineNames();
+	private void updateMachineNumber() {
+		JPanel machineNumberPanel = new JPanel();
+		String [] machineConfigurations = myRobotController.getSettings().getKnownMachineNames();
 		GridBagConstraints cMachine = new GridBagConstraints();
 		cMachine.fill= GridBagConstraints.HORIZONTAL;
 		cMachine.anchor = GridBagConstraints.CENTER;
@@ -467,7 +462,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		cMachine.gridy=0;
 		
 		if( machineConfigurations.length>0 ) {
-			machineChoices = new JComboBox<>(machineConfigurations);
+			JComboBox<String> machineChoices = new JComboBox<String>(machineConfigurations);
 			JLabel label = new JLabel(Translator.get("MachineNumber"));
 			cMachine.insets = new Insets(0,0,0,5);
 			machineNumberPanel.add(label,cMachine);
@@ -488,7 +483,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					if(e.getStateChange()==ItemEvent.SELECTED) {
-						updateMachineChoice();
+						// TODO ?
 					}
 				}
 			});
@@ -496,22 +491,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			int index = myRobotController.getSettings().getKnownMachineIndex();
 			if( index<0 ) index=0;
 			machineChoices.setSelectedIndex(index);
-
-			// force the GUI to load the correct initial choice.
-			updateMachineChoice();
 		}
-
-		buttonOpenSettings = new JButton(Translator.get("configureMachine"));
-		buttonOpenSettings.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				SettingsDialog m = new SettingsDialog(myRobotController);
-				m.run(parentFrame);
-			}
-		});
-		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
-		machineNumberPanel.add(buttonOpenSettings,cMachine);
-		cMachine.gridx++;
 	}
 	
 	// The user has done something. respond to it.
@@ -535,7 +515,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		if (subject == right10) dx = 10;
 		if (subject == right1) dx = 1;
 
-		if(dx!=0 || dy!=0) myRobotController.movePenRelative(dx,dy);
+		if(dx!=0 || dy!=0) myRobotController.myPlotter.movePenRelative(dx,dy);
 	}
 	
 	protected void startAt() {
@@ -560,9 +540,8 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 
 	// the moment a robot is confirmed to have connected
 	public void onConnect() {
-		updateMachineNumberPanel();
 		updateButtonAccess();
-		myRobotController.engageMotors();
+		myRobotController.myPlotter.engageMotors();
 	}
 	
 	public void updateButtonAccess() {
@@ -572,8 +551,8 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 				
 		if(myRobotController!=null) {
 			isConfirmed = myRobotController.isPortConfirmed();
-			isRunning = myRobotController.isRunning();
-			didSetHome = myRobotController.didSetHome();
+			isRunning = myRobotController.myPlotter.isRunning();
+			didSetHome = myRobotController.myPlotter.didSetHome();
 		}
 		
 		buttonOpenSettings.setEnabled(!isRunning);
@@ -656,7 +635,6 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		if (parentFrame != null) {
 			parentFrame.invalidate();
 		}
-		updateMachineNumberPanel();
 		updateButtonAccess();
 	}
 

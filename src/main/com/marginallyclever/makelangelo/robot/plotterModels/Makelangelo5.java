@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -10,7 +10,7 @@ import com.marginallyclever.core.Point2D;
 import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
-public class Makelangelo5Properties extends Makelangelo3Properties {
+public class Makelangelo5 extends Makelangelo3 {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
@@ -64,14 +64,12 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
-		paintPenHolderToCounterweights(gl2,robot);
-		paintSafeArea(gl2,robot);
+	public void render(GL2 gl2, Plotter plotter) {
+		paintCalibrationPoint(gl2,plotter);
+		paintControlBox(gl2,plotter);
+		paintMotors(gl2,plotter);
+		paintPenHolderToCounterweights(gl2,plotter);
+		paintSafeArea(gl2,plotter);
 	}
 
 	/**
@@ -235,8 +233,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	protected void paintPenHolderToCounterweights( GL2 gl2, RobotController robot ) {
 		Plotter settings = robot.getSettings();
 		double dx,dy;
-		double gx = robot.getPenX();// / 10;
-		double gy = robot.getPenY();// / 10;
+		double gx = robot.myPlotter.getPenX();// / 10;
+		double gy = robot.myPlotter.getPenY();// / 10;
 		
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();
@@ -323,12 +321,11 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 	
-	protected void paintSafeArea(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-		double top = settings.getLimitTop();
+	protected void paintSafeArea(GL2 gl2,Plotter plotter) {
+		double top = plotter.getLimitTop();
 		//double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 
 		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
 

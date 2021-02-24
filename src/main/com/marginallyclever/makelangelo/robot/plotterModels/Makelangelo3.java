@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -6,18 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
-public class Makelangelo3_3Properties extends Makelangelo2Properties {
+public class Makelangelo3 extends Makelangelo2 {
 	@Override
 	public String getVersion() {
-		return "4";
+		return "3";
 	}
 
 	@Override
 	public String getName() {
-		return "Makelangelo 3.3";
+		return "Makelangelo 3.0-3.2";
 	}
 
 	@Override
@@ -32,7 +31,7 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	
 	@Override
 	public boolean canAutoHome() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -41,24 +40,22 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
-		paintPenHolderToCounterweights(gl2,robot);		
+	public void render(GL2 gl2, Plotter plotter) {
+		paintCalibrationPoint(gl2,plotter);
+		paintControlBox(gl2,plotter);
+		paintMotors(gl2,plotter);
+		paintPenHolderToCounterweights(gl2,plotter);		
 	}
 
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
-	 * @param settings
+	 * @param plotter
 	 */
-	protected void paintControlBox(GL2 gl2,Plotter settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+	protected void paintControlBox(GL2 gl2,Plotter plotter) {
+		double cy = plotter.getLimitTop();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -179,7 +176,51 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Makelangelo 3.3\n");
+		out.write("; Makelangelo 3\n");
 		out.write("; "+formatter.format(date)+"\n");
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateMax() {
+		return 400;
+	}
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s [>0]
+	 */
+	@Override
+	public float getFeedrateDefault() {
+		return 100;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return mm/s^2 [>0]
+	 */
+	@Override
+	public float getAccelerationMax() {
+		return 50;
+	}
+
+	/**
+	 * @since software 7.22.6
+	 * @return deg/s [>0]
+	 */
+	@Override
+	public float getZRate() {
+		return 50;
+	}
+	
+	/**
+	 * @since software 7.22.6
+	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
+	 */
+	@Override
+	public float getZAngleOn() {
+		return 40;
 	}
 }

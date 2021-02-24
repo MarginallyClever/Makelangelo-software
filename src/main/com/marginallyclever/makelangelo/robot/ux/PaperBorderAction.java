@@ -22,13 +22,13 @@ public class PaperBorderAction extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		Paper paper = myController.getPaper();
-		myController.movePenAbsolute(paper.getLeft(),paper.getTop());
-		myController.lowerPen();
-		myController.movePenAbsolute(paper.getRight(),paper.getTop());
-		myController.movePenAbsolute(paper.getRight(),paper.getBottom());
-		myController.movePenAbsolute(paper.getLeft(),paper.getBottom());
-		myController.movePenAbsolute(paper.getLeft(),paper.getTop());
-		myController.raisePen();
-		myController.goHome();
+		myController.myPlotter.movePenAbsolute(paper.getLeft(),paper.getTop());
+		myController.myPlotter.lowerPen();
+		myController.myPlotter.movePenAbsolute(paper.getRight(),paper.getTop());
+		myController.myPlotter.movePenAbsolute(paper.getRight(),paper.getBottom());
+		myController.myPlotter.movePenAbsolute(paper.getLeft(),paper.getBottom());
+		myController.myPlotter.movePenAbsolute(paper.getLeft(),paper.getTop());
+		myController.myPlotter.raisePen();
+		myController.myPlotter.goHome();
 	}
 }

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -7,7 +7,6 @@ import java.util.Date;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
 /**
@@ -15,12 +14,17 @@ import com.marginallyclever.makelangelo.robot.Plotter;
  * @author Dan Royer
  *
  */
-public class CartesianProperties extends Makelangelo2Properties {
+public class CartesianPlotter extends Makelangelo2 {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
 	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
+	
+	@Override
+	public String getHello() {
+		return "HELLO WORLD! I AM TRADITIONALXY #";
+	}
 	
 	@Override
 	public Point2D getHome(Plotter settings) {
@@ -58,27 +62,23 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintGantryAndHead(gl2,robot);		
-		paintMotors(gl2,settings);
-		paintControlBox(gl2,settings);
+	public void render(GL2 gl2, Plotter plotter) {
+		paintCalibrationPoint(gl2,plotter);
+		paintGantryAndHead(gl2,plotter);		
+		paintMotors(gl2,plotter);
+		paintControlBox(gl2,plotter);
 	}
 
 	
-	protected void paintGantryAndHead(GL2 gl2, RobotController robot) {
-		Plotter settings = robot.getSettings();
-		
-		double gx = robot.getPenX();
-		double gy = robot.getPenY();
-		double gz = (robot.isPenUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
+	protected void paintGantryAndHead(GL2 gl2, Plotter plotter) {		
+		double gx = plotter.getPenX();
+		double gy = plotter.getPenY();
+		double gz = (plotter.isPenUp() ? plotter.getPenUpAngle() : plotter.getPenDownAngle())/10;
 
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = plotter.getLimitTop();
+		double bottom = plotter.getLimitBottom();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glColor3f(1, 0.8f, 0.5f);

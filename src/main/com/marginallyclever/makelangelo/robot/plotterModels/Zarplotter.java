@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -7,15 +7,19 @@ import java.util.Date;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
-public class ZarplotterProperties extends Makelangelo2Properties {
+public class Zarplotter extends Makelangelo2 {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
 	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
+
+	@Override
+	public String getHello() {
+		return "HELLO WORLD! I AM ZARPLOTTER #";
+	}
 	
 	@Override
 	public Point2D getHome(Plotter settings) {
@@ -53,27 +57,24 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintMotors(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintPenHolderToCounterweights(gl2,robot);		
+	public void render(GL2 gl2, Plotter plotter) {
+		paintCalibrationPoint(gl2,plotter);
+		paintMotors(gl2,plotter);
+		paintControlBox(gl2,plotter);
+		paintPenHolderToCounterweights(gl2,plotter);		
 	}
 
 	
 	@Override
-	protected void paintPenHolderToCounterweights(GL2 gl2, RobotController robot) {
-		Plotter settings = robot.getSettings();
+	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter plotter) {
 		//double dx, dy;
-		double gx = robot.getPenX();
-		double gy = robot.getPenY();
+		double gx = plotter.getPenX();
+		double gy = plotter.getPenY();
 
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = plotter.getLimitTop();
+		double bottom = plotter.getLimitBottom();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 
 		gl2.glEnable(GL2.GL_BLEND);
 		gl2.glBlendFunc(GL2.GL_SRC_ALPHA,GL2.GL_ONE_MINUS_SRC_ALPHA);

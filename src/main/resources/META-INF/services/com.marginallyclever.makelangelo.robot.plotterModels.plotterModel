@@ -1,0 +1,8 @@
+com.marginallyclever.makelangelo.robot.plotterModels.CartesianPlotter
+com.marginallyclever.makelangelo.robot.plotterModels.CoreXYPlotter
+com.marginallyclever.makelangelo.robot.plotterModels.CustomPlotter
+com.marginallyclever.makelangelo.robot.plotterModels.Makelangelo2
+com.marginallyclever.makelangelo.robot.plotterModels.Makelangelo3
+com.marginallyclever.makelangelo.robot.plotterModels.Makelangelo3_3
+com.marginallyclever.makelangelo.robot.plotterModels.Makelangelo5
+com.marginallyclever.makelangelo.robot.plotterModels.Zarplotter

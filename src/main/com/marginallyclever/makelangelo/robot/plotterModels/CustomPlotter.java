@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -8,10 +8,9 @@ import java.util.Date;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
-public class CustomProperties extends Makelangelo3Properties {
+public class CustomPlotter extends Makelangelo3 {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -63,14 +62,12 @@ public class CustomProperties extends Makelangelo3Properties {
 	}
 
 	@Override
-	public void render(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
-
+	public void render(GL2 gl2, Plotter plotter) {
 //		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
-		paintPenHolderToCounterweights(gl2,robot);
-		paintSafeArea(gl2,robot);
+		paintControlBox(gl2,plotter);
+		paintMotors(gl2,plotter);
+		paintPenHolderToCounterweights(gl2,plotter);
+		paintSafeArea(gl2,plotter);
 	}
 
 	/**
@@ -231,16 +228,15 @@ public class CustomProperties extends Makelangelo3Properties {
 	}
 
 	
-	protected void paintPenHolderToCounterweights( GL2 gl2, RobotController robot ) {
-		Plotter settings = robot.getSettings();
+	protected void paintPenHolderToCounterweights( GL2 gl2, Plotter plotter ) {
 		double dx,dy;
-		double gx = robot.getPenX();// / 10;
-		double gy = robot.getPenY();// / 10;
+		double gx = plotter.getPenX();// / 10;
+		double gy = plotter.getPenY();// / 10;
 		
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = plotter.getLimitTop();
+		double bottom = plotter.getLimitBottom();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 		
 		if(gx<left  ) return;
 		if(gx>right ) return;
@@ -250,7 +246,7 @@ public class CustomProperties extends Makelangelo3Properties {
 		float bottleCenter = 8f+7.5f;
 		
 		double mw = right-left;
-		double mh = top-settings.getLimitBottom();
+		double mh = top-plotter.getLimitBottom();
 		double suggestedLength = Math.sqrt(mw*mw+mh*mh)+50;
 
 		dx = gx - left;
@@ -339,14 +335,13 @@ public class CustomProperties extends Makelangelo3Properties {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 	
-	protected void paintSafeArea(GL2 gl2,RobotController robot) {
-		Plotter settings = robot.getSettings();
+	protected void paintSafeArea(GL2 gl2,Plotter plotter) {
 		double topcrit_ang=20*3.14/180.0;
 		double sidecrit_ang=20*3.14/180.0;
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = plotter.getLimitTop();
+		double bottom = plotter.getLimitBottom();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 		double top_crit=top-(right-left)/2.0*Math.tan(topcrit_ang);
 		double side_crit=(top-top_crit)*Math.tan(sidecrit_ang);
 		double belt=Math.sqrt(Math.pow(top-bottom,2)+Math.pow((right-left)/2.0f,2));

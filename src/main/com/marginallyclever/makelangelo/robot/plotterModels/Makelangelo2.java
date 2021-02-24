@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -8,14 +8,18 @@ import java.util.Date;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
-public class Makelangelo2Properties implements HardwareProperties {
+public class Makelangelo2 implements PlotterModel {
 	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
 	public final static float FRAME_SIZE= 50f; // cm
+
+	@Override
+	public String getHello() {
+		return "HELLO WORLD! I AM POLARGRAPH #";
+	}
 	
 	/**
 	 * convert from belt length mm to cartesian position.
@@ -107,13 +111,11 @@ public class Makelangelo2Properties implements HardwareProperties {
 	}
 
 	@Override
-	public void render(GL2 gl2, RobotController robot) {
-		Plotter settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2, settings);
-		paintMotors(gl2, settings);
-		paintControlBox(gl2, settings);
-		paintPenHolderToCounterweights(gl2, robot);
+	public void render(GL2 gl2, Plotter plotter) {
+		paintCalibrationPoint(gl2, plotter);
+		paintMotors(gl2, plotter);
+		paintControlBox(gl2, plotter);
+		paintPenHolderToCounterweights(gl2, plotter);
 	}
 
 	// draw left & right motor
@@ -208,19 +210,18 @@ public class Makelangelo2Properties implements HardwareProperties {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights(GL2 gl2, RobotController robot) {
-		Plotter settings = robot.getSettings();
+	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter plotter) {
 		double dx, dy;
-		double gx = robot.getPenX();
-		double gy = robot.getPenY();
+		double gx = plotter.getPenX();
+		double gy = plotter.getPenY();
 
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = plotter.getLimitTop();
+		double bottom = plotter.getLimitBottom();
+		double left = plotter.getLimitLeft();
+		double right = plotter.getLimitRight();
 
 		double mw = right - left;
-		double mh = top - settings.getLimitBottom();
+		double mh = top - plotter.getLimitBottom();
 		double suggestedLength = Math.sqrt(mw * mw + mh * mh) + 50;
 
 		dx = gx - left;

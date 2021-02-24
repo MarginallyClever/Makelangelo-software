@@ -18,7 +18,7 @@ import javax.swing.JTabbedPane;
 
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.hardwareProperties.HardwareProperties;
+import com.marginallyclever.makelangelo.robot.plotterModels.PlotterModel;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -133,10 +133,10 @@ public class SettingsDialog {
 		availableHardwareVersions = new ArrayList<String>();
 
 		// get version numbers
-		ServiceLoader<HardwareProperties> knownHardware = ServiceLoader.load(HardwareProperties.class);
-		Iterator<HardwareProperties> i = knownHardware.iterator();
+		ServiceLoader<PlotterModel> knownHardware = ServiceLoader.load(PlotterModel.class);
+		Iterator<PlotterModel> i = knownHardware.iterator();
 		while (i.hasNext()) {
-			HardwareProperties hw = i.next();
+			PlotterModel hw = i.next();
 			availableHardwareVersions.add(new String(hw.getVersion()));
 		}
 
@@ -145,7 +145,7 @@ public class SettingsDialog {
 		i = knownHardware.iterator();
 		int j = 0;
 		while (i.hasNext()) {
-			HardwareProperties hw = i.next();
+			PlotterModel hw = i.next();
 			hardwareVersionNames[j] = hw.getName();
 			++j;
 		}

@@ -1,21 +1,22 @@
-package com.marginallyclever.makelangelo.robot.hardwareProperties;
+package com.marginallyclever.makelangelo.robot.plotterModels;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Point2D;
-import com.marginallyclever.makelangelo.robot.RobotController;
 import com.marginallyclever.makelangelo.robot.Plotter;
 
 /**
- * Properties of each Makelangelo version. These are non-configurable features
+ * Properties of each plotter style. These are non-configurable features
  * unique to each machine.
  * 
  * @author Dan Royer
  *
  */
-public abstract interface HardwareProperties {
+public abstract interface PlotterModel {
+	public String getHello();
+	
 	public String getVersion();
 
 	public String getName();
@@ -54,8 +55,9 @@ public abstract interface HardwareProperties {
 	 * custom look and feel for each version
 	 * 
 	 * @param gl2
+	 * @param plotter TODO
 	 */
-	public void render(GL2 gl2, RobotController robot);
+	public void render(GL2 gl2, Plotter plotter);
 
 	/**
 	 * hardware specific gcode included at the start of each program

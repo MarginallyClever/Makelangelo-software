@@ -30,10 +30,11 @@ import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
 import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
-import com.marginallyclever.makelangelo.robot.machineStyles.MachineStyle;
+import com.marginallyclever.makelangelo.robot.plotterModels.PlotterModel;
 
 /**
  * A Makelangelo robot is made of up a {@link RobotController}, which uses a {@link Plotter} to update it's internal state.
+ * That sentence doesn't explain who is responsible for what and is junk.
  * 
  * It contains state information, where the {@link Plotter} contains only the physical properties (configuration).
  * Classes who implement the {@link RobotControllerListener} interface can obtain state change information in real time (via PropertyChangeEvents)
@@ -51,23 +52,12 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
-	private Plotter myPlotter = null;
+	public Plotter myPlotter = null;
 	private Paper myPaper = new Paper();
 
 	// Connection state
 	private NetworkConnection connection = null;
 	private boolean portConfirmed;
-
-	// misc state
-	private boolean areMotorsEngaged;
-	private boolean isRunning;
-	private boolean isPaused;
-	private boolean penIsUp;
-	private boolean penJustMoved;
-	private boolean penIsUpBeforePause;
-	private boolean didSetHome;
-	private double penX;
-	private double penY;
 
 	private ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 
@@ -88,15 +78,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		listeners = new ArrayList<RobotControllerListener>();
 		myPlotter = new Plotter();
 		portConfirmed = false;
-		areMotorsEngaged = true;
-		isRunning = false;
-		isPaused = false;
-		penIsUp = false;
-		penJustMoved = false;
-		penIsUpBeforePause = false;
-		didSetHome = false;
-		setPenX(0);
-		setPenY(0);
+		myPlotter.setPenX(0);
+		myPlotter.setPenY(0);
 		drawingProgress = 0;
 	}
 
@@ -122,7 +105,6 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		}
 
 		portConfirmed = false;
-		didSetHome = false;
 		firmwareVersionChecked = false;
 		hardwareVersionChecked = false;
 		this.connection = c;
@@ -168,10 +150,10 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		// is port confirmed?
 		if (!portConfirmed) {
 			// machine names
-			ServiceLoader<MachineStyle> knownHardware = ServiceLoader.load(MachineStyle.class);
-			Iterator<MachineStyle> i = knownHardware.iterator();
+			ServiceLoader<PlotterModel> knownStyles = ServiceLoader.load(PlotterModel.class);
+			Iterator<PlotterModel> i = knownStyles.iterator();
 			while (i.hasNext()) {
-				MachineStyle ms = i.next();
+				PlotterModel ms = i.next();
 				String machineTypeName = ms.getHello();
 				if (data.lastIndexOf(machineTypeName) >= 0) {
 					portConfirmed = true;
@@ -261,7 +243,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	}
 
 	// notify PropertyChangeListeners
-	private void notifyListeners(String propertyName,Object oldValue,Object newValue) {
+	void notifyListeners(String propertyName,Object oldValue,Object newValue) {
 		PropertyChangeEvent e = new PropertyChangeEvent(this,propertyName,oldValue,newValue);
 		for(RobotControllerListener ear : listeners) {
 			ear.propertyChange(e);
@@ -378,7 +360,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			for (int i = 0; i < lines.length; ++i) {
 				sendLineToRobot(lines[i] + "\n");
 			}
-			setHome();
+			myPlotter.setHome();
 			sendLineToRobot("G0"
 					+" F" + StringHelper.formatDouble(myPlotter.getTravelFeedRate()) 
 					+" A" + StringHelper.formatDouble(myPlotter.getAcceleration())
@@ -387,73 +369,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		}
 	}
 
-	public boolean isRunning() {
-		return isRunning;
-	}
-
-	public boolean isPaused() {
-		return isPaused;
-	}
-
-	public void pause() {
-		if (isPaused)
-			return;
-
-		isPaused = true;
-		// remember for later if the pen is down
-		penIsUpBeforePause = penIsUp;
-		// raise it if needed.
-		raisePen();
-	}
-
-	public void unPause() {
-		if (!isPaused)
-			return;
-
-		// if pen was down before pause, lower it
-		if (!penIsUpBeforePause) {
-			lowerPen();
-		}
-
-		isPaused = false;
-	}
-
-	public void halt() {
-		isRunning = false;
-		isPaused = false;
-		raisePen();
-		
-		notifyListeners("halt", false, true);
-	}
-
-	public void setRunning() {
-		isRunning = true;
-
-		notifyListeners("running", false, true);
-	}
-
-	public void raisePen() {
-		sendLineToRobot(myPlotter.getPenUpString());
-		rememberRaisedPen();
-	}
-	
-	protected void rememberRaisedPen() {
-		penJustMoved = !penIsUp;
-		penIsUp = true;
-	}
-	
-	protected void rememberLoweredPen() {
-		penJustMoved = penIsUp;
-		penIsUp = false;
-	}
-
-	public void lowerPen() {
-		sendLineToRobot(myPlotter.getPenDownString());
-		rememberLoweredPen();
-	}
-
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(Plotter.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(Plotter.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -463,7 +380,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	 * @param line command to send
 	 */
 	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
-		if (getConnection() == null || !isPortConfirmed() || !isRunning())
+		if (getConnection() == null || !isPortConfirmed() || !myPlotter.isRunning())
 			return;
 
 		line = "N" + lineNumber + " " + line;
@@ -482,13 +399,13 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 	public void sendFileCommand() {
 		int total = drawingCommands.size();
 
-		if (!isRunning() || isPaused() || total == 0 || (getConnection() != null && isPortConfirmed() == false))
+		if (!myPlotter.isRunning() || myPlotter.isPaused() || total == 0 || (getConnection() != null && isPortConfirmed() == false))
 			return;
 
 		// are there any more commands?
 		if (drawingProgress == total) {
 			// no!
-			halt();
+			myPlotter.halt();
 			notifyListeners("progress",total,total);
 			SoundSystem.playDrawingFinishedSound();
 		} else {
@@ -498,8 +415,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 			// update the simulated position to match the real robot?
 			if (line.contains("G0") || line.contains("G1")) {
-				double px = getPenX();
-				double py = getPenY();
+				double px = myPlotter.getPenX();
+				double py = myPlotter.getPenY();
 
 				String[] tokens = line.split(" ");
 				for (String t : tokens) {
@@ -508,8 +425,8 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 					if (t.startsWith("Y"))
 						py = Double.parseDouble(t.substring(1));
 				}
-				this.setPenX(px);
-				this.setPenY(py);
+				myPlotter.setPenX(px);
+				myPlotter.setPenY(py);
 			}
 			
 			notifyListeners("progress",drawingProgress, total);
@@ -524,7 +441,7 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 		drawingProgress = lineNumber;
 		setLineNumber(lineNumber);
-		setRunning();
+		myPlotter.setRunning();
 		sendFileCommand();
 	}
 
@@ -553,9 +470,9 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		// remember important status changes
 		
 		if(reportedline.startsWith(myPlotter.getPenUpString())) {
-			rememberRaisedPen();
+			myPlotter.rememberRaisedPen();
 		} else if(reportedline.startsWith(myPlotter.getPenDownString())) {
-			rememberLoweredPen();
+			myPlotter.rememberLoweredPen();
 		} else if(reportedline.startsWith("M17")) {
 			notifyListeners("motorsEngaged", null, true);
 		} else if(reportedline.startsWith("M18")) {
@@ -580,108 +497,6 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 
 	public double getCurrentFeedRate() {
 		return myPlotter.getDrawingFeedRate();
-	}
-
-	public void goHome() {
-		sendLineToRobot("G0 F"+StringHelper.formatDouble(myPlotter.getTravelFeedRate())+" X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(myPlotter.getHomeY()));
-		setPenX((float) myPlotter.getHomeX());
-		penY = (float) myPlotter.getHomeY();
-	}
-
-	public void findHome() {
-		this.raisePen();
-		sendLineToRobot("G28");
-		setPenX((float) myPlotter.getHomeX());
-		setPenY((float) myPlotter.getHomeY());
-	}
-
-	public void setHome() {
-		sendLineToRobot(myPlotter.getGCodeSetPositionAtHome());
-		// save home position
-		sendLineToRobot("D6 X" + StringHelper.formatDouble(myPlotter.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(myPlotter.getHomeY()));
-		setPenX((float) myPlotter.getHomeX());
-		setPenY((float) myPlotter.getHomeY());
-		didSetHome = true;
-	}
-
-	public boolean didSetHome() {
-		return didSetHome;
-	}
-
-	/**
-	 * @param x absolute position in mm
-	 * @param y absolute position in mm
-	 */
-	public void movePenAbsolute(double x, double y) {
-		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? myPlotter.getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
-						: (penJustMoved ? myPlotter.getDrawingFeedrateString() : Plotter.COMMAND_MOVE))
-						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
-		setPenX(x);
-		penY = y;
-	}
-
-	/**
-	 * @param dx relative position in mm
-	 * @param dy relative position in mm
-	 */
-	public void movePenRelative(double dx, double dy) {
-		sendLineToRobot("G91"); // set relative mode
-		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? myPlotter.getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
-						: (penJustMoved ? myPlotter.getDrawingFeedrateString() : Plotter.COMMAND_MOVE))
-						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
-		sendLineToRobot("G90"); // return to absolute mode
-		setPenX(getPenX() + dx);
-		penY += dy;
-	}
-
-	public boolean areMotorsEngaged() {
-		return areMotorsEngaged;
-	}
-
-	public void movePenToEdgeLeft() {
-		movePenAbsolute((float) myPaper.getLeft(), penY);
-	}
-
-	public void movePenToEdgeRight() {
-		movePenAbsolute((float) myPaper.getRight(), penY);
-	}
-
-	public void movePenToEdgeTop() {
-		movePenAbsolute(getPenX(), (float) myPaper.getTop());
-	}
-
-	public void movePenToEdgeBottom() {
-		movePenAbsolute(getPenX(), (float) myPaper.getBottom());
-	}
-
-	public void disengageMotors() {
-		sendLineToRobot("M18");
-		areMotorsEngaged = false;
-	}
-
-	public void engageMotors() {
-		sendLineToRobot("M17");
-		areMotorsEngaged = true;
-	}
-
-	public void jogLeftMotorOut() {
-		sendLineToRobot("D00 L400");
-	}
-
-	public void jogLeftMotorIn() {
-		sendLineToRobot("D00 L-400");
-	}
-
-	public void jogRightMotorOut() {
-		sendLineToRobot("D00 R400");
-	}
-
-	public void jogRightMotorIn() {
-		sendLineToRobot("D00 R-400");
 	}
 
 	public void setLineNumber(int newLineNumber) {
@@ -858,11 +673,10 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		
 		// outside physical limits
-		paintLimits(gl2);
 		myPaper.render(gl2);
 		
 		// hardware features
-		myPlotter.getHardwareProperties().render(gl2, this);
+		myPlotter.render(gl2);
 
 		gl2.glLineWidth(lineWidthBuf[0]);
 
@@ -871,38 +685,6 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 			tr.setPenDownColor(t.getColor());
 			t.render(tr);
 		}
-	}
-
-	private void paintLimits(GL2 gl2) {
-		gl2.glLineWidth(1);
-
-		gl2.glColor3f(0.7f, 0.7f, 0.7f);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(myPlotter.getLimitLeft(), myPlotter.getLimitTop());
-		gl2.glVertex2d(myPlotter.getLimitRight(), myPlotter.getLimitTop());
-		gl2.glVertex2d(myPlotter.getLimitRight(), myPlotter.getLimitBottom());
-		gl2.glVertex2d(myPlotter.getLimitLeft(), myPlotter.getLimitBottom());
-		gl2.glEnd();
-	}
-
-	// in mm
-	public double getPenX() {
-		return penX;
-	}
-
-	// in mm
-	public double getPenY() {
-		return penY;
-	}
-
-	// in mm
-	public void setPenX(double px) {
-		this.penX = px;
-	}
-
-	// in mm
-	public void setPenY(double py) {
-		this.penY = py;
 	}
 
 	public int findLastPenUpBefore(int startAtLine) {
@@ -927,10 +709,6 @@ public class RobotController extends Node implements NetworkConnectionListener, 
 		}
 
 		return x;
-	}
-
-	public boolean isPenUp() {
-		return penIsUp;
 	}
 
 	public boolean getShowPenUp() {

@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.makelangelo.robot.hardwareProperties.Makelangelo2Properties;
-import com.marginallyclever.makelangelo.robot.hardwareProperties.HardwareProperties;
+import com.marginallyclever.makelangelo.robot.plotterModels.PlotterModel;
+import com.marginallyclever.makelangelo.robot.plotterModels.Makelangelo2;
 import com.marginallyclever.util.PreferencesHelper;
 
 
@@ -31,8 +32,8 @@ public final class Plotter implements Serializable {
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
-	public static final String COMMAND_MOVE = "G0";
-	public static final String COMMAND_TRAVEL = "G1";
+	public static final String COMMAND_DRAW = "G1";
+	public static final String COMMAND_TRAVEL = "G0";
 	
 	private String[] configsAvailable;
 
@@ -47,15 +48,15 @@ public final class Plotter implements Serializable {
 	private double limitTop;
 	
 	private String hardwareVersion;
-	private HardwareProperties hardwareProperties;
+	private PlotterModel hardwareProperties;
 
 	private ColorRGB penDownColor;
 	private ColorRGB penUpColor;
 	
 	// speed control
-	private double feedRateMax;
-	private double feedRateDefault;
-	private double accelerationMax;
+	private double feedRateTravel;
+	private double feedRateDrawing;
+	private double acceleration;
 
 	private double diameter;  // pen diameter (mm, >0)
 	private double zOff;	// pen up servo angle (deg,0...180)
@@ -81,6 +82,24 @@ public final class Plotter implements Serializable {
 	 */
 	private int startingPositionIndex;
 
+	// misc state
+	private boolean areMotorsEngaged;
+
+	private boolean isRunning;
+
+	private boolean isPaused;
+
+	private boolean penIsUp;
+
+	private boolean didSetHome;
+
+	private double penX;
+
+	private double penY;
+
+	private boolean penIsUpBeforePause;
+
+	private boolean penJustMoved;
 	
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
@@ -90,6 +109,7 @@ public final class Plotter implements Serializable {
 		
 		robotUID = 0;
 		isRegistered = false;
+		penJustMoved = false;
 		
 		double mh = 835; // mm
 		double mw = 835; // mm
@@ -102,6 +122,13 @@ public final class Plotter implements Serializable {
 		penUpColor = new ColorRGB(0,255,0); // blue
 		startingPositionIndex = 4;
 
+		areMotorsEngaged = true;
+		isRunning = false;
+		isPaused = false;
+		penIsUp = false;
+		penIsUpBeforePause = false;
+		didSetHome = false;
+		
 		// default hardware version
 		setHardwareVersion("5");
 
@@ -134,7 +161,7 @@ public final class Plotter implements Serializable {
 	
 	
 	public double getAcceleration() {
-		return accelerationMax;
+		return acceleration;
 	}
 
 	/**
@@ -147,7 +174,7 @@ public final class Plotter implements Serializable {
 	}
 
 	private Point2D getHome() {
-		return getHardwareProperties().getHome(this);
+		return hardwareProperties.getHome(this);
 	}
 	
 	/**
@@ -170,7 +197,7 @@ public final class Plotter implements Serializable {
 
 	// return the strings that will tell a makelangelo robot its physical limits.
 	public String getGCodeConfig() {
-		return getHardwareProperties().getGCodeConfig(this);
+		return hardwareProperties.getGCodeConfig(this);
 	}
 
 	public String getAbsoluteMode() {
@@ -311,7 +338,7 @@ public final class Plotter implements Serializable {
 		limitLeft   = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
 		limitRight  = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
 
-		accelerationMax=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(accelerationMax)));
+		acceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(acceleration)));
 
 		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
 
@@ -330,8 +357,8 @@ public final class Plotter implements Serializable {
 		setZOn(Double.parseDouble(prefs.get("z_on", Double.toString(getZOn()))));
 		setZOff(Double.parseDouble(prefs.get("z_off", Double.toString(getZOff()))));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feedRateMax = Double.parseDouble(prefs.get("feed_rate", Double.toString(feedRateMax)));
-		feedRateDefault=Double.valueOf(prefs.get("feed_rate_current",Double.toString(feedRateDefault)));
+		feedRateTravel = Double.parseDouble(prefs.get("feed_rate", Double.toString(feedRateTravel)));
+		feedRateDrawing=Double.valueOf(prefs.get("feed_rate_current",Double.toString(feedRateDrawing)));
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -351,8 +378,8 @@ public final class Plotter implements Serializable {
 		prefs.put("z_on", Double.toString(getZOn()));
 		prefs.put("z_off", Double.toString(getZOff()));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Double.toString(feedRateMax));
-		prefs.put("feed_rate_current", Double.toString(feedRateDefault));
+		prefs.put("feed_rate", Double.toString(feedRateTravel));
+		prefs.put("feed_rate_current", Double.toString(feedRateDrawing));
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
@@ -372,7 +399,7 @@ public final class Plotter implements Serializable {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("acceleration", Double.toString(accelerationMax));
+		uniqueMachinePreferencesNode.put("acceleration", Double.toString(acceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
@@ -384,23 +411,23 @@ public final class Plotter implements Serializable {
 	}
 	
 	public void setAcceleration(double f) {
-		accelerationMax = f;
+		acceleration = f;
 	}
 	
 	public void setTravelFeedRate(double f) {
-		feedRateMax = Math.max(f,0.001);
+		feedRateTravel = Math.max(f,0.001);
 	}
 	
 	public double getTravelFeedRate() {
-		return feedRateMax;
+		return feedRateTravel;
 	}
 	
 	public void setDrawingFeedRate(double f) {
-		feedRateDefault = Math.max(f,0.001);
+		feedRateDrawing = Math.max(f,0.001);
 	}
 	
 	public double getDrawingFeedRate() {
-		return feedRateDefault;
+		return feedRateDrawing;
 	}
 	
 	public void setLimitBottom(double limitBottom) {
@@ -435,7 +462,7 @@ public final class Plotter implements Serializable {
 		return hardwareVersion;
 	}
 
-	public HardwareProperties getHardwareProperties() {
+	public PlotterModel getHardwareProperties() {
 		return hardwareProperties;
 	}
 
@@ -444,10 +471,10 @@ public final class Plotter implements Serializable {
 
 		try {
 			// get version numbers
-			ServiceLoader<HardwareProperties> knownHardware = ServiceLoader.load(HardwareProperties.class);
-			Iterator<HardwareProperties> i = knownHardware.iterator();
+			ServiceLoader<PlotterModel> knownHardware = ServiceLoader.load(PlotterModel.class);
+			Iterator<PlotterModel> i = knownHardware.iterator();
 			while(i.hasNext()) {
-				HardwareProperties hw = i.next();
+				PlotterModel hw = i.next();
 				if(hw.getVersion().equals(version)) {
 					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
 					newVersion = version;
@@ -457,23 +484,24 @@ public final class Plotter implements Serializable {
 		} catch(Exception e) {
 			e.printStackTrace();
 			Log.error("Hardware version instance failed. Defaulting to v2");
-			hardwareProperties = new Makelangelo2Properties();
+			hardwareProperties = new Makelangelo2();
 			newVersion="2";
 		}
 		if(newVersion == "") {
 			Log.error("Unknown hardware version requested. Defaulting to v2");
-			hardwareProperties = new Makelangelo2Properties();
+			hardwareProperties = new Makelangelo2();
 		}
 		
 		hardwareVersion = newVersion;
-		if(!hardwareProperties.canChangeMachineSize()) {
-			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
+		//if(!hardwareProperties.canChangeMachineSize())
+		{
+			setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
 		}
 
 		// apply default hardware values
-		feedRateMax = hardwareProperties.getFeedrateMax();
-		feedRateDefault = hardwareProperties.getFeedrateDefault();
-		accelerationMax = hardwareProperties.getAccelerationMax();
+		feedRateTravel = hardwareProperties.getFeedrateMax();
+		feedRateDrawing = hardwareProperties.getFeedrateDefault();
+		acceleration = hardwareProperties.getAccelerationMax();
 		
 		setZFeedrate(hardwareProperties.getZRate());
 		setZOn(hardwareProperties.getZAngleOn());
@@ -528,11 +556,11 @@ public final class Plotter implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getZFeedrate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getTravelFeedrateString() {
@@ -540,7 +568,7 @@ public final class Plotter implements Serializable {
 	}
 	
 	public String getDrawingFeedrateString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getDrawingFeedRate());
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getDrawingFeedRate());
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
@@ -575,13 +603,15 @@ public final class Plotter implements Serializable {
 		out.write("M300 S60 P250\n");  // beep
 		out.write("M226\n");  // pause for user input
 		out.write("M117\n");  // clear message
-		out.write("G00 F" + StringHelper.formatDouble(getTravelFeedRate()) + 
-					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
+		out.write(COMMAND_TRAVEL
+				+" F" + StringHelper.formatDouble(getTravelFeedRate()) 
+				+" A" + StringHelper.formatDouble(getAcceleration())
+				+"\n");
 	}
 	
 	// 7.22.6: feedrate changes here
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
-		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
+		String command = isUp?COMMAND_TRAVEL:COMMAND_DRAW;
 		if(zMoved) {
 			command = isUp 
 					? getTravelFeedrateString() 
@@ -657,5 +687,205 @@ public final class Plotter implements Serializable {
 	
 	public double getZFeedrate() {
 		return zFeedrate;
+	}
+	
+	public void render(GL2 gl2) {
+		paintLimits(gl2);
+		
+		hardwareProperties.render(gl2, null);
+	}
+
+	private void paintLimits(GL2 gl2) {
+		gl2.glLineWidth(1);
+
+		gl2.glColor3f(0.7f, 0.7f, 0.7f);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(getLimitLeft(), getLimitTop());
+		gl2.glVertex2d(getLimitRight(), getLimitTop());
+		gl2.glVertex2d(getLimitRight(), getLimitBottom());
+		gl2.glVertex2d(getLimitLeft(), getLimitBottom());
+		gl2.glEnd();
+	}
+
+	public double getPenX() {
+		return penX;
+	}
+
+
+	public double getPenY() {
+		return penY;
+	}
+
+
+	public void setPenX(double px) {
+		penX = px;
+	}
+
+	public void setPenY(double py) {
+		penY = py;
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public boolean isPaused() {
+		return isPaused;
+	}
+
+	public void pause() {
+		if (isPaused)
+			return;
+	
+		isPaused = true;
+		// remember for later if the pen is down
+		penIsUpBeforePause = penIsUp;
+		// raise it if needed.
+		raisePen();
+	}
+
+	public void unPause() {
+		if (!isPaused)
+			return;
+	
+		// if pen was down before pause, lower it
+		if (!penIsUpBeforePause) {
+			lowerPen();
+		}
+	
+		isPaused = false;
+	}
+
+	public void halt() {
+		isRunning = false;
+		isPaused = false;
+		raisePen();
+		
+		notifyListeners("halt", false, true);
+	}
+
+	public void setRunning() {
+		isRunning = true;
+
+		notifyListeners("running", false, true);
+	}
+
+	public void raisePen() {
+		sendLineToRobot(getPenUpString());
+	}
+
+	public void lowerPen() {
+		sendLineToRobot(getPenDownString());
+	}
+
+	public boolean didSetHome() {
+		return didSetHome;
+	}
+
+	public boolean areMotorsEngaged() {
+		return areMotorsEngaged;
+	}
+
+	public boolean isPenUp() {
+		return penIsUp;
+	}
+
+	public void hasSetHome(boolean b) {
+		didSetHome=b;
+	}
+
+	public void disengageMotors() {
+		sendLineToRobot("M18");
+		areMotorsEngaged = false;
+	}
+
+	public void engageMotors() {
+		sendLineToRobot("M17");
+		areMotorsEngaged = true;
+	}
+
+	public void goHome() {
+		sendLineToRobot(COMMAND_TRAVEL+
+				" F"+StringHelper.formatDouble(getTravelFeedRate())
+				+" X"+ StringHelper.formatDouble(getHomeX())
+				+" Y"+ StringHelper.formatDouble(getHomeY()));
+		setPenX(getHomeX());
+		setPenY(getHomeY());
+	}
+
+	public void findHome() {
+		raisePen();
+		sendLineToRobot("G28");
+		setPenX(getHomeX());
+		setPenY(getHomeY());
+	}
+
+	public void setHome() {
+		sendLineToRobot(getGCodeSetPositionAtHome());
+		// save home position
+		sendLineToRobot("D6"
+				+" X" + StringHelper.formatDouble(getHomeX())
+				+" Y" + StringHelper.formatDouble(getHomeY()));
+		setPenX(getHomeX());
+		setPenY(getHomeY());
+		hasSetHome(true);
+	}
+
+	/**
+	 * @param x absolute position in mm
+	 * @param y absolute position in mm
+	 */
+	public void movePenAbsolute(double x, double y) {
+		sendLineToRobot(
+				(isPenUp() 
+					? (penJustMoved ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+					: (penJustMoved ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
+				+ " X" + StringHelper.formatDouble(x) 
+				+ " Y" + StringHelper.formatDouble(y));
+		setPenX(x);
+		setPenY(y);
+	}
+
+	/**
+	 * @param dx relative position in mm
+	 * @param dy relative position in mm
+	 */
+	public void movePenRelative(double dx, double dy) {
+		sendLineToRobot("G91"); // set relative mode
+		sendLineToRobot(
+				(isPenUp()  
+					? (penJustMoved ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+					: (penJustMoved ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
+				+ " X" + StringHelper.formatDouble(dx) 
+				+ " Y" + StringHelper.formatDouble(dy));
+		sendLineToRobot("G90"); // return to absolute mode
+		setPenX(getPenX() + dx);
+		setPenY(getPenY() + dy);
+	}
+
+	public void jogLeftMotorOut() {
+		sendLineToRobot("D00 L400");
+	}
+
+	public void jogLeftMotorIn() {
+		sendLineToRobot("D00 L-400");
+	}
+
+	public void jogRightMotorOut() {
+		sendLineToRobot("D00 R400");
+	}
+
+	public void jogRightMotorIn() {
+		sendLineToRobot("D00 R-400");
+	}
+	
+	protected void rememberRaisedPen() {
+		penJustMoved = !isPenUp();
+		raisePen();
+	}
+	
+	protected void rememberLoweredPen() {
+		penJustMoved = isPenUp();
+		lowerPen();
 	}
 }
