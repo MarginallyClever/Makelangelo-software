@@ -1,9 +1,12 @@
 package com.marginallyclever.makelangelo.robot;
 
 import java.awt.BasicStroke;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -101,6 +104,8 @@ public final class Plotter implements Serializable {
 
 	private boolean penJustMoved;
 	
+	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
+	
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
@@ -128,6 +133,9 @@ public final class Plotter implements Serializable {
 		penIsUp = false;
 		penIsUpBeforePause = false;
 		didSetHome = false;
+
+		setPenX(0);
+		setPenY(0);
 		
 		// default hardware version
 		setHardwareVersion("5");
@@ -887,5 +895,22 @@ public final class Plotter implements Serializable {
 	protected void rememberLoweredPen() {
 		penJustMoved = isPenUp();
 		lowerPen();
+	}
+
+	public void addListener(RobotControllerListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(RobotControllerListener listener) {
+		listeners.remove(listener);
+	}
+
+	
+	// notify PropertyChangeListeners
+	void notifyListeners(String propertyName,Object oldValue,Object newValue) {
+		PropertyChangeEvent e = new PropertyChangeEvent(this,propertyName,oldValue,newValue);
+		for(PropertyChangeListener ear : listeners) {
+			ear.propertyChange(e);
+		}
 	}
 }

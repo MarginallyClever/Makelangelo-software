@@ -55,7 +55,7 @@ public abstract interface PlotterModel {
 	 * custom look and feel for each version
 	 * 
 	 * @param gl2
-	 * @param plotter TODO
+	 * @param plotter
 	 */
 	public void render(GL2 gl2, Plotter plotter);
 

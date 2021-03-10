@@ -600,30 +600,31 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	
 	
 	public static void main(String[] argv) {
+		if(!GraphicsEnvironment.isHeadless()) {
+			System.out.println("Test can only be run on a machine with a head (monitor, HID)");
+			return;
+		}	
+		
 		Log.start();
 		CommandLineOptions.setFromMain(argv);
 		Translator.start();
 		
-		if(GraphicsEnvironment.isHeadless()) {
-			// TODO a text-only interface?
-		} else {			
-			// Schedule a job for the event-dispatching thread:
-			// creating and showing this application's GUI.
-			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					JFrame mainFrame = new JFrame(Translator.get("Makelangelo.menuRobot"));
-					mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// Schedule a job for the event-dispatching thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JFrame mainFrame = new JFrame(Translator.get("Makelangelo.menuRobot"));
+				mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-					RobotController robot = new RobotController();
-					PanelRobot makelangeloRobotPanel = new PanelRobot(mainFrame, robot);
+				RobotController robot = new RobotController();
+				PanelRobot makelangeloRobotPanel = new PanelRobot(mainFrame, robot);
 
-					mainFrame.setContentPane(makelangeloRobotPanel);
-					mainFrame.pack();
-					mainFrame.setVisible(true);
-				}
-			});
-		}
+				mainFrame.setContentPane(makelangeloRobotPanel);
+				mainFrame.pack();
+				mainFrame.setVisible(true);
+			}
+		});
 	}
 
 	@Override
