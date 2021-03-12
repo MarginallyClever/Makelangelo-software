@@ -134,7 +134,7 @@
 
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
+		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</body></html>]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 
@@ -441,13 +441,13 @@
 	</string>
 	<string>
 		<key>collectAnonymousMetrics</key>
-		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
+		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>collectAnonymousMetricsOnUpdate</key>
-		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
+		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -668,7 +668,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
+		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
