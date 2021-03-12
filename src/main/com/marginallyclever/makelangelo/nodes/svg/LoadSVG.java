@@ -160,8 +160,11 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-	    	SVGPointShapeElement pathElement = (SVGPointShapeElement)pathNodes.item( iPathNode );
-	    	SVGPointList pointList = pathElement.getAnimatedPoints();
+	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
+			if(isElementStrokeNone(element)) 
+				continue;
+	    	
+	    	SVGPointList pointList = element.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//Log.message("New Node has "+pathObjects+" elements.");
 
@@ -203,6 +206,8 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 				Element element = (Element)node.item( iPathNode );
+				if(isElementStrokeNone(element)) 
+					continue;
 				double x1=0,y1=0;
 				double x2=0,y2=0;
 				
@@ -219,6 +224,27 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		return true;
 	}
 
+	private boolean isElementStrokeNone(Element element) {
+		if(element.hasAttribute("style")) {
+			// we have a style
+			String style = element.getAttribute("style");
+			// stripe whitespace and smash to lower case
+			style = style.toLowerCase().replace(" ","");
+			// does the style contain "stroke:"?
+			String strokeLabelName="stroke:";
+			if(style.contains(strokeLabelName)) {
+				// is the stroke none?
+				int k = style.indexOf(strokeLabelName);
+				String strokeStyleName = style.substring(k+strokeLabelName.length());
+				System.out.println(strokeStyleName);
+				if(strokeStyleName.startsWith("none"))
+					// it is!  bail.
+					return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Draw rectangles that may have rounded corners.
 	 * given corners
@@ -238,6 +264,9 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 				Element element = (Element)node.item( iPathNode );
+				if(isElementStrokeNone(element)) 
+					continue;
+				
 				double x=0,y=0;
 				double rx=0,ry=0;
 				
@@ -313,6 +342,8 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 				Element element = (Element)node.item( iPathNode );
+				if(isElementStrokeNone(element)) 
+					continue;
 				double cx=0,cy=0,r=0;
 				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
 				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
@@ -337,6 +368,8 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 				Element element = (Element)node.item( iPathNode );
+				if(isElementStrokeNone(element)) 
+					continue;
 				double cx=0,cy=0,rx=0,ry=0;
 				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
 				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
@@ -376,9 +409,11 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 	    		parsePolylineElements(turtle,pathNodes);
 	    		continue;
 	    	}
+	    	SVGOMPathElement element = ((SVGOMPathElement)pathNodes.item( iPathNode ));
+			if(isElementStrokeNone(element)) 
+				continue;
 	    	
-	    	SVGOMPathElement pathElement = ((SVGOMPathElement)pathNodes.item( iPathNode ));
-	    	SVGPathSegList pathList = pathElement.getNormalizedPathSegList();
+	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
 	    	int pathObjects = pathList.getNumberOfItems();
 			//Log.message("Node has "+pathObjects+" elements.");
 
