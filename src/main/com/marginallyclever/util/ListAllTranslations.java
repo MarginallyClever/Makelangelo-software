@@ -1,17 +1,28 @@
 package com.marginallyclever.util;
 
 import java.util.List;
+
+import org.apache.commons.io.output.WriterOutputStream;
+import org.apache.commons.text.StringEscapeUtils;
+
+import com.marginallyclever.core.Translator;
+import com.marginallyclever.core.log.Log;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+//import java.time.LocalDateTime;
+//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
  * Scan all java files in the project, find instances of "Translator.get"+"(\"AAAAA\")" and return the AAAAA part,
- * XML formatted, to the System.out.  You can copy/paste the results to an XML file and start filling in the values.
+ * XML formatted, to the PrintStream.  You can copy/paste the results to an XML file and start filling in the values.
  * Don't forget to change the meta-language and meta-author values!
  * @author Dan Royer
  * @since 7.25.0
@@ -41,35 +52,49 @@ public class ListAllTranslations {
 		rootPath = root;
 	}
 	
-	private void emitXML() {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-		LocalDateTime now = LocalDateTime.now();
+	private void emitXML(PrintStream out) {
 		
-		System.out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		System.out.println("<!DOCTYPE language>");
-		System.out.println("<language>");
-		System.out.println("\t<meta>");
-		System.out.println("\t\t<name>English</name>");
-		System.out.println("\t\t<author>Dan Royer (dan@marginallyclever.com)</author>");
-		System.out.println("\t\t<when>"+dtf.format(now)+"</when>");
-		System.out.println("\t</meta>");
+		out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		out.println("<!DOCTYPE language>");
+		out.println("<language>");
+		out.println("\t<meta>");
+		out.println("\t\t<name>English</name>");
+		out.println("\t\t<author>Dan Royer (dan@marginallyclever.com)</author>");
+
+		//DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+		//LocalDateTime now = LocalDateTime.now();
+		//out.println("\t\t<when>"+dtf.format(now)+"</when>");
+		
+		out.println("\t</meta>");
 
 		for(TranslationKey tk : keys) {
-			System.out.println("\t<string>");
-			System.out.println("\t\t<key>"+tk.myKey+"</key>");
-			System.out.println("\t\t<value></value>");
-			System.out.println("\t\t<src>"+tk.mySrcFile+"</src>");
-			System.out.println("\t</string>");
+			String v = Translator.keyExists(tk.myKey) ? Translator.get(tk.myKey) : "";
+			if(v.contains("<html>")) {
+				v = "<![CDATA["+v+"]]>";
+			}
+			tk.mySrcFile = tk.mySrcFile.replace("\\","/");
+			out.println("\t<string>");
+			out.println("\t\t<key>"+tk.myKey+"</key>");
+			out.println("\t\t<value>"+v+"</value>");
+			out.println("\t\t<src>"+tk.mySrcFile+"</src>");
+			out.println("\t</string>");
 		}
 
-		System.out.println("</language>");
+		out.println("</language>");
 		
 	}
 	
-	private void emitCSV() {
-		System.out.println("File\tKey\tValue");
+	private void emitCSV(PrintStream out) {
+		out.println("File\tKey\tValue");
 		for(TranslationKey tk : keys) {
-			System.out.println(tk.mySrcFile+"\t"+tk.myKey+"\t ");
+			String v = Translator.keyExists(tk.myKey) ? Translator.get(tk.myKey) : "";
+			if(v.contains("<html>")) {
+				v = "<![CDATA["+v+"]]>";
+			} else {
+				v = StringEscapeUtils.unescapeXml(v);
+			}
+			tk.mySrcFile = tk.mySrcFile.replace("\\","/");
+			out.println(tk.mySrcFile+"\t"+tk.myKey+"\t"+v);
 		}
 	}
 	
@@ -121,19 +146,37 @@ public class ListAllTranslations {
 	public static void main(String[] args) {
 		String cwd = System.getProperty("user.dir") + File.separator + "src"+ File.separator +"main";
 		
+		Log.start();
+		Translator.start();
+		
 		ListAllTranslations lat = new ListAllTranslations(cwd);
 		File f = new File(cwd);
 		lat.listFilesForFolder(f);
 		
-		int choice=0;  // default csv
+		int choice=1;  // default csv
 		for( String a : args ) {
 			if(a.contentEquals("csv")) choice=0;
 			if(a.contentEquals("xml")) choice=1;
 		}
-		switch(choice) {
-		case 0:  lat.emitCSV();  break;
-		case 1:  lat.emitXML();  break;
+		
+		PrintStream out;
+		try {
+			PrintWriter pw = new PrintWriter(new File("output.xml"));
+			OutputStream os = new WriterOutputStream( pw, StandardCharsets.UTF_8 );
+			out = new PrintStream(os);
 		}
+		catch(IOException e) {
+			out = System.out;
+		}
+		
+		switch(choice) {
+		case 0:  lat.emitCSV(out);  break;
+		case 1:  lat.emitXML(out);  break;
+		}
+		out.flush();
+		out.close();
+		
+		Log.end();
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.core.node;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -11,8 +11,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import com.marginallyclever.core.Translator;
-import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.node.NodePanel;
 
 /**
  * Show NodePanel with a run/cancel button at the bottom.

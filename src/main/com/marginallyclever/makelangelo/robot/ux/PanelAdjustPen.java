@@ -62,14 +62,14 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 
 		if (subject == buttonTestUp  ) {
 			// must match MakelangeloRobotSettings.getPenUpString()
-			myRobotController.sendLineToRobot(
+			myRobotController.myPlotter.sendLineToRobot(
 				"G00 F" + penZRate.getValue() + " Z" + penUp.getValue() + ";\n"+
 				"G00 F" + maxFeedRate.getValue() + ";\n"
 				);
 		}
 		if (subject == buttonTestDown) {
 			// must match MakelangeloRobotSettings.getPenDownString()
-			myRobotController.sendLineToRobot(
+			myRobotController.myPlotter.sendLineToRobot(
 					"G01 F" + penZRate.getValue() + " Z" + penDown.getValue() + ";\n"+
 					"G01 F" + currentFeedRate.getValue() + ";\n"
 					);

@@ -1772,4 +1772,17 @@
 		<value>Capture photo</value>
 	</string>
 	
+	<string>
+		<key>Makelangelo.menuView</key>
+		<value>View</value>
+	</string>
+	
+	<string>
+		<key>Makelangelo.menuRobot</key>
+		<value>Robot</value>
+	</string>
+	<string>
+		<key>Makelangelo.menuHelp</key>
+		<value>Help</value>
+	</string>
 </language>

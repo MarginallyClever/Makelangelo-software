@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
@@ -72,6 +73,7 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
+import com.marginallyclever.core.node.NodeDialog;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedImage;
@@ -96,7 +98,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler implements WindowListener {
+public final class Makelangelo extends TransferHandler {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -113,7 +115,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private MakelangeloAppPreferences appPreferences;
 	
 	private Camera camera;
-	private RobotController robot;
+	private RobotController robotController;
 
 	private ArrayList<Turtle> myTurtles;
 	
@@ -176,10 +178,10 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
-		robot = new RobotController();
-		logPanel.setRobot(robot);
+		//robotController = new RobotController();
+		//logPanel.setRobot(robotController);
 
-		testGeneratorsAndConverters();
+		//testGeneratorsAndConverters();
 		
 		Log.message("Starting camera...");
 		camera = new Camera();
@@ -239,6 +241,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO add confirm here, just to be safe.
+					
 					newFile();
 				}
 			});
@@ -308,7 +311,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 								}
 								
 								if(myTurtles.size()>0) {
-									robot.setTurtles(myTurtles);
+									robotController.setTurtles(myTurtles);
 								} else {
 									System.out.println("No turtles found!");
 								}
@@ -356,7 +359,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 								}
 								
 								if(myTurtles.size()>0) {
-									robot.setTurtles(myTurtles);
+									robotController.setTurtles(myTurtles);
 								} else {
 									System.out.println("No turtles found!");
 								}
@@ -487,8 +490,8 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			buttonShowUp.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if( robot != null ) {
-						robot.setShowPenUp(!robot.getShowPenUp());
+					if( robotController != null ) {
+						robotController.setShowPenUp(!robotController.getShowPenUp());
 					}
 				};
 			});
@@ -519,9 +522,11 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			buttonZoomToFit.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					camera.zoomToFit(
-							robot.getPaper().getWidth(),
-							robot.getPaper().getHeight());
+					if( robotController != null ) {
+						camera.zoomToFit(
+								robotController.getPaper().getWidth(),
+								robotController.getPaper().getHeight());
+					}
 				};
 			});
 			menu.add(buttonZoomToFit);
@@ -571,10 +576,12 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			buttonRobotSettings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					menuBar.setEnabled(false);
-					SettingsDialog m = new SettingsDialog(robot);
-					m.run(getMainFrame());
-					menuBar.setEnabled(true);
+					if( robotController != null ) {
+						menuBar.setEnabled(false);
+						SettingsDialog m = new SettingsDialog(robotController);
+						m.run(getMainFrame());
+						menuBar.setEnabled(true);
+					}
 				}
 			});
 			
@@ -712,7 +719,12 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.addWindowListener(this);
+		mainFrame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				onClose();
+			}
+		});
 		
 		// overall look and feel 2
         try {
@@ -732,17 +744,22 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			Log.message("  create PreviewPanel...");
 			previewPanel = new OpenGLPanel();
 			previewPanel.setCamera(camera);
-			previewPanel.addListener(robot);
-
+			
+			if(robotController!=null) {
+				previewPanel.addListener(robotController);
+			}
+			
 			contentPane.add(previewPanel);
 			mainFrame.setContentPane(contentPane);
 		}
 		
 		adjustWindowSize();
 
-		camera.zoomToFit(
-				robot.getPaper().getWidth(),
-				robot.getPaper().getHeight());
+		if(robotController!=null) {
+			camera.zoomToFit(
+					robotController.getPaper().getWidth(),
+					robotController.getPaper().getHeight());
+		}
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
@@ -754,7 +771,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	private void runRobotDialog() {
 		menuBar.setEnabled(false);
 
-		PanelRobot myRobotPanel = new PanelRobot(getMainFrame(),robot);
+		PanelRobot myRobotPanel = new PanelRobot(getMainFrame(),robotController);
 		
 		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(getMainFrame().getLocation());
@@ -803,30 +820,28 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 			previewPanel.repaint();
 	}
 
-	@Override
-	public void windowClosing(WindowEvent e) {
-		onClose();
-	}
-
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 
 		if (result == JOptionPane.YES_OPTION) {
-			previewPanel.removeListener(robot);
+			previewPanel.removeListener(robotController);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowRealEstate();
-			robot.getSettings().saveConfig();
+			if(robotController!=null) {
+				robotController.getSettings().saveConfig();
+			}
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
 
-			// Run this on another thread than the AWT event queue to
-			// make sure the call to Animator.stop() completes before
-			// exiting
+			// Run this on another thread than the AWT event queue to make sure the 
+			// call to Animator.stop() completes before exiting
 			new Thread(new Runnable() {
 				public void run() {
+					// stop the animator
 					previewPanel.stop();
+					// throw out the window, which is set to EXIT_ON_CLOSE, which kills the original thread.
 					mainFrame.dispose();
 				}
 			}).start();
@@ -848,30 +863,12 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		preferences.putInt("Default window location y", location.y);
 	}
 
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowClosed(WindowEvent e) {}
-
 	public JFrame getMainFrame() {
 		return mainFrame;
 	}
 
 	public RobotController getRobot() {
-		return robot;
+		return robotController;
 	}
 	
 	// transfer handler
@@ -1019,7 +1016,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,myTurtles,robot);
+					success=lft.save(fileOutputStream,myTurtles,robotController);
 				} catch(IOException e) {
 					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
 					//e.printStackTrace();
@@ -1092,7 +1089,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		}
 		
 		if(myTurtles.size()>0) {
-			robot.setTurtles(myTurtles);
+			robotController.setTurtles(myTurtles);
 		} else {
 			System.out.println("No turtles found!");
 		}
@@ -1101,7 +1098,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	// DO NOT add confirm here, it's too late at this point.
 	private void newFile() {
 		myTurtles.clear();
-		robot.setTurtles(myTurtles);
+		robotController.setTurtles(myTurtles);
 	}
 
 	private void rotateTurtles(double degrees) {
@@ -1127,7 +1124,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double th=top.y-bottom.y;
-		double ph=robot.getPaper().getHeight();
+		double ph=robotController.getPaper().getHeight();
 		double n = ph/th;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1140,7 +1137,7 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double tw=top.x-bottom.x;
-		double pw=robot.getPaper().getWidth();
+		double pw=robotController.getPaper().getWidth();
 		double n = pw/tw;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1572,10 +1569,10 @@ public final class Makelangelo extends TransferHandler implements WindowListener
 	 * crop a set of {@link Turtle} to the page edges.
 	 */
 	private void cropTurtles() {	
-		double yTop    = robot.getPaper().getTop();
-		double yBottom = robot.getPaper().getBottom();
-		double xLeft   = robot.getPaper().getLeft();
-		double xRight  = robot.getPaper().getRight();
+		double yTop    = robotController.getPaper().getTop();
+		double yBottom = robotController.getPaper().getBottom();
+		double xLeft   = robotController.getPaper().getLeft();
+		double xRight  = robotController.getPaper().getRight();
 		
 		for( Turtle t : myTurtles ) {
 			cropOneTurtle(t,xRight,yTop,xLeft,yBottom);

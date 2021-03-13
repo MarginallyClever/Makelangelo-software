@@ -100,7 +100,7 @@ public class TranslatorLanguage {
 	}
 
 	public String get(String key) {
-		if(strings.containsKey(key)) {
+		if(keyExists(key)) {
 			return strings.get(key);
 		} else {
 			return "Missing:"+key;
@@ -143,5 +143,13 @@ public class TranslatorLanguage {
 
 	public String getAuthor() {
 		return author;
+	}
+
+	/**
+	 * @param keyName
+	 * @return true if key exists
+	 */
+	public boolean keyExists(String keyName) {
+		return strings.containsKey(keyName);
 	}
 }

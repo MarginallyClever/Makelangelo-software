@@ -2,10 +2,15 @@ package com.marginallyclever.makelangelo.robot;
 
 import java.awt.BasicStroke;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -15,7 +20,10 @@ import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.core.ColorRGB;
+import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.Point2D;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
@@ -29,7 +37,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * @since before 7.25.0
  */
-public final class Plotter implements Serializable {
+public final class Plotter implements Serializable, NetworkConnectionListener {
 	/**
 	 * 
 	 */
@@ -104,7 +112,17 @@ public final class Plotter implements Serializable {
 
 	private boolean penJustMoved;
 	
-	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
+	private ArrayList<PlotterListener> listeners = new ArrayList<PlotterListener>();
+
+	// Connection state
+	private NetworkConnection connection = null;
+	private boolean portConfirmed;
+
+	// Firmware check
+	private final String versionCheckStart = new String("Firmware v");
+	private boolean firmwareVersionChecked = false;
+	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
+	private boolean hardwareVersionChecked = false;
 	
 	/**
 	 * These values should match https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
@@ -152,6 +170,8 @@ public final class Plotter implements Serializable {
 		
 		// Load most recent config
 		//loadConfig(last_machine_id);
+
+		portConfirmed = false;
 	}
 		
 	public void createNewUID(long newUID) {
@@ -227,45 +247,6 @@ public final class Plotter implements Serializable {
 
 		return -1;
 	}
-
-	/*
-  // TODO finish these cloud storage methods.  Security will be a problem.
-
-   public boolean GetCanUseCloud() {
-    return topLevelMachinesPreferenceNode.getBoolean("can_use_cloud", false);
-  }
-
-
-  public void SetCanUseCloud(boolean b) {
-    topLevelMachinesPreferenceNode.putBoolean("can_use_cloud", b);
-  }
-
-  protected boolean SaveConfigToCloud() {
-    return false;
-  }
-
-
-
-   protected boolean LoadConfigFromCloud() {
-     // Ask for credentials: MC login, password.  auto-remember login name.
-     //String login = new String();
-     //String password = new String();
-
-     //try {
-     // Send query
-     //URL url = new URL("https://marginallyclever.com/drawbot_getmachineconfig.php?name="+login+"pass="+password+"&id="+robot_uid);
-     //URLConnection conn = url.openConnection();
-     //BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-     // read data
-
-     // close connection
-     //rd.close();
-     //} catch (Exception e) {}
-
-    return false;
-  }
-	 */
-
 
 	/**
 	 * Get the UID of every machine this computer recognizes EXCEPT machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
@@ -699,7 +680,6 @@ public final class Plotter implements Serializable {
 	
 	public void render(GL2 gl2) {
 		paintLimits(gl2);
-		
 		hardwareProperties.render(gl2, null);
 	}
 
@@ -897,20 +877,316 @@ public final class Plotter implements Serializable {
 		lowerPen();
 	}
 
-	public void addListener(RobotControllerListener listener) {
+	public void addListener(PlotterListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(RobotControllerListener listener) {
+	public void removeListener(PlotterListener listener) {
 		listeners.remove(listener);
 	}
 
+
+	/**
+	 * Sends a single command the robot. Could be anything.
+	 *
+	 * @param line command to send.
+	 * @return <code>true</code> if command was sent to the robot;
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean sendLineToRobot(String line) {
+		if (getConnection() == null || !isPortConfirmed())
+			return false;
+
+		String reportedline = line;
+		// does it have a checksum? hide it from the log
+		if (reportedline.contains(";")) {
+			String[] lines = line.split(";");
+			reportedline = lines[0];
+		}
+		if (reportedline.trim().isEmpty()) {
+			// nothing to send
+			return false;
+		}
+
+		// remember important status changes
+		
+		if(reportedline.startsWith(getPenUpString())) {
+			rememberRaisedPen();
+		} else if(reportedline.startsWith(getPenDownString())) {
+			rememberLoweredPen();
+		} else if(reportedline.startsWith("M17")) {
+			notifyListeners("motorsEngaged", null, true);
+		} else if(reportedline.startsWith("M18")) {
+			notifyListeners("motorsEngaged", null, false);
+		}
+
+		Log.message(reportedline);
+		
+		// make sure the line has a return on the end
+		if(!line.endsWith("\n")) {
+			line += "\n";
+		}
+
+		try {
+			getConnection().sendMessage(line);
+		} catch (Exception e) {
+			Log.error(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	
+	public NetworkConnection getConnection() {
+		return connection;
+	}
+
+	/**
+	 * @param c the connection. Use null to close the connection.
+	 */
+	public void openConnection(NetworkConnection c) {
+		assert (c != null);
+
+		if (connection != null) {
+			closeConnection();
+		}
+
+		portConfirmed = false;
+		firmwareVersionChecked = false;
+		hardwareVersionChecked = false;
+		this.connection = c;
+		this.connection.addListener(this);
+		try {
+			this.connection.sendMessage("M100\n");
+		} catch (Exception e) {
+			Log.error(e.getMessage());
+		}
+	}
+
+	public void closeConnection() {
+		if (this.connection == null)
+			return;
+
+		this.connection.closeConnection();
+		this.connection.removeListener(this);
+		notifyDisconnected();
+		this.connection = null;
+		this.portConfirmed = false;
+	}
+
+	@Override
+	public void finalize() {
+		if (this.connection != null) {
+			this.connection.removeListener(this);
+		}
+	}
+
+	@Override
+	public void dataAvailable(NetworkConnection arg0, String data) {
+		notifyDataAvailable(data);
+
+		boolean justNow = false;
+
+		// is port confirmed?
+		if (!portConfirmed) {
+			// machine names
+			ServiceLoader<PlotterModel> knownStyles = ServiceLoader.load(PlotterModel.class);
+			Iterator<PlotterModel> i = knownStyles.iterator();
+			while (i.hasNext()) {
+				PlotterModel ms = i.next();
+				String machineTypeName = ms.getHello();
+				if (data.lastIndexOf(machineTypeName) >= 0) {
+					portConfirmed = true;
+					// which machine GUID is this?
+					String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
+					parseRobotUID(afterHello);
+
+					justNow = true;
+					break;
+				}
+			}
+		}
+
+		// is firmware checked?
+		if (!firmwareVersionChecked && data.lastIndexOf(versionCheckStart) >= 0) {
+			String afterV = data.substring(versionCheckStart.length()).trim();
+			long versionFound = Long.parseLong(afterV);
+
+			if (versionFound == expectedFirmwareVersion) {
+				firmwareVersionChecked = true;
+				justNow = true;
+				// request the hardware version of this robot
+				sendLineToRobot("D10\n");
+			} else {
+				notifyFirmwareVersionBad(versionFound);
+			}
+		}
+
+		// is hardware checked?
+		if (!hardwareVersionChecked && data.lastIndexOf("D10") >= 0) {
+			String[] pieces = data.split(" ");
+			if (pieces.length > 1) {
+				String last = pieces[pieces.length - 1];
+				last = last.replace("\r\n", "");
+				if (last.startsWith("V")) {
+					String hardwareVersion = last.substring(1);
+
+					setHardwareVersion(hardwareVersion);
+					hardwareVersionChecked = true;
+					justNow = true;
+				}
+			}
+		}
+
+		if (justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
+			// send whatever config settings I have for this machine.
+			sendConfig();
+			
+			// tell everyone I've confirmed connection.
+			notifyConnectionConfirmed();
+		}
+	}
+
+	public boolean isPortConfirmed() {
+		return portConfirmed;
+	}
+
+	private void parseRobotUID(String line) {
+		saveConfig();
+
+		// get the UID reported by the robot
+		String[] lines = line.split("\\r?\\n");
+		long newUID = -1;
+		if (lines.length > 0) {
+			try {
+				newUID = Long.parseLong(lines[0]);
+			} catch (NumberFormatException e) {
+				Log.error("UID parsing: " + e.getMessage());
+			}
+		}
+
+		// new robots have UID<=0
+		if (newUID <= 0) {
+			newUID = getNewRobotUID();
+			if(newUID!=0) {
+				createNewUID(newUID);
+			}
+		}
+
+		// load machine specific config
+		loadConfig(newUID);
+	}
+
+	@Override
+	public void sendBufferEmpty(NetworkConnection arg0) {
+		notifySendBufferEmpty();
+	}
+
+	@Override
+	public void lineError(NetworkConnection arg0, int lineNumber) {
+		notifyLineError(lineNumber);
+	}
+
+	/**
+	 * Send the machine configuration to the robot.
+	 */
+	public void sendConfig() {
+		if (getConnection() != null && !isPortConfirmed())
+			return;
+
+		String config = getGCodeConfig();
+		String[] lines = config.split("\n");
+
+		for (int i = 0; i < lines.length; ++i) {
+			sendLineToRobot(lines[i] + "\n");
+		}
+		setHome();
+		sendLineToRobot("G0"
+				+" F" + StringHelper.formatDouble(getTravelFeedRate()) 
+				+" A" + StringHelper.formatDouble(getAcceleration())
+				+"\n");
+	}
 	
 	// notify PropertyChangeListeners
 	void notifyListeners(String propertyName,Object oldValue,Object newValue) {
 		PropertyChangeEvent e = new PropertyChangeEvent(this,propertyName,oldValue,newValue);
-		for(PropertyChangeListener ear : listeners) {
+		for(PlotterListener ear : listeners) {
 			ear.propertyChange(e);
 		}
+	}
+	
+	// Notify when unknown robot connected so that Makelangelo GUI can respond.
+	private void notifyConnectionConfirmed() {
+		for (PlotterListener listener : listeners) {
+			listener.connectionConfirmed(this);
+		}
+	}
+
+	// Notify when unknown robot connected so that Makelangelo GUI can respond.
+	private void notifyFirmwareVersionBad(long versionFound) {
+		for (PlotterListener listener : listeners) {
+			listener.firmwareVersionBad(this, versionFound);
+		}
+	}
+
+	private void notifyDataAvailable(String data) {
+		for (PlotterListener listener : listeners) {
+			listener.dataAvailable(this, data);
+		}
+	}
+
+	private void notifySendBufferEmpty() {
+		for (PlotterListener listener : listeners) {
+			listener.sendBufferEmpty(this);
+		}
+	}
+
+	private void notifyLineError(int lineNumber) {
+		for (PlotterListener listener : listeners) {
+			listener.lineError(this, lineNumber);
+		}
+	}
+
+	private void notifyDisconnected() {
+		for (PlotterListener listener : listeners) {
+			listener.disconnected(this);
+		}
+	}
+
+	/**
+	 * Make a request to the GUID server and parse the results.
+	 * If there is an {@link Exception} the details will appear in the {@link Log} output. 
+	 * @return the new UID on success.  0 on failure.
+	 */
+	private long getNewRobotUID() {
+		long newUID = 0;
+
+		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
+		if (!pleaseGetAGUID)
+			return 0;
+
+		Log.message("Requesting universal ID from server.");
+		try {
+			// Send request.  This url is broken up to prevent code scanners spotting it in open source repositories.
+			URL url = new URL("htt"+"ps://www.marginally"+"clever.com/drawbot_getuid.p"+"hp");
+			URLConnection conn = url.openConnection();
+			// read results
+			InputStream connectionInputStream = conn.getInputStream();
+			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
+			BufferedReader rd = new BufferedReader(inputStreamReader);
+			String line = rd.readLine();
+			Log.message("Server says: '" + line + "'");
+			newUID = Long.parseLong(line);
+			// did read go ok?
+			if (newUID != 0) {
+				// Tell the robot it's new UID.
+				sendLineToRobot("UID " + newUID);
+			}
+		} catch (Exception e) {
+			Log.error("UID request error: " + e.getMessage());
+			return 0;
+		}
+
+		return newUID;
 	}
 }

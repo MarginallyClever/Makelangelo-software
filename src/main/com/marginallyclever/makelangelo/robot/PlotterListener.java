@@ -8,17 +8,17 @@ import java.beans.PropertyChangeListener;
  * @since before 7.25.0
  *
  */
-public abstract interface RobotControllerListener extends PropertyChangeListener {
+public abstract interface PlotterListener extends PropertyChangeListener {
 	// called when live robot is ready to receive more commands.
-	public void sendBufferEmpty(RobotController r);
+	public void sendBufferEmpty(Plotter r);
 	// called whenever data arrives from serial connection, regardless of confirmation.
-	public void dataAvailable(RobotController r,String data);
+	public void dataAvailable(Plotter r,String data);
 	// called when robot connection is disconnected
-	public void disconnected(RobotController r);
+	public void disconnected(Plotter r);
 	// called when live robot has detected an error in the transmission
-	public void lineError(RobotController r,int lineNumber);
+	public void lineError(Plotter r,int lineNumber);
 	// called when the firmware on the robot is detected as out of date
-	public void firmwareVersionBad(RobotController r,long versionFound);
+	public void firmwareVersionBad(Plotter r,long versionFound);
 	// called when robot connection is confirmed.  connection is open to a valid robot with good hardware and firmware.
-	public void connectionConfirmed(RobotController r);
+	public void connectionConfirmed(Plotter r);
 }

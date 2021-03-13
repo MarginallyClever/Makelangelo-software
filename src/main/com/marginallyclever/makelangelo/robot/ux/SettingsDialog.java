@@ -82,7 +82,7 @@ public class SettingsDialog {
 			panelAdjustPaper.save();
 			panelAdjustPen.save();
 			myRobotController.getSettings().saveConfig();
-			myRobotController.sendConfig();
+			myRobotController.myPlotter.sendConfig();
 		} else {
 			myRobotController.getSettings().setHardwareVersion(originalHardwareVersion);
 		}

@@ -155,7 +155,7 @@ public class LogPanel extends JPanel implements LogListener {
 	
 	public void sendCommand() {
 		if(robot != null) {
-			robot.sendLineToRobot(commandLineText.getText());
+			robot.myPlotter.sendLineToRobot(commandLineText.getText());
 		}
 		commandLineText.setText("");
 	}

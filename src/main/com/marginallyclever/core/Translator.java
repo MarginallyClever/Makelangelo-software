@@ -83,47 +83,35 @@ public final class Translator {
 		loadLanguages();
 		loadConfig();
 
-		if (isThisTheFirstTimeLoadingLanguageFiles()) {
+		if(!doesLanguagePreferenceExist()) {
 			LanguagePreferences.chooseLanguage();
 		}
 	}
 	
-
-	/**
-	 * @return true if this is the first time loading language files (probably on install)
-	 */
-	static private boolean isThisTheFirstTimeLoadingLanguageFiles() {
-		// Did the language file disappear?  Offer the language dialog.
-		try {
-			if (doesLanguagePreferenceExist()) {
-				return false;
-			}
-		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
-		}
-		return true;
-	}
-
 	/**
 	 * @return true if a preferences node exists
 	 * @throws BackingStoreException
 	 */
-	static private boolean doesLanguagePreferenceExist() throws BackingStoreException {
-		if (Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
-			return true;
+	static private boolean doesLanguagePreferenceExist() {
+		try {
+			if (Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
+				return true;
+			}
+		} catch (BackingStoreException e) {
+			Log.error(e.getMessage());
 		}
 		return false;
 	}
 
 	/**
-	 * save the user's current langauge choice
+	 * Save the user's current language choice
 	 */
 	static public void saveConfig() {
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
-	 * load the user's language choice
+	 * Load the user's language choice
 	 */
 	static public void loadConfig() {
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
@@ -180,7 +168,7 @@ public final class Translator {
 						try {
 							lang.loadFromInputStream(stream);
 						} catch(Exception e) {
-							Log.error("Failed to load "+actualFilename);
+							Log.error("Failed to load "+actualFilename+":"+ e.getLocalizedMessage());
 							// if the xml file is invalid then an exception can occur.
 							// make sure lang is empty in case of a partial-load failure.
 							lang = new TranslatorLanguage();
@@ -226,13 +214,21 @@ public final class Translator {
 	}
 
 	/**
-	 * @param key name of key to find in translation list
+	 * @param keyName name of key to find in translation list
 	 * @return the translated value for key, or "missing:key".
 	 */
-	static public String get(String key) {
-		return languages.get(currentLanguage).get(key);
+	static public String get(String keyName) {
+		return languages.get(currentLanguage).get(keyName);
 	}
 
+	/*
+	 * @param keyName
+	 * @return true if key exists
+	 */
+	static public boolean keyExists(String keyName) {
+		return languages.get(currentLanguage).keyExists(keyName);
+	}
+	
 	/**
 	 * Translates a string and fills in some details.  String contains the special character sequence "%N", where N is the n-th parameter passed to get()
 	 * A %1 is replaced with the first parameter, %2 with the second, and so on.  There is no escape character.

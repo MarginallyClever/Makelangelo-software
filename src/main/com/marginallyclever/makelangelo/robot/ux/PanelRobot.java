@@ -30,7 +30,8 @@ import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
 import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.RobotControllerListener;
+import com.marginallyclever.makelangelo.robot.Plotter;
+import com.marginallyclever.makelangelo.robot.PlotterListener;
 import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
 
 /**
@@ -39,7 +40,7 @@ import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class PanelRobot extends JPanel implements ActionListener, RobotControllerListener {
+public class PanelRobot extends JPanel implements ActionListener, PlotterListener {
 	/**
 	 *
 	 */
@@ -216,7 +217,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
 					myRobotController.myPlotter.halt();
-					myRobotController.closeConnection();
+					myRobotController.myPlotter.closeConnection();
 					buttonConnect.setText(Translator.get("ButtonConnect"));
 					buttonConnect.setForeground(Color.GREEN);
 					isConnected=false;
@@ -228,7 +229,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 						Log.message("Connected.");
 						buttonConnect.setText(Translator.get("ButtonDisconnect"));
 						buttonConnect.setForeground(Color.RED);
-						myRobotController.openConnection( s );
+						myRobotController.myPlotter.openConnection( s );
 					}
 					isConnected=true;
 				}
@@ -474,9 +475,9 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			
 			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
 			boolean state=false;
-			if( myRobotController.getConnection() == null ) state=true;
-			else if( myRobotController.getConnection().isOpen() == false ) state=true;
-			else if( myRobotController.isPortConfirmed() == false ) state=true;
+			if( myRobotController.myPlotter.getConnection() == null ) state=true;
+			else if( myRobotController.myPlotter.getConnection().isOpen() == false ) state=true;
+			else if( myRobotController.myPlotter.isPortConfirmed() == false ) state=true;
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener(new ItemListener() {
@@ -526,7 +527,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 			if (lineNumber != -1) {
 				if(p.findPreviousPenDown==false) {
 					if(p.addPenDownCommand==true) {
-						myRobotController.sendLineToRobot(myRobotController.getSettings().getPenDownString());
+						myRobotController.myPlotter.sendLineToRobot(myRobotController.getSettings().getPenDownString());
 					}
 					myRobotController.startAt(lineNumber);
 				} else {
@@ -550,7 +551,7 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 		boolean didSetHome=false;
 				
 		if(myRobotController!=null) {
-			isConfirmed = myRobotController.isPortConfirmed();
+			isConfirmed = myRobotController.myPlotter.isPortConfirmed();
 			isRunning = myRobotController.myPlotter.isRunning();
 			didSetHome = myRobotController.myPlotter.didSetHome();
 		}
@@ -628,10 +629,10 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	}
 
 	@Override
-	public void connectionConfirmed(RobotController r) {
-		String hardwareVersion = r.getSettings().getHardwareVersion();
+	public void connectionConfirmed(Plotter r) {
+		String hardwareVersion = r.getHardwareVersion();
 		onConnect();
-		r.getSettings().setHardwareVersion(hardwareVersion);
+		r.setHardwareVersion(hardwareVersion);
 		
 		if (parentFrame != null) {
 			parentFrame.invalidate();
@@ -640,25 +641,25 @@ public class PanelRobot extends JPanel implements ActionListener, RobotControlle
 	}
 
 	@Override
-	public void firmwareVersionBad(RobotController r, long versionFound) {
+	public void firmwareVersionBad(Plotter r, long versionFound) {
 		(new DialogBadFirmwareVersion()).display(parentFrame, Long.toString(versionFound));
 	}
 
 	@Override
-	public void dataAvailable(RobotController r, String data) {
+	public void dataAvailable(Plotter r, String data) {
 		if (data.endsWith("\n"))
 			data = data.substring(0, data.length() - 1);
 		Log.message(data); // #ffa500 = orange
 	}
 
 	@Override
-	public void sendBufferEmpty(RobotController r) {}
+	public void sendBufferEmpty(Plotter r) {}
 
 	@Override
-	public void lineError(RobotController r, int lineNumber) {}
+	public void lineError(Plotter r, int lineNumber) {}
 
 	@Override
-	public void disconnected(RobotController r) {
+	public void disconnected(Plotter r) {
 		if (parentFrame != null) {
 			parentFrame.invalidate();
 		}
