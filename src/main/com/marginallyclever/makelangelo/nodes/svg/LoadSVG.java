@@ -2,9 +2,6 @@ package com.marginallyclever.makelangelo.nodes.svg;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -37,9 +34,8 @@ import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.RobotController;
 
 /**
  * Reads in SVG file and converts it to a {@code Turtle}
@@ -47,7 +43,7 @@ import com.marginallyclever.makelangelo.robot.RobotController;
  * @author Dan Royer
  * @Since 7.25.0
  */
-public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
+public class LoadSVG extends TurtleGenerator implements LoadFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadSVG.filter"), "svg");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadSVG.inputFile",filter,""); 
 	
@@ -68,12 +64,6 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
-	}
-
-	
-	@Override
-	public boolean canLoad() {
-		return true;
 	}
 
 	@Override
@@ -595,25 +585,5 @@ public class LoadSVG extends TurtleGenerator implements LoadAndSaveFile {
 		}
 
 		return ret;
-	}
-	  
-	@Override
-	public boolean canSave() {
-		return false;
-	}
-	
-	@Override
-	public boolean canSave(String filename) {
-		return false;
-	}
-
-	/**
-	 * @param outputStream where to write the data
-	 * @param robot the robot from which the data is obtained
-	 * @return true if save succeeded.
-	 */
-	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
-		return false;
 	}
 }

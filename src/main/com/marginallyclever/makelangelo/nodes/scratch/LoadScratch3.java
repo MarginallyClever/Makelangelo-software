@@ -32,10 +32,10 @@ import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodePanel;
 import com.marginallyclever.core.turtle.Turtle;
+import com.marginallyclever.makelangelo.RobotController;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.RobotController;
 
 /**
  * LoadAndSaveSB3 loads limited set of Scratch commands into memory. 
@@ -47,7 +47,7 @@ import com.marginallyclever.makelangelo.robot.RobotController;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
+public class LoadScratch3 extends TurtleGenerator implements LoadFile {
 
 	private final String PROJECT_JSON = "project.json";
 		
@@ -102,16 +102,6 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 	}
 
 	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
-	}
-	
-	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
 	}
@@ -122,12 +112,6 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
 
-	@Override
-	public boolean canSave(String filename) {
-		return false;
-	}
-
-	
 	@Override
 	public boolean load(InputStream in) {
 		Log.message(Translator.get("LoadScratch3.fileType"));
@@ -886,10 +870,5 @@ public class LoadScratch3 extends TurtleGenerator implements LoadAndSaveFile {
 		}
 
 		return listIndex;
-	}
-	
-	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
-		return true;
 	}
 }

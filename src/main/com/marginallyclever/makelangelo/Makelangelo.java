@@ -28,26 +28,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -56,12 +51,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector3d;
+
+import org.apache.batik.ext.swing.JAffineTransformChooser.Dialog;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.core.Clipper2D;
@@ -79,17 +78,15 @@ import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
+import com.marginallyclever.makelangelo.nodes.SaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 import com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTriangle;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
-import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.Plotter;
-import com.marginallyclever.makelangelo.robot.ux.PanelRobot;
-import com.marginallyclever.makelangelo.robot.ux.SettingsDialog;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -107,12 +104,13 @@ public final class Makelangelo extends TransferHandler {
 	 */
 	public String VERSION;
 	
-	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
 	// only used on first run.
 	private final static int DEFAULT_WINDOW_WIDTH = 1200;
 	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	private MakelangeloAppPreferences appPreferences;
+	private AllPlotters allPlotters;
+	private Plotter activePlotter;
 	
 	private Camera camera;
 	private RobotController robotController;
@@ -177,6 +175,11 @@ public final class Makelangelo extends TransferHandler {
 		appPreferences = new MakelangeloAppPreferences(this);
 
 		Log.message("Starting robot...");
+		allPlotters = new AllPlotters();
+		if(allPlotters.length()>0) {
+			setActivePlotter(allPlotters.get(0));
+		}
+		
 		// create a robot and listen to it for important news
 		//robotController = new RobotController();
 		//logPanel.setRobot(robotController);
@@ -199,8 +202,10 @@ public final class Makelangelo extends TransferHandler {
 		checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-		if (preferences.getBoolean("Check for updates", false))
-			checkForUpdate(true);
+		if (preferences.getBoolean("Check for updates", false)) {
+			ActionCheckForUpdate a = new ActionCheckForUpdate(mainFrame,VERSION);
+			a.checkForUpdate(true);
+		}
 	}
 
 	// check if we need to ask about sharing
@@ -240,9 +245,15 @@ public final class Makelangelo extends TransferHandler {
 			buttonNew.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO add confirm here, just to be safe.
-					
-					newFile();
+					// confirm here, just to be safe.
+					int result = JOptionPane.showConfirmDialog(
+							mainFrame, 
+							Translator.get("AreYouSure"),
+							Translator.get("AreYouSure"),
+							JOptionPane.YES_NO_OPTION); 
+					if(result==JOptionPane.YES_OPTION) {
+						newFile();
+					}
 				}
 			});
 			menu.add(buttonNew);
@@ -279,6 +290,73 @@ public final class Makelangelo extends TransferHandler {
 			menu.add(buttonExit);
 		}
 
+		// robot menu
+		{
+			Log.message("  robot...");
+			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
+
+			// list 10 most recent robot profiles, select first.
+			int count = allPlotters.length();
+			if(count>0) {
+				ButtonGroup group = new ButtonGroup();
+				JRadioButtonMenuItem [] favorites = new JRadioButtonMenuItem[10];
+				int i;
+				for(i=0;i<favorites.length;++i) {
+					Plotter p = allPlotters.get(i);
+					String name = p.getName()+" "+p.getUID();
+					favorites[i] = new JRadioButtonMenuItem(name);
+					group.add(favorites[i]);
+					menu.add(favorites[i]);
+					favorites[i].addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							setActivePlotter(p);
+						}
+					});
+					favorites[i].setSelected(p.getUID()==activePlotter.getUID());
+				}
+				menu.add(new JSeparator());
+			}
+			JMenuItem buttonManage = new JMenuItem(Translator.get("Makelangelo.manageMachines"));
+			menu.add(buttonManage);
+			buttonManage.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JPanel managePane = new PanelManageMachines(allPlotters); 
+					JDialog manageDialog = new JDialog(mainFrame,Translator.get("Makelangelo.manageMachines"),true);
+					manageDialog.setContentPane(managePane);
+					manageDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					manageDialog.pack();
+					manageDialog.setVisible(true);
+				}
+			});
+			menu.add(buttonManage);
+			/*
+			JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
+			menu.add(buttonRobotSettings);
+			buttonRobotSettings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if( robotController != null ) {
+						menuBar.setEnabled(false);
+						DialogMachineSettings m = new DialogMachineSettings(mainFrame,Translator.get("Makelangelo.robotSettings"));
+						m.run(robotController);
+						menuBar.setEnabled(true);
+					}
+				}
+			});*/
+			
+			JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
+			menu.add(buttonShowRobotPanel);
+			buttonShowRobotPanel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					runRobotDialog();
+				}
+			});
+			menuBar.add(menu);
+		}
+		
 		// generate
 		{
 			Log.message("  generate...");
@@ -288,7 +366,6 @@ public final class Makelangelo extends TransferHandler {
 			ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
 			for( TurtleGenerator node : service ) {
 				JMenuItem item = new JMenuItem(node.getName());
-				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
@@ -335,7 +412,6 @@ public final class Makelangelo extends TransferHandler {
 			ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
 			for( ImageConverter node : service ) {
 				JMenuItem item = new JMenuItem(node.getName());
-				// TODO add tooltip text?
 				menu.add(item);
 				item.addActionListener(new ActionListener() {
 					@Override
@@ -524,8 +600,8 @@ public final class Makelangelo extends TransferHandler {
 				public void actionPerformed(ActionEvent e) {
 					if( robotController != null ) {
 						camera.zoomToFit(
-								robotController.getPaper().getWidth(),
-								robotController.getPaper().getHeight());
+							robotController.getPaper().getWidth(),
+							robotController.getPaper().getHeight());
 					}
 				};
 			});
@@ -566,73 +642,15 @@ public final class Makelangelo extends TransferHandler {
 			menu.add(buttonViewLog);
 		}
 		
-		// robot menu
-		{
-			Log.message("  robot...");
-			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
-			
-			JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
-			menu.add(buttonRobotSettings);
-			buttonRobotSettings.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if( robotController != null ) {
-						menuBar.setEnabled(false);
-						SettingsDialog m = new SettingsDialog(robotController);
-						m.run(getMainFrame());
-						menuBar.setEnabled(true);
-					}
-				}
-			});
-			
-			JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
-			menu.add(buttonShowRobotPanel);
-			buttonShowRobotPanel.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					runRobotDialog();
-				}
-			});
-			menuBar.add(menu);
-		}
-		
 		// help menu
 		{
 			Log.message("  help...");
 			menu = new JMenu(Translator.get("Makelangelo.menuHelp"));
 			menuBar.add(menu);
 	
-			JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
-			buttonForums.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					try {
-						java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-			});
-			menu.add(buttonForums);
-			
-			JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-			buttonCheckForUpdate.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					checkForUpdate(false);
-				}
-			});
-			menu.add(buttonCheckForUpdate);
-			
-			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-			buttonAbout.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					DialogAbout a = new DialogAbout();
-					a.display(mainFrame,VERSION);
-				}
-			});
-			menu.add(buttonAbout);
+			menu.add(new JMenuItem(new ActionOpenForum()));
+			menu.add(new JMenuItem(new ActionCheckForUpdate(mainFrame,VERSION)));
+			menu.add(new JMenuItem(new ActionAbout(mainFrame,VERSION)));
 		}
 		
 		// finish
@@ -642,71 +660,30 @@ public final class Makelangelo extends TransferHandler {
 		return menuBar;
 	}
 
-	/**
-	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
-	 * redirect notice to find the latest release tag.
-	 */
-	public void checkForUpdate(boolean announceIfFailure) {
-		Log.message("checking for updates...");
-		try {
-			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
-			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
-			conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
-			HttpURLConnection.setFollowRedirects(false);
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-			String inputLine = in.readLine();
-			if (inputLine == null) {
-				throw new Exception("Could not read from update server.");
+	protected void setActivePlotter(Plotter p) {
+		if(previewPanel!=null) {
+			previewPanel.removeListener(activePlotter);
+		}
+		
+		if(activePlotter != p) {
+			activePlotter = p;
+			// PropertyChangeEvent here?
+			if(activePlotter!=null) {
+				System.out.println("Changing active plotter to "+p.getName());
 			}
-
-			// parse the URL in the text-only redirect
-			String matchStart = "<a href=\"";
-			String matchEnd = "\">";
-			int start = inputLine.indexOf(matchStart);
-			int end = inputLine.indexOf(matchEnd);
-			if (start != -1 && end != -1) {
-				String line2 = inputLine.substring(start + matchStart.length(), end);
-				// parse the last part of the redirect URL, which contains the
-				// release tag (which is the VERSION)
-				line2 = line2.substring(line2.lastIndexOf("/") + 1);
-
-				Log.message("latest release: " + line2 + "; this version: " + VERSION);
-				// Log.message(inputLine.compareTo(VERSION));
-
-				int comp = line2.compareTo(VERSION);
-				String results;
-				if (comp > 0) {
-					results = Translator.get("Makelangelo.updateNotice");
-					// TODO downloadUpdate(), updateThisApp();
-				} else if (comp < 0)
-					results = "This version is from the future?!";
-				else
-					results = Translator.get("Makelangelo.upToDate");
-
-				JOptionPane.showMessageDialog(mainFrame, results);
+		}
+		
+		if(previewPanel!=null) {
+			previewPanel.addListener(activePlotter);
+			
+			// new plotter?  recenter and rezoom camera.
+			if(activePlotter!=null) {
+				camera.zoomToFit(
+						activePlotter.getWidth(),
+						activePlotter.getHeight());
 			}
-			in.close();
-		} catch (Exception e) {
-			if (announceIfFailure) {
-				JOptionPane.showMessageDialog(null, Translator.get("Makelangelo.updateCheckFailed"));
-			}
-			e.printStackTrace();
 		}
 	}
-
-	
-	/**
-	 * See
-	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
-	 * java/
-	 *//*
-	 * private void downloadUpdate() { String[] run =
-	 * {"java","-jar","updater/update.jar"}; try {
-	 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
-	 * ex.printStackTrace(); } System.exit(0); }
-	 */
-
 
 	/**
 	 *  For thread safety this method should be invoked from the event-dispatching thread.
@@ -744,6 +721,8 @@ public final class Makelangelo extends TransferHandler {
 			Log.message("  create PreviewPanel...");
 			previewPanel = new OpenGLPanel();
 			previewPanel.setCamera(camera);
+
+			setActivePlotter(activePlotter);
 			
 			if(robotController!=null) {
 				previewPanel.addListener(robotController);
@@ -755,12 +734,6 @@ public final class Makelangelo extends TransferHandler {
 		
 		adjustWindowSize();
 
-		if(robotController!=null) {
-			camera.zoomToFit(
-					robotController.getPaper().getWidth(),
-					robotController.getPaper().getHeight());
-		}
-		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
 
@@ -908,55 +881,34 @@ public final class Makelangelo extends TransferHandler {
 
         return openFileOnDemand(filename);
     }
-	
 
-
-	/**
-	 * Open a file with a given LoadAndSaveFileType plugin.  
-	 * The loader might spawn a new thread and return before the load is actually finished.
-	 * @param filename absolute path of the file to load
-	 * @param loader the plugin to use
-	 * @return true if load is successful.
-	 */
-	private boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFile loader) {
-		boolean success = false;
-		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-
-		// TODO don't rely on success to be true, load may not have finished yet.
-		if (success == true) {
-			SoundSystem.playConversionFinishedSound();
-		}
-		
-		return success;
-	}
-	
 	/**
 	 * User has asked that a file be opened.
+	 * find the LoadAndSaveFileType plugin that can do it, and then try.  
+	 * The loader might spawn a new thread and return before the load is actually finished.
 	 * @param filename the file to be opened.
 	 * @return true if file was loaded successfully.  false if it failed.
 	 */
 	public boolean openFileOnDemand(String filename) {
-		Log.message(Translator.get("OpeningFile") + filename + "...");
+		Log.message(Translator.get("OpeningFile",filename));
 
-		ServiceLoader<LoadAndSaveFile> imageLoaders = ServiceLoader.load(LoadAndSaveFile.class);
-		Iterator<LoadAndSaveFile> i = imageLoaders.iterator();
-		while(i.hasNext()) {
-			LoadAndSaveFile loader = i.next();
-			if(!loader.canLoad()) continue;  // TODO feels redundant given the next line
+		ServiceLoader<LoadFile> imageLoaders = ServiceLoader.load(LoadFile.class);
+		for( LoadFile loader : imageLoaders ) {
+			// Can you load this file?
 			if(!loader.canLoad(filename)) continue;
-			
-			return openFileOnDemandWithLoader(filename,loader);
+
+			try (final InputStream fileInputStream = new FileInputStream(filename)) {
+				boolean success=loader.load(fileInputStream);
+				return success;
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		Log.error(Translator.get("UnknownFileType"));
 		return false;
 	}
 
-	
 	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
 		if(!a.getDescription().equals(b.getDescription())) return false;
 		String [] aa = a.getExtensions();
@@ -973,12 +925,10 @@ public final class Makelangelo extends TransferHandler {
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
 		
-		ServiceLoader<LoadAndSaveFile> imageSavers = ServiceLoader.load(LoadAndSaveFile.class);
-		for( LoadAndSaveFile lft : imageSavers ) {
-			if(lft.canSave()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
+		ServiceLoader<SaveFile> imageSavers = ServiceLoader.load(SaveFile.class);
+		for( SaveFile saver : imageSavers ) {
+			FileFilter filter = saver.getFileNameFilter();
+			fc.addChoosableFileFilter(filter);
 		}
 		
 		// do not allow wild card (*.*) file extensions
@@ -992,13 +942,13 @@ public final class Makelangelo extends TransferHandler {
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			for( LoadAndSaveFile lft : imageSavers ) {
-				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
+			for( SaveFile saver : imageSavers ) {
+				FileNameExtensionFilter filter = (FileNameExtensionFilter)saver.getFileNameFilter();
 				//if(!filter.accept(new File(selectedFile))) {
 				if( !isMatchingFileFilter(selectedFilter,filter) ) {
 					continue;
 				}
-					
+				
 				// make sure a valid extension is added to the file.
 				String selectedFileLC = selectedFile.toLowerCase();
 				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
@@ -1016,7 +966,7 @@ public final class Makelangelo extends TransferHandler {
 				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,myTurtles,robotController);
+					success=saver.save(fileOutputStream,myTurtles,robotController);
 				} catch(IOException e) {
 					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
 					//e.printStackTrace();

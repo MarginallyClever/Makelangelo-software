@@ -1,9 +1,0 @@
-com.marginallyclever.makelangelo.nodes.dxf.LoadDXF
-com.marginallyclever.makelangelo.nodes.dxf.SaveDXF
-com.marginallyclever.makelangelo.nodes.svg.LoadSVG
-com.marginallyclever.makelangelo.nodes.svg.SaveSVG
-com.marginallyclever.makelangelo.nodes.gcode.LoadGCode
-com.marginallyclever.makelangelo.nodes.gcode.SaveGCode
-com.marginallyclever.makelangelo.nodes.scratch.LoadScratch2
-
-#com.marginallyclever.makelangelo.nodes.scratch.LoadScratch3

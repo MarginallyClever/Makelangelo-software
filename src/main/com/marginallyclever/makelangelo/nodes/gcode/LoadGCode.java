@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.gcode;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -12,16 +10,15 @@ import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.RobotController;
 
 /**
  * LoadGCode loads gcode into memory. 
  * @author Dan Royer
  *
  */
-public class LoadGCode extends TurtleGenerator implements LoadAndSaveFile {
+public class LoadGCode extends TurtleGenerator implements LoadFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadGCode.filter"), "ngc");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadGCode.inputFile",filter,""); 
 	
@@ -41,26 +38,11 @@ public class LoadGCode extends TurtleGenerator implements LoadAndSaveFile {
 	}
 	
 	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
-	}
-
-	@Override
 	public boolean canLoad(String filename) {
-		return false;
-	}
-
-	@Override
-	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
-	
+
 	// search all tokens for one that starts with key and return it.
 	protected String tokenExists(String key,String[] tokens) {
 		for( String t : tokens ) {
@@ -213,10 +195,5 @@ public class LoadGCode extends TurtleGenerator implements LoadAndSaveFile {
 
 		outputTurtle.setValue(turtle);
 		return true;
-	}
-
-	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
-		return false;
 	}
 }

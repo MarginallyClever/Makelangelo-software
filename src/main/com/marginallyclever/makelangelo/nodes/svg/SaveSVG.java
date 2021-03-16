@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.svg;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -16,8 +15,8 @@ import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.RobotController;
+import com.marginallyclever.makelangelo.nodes.SaveFile;
 
 /**
  * Saves {@code Turtle} to SVG
@@ -25,7 +24,7 @@ import com.marginallyclever.makelangelo.robot.RobotController;
  * @author Dan Royer
  * @Since 7.25.0
  */
-public class SaveSVG extends Node implements LoadAndSaveFile {
+public class SaveSVG extends Node implements SaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadSVG.filter"), "svg");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("SaveSVG.inputFile",filter,""); 
 	
@@ -47,27 +46,6 @@ public class SaveSVG extends Node implements LoadAndSaveFile {
 		return filter;
 	}
 
-	
-	@Override
-	public boolean canLoad() {
-		return false;
-	}
-
-	@Override
-	public boolean canLoad(String filename) {
-		return false;
-	}
-
-	@Override
-	public boolean load(InputStream in) {
-		return false;
-	}
-	  
-	@Override
-	public boolean canSave() {
-		return true;
-	}
-	
 	@Override
 	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));

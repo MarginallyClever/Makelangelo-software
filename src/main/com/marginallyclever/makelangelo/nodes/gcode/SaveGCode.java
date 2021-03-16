@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.gcode;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -14,16 +13,16 @@ import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.RobotController;
-import com.marginallyclever.makelangelo.robot.Plotter;
+import com.marginallyclever.makelangelo.RobotController;
+import com.marginallyclever.makelangelo.nodes.SaveFile;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 
 /**
  * LoadGCode loads gcode into memory. 
  * @author Dan Royer
  *
  */
-public class SaveGCode extends Node implements LoadAndSaveFile {
+public class SaveGCode extends Node implements SaveFile {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadGCode.filter"), "ngc");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadGCode.inputFile",filter,""); 
 	
@@ -43,31 +42,11 @@ public class SaveGCode extends Node implements LoadAndSaveFile {
 	}
 	
 	@Override
-	public boolean canLoad() {
-		return false;
-	}
-
-	@Override
-	public boolean canSave() {
-		return true;
-	}
-
-	@Override
-	public boolean canLoad(String filename) {
-		return false;
-	}
-
-	@Override
 	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
 	}
 	
-	@Override
-	public boolean load(InputStream in) {
-		return false;
-	}
-
 	@Override
 	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
 		Log.message("saving...");

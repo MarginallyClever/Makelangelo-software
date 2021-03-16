@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,16 +24,15 @@ import org.json.simple.parser.JSONParser;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
-import com.marginallyclever.makelangelo.robot.RobotController;
 
 /**
  * LoadAndSaveSB2 loads limited set of Scratch commands into memory. 
  * @author Admin
  *
  */
-public class LoadScratch2 extends TurtleGenerator implements LoadAndSaveFile {
+public class LoadScratch2 extends TurtleGenerator implements LoadFile {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -80,16 +78,6 @@ public class LoadScratch2 extends TurtleGenerator implements LoadAndSaveFile {
 	}
 
 	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
-	}
-	
-	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
 	}
@@ -99,12 +87,6 @@ public class LoadScratch2 extends TurtleGenerator implements LoadAndSaveFile {
 		String filenameExtension = filename.substring(filename.lastIndexOf('.'));
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
-
-	@Override
-	public boolean canSave(String filename) {
-		return false;
-	}
-
 	
 	@Override
 	public boolean load(InputStream in) {
@@ -758,10 +740,5 @@ public class LoadScratch2 extends TurtleGenerator implements LoadAndSaveFile {
 		}
 
 		return listIndex;
-	}
-	
-	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
-		return true;
 	}
 }

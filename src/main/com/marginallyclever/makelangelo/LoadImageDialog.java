@@ -11,7 +11,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.ServiceLoader;
@@ -30,10 +29,8 @@ import com.marginallyclever.core.TransformedImage;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.NodePanel;
-import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -42,7 +39,7 @@ import com.marginallyclever.util.PreferencesHelper;
  *
  */
 @Deprecated
-public class LoadImageDialog implements LoadAndSaveFile {
+public class LoadImageDialog implements LoadFile {
 	// threading
 	protected ProgressMonitor pm;
 	protected LoadImageSwingWorker threadWorker;
@@ -282,21 +279,6 @@ public class LoadImageDialog implements LoadAndSaveFile {
 	}
 
 	public boolean canSave(String filename) {
-		return false;
-	}
-
-	@Override
-	public boolean save(OutputStream outputStream, ArrayList<Turtle> turtles, RobotController robot) {
-		return false;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
 		return false;
 	}
 }

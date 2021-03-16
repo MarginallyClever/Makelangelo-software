@@ -233,10 +233,10 @@ public final class Translator {
 	 * Translates a string and fills in some details.  String contains the special character sequence "%N", where N is the n-th parameter passed to get()
 	 * A %1 is replaced with the first parameter, %2 with the second, and so on.  There is no escape character.
 	 * @param key name of key to find in translation list
-	 * @param params 
+	 * @param params one or more parameters to pass into the translator.
 	 * @return the translated value for key, or "missing:key".
 	 */
-	static public String get(String key,String [] params) {
+	static public String get(String key,String ... params ) {
 		String modified = get(key);
 		int n=1;
 		for(String p : params) {

@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.nodes.dxf;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -16,8 +15,8 @@ import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.nodes.LoadAndSaveFile;
-import com.marginallyclever.makelangelo.robot.RobotController;
+import com.marginallyclever.makelangelo.RobotController;
+import com.marginallyclever.makelangelo.nodes.SaveFile;
 
 /**
  * Saves a Turtle to DXF format.
@@ -25,7 +24,7 @@ import com.marginallyclever.makelangelo.robot.RobotController;
  * @since 7.25.0
  *
  */
-public class SaveDXF extends Node implements LoadAndSaveFile {
+public class SaveDXF extends Node implements SaveFile {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("LoadDXF.filter"), "dxf");
 	private NodeConnectorExistingFile inputFile = new NodeConnectorExistingFile("LoadDXF.inputFile",filter,""); 
 	
@@ -45,33 +44,9 @@ public class SaveDXF extends Node implements LoadAndSaveFile {
 	}
 
 	@Override
-	public boolean canLoad() {
-		return false;
-	}
-
-	@Override
-	public boolean canSave() {
-		return true;
-	}
-
-	@Override
-	public boolean canLoad(String filename) {
-		return false;
-	}
-
-	@Override
 	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
 		return (ext.equalsIgnoreCase(".dxf"));
-	}
-
-	/**
-	 * @param in
-	 * @return true if load is successful.
-	 */
-	@Override
-	public boolean load(InputStream in) {
-		return false;
 	}
 	
 	@Override
