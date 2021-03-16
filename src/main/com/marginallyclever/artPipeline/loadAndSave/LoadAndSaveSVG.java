@@ -241,7 +241,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				// is the stroke none?
 				int k = style.indexOf(strokeLabelName);
 				String strokeStyleName = style.substring(k+strokeLabelName.length());
-				System.out.println(strokeStyleName);
 				if(strokeStyleName.startsWith("none"))
 					// it is!  bail.
 					return true;
