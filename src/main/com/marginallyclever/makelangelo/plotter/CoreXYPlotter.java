@@ -22,4 +22,9 @@ public class CoreXYPlotter extends CartesianPlotter {
 		// TODO draw me better.
 		super.render(gl2);
 	}
+
+	@Override
+	public String getName() {
+		return "CoreXY";
+	}
 }

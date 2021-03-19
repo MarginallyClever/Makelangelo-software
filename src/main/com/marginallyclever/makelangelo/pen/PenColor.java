@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.pen;
 
 public class PenColor {
 	// hex color (0xRRGGBBAA)

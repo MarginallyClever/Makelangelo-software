@@ -3,31 +3,38 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class PanelAdjustMachine extends SelectPanel {
+public class EditPlotterGUI extends SelectPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private RobotController myRobot;
+	private Plotter myPlotter;
 
 	private SelectDouble machineWidth, machineHeight;
 	private SelectDouble totalBeltNeeded;
 	private SelectDouble totalServoNeeded;
 	private SelectDouble totalStepperNeeded;
 	private SelectDouble acceleration;
+	
+	protected SelectDouble maxFeedRate;
+	protected SelectDouble currentFeedRate;
+	protected SelectDouble penUp;
+	protected SelectDouble penDown;
+	protected SelectDouble penZRate;
 
 
-	public PanelAdjustMachine(RobotController robot) {
+	public EditPlotterGUI(Plotter robot) {
 		super();
 		
-		this.myRobot = robot;
+		myPlotter = robot;
 
 		// adjust machine size
 		{
-			float w = (float)(robot.getSettings().getLimitRight() - robot.getSettings().getLimitLeft());
-			float h = (float)(robot.getSettings().getLimitTop() - robot.getSettings().getLimitBottom());
+			float w = (float)(myPlotter.getLimitRight() - myPlotter.getLimitLeft());
+			float h = (float)(myPlotter.getLimitTop() - myPlotter.getLimitBottom());
 			
 			add(machineWidth = new SelectDouble(Translator.get("MachineWidth"),w));
 			add(machineHeight = new SelectDouble(Translator.get("MachineHeight"),h));
@@ -38,11 +45,17 @@ public class PanelAdjustMachine extends SelectPanel {
 			add(totalBeltNeeded = new SelectDouble(Translator.get("BeltLengthNeeded"),0));
 			add(totalServoNeeded = new SelectDouble(Translator.get("ServoLengthNeeded"),0));
 
+		    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),myPlotter.getTravelFeedRate()));
+		    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),myPlotter.getDrawingFeedRate()));
+		    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),myPlotter.getZFeedrate()));
+		    add(penUp = new SelectDouble(Translator.get("penToolUp"),myPlotter.getPenUpAngle()));
+		    add(penDown = new SelectDouble(Translator.get("penToolDown"),myPlotter.getPenDownAngle()));
+		    
 			totalStepperNeeded.setReadOnly();
 			totalBeltNeeded.setReadOnly();
 			totalServoNeeded.setReadOnly();
 
-			if(!robot.getSettings().canChangeMachineSize()) {
+			if(!myPlotter.canChangeMachineSize()) {
 				machineWidth.setReadOnly();
 				machineHeight.setReadOnly();
 			}
@@ -51,16 +64,11 @@ public class PanelAdjustMachine extends SelectPanel {
 		
 		// Acceleration
 		{
-			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)robot.getSettings().getAcceleration());
+			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)myPlotter.getAcceleration());
 
-			if(robot.getSettings().canAccelerate()) {
+			if(myPlotter.canAccelerate()) {
 				add(acceleration);
 			}
-		}
-
-		
-		if(!robot.getSettings().canInvertMotors()) {
-			interiorPanel.setVisible(false);
 		}
 		
 		finish();
@@ -95,8 +103,14 @@ public class PanelAdjustMachine extends SelectPanel {
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
-			myRobot.getSettings().setMachineSize(mwf, mhf);
-			myRobot.getSettings().setAcceleration(accel);
+			myPlotter.setMachineSize(mwf, mhf);
+			myPlotter.setAcceleration(accel);
+
+			myPlotter.setTravelFeedRate(maxFeedRate.getValue());
+			myPlotter.setDrawingFeedRate(currentFeedRate.getValue());
+			myPlotter.setZFeedrate(penZRate.getValue());
+			myPlotter.setPenUpAngle(penUp.getValue());
+			myPlotter.setPenDownAngle(penDown.getValue());
 		}
 	}
 }

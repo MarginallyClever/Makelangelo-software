@@ -16,11 +16,19 @@ public abstract interface PlotterModel extends RendersInOpenGL {
 	public String getHello();
 
 	/**
-	 * Each {@link PlotterModel} has a hardware version for class identification
+	 * Each {@link PlotterModel} has a hardware version for identification
 	 */
 	public String getVersion();
 
+	/**
+	 * Each {@link PlotterModel} has a type name for identification
+	 */
 	public String getName();
+	
+	/**
+	 * Each {@link PlotterModel} has a type name for identification
+	 */
+	public String getLongName();
 
 	public Point2D getHome();
 

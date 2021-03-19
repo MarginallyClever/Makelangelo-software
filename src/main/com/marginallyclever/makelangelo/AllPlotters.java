@@ -8,6 +8,7 @@ import java.util.prefs.Preferences;
 
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.PlotterModel;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -20,15 +21,14 @@ public class AllPlotters {
 	private String [] configsAvailable; 
 	
 	public AllPlotters() {
-		loadPlotters();
+		refreshPlotters();
 	}
 	
-	private void loadPlotters() {
+	public void refreshPlotters() {
 		// which configurations are available?
 		try {
 			Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
-			
 		} catch (Exception e) {
 			Log.error( e.getMessage() );
 		}
@@ -43,7 +43,7 @@ public class AllPlotters {
 	 * @return the ith plotter in the list.
 	 */
 	public Plotter get(int i) {
-		if(i<0 || i>= configsAvailable.length) throw new InvalidParameterException(">=0, < AllPlotters.length");
+		//if(i<0 || i>= configsAvailable.length) throw new InvalidParameterException("i ("+i+") >=0, <configsAvailable.length ("+configsAvailable.length+")");
 
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(configsAvailable[i]);
@@ -56,11 +56,11 @@ public class AllPlotters {
 		for( Plotter p : slp ) {
 			if(p.getVersion().contentEquals(typeName)) {
 				try {
-					Plotter newP = (Plotter) p.getClass().getConstructors()[0].newInstance();
+					Plotter newP = (Plotter) p.getClass().getDeclaredConstructor().newInstance();
 					newP.loadConfig(Long.parseLong(configsAvailable[i]));
 					return newP;
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | SecurityException e) {
+						| InvocationTargetException | SecurityException | NoSuchMethodException e) {
 					e.printStackTrace();
 				}
 			}
@@ -80,5 +80,11 @@ public class AllPlotters {
 		} catch (BackingStoreException e) {
 			e.printStackTrace();
 		}
+		refreshPlotters();
+	}
+
+	public void add(PlotterModel plotter) {
+		
+		
 	}
 }

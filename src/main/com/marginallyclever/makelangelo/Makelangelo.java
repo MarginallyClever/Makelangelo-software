@@ -60,8 +60,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector3d;
 
-import org.apache.batik.ext.swing.JAffineTransformChooser.Dialog;
-
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
@@ -82,6 +80,8 @@ import com.marginallyclever.makelangelo.nodes.LoadFile;
 import com.marginallyclever.makelangelo.nodes.SaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 import com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTriangle;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Pen;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
@@ -112,8 +112,11 @@ public final class Makelangelo extends TransferHandler {
 	private AllPlotters allPlotters;
 	private Plotter activePlotter;
 	
+	private Paper myPaper;
+	private Pen myPen;
+	
 	private Camera camera;
-	private RobotController robotController;
+	//private RobotController robotController;
 
 	private ArrayList<Turtle> myTurtles;
 	
@@ -294,66 +297,7 @@ public final class Makelangelo extends TransferHandler {
 		{
 			Log.message("  robot...");
 			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
-
-			// list 10 most recent robot profiles, select first.
-			int count = allPlotters.length();
-			if(count>0) {
-				ButtonGroup group = new ButtonGroup();
-				JRadioButtonMenuItem [] favorites = new JRadioButtonMenuItem[10];
-				int i;
-				for(i=0;i<favorites.length;++i) {
-					Plotter p = allPlotters.get(i);
-					String name = p.getName()+" "+p.getUID();
-					favorites[i] = new JRadioButtonMenuItem(name);
-					group.add(favorites[i]);
-					menu.add(favorites[i]);
-					favorites[i].addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							setActivePlotter(p);
-						}
-					});
-					favorites[i].setSelected(p.getUID()==activePlotter.getUID());
-				}
-				menu.add(new JSeparator());
-			}
-			JMenuItem buttonManage = new JMenuItem(Translator.get("Makelangelo.manageMachines"));
-			menu.add(buttonManage);
-			buttonManage.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					JPanel managePane = new PanelManageMachines(allPlotters); 
-					JDialog manageDialog = new JDialog(mainFrame,Translator.get("Makelangelo.manageMachines"),true);
-					manageDialog.setContentPane(managePane);
-					manageDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					manageDialog.pack();
-					manageDialog.setVisible(true);
-				}
-			});
-			menu.add(buttonManage);
-			/*
-			JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
-			menu.add(buttonRobotSettings);
-			buttonRobotSettings.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if( robotController != null ) {
-						menuBar.setEnabled(false);
-						DialogMachineSettings m = new DialogMachineSettings(mainFrame,Translator.get("Makelangelo.robotSettings"));
-						m.run(robotController);
-						menuBar.setEnabled(true);
-					}
-				}
-			});*/
-			
-			JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
-			menu.add(buttonShowRobotPanel);
-			buttonShowRobotPanel.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					runRobotDialog();
-				}
-			});
+			refreshRobotsList(menu);
 			menuBar.add(menu);
 		}
 		
@@ -598,10 +542,14 @@ public final class Makelangelo extends TransferHandler {
 			buttonZoomToFit.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if( robotController != null ) {
+					if( activePlotter != null ) {
 						camera.zoomToFit(
-							robotController.getPaper().getWidth(),
-							robotController.getPaper().getHeight());
+							activePlotter.getWidth(),
+							activePlotter.getHeight());
+					} else if( myPaper != null ) {
+						camera.zoomToFit(
+							myPaper.getWidth(),
+							myPaper.getHeight());
 					}
 				};
 			});
@@ -660,6 +608,70 @@ public final class Makelangelo extends TransferHandler {
 		return menuBar;
 	}
 
+	// list 10 most recent robot profiles, select first.
+	private void refreshRobotsList(JMenu menu) {
+		
+		menu.removeAll();
+		int count = allPlotters.length();
+		if(count>0) {
+			ButtonGroup group = new ButtonGroup();
+			JRadioButtonMenuItem [] favorites = new JRadioButtonMenuItem[10];
+			int i;
+			int limit = (int)Math.min(count, favorites.length);
+			for(i=0;i<limit;++i) {
+				Plotter p = allPlotters.get(i);
+				String name = p.getLongName();
+				favorites[i] = new JRadioButtonMenuItem(name);
+				group.add(favorites[i]);
+				menu.add(favorites[i]);
+				favorites[i].addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						setActivePlotter(p);
+					}
+				});
+				favorites[i].setSelected(p.getUID()==activePlotter.getUID());
+			}
+			menu.add(new JSeparator());
+		}
+
+		JMenuItem buttonManage = new JMenuItem(Translator.get("Makelangelo.manageMachines"));
+		menu.add(buttonManage);
+		final JMenu menu2 = menu;
+		buttonManage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AllPlottersGUI mm = new AllPlottersGUI(allPlotters); 
+				mm.run(mainFrame);
+				refreshRobotsList(menu2);
+			}
+		});
+		menu.add(buttonManage);
+		/*
+		JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
+		menu.add(buttonRobotSettings);
+		buttonRobotSettings.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if( robotController != null ) {
+					menuBar.setEnabled(false);
+					DialogMachineSettings m = new DialogMachineSettings(mainFrame,Translator.get("Makelangelo.robotSettings"));
+					m.run(robotController);
+					menuBar.setEnabled(true);
+				}
+			}
+		});*/
+		
+		JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
+		menu.add(buttonShowRobotPanel);
+		buttonShowRobotPanel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				runRobotDialog();
+			}
+		});
+	}
+	
 	protected void setActivePlotter(Plotter p) {
 		if(previewPanel!=null) {
 			previewPanel.removeListener(activePlotter);
@@ -669,7 +681,7 @@ public final class Makelangelo extends TransferHandler {
 			activePlotter = p;
 			// PropertyChangeEvent here?
 			if(activePlotter!=null) {
-				System.out.println("Changing active plotter to "+p.getName());
+				System.out.println("Changing active plotter to "+p.getLongName());
 			}
 		}
 		
@@ -724,10 +736,6 @@ public final class Makelangelo extends TransferHandler {
 
 			setActivePlotter(activePlotter);
 			
-			if(robotController!=null) {
-				previewPanel.addListener(robotController);
-			}
-			
 			contentPane.add(previewPanel);
 			mainFrame.setContentPane(contentPane);
 		}
@@ -744,7 +752,7 @@ public final class Makelangelo extends TransferHandler {
 	private void runRobotDialog() {
 		menuBar.setEnabled(false);
 
-		PanelRobot myRobotPanel = new PanelRobot(getMainFrame(),robotController);
+		PanelDrivePlotter myRobotPanel = new PanelDrivePlotter(getMainFrame(),activePlotter);
 		
 		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(getMainFrame().getLocation());
@@ -798,7 +806,7 @@ public final class Makelangelo extends TransferHandler {
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 
 		if (result == JOptionPane.YES_OPTION) {
-			previewPanel.removeListener(robotController);
+			previewPanel.removeListener(activePlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowRealEstate();
 			if(robotController!=null) {
@@ -840,6 +848,7 @@ public final class Makelangelo extends TransferHandler {
 		return mainFrame;
 	}
 
+	@Deprecated
 	public RobotController getRobot() {
 		return robotController;
 	}
@@ -1074,7 +1083,7 @@ public final class Makelangelo extends TransferHandler {
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double th=top.y-bottom.y;
-		double ph=robotController.getPaper().getHeight();
+		double ph=myPaper.getHeight();
 		double n = ph/th;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1087,7 +1096,7 @@ public final class Makelangelo extends TransferHandler {
 		Point2D bottom = new Point2D();
 		Turtle.getBounds(myTurtles, top, bottom);
 		double tw=top.x-bottom.x;
-		double pw=robotController.getPaper().getWidth();
+		double pw=myPaper.getWidth();
 		double n = pw/tw;
 		System.out.println("scale="+n);
 		for( Turtle t : myTurtles ) {
@@ -1519,10 +1528,10 @@ public final class Makelangelo extends TransferHandler {
 	 * crop a set of {@link Turtle} to the page edges.
 	 */
 	private void cropTurtles() {	
-		double yTop    = robotController.getPaper().getTop();
-		double yBottom = robotController.getPaper().getBottom();
-		double xLeft   = robotController.getPaper().getLeft();
-		double xRight  = robotController.getPaper().getRight();
+		double yTop    = myPaper.getTop();
+		double yBottom = myPaper.getBottom();
+		double xLeft   = myPaper.getLeft();
+		double xRight  = myPaper.getRight();
 		
 		for( Turtle t : myTurtles ) {
 			cropOneTurtle(t,xRight,yTop,xLeft,yBottom);

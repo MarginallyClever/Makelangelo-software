@@ -25,13 +25,7 @@ import com.marginallyclever.makelangelo.plotter.PlotterListener;
 import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 
 /**
- * A Makelangelo robot is made of up a {@link RobotController}, 
- * which uses a {@link Plotter} to update it's internal state.
- * That sentence doesn't explain who is responsible for what and is junk.
- * 
- * It contains state information, where the {@link Plotter} contains only the physical properties (configuration).
- * Classes who implement the {@link PlotterListener} interface can obtain state change information in real time (via PropertyChangeEvents)
- * which allows Views to stay up to date.
+ * A {@link RobotController} talk to a {@link Plotter} to update it's internal state.
  * 
  * @see <a href='https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller'>Model-View-Controller design pattern</a>. 
  * 
@@ -56,9 +50,9 @@ public class RobotController extends Node implements RendersInOpenGL, PlotterLis
 	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
 
-	public RobotController() {
+	public RobotController(Plotter plotter) {
 		super();
-		myPlotter = new Plotter();
+		myPlotter = plotter;
 		drawingProgress = 0;
 	}
 

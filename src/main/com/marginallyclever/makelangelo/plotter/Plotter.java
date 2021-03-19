@@ -23,13 +23,19 @@ import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.log.Log;
-import com.marginallyclever.makelangelo.Pen;
-import com.marginallyclever.makelangelo.PenColor;
+import com.marginallyclever.makelangelo.pen.Pen;
+import com.marginallyclever.makelangelo.pen.PenColor;
 import com.marginallyclever.util.PreferencesHelper;
 
 
 /**
- * All the hardware settings for a single plotter robot.  Does not store state information.  
+ * A {@link Plotter} is a state machine used to simulate a drawing robot in the real world.
+ * This abstract class contains the code most common to all types of drawing robots.  Subclasses can then
+ * alter the behavior and the visual representation.
+ * 
+ * {@link Plotter} is limited in scope - it can be told to do one command at a time, much like a real plotter.
+ * For more sophisticated behavior associate your Plotter with some buffering class.
+ * 
  * @author Dan Royer
  * @since before 7.25.0
  */
@@ -49,6 +55,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
+	
 	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
@@ -898,10 +905,11 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 				last = last.replace("\r\n", "");
 				if (last.startsWith("V")) {
 					String version = last.substring(1);
-
-					// TODO die here if versions don't match?
-					//setVersion(version);
-					hardwareVersionChecked = true;
+					if(version.contentEquals(getVersion())) {
+						// TODO die here if versions don't match?
+					} else {
+						hardwareVersionChecked = true;
+					}
 					justNow = true;
 				}
 			}
@@ -1057,5 +1065,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		}
 
 		return newUID;
+	}
+	
+	/**
+	 * Each {@link PlotterModel} has a type name for identification
+	 */
+	public String getLongName() {
+		return getName() 
+				//+" "+getVersion()
+				+" #"+getUID();
 	}
 }

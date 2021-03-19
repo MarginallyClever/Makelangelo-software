@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.pen;
 
 import java.util.prefs.Preferences;
 
