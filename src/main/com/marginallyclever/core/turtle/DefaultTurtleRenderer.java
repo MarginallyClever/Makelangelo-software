@@ -14,8 +14,6 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public ColorRGB colorTravel = new ColorRGB(0,255,0);
 	public ColorRGB colorDraw = new ColorRGB(0,0,0);
 	public boolean showPenUp = false;
-	public float lineWidth=1;
-	public float[] lineWidthBuf = new float[1];
 	
 	public DefaultTurtleRenderer(GL2 gl2, boolean showPenUp) {
 		this.gl2=gl2;
@@ -24,22 +22,12 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	
 	@Override
 	public void start() {
-		//colorTravel.set(settings.getPenUpColor());
-		//colorDraw.set(settings.getPenDownColorDefault());
-		float penDiameter = 0.8f;//settings.getPenDiameter();
-		
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		lineWidth = lineWidthBuf[0];
-
-		float newDiameter = 2.0f * 100.0f * penDiameter / lineWidth;
-		gl2.glLineWidth(newDiameter);
 		gl2.glBegin(GL2.GL_LINES);
 	}
 
 	@Override
 	public void end() {
 		gl2.glEnd();
-		gl2.glLineWidth(lineWidth);
 	}
 
 	@Override
