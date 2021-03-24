@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
+import com.marginallyclever.core.select.SelectString;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 public class EditPlotterGUI extends SelectPanel {
@@ -13,6 +14,8 @@ public class EditPlotterGUI extends SelectPanel {
 
 	private Plotter myPlotter;
 
+	private SelectString nickname;
+	
 	private SelectDouble machineWidth, machineHeight;
 	private SelectDouble totalBeltNeeded;
 	private SelectDouble totalServoNeeded;
@@ -36,6 +39,7 @@ public class EditPlotterGUI extends SelectPanel {
 			float w = (float)(myPlotter.getLimitRight() - myPlotter.getLimitLeft());
 			float h = (float)(myPlotter.getLimitTop() - myPlotter.getLimitBottom());
 			
+			add(nickname = new SelectString(Translator.get("MachineNickname"),myPlotter.getNickname()));
 			add(machineWidth = new SelectDouble(Translator.get("MachineWidth"),w));
 			add(machineHeight = new SelectDouble(Translator.get("MachineHeight"),h));
 			//machineWidth.setPreferredSize(s);
@@ -103,6 +107,7 @@ public class EditPlotterGUI extends SelectPanel {
 
 		boolean isDataSane = (mwf > 0 && mhf > 0);
 		if (isDataSane) {
+			myPlotter.setNickname(nickname.getText());
 			myPlotter.setMachineSize(mwf, mhf);
 			myPlotter.setAcceleration(accel);
 

@@ -38,25 +38,32 @@ public class AllPlottersGUI {
 		allPlotters = plotters;
 	}
 	
-	public void run(Frame parent) {
-		myParent = parent;
+	private void refreshBackendList(DefaultListModel<Object> list) {
+		list.clear();
 		
-		// get all names
-		listBackend = new DefaultListModel<Object>();
-
 		int count = allPlotters.length();
 		for(int i=0;i<count;++i) {
 			Plotter p = allPlotters.get(i);
 			String name = p.getName()+" "+p.getUID();
-			listBackend.addElement(name);
+			list.addElement(name);
 		}
-
-		// make list
+	}
+	
+	public void run(Frame parent) {
+		myParent = parent;
+		
+		// storage of names
+		listBackend = new DefaultListModel<Object>();
+		
+		// visible part of list
 		listOfNames = new JList<Object>();
-		listOfNames.setModel(listBackend);
 		listOfNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listOfNames.setLayoutOrientation(JList.VERTICAL);
         listOfNames.setVisibleRowCount(-1);
+        
+        // fill list
+		refreshBackendList(listBackend);
+		listOfNames.setModel(listBackend);
         
         // make list scrollable
         JScrollPane listScroller = new JScrollPane(listOfNames);
@@ -155,8 +162,7 @@ public class AllPlottersGUI {
 				Plotter p = panel.getNewPlotter();
 				p.saveConfig();
 				allPlotters.add(p);
-				
-				listBackend.addElement(p.getName()+" "+p.getUID());
+				refreshBackendList(listBackend);
 				listOfNames.setModel(listBackend);
 				
 				// TODO open edit panel immediately?
@@ -182,10 +188,9 @@ public class AllPlottersGUI {
 		if(result == JOptionPane.YES_OPTION) {
 
 			if(index!=-1) {
-				listBackend.remove(index);
-				listOfNames.setModel(listBackend);
-				
 				allPlotters.delete(index);
+				refreshBackendList(listBackend);
+				listOfNames.setModel(listBackend);
 			}
 		}
 	}
