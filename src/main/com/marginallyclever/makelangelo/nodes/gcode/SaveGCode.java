@@ -52,7 +52,7 @@ public class SaveGCode extends Node implements SaveFile {
 		Log.message("saving...");
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			Plotter machine = robot.getSettings();
+			Plotter machine = robot.getPlotter();
 			machine.writeProgramStart(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);

@@ -49,6 +49,7 @@ public class Makelangelo3_3 extends Makelangelo2 {
 
 	@Override
 	public void render(GL2 gl2) {
+		super.render(gl2);
 		paintCalibrationPoint(gl2);
 		paintControlBox(gl2);
 		paintMotors(gl2);

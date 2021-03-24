@@ -52,6 +52,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	 * Each {@link Plotter} has a global unique identifier
 	 */
 	private long robotUID;
+	/**
+	 * Users can pick nicknames for machines.
+	 */
+	private String nickname="";
+	/**
+	 * Name of preference node where save data is stored.
+	 */
+	private String nodeName="";
 	
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
@@ -162,14 +170,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 		// pen
 		setPenDiameter(0.8f);
+		setNickname(getName());
 
 		portConfirmed = false;
-	}
-	
-	public void createNewUID(long newUID) {
-		// make sure a topLevelMachinesPreferenceNode node is created
-		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		topLevelMachinesPreferenceNode.node(Long.toString(newUID));
 	}
 	
 	public double getAcceleration() {
@@ -244,53 +247,22 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		return isRegistered;
 	}
 
-	/**
-	 * Load the machine configuration
-	 *
-	 * @param uid the unique id of the robot to be loaded
-	 */
-	public void loadConfig(long uid) {
-		robotUID = uid;
-		// once cloud logic is finished.
-		//if( GetCanUseCloud() && LoadConfigFromCloud() ) return;
-		loadConfigFromLocal();
-	}
-
-	protected void loadConfigFromLocal() {
-		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
-		limitTop    = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
-		limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
-		limitLeft   = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
-		limitRight  = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
-
-		acceleration=Double.valueOf(uniqueMachinePreferencesNode.get("acceleration",Double.toString(acceleration)));
-
-		startingPositionIndex = Integer.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex",Integer.toString(startingPositionIndex)));
-
-		//setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool", Integer.toString(getCurrentToolNumber()))));
-		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered",Boolean.toString(isRegistered))));
-
-		loadPenConfig(uniqueMachinePreferencesNode);
-
-		//hardwareVersion = uniqueMachinePreferencesNode.get("hardwareVersion", getVersion());
-	}
-
+	
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setPenDiameter(Double.parseDouble(prefs.get("diameter", Double.toString(getPenDiameter()))));
-		setZFeedrate(Double.parseDouble(prefs.get("z_rate", Double.toString(getZFeedrate()))));
-		setZOn(Double.parseDouble(prefs.get("z_on", Double.toString(getZOn()))));
-		setZOff(Double.parseDouble(prefs.get("z_off", Double.toString(getZOff()))));
-		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feedRateTravel = Double.parseDouble(prefs.get("feed_rate", Double.toString(feedRateTravel)));
-		feedRateDrawing=Double.valueOf(prefs.get("feed_rate_current",Double.toString(feedRateDrawing)));
+		setPenDiameter(prefs.getDouble("diameter", getPenDiameter()));
+		setZFeedrate(prefs.getDouble("z_rate", getZFeedrate()));
+		setZOn(prefs.getDouble("z_on", getZOn()));
+		setZOff(prefs.getDouble("z_off", getZOff()));
+		feedRateTravel = prefs.getDouble("feed_rate", feedRateTravel);
+		feedRateDrawing=prefs.getDouble("feed_rate_current",feedRateDrawing);
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
 		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
 		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
 		penDownColor = new ColorRGB(r,g,b);
+		
 		r = prefs.getInt("penUpColorR", penUpColor.getRed());
 		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
 		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
@@ -299,43 +271,83 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		prefs.put("diameter", Double.toString(getPenDiameter()));
-		prefs.put("z_rate", Double.toString(getZFeedrate()));
-		prefs.put("z_on", Double.toString(getZOn()));
-		prefs.put("z_off", Double.toString(getZOff()));
-		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Double.toString(feedRateTravel));
-		prefs.put("feed_rate_current", Double.toString(feedRateDrawing));
+		prefs.putDouble("diameter", getPenDiameter());
+		prefs.putDouble("z_rate", getZFeedrate());
+		prefs.putDouble("z_on", getZOn());
+		prefs.putDouble("z_off", getZOff());
+		prefs.putDouble("feed_rate", feedRateTravel);
+		prefs.putDouble("feed_rate_current", feedRateDrawing);
+
+		prefs.putInt("penDownColorR", penDownColor.getRed());
+		prefs.putInt("penDownColorG", penDownColor.getGreen());
+		prefs.putInt("penDownColorB", penDownColor.getBlue());
+		
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
-	
-	// Save the machine configuration
+
+
+	/**
+	 * Save the machine configuration
+	 * @param nodeName preference node name at which data will be saved
+	 */
 	public void saveConfig() {
-		// once cloud logic is finished.
-		//if(GetCanUseCloud() && SaveConfigToCloud() ) return;
-		saveConfigToLocal();
-	}
-	
-	protected void saveConfigToLocal() {
-		Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
-		uniqueMachinePreferencesNode.put("limit_top", Double.toString(limitTop));
-		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
-		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
-		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("acceleration", Double.toString(acceleration));
-		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
-
-		//uniqueMachinePreferencesNode.put("current_tool", Integer.toString(getCurrentToolNumber()));
-		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
+		Preferences topNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences myNode = topNode.node(nodeName);
 		
-		uniqueMachinePreferencesNode.put("hardwareVersion", getVersion());
+		myNode.putDouble("limit_top", limitTop);
+		myNode.putDouble("limit_bottom", limitBottom);
+		myNode.putDouble("limit_right", limitRight);
+		myNode.putDouble("limit_left", limitLeft);
+		
+		myNode.putDouble("acceleration", acceleration);
+		myNode.putInt("startingPosIndex", startingPositionIndex);
+		
+		myNode.putBoolean("isRegistered", isRegistered());
+		myNode.put("hardwareVersion", getVersion());
+		myNode.putLong("GUID", getUID());
+		myNode.put("Nickname", nickname);
 
-		savePenConfig(uniqueMachinePreferencesNode);
+		savePenConfig(myNode);
 	}
 	
+	/**
+	 * Load the machine configuration
+	 * @param nodeName preference node name from which to load data
+	 */
+	public void loadConfig(String fromNodeName) {
+		Preferences topNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences myNode = topNode.node(fromNodeName);
+		nodeName = fromNodeName;
+		
+		limitTop    = myNode.getDouble("limit_top", limitTop);
+		limitBottom = myNode.getDouble("limit_bottom", limitBottom);
+		limitLeft   = myNode.getDouble("limit_left", limitLeft);
+		limitRight  = myNode.getDouble("limit_right", limitRight);
+
+		acceleration=myNode.getDouble("acceleration",acceleration);
+		startingPositionIndex = myNode.getInt("startingPosIndex",startingPositionIndex);
+
+		setRegistered(myNode.getBoolean("isRegistered",isRegistered));
+		myNode.get("hardwareVersion", getVersion());
+		myNode.getLong("GUID", getUID());
+		myNode.get("Nickname", nickname);
+		
+		loadPenConfig(myNode);
+
+		//hardwareVersion = myNode.get("hardwareVersion", getVersion());
+	}
+
+	
+	public String getNickname() {
+		return nickname;
+	}
+	
+	public void setNickname(String name) {
+		nickname=name;
+	}
+
 	public void setAcceleration(double f) {
 		acceleration = f;
 	}
@@ -929,8 +941,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	private void parseRobotUID(String line) {
-		saveConfig();
-
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
 		long newUID = -1;
@@ -946,12 +956,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		if (newUID <= 0) {
 			newUID = getNewRobotUID();
 			if(newUID!=0) {
-				createNewUID(newUID);
+				robotUID = newUID;
 			}
-		}
-
-		// load machine specific config
-		loadConfig(newUID);
+		}		
 	}
 
 	@Override
@@ -1074,5 +1081,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		return getName() 
 				//+" "+getVersion()
 				+" #"+getUID();
+	}
+
+	public void setNodeName(String name) {
+		nodeName=name;		
 	}
 }

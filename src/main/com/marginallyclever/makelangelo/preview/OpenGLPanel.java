@@ -229,7 +229,7 @@ public class OpenGLPanel extends GLJPanel implements GLEventListener {
 	}
 	
 	/**
-	 * Set up the correct modelview so the robot appears where it should.
+	 * Set up the correct {@code GL2.GL_MODELVIEW} so the robot appears where it should.
 	 *
 	 * @param gl2
 	 */
