@@ -6,7 +6,7 @@ import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectPanel;
 
 
-public class PanelAdjustPen extends SelectPanel {
+public class EditPenGUI extends SelectPanel {
 	/**
 	 * 
 	 */
@@ -18,7 +18,7 @@ public class PanelAdjustPen extends SelectPanel {
 
 	private Pen myPen;
 	
-	public PanelAdjustPen(Pen pen) {
+	public EditPenGUI(Pen pen) {
 		super();
 		myPen=pen;
 	    

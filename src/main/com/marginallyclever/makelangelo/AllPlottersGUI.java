@@ -121,6 +121,7 @@ public class AllPlottersGUI {
 		dialog.setContentPane(panel);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.pack();
+		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
 	}
 
@@ -166,13 +167,20 @@ public class AllPlottersGUI {
 	}
 	
 	private void deleteSelectedMachine() {
-		Plotter p = allPlotters.get(listOfNames.getSelectedIndex());
+		int index = listOfNames.getSelectedIndex();
+		if(index==-1) {
+			// no selection.
+			return;
+		}
+		
+		Plotter p = allPlotters.get(index);
 		int result = JOptionPane.showConfirmDialog(
-				myParent, 
-				Translator.get("confirmDeleteMachine",(p.getName()+" "+p.getUID()))
-				);
+				myParent,
+				Translator.get("confirmDeleteMachine",(p.getName()+" "+p.getUID())),
+				Translator.get("confirmDeleteMachine",(p.getName()+" "+p.getUID())),
+				JOptionPane.YES_NO_OPTION);
 		if(result == JOptionPane.YES_OPTION) {
-			int index=listOfNames.getSelectedIndex();
+
 			if(index!=-1) {
 				listBackend.remove(index);
 				listOfNames.setModel(listBackend);

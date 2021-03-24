@@ -5,6 +5,7 @@ import java.util.prefs.Preferences;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -13,7 +14,7 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  * @since 7.25.0
  */
-public class Paper {
+public class Paper implements RendersInOpenGL {
 	private final double DEFAULT_PAPER_WIDTH = 420.0;  // mm
 	private final double DEFAULT_PAPER_HEIGHT = 594.0;  // mm
 
@@ -227,7 +228,10 @@ public class Paper {
 		this.rotation=rot;
 	}
 	
+	@Override
 	public void render(GL2 gl2) {
+		gl2.glLineWidth(1);
+		
 		// paper rectangle
 		ColorRGB c = getPaperColor();
 		gl2.glColor3d(

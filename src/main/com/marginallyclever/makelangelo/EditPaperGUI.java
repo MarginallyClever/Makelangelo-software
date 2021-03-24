@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.paper;
+package com.marginallyclever.makelangelo;
 
 import java.beans.PropertyChangeEvent;
 
@@ -9,21 +9,21 @@ import com.marginallyclever.core.select.SelectDouble;
 import com.marginallyclever.core.select.SelectOneOfMany;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectSlider;
-import com.marginallyclever.makelangelo.RobotController;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.paper.PaperSize;
 
 /**
- * UX to adjust the size of the {@link Paper} known to a {@link RobotController}
+ * {@link EditPaperGUI} adjusts the size, orientation, margin, and color of the {@link Paper}
  * @author Dan Royer
  * @since before 7.25.0
- *
  */
-public class PanelAdjustPaper extends SelectPanel {
+public class EditPaperGUI extends SelectPanel {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4234626181293642441L;
 
-	protected Paper myPaper;
+	private Paper myPaper;
 	
 	private SelectOneOfMany paperSizes;
 	private SelectDouble pw, ph,sx,sy,ang;
@@ -32,7 +32,7 @@ public class PanelAdjustPaper extends SelectPanel {
 	private boolean beingModified;
 	private SelectColor paperColor;
 
-	public PanelAdjustPaper(Paper paper) {
+	public EditPaperGUI(Paper paper) {
 		myPaper = paper;
 		
 		beingModified=false;
@@ -46,19 +46,23 @@ public class PanelAdjustPaper extends SelectPanel {
 		}
 		
 		add(paperSizes = new SelectOneOfMany(Translator.get("PaperSize"),commonPaperNames,0));
+
 		double top = myPaper.getTop();
 		double bot = myPaper.getBottom();
 		double left = myPaper.getLeft();
 		double right = myPaper.getRight();
 		double rot = myPaper.getRotation();
 		add(pw = new SelectDouble(Translator.get("PaperWidth"),(float)(right-left)));
-		add(ph = new SelectDouble(Translator.get("PaperHeight"),(float)(top-bot))); 
+		add(ph = new SelectDouble(Translator.get("PaperHeight"),(float)(top-bot)));
+		add(isLandscape = new SelectBoolean("\u21cb",false));
+		
 		add(sx = new SelectDouble("Shift X",(float)(left+right)/2.0f)); 
 		add(sy = new SelectDouble("Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("Rotation",(float)rot));
-		add(isLandscape = new SelectBoolean("\u21cb",false));
+		
 		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getMarginPercent() * 100)));
 		add(paperColor = new SelectColor(interiorPanel,Translator.get("paper color"),myPaper.getPaperColor()));
+		
 		finish();
 		updateValues();
 	}

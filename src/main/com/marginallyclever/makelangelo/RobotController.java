@@ -33,7 +33,7 @@ import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
  * @since 7.2.10
  */
 public class RobotController extends Node implements RendersInOpenGL, PlotterListener {
-	public Plotter myPlotter = null;
+	public Plotter myPlotter;
 	private Paper myPaper = new Paper();
 
 	private ArrayList<Turtle> turtles = new ArrayList<Turtle>();

@@ -337,7 +337,7 @@ public class PanelDrivePlotter extends JPanel implements ActionListener, Plotter
 		buttonStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myPlotter.startAt(0);
+				robotController.startAt(0);
 			}
 		});
 
@@ -360,11 +360,11 @@ public class PanelDrivePlotter extends JPanel implements ActionListener, Plotter
 				// toggle pause
 				if (myPlotter.isPaused() == true) {
 					buttonPause.setText(Translator.get("Pause"));
-					myPlotter.unPause();
-					myPlotter.sendFileCommand();
+					robotController.unPause();
+					robotController.sendFileCommand();
 				} else {
 					buttonPause.setText(Translator.get("Unpause"));
-					myPlotter.pause();
+					robotController.pause();
 				}
 			}
 		});
@@ -465,10 +465,10 @@ public class PanelDrivePlotter extends JPanel implements ActionListener, Plotter
 					if(p.addPenDownCommand==true) {
 						myPlotter.sendLineToRobot(myPlotter.getPenDownString());
 					}
-					myPlotter.startAt(lineNumber);
+					robotController.startAt(lineNumber);
 				} else {
-					int lineBefore = myPlotter.findLastPenUpBefore(lineNumber);
-					myPlotter.startAt(lineBefore);
+					int lineBefore = robotController.findLastPenUpBefore(lineNumber);
+					robotController.startAt(lineBefore);
 				}
 			}
 		}

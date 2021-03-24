@@ -81,6 +81,7 @@ import com.marginallyclever.makelangelo.nodes.SaveFile;
 import com.marginallyclever.makelangelo.nodes.TurtleGenerator;
 import com.marginallyclever.makelangelo.nodes.fractals.Generator_SierpinskiTriangle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.EditPenGUI;
 import com.marginallyclever.makelangelo.pen.Pen;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
@@ -111,27 +112,35 @@ public final class Makelangelo extends TransferHandler {
 	private MakelangeloAppPreferences appPreferences;
 	private AllPlotters allPlotters;
 	private Plotter activePlotter;
+
+	// what drawing tool is loaded.
+	private Pen myPen = new Pen();
 	
-	private Paper myPaper;
-	private Pen myPen;
+	// what surface is under the tool.
+	
+	private Paper myPaper = new Paper();
+	// The collection of lines to draw.
+	private ArrayList<Turtle> myTurtles;
 	
 	private Camera camera;
-	//private RobotController robotController;
+	private RobotController robotController;//= new RobotController();
 
-	private ArrayList<Turtle> myTurtles;
 	
 	protected String lastFileIn = "";
 	protected FileFilter lastFilterIn = null;
+	
 	protected String lastFileOut = "";
 	protected FileFilter lastFilterOut = null;
 	
 	// GUI elements
 	private JFrame mainFrame = null;
+	
 	// only allow one log frame
 	private JFrame logFrame = null;
 	private LogPanel logPanel = null;
+	
+	// the menu along the top of the app
 	private JMenuBar menuBar;
-
 	
 	// OpenGL window
 	private OpenGLPanel previewPanel;
@@ -298,6 +307,64 @@ public final class Makelangelo extends TransferHandler {
 			Log.message("  robot...");
 			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
 			refreshRobotsList(menu);
+			menuBar.add(menu);
+		}
+		
+		// paper menu
+		{
+			Log.message("  paper...");
+			menu = new JMenu(Translator.get("Makelangelo.editPaper"));
+
+			JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPaper"));
+			menu.add(buttonEditPaper);
+			buttonEditPaper.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					EditPaperGUI panel = new EditPaperGUI(myPaper);
+					JPanel interior = panel.getInteriorPanel();
+					
+					int result = JOptionPane.showConfirmDialog(
+							mainFrame, 
+							interior,
+							Translator.get("Makelangelo.editPaper"),
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.PLAIN_MESSAGE);
+					if(result==JOptionPane.OK_OPTION) {
+						//myPaper.saveConfig();
+					}
+				}
+			});
+			menu.add(buttonEditPaper);
+			
+			menuBar.add(menu);
+		}
+		
+		// pen menu
+		{
+			Log.message("  pen...");
+			menu = new JMenu(Translator.get("Makelangelo.editPen"));
+
+			JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPen"));
+			menu.add(buttonEditPaper);
+			buttonEditPaper.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					EditPenGUI panel = new EditPenGUI(myPen);
+					JPanel interior = panel.getInteriorPanel();
+					
+					int result = JOptionPane.showConfirmDialog(
+							mainFrame, 
+							interior,
+							Translator.get("Makelangelo.editPen"),
+							JOptionPane.OK_CANCEL_OPTION,
+							JOptionPane.PLAIN_MESSAGE);
+					if(result==JOptionPane.OK_OPTION) {
+						//myPen.saveConfig();
+					}
+				}
+			});
+			menu.add(buttonEditPaper);
+			
 			menuBar.add(menu);
 		}
 		
@@ -544,12 +611,12 @@ public final class Makelangelo extends TransferHandler {
 				public void actionPerformed(ActionEvent e) {
 					if( activePlotter != null ) {
 						camera.zoomToFit(
-							activePlotter.getWidth(),
-							activePlotter.getHeight());
+							activePlotter.getWidth()/2,
+							activePlotter.getHeight()/2);
 					} else if( myPaper != null ) {
 						camera.zoomToFit(
-							myPaper.getWidth(),
-							myPaper.getHeight());
+							myPaper.getWidth()/2,
+							myPaper.getHeight()/2);
 					}
 				};
 			});
@@ -610,7 +677,6 @@ public final class Makelangelo extends TransferHandler {
 
 	// list 10 most recent robot profiles, select first.
 	private void refreshRobotsList(JMenu menu) {
-		
 		menu.removeAll();
 		int count = allPlotters.length();
 		if(count>0) {
@@ -733,7 +799,7 @@ public final class Makelangelo extends TransferHandler {
 			Log.message("  create PreviewPanel...");
 			previewPanel = new OpenGLPanel();
 			previewPanel.setCamera(camera);
-
+			previewPanel.addListener(myPaper);
 			setActivePlotter(activePlotter);
 			
 			contentPane.add(previewPanel);

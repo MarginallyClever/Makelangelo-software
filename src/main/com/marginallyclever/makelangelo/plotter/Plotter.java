@@ -562,7 +562,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		gl2.glLineWidth(1);
 
 		gl2.glColor3f(0.7f, 0.7f, 0.7f);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(getLimitLeft(), getLimitTop());
 		gl2.glVertex2d(getLimitRight(), getLimitTop());
 		gl2.glVertex2d(getLimitRight(), getLimitBottom());
