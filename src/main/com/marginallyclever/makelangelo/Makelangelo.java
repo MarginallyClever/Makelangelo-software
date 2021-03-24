@@ -61,6 +61,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector3d;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.Clipper2D;
 import com.marginallyclever.core.CommandLineOptions;
 import com.marginallyclever.core.Point2D;
@@ -71,8 +72,10 @@ import com.marginallyclever.core.log.LogPanel;
 import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnector;
 import com.marginallyclever.core.node.NodeDialog;
+import com.marginallyclever.core.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
+import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTransformedImage;
 import com.marginallyclever.makelangelo.nodeConnector.NodeConnectorTurtle;
 import com.marginallyclever.makelangelo.nodes.ImageConverter;
@@ -88,6 +91,7 @@ import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
+import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -96,7 +100,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler {
+public final class Makelangelo extends TransferHandler implements RendersInOpenGL {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -123,7 +127,7 @@ public final class Makelangelo extends TransferHandler {
 	private ArrayList<Turtle> myTurtles;
 	
 	private Camera camera;
-	private RobotController robotController;//= new RobotController();
+	private RobotController robotController;
 
 	
 	protected String lastFileIn = "";
@@ -192,10 +196,6 @@ public final class Makelangelo extends TransferHandler {
 			setActivePlotter(allPlotters.get(0));
 		}
 		
-		// create a robot and listen to it for important news
-		//robotController = new RobotController();
-		//logPanel.setRobot(robotController);
-
 		//testGeneratorsAndConverters();
 		
 		Log.message("Starting camera...");
@@ -383,6 +383,11 @@ public final class Makelangelo extends TransferHandler {
 					public void actionPerformed(ActionEvent e) {
 						menuBar.setEnabled(false);
 						
+						// find input width & height, set to paper width & height
+						for(NodeConnector<?> nc : node.inputs ) {
+							
+						}
+						
 						// Display the panel
 						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
 				        dialog.setLocation(getMainFrame().getLocation());
@@ -399,7 +404,9 @@ public final class Makelangelo extends TransferHandler {
 								}
 								
 								if(myTurtles.size()>0) {
-									robotController.setTurtles(myTurtles);
+									if(robotController!=null) {
+										robotController.setTurtles(myTurtles);
+									}
 								} else {
 									System.out.println("No turtles found!");
 								}
@@ -446,7 +453,9 @@ public final class Makelangelo extends TransferHandler {
 								}
 								
 								if(myTurtles.size()>0) {
-									robotController.setTurtles(myTurtles);
+									if(robotController!=null) {
+										robotController.setTurtles(myTurtles);
+									}
 								} else {
 									System.out.println("No turtles found!");
 								}
@@ -686,7 +695,7 @@ public final class Makelangelo extends TransferHandler {
 			int limit = (int)Math.min(count, favorites.length);
 			for(i=0;i<limit;++i) {
 				Plotter p = allPlotters.get(i);
-				String name = p.getLongName();
+				String name = p.getNickname();
 				favorites[i] = new JRadioButtonMenuItem(name);
 				group.add(favorites[i]);
 				menu.add(favorites[i]);
@@ -740,25 +749,37 @@ public final class Makelangelo extends TransferHandler {
 	
 	protected void setActivePlotter(Plotter p) {
 		if(previewPanel!=null) {
-			previewPanel.removeListener(activePlotter);
+			if(activePlotter!=null) {
+				previewPanel.removeListener(activePlotter);
+			}
 		}
+
+		logPanel.setRobot(null);
+		robotController = null;
 		
 		if(activePlotter != p) {
 			activePlotter = p;
 			// PropertyChangeEvent here?
 			if(activePlotter!=null) {
-				System.out.println("Changing active plotter to "+p.getLongName());
+				System.out.println("Changing active plotter to "+p.getNickname());
+				robotController = new RobotController(activePlotter);
+				
+				// create a robot and listen to it for important news
+				logPanel.setRobot(robotController);
 			}
 		}
 		
 		if(previewPanel!=null) {
-			previewPanel.addListener(activePlotter);
+			if(activePlotter !=null) {
+				previewPanel.addListener(activePlotter);
+			}
 			
 			// new plotter?  recenter and rezoom camera.
 			if(activePlotter!=null) {
 				camera.zoomToFit(
-						activePlotter.getWidth(),
-						activePlotter.getHeight());
+						activePlotter.getWidth()/2,
+						activePlotter.getHeight()/2);
+				
 			}
 		}
 	}
@@ -800,6 +821,7 @@ public final class Makelangelo extends TransferHandler {
 			previewPanel = new OpenGLPanel();
 			previewPanel.setCamera(camera);
 			previewPanel.addListener(myPaper);
+			previewPanel.addListener(this);
 			setActivePlotter(activePlotter);
 			
 			contentPane.add(previewPanel);
@@ -875,9 +897,6 @@ public final class Makelangelo extends TransferHandler {
 			previewPanel.removeListener(activePlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowRealEstate();
-			if(robotController!=null) {
-				robotController.getSettings().saveConfig();
-			}
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
@@ -1656,6 +1675,24 @@ public final class Makelangelo extends TransferHandler {
 		turtle.history.clear();
 		turtle.history.addAll(toKeep);
 		toKeep.clear();
+	}
+
+	@Override
+	public void render(GL2 gl2) {
+		boolean showPenUp = false;
+		
+		if( robotController != null ) {
+			showPenUp = robotController.getShowPenUp();
+		}
+		
+		float size = (float)(myPen.getDiameter() * 200.0 / camera.getZoom());
+		
+		for( Turtle t : myTurtles ) {
+			TurtleRenderer tr = new DefaultTurtleRenderer(gl2,showPenUp);
+			tr.setPenDownColor(t.getColor());
+			gl2.glLineWidth(size);
+			t.render(tr);
+		}
 	}
 }
 

@@ -8,31 +8,28 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.core.StringHelper;
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.log.Log;
 import com.marginallyclever.core.node.Node;
-import com.marginallyclever.core.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.core.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.FirmwareSimulation;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterListener;
-import com.marginallyclever.makelangelo.preview.RendersInOpenGL;
 
 /**
- * A {@link RobotController} talk to a {@link Plotter} to update it's internal state.
+ * A {@link RobotController} talks to a {@link Plotter}.  It converts a set of {@link Turtle}s to plotter commands
+ * and delivers them one at a time to draw pictures.
  * 
  * @see <a href='https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller'>Model-View-Controller design pattern</a>. 
  * 
  * @author Dan Royer
  * @since 7.2.10
  */
-public class RobotController extends Node implements RendersInOpenGL, PlotterListener {
+public class RobotController extends Node implements PlotterListener {
 	public Plotter myPlotter;
 	private Paper myPaper = new Paper();
 
@@ -179,7 +176,7 @@ public class RobotController extends Node implements RendersInOpenGL, PlotterLis
 		myPlotter.sendLineToRobot("M110 N" + newLineNumber);
 	}
 
-	public Plotter getSettings() {
+	public Plotter getPlotter() {
 		return myPlotter;
 	}
 
@@ -340,24 +337,6 @@ public class RobotController extends Node implements RendersInOpenGL, PlotterLis
 
 		// sum total
 		return time + accelTime + decelTime;
-	}
-
-	// from PreviewListener
-	@Override
-	public void render(GL2 gl2) {
-		float[] lineWidthBuf = new float[1];
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		
-		// outside physical limits
-		myPaper.render(gl2);
-
-		gl2.glLineWidth(lineWidthBuf[0]);
-
-		for( Turtle t : turtles ) {
-			TurtleRenderer tr = new DefaultTurtleRenderer(gl2,showPenUp);
-			tr.setPenDownColor(t.getColor());
-			t.render(tr);
-		}
 	}
 
 	public int findLastPenUpBefore(int startAtLine) {
