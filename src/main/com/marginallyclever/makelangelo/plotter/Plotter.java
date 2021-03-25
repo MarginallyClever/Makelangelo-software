@@ -305,10 +305,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		myNode.putInt("startingPosIndex", startingPositionIndex);
 		
 		myNode.putBoolean("isRegistered", isRegistered());
-		myNode.put("hardwareVersion", getVersion());
-		myNode.putLong("GUID", getUID());
-		myNode.put("Nickname", nickname);
 
+		myNode.putLong("GUID", robotUID);
+		myNode.put("Nickname", nickname);
 		savePenConfig(myNode);
 	}
 	
@@ -329,10 +328,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		acceleration=myNode.getDouble("acceleration",acceleration);
 		startingPositionIndex = myNode.getInt("startingPosIndex",startingPositionIndex);
 
-		setRegistered(myNode.getBoolean("isRegistered",isRegistered));
-		myNode.get("hardwareVersion", getVersion());
-		myNode.getLong("GUID", getUID());
-		myNode.get("Nickname", nickname);
+		isRegistered = myNode.getBoolean("isRegistered",false);
+		robotUID = myNode.getLong("GUID", 0);
+		nickname = myNode.get("Nickname", nickname);
 		
 		loadPenConfig(myNode);
 
@@ -1085,5 +1083,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public void setNodeName(String name) {
 		nodeName=name;		
+	}
+
+	public String getNodeName() {
+		return nodeName;
 	}
 }

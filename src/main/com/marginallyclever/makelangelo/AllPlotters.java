@@ -73,7 +73,7 @@ public class AllPlotters {
 		System.out.println("Deleting "+(p.getName()+" "+p.getUID()));
 		
 		Preferences topNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences deadNode = topNode.node(Long.toString(p.getUID()));
+		Preferences deadNode = topNode.node(p.getNodeName());
 		try {
 			deadNode.removeNode();
 		} catch (BackingStoreException e) {
@@ -91,8 +91,12 @@ public class AllPlotters {
 			int biggestID=0;
 			for( String s : names ) {
 				System.out.println("\t"+s);
-				int id = Integer.parseInt(s);
-				if(biggestID<id) biggestID=id;
+				try {
+					int id = Integer.parseInt(s);
+					if(biggestID<id) biggestID=id;
+				} catch(NumberFormatException e) {
+					// bad number format
+				}
 			}
 			p.setNodeName(Integer.toString(biggestID+1));
 			p.saveConfig();

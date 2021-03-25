@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -44,8 +46,7 @@ public class AllPlottersGUI {
 		int count = allPlotters.length();
 		for(int i=0;i<count;++i) {
 			Plotter p = allPlotters.get(i);
-			String name = p.getName()+" "+p.getUID();
-			list.addElement(name);
+			list.addElement(p.getNickname());
 		}
 	}
 	
@@ -71,14 +72,6 @@ public class AllPlottersGUI {
         //listScroller.setAlignmentX(LEFT_ALIGNMENT);
         
         //Create and initialize the buttons.
-        JButton buttonEdit = new JButton("Edit");
-        buttonEdit.setActionCommand("Edit");
-        buttonEdit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				editSelectedMachine();
-			}
-		});
 
         JButton buttonAdd = new JButton("+");
         buttonAdd.setActionCommand("Add");
@@ -86,6 +79,15 @@ public class AllPlottersGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				addNewMachine();
+			}
+		});
+        
+        JButton buttonEdit = new JButton("Edit");
+        buttonEdit.setActionCommand("Edit");
+        buttonEdit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				editSelectedMachine();
 			}
 		});
 
@@ -123,6 +125,17 @@ public class AllPlottersGUI {
 		panel.add(buttonPane);
         
         listOfNames.setSelectedIndex(0);
+        listOfNames.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				// if there is no selected item, disable edit/remove.
+				// if there is a selected item, enable edit/remove.
+				boolean b = !lsm.isSelectionEmpty();
+				buttonEdit.setEnabled(b);
+				buttonRemove.setEnabled(b);
+			}
+		});
 
 		JDialog dialog = new JDialog(parent,Translator.get("Makelangelo.manageMachines"),true);
 		dialog.setContentPane(panel);
@@ -130,23 +143,6 @@ public class AllPlottersGUI {
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
-	}
-
-	private void editSelectedMachine() {
-		Plotter p = allPlotters.get(listOfNames.getSelectedIndex());
-
-		EditPlotterGUI panel = new EditPlotterGUI(p);
-		JPanel interior = panel.getInteriorPanel();
-		
-		int result = JOptionPane.showConfirmDialog(
-				myParent, 
-				interior,
-				Translator.get("Makelangelo.robotSettings"),
-				JOptionPane.OK_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE);
-		if(result==JOptionPane.OK_OPTION) {
-			p.saveConfig();
-		}
 	}
 	
 	public void addNewMachine() {
@@ -162,6 +158,7 @@ public class AllPlottersGUI {
 				Plotter p = panel.getNewPlotter();
 				p.saveConfig();
 				allPlotters.add(p);
+				
 				refreshBackendList(listBackend);
 				listOfNames.setModel(listBackend);
 				
@@ -169,6 +166,33 @@ public class AllPlottersGUI {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
+		}
+	}
+
+	private void editSelectedMachine() {
+		int index = listOfNames.getSelectedIndex();
+		if(index==-1) {
+			// no selection.
+			return;  
+		}
+		
+		Plotter p = allPlotters.get(index);
+
+		EditPlotterGUI panel = new EditPlotterGUI(p);
+		JPanel interior = panel.getInteriorPanel();
+		
+		int result = JOptionPane.showConfirmDialog(
+				myParent, 
+				interior,
+				Translator.get("Makelangelo.robotSettings"),
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE);
+		if(result==JOptionPane.OK_OPTION) {
+			panel.save();
+			p.saveConfig();
+			
+			refreshBackendList(listBackend);
+			listOfNames.setModel(listBackend);
 		}
 	}
 	
@@ -189,6 +213,7 @@ public class AllPlottersGUI {
 
 			if(index!=-1) {
 				allPlotters.delete(index);
+				
 				refreshBackendList(listBackend);
 				listOfNames.setModel(listBackend);
 			}
