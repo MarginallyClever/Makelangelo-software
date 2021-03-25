@@ -382,11 +382,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						menuBar.setEnabled(false);
-						
-						// find input width & height, set to paper width & height
-						for(NodeConnector<?> nc : node.inputs ) {
-							
-						}
+
+						node.setWidth(myPaper.getWidth());
+						node.setHeight(myPaper.getHeight());
 						
 						// Display the panel
 						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
@@ -1276,11 +1274,13 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			// is this point unique in the pool?
 			if( !m.isUp ) {
 				drawMoves++;
-				int a = optimizeAddPointToPool(prev.x,prev.y,EPSILON);
-				int b = optimizeAddPointToPool(m.x,m.y,EPSILON);
-				if(a!=b) {
-					// we keep only segments that are longer than EPSILON.
-					segments.add(new Segment2D(a,b));
+				if(prev!=null) {
+					int a = optimizeAddPointToPool(prev.x,prev.y,EPSILON);
+					int b = optimizeAddPointToPool(m.x,m.y,EPSILON);
+					if(a!=b) {
+						// we keep only segments that are longer than EPSILON.
+						segments.add(new Segment2D(a,b));
+					}
 				}
 			} else {
 				travelMoves++;
