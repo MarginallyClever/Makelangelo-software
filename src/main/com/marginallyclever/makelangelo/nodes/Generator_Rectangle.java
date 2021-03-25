@@ -9,16 +9,9 @@ import com.marginallyclever.core.turtle.Turtle;
  * @author Dan Royer
  * @since 7.25.0
  */
-public class Generator_Rectangle extends TurtleGenerator {
-	// width of box
-	NodeConnectorDouble inputWidth = new NodeConnectorDouble("Generator_Rectangle.inputWidth",100.0);
-	// height of box
-	NodeConnectorDouble inputHeight = new NodeConnectorDouble("Generator_Rectangle.inputHeight",100.0);
-	
+public class Generator_Rectangle extends TurtleGenerator {	
 	public Generator_Rectangle() {
 		super();
-		inputs.add(inputWidth);
-		inputs.add(inputHeight);
 	}
 	
 	@Override

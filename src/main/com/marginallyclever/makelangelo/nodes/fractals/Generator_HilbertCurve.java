@@ -32,12 +32,13 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		
-		double v = 100;
-		xMax = v;
-		yMax = v;
-		xMin = -v;
 
+		double w = inputWidth.getValue();
+		double h = inputHeight.getValue();
+		xMax = w/2;
+		xMin = -xMax;
+		yMax = h/2;
+		
 		turtle.reset();
 		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, inputOrder.getValue())));
 

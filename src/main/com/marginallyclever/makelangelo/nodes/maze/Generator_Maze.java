@@ -16,7 +16,7 @@ public class Generator_Maze extends TurtleGenerator {
 	// controls complexity of maze
 	private NodeConnectorInteger inputCols = new NodeConnectorInteger("Generator_Maze.inputCols",10);
 
-	protected float xMax, xMin, yMax, yMin;
+	protected double xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
 	
@@ -129,14 +129,16 @@ public class Generator_Maze extends TurtleGenerator {
 	private void drawMaze(Turtle turtle) {
 		int rowCount = inputRows.getValue();
 		int colCount = inputCols.getValue();
+
+		double pw = inputWidth.getValue();
+		double ph = inputHeight.getValue();
+		yMin = -ph/2;
+		yMax = ph/2;
+		xMin = -pw/2;
+		xMax = pw/2;
 		
-		yMin = -100;
-		yMax = 100;
-		xMin = -100;
-		xMax = 100;
-		
-		float w = (xMax - xMin) / colCount;
-		float h = (yMax - yMin) / rowCount;
+		double w = (xMax - xMin) / colCount;
+		double h = (yMax - yMin) / rowCount;
 
 		turtle.reset();
 		
@@ -162,16 +164,16 @@ public class Generator_Maze extends TurtleGenerator {
 			int by = cells[b].y;
 			if (ay == by) {
 				// vertical wall
-				float x = xMin + (ax + 1) * w;
-				float y0 = yMin + (ay + 0) * h;
-				float y1 = yMin + (ay + 1) * h;
+				double x = xMin + (ax + 1) * w;
+				double y0 = yMin + (ay + 0) * h;
+				double y1 = yMin + (ay + 1) * h;
 				turtle.jumpTo(x, y0);
 				turtle.moveTo(x, y1);
 			} else if (ax == bx) {
 				// horizontal wall
-				float x0 = xMin + (ax + 0) * w;
-				float x1 = xMin + (ax + 1) * w;
-				float y = yMin + (ay + 1) * h;
+				double x0 = xMin + (ax + 0) * w;
+				double x1 = xMin + (ax + 1) * w;
+				double y = yMin + (ay + 1) * h;
 				turtle.jumpTo(x0, y);
 				turtle.moveTo(x1, y);
 			}

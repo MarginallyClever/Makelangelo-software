@@ -12,17 +12,17 @@ import com.marginallyclever.core.turtle.Turtle;
  */
 public class Generator_Package extends TurtleGenerator {
 	// shape of box
-	private NodeConnectorInteger inputWidth = new NodeConnectorInteger("Generator_Package.inputWidth",200);
+	private NodeConnectorInteger inputBoxWidth = new NodeConnectorInteger("Generator_Package.inputBoxWidth",200);
 	// shape of box
-	private NodeConnectorInteger inputLength = new NodeConnectorInteger("Generator_Package.inputLength",100);
+	private NodeConnectorInteger inputBoxLength = new NodeConnectorInteger("Generator_Package.inputBoxLength",100);
 	// shape of box
-	private NodeConnectorInteger inputHeight = new NodeConnectorInteger("Generator_Package.inputHeight",50);
+	private NodeConnectorInteger inputBoxHeight = new NodeConnectorInteger("Generator_Package.inputBoxHeight",50);
 	
 	public Generator_Package() {
 		super();
-		inputs.add(inputWidth);
-		inputs.add(inputLength);
-		inputs.add(inputHeight);
+		inputs.add(inputBoxWidth);
+		inputs.add(inputBoxLength);
+		inputs.add(inputBoxHeight);
 	}
 	
 	@Override
@@ -50,9 +50,9 @@ public class Generator_Package extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		int w = inputWidth.getValue();
-		int h = inputHeight.getValue();
-		int len = inputLength.getValue();
+		int w = inputBoxWidth.getValue();
+		int h = inputBoxHeight.getValue();
+		int len = inputBoxLength.getValue();
 		
 		int ytot=2*w+3*h+20;
 		int xtot=len+2*h;

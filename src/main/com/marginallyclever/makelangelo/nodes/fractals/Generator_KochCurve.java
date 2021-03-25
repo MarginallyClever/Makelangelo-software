@@ -33,12 +33,13 @@ public class Generator_KochCurve extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		
-		double v = 100;
-		xMax = v;
-		yMax = v;
-		xMin = -v;
-		yMin = -v;
+
+		double pw = inputWidth.getValue();
+		double ph = inputHeight.getValue();
+		yMin = -ph/2;
+		yMax = ph/2;
+		xMin = -pw/2;
+		xMax = pw/2;
 		
 		double xx = xMax - xMin;
 		double yy = yMax - yMin;

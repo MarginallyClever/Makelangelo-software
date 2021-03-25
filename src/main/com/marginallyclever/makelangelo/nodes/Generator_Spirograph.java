@@ -56,8 +56,8 @@ public class Generator_Spirograph extends TurtleGenerator {
 		drawSpirograph(turtle,false);
 
 		// scale the step size so the spirograph fits on the paper
-		double paperWidth  = 100;
-		double paperHeight = 100;
+		double paperWidth = inputWidth.getValue();
+		double paperHeight = inputHeight.getValue();
 
 		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
 		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the

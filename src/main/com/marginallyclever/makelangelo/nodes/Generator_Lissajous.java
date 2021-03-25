@@ -24,7 +24,7 @@ public class Generator_Lissajous extends TurtleGenerator {
 	
 	// scale the step size so the curve fits on the paper
 	// TODO make parameter?
-	private final double WIDTH=100, HEIGHT=100;
+	private double WIDTH=100, HEIGHT=100;
 
 	private double delta;
 	private double a,b;
@@ -47,6 +47,9 @@ public class Generator_Lissajous extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
+
+		WIDTH = inputWidth.getValue();
+		HEIGHT = inputHeight.getValue();
 		
 		a = inputA.getValue();
 		b = inputB.getValue();

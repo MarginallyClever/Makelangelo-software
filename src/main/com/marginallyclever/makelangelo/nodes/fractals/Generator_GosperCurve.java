@@ -34,9 +34,11 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
 
-		double v = 100;
-		
 		turtleStep = 10;
+
+		double pw = inputWidth.getValue();
+		double ph = inputHeight.getValue();
+		double v = Math.min(pw,ph);
 		
 		xMax = 0;
 		xMin = 0;

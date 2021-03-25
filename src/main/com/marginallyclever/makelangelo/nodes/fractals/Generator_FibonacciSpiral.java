@@ -18,8 +18,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	// controls complexity of curve
 	private NodeConnectorInteger inputOrder = new NodeConnectorBoundedInt("Generator_FibonacciSpiral.inputOrder",25,1,7);
 	
-	private float xMax = 100;
-	private float yMax = 100;
+	private double xMax = 100;
+	private double yMax = 100;
 	private Stack<Integer> fibonacciSequence;
 	
 	public Generator_FibonacciSpiral() {
@@ -52,28 +52,29 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		Log.message("xMax="+xMax);
-		Log.message("yMax="+yMax);
+
+		xMax = inputWidth.getValue();
+		yMax = inputHeight.getValue();
 		
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(inputOrder.getValue());
 		
 		// scale the fractal to fit on the page
 		// short side
-		float s1 = fibonacciSequence.peek();
+		double s1 = fibonacciSequence.peek();
 		Log.message("s1="+s1);
-		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
+		double scale1 = Math.min(xMax, yMax) * 2.0 / s1;
 		// long side
-		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
+		double s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
 		Log.message("s2="+s2);
-		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
+		double scale2 = Math.max(xMax, yMax) * 2.0 / s2;
 
 		if(scale1>scale2) scale1=scale2;
 		
 		turtle = new Turtle();
 		
 		// move to starting position
-		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
+		double shortSide = fibonacciSequence.peek() * scale1 /2.0; 
 		Log.message("shortSide="+shortSide);
 		if( xMax < yMax ) {
 			Log.message("tall thin");
@@ -101,7 +102,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 
 	// L System tree
-	private void fibonacciCell(Turtle turtle,float size) {
+	private void fibonacciCell(Turtle turtle,double size) {
 		// make the square around the cell
 		turtle.forward(size);
 		turtle.turn(90);

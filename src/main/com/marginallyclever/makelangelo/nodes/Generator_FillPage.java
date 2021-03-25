@@ -38,6 +38,13 @@ public class Generator_FillPage extends TurtleGenerator {
 		double majorX = Math.cos(r);
 		double majorY = Math.sin(r);
 
+		double w = inputWidth.getValue();
+		double h = inputHeight.getValue();
+		yBottom = -h/2;
+		yTop = h/2;
+		xLeft = -w/2;
+		xRight = w/2;
+		
 		// figure out how many lines we're going to have on this image.
 		// from top to bottom of the margin area...
 		double dy = (yTop - yBottom)/2;

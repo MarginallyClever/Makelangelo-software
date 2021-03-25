@@ -32,11 +32,13 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	@Override
 	public boolean iterate() {
 		Turtle turtle = new Turtle();
-		
-		xMax = 100;
-		yMax = -100;
-		xMin = -xMax;
-		yMin = -yMax;
+
+		double pw = inputWidth.getValue();
+		double ph = inputHeight.getValue();
+		yMin = -ph/2;
+		yMax = ph/2;
+		xMin = -pw/2;
+		xMax = pw/2;
 
 		turtle = new Turtle();
 		

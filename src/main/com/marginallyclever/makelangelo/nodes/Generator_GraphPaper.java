@@ -41,10 +41,13 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
 		// from top to bottom of the margin area...
-		double yBottom = -100;
-		double yTop    = 100;
-		double xLeft   = -100;
-		double xRight  = 100;
+		double w = inputWidth.getValue();
+		double h = inputHeight.getValue();
+		double yBottom = -h/2;
+		double yTop = h/2;
+		double xLeft = -w/2;
+		double xRight = w/2;
+		
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
