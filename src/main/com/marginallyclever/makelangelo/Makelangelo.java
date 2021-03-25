@@ -245,441 +245,443 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 
 		menuBar = new JMenuBar();
 		
-		JMenu menu;
-
-		// File menu
-		{
-			Log.message("  file...");
-			menu = new JMenu(Translator.get("MenuMakelangelo"));
-			menuBar.add(menu);
-	
-			JMenuItem buttonNew = new JMenuItem(Translator.get("Makelangelo.action.new"));
-			buttonNew.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					// confirm here, just to be safe.
-					int result = JOptionPane.showConfirmDialog(
-							mainFrame, 
-							Translator.get("AreYouSure"),
-							Translator.get("AreYouSure"),
-							JOptionPane.YES_NO_OPTION); 
-					if(result==JOptionPane.YES_OPTION) {
-						newFile();
-					}
-				}
-			});
-			menu.add(buttonNew);
-			
-			JMenuItem buttonSave = new JMenuItem(Translator.get("Makelangelo.action.save"));
-			buttonSave.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					saveFile();	
-				}
-			});
-			menu.add(buttonSave);
-
-			menu.addSeparator();
-			
-			JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-			buttonAdjustPreferences.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					appPreferences.run(getMainFrame());
-				}
-			});
-			menu.add(buttonAdjustPreferences);
-	
-			menu.addSeparator();
-	
-			JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-			buttonExit.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					onClose();
-				}
-			});
-			menu.add(buttonExit);
-		}
-
-		// robot menu
-		{
-			Log.message("  robot...");
-			menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
-			refreshRobotsList(menu);
-			menuBar.add(menu);
-		}
+		addMenuFile();
+		addMenuPaper();
+		addMenuPen();
+		addMenuGenerate();
+		addMenuPiCapture();
+		addMenuConvert();
+		addMenuEdit();
+		addMenuRobot();
+		addMenuView();
+		addMenuHelp();
 		
-		// paper menu
-		{
-			Log.message("  paper...");
-			menu = new JMenu(Translator.get("Makelangelo.editPaper"));
-
-			JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPaper"));
-			menu.add(buttonEditPaper);
-			buttonEditPaper.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					EditPaperGUI panel = new EditPaperGUI(myPaper);
-					JPanel interior = panel.getInteriorPanel();
-					
-					int result = JOptionPane.showConfirmDialog(
-							mainFrame, 
-							interior,
-							Translator.get("Makelangelo.editPaper"),
-							JOptionPane.OK_CANCEL_OPTION,
-							JOptionPane.PLAIN_MESSAGE);
-					if(result==JOptionPane.OK_OPTION) {
-						//myPaper.saveConfig();
-					}
-				}
-			});
-			menu.add(buttonEditPaper);
-			
-			menuBar.add(menu);
-		}
-		
-		// pen menu
-		{
-			Log.message("  pen...");
-			menu = new JMenu(Translator.get("Makelangelo.editPen"));
-
-			JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPen"));
-			menu.add(buttonEditPaper);
-			buttonEditPaper.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					EditPenGUI panel = new EditPenGUI(myPen);
-					JPanel interior = panel.getInteriorPanel();
-					
-					int result = JOptionPane.showConfirmDialog(
-							mainFrame, 
-							interior,
-							Translator.get("Makelangelo.editPen"),
-							JOptionPane.OK_CANCEL_OPTION,
-							JOptionPane.PLAIN_MESSAGE);
-					if(result==JOptionPane.OK_OPTION) {
-						//myPen.saveConfig();
-					}
-				}
-			});
-			menu.add(buttonEditPaper);
-			
-			menuBar.add(menu);
-		}
-		
-		// generate
-		{
-			Log.message("  generate...");
-			menu = new JMenu(Translator.get("Makelangelo.menuGenerate"));
-			menuBar.add(menu);
-			
-			ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
-			for( TurtleGenerator node : service ) {
-				JMenuItem item = new JMenuItem(node.getName());
-				menu.add(item);
-				item.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						menuBar.setEnabled(false);
-
-						node.setWidth(myPaper.getWidth());
-						node.setHeight(myPaper.getHeight());
-						
-						// Display the panel
-						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
-				        dialog.setLocation(getMainFrame().getLocation());
-						dialog.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								myTurtles.clear();
-
-								for(NodeConnector<?> nc : node.outputs ) {
-									System.out.println("Node output "+nc.getClass().getSimpleName());
-									if(nc instanceof NodeConnectorTurtle) {
-										myTurtles.add(((NodeConnectorTurtle)nc).getValue());
-									}
-								}
-								
-								if(myTurtles.size()>0) {
-									if(robotController!=null) {
-										robotController.setTurtles(myTurtles);
-									}
-								} else {
-									System.out.println("No turtles found!");
-								}
-							}
-						});
-						dialog.run();
-						// @see makelangeloApp.openFile();
-						
-						menuBar.setEnabled(true);
-					}
-				});
-			}
-		}
-
-		// convert
-		{
-			Log.message("  convert...");
-			menu = new JMenu(Translator.get("Makelangelo.menuConvert"));
-			menuBar.add(menu);
-			
-			ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
-			for( ImageConverter node : service ) {
-				JMenuItem item = new JMenuItem(node.getName());
-				menu.add(item);
-				item.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						menuBar.setEnabled(false);
-						
-						// add the converter to the pool
-						// display the panel
-						NodeDialog dialog = new NodeDialog(getMainFrame(),node);
-				        dialog.setLocation(getMainFrame().getLocation());
-						dialog.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								myTurtles.clear();
-								
-								for(NodeConnector<?> nc : node.outputs ) {
-									System.out.println("Node output "+nc.getClass().getSimpleName());
-									if(nc instanceof NodeConnectorTurtle) {
-										myTurtles.add(((NodeConnectorTurtle)nc).getValue());
-									}
-								}
-								
-								if(myTurtles.size()>0) {
-									if(robotController!=null) {
-										robotController.setTurtles(myTurtles);
-									}
-								} else {
-									System.out.println("No turtles found!");
-								}
-							}
-						});
-						dialog.run();
-						
-						menuBar.setEnabled(true);
-					}
-				});
-			}
-		}
-
-		// pi capture action
-		if (piCameraCaptureAction != null) {
-			JMenu item = new JMenu(piCameraCaptureAction);
-            menuBar.add(item);
-        }
-
-		// edit
-		{
-			Log.message("  edit...");
-			menu = new JMenu(Translator.get("Makelangelo.menuEdit"));
-			menuBar.add(menu);
-
-			JMenuItem buttonRotate90 = new JMenuItem(Translator.get("Makelangelo.action.rotate90"));
-			buttonRotate90.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK));
-			buttonRotate90.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					rotateTurtles(90);
-				}
-			});
-			menu.add(buttonRotate90);
-
-			JMenuItem buttonRotate90cw = new JMenuItem(Translator.get("Makelangelo.action.rotate90cw"));
-			buttonRotate90cw.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK));
-			buttonRotate90cw.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					rotateTurtles(-90);
-				}
-			});
-			menu.add(buttonRotate90cw);
-
-			
-			JMenuItem buttonFlipV = new JMenuItem(Translator.get("Makelangelo.action.flipVertical"));
-			buttonFlipV.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					flipTurtlesVertically();
-				}
-			});
-			menu.add(buttonFlipV);
-			
-			JMenuItem buttonFlipH = new JMenuItem(Translator.get("Makelangelo.action.flipHorizontal"));
-			buttonFlipH.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					flipTurtlesHorizontally();
-				}
-			});
-			menu.add(buttonFlipH);
-
-			JMenuItem buttonScaleToHeight = new JMenuItem(Translator.get("Makelangelo.action.scaleToHeight"));
-			buttonScaleToHeight.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					scaleToFillHeight();
-				}
-			});
-			menu.add(buttonScaleToHeight);
-			
-			JMenuItem buttonScaleToWidth = new JMenuItem(Translator.get("Makelangelo.action.scaleToWidth"));
-			buttonScaleToWidth.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					scaleToFillWidth();
-				}
-			});
-			menu.add(buttonScaleToWidth);
-			
-			JMenuItem buttonCenter = new JMenuItem(Translator.get("Makelangelo.action.center"));
-			buttonCenter.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					centerToPaper();
-				}
-			});
-			menu.add(buttonCenter);
-						
-			JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
-			buttonOptimize.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					optimizeTurtles();
-				}
-			});
-			menu.add(buttonOptimize);
-			
-			JMenuItem buttonSimplify = new JMenuItem(Translator.get("Makelangelo.action.simplify"));
-			buttonSimplify.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					simplifyTurtles();
-				}
-			});
-			menu.add(buttonSimplify);
-			
-			JMenuItem buttonCrop = new JMenuItem(Translator.get("Makelangelo.action.crop"));
-			buttonCrop.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					cropTurtles();
-				}
-			});
-			menu.add(buttonCrop);
-		}
-		
-		// view menu
-		{
-			Log.message("  view...");
-			menu = new JMenu(Translator.get("Makelangelo.menuView"));
-			menuBar.add(menu);
-			
-			JMenuItem buttonShowUp = new JMenuItem(Translator.get("Makelangelo.viewPenUp"));
-			buttonShowUp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
-			buttonShowUp.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if( robotController != null ) {
-						robotController.setShowPenUp(!robotController.getShowPenUp());
-					}
-				};
-			});
-			menu.add(buttonShowUp);
-			
-			JMenuItem buttonZoomOut = new JMenuItem(Translator.get("Makelangelo.ZoomOut"));
-			buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
-			buttonZoomOut.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					camera.zoomOut();
-				};
-			});
-			menu.add(buttonZoomOut);
-	
-			JMenuItem buttonZoomIn = new JMenuItem(Translator.get("Makelangelo.ZoomIn"));
-			buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
-			buttonZoomIn.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					camera.zoomIn();
-				};
-			});
-			menu.add(buttonZoomIn);
-			
-			JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("Makelangelo.ZoomFit"));
-			buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-			buttonZoomToFit.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if( activePlotter != null ) {
-						camera.zoomToFit(
-							activePlotter.getWidth()/2,
-							activePlotter.getHeight()/2);
-					} else if( myPaper != null ) {
-						camera.zoomToFit(
-							myPaper.getWidth()/2,
-							myPaper.getHeight()/2);
-					}
-				};
-			});
-			menu.add(buttonZoomToFit);
-			
-			JMenuItem buttonViewLog = new JMenuItem(Translator.get("Makelangelo.ShowLog"));
-			buttonViewLog.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(logFrame == null) {
-						logFrame = new JFrame(Translator.get("Log"));
-						logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-						logFrame.setPreferredSize(new Dimension(600,400));
-						logFrame.add(logPanel);
-						logFrame.pack();
-						logFrame.addWindowListener(new WindowListener() {
-							@Override
-							public void windowOpened(WindowEvent e) {}
-							@Override
-							public void windowIconified(WindowEvent e) {}
-							@Override
-							public void windowDeiconified(WindowEvent e) {}
-							@Override
-							public void windowDeactivated(WindowEvent e) {}
-							@Override
-							public void windowClosing(WindowEvent e) {}
-							@Override
-							public void windowClosed(WindowEvent e) {
-								logFrame=null;
-							}
-							@Override
-							public void windowActivated(WindowEvent e) {}
-						});
-					}
-					logFrame.setVisible(true);
-				}
-			});
-			menu.add(buttonViewLog);
-		}
-		
-		// help menu
-		{
-			Log.message("  help...");
-			menu = new JMenu(Translator.get("Makelangelo.menuHelp"));
-			menuBar.add(menu);
-	
-			menu.add(new JMenuItem(new ActionOpenForum()));
-			menu.add(new JMenuItem(new ActionCheckForUpdate(mainFrame,VERSION)));
-			menu.add(new JMenuItem(new ActionAbout(mainFrame,VERSION)));
-		}
-		
-		// finish
 		Log.message("  finish...");
 		menuBar.updateUI();
 
 		return menuBar;
+	}
+	
+	private void addMenuFile() {
+		Log.message("  file...");
+		JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
+		menuBar.add(menu);
+
+		JMenuItem buttonNew = new JMenuItem(Translator.get("Makelangelo.action.new"));
+		buttonNew.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// confirm here, just to be safe.
+				int result = JOptionPane.showConfirmDialog(
+						mainFrame, 
+						Translator.get("AreYouSure"),
+						Translator.get("AreYouSure"),
+						JOptionPane.YES_NO_OPTION); 
+				if(result==JOptionPane.YES_OPTION) {
+					newFile();
+				}
+			}
+		});
+		menu.add(buttonNew);
+		
+		JMenuItem buttonSave = new JMenuItem(Translator.get("Makelangelo.action.save"));
+		buttonSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveFile();	
+			}
+		});
+		menu.add(buttonSave);
+
+		menu.addSeparator();
+		
+		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
+		buttonAdjustPreferences.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				appPreferences.run(getMainFrame());
+			}
+		});
+		menu.add(buttonAdjustPreferences);
+
+		menu.addSeparator();
+
+		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
+		buttonExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onClose();
+			}
+		});
+		menu.add(buttonExit);
+	}
+	
+	private void addMenuPaper() {
+		Log.message("  paper...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.editPaper"));
+
+		JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPaper"));
+		menu.add(buttonEditPaper);
+		buttonEditPaper.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EditPaperGUI panel = new EditPaperGUI(myPaper);
+				JPanel interior = panel.getInteriorPanel();
+				
+				int result = JOptionPane.showConfirmDialog(
+						mainFrame, 
+						interior,
+						Translator.get("Makelangelo.editPaper"),
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.PLAIN_MESSAGE);
+				if(result==JOptionPane.OK_OPTION) {
+					//myPaper.saveConfig();
+				}
+			}
+		});
+		menu.add(buttonEditPaper);
+		
+		menuBar.add(menu);
+	}
+	
+	private void addMenuPen() {
+		Log.message("  pen...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.editPen"));
+
+		JMenuItem buttonEditPaper = new JMenuItem(Translator.get("Makelangelo.editPen"));
+		menu.add(buttonEditPaper);
+		buttonEditPaper.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EditPenGUI panel = new EditPenGUI(myPen);
+				JPanel interior = panel.getInteriorPanel();
+				
+				int result = JOptionPane.showConfirmDialog(
+						mainFrame, 
+						interior,
+						Translator.get("Makelangelo.editPen"),
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.PLAIN_MESSAGE);
+				if(result==JOptionPane.OK_OPTION) {
+					//myPen.saveConfig();
+				}
+			}
+		});
+		menu.add(buttonEditPaper);
+		
+		menuBar.add(menu);
+	}
+	
+	private void addMenuGenerate() {
+		Log.message("  generate...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuGenerate"));
+		menuBar.add(menu);
+		
+		ServiceLoader<TurtleGenerator> service = ServiceLoader.load(TurtleGenerator.class);
+		for( TurtleGenerator node : service ) {
+			JMenuItem item = new JMenuItem(node.getName());
+			menu.add(item);
+			item.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					menuBar.setEnabled(false);
+
+					node.setWidth(myPaper.getWidth());
+					node.setHeight(myPaper.getHeight());
+					
+					// Display the panel
+					NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+			        dialog.setLocation(getMainFrame().getLocation());
+					dialog.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							myTurtles.clear();
+
+							for(NodeConnector<?> nc : node.outputs ) {
+								System.out.println("Node output "+nc.getClass().getSimpleName());
+								if(nc instanceof NodeConnectorTurtle) {
+									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+								}
+							}
+							
+							if(myTurtles.size()>0) {
+								if(robotController!=null) {
+									robotController.setTurtles(myTurtles);
+								}
+							} else {
+								System.out.println("No turtles found!");
+							}
+						}
+					});
+					dialog.run();
+					// @see makelangeloApp.openFile();
+					
+					menuBar.setEnabled(true);
+				}
+			});
+		}
+	}
+
+	
+	private void addMenuConvert() {
+		Log.message("  convert...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuConvert"));
+		menuBar.add(menu);
+		
+		ServiceLoader<ImageConverter> service = ServiceLoader.load(ImageConverter.class);
+		for( ImageConverter node : service ) {
+			JMenuItem item = new JMenuItem(node.getName());
+			menu.add(item);
+			item.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					menuBar.setEnabled(false);
+					
+					// add the converter to the pool
+					// display the panel
+					NodeDialog dialog = new NodeDialog(getMainFrame(),node);
+			        dialog.setLocation(getMainFrame().getLocation());
+					dialog.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							myTurtles.clear();
+							
+							for(NodeConnector<?> nc : node.outputs ) {
+								System.out.println("Node output "+nc.getClass().getSimpleName());
+								if(nc instanceof NodeConnectorTurtle) {
+									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+								}
+							}
+							
+							if(myTurtles.size()>0) {
+								if(robotController!=null) {
+									robotController.setTurtles(myTurtles);
+								}
+							} else {
+								System.out.println("No turtles found!");
+							}
+						}
+					});
+					dialog.run();
+					
+					menuBar.setEnabled(true);
+				}
+			});
+		}
+	}
+	
+	// pi capture action
+	private void addMenuPiCapture() {
+		if (piCameraCaptureAction != null) {
+			JMenu item = new JMenu(piCameraCaptureAction);
+            menuBar.add(item);
+        }
+	}
+	
+	private void addMenuEdit() {
+		Log.message("  edit...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuEdit"));
+		menuBar.add(menu);
+
+		JMenuItem buttonRotate90 = new JMenuItem(Translator.get("Makelangelo.action.rotate90"));
+		buttonRotate90.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK));
+		buttonRotate90.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				rotateTurtles(90);
+			}
+		});
+		menu.add(buttonRotate90);
+
+		JMenuItem buttonRotate90cw = new JMenuItem(Translator.get("Makelangelo.action.rotate90cw"));
+		buttonRotate90cw.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK));
+		buttonRotate90cw.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				rotateTurtles(-90);
+			}
+		});
+		menu.add(buttonRotate90cw);
+
+		
+		JMenuItem buttonFlipV = new JMenuItem(Translator.get("Makelangelo.action.flipVertical"));
+		buttonFlipV.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flipTurtlesVertically();
+			}
+		});
+		menu.add(buttonFlipV);
+		
+		JMenuItem buttonFlipH = new JMenuItem(Translator.get("Makelangelo.action.flipHorizontal"));
+		buttonFlipH.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flipTurtlesHorizontally();
+			}
+		});
+		menu.add(buttonFlipH);
+
+		JMenuItem buttonScaleToHeight = new JMenuItem(Translator.get("Makelangelo.action.scaleToHeight"));
+		buttonScaleToHeight.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				scaleToFillHeight();
+			}
+		});
+		menu.add(buttonScaleToHeight);
+		
+		JMenuItem buttonScaleToWidth = new JMenuItem(Translator.get("Makelangelo.action.scaleToWidth"));
+		buttonScaleToWidth.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				scaleToFillWidth();
+			}
+		});
+		menu.add(buttonScaleToWidth);
+		
+		JMenuItem buttonCenter = new JMenuItem(Translator.get("Makelangelo.action.center"));
+		buttonCenter.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				centerToPaper();
+			}
+		});
+		menu.add(buttonCenter);
+					
+		JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
+		buttonOptimize.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				optimizeTurtles();
+			}
+		});
+		menu.add(buttonOptimize);
+		
+		JMenuItem buttonSimplify = new JMenuItem(Translator.get("Makelangelo.action.simplify"));
+		buttonSimplify.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				simplifyTurtles();
+			}
+		});
+		menu.add(buttonSimplify);
+		
+		JMenuItem buttonCrop = new JMenuItem(Translator.get("Makelangelo.action.crop"));
+		buttonCrop.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cropTurtles();
+			}
+		});
+		menu.add(buttonCrop);
+	}
+	
+	private void addMenuRobot() {
+		Log.message("  robot...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
+		refreshRobotsList(menu);
+		menuBar.add(menu);
+	}
+	
+	private void addMenuView() {
+		Log.message("  view...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuView"));
+		menuBar.add(menu);
+		
+		JMenuItem buttonShowUp = new JMenuItem(Translator.get("Makelangelo.viewPenUp"));
+		buttonShowUp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
+		buttonShowUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if( robotController != null ) {
+					robotController.setShowPenUp(!robotController.getShowPenUp());
+				}
+			};
+		});
+		menu.add(buttonShowUp);
+		
+		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("Makelangelo.ZoomOut"));
+		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomOut();
+			};
+		});
+		menu.add(buttonZoomOut);
+
+		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("Makelangelo.ZoomIn"));
+		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomIn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomIn();
+			};
+		});
+		menu.add(buttonZoomIn);
+		
+		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("Makelangelo.ZoomFit"));
+		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomToFit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if( activePlotter != null ) {
+					camera.zoomToFit(
+						activePlotter.getWidth()/2,
+						activePlotter.getHeight()/2);
+				} else if( myPaper != null ) {
+					camera.zoomToFit(
+						myPaper.getWidth()/2,
+						myPaper.getHeight()/2);
+				}
+			};
+		});
+		menu.add(buttonZoomToFit);
+		
+		JMenuItem buttonViewLog = new JMenuItem(Translator.get("Makelangelo.ShowLog"));
+		buttonViewLog.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(logFrame == null) {
+					logFrame = new JFrame(Translator.get("Log"));
+					logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					logFrame.setPreferredSize(new Dimension(600,400));
+					logFrame.add(logPanel);
+					logFrame.pack();
+					logFrame.addWindowListener(new WindowListener() {
+						@Override
+						public void windowOpened(WindowEvent e) {}
+						@Override
+						public void windowIconified(WindowEvent e) {}
+						@Override
+						public void windowDeiconified(WindowEvent e) {}
+						@Override
+						public void windowDeactivated(WindowEvent e) {}
+						@Override
+						public void windowClosing(WindowEvent e) {}
+						@Override
+						public void windowClosed(WindowEvent e) {
+							logFrame=null;
+						}
+						@Override
+						public void windowActivated(WindowEvent e) {}
+					});
+				}
+				logFrame.setVisible(true);
+			}
+		});
+		menu.add(buttonViewLog);
+	}
+	
+	private void addMenuHelp() {
+		Log.message("  help...");
+		JMenu menu = new JMenu(Translator.get("Makelangelo.menuHelp"));
+		menuBar.add(menu);
+
+		menu.add(new JMenuItem(new ActionOpenForum()));
+		menu.add(new JMenuItem(new ActionCheckForUpdate(mainFrame,VERSION)));
+		menu.add(new JMenuItem(new ActionAbout(mainFrame,VERSION)));
 	}
 
 	// list 10 most recent robot profiles, select first.
