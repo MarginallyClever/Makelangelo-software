@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -220,7 +221,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 	}
 
-	// check if we need to ask about sharing
+	/**
+	 * Check if we need to ask about sharing
+	 */
 	protected void checkSharingPermission() {
 		Log.message("Checking sharing permissions...");
 		
@@ -238,9 +241,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 
 	/**
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
-	 * @return the refreshed menu bar
 	 */
-	public JMenuBar createMenuBar() {
+	public void createMenuBar() {
 		Log.message("Create menu bar");
 
 		menuBar = new JMenuBar();
@@ -252,14 +254,13 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		addMenuPiCapture();
 		addMenuConvert();
 		addMenuEdit();
-		addMenuRobot();
+		addMenuRobots();
 		addMenuView();
 		addMenuHelp();
 		
 		Log.message("  finish...");
 		menuBar.updateUI();
-
-		return menuBar;
+		mainFrame.setJMenuBar(menuBar);
 	}
 	
 	private void addMenuFile() {
@@ -422,7 +423,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 	}
 
-	
 	private void addMenuConvert() {
 		Log.message("  convert...");
 		JMenu menu = new JMenu(Translator.get("Makelangelo.menuConvert"));
@@ -470,7 +470,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 	}
 	
-	// pi capture action
 	private void addMenuPiCapture() {
 		if (piCameraCaptureAction != null) {
 			JMenu item = new JMenu(piCameraCaptureAction);
@@ -577,7 +576,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		menu.add(buttonCrop);
 	}
 	
-	private void addMenuRobot() {
+	private void addMenuRobots() {
 		Log.message("  robot...");
 		JMenu menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
 		refreshRobotsList(menu);
@@ -737,12 +736,12 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		});*/
 		
-		JMenuItem buttonShowRobotPanel = new JMenuItem(Translator.get("Makelangelo.runRobot"));
-		menu.add(buttonShowRobotPanel);
-		buttonShowRobotPanel.addActionListener(new ActionListener() {
+		JMenuItem buttonDrive = new JMenuItem(Translator.get("Makelangelo.runRobot"));
+		menu.add(buttonDrive);
+		buttonDrive.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				runRobotDialog();
+				drivePlotter();
 			}
 		});
 	}
@@ -790,9 +789,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	public void createAppWindow() {
 		Log.message("Creating GUI...");
 
-		// overall look and feel 1
-		//JFrame.setDefaultLookAndFeelDecorated(true);  // ugly!
-
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
@@ -802,42 +798,35 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		});
 		
-		// overall look and feel 2
+		// overall look and feel
+		
+		//JFrame.setDefaultLookAndFeelDecorated(true);  // ugly!
+
         try {
         	// weird but less ugly.
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {}
+
+		createMenuBar();
+
+		Log.message("create PreviewPanel...");
+		previewPanel = new OpenGLPanel();
+		previewPanel.setCamera(camera);
+		previewPanel.addListener(myPaper);
+		previewPanel.addListener(this);
+		setActivePlotter(activePlotter);
+
+		mainFrame.setContentPane(previewPanel);
 		
-		JMenuBar bar = createMenuBar();
-		Log.message("  adding menu bar...");
-		mainFrame.setJMenuBar(bar);
-
-		{
-			Log.message("create content pane...");
-			JPanel contentPane = new JPanel(new BorderLayout());
-			contentPane.setOpaque(true);
-	
-			Log.message("  create PreviewPanel...");
-			previewPanel = new OpenGLPanel();
-			previewPanel.setCamera(camera);
-			previewPanel.addListener(myPaper);
-			previewPanel.addListener(this);
-			setActivePlotter(activePlotter);
-			
-			contentPane.add(previewPanel);
-			mainFrame.setContentPane(contentPane);
-		}
-		
-		adjustWindowSize();
-
-		Log.message("  make visible...");
-		mainFrame.setVisible(true);
-
 		Log.message("  adding drag & drop support...");
 		mainFrame.setTransferHandler(this);
+
+		adjustWindowSize();
+		
+		mainFrame.setVisible(true);
 	}
 
-	private void runRobotDialog() {
+	private void drivePlotter() {
 		menuBar.setEnabled(false);
 
 		PanelDrivePlotter myRobotPanel = new PanelDrivePlotter(getMainFrame(),activePlotter);
@@ -882,11 +871,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		// int locationY = prefs.getInt("Default window location y",
 		// defaultLocationY);
 		// mainFrame.setLocation(locationX,locationY);
-	}
-
-	public void settingsChangedEvent(Plotter settings) {
-		if (previewPanel != null)
-			previewPanel.repaint();
 	}
 
 	private void onClose() {
@@ -1422,9 +1406,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 				}
 				//System.out.println("found "+foundLines.size()+" unique polyLine(s).");
 				
-				if(newOrder.size()>0) {
-					newOrder.get(newOrder.size()-1);
-				}
 				// we know which lines were found.
 				// we know they are pretty close.
 				// We prefer polylines that start and end in the same cell.
@@ -1517,8 +1498,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		reportTurtleTravel(turtle);
 	}
 	
-	
-	// reduce the total number of commands without altering the output.
+	/**
+	 * Reduce the total number of commands without altering the output.
+	 */
 	private void simplifyTurtles() {
 		for( Turtle t : myTurtles ) {
 			removeSequentialPenUpMoves(t);
@@ -1562,7 +1544,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	}
 	
 	/**
-	 * Any time there are three pen up moves in a row, the middle is not needed.
+	 * Any time there are two pen down moves in ab and bc where abc is a straight line?  Lose b.
 	 * @param turtle to be simplified.
 	 */
 	private void removeSequentialLinearPenDownMoves(Turtle turtle) {
@@ -1590,10 +1572,11 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 				v1.x = c.x-b.x;
 				v1.y = c.y-b.y;
 				v1.normalize();
-				if(v1.dot(v0)>0.999999) {
-					// do nothing. lose b.
+				// 1 degree = cos(PI/180) = 0.99984769515
+				if(v1.dot(v0)>0.99984769515) {
+					// Less than 1 degree.  Lose b.
 				} else {
-					// b not redudant, keep it.
+					// 1 degree or more.  b not redudant.  Keep it.
 					toKeep.add(b);
 				}
 			} else {
@@ -1695,6 +1678,10 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			gl2.glLineWidth(size);
 			t.render(tr);
 		}
+	}
+
+	public Paper getPaper() {
+		return myPaper;
 	}
 }
 

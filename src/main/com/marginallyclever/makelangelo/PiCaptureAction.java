@@ -83,8 +83,8 @@ public class PiCaptureAction extends AbstractAction {
         // let's make the image the correct width and height for the paper
 		useImage = false;
         int captureH = 650;
-        double aspectRatio = makelangeloApp.getRobot().getPaper().getWidth() 
-        					/ makelangeloApp.getRobot().getPaper().getHeight();
+        double aspectRatio = makelangeloApp.getPaper().getWidth() 
+        					/ makelangeloApp.getPaper().getHeight();
         int captureW = (int) ((double) captureH * aspectRatio);
 
 		JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("CaptureImageTitle"), true);
