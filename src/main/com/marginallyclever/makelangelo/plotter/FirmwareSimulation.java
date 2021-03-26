@@ -19,6 +19,7 @@ public class FirmwareSimulation {
 	public static final double MIN_SEGMENT_TIME = 25000.0/1000000.0;
 	public static final double MAX_FEEDRATE = 200.0;   // mm/s
 	public static final double MAX_ACCELERATION = 1250.0;  // mm/s/s
+	public static final double MIN_ACCELERATION = 0.01;  // mm/s/s
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
 	public static final int SEGMENTS_PER_SECOND = 8;
 	public static final double [] MAX_JERK = { 8, 8, 0.3 };
@@ -182,6 +183,8 @@ public class FirmwareSimulation {
 			next.nominalSpeed *= speedFactor;
 		}
 		
+		if(acceleration<MIN_ACCELERATION)
+			acceleration = MIN_ACCELERATION;
 		next.acceleration = acceleration;
 
 		// limit jerk between moves
@@ -363,10 +366,10 @@ public class FirmwareSimulation {
 		double nominalT = plateauD/seg.nominalSpeed;
 		
 		// d = vt + 0.5att.  it's a quadratic, so t = -v +/- sqrt( v*v -2ad ) / a
-		double nA = maxSpeedAllowed(-seg.acceleration,entrySpeed,accelerateD);
-		double nD = maxSpeedAllowed(-seg.acceleration,exitSpeed, decelerateD);
-		double accelerateT = ( -entrySpeed + nA ) / seg.acceleration;
-		double decelerateT = ( -exitSpeed  + nD ) / seg.acceleration;
+		double nA = maxSpeedAllowed(-accel,entrySpeed,accelerateD);
+		double nD = maxSpeedAllowed(-accel,exitSpeed, decelerateD);
+		double accelerateT = ( -entrySpeed + nA ) / accel;
+		double decelerateT = ( -exitSpeed  + nD ) / accel;
 		
 		seg.accelerateUntilT = accelerateT;
 		seg.decelerateAfterT = accelerateT + nominalT;
@@ -375,7 +378,7 @@ public class FirmwareSimulation {
 		seg.exitSpeed = exitSpeed;
 		
 		if(Double.isNaN(seg.end_s)) {
-			System.out.println("Uh oh");
+			System.out.println("Uh oh "+accelerateT+"\t"+nominalT+"\t"+decelerateT);
 		}
 	}
 
