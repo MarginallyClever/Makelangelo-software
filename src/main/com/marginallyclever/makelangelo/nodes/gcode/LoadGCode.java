@@ -108,15 +108,13 @@ public class LoadGCode extends TurtleGenerator implements LoadFile {
 					}
 				}
 	
-				turtle.penUp();
 				double nx = turtle.getX();
 				double ny = turtle.getY();
-				double nz = 90;
+				double nz = turtle.isUp()?90:30;
 				double ni = nx;
 				double nj = ny;
 				double ox=nx;
 				double oy=ny;
-				double oz=nz;
 						
 				if(tokenExists("X",tokens)!=null) {
 					double v = Float.valueOf(tokenExists("X",tokens).substring(1)) * scaleXY;
@@ -142,14 +140,14 @@ public class LoadGCode extends TurtleGenerator implements LoadFile {
 				if(gCodeToken!=null) {
 					int gCode = Integer.parseInt(gCodeToken.substring(1));
 					if(gCode==0 || gCode==1) {
-						if(nz!=oz) {
-							// z change
-							if(turtle.isUp()) turtle.penDown();
-							else turtle.penUp();
+						// z change
+						if(nz==90) {
+							turtle.penUp();
+						} else {
+							turtle.penDown();
 						}
-						if(nx!=ox || ny!=oy) {
-							turtle.moveTo(nx, ny);
-						}
+						System.out.println(nx+"\t"+ny+"\t"+nz);
+						turtle.moveTo(nx, ny);
 					} else if(gCode==2 || gCode==3) {
 						// arc
 						int dir = (gCode==2) ? -1 : 1;
@@ -182,8 +180,6 @@ public class LoadGCode extends TurtleGenerator implements LoadFile {
 							turtle.moveTo(ix,iy);
 						}
 						turtle.moveTo(nx,ny);
-					} else {
-						// do nothing.
 					}
 				}
 			} catch(Exception e) {
@@ -193,6 +189,7 @@ public class LoadGCode extends TurtleGenerator implements LoadFile {
 		}
 		scanner.close();
 
+		System.out.println("d="+turtle.getDistance());
 		outputTurtle.setValue(turtle);
 		return true;
 	}
