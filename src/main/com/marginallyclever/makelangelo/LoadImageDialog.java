@@ -211,7 +211,7 @@ public class LoadImageDialog implements LoadFile {
 			return false;
 		}
 
-		if (!GraphicsEnvironment.isHeadless()) {
+		if(GraphicsEnvironment.isHeadless()) {
 			//runDialog(robot.getControlPanel());
 		}
 
