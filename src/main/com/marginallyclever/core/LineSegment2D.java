@@ -5,6 +5,7 @@ package com.marginallyclever.core;
  * @author Dan Royer
  *
  */
+@Deprecated
 public class LineSegment2D {
 	public Point2D a, b;
 	
