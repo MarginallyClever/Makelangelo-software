@@ -12,8 +12,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
@@ -45,17 +43,19 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
-	public static final String COMMAND_DRAW = "G1";
+	public static final String COMMAND_DRAW   = "G1";
 	public static final String COMMAND_TRAVEL = "G0";
 
 	/**
 	 * Each {@link Plotter} has a global unique identifier
 	 */
 	private long robotUID;
+	
 	/**
 	 * Users can pick nicknames for machines.
 	 */
 	private String nickname="";
+	
 	/**
 	 * Name of preference node where save data is stored.
 	 */
@@ -114,12 +114,12 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	private boolean didSetHome;
 
 	private double penX;
-
 	private double penY;
 
+	// pen is lifted when the machine is paused.  Remember state before hand.
 	private boolean penIsUpBeforePause;
-
-	private boolean penJustMoved;
+	
+	private boolean firstMoveAfterUpChange;
 	
 	private ArrayList<PlotterListener> listeners = new ArrayList<PlotterListener>();
 
@@ -141,7 +141,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		
 		robotUID = 0;
 		isRegistered = false;
-		penJustMoved = false;
+		firstMoveAfterUpChange = false;
 		
 		double mh = 835; // mm
 		double mw = 835; // mm
@@ -645,10 +645,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public void raisePen() {
 		sendLineToRobot(getPenUpString());
+		firstMoveAfterUpChange = true;
+		penIsUp=true;
 	}
 
 	public void lowerPen() {
 		sendLineToRobot(getPenDownString());
+		firstMoveAfterUpChange = true;
+		penIsUp=true;
 	}
 
 	public boolean didSetHome() {
@@ -711,12 +715,13 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	public void movePenAbsolute(double x, double y) {
 		sendLineToRobot(
 				(isPenUp() 
-					? (penJustMoved ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
-					: (penJustMoved ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
+					? (firstMoveAfterUpChange ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+					: (firstMoveAfterUpChange ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
 				+ " X" + StringHelper.formatDouble(x) 
 				+ " Y" + StringHelper.formatDouble(y));
 		setPenX(x);
 		setPenY(y);
+		firstMoveAfterUpChange = false;
 	}
 
 	/**
@@ -727,13 +732,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		sendLineToRobot("G91"); // set relative mode
 		sendLineToRobot(
 				(isPenUp()  
-					? (penJustMoved ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
-					: (penJustMoved ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
+					? (firstMoveAfterUpChange ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
+					: (firstMoveAfterUpChange ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
 				+ " X" + StringHelper.formatDouble(dx) 
 				+ " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
 		setPenX(getPenX() + dx);
 		setPenY(getPenY() + dy);
+		firstMoveAfterUpChange = false;
 	}
 
 	public void jogLeftMotorOut() {
@@ -752,16 +758,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		sendLineToRobot("D00 R-400");
 	}
 	
-	protected void rememberRaisedPen() {
-		penJustMoved = !isPenUp();
-		raisePen();
-	}
-	
-	protected void rememberLoweredPen() {
-		penJustMoved = isPenUp();
-		lowerPen();
-	}
-
 	public void addListener(PlotterListener listener) {
 		listeners.add(listener);
 	}
@@ -796,9 +792,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		// remember important status changes
 		
 		if(reportedline.startsWith(getPenUpString())) {
-			rememberRaisedPen();
+			notifyListeners("penUp", null, true);
 		} else if(reportedline.startsWith(getPenDownString())) {
-			rememberLoweredPen();
+			notifyListeners("penUp", null, false);
 		} else if(reportedline.startsWith("M17")) {
 			notifyListeners("motorsEngaged", null, true);
 		} else if(reportedline.startsWith("M18")) {
@@ -839,10 +835,10 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		portConfirmed = false;
 		firmwareVersionChecked = false;
 		hardwareVersionChecked = false;
-		this.connection = c;
-		this.connection.addListener(this);
+		connection = c;
+		connection.addListener(this);
 		try {
-			this.connection.sendMessage("M100\n");
+			connection.sendMessage("M100\n");
 		} catch (Exception e) {
 			Log.error(e.getMessage());
 		}
@@ -872,27 +868,25 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 		boolean justNow = false;
 
-		// is port confirmed?
+		// Every Makelangelo on startup says "HELLO WORLD, I AM [model] #[GUID]" on connect.
+		// @See <a href ='https://github.com/MarginallyClever/Makelangelo-firmware/blob/master/src/parser.cpp'>Parser::M100()</a>
+		// portConfirmed is true when the robot we called says these magic words and the [model] matches this.getHello()
 		if (!portConfirmed) {
-			// machine names
-			ServiceLoader<PlotterModel> knownStyles = ServiceLoader.load(PlotterModel.class);
-			Iterator<PlotterModel> i = knownStyles.iterator();
-			while (i.hasNext()) {
-				PlotterModel ms = i.next();
-				String machineTypeName = ms.getHello();
-				if (data.lastIndexOf(machineTypeName) >= 0) {
-					portConfirmed = true;
-					// which machine GUID is this?
-					String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
-					parseRobotUID(afterHello);
+			// not confirmed yet, keep reading to check.
+			PlotterModel ms = this;
+			String machineTypeName = ms.getHello();
+			if (data.lastIndexOf(machineTypeName) >= 0) {
+				Log.message("Connecting machine recognized!");
+				portConfirmed = true;
+				// which machine GUID is this?
+				String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
+				parseRobotUID(afterHello);
 
-					justNow = true;
-					break;
-				}
+				justNow = true;
 			}
 		}
 
-		// is firmware checked?
+		// Part of M100 is a D5 which reports "Firmware v**".  We want to know we're on the right version of the firmware.
 		if (!firmwareVersionChecked && data.lastIndexOf(versionCheckStart) >= 0) {
 			String afterV = data.substring(versionCheckStart.length()).trim();
 			long versionFound = Long.parseLong(afterV);
@@ -907,6 +901,11 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 			}
 		}
 
+		// "D10 V**" where ** is 
+		// 3 is makelangelo 3
+		// 4 is makelangelo huge
+		// 5 is makelangelo 5
+		// 6 is makelangelo 6
 		// is hardware checked?
 		if (!hardwareVersionChecked && data.lastIndexOf("D10") >= 0) {
 			String[] pieces = data.split(" ");
@@ -916,15 +915,16 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 				if (last.startsWith("V")) {
 					String version = last.substring(1);
 					if(version.contentEquals(getVersion())) {
-						// TODO die here if versions don't match?
-					} else {
 						hardwareVersionChecked = true;
+					} else {
+						// TODO die here if versions don't match?
 					}
 					justNow = true;
 				}
 			}
 		}
 
+		// all checks have passed!
 		if (justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
 			// send whatever config settings I have for this machine.
 			sendConfig();
@@ -939,6 +939,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	private void parseRobotUID(String line) {
+		Log.message("Reading GUID");
 		// get the UID reported by the robot
 		String[] lines = line.split("\\r?\\n");
 		long newUID = -1;
@@ -946,7 +947,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 			try {
 				newUID = Long.parseLong(lines[0]);
 			} catch (NumberFormatException e) {
-				Log.error("UID parsing: " + e.getMessage());
+				Log.error(e.getMessage());
 			}
 		}
 
@@ -983,7 +984,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 			sendLineToRobot(lines[i] + "\n");
 		}
 		setHome();
-		sendLineToRobot("G0"
+		sendLineToRobot(COMMAND_TRAVEL
 				+" F" + StringHelper.formatDouble(getTravelFeedRate()) 
 				+" A" + StringHelper.formatDouble(getAcceleration())
 				+"\n");
@@ -1047,7 +1048,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		if (!pleaseGetAGUID)
 			return 0;
 
-		Log.message("Requesting universal ID from server.");
+		Log.message("Requesting GUID from server.");
 		try {
 			// Send request.  This url is broken up to prevent code scanners spotting it in open source repositories.
 			URL url = new URL("htt"+"ps://www.marginally"+"clever.com/drawbot_getuid.p"+"hp");
