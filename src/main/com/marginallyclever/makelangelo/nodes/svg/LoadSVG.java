@@ -97,14 +97,6 @@ public class LoadSVG extends TurtleGenerator implements LoadFile {
 		imageCenterX = ( top.x + bottom.x ) / 2.0;
 		imageCenterY = -( top.y + bottom.y ) / 2.0;
 
-		double imageWidth  = top.x - bottom.x;
-		double imageHeight = top.y - bottom.y;
-
-		// add 2% for margins
-
-		imageWidth += imageWidth * .02;
-		imageHeight += imageHeight * .02;
-
 	    turtle = new Turtle();
 	    turtle.setX(turtle.getX());
 	    turtle.setY(turtle.getX());
@@ -226,7 +218,7 @@ public class LoadSVG extends TurtleGenerator implements LoadFile {
 				// is the stroke none?
 				int k = style.indexOf(strokeLabelName);
 				String strokeStyleName = style.substring(k+strokeLabelName.length());
-				System.out.println(strokeStyleName);
+				//System.out.println(strokeStyleName);
 				if(strokeStyleName.startsWith("none"))
 					// it is!  bail.
 					return true;
