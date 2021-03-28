@@ -351,4 +351,22 @@ public class Turtle implements Cloneable {
 			m.y = s*x + c*y;
 		}
 	}
+
+	/**
+	 * Measure the distance travelled by this {@code Turtle} path.
+	 * @return distance in mm.
+	 */
+	public double getDistance() {
+		double travel=0;
+		TurtleMove prev=null;
+		for( TurtleMove mo : history ) {
+			if(prev!=null) {
+				double dx=prev.x-mo.x;
+				double dy=prev.y-mo.y;
+				travel += Math.sqrt(dx*dx+dy*dy);
+			}
+			prev=mo;
+		}
+		return travel;
+	}
 }
