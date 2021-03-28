@@ -15,7 +15,6 @@ package com.marginallyclever.makelangelo;
  * @version 1.00 2012/2/28
  */
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -35,16 +34,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -59,7 +54,6 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.vecmath.Vector3d;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.jogamp.opengl.GL2;
@@ -151,6 +145,11 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	private OpenGLPanel previewPanel;
 	
 	private PiCaptureAction piCameraCaptureAction;
+	
+	private JMenu robotsMenu;
+	JRadioButtonMenuItem [] favoriteRobots = new JRadioButtonMenuItem[10];
+	
+	private boolean showPenUp=false;
 	
 	
 	public static void main(String[] argv) throws Exception {
@@ -336,7 +335,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 						JOptionPane.OK_CANCEL_OPTION,
 						JOptionPane.PLAIN_MESSAGE);
 				if(result==JOptionPane.OK_OPTION) {
-					//myPaper.saveConfig();
+					panel.save();
 				}
 			}
 		});
@@ -364,7 +363,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 						JOptionPane.OK_CANCEL_OPTION,
 						JOptionPane.PLAIN_MESSAGE);
 				if(result==JOptionPane.OK_OPTION) {
-					//myPen.saveConfig();
+					panel.save();
 				}
 			}
 		});
@@ -399,8 +398,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 							myTurtles.clear();
 
 							for(NodeConnector<?> nc : node.outputs ) {
-								System.out.println("Node output "+nc.getClass().getSimpleName());
 								if(nc instanceof NodeConnectorTurtle) {
+									System.out.println("Node output "+nc.getClass().getSimpleName());
 									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 								}
 							}
@@ -447,8 +446,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 							myTurtles.clear();
 							
 							for(NodeConnector<?> nc : node.outputs ) {
-								System.out.println("Node output "+nc.getClass().getSimpleName());
 								if(nc instanceof NodeConnectorTurtle) {
+									System.out.println("Node output "+nc.getClass().getSimpleName());
 									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 								}
 							}
@@ -578,9 +577,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	
 	private void addMenuRobots() {
 		Log.message("  robot...");
-		JMenu menu = new JMenu(Translator.get("Makelangelo.menuRobot"));
-		refreshRobotsList(menu);
-		menuBar.add(menu);
+		robotsMenu = new JMenu(Translator.get("Makelangelo.menuRobot"));
+		refreshRobotsList();
+		menuBar.add(robotsMenu);
 	}
 	
 	private void addMenuView() {
@@ -594,7 +593,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if( robotController != null ) {
-					robotController.setShowPenUp(!robotController.getShowPenUp());
+					showPenUp=!showPenUp;
 				}
 			};
 		});
@@ -684,43 +683,40 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	}
 
 	// list 10 most recent robot profiles, select first.
-	private void refreshRobotsList(JMenu menu) {
-		menu.removeAll();
+	private void refreshRobotsList() {
+		robotsMenu.removeAll();
 		int count = allPlotters.length();
 		if(count>0) {
 			ButtonGroup group = new ButtonGroup();
-			JRadioButtonMenuItem [] favorites = new JRadioButtonMenuItem[10];
 			int i;
-			int limit = (int)Math.min(count, favorites.length);
+			int limit = (int)Math.min(count, favoriteRobots.length);
 			for(i=0;i<limit;++i) {
 				Plotter p = allPlotters.get(i);
 				String name = p.getNickname();
-				favorites[i] = new JRadioButtonMenuItem(name);
-				group.add(favorites[i]);
-				menu.add(favorites[i]);
-				favorites[i].addActionListener(new ActionListener() {
+				favoriteRobots[i] = new JRadioButtonMenuItem(name);
+				group.add(favoriteRobots[i]);
+				robotsMenu.add(favoriteRobots[i]);
+				favoriteRobots[i].addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						setActivePlotter(p);
 					}
 				});
-				favorites[i].setSelected(p.getUID()==activePlotter.getUID());
 			}
-			menu.add(new JSeparator());
+			robotsMenu.add(new JSeparator());
 		}
 
 		JMenuItem buttonManage = new JMenuItem(Translator.get("Makelangelo.manageMachines"));
-		menu.add(buttonManage);
-		final JMenu menu2 = menu;
+		robotsMenu.add(buttonManage);
 		buttonManage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				AllPlottersGUI mm = new AllPlottersGUI(allPlotters); 
 				mm.run(mainFrame);
-				refreshRobotsList(menu2);
+				refreshRobotsList();
 			}
 		});
-		menu.add(buttonManage);
+		robotsMenu.add(buttonManage);
 		/*
 		JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
 		menu.add(buttonRobotSettings);
@@ -737,16 +733,21 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		});*/
 		
 		JMenuItem buttonDrive = new JMenuItem(Translator.get("Makelangelo.runRobot"));
-		menu.add(buttonDrive);
+		robotsMenu.add(buttonDrive);
 		buttonDrive.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				drivePlotter();
+				DrivePlotterGUI mm = new DrivePlotterGUI(activePlotter); 
+				mm.run(mainFrame);
+				refreshRobotsList();
 			}
 		});
 	}
 	
 	protected void setActivePlotter(Plotter p) {
+		if(activePlotter == p) return;
+		
+		// if we were drawing a robot, forget about it.
 		if(previewPanel!=null) {
 			if(activePlotter!=null) {
 				previewPanel.removeListener(activePlotter);
@@ -756,18 +757,37 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		logPanel.setRobot(null);
 		robotController = null;
 		
-		if(activePlotter != p) {
-			activePlotter = p;
-			// PropertyChangeEvent here?
-			if(activePlotter!=null) {
-				System.out.println("Changing active plotter to "+p.getNickname());
-				robotController = new RobotController(activePlotter);
-				
-				// create a robot and listen to it for important news
-				logPanel.setRobot(robotController);
+		// uncheck the favorites list
+		int limit = (int)Math.min(allPlotters.length(), favoriteRobots.length);
+		for(int i=0;i<limit;++i) {
+			if(favoriteRobots[i]!=null) {
+				favoriteRobots[i].setSelected(false);
 			}
 		}
 		
+		// set the new robot
+		activePlotter = p;
+
+		// PropertyChangeEvent here?
+		if(activePlotter!=null) {
+			System.out.println("Changing active plotter to "+p.getNickname());
+			robotController = new RobotController(activePlotter);
+			
+			// create a robot and listen to it for important news
+			logPanel.setRobot(robotController);
+
+			String activeNodeName = activePlotter.getNodeName();
+			//System.out.println("activeNodeName="+activeNodeName);
+			for(int i=0;i<limit;++i) {
+				Plotter p2 = allPlotters.get(i);
+				//System.out.println("p2.getNodeName "+i+"="+p2.getNodeName());
+				if(favoriteRobots[i]!=null) {
+					favoriteRobots[i].setSelected(activeNodeName.contentEquals(p2.getNodeName()));
+				}
+			}
+		}
+
+		// remember to draw the new robot
 		if(previewPanel!=null) {
 			if(activePlotter !=null) {
 				previewPanel.addListener(activePlotter);
@@ -814,7 +834,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		previewPanel.setCamera(camera);
 		previewPanel.addListener(myPaper);
 		previewPanel.addListener(this);
-		setActivePlotter(activePlotter);
+
+		setActivePlotter(allPlotters.get(0));
 
 		mainFrame.setContentPane(previewPanel);
 		
@@ -826,19 +847,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		mainFrame.setVisible(true);
 	}
 
-	private void drivePlotter() {
-		menuBar.setEnabled(false);
-
-		PanelDrivePlotter myRobotPanel = new PanelDrivePlotter(getMainFrame(),activePlotter);
-		
-		JDialog dialog = new JDialog(getMainFrame(),Translator.get("Makelangelo.menuRobot"), true);
-        dialog.setLocation(getMainFrame().getLocation());
-		dialog.setContentPane(myRobotPanel);
-		dialog.pack();
-		dialog.setVisible(true);
-		
-		menuBar.setEnabled(true);
-	}
 
 	private void adjustWindowSize() {
 		Log.message("adjust window size...");
@@ -913,15 +921,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		preferences.putInt("Default window location y", location.y);
 	}
 
-	public JFrame getMainFrame() {
-		return mainFrame;
-	}
-
-	@Deprecated
-	public RobotController getRobot() {
-		return robotController;
-	}
-	
 	// transfer handler
 	@Override
     public boolean canImport(TransferHandler.TransferSupport info) {
@@ -948,9 +947,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
         	data = (List<?>)info.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
         } 
         catch (Exception e) {
+        	Log.error("Failed to import from drag and drop.");
         	return false;
         }
-
         if(data==null) return false;
         // accept only one file at a time.
         if(data.size()!=1) return false;
@@ -977,13 +976,27 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 
 			try (final InputStream fileInputStream = new FileInputStream(filename)) {
 				boolean success=loader.load(fileInputStream);
+				
+				if( loader instanceof TurtleGenerator ) {
+					TurtleGenerator g = (TurtleGenerator)loader;
+
+					myTurtles.clear();
+					
+					for(NodeConnector<?> nc : g.outputs ) {
+						if(nc instanceof NodeConnectorTurtle) {
+							System.out.println("Node output "+nc.getClass().getSimpleName());
+							myTurtles.add(((NodeConnectorTurtle)nc).getValue());
+						}
+					}
+				}
+				
 				return success;
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		Log.error(Translator.get("UnknownFileType"));
+		JOptionPane.showMessageDialog(mainFrame, Translator.get("UnknownFileType"));
 		return false;
 	}
 
@@ -1059,6 +1072,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void testGeneratorsAndConverters() {
 		TransformedImage owl = TransformedImage.loadImage(".\\src\\test\\resources\\owl.jpg");
 		owl.rotateAbsolute(-25);
@@ -1096,8 +1110,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		System.out.println("Node name "+c.getName());
 		
 		for(NodeConnector<?> nc : c.inputs ) {
-			System.out.println("Node input "+nc.getClass().getSimpleName());
 			if(nc instanceof NodeConnectorTransformedImage) {
+				System.out.println("Node input "+nc.getClass().getSimpleName());
 				((NodeConnectorTransformedImage)nc).setValue(owl);
 			};
 		}
@@ -1110,8 +1124,8 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		myTurtles.clear();
 		
 		for(NodeConnector<?> nc : c.outputs ) {
-			System.out.println("Node output "+nc.getClass().getSimpleName());
 			if(nc instanceof NodeConnectorTurtle) {
+				System.out.println("Node output "+nc.getClass().getSimpleName());
 				myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 			}
 		}
@@ -1186,418 +1200,34 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 	}
 	
-	
 	// shorten the pen up travels.
 	private void optimizeTurtles() {
+		TurtleOptimizer opt = new TurtleOptimizer();
+		
 		for( Turtle t : myTurtles ) {
-			optimizeOneTurtle(t);
+			opt.optimizeOneTurtle(t);
 		}
-	}
-
-	private class Polyline extends LinkedList<Integer> {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-	}
-
-	private class Segment2D {
-		public int a,b;
-		
-		public Segment2D(int aa,int bb) {
-			a=aa;
-			b=bb;
-		}
-	}
-	private ArrayList<Point2D> points = new ArrayList<Point2D>();
-	private ArrayList<Segment2D> segments = new ArrayList<Segment2D>();
-	private ArrayList<Polyline> polyLines = new ArrayList<Polyline>();
-
-	private int optimizeAddPointToPool(double x,double y,final double EPSILON) {
-		int i=0;
-		for( Point2D p1 : points ) {
-			if(Math.abs(x-p1.x)<EPSILON && Math.abs(y-p1.y)<EPSILON) {
-				// no
-				return i;
-			}
-			++i;
-		}
-		// yes
-		points.add(new Point2D(x,y));
-		return i; // which is the same as points.size()-1;
-	}
-	
-	private void reportTurtleTravel(Turtle turtle) {
-		double travel=0;
-		TurtleMove prev=null;
-		for( TurtleMove mo : turtle.history ) {
-			if(mo.isUp && prev!=null ) {
-				double dx=prev.x-mo.x;
-				double dy=prev.y-mo.y;
-				travel += Math.sqrt(dx*dx+dy*dy);
-			}
-			prev=mo;
-		}
-		System.out.println("Travel (mm)="+travel);
-	}
-
-	private void optimizeOneTurtle(Turtle turtle) {
-		reportTurtleTravel(turtle);
-		
-		points.clear();
-		segments.clear();
-		polyLines.clear();
-		
-		// build a list of unique points (further than EPSILON apart)
-		// and line segments (two points connected by a line)
-		final double EPSILON = 0.01;
-		
-		TurtleMove prev = null;
-		int drawMoves=0;
-		int travelMoves=0;
-
-		for( TurtleMove m : turtle.history ) {
-			// is this point unique in the pool?
-			if( !m.isUp ) {
-				drawMoves++;
-				if(prev!=null) {
-					int a = optimizeAddPointToPool(prev.x,prev.y,EPSILON);
-					int b = optimizeAddPointToPool(m.x,m.y,EPSILON);
-					if(a!=b) {
-						// we keep only segments that are longer than EPSILON.
-						segments.add(new Segment2D(a,b));
-					}
-				}
-			} else {
-				travelMoves++;
-			}
-			
-			prev = m;
-		}
-		System.out.println("history = "+turtle.history.size());
-		System.out.println("drawMoves = "+drawMoves);
-		System.out.println("travelMoves = "+travelMoves);
-		System.out.println("points = "+points.size());
-		System.out.println("segments = "+segments.size());
-		assert(segments.size()<=drawMoves);
-		
-		// greedy tours to build sequence of lines with no pen up or down.
-		while( segments.size()>0 ) {
-			Polyline line = new Polyline();
-			polyLines.add(line);
-			
-			Segment2D s0 = segments.remove(0);
-			int head = s0.a;
-			int tail = s0.b;
-			line.add(head);
-			line.add(tail);
-
-			// if a segment meets the head or tail of this snake, take it from the segment pool and add grow the snake. 
-			ArrayList<Segment2D> segmentsToKeep = new ArrayList<Segment2D>();
-			for( Segment2D s : segments ) {
-					 if(s.a==head) {	line.addFirst(s.b);		head=s.b;	}
-				else if(s.b==head) {	line.addFirst(s.a);		head=s.a;	}
-				else if(s.a==tail) {	line.addLast(s.b);		tail=s.b;	}
-				else if(s.b==tail) {	line.addLast(s.a);		tail=s.a;	}
-				else segmentsToKeep.add(s);
-			}
-			segments = segmentsToKeep;
-			//System.out.println("line size="+line.size());
-		}
-		System.out.println("polylines = "+polyLines.size());
-		assert(polyLines.size()<=segments.size());
-		assert(polyLines.size()<=travelMoves);
-
-		// find the bounds of the points
-		Point2D top = new Point2D(-Double.MAX_VALUE,-Double.MAX_VALUE);
-		Point2D bottom = new Point2D(Double.MAX_VALUE,Double.MAX_VALUE);
-		for( Point2D p : points ) {
-			top.x = Math.max(p.x, top.x);
-			top.y = Math.max(p.y, top.y);
-			bottom.x = Math.min(p.x, bottom.x);
-			bottom.y = Math.min(p.y, bottom.y);
-		}
-		top.x+=0.001;
-		top.y+=0.001;
-		double w = top.x-bottom.x;
-		double h = top.y-bottom.y;
-
-		// we have a box from top to bottom.  
-		// let's make a grid bucketsPerSide*bucketsPerSide large.
-		int numEnds = polyLines.size()*2;
-		int bucketsPerSide = (int)Math.ceil(Math.sqrt(numEnds/2));
-		if(bucketsPerSide<1) bucketsPerSide=1;
-		// allocate buckets
-		Polyline[] buckets = new Polyline[bucketsPerSide*bucketsPerSide];
-		for( int b=0;b<buckets.length;b++) {
-			buckets[b] = new Polyline();
-		}
-		
-		// put the head and tail of each polyline into their buckets.
-		for( Polyline line : polyLines ) {
-			for( int index : new int[] { line.peekFirst(), line.peekLast() } ) {
-				Point2D p = points.get(index);
-				int ix = (int)(bucketsPerSide * (p.x-bottom.x) / w);
-				int iy = (int)(bucketsPerSide * (p.y-bottom.y) / h);
-				buckets[iy*bucketsPerSide+ix].add(index);
-			}
-		}
-
-		{/*
-			// some debug info
-			int i=0;
-			System.out.println("buckets=[");
-			for(int y=0;y<bucketsPerSide;++y) {
-				for(int x=0;x<bucketsPerSide;++x) {
-					System.out.print(buckets[i].size()+"\t");
-					i++;
-				}
-				System.out.println();
-			}
-			System.out.println("]");
-		//*/
-		}
-		
-		// sort the polylines by nearest neighbor into newOrder
-		ArrayList<Polyline> newOrder = new ArrayList<Polyline>();
-		ArrayList<Polyline> foundLines = new ArrayList<Polyline>(); 
-		Polyline foundIndexes = new Polyline();
-		Point2D lastPoint=null;
-		int ix,iy;
-		int bx=0;
-		int by=0;
-		
-		while(polyLines.size()>0) {
-			int radius=0;
-			while(foundIndexes.size()==0) {
-				if(radius==0) {
-					foundIndexes.addAll(buckets[by*bucketsPerSide+bx]);
-				} else {
-					//System.out.println("radius="+radius);
-					for(iy=by-radius;iy<=by+radius;++iy) {
-						if(iy<0 || iy >= bucketsPerSide) continue;
-						ix = bx-radius;  if(ix>=0            ) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
-						ix = bx+radius;  if(ix<bucketsPerSide) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
-					}
-					for(ix=bx-radius;ix<=bx+radius;++ix) {
-						if(ix<0 || ix >= bucketsPerSide) continue;
-						iy = by-radius;  if(iy>=0            ) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
-						iy = by+radius;  if(iy<bucketsPerSide) foundIndexes.addAll(buckets[iy*bucketsPerSide+ix]);
-					}
-				}
-				radius++;
-			}
-			
-			// find best line.
-			Polyline bestLine;
-			{
-				//System.out.println("found "+foundIndexes.size()+" candidate point(s).");
-				// we found at least one index, maybe more, and we don't know which bucket the index(es) came from.
-				// figure out to which polyLine they belong.
-				for( Polyline line : polyLines ) {
-					int first=line.peekFirst();
-					int last =line.peekLast();
-					if(foundIndexes.contains(first) || foundIndexes.contains(last)) {
-						// make sure found lines are unique.
-						if(!foundLines.contains(line)) {
-							foundLines.add(line);
-						}
-					}
-				}
-				//System.out.println("found "+foundLines.size()+" unique polyLine(s).");
-				
-				// we know which lines were found.
-				// we know they are pretty close.
-				// We prefer polylines that start and end in the same cell.
-				//   That means we prefer closed polyloops first.
-				// We prefer polylines with a head close to their tail
-				// sort based on this preference.
-				final Point2D testLastPoint = lastPoint;
-				foundLines.sort(new Comparator<Polyline>() {
-					@Override
-					public int compare(Polyline o1, Polyline o2) {
-						int a = o1.peekFirst();
-						int b = o1.peekLast();
-						int c=o2.peekFirst();
-						int d=o2.peekLast();
-						double d1=0;
-						double d2=0;
-						/*
-						if(a==b) d1=0;  // closed
-						else {
-							Point2D h1=points.get(a);
-							Point2D t1=points.get(b);
-							double dx=h1.x-t1.x;
-							double dy=h1.y-t1.y;
-							d1 = dx*dx+dy*dy;
-						}
-						
-						if(c==d) d2=0;  // closed
-						else {
-							Point2D h2=points.get(c);
-							Point2D t2=points.get(d);					
-							double dx=h2.x-t2.x;
-							double dy=h2.y-t2.y;
-							d2 = dx*dx+dy*dy;
-						}*/
-						
-						if(d1==d2 && testLastPoint!=null) {
-							Point2D h1=points.get(a);
-							Point2D t1=points.get(b);
-							Point2D h2=points.get(c);
-							Point2D t2=points.get(d);					
-							d1 = Math.min(testLastPoint.distance(h1), testLastPoint.distance(t1));
-							d1 = Math.min(testLastPoint.distance(h2), testLastPoint.distance(t2));
-						}
-						
-						return (int)((d2-d1)*1000);
-					}
-				});
-				// the first line is the best line in the list
-				bestLine = foundLines.get(0);
-				foundLines.clear();
-				
-				// set bx/by 
-				int first = bestLine.peekLast();
-				int last = bestLine.peekLast();
-				lastPoint = points.get(foundIndexes.contains(first) ? last : first);
-				bx = (int)(bucketsPerSide * (lastPoint.x-bottom.x) / w);
-				by = (int)(bucketsPerSide * (lastPoint.y-bottom.y) / h);
-
-				foundIndexes.clear();
-			}
-
-			//System.out.println("cleanup...");
-			polyLines.remove(bestLine);
-			newOrder.add(bestLine);
-			Integer bh = bestLine.peekFirst();
-			Integer bt = bestLine.peekLast();
-			for( Polyline b : buckets ) {
-				b.remove(bh);
-				b.remove(bt);
-			}
-			
-			if((polyLines.size()%1000)==0) {
-				//System.out.println(polyLines.size());
-			}
-		}
-		
-		// rebuild the new, more efficient turtle path
-		System.out.println("Rebuilding...");
-		ArrayList<TurtleMove> newHistory = new ArrayList<TurtleMove>();
-		for( Polyline line : newOrder ) {
-			boolean first=true;
-			for( Integer index : line ) {
-				Point2D p = points.get(index);
-				newHistory.add(new TurtleMove(p.x,p.y,first));
-				first=false;
-			}
-		}
-		turtle.history = newHistory;
-
-		reportTurtleTravel(turtle);
 	}
 	
 	/**
 	 * Reduce the total number of commands without altering the output.
 	 */
 	private void simplifyTurtles() {
-		for( Turtle t : myTurtles ) {
-			removeSequentialPenUpMoves(t);
-		}
+		TurtleOptimizer opt = new TurtleOptimizer();
 		
 		for( Turtle t : myTurtles ) {
-			removeSequentialLinearPenDownMoves(t);
+			opt.removeSequentialPenUpMoves(t);
 		}
-	}
-	
-	/**
-	 * Any time there are two pen up moves in a row then the first is not needed.
-	 * @param turtle to be simplified.
-	 */
-	private void removeSequentialPenUpMoves(Turtle turtle) {
-		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 		
-		int len = turtle.history.size();
-		
-		TurtleMove a=turtle.history.get(0);
-		TurtleMove b=null;
-		for(int i=1;i<len;++i) {
-			b = turtle.history.get(i);
-			// if abc are up then b is redundant.
-			if(a.isUp && b.isUp) {
-				// do nothing. lose a.
-			} else {
-				// a not redudant, keep it.
-				toKeep.add(a);
-			}
-			a = b;
+		for( Turtle t : myTurtles ) {
+			opt.removeSequentialLinearPenDownMoves(t);
 		}
-		if(b!=null) {
-			toKeep.add(b);
-		}
-
-		int len2 = toKeep.size();
-		System.out.println("history start="+len+", end="+len2+", saved="+(len-len2));
-		turtle.history.clear();
-		turtle.history.addAll(toKeep);
-	}
-	
-	/**
-	 * Any time there are two pen down moves in ab and bc where abc is a straight line?  Lose b.
-	 * @param turtle to be simplified.
-	 */
-	private void removeSequentialLinearPenDownMoves(Turtle turtle) {
-		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
-		
-		int len = turtle.history.size();
-
-		Vector3d v0 = new Vector3d();
-		Vector3d v1 = new Vector3d();
-
-		TurtleMove a;
-		TurtleMove b;
-		TurtleMove c=null;
-		toKeep.add(turtle.history.get(0));
-		for(int i=1;i<len-1;++i) {
-			a = turtle.history.get(i-1);
-			b = turtle.history.get(i);
-			c = turtle.history.get(i+1);
-			// if abc are up then b is redundant.
-			if(!b.isUp && !c.isUp) {
-				// are ABC in a straight line?
-				v0.x = b.x-a.x;
-				v0.y = b.y-a.y;
-				v0.normalize();
-				v1.x = c.x-b.x;
-				v1.y = c.y-b.y;
-				v1.normalize();
-				// 1 degree = cos(PI/180) = 0.99984769515
-				if(v1.dot(v0)>0.99984769515) {
-					// Less than 1 degree.  Lose b.
-				} else {
-					// 1 degree or more.  b not redudant.  Keep it.
-					toKeep.add(b);
-				}
-			} else {
-				// b not redudant, keep it.
-				toKeep.add(b);
-			}
-		}
-		if(c!=null) {
-			toKeep.add(c);
-		}
-
-		int len2 = toKeep.size();
-		System.out.println("history start="+len+", end="+len2+", saved="+(len-len2));
-		turtle.history.clear();
-		turtle.history.addAll(toKeep);
 	}
 	
 	/**
 	 * crop a set of {@link Turtle} to the page edges.
 	 */
-	private void cropTurtles() {	
+	private void cropTurtles() {
 		double yTop    = myPaper.getTop();
 		double yBottom = myPaper.getBottom();
 		double xLeft   = myPaper.getLeft();
@@ -1664,12 +1294,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 
 	@Override
 	public void render(GL2 gl2) {
-		boolean showPenUp = false;
-		
-		if( robotController != null ) {
-			showPenUp = robotController.getShowPenUp();
-		}
-		
 		float size = (float)(myPen.getDiameter() * 200.0 / camera.getZoom());
 		
 		for( Turtle t : myTurtles ) {
@@ -1682,6 +1306,10 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 
 	public Paper getPaper() {
 		return myPaper;
+	}
+	
+	public JFrame getMainFrame() {
+		return mainFrame;
 	}
 }
 
