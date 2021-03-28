@@ -395,8 +395,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 					dialog.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							myTurtles.clear();
-
 							for(NodeConnector<?> nc : node.outputs ) {
 								if(nc instanceof NodeConnectorTurtle) {
 									System.out.println("Node output "+nc.getClass().getSimpleName());
@@ -443,8 +441,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 					dialog.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							myTurtles.clear();
-							
 							for(NodeConnector<?> nc : node.outputs ) {
 								if(nc instanceof NodeConnectorTurtle) {
 									System.out.println("Node output "+nc.getClass().getSimpleName());
@@ -480,6 +476,24 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		Log.message("  edit...");
 		JMenu menu = new JMenu(Translator.get("Makelangelo.menuEdit"));
 		menuBar.add(menu);
+		
+		JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
+		buttonOptimize.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			optimizeTurtles();
+		}
+		});
+		menu.add(buttonOptimize);
+		
+		JMenuItem buttonSimplify = new JMenuItem(Translator.get("Makelangelo.action.simplify"));
+		buttonSimplify.addActionListener(new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			simplifyTurtles();
+		}
+		});
+		menu.add(buttonSimplify);
 
 		JMenuItem buttonRotate90 = new JMenuItem(Translator.get("Makelangelo.action.rotate90"));
 		buttonRotate90.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK));
@@ -546,24 +560,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		});
 		menu.add(buttonCenter);
-					
-		JMenuItem buttonOptimize = new JMenuItem(Translator.get("Makelangelo.action.optimize"));
-		buttonOptimize.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				optimizeTurtles();
-			}
-		});
-		menu.add(buttonOptimize);
-		
-		JMenuItem buttonSimplify = new JMenuItem(Translator.get("Makelangelo.action.simplify"));
-		buttonSimplify.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				simplifyTurtles();
-			}
-		});
-		menu.add(buttonSimplify);
 		
 		JMenuItem buttonCrop = new JMenuItem(Translator.get("Makelangelo.action.crop"));
 		buttonCrop.addActionListener(new ActionListener() {
@@ -980,8 +976,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 				if( loader instanceof TurtleGenerator ) {
 					TurtleGenerator g = (TurtleGenerator)loader;
 
-					myTurtles.clear();
-					
 					for(NodeConnector<?> nc : g.outputs ) {
 						if(nc instanceof NodeConnectorTurtle) {
 							System.out.println("Node output "+nc.getClass().getSimpleName());
@@ -1120,8 +1114,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			c.iterate();
 			if(!c.getKeepIterating()) break;
 		}
-		
-		myTurtles.clear();
 		
 		for(NodeConnector<?> nc : c.outputs ) {
 			if(nc instanceof NodeConnectorTurtle) {
