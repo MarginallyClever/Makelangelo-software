@@ -15,7 +15,6 @@ import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.nodes.gcode.SaveGCode;
-import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.FirmwareSimulation;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterListener;
@@ -31,7 +30,6 @@ import com.marginallyclever.makelangelo.plotter.PlotterListener;
  */
 public class RobotController extends Node implements PlotterListener {
 	public Plotter myPlotter;
-	private Paper myPaper = new Paper();
 
 	private ArrayList<Turtle> turtles = new ArrayList<Turtle>();
 
@@ -40,8 +38,6 @@ public class RobotController extends Node implements PlotterListener {
 	
 	// what line in drawingCommands is going to be sent next?
 	protected int drawingProgress;
-
-	private boolean showPenUp = false;
 	
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
@@ -363,31 +359,15 @@ public class RobotController extends Node implements PlotterListener {
 		return x;
 	}
 
-	public boolean getShowPenUp() {
-		return showPenUp;
-	}
-
-	public void setShowPenUp(boolean b) {
-		showPenUp=b;
-	}
-	
-	public Paper getPaper() {
-		return myPaper;
-	}
-
-
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub
-		
 	}
-
 
 	@Override
 	public void sendBufferEmpty(Plotter r) {
 		sendFileCommand();
 	}
-
 
 	@Override
 	public void dataAvailable(Plotter r, String data) {
@@ -395,12 +375,10 @@ public class RobotController extends Node implements PlotterListener {
 		
 	}
 
-
 	@Override
 	public void disconnected(Plotter r) {
 		// TODO Auto-generated method stub
 	}
-
 
 	@Override
 	public void lineError(Plotter r, int lineNumber) {
