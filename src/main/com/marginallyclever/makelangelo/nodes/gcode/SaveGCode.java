@@ -13,7 +13,6 @@ import com.marginallyclever.core.node.Node;
 import com.marginallyclever.core.node.NodeConnectorExistingFile;
 import com.marginallyclever.core.turtle.Turtle;
 import com.marginallyclever.core.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.RobotController;
 import com.marginallyclever.makelangelo.nodes.SaveFile;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
@@ -48,11 +47,10 @@ public class SaveGCode extends Node implements SaveFile {
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot) {
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Plotter machine) {
 		Log.message("saving...");
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			Plotter machine = robot.getPlotter();
 			machine.writeProgramStart(out);
 			machine.writeAbsoluteMode(out);
 			machine.writePenUp(out);

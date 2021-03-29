@@ -588,9 +588,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		buttonShowUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if( robotController != null ) {
-					showPenUp=!showPenUp;
-				}
+				showPenUp=!showPenUp;
 			};
 		});
 		menu.add(buttonShowUp);
@@ -713,20 +711,6 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		});
 		robotsMenu.add(buttonManage);
-		/*
-		JMenuItem buttonRobotSettings = new JMenuItem(Translator.get("Makelangelo.robotSettings"));
-		menu.add(buttonRobotSettings);
-		buttonRobotSettings.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if( robotController != null ) {
-					menuBar.setEnabled(false);
-					DialogMachineSettings m = new DialogMachineSettings(mainFrame,Translator.get("Makelangelo.robotSettings"));
-					m.run(robotController);
-					menuBar.setEnabled(true);
-				}
-			}
-		});*/
 		
 		JMenuItem buttonDrive = new JMenuItem(Translator.get("Makelangelo.runRobot"));
 		robotsMenu.add(buttonDrive);
@@ -770,7 +754,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			robotController = new RobotController(activePlotter);
 			
 			// create a robot and listen to it for important news
-			logPanel.setRobot(robotController);
+			logPanel.setRobot(activePlotter);
 
 			String activeNodeName = activePlotter.getNodeName();
 			//System.out.println("activeNodeName="+activeNodeName);
@@ -1051,10 +1035,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=saver.save(fileOutputStream,myTurtles,robotController);
+					success=saver.save(fileOutputStream,myTurtles,activePlotter);
 				} catch(IOException e) {
 					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
-					//e.printStackTrace();
 				}
 				if(success==true) {
 					lastFileOut = selectedFile;
@@ -1122,9 +1105,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		}
 		
+		robotController.setTurtles(myTurtles);
+		
 		if(myTurtles.size()>0) {
-			robotController.setTurtles(myTurtles);
-		} else {
 			System.out.println("No turtles found!");
 		}
 	}

@@ -188,7 +188,7 @@ public class RobotController extends Node implements PlotterListener {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			SaveGCode saveNGC = new SaveGCode();
-			saveNGC.save(fileOutputStream, turtles, this);
+			saveNGC.save(fileOutputStream, turtles, myPlotter);
 
 			drawingCommands.clear();
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));

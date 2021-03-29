@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.core.turtle.Turtle;
-import com.marginallyclever.makelangelo.RobotController;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 
 /**
  * Interface for the service handler
@@ -34,5 +34,5 @@ public abstract interface SaveFile {
 	 * @param robot machine hardware settings to use in loading process
 	 * @return true if save successful.
 	 */
-	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, RobotController robot);
+	public boolean save(OutputStream outputStream,ArrayList<Turtle> turtles, Plotter robot);
 }
