@@ -112,6 +112,9 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	private AllPlotters allPlotters;
 	private Plotter activePlotter;
 
+	// who manages sending drawings to the plotter?
+	private RobotController myController;
+	
 	// what drawing tool is loaded.
 	private Pen myPen = new Pen();
 	
@@ -122,9 +125,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	private ArrayList<Turtle> myTurtles;
 	
 	private Camera camera;
-	private RobotController robotController;
 
-	
 	protected String lastFileIn = "";
 	protected FileFilter lastFilterIn = null;
 	
@@ -401,12 +402,11 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 									myTurtles.add(((NodeConnectorTurtle)nc).getValue());
 								}
 							}
-							
-							if(myTurtles.size()>0) {
-								if(robotController!=null) {
-									robotController.setTurtles(myTurtles);
-								}
-							} else {
+
+							if(myController!=null) {
+								myController.setTurtles(myTurtles);
+							}
+							if(myTurtles.size()==0) {
 								System.out.println("No turtles found!");
 							}
 						}
@@ -448,11 +448,10 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 								}
 							}
 							
-							if(myTurtles.size()>0) {
-								if(robotController!=null) {
-									robotController.setTurtles(myTurtles);
-								}
-							} else {
+							if(myController!=null) {
+								myController.setTurtles(myTurtles);
+							}
+							if(myTurtles.size()==0) {
 								System.out.println("No turtles found!");
 							}
 						}
@@ -717,7 +716,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		buttonDrive.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DrivePlotterGUI mm = new DrivePlotterGUI(activePlotter); 
+				DrivePlotterGUI mm = new DrivePlotterGUI(myController); 
 				mm.run(mainFrame);
 				refreshRobotsList();
 			}
@@ -735,7 +734,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		}
 
 		logPanel.setRobot(null);
-		robotController = null;
+		myController = null;
 		
 		// uncheck the favorites list
 		int limit = (int)Math.min(allPlotters.length(), favoriteRobots.length);
@@ -751,7 +750,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 		// PropertyChangeEvent here?
 		if(activePlotter!=null) {
 			System.out.println("Changing active plotter to "+p.getNickname());
-			robotController = new RobotController(activePlotter);
+			myController = new RobotController(activePlotter);
 			
 			// create a robot and listen to it for important news
 			logPanel.setRobot(activePlotter);
@@ -1105,7 +1104,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 			}
 		}
 		
-		robotController.setTurtles(myTurtles);
+		myController.setTurtles(myTurtles);
 		
 		if(myTurtles.size()>0) {
 			System.out.println("No turtles found!");
@@ -1115,7 +1114,7 @@ public final class Makelangelo extends TransferHandler implements RendersInOpenG
 	// DO NOT add confirm here, it's too late at this point.
 	private void newFile() {
 		myTurtles.clear();
-		robotController.setTurtles(myTurtles);
+		myController.setTurtles(myTurtles);
 	}
 
 	private void rotateTurtles(double degrees) {

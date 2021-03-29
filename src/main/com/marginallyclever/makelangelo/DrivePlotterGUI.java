@@ -9,8 +9,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -40,6 +38,8 @@ import com.marginallyclever.makelangelo.plotter.PlotterListener;
 public class DrivePlotterGUI implements ActionListener, PlotterListener {
 	// the robot being controlled
 	private Plotter myPlotter;
+	// the recording to play
+	private RobotController myController;
 	
 	// the top-most UX element
 	private Frame parentFrame;
@@ -74,8 +74,9 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 	/**
 	 * @param plotter
 	 */
-	public DrivePlotterGUI(Plotter plotter) {
-		myPlotter = plotter;
+	public DrivePlotterGUI(RobotController controller) {
+		myController = controller;
+		myPlotter = controller.getPlotter();
 	}
 
 	public void run(Frame parent) {
@@ -83,9 +84,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 		
 		JDialog dialog = new JDialog(parent,Translator.get("Makelangelo.menuRobot"), true);
         dialog.setLocation(parent.getLocation());
-	
-		myPlotter.addListener(this);
-		
+
 		myPanel = new JPanel(new GridBagLayout());
 
 		GridBagConstraints con1 = new GridBagConstraints();
@@ -111,6 +110,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 		// lastly, set the button states
 		updateButtonAccess();
 
+		myController.addListener(this);
 		myPlotter.addListener(this);
 		
 		dialog.setContentPane(myPanel);
@@ -129,7 +129,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 	}
 
 
-	public JButton createTightJButton(String label) {
+	private JButton createTightJButton(String label) {
 		JButton b = new JButton(label);
 		//b.setMargin(new Insets(0,0,0,0));
 		Dimension d = new Dimension(60,20);
@@ -141,7 +141,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 	}
 
 
-	public JButton createNarrowJButton(String label) {
+	private JButton createNarrowJButton(String label) {
 		JButton b = new JButton(label);
 		b.setMargin(new Insets(0,0,0,0));
 		b.setPreferredSize(new Dimension(40,20));
@@ -214,7 +214,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
-					myPlotter.halt();
+					myController.halt();
 					myPlotter.closeConnection();
 					buttonConnect.setText(Translator.get("ButtonConnect"));
 					buttonConnect.setForeground(Color.GREEN);
@@ -240,7 +240,6 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 
 	    return connectionPanel;
 	}
-
 
 	private JPanel createUtilitiesPanel(final Plotter plotter) {
 		CollapsiblePanel utilitiesPanel = new CollapsiblePanel(Translator.get("RobotPanel.Animate"));
@@ -353,7 +352,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 		buttonStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				robotController.startAt(0);
+				myController.startAt(0);
 			}
 		});
 
@@ -374,13 +373,13 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// toggle pause
-				if (myPlotter.isPaused() == true) {
+				if (myController.isPaused()) {
 					buttonPause.setText(Translator.get("Pause"));
-					robotController.unPause();
-					robotController.sendFileCommand();
+					myController.unPause();
+					myController.sendFileCommand();
 				} else {
 					buttonPause.setText(Translator.get("Unpause"));
-					robotController.pause();
+					myController.pause();
 				}
 			}
 		});
@@ -392,7 +391,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 		buttonHalt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				myPlotter.halt();	
+				myController.halt();	
 			}
 		});
 
@@ -451,6 +450,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 	}
 	
 	// The user has done something. respond to it.
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
@@ -486,16 +486,15 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 					if(p.addPenDownCommand==true) {
 						myPlotter.sendLineToRobot(myPlotter.getPenDownString());
 					}
-					robotController.startAt(lineNumber);
+					myController.startAt(lineNumber);
 				} else {
-					int lineBefore = robotController.findLastPenUpBefore(lineNumber);
-					robotController.startAt(lineBefore);
+					int lineBefore = myController.findLastPenUpBefore(lineNumber);
+					myController.startAt(lineBefore);
 				}
 			}
 		}
 	}
 	
-
 	// the moment a robot is confirmed to have connected
 	public void onConnect() {
 		updateButtonAccess();
@@ -509,7 +508,7 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 				
 		if(myPlotter!=null) {
 			isConfirmed = myPlotter.isPortConfirmed();
-			isRunning = myPlotter.isRunning();
+			isRunning = myController.isRunning();
 			didSetHome = myPlotter.didSetHome();
 		}
 		
@@ -555,7 +554,6 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 		myPanel.validate();
 	}
 	
-	
 	public static void main(String[] argv) {
 		if(GraphicsEnvironment.isHeadless()) {
 			System.out.println("Test can only be run on a machine with a head (monitor, HID)");
@@ -574,8 +572,9 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 				JFrame mainFrame = new JFrame(Translator.get("Makelangelo.menuRobot"));
 				mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-				Plotter robot = new Makelangelo5();
-				DrivePlotterGUI gui = new DrivePlotterGUI(robot);
+				Plotter p = new Makelangelo5();
+				RobotController rc = new RobotController(p);
+				DrivePlotterGUI gui = new DrivePlotterGUI(rc);
 				gui.run(mainFrame);
 			}
 		});
@@ -626,15 +625,21 @@ public class DrivePlotterGUI implements ActionListener, PlotterListener {
 				statusBar.start();
 				updateButtonAccess(); // disables all the manual driving buttons
 				break;
-			case "progress":
-				statusBar.setProgress((long)evt.getOldValue(), (long)evt.getNewValue());
-				break;
 			case "engaged":
 				if((boolean)evt.getNewValue()) {
 					toggleEngageMotor.setText(Translator.get("DisengageMotors"));
 				} else {
 					toggleEngageMotor.setText(Translator.get("EngageMotors"));
 				}
+				break;
+			}
+		} else if(evt.getSource()==myController) {
+			switch(evt.getPropertyName()) {
+			case "progress":
+				statusBar.setProgress((int)evt.getOldValue(), (int)evt.getNewValue());
+				break;
+			case "running":
+				updateButtonAccess();
 				break;
 			}
 		}

@@ -42,11 +42,26 @@ public class RobotController extends Node implements PlotterListener {
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
+	private boolean isRunning;
+
+	private boolean isPaused;
+	
+	// machine is confirmed ready to go.
+	private boolean readyToDraw;
+
+	// pen is lifted when the machine is paused.  Remember state before hand.
+	private boolean penIsUpBeforePause;
+
 	
 	public RobotController(Plotter plotter) {
 		super();
 		myPlotter = plotter;
+		plotter.addListener(this);
 		drawingProgress = 0;
+		readyToDraw = false;
+		isRunning = false;
+		isPaused = false;
+		penIsUpBeforePause = false;
 	}
 
 	@Override
@@ -75,7 +90,7 @@ public class RobotController extends Node implements PlotterListener {
 	 * @param line the string from which the checksum is generated.
 	 * @return '*' + the checksum
 	 */
-	public String generateChecksum(String line) {
+	private String generateChecksum(String line) {
 		byte checksum = 0;
 
 		for (int i = 0; i < line.length(); ++i) {
@@ -96,12 +111,12 @@ public class RobotController extends Node implements PlotterListener {
 	 * @param line command to send
 	 * @param lineNumber
 	 */
-	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
-		if (myPlotter.getConnection() == null || !myPlotter.isPortConfirmed() || !myPlotter.isRunning())
+	private void sendLineWithNumberAndChecksum(String line, int lineNumber) {
+		if(!readyToDraw || !isRunning)
 			return;
 
 		line = "N" + lineNumber + " " + line;
-		if (!line.endsWith(";"))
+		if(!line.endsWith(";"))
 			line += ';';
 		String checksum = generateChecksum(line);
 		line += checksum;
@@ -115,19 +130,16 @@ public class RobotController extends Node implements PlotterListener {
 	 * Notify listeners about the progress of the file transmission.
 	 */
 	public void sendFileCommand() {
-		int total = drawingCommands.size();
+		int numCommands = drawingCommands.size();
 
-		if (!myPlotter.isRunning() 
-			|| myPlotter.isPaused() 
-			|| total == 0 
-			|| (myPlotter.getConnection() != null && myPlotter.isPortConfirmed() == false))
+		if(!readyToDraw || !isRunning || isPaused || numCommands==0 )
 			return;
 
 		// are there any more commands?
-		if (drawingProgress == total) {
+		if (drawingProgress == numCommands) {
 			// no!
-			myPlotter.halt();
-			notifyListeners("progress",total,total);
+			halt();
+			notifyListeners("progress",numCommands,numCommands);
 			SoundSystem.playDrawingFinishedSound();
 		} else {
 			// yes!
@@ -149,7 +161,7 @@ public class RobotController extends Node implements PlotterListener {
 				myPlotter.setPenY(py);
 			}
 			
-			notifyListeners("progress",drawingProgress, total);
+			notifyListeners("progress",drawingProgress, numCommands);
 		}
 	}
 
@@ -159,8 +171,53 @@ public class RobotController extends Node implements PlotterListener {
 
 		drawingProgress = lineNumber;
 		setLineNumber(lineNumber);
-		myPlotter.start();
+		start();
 		sendFileCommand();
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public boolean isPaused() {
+		return isPaused;
+	}
+
+	public void pause() {
+		if (isPaused)
+			return;
+	
+		isPaused = true;
+		// remember for later if the pen is down
+		penIsUpBeforePause = myPlotter.isPenUp();
+		// raise it if needed.
+		myPlotter.raisePen();
+	}
+
+	public void unPause() {
+		if(!isPaused)
+			return;
+	
+		// if pen was down before pause, lower it
+		if(!penIsUpBeforePause) {
+			myPlotter.lowerPen();
+		}
+	
+		isPaused = false;
+	}
+
+	public void halt() {
+		isRunning = false;
+		isPaused = false;
+		myPlotter.raisePen();
+		
+		notifyListeners("running", null, false);
+	}
+
+	public void start() {
+		isRunning = true;
+
+		notifyListeners("running", null, true);
 	}
 
 	public double getCurrentFeedRate() {
@@ -359,9 +416,7 @@ public class RobotController extends Node implements PlotterListener {
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		// TODO Auto-generated method stub
-	}
+	public void propertyChange(PropertyChangeEvent evt) {}
 
 	@Override
 	public void sendBufferEmpty(Plotter r) {
@@ -369,14 +424,12 @@ public class RobotController extends Node implements PlotterListener {
 	}
 
 	@Override
-	public void dataAvailable(Plotter r, String data) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void dataAvailable(Plotter r, String data) {}
 
 	@Override
 	public void disconnected(Plotter r) {
-		// TODO Auto-generated method stub
+		halt();
+		readyToDraw=false;
 	}
 
 	@Override
@@ -384,15 +437,11 @@ public class RobotController extends Node implements PlotterListener {
 		drawingProgress = lineNumber;
 	}
 
-
 	@Override
-	public void firmwareVersionBad(Plotter r, long versionFound) {
-		// TODO Auto-generated method stub
-	}
-
+	public void firmwareVersionBad(Plotter r, long versionFound) {}
 
 	@Override
 	public void connectionConfirmed(Plotter r) {
-		// TODO Auto-generated method stub
+		readyToDraw=true;
 	}
 }

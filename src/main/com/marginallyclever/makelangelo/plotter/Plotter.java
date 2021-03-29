@@ -111,19 +111,12 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	// misc state
 	private boolean areMotorsEngaged;
 
-	private boolean isRunning;
-
-	private boolean isPaused;
-
 	private boolean penIsUp;
 
 	private boolean didSetHome;
 
 	private double penX;
 	private double penY;
-
-	// pen is lifted when the machine is paused.  Remember state before hand.
-	private boolean penIsUpBeforePause;
 	
 	private boolean firstMoveAfterUpChange;
 	
@@ -161,10 +154,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		startingPositionIndex = 4;
 
 		areMotorsEngaged = true;
-		isRunning = false;
-		isPaused = false;
 		penIsUp = false;
-		penIsUpBeforePause = false;
 		didSetHome = false;
 
 		setPenX(0);
@@ -381,10 +371,10 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 	
 	public void setMachineSize(double width, double height) {
-		this.limitLeft = -width/2.0;
-		this.limitRight = width/2.0;
-		this.limitBottom = -height/2.0;
-		this.limitTop = height/2.0;
+		limitLeft = -width/2.0;
+		limitRight = width/2.0;
+		limitBottom = -height/2.0;
+		limitTop = height/2.0;
 	}
 	
 	public void setRegistered(boolean isRegistered) {
@@ -539,7 +529,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	public void setZFeedrate(double arg0) {
-		this.zFeedrate = arg0;
+		zFeedrate = arg0;
 	}
 	
 	public double getZFeedrate() {
@@ -579,51 +569,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public void setPenY(double py) {
 		penY = py;
-	}
-
-	public boolean isRunning() {
-		return isRunning;
-	}
-
-	public boolean isPaused() {
-		return isPaused;
-	}
-
-	public void pause() {
-		if (isPaused)
-			return;
-	
-		isPaused = true;
-		// remember for later if the pen is down
-		penIsUpBeforePause = penIsUp;
-		// raise it if needed.
-		raisePen();
-	}
-
-	public void unPause() {
-		if (!isPaused)
-			return;
-	
-		// if pen was down before pause, lower it
-		if (!penIsUpBeforePause) {
-			lowerPen();
-		}
-	
-		isPaused = false;
-	}
-
-	public void halt() {
-		isRunning = false;
-		isPaused = false;
-		raisePen();
-		
-		notifyListeners("running", null, false);
-	}
-
-	public void start() {
-		isRunning = true;
-
-		notifyListeners("running", null, true);
 	}
 
 	public void raisePen() {
@@ -828,20 +773,20 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	public void closeConnection() {
-		if (this.connection == null)
+		if (connection == null)
 			return;
 
-		this.connection.closeConnection();
-		this.connection.removeListener(this);
+		connection.closeConnection();
+		connection.removeListener(this);
 		notifyDisconnected();
-		this.connection = null;
-		this.portConfirmed = false;
+		connection = null;
+		portConfirmed = false;
 	}
 
 	@Override
 	public void finalize() {
-		if (this.connection != null) {
-			this.connection.removeListener(this);
+		if (connection != null) {
+			connection.removeListener(this);
 		}
 	}
 
@@ -853,7 +798,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 		// Every Makelangelo on startup says "HELLO WORLD, I AM [model] #[GUID]" on connect.
 		// @See <a href ='https://github.com/MarginallyClever/Makelangelo-firmware/blob/master/src/parser.cpp'>Parser::M100()</a>
-		// portConfirmed is true when the robot we called says these magic words and the [model] matches this.getHello()
+		// portConfirmed is true when the robot we called says these magic words and the [model] matches getHello()
 		if (!portConfirmed) {
 			// not confirmed yet, keep reading to check.
 			PlotterModel ms = this;
