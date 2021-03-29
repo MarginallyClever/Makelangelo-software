@@ -209,14 +209,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		return null;
 	}
 
-	public String getAbsoluteMode() {
-		return COMMAND_MODE_ABSOLUTE;
-	}
-
-	public String getRelativeMode() {
-		return COMMAND_MODE_RELATIVE;
-	}
-
 	/**
 	 * @return bottom limit in mm
 	 */
@@ -489,7 +481,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 				+"\n");
 	}
 	
-	// 7.22.6: feedrate changes here
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
 		String command = isUp?COMMAND_TRAVEL:COMMAND_DRAW;
 		if(zMoved) {
@@ -507,33 +498,19 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	// lift the pen
 	public void writePenUp(Writer out) throws IOException {
 		out.write(getPenUpString()+"\n");
-		// this dwell forces the firmware to stop path-planning through the lift action.
-		// we want to stop is so that it doesn't take off at a crazy speed after.
-		// G04 S[milliseconds] P[seconds]
-		//out.write(COMMAND_DWELL+" S1\n");
-		
-		// moved the feedrate adjust to writeMoveTo() in 7.22.6
-		//out.write(COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
 	}
 	
 	// lower the pen
 	public void writePenDown(Writer out) throws IOException {
 		out.write(getPenDownString()+"\n");
-		// this dwell forces the firmware to stop path-planning through the lift action.
-		// we want to stop is so that it doesn't take off at a crazy speed after.
-		// G04 S[milliseconds] P[seconds]
-		//out.write(COMMAND_DWELL+" S1\n");
-
-		// moved the feedrate adjust to writeMoveTo() in 7.22.6
-		//out.write(COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
 	}
 	
 	public void writeAbsoluteMode(Writer out) throws IOException {
-		out.write(getAbsoluteMode() + "\n");
+		out.write(COMMAND_MODE_ABSOLUTE+"\n");
 	}
 
 	public void writeRelativeMode(Writer out) throws IOException {
-		out.write(getRelativeMode() + "\n");
+		out.write(COMMAND_MODE_RELATIVE+"\n");
 	}
 
 
