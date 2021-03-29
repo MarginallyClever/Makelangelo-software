@@ -617,13 +617,13 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		isPaused = false;
 		raisePen();
 		
-		notifyListeners("halt", false, true);
+		notifyListeners("running", null, false);
 	}
 
-	public void setRunning() {
+	public void start() {
 		isRunning = true;
 
-		notifyListeners("running", false, true);
+		notifyListeners("running", null, true);
 	}
 
 	public void raisePen() {

@@ -42,13 +42,12 @@ public class RobotController extends Node implements PlotterListener {
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
-
+	
 	public RobotController(Plotter plotter) {
 		super();
 		myPlotter = plotter;
 		drawingProgress = 0;
 	}
-
 
 	@Override
 	public String getName() {
@@ -160,7 +159,7 @@ public class RobotController extends Node implements PlotterListener {
 
 		drawingProgress = lineNumber;
 		setLineNumber(lineNumber);
-		myPlotter.setRunning();
+		myPlotter.start();
 		sendFileCommand();
 	}
 
