@@ -43,8 +43,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
-	public static final String COMMAND_DRAW   = "G1";
 	public static final String COMMAND_TRAVEL = "G0";
+	public static final String COMMAND_DRAW   = "G1";
+	public static final String COMMAND_DWELL = "G4";
+	public static final String COMMAND_MODE_ABSOLUTE = "G90";
+	public static final String COMMAND_MODE_RELATIVE = "G91";
+	public static final String COMMAND_TELEPORT = "G92";
+	public static final String COMMAND_JOG_MOTOR = "D0";
+	public static final String COMMAND_FIND_HOME = "G28";
 
 	/**
 	 * Each {@link Plotter} has a global unique identifier
@@ -194,7 +200,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 	
 	public String getGCodeSetPositionAtHome() {
-		return "G92 X"+getHomeX()+" Y"+getHomeY();
+		return COMMAND_TELEPORT + " X"+getHomeX()+" Y"+getHomeY();
 	}
 
 	// return the strings that will tell a makelangelo robot its physical limits.
@@ -204,11 +210,11 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	public String getAbsoluteMode() {
-		return "G90";
+		return COMMAND_MODE_ABSOLUTE;
 	}
 
 	public String getRelativeMode() {
-		return "G91";
+		return COMMAND_MODE_RELATIVE;
 	}
 
 	/**
@@ -504,7 +510,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		// this dwell forces the firmware to stop path-planning through the lift action.
 		// we want to stop is so that it doesn't take off at a crazy speed after.
 		// G04 S[milliseconds] P[seconds]
-		//out.write("G04 S1\n");
+		//out.write(COMMAND_DWELL+" S1\n");
 		
 		// moved the feedrate adjust to writeMoveTo() in 7.22.6
 		//out.write(COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate()) + "\n");
@@ -516,7 +522,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		// this dwell forces the firmware to stop path-planning through the lift action.
 		// we want to stop is so that it doesn't take off at a crazy speed after.
 		// G04 S[milliseconds] P[seconds]
-		//out.write("G04 S1\n");
+		//out.write(COMMAND_DWELL+" S1\n");
 
 		// moved the feedrate adjust to writeMoveTo() in 7.22.6
 		//out.write(COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate()) + "\n");
@@ -682,8 +688,8 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	}
 
 	public void goHome() {
-		sendLineToRobot(COMMAND_TRAVEL+
-				" F"+StringHelper.formatDouble(getTravelFeedRate())
+		sendLineToRobot(COMMAND_TRAVEL
+				+" F"+ StringHelper.formatDouble(getTravelFeedRate())
 				+" X"+ StringHelper.formatDouble(getHomeX())
 				+" Y"+ StringHelper.formatDouble(getHomeY()));
 		setPenX(getHomeX());
@@ -692,7 +698,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public void findHome() {
 		raisePen();
-		sendLineToRobot("G28");
+		sendLineToRobot(COMMAND_FIND_HOME);
 		setPenX(getHomeX());
 		setPenY(getHomeY());
 	}
@@ -729,33 +735,33 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	 * @param dy relative position in mm
 	 */
 	public void movePenRelative(double dx, double dy) {
-		sendLineToRobot("G91"); // set relative mode
+		sendLineToRobot(COMMAND_MODE_RELATIVE);
 		sendLineToRobot(
 				(isPenUp()  
 					? (firstMoveAfterUpChange ? getTravelFeedrateString() : Plotter.COMMAND_TRAVEL)
 					: (firstMoveAfterUpChange ? getDrawingFeedrateString() : Plotter.COMMAND_DRAW))
 				+ " X" + StringHelper.formatDouble(dx) 
 				+ " Y" + StringHelper.formatDouble(dy));
-		sendLineToRobot("G90"); // return to absolute mode
+		sendLineToRobot(COMMAND_MODE_ABSOLUTE);
 		setPenX(getPenX() + dx);
 		setPenY(getPenY() + dy);
 		firstMoveAfterUpChange = false;
 	}
 
 	public void jogLeftMotorOut() {
-		sendLineToRobot("D00 L400");
+		sendLineToRobot(COMMAND_JOG_MOTOR+" L400");
 	}
 
 	public void jogLeftMotorIn() {
-		sendLineToRobot("D00 L-400");
+		sendLineToRobot(COMMAND_JOG_MOTOR+" L-400");
 	}
 
 	public void jogRightMotorOut() {
-		sendLineToRobot("D00 R400");
+		sendLineToRobot(COMMAND_JOG_MOTOR+" R400");
 	}
 
 	public void jogRightMotorIn() {
-		sendLineToRobot("D00 R-400");
+		sendLineToRobot(COMMAND_JOG_MOTOR+" R-400");
 	}
 	
 	public void addListener(PlotterListener listener) {
