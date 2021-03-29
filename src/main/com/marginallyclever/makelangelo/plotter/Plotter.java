@@ -171,10 +171,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 		portConfirmed = false;
 	}
-	
-	public double getAcceleration() {
-		return acceleration;
-	}
 
 	/**
 	 * @return home X coordinate in mm
@@ -240,11 +236,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		setPenDiameter(prefs.getDouble("diameter", getPenDiameter()));
-		setZFeedrate(prefs.getDouble("z_rate", getZFeedrate()));
-		setZOn(prefs.getDouble("z_on", getZOn()));
-		setZOff(prefs.getDouble("z_off", getZOff()));
-		feedRateTravel = prefs.getDouble("feed_rate", feedRateTravel);
-		feedRateDrawing=prefs.getDouble("feed_rate_current",feedRateDrawing);
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -261,11 +252,6 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		prefs.putDouble("diameter", getPenDiameter());
-		prefs.putDouble("z_rate", getZFeedrate());
-		prefs.putDouble("z_on", getZOn());
-		prefs.putDouble("z_off", getZOff());
-		prefs.putDouble("feed_rate", feedRateTravel);
-		prefs.putDouble("feed_rate_current", feedRateDrawing);
 
 		prefs.putInt("penDownColorR", penDownColor.getRed());
 		prefs.putInt("penDownColorG", penDownColor.getGreen());
@@ -291,8 +277,11 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		myNode.putDouble("limit_left", limitLeft);
 
 		myNode.putDouble("acceleration", acceleration);
-		myNode.putDouble("feedRateDrawing", feedRateDrawing);
-		myNode.putDouble("feedRateTravel", feedRateTravel);
+		myNode.putDouble("z_rate", getZFeedrate());
+		myNode.putDouble("z_on", getZOn());
+		myNode.putDouble("z_off", getZOff());
+		myNode.putDouble("feed_rate", feedRateTravel);
+		myNode.putDouble("feed_rate_current", feedRateDrawing);
 		myNode.putInt("minimumSegmentTime", minimumSegmentTime);
 		
 		myNode.putInt("startingPosIndex", startingPositionIndex);
@@ -317,8 +306,11 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		limitRight  = myNode.getDouble("limit_right", limitRight);
 		
 		acceleration = myNode.getDouble("acceleration",acceleration);
-		feedRateDrawing = myNode.getDouble("feedRateDrawing", feedRateDrawing);
-		feedRateTravel = myNode.getDouble("feedRateTravel", feedRateTravel);
+		setZFeedrate(myNode.getDouble("z_rate", getZFeedrate()));
+		setZOn(myNode.getDouble("z_on", getZOn()));
+		setZOff(myNode.getDouble("z_off", getZOff()));
+		feedRateTravel  = myNode.getDouble("feed_rate", feedRateTravel);
+		feedRateDrawing = myNode.getDouble("feed_rate_current",feedRateDrawing);
 		minimumSegmentTime = myNode.getInt("minimumSegmentTime", minimumSegmentTime);
 		
 		startingPositionIndex = myNode.getInt("startingPosIndex",startingPositionIndex);
@@ -342,6 +334,10 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public void setAcceleration(double f) {
 		acceleration = f;
+	}
+	
+	public double getAcceleration() {
+		return acceleration;
 	}
 	
 	public void setTravelFeedRate(double f) {
@@ -913,15 +909,15 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 		String config = getGCodeConfig();
 		String[] lines = config.split("\n");
-
-		for (int i = 0; i < lines.length; ++i) {
-			sendLineToRobot(lines[i] + "\n");
+		for( String s : lines ) {
+			sendLineToRobot(s + "\n");
 		}
 		setHome();
 		sendLineToRobot(COMMAND_TRAVEL
 				+" F" + StringHelper.formatDouble(getTravelFeedRate()) 
 				+" A" + StringHelper.formatDouble(getAcceleration())
 				+"\n");
+		sendLineToRobot("M205 B"+minimumSegmentTime);
 	}
 	
 	// notify PropertyChangeListeners
@@ -1024,7 +1020,15 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		return nodeName;
 	}
 
-	protected int getMinimumSegmentTime() {
+	public int getMinimumSegmentTime() {
 		return minimumSegmentTime;
+	}
+
+	/**
+	 * the minimum time for each segment in the planner buffer.
+	 * @param microseconds time (μs)
+	 */
+	public void setMinimumSegmentTime(int microseconds) {
+		minimumSegmentTime = microseconds;
 	}
 }

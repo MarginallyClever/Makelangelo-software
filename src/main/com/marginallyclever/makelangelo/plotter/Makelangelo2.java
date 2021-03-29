@@ -409,11 +409,10 @@ public class Makelangelo2 extends Plotter implements PlotterModel {
 
 	@Override
 	public String getGCodeConfig() {
-		String result;
 		String xAxis = "M101 A0 T"+StringHelper.formatDouble(getLimitRight())+" B"+StringHelper.formatDouble(getLimitLeft());
 		String yAxis = "M101 A1 T"+StringHelper.formatDouble(getLimitTop())+" B"+StringHelper.formatDouble(getLimitBottom());
 		String zAxis = "M101 A2 T170 B10";
-		result = xAxis+"\n"+yAxis+"\n"+zAxis;
+		String result = xAxis+"\n"+yAxis+"\n"+zAxis;
 		return result;
 	}
 }

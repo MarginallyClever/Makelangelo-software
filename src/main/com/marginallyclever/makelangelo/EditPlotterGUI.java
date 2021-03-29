@@ -53,8 +53,8 @@ public class EditPlotterGUI extends SelectPanel {
 	    add(travelFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),myPlotter.getTravelFeedRate()));
 	    add(drawFeedRate = new SelectDouble(Translator.get("Speed"),myPlotter.getDrawingFeedRate()));
 
-		add(acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)myPlotter.getAcceleration()));
-		add(minimumSegmentTime = new SelectDouble(Translator.get("minimumSegmentTime"),(float)myPlotter.getMinimumSegmentTime()));
+		add(acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),myPlotter.getAcceleration()));
+		add(minimumSegmentTime = new SelectInteger(Translator.get("minimumSegmentTime"),myPlotter.getMinimumSegmentTime()));
 		
 	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),myPlotter.getZFeedrate()));
 	    add(penUp = new SelectDouble(Translator.get("penToolUp"),myPlotter.getPenUpAngle()));
@@ -109,6 +109,7 @@ public class EditPlotterGUI extends SelectPanel {
 
 			myPlotter.setTravelFeedRate(travelFeedRate.getValue());
 			myPlotter.setDrawingFeedRate(drawFeedRate.getValue());
+			myPlotter.setMinimumSegmentTime(minimumSegmentTime.getValue());
 			myPlotter.setZFeedrate(penZRate.getValue());
 			myPlotter.setPenUpAngle(penUp.getValue());
 			myPlotter.setPenDownAngle(penDown.getValue());
