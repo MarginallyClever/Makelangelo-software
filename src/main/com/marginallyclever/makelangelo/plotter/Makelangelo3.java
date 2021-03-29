@@ -33,11 +33,6 @@ public class Makelangelo3 extends Makelangelo2 {
 	}
 
 	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
 	public boolean canAutoHome() {
 		return false;
 	}

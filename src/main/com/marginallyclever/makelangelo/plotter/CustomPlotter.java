@@ -35,19 +35,9 @@ public class CustomPlotter extends Makelangelo3 {
 	public String getName() {
 		return "Makelangelo (Custom)";
 	}
-	
-	@Override
-	public boolean canInvertMotors() {
-		return true;
-	}
 
 	@Override
 	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
 		return true;
 	}
 	

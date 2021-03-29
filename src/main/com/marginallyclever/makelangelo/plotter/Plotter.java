@@ -83,6 +83,7 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 	private double feedRateTravel;
 	private double feedRateDrawing;
 	private double acceleration;
+	private int minimumSegmentTime;
 
 	private double diameter;  // pen diameter (mm, >0)
 	private double zOff;	// pen up servo angle (deg,0...180)
@@ -288,12 +289,14 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		myNode.putDouble("limit_bottom", limitBottom);
 		myNode.putDouble("limit_right", limitRight);
 		myNode.putDouble("limit_left", limitLeft);
-		
-		myNode.putDouble("acceleration", acceleration);
-		myNode.putInt("startingPosIndex", startingPositionIndex);
-		
-		myNode.putBoolean("isRegistered", isRegistered());
 
+		myNode.putDouble("acceleration", acceleration);
+		myNode.putDouble("feedRateDrawing", feedRateDrawing);
+		myNode.putDouble("feedRateTravel", feedRateTravel);
+		myNode.putInt("minimumSegmentTime", minimumSegmentTime);
+		
+		myNode.putInt("startingPosIndex", startingPositionIndex);
+		myNode.putBoolean("isRegistered", isRegistered());
 		myNode.putLong("GUID", robotUID);
 		myNode.put("Nickname", nickname);
 		savePenConfig(myNode);
@@ -312,10 +315,13 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 		limitBottom = myNode.getDouble("limit_bottom", limitBottom);
 		limitLeft   = myNode.getDouble("limit_left", limitLeft);
 		limitRight  = myNode.getDouble("limit_right", limitRight);
-
-		acceleration=myNode.getDouble("acceleration",acceleration);
+		
+		acceleration = myNode.getDouble("acceleration",acceleration);
+		feedRateDrawing = myNode.getDouble("feedRateDrawing", feedRateDrawing);
+		feedRateTravel = myNode.getDouble("feedRateTravel", feedRateTravel);
+		minimumSegmentTime = myNode.getInt("minimumSegmentTime", minimumSegmentTime);
+		
 		startingPositionIndex = myNode.getInt("startingPosIndex",startingPositionIndex);
-
 		isRegistered = myNode.getBoolean("isRegistered",false);
 		robotUID = myNode.getLong("GUID", 0);
 		nickname = myNode.get("Nickname", nickname);
@@ -1016,5 +1022,9 @@ public abstract class Plotter implements Serializable, NetworkConnectionListener
 
 	public String getNodeName() {
 		return nodeName;
+	}
+
+	protected int getMinimumSegmentTime() {
+		return minimumSegmentTime;
 	}
 }

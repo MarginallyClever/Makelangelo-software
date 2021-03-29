@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.core.Translator;
 import com.marginallyclever.core.select.SelectDouble;
+import com.marginallyclever.core.select.SelectInteger;
 import com.marginallyclever.core.select.SelectPanel;
 import com.marginallyclever.core.select.SelectString;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -21,9 +22,10 @@ public class EditPlotterGUI extends SelectPanel {
 	private SelectDouble totalServoNeeded;
 	private SelectDouble totalStepperNeeded;
 	private SelectDouble acceleration;
+	private SelectInteger minimumSegmentTime;
 	
-	protected SelectDouble maxFeedRate;
-	protected SelectDouble currentFeedRate;
+	protected SelectDouble travelFeedRate;
+	protected SelectDouble drawFeedRate;
 	protected SelectDouble penUp;
 	protected SelectDouble penDown;
 	protected SelectDouble penZRate;
@@ -35,45 +37,39 @@ public class EditPlotterGUI extends SelectPanel {
 		myPlotter = robot;
 
 		// adjust machine size
-		{
-			float w = (float)(myPlotter.getLimitRight() - myPlotter.getLimitLeft());
-			float h = (float)(myPlotter.getLimitTop() - myPlotter.getLimitBottom());
-			
-			add(nickname = new SelectString(Translator.get("MachineNickname"),myPlotter.getNickname()));
-			add(machineWidth = new SelectDouble(Translator.get("MachineWidth"),w));
-			add(machineHeight = new SelectDouble(Translator.get("MachineHeight"),h));
-			//machineWidth.setPreferredSize(s);
-			//machineHeight.setPreferredSize(s);
-	
-			add(totalStepperNeeded = new SelectDouble(Translator.get("StepperLengthNeeded"),0));
-			add(totalBeltNeeded = new SelectDouble(Translator.get("BeltLengthNeeded"),0));
-			add(totalServoNeeded = new SelectDouble(Translator.get("ServoLengthNeeded"),0));
-
-		    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),myPlotter.getTravelFeedRate()));
-		    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),myPlotter.getDrawingFeedRate()));
-		    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),myPlotter.getZFeedrate()));
-		    add(penUp = new SelectDouble(Translator.get("penToolUp"),myPlotter.getPenUpAngle()));
-		    add(penDown = new SelectDouble(Translator.get("penToolDown"),myPlotter.getPenDownAngle()));
-		    
-			totalStepperNeeded.setReadOnly();
-			totalBeltNeeded.setReadOnly();
-			totalServoNeeded.setReadOnly();
-
-			if(!myPlotter.canChangeMachineSize()) {
-				machineWidth.setReadOnly();
-				machineHeight.setReadOnly();
-			}
-			//this.add(new JSeparator(SwingConstants.HORIZONTAL));
-		}
+		float w = (float)(myPlotter.getLimitRight() - myPlotter.getLimitLeft());
+		float h = (float)(myPlotter.getLimitTop() - myPlotter.getLimitBottom());
 		
-		// Acceleration
-		{
-			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)myPlotter.getAcceleration());
+		add(nickname = new SelectString(Translator.get("MachineNickname"),myPlotter.getNickname()));
+		add(machineWidth = new SelectDouble(Translator.get("MachineWidth"),w));
+		add(machineHeight = new SelectDouble(Translator.get("MachineHeight"),h));
+		//machineWidth.setPreferredSize(s);
+		//machineHeight.setPreferredSize(s);
 
-			if(myPlotter.canAccelerate()) {
-				add(acceleration);
-			}
+		add(totalStepperNeeded = new SelectDouble(Translator.get("StepperLengthNeeded"),0));
+		add(totalBeltNeeded = new SelectDouble(Translator.get("BeltLengthNeeded"),0));
+		add(totalServoNeeded = new SelectDouble(Translator.get("ServoLengthNeeded"),0));
+
+	    add(travelFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),myPlotter.getTravelFeedRate()));
+	    add(drawFeedRate = new SelectDouble(Translator.get("Speed"),myPlotter.getDrawingFeedRate()));
+
+		add(acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)myPlotter.getAcceleration()));
+		add(minimumSegmentTime = new SelectDouble(Translator.get("minimumSegmentTime"),(float)myPlotter.getMinimumSegmentTime()));
+		
+	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),myPlotter.getZFeedrate()));
+	    add(penUp = new SelectDouble(Translator.get("penToolUp"),myPlotter.getPenUpAngle()));
+	    add(penDown = new SelectDouble(Translator.get("penToolDown"),myPlotter.getPenDownAngle()));
+	    
+		totalStepperNeeded.setReadOnly();
+		totalBeltNeeded.setReadOnly();
+		totalServoNeeded.setReadOnly();
+
+		if(!myPlotter.canChangeMachineSize()) {
+			machineWidth.setReadOnly();
+			machineHeight.setReadOnly();
 		}
+		//this.add(new JSeparator(SwingConstants.HORIZONTAL));
+		
 		
 		finish();
 		updateLengthNeeded();
@@ -111,8 +107,8 @@ public class EditPlotterGUI extends SelectPanel {
 			myPlotter.setMachineSize(mwf, mhf);
 			myPlotter.setAcceleration(accel);
 
-			myPlotter.setTravelFeedRate(maxFeedRate.getValue());
-			myPlotter.setDrawingFeedRate(currentFeedRate.getValue());
+			myPlotter.setTravelFeedRate(travelFeedRate.getValue());
+			myPlotter.setDrawingFeedRate(drawFeedRate.getValue());
 			myPlotter.setZFeedrate(penZRate.getValue());
 			myPlotter.setPenUpAngle(penUp.getValue());
 			myPlotter.setPenDownAngle(penDown.getValue());

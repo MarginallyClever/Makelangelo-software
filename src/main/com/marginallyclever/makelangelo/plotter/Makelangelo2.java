@@ -86,18 +86,8 @@ public class Makelangelo2 extends Plotter implements PlotterModel {
 	}
 
 	@Override
-	public boolean canInvertMotors() {
-		return true;
-	}
-
-	@Override
 	public boolean canChangeMachineSize() {
 		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return false;
 	}
 	
 	@Override

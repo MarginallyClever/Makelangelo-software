@@ -40,22 +40,12 @@ public class Zarplotter extends Makelangelo2 {
 	}
 
 	@Override
-	public boolean canInvertMotors() {
-		return false;
-	}
-	
-	@Override
 	public boolean canAutoHome() {
 		return false;
 	}
 
 	@Override
 	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
 		return true;
 	}
 

@@ -40,22 +40,12 @@ public class Makelangelo5 extends Makelangelo3 {
 	public String getName() {
 		return "Makelangelo 5+";
 	}
-	
-	@Override
-	public boolean canInvertMotors() {
-		return false;
-	}
 
 	@Override
 	public boolean canChangeMachineSize() {
 		return false;
 	}
 
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
 	public float getWidth() { return 650; }
 	public float getHeight() { return 1000; }
 

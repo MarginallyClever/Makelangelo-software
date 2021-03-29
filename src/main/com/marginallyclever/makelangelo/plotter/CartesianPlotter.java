@@ -46,11 +46,6 @@ public class CartesianPlotter extends Makelangelo2 {
 	public String getName() {
 		return "Cartesian";
 	}
-
-	@Override
-	public boolean canInvertMotors() {
-		return false;
-	}
 	
 	@Override
 	public boolean canAutoHome() {
@@ -59,11 +54,6 @@ public class CartesianPlotter extends Makelangelo2 {
 
 	@Override
 	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
 		return true;
 	}
 

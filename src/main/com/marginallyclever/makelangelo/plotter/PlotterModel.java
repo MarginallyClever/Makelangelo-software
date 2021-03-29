@@ -34,10 +34,6 @@ public abstract interface PlotterModel extends RendersInOpenGL {
 
 	public boolean canChangeMachineSize();
 
-	public boolean canAccelerate();
-
-	public boolean canInvertMotors();
-
 	/**
 	 * @return true if the machine has limit switches and can find home on its own.
 	 */
