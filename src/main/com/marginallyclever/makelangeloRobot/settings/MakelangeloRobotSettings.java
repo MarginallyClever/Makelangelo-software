@@ -273,6 +273,14 @@ public final class MakelangeloRobotSettings implements Serializable {
   }
 	 */
 
+	boolean isNumeric(String s) {
+		try {
+			Integer.parseInt(s);
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Get the UID of every machine this computer recognizes EXCEPT machine 0, which is only assigned temporarily when a machine is new or before the first software connect.
@@ -280,11 +288,15 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		final List<String> knownMachineList = new LinkedList<>(Arrays.asList(configsAvailable));
-		if (knownMachineList.contains("0")) {
-			knownMachineList.remove("0");
+		List<String> knownMachineList = new LinkedList<>(Arrays.asList(configsAvailable));
+		List<String> keepList = new LinkedList<>();
+		for(String a : knownMachineList ) {
+			if( a.contentEquals("0")) continue;
+			if(!isNumeric(a)) continue;
+			keepList.add(a);
 		}
-		return Arrays.copyOf(knownMachineList.toArray(), knownMachineList.size(), String[].class);
+
+		return Arrays.copyOf(keepList.toArray(), keepList.size(), String[].class);
 	}
 
 
