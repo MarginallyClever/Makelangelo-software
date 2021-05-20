@@ -353,8 +353,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
 				if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
 				turtle.jumpTo(TX(cx+r),TY(cy));
-				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
-					double v = (Math.PI*2.0) * (i/40.0);
+				double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
+				for(double i=1;i<circ;++i) {  // hard coded 40?  gross!
+					double v = (Math.PI*2.0) * (i/circ);
 					double s=r*Math.sin(v);
 					double c=r*Math.cos(v);
 					turtle.moveTo(TX(cx+c),TY(cy+s));
@@ -380,8 +381,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
 				if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
 				turtle.jumpTo(TX(cx+rx),TY(cy));
-				for(double i=1;i<40;++i) {  // hard coded 40?  gross!
-					double v = (Math.PI*2.0) * (i/40.0);
+				double circ = Math.min(3,Math.floor(Math.PI * ry*rx)); 
+				for(double i=1;i<circ;++i) {  // hard coded 40?  gross!
+					double v = (Math.PI*2.0) * (i/circ);
 					double s=ry*Math.sin(v);
 					double c=rx*Math.cos(v);
 					turtle.moveTo(TX(cx+c),TY(cy+s));

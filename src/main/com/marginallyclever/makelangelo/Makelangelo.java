@@ -146,7 +146,7 @@ public final class Makelangelo extends TransferHandler
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
 		Log.message("Starting preferences...");
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences(this);
 
