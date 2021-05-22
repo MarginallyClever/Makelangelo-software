@@ -107,8 +107,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 		// add 2% for margins
 
-		imageWidth += imageWidth * .02;
-		imageHeight += imageHeight * .02;
+		imageWidth *=1.02;
+		imageHeight*=1.02;
 
 		double paperHeight = robot.getSettings().getMarginHeight();
 		double paperWidth  = robot.getSettings().getMarginWidth ();
@@ -354,7 +354,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
 				turtle.jumpTo(TX(cx+r),TY(cy));
 				double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
-				for(double i=1;i<circ;++i) {  // hard coded 40?  gross!
+				for(double i=1;i<circ;++i) {
 					double v = (Math.PI*2.0) * (i/circ);
 					double s=r*Math.sin(v);
 					double c=r*Math.cos(v);
@@ -382,7 +382,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
 				turtle.jumpTo(TX(cx+rx),TY(cy));
 				double circ = Math.min(3,Math.floor(Math.PI * ry*rx)); 
-				for(double i=1;i<circ;++i) {  // hard coded 40?  gross!
+				for(double i=1;i<circ;++i) {
 					double v = (Math.PI*2.0) * (i/circ);
 					double s=ry*Math.sin(v);
 					double c=rx*Math.cos(v);
@@ -398,9 +398,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	/**
 	 * Parse through all the SVG path elements and raster them to gcode.
-	 * @param pathNodes the source of the elements
+	 * @param paths the source of the elements
 	 */
-	protected boolean parsePathElements(NodeList pathNodes) {
+	protected boolean parsePathElements(NodeList paths) {
 	    boolean loadOK=true;
 
 	    double x=turtle.getX();
@@ -408,14 +408,14 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		double firstX=0;
 		double firstY=0;
 		
-	    int pathNodeCount = pathNodes.getLength();
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-	    	if(pathNodes.item( iPathNode ).getClass() == SVGOMPolylineElement.class) {
+	    int pathCount = paths.getLength();
+	    for( int iPath = 0; iPath < pathCount; iPath++ ) {
+	    	if(paths.item( iPath ).getClass() == SVGOMPolylineElement.class) {
 	    		Log.message("Node is a polyline.");
-	    		parsePolylineElements(pathNodes);
+	    		parsePolylineElements(paths);
 	    		continue;
 	    	}
-	    	SVGOMPathElement element = ((SVGOMPathElement)pathNodes.item( iPathNode ));
+	    	SVGOMPathElement element = ((SVGOMPathElement)paths.item( iPath ));
 			if(isElementStrokeNone(element)) 
 				continue;
 	    	
@@ -428,13 +428,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
 					{
-						//Log.message("Close path");
+						System.out.println("Close path");
 						turtle.moveTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
 					{
-						//Log.message("Move Abs");
+						System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() );
 						firstY = y = TY( path.getY() );
@@ -443,7 +443,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
 					{
-						//Log.message("Move Rel");
+						System.out.println("Move Rel");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() ) + turtle.getX();
 						firstY = y = TY( path.getY() ) + turtle.getY();
@@ -452,7 +452,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
 					{
-						//Log.message("Line Abs");
+						System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
@@ -461,7 +461,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
 					{
-						//Log.message("Line REL");
+						System.out.println("Line REL");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() ) + turtle.getX();
 						y = TY( path.getY() ) + turtle.getY();
@@ -470,7 +470,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
 					{
-						//Log.message("Curve Cubic Abs");
+						System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 						
 						// x0,y0 is the first point
@@ -521,7 +521,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						double steps = (int)Math.ceil(Math.max(Math.min(length, 10),1));
 
 						
-						for(double j=0;j<1;j+=1.0/steps) {/*
+						for(double k=0;k<=steps;k++) {
+							double j = k/steps;
+							/*
 							// old method
 							double xa = p(x0,x1,j);
 							double ya = p(y0,y1,j);
