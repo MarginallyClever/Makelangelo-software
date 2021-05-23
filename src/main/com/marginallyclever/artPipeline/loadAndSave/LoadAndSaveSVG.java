@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -485,75 +487,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						// x3,y3 is the fourth control point
 						double x3=TX( path.getX());
 						double y3=TY( path.getY());
-						/*
-						double d0 = distanceSquared(x0,y0,x,y);
-						double dN = distanceSquared(x3,y3,x,y);
-						
-						if(dN>d0) {
-							// the far end of the curve is closer to the current pen position.
-							// flip the curve.
-							double t;
-							
-							t = x3; x3=x0; x0=t;
-							t = x2; x2=x1; x1=t;
-							
-							t = y3; y3=y0; y0=t;
-							t = y2; y2=y1; y1=t;
-						}*/
 
-						double length=0;
-						double oldx=x;
-						double oldy=y;
-						for(double j=0;j<=1;j+=0.1) {
-					        double a = Math.pow((1.0 - j), 3.0);
-					        double b = 3.0 * j * Math.pow((1.0 - j), 2.0);
-					        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
-					        double d = Math.pow(j, 3.0);
-					 
-					        double xabc = a * x0 + b * x1 + c * x2 + d * x3;
-					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;
-					        
-					        length += Math.sqrt( Math.pow(xabc-oldx, 2) + Math.pow(yabc-oldy,2) );
-					        oldx=xabc;
-					        oldy=yabc;
+						ArrayList<Point2D> points = generateCurvePointsB(x0,y0,x1,y1,x2,y2,x3,y3);
+						for(Point2D p : points) {
+							turtle.moveTo(p.x, p.y);
+							x = p.x;
+							y = p.y;
 						}
-						
-						double steps = (int)Math.ceil(Math.max(Math.min(length, 10),1));
-
-						
-						for(double k=0;k<=steps;k++) {
-							double j = k/steps;
-							/*
-							// old method
-							double xa = p(x0,x1,j);
-							double ya = p(y0,y1,j);
-							double xb = p(x1,x2,j);
-							double yb = p(y1,y2,j);
-							double xc = p(x2,x3,j);
-							double yc = p(y2,y3,j);
-							
-							double xab = p(xa,xb,j);
-							double yab = p(ya,yb,j);
-							double xbc = p(xb,xc,j);
-							double ybc = p(yb,yc,j);
-							
-							xabc = p(xab,xbc,j);
-							yabc = p(yab,ybc,j);/*/
-					        double a = Math.pow((1.0 - j), 3.0);
-					        double b = 3.0 * j * Math.pow((1.0 - j), 2.0);
-					        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
-					        double d = Math.pow(j, 3.0);
-					 
-					        double xabc = a * x0 + b * x1 + c * x2 + d * x3;
-					        double yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
-							
-							//if(j<1 && distanceSquared(xabc,yabc,x,y)>toolMinimumStepSize*toolMinimumStepSize) {
-								x=xabc;
-								y=yabc;
-								turtle.moveTo(xabc,yabc);
-							//}
-						}
-						turtle.moveTo(x3,y3);
 					}
 					break; 
 				default:
@@ -566,9 +506,206 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		}
 	    return loadOK;
 	}
-	
 
-	protected double p(double a,double b,double fraction) {
+	protected int RECURSION_LIMIT = 8;
+	protected double curve_angle_tolerance_epsilon =0.01;
+	protected double m_angle_tolerance = 0;
+	protected double m_cusp_limit= 0;
+	protected double FLT_EPSILON=1.19209290e-7;
+    
+	// Based on https://github.com/pelson/antigrain/blob/master/agg-2.4/src/agg_curves.cpp
+	// and https://github.com/mattdesl/adaptive-bezier-curve
+	protected ArrayList<Point2D> generateCurvePointsB(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4) {
+		RECURSION_LIMIT = 8;
+		curve_angle_tolerance_epsilon =0.01;
+		m_angle_tolerance = 0;
+		m_cusp_limit= 0;
+		FLT_EPSILON=1.19209290e-7;
+		
+		double distanceTolerance = 0.1;
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		points.add(new Point2D(x1,y1));
+		recursive(x1,y1,x2,y2,x3,y3,x4,y4,points,distanceTolerance*distanceTolerance,0);
+		points.add(new Point2D(x4,y4));
+		return points;
+	}
+	
+	protected void recursive(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4,ArrayList<Point2D> points, double distanceTolerance,int level) {
+        if(level > RECURSION_LIMIT) 
+            return;
+
+        // Calculate all the mid-points of the line segments
+        double x12   = (x1 + x2) / 2.0;
+        double y12   = (y1 + y2) / 2.0;
+        double x23   = (x2 + x3) / 2.0;
+        double y23   = (y2 + y3) / 2.0;
+        double x34   = (x3 + x4) / 2.0;
+        double y34   = (y3 + y4) / 2.0;
+        double x123  = (x12 + x23) / 2.0;
+        double y123  = (y12 + y23) / 2.0;
+        double x234  = (x23 + x34) / 2.0;
+        double y234  = (y23 + y34) / 2.0;
+        double x1234 = (x123 + x234) / 2.0;
+        double y1234 = (y123 + y234) / 2.0;
+
+        if(level > 0) { // Enforce subdivision first time
+            // Try to approximate the full cubic curve by a single straight line
+            double dx = x4-x1;
+            double dy = y4-y1;
+
+            double d2 = Math.abs((x2 - x4) * dy - (y2 - y4) * dx);
+            double d3 = Math.abs((x3 - x4) * dy - (y3 - y4) * dx);
+
+            double da1, da2;
+
+            if(d2 > FLT_EPSILON && d3 > FLT_EPSILON) {
+                // Regular care
+                if((d2 + d3)*(d2 + d3) <= distanceTolerance * (dx*dx + dy*dy)) {
+                    // If the curvature doesn't exceed the distanceTolerance value we tend to finish subdivisions.
+                    if(m_angle_tolerance < curve_angle_tolerance_epsilon) {
+                        points.add(new Point2D(x1234, y1234));
+                        return;
+                    }
+
+                    // Angle & Cusp Condition
+                    double a23 = Math.atan2(y3 - y2, x3 - x2);
+                    da1 = Math.abs(a23 - Math.atan2(y2 - y1, x2 - x1));
+                    da2 = Math.abs(Math.atan2(y4 - y3, x4 - x3) - a23);
+                    if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
+                    if(da2 >= Math.PI) da2 = 2.0*Math.PI - da2;
+
+                    if(da1 + da2 < m_angle_tolerance) {
+                        // Finally we can stop the recursion
+                        points.add(new Point2D(x1234, y1234));
+                        return;
+                    }
+
+                    if(m_cusp_limit != 0.0) {
+                        if(da1 > m_cusp_limit) {
+                            points.add(new Point2D(x2, y2));
+                            return;
+                        }
+
+                        if(da2 > m_cusp_limit) {
+                            points.add(new Point2D(x3, y3));
+                            return;
+                        }
+                    }
+                }
+            }
+            else {
+                if(d2 > FLT_EPSILON) {
+                    // p1,p3,p4 are co-linear, p2 is considerable
+                    if(d2 * d2 <= distanceTolerance * (dx*dx + dy*dy)) {
+                        if(m_angle_tolerance < curve_angle_tolerance_epsilon) {
+                            points.add(new Point2D(x1234, y1234));
+                            return;
+                        }
+
+                        // Angle Condition
+                        da1 = Math.abs(Math.atan2(y3 - y2, x3 - x2) - Math.atan2(y2 - y1, x2 - x1));
+                        if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
+
+                        if(da1 < m_angle_tolerance) {
+                            points.add(new Point2D(x2, y2));
+                            points.add(new Point2D(x3, y3));
+                            return;
+                        }
+
+                        if(m_cusp_limit != 0.0) {
+                            if(da1 > m_cusp_limit) {
+                                points.add(new Point2D(x2, y2));
+                                return;
+                            }
+                        }
+                    }
+                }
+                else if(d3 > FLT_EPSILON) {
+                    // p1,p2,p4 are collinear, p3 is considerable
+                    //----------------------
+                    if(d3 * d3 <= distanceTolerance * (dx*dx + dy*dy)) {
+                        if(m_angle_tolerance < curve_angle_tolerance_epsilon) {
+                            points.add(new Point2D(x1234, y1234));
+                            return;
+                        }
+
+                        // Angle Condition
+                        //----------------------
+                        da1 = Math.abs(Math.atan2(y4 - y3, x4 - x3) - Math.atan2(y3 - y2, x3 - x2));
+                        if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
+
+                        if(da1 < m_angle_tolerance) {
+                            points.add(new Point2D(x2, y2));
+                            points.add(new Point2D(x3, y3));
+                            return;
+                        }
+
+                        if(m_cusp_limit != 0.0) {
+                            if(da1 > m_cusp_limit) {
+                                points.add(new Point2D(x3, y3));
+                                return;
+                            }
+                        }
+                    }
+                }
+                else {
+                    // Collinear case
+                    //-----------------
+                    dx = x1234 - (x1 + x4) / 2.0;
+                    dy = y1234 - (y1 + y4) / 2.0;
+                    if(dx*dx + dy*dy <= distanceTolerance) {
+                        points.add(new Point2D(x1234, y1234));
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Continue subdivision
+        //----------------------
+        recursive(x1, y1, x12, y12, x123, y123, x1234, y1234, points, distanceTolerance, level + 1);
+        recursive(x1234, y1234, x234, y234, x34, y34, x4, y4, points, distanceTolerance, level + 1);
+	}
+	
+	protected ArrayList<Point2D> generateCurvePointsA(double x0,double y0,double x1,double y1,double x2,double y2,double x3,double y3) {
+		ArrayList<Point2D> list = new ArrayList<Point2D>();
+		list.add(new Point2D(x0,y0));
+		
+		double steps=25;
+		for(double k=1;k<steps;k++) {
+			double j = k/steps;
+			/*
+			// old method
+			double xa = lerp(x0,x1,j);
+			double ya = lerp(y0,y1,j);
+			double xb = lerp(x1,x2,j);
+			double yb = lerp(y1,y2,j);
+			double xc = lerp(x2,x3,j);
+			double yc = lerp(y2,y3,j);
+			
+			double xab = lerp(xa,xb,j);
+			double yab = lerp(ya,yb,j);
+			double xbc = lerp(xb,xc,j);
+			double ybc = lerp(yb,yc,j);
+			
+			xabc = lerp(xab,xbc,j);
+			yabc = lerp(yab,ybc,j);/*/
+	        double a = Math.pow((1.0 - j), 3.0);
+	        double b = 3.0 * j * Math.pow((1.0 - j), 2.0);
+	        double c = 3.0 * Math.pow(j, 2.0) * (1.0 - j);
+	        double d = Math.pow(j, 3.0);
+	 
+	        double xabc = a * x0 + b * x1 + c * x2 + d * x3;
+	        double yabc = a * y0 + b * y1 + c * y2 + d * y3;//*/
+			
+	        list.add(new Point2D(xabc,yabc));
+		}
+		list.add(new Point2D(x3,y3));
+		
+		return list;
+	}
+
+	protected double lerp(double a,double b,double fraction) {
 		return ( b - a ) * fraction + a;
 	}
 	
