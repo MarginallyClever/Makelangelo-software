@@ -59,7 +59,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
+	private final long expectedFirmwareVersion = 11; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
 	private MakelangeloRobotSettings settings = null;
