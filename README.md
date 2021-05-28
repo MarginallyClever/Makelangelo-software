@@ -43,8 +43,8 @@ Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest 
 * In Eclipse. Fo to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
 * If you see the "Weldome!" tab, close it.
 * select Run > Debug As > Java Application
-* select "Makelangelo Software - com.marginallyclever.makealngelo.Makelangelo" and click OK.
-* Wait while the progress bar in the bottom right fills up.  This is a one time thing.
+* select "Makelangelo - com.marginallyclever.makelangelo" and click OK.  (It should be the top of the list)
+* Wait while the progress bar in the bottom right fills up.  This is a one time thing while it installs other dependencies and packages and puts everything together.
 * "Errors exist...Proceed with launch?" Select Proceed.
 
 Application should now launch.
