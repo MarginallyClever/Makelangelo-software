@@ -6,11 +6,48 @@ It pairs really well with [Makelangelo-firmware](https://github.com/MarginallyCl
 
 ## Where to go from here
 
-**Run the app** by double-clicking the .jar file to get started.
+**On your own**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
 
-**Trouble?**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
+**Together** and [join our Discord group](https://discord.gg/QtvHqAv8yp)
 
-**Go further** and [join our Discord group](https://discord.gg/QtvHqAv8yp)
+# Get Started developing!
+
+Steps to get started poking the code:
+
+1. Install The latest OpenJDK (java software)
+2. Install Eclipse (prorgramming interface)
+4. Install the Makelangelo Software App
+
+Then you should be able to run the application.
+
+## Install The latest OpenJDK
+
+Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest version is the "ready to use" edition.
+
+*OSX*: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-12.jdk) into your /Library/Java/JavaVirtualMachines/ folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
+
+*Windows*: https://stackoverflow.com/a/52531093 _untested_
+
+*Linux*: https://linuxize.com/post/install-java-on-ubuntu-18-04/ _untested_
+
+## Install Eclipse
+
+* Download Eclipse IDE: https://www.eclipse.org/downloads/
+* install the latest.  
+* Choose "Eclipse IDE for Java developers"
+
+## Install Makelangelo Software App
+
+* Goto https://github.com/MarginallyClever/Makelangelo-software/
+* Fownload this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it.  Note the folder for later.
+* In Eclipse. Fo to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
+* If you see the "Weldome!" tab, close it.
+* select Run > Debug As > Java Application
+* select "Makelangelo Software - com.marginallyclever.makealngelo.Makelangelo" and click OK.
+* Wait while the progress bar in the bottom right fills up.  This is a one time thing.
+* "Errors exist...Proceed with launch?" Select Proceed.
+
+Application should now launch.
 
 ## Thank you
 
