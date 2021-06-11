@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.marginallyclever.makelangelo.Makelangelo;
 
-import ch.qos.logback.classic.BasicConfigurator;
-
 /**
  * static log methods available everywhere
  * @author Dan Royer
@@ -60,7 +58,6 @@ public class Log {
 		deleteOldLog();
 		
 		logger = LoggerFactory.getLogger(Makelangelo.class);
-		BasicConfigurator.configureDefaultContext();
 		
 		write(PROGRAM_START_STRING);
 		write("------------------------");
