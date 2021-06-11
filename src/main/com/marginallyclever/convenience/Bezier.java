@@ -96,15 +96,13 @@ public class Bezier {
                             points.add(new Point2D(x2, y2));
                             return;
                         }
-
                         if(da2 > CUSP_LIMIT) {
                             points.add(new Point2D(x3, y3));
                             return;
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 if(d2 > FLT_EPSILON) {
                     // p1,p3,p4 are co-linear, p2 is considerable
                     if(d2 * d2 <= distanceTolerance * (dx*dx + dy*dy)) {
@@ -130,10 +128,8 @@ public class Bezier {
                             }
                         }
                     }
-                }
-                else if(d3 > FLT_EPSILON) {
-                    // p1,p2,p4 are collinear, p3 is considerable
-                    //----------------------
+                } else if(d3 > FLT_EPSILON) {
+                    // p1,p2,p4 are co-linear, p3 is considerable
                     if(d3 * d3 <= distanceTolerance * (dx*dx + dy*dy)) {
                         if(ANGLE_TOLERANCE < CURVE_ANGLE_TOLERANCE_EPSILON) {
                             points.add(new Point2D(x1234, y1234));
@@ -141,7 +137,6 @@ public class Bezier {
                         }
 
                         // Angle Condition
-                        //----------------------
                         da1 = Math.abs(Math.atan2(y4 - y3, x4 - x3) - Math.atan2(y3 - y2, x3 - x2));
                         if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
 
@@ -158,9 +153,8 @@ public class Bezier {
                             }
                         }
                     }
-                }
-                else {
-                    // Collinear case
+                } else {
+                    // Co-linear case
                     dx = x1234 - (x1 + x4) / 2.0;
                     dy = y1234 - (y1 + y4) / 2.0;
                     if(dx*dx + dy*dy <= distanceTolerance) {
