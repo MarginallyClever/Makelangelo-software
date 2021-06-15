@@ -10,11 +10,11 @@ import java.util.ArrayList;
  *
  */
 public class Bezier {
-	static public final int RECURSION_LIMIT = 8;
-	static public final double CURVE_ANGLE_TOLERANCE_EPSILON =0.01;
-	static public final double ANGLE_TOLERANCE = 0;
-	static public final double CUSP_LIMIT = 0;
-	static public final double FLT_EPSILON=1.19209290e-7;
+	private int recursionLimit = 8;
+	private double curveAngleToleranceEpsilon =0.01;
+	private double angleTolerance = 0;
+	private double cuspLimit = 0;
+	private static final double FLOAT_EPSILON=1.19209290e-7;
     
 	private double x0,x1,x2,x3;
 	private double y0,y1,y2,y3;
@@ -42,7 +42,7 @@ public class Bezier {
 	}
 	
 	private void recursive(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4,ArrayList<Point2D> points, double distanceTolerance,int level) {
-        if(level > RECURSION_LIMIT) 
+        if(level > recursionLimit) 
             return;
 
         // Calculate all the mid-points of the line segments
@@ -69,44 +69,44 @@ public class Bezier {
 
             double da1, da2;
 
-            if(d2 > FLT_EPSILON && d3 > FLT_EPSILON) {
+            if(d2 > FLOAT_EPSILON && d3 > FLOAT_EPSILON) {
                 // Regular care
                 if((d2 + d3)*(d2 + d3) <= distanceTolerance * (dx*dx + dy*dy)) {
                     // If the curvature doesn't exceed the distanceTolerance value we tend to finish subdivisions.
-                    if(ANGLE_TOLERANCE < CURVE_ANGLE_TOLERANCE_EPSILON) {
+                    if(angleTolerance < curveAngleToleranceEpsilon) {
                         points.add(new Point2D(x1234, y1234));
                         return;
                     }
 
                     // Angle & Cusp Condition
-                    double a23 = Math.atan2(y3 - y2, x3 - x2);
+					double a23 = Math.atan2(y3 - y2, x3 - x2);
                     da1 = Math.abs(a23 - Math.atan2(y2 - y1, x2 - x1));
                     da2 = Math.abs(Math.atan2(y4 - y3, x4 - x3) - a23);
                     if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
                     if(da2 >= Math.PI) da2 = 2.0*Math.PI - da2;
 
-                    if(da1 + da2 < ANGLE_TOLERANCE) {
+                    if(da1 + da2 < angleTolerance) {
                         // Finally we can stop the recursion
                         points.add(new Point2D(x1234, y1234));
                         return;
                     }
 
-                    if(CUSP_LIMIT != 0.0) {
-                        if(da1 > CUSP_LIMIT) {
+                    if(cuspLimit != 0.0) {
+                        if(da1 > cuspLimit) {
                             points.add(new Point2D(x2, y2));
                             return;
                         }
-                        if(da2 > CUSP_LIMIT) {
+                        if(da2 > cuspLimit) {
                             points.add(new Point2D(x3, y3));
                             return;
                         }
                     }
                 }
             } else {
-                if(d2 > FLT_EPSILON) {
+                if(d2 > FLOAT_EPSILON) {
                     // p1,p3,p4 are co-linear, p2 is considerable
                     if(d2 * d2 <= distanceTolerance * (dx*dx + dy*dy)) {
-                        if(ANGLE_TOLERANCE < CURVE_ANGLE_TOLERANCE_EPSILON) {
+                        if(angleTolerance < curveAngleToleranceEpsilon) {
                             points.add(new Point2D(x1234, y1234));
                             return;
                         }
@@ -115,23 +115,23 @@ public class Bezier {
                         da1 = Math.abs(Math.atan2(y3 - y2, x3 - x2) - Math.atan2(y2 - y1, x2 - x1));
                         if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
 
-                        if(da1 < ANGLE_TOLERANCE) {
+                        if(da1 < angleTolerance) {
                             points.add(new Point2D(x2, y2));
                             points.add(new Point2D(x3, y3));
                             return;
                         }
 
-                        if(CUSP_LIMIT != 0.0) {
-                            if(da1 > CUSP_LIMIT) {
+                        if(cuspLimit != 0.0) {
+                            if(da1 > cuspLimit) {
                                 points.add(new Point2D(x2, y2));
                                 return;
                             }
                         }
                     }
-                } else if(d3 > FLT_EPSILON) {
+                } else if(d3 > FLOAT_EPSILON) {
                     // p1,p2,p4 are co-linear, p3 is considerable
                     if(d3 * d3 <= distanceTolerance * (dx*dx + dy*dy)) {
-                        if(ANGLE_TOLERANCE < CURVE_ANGLE_TOLERANCE_EPSILON) {
+                        if(angleTolerance < curveAngleToleranceEpsilon) {
                             points.add(new Point2D(x1234, y1234));
                             return;
                         }
@@ -140,14 +140,14 @@ public class Bezier {
                         da1 = Math.abs(Math.atan2(y4 - y3, x4 - x3) - Math.atan2(y3 - y2, x3 - x2));
                         if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
 
-                        if(da1 < ANGLE_TOLERANCE) {
+                        if(da1 < angleTolerance) {
                             points.add(new Point2D(x2, y2));
                             points.add(new Point2D(x3, y3));
                             return;
                         }
 
-                        if(CUSP_LIMIT != 0.0) {
-                            if(da1 > CUSP_LIMIT) {
+                        if(cuspLimit != 0.0) {
+                            if(da1 > cuspLimit) {
                                 points.add(new Point2D(x3, y3));
                                 return;
                             }
