@@ -24,24 +24,26 @@ public class LineSegment2D {
 		b=a;
 		a=temp;
 	}
+	
 	public String toString() {
 		return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
 	}
-	public double physicalLengthSquared() {
+	
+	public double lengthSquared() {
 		double dx=a.x-b.x;
 		double dy=a.y-b.y;
 		return dx*dx + dy*dy;
 	}
-	
+
+	// The distance measured is the distance between the specified point,
+	// and the closest point between the start and end points of line a. 
 	public double ptSegDistSq(Point2D point) {
-		// The distance measured is the distance between the specified point,
-		// and the closest point between the start and end points of line a. 
 		return java.awt.geom.Line2D.ptSegDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
 	}
-	
+
+	// The distance measured is the distance between the specified point
+	// and the closest point on the infinite extension of line a.
 	public double ptLineDistSq(Point2D point) {
-		// The distance measured is the distance between the specified point,
-		// and the closest point on the infinite extension of line a.
 		return java.awt.geom.Line2D.ptLineDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
 	}
 }
