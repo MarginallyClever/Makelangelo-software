@@ -79,8 +79,6 @@ public class ArtPipeline {
 		int count = originalLines.size();
 		System.out.println("  Converted to "+count+" lines.");
 
-		final double EPSILON = 1e-7;
-		
 		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-5); 
 		int duplicates = count - uniqueLines.size();
 		System.out.println("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
@@ -496,54 +494,47 @@ public class ArtPipeline {
 		Log.message("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
 	}
 
+	public Turtle reprocessTurtle() {
+		return processTurtle(lastTurtle,lastSettings);
+	}
 	
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
-	public void processTurtle(Turtle turtle, MakelangeloRobotSettings settings) {
-		if(turtle == null) turtle=lastTurtle;
-		if(settings == null) settings=lastSettings;
-		lastSettings=settings;
-		lastTurtle=turtle;
+	public Turtle processTurtle(Turtle turtleLoaded, MakelangeloRobotSettings settings) {
+		if(turtleLoaded == null) return null;
+		if(settings == null) return null;
+		if(turtleLoaded.history.isEmpty()) return null;
 		
-		if(turtle == null) return;
-		if(turtle.history.isEmpty()) return;
-		
-		
-		while(turtle.isLocked()) {
+		while(turtleLoaded.isLocked()) {
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 				Log.message("processTurtle wait interrupted.");
-				return;
+				return null;
 			}
 		}
-		turtle.lock();
-		try {
-			double ang=settings.getRotation();
-			if(ang != 0.0)
-			{
-				rotatePicture(turtle,settings);
-			}
-			if(shouldResizeFill()) fitToPaper(turtle,settings,false);
-			if(shouldResizeFit()) fitToPaper(turtle,settings,true);
-			if(shouldFlipV()) flipV(turtle,settings);
-			if(shouldFlipH()) flipH(turtle,settings);
-			if(shouldReorder()) reorder(turtle,settings);
-			if(shouldSimplify()) simplify(turtle,settings);
-			if(shouldCrop()) cropToPageMargin(turtle,settings);
-			removeRedundantToolChanges(turtle);
-		}
-		finally {
-			turtle.unlock();
-			notifyListenersTurtleFinished(turtle);
-		}
+		turtleLoaded.lock();
+		Turtle newTurtle = new Turtle(turtleLoaded);
+		lastTurtle=turtleLoaded;
+		lastSettings=settings;
+		turtleLoaded.unlock();
+		
+		double ang = settings.getRotation();
+		if(ang != 0.0) rotatePicture(newTurtle,settings);
+		if(shouldResizeFill()) fitToPaper(newTurtle,settings,false);
+		if(shouldResizeFit()) fitToPaper(newTurtle,settings,true);
+		if(shouldFlipV()) flipV(newTurtle,settings);
+		if(shouldFlipH()) flipH(newTurtle,settings);
+		if(shouldReorder()) reorder(newTurtle,settings);
+		if(shouldSimplify()) simplify(newTurtle,settings);
+		if(shouldCrop()) cropToPageMargin(newTurtle,settings);
+		removeRedundantToolChanges(newTurtle);
+		
+		notifyListenersTurtleFinished(newTurtle);
+		
+		return newTurtle;
 	}
 
-	protected void removeRedundantToolChanges(Turtle t) {
+	private void removeRedundantToolChanges(Turtle t) {
 		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
 		int size=t.history.size();
 		for(int i=0;i<size;++i) {
@@ -570,71 +561,43 @@ public class ArtPipeline {
 		t.history = toKeep;
 	}
 	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldResizeFill() {
+	private boolean shouldResizeFill() {
 		if(myPanel!=null) return myPanel.shouldResizeFill();
 		int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldResizeFit() {
+	private boolean shouldResizeFit() {
 		if(myPanel!=null) return myPanel.shouldResizeFit();
 		int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldReorder() {
+	private boolean shouldReorder() {
 		if(myPanel!=null) return myPanel.shouldReorder();
 		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldFlipV() {
+	private boolean shouldFlipV() {
 		if(myPanel!=null) return myPanel.shouldFlipV();
 		int result = JOptionPane.showConfirmDialog(null, "Flip vertical?", "Flip", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldFlipH() {
+	private boolean shouldFlipH() {
 		if(myPanel!=null) return myPanel.shouldFlipH();
 		int result = JOptionPane.showConfirmDialog(null, "Flip horizonal?", "Flip", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldSimplify() {
+	private boolean shouldSimplify() {
 		if(myPanel!=null) return myPanel.shouldSimplify();
 		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);
 	}
 	
-	/**
-	 * 
-	 * @return true or false
-	 */
-	public boolean shouldCrop() {
+	private boolean shouldCrop() {
 		if(myPanel!=null) return myPanel.shouldCrop();
 		int result = JOptionPane.showConfirmDialog(null, "Crop to margins?", "Crop", JOptionPane.YES_NO_OPTION);
 		return (result == JOptionPane.YES_OPTION);

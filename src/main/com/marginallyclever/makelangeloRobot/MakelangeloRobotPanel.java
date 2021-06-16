@@ -502,7 +502,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 				m.run();
 				// we can only get here if the robot is connected and not running.
 				// Save the gcode so that updates to settings are applied immediately + automatically.
-				robot.saveCurrentTurtleToDrawing();
+				robot.saveTurtleToDrawing(robot.getTurtle());
 			}
 		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());

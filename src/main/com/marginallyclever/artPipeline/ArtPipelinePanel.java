@@ -85,32 +85,32 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				setPreferredResizeStyle(resize.getSelectedIndex());
-				myPipeline.processTurtle(null,null);
+				myPipeline.reprocessTurtle();
 			}
 		});
 		flip.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				setPreferredFlipStyle(flip.getSelectedIndex());
-				myPipeline.processTurtle(null,null);
+				myPipeline.reprocessTurtle();
 			}
 		});
 		reorder.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.processTurtle(null,null);
+				myPipeline.reprocessTurtle();
 			}
 		});
 		simplify.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.processTurtle(null,null);
+				myPipeline.reprocessTurtle();
 			}
 		});
 		crop.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.processTurtle(null,null);
+				myPipeline.reprocessTurtle();
 			}
 		});
 	}

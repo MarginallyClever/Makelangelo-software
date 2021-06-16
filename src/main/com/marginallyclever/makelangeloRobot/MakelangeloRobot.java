@@ -80,7 +80,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private float penX;
 	private float penY;
 
-	protected Turtle turtle;
+	private Turtle turtleToRender;
+	private Turtle TurtleLoaded;
 	
 	private ArtPipeline myPipeline;
 
@@ -110,7 +111,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		didSetHome = false;
 		setPenX(0);
 		setPenY(0);
-		turtle = new Turtle();
+		turtleToRender = new Turtle();
 		drawingCommands = new ArrayList<String>();
 		drawingProgress = 0;
 	}
@@ -773,14 +774,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public void setTurtle(Turtle t) {
-		turtle = new Turtle(t);
-		myPipeline.processTurtle(turtle, settings);
+		TurtleLoaded = new Turtle(t);
+		myPipeline.processTurtle(TurtleLoaded, settings);
 	}
 
 	/**
 	 * Copy the most recent turtle to the drawing output buffer.
 	 */
-	public void saveCurrentTurtleToDrawing() {
+	public void saveTurtleToDrawing(Turtle t) {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
@@ -802,7 +803,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		Log.message("Old method "+printTimeEstimate(estimateTime()));
 		
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
-		double newEstimate= m.getTimeEstimate(turtle, settings);
+		double newEstimate= m.getTimeEstimate(t, settings);
 		Log.message("New method "+printTimeEstimate(newEstimate));
 		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
 	}
@@ -812,16 +813,16 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public Turtle getTurtle() {
-		return turtle;
+		return turtleToRender;
 	}
 
 	protected double estimateTime() {
 		double totalTime = 0;
 		
-		if (turtle.isLocked())
+		if (turtleToRender.isLocked())
 			return totalTime;
 		
-		turtle.lock();
+		turtleToRender.lock();
 
 		try {
 			boolean isUp = true;
@@ -829,7 +830,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			double oy = this.settings.getHomeY();
 			double oz = this.settings.getPenUpAngle();
 
-			for (TurtleMove m : turtle.history) {
+			for (TurtleMove m : turtleToRender.history) {
 				double nx = ox;
 				double ny = oy;
 				double nz = oz;
@@ -875,7 +876,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				oz = nz;
 			}
 		} finally {
-			turtle.unlock();
+			turtleToRender.unlock();
 		}
 		
 		return totalTime;
@@ -953,9 +954,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
-		} else if (turtle != null) {
+		} else if (turtleToRender != null) {
 			TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
-			turtle.render(tr);
+			turtleToRender.render(tr);
 		}
 	}
 
@@ -1050,7 +1051,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	@Override
 	public void turtleFinished(Turtle t) {
-		// TODO t is not passed to saving?  how does this even work?
-		saveCurrentTurtleToDrawing();		
+		turtleToRender = t;
+		saveTurtleToDrawing(t);		
 	}
 }

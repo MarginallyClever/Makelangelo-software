@@ -232,7 +232,7 @@ public final class SerialConnection implements SerialPortEventListener, NetworkC
 		src = src.trim();
 		int length = src.length();
 		String result = "";
-		for (int i = 0; i < length; i++) {
+		for(int i = 0; i < length; i++) {
 			Character character = src.charAt(i);
 			if (Character.isDigit(character)) {
 				result += character;
