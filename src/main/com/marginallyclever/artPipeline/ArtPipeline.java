@@ -494,14 +494,14 @@ public class ArtPipeline {
 		Log.message("cropTurtleToPageMargin() end (was "+oldSize+" now "+newSize+")");
 	}
 
-	public Turtle reprocessTurtle() {
-		return processTurtle(lastTurtle,lastSettings);
+	public void reprocessTurtle() {
+		processTurtle(lastTurtle,lastSettings);
 	}
 	
-	public Turtle processTurtle(Turtle turtleLoaded, MakelangeloRobotSettings settings) {
-		if(turtleLoaded == null) return null;
-		if(settings == null) return null;
-		if(turtleLoaded.history.isEmpty()) return null;
+	public void processTurtle(Turtle turtleLoaded, MakelangeloRobotSettings settings) {
+		if(turtleLoaded == null) return;
+		if(settings == null) return;
+		if(turtleLoaded.history.isEmpty()) return;
 		
 		while(turtleLoaded.isLocked()) {
 			try {
@@ -509,7 +509,7 @@ public class ArtPipeline {
 			} catch (InterruptedException e) {
 				//e.printStackTrace();
 				Log.message("processTurtle wait interrupted.");
-				return null;
+				return;
 			}
 		}
 		turtleLoaded.lock();
@@ -530,8 +530,6 @@ public class ArtPipeline {
 		removeRedundantToolChanges(newTurtle);
 		
 		notifyListenersTurtleFinished(newTurtle);
-		
-		return newTurtle;
 	}
 
 	private void removeRedundantToolChanges(Turtle t) {
