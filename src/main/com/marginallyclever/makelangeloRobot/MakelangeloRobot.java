@@ -498,7 +498,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			return;
 
 		// are there any more commands?
-		if (drawingProgress == total) {
+		if (drawingProgress >= total) {
 			// no!
 			halt();
 			// bask in the glory
