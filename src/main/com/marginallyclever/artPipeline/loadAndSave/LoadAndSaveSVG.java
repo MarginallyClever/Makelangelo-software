@@ -489,7 +489,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						double x3=TX(path.getX());
 						double y3=TY(path.getY());
 						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
-						ArrayList<Point2D> points = b.generateCurvePoints();
+						ArrayList<Point2D> points = b.generateCurvePoints(1.5);
 						for(Point2D p : points) {
 							turtle.moveTo(p.x, p.y);
 							x = p.x;

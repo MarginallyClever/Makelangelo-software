@@ -32,8 +32,7 @@ public class Bezier {
 	
 	// Based on https://github.com/pelson/antigrain/blob/master/agg-2.4/src/agg_curves.cpp
 	// and https://github.com/mattdesl/adaptive-bezier-curve
-	public ArrayList<Point2D> generateCurvePoints() {
-		double distanceTolerance = 0.25;
+	public ArrayList<Point2D> generateCurvePoints(double distanceTolerance) {
 		ArrayList<Point2D> points = new ArrayList<Point2D>();
 		points.add(new Point2D(x0,y0));
 		recursive(x0,y0,x1,y1,x2,y2,x3,y3,points,distanceTolerance*distanceTolerance,0);
