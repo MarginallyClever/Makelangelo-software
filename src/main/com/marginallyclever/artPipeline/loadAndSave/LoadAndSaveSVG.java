@@ -431,13 +431,13 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
 					{
-						System.out.println("Close path");
+						//System.out.println("Close path");
 						turtle.moveTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
 					{
-						System.out.println("Move Abs");
+						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() );
 						firstY = y = TY( path.getY() );
@@ -446,7 +446,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
 					{
-						System.out.println("Move Rel");
+						//System.out.println("Move Rel");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						firstX = x = TX( path.getX() ) + turtle.getX();
 						firstY = y = TY( path.getY() ) + turtle.getY();
@@ -455,7 +455,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
 					{
-						System.out.println("Line Abs");
+						//System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() );
 						y = TY( path.getY() );
@@ -464,7 +464,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
 					{
-						System.out.println("Line REL");
+						//System.out.println("Line REL");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						x = TX( path.getX() ) + turtle.getX();
 						y = TY( path.getY() ) + turtle.getY();
@@ -473,7 +473,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
 					{
-						System.out.println("Curve Cubic Abs");
+						//System.out.println("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
 						// x0,y0 is the first point
@@ -489,7 +489,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						double x3=TX(path.getX());
 						double y3=TY(path.getY());
 						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
-						ArrayList<Point2D> points = b.generateCurvePoints(1.5);
+						ArrayList<Point2D> points = b.generateCurvePoints(0.5);
 						for(Point2D p : points) {
 							turtle.moveTo(p.x, p.y);
 							x = p.x;
