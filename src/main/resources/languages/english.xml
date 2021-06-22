@@ -328,6 +328,12 @@
 	</string>
 
 	<string>
+		<key>Log</key>
+		<value>Log</value>
+		<hint>title of log window</hint>
+	</string>
+
+	<string>
 		<key>PaperMargin</key>
 		<value>Margin (%)</value>
 		<hint>conversion options</hint>
