@@ -3,6 +3,8 @@ package com.marginallyclever.artPipeline;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+import javax.vecmath.Vector2d;
+import javax.vecmath.Vector3d;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
@@ -94,12 +96,44 @@ public class ArtPipeline {
 
 	private ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double d) {
 		ArrayList<LineSegment2D> toKeep = new ArrayList<LineSegment2D>();
-		for( LineSegment2D line : toTest ) {
-			if(lengthSquared(line.a,line.b)>d) {
-				toKeep.add(line);
+		int count = toTest.size();
+		if(count==0) return toKeep;
+		
+		toKeep.add(toTest.get(0));
+		LineSegment2D first = toKeep.get(toKeep.size()-1); 
+
+		for(int i=1;i<count;++i) {
+			LineSegment2D second = toTest.get(i);
+			// sequential with no jump?
+			if(lengthSquared(first.b,second.a)<d) {
+				// very short?
+				if(lengthSquared(second.a,second.b)<d) {
+					first.b=second.b;
+					continue;
+				}
+
+				// colinear?
+				Vector2d firstN = makeUnitVectorFromLineSegment(first);
+				Vector2d secondN = makeUnitVectorFromLineSegment(second);
+				if(firstN.dot(secondN)>0.9999) {
+					first.b=second.b;
+					continue;
+				}
+				second.a=first.b;
 			}
+			
+			toKeep.add(second);
+			first = second;
 		}
 		return toKeep;
+	}
+
+	private Vector2d makeUnitVectorFromLineSegment(LineSegment2D line) {
+		Vector2d n = new Vector2d();
+		n.x = line.b.x - line.a.x;
+		n.y = line.b.y - line.a.y;
+		n.normalize();
+		return n;
 	}
 
 	private Turtle convertLinesToTurtle(ArrayList<LineSegment2D> orderedLines,double epsilon) {
@@ -327,46 +361,29 @@ public class ArtPipeline {
 		System.out.println("simplify() end (was "+os+" is now "+ns+")");
 	}
 
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
 	protected void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(1,-1);
 	}
 
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
 	protected void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(-1,1);
 	}
 	
-	/**
-	 * Offers to resize your loaded image to fill the margins completely.
-	 * @param turtle
-	 * @param settings
-	 */
 	protected void fitToPaper(Turtle turtle, MakelangeloRobotSettings settings,boolean keepAspect) {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
 		turtle.getBounds(top, bottom); // image bounds
-		
+
 		// find the scale
 		double iw = top.x-bottom.x; // image width
 		double ih = top.y-bottom.y; // image height
-		double pw = settings.getPaperWidth();
-		double ph = settings.getPaperHeight();
-		double px = (settings.getPaperRight()+settings.getPaperLeft())*0.5;
-		double py = (settings.getPaperTop()+settings.getPaperBottom())*0.5;
+		double pw = settings.getMarginWidth();
+		double ph = settings.getMarginHeight();
+		double px = (settings.getMarginRight()+settings.getMarginLeft())*0.5;
+		double py = (settings.getMarginTop()+settings.getMarginBottom())*0.5;
 		double ratioW=1,ratioH=1;
 		ratioH = ph/ih;
 		ratioW = pw/iw;
-		ratioH  *= (1-settings.getPaperMargin()*0.01);
-		ratioW  *= (1-settings.getPaperMargin()*0.01);
 		// use > to fill the page.
 		
 		// and the translation
@@ -384,7 +401,6 @@ public class ArtPipeline {
 		turtle.translate(px,py);
 	}
 	
-	
 	private void rotatePicture(Turtle turtle, MakelangeloRobotSettings settings) {
 		double ang=settings.getRotation();
 		double refang=settings.getRotationRef();
@@ -400,12 +416,6 @@ public class ArtPipeline {
 		settings.setRotationRef(ang);
 	}
 	
-	
-	/**
-	 * 
-	 * @param turtle
-	 * @param settings
-	 */
 	protected void cropToPageMargin(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle==null) return;
 		
