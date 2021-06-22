@@ -79,12 +79,12 @@ public class ArtPipeline {
 		int count = originalLines.size();
 		System.out.println("  Converted to "+count+" lines.");
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-5); 
+		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-12); 
 		int duplicates = count - uniqueLines.size();
 		System.out.println("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
 		
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
-		Turtle t = converterOrderedLinesToTurtleHistory(orderedLines,0.05);
+		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
+		Turtle t = converterOrderedLinesToTurtleHistory(orderedLines,1e-2);
 
 		System.out.println("  after: "+t.history.size()+" instructions.");
 		turtle.history = t.history;
@@ -93,30 +93,31 @@ public class ArtPipeline {
 
 	private Turtle converterOrderedLinesToTurtleHistory(ArrayList<LineSegment2D> orderedLines,double epsilon) {
 		Turtle t = new Turtle();
-		if(!orderedLines.isEmpty()) {
-			t.setX(orderedLines.get(0).a.x);
-			t.setY(orderedLines.get(0).a.y);
+		if(orderedLines.isEmpty()) return t;
+		
+		LineSegment2D first = orderedLines.get(0); 
+		t.jumpTo(first.a.x,first.a.y);
+		Point2D currentPosition = new Point2D(first.b.x, first.b.y);
+		
+		for( LineSegment2D line : orderedLines ) {
+			// change color if needed
+			if(line.c!=t.getColor()) {
+				t.setColor(line.c);
+			}
 			
-			for( LineSegment2D line : orderedLines ) {
-				// change color if needed
-				if(line.c!=t.getColor()) {
-					t.setColor(line.c);
-				}
-				
-				Point2D currentPosition = new Point2D(t.getX(), t.getY());
-				if(lengthSquared(currentPosition, line.a) > epsilon) {
-					// The previous line ends too far from the start point of this line,
-					// need to make a travel with the pen up to the start point of this line.
-					t.jumpTo(line.a.x,line.a.y);
-				} else {
-					// The previous line ends close to the start point of this line,
-					// so there's no need to go to the start point of this line since the pen is practically there.
-					// The start point of this line will be skipped.
-					t.moveTo(line.a.x,line.a.y);
-				}
-				// Make a pen down move to the end of this line
-				t.moveTo(line.b.x,line.b.y);
-			}		
+			if(lengthSquared(currentPosition, line.a) > epsilon) {
+				// The previous line ends too far from the start point of this line,
+				// need to make a travel with the pen up to the start point of this line.
+				t.jumpTo(line.a.x,line.a.y);
+			} else {
+				// The previous line ends close to the start point of this line,
+				// so there's no need to go to the start point of this line since the pen is practically there.
+				// The start point of this line will be skipped.
+				//t.moveTo(line.a.x,line.a.y);
+			}
+			// Make a pen down move to the end of this line
+			t.moveTo(line.b.x,line.b.y);
+			currentPosition.set(line.b.x,line.b.y);
 		}
 		
 		return t;
@@ -126,7 +127,7 @@ public class ArtPipeline {
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
 
-		Point2D lastPosition = uniqueLines.get(0).b;
+		Point2D lastPosition = uniqueLines.get(0).a;
 		
 		while(!uniqueLines.isEmpty()) {
 			double bestD = Double.MAX_VALUE;
@@ -161,17 +162,12 @@ public class ArtPipeline {
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 
 		for(LineSegment2D candidateLine : originalLines) {
-			int b = 0;
-			int end = uniqueLines.size();
 			boolean isDuplicate = false;
 			LineSegment2D lineToReplace = null;
 			
 			// Compare this line to all the lines previously marked as non-duplicate
-			while (b < end) {
-				LineSegment2D uniqueLine = uniqueLines.get(b);	
-				++b;
-				
-				// Check if lines are (almost) colinear
+			for( LineSegment2D uniqueLine : uniqueLines ) {
+				// Check if lines are (almost) collinear
 				if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
 					uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
 					// Both lines are (almost) colinear, if they touch or overlap then I have a candidate.
