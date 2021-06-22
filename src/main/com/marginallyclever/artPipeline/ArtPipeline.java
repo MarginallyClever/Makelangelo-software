@@ -75,23 +75,34 @@ public class ArtPipeline {
 		//   look at all pen down moves in the section.
 		//     if two pen down moves share a start/end, then they are connected in sequence.
 		
-		ArrayList<LineSegment2D> originalLines = convertTurtleToLineCollection(turtle);
-		int count = originalLines.size();
-		System.out.println("  Converted to "+count+" lines.");
+		ArrayList<LineSegment2D> originalLines = convertTurtleToLines(turtle);
+		int originalCount = originalLines.size();
+		System.out.println("  Converted to "+originalCount+" lines.");
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-12); 
-		int duplicates = count - uniqueLines.size();
-		System.out.println("  - "+duplicates+" duplicates = "+uniqueLines.size()+" lines.");
-		
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
-		Turtle t = converterOrderedLinesToTurtleHistory(orderedLines,1e-2);
+		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-12);
+		int uniqueCount = uniqueLines.size();
+		int duplicateCount = originalCount - uniqueCount;
+		System.out.println("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
+
+		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
+		Turtle t = convertLinesToTurtle(orderedLines,1);
 
 		System.out.println("  after: "+t.history.size()+" instructions.");
 		turtle.history = t.history;
 		System.out.println("reorder() end");
 	}
 
-	private Turtle converterOrderedLinesToTurtleHistory(ArrayList<LineSegment2D> orderedLines,double epsilon) {
+	private ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double d) {
+		ArrayList<LineSegment2D> toKeep = new ArrayList<LineSegment2D>();
+		for( LineSegment2D line : toTest ) {
+			if(lengthSquared(line.a,line.b)>d) {
+				toKeep.add(line);
+			}
+		}
+		return toKeep;
+	}
+
+	private Turtle convertLinesToTurtle(ArrayList<LineSegment2D> orderedLines,double epsilon) {
 		Turtle t = new Turtle();
 		if(orderedLines.isEmpty()) return t;
 		
@@ -124,6 +135,7 @@ public class ArtPipeline {
 	}
 
 	private ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
+		System.out.println("greedyReordering()");
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
 
@@ -159,6 +171,7 @@ public class ArtPipeline {
 	}
 
 	private ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
+		System.out.println("removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 
 		for(LineSegment2D candidateLine : originalLines) {
@@ -228,7 +241,7 @@ public class ArtPipeline {
 		return uniqueLines;
 	}
 
-	private ArrayList<LineSegment2D> convertTurtleToLineCollection(Turtle turtle) {
+	private ArrayList<LineSegment2D> convertTurtleToLines(Turtle turtle) {
 		// build a list of all the pen-down lines while remembering their color.
 		ArrayList<LineSegment2D> originalLines = new ArrayList<LineSegment2D>();
 		TurtleMove previousMovement=null;
@@ -293,56 +306,25 @@ public class ArtPipeline {
 	 * @param settings
 	 */
 	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
-		Log.message("simplify() begin");
-		ArrayList<TurtleMove> toKeep = new ArrayList<TurtleMove>();
+		System.out.println("simplify() begin");
 
-		double minimumStepSize=1;
-
-		// start assuming pen is up at home position
-		boolean isUp=true;
-		double ox=settings.getHomeX();
-		double oy=settings.getHomeY();
-		double sum=0;
-		double dx,dy;
-		TurtleMove previous=null;
-		
-		for( TurtleMove m : turtle.history ) {
-			switch(m.type) {
-			case DRAW:
-				dx=m.x-ox;
-				dy=m.y-oy;
-				sum+=Math.sqrt(dx*dx+dy*dy);
-				if(isUp || sum>minimumStepSize) {
-					// pen has just been put down OR move is large enough to be important
-					toKeep.add(m);
-					sum=0;
-					ox=m.x;
-					oy=m.y;
-				}
-				isUp=false;
-				break;
-			case TRAVEL:
-				if(!isUp && sum>0 ) {
-					if(previous!=null && previous.type==TurtleMoveType.DRAW) {
-						toKeep.add(previous);
-					}
-				}
-				isUp=true;
-				toKeep.add(m);
-				ox=m.x;
-				oy=m.y;
-				sum=0;
-				break;
-			default:
-				toKeep.add(m);
-				break;
-			}
-			previous=m;
-		}
 		int os = turtle.history.size();
-		int ns = toKeep.size();
-		turtle.history = toKeep;
-		Log.message("simplify() end (was "+os+" is now "+ns+")");
+		
+		ArrayList<LineSegment2D> originalLines = convertTurtleToLines(turtle);
+		int originalCount = originalLines.size();
+		System.out.println("  Converted to "+originalCount+" lines.");
+
+		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,1e-1); 
+		int longCount = longLines.size();
+		int shortCount = originalCount - longCount;
+		System.out.println("  - "+shortCount+" shorts = "+longCount+" lines.");
+
+		Turtle t = convertLinesToTurtle(longLines,1);
+		
+		int ns = t.history.size();
+		turtle.history = t.history;
+		
+		System.out.println("simplify() end (was "+os+" is now "+ns+")");
 	}
 
 	/**
