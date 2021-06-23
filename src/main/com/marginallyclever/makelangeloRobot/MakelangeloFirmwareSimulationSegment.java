@@ -8,14 +8,16 @@ class MakelangeloFirmwareSimulationSegment {
 	public static int counter=0;
 	public int id;
 	
-	public Vector3d start;
-	public Vector3d end;
-	public Vector3d delta;
-	public Vector3d normal;
+	public Vector3d start = new Vector3d();
+	public Vector3d end = new Vector3d();
+	public Vector3d delta = new Vector3d();
+	public Vector3d normal = new Vector3d();
 	
 	//public double start_s;
 	public double end_s;
 	//public double now_s;
+	
+	public double feedrate;
 	
 	public double distance;
 	public double nominalSpeed;  // top speed in this segment
@@ -42,16 +44,14 @@ class MakelangeloFirmwareSimulationSegment {
 	
 	
 	// delta is calculated here in the constructor.
-	public MakelangeloFirmwareSimulationSegment(Vector3d startPose,Vector3d endPose) {
-		start  = (Vector3d)startPose.clone();
-		end    = (Vector3d)endPose.clone();
-		delta  = (Vector3d)endPose.clone();
-		normal = (Vector3d)endPose.clone();
+	public MakelangeloFirmwareSimulationSegment(final Vector3d endPose,final Vector3d deltaPose) {
+		end.set(endPose);
+		delta.set(deltaPose);
+		normal.set(deltaPose);
+		normal.normalize();
+		start.sub(end,delta);
 		
 		id=counter++;
-		delta.sub(endPose,startPose);
-		normal.set(delta);
-		normal.normalize();
 		distance = delta.length();
 		busy=false;
 		recalculate=true;

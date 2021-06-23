@@ -16,28 +16,42 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.24.0
  */
 public class MakelangeloFirmwareSimulation {
-	public static final int MAX_SEGMENTS = 8;
-	public static final double MIN_SEGMENT_TIME = 25000.0/1000000.0;
+	public static final int MAX_SEGMENTS = 32;
+	public static final long MIN_SEGMENT_TIME_US = 20000;
+	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
 	public static final double MAX_FEEDRATE = 200.0;   // mm/s
-	public static final double MAX_ACCELERATION = 1250.0;  // mm/s/s
+	public static final double MAX_ACCELERATION = 1000.0;  // mm/s/s
+	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
-	public static final int SEGMENTS_PER_SECOND = 8;
+	public static final int SEGMENTS_PER_SECOND = 40;
 	public static final double [] MAX_JERK = { 8, 8, 0.3 };
+	public static final double GRAVITYmag = 9800.0;  // mm/s/s
 	
-	// poseTo represents the desired destination. It could be null if there is none.  Roughly equivalent to Sixi2Live.poseSent.
-	public Vector3d poseTo;
+	private static final boolean JD_HANDLE_SMALL_SEGMENTS = false;
+	
 	// poseNow is the current position.  Roughly equivalent to Sixi2Live.poseReceived.
-	protected Vector3d poseNow;
+	protected Vector3d poseNow = new Vector3d();
 	
 	protected LinkedList<MakelangeloFirmwareSimulationSegment> queue = new LinkedList<MakelangeloFirmwareSimulationSegment>();
 	
 	protected boolean readyForCommands;
 
-	protected double [] previousSpeedArray = { 0,0,0 };
+	protected double [] previousSpeed = { 0,0,0 };
 	protected double previousSafeSpeed = 0;
+	private double XMAX = 325;
+	private double XMIN = -325;
+	private double YMAX = 500;
+
+	// Unit vector of previous path line segment
+	private Vector3d previousNormal = new Vector3d();
+	private double previousNominalSpeed=0;
+	private double junction_deviation = 0.05;
 	
-	public MakelangeloFirmwareSimulation() {
+	public MakelangeloFirmwareSimulation(double left,double right,double top) {
 		readyForCommands = true;
+		XMAX=right;
+		XMIN=left;
+		YMAX=top;
 	}
 	
 /*
@@ -64,12 +78,8 @@ public class MakelangeloFirmwareSimulation {
 			
 			readyForCommands=(queue.size()<MAX_SEGMENTS); 
 		}
-	}*/
-
-	/**
-	 * override this to change behavior of joints over time.
-	 * @param dt
-	 *//*
+	}
+	
 	protected void updatePositions(MakelangeloFirmwareSimulationSegment seg) {
 		if(poseNow==null) return;
 
@@ -111,86 +121,205 @@ public class MakelangeloFirmwareSimulation {
 
 	/**
 	 * Add this destination to the queue and attempt to optimize travel between destinations. 
-	 * @param to destination
-	 * @param feedrate velocity (mm/s)
+	 * @param destination destination (mm)
+	 * @param feedrate (mm/s)
 	 * @param acceleration (mm/s/s)
 	 */
-	protected void addDestination2(final Vector3d to, double feedrate, double acceleration) {
+	protected void bufferLine(final Vector3d destination, double feedrate, double acceleration) {
 		Vector3d delta = new Vector3d();
-		delta.sub(to,poseNow);
-		double len = delta.length();
+		delta.sub(destination,poseNow);
+		
+		double len = delta.length();		
 		double seconds = len / feedrate;
 		int segments = (int)Math.ceil(seconds * SEGMENTS_PER_SECOND);
+		int maxSeg = (int)Math.ceil(len / MIN_SEGMENT_LENGTH_MM); 
+		if(segments>maxSeg) segments=maxSeg;
 		if(segments<1) segments=1;
-		//double inv_segments = 1.0 / (double)segments;
-		//double segment_len_mm = len * inv_segments;
-		delta.scale(1.0/segments);
+		Vector3d deltaSegment = new Vector3d(delta);
+		deltaSegment.scale(1.0/segments);
 		
 		Vector3d temp = new Vector3d(poseNow);
 		while(--segments>0) {
-			temp.add(delta);
-			addDestination(temp,feedrate,acceleration);
+			temp.add(deltaSegment);
+			bufferSegment(temp,feedrate,acceleration,deltaSegment);
 		}
-		addDestination(to,feedrate,acceleration);
+		bufferSegment(destination,feedrate,acceleration,deltaSegment);
 	}
 	
 	/**
 	 * add this destination to the queue and attempt to optimize travel between destinations. 
-	 * @param to detination
+	 * @param to destination position
 	 * @param feedrate velocity (mm/s)
 	 * @param acceleration (mm/s/s)
+	 * @param cartesian move (mm)
 	 */
-	protected void addDestination(final Vector3d to, double feedrate, double acceleration) {
-		poseTo=to;
-		
-		Vector3d start = (!queue.isEmpty()) ? queue.getLast().end : poseNow;
-		
-		MakelangeloFirmwareSimulationSegment next = new MakelangeloFirmwareSimulationSegment(start,to);
-		poseNow=to;
+	protected void bufferSegment(final Vector3d to, final double feedrate, final double acceleration,final Vector3d cartesianDelta) {
+		MakelangeloFirmwareSimulationSegment next = new MakelangeloFirmwareSimulationSegment(to,cartesianDelta);
+		next.feedrate = feedrate;
+		poseNow.set(to);
 
 		// zero distance?  do nothing.
 		if(next.distance==0) return;
 		
-		double timeToEnd = next.distance / feedrate;
-
 		// slow down if the buffer is nearly empty.
+		double inverse_secs = feedrate / next.distance;
+		long segment_time_us = (long)Math.round(1000000.0f / inverse_secs);
+		  
 		if( queue.size() >= 2 && queue.size() <= (MAX_SEGMENTS/2)-1 ) {
-			if( timeToEnd < MIN_SEGMENT_TIME ) {
-				timeToEnd += (MIN_SEGMENT_TIME-timeToEnd)*2.0 / queue.size();
+			long timeDiff = MIN_SEGMENT_TIME_US - segment_time_us;
+			if( timeDiff>0 ) {
+				double nst = segment_time_us + Math.round(2 * timeDiff / queue.size());
+				inverse_secs = 1000000.0 / nst;
 			}
 		}
 		
-		next.nominalSpeed = next.distance / timeToEnd;
+		next.nominalSpeed = next.distance * inverse_secs;
 		
 		// find if speed exceeds any joint max speed.
-		double [] currentSpeedArray = { 
-				next.delta.x / timeToEnd,
-				next.delta.y / timeToEnd,
-				next.delta.z / timeToEnd
+		double [] currentSpeed = { 
+			next.delta.x * inverse_secs,
+			next.delta.y * inverse_secs,
+			next.delta.z * inverse_secs
 		};
-		double speedFactor=1.0;
+		double speedFactor=1.0;/*
 		double cs;
-		for(double v : currentSpeedArray ) {
+		for(double v : currentSpeed ) {
 			cs = Math.abs(v);
 			if( cs > MAX_FEEDRATE ) {
 				speedFactor = Math.min(speedFactor, MAX_FEEDRATE/cs);
 			}
-		}
+		}*/
 
 		// apply speed limit
 		if(speedFactor<1.0) {
-			for(int i=0;i<currentSpeedArray.length;++i) currentSpeedArray[0]*=speedFactor;
+			for(int i=0;i<currentSpeed.length;++i) currentSpeed[0]*=speedFactor;
 			next.nominalSpeed *= speedFactor;
 		}
-		
-		next.acceleration = acceleration;
 
+		boolean polargraphLimit=false;
+		if(polargraphLimit) {
+			next.acceleration = limitPolargraphAcceleration(to,cartesianDelta,acceleration);
+		} else {
+			next.acceleration = acceleration;
+		}
+		
 		// limit jerk between moves
-		double safeSpeed = next.nominalSpeed;
+		double vmax_junction;
+		boolean allowClassicJerk=false;
+		boolean allowJunctionDeviation=false;
+		boolean allowDotProduct=true;
+		if(allowClassicJerk) {
+			vmax_junction = classicJerk(next,currentSpeed,next.nominalSpeed);	
+		} else if(allowJunctionDeviation) {
+			vmax_junction = junctionDeviation(next,next.nominalSpeed);
+		} else if(allowDotProduct) {
+			double d = next.normal.dot(previousNormal) * 1.1;
+			vmax_junction = next.nominalSpeed * d;
+			vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
+			vmax_junction = Math.max(vmax_junction, MINIMUM_PLANNER_SPEED);
+			
+			previousNormal.set(next.normal);
+		} else vmax_junction = next.nominalSpeed;
+		
+		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,MINIMUM_PLANNER_SPEED,next.distance);
+		next.entrySpeedMax = vmax_junction;
+		next.entrySpeed = Math.min(vmax_junction, next.allowableSpeed);
+		next.nominalLength = ( next.allowableSpeed >= next.nominalSpeed );
+		next.recalculate = true;
+		
+		previousNominalSpeed = next.nominalSpeed;
+		for(int i=0;i<previousSpeed.length;++i) {
+			previousSpeed[i] = currentSpeed[i];
+		}
+		
+		queue.add(next);
+		
+		recalculateAcceleration();
+	}
+	
+	private double junctionDeviation(MakelangeloFirmwareSimulationSegment next,double nominalSpeed) {
+		double vmax_junction=nominalSpeed;
+		// Skip first block or when previousNominalSpeed is used as a flag for homing and offset cycles.
+		if (queue.size() > 0 && previousNominalSpeed > 1e-6) {
+			// Compute cosine of angle between previous and current path. (prev_unit_vec is negative)
+			// NOTE: Max junction velocity is computed without sin() or acos() by trig half angle identity.
+			double junction_cos_theta = (-previousNormal.x * next.normal.x)
+									  + (-previousNormal.y * next.normal.y)
+									  + (-previousNormal.z * next.normal.z);
+
+			// NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
+			if (junction_cos_theta > 0.999999f) {
+				// For a 0 degree acute junction, just set minimum junction speed.
+				vmax_junction = MINIMUM_PLANNER_SPEED;
+			} else {
+				// Check for numerical round-off to avoid divide by zero.
+				junction_cos_theta = Math.max(junction_cos_theta, -0.999999f); 
+
+				// Convert delta vector to unit vector
+				Vector3d junction_unit_vec = new Vector3d();
+				junction_unit_vec.sub(next.normal, previousNormal);
+				junction_unit_vec.normalize();
+				if (junction_unit_vec.length() > 0) {
+					final double junction_acceleration = limit_value_by_axis_maximum(next.acceleration,junction_unit_vec, MAX_ACCELERATION);
+					// Trig half angle identity. Always positive.
+					final double sin_theta_d2 = Math.sqrt(0.5 * (1.0 - junction_cos_theta)); 
+
+					vmax_junction = junction_acceleration * junction_deviation * sin_theta_d2 / (1.0f - sin_theta_d2);
+
+					if (JD_HANDLE_SMALL_SEGMENTS) {
+						// For small moves with >135° junction (octagon) find speed for approximate arc
+						if (next.distance < 1 && junction_cos_theta < -0.7071067812f) {
+							double junction_theta = Math.acos(-junction_cos_theta);
+							// NOTE: junction_theta bottoms out at 0.033 which avoids divide by 0.
+							double limit = (next.distance * junction_acceleration) / junction_theta;
+							vmax_junction = Math.min(vmax_junction, limit);
+						}
+
+					} // JD_HANDLE_SMALL_SEGMENTS
+				}
+			}
+
+			// Get the lowest speed
+			vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
+			vmax_junction = Math.min(vmax_junction, previousNominalSpeed);
+		} else {
+			// Init entry speed to zero. Assume it starts from rest. Planner will correct
+			// this later.
+			vmax_junction = 0;
+		}
+
+		previousNormal.set(next.normal);
+
+		return vmax_junction;
+	}
+
+	private double limit_value_by_axis_maximum(double max_value, Vector3d junction_unit_vec,double maxAcceleration) {
+	    double limit_value = max_value;
+	    
+	    if(junction_unit_vec.x!=0) {
+	    	if(limit_value * Math.abs(junction_unit_vec.x) > maxAcceleration) {
+	    		limit_value = Math.abs( maxAcceleration / junction_unit_vec.x );
+	      	}
+	    }
+	    if(junction_unit_vec.y!=0) {
+	    	if(limit_value * Math.abs(junction_unit_vec.y) > maxAcceleration) {
+	    		limit_value = Math.abs( maxAcceleration / junction_unit_vec.y );
+	      	}
+	    }
+	    if(junction_unit_vec.z!=0) {
+	    	if(limit_value * Math.abs(junction_unit_vec.z) > maxAcceleration) {
+	    		limit_value = Math.abs( maxAcceleration / junction_unit_vec.z );
+	      	}
+	    }
+	
+	    return limit_value;
+	}
+
+	private double classicJerk(MakelangeloFirmwareSimulationSegment next,double[] currentSpeed,double safeSpeed) {
 		boolean limited=false;
 		
-		for(int i=0;i<currentSpeedArray.length;++i) {
-			double jerk = Math.abs(currentSpeedArray[i]),
+		for(int i=0;i<currentSpeed.length;++i) {
+			double jerk = Math.abs(currentSpeed[i]),
 					maxj = MAX_JERK[i];
 			if( jerk > maxj ) {
 				if(limited) {
@@ -202,7 +331,8 @@ public class MakelangeloFirmwareSimulation {
 				}
 			}
 		}
-		double vmax_junction = 0;
+		
+		double vmax_junction;
 		
 		if(queue.size()>0) { 
 			// look at difference between this move and previous move
@@ -214,9 +344,9 @@ public class MakelangeloFirmwareSimulation {
 				double vFactor=0;
 				double smallerSpeedFactor = vmax_junction / prev.nominalSpeed;
 
-				for(int i=0;i<previousSpeedArray.length;++i) {
-					double vExit = previousSpeedArray[i] * smallerSpeedFactor;
-					double vEntry = currentSpeedArray[i];
+				for(int i=0;i<previousSpeed.length;++i) {
+					double vExit = previousSpeed[i] * smallerSpeedFactor;
+					double vEntry = currentSpeed[i];
 					if(limited) {
 						vExit *= vFactor;
 						vEntry *= vFactor;
@@ -228,42 +358,81 @@ public class MakelangeloFirmwareSimulation {
 						limited = true;
 					}
 				}
-				if(limited) {
-					vmax_junction *= vFactor;
-				}
+				if(limited) vmax_junction *= vFactor;
 				
 				double vmax_junction_threshold = vmax_junction * 0.99;
-				if( previousSafeSpeed > vmax_junction_threshold &&
-				    safeSpeed > vmax_junction_threshold ) {
+				if( previousSafeSpeed > vmax_junction_threshold && safeSpeed > vmax_junction_threshold ) {
 					vmax_junction = safeSpeed;
 				}
+			} else {
+				vmax_junction = safeSpeed;
 			}
 		} else {
 			vmax_junction = safeSpeed;
 		}
-		
+
 		previousSafeSpeed = safeSpeed;
 		
-		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,MINIMUM_PLANNER_SPEED,next.distance);
-		next.entrySpeedMax = vmax_junction;
-		next.entrySpeed = Math.min(vmax_junction, next.allowableSpeed);
-		next.nominalLength = ( next.allowableSpeed >= next.nominalSpeed );
-		next.recalculate = true;
-		//next.now_s = 0;
-		//next.start_s = 0;
-		//next.end_s = 0;
-		
-		for(int i=0;i<previousSpeedArray.length;++i) {
-			previousSpeedArray[i] = currentSpeedArray[i];
-		}
-		
-		recalculateTrapezoidSegment(next, next.entrySpeed, MINIMUM_PLANNER_SPEED);
-		
-		queue.add(next);
-		
-		recalculateAcceleration();
+		return vmax_junction;
 	}
-	
+
+	private double limitPolargraphAcceleration(final Vector3d to, final Vector3d cartesianDelta, final double acceleration) {
+		double maxAcceleration = MAX_ACCELERATION;
+		
+		// Adjust the maximum acceleration based on the plotter position to reduce
+		// wobble at the bottom of the picture.
+		// We only consider the XY plane.
+		// Special thanks to https://www.reddit.com/user/zebediah49 for his math help.
+		double ox = to.x - cartesianDelta.x;
+		double oy = to.y - cartesianDelta.y;
+		
+		// if T is your target direction unit vector,
+		double Tx = cartesianDelta.x;
+		double Ty = cartesianDelta.y;
+		double Rlen = (Tx*Tx) + (Ty*Ty); // always >=0
+		if (Rlen > 0) {
+			// only affects XY non-zero movement. Servo is not touched.
+			Rlen = 1.0 / Math.sqrt(Rlen);
+			Tx *= Rlen;
+			Ty *= Rlen;
+			
+			// normal vectors pointing from plotter to motor
+			double R1x = XMIN - ox; // to left
+			double R1y = YMAX - oy; // to top
+			double Rlen1 = 1.0 / Math.sqrt((R1x*R1x) + (R1y*R1y));// old_seg.a[0].step_count * UNITS_PER_STEP;
+			R1x *= Rlen1;
+			R1y *= Rlen1;
+
+			double R2x = XMAX - ox; // to right
+			double R2y = YMAX - oy; // to top
+			double Rlen2 = 1.0 / Math.sqrt((R2x*R2x) + (R2y*R2y));// old_seg.a[1].step_count * UNITS_PER_STEP;
+			R2x *= Rlen2;
+			R2y *= Rlen2;
+
+			// solve cT = -gY + k1 R1 for c [and k1]
+			// solve cT = -gY + k2 R2 for c [and k2]
+			double c1 = -GRAVITYmag * R1x / (Tx * R1y - Ty * R1x);
+			double c2 = -GRAVITYmag * R2x / (Tx * R2y - Ty * R2x);
+
+			// If c is negative, that means that that support rope doesn't limit the
+			// acceleration; discard that c.
+			double cT = -1;
+			if (c1 > 0 && c2 > 0) {
+				cT = (c1 < c2) ? c1 : c2;
+			} else if (c1 > 0) {
+				cT = c1;
+			} else if (c2 > 0) {
+				cT = c2;
+			}
+
+			// The maximum acceleration is given by cT if cT>0
+			if (cT > 0) {
+				maxAcceleration = Math.max(Math.min(maxAcceleration, cT), (double) MIN_ACCELERATION);
+			}
+		}
+		return maxAcceleration;
+	}
+
 	protected void recalculateAcceleration() {
 		recalculateBackwards();
 		recalculateForwards();
@@ -286,7 +455,7 @@ public class MakelangeloFirmwareSimulation {
 		if(current.entrySpeed != top || (next!=null && next.recalculate)) {
 			double newEntrySpeed = current.nominalLength 
 					? top
-					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : 0), current.distance));
+					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : MINIMUM_PLANNER_SPEED), current.distance));
 			current.entrySpeed = newEntrySpeed;
 			current.recalculate = true;
 		}
@@ -317,30 +486,28 @@ public class MakelangeloFirmwareSimulation {
 	protected void recalculateTrapezoids() {
 		MakelangeloFirmwareSimulationSegment current=null;
 		
-		boolean nextDirty;
-		double currentEntrySpeed=0, nextEntrySpeed=0;
-		int size = queue.size();
-		
-		for(int i=0;i<size;++i) {
-			current = queue.get(i);
-			int j = i+1;
-			if(j<size) {
-				MakelangeloFirmwareSimulationSegment next = queue.get(j);
-				nextEntrySpeed = next.entrySpeed;
-				nextDirty = next.recalculate;
-			} else {
-				nextEntrySpeed=0;
-				nextDirty=false;
-			}
-			if( current.recalculate || nextDirty ) {
-				current.recalculate = true;
-				if( !current.busy ) {
-					recalculateTrapezoidSegment(current, currentEntrySpeed, nextEntrySpeed);
+		double currentEntrySpeed=0, nextEntrySpeed=0;		
+		for( MakelangeloFirmwareSimulationSegment next : queue ) {
+			nextEntrySpeed = next.entrySpeed;
+			if(current!=null) {
+				if(current.recalculate || next.recalculate) {
+					current.recalculate = true;
+					if( !current.busy ) {
+						recalculateTrapezoidSegment(current, currentEntrySpeed, nextEntrySpeed);
+					}
+					current.recalculate = false;
 				}
-				current.recalculate = false;
 			}
-			current.recalculate=false;
+			current = next;
 			currentEntrySpeed = nextEntrySpeed;
+		}
+		
+		if(current!=null) {
+			current.recalculate = true;
+			if( !current.busy ) {
+				recalculateTrapezoidSegment(current, currentEntrySpeed, MINIMUM_PLANNER_SPEED);
+			}
+			current.recalculate = false;
 		}
 	}
 	
@@ -351,6 +518,8 @@ public class MakelangeloFirmwareSimulation {
 		double accel = seg.acceleration;
 		double accelerateD = Math.ceil( estimateAccelerationDistance(entrySpeed, seg.nominalSpeed, accel));
 		double decelerateD = Math.floor( estimateAccelerationDistance(seg.nominalSpeed, exitSpeed, -accel));
+		accelerateD = Math.max(accelerateD,0);
+		decelerateD = Math.max(decelerateD,0);
 		double plateauD = seg.distance - accelerateD - decelerateD;
 		if( plateauD < 0 ) {
 			double half = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, seg.distance));
@@ -358,25 +527,24 @@ public class MakelangeloFirmwareSimulation {
 			plateauD = 0;
 		}
 		seg.accelerateUntilD = accelerateD;
-		seg.plateauD = plateauD;
 		seg.decelerateAfterD = accelerateD + plateauD;
-		
-		double nominalT = plateauD/seg.nominalSpeed;
-		
+		seg.entrySpeed = entrySpeed;
+		seg.exitSpeed = exitSpeed;
+
+		seg.plateauD = plateauD;
 		// d = vt + 0.5att.  it's a quadratic, so t = -v +/- sqrt( v*v -2ad ) / a
 		double nA = maxSpeedAllowed(-seg.acceleration,entrySpeed,accelerateD);
 		double nD = maxSpeedAllowed(-seg.acceleration,exitSpeed, decelerateD);
 		double accelerateT = ( -entrySpeed + nA ) / seg.acceleration;
 		double decelerateT = ( -exitSpeed  + nD ) / seg.acceleration;
+		double nominalT = plateauD/seg.nominalSpeed;
 		
 		seg.accelerateUntilT = accelerateT;
 		seg.decelerateAfterT = accelerateT + nominalT;
 		seg.end_s = accelerateT + nominalT + decelerateT;
-		seg.entrySpeed = entrySpeed;
-		seg.exitSpeed = exitSpeed;
 		
 		if(Double.isNaN(seg.end_s)) {
-			System.out.println("Uh oh");
+			System.out.println("recalculateTrapezoidSegment() Uh oh");
 		}
 	}
 
@@ -391,6 +559,7 @@ public class MakelangeloFirmwareSimulation {
 		return Math.sqrt( (targetVelocity*targetVelocity) - 2 * acceleration * distance );
 	}
 	
+	// (m^2 - s^2) / 2a
 	protected double estimateAccelerationDistance(final double initialRate, final double targetRate, final double accel) {
 		if(accel == 0) return 0;
 		return ( (targetRate*targetRate) - (initialRate*initialRate) ) / (accel * 2.0);
@@ -401,54 +570,66 @@ public class MakelangeloFirmwareSimulation {
 		return ( 2.0 * accel * distance - (startRate*startRate) + (endRate*endRate) ) / (4.0 * accel);
 	}
 
-	/**
-	 * @return time in seconds to run sequence.
-	 */
-	public double getTimeEstimate(Turtle t,MakelangeloRobotSettings settings) {
+	public interface SegmentFunction {
+		void run(MakelangeloFirmwareSimulationSegment s);
+	}
+	
+	public void historyAction(Turtle t,MakelangeloRobotSettings settings,SegmentFunction consumer) {
 		double fu = settings.getPenUpFeedRate();
 		double fd = settings.getPenDownFeedRate();
 		double fz = settings.getZRate();
 		double a = settings.getAcceleration();
-		boolean isUp=true;
 		double zu = settings.getPenUpAngle();
 		double zd = settings.getPenDownAngle();
+		boolean isUp=true;
 		
-		poseNow = new Vector3d(settings.getHomeX(),settings.getHomeY(),zu);
-		double lx=poseNow.x;
-		double ly=poseNow.y;
-		double sum=0;
-		
-		for(TurtleMove m : t.history) {
+		double lx=settings.getHomeX();
+		double ly=settings.getHomeY();
+		poseNow.set(lx,ly,zu);
+		queue.clear();
+				
+		for(TurtleMove m : t.history) {			
 			switch(m.type) {
 			case DRAW:
 				if(isUp) {
 					isUp=false;
-					addDestination2(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
+					bufferLine(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
 				}
-				addDestination2(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
+				bufferLine(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
 				lx=m.x;
 				ly=m.y;
 				break;
 			case TRAVEL: 
 				if(!isUp) {
 					isUp=true;
-					addDestination2(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
+					bufferLine(new Vector3d(lx,ly,isUp?zu:zd),fz,a);
 				}
-				addDestination2(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
+				bufferLine(new Vector3d(m.x,m.y,isUp?zu:zd),isUp?fu:fd,a); 
 				lx=m.x;
 				ly=m.y;
 				break;
 			default:
 				break;
 			}
-			while(queue.size()>MAX_SEGMENTS) {
+			while(queue.size()>MAX_SEGMENTS/4) {
 				MakelangeloFirmwareSimulationSegment s= queue.remove(0);
-				//s.report();
-				sum += s.end_s;// - s.start_s;
+				consumer.run(s);
 			}
 		}
-		System.out.println("done");
+		while(queue.size()>0) {
+			MakelangeloFirmwareSimulationSegment s= queue.remove(0);
+			consumer.run(s);
+		}
+	}
+	
+	private double timeSum;
+	
+	// @return time in seconds to run sequence.
+	public double getTimeEstimate(Turtle t,MakelangeloRobotSettings settings) {
+		timeSum=0;
 		
-		return sum;
+		historyAction(t,settings, (n)->{ timeSum += n.end_s; });
+		
+		return timeSum;
 	}
 }
