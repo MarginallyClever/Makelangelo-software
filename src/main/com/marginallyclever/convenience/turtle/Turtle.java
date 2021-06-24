@@ -303,9 +303,8 @@ public class Turtle implements Cloneable {
 				showCount++;
 
 				for (TurtleMove m : history) {
-					if(m==null) {
-						throw new NullPointerException();
-					}
+					if(m==null) throw new NullPointerException();
+					
 					boolean inShow = (showCount >= first && showCount < last);
 					switch (m.type) {
 					case TRAVEL:
