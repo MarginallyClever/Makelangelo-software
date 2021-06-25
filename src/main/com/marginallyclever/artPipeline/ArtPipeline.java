@@ -43,9 +43,9 @@ public class ArtPipeline {
 			p.turtleFinished(t);
 		}
 	}
-	
+
+	// assumes extPoint is a point which lies on the infinite extension of targetLine
 	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
-		// extPoint is supposed to be a point which lies (almost) on the infinite extension of targetLine
 		double newLengthA = lengthSquared(targetLine.a, extPoint);
 		double newLengthB = lengthSquared(targetLine.b, extPoint);
 		double currentLength = targetLine.lengthSquared();
@@ -80,7 +80,7 @@ public class ArtPipeline {
 		int originalCount = originalLines.size();
 		System.out.println("  Converted to "+originalCount+" lines.");
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-12);
+		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,0.001);
 		int uniqueCount = uniqueLines.size();
 		int duplicateCount = originalCount - uniqueCount;
 		System.out.println("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
@@ -209,63 +209,41 @@ public class ArtPipeline {
 
 		for(LineSegment2D candidateLine : originalLines) {
 			boolean isDuplicate = false;
-			LineSegment2D lineToReplace = null;
 			
 			// Compare this line to all the lines previously marked as non-duplicate
 			for( LineSegment2D uniqueLine : uniqueLines ) {
-				// Check if lines are (almost) collinear
+				// Check if lines are colinear
 				if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
 					uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
-					// Both lines are (almost) colinear, if they touch or overlap then I have a candidate.
+					// they are!
+					// if they touch or overlap then I have a candidate.
 					// measure where the points are relative to each other.
 					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
 					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
-					boolean uniqueStartsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.a) < EPSILON2;
-					boolean uniqueEndsCloseToCandidate = candidateLine.ptSegDistSq(uniqueLine.b) < EPSILON2;
 					
 					if(candidateStartsCloseToUnique) {
-						isDuplicate = true;
-						
 						if(candidateEndsCloseToUnique) {
 							// Candidate doesn't add anything which isn't already covered by the unique line.
 							// No further action needed.
-							
-							// TODO: extend the line, to ensure no gaps will arise due to the configured tolerance?
-							// extendLine(uniqueLine, candidateLine.a);
-							// extendLine(uniqueLine, candidateLine.b);
 						} else {
 							// Partial overlap, extend uniqueLine
 							extendLine(uniqueLine, candidateLine.b);
 						}
-					} else if(candidateEndsCloseToUnique) {
 						isDuplicate = true;
+						break;
+					} else if(candidateEndsCloseToUnique) {
 						// Partial overlap, extend uniqueLine
-						extendLine(uniqueLine, candidateLine.a);						
-					} else if(uniqueStartsCloseToCandidate) {
-						if(uniqueEndsCloseToCandidate) {
-							// The candidateLine covers more than the unique line already added,
-							// replace uniqueLine with candidateLine.
-							lineToReplace = uniqueLine;
-							// No further action needed.
-						} else {
-							isDuplicate = true;
-							// Partial overlap, extend uniqueLine
-							extendLine(uniqueLine, candidateLine.a);
-						}
+						extendLine(uniqueLine, candidateLine.a);
+						isDuplicate = true;
+						break;						
 					} else {
 						// No match, check remaining lines for duplicates
 						continue;
 					}
-					
-					// Match found, no need to continue search
-					break;
 				}
 			}
 			
 			if(!isDuplicate) {
-				if(lineToReplace != null) {
-					uniqueLines.remove(lineToReplace);
-				}
 				// candidateLine does not match any line in the list.
 				uniqueLines.add(candidateLine);					
 			}
