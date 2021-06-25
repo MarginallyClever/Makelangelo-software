@@ -4,7 +4,7 @@ import javax.vecmath.Vector3d;
 
 import com.marginallyclever.convenience.StringHelper;
 
-class MakelangeloFirmwareSimulationSegment {
+public class MakelangeloFirmwareSimulationBlock {
 	public static int counter=0;
 	public int id;
 	
@@ -26,8 +26,8 @@ class MakelangeloFirmwareSimulationSegment {
 	public double acceleration;  // per second per second
 	
 	public double entrySpeedMax;
-	public double accelerateUntilD;  // distance
-	public double decelerateAfterD;  // distance
+	public double accelerateD;  // distance
+	public double decelerateD;  // distance
 	public double plateauD;  // distance
 
 	public double accelerateUntilT;  // seconds
@@ -44,7 +44,7 @@ class MakelangeloFirmwareSimulationSegment {
 	
 	
 	// delta is calculated here in the constructor.
-	public MakelangeloFirmwareSimulationSegment(final Vector3d endPose,final Vector3d deltaPose) {
+	public MakelangeloFirmwareSimulationBlock(final Vector3d endPose,final Vector3d deltaPose) {
 		end.set(endPose);
 		delta.set(deltaPose);
 		normal.set(deltaPose);
@@ -60,28 +60,24 @@ class MakelangeloFirmwareSimulationSegment {
 	public void report() {
 		System.out.print("S");
 		System.out.print("\t"+id);
-
-		//public Vector3d start;
-		//public Vector3d end;
-		//public Vector3d delta;
-		//public Vector3d normal;
-		
+		System.out.print("\t"+start);
+		System.out.print("\t"+end);
+		System.out.print("\t"+delta);
+		System.out.print("\t"+normal);
 		System.out.print("\t"+StringHelper.formatDouble(end_s));
+		System.out.print("\t"+StringHelper.formatDouble(feedrate));
 		System.out.print("\t"+StringHelper.formatDouble(distance));
 		System.out.print("\t"+StringHelper.formatDouble(nominalSpeed));
 		System.out.print("\t"+StringHelper.formatDouble(entrySpeed));
 		System.out.print("\t"+StringHelper.formatDouble(exitSpeed));
-		System.out.print("\t"+StringHelper.formatDouble(acceleration));
-
 		System.out.print("\t"+StringHelper.formatDouble(entrySpeedMax));
-		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilD));
+		System.out.print("\t"+StringHelper.formatDouble(allowableSpeed));
+		System.out.print("\t"+StringHelper.formatDouble(acceleration));
+		System.out.print("\t"+StringHelper.formatDouble(accelerateD));
 		System.out.print("\t"+StringHelper.formatDouble(plateauD));
-		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterD));
-		
+		System.out.print("\t"+StringHelper.formatDouble(decelerateD));
 		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilT));
 		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterT));
-		
-		System.out.print("\t"+StringHelper.formatDouble(allowableSpeed));
 		System.out.print("\t"+(nominalLength?1:0));
 		System.out.println();
 	}
