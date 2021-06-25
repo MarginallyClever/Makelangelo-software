@@ -34,7 +34,7 @@ import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
+import com.marginallyclever.convenience.turtle.BarberPoleTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
@@ -65,6 +65,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
 
+	private TurtleRenderer turtleRenderer;
+	
 	// Connection state
 	private NetworkConnection connection = null;
 	private boolean portConfirmed;
@@ -778,9 +780,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		myPipeline.processTurtle(TurtleLoaded, settings);
 	}
 
-	/**
-	 * Copy the most recent turtle to the drawing output buffer.
-	 */
 	public void saveTurtleToDrawing(Turtle t) {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
@@ -802,8 +801,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 		Log.message("Old method "+printTimeEstimate(estimateTime()));
 		
-		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation();
-		double newEstimate= m.getTimeEstimate(t, settings);
+		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
+		double newEstimate= m.getTimeEstimate(t);
 		Log.message("New method "+printTimeEstimate(newEstimate));
 		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
 	}
@@ -883,8 +882,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	/**
-	 * calculate seconds to move a given length. Also uses globals feedRate and
-	 * acceleration See
+	 * Calculate seconds to move a given length. Also uses globals feedRate and acceleration See
 	 * http://zonalandeducation.com/mstm/physics/mechanics/kinematics/EquationsForAcceleratedMotion/AlgebraRearrangements/Displacement/DisplacementAccelerationAlgebra.htm
 	 * 
 	 * @param length    mm distance to travel.
@@ -937,6 +935,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		decorator = arg0;
 	}
 
+	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
@@ -955,11 +954,18 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
 		} else if (turtleToRender != null) {
-			TurtleRenderer tr = new DefaultTurtleRenderer(gl2);
-			turtleToRender.render(tr);
+			if(turtleRenderer==null) {
+				//turtleRenderer = new DefaultTurtleRenderer(gl2);
+				turtleRenderer = new BarberPoleTurtleRenderer(gl2);
+			}
+			if(turtleRenderer!=null) {
+				turtleToRender.render(turtleRenderer);
+			}
+			
+			
 		}
 	}
-
+	
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
 
