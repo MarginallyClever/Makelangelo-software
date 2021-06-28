@@ -388,36 +388,18 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<version>1.7</version>
 		</dependency>
 		<!-- SVG loading -->
+		<dependency>
+	      <groupId>xml-apis</groupId>
+	      <artifactId>xml-apis</artifactId>
+	      <version>1.4.01</version>
+	 	</dependency>
 		<!-- https://mvnrepository.com/artifact/batik/batik-xml -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-xml</artifactId>
-			<version>1.9</version>
+			<artifactId>batik-all</artifactId>
+			<version>[1.14,)</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/batik/batik-svg-dom -->
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-svg-dom</artifactId>
-			<version>1.9</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/batik/batik-util -->
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-util</artifactId>
-			<version>1.9</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-dom -->
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-dom</artifactId>
-			<version>1.9</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/batik/batik-bridge -->
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-bridge</artifactId>
-			<version>1.9</version>
-		</dependency>
+		
 		
 	</dependencies>
 
@@ -435,7 +417,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.3.1</minimum.maven.version>
-		<minimum.java.version>8</minimum.java.version>
+		<minimum.java.version>9</minimum.java.version>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
 		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
 		<maven.compiler.release>${minimum.java.version}</maven.compiler.release>

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -23,9 +23,9 @@ import java.util.zip.ZipInputStream;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.convenience.log.Log;
@@ -146,9 +146,9 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			
 			// parse JSON
             Log.message("Parsing JSON file...");
-            
-        	JSONParser parser = new JSONParser();
-			JSONObject tree = (JSONObject)parser.parse(new FileReader(tempZipFile));
+
+            JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
+            JSONObject tree = new JSONObject(tokener);
 			// we're done with the tempZipFile now that we have the JSON structure.
 			tempZipFile.delete();
 			
@@ -172,7 +172,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			//Log.message("found children");
 			
 			// look for the first child with a script
-			ListIterator<?> childIter = children.listIterator();
+			Iterator<?> childIter = children.iterator();
 			JSONArray scripts = null;
 			while( childIter.hasNext() ) {
 				JSONObject child = (JSONObject)childIter.next();
@@ -183,7 +183,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			
 			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
-			Log.message("found  " +scripts.size() + " scripts");
+			Log.message("found  " +scripts.length() + " scripts");
 			Log.message("finished scripts");
 		} catch (Exception e) {
 			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
@@ -204,18 +204,18 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private void readScratchInstructions(JSONObject tree) throws Exception {
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray targets = (JSONArray)tree.get("targets");
-		ListIterator<?> targetIter = targets.listIterator();
+		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
 			if( (boolean)targetN.get("isStage") == true ) continue;
 			blocks = (JSONObject)targetN.get("blocks");
 			// we found the blocks.
-			Log.message("found  " +blocks.size() + " blocks");
+			Log.message("found  " +blocks.length() + " blocks");
 			// get the keys, too.
 			blockKeys = blocks.keySet();
 			// find the first block, which should be the only toplevel block.
 			for( Object k : blockKeys ) {
-				JSONObject block = (JSONObject)blocks.get(k);
+				JSONObject block = (JSONObject)blocks.get(k.toString());
 				boolean topLevel = (boolean)block.get("topLevel");
 				String opcode = (String)block.get("opcode");
 				if(topLevel && opcode.equals("event_whenflagclicked")) {
@@ -237,7 +237,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	}
 	
 	void parseScratchCode(Object currentKey) throws Exception {
-		JSONObject currentBlock = (JSONObject)blocks.get(currentKey);
+		JSONObject currentBlock = (JSONObject)blocks.get(currentKey.toString());
 		JSONObject inputs;
 		JSONArray substack, condition;
 		
@@ -341,8 +341,12 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private boolean confirmHasPenExtension(JSONObject tree) throws Exception {
 		JSONArray extensions = (JSONArray)tree.get("extensions");
 		if(extensions==null) return false;
-		
-		return extensions.contains("pen");
+		Iterator<Object> i = extensions.iterator();
+		while(i.hasNext()) {
+			Object o = i.next();
+			if(o instanceof String && o.equals("pen")) return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -353,7 +357,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private void readScratchVariables(JSONObject tree) throws Exception {
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray targets = (JSONArray)tree.get("targets");
-		ListIterator<?> targetIter = targets.listIterator();
+		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
 			if( (boolean)targetN.get("isStage") == false ) continue;
@@ -384,7 +388,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private void readScratchLists(JSONObject tree) throws Exception {
 		scratchLists = new LinkedList<ScratchList>();
 		JSONArray targets = (JSONArray)tree.get("targets");
-		ListIterator<?> targetIter = targets.listIterator();
+		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
 			if( (boolean)targetN.get("isStage") == false ) continue;
@@ -404,7 +408,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 				if( contents != null && contents instanceof JSONArray ) {
 					JSONArray arr = (JSONArray)contents;
 
-					ListIterator<?> scriptIter = arr.listIterator();
+					Iterator<?> scriptIter = arr.iterator();
 					while(scriptIter.hasNext()) {
 						Object varValue = scriptIter.next();
 						double value;
@@ -433,7 +437,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 	private int getListID(Object obj) throws Exception {
 		if(!(obj instanceof String)) throw new Exception("List name not a string.");
 		String listName = obj.toString();
-		ListIterator<ScratchList> iter = scratchLists.listIterator();
+		Iterator<ScratchList> iter = scratchLists.iterator();
 		int index=0;
 		while(iter.hasNext()) {
 			ScratchList i = iter.next();
@@ -456,7 +460,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		//Log.message("size="+script.size());
 		//indent++;
 		
-		ListIterator<?> scriptIter = script.listIterator();
+		Iterator<?> scriptIter = script.iterator();
 		// find the script with the green flag
 		while( scriptIter.hasNext() ) {
 			Object o = (Object)scriptIter.next();
@@ -601,7 +605,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					double v = (float)resolveValue(o3);
 
 					boolean foundVar=false;
-					ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
+					Iterator<ScratchVariable> svi = scratchVariables.iterator();
 					while(svi.hasNext()) {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
@@ -620,7 +624,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 					float v = (float)resolveValue(o3);
 
 					boolean foundVar=false;
-					ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
+					Iterator<ScratchVariable> svi = scratchVariables.iterator();
 					while(svi.hasNext()) {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
@@ -657,7 +661,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			throw new Exception("Parse error (resolveBoolean not array)");
 		}
 		JSONArray arr=(JSONArray)obj;
-		ListIterator<?> scriptIter = arr.listIterator();
+		Iterator<?> scriptIter = arr.iterator();
 		Object first = scriptIter.next();
 		String name = first.toString();
 		if(name.equals(">")) {
@@ -735,7 +739,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		
 		if(obj instanceof JSONArray) {
 			JSONArray arr=(JSONArray)obj;
-			ListIterator<?> scriptIter = arr.listIterator();
+			Iterator<?> scriptIter = arr.iterator();
 			Object first = scriptIter.next();
 			if(!(first instanceof String)) {
 				throw new Exception("Parse error (resolveValue array)");
@@ -789,7 +793,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			if(firstName.equals("readVariable")) {
 				String varName = (String)scriptIter.next();
 
-				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
+				Iterator<ScratchVariable> svi = scratchVariables.iterator();
 				while(svi.hasNext()) {
 					ScratchVariable sv = svi.next();
 					if(sv.name.equals(varName)) {

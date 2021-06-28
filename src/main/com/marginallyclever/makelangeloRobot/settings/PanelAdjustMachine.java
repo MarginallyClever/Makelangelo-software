@@ -135,7 +135,6 @@ public class PanelAdjustMachine extends SelectPanel {
 		else if(o == buttonBpos) robot.jogRightMotorOut();
 		else if(o == buttonBneg) robot.jogRightMotorIn();
 		else {
-			System.out.println("update Length?");
 			//updateLengthNeeded();
 		}
 	}
