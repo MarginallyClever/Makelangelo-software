@@ -417,7 +417,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.3.1</minimum.maven.version>
-		<minimum.java.version>9</minimum.java.version>
+		<minimum.java.version>15</minimum.java.version>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
 		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
 		<maven.compiler.release>${minimum.java.version}</maven.compiler.release>
