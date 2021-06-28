@@ -34,11 +34,6 @@ module com.marginallyclever.makelangelo {
 	requires vecmath;
 	
 	uses MakelangeloHardwareProperties;
-	uses LoadAndSaveFileType;
-	uses ImageConverter;
-	uses ImageGenerator;
-	uses MachineStyle;
-	
 	provides MakelangeloHardwareProperties with 
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.CartesianProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties,
@@ -47,6 +42,8 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5Properties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloCustomProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.ZarplotterProperties;
+	
+	uses LoadAndSaveFileType;
 	provides LoadAndSaveFileType with
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveDXF,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode,
@@ -54,6 +51,8 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch2,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch3,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveSVG;
+
+	uses ImageConverter;
 	provides ImageConverter with
 		com.marginallyclever.artPipeline.converters.Converter_Boxes,
 		com.marginallyclever.artPipeline.converters.Converter_CMYK,
@@ -69,6 +68,8 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.artPipeline.converters.Converter_VoronoiStippling,
 		com.marginallyclever.artPipeline.converters.Converter_VoronoiZigZag,
 		com.marginallyclever.artPipeline.converters.Converter_Wander;
+
+	uses ImageGenerator;
 	provides ImageGenerator with
 		com.marginallyclever.artPipeline.generators.Generator_Border,
 		com.marginallyclever.artPipeline.generators.Generator_Dragon,
@@ -86,6 +87,8 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.artPipeline.generators.Generator_SierpinskiTriangle,
 		com.marginallyclever.artPipeline.generators.Generator_Spirograph,
 		com.marginallyclever.artPipeline.generators.Generator_Text;
+
+	uses MachineStyle;
 	provides MachineStyle with
 		com.marginallyclever.makelangeloRobot.machineStyles.CoreXY,
 		com.marginallyclever.makelangeloRobot.machineStyles.Cartesian,

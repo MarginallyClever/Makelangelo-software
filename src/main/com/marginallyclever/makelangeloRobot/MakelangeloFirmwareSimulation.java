@@ -35,7 +35,7 @@ public class MakelangeloFirmwareSimulation {
 	private double timeSum;
 	private LinkedList<MakelangeloFirmwareSimulationBlock> queue = new LinkedList<MakelangeloFirmwareSimulationBlock>();
 	
-	private boolean readyForCommands;
+//	private boolean readyForCommands = true;
 
 	private double [] previousSpeed = { 0,0,0 };
 	private double previousSafeSpeed = 0;
@@ -57,7 +57,6 @@ public class MakelangeloFirmwareSimulation {
 	private double junction_deviation = 0.05;
 	
 	public MakelangeloFirmwareSimulation(MakelangeloRobotSettings settings) {
-		readyForCommands = true;
 		this.settings = settings;
 		XMAX=settings.getLimitRight();
 		XMIN=settings.getLimitLeft();
