@@ -90,30 +90,15 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 				</excludes>
 			</resource>
 		</resources>
-		<plugins><!-- 
-			<plugin>
-				<groupId>com.antwerkz.sofia</groupId>
-				<artifactId>sofia-maven</artifactId>
-				<version>0.23</version>
-				<executions>
-					<execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-					</execution>
-				</executions>
-                <configuration>
-                    <loggingType>slf4j</loggingType>
-                    <outputType>java</outputType>
-                    <packageName>com.marginallyclever.makelangelo</packageName>
-                </configuration>
-			</plugin> -->
+		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
+					<source>${minimum.java.version}</source>
+					<target>${minimum.java.version}</target>
+					<encoding>UTF-8</encoding>
 					<compilerArgs>
 						<compilerArg>-Xlint:unchecked</compilerArg>
 						<compilerArg>-Xlint:deprecation</compilerArg>
@@ -147,7 +132,15 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin><!-- 
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<configuration>
+					<source>8</source>
+					<destDir>${project.basedir}/docs</destDir>
+				</configuration> 
+			</plugin> -->
 
 			<!-- Beginning of plugins defined originally only in Super POM -->
 			<plugin>
@@ -188,14 +181,6 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
-				<configuration>
-					<systemProperties>
-						<property>
-							<name>sun.java2d.noddraw</name>
-							<value>true</value>
-						</property>
-					</systemProperties>
-				</configuration>
 			</plugin>
 			<!-- End of plugins defined originally only in Super POM -->
 			<plugin>
@@ -210,6 +195,22 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 				<version>3.0.0-M3</version>
 				<executions>
 					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${minimum.maven.version}</version>
+									<message>********** Minimum Maven Version is
+										${minimum.maven.version}. Please upgrade Maven before
+										continuing (run "mvn --version" to check). **********</message>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+					<execution>
 						<id>enforce-java</id>
 						<goals>
 							<goal>enforce</goal>
@@ -223,10 +224,9 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin><!-- 
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<!-- <version>2.10.3</version> -->
 				<version>3.0.1</version>
 				<configuration>
 					<source>8</source>
@@ -242,14 +242,24 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>2.8</version>
-			</plugin><!-- <plugin> <groupId>org.pitest</groupId> <artifactId>pitest-maven</artifactId> 
-				<version>1.5.2</version> <configuration> <targetClasses> <param>com.marginallyclever*</param> 
-				</targetClasses> <targetTests> <param>com.marginallyclever*</param> </targetTests> 
-				</configuration> </plugin> -->
+			</plugin><!--
+		 	<plugin> 
+		 		<groupId>org.pitest</groupId> 
+		 		<artifactId>pitest-maven</artifactId> 
+				<version>1.5.2</version> 
+				<configuration>
+					<targetClasses>
+ 						<param>com.marginallyclever*</param> 
+					</targetClasses> 
+					<targetTests>
+						<param>com.marginallyclever*</param>
+					</targetTests> 
+				</configuration>
+			</plugin> -->
 		</plugins>
 
 		<pluginManagement>
@@ -282,7 +292,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<version>2.8.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.scream3r/jssc -->
+		<!-- https://github.com/java-native/jssc/ -->
 		<dependency>
 			<groupId>io.github.java-native</groupId>
 			<artifactId>jssc</artifactId>
@@ -290,9 +300,9 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		</dependency>
 
 		<dependency>
-			<groupId>org.everit.osgi.bundles</groupId>
-			<artifactId>org.everit.osgi.bundles.org.scream3r.jssc</artifactId>
-			<version>2.8.0</version>
+			<groupId>org.jogamp.fat</groupId>
+			<artifactId>jogamp-fat</artifactId>
+			<version>2.4.0-rc-20200307</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -321,12 +331,6 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<version>0.2.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.jogamp.fat</groupId>
-			<artifactId>jogamp-fat</artifactId>
-			<version>2.4.0-rc-20200307</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
 		<dependency>
 			<groupId>net.sourceforge</groupId>
@@ -338,7 +342,6 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.0</version>
-			<!--<scope>runtime</scope> -->
 		</dependency>
 
 		<dependency>
@@ -398,8 +401,6 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<artifactId>batik-all</artifactId>
 			<version>[1.14,)</version>
 		</dependency>
-		
-		
 	</dependencies>
 
 	<repositories>
@@ -417,10 +418,10 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.3.1</minimum.maven.version>
 		<minimum.java.version>15</minimum.java.version>
+		<jogl.version>2.4.0-rc-20200307</jogl.version>
+		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
 		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
 		<maven.compiler.release>${minimum.java.version}</maven.compiler.release>
-		<jogl.version>2.4.0-rc-20200307</jogl.version>
-		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 	</properties>
 </project>

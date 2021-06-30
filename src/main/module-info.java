@@ -8,13 +8,13 @@ module com.marginallyclever.makelangelo {
 	requires java.desktop;
 	requires java.prefs;
 	requires java.logging;
-	
+	requires junit;
+	requires org.apache.commons.io;
+	requires org.json;
+	requires org.jetbrains.annotations;
 	requires jrpicam;
-	
 	requires jogamp.fat;
-	
 	requires kabeja;
-	
 	requires batik.bridge;
 	requires batik.anim;
 	requires batik.svg.dom;
@@ -24,13 +24,8 @@ module com.marginallyclever.makelangelo {
 	requires batik.dom;
 	requires xml.apis.ext;
 	requires batik.ext;
-	
-	requires org.apache.commons.io;
-	requires org.json;
 	requires slf4j.api;
-	requires org.jetbrains.annotations;
 	requires jssc;
-	requires junit;
 	requires vecmath;
 	
 	uses MakelangeloHardwareProperties;
