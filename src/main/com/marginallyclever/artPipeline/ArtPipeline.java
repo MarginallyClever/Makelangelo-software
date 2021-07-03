@@ -493,7 +493,7 @@ public class ArtPipeline {
 		if(shouldSimplify()) simplify(newTurtle,settings);
 		if(shouldCrop()) cropToPageMargin(newTurtle,settings);
 		removeRedundantToolChanges(newTurtle);
-		
+
 		notifyListenersTurtleFinished(newTurtle);
 	}
 
