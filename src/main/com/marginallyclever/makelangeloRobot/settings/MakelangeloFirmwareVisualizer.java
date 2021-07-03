@@ -1,44 +1,90 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
+import java.util.ArrayList;
+
 import javax.vecmath.Vector3d;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.OpenGLHelper;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloFirmwareSimulation;
 import com.marginallyclever.makelangeloRobot.MakelangeloFirmwareSimulationBlock;
 
 public class MakelangeloFirmwareVisualizer {
 	public static int limit;
+	Turtle previousTurtle=null;
+	
+	private class ColorPoint {
+		public Vector3d c;
+		public Vector3d p;
+		
+		public ColorPoint(Vector3d cc, Vector3d pp) {
+			c=cc;
+			p=pp;
+		}
+	};
+	ArrayList<ColorPoint> buffer = new ArrayList<>();
 	
 	public MakelangeloFirmwareVisualizer() {}
 	
 	public void render(GL2 gl2,Turtle turtleToRender,MakelangeloRobotSettings settings) {
-		MakelangeloFirmwareSimulationBlock.counter=0;
+		//if(previousTurtle!=turtleToRender) 
+		{
+			recalculateBuffer(gl2,turtleToRender,settings);
+			//previousTurtle = turtleToRender;
+		}
+		
+		drawBufferedTurtle(gl2);
+	}
 
+	private void drawBufferedTurtle(GL2 gl2) {
 		gl2.glPushMatrix();
 		gl2.glLineWidth(1);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
-		m.historyAction(turtleToRender, (block)->{
-			//renderAccelDecel(gl2,block,settings);
-			renderMinLength(gl2,block);
-		});
+
+		for( ColorPoint a : buffer ) {
+			gl2.glColor3d(a.c.x, a.c.y, a.c.z);
+			gl2.glVertex2d(a.p.x, a.p.y);
+		}
+		
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}
 
-	private void renderMinLength(GL2 gl2,MakelangeloFirmwareSimulationBlock block) {
-		double d = block.distance / MakelangeloFirmwareSimulation.MIN_SEGMENT_LENGTH_MM;
+	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, MakelangeloRobotSettings settings) {
+		buffer.clear();
+		
+		final int renderMode=1;
+		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
+		m.historyAction(turtleToRender, (block)->{
+			switch(renderMode) {
+			case 0: renderAccelDecel(block,settings); break;
+			case 1: renderMinLength(block); break;
+			case 2: renderAlternatingBlocks(block);  break;
+			}
+		});
+	}
+
+	private void renderAlternatingBlocks(MakelangeloFirmwareSimulationBlock block) {
+		Vector3d c;
+		if(block.id % 2 == 0) {
+			c=new Vector3d(1,0,0);
+		} else {
+			c=new Vector3d(0,0,1);
+		}
+		buffer.add(new ColorPoint(c,block.start));
+		buffer.add(new ColorPoint(c,block.end));
+	}
+
+	private void renderMinLength(MakelangeloFirmwareSimulationBlock block) {
+		double d = block.distance / (MakelangeloFirmwareSimulation.MIN_SEGMENT_LENGTH_MM*2.0);
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;
-		gl2.glColor3d(r, g, 0);
-		//gl2.glVertex2d(block.start.x,block.start.y);
-		gl2.glVertex2d(block.end.x,block.end.y);
+		buffer.add(new ColorPoint(new Vector3d(r,g,0),block.start));
+		buffer.add(new ColorPoint(new Vector3d(r,g,0),block.end));
 	}
 	
-	private void renderAccelDecel(GL2 gl2,MakelangeloFirmwareSimulationBlock block,MakelangeloRobotSettings settings) {
+	private void renderAccelDecel(MakelangeloFirmwareSimulationBlock block,MakelangeloRobotSettings settings) {
 		double t,a,d;
 		boolean useDistance=true;
 		if(useDistance) {
@@ -55,9 +101,6 @@ public class MakelangeloFirmwareVisualizer {
 
 		//if(--limit<=0) return;
 		//if(limit<20) block.report();
-		
-		double [] rgba = OpenGLHelper.getCurrentColor(gl2);
-		
 		// nominal vs entry speed
 		
 		boolean showNominal=false;
@@ -66,10 +109,10 @@ public class MakelangeloFirmwareVisualizer {
 			double f = block.nominalSpeed / settings.getPenDownFeedRate();
 			o.scale(f*1);
 			o.add(block.start);
-			gl2.glColor3d(0,0,0);
-			gl2.glVertex2d(block.start.x,block.start.y);
-			gl2.glVertex2d(o.x,o.y);
-			gl2.glVertex2d(block.start.x,block.start.y);
+			Vector3d black = new Vector3d(0,0,0);
+			buffer.add(new ColorPoint(black,block.start));
+			buffer.add(new ColorPoint(black,o));
+			buffer.add(new ColorPoint(black,block.start));
 		}
 		boolean showEntry=false;
 		if(showEntry) {
@@ -77,14 +120,12 @@ public class MakelangeloFirmwareVisualizer {
 			double f = block.entrySpeed / settings.getPenDownFeedRate();
 			o.scale(f*1);
 			o.add(block.start);
-			gl2.glColor3d(1,0,0);
-			gl2.glVertex2d(block.start.x,block.start.y);
-			gl2.glVertex2d(o.x,o.y);
-			gl2.glVertex2d(block.start.x,block.start.y);
+			Vector3d red = new Vector3d(1,0,0);
+			buffer.add(new ColorPoint(red,block.start));
+			buffer.add(new ColorPoint(red,o));
+			buffer.add(new ColorPoint(red,block.start));
 		}
 
-		gl2.glColor3dv(rgba, 0);
-		
 		// nominal section of move is brighter the closer it gets to max feedrate.
 		double c0 = 1;//Math.min(1,block.entrySpeed / settings.getPenDownFeedRate()); 
 		double c1 = 1;//Math.min(1,block.nominalSpeed / settings.getPenDownFeedRate()); 
@@ -95,9 +136,9 @@ public class MakelangeloFirmwareVisualizer {
 			Vector3d p0 = new Vector3d(block.delta);
 			p0.scale(a/t);
 			p0.add(block.start);
-			gl2.glColor3d(0,c0,0);
-			gl2.glVertex2d(block.start.x,block.start.y);
-			gl2.glVertex2d(p0.x,p0.y);
+			Vector3d green = new Vector3d(0,c0,0);
+			buffer.add(new ColorPoint(green,block.start));
+			buffer.add(new ColorPoint(green,p0));
 			pLast=p0;
 		}
 		if(a<d) {
@@ -105,14 +146,14 @@ public class MakelangeloFirmwareVisualizer {
 			Vector3d p1 = new Vector3d(block.delta);
 			p1.scale(d/t);
 			p1.add(block.start);
-			gl2.glColor3d(0,0,c1);
-			gl2.glVertex2d(pLast.x,pLast.y);
-			gl2.glVertex2d(p1.x,p1.y);
+			Vector3d blue = new Vector3d(0,0,c1);
+			buffer.add(new ColorPoint(blue,pLast));
+			buffer.add(new ColorPoint(blue,p1));
 			pLast=p1;
 		}
 		// decel part of block
-		gl2.glColor3d(c2,0,0);
-		gl2.glVertex2d(pLast.x,pLast.y);
-		gl2.glVertex2d(block.end.x,block.end.y);
+		Vector3d red = new Vector3d(c2,0,0);
+		buffer.add(new ColorPoint(red,pLast));
+		buffer.add(new ColorPoint(red,block.end));
 	}
 }
