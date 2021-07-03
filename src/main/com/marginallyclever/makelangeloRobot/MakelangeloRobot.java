@@ -34,10 +34,7 @@ import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.BarberPoleTurtleRenderer;
-import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -782,7 +779,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		myPipeline.processTurtle(TurtleLoaded, settings);
 	}
 
-	public void saveTurtleToDrawing(Turtle t) {
+	public void saveTurtleToDrawing(Turtle turtle) {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
@@ -801,142 +798,24 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			e.printStackTrace();
 		}
 
-		Log.message("Old method "+printTimeEstimate(estimateTime()));
-		
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
-		double newEstimate= m.getTimeEstimate(t);
-		Log.message("New method "+printTimeEstimate(newEstimate));
-		myPanel.statusBar.setProgressEstimate(newEstimate, lineCount);
+		double eta= m.getTimeEstimate(turtle);
+		String msg = "Run time estimate=" +Log.secondsToHumanReadable(eta);
+		Log.message(msg);
+		System.out.println(msg);
+		myPanel.statusBar.setProgressEstimate(eta, lineCount);
 	}
 	
-	protected String printTimeEstimate(double seconds) {
-		return "Estimate =" + Log.secondsToHumanReadable(seconds);
-	}
-
 	public Turtle getTurtle() {
 		return turtleToRender;
-	}
-
-	protected double estimateTime() {
-		double totalTime = 0;
-		
-		if (turtleToRender.isLocked())
-			return totalTime;
-		
-		turtleToRender.lock();
-
-		try {
-			boolean isUp = true;
-			double ox = this.settings.getHomeX();
-			double oy = this.settings.getHomeY();
-			double oz = this.settings.getPenUpAngle();
-
-			for (TurtleMove m : turtleToRender.history) {
-				double nx = ox;
-				double ny = oy;
-				double nz = oz;
-
-				switch (m.type) {
-				case TRAVEL:
-					if (!isUp) {
-						nz = this.settings.getPenUpAngle();
-						isUp = true;
-					}
-					break;
-				case DRAW:
-					if (isUp) {
-						nz = this.settings.getPenDownAngle();
-						isUp = false;
-					}
-					nx = m.x;
-					ny = m.y;
-					break;
-				case TOOL_CHANGE:
-					// n remains unchanged, so length is zero.
-					break;
-				}
-
-				double dx = nx - ox;
-				double dy = ny - oy;
-				double dz = nz - oz;
-				double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-				if (length > 0) {
-					double accel = settings.getAcceleration();
-					double maxV;
-					if (oz != nz) {
-						maxV = settings.getZRate();
-					} else if (nz == settings.getPenDownAngle()) {
-						maxV = settings.getPenDownFeedRate();
-					} else {
-						maxV = settings.getPenUpFeedRate();
-					}
-					totalTime += estimateSingleBlock(length, 0, 0, maxV, accel);
-				}
-				ox = nx;
-				oy = ny;
-				oz = nz;
-			}
-		} finally {
-			turtleToRender.unlock();
-		}
-		
-		return totalTime;
-	}
-
-	/**
-	 * Calculate seconds to move a given length. Also uses globals feedRate and acceleration See
-	 * http://zonalandeducation.com/mstm/physics/mechanics/kinematics/EquationsForAcceleratedMotion/AlgebraRearrangements/Displacement/DisplacementAccelerationAlgebra.htm
-	 * 
-	 * @param length    mm distance to travel.
-	 * @param startRate mm/s at start of move
-	 * @param endRate   mm/s at end of move
-	 * @return time to execute move
-	 */
-	protected double estimateSingleBlock(double length, double startRate, double endRate, double maxV, double accel) {
-		double distanceToAccelerate = (maxV * maxV - startRate * startRate) / (2.0 * accel);
-		double distanceToDecelerate = (endRate * endRate - maxV * maxV) / (2.0 * -accel);
-		double distanceAtTopSpeed = length - distanceToAccelerate - distanceToDecelerate;
-		if (distanceAtTopSpeed < 0) {
-			// we never reach feedRate.
-			double intersection = (2.0 * accel * length - startRate * startRate + endRate * endRate) / (4.0 * accel);
-			distanceToAccelerate = intersection;
-			distanceToDecelerate = length - intersection;
-			distanceAtTopSpeed = 0;
-		}
-		// time at maxV
-		double time = distanceAtTopSpeed / maxV;
-
-		// time accelerating (v=start vel;a=acceleration;d=distance;t=time)
-		// 0.5att+vt-d=0
-		// att+2vt=2d
-		// using quadratic to solve for t,
-		// t = (-v +/- sqrt(vv+2ad))/a
-		double s;
-		s = Math.sqrt(startRate * startRate + 2.0 * accel * distanceToAccelerate);
-		double a = (-startRate + s) / accel;
-		double b = (-startRate - s) / accel;
-		double accelTime = a > b ? a : b;
-		if (accelTime < 0) {
-			accelTime = 0;
-		}
-
-		// time decelerating (v=end vel;a=acceleration;d=distance;t=time)
-		s = Math.sqrt(endRate * endRate + 2.0 * accel * distanceToDecelerate);
-		double c = (-endRate + s) / accel;
-		double d = (-endRate - s) / accel;
-		double decelTime = c > d ? c : d;
-		if (decelTime < 0) {
-			decelTime = 0;
-		}
-
-		// sum total
-		return time + accelTime + decelTime;
 	}
 
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 	}
 
+	private MakelangeloFirmwareVisualizer v = new MakelangeloFirmwareVisualizer();
+	
 	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];
@@ -958,15 +837,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		} else if (turtleToRender != null) {
 			if(turtleRenderer==null) {
 				//turtleRenderer = new DefaultTurtleRenderer(gl2);
-				turtleRenderer = new BarberPoleTurtleRenderer(gl2);
+				//turtleRenderer = new BarberPoleTurtleRenderer(gl2);
 			}
 			if(turtleRenderer!=null) {
 				turtleToRender.render(turtleRenderer);
 			}
 			
-			//MakelangeloFirmwareVisualizer v = new MakelangeloFirmwareVisualizer();
-			//v.render(gl2,turtleToRender,settings);
-			
+			v.render(gl2,turtleToRender,settings);
 		}
 	}
 	
