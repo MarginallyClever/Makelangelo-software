@@ -214,15 +214,10 @@ public class MakelangeloFirmwareSimulation {
 		// limit jerk between moves
 		double vmax_junction;
 		switch(jerkType) {
-			case CLASSIC_JERK: vmax_junction = classicJerk(next,currentSpeed,next.nominalSpeed); break;
-			case JUNCTION_DEVIATION: vmax_junction = junctionDeviation(next,next.nominalSpeed); break;
-			case DOT_PRODUCT:
-				vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
-				vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
-				vmax_junction = Math.max(vmax_junction, MINIMUM_PLANNER_SPEED);
-				previousNormal.set(next.normal);
-				break;
-			default: vmax_junction = next.nominalSpeed; break;
+			case CLASSIC_JERK:        vmax_junction = classicJerk(next,currentSpeed,next.nominalSpeed);  break;
+			case JUNCTION_DEVIATION:  vmax_junction = junctionDeviationJerk(next,next.nominalSpeed);  break;
+			case DOT_PRODUCT:         vmax_junction = dotProductJerk(next);  break;
+			default:                  vmax_junction = next.nominalSpeed;  break;
 		}
 		
 		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,MINIMUM_PLANNER_SPEED,next.distance);
@@ -242,7 +237,16 @@ public class MakelangeloFirmwareSimulation {
 		recalculateAcceleration();
 	}
 	
-	private double junctionDeviation(MakelangeloFirmwareSimulationBlock next,double nominalSpeed) {
+	private double dotProductJerk(MakelangeloFirmwareSimulationBlock next) { 
+		double vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
+		vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
+		vmax_junction = Math.max(vmax_junction, MINIMUM_PLANNER_SPEED);
+		previousNormal.set(next.normal);
+		
+		return vmax_junction;
+	}
+
+	private double junctionDeviationJerk(MakelangeloFirmwareSimulationBlock next,double nominalSpeed) {
 		double vmax_junction=nominalSpeed;
 		// Skip first block or when previousNominalSpeed is used as a flag for homing and offset cycles.
 		if (queue.size() > 0 && previousNominalSpeed > 1e-6) {
@@ -516,50 +520,46 @@ public class MakelangeloFirmwareSimulation {
 		}
 	}
 	
-	protected void recalculateTrapezoidBlock(MakelangeloFirmwareSimulationBlock seg, double entrySpeed, double exitSpeed) {
+	protected void recalculateTrapezoidBlock(MakelangeloFirmwareSimulationBlock block, double entrySpeed, double exitSpeed) {
 		if( entrySpeed < MINIMUM_PLANNER_SPEED ) entrySpeed = MINIMUM_PLANNER_SPEED;
 		if( exitSpeed  < MINIMUM_PLANNER_SPEED ) exitSpeed  = MINIMUM_PLANNER_SPEED;
 		
-		double accel = seg.acceleration;
-		double accelerateD = estimateAccelerationDistance(entrySpeed, seg.nominalSpeed, accel);
-		double decelerateD = estimateAccelerationDistance(seg.nominalSpeed, exitSpeed, -accel);
-		//accelerateD = Math.max(accelerateD,0);
-		//decelerateD = Math.max(decelerateD,0);
-		
-		double plateauD = seg.distance - accelerateD - decelerateD;
+		double accel = block.acceleration;
+		double accelerateD = estimateAccelerationDistance(entrySpeed, block.nominalSpeed, accel);
+		double decelerateD = estimateAccelerationDistance(block.nominalSpeed, exitSpeed, -accel);
+		double cruiseRate;
+		double plateauD = block.distance - accelerateD - decelerateD;
 		if( plateauD < 0 ) {
 			// never reaches nominal v
-			double d = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, seg.distance));
-			accelerateD = Math.min(Math.max(d, 0), seg.distance);
+			double d = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, block.distance));
+			accelerateD = Math.min(Math.max(d, 0), block.distance);
 			decelerateD = 0;
 			plateauD = 0;
+			cruiseRate = finalRate(accel,entrySpeed,accelerateD);
+		} else {
+			cruiseRate = block.nominalSpeed;
 		}
-		seg.accelerateUntilD = accelerateD;
-		seg.decelerateAfterD = accelerateD + plateauD;
-		seg.entrySpeed = entrySpeed;
-		seg.exitSpeed = exitSpeed;
-		seg.plateauD = plateauD;
+		block.accelerateUntilD = accelerateD;
+		block.decelerateAfterD = accelerateD + plateauD;
+		block.entrySpeed = entrySpeed;
+		block.exitSpeed = exitSpeed;
+		block.plateauD = plateauD;
 		
-		// endV^2 - startV^2 = 2ad
-		// endV^2 = 2ad + startV^2
-		// endV = sqrt(2ad + startV^2)
-		double nomV1 = accelerateD==0? 0 : (2.0 * seg.acceleration * accelerateD + entrySpeed*entrySpeed);
-		double nomV2 = decelerateD==0? 0 : (2.0 * seg.acceleration * decelerateD + exitSpeed*exitSpeed);
-		if(nomV1 != nomV2) {
-			//System.out.println("Uh oh "+nomV1+", "+nomV2);
-		}
-		
-		double accelerateT = Math.max(0, ( nomV1-entrySpeed ) / seg.acceleration );
-		double decelerateT = Math.max(0, ( nomV1-exitSpeed ) / seg.acceleration );
-		double nominalT = plateauD/seg.nominalSpeed;
+		double accelerateT = (cruiseRate - entrySpeed) / accel;
+		double decelerateT = (cruiseRate - exitSpeed) / accel;
+		double nominalT = plateauD/block.nominalSpeed;
 
-		seg.end_s = accelerateT + nominalT + decelerateT;
-		seg.accelerateUntilT = accelerateT;
-		seg.decelerateAfterT = seg.end_s - decelerateT;
+		block.end_s = accelerateT + nominalT + decelerateT;
+		block.accelerateUntilT = accelerateT;
+		block.decelerateAfterT = block.end_s - decelerateT;
 		
-		if(Double.isNaN(seg.end_s)) {
-			//System.out.println("recalculateTrapezoidSegment() Uh oh");
+		if(Double.isNaN(block.end_s)) {
+			System.out.println("recalculateTrapezoidSegment() Uh oh");
 		}
+	}
+	
+	private double finalRate(double acceleration, double startV, double distance) {
+		return Math.sqrt( (startV*startV) + 2.0 * acceleration*distance);
 	}
 
 	/**
@@ -589,6 +589,8 @@ public class MakelangeloFirmwareSimulation {
 	}
 	
 	public void historyAction(Turtle t,SegmentFunction consumer) {
+		MakelangeloFirmwareSimulationBlock.counter=0;
+		
 		double fu = settings.getPenUpFeedRate();
 		double fd = settings.getPenDownFeedRate();
 		double fz = settings.getZRate();
@@ -625,15 +627,9 @@ public class MakelangeloFirmwareSimulation {
 			default:
 				break;
 			}
-			while(queue.size()>MAX_SEGMENTS) {
-				MakelangeloFirmwareSimulationBlock s= queue.remove(0);
-				consumer.run(s);
-			}
+			while(queue.size()>MAX_SEGMENTS) consumer.run(queue.remove(0));
 		}
-		while(queue.size()>0) {
-			MakelangeloFirmwareSimulationBlock s= queue.remove(0);
-			consumer.run(s);
-		}
+		while(queue.size()>0) consumer.run(queue.remove(0));
 	}
 	
 	// @return time in seconds to run sequence.
