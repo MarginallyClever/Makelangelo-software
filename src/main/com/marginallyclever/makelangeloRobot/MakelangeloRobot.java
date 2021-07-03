@@ -35,6 +35,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.BarberPoleTurtleRenderer;
+import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
@@ -44,6 +45,7 @@ import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloFirmwareVisualizer;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -59,7 +61,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 11; // must match the version in the the firmware EEPROM
+	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
 	private MakelangeloRobotSettings settings = null;
@@ -962,6 +964,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				turtleToRender.render(turtleRenderer);
 			}
 			
+			//MakelangeloFirmwareVisualizer v = new MakelangeloFirmwareVisualizer();
+			//v.render(gl2,turtleToRender,settings);
 			
 		}
 	}

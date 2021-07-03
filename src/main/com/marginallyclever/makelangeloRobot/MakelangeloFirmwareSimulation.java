@@ -16,7 +16,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.24.0
  */
 public class MakelangeloFirmwareSimulation {
-	public static final int MAX_SEGMENTS = 32;
+	public static final int MAX_SEGMENTS = 16;
 	public static final long MIN_SEGMENT_TIME_US = 20000;
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
 	public static final double MAX_FEEDRATE = 200.0;   // mm/s
@@ -165,7 +165,6 @@ public class MakelangeloFirmwareSimulation {
 	protected void bufferSegment(final Vector3d to, final double feedrate, final double acceleration,final Vector3d cartesianDelta) {
 		MakelangeloFirmwareSimulationBlock next = new MakelangeloFirmwareSimulationBlock(to,cartesianDelta);
 		next.feedrate = feedrate;
-		poseNow.set(to);
 
 		// zero distance?  do nothing.
 		if(next.distance==0) return;
@@ -215,18 +214,15 @@ public class MakelangeloFirmwareSimulation {
 		// limit jerk between moves
 		double vmax_junction;
 		switch(jerkType) {
-		case CLASSIC_JERK: vmax_junction = classicJerk(next,currentSpeed,next.nominalSpeed); break;
-		case JUNCTION_DEVIATION: vmax_junction = junctionDeviation(next,next.nominalSpeed); break;
-		case DOT_PRODUCT: 
-			{
-				double d = next.normal.dot(previousNormal) * 1.1;
-				vmax_junction = next.nominalSpeed * d;
+			case CLASSIC_JERK: vmax_junction = classicJerk(next,currentSpeed,next.nominalSpeed); break;
+			case JUNCTION_DEVIATION: vmax_junction = junctionDeviation(next,next.nominalSpeed); break;
+			case DOT_PRODUCT:
+				vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
 				vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
 				vmax_junction = Math.max(vmax_junction, MINIMUM_PLANNER_SPEED);
-				
 				previousNormal.set(next.normal);
-			} break;
-		default: vmax_junction = next.nominalSpeed; break;
+				break;
+			default: vmax_junction = next.nominalSpeed; break;
 		}
 		
 		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,MINIMUM_PLANNER_SPEED,next.distance);
@@ -241,6 +237,7 @@ public class MakelangeloFirmwareSimulation {
 		}
 		
 		queue.add(next);
+		poseNow.set(to);
 		
 		recalculateAcceleration();
 	}
@@ -524,29 +521,36 @@ public class MakelangeloFirmwareSimulation {
 		if( exitSpeed  < MINIMUM_PLANNER_SPEED ) exitSpeed  = MINIMUM_PLANNER_SPEED;
 		
 		double accel = seg.acceleration;
-		double accelerateD = Math.ceil( estimateAccelerationDistance(entrySpeed, seg.nominalSpeed, accel));
-		double decelerateD = Math.floor( estimateAccelerationDistance(seg.nominalSpeed, exitSpeed, -accel));
+		double accelerateD = estimateAccelerationDistance(entrySpeed, seg.nominalSpeed, accel);
+		double decelerateD = estimateAccelerationDistance(seg.nominalSpeed, exitSpeed, -accel);
 		//accelerateD = Math.max(accelerateD,0);
 		//decelerateD = Math.max(decelerateD,0);
 		
 		double plateauD = seg.distance - accelerateD - decelerateD;
 		if( plateauD < 0 ) {
-			double half = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, seg.distance));
-			accelerateD = Math.min(Math.max(half, 0), seg.distance);
-			decelerateD = seg.distance - accelerateD; 
+			// never reaches nominal v
+			double d = Math.ceil(intersectionDistance(entrySpeed, exitSpeed, accel, seg.distance));
+			accelerateD = Math.min(Math.max(d, 0), seg.distance);
+			decelerateD = 0;
 			plateauD = 0;
 		}
-		seg.accelerateD = accelerateD;
-		seg.decelerateD = accelerateD + plateauD;
+		seg.accelerateUntilD = accelerateD;
+		seg.decelerateAfterD = accelerateD + plateauD;
 		seg.entrySpeed = entrySpeed;
 		seg.exitSpeed = exitSpeed;
-
 		seg.plateauD = plateauD;
-		// d = vt + 0.5att.  it's a quadratic, so t = -v +/- sqrt( v*v -2ad ) / a
-		double nA = maxSpeedAllowed(-seg.acceleration,entrySpeed,accelerateD);
-		double nD = maxSpeedAllowed(-seg.acceleration,exitSpeed, decelerateD);
-		double accelerateT = ( -entrySpeed + nA ) / seg.acceleration;
-		double decelerateT = ( -exitSpeed  + nD ) / seg.acceleration;
+		
+		// endV^2 - startV^2 = 2ad
+		// endV^2 = 2ad + startV^2
+		// endV = sqrt(2ad + startV^2)
+		double nomV1 = accelerateD==0? 0 : (2.0 * seg.acceleration * accelerateD + entrySpeed*entrySpeed);
+		double nomV2 = decelerateD==0? 0 : (2.0 * seg.acceleration * decelerateD + exitSpeed*exitSpeed);
+		if(nomV1 != nomV2) {
+			//System.out.println("Uh oh "+nomV1+", "+nomV2);
+		}
+		
+		double accelerateT = Math.max(0, ( nomV1-entrySpeed ) / seg.acceleration );
+		double decelerateT = Math.max(0, ( nomV1-exitSpeed ) / seg.acceleration );
 		double nominalT = plateauD/seg.nominalSpeed;
 
 		seg.end_s = accelerateT + nominalT + decelerateT;
@@ -569,7 +573,7 @@ public class MakelangeloFirmwareSimulation {
 		return Math.sqrt( (targetVelocity*targetVelocity) - 2 * acceleration * distance );
 	}
 	
-	// (m^2 - s^2) / 2a
+	// (endV^2 - startV^2) / 2a
 	protected double estimateAccelerationDistance(final double initialRate, final double targetRate, final double accel) {
 		if(accel == 0) return 0;
 		return ( (targetRate*targetRate) - (initialRate*initialRate) ) / (accel * 2.0);

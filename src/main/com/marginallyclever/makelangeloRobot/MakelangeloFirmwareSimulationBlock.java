@@ -26,8 +26,8 @@ public class MakelangeloFirmwareSimulationBlock {
 	public double acceleration;  // per second per second
 	
 	public double entrySpeedMax;
-	public double accelerateD;  // distance
-	public double decelerateD;  // distance
+	public double accelerateUntilD;  // distance
+	public double decelerateAfterD;  // distance
 	public double plateauD;  // distance
 
 	public double accelerateUntilT;  // seconds
@@ -73,9 +73,9 @@ public class MakelangeloFirmwareSimulationBlock {
 		System.out.print("\t"+StringHelper.formatDouble(entrySpeedMax));
 		System.out.print("\t"+StringHelper.formatDouble(allowableSpeed));
 		System.out.print("\t"+StringHelper.formatDouble(acceleration));
-		System.out.print("\t"+StringHelper.formatDouble(accelerateD));
+		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilD));
 		System.out.print("\t"+StringHelper.formatDouble(plateauD));
-		System.out.print("\t"+StringHelper.formatDouble(decelerateD));
+		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterD));
 		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilT));
 		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterT));
 		System.out.print("\t"+(nominalLength?1:0));
