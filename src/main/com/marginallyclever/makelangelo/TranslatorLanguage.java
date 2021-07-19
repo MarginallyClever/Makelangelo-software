@@ -19,7 +19,7 @@ import com.marginallyclever.convenience.log.Log;
 public class TranslatorLanguage {
 	private String name = "";
 	private String author = "";
-	private Map<String, String> strings = new HashMap<>();
+	private Map<String, String> strings = new HashMap<String, String>();
 
 
 	/**

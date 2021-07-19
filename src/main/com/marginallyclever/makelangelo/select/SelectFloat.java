@@ -38,21 +38,18 @@ public class SelectFloat extends Select {
 		field.setMinimumSize(d);
 		field.setText(StringHelper.formatFloat(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
-		Select parent = this;
+		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
 			public void changedUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();
 			}
 
-			@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();
 			}
 
-			@Override
 			public void removeUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();

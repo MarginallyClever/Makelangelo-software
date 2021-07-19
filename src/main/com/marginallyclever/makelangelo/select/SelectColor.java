@@ -32,7 +32,7 @@ public class SelectColor extends Select {
 	 * @param labelValue
 	 * @param defaultValue
 	 */
-	public SelectColor(Component parentComponent,String labelValue,ColorRGB defaultValue) {
+	public SelectColor(final Component parentComponent,String labelValue,ColorRGB defaultValue) {
 		super();
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
@@ -49,7 +49,6 @@ public class SelectColor extends Select {
 		chooseButton = new JButton("...");
 		final Select parent = this;
 		chooseButton.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
 				field.setBackground(c);

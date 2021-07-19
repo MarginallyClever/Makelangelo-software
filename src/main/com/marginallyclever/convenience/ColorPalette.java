@@ -21,7 +21,7 @@ public class ColorPalette {
   
 
   public ColorPalette() {
-    colors = new ArrayList<>();
+    colors = new ArrayList<ColorRGB>();
   }
 
   /**

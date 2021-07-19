@@ -16,14 +16,14 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @since 7.24.0
  */
 public class MakelangeloFirmwareSimulation {
-	public static final int MAX_SEGMENTS = 16;
-	public static final long MIN_SEGMENT_TIME_US = 20000;
+	public static final int MAX_SEGMENTS = 32;
+	public static final long MIN_SEGMENT_TIME_US = 25000;
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
-	public static final double MAX_FEEDRATE = 200.0;   // mm/s
-	public static final double MAX_ACCELERATION = 1000.0;  // mm/s/s
+	public static double MAX_FEEDRATE = 200.0;   // mm/s
+	public static double MAX_ACCELERATION = 1000.0;  // mm/s/s
 	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
-	public static final int SEGMENTS_PER_SECOND = 40;
+	public static final int SEGMENTS_PER_SECOND = 10;
 	public static final double [] MAX_JERK = { 8, 8, 0.3 };
 	public static final double GRAVITYmag = 9800.0;  // mm/s/s
 	
@@ -53,6 +53,7 @@ public class MakelangeloFirmwareSimulation {
 
 	// Unit vector of previous path line segment
 	private Vector3d previousNormal = new Vector3d();
+	
 	private double previousNominalSpeed=0;
 	private double junction_deviation = 0.05;
 	
@@ -138,6 +139,9 @@ public class MakelangeloFirmwareSimulation {
 		Vector3d delta = new Vector3d();
 		delta.sub(destination,poseNow);
 		
+		acceleration=Math.min(MAX_ACCELERATION, acceleration);
+		feedrate=Math.min(40, feedrate);
+		
 		double len = delta.length();		
 		double seconds = len / feedrate;
 		int segments = (int)Math.ceil(seconds * SEGMENTS_PER_SECOND);
@@ -167,7 +171,7 @@ public class MakelangeloFirmwareSimulation {
 		next.feedrate = feedrate;
 
 		// zero distance?  do nothing.
-		if(next.distance==0) return;
+		if(next.distance<=6.0/80.0) return;
 		
 		double inverse_secs = feedrate / next.distance;
 		
@@ -502,7 +506,7 @@ public class MakelangeloFirmwareSimulation {
 				if(current.recalculate || next.recalculate) {
 					current.recalculate = true;
 					if( !current.busy ) {
-						recalculateTrapezoidBlock(current, currentEntrySpeed, nextEntrySpeed);
+						recalculateTrapezoidForBlock(current, currentEntrySpeed, nextEntrySpeed);
 					}
 					current.recalculate = false;
 				}
@@ -514,13 +518,13 @@ public class MakelangeloFirmwareSimulation {
 		if(current!=null) {
 			current.recalculate = true;
 			if( !current.busy ) {
-				recalculateTrapezoidBlock(current, currentEntrySpeed, MINIMUM_PLANNER_SPEED);
+				recalculateTrapezoidForBlock(current, currentEntrySpeed, MINIMUM_PLANNER_SPEED);
 			}
 			current.recalculate = false;
 		}
 	}
 	
-	protected void recalculateTrapezoidBlock(MakelangeloFirmwareSimulationBlock block, double entrySpeed, double exitSpeed) {
+	protected void recalculateTrapezoidForBlock(MakelangeloFirmwareSimulationBlock block, double entrySpeed, double exitSpeed) {
 		if( entrySpeed < MINIMUM_PLANNER_SPEED ) entrySpeed = MINIMUM_PLANNER_SPEED;
 		if( exitSpeed  < MINIMUM_PLANNER_SPEED ) exitSpeed  = MINIMUM_PLANNER_SPEED;
 		

@@ -142,15 +142,15 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * See <a href="http://stackoverflow.com/a/14026865">Comparing key and values of two java maps</a>
    */
   private static Set<String> getMissingKeys(Set<String> expected, Set<String> actual) {
-    final Set<String> keysInA = new HashSet<>(expected);
-    final Set<String> keysInB = new HashSet<>(actual);
+    final Set<String> keysInA = new HashSet<String>(expected);
+    final Set<String> keysInB = new HashSet<String>(actual);
 
     // Keys in A and not in B
-    final Set<String> inANotB = new HashSet<>(keysInA);
+    final Set<String> inANotB = new HashSet<String>(keysInA);
     inANotB.removeAll(keysInB);
 
     // Keys common to both maps
-    final Set<String> commonKeys = new HashSet<>(keysInA);
+    final Set<String> commonKeys = new HashSet<String>(keysInA);
     commonKeys.retainAll(keysInB);
     return inANotB;
   }
@@ -267,7 +267,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
    * See <a href="http://stackoverflow.com/a/5511298">Java: Most efficient method to iterate over all elements in a org.w3c.dom.Document?</a>
    */
   private static Set<String> getKeySet(Node node) {
-    final Set<String> keySet = new HashSet<>();
+    final Set<String> keySet = new HashSet<String>();
     if (node.getNodeName().equals("key")) {
       keySet.add(node.getTextContent());
     }

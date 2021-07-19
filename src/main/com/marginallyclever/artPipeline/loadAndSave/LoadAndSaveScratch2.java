@@ -57,7 +57,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 	static {
-		IMAGE_FILE_EXTENSIONS = new HashSet<>();
+		IMAGE_FILE_EXTENSIONS = new HashSet<String>();
 		IMAGE_FILE_EXTENSIONS.add("SB2");
 	}
 	

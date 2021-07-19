@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -79,17 +80,21 @@ public class PiCaptureAction extends AbstractAction {
 		sharpness = 0;
     }
     
-	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		runCapture();
+	}
+	
+	private void runCapture() {
         // let's make the image the correct width and height for the paper
 		useImage = false;
-        int captureH = 650;
         double aspectRatio = makelangeloApp.getRobot().getSettings().getPaperWidth() 
         					/ makelangeloApp.getRobot().getSettings().getPaperHeight();
-        int captureW = (int) ((double) captureH * aspectRatio);
+		final int captureH = 650;
+        final int captureW = (int) ((double) captureH * aspectRatio);
 
-		JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("CaptureImageTitle"), true);
-        dialog.setLocation(makelangeloApp.getMainFrame().getLocation());
+        JFrame mainFrame = makelangeloApp.getMainFrame();
+		final JDialog dialog = new JDialog(mainFrame,Translator.get("CaptureImageTitle"), true);
+        dialog.setLocation(mainFrame.getLocation());
 
         final JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -107,7 +112,7 @@ public class PiCaptureAction extends AbstractAction {
 
         // if you add more things to the right side, you must increase this.
         cMain.gridheight = 16;
-        JLabel imageLabel = new JLabel();
+        final JLabel imageLabel = new JLabel();
         imageLabel.setPreferredSize(new Dimension(captureW, captureH));
   		panel.add(imageLabel, cMain);
         cMain.gridheight = 1;
@@ -131,7 +136,7 @@ public class PiCaptureAction extends AbstractAction {
                 Translator.get("Incandescent"),
                 Translator.get("Flash"),
                 Translator.get("Horizon") };
-		JComboBox<String> awbComboBox = new JComboBox<>(awbComboBoxChoices);
+		final JComboBox<String> awbComboBox = new JComboBox<String>(awbComboBoxChoices);
 		awbComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		awbComboBox.setSelectedIndex(awb);
 		panel.add(awbComboBox, cMain);
@@ -147,7 +152,7 @@ public class PiCaptureAction extends AbstractAction {
                 Translator.get("High"),
                 Translator.get("Medium"),
                 Translator.get("Low") };
-		JComboBox<String> drcComboBox = new JComboBox<>(drcComboBoxChoices);
+		final JComboBox<String> drcComboBox = new JComboBox<String>(drcComboBoxChoices);
 		drcComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		drcComboBox.setSelectedIndex(drc);
 		panel.add(drcComboBox, cMain);
@@ -171,7 +176,7 @@ public class PiCaptureAction extends AbstractAction {
                 Translator.get("Sports"),
                 Translator.get("Spotlight"),
                 Translator.get("Verylong") };
-		JComboBox<String> expComboBox = new JComboBox<>(expComboBoxChoices);
+		final JComboBox<String> expComboBox = new JComboBox<String>(expComboBoxChoices);
 //		expComboBox.setBounds(584, 362, 90, 20);
 		expComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		expComboBox.setSelectedIndex(exp);
@@ -184,7 +189,7 @@ public class PiCaptureAction extends AbstractAction {
 		panel.add(lblContrast, cMain);
 		cMain.gridy++;
 
-		JSlider contrastSlider = new JSlider();
+		final JSlider contrastSlider = new JSlider();
 		contrastSlider.setMinimum(-100);
 //		contrastSlider.setBounds(588, 418, 90, 23);
 		contrastSlider.setValue(contrast);
@@ -197,7 +202,7 @@ public class PiCaptureAction extends AbstractAction {
 		panel.add(lblQuality, cMain);
 		cMain.gridy++;
 
-		JSlider qualitySlider = new JSlider();
+		final JSlider qualitySlider = new JSlider();
 		qualitySlider.setValue(quality);
 //		qualitySlider.setBounds(584, 477, 90, 29);
 		panel.add(qualitySlider, cMain);
@@ -209,7 +214,7 @@ public class PiCaptureAction extends AbstractAction {
 		panel.add(lblSharpness, cMain);
 		cMain.gridy++;
 
-		JSlider sharpnessSlider = new JSlider();
+		final JSlider sharpnessSlider = new JSlider();
 		sharpnessSlider.setMinimum(-100);
 		sharpnessSlider.setValue(sharpness);
 //		sharpnessSlider.setBounds(588, 542, 90, 23);
@@ -225,14 +230,15 @@ public class PiCaptureAction extends AbstractAction {
 		buttonCaptureImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					JFrame mainFrame = makelangeloApp.getMainFrame();
 					piCamera.turnOnPreview(
-							makelangeloApp.getMainFrame().getLocationOnScreen().x + 50,
-							makelangeloApp.getMainFrame().getLocationOnScreen().y + 100,
+							mainFrame.getLocationOnScreen().x + 50,
+							mainFrame.getLocationOnScreen().y + 100,
 							captureW,
 							captureH);
-					piCamera.setAWB(AWB.valueOf(((String) awbComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setDRC(DRC.valueOf(((String) drcComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setExposure(Exposure.valueOf(((String) expComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setAWB(AWB.valueOf(((String)awbComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setDRC(DRC.valueOf(((String)drcComboBox.getSelectedItem()).toUpperCase()));
+					piCamera.setExposure(Exposure.valueOf(((String)expComboBox.getSelectedItem()).toUpperCase()));
 					piCamera.setEncoding(Encoding.JPG);
 					piCamera.setWidth(captureW);
 					piCamera.setHeight(captureH);

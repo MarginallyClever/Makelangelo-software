@@ -288,8 +288,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 * @return an array of strings, each string is a machine UID.
 	 */
 	public String[] getKnownMachineNames() {
-		List<String> knownMachineList = new LinkedList<>(Arrays.asList(configsAvailable));
-		List<String> keepList = new LinkedList<>();
+		List<String> knownMachineList = new LinkedList<String>(Arrays.asList(configsAvailable));
+		List<String> keepList = new LinkedList<String>();
 		for(String a : knownMachineList ) {
 			if( a.contentEquals("0")) continue;
 			if(!isNumeric(a)) continue;
@@ -651,16 +651,15 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return hardwareProperties;
 	}
 
-	public void setHardwareVersion(String version) {
+	public void setHardwareVersion(String version) {		
 		String newVersion = "";
-
-		try {
+	try {
 			// get version numbers
 			ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
 			Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
 			while(i.hasNext()) {
 				MakelangeloHardwareProperties hw = i.next();
-				if(hw.getVersion().equals(version)) {
+				if(hw.getVersion().contentEquals(version)) {
 					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
 					newVersion = version;
 					break;
@@ -676,7 +675,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 			Log.error("Unknown hardware version requested. Defaulting to v2");
 			hardwareProperties = new Makelangelo2Properties();
 		}
-		
+	
 		hardwareVersion = newVersion;
 		if(!hardwareProperties.canChangeMachineSize()) {
 			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());

@@ -71,7 +71,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 	static {
-		IMAGE_FILE_EXTENSIONS = new HashSet<>();
+		IMAGE_FILE_EXTENSIONS = new HashSet<String>();
 		IMAGE_FILE_EXTENSIONS.add("SB3");
 	}
 	
@@ -207,7 +207,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
-			if( (boolean)targetN.get("isStage") == true ) continue;
+			if( (Boolean)targetN.get("isStage") == true ) continue;
 			blocks = (JSONObject)targetN.get("blocks");
 			// we found the blocks.
 			Log.message("found  " +blocks.length() + " blocks");
@@ -216,7 +216,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			// find the first block, which should be the only toplevel block.
 			for( Object k : blockKeys ) {
 				JSONObject block = (JSONObject)blocks.get(k.toString());
-				boolean topLevel = (boolean)block.get("topLevel");
+				boolean topLevel = (Boolean)block.get("topLevel");
 				String opcode = (String)block.get("opcode");
 				if(topLevel && opcode.equals("event_whenflagclicked")) {
 					// found!
@@ -360,7 +360,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
-			if( (boolean)targetN.get("isStage") == false ) continue;
+			if( (Boolean)targetN.get("isStage") == false ) continue;
 			
 			JSONObject variables = (JSONObject)targetN.get("variables");
 			Iterator<?> keys = variables.keySet().iterator();
@@ -391,7 +391,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
 			JSONObject targetN = (JSONObject)targetIter.next();
-			if( (boolean)targetN.get("isStage") == false ) continue;
+			if( (Boolean)targetN.get("isStage") == false ) continue;
 			JSONObject listOfLists = (JSONObject)targetN.get("lists");
 			if(listOfLists == null) return;
 			Set<?> keys = listOfLists.keySet();

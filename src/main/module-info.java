@@ -1,32 +1,25 @@
-import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
-	
+import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
+
 module com.marginallyclever.makelangelo {
 	requires java.desktop;
 	requires java.prefs;
 	requires java.logging;
-	requires junit;
 	requires org.apache.commons.io;
 	requires org.json;
 	requires org.jetbrains.annotations;
 	requires jrpicam;
 	requires jogamp.fat;
 	requires kabeja;
-	requires batik.bridge;
-	requires batik.anim;
-	requires batik.svg.dom;
-	requires batik.util;
-	requires batik.constants;
-	requires batik.gvt;
-	requires batik.dom;
-	requires xml.apis.ext;
-	requires batik.ext;
 	requires slf4j.api;
 	requires jssc;
 	requires vecmath;
+	requires batik.all;
+	requires xml.apis.ext;
+	requires junit;
 	
 	uses MakelangeloHardwareProperties;
 	provides MakelangeloHardwareProperties with 

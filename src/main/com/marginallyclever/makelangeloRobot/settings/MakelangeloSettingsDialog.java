@@ -123,7 +123,7 @@ implements ActionListener {
 	  
 	  d.gridx=1;
 	  d.gridwidth=2;
-	  hardwareVersionChoices = new JComboBox<>(hardwareVersionNames);
+	  hardwareVersionChoices = new JComboBox<String>(hardwareVersionNames);
 	  // set the default
 	  String hv = robot.getSettings().getHardwareVersion();
 	  for(int i=0;i<availableHardwareVersions.size();++i) {

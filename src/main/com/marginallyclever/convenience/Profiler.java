@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  */
 public class Profiler {
-	private ArrayList<Long> times = new ArrayList<>();
+	private ArrayList<Long> times = new ArrayList<Long>();
 	
 	public void clear() {
 		times.clear();

@@ -95,9 +95,8 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
+					<release>${minimum.java.version}</release>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
-					<source>${minimum.java.version}</source>
-					<target>${minimum.java.version}</target>
 					<encoding>UTF-8</encoding>
 					<compilerArgs>
 						<compilerArg>-Xlint:unchecked</compilerArg>
@@ -389,17 +388,17 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version>
 		</dependency>
-		<!-- SVG loading -->
-		<dependency>
-	      <groupId>xml-apis</groupId>
-	      <artifactId>xml-apis</artifactId>
-	      <version>1.4.01</version>
-	 	</dependency>
 		<!-- https://mvnrepository.com/artifact/batik/batik-xml -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-all</artifactId>
 			<version>[1.14,)</version>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>xml-apis</groupId>
+		            <artifactId>xml-apis</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 	</dependencies>
 
@@ -416,7 +415,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<minimum.maven.version>3.3.1</minimum.maven.version>
+		<minimum.maven.version>3.8.1</minimum.maven.version>
 		<minimum.java.version>15</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>

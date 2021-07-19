@@ -34,6 +34,7 @@ import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
@@ -42,7 +43,6 @@ import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloFirmwareVisualizer;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -211,14 +211,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 
 		// is hardware checked?
-		if (!hardwareVersionChecked && data.lastIndexOf("D10") >= 0) {
+		if(!hardwareVersionChecked && data.lastIndexOf("D10") >= 0) {
 			String[] pieces = data.split(" ");
 			if (pieces.length > 1) {
 				String last = pieces[pieces.length - 1];
 				last = last.replace("\r\n", "");
 				if (last.startsWith("V")) {
-					String hardwareVersion = last.substring(1);
-
+					String hardwareVersion = last.substring(1).trim();
+					System.out.println("HARDWARE VERSION FOUND '"+hardwareVersion+"' in '"+data+"'.");
 					this.settings.setHardwareVersion(hardwareVersion);
 					hardwareVersionChecked = true;
 					justNow = true;
@@ -814,7 +814,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		decorator = arg0;
 	}
 
-	private MakelangeloFirmwareVisualizer v = new MakelangeloFirmwareVisualizer();
+	@SuppressWarnings("unused")
+	private MakelangeloFirmwareVisualizer visualizer = new MakelangeloFirmwareVisualizer();
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -836,14 +837,14 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			decorator.render(gl2);
 		} else if (turtleToRender != null) {
 			if(turtleRenderer==null) {
-				//turtleRenderer = new DefaultTurtleRenderer(gl2);
+				turtleRenderer = new DefaultTurtleRenderer(gl2);
 				//turtleRenderer = new BarberPoleTurtleRenderer(gl2);
 			}
 			if(turtleRenderer!=null) {
 				turtleToRender.render(turtleRenderer);
 			}
 			
-			v.render(gl2,turtleToRender,settings);
+			//visualizer.render(gl2,turtleToRender,settings);
 		}
 	}
 	

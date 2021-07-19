@@ -65,7 +65,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	// Set of image file extensions.
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
 	static {
-		IMAGE_FILE_EXTENSIONS = new HashSet<>();
+		IMAGE_FILE_EXTENSIONS = new HashSet<String>();
 		IMAGE_FILE_EXTENSIONS.add("jpg");
 		IMAGE_FILE_EXTENSIONS.add("jpeg");
 		IMAGE_FILE_EXTENSIONS.add("png");

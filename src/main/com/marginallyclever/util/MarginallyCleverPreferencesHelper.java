@@ -81,7 +81,7 @@ final class MarginallyCleverPreferencesHelper {
    * @return
    */
   private static Set<String> getMachineNamesThatAreLessThanZero(String[] childrenPreferenceNodeNames) {
-    final Set<String> lessThanZeroNames = new HashSet<>();
+    final Set<String> lessThanZeroNames = new HashSet<String>();
     for (String childNodeName : childrenPreferenceNodeNames) {
       Log.message("child node name: "+ childNodeName);
       Long parsedMachineName = null;

@@ -29,20 +29,19 @@ public class ArtPanel2 {
 	public JPanel buildPanel(JFrame frame) {
 		parentFrame = frame;
 		
-		JPanel rootPanel = new JPanel();
+		final JPanel rootPanel = new JPanel();
 		rootPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		rootPanel.setLayout(new BoxLayout(rootPanel,BoxLayout.LINE_AXIS));
 		
 		SelectPanel firstLayer = new SelectPanel();
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		HashMap<SelectButton,JPanel> mani = new HashMap<SelectButton,JPanel>(); 
+		final HashMap<SelectButton,JPanel> mani = new HashMap<SelectButton,JPanel>(); 
 		
 		for( ImageGenerator generator : imageGenerators ) {
-			SelectButton b = new SelectButton(generator.getName()); 
+			final SelectButton b = new SelectButton(generator.getName()); 
 			mani.put(b,generator.getPanel().getPanel());
 			firstLayer.add(b);
 			b.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					JPanel p = mani.get(b);
 					p.setMaximumSize(new Dimension(100,10000));

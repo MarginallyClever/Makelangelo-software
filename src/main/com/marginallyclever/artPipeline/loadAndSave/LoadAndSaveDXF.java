@@ -332,7 +332,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 		while(g.hasNext()) {
 			DXFGroup group = g.next();
 			int before = group.entities.size();
-			Set<DXFBucketEntity> hs = new LinkedHashSet<>();
+			Set<DXFBucketEntity> hs = new LinkedHashSet<DXFBucketEntity>();
 			hs.addAll(group.entities);
 			group.entities.clear();
 			group.entities.addAll(hs);

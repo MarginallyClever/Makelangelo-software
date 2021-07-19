@@ -134,7 +134,7 @@ public class VoronoiTesselator {
 
   private void sort(double[] xValuesIn, double[] yValuesIn, int count) {
     sites = null;
-    allEdges = new LinkedList<>();
+    allEdges = new LinkedList<VoronoiGraphEdge>();
 
     nsites = count;
     nvertices = 0;
@@ -154,7 +154,7 @@ public class VoronoiTesselator {
   }
 
   private void qsort(VoronoiSite[] sites) {
-    List<VoronoiSite> listSites = new ArrayList<>(sites.length);
+    List<VoronoiSite> listSites = new ArrayList<VoronoiSite>(sites.length);
     Collections.addAll(listSites, sites);
 
     Collections.sort(listSites, new Comparator<VoronoiSite>() {

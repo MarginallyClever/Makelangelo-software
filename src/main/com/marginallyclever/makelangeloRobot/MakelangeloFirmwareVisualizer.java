@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot.settings;
+package com.marginallyclever.makelangeloRobot;
 
 import java.util.ArrayList;
 
@@ -6,8 +6,7 @@ import javax.vecmath.Vector3d;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.MakelangeloFirmwareSimulation;
-import com.marginallyclever.makelangeloRobot.MakelangeloFirmwareSimulationBlock;
+import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class MakelangeloFirmwareVisualizer {
 	public static int limit;
@@ -22,7 +21,7 @@ public class MakelangeloFirmwareVisualizer {
 			p=pp;
 		}
 	};
-	ArrayList<ColorPoint> buffer = new ArrayList<>();
+	ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
 	
 	public MakelangeloFirmwareVisualizer() {}
 	
@@ -50,10 +49,10 @@ public class MakelangeloFirmwareVisualizer {
 		gl2.glPopMatrix();
 	}
 
-	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, MakelangeloRobotSettings settings) {
+	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, final MakelangeloRobotSettings settings) {
 		buffer.clear();
 		
-		final int renderMode=1;
+		final int renderMode=2;
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
 		m.historyAction(turtleToRender, (block)->{
 			switch(renderMode) {
@@ -66,10 +65,10 @@ public class MakelangeloFirmwareVisualizer {
 
 	private void renderAlternatingBlocks(MakelangeloFirmwareSimulationBlock block) {
 		Vector3d c;
-		if(block.id % 2 == 0) {
-			c=new Vector3d(1,0,0);
-		} else {
-			c=new Vector3d(0,0,1);
+		switch(block.id % 3) {
+		case 0: c=new Vector3d(1,0,0); break;
+		case 1: c=new Vector3d(0,1,0); break;
+		default: c=new Vector3d(0,0,1); break;
 		}
 		buffer.add(new ColorPoint(c,block.start));
 		buffer.add(new ColorPoint(c,block.end));
@@ -107,9 +106,9 @@ public class MakelangeloFirmwareVisualizer {
 		if(showNominal) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.nominalSpeed / settings.getPenDownFeedRate();
-			o.scale(f*1);
+			o.scale(f*5);
 			o.add(block.start);
-			Vector3d black = new Vector3d(0,0,0);
+			Vector3d black = new Vector3d(1-f,f,0);
 			buffer.add(new ColorPoint(black,block.start));
 			buffer.add(new ColorPoint(black,o));
 			buffer.add(new ColorPoint(black,block.start));
@@ -118,25 +117,33 @@ public class MakelangeloFirmwareVisualizer {
 		if(showEntry) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.entrySpeed / settings.getPenDownFeedRate();
-			o.scale(f*1);
+			o.scale(f*5);
 			o.add(block.start);
-			Vector3d red = new Vector3d(1,0,0);
+			Vector3d red = new Vector3d(1-f,0,f);
 			buffer.add(new ColorPoint(red,block.start));
 			buffer.add(new ColorPoint(red,o));
 			buffer.add(new ColorPoint(red,block.start));
 		}
+		boolean showExit=false;
+		if(showExit) {
+			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
+			double f = block.exitSpeed / settings.getPenDownFeedRate();
+			o.scale(f*-5);
+			o.add(block.start);
+			Vector3d black = new Vector3d(0,1-f,f);
+			buffer.add(new ColorPoint(black,block.start));
+			buffer.add(new ColorPoint(black,o));
+			buffer.add(new ColorPoint(black,block.start));
+		}
 
-		// nominal section of move is brighter the closer it gets to max feedrate.
-		double c0 = 1;//Math.min(1,block.entrySpeed / settings.getPenDownFeedRate()); 
-		double c1 = 1;//Math.min(1,block.nominalSpeed / settings.getPenDownFeedRate()); 
-		double c2 = 1;//Math.min(1,block.exitSpeed / settings.getPenDownFeedRate()); 
+		double v = 1;
 		Vector3d pLast = block.start;
 		if(a>0) {
 			// accel part of block
 			Vector3d p0 = new Vector3d(block.delta);
 			p0.scale(a/t);
 			p0.add(block.start);
-			Vector3d green = new Vector3d(0,c0,0);
+			Vector3d green = new Vector3d(0,v,0);
 			buffer.add(new ColorPoint(green,block.start));
 			buffer.add(new ColorPoint(green,p0));
 			pLast=p0;
@@ -146,13 +153,13 @@ public class MakelangeloFirmwareVisualizer {
 			Vector3d p1 = new Vector3d(block.delta);
 			p1.scale(d/t);
 			p1.add(block.start);
-			Vector3d blue = new Vector3d(0,0,c1);
+			Vector3d blue = new Vector3d(0,0,v);
 			buffer.add(new ColorPoint(blue,pLast));
 			buffer.add(new ColorPoint(blue,p1));
 			pLast=p1;
 		}
 		// decel part of block
-		Vector3d red = new Vector3d(c2,0,0);
+		Vector3d red = new Vector3d(v,0,0);
 		buffer.add(new ColorPoint(red,pLast));
 		buffer.add(new ColorPoint(red,block.end));
 	}

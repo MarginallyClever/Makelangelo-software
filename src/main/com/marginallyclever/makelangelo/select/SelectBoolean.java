@@ -28,7 +28,6 @@ public class SelectBoolean extends Select {
 		field.setBorder(new EmptyBorder(0,0,0,0));
 		final Select parent = this;
 		field.addItemListener(new ItemListener() {
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				boolean newValue = field.isSelected();
 				boolean oldValue = !newValue;

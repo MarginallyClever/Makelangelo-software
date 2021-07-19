@@ -128,7 +128,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 * @param colorIndex
 	 */
 	protected void floodFillBlob(int colorIndex, float x, float y) {
-		LinkedList<Point> pointsToVisit = new LinkedList<>();
+		LinkedList<Point> pointsToVisit = new LinkedList<Point>();
 		pointsToVisit.add(new Point((int)x, (int)y));
 
 		Point a;

@@ -74,7 +74,7 @@ public final class PreferencesHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	static public void start() {
-		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
+		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<MakelangeloPreferenceKey, Preferences>();
 		Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
 		//FIXME write unit test/tool to view import/export machine configurations.
 		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);

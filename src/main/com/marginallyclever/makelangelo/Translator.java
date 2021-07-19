@@ -68,7 +68,7 @@ public final class Translator {
 	/**
 	 * a list of all languages and their translations strings
 	 */
-	private static final Map<String, TranslatorLanguage> languages = new HashMap<>();
+	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
 
 	/**
 	 *
