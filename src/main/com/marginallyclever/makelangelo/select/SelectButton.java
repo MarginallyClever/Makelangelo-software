@@ -28,6 +28,7 @@ public class SelectButton extends Select {
 		button = new JButton(labelText);
 		final Select parent = this;
 		button.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent e) {
 				notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"click",null,null));
 			}

@@ -26,6 +26,7 @@ public class SelectOneOfMany extends Select {
 
 		final Select parent = this;
 		field.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent e) {
 				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null, field.getSelectedIndex()));
 			}

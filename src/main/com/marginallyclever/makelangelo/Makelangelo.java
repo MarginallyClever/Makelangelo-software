@@ -156,7 +156,7 @@ public final class Makelangelo extends TransferHandler
 		robot = new MakelangeloRobot();
 		robot.addListener(this);
 		robot.getSettings().addListener(this);
-		logPanel.setRobot(robot);
+		logPanel.addListener(robot);
 
 		Log.message("Starting camera...");
 		camera = new Camera();

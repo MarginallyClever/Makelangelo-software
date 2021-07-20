@@ -31,6 +31,7 @@ public class SelectSlider extends Select {
 		field.setMinorTickSpacing(1);
 		final Select parent = this;
 		field.addChangeListener(new ChangeListener() {
+        	@Override
 			public void stateChanged(ChangeEvent e) {
 		        int n = field.getValue();
 

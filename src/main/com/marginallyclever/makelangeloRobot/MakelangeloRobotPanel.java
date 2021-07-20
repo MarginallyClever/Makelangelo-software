@@ -173,6 +173,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 				
         buttonConnect = new SelectButton(Translator.get("ButtonConnect"));
         buttonConnect.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(isConnected) {
 					robot.halt();
@@ -218,16 +219,19 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonPause = new SelectButton(Translator.get("Pause"));
 		buttonHalt = new SelectButton(Translator.get("Halt"));
 		buttonStart.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.startAt(0);
 			}
 		});
 		buttonStartAt.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				startAt();
 			}
 		});
 		buttonPause.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				// toggle pause
 				if (robot.isPaused() == true) {
@@ -241,6 +245,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			}
 		});
 		buttonHalt.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.halt();	
 			}
@@ -266,18 +271,17 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
 		SelectPanel panel = creativeControlPanel.getContentPane();
 
-
 		if (piCameraCaptureAction != null) {
             buttonCapture = new SelectButton(piCameraCaptureAction);
             panel.add(buttonCapture);
         } else {
         	buttonCapture = null;
         }
-		
 
 		buttonNewFile = new SelectButton(Translator.get("MenuNewFile"));
 		panel.add(buttonNewFile);
 		buttonNewFile.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				newFile();
 			}
@@ -286,6 +290,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonOpenFile = new SelectButton(Translator.get("MenuOpenFile"));
 		panel.add(buttonOpenFile);
 		buttonOpenFile.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				makelangeloApp.openFile();
 			}
@@ -294,6 +299,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonReopenFile = new SelectButton(Translator.get("MenuReopenFile"));
 		panel.add(buttonReopenFile);
 		buttonReopenFile.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				makelangeloApp.reopenLastFile();
 			}
@@ -302,6 +308,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonGenerate = new SelectButton(Translator.get("MenuGenerate"));
 		panel.add(buttonGenerate);
 		buttonGenerate.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				generateImage();
 			}
@@ -310,6 +317,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonSaveFile = new SelectButton(Translator.get("MenuSaveGCODEAs"));
 		panel.add(buttonSaveFile);
 		buttonSaveFile.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				makelangeloApp.saveFile();	
 			}
@@ -394,6 +402,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		commonInterior.add(findHome);
 		
 		toggleEngagedMotor.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if(robot.areMotorsEngaged() ) {
 					robot.disengageMotors();
@@ -403,22 +412,26 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			}
 		});
 		penUp.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.raisePen();
 			}
 		});
 		penDown.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.lowerPen();
 			}
 		});
 		
 		goHome.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.goHome();	
 			}
 		});
 		findHome.addPropertyChangeListener(new PropertyChangeListener() {
+        	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				robot.findHome();
 			}
@@ -462,6 +475,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener(new ItemListener() {
+	        	@Override
 				public void itemStateChanged(ItemEvent e) {
 					if(e.getStateChange()==ItemEvent.SELECTED) {
 						updateMachineChoice();
@@ -479,6 +493,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 
 		buttonOpenSettings = new JButton(Translator.get("configureMachine"));
 		buttonOpenSettings.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent e) {
 				Frame frame = (Frame)getRootPane().getParent();
 				MakelangeloSettingsDialog m = new MakelangeloSettingsDialog(frame, robot);
@@ -494,6 +509,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 	}
 	
 	// The user has done something. respond to it.
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 		
@@ -651,6 +667,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		panel.add(cards,BorderLayout.CENTER);
 
 		options.addItemListener(new ItemListener() {
+        	@Override
 			public void itemStateChanged(ItemEvent e) {
 			    CardLayout cl = (CardLayout)(cards.getLayout());
 			    cl.show(cards, (String)e.getItem());

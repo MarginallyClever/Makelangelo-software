@@ -49,6 +49,7 @@ public class SelectColor extends Select {
 		chooseButton = new JButton("...");
 		final Select parent = this;
 		chooseButton.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent e) {
 				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
 				field.setBackground(c);

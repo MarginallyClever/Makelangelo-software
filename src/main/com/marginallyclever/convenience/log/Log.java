@@ -17,6 +17,8 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,22 +166,27 @@ public class Log {
 	public static void write(String msg) {
 		if(logger==null) start();
 		
-		msg = sdf.format(Calendar.getInstance().getTime())+" "+msg;
+		final String cleanMsg = sdf.format(Calendar.getInstance().getTime())+" "+msg;
 		
-		//System.out.println(msg);
+		// TODO why have logger if it's not being used?
 		//logger.info(msg);
 		
 		try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream("log.txt", true), StandardCharsets.UTF_8)) {
 			PrintWriter logToFile = new PrintWriter(fileWriter);
-			logToFile.write(msg+"\n");
+			logToFile.write(cleanMsg+"\n");
 			logToFile.flush();
 		} catch (IOException e) {
 			logger.error("{}", e);
 		}
 		
-		for( LogListener listener : listeners ) {
-			listener.logEvent(msg);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+        		for( LogListener listener : listeners ) {
+        			listener.logEvent(cleanMsg);
+        		}
+        		//System.out.println(msg);
+            }
+         });
 	}
 
 

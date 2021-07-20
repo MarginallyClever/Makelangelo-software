@@ -42,6 +42,7 @@ public class ArtPanel2 {
 			mani.put(b,generator.getPanel().getPanel());
 			firstLayer.add(b);
 			b.addPropertyChangeListener(new PropertyChangeListener() {
+	        	@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					JPanel p = mani.get(b);
 					p.setMaximumSize(new Dimension(100,10000));

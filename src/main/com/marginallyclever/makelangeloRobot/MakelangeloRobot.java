@@ -34,6 +34,7 @@ import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.convenience.log.LogPanelListener;
 import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
@@ -54,11 +55,11 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener {
+public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener, LogPanelListener {
 	// Firmware check
 	private final String versionCheckStart = new String("Firmware v");
 	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 10; // must match the version in the the firmware EEPROM
+	private final long expectedFirmwareVersion = 11; // must match the version in the the firmware EEPROM
 	private boolean hardwareVersionChecked = false;
 
 	private MakelangeloRobotSettings settings = null;
@@ -583,6 +584,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if (p != null)
 			root = p.getRootPane();
 		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	@Override
+	public void commandFromLogPanel(String msg) {
+		sendLineToRobot(msg);
 	}
 
 	/**

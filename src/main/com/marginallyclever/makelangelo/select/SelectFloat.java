@@ -40,16 +40,19 @@ public class SelectFloat extends Select {
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
+        	@Override
 			public void changedUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();
 			}
 
+        	@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();
 			}
 
+        	@Override
 			public void removeUpdate(DocumentEvent arg0) {
 				if(arg0.getLength()==0) return;
 				validate();

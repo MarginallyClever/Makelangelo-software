@@ -79,7 +79,8 @@ public class PiCaptureAction extends AbstractAction {
 		quality = 75;
 		sharpness = 0;
     }
-    
+
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		runCapture();
 	}
@@ -228,6 +229,7 @@ public class PiCaptureAction extends AbstractAction {
 
         buttonCaptureImage = new JButton(Translator.get("CaptureImage"));
 		buttonCaptureImage.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					JFrame mainFrame = makelangeloApp.getMainFrame();
@@ -263,6 +265,7 @@ public class PiCaptureAction extends AbstractAction {
 
 		buttonUseCapture = new JButton(Translator.get("UseCapture"));
 		buttonUseCapture.addActionListener(new ActionListener() {
+        	@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// we like this image, save off the parameters used.
 				awb = awbComboBox.getSelectedIndex();
