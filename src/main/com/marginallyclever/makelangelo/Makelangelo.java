@@ -62,6 +62,7 @@ import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -505,33 +506,38 @@ public final class Makelangelo extends TransferHandler
 	}
 
 	@Override
-	public void portConfirmed(MakelangeloRobot r) {
-		if (previewPanel != null)
-			previewPanel.repaint();
+	public void makelangeloRobotUpdate(MakelangeloRobotEvent e) {
+		if(e.type==MakelangeloRobotEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
+		if(e.type==MakelangeloRobotEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
+		if(e.type==MakelangeloRobotEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
+		if(e.type==MakelangeloRobotEvent.DISCONNECT) whenDisconnected();
 	}
 
-	@Override
-	public void firmwareVersionBad(MakelangeloRobot r, long versionFound) {
-		(new DialogBadFirmwareVersion()).display(mainFrame, Long.toString(versionFound));
+	
+	private void whenIdentityConfirmed(MakelangeloRobot r) {
+		if (previewPanel != null) previewPanel.repaint();
+
+		robot.sendConfig();
+
+		if(robotPanel != null) {
+			String hardwareVersion = robot.getSettings().getHardwareVersion();
+			robotPanel.onConnect();
+			robot.getSettings().setHardwareVersion(hardwareVersion);
+		}
 	}
 
-	@Override
-	public void dataAvailable(MakelangeloRobot r, String data) {
-		if (data.endsWith("\n"))
-			data = data.substring(0, data.length() - 1);
-		Log.message(data); // #ffa500 = orange
+	
+	private void whenBadFirmwareDetected(String versionFound) {
+		(new DialogBadFirmwareVersion()).display(mainFrame, versionFound);
 	}
 
-	@Override
-	public void sendBufferEmpty(MakelangeloRobot r) {
+	
+	private void whenBadHardwareDetected(String versionFound) {
+		JOptionPane.showMessageDialog(mainFrame, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
 	}
 
-	@Override
-	public void lineError(MakelangeloRobot r, int lineNumber) {
-	}
-
-	@Override
-	public void disconnected(MakelangeloRobot r) {
+	
+	private void whenDisconnected() {
 		if (previewPanel != null)
 			previewPanel.repaint();
 		SoundSystem.playDisconnectSound();
@@ -576,9 +582,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
-	/**
-	 * save window position and size
-	 */
+	// save window position and size
 	private void saveWindowRealEstate() {
 		Dimension size = this.mainFrame.getSize();
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
@@ -617,6 +621,7 @@ public final class Makelangelo extends TransferHandler
 		return robot;
 	}
 	
+	
 	// transfer handler
 	@Override
     public boolean canImport(TransferHandler.TransferSupport info) {
@@ -628,6 +633,7 @@ public final class Makelangelo extends TransferHandler
         return true;
     }
 
+	
 	// transfer handler
 	@Override
     public boolean importData(TransferHandler.TransferSupport info) {
@@ -655,7 +661,6 @@ public final class Makelangelo extends TransferHandler
         return openFileOnDemand(filename);
     }
 	
-
 
 	/**
 	 * Open a file with a given LoadAndSaveFileType plugin.  
