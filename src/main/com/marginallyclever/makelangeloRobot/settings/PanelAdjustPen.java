@@ -43,8 +43,8 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	    MakelangeloRobotSettings settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectFloat(Translator.get("penToolDiameter"),settings.getPenDiameter()));
-	    add(maxFeedRate = new SelectFloat(Translator.get("penToolMaxFeedRate"),settings.getPenUpFeedRate()));
-	    add(currentFeedRate = new SelectFloat(Translator.get("Speed"),settings.getPenDownFeedRate()));
+	    add(maxFeedRate = new SelectFloat(Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
+	    add(currentFeedRate = new SelectFloat(Translator.get("Speed"),settings.getDrawFeedRate()));
 	    add(penZRate = new SelectFloat(Translator.get("penToolLiftSpeed"),settings.getZRate()));
 	    add(penUp = new SelectFloat(Translator.get("penToolUp"),settings.getPenUpAngle()));
 	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
@@ -79,8 +79,8 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	public void save() {
 	    MakelangeloRobotSettings settings = robot.getSettings();
 		settings.setDiameter(penDiameter.getValue());
-		settings.setMaxFeedRate(maxFeedRate.getValue());
-		settings.setCurrentFeedRate(currentFeedRate.getValue());
+		settings.setTravelFeedRate(maxFeedRate.getValue());
+		settings.setDrawFeedRate(currentFeedRate.getValue());
 		settings.setZRate(penZRate.getValue());
 		settings.setPenUpAngle(penUp.getValue());
 		settings.setPenDownAngle(penDown.getValue());

@@ -57,19 +57,20 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  */
 public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener, LogPanelListener {
 	// Firmware check
-	private final String versionCheckStart = new String("Firmware v");
-	private boolean firmwareVersionChecked = false;
-	private final long expectedFirmwareVersion = 11; // must match the version in the the firmware EEPROM
-	private boolean hardwareVersionChecked = false;
-
+	private final String VERSION_CHECK_MESSAGE = new String("Firmware v");
+	private final long EXPECTED_FIRMWARE_VERSION = 11; // must match the version in the the firmware EEPROM
+	
 	private MakelangeloRobotSettings settings = null;
 	private MakelangeloRobotPanel myPanel = null;
 
 	private TurtleRenderer turtleRenderer;
 	
-	// Connection state
+	// Talking to the real machine
 	private NetworkConnection connection = null;
-	private boolean portConfirmed;
+	private boolean identityConfirmed = false;
+	private boolean portConfirmed = false;
+	private boolean firmwareVersionChecked = false;
+	private boolean hardwareVersionChecked = false;
 
 	// misc state
 	private boolean areMotorsEngaged;
@@ -79,8 +80,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
 	private boolean didSetHome;
-	private float penX;
-	private float penY;
+	private double penX;
+	private double penY;
 
 	private Turtle turtleToRender;
 	private Turtle TurtleLoaded;
@@ -122,16 +123,12 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return connection;
 	}
 
-	/**
-	 * @param c the connection. Use null to close the connection.
-	 */
+	
+	// @param c the connection.
 	public void openConnection(NetworkConnection c) {
-		assert (c != null);
+		if (c == null) return;
 
-		if (this.connection != null) {
-			closeConnection();
-		}
-
+		Log.message("Opening connection...");
 		portConfirmed = false;
 		didSetHome = false;
 		firmwareVersionChecked = false;
@@ -145,17 +142,20 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 
+	
 	public void closeConnection() {
 		if (this.connection == null)
 			return;
 
 		this.connection.closeConnection();
 		this.connection.removeListener(this);
-		notifyDisconnected();
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
 		this.connection = null;
 		this.portConfirmed = false;
+		this.identityConfirmed=false;
 	}
 
+	
 	@Override
 	public void finalize() {
 		if (this.connection != null) {
@@ -163,162 +163,163 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 
+	
 	@Override
 	public void sendBufferEmpty(NetworkConnection arg0) {
 		sendFileCommand();
-
-		notifyConnectionReady();
 	}
 
+	
 	@Override
 	public void dataAvailable(NetworkConnection arg0, String data) {
-		notifyDataAvailable(data);
-
-		boolean justNow = false;
-
-		// is port confirmed?
-		if (!portConfirmed) {
-			// machine names
-			ServiceLoader<MachineStyle> knownHardware = ServiceLoader.load(MachineStyle.class);
-			Iterator<MachineStyle> i = knownHardware.iterator();
-			while (i.hasNext()) {
-				MachineStyle ms = i.next();
-				String machineTypeName = ms.getHello();
-				if (data.lastIndexOf(machineTypeName) >= 0) {
-					portConfirmed = true;
-					// which machine GUID is this?
-					String afterHello = data.substring(data.lastIndexOf(machineTypeName) + machineTypeName.length());
-					parseRobotUID(afterHello);
-
-					justNow = true;
-					break;
-				}
+		if (data.endsWith("\n")) data = data.substring(0, data.length() - 1);
+		Log.message("Recv: "+data);
+		
+		if(!identityConfirmed) {
+			identityConfirmed = whenTheIntroductionsFinishOK(data);
+			if(identityConfirmed) {
+				Log.message("Identity confirmed.");
+				notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.CONNECTION_READY,this));
 			}
 		}
+	}
 
-		// is firmware checked?
-		if (!firmwareVersionChecked && data.lastIndexOf(versionCheckStart) >= 0) {
-			String afterV = data.substring(versionCheckStart.length()).trim();
-			long versionFound = Long.parseLong(afterV);
 
-			if (versionFound == expectedFirmwareVersion) {
-				firmwareVersionChecked = true;
-				justNow = true;
+	private boolean whenTheIntroductionsFinishOK(String data) {
+		if(!portConfirmed) portConfirmed = doISeeAHello(data);
+		
+		if(!firmwareVersionChecked) {
+			boolean isGood=doIseeMyFavoriteFirmwareVersion(data);
+			if(isGood) {
+				firmwareVersionChecked=true;
 				// request the hardware version of this robot
 				sendLineToRobot("D10\n");
-			} else {
-				notifyFirmwareVersionBad(versionFound);
 			}
 		}
+		
+		if(!hardwareVersionChecked) {
+			String version=doISeeAHardwareVersion(data);
+			if(version!=null) {
+				hardwareVersionChecked=true;
+				settings.setHardwareVersion(version);
+			}
+		}
+		
+		return portConfirmed && firmwareVersionChecked && hardwareVersionChecked;
+	}
 
-		// is hardware checked?
-		if(!hardwareVersionChecked && data.lastIndexOf("D10") >= 0) {
+	private String doISeeAHardwareVersion(String data) {
+		if(data.lastIndexOf("D10") >= 0) {
 			String[] pieces = data.split(" ");
 			if (pieces.length > 1) {
 				String last = pieces[pieces.length - 1];
+				Log.message("Heard "+data);
+				Log.message("Hardware version check "+last);
 				last = last.replace("\r\n", "");
 				if (last.startsWith("V")) {
-					String hardwareVersion = last.substring(1).trim();
-					System.out.println("HARDWARE VERSION FOUND '"+hardwareVersion+"' in '"+data+"'.");
-					this.settings.setHardwareVersion(hardwareVersion);
-					hardwareVersionChecked = true;
-					justNow = true;
+					String versionFound = last.substring(1).trim();
+					Log.message("OK");
+					return versionFound;
+				} else {
+					Log.message("BAD");
+					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, last));
 				}
 			}
 		}
 
-		if (justNow && portConfirmed && firmwareVersionChecked && hardwareVersionChecked) {
-			// send whatever config settings I have for this machine.
-			sendConfig();
-
-			if (myPanel != null) {
-				String hardwareVersion = this.settings.getHardwareVersion();
-				myPanel.onConnect();
-				this.settings.setHardwareVersion(hardwareVersion);
-			}
-
-			// tell everyone I've confirmed connection.
-			notifyPortConfirmed();
-		}
+		return null;
 	}
 
+	private boolean doIseeMyFavoriteFirmwareVersion(String data) {
+		if (data.lastIndexOf(VERSION_CHECK_MESSAGE) >= 0) {
+			Log.message("Heard "+VERSION_CHECK_MESSAGE);
+			String afterV = data.substring(VERSION_CHECK_MESSAGE.length()).trim();
+			Log.message("Software version check "+afterV);
+			
+			long versionFound = 0;
+			try {
+				versionFound = Long.parseLong(afterV);
+			} finally {}
+			
+			if (versionFound == EXPECTED_FIRMWARE_VERSION) {
+				Log.message("OK");
+				return true;
+			} else {
+				Log.message("BAD");
+				notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_FIRMWARE, this, versionFound));
+			}
+		}
+		
+		return false;
+	}
+
+	// introductions
+	private boolean doISeeAHello(String data) {
+		ServiceLoader<MachineStyle> knownHardware = ServiceLoader.load(MachineStyle.class);
+		Iterator<MachineStyle> i = knownHardware.iterator();
+		while (i.hasNext()) {
+			MachineStyle ms = i.next();
+			String myHello = ms.getHello();
+			if (data.lastIndexOf(myHello) >= 0) {
+				Log.message("Heard "+myHello+".  Port confirmed.");
+				portConfirmed = true;
+				// which machine GUID is this?
+				String afterHello = data.substring(data.lastIndexOf(myHello) + myHello.length());
+				settings.saveConfig();
+				long id=findOrCreateA_UID(afterHello);
+				settings.loadConfig(id);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	
 	public boolean isPortConfirmed() {
 		return portConfirmed;
 	}
-
-	public void parseRobotUID(String line) {
-		settings.saveConfig();
-
-		// get the UID reported by the robot
-		String[] lines = line.split("\\r?\\n");
+	
+ 
+	public long findOrCreateA_UID(String line) {
 		long newUID = -1;
+		
+		// try to get the UID in the line
+		String[] lines = line.split("\\r?\\n");
 		if (lines.length > 0) {
 			try {
 				newUID = Long.parseLong(lines[0]);
+				Log.message("UID found: "+newUID);
 			} catch (NumberFormatException e) {
-				Log.error("UID parsing: " + e.getMessage());
+				Log.error("UID parsing failed.");
+				Log.error("line="+line);
+				Log.error(e.getMessage());
 			}
 		}
 
 		// new robots have UID<=0
-		if (newUID <= 0) {
-			newUID = getNewRobotUID();
-		}
-
-		// load machine specific config
-		settings.loadConfig(newUID);
+		if(newUID <= 0) newUID = getNewRobotUID();
+		
+		return newUID;
 	}
 
-	// Notify when unknown robot connected so that Makelangelo GUI can respond.
-	private void notifyPortConfirmed() {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.portConfirmed(this);
-		}
-	}
-
-	// Notify when unknown robot connected so that Makelangelo GUI can respond.
-	private void notifyFirmwareVersionBad(long versionFound) {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.firmwareVersionBad(this, versionFound);
-		}
-	}
-
-	private void notifyDataAvailable(String data) {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.dataAvailable(this, data);
-		}
-	}
-
-	private void notifyConnectionReady() {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.sendBufferEmpty(this);
-		}
-	}
-
-	public void lineError(NetworkConnection arg0, int lineNumber) {
-		drawingProgress = lineNumber;
-
-		notifyLineError(lineNumber);
-	}
-
-	private void notifyLineError(int lineNumber) {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.lineError(this, lineNumber);
-		}
-	}
-
-	public void notifyDisconnected() {
-		for (MakelangeloRobotListener listener : listeners) {
-			listener.disconnected(this);
-		}
-	}
-
+	
 	public void addListener(MakelangeloRobotListener listener) {
 		listeners.add(listener);
 	}
 
 	public void removeListener(MakelangeloRobotListener listener) {
 		listeners.remove(listener);
+	}
+	
+	private void notifyListeners(MakelangeloRobotEvent e) {
+		for (MakelangeloRobotListener listener : listeners) listener.makelangeloRobotUpdate(e);
+	}
+
+	
+	@Override
+	public void lineError(NetworkConnection arg0, int lineNumber) {
+		drawingProgress = lineNumber;
 	}
 
 	/**
@@ -373,27 +374,19 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return "*" + Integer.toString(checksum);
 	}
 
-	/**
-	 * Send the machine configuration to the robot.
-	 */
+	// Send the machine configuration to the robot.
 	public void sendConfig() {
-		if (getConnection() != null && !isPortConfirmed())
-			return;
+		if(!identityConfirmed) return;
 
+		Log.message("Sending config.");
 		String config = settings.getGCodeConfig();
 		String[] lines = config.split("\n");
-
-		try {
-			for (int i = 0; i < lines.length; ++i) {
-				sendLineToRobot(lines[i] + "\n");
-			}
-			setHome();
-			sendLineToRobot("G0"
-					+" F" + StringHelper.formatDouble(settings.getPenUpFeedRate()) 
-					+" A" + StringHelper.formatDouble(settings.getAcceleration())
-					+"\n");
-		} catch (Exception e) {
-		}
+		for( String line : lines ) sendLineToRobot(line + "\n");
+		setHome();
+		sendLineToRobot("G0"
+				+" F" + StringHelper.formatDouble(settings.getTravelFeedRate()) 
+				+" A" + StringHelper.formatDouble(settings.getAcceleration())
+				+"\n");
 	}
 
 	public boolean isRunning() {
@@ -467,7 +460,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(MakelangeloRobotSettings.COMMAND_MOVE + " Z" + StringHelper.formatDouble(testAngle));
+		sendLineToRobot(MakelangeloRobotSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
 	}
 
 	/**
@@ -481,22 +474,17 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			return;
 
 		line = "N" + lineNumber + " " + line;
-		if (!line.endsWith(";"))
-			line += ';';
-		String checksum = generateChecksum(line);
-		line += checksum;
-
-		// send relevant part of line to the robot
+		if(!line.endsWith(";")) line += ';';
+		line += generateChecksum(line);
 		sendLineToRobot(line);
 	}
 
-	/**
-	 * Take the next line from the file and send it to the robot, if permitted.
-	 */
+	
+	// Take the next line from the file and send it to the robot, if permitted.
 	public void sendFileCommand() {
 		int total = drawingCommands.size();
 
-		if (!isRunning() || isPaused() || total == 0 || (getConnection() != null && isPortConfirmed() == false))
+		if(!isRunning() || isPaused() || total == 0 || identityConfirmed==true)
 			return;
 
 		// are there any more commands?
@@ -515,15 +503,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 			// TODO update the simulated position to match the real robot?
 			if (line.contains("G0") || line.contains("G1")) {
-				float px = this.getPenX();
-				float py = this.getPenY();
+				double px = this.getPenX();
+				double py = this.getPenY();
 
 				String[] tokens = line.split(" ");
 				for (String t : tokens) {
-					if (t.startsWith("X"))
-						px = Float.parseFloat(t.substring(1));
-					if (t.startsWith("Y"))
-						py = Float.parseFloat(t.substring(1));
+					if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
+					if (t.startsWith("Y")) py = Float.parseFloat(t.substring(1));
 				}
 				this.setPenX(px);
 				this.setPenY(py);
@@ -648,26 +634,31 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return true;
 	}
 
+	
 	public void setCurrentFeedRate(float feedRate) {
 		// remember it
-		settings.setCurrentFeedRate(feedRate);
+		settings.setDrawFeedRate(feedRate);
 		// get it again in case it was capped.
-		feedRate = settings.getPenDownFeedRate();
+		feedRate = settings.getDrawFeedRate();
 		// tell the robot
 		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
 	}
 
+	
 	public double getCurrentFeedRate() {
-		return settings.getPenDownFeedRate();
+		return penIsUp
+				? settings.getTravelFeedRate()
+				: settings.getDrawFeedRate();
 	}
+	
 
 	public void goHome() {
-		sendLineToRobot("G00 F"+StringHelper.formatDouble(getCurrentFeedRate())+" X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(settings.getHomeY()));
-		setPenX((float) settings.getHomeX());
-		penY = (float) settings.getHomeY();
+		movePenAbsolute(settings.getHomeX(),settings.getHomeY());
+		penX=settings.getHomeX();
+		penY=settings.getHomeY();
 	}
 
+	
 	public void findHome() {
 		this.raisePen();
 		sendLineToRobot("G28");
@@ -675,116 +666,150 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setPenY((float) settings.getHomeY());
 	}
 
+	
 	public void setHome() {
-		sendLineToRobot(settings.getGCodeSetPositionAtHome());
+		sendLineToRobot(settings.getGCodeTeleportToHomePosition());
 		// save home position
-		sendLineToRobot("D6 X" + StringHelper.formatDouble(settings.getHomeX()) + " Y"
-				+ StringHelper.formatDouble(settings.getHomeY()));
+		sendLineToRobot("D6"
+						+" X" + StringHelper.formatDouble(settings.getHomeX())
+						+" Y" + StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 		didSetHome = true;
 	}
 
+	
 	public boolean didSetHome() {
 		return didSetHome;
 	}
 
+	
 	/**
 	 * @param x absolute position in mm
 	 * @param y absolute position in mm
 	 */
-	public void movePenAbsolute(float x, float y) {
-		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
-						+ " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y));
-		setPenX(x);
+	public void movePenAbsolute(double x, double y) {
+		String go = (penJustMoved ? getTravelOrMoveWithFeedrate() : "");
+		penJustMoved=false;
+		
+		sendLineToRobot(getTravelOrMoveWithFeedrate()
+						+ " X" + StringHelper.formatDouble(x)
+						+ " Y" + StringHelper.formatDouble(y));
+		penX = x;
 		penY = y;
+		penJustMoved=false;
 	}
 
+	
 	/**
 	 * @param dx relative position in mm
 	 * @param dy relative position in mm
 	 */
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
-		sendLineToRobot(
-				(penIsUp ? (penJustMoved ? settings.getPenUpFeedrateString() : MakelangeloRobotSettings.COMMAND_TRAVEL)
-						: (penJustMoved ? settings.getPenDownFeedrateString() : MakelangeloRobotSettings.COMMAND_MOVE))
-						+ " X" + StringHelper.formatDouble(dx) + " Y" + StringHelper.formatDouble(dy));
+
+		String go = (penJustMoved ? getTravelOrMoveWithFeedrate() : "");
+		penJustMoved=false;
+		
+		sendLineToRobot(go
+						+ " X" + StringHelper.formatDouble(dx)
+						+ " Y" + StringHelper.formatDouble(dy));
 		sendLineToRobot("G90"); // return to absolute mode
-		setPenX(getPenX() + dx);
+		penX += dx;
 		penY += dy;
 	}
 
+	
+	private String getTravelOrMoveWithFeedrate() {
+		if(penIsUp) return MakelangeloRobotSettings.COMMAND_TRAVEL +" "+ settings.getTravelFeedrateString();
+		else        return MakelangeloRobotSettings.COMMAND_DRAW   +" "+ settings.getDrawFeedrateString();
+	}
+
+	
 	public boolean areMotorsEngaged() {
 		return areMotorsEngaged;
 	}
 
+	
 	public void movePenToEdgeLeft() {
-		movePenAbsolute((float) settings.getPaperLeft(), penY);
+		movePenAbsolute(settings.getPaperLeft(),penY);
 	}
+	
 
 	public void movePenToEdgeRight() {
-		movePenAbsolute((float) settings.getPaperRight(), penY);
+		movePenAbsolute(settings.getPaperRight(),penY);
 	}
 
+	
 	public void movePenToEdgeTop() {
-		movePenAbsolute(getPenX(), (float) settings.getPaperTop());
+		movePenAbsolute(getPenX(),settings.getPaperTop());
 	}
 
+	
 	public void movePenToEdgeBottom() {
-		movePenAbsolute(getPenX(), (float) settings.getPaperBottom());
+		movePenAbsolute(getPenX(),settings.getPaperBottom());
 	}
 
+	
 	public void disengageMotors() {
 		sendLineToRobot("M18");
 		areMotorsEngaged = false;
 	}
+	
 
 	public void engageMotors() {
 		sendLineToRobot("M17");
 		areMotorsEngaged = true;
 	}
 
+	
 	public void jogLeftMotorOut() {
 		sendLineToRobot("D00 L400");
 	}
 
+	
 	public void jogLeftMotorIn() {
 		sendLineToRobot("D00 L-400");
 	}
+	
 
 	public void jogRightMotorOut() {
 		sendLineToRobot("D00 R400");
 	}
+	
 
 	public void jogRightMotorIn() {
 		sendLineToRobot("D00 R-400");
 	}
 
+	
 	public void setLineNumber(int newLineNumber) {
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 
+	
 	public MakelangeloRobotSettings getSettings() {
 		return settings;
 	}
 
+	
 	public MakelangeloRobotPanel createControlPanel(Makelangelo gui) {
 		myPanel = new MakelangeloRobotPanel(gui, this);
 		return myPanel;
 	}
 
+	
 	public MakelangeloRobotPanel getControlPanel() {
 		return myPanel;
 	}
 
+	
 	public void setTurtle(Turtle t) {
 		TurtleLoaded = new Turtle(t);
 		myPipeline.processTurtle(TurtleLoaded, settings);
 	}
 
+	
 	public void saveTurtleToDrawing(Turtle turtle) {
 		int lineCount=0;
 		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
@@ -811,17 +836,21 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		System.out.println(msg);
 		myPanel.statusBar.setProgressEstimate(eta, lineCount);
 	}
+
 	
 	public Turtle getTurtle() {
 		return turtleToRender;
 	}
 
+	
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 	}
 
+	
 	@SuppressWarnings("unused")
 	private MakelangeloFirmwareVisualizer visualizer = new MakelangeloFirmwareVisualizer();
+	
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -854,6 +883,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 	
+	
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
 
@@ -865,6 +895,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
 		gl2.glEnd();
 	}
+	
 	
 	private void paintPaper(GL2 gl2) {
 		ColorRGB c = settings.getPaperColor();
@@ -880,6 +911,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glEnd();
 	}
 	
+	
 	private void paintMargins(GL2 gl2) {
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
@@ -892,26 +924,31 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glPopMatrix();
 	}
 
+	
 	// in mm
-	public float getPenX() {
+	public double getPenX() {
 		return penX;
 	}
+	
 
 	// in mm
-	public void setPenX(float px) {
+	public void setPenX(double px) {
 		this.penX = px;
 	}
 
+	
 	// in mm
-	public float getPenY() {
+	public double getPenY() {
 		return penY;
 	}
 
+	
 	// in mm
-	public void setPenY(float py) {
+	public void setPenY(double py) {
 		this.penY = py;
 	}
 
+	
 	public int findLastPenUpBefore(int startAtLine) {
 		int total = drawingCommands.size();
 		if (total == 0)

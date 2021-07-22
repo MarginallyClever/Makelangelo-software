@@ -595,8 +595,8 @@ public class MakelangeloFirmwareSimulation {
 	public void historyAction(Turtle t,SegmentFunction consumer) {
 		MakelangeloFirmwareSimulationBlock.counter=0;
 		
-		double fu = settings.getPenUpFeedRate();
-		double fd = settings.getPenDownFeedRate();
+		double fu = settings.getTravelFeedRate();
+		double fd = settings.getDrawFeedRate();
 		double fz = settings.getZRate();
 		double a = settings.getAcceleration();
 		double zu = settings.getPenUpAngle();

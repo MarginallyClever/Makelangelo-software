@@ -105,7 +105,7 @@ public class MakelangeloFirmwareVisualizer {
 		boolean showNominal=false;
 		if(showNominal) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
-			double f = block.nominalSpeed / settings.getPenDownFeedRate();
+			double f = block.nominalSpeed / settings.getDrawFeedRate();
 			o.scale(f*5);
 			o.add(block.start);
 			Vector3d black = new Vector3d(1-f,f,0);
@@ -116,7 +116,7 @@ public class MakelangeloFirmwareVisualizer {
 		boolean showEntry=false;
 		if(showEntry) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
-			double f = block.entrySpeed / settings.getPenDownFeedRate();
+			double f = block.entrySpeed / settings.getDrawFeedRate();
 			o.scale(f*5);
 			o.add(block.start);
 			Vector3d red = new Vector3d(1-f,0,f);
@@ -127,7 +127,7 @@ public class MakelangeloFirmwareVisualizer {
 		boolean showExit=false;
 		if(showExit) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
-			double f = block.exitSpeed / settings.getPenDownFeedRate();
+			double f = block.exitSpeed / settings.getDrawFeedRate();
 			o.scale(f*-5);
 			o.add(block.start);
 			Vector3d black = new Vector3d(0,1-f,f);

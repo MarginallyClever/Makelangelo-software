@@ -32,7 +32,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
-	public static final String COMMAND_MOVE = "G0";
+	public static final String COMMAND_DRAW = "G0";
 	public static final String COMMAND_TRAVEL = "G1";
 	public static final double INCH_TO_CM = 2.54;
 	public static final int FIRMWARE_MAX_SEGMENTS = 32;
@@ -77,8 +77,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	protected ColorRGB penUpColor;
 	
 	// speed control
-	private float feedRateMax;
-	private float feedRateDefault;
+	private float travelFeedRate;
+	private float drawFeedRate;
 	private float accelerationMax;
 
 	private float diameter;  // pen diameter (mm, >0)
@@ -206,7 +206,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return getHome().y;
 	}
 	
-	public String getGCodeSetPositionAtHome() {
+	public String getGCodeTeleportToHomePosition() {
 		return "G92 X"+getHomeX()+" Y"+getHomeY();
 	}
 
@@ -493,8 +493,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		setzOn(Float.parseFloat(prefs.get("z_on", Float.toString(getzOn()))));
 		setzOff(Float.parseFloat(prefs.get("z_off", Float.toString(getzOff()))));
 		//tool_number = Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		feedRateMax = Float.parseFloat(prefs.get("feed_rate", Float.toString(feedRateMax)));
-		feedRateDefault=Float.valueOf(prefs.get("feed_rate_current",Float.toString(feedRateDefault)));
+		travelFeedRate = Float.parseFloat(prefs.get("feed_rate", Float.toString(travelFeedRate)));
+		drawFeedRate=Float.valueOf(prefs.get("feed_rate_current",Float.toString(drawFeedRate)));
 		
 		int r,g,b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -514,8 +514,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		prefs.put("z_on", Float.toString(getzOn()));
 		prefs.put("z_off", Float.toString(getzOff()));
 		//prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Float.toString(feedRateMax));
-		prefs.put("feed_rate_current", Float.toString(feedRateDefault));
+		prefs.put("feed_rate", Float.toString(travelFeedRate));
+		prefs.put("feed_rate_current", Float.toString(drawFeedRate));
 		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
 		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
 		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
@@ -575,27 +575,25 @@ public final class MakelangeloRobotSettings implements Serializable {
 		accelerationMax = f;
 	}
 	
-	public void setMaxFeedRate(float f) {
-		feedRateMax = f;
-		if(feedRateDefault > feedRateMax) {
-			feedRateDefault = feedRateMax;
-		}
+	public void setTravelFeedRate(float f) {
+		if(f < 0.001) f = 0.001f;
+		travelFeedRate = f;
+		
+		if(drawFeedRate > travelFeedRate) drawFeedRate = travelFeedRate;
 	}
 	
-	public float getPenUpFeedRate() {
-		return feedRateMax;
+	public float getTravelFeedRate() {
+		return travelFeedRate;
 	}
 	
-	public void setCurrentFeedRate(float f) {
-		if (f < 0.001) f = 0.001f;
-		if( f > feedRateMax) {
-			f = feedRateMax;
-		}
-		feedRateDefault = f;
+	public float getDrawFeedRate() {
+		return drawFeedRate;
 	}
 	
-	public float getPenDownFeedRate() {
-		return feedRateDefault;
+	public void setDrawFeedRate(float f) {
+		if(f < 0.001) f = 0.001f;
+		if(f > travelFeedRate) f = travelFeedRate;
+		drawFeedRate = f;
 	}
 	
 	
@@ -682,8 +680,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		}
 
 		// apply default hardware values
-		feedRateMax = hardwareProperties.getFeedrateMax();
-		feedRateDefault = hardwareProperties.getFeedrateDefault();
+		travelFeedRate = hardwareProperties.getFeedrateMax();
+		drawFeedRate = hardwareProperties.getFeedrateDefault();
 		accelerationMax = hardwareProperties.getAccelerationMax();
 		
 		setzRate(hardwareProperties.getZRate());
@@ -764,19 +762,19 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
-	public String getPenUpFeedrateString() {
-		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getPenUpFeedRate());
+	public String getTravelFeedrateString() {
+		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getTravelFeedRate());
 	}
 	
-	public String getPenDownFeedrateString() {
-		return COMMAND_MOVE+" F" + StringHelper.formatDouble(getPenDownFeedRate());
+	public String getDrawFeedrateString() {
+		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getDrawFeedRate());
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
@@ -815,7 +813,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		out.write("M300 S60 P250\n");  // beep
 		out.write("M226\n");  // pause for user input
 		out.write("M117\n");  // clear message
-		out.write("G00 F" + StringHelper.formatDouble(getPenUpFeedRate()) + 
+		out.write("G00 F" + StringHelper.formatDouble(getTravelFeedRate()) + 
 					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
 	}
 	
@@ -825,11 +823,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	// 7.22.6: feedrate changes here
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
-		String command = isUp?COMMAND_TRAVEL:COMMAND_MOVE;
+		String command = isUp?COMMAND_TRAVEL:COMMAND_DRAW;
 		if(zMoved) {
 			command = isUp 
-					? getPenUpFeedrateString() 
-					: getPenDownFeedrateString();
+					? getTravelFeedrateString() 
+					: getDrawFeedrateString();
 			zMoved=false;
 		}
 		out.write(command
