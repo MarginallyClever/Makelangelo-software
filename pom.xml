@@ -346,7 +346,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.12</version>
+			<version>1.7.32</version>
 		</dependency>
 
 		<dependency>

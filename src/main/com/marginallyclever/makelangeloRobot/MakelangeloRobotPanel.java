@@ -233,11 +233,9 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		buttonPause.addPropertyChangeListener(new PropertyChangeListener() {
         	@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				// toggle pause
 				if (robot.isPaused() == true) {
 					buttonPause.setText(Translator.get("Pause"));
 					robot.unPause();
-					robot.sendFileCommand();
 				} else {
 					buttonPause.setText(Translator.get("Unpause"));
 					robot.pause();
@@ -553,7 +551,7 @@ public class MakelangeloRobotPanel extends JPanel implements ActionListener {
 		int lineNumber = p.lineNumber;
 		if (lineNumber != -1) {
 			if(p.findPreviousPenDown==false) {
-				robot.drawingProgress=lineNumber;
+				robot.nextLineNumber=lineNumber;
 				if(p.addPenDownCommand==true) {
 					robot.sendLineToRobot(robot.getSettings().getPenDownString());
 				}

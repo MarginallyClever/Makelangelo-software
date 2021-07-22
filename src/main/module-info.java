@@ -14,7 +14,7 @@ module com.marginallyclever.makelangelo {
 	requires jrpicam;
 	requires jogamp.fat;
 	requires kabeja;
-	requires slf4j.api;
+	requires org.slf4j;
 	requires jssc;
 	requires vecmath;
 	requires batik.all;

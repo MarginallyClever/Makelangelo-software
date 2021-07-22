@@ -1,11 +1,5 @@
 package com.marginallyclever.makelangeloRobot;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -19,11 +13,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.ArtPipeline;
@@ -41,10 +30,10 @@ import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+
 
 /**
  * MakelangeloRobot is the Controller for a physical robot, following a
@@ -91,7 +80,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	// this list of gcode commands is store separate from the Turtle.
 	private ArrayList<String> drawingCommands;
 	// what line in drawingCommands is going to be sent next?
-	protected int drawingProgress;
+	protected int nextLineNumber;
 
 	// rendering stuff
 	private MakelangeloRobotDecorator decorator = null;
@@ -116,7 +105,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setPenY(0);
 		turtleToRender = new Turtle();
 		drawingCommands = new ArrayList<String>();
-		drawingProgress = 0;
+		setNextLineNumber(0);
 	}
 
 	public NetworkConnection getConnection() {
@@ -319,7 +308,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	
 	@Override
 	public void lineError(NetworkConnection arg0, int lineNumber) {
-		drawingProgress = lineNumber;
+		setNextLineNumber(lineNumber);
 	}
 
 	/**
@@ -398,26 +387,20 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	public void pause() {
-		if (isPaused)
-			return;
-
+		if(isPaused) return;
 		isPaused = true;
-		// remember for later if the pen is down
+		
+		// if we're drawing, raise the pen so it doesn't make an ink blot.
 		penIsUpBeforePause = penIsUp;
-		// raise it if needed.
-		raisePen();
+		if(!penIsUp) raisePen();
 	}
 
 	public void unPause() {
-		if (!isPaused)
-			return;
-
-		// if pen was down before pause, lower it
-		if (!penIsUpBeforePause) {
-			lowerPen();
-		}
-
+		if(!isPaused) return;
 		isPaused = false;
+		
+		if(!penIsUpBeforePause) lowerPen();
+		sendFileCommand();
 	}
 
 	public void halt() {
@@ -437,12 +420,12 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		rememberRaisedPen();
 	}
 	
-	protected void rememberRaisedPen() {
+	private void rememberRaisedPen() {
 		penJustMoved = !penIsUp;
 		penIsUp = true;
 	}
 	
-	protected void rememberLoweredPen() {
+	private void rememberLoweredPen() {
 		penJustMoved = penIsUp;
 		penIsUp = false;
 	}
@@ -462,9 +445,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	 *
 	 * @param line command to send
 	 */
-	public void sendLineWithNumberAndChecksum(String line, int lineNumber) {
-		if (getConnection() == null || !isPortConfirmed() || !isRunning())
-			return;
+	private void sendLineWithNumberAndChecksum(String line, int lineNumber) {
+		if(!identityConfirmed || !isRunning()) return;
 
 		line = "N" + lineNumber + " " + line;
 		if(!line.endsWith(";")) line += ';';
@@ -474,96 +456,74 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	
 	// Take the next line from the file and send it to the robot, if permitted.
-	public void sendFileCommand() {
+	private void sendFileCommand() {
+		if(!isRunning() || isPaused() || !identityConfirmed) return;
+		
 		int total = drawingCommands.size();
-
-		if(!isRunning() || isPaused() || total == 0 || identityConfirmed==true)
-			return;
-
 		// are there any more commands?
-		if (drawingProgress >= total) {
-			// no!
+		if(nextLineNumber >= total) {
 			halt();
-			// bask in the glory
-			if (myPanel != null)
-				myPanel.statusBar.setProgress(total, total);
-
 			SoundSystem.playDrawingFinishedSound();
 		} else {
-			String line = drawingCommands.get(drawingProgress);
-			sendLineWithNumberAndChecksum(line, drawingProgress);
-			drawingProgress++;
+			String line = drawingCommands.get(nextLineNumber);
+			sendLineWithNumberAndChecksum(line, nextLineNumber);
+			setNextLineNumber(nextLineNumber+1);
+		}
+	}
+	
+	
+	private void setNextLineNumber(int count) {
+		nextLineNumber=count;
+		if(myPanel != null) myPanel.statusBar.setProgress(nextLineNumber, drawingCommands.size());
+	}
 
-			// TODO update the simulated position to match the real robot?
-			if (line.contains("G0") || line.contains("G1")) {
-				double px = this.getPenX();
-				double py = this.getPenY();
+	
+	// update the simulated position to match the real robot
+	private void updateStateFromGCode(String line) {
+		if (line.contains("G0") || line.contains("G1")) {
+			double px = this.getPenX();
+			double py = this.getPenY();
 
-				String[] tokens = line.split(" ");
-				for (String t : tokens) {
-					if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
-					if (t.startsWith("Y")) py = Float.parseFloat(t.substring(1));
-				}
-				this.setPenX(px);
-				this.setPenY(py);
+			String[] tokens = line.split(" ");
+			for (String t : tokens) {
+				if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
+				if (t.startsWith("Y")) py = Float.parseFloat(t.substring(1));
 			}
-
-			if (myPanel != null)
-				myPanel.statusBar.setProgress(drawingProgress, total);
-			// loop until we find a line that gets sent to the robot, at which
-			// point we'll
-			// pause for the robot to respond. Also stop at end of file.
+			this.setPenX(px);
+			this.setPenY(py);
+		}
+		
+		if(line.startsWith(settings.getPenUpString())) rememberRaisedPen();
+		if(line.startsWith(settings.getPenDownString())) rememberLoweredPen();
+		if(line.startsWith("M17")) {
+			if( myPanel != null ) myPanel.motorsHaveBeenEngaged();
+		}
+		if(line.startsWith("M18")) {
+			if( myPanel != null ) myPanel.motorsHaveBeenDisengaged();
 		}
 	}
 
+	
 	public void startAt(int lineNumber) {
-		if (drawingCommands.size() == 0)
-			return;
+		if(lineNumber>=drawingCommands.size()) lineNumber = drawingCommands.size();
+		if(lineNumber<0) lineNumber=0;
 
-		drawingProgress = lineNumber;
-		setLineNumber(lineNumber);
+		setNextLineNumber(lineNumber);
+		sendLineNumber(lineNumber);
 		setRunning();
 		sendFileCommand();
 	}
 
+	
 	/**
-	 * display a dialog asking the user to change the pen
-	 * 
+	 * Display a dialog asking the user to change the pen
 	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
-	public void requestUserChangeTool(int toolNumber) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.insets = new Insets(10, 10, 10, 10);
-
-		JLabel fieldValue = new JLabel("");
-		fieldValue.setOpaque(true);
-		fieldValue.setMinimumSize(new Dimension(80, 20));
-		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
-		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
-		fieldValue.setSize(fieldValue.getMinimumSize());
-		fieldValue.setBackground(new Color(toolNumber));
-		fieldValue.setBorder(new LineBorder(Color.BLACK));
-		panel.add(fieldValue, c);
-
-		JLabel message = new JLabel(Translator.get("ChangeToolMessage"));
-		c.gridx = 1;
-		c.gridwidth = 3;
-		panel.add(message, c);
-
+	@SuppressWarnings("unused")
+	private void requestUserChangeTool(int toolNumber) {
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
-		Component root = null;
-		MakelangeloRobotPanel p = this.getControlPanel();
-		if(p != null) root = p.getRootPane();
-		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
+	
 	
 	@Override
 	public void commandFromLogPanel(String msg) {
@@ -578,45 +538,19 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean sendLineToRobot(String line) {
-		if (getConnection() == null || !isPortConfirmed())
-			return false;
+		if(getConnection()==null || !isPortConfirmed()) return false;
 
-		String reportedline = line;
 		// does it have a checksum? hide it from the log
-		if (reportedline.contains(";")) {
-			String[] lines = line.split(";");
-			reportedline = lines[0];
-		}
-		if (reportedline.trim().isEmpty()) {
-			// nothing to send
-			return false;
-		}
+		String reportedLine = line;
+		int n = reportedLine.indexOf(";");
+		if(n>=0) reportedLine = reportedLine.substring(n);
+		if(reportedLine.trim().isEmpty()) return false;
+		Log.message(reportedLine);
 
-		// remember important status changes
-		
-		if (reportedline.startsWith(settings.getPenUpString())) {
-			rememberRaisedPen();
-		}
-		if (reportedline.startsWith(settings.getPenDownString())) {
-			rememberLoweredPen();
-		}
-		if (reportedline.startsWith("M17")) {
-			if( myPanel != null ) {
-				myPanel.motorsHaveBeenEngaged();
-			}
-		}
-		if (reportedline.startsWith("M18")) {
-			if( myPanel != null ) {
-				myPanel.motorsHaveBeenDisengaged();
-			}
-		}
-
-		Log.message(reportedline);
+		updateStateFromGCode(line);
 		
 		// make sure the line has a return on the end
-		if(!line.endsWith("\n")) {
-			line += "\n";
-		}
+		if(!line.endsWith("\n")) line += "\n";
 
 		try {
 			getConnection().sendMessage(line);
@@ -775,7 +709,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	
-	public void setLineNumber(int newLineNumber) {
+	public void sendLineNumber(int newLineNumber) {
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 
@@ -804,15 +738,15 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	
 	public void saveTurtleToDrawing(Turtle turtle) {
 		int lineCount=0;
-		try (final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
+		try(final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this);
 
 			drawingCommands.clear();
+			
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
 			String line;
-
-			while ((line = reader.readLine()) != null) {
+			while((line = reader.readLine()) != null) {
 				drawingCommands.add(line.trim());
 				++lineCount;
 			}
@@ -823,10 +757,8 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
 		double eta= m.getTimeEstimate(turtle);
-		String msg = "Run time estimate=" +Log.secondsToHumanReadable(eta);
-		Log.message(msg);
-		System.out.println(msg);
-		myPanel.statusBar.setProgressEstimate(eta, lineCount);
+		Log.message("Run time estimate=" +Log.secondsToHumanReadable(eta));
+		if(myPanel!=null) myPanel.statusBar.setProgressEstimate(eta, lineCount);
 	}
 
 	

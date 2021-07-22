@@ -532,7 +532,10 @@ public final class Makelangelo extends TransferHandler
 	}
 
 
-	
+	/**
+	 * Display a dialog asking the user to change the pen
+	 * @param toolNumber a 24 bit RGB color of the new pen.
+	 */
 	private void requestUserChangeTool(int toolNumber) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -729,9 +732,7 @@ public final class Makelangelo extends TransferHandler
 		// TODO don't rely on success to be true, load may not have finished yet.
 		if (success == true) {
 			SoundSystem.playConversionFinishedSound();
-			if( robot.getControlPanel() != null ) {
-				robot.getControlPanel().updateButtonAccess();
-			}
+			if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
 		}
 		
 		return success;
@@ -796,15 +797,14 @@ public final class Makelangelo extends TransferHandler
 				if(success) {
 					lastFilterIn = selectedFilter;
 					lastFileIn = selectedFile;
-					if( robot.getControlPanel() != null ) {
-						robot.getControlPanel().updateButtonAccess();
-					}
+					if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
 					break;
 				}
 			}
 		}
 	}
 
+	
 	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
 		if(!a.getDescription().equals(b.getDescription())) return false;
 		String [] aa = a.getExtensions();
@@ -815,6 +815,7 @@ public final class Makelangelo extends TransferHandler
 		}
 		return true;
 	}
+	
 	
 	public void saveFile() {
 		// list all the known savable file types.
@@ -871,9 +872,7 @@ public final class Makelangelo extends TransferHandler
 				if(success==true) {
 					lastFileOut = selectedFile;
 					lastFilterOut = selectedFilter;
-					if( robot.getControlPanel() != null ) {
-						robot.getControlPanel().updateButtonAccess();
-					}
+					if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
 					break;
 				}					
 			}
