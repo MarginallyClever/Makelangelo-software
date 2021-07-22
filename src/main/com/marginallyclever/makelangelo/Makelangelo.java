@@ -8,9 +8,13 @@ package com.marginallyclever.makelangelo;
 // io functions
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -39,6 +43,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -49,6 +54,7 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -511,8 +517,51 @@ public final class Makelangelo extends TransferHandler
 		if(e.type==MakelangeloRobotEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
 		if(e.type==MakelangeloRobotEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
 		if(e.type==MakelangeloRobotEvent.DISCONNECT) whenDisconnected();
+		if(e.type==MakelangeloRobotEvent.START) {
+			if (robotPanel != null) {
+				robotPanel.statusBar.start();
+				robotPanel.updateButtonAccess();
+			}
+		}
+		if(e.type==MakelangeloRobotEvent.STOP) {
+			if(robotPanel != null) robotPanel.updateButtonAccess();
+		}
+		if(e.type==MakelangeloRobotEvent.TOOL_CHANGE) {
+			requestUserChangeTool((int)e.extra);
+		}
 	}
 
+
+	
+	private void requestUserChangeTool(int toolNumber) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+
+		c.anchor = GridBagConstraints.EAST;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.insets = new Insets(10, 10, 10, 10);
+
+		JLabel fieldValue = new JLabel("");
+		fieldValue.setOpaque(true);
+		fieldValue.setMinimumSize(new Dimension(80, 20));
+		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
+		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
+		fieldValue.setSize(fieldValue.getMinimumSize());
+		fieldValue.setBackground(new Color(toolNumber));
+		fieldValue.setBorder(new LineBorder(Color.BLACK));
+		panel.add(fieldValue, c);
+
+		JLabel message = new JLabel(Translator.get("ChangeToolMessage"));
+		c.gridx = 1;
+		c.gridwidth = 3;
+		panel.add(message, c);
+
+		JOptionPane.showMessageDialog(mainFrame, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
+	}
 	
 	private void whenIdentityConfirmed(MakelangeloRobot r) {
 		if (previewPanel != null) previewPanel.repaint();

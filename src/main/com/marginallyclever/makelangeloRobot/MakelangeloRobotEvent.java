@@ -20,4 +20,7 @@ public class MakelangeloRobotEvent {
 	public static final int CONNECTION_READY = 1;
 	public static final int BAD_FIRMWARE = 2;
 	public static final int BAD_HARDWARE = 3;
+	public static final int START = 4;
+	public static final int STOP = 5;
+	public static final int TOOL_CHANGE = 6;
 }

@@ -424,19 +424,12 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		isRunning = false;
 		isPaused = false;
 		raisePen();
-		
-		if (myPanel != null)
-			myPanel.updateButtonAccess();
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.STOP,this));
 	}
 
 	public void setRunning() {
 		isRunning = true;
-		
-		if (myPanel != null)
-			myPanel.statusBar.start();
-		if (myPanel != null)
-			myPanel.updateButtonAccess(); // disables all the manual driving
-											// buttons
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.START,this));
 	}
 
 	public void raisePen() {
@@ -565,10 +558,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		c.gridwidth = 3;
 		panel.add(message, c);
 
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
 		Component root = null;
 		MakelangeloRobotPanel p = this.getControlPanel();
-		if (p != null)
-			root = p.getRootPane();
+		if(p != null) root = p.getRootPane();
 		JOptionPane.showMessageDialog(root, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 	
@@ -691,8 +684,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	public void movePenAbsolute(double x, double y) {
 		String go = (penJustMoved ? getTravelOrMoveWithFeedrate() : "");
 		penJustMoved=false;
-		
-		sendLineToRobot(getTravelOrMoveWithFeedrate()
+		sendLineToRobot(go
 						+ " X" + StringHelper.formatDouble(x)
 						+ " Y" + StringHelper.formatDouble(y));
 		penX = x;
