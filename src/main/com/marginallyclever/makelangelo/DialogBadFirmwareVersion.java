@@ -11,6 +11,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
+import com.marginallyclever.convenience.log.Log;
+
 public class DialogBadFirmwareVersion {
 	/**
 	 * <p>
@@ -27,13 +29,12 @@ public class DialogBadFirmwareVersion {
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString(String version) {
-		String message = Translator.get("firmwareVersionBadMessage");
-		return message.replace("%VERSION%", version);
+		return Translator.get("firmwareVersionBadMessage", new String[]{version});
 	}
 
 	/**
 	 * @param html String of valid HTML.
-	 * @return a
+	 * @return a text component with clickable links.
 	 */
 	public JTextComponent createHyperlinkListenableJEditorPane(String html) {
 		final JEditorPane bottomText = new JEditorPane();
@@ -47,9 +48,8 @@ public class DialogBadFirmwareVersion {
 					if (Desktop.isDesktopSupported()) {
 						try {
 							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
-						} catch (IOException | URISyntaxException exception) {
-							// Auto-generated catch block
-							exception.printStackTrace();
+						} catch (IOException | URISyntaxException e) {
+							e.printStackTrace();
 						}
 					}
 
@@ -61,9 +61,6 @@ public class DialogBadFirmwareVersion {
 	}
 
 
-	/**
-	 * Display the about dialog.
-	 */
 	public void display(Component parent,String version) {
 		final String aboutHtml = getAboutHtmlFromMultilingualString(version);
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
