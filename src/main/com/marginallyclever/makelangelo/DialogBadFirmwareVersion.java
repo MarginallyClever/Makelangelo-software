@@ -11,7 +11,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
-import com.marginallyclever.convenience.log.Log;
 
 public class DialogBadFirmwareVersion {
 	/**
@@ -36,7 +35,7 @@ public class DialogBadFirmwareVersion {
 	 * @param html String of valid HTML.
 	 * @return a text component with clickable links.
 	 */
-	public JTextComponent createHyperlinkListenableJEditorPane(String html) {
+	private JTextComponent createHyperlinkListenableJEditorPane(String html) {
 		final JEditorPane bottomText = new JEditorPane();
 		bottomText.setContentType("text/html");
 		bottomText.setEditable(false);

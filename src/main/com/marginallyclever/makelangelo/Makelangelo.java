@@ -18,8 +18,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -69,10 +67,7 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotListener;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettingsListener;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -89,8 +84,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler
-		implements WindowListener, MakelangeloRobotListener, MakelangeloRobotSettingsListener {
+public final class Makelangelo extends TransferHandler {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -100,33 +94,26 @@ public final class Makelangelo extends TransferHandler
 	public String VERSION;
 	
 	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
-	// only used on first run.
 	private final static int DEFAULT_WINDOW_WIDTH = 1200;
 	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	private MakelangeloAppPreferences appPreferences;
-	
 	private ConnectionManager connectionManager;
-	
 	private Camera camera;
 	private MakelangeloRobot robot;
 
-	protected String lastFileIn = "";
-	protected FileFilter lastFilterIn = null;
-	protected String lastFileOut = "";
-	protected FileFilter lastFilterOut = null;
+	private String lastFileIn = "";
+	private FileFilter lastFilterIn = null;
+	private String lastFileOut = "";
+	private FileFilter lastFilterOut = null;
 	
 	// GUI elements
 	private JFrame mainFrame = null;
-	// only allow one log frame
 	private JFrame logFrame = null;
 	private LogPanel logPanel = null;
-	
-	// OpenGL window
 	private PreviewPanel previewPanel;
-	
-	// Context sensitive menu
 	private MakelangeloRobotPanel robotPanel;
+	
 	
 	public static void main(String[] argv) {
 		Log.start();
@@ -135,14 +122,12 @@ public final class Makelangelo extends TransferHandler
 		
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Makelangelo makelangeloProgram = new Makelangelo();
-				makelangeloProgram.run();
-			}
+		javax.swing.SwingUtilities.invokeLater(()->{
+			Makelangelo makelangeloProgram = new Makelangelo();
+			makelangeloProgram.run();
 		});
 	}
+	
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
@@ -156,14 +141,25 @@ public final class Makelangelo extends TransferHandler
 		Log.message("Starting preferences...");
 		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-		appPreferences = new MakelangeloAppPreferences(this);
+		appPreferences = new MakelangeloAppPreferences();
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
 		robot = new MakelangeloRobot();
-		robot.addListener(this);
-		robot.getSettings().addListener(this);
-		logPanel.addListener(robot);
+		robot.addListener((e)->{
+			if(e.type==MakelangeloRobotEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
+			if(e.type==MakelangeloRobotEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
+			if(e.type==MakelangeloRobotEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
+			if(e.type==MakelangeloRobotEvent.DISCONNECT) whenDisconnected();
+			if(e.type==MakelangeloRobotEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
+		});
+		robot.getSettings().addListener((e)->{
+			if(previewPanel != null) previewPanel.repaint();
+		});
+		
+		logPanel.addListener((command)->{
+			robot.sendLineToRobot(command);
+		});
 
 		Log.message("Starting camera...");
 		camera = new Camera();
@@ -172,18 +168,18 @@ public final class Makelangelo extends TransferHandler
 		connectionManager = new ConnectionManager();
 	}
 	
+	
 	public void run() {
-		createAppWindow();
-		
+		createAppWindow();		
 		checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-		if (preferences.getBoolean("Check for updates", false))
-			checkForUpdate(true);
+		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
 	}
 
+	
 	// check if we need to ask about sharing
-	protected void checkSharingPermission() {
+	private void checkSharingPermission() {
 		Log.message("Checking sharing permissions...");
 		
 		final String SHARING_CHECK_STRING = "Last version sharing checked";
@@ -198,11 +194,12 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
+	
 	/**
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
 	 * @return the refreshed menu bar
 	 */
-	public JMenuBar createMenuBar() {
+	private JMenuBar createMenuBar() {
 		Log.message("Create menu bar");
 
 		JMenuBar menuBar = new JMenuBar();
@@ -215,31 +212,23 @@ public final class Makelangelo extends TransferHandler
 		menuBar.add(menu);
 
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				appPreferences.run();
-			}
+		buttonAdjustPreferences.addActionListener((e)->{
+			appPreferences.run(mainFrame);
+			robotPanel.updateButtonAccess();
 		});
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checkForUpdate(false);
-			}
+		buttonCheckForUpdate.addActionListener((e)->{
+			checkForUpdate(false);
 		});
 		menu.add(buttonCheckForUpdate);
 
 		menu.addSeparator();
 
 		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onClose();
-			}
+		buttonExit.addActionListener((e)->{
+			onClose();
 		});
 		menu.add(buttonExit);
 
@@ -250,67 +239,55 @@ public final class Makelangelo extends TransferHandler
 		
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomOut.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomOut();
-			};
+		buttonZoomOut.addActionListener((e)->{
+			camera.zoomOut();
 		});
 		menu.add(buttonZoomOut);
 
 		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomIn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomIn();
-			};
+		buttonZoomIn.addActionListener((e)->{
+			camera.zoomIn();
 		});
 		menu.add(buttonZoomIn);
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomToFit.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				camera.zoomToFit(
-						robot.getSettings().getPaperWidth(),
-						robot.getSettings().getPaperHeight());
-			};
+		buttonZoomToFit.addActionListener((e)->{
+			camera.zoomToFit(
+					robot.getSettings().getPaperWidth(),
+					robot.getSettings().getPaperHeight());
 		});
 		menu.add(buttonZoomToFit);
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(logFrame == null) {
-					logFrame = new JFrame(Translator.get("Log"));
-					logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					logFrame.setPreferredSize(new Dimension(600,400));
-					logFrame.add(logPanel);
-					logFrame.pack();
-					logFrame.addWindowListener(new WindowListener() {
-						@Override
-						public void windowOpened(WindowEvent e) {}
-						@Override
-						public void windowIconified(WindowEvent e) {}
-						@Override
-						public void windowDeiconified(WindowEvent e) {}
-						@Override
-						public void windowDeactivated(WindowEvent e) {}
-						@Override
-						public void windowClosing(WindowEvent e) {}
-						@Override
-						public void windowClosed(WindowEvent e) {
-							logFrame=null;
-						}
-						@Override
-						public void windowActivated(WindowEvent e) {}
-					});
-				}
-				logFrame.setVisible(true);
+		buttonViewLog.addActionListener((e)->{
+			if(logFrame == null) {
+				logFrame = new JFrame(Translator.get("Log"));
+				logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				logFrame.setPreferredSize(new Dimension(600,400));
+				logFrame.add(logPanel);
+				logFrame.pack();
+				logFrame.addWindowListener(new WindowListener() {
+					@Override
+					public void windowOpened(WindowEvent e) {}
+					@Override
+					public void windowIconified(WindowEvent e) {}
+					@Override
+					public void windowDeiconified(WindowEvent e) {}
+					@Override
+					public void windowDeactivated(WindowEvent e) {}
+					@Override
+					public void windowClosing(WindowEvent e) {}
+					@Override
+					public void windowClosed(WindowEvent e) {
+						logFrame=null;
+					}
+					@Override
+					public void windowActivated(WindowEvent e) {}
+				});
 			}
+			logFrame.setVisible(true);
 		});
 		menu.add(buttonViewLog);
 
@@ -320,25 +297,19 @@ public final class Makelangelo extends TransferHandler
 		menuBar.add(menu);
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
-		buttonForums.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+		buttonForums.addActionListener((e)->{
+			try {
+				java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
 		});
 		menu.add(buttonForums);
 		
 		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				DialogAbout a = new DialogAbout();
-				a.display(mainFrame,VERSION);
-			}
+		buttonAbout.addActionListener((e)->{
+			DialogAbout a = new DialogAbout();
+			a.display(mainFrame,VERSION);
 		});
 		menu.add(buttonAbout);
 		
@@ -349,11 +320,12 @@ public final class Makelangelo extends TransferHandler
 		return menuBar;
 	}
 
+	
 	/**
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
 	 * redirect notice to find the latest release tag.
 	 */
-	public void checkForUpdate(boolean announceIfFailure) {
+	private void checkForUpdate(boolean announceIfFailure) {
 		Log.message("checking for updates...");
 		try {
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
@@ -364,9 +336,7 @@ public final class Makelangelo extends TransferHandler
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
 			String inputLine = in.readLine();
-			if (inputLine == null) {
-				throw new Exception("Could not read from update server.");
-			}
+			if(inputLine == null) throw new Exception("Could not read from update server.");
 
 			// parse the URL in the text-only redirect
 			String matchStart = "<a href=\"";
@@ -403,6 +373,7 @@ public final class Makelangelo extends TransferHandler
 		}
 	}
 
+	
 	/**
 	 * See
 	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
@@ -415,7 +386,7 @@ public final class Makelangelo extends TransferHandler
 	 */
 
 
-	public Container createContentPane() {
+	private Container createContentPane() {
 		Log.message("create content pane...");
 
 		JPanel contentPane = new JPanel(new BorderLayout());
@@ -427,7 +398,7 @@ public final class Makelangelo extends TransferHandler
 		previewPanel.addListener(robot);
 
 		Log.message("  assign panel to robot...");
-		robotPanel = robot.createControlPanel(this);
+		robotPanel = new MakelangeloRobotPanel(this,robot);
 
 		// major layout
 		Log.message("  vertical split...");
@@ -440,10 +411,8 @@ public final class Makelangelo extends TransferHandler
 		return contentPane;
 	}
 
-	/**
-	 *  For thread safety this method should be invoked from the event-dispatching thread.
-	 */
-	public void createAppWindow() {
+	//  For thread safety this method should be invoked from the event-dispatching thread.
+	private void createAppWindow() {
 		Log.message("Creating GUI...");
 
 		// overall look and feel 1
@@ -451,7 +420,25 @@ public final class Makelangelo extends TransferHandler
 
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.addWindowListener(this);
+		mainFrame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				onClose();
+			}
+	
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+			@Override
+			public void windowIconified(WindowEvent e) {}
+			@Override
+			public void windowOpened(WindowEvent e) {}
+			@Override
+			public void windowActivated(WindowEvent e) {}
+			@Override
+			public void windowClosed(WindowEvent e) {}
+		});
 		
 		// overall look and feel 2
         try {
@@ -478,6 +465,7 @@ public final class Makelangelo extends TransferHandler
 		mainFrame.setTransferHandler(this);
 	}
 
+	
 	private void adjustWindowSize() {
 		Log.message("adjust window size...");
 
@@ -511,27 +499,7 @@ public final class Makelangelo extends TransferHandler
 		// mainFrame.setLocation(locationX,locationY);
 	}
 
-	@Override
-	public void makelangeloRobotUpdate(MakelangeloRobotEvent e) {
-		if(e.type==MakelangeloRobotEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
-		if(e.type==MakelangeloRobotEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
-		if(e.type==MakelangeloRobotEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
-		if(e.type==MakelangeloRobotEvent.DISCONNECT) whenDisconnected();
-		if(e.type==MakelangeloRobotEvent.START) {
-			if (robotPanel != null) {
-				robotPanel.statusBar.start();
-				robotPanel.updateButtonAccess();
-			}
-		}
-		if(e.type==MakelangeloRobotEvent.STOP) {
-			if(robotPanel != null) robotPanel.updateButtonAccess();
-		}
-		if(e.type==MakelangeloRobotEvent.TOOL_CHANGE) {
-			requestUserChangeTool((int)e.extra);
-		}
-	}
-
-
+	
 	/**
 	 * Display a dialog asking the user to change the pen
 	 * @param toolNumber a 24 bit RGB color of the new pen.
@@ -566,16 +534,11 @@ public final class Makelangelo extends TransferHandler
 		JOptionPane.showMessageDialog(mainFrame, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 	
+	
 	private void whenIdentityConfirmed(MakelangeloRobot r) {
-		if (previewPanel != null) previewPanel.repaint();
+		if(previewPanel != null) previewPanel.repaint();
 
 		robot.sendConfig();
-
-		if(robotPanel != null) {
-			String hardwareVersion = robot.getSettings().getHardwareVersion();
-			robotPanel.onConnect();
-			robot.getSettings().setHardwareVersion(hardwareVersion);
-		}
 	}
 
 	
@@ -590,24 +553,15 @@ public final class Makelangelo extends TransferHandler
 
 	
 	private void whenDisconnected() {
-		if (previewPanel != null)
-			previewPanel.repaint();
+		if(previewPanel != null) previewPanel.repaint();
 		SoundSystem.playDisconnectSound();
 	}
 
-	public void settingsChangedEvent(MakelangeloRobotSettings settings) {
-		if (previewPanel != null)
-			previewPanel.repaint();
-	}
-
+	
 	public NetworkConnection requestNewConnection() {
 		return connectionManager.requestNewConnection(this.mainFrame);
 	}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		onClose();
-	}
+	
 
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
@@ -647,27 +601,12 @@ public final class Makelangelo extends TransferHandler
 		preferences.putInt("Default window location y", location.y);
 	}
 
-	@Override
-	public void windowDeactivated(WindowEvent e) {}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {}
-
-	@Override
-	public void windowIconified(WindowEvent e) {}
-
-	@Override
-	public void windowOpened(WindowEvent e) {}
-
-	@Override
-	public void windowActivated(WindowEvent e) {}
-
-	@Override
-	public void windowClosed(WindowEvent e) {}
-
+	
+	
 	public JFrame getMainFrame() {
 		return mainFrame;
 	}
+	
 
 	public MakelangeloRobot getRobot() {
 		return robot;
@@ -724,7 +663,7 @@ public final class Makelangelo extends TransferHandler
 	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
 		boolean success = false;
 		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream,robot);
+			success=loader.load(fileInputStream,robot,mainFrame);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -732,7 +671,7 @@ public final class Makelangelo extends TransferHandler
 		// TODO don't rely on success to be true, load may not have finished yet.
 		if (success == true) {
 			SoundSystem.playConversionFinishedSound();
-			if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
+			if( robotPanel != null ) robotPanel.updateButtonAccess();
 		}
 		
 		return success;
@@ -797,7 +736,7 @@ public final class Makelangelo extends TransferHandler
 				if(success) {
 					lastFilterIn = selectedFilter;
 					lastFileIn = selectedFile;
-					if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
+					if( robotPanel != null ) robotPanel.updateButtonAccess();
 					break;
 				}
 			}
@@ -864,7 +803,7 @@ public final class Makelangelo extends TransferHandler
 				// try to save now.
 				boolean success = false;
 				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,robot);
+					success=lft.save(fileOutputStream,robot,mainFrame);
 				} catch(IOException e) {
 					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
 					//e.printStackTrace();
@@ -872,7 +811,7 @@ public final class Makelangelo extends TransferHandler
 				if(success==true) {
 					lastFileOut = selectedFile;
 					lastFilterOut = selectedFilter;
-					if( robot.getControlPanel() != null ) robot.getControlPanel().updateButtonAccess();
+					if( robotPanel != null ) robotPanel.updateButtonAccess();
 					break;
 				}					
 			}

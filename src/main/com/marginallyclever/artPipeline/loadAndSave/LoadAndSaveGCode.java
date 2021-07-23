@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,7 +58,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	}
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
 		Turtle turtle = new Turtle();
 		MakelangeloRobotSettings settings = robot.getSettings();
 		ColorRGB penDownColor = settings.getPenDownColorDefault();
@@ -194,7 +195,7 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
 		Log.message("saving...");
 		Turtle turtle = robot.getTurtle();
 		MakelangeloRobotSettings machine = robot.getSettings();

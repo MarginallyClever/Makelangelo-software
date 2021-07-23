@@ -38,7 +38,6 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -106,6 +105,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		final String filenameExtension = filename.substring(filename.lastIndexOf('.') + 1);
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
+	
 
 	protected boolean chooseImageConversionOptions(Component parent) {
 		conversionPanel = new JPanel(new GridBagLayout());
@@ -250,7 +250,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	 * @return false if loading cancelled or failed.
 	 */
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
 		try {
 			img = new TransformedImage( ImageIO.read(in) );
 		} catch (IOException e1) {
@@ -266,7 +266,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 			default: break;
 		}
 		
-		chooseImageConversionOptions(robot.getControlPanel());
+		chooseImageConversionOptions(parentComponent);
 		
 		return true;
 	}
@@ -304,9 +304,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	
 	protected void stopSwingWorker() {
 		chosenRobot.setDecorator(null);
-		if(chosenConverter!=null) {
-			chosenConverter.stopIterating();
-		}
+		if(chosenConverter!=null) chosenConverter.stopIterating();
 		if(swingWorker!=null) {
 			Log.message("Stopping swingWorker");
 			if(swingWorker.cancel(true)) {
@@ -363,6 +361,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 					Log.message("swingWorker finishing.");
 					chosenConverter.finish();
 					Turtle t=chosenConverter.turtle;
+					// setTurtle will cause a MakelangeloRobotEvent.NEW_GCODE to be fired.
 					chosenRobot.setTurtle(t);
 				} else {
 					Log.message("swingWorder cancelled.");
@@ -378,8 +377,6 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 				workerCount--;
 				Log.message("removed worker.  "+workerCount+"/"+workerList.size()+" workers now.");
 				swingWorker=null;
-				MakelangeloRobotPanel panel = chosenRobot.getControlPanel();
-				if(panel!=null) panel.updateButtonAccess();
 			}
 		};
 
@@ -429,7 +426,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		return false;
 	}
 	
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
 		return false;
 	}
 

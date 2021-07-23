@@ -54,7 +54,7 @@ public class DialogAbout {
 	 * @param html String of valid HTML.
 	 * @return a
 	 */
-	public JTextComponent createHyperlinkListenableJEditorPane(String html) {
+	private JTextComponent createHyperlinkListenableJEditorPane(String html) {
 		final JEditorPane bottomText = new JEditorPane();
 		bottomText.setContentType("text/html");
 		bottomText.setEditable(false);

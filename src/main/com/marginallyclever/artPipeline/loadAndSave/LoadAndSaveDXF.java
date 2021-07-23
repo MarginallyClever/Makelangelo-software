@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -179,13 +180,13 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	
 	/**
 	 * 
-	 * @param in
 	 * @param robot
+	 * @param in
 	 * @return true if load is successful.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
 
 		// Read in the DXF file
@@ -453,7 +454,7 @@ public class LoadAndSaveDXF extends ImageManipulator implements LoadAndSaveFileT
 	 * @param robot the robot from which the data is obtained
 	 * @return true if save succeeded.
 	 */
-	public boolean save(OutputStream outputStream, MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream, MakelangeloRobot robot, Component parentComponent) {
 		Log.message("saving...");
 		Turtle turtle = robot.getTurtle();
 		MakelangeloRobotSettings settings = robot.getSettings();

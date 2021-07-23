@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
+import java.awt.Component;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -48,15 +49,17 @@ public interface LoadAndSaveFileType {
 	 * attempt to load a file into the system from a given stream
 	 * @param inputStream source of image
 	 * @param robot machine hardware settings to use in loading process
+	 * @param parentComponent parent component of dialogs, if any.
 	 * @return true if load successful.
 	 */
-	public boolean load(InputStream inputStream,MakelangeloRobot robot);
+	public boolean load(InputStream inputStream,MakelangeloRobot robot, Component parentComponent);
 	
 	/**
 	 * attempt to save makelangelo instructions to a given stream
 	 * @param outputStream destination
 	 * @param robot machine hardware settings to use in loading process
+	 * @param parentComponent parent component of dialogs, if any.
 	 * @return true if save successful.
 	 */
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot);
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent);
 }

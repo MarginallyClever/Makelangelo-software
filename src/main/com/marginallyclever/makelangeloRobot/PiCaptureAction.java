@@ -67,7 +67,7 @@ public class PiCaptureAction extends AbstractAction {
         setup();
     }
 	
-    protected void setup() throws FailedToRunRaspistillException {
+    private void setup() throws FailedToRunRaspistillException {
 		// Create a piCamera
 		piCamera = new RPiCamera("/home/pi/Pictures");
 

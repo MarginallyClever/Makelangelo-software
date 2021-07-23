@@ -12,19 +12,16 @@ public class StartAtPanel extends SelectPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public int lineNumber;
-	public boolean findPreviousPenDown;
-	public boolean addPenDownCommand;
+	private int lineNumber;
+	private boolean findPreviousPenDown = true;
+	private boolean addPenDownCommand = false;
 
-	protected SelectInteger starting_line = new SelectInteger("StartAtLine",0);
-	protected SelectOneOfMany comboBox;
-	protected String [] optionsList;
+	private SelectInteger starting_line = new SelectInteger("StartAtLine",0);
+	private SelectOneOfMany comboBox;
+	private String [] optionsList;
 	
 	public StartAtPanel() {
 		super();
-		
-		findPreviousPenDown = true;
-		addPenDownCommand = false;
 		
 		this.add(starting_line);
 		
@@ -45,7 +42,10 @@ public class StartAtPanel extends SelectPanel {
 	 * @return true if the dialog succeeded and the user did not cancel the operation.
 	 */
 	public boolean run(Component parent) {
-		int result = JOptionPane.showConfirmDialog(parent, this, Translator.get("StartAt"), JOptionPane.OK_CANCEL_OPTION,
+		int result = JOptionPane.showConfirmDialog(parent,
+				this,
+				Translator.get("StartAt"),
+				JOptionPane.OK_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE);
 		if(result != JOptionPane.OK_OPTION) return false;
 		
@@ -68,5 +68,17 @@ public class StartAtPanel extends SelectPanel {
 		}
 		
 		return true;
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	public boolean isFindPreviousPenDown() {
+		return findPreviousPenDown;
+	}
+
+	public boolean isAddPenDownCommand() {
+		return addPenDownCommand;
 	}
 }

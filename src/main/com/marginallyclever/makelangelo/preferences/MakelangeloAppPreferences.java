@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.preferences;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -22,25 +23,20 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class MakelangeloAppPreferences {
-	transient private Makelangelo app;
-	
+public class MakelangeloAppPreferences {	
 	transient private JPanel panel; 
 	transient private JButton buttonExport;
 	transient private JButton buttonImport;
 	transient private JButton buttonReset;
 	
-	public MakelangeloAppPreferences(Makelangelo arg0) {
+	public MakelangeloAppPreferences() {
 		super();
-		
-		app=arg0;
 	}
 	
-	public void run() {
+	public void run(Component parentComponent) {
 		panel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();  
 		c.gridx=0;
@@ -53,7 +49,7 @@ public class MakelangeloAppPreferences {
 		buttonImport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				importPreferences();
+				importPreferences(parentComponent);
 			}
 		});
 		c.gridx++;
@@ -63,7 +59,7 @@ public class MakelangeloAppPreferences {
 		buttonExport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				exportPreferences();
+				exportPreferences(parentComponent);
 			}
 		});
 		c.gridx++;
@@ -73,7 +69,7 @@ public class MakelangeloAppPreferences {
 		buttonReset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				resetPreferences();
+				resetPreferences(parentComponent);
 			}
 		});
 		c.gridx++;
@@ -91,13 +87,12 @@ public class MakelangeloAppPreferences {
 		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getPanel());
 
 		
-		int result = JOptionPane.showConfirmDialog(app.getMainFrame(), panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			SoundPreferences.save();
 			GFXPreferences.save();
 			LanguagePreferences.save();
 			MetricsPreferences.save();
-			app.getRobot().getControlPanel().updateButtonAccess();
 		} else {
 			SoundPreferences.cancel();
 			GFXPreferences.cancel();
@@ -107,9 +102,9 @@ public class MakelangeloAppPreferences {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void exportPreferences() {
+	private void exportPreferences(Component parentComponent) {
 		final JFileChooser fc = new JFileChooser();
-		int returnVal = fc.showSaveDialog(app.getMainFrame());
+		int returnVal = fc.showSaveDialog(parentComponent);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 			final File file = fc.getSelectedFile();
 			try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
@@ -123,9 +118,9 @@ public class MakelangeloAppPreferences {
 	
 
 	@SuppressWarnings("deprecation")
-	private void importPreferences() {
+	private void importPreferences(Component parentComponent) {
 		final JFileChooser fc = new JFileChooser();
-		int returnVal = fc.showOpenDialog(app.getMainFrame());
+		int returnVal = fc.showOpenDialog(parentComponent);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
 			final File file = fc.getSelectedFile();
 			try (final InputStream fileInputStream = new FileInputStream(file)) {
@@ -141,8 +136,8 @@ public class MakelangeloAppPreferences {
 	
 
 	@SuppressWarnings("deprecation")
-	private void resetPreferences() {
-		int dialogResult = JOptionPane.showConfirmDialog(app.getMainFrame(), Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
+	private void resetPreferences(Component parentComponent) {
+		int dialogResult = JOptionPane.showConfirmDialog(parentComponent, Translator.get("MenuResetMachinePreferencesWarning"), Translator.get("MenuResetMachinePreferencesWarningHeader"), JOptionPane.YES_NO_OPTION);
 		if(dialogResult == JOptionPane.YES_OPTION){
 			try {
 				Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);

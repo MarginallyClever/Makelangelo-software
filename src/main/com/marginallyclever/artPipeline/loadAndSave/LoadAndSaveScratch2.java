@@ -1,5 +1,6 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -87,7 +88,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot) {
+	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
 		Log.message(Translator.get("FileTypeSB2")+"...");
 
 		machine = robot.getSettings();
@@ -744,7 +745,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot) {
+	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
 		return true;
 	}
 

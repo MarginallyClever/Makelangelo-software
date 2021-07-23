@@ -23,12 +23,10 @@ import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.log.LogPanelListener;
 import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
@@ -44,13 +42,12 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener, LogPanelListener {
+public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener {
 	// Firmware check
 	private final String VERSION_CHECK_MESSAGE = new String("Firmware v");
 	private final long EXPECTED_FIRMWARE_VERSION = 11; // must match the version in the the firmware EEPROM
 	
-	private MakelangeloRobotSettings settings = null;
-	private MakelangeloRobotPanel myPanel = null;
+	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
 
 	private TurtleRenderer turtleRenderer;
 	
@@ -72,13 +69,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private double penX;
 	private double penY;
 
-	private Turtle turtleToRender;
+	private Turtle turtleToRender = new Turtle();
 	private Turtle TurtleLoaded;
 	
-	private ArtPipeline myPipeline;
+	private ArtPipeline myPipeline = new ArtPipeline();
 
 	// this list of gcode commands is store separate from the Turtle.
-	private ArrayList<String> drawingCommands;
+	private ArrayList<String> gcodeCommands = new ArrayList<String>();
 	// what line in drawingCommands is going to be sent next?
 	protected int nextLineNumber;
 
@@ -88,10 +85,9 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
 
+	
 	public MakelangeloRobot() {
 		super();
-		settings = new MakelangeloRobotSettings();
-		myPipeline = new ArtPipeline();
 		myPipeline.addListener(this);
 		portConfirmed = false;
 		areMotorsEngaged = true;
@@ -103,11 +99,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		didSetHome = false;
 		setPenX(0);
 		setPenY(0);
-		turtleToRender = new Turtle();
-		drawingCommands = new ArrayList<String>();
 		setNextLineNumber(0);
 	}
 
+	
 	public NetworkConnection getConnection() {
 		return connection;
 	}
@@ -147,9 +142,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	
 	@Override
 	public void finalize() {
-		if (this.connection != null) {
-			this.connection.removeListener(this);
-		}
+		if(connection != null) connection.removeListener(this);
 	}
 
 	
@@ -311,9 +304,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setNextLineNumber(lineNumber);
 	}
 
-	/**
-	 * based on http://www.exampledepot.com/egs/java.net/Post.html
-	 */
+	// based on http://www.exampledepot.com/egs/java.net/Post.html
 	private long getNewRobotUID() {
 		long newUID = 0;
 
@@ -353,6 +344,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return newUID;
 	}
 
+	
 	public String generateChecksum(String line) {
 		byte checksum = 0;
 
@@ -362,6 +354,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 		return "*" + Integer.toString(checksum);
 	}
+	
 
 	// Send the machine configuration to the robot.
 	public void sendConfig() {
@@ -378,14 +371,17 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				+"\n");
 	}
 
+	
 	public boolean isRunning() {
 		return isRunning;
 	}
 
+	
 	public boolean isPaused() {
 		return isPaused;
 	}
 
+	
 	public void pause() {
 		if(isPaused) return;
 		isPaused = true;
@@ -395,6 +391,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if(!penIsUp) raisePen();
 	}
 
+	
 	public void unPause() {
 		if(!isPaused) return;
 		isPaused = false;
@@ -403,45 +400,52 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		sendFileCommand();
 	}
 
+	
 	public void halt() {
 		isRunning = false;
 		isPaused = false;
 		raisePen();
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.STOP,this));
 	}
+	
 
 	public void setRunning() {
 		isRunning = true;
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.START,this));
 	}
 
+	
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
 		rememberRaisedPen();
 	}
+	
 	
 	private void rememberRaisedPen() {
 		penJustMoved = !penIsUp;
 		penIsUp = true;
 	}
 	
+	
 	private void rememberLoweredPen() {
 		penJustMoved = penIsUp;
 		penIsUp = false;
 	}
 
+	
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
 		rememberLoweredPen();
 	}
 
+	
 	public void testPenAngle(double testAngle) {
 		sendLineToRobot(MakelangeloRobotSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
 	}
+	
 
 	/**
-	 * removes comments, processes commands robot doesn't handle, add checksum
-	 * information.
+	 * removes comments, processes commands robot doesn't handle, add checksum information.
 	 *
 	 * @param line command to send
 	 */
@@ -459,13 +463,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private void sendFileCommand() {
 		if(!isRunning() || isPaused() || !identityConfirmed) return;
 		
-		int total = drawingCommands.size();
+		int total = gcodeCommands.size();
 		// are there any more commands?
 		if(nextLineNumber >= total) {
 			halt();
 			SoundSystem.playDrawingFinishedSound();
 		} else {
-			String line = drawingCommands.get(nextLineNumber);
+			String line = gcodeCommands.get(nextLineNumber);
 			sendLineWithNumberAndChecksum(line, nextLineNumber);
 			setNextLineNumber(nextLineNumber+1);
 		}
@@ -474,7 +478,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	
 	private void setNextLineNumber(int count) {
 		nextLineNumber=count;
-		if(myPanel != null) myPanel.statusBar.setProgress(nextLineNumber, drawingCommands.size());
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.PROGRESS_SOFAR, this, nextLineNumber));
 	}
 
 	
@@ -495,17 +499,19 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		
 		if(line.startsWith(settings.getPenUpString())) rememberRaisedPen();
 		if(line.startsWith(settings.getPenDownString())) rememberLoweredPen();
-		if(line.startsWith("M17")) {
-			if( myPanel != null ) myPanel.motorsHaveBeenEngaged();
-		}
-		if(line.startsWith("M18")) {
-			if( myPanel != null ) myPanel.motorsHaveBeenDisengaged();
-		}
+		if(line.startsWith("M17")) rememberMotorsEngaged(true);
+		if(line.startsWith("M18")) rememberMotorsEngaged(false);
 	}
 
 	
+	private void rememberMotorsEngaged(boolean b) {
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.MOTORS_ENGAGED,this,b));
+		areMotorsEngaged=b;
+	}
+
+
 	public void startAt(int lineNumber) {
-		if(lineNumber>=drawingCommands.size()) lineNumber = drawingCommands.size();
+		if(lineNumber>=gcodeCommands.size()) lineNumber = gcodeCommands.size();
 		if(lineNumber<0) lineNumber=0;
 
 		setNextLineNumber(lineNumber);
@@ -524,11 +530,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
 	}
 	
-	
-	@Override
-	public void commandFromLogPanel(String msg) {
-		sendLineToRobot(msg);
-	}
 
 	/**
 	 * Sends a single command the robot. Could be anything.
@@ -545,7 +546,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		int n = reportedLine.indexOf(";");
 		if(n>=0) reportedLine = reportedLine.substring(n);
 		if(reportedLine.trim().isEmpty()) return false;
-		Log.message(reportedLine);
+		Log.message("Send: "+reportedLine);
 
 		updateStateFromGCode(line);
 		
@@ -719,16 +720,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	}
 
 	
-	public MakelangeloRobotPanel createControlPanel(Makelangelo gui) {
-		myPanel = new MakelangeloRobotPanel(gui, this);
-		return myPanel;
+	public int getGCodeCommandsCount() {
+		return gcodeCommands.size();
 	}
-
 	
-	public MakelangeloRobotPanel getControlPanel() {
-		return myPanel;
-	}
-
 	
 	public void setTurtle(Turtle t) {
 		TurtleLoaded = new Turtle(t);
@@ -737,28 +732,23 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	
 	public void saveTurtleToDrawing(Turtle turtle) {
-		int lineCount=0;
 		try(final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
-			exportForDrawing.save(fileOutputStream, this);
+			exportForDrawing.save(fileOutputStream, this, null);
 
-			drawingCommands.clear();
+			gcodeCommands.clear();
 			
 			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
 			String line;
 			while((line = reader.readLine()) != null) {
-				drawingCommands.add(line.trim());
-				++lineCount;
+				gcodeCommands.add(line.trim());
 			}
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
-		double eta= m.getTimeEstimate(turtle);
-		Log.message("Run time estimate=" +Log.secondsToHumanReadable(eta));
-		if(myPanel!=null) myPanel.statusBar.setProgressEstimate(eta, lineCount);
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.NEW_GCODE,this));
 	}
 
 	
@@ -874,7 +864,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 	
 	public int findLastPenUpBefore(int startAtLine) {
-		int total = drawingCommands.size();
+		int total = gcodeCommands.size();
 		if (total == 0)
 			return 0;
 
@@ -886,7 +876,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 		toMatch = toMatch.trim();
 		while (x > 1) {
-			String line = drawingCommands.get(x).trim();
+			String line = gcodeCommands.get(x).trim();
 			if (line.equals(toMatch)) {
 				return x;
 			}
