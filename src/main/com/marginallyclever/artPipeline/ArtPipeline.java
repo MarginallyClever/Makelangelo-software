@@ -2,7 +2,6 @@ package com.marginallyclever.artPipeline;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 import javax.vecmath.Vector2d;
 
 import com.marginallyclever.convenience.Clipper2D;
@@ -22,13 +21,20 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * 
  */
 public class ArtPipeline {
-	protected ArtPipelinePanel myPanel;
-	
 	protected ArrayList<ArtPipelineListener> listeners = new ArrayList<ArtPipelineListener>();
 
 	protected MakelangeloRobotSettings lastSettings = null;
 	protected Turtle lastTurtle = null;
 
+	private boolean shouldResizeFill;
+	private boolean shouldResizeFit;
+	private boolean shouldReorder;
+	private boolean shouldFlipV;
+	private boolean shouldFlipH;
+	private boolean shouldSimplify;
+	private boolean shouldCrop;
+	
+	public ArtPipeline() {}
 	
 	public void addListener(ArtPipelineListener arg0) {
 		listeners.add(arg0);
@@ -38,14 +44,12 @@ public class ArtPipeline {
 		listeners.remove(arg0);
 	}
 	
-	public void notifyListenersTurtleFinished(Turtle t) {
-		for(ArtPipelineListener p : listeners) {
-			p.turtleFinished(t);
-		}
+	private void notifyListeners(ArtPipelineEvent evt) {
+		for(ArtPipelineListener p : listeners) p.pipelineEvent(evt);
 	}
-
+	
 	// assumes extPoint is a point which lies on the infinite extension of targetLine
-	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
+ 	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
 		double newLengthA = lengthSquared(targetLine.a, extPoint);
 		double newLengthB = lengthSquared(targetLine.b, extPoint);
 		double currentLength = targetLine.lengthSquared();
@@ -65,7 +69,7 @@ public class ArtPipeline {
 	 * @param turtle
 	 * @param settings
 	 */
-	public void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
+	private void reorder(Turtle turtle, MakelangeloRobotSettings settings) {
 		if(turtle.history.size()==0) return;
 		
 		System.out.println("reorder() begin");
@@ -286,19 +290,21 @@ public class ArtPipeline {
 		return originalLines;
 	}
 
-	public double lengthSquared(TurtleMove a,TurtleMove b) {
+	@SuppressWarnings("unused")
+	private double lengthSquared(TurtleMove a,TurtleMove b) {
 		double dx = a.x-b.x;
 		double dy = a.y-b.y;
 		return MathHelper.lengthSquared(dx, dy); 
 	}
 
-	public double lengthSquared(Point2D a,Point2D b) {
+	private double lengthSquared(Point2D a,Point2D b) {
 		double dx = a.x-b.x;
 		double dy = a.y-b.y;
 		return dx*dx + dy*dy; 
 	}
 	
-	public boolean thesePointsAreTheSame(Point2D a,Point2D b,double epsilon) {
+	@SuppressWarnings("unused")
+	private boolean thesePointsAreTheSame(Point2D a,Point2D b,double epsilon) {
 		if(a==b) return true;
 		
 		// close enough ?
@@ -310,13 +316,12 @@ public class ArtPipeline {
 	}
 	
 	/**
-	 * Offers to optimize your gcode by chopping out very short line segments.
-	 * It travels the entire path and drops any pen-down segment shorter than 
-	 * minimumStepSize.
+	 * Optimize by chopping out very short line segments.  It travels the entire 
+	 * path and drops any pen-down segment shorter than minimumStepSize.
 	 * @param turtle
 	 * @param settings
 	 */
-	public void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
+	private void simplify(Turtle turtle, MakelangeloRobotSettings settings) {
 		System.out.println("simplify() begin");
 
 		int os = turtle.history.size();
@@ -325,7 +330,8 @@ public class ArtPipeline {
 		int originalCount = originalLines.size();
 		System.out.println("  Converted to "+originalCount+" lines.");
 
-		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,1e-1); 
+		double minimumStepSize = 1e-1;
+		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,minimumStepSize); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
 		System.out.println("  - "+shortCount+" shorts = "+longCount+" lines.");
@@ -338,15 +344,15 @@ public class ArtPipeline {
 		System.out.println("simplify() end (was "+os+" is now "+ns+")");
 	}
 
-	protected void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
+	private void flipV(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(1,-1);
 	}
 
-	protected void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
+	private void flipH(Turtle turtle, MakelangeloRobotSettings settings) {	
 		turtle.scale(-1,1);
 	}
 	
-	protected void fitToPaper(Turtle turtle, MakelangeloRobotSettings settings,boolean keepAspect) {
+	private void fitToPaper(Turtle turtle, MakelangeloRobotSettings settings,boolean keepAspect) {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
 		turtle.getBounds(top, bottom); // image bounds
@@ -485,16 +491,16 @@ public class ArtPipeline {
 		
 		double ang = settings.getRotation();
 		if(ang != 0.0) rotatePicture(newTurtle,settings);
-		if(shouldResizeFill()) fitToPaper(newTurtle,settings,false);
-		if(shouldResizeFit()) fitToPaper(newTurtle,settings,true);
-		if(shouldFlipV()) flipV(newTurtle,settings);
-		if(shouldFlipH()) flipH(newTurtle,settings);
-		if(shouldReorder()) reorder(newTurtle,settings);
-		if(shouldSimplify()) simplify(newTurtle,settings);
-		if(shouldCrop()) cropToPageMargin(newTurtle,settings);
+		if(shouldResizeFill) fitToPaper(newTurtle,settings,false);
+		if(shouldResizeFit) fitToPaper(newTurtle,settings,true);
+		if(shouldFlipV) flipV(newTurtle,settings);
+		if(shouldFlipH) flipH(newTurtle,settings);
+		if(shouldReorder) reorder(newTurtle,settings);
+		if(shouldSimplify) simplify(newTurtle,settings);
+		if(shouldCrop) cropToPageMargin(newTurtle,settings);
 		removeRedundantToolChanges(newTurtle);
 
-		notifyListenersTurtleFinished(newTurtle);
+		notifyListeners(new ArtPipelineEvent(ArtPipelineEvent.FINISHED,this,newTurtle));
 	}
 
 	private void removeRedundantToolChanges(Turtle t) {
@@ -524,45 +530,59 @@ public class ArtPipeline {
 		t.history = toKeep;
 	}
 	
-	private boolean shouldResizeFill() {
-		if(myPanel!=null) return myPanel.shouldResizeFill();
-		int result = JOptionPane.showConfirmDialog(null, "Resize to fill margins?", "Resize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+	public boolean getShouldResizeFill() {
+		return shouldResizeFill;
 	}
 
-	private boolean shouldResizeFit() {
-		if(myPanel!=null) return myPanel.shouldResizeFit();
-		int result = JOptionPane.showConfirmDialog(null, "Resize to fit inside margins?", "Resize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+	public void setShouldResizeFill(boolean shouldResizeFill) {
+		this.shouldResizeFill = shouldResizeFill;
 	}
 
-	private boolean shouldReorder() {
-		if(myPanel!=null) return myPanel.shouldReorder();
-		int result = JOptionPane.showConfirmDialog(null, "Avoid needless travel?", "Optimize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+	public boolean getShouldResizeFit() {
+		return shouldResizeFit;
 	}
-	
-	private boolean shouldFlipV() {
-		if(myPanel!=null) return myPanel.shouldFlipV();
-		int result = JOptionPane.showConfirmDialog(null, "Flip vertical?", "Flip", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+
+	public void setShouldResizeFit(boolean shouldResizeFit) {
+		this.shouldResizeFit = shouldResizeFit;
 	}
-	
-	private boolean shouldFlipH() {
-		if(myPanel!=null) return myPanel.shouldFlipH();
-		int result = JOptionPane.showConfirmDialog(null, "Flip horizonal?", "Flip", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+
+	public boolean getShouldReorder() {
+		return shouldReorder;
 	}
-	
-	private boolean shouldSimplify() {
-		if(myPanel!=null) return myPanel.shouldSimplify();
-		int result = JOptionPane.showConfirmDialog(null, "Simplify?", "Optimize", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+
+	public void setShouldReorder(boolean shouldReorder) {
+		this.shouldReorder = shouldReorder;
 	}
-	
-	private boolean shouldCrop() {
-		if(myPanel!=null) return myPanel.shouldCrop();
-		int result = JOptionPane.showConfirmDialog(null, "Crop to margins?", "Crop", JOptionPane.YES_NO_OPTION);
-		return (result == JOptionPane.YES_OPTION);
+
+	public boolean getShouldFlipV() {
+		return shouldFlipV;
 	}
+
+	public void setShouldFlipV(boolean shouldFlipV) {
+		this.shouldFlipV = shouldFlipV;
+	}
+
+	public boolean getShouldFlipH() {
+		return shouldFlipH;
+	}
+
+	public void setShouldFlipH(boolean shouldFlipH) {
+		this.shouldFlipH = shouldFlipH;
+	}
+
+	public boolean getShouldSimplify() {
+		return shouldSimplify;
+	}
+
+	public void setShouldSimplify(boolean shouldSimplify) {
+		this.shouldSimplify = shouldSimplify;
+	}
+
+	public boolean getShouldCrop() {
+		return shouldCrop;
+	}
+
+	public void setShouldCrop(boolean shouldCrop) {
+		this.shouldCrop = shouldCrop;
+	}	
 }

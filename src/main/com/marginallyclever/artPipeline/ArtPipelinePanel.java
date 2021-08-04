@@ -1,8 +1,6 @@
 package com.marginallyclever.artPipeline;
 
 import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFrame;
@@ -16,11 +14,8 @@ import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
- * 
  * @author Dan Royer
- *
  */
-@SuppressWarnings("deprecation")
 public class ArtPipelinePanel extends CollapsiblePanel { 
 	/**
 	 * 
@@ -36,14 +31,15 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 	protected SelectBoolean simplify;
 	protected SelectBoolean crop;
 	
-
+	@SuppressWarnings("deprecation")
 	transient private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	public ArtPipelinePanel(JFrame parentFrame0) {
+	public ArtPipelinePanel(JFrame parentFrame0,ArtPipeline pipeline) {
 		super(Translator.get("Art Pipeline"));
 
 		parentFrame=parentFrame0;
+		myPipeline = pipeline;
 		
 		// create and arrange the elements of this panel.
 		
@@ -81,62 +77,27 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		panel.add(crop);
 		panel.invalidate();
 		
-		resize.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				setPreferredResizeStyle(resize.getSelectedIndex());
-				myPipeline.reprocessTurtle();
-			}
+		resize.addPropertyChangeListener((evt)-> {
+			setPreferredResizeStyle(resize.getSelectedIndex());
+			myPipeline.reprocessTurtle();
 		});
-		flip.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				setPreferredFlipStyle(flip.getSelectedIndex());
-				myPipeline.reprocessTurtle();
-			}
+		flip.addPropertyChangeListener((evt)-> {
+			setPreferredFlipStyle(flip.getSelectedIndex());
+			myPipeline.reprocessTurtle();
 		});
-		reorder.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.reprocessTurtle();
-			}
+
+		reorder.addPropertyChangeListener((evt)-> {
+			myPipeline.setShouldReorder(reorder.isSelected());
+			myPipeline.reprocessTurtle();
 		});
-		simplify.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.reprocessTurtle();
-			}
+		simplify.addPropertyChangeListener((evt)-> {
+			myPipeline.setShouldSimplify(simplify.isSelected());
+			myPipeline.reprocessTurtle();
 		});
-		crop.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				myPipeline.reprocessTurtle();
-			}
+		crop.addPropertyChangeListener((evt)-> {
+			myPipeline.setShouldCrop(crop.isSelected());
+			myPipeline.reprocessTurtle();
 		});
-	}
-	
-	public boolean shouldResizeFill() {
-		return resize.getSelectedIndex()==2;
-	}
-	public boolean shouldResizeFit() {
-		return resize.getSelectedIndex()==1;
-	}
-	public boolean shouldReorder() {
-		return reorder.isSelected();
-	}
-	public boolean shouldFlipV() {
-		int i = flip.getSelectedIndex();
-		return i==2 || i==3;
-	}
-	public boolean shouldFlipH() {
-		int i = flip.getSelectedIndex();
-		return i==1 || i==3;
-	}
-	public boolean shouldSimplify() {
-		return simplify.isSelected();
-	}
-	public boolean shouldCrop() {
-		return crop.isSelected();
 	}
 	
 	private void setPreferredResizeStyle(int style) {
@@ -156,10 +117,6 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 	}
 	
 	public void setPipeline(ArtPipeline pipeline) {
-		myPipeline = pipeline;
-		if(myPipeline!=null) {
-			myPipeline.myPanel = this;
-		}
 	}
 	
 	/**
@@ -172,7 +129,7 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		JFrame frame = new JFrame("Art Pipeline Panel");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		ArtPipelinePanel p = new ArtPipelinePanel(frame);
+		ArtPipelinePanel p = new ArtPipelinePanel(frame,new ArtPipeline());
 		p.getContentPane().getPanel().setPreferredSize(new Dimension(400,600));
 		frame.add(p);
 		
