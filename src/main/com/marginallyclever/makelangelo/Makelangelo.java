@@ -18,6 +18,13 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -50,7 +57,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
@@ -89,7 +95,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @author Dan Royer
  * @since 0.0.1
  */
-public final class Makelangelo extends TransferHandler {
+public final class Makelangelo {
 	static final long serialVersionUID = 1L;
 
 	/**
@@ -119,6 +125,10 @@ public final class Makelangelo extends TransferHandler {
 	private LogPanel logPanel = null;
 	private PreviewPanel previewPanel;
 	private MakelangeloRobotPanel robotPanel;
+	
+	// for drag + drop operations
+	@SuppressWarnings("unused")
+	private DropTarget dropTarget;
 	
 	
 	public static void main(String[] argv) {
@@ -445,6 +455,7 @@ public final class Makelangelo extends TransferHandler {
 			public void windowClosed(WindowEvent e) {}
 		});
 		
+		
 		// overall look and feel 2
         try {
         	// weird but less ugly.
@@ -466,8 +477,59 @@ public final class Makelangelo extends TransferHandler {
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
 
+		setupDropTarget();
+	}
+
+	private void setupDropTarget() {
 		Log.message("  adding drag & drop support...");
-		mainFrame.setTransferHandler(this);
+		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
+			@Override
+			public void dragEnter(DropTargetDragEvent dtde) {
+			}
+
+			@Override
+			public void dragOver(DropTargetDragEvent dtde) {
+			}
+
+			@Override
+			public void dropActionChanged(DropTargetDragEvent dtde) {
+			}
+
+			@Override
+			public void dragExit(DropTargetEvent dte) {
+			}
+
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+			    try {
+			        Transferable tr = dtde.getTransferable();
+			        DataFlavor[] flavors = tr.getTransferDataFlavors();
+			        for (int i = 0; i < flavors.length; i++) {
+			        	System.out.println("Possible flavor: " + flavors[i].getMimeType());
+			        	if (flavors[i].isFlavorJavaFileListType()) {
+			        		dtde.acceptDrop(DnDConstants.ACTION_COPY);
+			        		Object o = tr.getTransferData(flavors[i]);
+			        		if(o instanceof List<?>) {
+			        			List<?> list = (List<?>)o;
+			        			if( list.size()>0 ) {
+			        				o = list.get(0);
+			        				if( o instanceof File ) {
+			        					openFileOnDemand(((File)o).getAbsolutePath());
+						        		dtde.dropComplete(true);
+			        					return;
+			        				}
+			        			}
+			        		}
+			        	}
+			        }
+			        System.out.println("Drop failed: " + dtde);
+			        dtde.rejectDrop();
+			    } catch (Exception e) {
+			        e.printStackTrace();
+			        dtde.rejectDrop();
+			    }
+			}
+		});
 	}
 
 	private void adjustWindowSize() {
@@ -605,44 +667,6 @@ public final class Makelangelo extends TransferHandler {
 	public MakelangeloRobot getRobot() {
 		return robot;
 	}
-	
-	// transfer handler
-	@Override
-    public boolean canImport(TransferHandler.TransferSupport info) {
-        // we only import FileList
-        if (!info.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            Log.message("Does not support files of type(s): "+info.getDataFlavors());
-            return false;
-        }
-        return true;
-    }
-
-	// transfer handler
-	@Override
-    public boolean importData(TransferHandler.TransferSupport info) {
-    	// only accept drops
-        if (!info.isDrop()) return false;
-        
-        // recommended to explicitly call canImport from importData (see java documentation)
-        if(!canImport(info)) return false;
-        
-        // Get the fileList that is being dropped.
-        List<?> data = null;
-        try {
-        	data = (List<?>)info.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-        } 
-        catch (Exception e) {
-        	return false;
-        }
-
-        if(data==null) return false;
-        // accept only one file at a time.
-        if(data.size()!=1) return false;
-        
-        String filename = ((File)data.get(0)).getAbsolutePath();
-
-        return openFileOnDemand(filename);
-    }
 	
 	/**
 	 * Open a file with a given LoadAndSaveFileType plugin.  
@@ -824,4 +848,6 @@ public final class Makelangelo extends TransferHandler {
 	public ArtPipeline getPipeline() {
 		return myPipeline;
 	}
+
+
 }
