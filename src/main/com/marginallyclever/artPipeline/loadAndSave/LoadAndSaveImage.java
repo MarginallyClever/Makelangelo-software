@@ -163,6 +163,7 @@ public class LoadAndSaveImage implements LoadAndSaveFileType {
 		chosenConverter.setProgressMonitor(pm);
 		chosenConverter.setRobot(myRobot);
 		chosenConverter.setImage(img);
+		
 		myRobot.setDecorator(chosenConverter);
 		
 		imageConverterThread = getNewWorker(chosenConverter,workerCount);
