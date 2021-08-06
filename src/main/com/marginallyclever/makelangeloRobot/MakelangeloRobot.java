@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.artPipeline.ArtPipeline;
-import com.marginallyclever.artPipeline.ArtPipelineListener;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
@@ -42,10 +40,10 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineListener, PreviewListener {
+public class MakelangeloRobot implements NetworkConnectionListener, PreviewListener {
 	// Firmware check
 	private final String VERSION_CHECK_MESSAGE = new String("Firmware v");
-	private final long EXPECTED_FIRMWARE_VERSION = 11; // must match the version in the the firmware EEPROM
+	private final long EXPECTED_FIRMWARE_VERSION = 10; // must match the version in the the firmware EEPROM
 	
 	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
 
@@ -70,9 +68,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private double penY;
 
 	private Turtle turtleToRender = new Turtle();
-	private Turtle TurtleLoaded;
 	
-	private ArtPipeline myPipeline = new ArtPipeline();
 
 	// this list of gcode commands is store separate from the Turtle.
 	private ArrayList<String> gcodeCommands = new ArrayList<String>();
@@ -88,7 +84,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	
 	public MakelangeloRobot() {
 		super();
-		myPipeline.addListener(this);
+		
 		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
@@ -101,13 +97,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setPenY(0);
 		setNextLineNumber(0);
 	}
-
 	
 	public NetworkConnection getConnection() {
 		return connection;
 	}
 
-	
 	// @param c the connection.
 	public void openConnection(NetworkConnection c) {
 		if (c == null) return;
@@ -126,7 +120,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 
-	
 	public void closeConnection() {
 		if (this.connection == null)
 			return;
@@ -138,20 +131,17 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		this.portConfirmed = false;
 		this.identityConfirmed=false;
 	}
-
 	
 	@Override
 	public void finalize() {
 		if(connection != null) connection.removeListener(this);
 	}
 
-	
 	@Override
 	public void sendBufferEmpty(NetworkConnection arg0) {
 		sendFileCommand();
 	}
 
-	
 	@Override
 	public void dataAvailable(NetworkConnection arg0, String data) {
 		if (data.endsWith("\n")) data = data.substring(0, data.length() - 1);
@@ -165,7 +155,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 			}
 		}
 	}
-
 
 	private boolean whenTheIntroductionsFinishOK(String data) {
 		if(!portConfirmed) portConfirmed = doISeeAHello(data);
@@ -257,12 +246,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return false;
 	}
 
-	
 	public boolean isPortConfirmed() {
 		return portConfirmed;
 	}
 	
- 
 	public long findOrCreateA_UID(String line) {
 		long newUID = -1;
 		
@@ -274,7 +261,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				Log.message("UID found: "+newUID);
 			} catch (NumberFormatException e) {
 				Log.error("UID parsing failed.");
-				Log.error("line="+line);
+				Log.error("line="+lines[0]);
 				Log.error(e.getMessage());
 			}
 		}
@@ -285,7 +272,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return newUID;
 	}
 
-	
 	public void addListener(MakelangeloRobotListener listener) {
 		listeners.add(listener);
 	}
@@ -298,7 +284,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		for (MakelangeloRobotListener listener : listeners) listener.makelangeloRobotUpdate(e);
 	}
 
-	
 	@Override
 	public void lineError(NetworkConnection arg0, int lineNumber) {
 		setNextLineNumber(lineNumber);
@@ -344,7 +329,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return newUID;
 	}
 
-	
 	public String generateChecksum(String line) {
 		byte checksum = 0;
 
@@ -354,7 +338,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 
 		return "*" + Integer.toString(checksum);
 	}
-	
 
 	// Send the machine configuration to the robot.
 	public void sendConfig() {
@@ -371,16 +354,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 				+"\n");
 	}
 
-	
 	public boolean isRunning() {
 		return isRunning;
 	}
 
-	
 	public boolean isPaused() {
 		return isPaused;
 	}
-
 	
 	public void pause() {
 		if(isPaused) return;
@@ -390,7 +370,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		penIsUpBeforePause = penIsUp;
 		if(!penIsUp) raisePen();
 	}
-
 	
 	public void unPause() {
 		if(!isPaused) return;
@@ -399,7 +378,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if(!penIsUpBeforePause) lowerPen();
 		sendFileCommand();
 	}
-
 	
 	public void halt() {
 		isRunning = false;
@@ -407,42 +385,35 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		raisePen();
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.STOP,this));
 	}
-	
 
 	public void setRunning() {
 		isRunning = true;
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.START,this));
 	}
-
 	
 	public void raisePen() {
 		sendLineToRobot(settings.getPenUpString());
 		rememberRaisedPen();
 	}
 	
-	
 	private void rememberRaisedPen() {
 		penJustMoved = !penIsUp;
 		penIsUp = true;
 	}
 	
-	
 	private void rememberLoweredPen() {
 		penJustMoved = penIsUp;
 		penIsUp = false;
 	}
-
 	
 	public void lowerPen() {
 		sendLineToRobot(settings.getPenDownString());
 		rememberLoweredPen();
 	}
-
 	
 	public void testPenAngle(double testAngle) {
 		sendLineToRobot(MakelangeloRobotSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
 	}
-	
 
 	/**
 	 * removes comments, processes commands robot doesn't handle, add checksum information.
@@ -457,7 +428,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		line += generateChecksum(line);
 		sendLineToRobot(line);
 	}
-
 	
 	// Take the next line from the file and send it to the robot, if permitted.
 	private void sendFileCommand() {
@@ -475,12 +445,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 	
-	
 	private void setNextLineNumber(int count) {
 		nextLineNumber=count;
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.PROGRESS_SOFAR, this, nextLineNumber));
 	}
-
 	
 	// update the simulated position to match the real robot
 	private void updateStateFromGCode(String line) {
@@ -502,13 +470,11 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if(line.startsWith("M17")) rememberMotorsEngaged(true);
 		if(line.startsWith("M18")) rememberMotorsEngaged(false);
 	}
-
 	
 	private void rememberMotorsEngaged(boolean b) {
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.MOTORS_ENGAGED,this,b));
 		areMotorsEngaged=b;
 	}
-
 
 	public void startAt(int lineNumber) {
 		if(lineNumber>=gcodeCommands.size()) lineNumber = gcodeCommands.size();
@@ -519,7 +485,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setRunning();
 		sendFileCommand();
 	}
-
 	
 	/**
 	 * Display a dialog asking the user to change the pen
@@ -529,7 +494,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 	private void requestUserChangeTool(int toolNumber) {
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
 	}
-	
 
 	/**
 	 * Sends a single command the robot. Could be anything.
@@ -548,7 +512,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		if(reportedLine.trim().isEmpty()) return false;
 		Log.message("Send: "+reportedLine);
 
-		updateStateFromGCode(line);
+		updateStateFromGCode(reportedLine);
 		
 		// make sure the line has a return on the end
 		if(!line.endsWith("\n")) line += "\n";
@@ -561,7 +525,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 		return true;
 	}
-
 	
 	public void setCurrentFeedRate(float feedRate) {
 		// remember it
@@ -571,21 +534,18 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		// tell the robot
 		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
 	}
-
 	
 	public double getCurrentFeedRate() {
 		return penIsUp
 				? settings.getTravelFeedRate()
 				: settings.getDrawFeedRate();
 	}
-	
 
 	public void goHome() {
 		movePenAbsolute(settings.getHomeX(),settings.getHomeY());
 		penX=settings.getHomeX();
 		penY=settings.getHomeY();
 	}
-
 	
 	public void findHome() {
 		this.raisePen();
@@ -593,7 +553,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 	}
-
 	
 	public void setHome() {
 		sendLineToRobot(settings.getGCodeTeleportToHomePosition());
@@ -605,12 +564,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		setPenY((float) settings.getHomeY());
 		didSetHome = true;
 	}
-
 	
 	public boolean didSetHome() {
 		return didSetHome;
 	}
-
 	
 	/**
 	 * @param x absolute position in mm
@@ -626,7 +583,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		penY = y;
 		penJustMoved=false;
 	}
-
 	
 	/**
 	 * @param dx relative position in mm
@@ -645,93 +601,73 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		penX += dx;
 		penY += dy;
 	}
-
 	
 	private String getTravelOrMoveWithFeedrate() {
 		if(penIsUp) return MakelangeloRobotSettings.COMMAND_TRAVEL +" "+ settings.getTravelFeedrateString();
 		else        return MakelangeloRobotSettings.COMMAND_DRAW   +" "+ settings.getDrawFeedrateString();
 	}
-
 	
 	public boolean areMotorsEngaged() {
 		return areMotorsEngaged;
 	}
-
 	
 	public void movePenToEdgeLeft() {
 		movePenAbsolute(settings.getPaperLeft(),penY);
 	}
-	
 
 	public void movePenToEdgeRight() {
 		movePenAbsolute(settings.getPaperRight(),penY);
 	}
-
 	
 	public void movePenToEdgeTop() {
 		movePenAbsolute(getPenX(),settings.getPaperTop());
 	}
-
 	
 	public void movePenToEdgeBottom() {
 		movePenAbsolute(getPenX(),settings.getPaperBottom());
 	}
-
 	
 	public void disengageMotors() {
 		sendLineToRobot("M18");
 		areMotorsEngaged = false;
 	}
-	
 
 	public void engageMotors() {
 		sendLineToRobot("M17");
 		areMotorsEngaged = true;
 	}
-
 	
 	public void jogLeftMotorOut() {
 		sendLineToRobot("D00 L400");
 	}
 
-	
 	public void jogLeftMotorIn() {
 		sendLineToRobot("D00 L-400");
 	}
-	
 
 	public void jogRightMotorOut() {
 		sendLineToRobot("D00 R400");
 	}
-	
 
 	public void jogRightMotorIn() {
 		sendLineToRobot("D00 R-400");
 	}
 
-	
 	public void sendLineNumber(int newLineNumber) {
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
-
 	
 	public MakelangeloRobotSettings getSettings() {
 		return settings;
 	}
 
-	
 	public int getGCodeCommandsCount() {
 		return gcodeCommands.size();
 	}
 	
-	
-	public void setTurtle(Turtle t) {
-		TurtleLoaded = new Turtle(t);
-		myPipeline.processTurtle(TurtleLoaded, settings);
-	}
-
-	
-	public void saveTurtleToDrawing(Turtle turtle) {
+	public void setTurtle(Turtle turtle) {
+		turtleToRender = turtle;
+		
 		try(final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
 			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
 			exportForDrawing.save(fileOutputStream, this, null);
@@ -751,20 +687,16 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.NEW_GCODE,this));
 	}
 
-	
 	public Turtle getTurtle() {
 		return turtleToRender;
 	}
 
-	
 	public void setDecorator(MakelangeloRobotDecorator arg0) {
 		decorator = arg0;
 	}
 
-	
 	@SuppressWarnings("unused")
 	private MakelangeloFirmwareVisualizer visualizer = new MakelangeloFirmwareVisualizer();
-	
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -797,7 +729,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		}
 	}
 	
-	
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
 
@@ -809,8 +740,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
 		gl2.glEnd();
 	}
-	
-	
+
 	private void paintPaper(GL2 gl2) {
 		ColorRGB c = settings.getPaperColor();
 		gl2.glColor3d(
@@ -825,7 +755,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glEnd();
 	}
 	
-	
 	private void paintMargins(GL2 gl2) {
 		gl2.glPushMatrix();
 		gl2.glColor3f(0.9f, 0.9f, 0.9f);
@@ -838,31 +767,26 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		gl2.glPopMatrix();
 	}
 
-	
 	// in mm
 	public double getPenX() {
 		return penX;
 	}
 	
-
 	// in mm
 	public void setPenX(double px) {
 		this.penX = px;
 	}
 
-	
 	// in mm
 	public double getPenY() {
 		return penY;
 	}
 
-	
 	// in mm
 	public void setPenY(double py) {
 		this.penY = py;
 	}
 
-	
 	public int findLastPenUpBefore(int startAtLine) {
 		int total = gcodeCommands.size();
 		if (total == 0)
@@ -886,17 +810,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, ArtPipelineL
 		return x;
 	}
 
-	public ArtPipeline getPipeline() {
-		return myPipeline;
-	}
-
 	public boolean isPenIsUp() {
 		return penIsUp;
-	}
-
-	@Override
-	public void turtleFinished(Turtle t) {
-		turtleToRender = t;
-		saveTurtleToDrawing(t);		
 	}
 }

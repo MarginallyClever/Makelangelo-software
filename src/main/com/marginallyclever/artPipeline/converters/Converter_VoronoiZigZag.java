@@ -64,10 +64,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yBottom = machine.getMarginBottom();
-		yTop    = machine.getMarginTop();
-		xLeft   = machine.getMarginLeft();
-		xRight  = machine.getMarginRight();
+		yBottom = settings.getMarginBottom();
+		yTop    = settings.getMarginTop();
+		xLeft   = settings.getMarginLeft();
+		xRight  = settings.getMarginRight();
 		
 		keepIterating=true;
 		restart();
@@ -186,7 +186,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
-			pm.setProgress((int) progress);
+			setProgress((int) progress);
 		}
 	}
 
@@ -204,12 +204,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		int start, end, j, best_end;
 		double a, b, c, d, temp_diff, best_diff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < solutionContains * 2 - 2 && !isThreadCancelled(); ++start) {
 			a = calculateWeight(solution[ti(start)], solution[ti(start + 1)]);
 			best_end = -1;
 			best_diff = 0;
 
-			for (end = start + 2; end < start + solutionContains && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end < start + solutionContains && !isThreadCancelled(); ++end) {
 				// before
 				b = calculateWeight(solution[ti(end)], solution[ti(end - 1)]);
 				// after
@@ -223,7 +223,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 				}
 			}
 
-			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !isThreadCancelled()) {
 				once = true;
 				// do the flip
 				int begin = start + 1;

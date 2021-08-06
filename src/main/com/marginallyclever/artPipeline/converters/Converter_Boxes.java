@@ -50,14 +50,14 @@ public class Converter_Boxes extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop();
+		double xLeft   = settings.getMarginLeft();
+		double xRight  = settings.getMarginRight();
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double d = machine.getPenDiameter()*boxMaxSize;
+		double d = settings.getPenDiameter()*boxMaxSize;
 		double fullStep = d;
 		double halfStep = fullStep / 2.0f;
 		

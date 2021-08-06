@@ -58,11 +58,11 @@ public class Converter_MagicCircle extends ImageConverter {
 		double [] px = new double[numberOfPoints];
 		double [] py = new double[numberOfPoints];
 		
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = settings.getPenDiameter();
 
 		// find the largest circle that still fits in the image.
-		double w = machine.getMarginWidth()/2.0f;
-		double h = machine.getMarginHeight()/2.0f;
+		double w = settings.getMarginWidth()/2.0f;
+		double h = settings.getMarginHeight()/2.0f;
 		double maxr = ( h < w ? h : w );
 
 		

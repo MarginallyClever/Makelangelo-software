@@ -58,17 +58,20 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 	}
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
+	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
 		Turtle turtle = new Turtle();
 		MakelangeloRobotSettings settings = robot.getSettings();
 		ColorRGB penDownColor = settings.getPenDownColorDefault();
 		double scaleXY=1;
 		boolean isAbsolute=true;
 		
+		int lineNumber=0;
 		Scanner scanner = new Scanner(in);	
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			try {
+		String line="";
+		try {
+			while (scanner.hasNextLine()) {
+				line = scanner.nextLine();
+				lineNumber++;
 				// lose anything after a ; because it's a comment 
 				String[] pieces = line.split(";");
 				if (pieces.length == 0) continue;
@@ -183,15 +186,16 @@ public class LoadAndSaveGCode implements LoadAndSaveFileType {
 						// do nothing.
 					}
 				}
-			} catch(Exception e) {
-				Log.error("At line "+line);
-				e.printStackTrace();
 			}
 		}
-		scanner.close();
+		catch(Exception e) {
+			throw new Exception("GCODE parse failure ("+lineNumber+"): "+line);
+		}
+		finally {
+			scanner.close();
+		}
 
-		robot.setTurtle(turtle);
-		return true;
+		return turtle;
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public class Generator_KochCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
+		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 		xMax = v;
 		yMax = v;
 		xMin = -v;
@@ -49,7 +49,7 @@ public class Generator_KochCurve extends ImageGenerator {
 		maxSize = xx > yy ? xx : yy;
 		
 		// move to starting position
-		if(machine.getPaperWidth() > machine.getPaperHeight()) {
+		if(settings.getPaperWidth() > settings.getPaperHeight()) {
 			turtle.moveTo(-xMax,0);
 		} else {
 			turtle.moveTo(0,-yMax);

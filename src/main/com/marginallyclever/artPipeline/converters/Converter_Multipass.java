@@ -51,7 +51,7 @@ public class Converter_Multipass extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter();
+		float stepSize = settings.getPenDiameter();
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -59,10 +59,10 @@ public class Converter_Multipass extends ImageConverter {
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop();
+		double xLeft   = settings.getMarginLeft();
+		double xRight  = settings.getMarginRight();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);

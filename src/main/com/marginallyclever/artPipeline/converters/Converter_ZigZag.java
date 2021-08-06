@@ -69,7 +69,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
 			}
 			progress = new_progress;
-			pm.setProgress((int) progress);
+			setProgress((int) progress);
 		}
 	}
 
@@ -79,12 +79,12 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 	public int flipTests() {
 		int start, end, j, once = 0;
 
-		for (start = 0; start < numPoints - 2 && !swingWorker.isCancelled() && !pm.isCanceled(); ++start) {
+		for (start = 0; start < numPoints - 2 && !isThreadCancelled(); ++start) {
 			float a = calculateWeight(solution[start], solution[start + 1]);
 			int best_end = -1;
 			double best_diff = 0;
 
-			for (end = start + 2; end <= numPoints && !swingWorker.isCancelled() && !pm.isCanceled(); ++end) {
+			for (end = start + 2; end <= numPoints && !isThreadCancelled(); ++end) {
 				// before
 				float b = calculateWeight(solution[end], solution[end - 1]);
 				// after
@@ -98,7 +98,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 				}
 			}
 
-			if (best_end != -1 && !swingWorker.isCancelled() && !pm.isCanceled()) {
+			if (best_end != -1 && !isThreadCancelled()) {
 				once = 1;
 				// do the flip
 				int begin = start + 1;
@@ -162,7 +162,7 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 		updateProgress(len, 2);
 
 		int once = 1;
-		while (once == 1 && t_elapsed < time_limit && !swingWorker.isCancelled()) {
+		while (once == 1 && t_elapsed < time_limit && !isThreadCancelled()) {
 			once = 0;
 			//@TODO: make these optional for the very thorough people
 			//once|=transposeForwardTest();
@@ -272,10 +272,10 @@ public class Converter_ZigZag extends ImageConverter implements MakelangeloRobot
 
 	protected void connectTheDots(TransformedImage img) {
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop()   ;
+		double xLeft   = settings.getMarginLeft()  ;
+		double xRight  = settings.getMarginRight() ;
 		
 		double x, y;
 		int i;

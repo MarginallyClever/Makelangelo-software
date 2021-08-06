@@ -88,121 +88,117 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
+	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
 		Log.message(Translator.get("FileTypeSB2")+"...");
 
-		machine = robot.getSettings();
 		turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+		
+		settings = robot.getSettings();
+		turtle.setX(settings.getHomeX());
+	    turtle.setY(settings.getHomeX());
 	    indent=0;
 		
-		try {
-			// open zip file
-        	Log.message("Searching for project.json...");
-        	
-			ZipInputStream zipInputStream = new ZipInputStream(in);
-			
-			// locate project.json
-			ZipEntry entry;
-			File tempZipFile=null;
-			boolean found=false;
-			while((entry = zipInputStream.getNextEntry())!=null) {
-		        if( entry.getName().equals(PROJECT_JSON) ) {
-		        	Log.message("Found project.json...");
-		        	
-			        // read buffered stream into temp file.
-		        	tempZipFile = File.createTempFile("project", "json");
-		        	tempZipFile.setReadable(true);
-		        	tempZipFile.setWritable(true);
-		        	tempZipFile.deleteOnExit();
-			        FileOutputStream fos = new FileOutputStream(tempZipFile);
-		    		byte[] buffer = new byte[2048];
-		    		int len;
-	                while ((len = zipInputStream.read(buffer)) > 0) {
-	                    fos.write(buffer, 0, len);
-	                }
-	                fos.close();
-	                found=true;
-	                break;
-		        }
-			}
-
-			if(found==false) {
-				throw new Exception("SB2 missing project.json");
-			}
-			
-			// parse JSON
-            Log.message("Parsing JSON file...");
-            
-            JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
-            JSONObject tree = new JSONObject(tokener);
-			// we're done with the tempZipFile now that we have the JSON structure.
-			tempZipFile.delete();
-			
-			readScratchVariables(tree);
-			readScratchLists(tree);
-
-			// read the sketch(es)
-			JSONArray children = (JSONArray)tree.get("children");
-			if(children==null) throw new Exception("JSON node 'children' missing.");
-			//Log.message("found children");
-			
-			// look for the first child with a script
-
-			Iterator<?> childIter = children.iterator();
-			JSONArray scripts = null;
-			while( childIter.hasNext() ) {
-				JSONObject child = (JSONObject)childIter.next();
-				scripts = (JSONArray)child.get("scripts");
-				if (scripts != null)
-					break;
-			}
-			
-			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
-			Log.message("found  " +scripts.length() + " top-level event scripts");
-			
-			JSONArray greenFlagScript = null;
-			
-			// extract known elements and convert them to turtle commands.
-			Iterator<?> scriptIter = scripts.iterator();
-			// find the first script with a green flag.
-			while( scriptIter.hasNext() ) {
-    			JSONArray scripts0 = (JSONArray)scriptIter.next();
-    			if( scripts0==null ) continue;
-    			JSONArray scripts02 = (JSONArray)scripts0.get(2);
-    			if( scripts02==null || scripts02.length()==0 ) continue;
-    			// look inside the script at the first block, which gives the type.
-    			Object scriptContents = scripts02.get(0);
-    			if( ( scriptContents instanceof JSONArray ) ) {
-    				Object scriptHead = ((JSONArray)scriptContents).get(0);
-    				
-	    			String firstType = (String)scriptHead;
-					if(firstType.equals("whenGreenFlag")) {
-						Log.message("Found green flag script");
-						if( greenFlagScript != null ) {
-							throw new Exception("More than one green flag script");
-						}
-						greenFlagScript = scripts02;
-					} else if(firstType.equals("whenIReceive")) {
-		    			String firstName = (String)((JSONArray)scriptContents).get(1);
-						Log.message("Found subroutine "+firstName);
-		    			subRoutines.put(firstName, ((JSONArray)scriptContents));
-					}
-    			}
-			}
-
-			// actual code begins here.
-			parseScratchCode(greenFlagScript);
-			
-			Log.message("finished scripts");
-			robot.setTurtle(turtle);
-		} catch (Exception e) {
-			e.printStackTrace();
+		// open zip file
+    	Log.message("Searching for project.json...");
+    	
+		ZipInputStream zipInputStream = new ZipInputStream(in);
+		
+		// locate project.json
+		ZipEntry entry;
+		File tempZipFile=null;
+		boolean found=false;
+		while((entry = zipInputStream.getNextEntry())!=null) {
+	        if( entry.getName().equals(PROJECT_JSON) ) {
+	        	Log.message("Found project.json...");
+	        	
+		        // read buffered stream into temp file.
+	        	tempZipFile = File.createTempFile("project", "json");
+	        	tempZipFile.setReadable(true);
+	        	tempZipFile.setWritable(true);
+	        	tempZipFile.deleteOnExit();
+		        FileOutputStream fos = new FileOutputStream(tempZipFile);
+	    		byte[] buffer = new byte[2048];
+	    		int len;
+                while ((len = zipInputStream.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                found=true;
+                break;
+	        }
 		}
 
-		return true;
+		if(found==false) {
+			throw new Exception("SB2 missing project.json");
+		}
+		
+		// parse JSON
+        Log.message("Parsing JSON file...");
+        
+        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
+        JSONObject tree = new JSONObject(tokener);
+		// we're done with the tempZipFile now that we have the JSON structure.
+		tempZipFile.delete();
+		
+		readScratchVariables(tree);
+		readScratchLists(tree);
+
+		// read the sketch(es)
+		JSONArray children = (JSONArray)tree.get("children");
+		if(children==null) throw new Exception("JSON node 'children' missing.");
+		//Log.message("found children");
+		
+		// look for the first child with a script
+
+		Iterator<?> childIter = children.iterator();
+		JSONArray scripts = null;
+		while( childIter.hasNext() ) {
+			JSONObject child = (JSONObject)childIter.next();
+			scripts = (JSONArray)child.get("scripts");
+			if (scripts != null)
+				break;
+		}
+		
+		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+
+		Log.message("found  " +scripts.length() + " top-level event scripts");
+		
+		JSONArray greenFlagScript = null;
+		
+		// extract known elements and convert them to turtle commands.
+		Iterator<?> scriptIter = scripts.iterator();
+		// find the first script with a green flag.
+		while( scriptIter.hasNext() ) {
+			JSONArray scripts0 = (JSONArray)scriptIter.next();
+			if( scripts0==null ) continue;
+			JSONArray scripts02 = (JSONArray)scripts0.get(2);
+			if( scripts02==null || scripts02.length()==0 ) continue;
+			// look inside the script at the first block, which gives the type.
+			Object scriptContents = scripts02.get(0);
+			if( ( scriptContents instanceof JSONArray ) ) {
+				Object scriptHead = ((JSONArray)scriptContents).get(0);
+				
+    			String firstType = (String)scriptHead;
+				if(firstType.equals("whenGreenFlag")) {
+					Log.message("Found green flag script");
+					if( greenFlagScript != null ) {
+						throw new Exception("More than one green flag script");
+					}
+					greenFlagScript = scripts02;
+				} else if(firstType.equals("whenIReceive")) {
+	    			String firstName = (String)((JSONArray)scriptContents).get(1);
+					Log.message("Found subroutine "+firstName);
+	    			subRoutines.put(firstName, ((JSONArray)scriptContents));
+				}
+			}
+		}
+
+		// actual code begins here.
+		parseScratchCode(greenFlagScript);
+		
+		Log.message("finished scripts");
+
+		return turtle;
 	}
 
 	/**

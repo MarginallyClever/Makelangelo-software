@@ -78,25 +78,24 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
+	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
 		Log.message("Loading...");
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 
 		// prepare for importing
-		machine = robot.getSettings();
+		settings = robot.getSettings();
 		imageCenterX=imageCenterY=0;
 		scale=1;
 		
 	    turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+	    turtle.setX(settings.getHomeX());
+	    turtle.setY(settings.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
 		boolean loadOK = parseAll(document);
 		if(!loadOK) {
-			Log.message("Failed to load some elements (1)");
-			return false;
+			throw new Exception("Failed to load some elements (1)");
 		}
 		
 		Point2D top = new Point2D();
@@ -126,17 +125,15 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					(paperHeight / imageHeight);
 		}
 	    turtle = new Turtle();
-	    turtle.setX(machine.getHomeX());
-	    turtle.setY(machine.getHomeX());
+	    turtle.setX(settings.getHomeX());
+	    turtle.setY(settings.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
 		loadOK = parseAll(document);
 		if(!loadOK) {
-			Log.message("Failed to load some elements (2)");
-			return false;
+			throw new Exception("Failed to load some elements (2)");
 		}
 		
-		robot.setTurtle(turtle);
-		return true;
+		return turtle;
 	}
 	
 	protected boolean parseAll(Document document) {
@@ -527,17 +524,12 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		(new GVTBuilder()).build(bridgeContext, document);
 	}
 
-	public static SVGDocument newDocumentFromInputStream(InputStream in) {
+	public static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
 		SVGDocument ret = null;
 
-		try {
-			String parser = XMLResourceDescriptor.getXMLParserClassName();
-	        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-	        ret = (SVGDocument) factory.createDocument("",in);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String parser = XMLResourceDescriptor.getXMLParserClassName();
+        SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+        ret = (SVGDocument) factory.createDocument("",in);
 
 		return ret;
 	}
@@ -565,11 +557,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		Log.message("saving...");
 		turtle = robot.getTurtle();
 
-		machine = robot.getSettings();
-		double left = machine.getPaperLeft();
-		double right = machine.getPaperRight();
-		double top = machine.getPaperTop();
-		double bottom = machine.getPaperBottom();
+		settings = robot.getSettings();
+		double left = settings.getPaperLeft();
+		double right = settings.getPaperRight();
+		double top = settings.getPaperTop();
+		double bottom = settings.getPaperBottom();
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
 			// header

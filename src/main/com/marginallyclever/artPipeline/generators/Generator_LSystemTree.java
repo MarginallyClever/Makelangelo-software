@@ -37,7 +37,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 		random.setSeed(0xDEADBEEF);
 		
 		// move to starting position
-		turtle.moveTo(0,-machine.getMarginHeight()/2);
+		turtle.moveTo(0,-settings.getMarginHeight()/2);
 		turtle.turn(90);
 		turtle.penDown();
 		// do the curve

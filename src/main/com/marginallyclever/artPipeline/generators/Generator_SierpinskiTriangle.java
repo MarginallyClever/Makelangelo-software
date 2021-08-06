@@ -34,8 +34,8 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		xMax = machine.getMarginWidth()/2.0f;
-		yMax = machine.getMarginHeight()/2.0f;
+		xMax = settings.getMarginWidth()/2.0f;
+		yMax = settings.getMarginHeight()/2.0f;
 		xMin = -xMax;
 		yMin = -yMax;
 

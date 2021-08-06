@@ -39,13 +39,13 @@ public class Generator_FillPage extends ImageGenerator {
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter();
+		float stepSize = settings.getPenDiameter();
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop()   ;
+		double xLeft   = settings.getMarginLeft()  ;
+		double xRight  = settings.getMarginRight() ;
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
@@ -54,8 +54,8 @@ public class Generator_FillPage extends ImageGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(machine.getMarginRight(),machine.getMarginTop());
-		Point2D rMin = new Point2D(machine.getMarginLeft(),machine.getMarginBottom());
+		Point2D rMax = new Point2D(settings.getMarginRight(),settings.getMarginTop());
+		Point2D rMin = new Point2D(settings.getMarginLeft(),settings.getMarginBottom());
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize) {

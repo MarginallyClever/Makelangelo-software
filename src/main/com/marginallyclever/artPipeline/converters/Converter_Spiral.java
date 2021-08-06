@@ -42,7 +42,7 @@ public class Converter_Spiral extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = settings.getPenDiameter();
 
 		int i, j;
 		final int steps = 4;
@@ -53,13 +53,13 @@ public class Converter_Spiral extends ImageConverter {
 		float maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getMarginHeight();
-			float w2 = (float)machine.getMarginWidth();
+			float h2 = (float)settings.getMarginHeight();
+			float w2 = (float)settings.getMarginWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
-			float w = (float)machine.getMarginWidth()/2.0f;
-			float h = (float)machine.getMarginHeight()/2.0f;
+			float w = (float)settings.getMarginWidth()/2.0f;
+			float h = (float)settings.getMarginHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
 

@@ -34,7 +34,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
+		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 		xMax = v;
 		yMax = v;
 		xMin = -v;

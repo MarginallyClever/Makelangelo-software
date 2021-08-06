@@ -141,7 +141,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		updateButtonAccess();
 	}
 
-
 	private JButton createTightJButton(String label) {
 		JButton b = new JButton(label);
 		b.setMargin(new Insets(0,0,0,0));
@@ -149,14 +148,12 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		return b;
 	}
 
-
 	private JButton createNarrowJButton(String label) {
 		JButton b = new JButton(label);
 		b.setMargin(new Insets(0,0,0,0));
 		b.setPreferredSize(new Dimension(40,20));
 		return b;
 	}
-
 
 	private JPanel createConnectSubPanel() {
 		connectionPanel = new SelectPanel();
@@ -188,14 +185,12 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 
 	    return connectionPanel;
 	}
-
 	
 	protected void updateMachineChoice() {
 		int selectedIndex = machineChoices.getSelectedIndex();
 		long newUID = Long.parseLong(machineChoices.getItemAt(selectedIndex));
 		myRobot.getSettings().loadConfig(newUID);
 	}
-
 
 	private JPanel createAnimationPanel() {
 		CollapsiblePanel animationPanel = new CollapsiblePanel(Translator.get("MenuAnimate"));
@@ -213,7 +208,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		return animationPanel;
 	}
-	
 
 	private void updatePauseButton() {
 		if (myRobot.isPaused()) {
@@ -225,14 +219,11 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		}
 	}
 
-
 	private CollapsiblePanel createArtPipelinePanel() {
-		myArtPipelinePanel = new ArtPipelinePanel(makelangeloApp.getMainFrame());
-		myArtPipelinePanel.setPipeline(myRobot.getPipeline());
+		myArtPipelinePanel = new ArtPipelinePanel(makelangeloApp.getMainFrame(),makelangeloApp.getPipeline());
 		
 		return myArtPipelinePanel;
 	}
-	
 	
 	private JPanel createCreativeControlPanel() {
 		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
@@ -360,7 +351,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		return commonControlsPanel;
 	}
-
 	
 	/**
 	 * Refresh the list of available known machines. 
@@ -412,23 +402,20 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 			m.run();
 			// we can only get here if the robot is connected and not running.
 			// Save the gcode so that updates to settings are applied immediately + automatically.
-			myRobot.saveTurtleToDrawing(myRobot.getTurtle());
+			myRobot.setTurtle(myRobot.getTurtle());
 		});
 		buttonOpenSettings.setPreferredSize(buttonOpenSettings.getPreferredSize());
 		machineNumberPanel.add(buttonOpenSettings,cMachine);
 		cMachine.gridx++;
 	}
 	
-	
 	private void motorsHaveBeenDisengaged() {
 		toggleEngagedMotor.setText(Translator.get("EngageMotors"));
 	}
 	
-	
 	private void motorsHaveBeenEngaged() {
 		toggleEngagedMotor.setText(Translator.get("DisengageMotors"));
 	}
-	
 
 	private void startAt() {
 		StartAtPanel p = new StartAtPanel();
@@ -442,15 +429,13 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		}
 	}
 	
-
 	// the moment a robot is confirmed to have connected
 	private void onConnect() {
 		updateMachineNumberPanel();
 		updateButtonAccess();
 		myRobot.engageMotors();
 	}
-	
-	
+		
 	public void updateButtonAccess() {
 		boolean isConfirmed=false;
 		boolean isRunning=false;
@@ -509,12 +494,10 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		this.validate();
 	}
 	
-
 	private void newFile() {
 		myRobot.setTurtle(new Turtle());
 	}
-	
-	
+		
 	private void generateImage() {
 		// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
 		final JPanel panel = new JPanel();
@@ -559,7 +542,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		dialog.setVisible(true);
 		// other app buttons are still accessible.
 	}
-
 	
 	private void changeGeneratorPanel(int index) {
 		ImageGeneratorPanel.makelangeloRobotPanel = this;
@@ -575,32 +557,30 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		}
 	}
 	
-	
 	public void regenerate(ImageGenerator chosenGenerator) {
 		myRobot.setDecorator(chosenGenerator);
 		chosenGenerator.setRobot(myRobot);
-		
-		// do the work
 		chosenGenerator.generate();
 		myRobot.getSettings().setRotationRef(0);
-				
 		Turtle t=chosenGenerator.turtle;
-
-		if (myRobot.getSettings().shouldSignName()) {
-			// Sign name
-			Generator_Text ymh = new Generator_Text();
-			ymh.setRobot(myRobot);
-			ymh.signName();
-			t.history.addAll(ymh.turtle.history);
-		}
+		signNameIfDesired(t);
 		myRobot.setDecorator(null);
 		myRobot.setTurtle(t);
+		
 		Log.message(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 		updateButtonAccess();
 	}
-
 	
+	private void signNameIfDesired(Turtle t) {
+		if(!myRobot.getSettings().shouldSignName()) return;
+		
+		Generator_Text ymh = new Generator_Text();
+		ymh.setRobot(myRobot);
+		ymh.signName();
+		t.history.addAll(ymh.turtle.history);
+	}
+
 	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
 		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
 		int i=0;
@@ -613,7 +593,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		throw new IndexOutOfBoundsException();
 	}
-
 
 	@Override
 	public void makelangeloRobotUpdate(MakelangeloRobotEvent e) {
@@ -631,7 +610,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		}
 		if(e.type==MakelangeloRobotEvent.STOP) updateButtonAccess();
 		if(e.type==MakelangeloRobotEvent.PROGRESS_SOFAR) { 
-			statusBar.setProgress((long)e.extra, e.subject.getGCodeCommandsCount());
+			statusBar.setProgress((int)e.extra, e.subject.getGCodeCommandsCount());
 		}
 		if(e.type==MakelangeloRobotEvent.NEW_GCODE) { 
 			MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(e.subject.getSettings());

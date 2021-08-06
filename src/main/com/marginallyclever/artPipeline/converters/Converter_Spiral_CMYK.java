@@ -45,8 +45,8 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		cmyk.filter(sourceImage);
 
 		double separation; 
-		float h2 = (float)machine.getPaperHeight();
-		float w2 = (float)machine.getPaperWidth();
+		float h2 = (float)settings.getPaperHeight();
+		float w2 = (float)settings.getPaperWidth();
 		separation = (w2<h2) ? w2/4 : h2/4;
 
 		turtle = new Turtle();
@@ -61,7 +61,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
 		turtle.setColor(newColor);
 		
-		double toolDiameter = machine.getPenDiameter();
+		double toolDiameter = settings.getPenDiameter();
 
 		int i, j;
 		int steps = 4;
@@ -72,13 +72,13 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		float maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)machine.getMarginHeight();
-			float w2 = (float)machine.getMarginWidth();
+			float h2 = (float)settings.getMarginHeight();
+			float w2 = (float)settings.getMarginWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the image.
-			float w = (float)machine.getMarginWidth()/2.0f;
-			float h = (float)machine.getMarginHeight()/2.0f;
+			float w = (float)settings.getMarginWidth()/2.0f;
+			float h = (float)settings.getMarginHeight()/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
 

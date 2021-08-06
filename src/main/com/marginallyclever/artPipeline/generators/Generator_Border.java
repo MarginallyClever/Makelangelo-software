@@ -22,10 +22,10 @@ public class Generator_Border extends ImageGenerator {
 
 	@Override
 	public boolean generate() {
-		float yMin = (float)machine.getMarginBottom();
-		float yMax = (float)machine.getMarginTop();
-		float xMin = (float)machine.getMarginLeft();
-		float xMax = (float)machine.getMarginRight();
+		float yMin = (float)settings.getMarginBottom();
+		float yMax = (float)settings.getMarginTop();
+		float xMin = (float)settings.getMarginLeft();
+		float xMax = (float)settings.getMarginRight();
 
 		turtle = new Turtle();
 		turtle.penUp();

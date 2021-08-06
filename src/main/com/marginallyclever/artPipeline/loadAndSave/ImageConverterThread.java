@@ -15,7 +15,7 @@ public class ImageConverterThread extends SwingWorker<Void, Void> {
 		chosenConverter = converter;
 		this.name = name;
 		
-		chosenConverter.setSwingWorker(this);
+		chosenConverter.setThread(this);
 	}
 	
 	@Override

@@ -35,7 +35,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 	
 	@Override
 	public boolean generate() {
-		double v = Math.min(machine.getMarginWidth(),machine.getMarginHeight());
+		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 
 		turtle = new Turtle();
 		

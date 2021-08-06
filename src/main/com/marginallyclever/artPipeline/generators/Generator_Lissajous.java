@@ -64,8 +64,8 @@ public class Generator_Lissajous extends ImageGenerator {
 	@Override
 	public boolean generate() {
 		// scale the step size so the curve fits on the paper
-		WIDTH = machine.getMarginWidth()/2.0;
-		HEIGHT = machine.getMarginHeight()/2.0;
+		WIDTH = settings.getMarginWidth()/2.0;
+		HEIGHT = settings.getMarginHeight()/2.0;
 
 		drawLissajous(true);
 	    

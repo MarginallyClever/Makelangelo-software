@@ -104,96 +104,87 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 
 	
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
+	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
 		Log.message(Translator.get("FileTypeSB3")+"...");
 		// reset the turtle object
 		turtle = new Turtle();
-		machine = robot.getSettings();
-			
-		try {
-			// open zip file
-        	Log.message("Searching for project.json...");
-        	
-			ZipInputStream zipInputStream = new ZipInputStream(in);
-			
-			// locate project.json
-			ZipEntry entry;
-			File tempZipFile=null;
-			boolean found=false;
-			while((entry = zipInputStream.getNextEntry())!=null) {
-		        if( entry.getName().equals(PROJECT_JSON) ) {
-		        	Log.message("Found project.json...");
-		        	
-			        // read buffered stream into temp file.
-		        	tempZipFile = File.createTempFile("project", "json");
-		        	tempZipFile.setReadable(true);
-		        	tempZipFile.setWritable(true);
-		        	tempZipFile.deleteOnExit();
-			        FileOutputStream fos = new FileOutputStream(tempZipFile);
-		    		byte[] buffer = new byte[2048];
-		    		int len;
-	                while ((len = zipInputStream.read(buffer)) > 0) {
-	                    fos.write(buffer, 0, len);
-	                }
-	                fos.close();
-	                found=true;
-	                break;
-		        }
-			}
-
-			if(found==false) {
-				throw new Exception("SB3 missing project.json");
-			}
-			
-			// parse JSON
-            Log.message("Parsing JSON file...");
-
-            JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
-            JSONObject tree = new JSONObject(tokener);
-			// we're done with the tempZipFile now that we have the JSON structure.
-			tempZipFile.delete();
-			
-			
-			if(confirmAtLeastVersion3(tree)==false) {
-				JOptionPane.showMessageDialog(null, "File must be at least version 3.0.0.");
-				return false;
-			}
-			if(confirmHasPenExtension(tree)==false) {
-				JOptionPane.showMessageDialog(null, "File must include pen extension.");
-				return false;
-			}
-			
-			readScratchVariables(tree);
-			readScratchLists(tree);
-			readScratchInstructions(tree);
-
-			// read the sketch(es)
-			JSONArray children = (JSONArray)tree.get("children");
-			if(children==null) throw new Exception("JSON node 'children' missing.");
-			//Log.message("found children");
-			
-			// look for the first child with a script
-			Iterator<?> childIter = children.iterator();
-			JSONArray scripts = null;
-			while( childIter.hasNext() ) {
-				JSONObject child = (JSONObject)childIter.next();
-				scripts = (JSONArray)child.get("scripts");
-				if (scripts != null)
-					break;
-			}
-			
-			if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
-			Log.message("found  " +scripts.length() + " scripts");
-			Log.message("finished scripts");
-		} catch (Exception e) {
-			Log.error(Translator.get("LoadError") +" "+ e.getLocalizedMessage());
-			e.printStackTrace();
-			return false;
+		settings = robot.getSettings();
+		
+		// open zip file
+    	Log.message("Searching for project.json...");
+    	
+		ZipInputStream zipInputStream = new ZipInputStream(in);
+		
+		// locate project.json
+		ZipEntry entry;
+		File tempZipFile=null;
+		boolean found=false;
+		while((entry = zipInputStream.getNextEntry())!=null) {
+	        if( entry.getName().equals(PROJECT_JSON) ) {
+	        	Log.message("Found project.json...");
+	        	
+		        // read buffered stream into temp file.
+	        	tempZipFile = File.createTempFile("project", "json");
+	        	tempZipFile.setReadable(true);
+	        	tempZipFile.setWritable(true);
+	        	tempZipFile.deleteOnExit();
+		        FileOutputStream fos = new FileOutputStream(tempZipFile);
+	    		byte[] buffer = new byte[2048];
+	    		int len;
+                while ((len = zipInputStream.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                found=true;
+                break;
+	        }
 		}
-			
-		robot.setTurtle(turtle);
-		return true;
+
+		if(found==false) {
+			throw new Exception("SB3 missing project.json");
+		}
+		
+		// parse JSON
+        Log.message("Parsing JSON file...");
+
+        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
+        JSONObject tree = new JSONObject(tokener);
+		// we're done with the tempZipFile now that we have the JSON structure.
+		tempZipFile.delete();
+		
+		
+		if(confirmAtLeastVersion3(tree)==false) {
+			throw new Exception("File must be at least version 3.0.0.");
+		}
+		if(confirmHasPenExtension(tree)==false) {
+			throw new Exception("File must include pen extension.");
+		}
+		
+		readScratchVariables(tree);
+		readScratchLists(tree);
+		readScratchInstructions(tree);
+
+		// read the sketch(es)
+		JSONArray children = (JSONArray)tree.get("children");
+		if(children==null) throw new Exception("JSON node 'children' missing.");
+		//Log.message("found children");
+		
+		// look for the first child with a script
+		Iterator<?> childIter = children.iterator();
+		JSONArray scripts = null;
+		while( childIter.hasNext() ) {
+			JSONObject child = (JSONObject)childIter.next();
+			scripts = (JSONArray)child.get("scripts");
+			if (scripts != null)
+				break;
+		}
+		
+		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+
+		Log.message("found  " +scripts.length() + " scripts");
+		Log.message("finished scripts");
+
+		return turtle;
 	}
 
 
@@ -241,6 +232,8 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		JSONObject currentBlock = (JSONObject)blocks.get(currentKey.toString());
 		JSONObject inputs;
 		JSONArray substack, condition;
+		
+		boolean stopCalled=false;
 		
 		while(currentBlock!=null) {
 			String opcode = (String)currentBlock.get("opcode");
@@ -290,7 +283,8 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			// C BLOCKS END
 			
 			case "control_stop":
-				throw new Exception("control_stop not supported.");
+				//throw new Exception("control_stop not supported.");
+				return;
 /*
 			case "data_variable":			break;
 			case "data_setvariableto":		break;
@@ -319,7 +313,7 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 			default:
 				Log.message("Ignored "+opcode);
 			}
-			
+
 			currentBlock = findNextBlock(currentBlock);
 		}
 	}

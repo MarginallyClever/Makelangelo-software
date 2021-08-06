@@ -1,65 +1,38 @@
 package com.marginallyclever.artPipeline.loadAndSave;
 
-import java.awt.CardLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
-import com.marginallyclever.artPipeline.converters.ImageConverterPanel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
-import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 
  * @author Dan Royer
  *
  */
-public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFileType {
-	
-	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper
-			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-
-	private ServiceLoader<ImageConverter> converters;
+public class LoadAndSaveImage implements LoadAndSaveFileType {
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
-	private MakelangeloRobot chosenRobot;
-	private JPanel conversionPanel;
-	private static JComboBox<String> styleNames;
-	private static JComboBox<String> fillNames;
-	private JPanel cards;
+	private MakelangeloRobot myRobot;
+	
+	private ImageConverterThread imageConverterThread; 
+	private ArrayList<ImageConverterThread> workerList = new ArrayList<ImageConverterThread>();
+	private int workerCount = 0;
 	
 	// Set of image file extensions.
 	private static final Set<String> IMAGE_FILE_EXTENSIONS;
@@ -72,28 +45,13 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		IMAGE_FILE_EXTENSIONS.add("bmp");
 		IMAGE_FILE_EXTENSIONS.add("gif");
 	}
+	
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
-	private ArrayList<String> imageConverterNames = new ArrayList<String>();
-	private String[] imageFillNames;
+	private ProgressMonitor pm;
 	
-	private ArrayList<SwingWorker<Void, Void>> workerList = new ArrayList<SwingWorker<Void, Void>>();
-	private int workerCount = 0;
-
 	
-	public LoadAndSaveImage() {
-		converters = ServiceLoader.load(ImageConverter.class);
-		
-		imageConverterNames.clear();
-		
-		for( ImageConverter ici : converters ) {
-			imageConverterNames.add(ici.getName());
-		}
-				
-		imageFillNames = new String[2];
-		imageFillNames[0] = Translator.get("ConvertImagePaperFill");
-		imageFillNames[1] = Translator.get("ConvertImagePaperFit");
-	}
+	public LoadAndSaveImage() {}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -105,175 +63,56 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		final String filenameExtension = filename.substring(filename.lastIndexOf('.') + 1);
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
-	
 
-	protected boolean chooseImageConversionOptions(Component parent) {
-		conversionPanel = new JPanel(new GridBagLayout());
-		
-		String [] array = (String[]) imageConverterNames.toArray(new String[0]);
-		styleNames = new JComboBox<String>(array);
-		fillNames = new JComboBox<String>(imageFillNames);
-		
-		cards = new JPanel(new CardLayout());
-		cards.setPreferredSize(new Dimension(450,300));
-		for( ImageConverter ici : converters ) {
-			cards.add(ici.getPanel().getPanel(),ici.getName());
-		}
-
-		GridBagConstraints c = new GridBagConstraints();
-		int y = 0;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = y;
-		c.ipadx=5;
-		conversionPanel.add(new JLabel(Translator.get("ConversionStyle")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.ipadx=0;
-		conversionPanel.add(styleNames, c);
-
-		y++;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridx = 0;
-		c.gridy = y;
-		c.ipadx=5;
-		conversionPanel.add(new JLabel(Translator.get("ConversionFill")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
-		c.gridx = 1;
-		c.ipadx=0;
-		conversionPanel.add(fillNames, c);
-		c.gridy = y;
-
-		y++;
-		c.anchor=GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth=4;
-		c.gridx=0;
-		c.gridy=y;
-		c.insets = new Insets(10, 0, 0, 0);
-		cards.setPreferredSize(new Dimension(449,325));
-		//previewPane.setBorder(BorderFactory.createLineBorder(new Color(255,0,0)));
-		conversionPanel.add(cards,c);
-
-		int p;
-		p=getPreferredFillStyle();
-		if(p>=fillNames.getItemCount()) p=0;
-		fillNames.setSelectedIndex(p);
-		
-		styleNames.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-			    CardLayout cl = (CardLayout)(cards.getLayout());
-			    cl.show(cards, (String)e.getItem());
-
-			    int index = styleNames.getSelectedIndex();
-				ImageConverter requestedConverter = getConverter(index);
-				if(requestedConverter == chosenConverter) return;
-				changeConverter(index);
-		    }
-		});
-		
-		fillNames.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				changeConverter(styleNames.getSelectedIndex());
-		    }
-		});
-		
-		p=getPreferredDrawStyle();
-		if(p>=styleNames.getItemCount()) p=0;
-		styleNames.setSelectedIndex(p);
-		
-		int result = JOptionPane.showConfirmDialog(parent, conversionPanel, Translator.get("ConversionOptions"),
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			setPreferredDrawStyle(styleNames.getSelectedIndex());
-			setPreferredFillStyle(fillNames.getSelectedIndex());
-			return true;
-		}
-		
-		if(swingWorker!=null) {
-			swingWorker.cancel(true);
-		}
-		stopSwingWorker();
-
-		return false;
+	public void stopConversion() {
+		Log.message("Stop conversion");
+		if(imageConverterThread!=null) imageConverterThread.cancel(true);
+		stopWorker();
 	}
 	
-	private void changeConverter(int index) {
-		ImageConverter requestedConverter = getConverter(index);
-
-		//Log.message("Changing converter");
-		stopSwingWorker();
-
-		ImageConverterPanel.loadAndSaveImage = this;
-		ImageConverter.loadAndSaveImage = this;
+	public void changeConverter(ImageConverter converter) {
+		if( converter == chosenConverter ) return;
 		
-		chosenConverter = requestedConverter;
+		Log.message("Changing converter");
+		stopConversion();
+		startConversion(converter);
+	}
+	
+	private void startConversion(ImageConverter converter) {
+		if(converter==null) return;  // TODO silent quit is ugly.
+		
+		ImageConverter.loadAndSaveImage = this;
+		chosenConverter = converter;
 		Log.message("Converter="+chosenConverter.getName());
 		
-		switch(fillNames.getSelectedIndex()) {
-			case 0:  scaleToFillPaper();  break;
-			case 1:  scaleToFitPaper();  break;
-			default: break;
-		}
-		
-		startSwingWorker();
+		startWorker();
 	}
 	
 	public void reconvert() {
-		changeConverter(styleNames.getSelectedIndex());
+		stopConversion();
+		startConversion(chosenConverter);
 	}
 	
-	private ImageConverter getConverter(int arg0) throws IndexOutOfBoundsException {
-		Iterator<ImageConverter> ici = converters.iterator();
-		int i=0;
-		while(ici.hasNext()) {
-			ImageConverter chosenConverter = ici.next();
-			if(i==arg0) {
-				return chosenConverter;
-			}
-			i++;
-		}
-		
-		throw new IndexOutOfBoundsException();
+	public ImageConverter getChosenConverter() {
+		return chosenConverter;
 	}
 	
-
-
 	/**
 	 * Load and convert the image in the chosen style
 	 * @return false if loading cancelled or failed.
 	 */
 	@Override
-	public boolean load(InputStream in,MakelangeloRobot robot, Component parentComponent) {
-		try {
-			img = new TransformedImage( ImageIO.read(in) );
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-		
-		chosenRobot = robot;
+	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
+		myRobot = robot;
 
-		switch(getPreferredFillStyle()) {
-			case 0:  scaleToFillPaper();  break;
-			case 1:  scaleToFitPaper();  break;
-			default: break;
-		}
+		img = new TransformedImage( ImageIO.read(in) );
 		
-		chooseImageConversionOptions(parentComponent);
-		
-		return true;
+		return null;
 	}
 
 	// adjust image to fill the paper
 	public void scaleToFillPaper() {
-		MakelangeloRobotSettings s = chosenRobot.getSettings();
+		MakelangeloRobotSettings s = myRobot.getSettings();
 
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
@@ -288,7 +127,7 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 	}
 	
 	public void scaleToFitPaper() {
-		MakelangeloRobotSettings s = chosenRobot.getSettings();
+		MakelangeloRobotSettings s = myRobot.getSettings();
 		
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
@@ -302,124 +141,78 @@ public class LoadAndSaveImage extends ImageManipulator implements LoadAndSaveFil
 		img.setScale(f,-f);
 	}
 	
-	protected void stopSwingWorker() {
-		chosenRobot.setDecorator(null);
+	private void stopWorker() {
 		if(chosenConverter!=null) chosenConverter.stopIterating();
-		if(swingWorker!=null) {
-			Log.message("Stopping swingWorker");
-			if(swingWorker.cancel(true)) {
-				Log.message("stopped OK");
+		if(imageConverterThread!=null) {
+			Log.message("Stopping worker");
+			if(imageConverterThread.cancel(true)) {
+				Log.message("stop OK");
 			} else {
 				Log.message("stop FAILED");
 			}
 		}
 	}
 
-	protected void startSwingWorker() {
-		Log.message("Starting swingWorker 1");
+	private void startWorker() {
+		Log.message("Starting thread "+workerCount);
 
-		machine = chosenRobot.getSettings();
+		ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
+		pm.setProgress(0);
+		pm.setMillisToPopup(0);
 		
 		chosenConverter.setProgressMonitor(pm);
-		chosenConverter.setRobot(chosenRobot);
+		chosenConverter.setRobot(myRobot);
 		chosenConverter.setImage(img);
-		chosenRobot.setDecorator(chosenConverter);
+		myRobot.setDecorator(chosenConverter);
 		
-		
-		swingWorker = new SwingWorker<Void, Void>() {
-			public int loopCount;
-			
-			@Override
-			public Void doInBackground() {
-				Log.message("Starting swingWorker 2");
-				
-				loopCount=0;
-				chosenConverter.setSwingWorker(swingWorker);
-
-				pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
-				pm.setProgress(0);
-				pm.setMillisToPopup(0);
-				
-				boolean keepIterating=false;
-				
-				do {
-					loopCount++;
-					keepIterating = chosenConverter.iterate();
-					try {
-						Thread.sleep(5);
-					} catch (InterruptedException e) {
-						Log.message("swingWorker interrupted.");
-						break;
-					}
-				} while(!isCancelled() && keepIterating);
-				chosenRobot.setDecorator(null);
-				
-				pm.setProgress(100);
-				if(pm!=null) pm.close();
-				
-				if(isCancelled()==false) {
-					Log.message("swingWorker finishing.");
-					chosenConverter.finish();
-					Turtle t=chosenConverter.turtle;
-					// setTurtle will cause a MakelangeloRobotEvent.NEW_GCODE to be fired.
-					chosenRobot.setTurtle(t);
-				} else {
-					Log.message("swingWorder cancelled.");
-				}
-
-				return null;
-			}
-
-			@Override
-			public void done() {
-				Log.message("swingWorker ended after "+loopCount+" iteration(s).");
-				workerList.remove(swingWorker);
-				workerCount--;
-				Log.message("removed worker.  "+workerCount+"/"+workerList.size()+" workers now.");
-				swingWorker=null;
-			}
-		};
-
-		swingWorker.addPropertyChangeListener(new PropertyChangeListener() {
-			// Invoked when task's progress property changes.
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (Objects.equals("progress", evt.getPropertyName())) {
-					int progress = (Integer) evt.getNewValue();
-					pm.setProgress(progress);
-					String message = String.format("%d%%.\n", progress);
-					pm.setNote(message);
-					if (swingWorker.isDone()) {
-						Log.message(Translator.get("Finished"));
-					} else if (swingWorker.isCancelled() || pm.isCanceled()) {
-						if(pm.isCanceled()) {
-							swingWorker.cancel(true);
-						}
-						Log.message(Translator.get("Cancelled"));
-					}
-				}
-			}
-		});
-		
-		workerList.add(swingWorker);
-		workerCount++;
-		Log.message("added worker.  "+workerCount+"/"+workerList.size()+" workers now.");
-
-		swingWorker.execute();
+		imageConverterThread = getNewWorker(chosenConverter,workerCount);
+		addWorker(imageConverterThread);
+		imageConverterThread.execute();
 	}
 	
-	private void setPreferredDrawStyle(int style) {
-		prefs.putInt("Draw Style", style);
-	}
-	private void setPreferredFillStyle(int style) {
-		prefs.putInt("Fill Style", style);
+	private ImageConverterThread getNewWorker(ImageConverter chosenConverter2, int workerCount2) {
+		ImageConverterThread thread = new ImageConverterThread(this,chosenConverter2,Integer.toString(workerCount2));
+		
+		thread.addPropertyChangeListener((evt) -> {
+			if(!Objects.equals("progress", evt.getPropertyName())) return;
+			
+			int progress = (Integer) evt.getNewValue();
+			pm.setProgress(progress);
+			String message = String.format("%d%%.\n", progress);
+			pm.setNote(message);
+			if (imageConverterThread.isDone()) {
+				Log.message(Translator.get("Finished"));
+			} else if (imageConverterThread.isCancelled() || pm.isCanceled()) {
+				if(pm.isCanceled()) imageConverterThread.cancel(true);
+				Log.message(Translator.get("Cancelled"));
+			}
+		});
+
+		return thread;
 	}
 
-	private int getPreferredDrawStyle() {
-		return prefs.getInt("Draw Style", 0);
+	// called when thread is finished, no matter how the thread is finished.
+	public void done(ImageConverterThread thread) {
+		if(thread.isDone()) {
+			if(myRobot!=null) myRobot.setTurtle(chosenConverter.turtle);
+			if(pm!=null) pm.setProgress(100);
+		}
+		if(myRobot!=null) myRobot.setDecorator(null);
+		if(pm!=null) pm.close();
+		removeWorker(thread);
 	}
-
-	private int getPreferredFillStyle() {
-		return prefs.getInt("Fill Style", 0);
+	
+	private void addWorker(ImageConverterThread thread) {
+		workerList.add(thread);
+		workerCount++;
+		Log.message("Added worker.  "+workerList.size()+" workers now.");
+	}
+	
+	private void removeWorker(ImageConverterThread thread) {
+		workerList.remove(thread);
+		Log.message("Removed worker.  "+workerList.size()+" workers now.");
+		if(imageConverterThread==thread)
+			imageConverterThread=null;
 	}
 	
 	public boolean canSave(String filename) {

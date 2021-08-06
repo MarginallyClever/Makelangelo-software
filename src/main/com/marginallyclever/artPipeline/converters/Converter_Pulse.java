@@ -83,15 +83,15 @@ public class Converter_Pulse extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 		
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop()   ;
+		double xLeft   = settings.getMarginLeft()  ;
+		double xRight  = settings.getMarginRight() ;
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter() * blockScale;
+		float stepSize = settings.getPenDiameter() * blockScale;
 		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = machine.getPenDiameter();
+		float zigZagSpacing = settings.getPenDiameter();
 		float spaceBetweenLines = stepSize;
 
 		// from top to bottom of the image...

@@ -1,8 +1,8 @@
 package com.marginallyclever.artPipeline;
 
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
 
+import com.marginallyclever.artPipeline.loadAndSave.ImageConverterThread;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -12,29 +12,40 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * shared methods for image manipulation (generating, converting, or filtering)
  * @author Dan
  */
-public abstract class ImageManipulator {		
-	// pen position optimizing
+public abstract class ImageManipulator {
 	public Turtle turtle = new Turtle();
+	
 	// threading
-	protected ProgressMonitor pm;
-	protected SwingWorker<Void, Void> swingWorker;
+	private ProgressMonitor pm;
+	private ImageConverterThread thread;
+	
 	// helpers
-	protected MakelangeloRobotSettings machine;
+	protected MakelangeloRobotSettings settings;
 
 	
-	public void setSwingWorker(SwingWorker<Void, Void> p) {
-		swingWorker = p;
+	public void setThread(ImageConverterThread p) {
+		thread = p;
 	}
 
 	public void setProgressMonitor(ProgressMonitor p) {
 		pm = p;
 	}
 	
+	public void setProgress(int d) {
+		if(pm==null) return;
+		pm.setProgress(d);
+	}
+	
 	public void setRobot(MakelangeloRobot robot) {
-		machine = robot.getSettings();
+		settings = robot.getSettings();
 	}
 
-
+	public boolean isThreadCancelled() {
+		if(thread!=null && thread.isCancelled()) return true;
+		if(pm!=null && !pm.isCanceled()) return true;
+		return false;
+	}
+	
 	/**
 	 * @return the translated name of the manipulator.
 	 */
@@ -42,29 +53,11 @@ public abstract class ImageManipulator {
 		return "Unnamed";
 	}
 
-
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < machine.getMarginLeft()  ) return false;
-		if( x > machine.getMarginRight() ) return false;
-		if( y < machine.getMarginBottom()) return false;
-		if( y > machine.getMarginTop()   ) return false;
+		if( x < settings.getMarginLeft()  ) return false;
+		if( x > settings.getMarginRight() ) return false;
+		if( y < settings.getMarginBottom()) return false;
+		if( y > settings.getMarginTop()   ) return false;
 		return true;
 	}
 }
-
-/**
- * This file is part of Makelangelo.
- * <p>
- * Makelangelo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * Makelangelo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
- */

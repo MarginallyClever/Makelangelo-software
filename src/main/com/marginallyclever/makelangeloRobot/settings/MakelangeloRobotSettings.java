@@ -56,7 +56,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private double paperBottom;
 	private double paperTop;
 	private double rotation;
-	private double rotationref;
+	private double rotationRef;
 	// % from edge of paper.
 	private double paperMargin;
 
@@ -465,7 +465,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		paperTop    = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top",Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom",Double.toString(paperBottom)));
 		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation",Double.toString(rotation)));
-		rotationref = 0;
+		rotationRef = 0;
 
 		accelerationMax=Float.valueOf(uniqueMachinePreferencesNode.get("acceleration",Float.toString(accelerationMax)));
 
@@ -918,12 +918,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public void setRotationRef(double ang) {
-		this.rotationref=ang;
+		this.rotationRef=ang;
 		
 	}
 
 	public double getRotationRef() {
-		return this.rotationref;
+		return this.rotationRef;
 	}
 
 }

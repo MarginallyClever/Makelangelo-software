@@ -43,15 +43,15 @@ public class Converter_Sandy extends ImageConverter {
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		double yBottom = machine.getLimitBottom();
-		double yTop    = machine.getLimitTop();
-		double xLeft   = machine.getLimitLeft();
-		double xRight  = machine.getLimitRight();
+		double yBottom = settings.getLimitBottom();
+		double yTop    = settings.getLimitTop();
+		double xLeft   = settings.getLimitLeft();
+		double xRight  = settings.getLimitRight();
 
-		double pBottom = machine.getMarginBottom() +1.0;
-		double pTop    = machine.getMarginTop()    -1.0;
-		double pLeft   = machine.getMarginLeft()   +1.0;
-		double pRight  = machine.getMarginRight()  -1.0;
+		double pBottom = settings.getMarginBottom() +1.0;
+		double pTop    = settings.getMarginTop()    -1.0;
+		double pLeft   = settings.getMarginLeft()   +1.0;
+		double pRight  = settings.getMarginRight()  -1.0;
 
 		double cx,cy;
 		double last_x=0,last_y=0;
@@ -79,7 +79,7 @@ public class Converter_Sandy extends ImageConverter {
 		double pulseFlip=1;
 		double t,t_step;
 		double flipSum;
-		double pulseSize = rStep*0.5 - machine.getPenDiameter()/2;//r_step * 0.6 * scale_z;
+		double pulseSize = rStep*0.5 - settings.getPenDiameter()/2;//r_step * 0.6 * scale_z;
 
 		turtle = new Turtle();
 		turtle.lock();
@@ -91,7 +91,7 @@ public class Converter_Sandy extends ImageConverter {
 			for(r=rMin;r<rMax;r+=rStep) {
 				// go around in a circle
 				t=0;
-				t_step = machine.getPenDiameter()/r;
+				t_step = settings.getPenDiameter()/r;
 				flipSum=0;
 				// go around the circle
 				for(t=0;t<Math.PI*2;t+=t_step) {

@@ -56,11 +56,16 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.artPipeline.ArtPipeline;
+import com.marginallyclever.artPipeline.ArtPipelineEvent;
 import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImagePanel;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
@@ -101,6 +106,7 @@ public final class Makelangelo extends TransferHandler {
 	private ConnectionManager connectionManager;
 	private Camera camera;
 	private MakelangeloRobot robot;
+	private ArtPipeline myPipeline = new ArtPipeline();
 
 	private String lastFileIn = "";
 	private FileFilter lastFilterIn = null;
@@ -127,7 +133,6 @@ public final class Makelangelo extends TransferHandler {
 			makelangeloProgram.run();
 		});
 	}
-	
 
 	@SuppressWarnings("deprecation")
 	public Makelangelo() {
@@ -156,18 +161,23 @@ public final class Makelangelo extends TransferHandler {
 		robot.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
-		
 		logPanel.addListener((command)->{
 			robot.sendLineToRobot(command);
 		});
 
 		Log.message("Starting camera...");
 		camera = new Camera();
+		
 		Log.message("Starting connection manager...");
-		// network connections
 		connectionManager = new ConnectionManager();
+		
+		Log.message("Starting art pipeline...");
+		myPipeline.addListener((e)->{
+			if(e.type==ArtPipelineEvent.FINISHED) {
+				robot.setTurtle((Turtle)e.extra);
+			}
+		});
 	}
-	
 	
 	public void run() {
 		createAppWindow();		
@@ -177,7 +187,6 @@ public final class Makelangelo extends TransferHandler {
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
 	}
 
-	
 	// check if we need to ask about sharing
 	private void checkSharingPermission() {
 		Log.message("Checking sharing permissions...");
@@ -194,7 +203,6 @@ public final class Makelangelo extends TransferHandler {
 		}
 	}
 
-	
 	/**
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
 	 * @return the refreshed menu bar
@@ -320,7 +328,6 @@ public final class Makelangelo extends TransferHandler {
 		return menuBar;
 	}
 
-	
 	/**
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
 	 * redirect notice to find the latest release tag.
@@ -373,7 +380,6 @@ public final class Makelangelo extends TransferHandler {
 		}
 	}
 
-	
 	/**
 	 * See
 	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
@@ -384,7 +390,6 @@ public final class Makelangelo extends TransferHandler {
 	 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
 	 * ex.printStackTrace(); } System.exit(0); }
 	 */
-
 
 	private Container createContentPane() {
 		Log.message("create content pane...");
@@ -465,7 +470,6 @@ public final class Makelangelo extends TransferHandler {
 		mainFrame.setTransferHandler(this);
 	}
 
-	
 	private void adjustWindowSize() {
 		Log.message("adjust window size...");
 
@@ -499,7 +503,6 @@ public final class Makelangelo extends TransferHandler {
 		// mainFrame.setLocation(locationX,locationY);
 	}
 
-	
 	/**
 	 * Display a dialog asking the user to change the pen
 	 * @param toolNumber a 24 bit RGB color of the new pen.
@@ -534,34 +537,28 @@ public final class Makelangelo extends TransferHandler {
 		JOptionPane.showMessageDialog(mainFrame, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 	
-	
 	private void whenIdentityConfirmed(MakelangeloRobot r) {
 		if(previewPanel != null) previewPanel.repaint();
 
 		robot.sendConfig();
 	}
 
-	
 	private void whenBadFirmwareDetected(String versionFound) {
 		(new DialogBadFirmwareVersion()).display(mainFrame, versionFound);
 	}
 
-	
 	private void whenBadHardwareDetected(String versionFound) {
 		JOptionPane.showMessageDialog(mainFrame, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
 	}
 
-	
 	private void whenDisconnected() {
 		if(previewPanel != null) previewPanel.repaint();
 		SoundSystem.playDisconnectSound();
 	}
 
-	
 	public NetworkConnection requestNewConnection() {
 		return connectionManager.requestNewConnection(this.mainFrame);
 	}
-	
 
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
@@ -600,18 +597,14 @@ public final class Makelangelo extends TransferHandler {
 		preferences.putInt("Default window location x", location.x);
 		preferences.putInt("Default window location y", location.y);
 	}
-
-	
 	
 	public JFrame getMainFrame() {
 		return mainFrame;
 	}
-	
 
 	public MakelangeloRobot getRobot() {
 		return robot;
 	}
-	
 	
 	// transfer handler
 	@Override
@@ -624,7 +617,6 @@ public final class Makelangelo extends TransferHandler {
         return true;
     }
 
-	
 	// transfer handler
 	@Override
     public boolean importData(TransferHandler.TransferSupport info) {
@@ -652,7 +644,6 @@ public final class Makelangelo extends TransferHandler {
         return openFileOnDemand(filename);
     }
 	
-
 	/**
 	 * Open a file with a given LoadAndSaveFileType plugin.  
 	 * The loader might spawn a new thread and return before the load is actually finished.
@@ -662,21 +653,30 @@ public final class Makelangelo extends TransferHandler {
 	 */
 	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
 		boolean success = false;
-		try (final InputStream fileInputStream = new FileInputStream(filename)) {
-			success=loader.load(fileInputStream,robot,mainFrame);
-		} catch(IOException e) {
+		try(final InputStream fileInputStream = new FileInputStream(filename)) {
+			if(loader instanceof LoadAndSaveImage) {
+				LoadAndSaveImage imageLoader = (LoadAndSaveImage)loader;
+				imageLoader.load(fileInputStream, robot, mainFrame);
+				runImageConversionProcess(imageLoader);
+			} else {
+				Turtle t = loader.load(fileInputStream,robot,mainFrame);
+				myPipeline.processTurtle(t, robot.getSettings());
+			}
+			success=true;
+		} catch(Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 
-		// TODO don't rely on success to be true, load may not have finished yet.
-		if (success == true) {
-			SoundSystem.playConversionFinishedSound();
-			if( robotPanel != null ) robotPanel.updateButtonAccess();
-		}
-		
 		return success;
 	}
 	
+	private void runImageConversionProcess(LoadAndSaveImage imageLoader) {
+		LoadAndSaveImagePanel panel = new LoadAndSaveImagePanel(imageLoader);
+		panel.run(mainFrame);
+	}
+	
+
 	/**
 	 * User has asked that a file be opened.
 	 * @param filename the file to be opened.
@@ -699,7 +699,6 @@ public final class Makelangelo extends TransferHandler {
 		return false;
 	}
 
-	
 	public void reopenLastFile() {
 		openFileOnDemand(lastFileIn);
 	}
@@ -736,6 +735,7 @@ public final class Makelangelo extends TransferHandler {
 				if(success) {
 					lastFilterIn = selectedFilter;
 					lastFileIn = selectedFile;
+					SoundSystem.playConversionFinishedSound();
 					if( robotPanel != null ) robotPanel.updateButtonAccess();
 					break;
 				}
@@ -743,7 +743,6 @@ public final class Makelangelo extends TransferHandler {
 		}
 	}
 
-	
 	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
 		if(!a.getDescription().equals(b.getDescription())) return false;
 		String [] aa = a.getExtensions();
@@ -754,7 +753,6 @@ public final class Makelangelo extends TransferHandler {
 		}
 		return true;
 	}
-	
 	
 	public void saveFile() {
 		// list all the known savable file types.
@@ -821,6 +819,10 @@ public final class Makelangelo extends TransferHandler {
 	
 	public String getLastFileIn() {
 		return lastFileIn;
+	}
+
+	public ArtPipeline getPipeline() {
+		return myPipeline;
 	}
 }
 

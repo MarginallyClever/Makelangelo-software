@@ -29,7 +29,7 @@ public class Converter_RandomLines extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 
-		float stepSize = machine.getPenDiameter()*5;
+		float stepSize = settings.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -37,10 +37,10 @@ public class Converter_RandomLines extends ImageConverter {
 		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)machine.getMarginBottom();
-		float yTop    = (float)machine.getMarginTop()   ;
-		float xLeft   = (float)machine.getMarginLeft()  ;
-		float xRight  = (float)machine.getMarginRight() ;
+		float yBottom = (float)settings.getMarginBottom();
+		float yTop    = (float)settings.getMarginTop()   ;
+		float xLeft   = (float)settings.getMarginLeft()  ;
+		float xRight  = (float)settings.getMarginRight() ;
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 

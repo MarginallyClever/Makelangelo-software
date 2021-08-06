@@ -6,11 +6,12 @@ import java.io.OutputStream;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
  * Interface for the service handler
- * @author Admin
+ * @author Dan Royer
  *
  */
 public interface LoadAndSaveFileType {
@@ -52,7 +53,7 @@ public interface LoadAndSaveFileType {
 	 * @param parentComponent parent component of dialogs, if any.
 	 * @return true if load successful.
 	 */
-	public boolean load(InputStream inputStream,MakelangeloRobot robot, Component parentComponent);
+	public Turtle load(InputStream inputStream,MakelangeloRobot robot, Component parentComponent) throws Exception;
 	
 	/**
 	 * attempt to save makelangelo instructions to a given stream

@@ -76,16 +76,21 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		panel.add(simplify);
 		panel.add(crop);
 		panel.invalidate();
-		
+
 		resize.addPropertyChangeListener((evt)-> {
-			setPreferredResizeStyle(resize.getSelectedIndex());
+			int style = resize.getSelectedIndex();
+			setPreferredResizeStyle(style);
+			myPipeline.setShouldResizeFit(style==1);
+			myPipeline.setShouldResizeFill(style==2);
 			myPipeline.reprocessTurtle();
 		});
 		flip.addPropertyChangeListener((evt)-> {
-			setPreferredFlipStyle(flip.getSelectedIndex());
+			int style = flip.getSelectedIndex();
+			setPreferredFlipStyle(style);
+			myPipeline.setShouldFlipH(style == 1 || style==3);
+			myPipeline.setShouldFlipV(style == 2 || style==3);
 			myPipeline.reprocessTurtle();
 		});
-
 		reorder.addPropertyChangeListener((evt)-> {
 			myPipeline.setShouldReorder(reorder.isSelected());
 			myPipeline.reprocessTurtle();

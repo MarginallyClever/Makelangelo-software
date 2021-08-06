@@ -202,7 +202,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	private void scanColor(int i) {
 		// "please change to tool X and press any key to continue"
 		turtle.penUp();
-		turtle.setColor(machine.getPenDownColorDefault());
+		turtle.setColor(settings.getPenDownColorDefault());
 		Log.message("Color " + i );
 
 		scanForContiguousBlocks(i);
@@ -229,12 +229,12 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
-		yBottom = machine.getMarginBottom();
-		yTop    = machine.getMarginTop();
-		xLeft   = machine.getMarginLeft();
-		xRight  = machine.getMarginRight();
+		yBottom = settings.getMarginBottom();
+		yTop    = settings.getMarginTop();
+		xLeft   = settings.getMarginLeft();
+		xRight  = settings.getMarginRight();
 		
-		diameter = (int)( machine.getPenDiameter() );
+		diameter = (int)( settings.getPenDiameter() );
 
 		imgChanged = img;
 

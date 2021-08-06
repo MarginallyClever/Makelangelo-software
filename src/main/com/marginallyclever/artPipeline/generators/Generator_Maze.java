@@ -142,10 +142,10 @@ public class Generator_Maze extends ImageGenerator {
 	}
 
 	private void drawMaze() {
-		yMin = (float)machine.getMarginBottom();
-		yMax = (float)machine.getMarginTop();
-		xMin = (float)machine.getMarginLeft();
-		xMax = (float)machine.getMarginRight();
+		yMin = (float)settings.getMarginBottom();
+		yMax = (float)settings.getMarginTop();
+		xMin = (float)settings.getMarginLeft();
+		xMax = (float)settings.getMarginRight();
 		
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;

@@ -57,17 +57,17 @@ public class Converter_Crosshatch extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angleDeg));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = machine.getPenDiameter()*2;
+		float stepSize = settings.getPenDiameter()*2;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop();
-		double xLeft   = machine.getMarginLeft();
-		double xRight  = machine.getMarginRight();
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop();
+		double xLeft   = settings.getMarginLeft();
+		double xRight  = settings.getMarginRight();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);
@@ -111,12 +111,12 @@ public class Converter_Crosshatch extends ImageConverter {
 		// corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		double yStart = machine.getMarginBottom();
-		double yEnd   = machine.getMarginTop();
-		double xStart = machine.getMarginLeft();
-		double xEnd   = machine.getMarginRight();
+		double yStart = settings.getMarginBottom();
+		double yEnd   = settings.getMarginTop();
+		double xStart = settings.getMarginLeft();
+		double xEnd   = settings.getMarginRight();
 
-		double stepSize = machine.getPenDiameter() * intensity;
+		double stepSize = settings.getPenDiameter() * intensity;
 		double x, y;
 		boolean flip = true;
 

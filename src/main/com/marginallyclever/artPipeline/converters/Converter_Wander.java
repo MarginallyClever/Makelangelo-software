@@ -59,7 +59,7 @@ public class Converter_Wander extends ImageConverter {
 	protected int outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
 		turtle.setColor(newColor);
 
-		float stepSize = machine.getPenDiameter()*5;
+		float stepSize = settings.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
 		float halfStep = stepSize/2;
 
@@ -67,10 +67,10 @@ public class Converter_Wander extends ImageConverter {
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		double yBottom = machine.getMarginBottom();
-		double yTop    = machine.getMarginTop()   ;
-		double xLeft   = machine.getMarginLeft()  ;
-		double xRight  = machine.getMarginRight() ;
+		double yBottom = settings.getMarginBottom();
+		double yTop    = settings.getMarginTop()   ;
+		double xLeft   = settings.getMarginLeft()  ;
+		double xRight  = settings.getMarginRight() ;
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;

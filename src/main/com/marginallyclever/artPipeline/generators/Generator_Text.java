@@ -106,24 +106,24 @@ public class Generator_Text extends ImageGenerator {
 	}
 	
 	protected void setupTransform() {
-		double imageHeight = machine.getPaperHeight()*machine.getPaperMargin();
-		double imageWidth = machine.getPaperWidth()*machine.getPaperMargin();
+		double imageHeight = settings.getPaperHeight()*settings.getPaperMargin();
+		double imageWidth = settings.getPaperWidth()*settings.getPaperMargin();
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > machine.getPaperWidth()) {
-			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > settings.getPaperWidth()) {
+			float resize = (float) settings.getPaperWidth() / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = machine.getPaperWidth();
+			newWidth = settings.getPaperWidth();
 		}
-		if (newHeight > machine.getPaperHeight()) {
-			float resize = (float) machine.getPaperHeight() / (float) newHeight;
+		if (newHeight > settings.getPaperHeight()) {
+			float resize = (float) settings.getPaperHeight() / (float) newHeight;
 			newWidth *= resize;
-			newHeight = machine.getPaperHeight();
+			newHeight = settings.getPaperHeight();
 		}
-		newWidth *= machine.getPaperMargin();
-		newHeight *= machine.getPaperMargin();
+		newWidth *= settings.getPaperMargin();
+		newHeight *= settings.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -139,18 +139,18 @@ public class Generator_Text extends ImageGenerator {
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > machine.getPaperWidth()) {
-			float resize = (float) machine.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > settings.getPaperWidth()) {
+			float resize = (float) settings.getPaperWidth() / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = machine.getPaperWidth();
+			newWidth = settings.getPaperWidth();
 		}
-		if (newHeight > machine.getPaperHeight()) {
-			float resize = (float) machine.getPaperHeight() / (float) newHeight;
+		if (newHeight > settings.getPaperHeight()) {
+			float resize = (float) settings.getPaperHeight() / (float) newHeight;
 			newWidth *= resize;
-			newHeight = machine.getPaperHeight();
+			newHeight = settings.getPaperHeight();
 		}
-		newWidth *= machine.getPaperMargin();
-		newHeight *= machine.getPaperMargin();
+		newWidth *= settings.getPaperMargin();
+		newHeight *= settings.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -301,7 +301,7 @@ public class Generator_Text extends ImageGenerator {
 		turtle = new Turtle();
 		posx=0;
 		posy=0;
-		textFindCharsPerLine(machine.getPaperWidth()*machine.getPaperMargin());
+		textFindCharsPerLine(settings.getPaperWidth()*settings.getPaperMargin());
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
 		writeBeautifulMessage(fontName,lastSize,lastMessage);
@@ -586,12 +586,12 @@ public class Generator_Text extends ImageGenerator {
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition(
-				(float)(machine.getPaperWidth() *10.0f*machine.getPaperMargin()),
-				(float)(machine.getPaperHeight()*10.0f*machine.getPaperMargin()));
+				(float)(settings.getPaperWidth() *10.0f*settings.getPaperMargin()),
+				(float)(settings.getPaperHeight()*10.0f*settings.getPaperMargin()));
 
 		textSetCharsPerLine(25);
 
-		textCreateMessageNow( "Makelangelo #" + Long.toString(machine.getUID()) );
+		textCreateMessageNow( "Makelangelo #" + Long.toString(settings.getUID()) );
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.");
 	}
 }

@@ -84,8 +84,8 @@ public class Generator_Spirograph extends ImageGenerator {
 		drawSpirograph(false);
 
 		// scale the step size so the spirograph fits on the paper
-		double paperWidth  = machine.getMarginWidth();
-		double paperHeight = machine.getMarginHeight();
+		double paperWidth  = settings.getMarginWidth();
+		double paperHeight = settings.getMarginHeight();
 
 		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
 		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the

@@ -152,6 +152,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 				return;
 			} else {
 				gl2.glColor3f(1, 0, 1);
+				gl2.glLineWidth(1);
 				gl2.glBegin(GL2.GL_LINE_LOOP);
 				gl2.glVertex2d(bounds.getMinX(), bounds.getMinY());
 				gl2.glVertex2d(bounds.getMinX(), bounds.getMaxY());
@@ -180,10 +181,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yMin = machine.getMarginBottom();
-		yMax = machine.getMarginTop();
-		xMin = machine.getMarginLeft();
-		xMax = machine.getMarginRight();
+		yMin = settings.getMarginBottom();
+		yMax = settings.getMarginTop();
+		xMin = settings.getMarginLeft();
+		xMax = settings.getMarginRight();
 
 		keepIterating=true;
 		restart();
@@ -370,7 +371,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void writeOutCells() {
 		turtle = new Turtle();
 
-		float toolDiameter = machine.getPenDiameter();
+		float toolDiameter = settings.getPenDiameter();
 
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
