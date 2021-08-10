@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -36,8 +38,7 @@ public class FileAccess {
 			return new BufferedInputStream(getInputStream(filename));
 		}
 	}
-	
-	
+		
 	private static InputStream getInputStream(String fname) throws IOException {
 		InputStream s = FileAccess.class.getResourceAsStream(fname);
 		if( s==null ) {
@@ -45,8 +46,7 @@ public class FileAccess {
 		}
 		return s;
 	}
-	
-	
+		
 	private static BufferedInputStream loadFromZip(String zipName,String fname) throws IOException {
 		ZipInputStream zipFile=null;
 		ZipEntry entry;
@@ -58,18 +58,8 @@ public class FileAccess {
 
 		while((entry = zipFile.getNextEntry())!=null) {
 	        if( entry.getName().equals(fname) ) {
-		        // read buffered stream into temp file.
-		        File f = File.createTempFile(fnameNoSuffix, fnameSuffix);
-		        f.setReadable(true);
-		        f.setWritable(true);
-                f.deleteOnExit();
-		        FileOutputStream fos = new FileOutputStream(f);
-	    		byte[] buffer = new byte[2048];
-	    		int len;
-                while ((len = zipFile.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
+	        	File f = createTempFile(fnameNoSuffix, fnameSuffix);                
+	        	readZipFileIntoTempFile(zipFile,f);
 		        // return temp file as input stream
                 return new BufferedInputStream(new FileInputStream(f));
 	        }
@@ -78,5 +68,37 @@ public class FileAccess {
 	    zipFile.close();
 
 	    throw new IOException("file not found in zip.");
+	}
+
+	private static File createTempFile(String fnameNoSuffix, String fnameSuffix) throws IOException {
+        File f = File.createTempFile(fnameNoSuffix, fnameSuffix);
+        f.setReadable(true);
+        f.setWritable(true);
+        f.deleteOnExit();
+		return f;
+	}
+
+	private static void readZipFileIntoTempFile(ZipInputStream zipFile, File f) throws IOException {
+        FileOutputStream fos = new FileOutputStream(f);
+		byte[] buffer = new byte[2048];
+		int len;
+        while ((len = zipFile.read(buffer)) > 0) {
+            fos.write(buffer, 0, len);
+        }
+        fos.close();
+	}
+
+	public static String getUserDirectory() {
+		return System.getProperty("user.dir");
+	}
+	
+	public static String getTempDirectory() { 
+		return System.getProperty("java.io.tmpdir");
+	}
+	
+	public static String getWorkingDirectory() {
+		Path currentRelativePath = Paths.get("");
+		String s = currentRelativePath.toAbsolutePath().toString();
+		return s;
 	}
 }
