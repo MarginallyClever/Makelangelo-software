@@ -332,7 +332,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 
 		<!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
 		<dependency>
-			<groupId>net.sourceforge</groupId>
+			<groupId>org.kabeja</groupId>
 			<artifactId>kabeja</artifactId>
 			<version>0.4</version>
 		</dependency>
