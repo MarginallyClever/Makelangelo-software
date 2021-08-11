@@ -32,28 +32,26 @@ Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest 
 ## Install Makelangelo Software App
 
 * Goto https://github.com/MarginallyClever/Makelangelo-software/
-* Download this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it.  Note the folder for later.
+* Download this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it. Note the folder for later.
 
 2 options are available for building the application:
 - with Eclipse: fully graphical but long
 - with Maven in a console: fast and reliable
 
 ### Eclipse IDE building
-* Download Eclipse IDE: https://www.eclipse.org/downloads/
-* install the latest.  
-* Choose "Eclipse IDE for Java developers"
-* In Eclipse. Fo to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
-* If you see the "Weldome!" tab, close it.
+* Go to Eclipse website: https://www.eclipse.org/downloads/, choose "Eclipse IDE for Java developers" and install the latest version.
+* Launch '"clipse IDE" when done and go to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
+* If you see the "Welcome!" tab, close it.
 * select Run > Debug As > Java Application
 * select "Makelangelo - com.marginallyclever.makelangelo" and click OK.  (It should be the top of the list)
-* Wait while the progress bar in the bottom right fills up.  This is a one time thing while it installs other dependencies and packages and puts everything together.
+* Wait while the progress bar in the bottom right fills up. This is a one time thing while it installs other dependencies and packages and puts everything together.
 * "Errors exist...Proceed with launch?" Select Proceed.
 
 🎉 Application should now launch.
 
 ### Console building
 * Open a terminal emulator (`cmd` on Windows, `Terminal` on macOS or GNU/Linux) in the extracted folder.
-* Build the application with `mvnw`:
+* Build the application with `mvnw` (the first time, it downloads a lot of files):
   * `./mvnw clean install` on macOS or GNU/Linux
   * `mvnw.cmd clean install` on Windows
 * in the `target/` folder, launch the jar file with a name like : `Makelangelo*-with-dependencies.jar`
