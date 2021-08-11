@@ -39,7 +39,7 @@ jobs:
       #if: matrix.os == 'windows-latest'
 # GME      uses: WebFreak001/deploy-nightly@v1.0.1
 # GME      env:
-# GME        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+# GME        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions 
 # GME      with:
         # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
         # in your browser and copy the full "upload_url" value including the {?name,label} part
