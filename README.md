@@ -34,9 +34,9 @@ Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest 
 * Goto https://github.com/MarginallyClever/Makelangelo-software/
 * Download this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it.  Note the folder for later.
 
-2 options is available for building the application:
-- with Eclipse, fully graphical but long
-- with a console, fast and reliable
+2 options are available for building the application:
+- with Eclipse: fully graphical but long
+- with Maven in a console: fast and reliable
 
 ### Eclipse IDE building
 * Download Eclipse IDE: https://www.eclipse.org/downloads/
