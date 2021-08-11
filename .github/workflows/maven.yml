@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - dev
-      - mvn
 
 jobs:
   build:
@@ -35,17 +34,17 @@ jobs:
       run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
 
     # from https://github.com/marketplace/actions/deploy-nightly
-# GME     - name: Deploy universal release
+    - name: Deploy universal release
       #if: matrix.os == 'windows-latest'
-# GME      uses: WebFreak001/deploy-nightly@v1.0.1
-# GME      env:
-# GME        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-# GME      with:
+      uses: WebFreak001/deploy-nightly@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
         # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
         # in your browser and copy the full "upload_url" value including the {?name,label} part
-# GME        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/28176830/assets{?name,label}
-# GME        release_id: 28176830 # same as above (id can just be taken out the upload_url, it's used to find old releases)
-# GME        asset_path: ./target/to-upload.jar # path to archive to upload
-# GME        asset_name: makelangelo-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
-# GME        asset_content_type: application/zip # required by GitHub API
-# GME        max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/28176830/assets{?name,label}
+        release_id: 28176830 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        asset_path: ./target/to-upload.jar # path to archive to upload
+        asset_name: makelangelo-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_content_type: application/zip # required by GitHub API
+        max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
