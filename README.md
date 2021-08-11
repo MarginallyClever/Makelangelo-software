@@ -15,8 +15,7 @@ It pairs really well with [Makelangelo-firmware](https://github.com/MarginallyCl
 Steps to get started poking the code:
 
 1. Install The latest OpenJDK (java software)
-2. Install Eclipse (prorgramming interface)
-4. Install the Makelangelo Software App
+2. Install Makelangelo Software App
 
 Then you should be able to run the application.
 
@@ -30,16 +29,19 @@ Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest 
 
 *Linux*: https://linuxize.com/post/install-java-on-ubuntu-18-04/ _untested_
 
-## Install Eclipse
-
-* Download Eclipse IDE: https://www.eclipse.org/downloads/
-* install the latest.  
-* Choose "Eclipse IDE for Java developers"
-
 ## Install Makelangelo Software App
 
 * Goto https://github.com/MarginallyClever/Makelangelo-software/
-* Fownload this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it.  Note the folder for later.
+* Download this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it.  Note the folder for later.
+
+2 options is available for building the application:
+- with Eclipse, fully graphical but long
+- with a console, fast and reliable
+
+### Eclipse IDE building
+* Download Eclipse IDE: https://www.eclipse.org/downloads/
+* install the latest.  
+* Choose "Eclipse IDE for Java developers"
 * In Eclipse. Fo to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
 * If you see the "Weldome!" tab, close it.
 * select Run > Debug As > Java Application
@@ -47,7 +49,18 @@ Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest 
 * Wait while the progress bar in the bottom right fills up.  This is a one time thing while it installs other dependencies and packages and puts everything together.
 * "Errors exist...Proceed with launch?" Select Proceed.
 
-Application should now launch.
+🎉 Application should now launch.
+
+### Console building
+* Open a terminal emulator (`cmd` on Windows, `Terminal` on macOS or GNU/Linux) in the extracted folder.
+* Build the application with `mvnw`:
+  * `./mvnw clean install` on macOS or GNU/Linux
+  * `mvnw.cmd clean install` on Windows
+* in the `target/` folder, launch the jar file with a name like : `Makelangelo*-with-dependencies.jar`
+  * double click on it OR
+  * in the previously opened console, run `java -jar target/Makelangelo*-with-dependencies.jar`
+
+🎉 Application should now launch.
 
 ## Thank you
 
