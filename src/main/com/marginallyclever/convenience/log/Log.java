@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Makelangelo;
 
 /**
@@ -44,12 +45,13 @@ public class Log {
 	public static void addListener(LogListener listener) {
 		listeners.add(listener);
 	}
+	
 	public static void removeListener(LogListener listener) {
 		listeners.remove(listener);
 	}
 	
 	public static void start() {
-		LOG_FILE_PATH = System.getProperty("user.dir");//System.getProperty("java.io.tmpdir");
+		LOG_FILE_PATH = FileAccess.getUserDirectory();
 		if(!LOG_FILE_PATH.endsWith(File.separator)) {
 			LOG_FILE_PATH+=File.separator;
 		}

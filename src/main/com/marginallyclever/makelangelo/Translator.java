@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preferences.LanguagePreferences;
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
@@ -148,7 +149,7 @@ public final class Translator {
 				myPath = Paths.get(uri);
 			}
 
-			Path rootPath = FileSystems.getDefault().getPath(System.getProperty("user.dir"));
+			Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
 			Log.message("rootDir="+rootPath.toString());
 			
 			// we'll look inside the JAR file first, then look in the working directory.

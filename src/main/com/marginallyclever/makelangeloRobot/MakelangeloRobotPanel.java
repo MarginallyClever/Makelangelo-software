@@ -499,48 +499,54 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	}
 		
 	private void generateImage() {
-		// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-
-		final JPanel cards = new JPanel(new CardLayout());
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		int i=0;
-		for( ImageGenerator ici : imageGenerators ) {
-			cards.add(ici.getPanel().getPanel(),ici.getName());
-			i++;
-		}
-		
-		String[] imageGeneratorNames = new String[i];
-		
-		i=0;
-		for( ImageManipulator f : imageGenerators ) {
-			imageGeneratorNames[i++] = f.getName();
-		}
-
-		final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
-		options.setSelectedIndex(generatorChoice);
-
-		panel.add(options,BorderLayout.PAGE_START);
-		panel.add(cards,BorderLayout.CENTER);
-
-		options.addItemListener(new ItemListener() {
-        	@Override
-			public void itemStateChanged(ItemEvent e) {
-			    CardLayout cl = (CardLayout)(cards.getLayout());
-			    cl.show(cards, (String)e.getItem());
-			    
-				changeGeneratorPanel(options.getSelectedIndex());
+		Log.message("Generating image...");
+		try {
+			// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
+			final JPanel panel = new JPanel();
+			panel.setLayout(new BorderLayout());
+	
+			final JPanel cards = new JPanel(new CardLayout());
+			ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+			int i=0;
+			for( ImageGenerator ici : imageGenerators ) {
+				cards.add(ici.getPanel().getPanel(),ici.getName());
+				i++;
 			}
-		});
-		
-		changeGeneratorPanel(options.getSelectedIndex());
-		
-		JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("MenuGenerate"));
-		dialog.add(panel);
-		dialog.pack();
-		dialog.setVisible(true);
-		// other app buttons are still accessible.
+			
+			String[] imageGeneratorNames = new String[i];
+			
+			i=0;
+			for( ImageManipulator f : imageGenerators ) {
+				imageGeneratorNames[i++] = f.getName();
+			}
+	
+			final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
+			options.setSelectedIndex(generatorChoice);
+	
+			panel.add(options,BorderLayout.PAGE_START);
+			panel.add(cards,BorderLayout.CENTER);
+	
+			options.addItemListener(new ItemListener() {
+	        	@Override
+				public void itemStateChanged(ItemEvent e) {
+				    CardLayout cl = (CardLayout)(cards.getLayout());
+				    cl.show(cards, (String)e.getItem());
+				    
+					changeGeneratorPanel(options.getSelectedIndex());
+				}
+			});
+			
+			changeGeneratorPanel(options.getSelectedIndex());
+			
+			JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("MenuGenerate"));
+			dialog.add(panel);
+			dialog.pack();
+			dialog.setVisible(true);
+			// other app buttons are still accessible.
+		}
+		catch(Exception e) {
+			Log.error(e.getLocalizedMessage());
+		}
 	}
 	
 	private void changeGeneratorPanel(int index) {

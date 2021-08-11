@@ -52,10 +52,10 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileType {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeSVG"), "svg");
 	
-	protected boolean shouldScaleOnLoad = true;
+	private boolean shouldScaleOnLoad = true;
 	
-	protected double scale,imageCenterX,imageCenterY;
-	protected double toolMinimumStepSize = 1; //mm
+	private double scale,imageCenterX,imageCenterY;
+	private double toolMinimumStepSize = 1; //mm
 	
 	@Override
 	public String getName() { return "SVG"; }
@@ -136,7 +136,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return turtle;
 	}
 	
-	protected boolean parseAll(Document document) {
+	private boolean parseAll(Document document) {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
 		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path"     ));
@@ -149,11 +149,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return loadOK;
 	}
 
-	protected double TX(double x) {
+	private double TX(double x) {
 		return ( x - imageCenterX ) * scale;
 	}
 	
-	protected double TY(double y) {
+	private double TY(double y) {
 		return ( y - imageCenterY ) * -scale;
 	}
 	
@@ -161,7 +161,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	protected boolean parsePolylineElements(NodeList pathNodes) {
+	private boolean parsePolylineElements(NodeList pathNodes) {
 	    boolean loadOK=true;
 		
 	    int pathNodeCount = pathNodes.getLength();
@@ -207,7 +207,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	}
 	
 	
-	protected boolean parseLineElements(NodeList node) {
+	private boolean parseLineElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -264,7 +264,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param node
 	 * @return
 	 */
-	protected boolean parseRectElements(NodeList node) {
+	private boolean parseRectElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -325,7 +325,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param p0 radian start angle.
 	 * @param p1 radian end angle.
 	 */
-	protected void arcTurtle(Turtle turtle,double cx,double cy,double rx,double ry,double p0,double p1) {
+	private void arcTurtle(Turtle turtle,double cx,double cy,double rx,double ry,double p0,double p1) {
 		double steps=1;
 		if(rx>0 && ry>0) {
 			double r = rx>ry?rx:ry;
@@ -342,7 +342,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		}
 	}
 	
-	protected boolean parseCircleElements(NodeList node) {
+	private boolean parseCircleElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -369,7 +369,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return true;
 	}
 
-	protected boolean parseEllipseElements(NodeList node) {
+	private boolean parseEllipseElements(NodeList node) {
 		try {
 		    int pathNodeCount = node.getLength();
 		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -401,7 +401,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * Parse through all the SVG path elements and raster them to gcode.
 	 * @param paths the source of the elements
 	 */
-	protected boolean parsePathElements(NodeList paths) {
+	private boolean parsePathElements(NodeList paths) {
 	    boolean loadOK=true;
 
 	    double x=turtle.getX();
@@ -524,7 +524,7 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		(new GVTBuilder()).build(bridgeContext, document);
 	}
 
-	public static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
+	private static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
 		SVGDocument ret = null;
 
 		String parser = XMLResourceDescriptor.getXMLParserClassName();

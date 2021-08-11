@@ -105,8 +105,6 @@ public final class Makelangelo {
 	public String VERSION;
 	
 	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
-	private final static int DEFAULT_WINDOW_WIDTH = 1200;
-	private final static int DEFAULT_WINDOW_HEIGHT = 1020;
 
 	private MakelangeloAppPreferences appPreferences;
 	private ConnectionManager connectionManager;
@@ -467,8 +465,6 @@ public final class Makelangelo {
 		mainFrame.setJMenuBar(bar);
 		
 		mainFrame.setContentPane(createContentPane());
-		
-		adjustWindowSize();
 
 		camera.zoomToFit(
 				robot.getSettings().getPaperWidth(),
@@ -476,6 +472,8 @@ public final class Makelangelo {
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
+		
+		setWindowSizeAndPosition();
 
 		setupDropTarget();
 	}
@@ -532,37 +530,39 @@ public final class Makelangelo {
 		});
 	}
 
-	private void adjustWindowSize() {
+	private void setWindowSizeAndPosition() {
 		Log.message("adjust window size...");
-
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
-		int width = preferences.getInt("Default window width", DEFAULT_WINDOW_WIDTH);
-		int height = preferences.getInt("Default window height", DEFAULT_WINDOW_HEIGHT);
 
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		// Set window size
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+
+		// window size
+		int width = preferences.getInt("windowWidth", -1);
+		int height = preferences.getInt("windowHeight", -1);
+		if(width==-1 || height==-1) {
+    		Log.message("...default size");
+			width = Math.min(screenSize.width,1200);
+			height = Math.min(screenSize.height,1020);
+		}
+
 		if (width > screenSize.width || height > screenSize.height) {
 			width = screenSize.width;
 			height = screenSize.height;
-
-			preferences.putInt("Default window width", width);
-			preferences.putInt("Default window height", height);
 		}
 
 		mainFrame.setSize(width, height);
 
-		// by default center the window. Later use preferences.
-		int defaultLocationX = (screenSize.width - width) / 2;
-		int defaultLocationY = (screenSize.height - height) / 2;
-		mainFrame.setLocation(defaultLocationX, defaultLocationY);
-		// int locationX = prefs.getInt("Default window location x",
-		// defaultLocationX);
-		// int locationY = prefs.getInt("Default window location y",
-		// defaultLocationY);
-		// mainFrame.setLocation(locationX,locationY);
+    	int windowX = preferences.getInt("windowX", -1);
+    	int windowY = preferences.getInt("windowY", -1);
+        if(windowX==-1 || windowY==-1) {
+    		Log.message("...default position");
+        	// centered
+        	windowX = (screenSize.width - width)/2;
+        	windowY = (screenSize.height - height)/2;
+        }
+		mainFrame.setLocation(windowX, windowY);
 	}
 
 	/**
@@ -629,7 +629,7 @@ public final class Makelangelo {
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(robot);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			saveWindowRealEstate();
+			saveWindowSizeAndPosition();
 			robot.getSettings().saveConfig();
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
@@ -648,7 +648,7 @@ public final class Makelangelo {
 	}
 
 	// save window position and size
-	private void saveWindowRealEstate() {
+	private void saveWindowSizeAndPosition() {
 		Dimension size = this.mainFrame.getSize();
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
@@ -728,42 +728,45 @@ public final class Makelangelo {
 	}
 
 	public void openFile() {
-		// create the chooser
-		JFileChooser fc = new JFileChooser();
-		
-		// list available loaders
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageLoaders ) {
-			if(lft.canLoad()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-		}
-		
-		// no wild card filter, please.
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last filter used, if any
-		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-		// remember the last path used, if any
-		fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
-		
-		// run the dialog
-		if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-
-			// figure out which of the loaders was requested.
-			for( LoadAndSaveFileType loader : imageLoaders ) {
-				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
-				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
-				if(success) {
-					lastFilterIn = selectedFilter;
-					lastFileIn = selectedFile;
-					SoundSystem.playConversionFinishedSound();
-					if( robotPanel != null ) robotPanel.updateButtonAccess();
-					break;
+		Log.message("Opening file...");
+		try {
+			JFileChooser fc = new JFileChooser();
+			// list available loaders
+			ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+			for( LoadAndSaveFileType lft : imageLoaders ) {
+				if(lft.canLoad()) {
+					FileFilter filter = lft.getFileNameFilter();
+					fc.addChoosableFileFilter(filter);
+				}
+			}		
+			// no wild card filter, please.
+			fc.setAcceptAllFileFilterUsed(false);
+			// remember the last filter used, if any
+			if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
+			// remember the last path used, if any
+			fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
+			
+			// run the dialog
+			if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+				String selectedFile = fc.getSelectedFile().getAbsolutePath();
+				FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
+	
+				// figure out which of the loaders was requested.
+				for( LoadAndSaveFileType loader : imageLoaders ) {
+					if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
+					boolean success = openFileOnDemandWithLoader(selectedFile,loader);
+					if(success) {
+						lastFilterIn = selectedFilter;
+						lastFileIn = selectedFile;
+						SoundSystem.playConversionFinishedSound();
+						if( robotPanel != null ) robotPanel.updateButtonAccess();
+						break;
+					}
 				}
 			}
+		}
+		catch(Exception e) {
+			Log.error(e.getLocalizedMessage());
 		}
 	}
 

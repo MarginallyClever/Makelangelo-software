@@ -1,9 +1,3 @@
-import com.marginallyclever.artPipeline.converters.ImageConverter;
-import com.marginallyclever.artPipeline.generators.ImageGenerator;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
-import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
-
 module com.marginallyclever.makelangelo {
 	requires java.desktop;
 	requires java.prefs;
@@ -21,8 +15,8 @@ module com.marginallyclever.makelangelo {
 	requires xml.apis.ext;
 	requires junit;
 	
-	uses MakelangeloHardwareProperties;
-	provides MakelangeloHardwareProperties with 
+	// See also src/resources/META-INF/services/*
+	provides com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties with 
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.CartesianProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo2Properties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo3_3Properties,
@@ -30,18 +24,18 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5Properties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloCustomProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.ZarplotterProperties;
+	uses com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
 	
-	uses LoadAndSaveFileType;
-	provides LoadAndSaveFileType with
+	provides com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType with
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveDXF,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch2,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch3,
 		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveSVG;
+	uses com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
 
-	uses ImageConverter;
-	provides ImageConverter with
+	provides com.marginallyclever.artPipeline.converters.ImageConverter with
 		com.marginallyclever.artPipeline.converters.Converter_Boxes,
 		com.marginallyclever.artPipeline.converters.Converter_CMYK,
 		com.marginallyclever.artPipeline.converters.Converter_Crosshatch,
@@ -56,9 +50,9 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.artPipeline.converters.Converter_VoronoiStippling,
 		com.marginallyclever.artPipeline.converters.Converter_VoronoiZigZag,
 		com.marginallyclever.artPipeline.converters.Converter_Wander;
+	uses com.marginallyclever.artPipeline.converters.ImageConverter;
 
-	uses ImageGenerator;
-	provides ImageGenerator with
+	provides com.marginallyclever.artPipeline.generators.ImageGenerator with
 		com.marginallyclever.artPipeline.generators.Generator_Border,
 		com.marginallyclever.artPipeline.generators.Generator_Dragon,
 		com.marginallyclever.artPipeline.generators.Generator_FibonacciSpiral,
@@ -75,11 +69,12 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.artPipeline.generators.Generator_SierpinskiTriangle,
 		com.marginallyclever.artPipeline.generators.Generator_Spirograph,
 		com.marginallyclever.artPipeline.generators.Generator_Text;
+	uses com.marginallyclever.artPipeline.generators.ImageGenerator;
 
-	uses MachineStyle;
-	provides MachineStyle with
+	provides com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle with
 		com.marginallyclever.makelangeloRobot.machineStyles.CoreXY,
 		com.marginallyclever.makelangeloRobot.machineStyles.Cartesian,
 		com.marginallyclever.makelangeloRobot.machineStyles.Polargraph,
 		com.marginallyclever.makelangeloRobot.machineStyles.Zarplotter;
+	uses com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 }
