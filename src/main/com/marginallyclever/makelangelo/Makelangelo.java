@@ -728,42 +728,45 @@ public final class Makelangelo {
 	}
 
 	public void openFile() {
-		// create the chooser
-		JFileChooser fc = new JFileChooser();
-		
-		// list available loaders
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageLoaders ) {
-			if(lft.canLoad()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-		}
-		
-		// no wild card filter, please.
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last filter used, if any
-		if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-		// remember the last path used, if any
-		fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
-		
-		// run the dialog
-		if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-
-			// figure out which of the loaders was requested.
-			for( LoadAndSaveFileType loader : imageLoaders ) {
-				if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
-				boolean success = openFileOnDemandWithLoader(selectedFile,loader);
-				if(success) {
-					lastFilterIn = selectedFilter;
-					lastFileIn = selectedFile;
-					SoundSystem.playConversionFinishedSound();
-					if( robotPanel != null ) robotPanel.updateButtonAccess();
-					break;
+		Log.message("Opening file...");
+		try {
+			JFileChooser fc = new JFileChooser();
+			// list available loaders
+			ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
+			for( LoadAndSaveFileType lft : imageLoaders ) {
+				if(lft.canLoad()) {
+					FileFilter filter = lft.getFileNameFilter();
+					fc.addChoosableFileFilter(filter);
+				}
+			}		
+			// no wild card filter, please.
+			fc.setAcceptAllFileFilterUsed(false);
+			// remember the last filter used, if any
+			if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
+			// remember the last path used, if any
+			fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
+			
+			// run the dialog
+			if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+				String selectedFile = fc.getSelectedFile().getAbsolutePath();
+				FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
+	
+				// figure out which of the loaders was requested.
+				for( LoadAndSaveFileType loader : imageLoaders ) {
+					if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
+					boolean success = openFileOnDemandWithLoader(selectedFile,loader);
+					if(success) {
+						lastFilterIn = selectedFilter;
+						lastFileIn = selectedFile;
+						SoundSystem.playConversionFinishedSound();
+						if( robotPanel != null ) robotPanel.updateButtonAccess();
+						break;
+					}
 				}
 			}
+		}
+		catch(Exception e) {
+			Log.error(e.getLocalizedMessage());
 		}
 	}
 
