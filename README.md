@@ -4,6 +4,8 @@ Makelangelo Software is a Java program that prepares art for CNC plotters.  It i
 
 It pairs really well with [Makelangelo-firmware](https://github.com/MarginallyClever/Makelangelo-firmware), the code in the brain of the robot that receives instructions and moves the motors.  
 
+![sreenshot](screenshot.png)
+
 ## Where to go from here
 
 **On your own**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
