@@ -2,9 +2,6 @@ name: Java CI with Maven
 
 on:
   push:
-    branches:
-      - master
-      - dev
 
 jobs:
   build:
@@ -37,6 +34,7 @@ jobs:
     - name: Deploy universal release
       #if: matrix.os == 'windows-latest'
       uses: WebFreak001/deploy-nightly@v1.0.1
+      if: github.ref == 'refs/heads/master'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
