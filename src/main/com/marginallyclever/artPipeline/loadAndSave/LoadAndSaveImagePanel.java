@@ -155,5 +155,4 @@ public class LoadAndSaveImagePanel {
 	public int getPreferredFillStyle() {
 		return prefs.getInt("Fill Style", 0);
 	}
-	
 }
