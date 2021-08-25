@@ -28,11 +28,11 @@ public class ArtPipeline {
 
 	private boolean shouldResizeFill;
 	private boolean shouldResizeFit;
-	private boolean shouldReorder;
 	private boolean shouldFlipV;
 	private boolean shouldFlipH;
-	private boolean shouldSimplify;
-	private boolean shouldCrop;
+	private boolean shouldReorder=true;
+	private boolean shouldSimplify=true;
+	private boolean shouldCrop=true;
 	
 	public ArtPipeline() {}
 	

@@ -61,14 +61,14 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		flip = new SelectOneOfMany(Translator.get("Flip"),flipOptions,getPreferredFlipStyle());
 		
 		//if(shouldReorder()) checkReorder(turtle,settings);
-		reorder = new SelectBoolean(Translator.get("Reorder"),true);
+		reorder = new SelectBoolean(Translator.get("Reorder"),myPipeline.getShouldReorder());
 		
 		//if(shouldSimplify()) checkSimplify(turtle,settings);
-		simplify = new SelectBoolean(Translator.get("Simplify"),true);
+		simplify = new SelectBoolean(Translator.get("Simplify"),myPipeline.getShouldSimplify());
 		
 		//if(shouldCrop()) cropTurtleToPageMargin(turtle,settings);
-		crop = new SelectBoolean(Translator.get("Crop to margins"),true);
-		
+		crop = new SelectBoolean(Translator.get("Crop to margins"),myPipeline.getShouldCrop());
+
 		SelectPanel panel = getContentPane();
 		panel.add(resize);
 		panel.add(flip);
@@ -76,7 +76,7 @@ public class ArtPipelinePanel extends CollapsiblePanel {
 		panel.add(simplify);
 		panel.add(crop);
 		panel.invalidate();
-
+		
 		resize.addPropertyChangeListener((evt)-> {
 			int style = resize.getSelectedIndex();
 			setPreferredResizeStyle(style);

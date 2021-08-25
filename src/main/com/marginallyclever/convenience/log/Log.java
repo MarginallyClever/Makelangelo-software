@@ -64,13 +64,13 @@ public class Log {
 		logger = LoggerFactory.getLogger(Makelangelo.class);
 		
 		write(PROGRAM_START_STRING);
-		write("------------------------");
+		write("------------------------------------------------");
 		Properties p = System.getProperties();
 		Set<String> names = p.stringPropertyNames();
 		for(String n : names) {
 			write(n+" = "+p.get(n));
 		}
-		write("------------------------");
+		write("------------------------------------------------");
 		if(hadCrashed) {
 			Log.message("Crash detected on previous run");
 		}
