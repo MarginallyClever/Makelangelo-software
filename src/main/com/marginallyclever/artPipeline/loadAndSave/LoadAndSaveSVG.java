@@ -70,7 +70,6 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 		return filter;
 	}
 
-	
 	@Override
 	public boolean canLoad() {
 		return true;
@@ -227,9 +226,12 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 				// is the stroke none?
 				int k = style.indexOf(strokeLabelName);
 				String strokeStyleName = style.substring(k+strokeLabelName.length());
-				if(strokeStyleName.startsWith("none"))
+				if(strokeStyleName.contentEquals("none") || strokeStyleName.contentEquals("white") )
 					// it is!  bail.
 					return true;
+			} else {
+				// default SVG stroke is "none", which isn't even transparent - it's nothing!
+				return false;
 			}
 		}
 		return false;
@@ -521,7 +523,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 
 		try {
 			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
-			SVGMatrix svgMatrix = svgge.getCTM();
+			SVGMatrix svgMatrix = svgge.getScreenCTM();
+			// [ a c e ]
+			// [ b d f ]
+			// [ 0 0 1 ]
 			m.m00 = svgMatrix.getA();
 			m.m01 = svgMatrix.getC();
 			m.m02 = svgMatrix.getE();
