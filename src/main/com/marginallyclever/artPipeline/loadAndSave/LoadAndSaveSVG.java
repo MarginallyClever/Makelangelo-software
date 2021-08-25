@@ -8,8 +8,11 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Vector3d;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.anim.dom.SVGGraphicsElement;
 import org.apache.batik.anim.dom.SVGOMPathElement;
 import org.apache.batik.anim.dom.SVGOMPolylineElement;
 import org.apache.batik.anim.dom.SVGOMSVGElement;
@@ -25,6 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPathSeg;
 import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
 import org.w3c.dom.svg.SVGPathSegLinetoAbs;
@@ -54,8 +58,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	
 	private boolean shouldScaleOnLoad = true;
 	
-	private double scale,imageCenterX,imageCenterY;
-	private double toolMinimumStepSize = 1; //mm
+	private double scale;
+	private double imageCenterX;
+	private double imageCenterY;
 	
 	@Override
 	public String getName() { return "SVG"; }
@@ -93,9 +98,11 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    turtle.setX(settings.getHomeX());
 	    turtle.setY(settings.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
-		boolean loadOK = parseAll(document);
-		if(!loadOK) {
-			throw new Exception("Failed to load some elements (1)");
+		try {
+			parseAll(document);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new Exception("Failed to load some elements (1): "+e.getLocalizedMessage());
 		}
 		
 		Point2D top = new Point2D();
@@ -128,106 +135,84 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    turtle.setX(settings.getHomeX());
 	    turtle.setY(settings.getHomeX());
 		turtle.setColor(new ColorRGB(0,0,0));
-		loadOK = parseAll(document);
-		if(!loadOK) {
-			throw new Exception("Failed to load some elements (2)");
+		try {
+			parseAll(document);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			throw new Exception("Failed to load some elements (2): "+e.getLocalizedMessage());
 		}
 		
 		return turtle;
 	}
 	
-	private boolean parseAll(Document document) {
+	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		boolean    loadOK = parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		if(loadOK) loadOK = parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		if(loadOK) loadOK = parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		if(loadOK) loadOK = parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		if(loadOK) loadOK = parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		if(loadOK) loadOK = parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
-		return loadOK;
-	}
-
-	private double TX(double x) {
-		return ( x - imageCenterX ) * scale;
-	}
-	
-	private double TY(double y) {
-		return ( y - imageCenterY ) * -scale;
+		parsePathElements(    documentElement.getElementsByTagName( "path"     ));
+		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
+		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
+		parseLineElements(    documentElement.getElementsByTagName( "line"     ));
+		parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
+		
+		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
+		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
 	}
 	
 	/**
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	private boolean parsePolylineElements(NodeList pathNodes) {
-	    boolean loadOK=true;
+	private void parsePolylineElements(NodeList pathNodes) throws Exception {
+		Vector3d v2;
 		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
 			if(isElementStrokeNone(element)) 
 				continue;
-	    	
+
+			Matrix3d m = getMatrixFromElement(element);
+
 	    	SVGPointList pointList = element.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
 			//Log.message("New Node has "+pathObjects+" elements.");
 
 			SVGPoint item = (SVGPoint)pointList.getItem(0);
-			double x = TX( item.getX() );
-			double y = TY( item.getY() );
-			turtle.jumpTo(x,y);
+			v2 = transform(item.getX(),item.getY(),m);
+			turtle.jumpTo(v2.x,v2.y);
 			
 			for( int i=1; i<numPoints; ++i ) {
 				item = (SVGPoint)pointList.getItem(i);
-				x = TX( item.getX() );
-				y = TY( item.getY() );
-				turtle.moveTo(x,y);
+				v2 = transform(item.getX(),item.getY(),m);
+				turtle.moveTo(v2.x,v2.y);
 			}
 		}
-	    return loadOK;
 	}
 	
-	double distanceSquared(SVGPoint item,double previousX,double previousY) {
-		double x = TX( item.getX() );
-		double y = TY( item.getY() );
+	private void parseLineElements(NodeList node) throws Exception {
+		Vector3d v2;
 		
-		double dx=x-previousX;
-		double dy=y-previousY;
-		
-		return dx*dx+dy*dy;
-	}
-	
-	double distanceSquared(double x,double y,double previousX,double previousY) {
-		double dx=x-previousX;
-		double dy=y-previousY;
-		
-		return dx*dx+dy*dy;
-	}
-	
-	
-	private boolean parseLineElements(NodeList node) {
-		try {
-		    int pathNodeCount = node.getLength();
-		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-				Element element = (Element)node.item( iPathNode );
-				if(isElementStrokeNone(element)) 
-					continue;
-				double x1=0,y1=0;
-				double x2=0,y2=0;
-				
-				if(element.hasAttribute("x1")) x1 = Double.parseDouble(element.getAttribute("x1"));
-				if(element.hasAttribute("y1")) y1 = Double.parseDouble(element.getAttribute("y1"));
-				if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
-				if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));;
-				turtle.jumpTo(TX(x1),TY(y1));
-				turtle.moveTo(TX(x2),TY(y2));
-		    }
-		} catch(Exception e) {
-			return false;
-		}
-		return true;
+	    int pathNodeCount = node.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+			Element element = (Element)node.item( iPathNode );
+			if(isElementStrokeNone(element)) 
+				continue;
+			
+			Matrix3d m = getMatrixFromElement(element);
+
+			double x1=0,y1=0;
+			double x2=0,y2=0;
+			
+			if(element.hasAttribute("x1")) x1 = Double.parseDouble(element.getAttribute("x1"));
+			if(element.hasAttribute("y1")) y1 = Double.parseDouble(element.getAttribute("y1"));
+			if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
+			if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));
+			v2 = transform(x1,y1,m);
+			turtle.jumpTo(v2.x,v2.y);
+			v2 = transform(x2,y2,m);
+			turtle.moveTo(v2.x,v2.y);
+	    }
 	}
 
 	private boolean isElementStrokeNone(Element element) {
@@ -262,57 +247,53 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * 
 	 * See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
 	 * @param node
-	 * @return
 	 */
-	private boolean parseRectElements(NodeList node) {
-		try {
-		    int pathNodeCount = node.getLength();
-		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-				Element element = (Element)node.item( iPathNode );
-				if(isElementStrokeNone(element)) 
-					continue;
-				
-				double x=0,y=0;
-				double rx=0,ry=0;
-				
-				if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
-				if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
-				
-				if(element.hasAttribute("rx")) {
-					rx = Double.parseDouble(element.getAttribute("rx"));
-					if(element.hasAttribute("ry")) {
-						ry = Double.parseDouble(element.getAttribute("ry"));
-					} else {
-						// ry defaults to rx if specified
-						ry = rx;
-					}
-				} else if(element.hasAttribute("ry")) {
-					// rx defaults to ry if specified
-					rx = ry = Double.parseDouble(element.getAttribute("ry"));
-					
-				}
-				double w = Double.parseDouble(element.getAttribute("width"));
-				double h = Double.parseDouble(element.getAttribute("height"));
-				
-				//double x0=x;
-				double x1=x+rx;
-				double x2=x+w-rx;
-				//double x3=x+w;
-				double y0=y;
-				double y1=y+ry;
-				double y2=y+h-ry;
-				//double y3=y+h;
+	private void parseRectElements(NodeList node) throws Exception {
+	    int pathNodeCount = node.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+			Element element = (Element)node.item( iPathNode );
+			if(isElementStrokeNone(element)) 
+				continue;
 
-				turtle.jumpTo(TX(x1),TY(y0));
-				arcTurtle(turtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0); 
-				arcTurtle(turtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5);
-				arcTurtle(turtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0);
-				arcTurtle(turtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5);
-		    }
-		} catch(Exception e) {
-			return false;
-		}
-		return true;
+			Matrix3d m = getMatrixFromElement(element);
+			
+			double x=0,y=0;
+			double rx=0,ry=0;
+			
+			if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
+			if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
+			if(element.hasAttribute("rx")) {
+				rx = Double.parseDouble(element.getAttribute("rx"));
+				if(element.hasAttribute("ry")) {
+					ry = Double.parseDouble(element.getAttribute("ry"));
+				} else {
+					// ry defaults to rx if specified
+					ry = rx;
+				}
+			} else if(element.hasAttribute("ry")) {
+				// rx defaults to ry if specified
+				rx = ry = Double.parseDouble(element.getAttribute("ry"));
+				
+			}
+			double w = Double.parseDouble(element.getAttribute("width"));
+			double h = Double.parseDouble(element.getAttribute("height"));
+			
+			//double x0=x;
+			double x1=x+rx;
+			double x2=x+w-rx;
+			//double x3=x+w;
+			double y0=y;
+			double y1=y+ry;
+			double y2=y+h-ry;
+			//double y3=y+h;
+
+			Vector3d v2 = transform(x1,y0,m);
+			turtle.jumpTo(v2.x,v2.y);
+			arcTurtle(turtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m); 
+			arcTurtle(turtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
+			arcTurtle(turtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
+			arcTurtle(turtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
+	    }
 	}
 
 	/**
@@ -325,7 +306,8 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	 * @param p0 radian start angle.
 	 * @param p1 radian end angle.
 	 */
-	private void arcTurtle(Turtle turtle,double cx,double cy,double rx,double ry,double p0,double p1) {
+	private void arcTurtle(Turtle turtle,double cx,double cy,double rx,double ry,double p0,double p1,Matrix3d m) {
+		Vector3d v2;
 		double steps=1;
 		if(rx>0 && ry>0) {
 			double r = rx>ry?rx:ry;
@@ -338,72 +320,79 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 			double pFraction = ((p1-p0)*(p/steps) + p0);
 			double c = Math.cos(pFraction) * rx;
 			double s = Math.sin(pFraction) * ry;
-			turtle.moveTo(TX(cx+c), TY(cy+s));
+			v2 = transform(cx+c,cy+s,m);
+			turtle.moveTo(v2.x,v2.y);
 		}
 	}
 	
-	private boolean parseCircleElements(NodeList node) {
-		try {
-		    int pathNodeCount = node.getLength();
-		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-				Element element = (Element)node.item( iPathNode );
-				if(isElementStrokeNone(element)) 
-					continue;
-				double cx=0,cy=0,r=0;
-				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
-				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
-				if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
-				turtle.jumpTo(TX(cx+r),TY(cy));
-				double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
-				for(double i=1;i<circ;++i) {
-					double v = (Math.PI*2.0) * (i/circ);
-					double s=r*Math.sin(v);
-					double c=r*Math.cos(v);
-					turtle.moveTo(TX(cx+c),TY(cy+s));
-				}
-				turtle.moveTo(TX(cx+r),TY(cy));
-		    }
-		} catch(Exception e) {
-			return false;
-		}
-		return true;
+	private void parseCircleElements(NodeList node) throws Exception {
+		Vector3d v2;
+
+	    int pathNodeCount = node.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+			Element element = (Element)node.item( iPathNode );
+			if(isElementStrokeNone(element)) 
+				continue;
+			
+			Matrix3d m = getMatrixFromElement(element);
+			
+			double cx=0,cy=0,r=0;
+			if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+			if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+			if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
+			v2 = transform(cx+r,cy,m);
+			turtle.jumpTo(v2.x,v2.y);
+			
+			double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
+			for(double i=1;i<circ;++i) {
+				double v = (Math.PI*2.0) * (i/circ);
+				double s=r*Math.sin(v);
+				double c=r*Math.cos(v);
+				v2 = transform(cx+c,cy+s,m);
+				turtle.moveTo(v2.x,v2.y);
+			}
+			v2 = transform(cx+r,cy,m);
+			turtle.moveTo(v2.x,v2.y);
+	    }
 	}
 
-	private boolean parseEllipseElements(NodeList node) {
-		try {
-		    int pathNodeCount = node.getLength();
-		    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-				Element element = (Element)node.item( iPathNode );
-				if(isElementStrokeNone(element)) 
-					continue;
-				double cx=0,cy=0,rx=0,ry=0;
-				if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
-				if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
-				if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
-				if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
-				turtle.jumpTo(TX(cx+rx),TY(cy));
-				double circ = Math.min(3,Math.floor(Math.PI * ry*rx)); 
-				for(double i=1;i<circ;++i) {
-					double v = (Math.PI*2.0) * (i/circ);
-					double s=ry*Math.sin(v);
-					double c=rx*Math.cos(v);
-					turtle.moveTo(TX(cx+c),TY(cy+s));
-				}
-				turtle.moveTo(TX(cx+rx),TY(cy));
-		    }
-		} catch(Exception e) {
-			return false;
-		}
-		return true;
+	private void parseEllipseElements(NodeList node) {
+		Vector3d v2;
+		
+	    int pathNodeCount = node.getLength();
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+			Element element = (Element)node.item( iPathNode );
+			if(isElementStrokeNone(element)) 
+				continue;
+			
+			Matrix3d m = getMatrixFromElement(element);
+			
+			double cx=0,cy=0,rx=0,ry=0;
+			if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+			if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+			if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
+			if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
+			v2 = transform(cx+rx,cy,m);
+			turtle.jumpTo(v2.x,v2.y);
+			
+			double circ = Math.min(3,Math.floor(Math.PI * ry*rx)); 
+			for(double i=1;i<circ;++i) {
+				double v = (Math.PI*2.0) * (i/circ);
+				double s=ry*Math.sin(v);
+				double c=rx*Math.cos(v);
+				v2 = transform(cx+c,cy+s,m);
+				turtle.moveTo(v2.x,v2.y);
+			}
+			v2 = transform(cx+rx,cy,m);
+			turtle.moveTo(v2.x,v2.y);
+	    }
 	}
 	
 	/**
 	 * Parse through all the SVG path elements and raster them to gcode.
 	 * @param paths the source of the elements
 	 */
-	private boolean parsePathElements(NodeList paths) {
-	    boolean loadOK=true;
-
+	private void parsePathElements(NodeList paths) throws Exception {
 	    double x=turtle.getX();
 	    double y=turtle.getY();
 		double firstX=0;
@@ -419,7 +408,10 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 	    	SVGOMPathElement element = ((SVGOMPathElement)paths.item( iPath ));
 			if(isElementStrokeNone(element)) 
 				continue;
-	    	
+			
+			Matrix3d m = getMatrixFromElement(element);
+			Vector3d v;
+			
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
 	    	int pathObjects = pathList.getNumberOfItems();
 			//Log.message("Node has "+pathObjects+" elements.");
@@ -437,8 +429,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						firstX = x = TX( path.getX() );
-						firstY = y = TY( path.getY() );
+						v = transform(path.getX(),path.getY(),m);
+						firstX = x = v.x;
+						firstY = y = v.y;
 						turtle.jumpTo(firstX,firstY);
 					}
 					break;
@@ -446,8 +439,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Move Rel");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						firstX = x = TX( path.getX() ) + turtle.getX();
-						firstY = y = TY( path.getY() ) + turtle.getY();
+						v = transform(path.getX(),path.getY(),m);
+						firstX = x = v.x + turtle.getX();
+						firstY = y = v.y + turtle.getY();
 						turtle.jumpTo(firstX,firstY);
 					}
 					break;
@@ -455,8 +449,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						x = TX( path.getX() );
-						y = TY( path.getY() );
+						v = transform(path.getX(),path.getY(),m);
+						x = v.x;
+						y = v.y;
 						turtle.moveTo(x,y);
 					}
 					break;
@@ -464,8 +459,9 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 					{
 						//System.out.println("Line REL");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						x = TX( path.getX() ) + turtle.getX();
-						y = TY( path.getY() ) + turtle.getY();
+						v = transform(path.getX(),path.getY(),m);
+						x = v.x + turtle.getX();
+						y = v.y + turtle.getY();
 						turtle.moveTo(x,y);
 					}
 					break;
@@ -478,34 +474,70 @@ public class LoadAndSaveSVG extends ImageManipulator implements LoadAndSaveFileT
 						double x0=x;
 						double y0=y;
 						// x1,y1 is the second control point
-						double x1=TX(path.getX1());
-						double y1=TY(path.getY1());
+						v = transform(path.getX1(),path.getY1(),m);
+						double x1=v.x;
+						double y1=v.y;
 						// x2,y2 is the third control point
-						double x2=TX(path.getX2());
-						double y2=TY(path.getY2());
+						v = transform(path.getX2(),path.getY2(),m);
+						double x2=v.x;
+						double y2=v.y;
 						// x3,y3 is the fourth control point
-						double x3=TX(path.getX());
-						double y3=TY(path.getY());
+						v = transform(path.getX(),path.getY(),m);
+						double x3=v.x;
+						double y3=v.y;
 						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
 						ArrayList<Point2D> points = b.generateCurvePoints(0.05);
-						for(Point2D p : points) {
-							turtle.moveTo(p.x, p.y);
-							x = p.x;
-							y = p.y;
+						for(Point2D p2 : points) {
+							turtle.moveTo(p2.x, p2.y);
+							x = p2.x;
+							y = p2.y;
 						}
 					}
 					break; 
 				default:
-					Log.message("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
+					throw new Exception("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
 						+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
-					loadOK=false;
-					break;
 				}
 			}
 		}
-	    return loadOK;
 	}
     
+	private Vector3d transform(double x, double y, Matrix3d m) {
+		Vector3d p = new Vector3d(x,y,0);
+		m.transform(p);
+		p.x = ( p.x - imageCenterX ) *  scale;
+		p.y = ( p.y - imageCenterY ) * -scale;
+		return p;
+	}
+
+	private Matrix3d getMatrixFromElement(Element element) {
+		if(!(element instanceof SVGGraphicsElement)) {
+			Matrix3d m = new Matrix3d();
+			m.setIdentity();
+			return m;
+		}
+		
+		Matrix3d m = new Matrix3d();
+
+		try {
+			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
+			SVGMatrix svgMatrix = svgge.getCTM();
+			m.m00 = svgMatrix.getA();
+			m.m01 = svgMatrix.getC();
+			m.m02 = svgMatrix.getE();
+			m.m10 = svgMatrix.getB();
+			m.m11 = svgMatrix.getD();
+			m.m12 = svgMatrix.getF();
+			m.m20 = 0;
+			m.m21 = 0;
+			m.m22 = 1;
+		}
+		catch(Exception e) {
+			m.setIdentity();
+		}
+		return m;
+	}
+
 	/**
 	 * Enhance the SVG DOM for the given document to provide CSS- and
 	 * SVG-specific DOM interfaces.
