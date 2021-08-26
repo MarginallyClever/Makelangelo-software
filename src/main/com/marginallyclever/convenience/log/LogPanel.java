@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience.log;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -39,7 +41,8 @@ public class LogPanel extends JPanel implements LogListener {
 	private JButton commandLineSend;
 
 	private ArrayList<LogPanelListener> listeners = new ArrayList<LogPanelListener>();
-
+	private ConcurrentLinkedQueue<String> inBoundQueue = new ConcurrentLinkedQueue<String>();
+	
 	public LogPanel() {
 		Log.addListener(this);
 
@@ -86,7 +89,24 @@ public class LogPanel extends JPanel implements LogListener {
 		msg = cleanMessage(msg);
 		if (msg.length() == 0)
 			return;
-
+		inBoundQueue.offer(msg);
+		repaint();
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		addMessages();
+		super.paint(g);
+	}
+	
+	private void addMessages() {
+		while(!inBoundQueue.isEmpty()) {
+			String msg = inBoundQueue.poll();
+			if(msg!=null) addMessage(msg);
+		}
+	}
+	
+	private void addMessage(String msg) {
 		int listSize = listModel.getSize() - 1;
 		int lastVisible = logArea.getLastVisibleIndex();
 		boolean isLast = (lastVisible == listSize);
