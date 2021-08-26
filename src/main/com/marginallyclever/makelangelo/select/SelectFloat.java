@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -23,6 +25,7 @@ public class SelectFloat extends Select {
 	private JLabel label;
 	private JTextField field;
 	private float value;
+	private Timer timer;
 
 	public SelectFloat(String labelKey, Locale locale, float defaultValue) {
 		super();
@@ -70,8 +73,15 @@ public class SelectFloat extends Select {
 				
 				field.setForeground(UIManager.getColor("Textfield.foreground"));
 				if(value != newNumber) {
-					notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", value, newNumber));
 					value = newNumber;
+					
+					if(timer!=null) timer.cancel();
+					timer = new Timer("Delayed response");
+					timer.schedule(new TimerTask() { 
+						public void run() {
+							notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
+						}
+					}, 100L); // brief delay in case someone is typing fast
 				}
 			}
 		});

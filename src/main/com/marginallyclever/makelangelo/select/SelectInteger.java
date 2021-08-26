@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -16,6 +18,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+
 /**
  * A JFormattedTextField that sets itself up to format integers. 
  * @author Dan Royer
@@ -25,6 +28,7 @@ public class SelectInteger extends Select {
 	private JLabel label;
 	private JFormattedTextField field;
 	private int value;
+	private Timer timer=null;
 
 	public SelectInteger(String labelKey,Locale locale,int defaultValue) {
 		super();
@@ -32,7 +36,8 @@ public class SelectInteger extends Select {
 		value = defaultValue;
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
-		field = new JFormattedTextField(); 
+		field = new JFormattedTextField();
+		field.setColumns(5);
 		createAndAttachFormatter(locale);
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
@@ -42,6 +47,7 @@ public class SelectInteger extends Select {
 		field.setHorizontalAlignment(JTextField.RIGHT);
 
 		final Select parent = this;
+
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -65,8 +71,15 @@ public class SelectInteger extends Select {
 					newNumber = Integer.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newNumber) {
-						notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
 						value = newNumber;
+						
+						if(timer!=null) timer.cancel();
+						timer = new Timer("Delayed response");
+						timer.schedule(new TimerTask() { 
+							public void run() {
+								notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
+							}
+						}, 100L); // brief delay in case someone is typing fast
 					}
 				} catch(NumberFormatException e1) {
 					field.setForeground(Color.RED);

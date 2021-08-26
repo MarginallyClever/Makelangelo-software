@@ -56,7 +56,7 @@ public class Converter_Wander extends ImageConverter {
 		}
 	}
 
-	protected int outputChannel(TransformedImage img,ColorRGB newColor,int numberOfLines,double cutoff) {
+	protected int outputChannel(TransformedImage img,ColorRGB newColor,int pointsPerChannel,double cutoff) {
 		turtle.setColor(newColor);
 
 		float stepSize = settings.getPenDiameter()*5;
@@ -100,7 +100,7 @@ public class Converter_Wander extends ImageConverter {
 		}
 
 		//Log.message("Finding points...");
-		for(int i=0;i<numberOfLines;++i) {
+		for(int i=0;i<pointsPerChannel;++i) {
 			int v, tries=0;
 			double endPX,endPY; 
 			do {
@@ -172,10 +172,12 @@ public class Converter_Wander extends ImageConverter {
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(sourceImage);
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines/4,255.0*3.0/4.0);
-		Log.message("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines/4,128.0);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines/4,128.0);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines/4,128.0);
+		int oneQuarter=numLines/4;
+		
+		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),oneQuarter,255.0*3.0/4.0);
+		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),oneQuarter,128.0);
+		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),oneQuarter,128.0);
+		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),oneQuarter,128.0);
 		Log.message("Finishing...");
 	}
 	
