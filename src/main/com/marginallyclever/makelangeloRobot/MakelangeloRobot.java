@@ -165,6 +165,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 				firmwareVersionChecked=true;
 				// request the hardware version of this robot
 				sendLineToRobot("D10\n");
+				sendLineToRobot("M503\n");
 			}
 		}
 		
