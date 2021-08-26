@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.io.image;
 
 import java.awt.Component;
 import java.io.InputStream;
@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.converters.ImageConverter;
+import com.marginallyclever.artPipeline.io.LoadResource;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -25,7 +26,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author Dan Royer
  *
  */
-public class LoadAndSaveImage implements LoadAndSaveFileType {
+public class LoadImage implements LoadResource {
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
 	private MakelangeloRobot myRobot;
@@ -51,7 +52,7 @@ public class LoadAndSaveImage implements LoadAndSaveFileType {
 	private ProgressMonitor pm;
 	
 	
-	public LoadAndSaveImage() {}
+	public LoadImage() {}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -81,7 +82,7 @@ public class LoadAndSaveImage implements LoadAndSaveFileType {
 	private void startConversion(ImageConverter converter) {
 		if(converter==null) return;  // TODO silent quit is ugly.
 		
-		ImageConverter.loadAndSaveImage = this;
+		ImageConverter.loadImage = this;
 		chosenConverter = converter;
 		Log.message("Converter="+chosenConverter.getName());
 		
@@ -221,16 +222,6 @@ public class LoadAndSaveImage implements LoadAndSaveFileType {
 	}
 	
 	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
-		return false;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
 		return false;
 	}
 }

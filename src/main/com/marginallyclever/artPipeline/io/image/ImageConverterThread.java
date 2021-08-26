@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.io.image;
 
 import javax.swing.SwingWorker;
 
@@ -8,9 +8,9 @@ import com.marginallyclever.convenience.log.Log;
 public class ImageConverterThread extends SwingWorker<Void, Void> {
 	private ImageConverter chosenConverter;
 	private String name;
-	private LoadAndSaveImage listener;
+	private LoadImage listener;
 
-	public ImageConverterThread(LoadAndSaveImage createdBy,ImageConverter converter,String name) {
+	public ImageConverterThread(LoadImage createdBy,ImageConverter converter,String name) {
 		listener = createdBy;
 		chosenConverter = converter;
 		this.name = name;

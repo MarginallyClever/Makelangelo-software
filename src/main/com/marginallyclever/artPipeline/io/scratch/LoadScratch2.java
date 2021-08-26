@@ -1,10 +1,9 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.io.scratch;
 
 import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.io.LoadResource;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -34,7 +34,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  * @author Admin
  *
  */
-public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadScratch2 extends ImageManipulator implements LoadResource {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -46,6 +46,7 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 			value=arg1;
 		}
 	};
+	
 	private class ScratchList {
 		public String name;
 		public ArrayList<Double> contents;
@@ -80,12 +81,6 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		String filenameExtension = filename.substring(filename.lastIndexOf('.'));
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
-
-	@Override
-	public boolean canSave(String filename) {
-		return false;
-	}
-
 	
 	@Override
 	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
@@ -738,20 +733,5 @@ public class LoadAndSaveScratch2 extends ImageManipulator implements LoadAndSave
 		}
 
 		return listIndex;
-	}
-	
-	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
-		return true;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
 	}
 }

@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.io.image;
 
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -19,12 +19,12 @@ import com.marginallyclever.artPipeline.converters.ImageConverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class LoadAndSaveImagePanel {
+public class LoadImagePanel {
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 	
-	private LoadAndSaveImage loader;
+	private LoadImage loader;
 	
 	private JPanel conversionPanel;
 	private static JComboBox<String> styleNames;
@@ -37,7 +37,7 @@ public class LoadAndSaveImagePanel {
 		Translator.get("ConvertImagePaperFit")
 	};
 	
-	public LoadAndSaveImagePanel(LoadAndSaveImage loader) {
+	public LoadImagePanel(LoadImage loader) {
 		this.loader = loader;
 
 		imageConverterNames.clear();

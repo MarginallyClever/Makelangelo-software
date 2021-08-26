@@ -5,7 +5,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
+import com.marginallyclever.artPipeline.io.image.LoadImage;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
@@ -27,12 +27,12 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 	protected boolean keepIterating=false;
 	protected Texture texture = null;
 
-	public static LoadAndSaveImage loadAndSaveImage;
+	public static LoadImage loadImage;
 
 	public void restart() {
 		if(!keepIterating) {
-			if(loadAndSaveImage!=null) {
-				loadAndSaveImage.reconvert();
+			if(loadImage!=null) {
+				loadImage.reconvert();
 			}
 			return;
 		}

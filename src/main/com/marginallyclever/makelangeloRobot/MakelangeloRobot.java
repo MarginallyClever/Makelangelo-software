@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode;
+import com.marginallyclever.artPipeline.io.gcode.SaveGCode;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.communications.NetworkConnectionListener;
 import com.marginallyclever.convenience.ColorRGB;
@@ -670,7 +670,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		turtleToRender = turtle;
 		
 		try(final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
-			LoadAndSaveGCode exportForDrawing = new LoadAndSaveGCode();
+			SaveGCode exportForDrawing = new SaveGCode();
 			exportForDrawing.save(fileOutputStream, this, null);
 
 			gcodeCommands.clear();

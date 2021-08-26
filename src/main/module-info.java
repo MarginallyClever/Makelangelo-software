@@ -25,15 +25,21 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloCustomProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.ZarplotterProperties;
 	uses com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;
+
+	uses com.marginallyclever.artPipeline.io.LoadResource;
+	provides com.marginallyclever.artPipeline.io.LoadResource with
+		com.marginallyclever.artPipeline.io.dxf.LoadDXF,
+		com.marginallyclever.artPipeline.io.gcode.LoadGCode,
+		com.marginallyclever.artPipeline.io.image.LoadImage,
+		com.marginallyclever.artPipeline.io.scratch.LoadScratch2,
+		com.marginallyclever.artPipeline.io.scratch.LoadScratch3,
+		com.marginallyclever.artPipeline.io.svg.LoadSVG;
 	
-	provides com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType with
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveDXF,
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveGCode,
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage,
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch2,
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveScratch3,
-		com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveSVG;
-	uses com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
+	uses com.marginallyclever.artPipeline.io.SaveResource;
+	provides com.marginallyclever.artPipeline.io.SaveResource with
+		com.marginallyclever.artPipeline.io.dxf.SaveDXF,
+		com.marginallyclever.artPipeline.io.gcode.SaveGCode,
+		com.marginallyclever.artPipeline.io.svg.SaveSVG;
 
 	provides com.marginallyclever.artPipeline.converters.ImageConverter with
 		com.marginallyclever.artPipeline.converters.Converter_Boxes,

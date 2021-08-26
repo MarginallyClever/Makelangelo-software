@@ -1,4 +1,4 @@
-package com.marginallyclever.artPipeline.loadAndSave;
+package com.marginallyclever.artPipeline.io.scratch;
 
 import java.awt.Component;
 import java.io.File;
@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.marginallyclever.artPipeline.ImageManipulator;
+import com.marginallyclever.artPipeline.io.LoadResource;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
@@ -44,7 +45,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSaveFileType {
+public class LoadScratch3 extends ImageManipulator implements LoadResource {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -96,12 +97,6 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		String filenameExtension = filename.substring(filename.lastIndexOf('.'));
 		return IMAGE_FILE_EXTENSIONS.contains(filenameExtension.toLowerCase());
 	}
-
-	@Override
-	public boolean canSave(String filename) {
-		return false;
-	}
-
 	
 	@Override
 	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
@@ -860,20 +855,5 @@ public class LoadAndSaveScratch3 extends ImageManipulator implements LoadAndSave
 		}
 
 		return listIndex;
-	}
-	
-	@Override
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
-		return true;
-	}
-
-	@Override
-	public boolean canLoad() {
-		return true;
-	}
-
-	@Override
-	public boolean canSave() {
-		return false;
 	}
 }

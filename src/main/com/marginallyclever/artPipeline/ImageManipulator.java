@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline;
 
 import javax.swing.ProgressMonitor;
 
-import com.marginallyclever.artPipeline.loadAndSave.ImageConverterThread;
+import com.marginallyclever.artPipeline.io.image.ImageConverterThread;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;

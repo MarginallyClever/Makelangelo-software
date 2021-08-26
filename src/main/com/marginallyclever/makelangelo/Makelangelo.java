@@ -64,9 +64,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.ArtPipeline;
 import com.marginallyclever.artPipeline.ArtPipelineEvent;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveFileType;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImage;
-import com.marginallyclever.artPipeline.loadAndSave.LoadAndSaveImagePanel;
+import com.marginallyclever.artPipeline.io.LoadResource;
+import com.marginallyclever.artPipeline.io.SaveResource;
+import com.marginallyclever.artPipeline.io.image.LoadImage;
+import com.marginallyclever.artPipeline.io.image.LoadImagePanel;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -460,9 +461,8 @@ public final class Makelangelo {
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {}
 		
-		JMenuBar bar = createMenuBar();
 		Log.message("  adding menu bar...");
-		mainFrame.setJMenuBar(bar);
+		mainFrame.setJMenuBar(createMenuBar());
 		
 		mainFrame.setContentPane(createContentPane());
 
@@ -675,11 +675,11 @@ public final class Makelangelo {
 	 * @param loader the plugin to use
 	 * @return true if load is successful.
 	 */
-	public boolean openFileOnDemandWithLoader(String filename,LoadAndSaveFileType loader) {
+	public boolean openFileOnDemandWithLoader(String filename,LoadResource loader) {
 		boolean success = false;
 		try(final InputStream fileInputStream = new FileInputStream(filename)) {
-			if(loader instanceof LoadAndSaveImage) {
-				LoadAndSaveImage imageLoader = (LoadAndSaveImage)loader;
+			if(loader instanceof LoadImage) {
+				LoadImage imageLoader = (LoadImage)loader;
 				imageLoader.load(fileInputStream, robot, mainFrame);
 				runImageConversionProcess(imageLoader);
 			} else {
@@ -695,8 +695,8 @@ public final class Makelangelo {
 		return success;
 	}
 	
-	private void runImageConversionProcess(LoadAndSaveImage imageLoader) {
-		LoadAndSaveImagePanel panel = new LoadAndSaveImagePanel(imageLoader);
+	private void runImageConversionProcess(LoadImage imageLoader) {
+		LoadImagePanel panel = new LoadImagePanel(imageLoader);
 		panel.run(mainFrame);
 	}
 	
@@ -709,11 +709,10 @@ public final class Makelangelo {
 	public boolean openFileOnDemand(String filename) {
 		Log.message(Translator.get("OpeningFile") + filename + "...");
 
-		ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-		Iterator<LoadAndSaveFileType> i = imageLoaders.iterator();
+		ServiceLoader<LoadResource> imageLoaders = ServiceLoader.load(LoadResource.class);
+		Iterator<LoadResource> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadAndSaveFileType loader = i.next();
-			if(!loader.canLoad()) continue;  // TODO feels redundant given the next line
+			LoadResource loader = i.next();
 			if(!loader.canLoad(filename)) continue;
 			
 			return openFileOnDemandWithLoader(filename,loader);
@@ -732,12 +731,10 @@ public final class Makelangelo {
 		try {
 			JFileChooser fc = new JFileChooser();
 			// list available loaders
-			ServiceLoader<LoadAndSaveFileType> imageLoaders = ServiceLoader.load(LoadAndSaveFileType.class);
-			for( LoadAndSaveFileType lft : imageLoaders ) {
-				if(lft.canLoad()) {
-					FileFilter filter = lft.getFileNameFilter();
-					fc.addChoosableFileFilter(filter);
-				}
+			ServiceLoader<LoadResource> imageLoaders = ServiceLoader.load(LoadResource.class);
+			for( LoadResource lft : imageLoaders ) {
+				FileFilter filter = lft.getFileNameFilter();
+				fc.addChoosableFileFilter(filter);
 			}		
 			// no wild card filter, please.
 			fc.setAcceptAllFileFilterUsed(false);
@@ -752,7 +749,7 @@ public final class Makelangelo {
 				FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 	
 				// figure out which of the loaders was requested.
-				for( LoadAndSaveFileType loader : imageLoaders ) {
+				for( LoadResource loader : imageLoaders ) {
 					if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
 					boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 					if(success) {
@@ -785,12 +782,10 @@ public final class Makelangelo {
 		// list all the known savable file types.
 		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
 		JFileChooser fc = new JFileChooser(lastDir);
-		ServiceLoader<LoadAndSaveFileType> imageSavers = ServiceLoader.load(LoadAndSaveFileType.class);
-		for( LoadAndSaveFileType lft : imageSavers ) {
-			if(lft.canSave()) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
+		ServiceLoader<SaveResource> imageSavers = ServiceLoader.load(SaveResource.class);
+		for( SaveResource lft : imageSavers ) {
+			FileFilter filter = lft.getFileNameFilter();
+			fc.addChoosableFileFilter(filter);
 		}
 		
 		// do not allow wild card (*.*) file extensions
@@ -804,7 +799,7 @@ public final class Makelangelo {
 			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 			
 			// figure out which of the savers was requested.
-			for( LoadAndSaveFileType lft : imageSavers ) {
+			for( SaveResource lft : imageSavers ) {
 				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
 				//if(!filter.accept(new File(selectedFile))) {
 				if( !isMatchingFileFilter(selectedFilter,filter) ) {
