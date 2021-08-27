@@ -37,7 +37,7 @@ public class Generator_Dragon_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_Dragon.getOrder()) {
 			Generator_Dragon.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

@@ -46,6 +46,6 @@ public class Generator_LSystemTree_Panel extends ImageGeneratorPanel {
 		generator.setScale(field_orderScale.getValue()/100.0f);
 		generator.setAngle(field_angle.getValue());
 		generator.setNoise(field_noise.getValue());
-		makelangeloRobotPanel.regenerate(generator);
+		generator.generate();
 	}
 }

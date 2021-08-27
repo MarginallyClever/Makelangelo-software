@@ -59,7 +59,7 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 			Generator_Spirograph.setPScale(newPScale);
 			Generator_Spirograph.setNumSamples(newNumSamples);
 			Generator_Spirograph.setEpitrochoid(newEpitrochoid);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

@@ -295,7 +295,7 @@ public class Generator_Text extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public void generate() {
 		String fontName = fontNames[lastFont];
 
 		turtle = new Turtle();
@@ -306,7 +306,7 @@ public class Generator_Text extends ImageGenerator {
 		textSetVAlign(VAlign.MIDDLE);
 		writeBeautifulMessage(fontName,lastSize,lastMessage);
 
-	    return true;
+		notifyListeners(turtle);
 	}
 	
 	public void textSetPosition(float x, float y) {

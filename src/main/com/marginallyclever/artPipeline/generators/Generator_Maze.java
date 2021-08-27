@@ -56,7 +56,7 @@ public class Generator_Maze extends ImageGenerator {
 	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
 	 */
 	@Override
-	public boolean generate() {
+	public void generate() {
 		// build the cells
 		cells = new MazeCell[rows * columns];
 
@@ -137,8 +137,8 @@ public class Generator_Maze extends ImageGenerator {
 
 		// draw the maze
 		drawMaze();
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 
 	private void drawMaze() {

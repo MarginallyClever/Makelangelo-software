@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -9,28 +7,24 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ServiceLoader;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.artPipeline.ArtPipelinePanel;
-import com.marginallyclever.artPipeline.ImageManipulator;
-import com.marginallyclever.artPipeline.generators.Generator_Text;
-import com.marginallyclever.artPipeline.generators.ImageGenerator;
-import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
+import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
-
-import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 
 
 /**
@@ -49,7 +43,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	// god objects?
 	private MakelangeloRobot myRobot;
 	private Makelangelo makelangeloApp;
-
+	
 	// connect menu
 	private SelectPanel connectionPanel;
 	private SelectButton buttonConnect;
@@ -62,8 +56,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private SelectButton buttonNewFile, buttonOpenFile, buttonReopenFile, buttonGenerate, buttonSaveFile;
-
 	private PiCaptureAction piCameraCaptureAction;
 	private SelectButton buttonCapture;
 
@@ -168,7 +160,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 				isConnected=false;
 				updateButtonAccess();
 			} else {
-				NetworkConnection s = makelangeloApp.requestNewConnection();
+				NetworkConnection s = ConnectionManager.requestNewConnection(makelangeloApp.getMainFrame());
 				if(s!=null) {
 					buttonConnect.setText(Translator.get("ButtonDisconnect"));
 					buttonConnect.setForeground(Color.RED);
@@ -234,18 +226,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
         } else {
         	buttonCapture = null;
         }
-
-		panel.add(buttonNewFile = new SelectButton(Translator.get("MenuNewFile")));
-		panel.add(buttonOpenFile = new SelectButton(Translator.get("MenuOpenFile")));
-		panel.add(buttonReopenFile = new SelectButton(Translator.get("MenuReopenFile")));
-		panel.add(buttonGenerate = new SelectButton(Translator.get("MenuGenerate")));
-		panel.add(buttonSaveFile = new SelectButton(Translator.get("MenuSaveGCODEAs")));
-
-		buttonNewFile.addPropertyChangeListener((evt)->{		newFile();							});
-		buttonOpenFile.addPropertyChangeListener((evt)->{		makelangeloApp.openFile();			});
-		buttonReopenFile.addPropertyChangeListener((evt)->{		makelangeloApp.reopenLastFile();	});
-		buttonGenerate.addPropertyChangeListener((evt)->{		generateImage();					});
-		buttonSaveFile.addPropertyChangeListener((evt)->{		makelangeloApp.saveFile();			});
 		
 		return creativeControlPanel;
 	}
@@ -447,8 +427,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 			didSetHome = myRobot.didSetHome();
 		}
 		
-		if(buttonGenerate != null) buttonGenerate.setEnabled(!isRunning);
-
 		buttonOpenSettings.setEnabled(!isRunning);
 
 		buttonStart.setEnabled(isConfirmed && didSetHome && !isRunning);
@@ -459,13 +437,9 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		if(!isConfirmed) buttonPause.setText(Translator.get("Pause"));
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
-		buttonNewFile.setEnabled(!isRunning);
 		
 		if(buttonCapture != null) buttonCapture.setEnabled(!isRunning);
 		
-		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && !makelangeloApp.getLastFileIn().isEmpty());
-		buttonGenerate.setEnabled(!isRunning);
 
 		down100.setEnabled(isConfirmed && !isRunning);
 		down10.setEnabled(isConfirmed && !isRunning);
@@ -488,116 +462,8 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		penUp.setEnabled(isConfirmed && !isRunning);
 		penDown.setEnabled(isConfirmed && !isRunning);
-
-		buttonSaveFile.setEnabled(myRobot!=null && myRobot.getTurtle().history.size()>0);
 		
 		this.validate();
-	}
-	
-	private void newFile() {
-		myRobot.setTurtle(new Turtle());
-	}
-		
-	private void generateImage() {
-		Log.message("Generating image...");
-		try {
-			// set up a card layout (https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html)
-			final JPanel panel = new JPanel();
-			panel.setLayout(new BorderLayout());
-	
-			final JPanel cards = new JPanel(new CardLayout());
-			ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-			int i=0;
-			for( ImageGenerator ici : imageGenerators ) {
-				cards.add(ici.getPanel().getPanel(),ici.getName());
-				i++;
-			}
-			
-			String[] imageGeneratorNames = new String[i];
-			
-			i=0;
-			for( ImageManipulator f : imageGenerators ) {
-				imageGeneratorNames[i++] = f.getName();
-			}
-	
-			final JComboBox<String> options = new JComboBox<String>(imageGeneratorNames);
-			options.setSelectedIndex(generatorChoice);
-	
-			panel.add(options,BorderLayout.PAGE_START);
-			panel.add(cards,BorderLayout.CENTER);
-	
-			options.addItemListener(new ItemListener() {
-	        	@Override
-				public void itemStateChanged(ItemEvent e) {
-				    CardLayout cl = (CardLayout)(cards.getLayout());
-				    cl.show(cards, (String)e.getItem());
-				    
-					changeGeneratorPanel(options.getSelectedIndex());
-				}
-			});
-			
-			changeGeneratorPanel(options.getSelectedIndex());
-			
-			JDialog dialog = new JDialog(makelangeloApp.getMainFrame(),Translator.get("MenuGenerate"));
-			dialog.add(panel);
-			dialog.pack();
-			dialog.setVisible(true);
-			// other app buttons are still accessible.
-		}
-		catch(Exception e) {
-			Log.error(e.getLocalizedMessage());
-		}
-	}
-	
-	private void changeGeneratorPanel(int index) {
-		ImageGeneratorPanel.makelangeloRobotPanel = this;
-		ImageGenerator chosenGenerator = getGenerator(index);
-		ImageGeneratorPanel chosenGeneratorPanel = chosenGenerator.getPanel();
-		if(chosenGeneratorPanel!=null) {
-			Log.message("Generator="+chosenGenerator.getName());
-			JPanel p = chosenGeneratorPanel.getPanel();
-			p.setBorder(BorderFactory.createLineBorder(Color.RED));
-			try {
-				regenerate(chosenGenerator);
-			} catch(Exception e){}
-		}
-	}
-	
-	public void regenerate(ImageGenerator chosenGenerator) {
-		myRobot.setDecorator(chosenGenerator);
-		chosenGenerator.setRobot(myRobot);
-		chosenGenerator.generate();
-		myRobot.getSettings().setRotationRef(0);
-		Turtle t=chosenGenerator.turtle;
-		signNameIfDesired(t);
-		myRobot.setDecorator(null);
-		myRobot.setTurtle(t);
-		
-		Log.message(Translator.get("Finished"));
-		SoundSystem.playConversionFinishedSound();
-		updateButtonAccess();
-	}
-	
-	private void signNameIfDesired(Turtle t) {
-		if(!myRobot.getSettings().shouldSignName()) return;
-		
-		Generator_Text ymh = new Generator_Text();
-		ymh.setRobot(myRobot);
-		ymh.signName();
-		t.history.addAll(ymh.turtle.history);
-	}
-
-	private ImageGenerator getGenerator(int arg0) throws IndexOutOfBoundsException {
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		int i=0;
-		for( ImageGenerator chosenGenerator : imageGenerators ) {
-			if(i==arg0) {
-				return chosenGenerator;
-			}
-			i++;
-		}
-		
-		throw new IndexOutOfBoundsException();
 	}
 
 	@Override

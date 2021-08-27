@@ -35,7 +35,7 @@ public class Generator_Dragon extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
+	public void generate() {
 		turtle = new Turtle();
 
 		// create the sequence of moves
@@ -56,7 +56,7 @@ public class Generator_Dragon extends ImageGenerator {
             turtle.turn(turn * 90);
             turtle.forward(1);
         }  
-	    
-	    return true;
+
+        notifyListeners(turtle);
 	}
 }

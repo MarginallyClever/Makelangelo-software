@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -64,12 +65,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.artPipeline.ArtPipeline;
 import com.marginallyclever.artPipeline.ArtPipelineEvent;
+import com.marginallyclever.artPipeline.generators.Generator_Text;
+import com.marginallyclever.artPipeline.generators.ImageGenerator;
+import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
 import com.marginallyclever.artPipeline.io.LoadResource;
 import com.marginallyclever.artPipeline.io.SaveResource;
 import com.marginallyclever.artPipeline.io.image.LoadImage;
 import com.marginallyclever.artPipeline.io.image.LoadImagePanel;
-import com.marginallyclever.communications.ConnectionManager;
-import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.convenience.turtle.Turtle;
@@ -108,7 +110,6 @@ public final class Makelangelo {
 	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
 
 	private MakelangeloAppPreferences appPreferences;
-	private ConnectionManager connectionManager;
 	private Camera camera;
 	private MakelangeloRobot robot;
 	private ArtPipeline myPipeline = new ArtPipeline();
@@ -177,9 +178,6 @@ public final class Makelangelo {
 		Log.message("Starting camera...");
 		camera = new Camera();
 		
-		Log.message("Starting connection manager...");
-		connectionManager = new ConnectionManager();
-		
 		Log.message("Starting art pipeline...");
 		myPipeline.addListener((e)->{
 			if(e.type==ArtPipelineEvent.FINISHED) {
@@ -217,17 +215,94 @@ public final class Makelangelo {
 	 * @return the refreshed menu bar
 	 */
 	private JMenuBar createMenuBar() {
-		Log.message("Create menu bar");
-
 		JMenuBar menuBar = new JMenuBar();
+		menuBar.add(createFileMenu());
+		menuBar.add(createGenerateMenu());
+		menuBar.add(createViewMenu());
+		menuBar.add(createHelpMenu());
+		menuBar.updateUI();
+		return menuBar;
+	}
 
-		JMenu menu;
+	private JMenu createGenerateMenu() {
+		JMenu menu = new JMenu(Translator.get("MenuGenerate"));
+		
+		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+		for( ImageGenerator ici : imageGenerators ) {
+			JMenuItem mi = new JMenuItem(ici.getName());
+			mi.addActionListener((e) -> runGeneratorDialog(ici));
+			menu.add(mi);
+		}
+		
+		return menu;
+	}
+	
+	private void runGeneratorDialog(ImageGenerator ici) {
+		robot.setDecorator(ici);
+		ici.setRobot(robot);
 
-		// File menu
-		Log.message("  file...");
-		menu = new JMenu(Translator.get("MenuMakelangelo"));
-		menuBar.add(menu);
+		ici.addListener((t) -> {
+			signNameIfDesired(t);
+			myPipeline.processTurtle(t, robot.getSettings());
+		});
+		
+		ici.generate();
+		
+		JDialog dialog = new JDialog(getMainFrame(),ici.getName());
+		ImageGeneratorPanel panel = ici.getPanel();
+		dialog.add(panel.getPanel());
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+		dialog.setVisible(true);
 
+		robot.getSettings().setRotationRef(0);
+		robot.setDecorator(null);
+		
+		Log.message(Translator.get("Finished"));
+		SoundSystem.playConversionFinishedSound();
+	}
+
+	private void signNameIfDesired(Turtle t) {
+		if(!robot.getSettings().shouldSignName()) return;
+		
+		Generator_Text ymh = new Generator_Text();
+		ymh.setRobot(robot);
+		ymh.signName();
+		t.history.addAll(ymh.turtle.history);
+	}
+	
+	private void newFile() {
+		robot.setTurtle(new Turtle());
+	}
+
+	private JMenu createFileMenu() {
+		JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
+
+		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
+		buttonNewFile.addActionListener((e) -> newFile());
+		menu.add(buttonNewFile);
+
+		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
+		buttonOpenFile.addActionListener((e) -> openFile());
+		menu.add(buttonOpenFile);
+		
+		JMenuItem buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
+		buttonReopenFile.addActionListener((e) -> reopenLastFile());
+		menu.add(buttonReopenFile);
+		
+		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveGCODEAs"));
+		buttonSaveFile.addActionListener((e) -> saveFile());
+		menu.add(buttonSaveFile);
+
+		// TODO
+		//buttonNewFile.setEnabled(!isRunning);
+		//buttonOpenFile.setEnabled(!isRunning);
+		//buttonReopenFile.setEnabled(!isRunning && !makelangeloApp.getLastFileIn().isEmpty());
+		//buttonSaveFile.setEnabled(myRobot!=null && myRobot.getTurtle().history.size()>0);
+		
+		menu.addSeparator();
+				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
 		buttonAdjustPreferences.addActionListener((e)->{
 			appPreferences.run(mainFrame);
@@ -236,41 +311,34 @@ public final class Makelangelo {
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener((e)->{
-			checkForUpdate(false);
-		});
+		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
 		menu.add(buttonCheckForUpdate);
 
 		menu.addSeparator();
 
 		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener((e)->{
-			onClose();
-		});
+		buttonExit.addActionListener((e) -> onClose());
 		menu.add(buttonExit);
 
-		// view menu
-		Log.message("  view...");
-		menu = new JMenu(Translator.get("MenuPreview"));
-		menuBar.add(menu);
+		return menu;
+	}
+
+	private JMenu createViewMenu() {
+		JMenu menu = new JMenu(Translator.get("MenuPreview"));
 		
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomOut.addActionListener((e)->{
-			camera.zoomOut();
-		});
+		buttonZoomOut.addActionListener((e) -> camera.zoomOut());
 		menu.add(buttonZoomOut);
 
 		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomIn.addActionListener((e)->{
-			camera.zoomIn();
-		});
+		buttonZoomIn.addActionListener((e) -> camera.zoomIn());
 		menu.add(buttonZoomIn);
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomToFit.addActionListener((e)->{
+		buttonZoomToFit.addActionListener((e) -> {
 			camera.zoomToFit(
 					robot.getSettings().getPaperWidth(),
 					robot.getSettings().getPaperHeight());
@@ -278,7 +346,7 @@ public final class Makelangelo {
 		menu.add(buttonZoomToFit);
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e)->{
+		buttonViewLog.addActionListener((e) -> {
 			if(logFrame == null) {
 				logFrame = new JFrame(Translator.get("Log"));
 				logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -308,34 +376,33 @@ public final class Makelangelo {
 		});
 		menu.add(buttonViewLog);
 
-		// help menu
-		Log.message("  help...");
-		menu = new JMenu(Translator.get("Help"));
-		menuBar.add(menu);
+		return menu;
+	}
+
+	private JMenu createHelpMenu() {
+		JMenu menu = new JMenu(Translator.get("Help"));
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
-		buttonForums.addActionListener((e)->{
+		buttonForums.addActionListener((e) -> {
 			try {
 				java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
 			} catch (IOException e1) {
+				Log.error("Forum URL error: "+e1.getLocalizedMessage());
 				e1.printStackTrace();
 			}
 		});
 		menu.add(buttonForums);
 		
 		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener((e)->{
+		buttonAbout.addActionListener((e) -> {
 			DialogAbout a = new DialogAbout();
 			a.display(mainFrame,VERSION);
 		});
 		menu.add(buttonAbout);
-		
-		// finish
-		Log.message("  finish...");
-		menuBar.updateUI();
 
-		return menuBar;
+		return menu;
 	}
+	
 
 	/**
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
@@ -453,7 +520,6 @@ public final class Makelangelo {
 			@Override
 			public void windowClosed(WindowEvent e) {}
 		});
-		
 		
 		// overall look and feel 2
         try {
@@ -618,10 +684,6 @@ public final class Makelangelo {
 		SoundSystem.playDisconnectSound();
 	}
 
-	public NetworkConnection requestNewConnection() {
-		return connectionManager.requestNewConnection(this.mainFrame);
-	}
-
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
@@ -700,7 +762,6 @@ public final class Makelangelo {
 		panel.run(mainFrame);
 	}
 	
-
 	/**
 	 * User has asked that a file be opened.
 	 * @param filename the file to be opened.

@@ -34,7 +34,7 @@ public class Generator_FillPage extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
@@ -78,7 +78,7 @@ public class Generator_FillPage extends ImageGenerator {
 			}
 			++i;
 		}
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 }

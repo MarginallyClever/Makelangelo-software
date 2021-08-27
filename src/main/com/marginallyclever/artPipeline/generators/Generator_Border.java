@@ -21,7 +21,7 @@ public class Generator_Border extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public void generate() {
 		float yMin = (float)settings.getMarginBottom();
 		float yMax = (float)settings.getMarginTop();
 		float xMin = (float)settings.getMarginLeft();
@@ -37,6 +37,6 @@ public class Generator_Border extends ImageGenerator {
 		turtle.moveTo(xMin,yMin);
 		turtle.moveTo(xMin,yMax);
 		
-	    return true;
+		notifyListeners(turtle);
 	}
 }

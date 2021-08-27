@@ -35,7 +35,7 @@ public class Generator_GraphPaper extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		turtle = new Turtle();
 		turtle.setColor(new ColorRGB(255,0,0));
 		lines(10,0);
@@ -43,8 +43,8 @@ public class Generator_GraphPaper extends ImageGenerator {
 		turtle.setColor(new ColorRGB(0,0,0));
 		lines(100,0);
 		lines(100,90);
-		
-		return true;
+
+		notifyListeners(turtle);
 	}
 
 	protected void lines(float stepSize_mm,int angle_deg) {

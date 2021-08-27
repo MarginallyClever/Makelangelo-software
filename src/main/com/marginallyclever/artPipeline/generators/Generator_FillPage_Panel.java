@@ -35,7 +35,7 @@ public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_FillPage.getAngle()) {
 			Generator_FillPage.setAngle(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

@@ -36,7 +36,7 @@ public class Generator_HilbertCurve_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_HilbertCurve.getOrder()) {
 			Generator_HilbertCurve.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

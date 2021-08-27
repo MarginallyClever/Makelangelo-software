@@ -33,7 +33,7 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		xMax = settings.getMarginWidth()/2.0f;
 		yMax = settings.getMarginHeight()/2.0f;
 		xMin = -xMax;
@@ -62,7 +62,7 @@ public class Generator_SierpinskiTriangle extends ImageGenerator {
 			drawCurve(order, maxSize,-60);
 		}
 
-		return true;
+		notifyListeners(turtle);
 	}
 
 

@@ -35,7 +35,7 @@ public class Generator_KochCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 		xMax = v;
 		yMax = v;
@@ -58,8 +58,8 @@ public class Generator_KochCurve extends ImageGenerator {
 		
 		turtle.penDown();
 		drawTriangle(order, maxSize);
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 
 

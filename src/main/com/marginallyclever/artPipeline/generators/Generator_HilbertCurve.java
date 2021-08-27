@@ -33,7 +33,7 @@ public class Generator_HilbertCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 		xMax = v;
 		yMax = v;
@@ -48,8 +48,8 @@ public class Generator_HilbertCurve extends ImageGenerator {
 				-yMax + turtleStep / 2);
 		turtle.penDown();
 		hilbert(order);
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 
 

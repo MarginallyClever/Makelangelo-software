@@ -40,6 +40,6 @@ public class Generator_Text_Panel extends ImageGeneratorPanel {
 		generator.setMessage(text.getText());
 		generator.setSize(((Number)size.getValue()).intValue());
 		generator.setFont(fontChoices.getSelectedIndex());
-		makelangeloRobotPanel.regenerate(generator);
+		generator.generate();
 	}
 }

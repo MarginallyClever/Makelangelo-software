@@ -34,7 +34,7 @@ public class Generator_GosperCurve extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
 
 		turtle = new Turtle();
@@ -80,8 +80,8 @@ public class Generator_GosperCurve extends ImageGenerator {
 		turtle.penDown();
 		// do the curve
 		gosperA(order);
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 
 

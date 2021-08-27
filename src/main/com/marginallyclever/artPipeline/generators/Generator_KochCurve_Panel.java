@@ -38,7 +38,7 @@ public class Generator_KochCurve_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_KochCurve.getOrder()) {
 			Generator_KochCurve.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

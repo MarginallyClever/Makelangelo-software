@@ -72,7 +72,7 @@ public class Generator_Spirograph extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
+	public void generate() {
 		xMax = Float.NEGATIVE_INFINITY;
 		yMax = Float.NEGATIVE_INFINITY;
 		xMin = Float.POSITIVE_INFINITY;
@@ -114,8 +114,8 @@ public class Generator_Spirograph extends ImageGenerator {
 		// draw the spirograph for real this time
 		turtle = new Turtle();
 		drawSpirograph(true);
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 	
 	protected void drawSpirograph(boolean write) {

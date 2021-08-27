@@ -236,7 +236,7 @@ public class Generator_Polyeder extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public void generate() {
 		instructionPtr=0;
 
 		turtle = new Turtle();
@@ -247,7 +247,7 @@ public class Generator_Polyeder extends ImageGenerator {
 		geneneratePolygonStep(t);
 		Log.message("end");
 
-	    return true;
+		notifyListeners(turtle);
 	}
 
 

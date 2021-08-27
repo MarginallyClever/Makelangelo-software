@@ -3,6 +3,7 @@ package com.marginallyclever.communications;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,20 +18,17 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class ConnectionManager {
-	private ArrayList<TransportLayer> transportLayers;
+	private static ArrayList<TransportLayer> transportLayers = new ArrayList<TransportLayer>( Arrays.asList(
+			new SerialTransportLayer()
+			//, transportLayers.add(new TCPTransportLayer()
+			));
 	
-	public ConnectionManager() {
-		transportLayers = new ArrayList<TransportLayer>();
-		transportLayers.add(new SerialTransportLayer());
-		//transportLayers.add(new TCPTransportLayer());
-	}
-
 	/**
 	 * create a GUI to give the user transport layer options.
 	 * @param parent the root gui component
 	 * @return a new connection or null.
 	 */
-	public NetworkConnection requestNewConnection(Component parent) {
+	public static NetworkConnection requestNewConnection(Component parent) {
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();

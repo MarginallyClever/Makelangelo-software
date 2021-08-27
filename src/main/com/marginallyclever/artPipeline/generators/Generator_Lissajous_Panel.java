@@ -51,7 +51,7 @@ public class Generator_Lissajous_Panel extends ImageGeneratorPanel {
 			Generator_Lissajous.setA(newA);
 			Generator_Lissajous.setDelta(newDelta);
 			Generator_Lissajous.setNumSamples(newNumSamples);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

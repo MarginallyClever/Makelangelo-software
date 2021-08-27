@@ -37,6 +37,6 @@ public class Generator_Maze_Panel extends ImageGeneratorPanel {
 
 		generator.setRows(field_rows.getValue());
 		generator.setCols(field_columns.getValue());
-		makelangeloRobotPanel.regenerate(generator);
+		generator.generate();
 	}
 }

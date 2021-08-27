@@ -18,8 +18,6 @@ import jssc.SerialPortList;
  * @since v7.1.0.0
  */
 public class SerialTransportLayer implements TransportLayer {
-	private String[] portsDetected;
-
 	public SerialTransportLayer() {}
 
 	public String getName() {
@@ -28,13 +26,12 @@ public class SerialTransportLayer implements TransportLayer {
 	
 	/**
 	 * find all available serial ports
-	 *
 	 * @return a list of port names
 	 */
 	public String[] listConnections() {
-
 		String OS = System.getProperty("os.name").toLowerCase();
 
+		String [] portsDetected;
 		if (OS.indexOf("mac") >= 0) {
 			// Also list Bluetooth serial connections
 			portsDetected = SerialPortList.getPortNames(Pattern.compile("cu"));
@@ -94,10 +91,8 @@ public class SerialTransportLayer implements TransportLayer {
 		}
 		
 		NetworkConnection [] connections = new NetworkConnection[connectionNames.length];
-		
 		for(int i=0;i<connectionNames.length;++i) {
 			connections[i] = openConnection(connectionNames[i]);
-			
 		}
 	}
 }

@@ -30,7 +30,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 	}
 	
 	@Override
-	public boolean generate() {
+	public void generate() {
 		turtle = new Turtle();
 
 		random = new SecureRandom();
@@ -43,7 +43,7 @@ public class Generator_LSystemTree extends ImageGenerator {
 		// do the curve
 		lSystemTree(order, 10);
 
-		return true;
+		notifyListeners(turtle);
 	}
 
 

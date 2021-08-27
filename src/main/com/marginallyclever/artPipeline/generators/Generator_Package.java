@@ -47,7 +47,7 @@ public class Generator_Package extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public void generate() {
 		int ytot=2*width+3*height+20;
 		int xtot=length+2*height;
 		
@@ -90,9 +90,7 @@ public class Generator_Package extends ImageGenerator {
 		drawRect(x2,y5-1,x3,y5+1); // lasche
 		drawRect(x2+20,y1,x3-20,y2); // lasche
 
-
-		
-	    return true;
+		notifyListeners(turtle);
 	}
 
 	

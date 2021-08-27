@@ -62,14 +62,14 @@ public class Generator_Lissajous extends ImageGenerator {
 	}
 		
 	@Override
-	public boolean generate() {
+	public void generate() {
 		// scale the step size so the curve fits on the paper
 		WIDTH = settings.getMarginWidth()/2.0;
 		HEIGHT = settings.getMarginHeight()/2.0;
 
 		drawLissajous(true);
-	    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 	
 	// see https://www.openprocessing.org/sketch/26608/

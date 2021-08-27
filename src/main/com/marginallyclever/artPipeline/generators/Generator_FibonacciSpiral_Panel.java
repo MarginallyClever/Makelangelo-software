@@ -37,7 +37,7 @@ public class Generator_FibonacciSpiral_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_FibonacciSpiral.getOrder()) {
 			Generator_FibonacciSpiral.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

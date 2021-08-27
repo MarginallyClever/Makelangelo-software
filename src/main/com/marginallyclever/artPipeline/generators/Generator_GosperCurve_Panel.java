@@ -38,7 +38,7 @@ public class Generator_GosperCurve_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_GosperCurve.getOrder()) {
 			Generator_GosperCurve.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

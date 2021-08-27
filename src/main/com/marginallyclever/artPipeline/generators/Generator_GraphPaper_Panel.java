@@ -35,7 +35,7 @@ public class Generator_GraphPaper_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_GraphPaper.getAngle()) {
 			Generator_GraphPaper.setAngle(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

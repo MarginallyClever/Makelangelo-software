@@ -55,7 +55,7 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 	}
 
 	@Override
-	public boolean generate() {
+	public void generate() {
 		xMax = (float)(settings.getMarginWidth () /2.0f);
 		yMax = (float)(settings.getMarginHeight() /2.0f);
 		Log.message("xMax="+xMax);
@@ -100,8 +100,8 @@ public class Generator_FibonacciSpiral extends ImageGenerator {
 			int o = fibonacciSequence.pop();
 			fibonacciCell(o*scale1);
 		}
-			    
-	    return true;
+
+		notifyListeners(turtle);
 	}
 
 

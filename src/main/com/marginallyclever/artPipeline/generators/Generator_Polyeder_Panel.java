@@ -40,6 +40,6 @@ public class Generator_Polyeder_Panel extends ImageGeneratorPanel {
 		generator.setSize(((Number)size.getValue()).intValue());
 		generator.setFlap(((Number)flap.getValue()).intValue());
 		generator.setModel(model.getSelectedIndex());
-		makelangeloRobotPanel.regenerate(generator);
+		generator.generate();
 	}
 }

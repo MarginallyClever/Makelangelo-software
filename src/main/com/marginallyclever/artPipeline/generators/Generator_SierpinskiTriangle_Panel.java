@@ -38,7 +38,7 @@ public class Generator_SierpinskiTriangle_Panel extends ImageGeneratorPanel {
 		
 		if(newOrder != Generator_SierpinskiTriangle.getOrder()) {
 			Generator_SierpinskiTriangle.setOrder(newOrder);
-			makelangeloRobotPanel.regenerate(generator);
+			generator.generate();
 		}
 	}
 }

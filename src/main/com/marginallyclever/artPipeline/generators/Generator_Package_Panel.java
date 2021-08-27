@@ -38,6 +38,6 @@ public class Generator_Package_Panel extends ImageGeneratorPanel {
 		generator.setWidth(((Number)width.getValue()).intValue());
 		generator.setHeight(((Number)height.getValue()).intValue());
 		generator.setLength(((Number)length.getValue()).intValue());
-		makelangeloRobotPanel.regenerate(generator);
+		generator.generate();
 	}
 }
