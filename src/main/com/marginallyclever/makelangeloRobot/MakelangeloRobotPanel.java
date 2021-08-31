@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -182,26 +181,11 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	}
 	
 	private CollapsiblePanel createAxisDrivingControls() {
-		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
-		JPanel driveInterior = drivePanel.getContentPane();
-		driveInterior.setLayout(new GridBagLayout());
-		final GridBagConstraints cMain = new GridBagConstraints();
-		cMain.fill=GridBagConstraints.HORIZONTAL;
-		cMain.anchor=GridBagConstraints.NORTH;
-		cMain.gridx=0;
-		cMain.gridy=0;
-
-		// manual axis driving
-		JPanel axisControl = new JPanel(new GridBagLayout());
-		driveInterior.add(axisControl,cMain);
-		cMain.gridy++;
-
 	    driveButtons = new CartesianButtons(); 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		c.gridx=0;
 		c.gridy=0;
-	    axisControl.add(driveButtons,c);
 	    driveButtons.addActionListener((e)->{
 	    	int id = e.getID();
 	    	if(CartesianButtons.isCenterZone(id)) {
@@ -219,13 +203,23 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	    		x=100;
 	    		y=0;
 	    	}
-	    	int scale = (int)Math.pow(10, z);
-	    	x/=scale;
-	    	y/=scale;
+	    	while(z-->=0) {
+	    		x/=10;
+	    		y/=10;
+	    	}
 	    	System.out.println("Move "+x+","+y);
 	    	//myRobot.movePenRelative(x,y);
 	    });
 		
+		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
+		JPanel driveInterior = drivePanel.getContentPane();
+		driveInterior.setLayout(new GridBagLayout());
+		final GridBagConstraints cMain = new GridBagConstraints();
+		cMain.fill=GridBagConstraints.HORIZONTAL;
+		cMain.anchor=GridBagConstraints.NORTH;
+		cMain.gridx=0;
+		cMain.gridy=0;
+		driveInterior.add(driveButtons,cMain);
 		drivePanel.setCollapsed(false);
 		
 		return drivePanel;

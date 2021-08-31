@@ -138,7 +138,14 @@ public final class Makelangelo {
 		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
-		
+
+		// set look and feel
+        try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+        	Log.error("Look and feel could not be set: "+e.getLocalizedMessage());
+        }
+        
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(()->{
@@ -183,6 +190,7 @@ public final class Makelangelo {
 	}
 	
 	public void run() {
+        
 		createAppWindow();		
 		checkSharingPermission();
 
@@ -544,9 +552,6 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		Log.message("Creating GUI...");
 
-		// overall look and feel 1
-		//JFrame.setDefaultLookAndFeelDecorated(true);  // ugly!
-
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowListener() {
@@ -568,13 +573,7 @@ public final class Makelangelo {
 			@Override
 			public void windowClosed(WindowEvent e) {}
 		});
-		
-		// overall look and feel 2
-        try {
-        	// weird but less ugly.
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
-		
+				
 		Log.message("  adding menu bar...");
 		mainFrame.setJMenuBar(createMenuBar());
 		

@@ -11,7 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import com.marginallyclever.convenience.log.Log;
+
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -60,7 +63,7 @@ public class CartesianButtons extends JComponent {
 				int zone = getZoneUnderPoint(e.getPoint());
 				if( highlightZone != zone ) {
 					highlightZone = zone;
-					highlightColor = UIManager.getColor("Button.highlight");
+					highlightColor = getColorButtonHighlight();
 					repaint();
 				}
 			}
@@ -68,20 +71,17 @@ public class CartesianButtons extends JComponent {
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {}
-
-			@Override
 			public void mousePressed(MouseEvent e) {
 				if(!isEnabled()) return; 
 				highlightZone = getZoneUnderPoint(e.getPoint());
-				highlightColor = UIManager.getColor("Button.select");
+				highlightColor = getColorButtonSelect();
 				//System.out.println("pressed");
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				highlightColor = UIManager.getColor("Button.highlight");
+				highlightColor = getColorButtonHighlight();
 				//System.out.println("released");
 				int zone = getZoneUnderPoint(e.getPoint());
 				if(highlightZone == zone) { 
@@ -100,8 +100,8 @@ public class CartesianButtons extends JComponent {
 		for(int a=0;a<4;++a) {
 			int n = 100 * (v>0?1:-1);
 			for(int i=NUM_ZONES_PER_QUADRANT-1;i>=0;--i) {
-				n/=10;
 				labels[j++]=Integer.toString(n);
+				n/=10;
 			}
 			--v;
 		}
@@ -111,15 +111,17 @@ public class CartesianButtons extends JComponent {
 	
 
 	@Override
-	public void paint(Graphics g) {
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		
+		Rectangle r = this.getBounds();
+		g.translate(r.width/2, r.height/2);
+		
 		drawAllQuadrantButtons(g);
 		drawCenterButton(g);
-		super.paint(g);
 	}
 
 	private void drawAllQuadrantButtons(Graphics g) {
-		Rectangle r = this.getBounds();
-		g.translate(r.width/2, r.height/2);
 		g.setColor(new Color(1.0f,0.0f,0.0f));
 
 		int k = 0;
@@ -143,11 +145,12 @@ public class CartesianButtons extends JComponent {
 		if(highlightZone==NUM_ZONES_PER_QUADRANT*4 && this.isEnabled()) {
 			g.setColor(highlightColor);
 		} else {
-			g.setColor(UIManager.getColor("control"));
+			g.setColor(getColorControl());
 		}
 		g.fillArc(-centerRadius, -centerRadius, centerRadius*2, centerRadius*2, 0, 360);
-		g.setColor(this.isEnabled() ? UIManager.getColor("Button.darkShadow") : UIManager.getColor("Button.disabledText") );
+		g.setColor(this.isEnabled() ? getColorForegroundText() : getColorDisabledText() );
 		g.drawArc(-centerRadius, -centerRadius, centerRadius*2, centerRadius*2, 0, 360);
+		
 		drawCenteredText(g,labels[ZONE_CENTER],0,0);
 	}
 
@@ -157,10 +160,42 @@ public class CartesianButtons extends JComponent {
 		int w = (int)r.getWidth();
 		int h = (int)r.getHeight()-fm.getLeading();
 		
-		g.setColor(this.isEnabled() ? UIManager.getColor("Label.foreground") : UIManager.getColor("Button.disabledText"));
+		g.setColor(this.isEnabled() ? getColorForegroundText()  : getColorDisabledText());
 		g.drawString(string, x-w/2, y+h/2);
 	}
 
+	private Color getColorControl() {
+		Color c = UIManager.getColor("control");
+		if(c==null) c = SystemColor.control;
+		return c;
+	}
+	
+	private Color getColorDisabledText() {
+		Color c = UIManager.getColor("Button.disabledText");
+		if(c==null) c = SystemColor.lightGray;
+		return c;
+	}
+	
+	//UIManager.getColor("Button.darkShadow")
+	
+	private Color getColorForegroundText() {
+		Color c = UIManager.getColor("Label.foreground");
+		if(c==null) c = SystemColor.darkGray;
+		return c;
+	}
+
+	private Color getColorButtonHighlight() {
+		Color c = UIManager.getColor("Button.highlight");
+		if(c==null) c = SystemColor.controlHighlight;
+		return c;
+	}
+
+	private Color getColorButtonSelect() {
+		Color c = UIManager.getColor("Button.select");
+		if(c==null) c = SystemColor.textHighlight;
+		return c;
+	}
+	
 	/**
 	 * @param p
 	 * @return The zone under point p.  in each quadrant, outside zones are lower numbers than inside zones.  Quadrants are numbered counter-clockwise, starting with eastern quadrant.  
@@ -188,13 +223,14 @@ public class CartesianButtons extends JComponent {
 		if(highlight && this.isEnabled()) {
 			g.setColor(highlightColor);
 		} else {
-			g.setColor(UIManager.getColor("control"));
+			g.setColor(getColorControl());
 		}
 		g.fillArc(-r1, -r1, r1*2, r1*2, startAngle, endAngle-startAngle);
-		g.setColor(UIManager.getColor("control"));
+		g.setColor(getColorControl());
 		g.fillArc(-r0, -r0, r0*2, r0*2, startAngle, endAngle-startAngle);
 
-		g.setColor(this.isEnabled() ? UIManager.getColor("Button.darkShadow") : UIManager.getColor("Button.disabledText") );
+		g.setColor(this.isEnabled() ? getColorForegroundText() : getColorDisabledText() );
+		//g.setColor(SystemColor.BLACK);
 		//g.drawArc(-r0, -r0, r0*2, r0*2, startAngle, endAngle-startAngle);
 		g.drawArc(-r1, -r1, r1*2, r1*2, startAngle, endAngle-startAngle);
 		drawLineInternal(g,startAngle,r0,r1);
@@ -273,18 +309,35 @@ public class CartesianButtons extends JComponent {
 		return (int)(id%NUM_ZONES_PER_QUADRANT);
 	}
 
+	public String getLabel(int id) throws IllegalArgumentException {
+		if(id<0 || id>=TOTAL_ZONES) throw new IllegalArgumentException("must be 0...TOTAL_ZONES-1");
+		return labels[id];
+	}
+
+	public void setLabel(int id,String arg0) throws IllegalArgumentException {
+		if(id<0 || id>=TOTAL_ZONES) throw new IllegalArgumentException("must be 0...TOTAL_ZONES-1");
+		labels[id]=arg0;
+	}
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Button Test");
 		frame.setSize(400,400);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
+		// set look and feel
+        try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+        	Log.error("Look and feel could not be set: "+e.getLocalizedMessage());
+        }
+        
 		JPanel p = new JPanel();
 		frame.add(p);
 		CartesianButtons button = new CartesianButtons();
 		p.add(button);
 		button.addActionListener((e)->{
-			System.out.println(e.getActionCommand()+" "+e.getID());
+			System.out.println(e.getActionCommand()+" "+button.getLabel(e.getID()));
 		});
 		
 		frame.setVisible(true);
