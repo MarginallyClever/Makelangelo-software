@@ -63,8 +63,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.artPipeline.ArtPipeline;
-import com.marginallyclever.artPipeline.ArtPipelineEvent;
+import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
+import com.marginallyclever.artPipeline.ReorderTurtle;
+import com.marginallyclever.artPipeline.ResizeTurtleToPaper;
 import com.marginallyclever.artPipeline.generators.Generator_Text;
 import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
@@ -82,6 +83,7 @@ import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangeloRobot.PiCaptureAction;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -112,7 +114,6 @@ public final class Makelangelo {
 	private MakelangeloAppPreferences appPreferences;
 	private Camera camera;
 	private MakelangeloRobot robot;
-	private ArtPipeline myPipeline = new ArtPipeline();
 
 	private String lastFileIn = "";
 	private FileFilter lastFilterIn = null;
@@ -125,6 +126,8 @@ public final class Makelangelo {
 	private LogPanel logPanel = null;
 	private PreviewPanel previewPanel;
 	private MakelangeloRobotPanel robotPanel;
+
+	private PiCaptureAction piCameraCaptureAction;
 	
 	// for drag + drop operations
 	@SuppressWarnings("unused")
@@ -144,7 +147,6 @@ public final class Makelangelo {
 		});
 	}
 
-	@SuppressWarnings("deprecation")
 	public Makelangelo() {
 		Translator.start();
 		
@@ -154,7 +156,6 @@ public final class Makelangelo {
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
 		Log.message("Starting preferences...");
-		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences();
 
@@ -175,15 +176,10 @@ public final class Makelangelo {
 			robot.sendLineToRobot(command);
 		});
 
-		Log.message("Starting camera...");
+		Log.message("Starting virtual camera...");
 		camera = new Camera();
 		
 		Log.message("Starting art pipeline...");
-		myPipeline.addListener((e)->{
-			if(e.type==ArtPipelineEvent.FINISHED) {
-				robot.setTurtle((Turtle)e.extra);
-			}
-		});
 	}
 	
 	public void run() {
@@ -218,10 +214,63 @@ public final class Makelangelo {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createGenerateMenu());
+		menuBar.add(createArtPipelineMenu());
 		menuBar.add(createViewMenu());
 		menuBar.add(createHelpMenu());
 		menuBar.updateUI();
 		return menuBar;
+	}
+
+	private JMenu createArtPipelineMenu() {
+		JMenu menu = new JMenu(Translator.get("Art Pipeline"));
+
+		try {
+			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("MenuCaptureImage"));	
+			if (piCameraCaptureAction != null) {
+		        menu.add(piCameraCaptureAction);
+				menu.addSeparator();
+		    } 
+		} catch (FailedToRunRaspistillException e) {
+			Log.message("Raspistill unavailable.");
+		}
+
+		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
+		menu.add(fit);
+		fit.addActionListener((e)->{
+			ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),false);
+		});
+
+		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
+		menu.add(fill);
+		fill.addActionListener((e)->{
+			ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),true);
+		});
+
+		menu.addSeparator();
+		
+		JMenuItem flipH = new JMenuItem(Translator.get("FlipH"));
+		menu.add(flipH);
+		flipH.addActionListener((e) -> robot.getTurtle().scale(1, -1));
+
+		JMenuItem flipV = new JMenuItem(Translator.get("FlipV"));
+		menu.add(flipV);
+		flipV.addActionListener((e) -> robot.getTurtle().scale(-1, 1));
+
+		menu.addSeparator();
+		
+		JMenuItem reorder = new JMenuItem(Translator.get("Reorder"));
+		menu.add(reorder);
+		reorder.addActionListener((e)->{
+			ReorderTurtle.run(robot.getTurtle());
+		});
+
+		JMenuItem simplify = new JMenuItem(Translator.get("Simplify"));
+		menu.add(simplify);
+		simplify.addActionListener((e)->{
+			ReorderTurtle.run(robot.getTurtle());
+		});
+
+		return menu;
 	}
 
 	private JMenu createGenerateMenu() {
@@ -243,7 +292,7 @@ public final class Makelangelo {
 
 		ici.addListener((t) -> {
 			signNameIfDesired(t);
-			myPipeline.processTurtle(t, robot.getSettings());
+			robot.setTurtle(t);
 		});
 		
 		ici.generate();
@@ -403,7 +452,6 @@ public final class Makelangelo {
 		return menu;
 	}
 	
-
 	/**
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
 	 * redirect notice to find the latest release tag.
@@ -745,8 +793,8 @@ public final class Makelangelo {
 				imageLoader.load(fileInputStream, robot, mainFrame);
 				runImageConversionProcess(imageLoader);
 			} else {
-				Turtle t = loader.load(fileInputStream,robot,mainFrame);
-				myPipeline.processTurtle(t, robot.getSettings());
+				Turtle t = loader.load(fileInputStream, robot ,mainFrame);
+				robot.setTurtle(t);
 			}
 			success=true;
 		} catch(Exception e) {
@@ -903,10 +951,4 @@ public final class Makelangelo {
 	public String getLastFileIn() {
 		return lastFileIn;
 	}
-
-	public ArtPipeline getPipeline() {
-		return myPipeline;
-	}
-
-
 }

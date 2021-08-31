@@ -14,8 +14,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.artPipeline.ArtPipelinePanel;
 import com.marginallyclever.communications.ConnectionManager;
 import com.marginallyclever.communications.NetworkConnection;
 import com.marginallyclever.convenience.log.Log;
@@ -56,23 +54,17 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private PiCaptureAction piCameraCaptureAction;
 	private SelectButton buttonCapture;
 
     // live controls
 	private SelectButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
 
 	// driving controls
-	private JButton down100,down10,down1,up1,up10,up100;
-	private JButton left100,left10,left1,right1,right10,right100;
-	private JButton setHome;
+	private CartesianButtons driveButtons;
 	private SelectButton goHome,findHome;
 	private SelectButton goPaperBorder,penUp,penDown;
 	private SelectButton toggleEngagedMotor;
 
-	// pipeline controls
-	private ArtPipelinePanel myArtPipelinePanel;
-	
 	private boolean isConnected;  // has pressed connect button
 	
 	public StatusBar statusBar;
@@ -109,16 +101,8 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		add(machineNumberPanel, con1);
 		con1.gridy++;
 
-		try {
-			piCameraCaptureAction = new PiCaptureAction(gui, Translator.get("MenuCaptureImage"));	
-		} catch (FailedToRunRaspistillException e) {
-			Log.message("Raspistill unavailable.");
-		}
-
 		add(createAxisDrivingControls(),con1);		con1.gridy++;
 		add(createCommonDriveControls(),con1);		con1.gridy++;
-		add(createCreativeControlPanel(), con1);	con1.gridy++;
-		add(createArtPipelinePanel(),con1);			con1.gridy++;
 		add(createAnimationPanel(),con1);			con1.gridy++;
 
 		statusBar = new StatusBar();
@@ -131,20 +115,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		// lastly, set the button states
 		updateButtonAccess();
-	}
-
-	private JButton createTightJButton(String label) {
-		JButton b = new JButton(label);
-		b.setMargin(new Insets(0,0,0,0));
-		b.setPreferredSize(new Dimension(60,20));
-		return b;
-	}
-
-	private JButton createNarrowJButton(String label) {
-		JButton b = new JButton(label);
-		b.setMargin(new Insets(0,0,0,0));
-		b.setPreferredSize(new Dimension(40,20));
-		return b;
 	}
 
 	private JPanel createConnectSubPanel() {
@@ -210,25 +180,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 			myRobot.pause();
 		}
 	}
-
-	private CollapsiblePanel createArtPipelinePanel() {
-		myArtPipelinePanel = new ArtPipelinePanel(makelangeloApp.getMainFrame(),makelangeloApp.getPipeline());
-		
-		return myArtPipelinePanel;
-	}
-	
-	private JPanel createCreativeControlPanel() {
-		CollapsiblePanel creativeControlPanel = new CollapsiblePanel(Translator.get("MenuCreativeControl"));
-		SelectPanel panel = creativeControlPanel.getContentPane();
-
-		if (piCameraCaptureAction != null) {
-            panel.add(buttonCapture = new SelectButton(piCameraCaptureAction));
-        } else {
-        	buttonCapture = null;
-        }
-		
-		return creativeControlPanel;
-	}
 	
 	private CollapsiblePanel createAxisDrivingControls() {
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
@@ -242,49 +193,40 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 
 		// manual axis driving
 		JPanel axisControl = new JPanel(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
 		driveInterior.add(axisControl,cMain);
 		cMain.gridy++;
 
-		setHome = createTightJButton(Translator.get("SetHome"));
-	    setHome.setPreferredSize(new Dimension(100,20));
-	    setHome.addActionListener((e)->{ 
-			myRobot.setHome();
-			updateButtonAccess();
-		});
-
-		down100 = createTightJButton("-100");		down100	.addActionListener((e)->{	myRobot.movePenRelative(0,-100);	});
-		down10 = createTightJButton("-10");			down10	.addActionListener((e)->{	myRobot.movePenRelative(0,-10);		});
-		down1 = createTightJButton("-1");			down1	.addActionListener((e)->{	myRobot.movePenRelative(0,-1);		});
-		up1 = createTightJButton("1");				up1		.addActionListener((e)->{	myRobot.movePenRelative(0,1);		});
-		up10 = createTightJButton("10");			up10	.addActionListener((e)->{	myRobot.movePenRelative(0,10);		});
-		up100 = createTightJButton("100");			down100	.addActionListener((e)->{	myRobot.movePenRelative(0,100);		});
-
-		left100 = createNarrowJButton("-100");		left100	.addActionListener((e)->{	myRobot.movePenRelative(-100,0);	});
-		left10 = createNarrowJButton("-10");		left10	.addActionListener((e)->{	myRobot.movePenRelative(-10,0);		});
-		left1 = createNarrowJButton("-1");			left1	.addActionListener((e)->{	myRobot.movePenRelative(-1,0);		});
-		right1 = createNarrowJButton("1");			right1	.addActionListener((e)->{	myRobot.movePenRelative(1,0);		});
-		right10 = createNarrowJButton("10");		right10	.addActionListener((e)->{	myRobot.movePenRelative(10,0);		});
-		right100 = createNarrowJButton("100");		right100.addActionListener((e)->{	myRobot.movePenRelative(100,0);		});
-
-		c.fill=GridBagConstraints.BOTH;
-		c.gridx=3;  c.gridy=6;  axisControl.add(down100,c);
-		c.gridx=3;  c.gridy=5;  axisControl.add(down10,c);
-		c.gridx=3;  c.gridy=4;  axisControl.add(down1,c);
-
-		c.gridx=3;  c.gridy=3;  axisControl.add(setHome,c);
-		c.gridx=3;  c.gridy=2;  axisControl.add(up1,c);
-		c.gridx=3;  c.gridy=1;  axisControl.add(up10,c);
-		c.gridx=3;  c.gridy=0;  axisControl.add(up100,c);
-
-		c.gridx=0;  c.gridy=3;  axisControl.add(left100,c);
-		c.gridx=1;  c.gridy=3;  axisControl.add(left10,c);
-		c.gridx=2;  c.gridy=3;  axisControl.add(left1,c);
-		c.gridx=4;  c.gridy=3;  axisControl.add(right1,c);
-		c.gridx=5;  c.gridy=3;  axisControl.add(right10,c);
-		c.gridx=6;  c.gridy=3;  axisControl.add(right100,c);
+	    driveButtons = new CartesianButtons(); 
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx=0;
+		c.gridy=0;
+	    axisControl.add(driveButtons,c);
+	    driveButtons.addActionListener((e)->{
+	    	int id = e.getID();
+	    	if(CartesianButtons.isCenterZone(id)) {
+				myRobot.setHome();
+				updateButtonAccess();
+	    		return;
+	    	}
+	    	int q=CartesianButtons.getQuadrant(id);
+	    	int z=CartesianButtons.getZone(id);
+	    	int x,y;
+	    	if((q%2)==0) {
+	    		x=0;
+	    		y=100;
+	    	} else {
+	    		x=100;
+	    		y=0;
+	    	}
+	    	int scale = (int)Math.pow(10, z);
+	    	x/=scale;
+	    	y/=scale;
+	    	System.out.println("Move "+x+","+y);
+	    	//myRobot.movePenRelative(x,y);
+	    });
 		
-		drivePanel.setCollapsed(true);
+		drivePanel.setCollapsed(false);
 		
 		return drivePanel;
 	}
@@ -440,23 +382,9 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		
 		if(buttonCapture != null) buttonCapture.setEnabled(!isRunning);
 		
-
-		down100.setEnabled(isConfirmed && !isRunning);
-		down10.setEnabled(isConfirmed && !isRunning);
-		down1.setEnabled(isConfirmed && !isRunning);
-		up1.setEnabled(isConfirmed && !isRunning);
-		up10.setEnabled(isConfirmed && !isRunning);
-		up100.setEnabled(isConfirmed && !isRunning);
-
-		left100.setEnabled(isConfirmed && !isRunning);
-		left10.setEnabled(isConfirmed && !isRunning);
-		left1.setEnabled(isConfirmed && !isRunning);
-		right1.setEnabled(isConfirmed && !isRunning);
-		right10.setEnabled(isConfirmed && !isRunning);
-		right100.setEnabled(isConfirmed && !isRunning);
+		driveButtons.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && didSetHome);
-		setHome .setEnabled( isConfirmed && !isRunning && !myRobot.getSettings().getHardwareProperties().canAutoHome() );
 		findHome.setEnabled( isConfirmed && !isRunning &&  myRobot.getSettings().getHardwareProperties().canAutoHome() );
 		goHome.setEnabled(isConfirmed && !isRunning && didSetHome);
 		

@@ -31,23 +31,21 @@ public class LoadImagePanel {
 	private static JComboBox<String> fillNames;
 	private JPanel cards;
 
-	private ArrayList<String> imageConverterNames = new ArrayList<String>();
-	private String[] imageFillNames = {
-		Translator.get("ConvertImagePaperFill"),
-		Translator.get("ConvertImagePaperFit")
-	};
-	
 	public LoadImagePanel(LoadImage loader) {
 		this.loader = loader;
 
-		imageConverterNames.clear();
-		
 		conversionPanel = new JPanel(new GridBagLayout());
-
+		
+		String[] imageFillNames = {
+			Translator.get("ConvertImagePaperFill"),
+			Translator.get("ConvertImagePaperFit")
+		};
 		fillNames = new JComboBox<String>(imageFillNames);
 		
 		cards = new JPanel(new CardLayout());
 		cards.setPreferredSize(new Dimension(450,300));
+
+		ArrayList<String> imageConverterNames = new ArrayList<String>();
 		ServiceLoader<ImageConverter> converterServices = ServiceLoader.load(ImageConverter.class);
 		ArrayList<ImageConverter> converters = new ArrayList<ImageConverter>();
 		for( ImageConverter ici : converterServices ) {

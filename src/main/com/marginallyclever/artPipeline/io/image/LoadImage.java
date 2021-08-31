@@ -2,8 +2,8 @@ package com.marginallyclever.artPipeline.io.image;
 
 import java.awt.Component;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -36,17 +36,7 @@ public class LoadImage implements LoadResource {
 	private int workerCount = 0;
 	
 	// Set of image file extensions.
-	private static final Set<String> IMAGE_FILE_EXTENSIONS;
-	static {
-		IMAGE_FILE_EXTENSIONS = new HashSet<String>();
-		IMAGE_FILE_EXTENSIONS.add("jpg");
-		IMAGE_FILE_EXTENSIONS.add("jpeg");
-		IMAGE_FILE_EXTENSIONS.add("png");
-		IMAGE_FILE_EXTENSIONS.add("wbmp");
-		IMAGE_FILE_EXTENSIONS.add("bmp");
-		IMAGE_FILE_EXTENSIONS.add("gif");
-	}
-	
+	private static final Set<String> IMAGE_FILE_EXTENSIONS = new HashSet<String>(Arrays.asList("jpg","jpeg","png","wbmp","bmp","gif"));
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private ProgressMonitor pm;
@@ -114,12 +104,11 @@ public class LoadImage implements LoadResource {
 	// adjust image to fill the paper
 	public void scaleToFillPaper() {
 		MakelangeloRobotSettings s = myRobot.getSettings();
-
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 
 		float f;
-		if( s.getPaperWidth() > s.getPaperHeight() ) {
+		if( width > height ) {
 			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
@@ -129,12 +118,11 @@ public class LoadImage implements LoadResource {
 	
 	public void scaleToFitPaper() {
 		MakelangeloRobotSettings s = myRobot.getSettings();
-		
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 		
 		float f;
-		if( s.getPaperWidth() < s.getPaperHeight() ) {
+		if( width < height ) {
 			f = (float)( width / (double)img.getSourceImage().getWidth() );
 		} else {
 			f = (float)( height / (double)img.getSourceImage().getHeight() );
@@ -216,12 +204,5 @@ public class LoadImage implements LoadResource {
 		if(imageConverterThread==thread)
 			imageConverterThread=null;
 	}
-	
-	public boolean canSave(String filename) {
-		return false;
-	}
-	
-	public boolean save(OutputStream outputStream,MakelangeloRobot robot, Component parentComponent) {
-		return false;
-	}
+
 }

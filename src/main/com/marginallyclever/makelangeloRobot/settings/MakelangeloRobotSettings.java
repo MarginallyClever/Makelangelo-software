@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.BasicStroke;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
@@ -926,4 +927,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 		return this.rotationRef;
 	}
 
+	public Rectangle2D.Double getMarginRectangle() {
+		Rectangle2D.Double rectangle = new Rectangle2D.Double();
+		rectangle.x = getMarginLeft();
+		rectangle.y = getMarginBottom();
+		rectangle.width = getMarginRight() - rectangle.x;
+		rectangle.height = getMarginTop() - rectangle.y;
+		return rectangle;
+	}
 }

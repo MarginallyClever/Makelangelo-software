@@ -1,6 +1,7 @@
 package com.marginallyclever.artPipeline.io.svg;
 
 import java.awt.Component;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -95,15 +96,11 @@ public class LoadSVG extends ImageManipulator implements LoadResource {
 			throw new Exception("Failed to load some elements (1): "+e.getLocalizedMessage());
 		}
 		
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
-		
-		turtle.getBounds(top, bottom);
-		imageCenterX = ( top.x + bottom.x ) / 2.0;
-		imageCenterY = -( top.y + bottom.y ) / 2.0;
-
-		double imageWidth  = top.x - bottom.x;
-		double imageHeight = top.y - bottom.y;
+		Rectangle2D.Double r = turtle.getBounds();
+		imageCenterX = r.getCenterX();
+		imageCenterY = -r.getCenterY();
+		double imageWidth  = r.width;
+		double imageHeight = r.height;
 
 		// add 2% for margins
 

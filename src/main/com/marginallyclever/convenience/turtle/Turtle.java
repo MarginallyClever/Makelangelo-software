@@ -1,9 +1,12 @@
 package com.marginallyclever.convenience.turtle;
 
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 
@@ -201,7 +204,21 @@ public class Turtle implements Cloneable {
 	 * @param top maximum limits
 	 * @param bottom minimum limits
 	 */
-	public void getBounds(Point2D top,Point2D bottom) {
+	public Rectangle2D.Double getBounds() {
+		Point2D top = new Point2D();
+		Point2D bottom = new Point2D();
+		getBounds(top,bottom);
+		
+		Rectangle2D.Double r = new Rectangle.Double();
+		r.x=bottom.x;
+		r.y=bottom.y;
+		r.width=top.x-bottom.x;
+		r.height=top.y-bottom.y;
+		
+		return r;
+	}
+	
+	private void getBounds(Point2D top,Point2D bottom) {
 		bottom.x=Float.MAX_VALUE;
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
@@ -209,14 +226,12 @@ public class Turtle implements Cloneable {
 		TurtleMove old=null;
 		
 		for( TurtleMove m : history ) {
-			if(m.type == TurtleMoveType.DRAW)
-			{
+			if(m.type == TurtleMoveType.DRAW) {
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
 				if(bottom.y>m.y) bottom.y=m.y;
-				if(old != null)
-				{
+				if(old != null) {
 					if(top.x<old.x) top.x=old.x;
 					if(top.y<old.y) top.y=old.y;
 					if(bottom.x>old.x) bottom.x=old.x;
@@ -342,5 +357,74 @@ public class Turtle implements Cloneable {
 				unlock();
 			}
 		}
+	}
+
+	// return a list of all the pen-down lines while remembering their color.
+	public ArrayList<LineSegment2D> getAsLineSegments() {
+		ArrayList<LineSegment2D> lines = new ArrayList<LineSegment2D>();
+		TurtleMove previousMovement=null;
+		ColorRGB color = new ColorRGB(0,0,0);
+
+		Log.message("  Found "+history.size()+" instructions.");
+		
+		for( TurtleMove m : history ) {
+			switch(m.type) {
+			case DRAW:
+				if(previousMovement!=null) {
+					LineSegment2D line = new LineSegment2D(
+							new Point2D(previousMovement.x,previousMovement.y),
+							new Point2D(m.x,m.y),
+							color);
+					if(line.lengthSquared()>0) {
+						lines.add(line);
+					}
+				}
+				previousMovement = m;
+				break;
+			case TRAVEL:
+				previousMovement = m;
+				break;
+			case TOOL_CHANGE:
+				color = m.getColor();
+				break;
+			}
+		}
+
+		return lines;
+	}
+
+	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize) {
+		if(orderedLines.isEmpty()) return;
+		
+		LineSegment2D first = orderedLines.get(0); 
+		jumpTo(first.a.x,first.a.y);
+		Point2D currentPosition = new Point2D(first.b.x, first.b.y);
+		
+		for( LineSegment2D line : orderedLines ) {
+			// change color if needed
+			if(line.c!=getColor()) {
+				setColor(line.c);
+			}
+			
+			if(lengthSquared(currentPosition, line.a) > minimumJumpSize) {
+				// The previous line ends too far from the start point of this line,
+				// need to make a travel with the pen up to the start point of this line.
+				jumpTo(line.a.x,line.a.y);
+			} else {
+				// The previous line ends close to the start point of this line,
+				// so there's no need to go to the start point of this line since the pen is practically there.
+				// The start point of this line will be skipped.
+				//t.moveTo(line.a.x,line.a.y);
+			}
+			// Make a pen down move to the end of this line
+			moveTo(line.b.x,line.b.y);
+			currentPosition.set(line.b.x,line.b.y);
+		}
+	}
+
+	private double lengthSquared(Point2D a,Point2D b) {
+		double dx = a.x-b.x;
+		double dy = a.y-b.y;
+		return dx*dx + dy*dy; 
 	}
 }
