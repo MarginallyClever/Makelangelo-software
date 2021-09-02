@@ -220,11 +220,9 @@ public class CartesianButtons extends JComponent {
 	}
 
 	private void drawArcingButtonInternal(Graphics g,int startAngle,int endAngle,int r0,int r1,boolean highlight,String label) {
-		if(highlight && this.isEnabled()) {
-			g.setColor(highlightColor);
-		} else {
-			g.setColor(getColorControl());
-		}
+		boolean shouldHighlight = highlight && this.isEnabled(); 
+		g.setColor(shouldHighlight ? highlightColor : getColorControl());
+		
 		g.fillArc(-r1, -r1, r1*2, r1*2, startAngle, endAngle-startAngle);
 		g.setColor(getColorControl());
 		g.fillArc(-r0, -r0, r0*2, r0*2, startAngle, endAngle-startAngle);

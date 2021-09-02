@@ -196,19 +196,23 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	    	int q=CartesianButtons.getQuadrant(id);
 	    	int z=CartesianButtons.getZone(id);
 	    	int x,y;
-	    	if((q%2)==0) {
+	    	if((q%2)==1) {
 	    		x=0;
 	    		y=100;
 	    	} else {
 	    		x=100;
 	    		y=0;
 	    	}
-	    	while(z-->=0) {
+	    	if(q>1) {
+	    		x=-x;
+	    		y=-y;
+	    	}
+	    	while(z-->0) {
 	    		x/=10;
 	    		y/=10;
 	    	}
 	    	System.out.println("Move "+x+","+y);
-	    	//myRobot.movePenRelative(x,y);
+	    	myRobot.movePenRelative(x,y);
 	    });
 		
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
