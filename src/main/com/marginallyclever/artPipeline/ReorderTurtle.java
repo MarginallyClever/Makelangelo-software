@@ -7,8 +7,8 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 
 public class ReorderTurtle {
-	public static void run(Turtle turtle) {
-		if(turtle.history.size()==0) return;
+	public static Turtle run(Turtle turtle) {
+		if(turtle.history.size()==0) return turtle;
 		
 		System.out.println("reorder() begin");
 		System.out.println("  before: "+turtle.history.size()+" instructions.");
@@ -30,10 +30,9 @@ public class ReorderTurtle {
 		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
 		Turtle t = new Turtle();
 		t.addLineSegments(orderedLines, 1.0);
-
 		System.out.println("  after: "+t.history.size()+" instructions.");
-		turtle.history = t.history;
 		System.out.println("reorder() end");
+		return t;
 	}
 
 	private static ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {

@@ -8,7 +8,7 @@ import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 
 public class SimplifyTurtle {
-	public static void run(Turtle turtle) {
+	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
 		System.out.println("SimplifyTurtle begin @ "+os);
 		
@@ -24,10 +24,10 @@ public class SimplifyTurtle {
 
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines,1.0);
-		turtle.history = t.history;
-		
-		int ns = turtle.history.size();
+		int ns = t.history.size();
 		System.out.println("SimplifyTurtle end @ "+ns);
+		
+		return t;
 	}
 
 	private static ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double d) {

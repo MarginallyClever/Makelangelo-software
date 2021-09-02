@@ -66,6 +66,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.artPipeline.ReorderTurtle;
 import com.marginallyclever.artPipeline.ResizeTurtleToPaper;
+import com.marginallyclever.artPipeline.SimplifyTurtle;
 import com.marginallyclever.artPipeline.generators.Generator_Text;
 import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
@@ -245,13 +246,13 @@ public final class Makelangelo {
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
 		fit.addActionListener((e)->{
-			ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),false);
+			robot.setTurtle(ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),false));
 		});
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
 		fill.addActionListener((e)->{
-			ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),true);
+			robot.setTurtle(ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),true));
 		});
 
 		menu.addSeparator();
@@ -269,13 +270,13 @@ public final class Makelangelo {
 		JMenuItem reorder = new JMenuItem(Translator.get("Reorder"));
 		menu.add(reorder);
 		reorder.addActionListener((e)->{
-			ReorderTurtle.run(robot.getTurtle());
+			robot.setTurtle(ReorderTurtle.run(robot.getTurtle()));
 		});
 
 		JMenuItem simplify = new JMenuItem(Translator.get("Simplify"));
 		menu.add(simplify);
 		simplify.addActionListener((e)->{
-			ReorderTurtle.run(robot.getTurtle());
+			robot.setTurtle(SimplifyTurtle.run(robot.getTurtle()));
 		});
 
 		return menu;

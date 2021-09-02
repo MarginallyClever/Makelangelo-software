@@ -6,10 +6,9 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class ResizeTurtleToPaper {
-	public static void run(Turtle turtle,MakelangeloRobotSettings settings,boolean fillPage) {
+	public static Turtle run(Turtle turtle,MakelangeloRobotSettings settings,boolean fillPage) {
 		Rectangle2D.Double turtleBounds = turtle.getBounds(); // image bounds
 
-		
 		// find the scale
 		double iw = turtleBounds.width; // image width
 		double ih = turtleBounds.height; // image height
@@ -30,5 +29,7 @@ public class ResizeTurtleToPaper {
 		turtle.translate(-ix,-iy);
 		turtle.scale(ratio,ratio);
 		turtle.translate(px,py);
+		
+		return turtle;
 	}
 }

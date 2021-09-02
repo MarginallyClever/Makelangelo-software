@@ -575,14 +575,13 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	 * @param y absolute position in mm
 	 */
 	public void movePenAbsolute(double x, double y) {
-		String go = (penJustMoved ? getTravelOrMoveWithFeedrate() : "");
-		penJustMoved=false;
+		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());	
 		sendLineToRobot(go
 						+ " X" + StringHelper.formatDouble(x)
 						+ " Y" + StringHelper.formatDouble(y));
 		penX = x;
 		penY = y;
-		penJustMoved=false;
+		penJustMoved=true;
 	}
 	
 	/**
@@ -591,14 +590,15 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	 */
 	public void movePenRelative(float dx, float dy) {
 		sendLineToRobot("G91"); // set relative mode
-
-		String go = (penJustMoved ? getTravelOrMoveWithFeedrate() : "");
 		penJustMoved=false;
-		
+
+		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());
 		sendLineToRobot(go
 						+ " X" + StringHelper.formatDouble(dx)
 						+ " Y" + StringHelper.formatDouble(dy));
+		
 		sendLineToRobot("G90"); // return to absolute mode
+		penJustMoved=false;
 		penX += dx;
 		penY += dy;
 	}
