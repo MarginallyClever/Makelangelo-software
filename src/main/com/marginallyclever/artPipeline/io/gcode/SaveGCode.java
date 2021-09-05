@@ -64,11 +64,8 @@ public class SaveGCode implements SaveResource {
 				case DRAW:
 					if(isUp) {
 						// go to m and put pen down
-						if(previousMovement!=null) {
-							machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
-						} else {
-							machine.writeMoveTo(out, m.x, m.y, true,true);
-						}
+						if(previousMovement==null) previousMovement=m;
+						machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
 						machine.writePenDown(out);
 						isUp=false;
 						zMoved=true;
