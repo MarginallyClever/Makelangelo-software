@@ -22,6 +22,7 @@ module com.marginallyclever.makelangelo {
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo3_3Properties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo3Properties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5Properties,
+		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelangelo5MarlinProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloCustomProperties,
 		com.marginallyclever.makelangeloRobot.settings.hardwareProperties.ZarplotterProperties;
 	uses com.marginallyclever.makelangeloRobot.settings.hardwareProperties.MakelangeloHardwareProperties;

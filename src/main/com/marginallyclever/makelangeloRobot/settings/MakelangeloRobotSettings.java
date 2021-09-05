@@ -763,19 +763,19 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenDownAngle());
+		return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getzRate()) + " Z" + StringHelper.formatDouble(getPenUpAngle());
+		return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getTravelFeedrateString() {
-		return COMMAND_TRAVEL+" F" + StringHelper.formatDouble(getTravelFeedRate());
+		return COMMAND_TRAVEL;
 	}
 	
 	public String getDrawFeedrateString() {
-		return COMMAND_DRAW+" F" + StringHelper.formatDouble(getDrawFeedRate());
+		return COMMAND_DRAW;
 	}
 
 	public void writeChangeTo(Writer out,ColorRGB newPenDownColor) throws IOException {
