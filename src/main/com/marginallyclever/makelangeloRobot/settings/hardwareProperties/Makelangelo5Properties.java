@@ -19,8 +19,8 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 
 	@Override
 	public Point2D getHome(MakelangeloRobotSettings settings) {
-		double beltLeft = 1025;
-		double beltRight = 1025;
+		double beltLeft = 1035;
+		double beltRight = 1035;
 		
 		return super.FK(beltLeft,beltRight);
 	}
@@ -346,7 +346,7 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		Date date = new Date(System.currentTimeMillis());  
 		out.write("; Makelangelo 5\n");
 		out.write("; "+formatter.format(date)+"\n");
-		out.write("G28\n");  // force find home
+		out.write("G28 XY\n");  // force find home
 	}
 	
 	@Override

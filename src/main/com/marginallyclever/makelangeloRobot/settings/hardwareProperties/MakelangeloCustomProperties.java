@@ -379,9 +379,9 @@ public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	public void writeProgramStart(Writer out) throws IOException {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Makelangelo 5\n");
+		out.write("; Custom\n");
 		out.write("; "+formatter.format(date)+"\n");
-		out.write("G28\n");  // force find home
+		out.write("G28 XY\n");  // force find home
 	}
 	
 	@Override

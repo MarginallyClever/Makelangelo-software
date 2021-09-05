@@ -182,10 +182,6 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	
 	private CollapsiblePanel createAxisDrivingControls() {
 	    driveButtons = new CartesianButtons(); 
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx=0;
-		c.gridy=0;
 	    driveButtons.addActionListener((e)->{
 	    	int id = e.getID();
 	    	if(CartesianButtons.isCenterZone(id)) {
@@ -214,16 +210,10 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	    	System.out.println("Move "+x+","+y);
 	    	myRobot.movePenRelative(x,y);
 	    });
-		
+
 		CollapsiblePanel drivePanel = new CollapsiblePanel(Translator.get("MenuAxisDriveControls"));
 		JPanel driveInterior = drivePanel.getContentPane();
-		driveInterior.setLayout(new GridBagLayout());
-		final GridBagConstraints cMain = new GridBagConstraints();
-		cMain.fill=GridBagConstraints.HORIZONTAL;
-		cMain.anchor=GridBagConstraints.NORTH;
-		cMain.gridx=0;
-		cMain.gridy=0;
-		driveInterior.add(driveButtons,cMain);
+		driveInterior.add(driveButtons);
 		drivePanel.setCollapsed(false);
 		
 		return drivePanel;
@@ -267,7 +257,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		goHome	.addPropertyChangeListener((evt)->{		myRobot.goHome();		});
 		findHome.addPropertyChangeListener((evt)->{		myRobot.findHome();		});
 
-		commonControlsPanel.setCollapsed(true);
+		commonControlsPanel.setCollapsed(false);
 		
 		return commonControlsPanel;
 	}

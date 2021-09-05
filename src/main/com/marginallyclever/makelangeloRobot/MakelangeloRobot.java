@@ -527,15 +527,27 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		return true;
 	}
 	
-	public void setCurrentFeedRate(float feedRate) {
+	public void setDrawFeedRate(float feedRate) {
 		// remember it
 		settings.setDrawFeedRate(feedRate);
 		// get it again in case it was capped.
 		feedRate = settings.getDrawFeedRate();
 		// tell the robot
-		sendLineToRobot("G00 F" + StringHelper.formatDouble(feedRate));
+		sendLineToRobot("G0 F" + StringHelper.formatDouble(feedRate));
 	}
 	
+	public void setTravelFeedRate(float feedRate) {
+		// remember it
+		settings.setTravelFeedRate(feedRate);
+		// get it again in case it was capped.
+		feedRate = settings.getTravelFeedRate();
+		// tell the robot
+		sendLineToRobot("G1 F" + StringHelper.formatDouble(feedRate));
+	}
+	
+	/**
+	 * @return travel or draw feed rate, depending on pen state.
+	 */
 	public double getCurrentFeedRate() {
 		return penIsUp
 				? settings.getTravelFeedRate()
@@ -550,7 +562,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	
 	public void findHome() {
 		this.raisePen();
-		sendLineToRobot("G28");
+		sendLineToRobot("G28 XY");
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 	}
