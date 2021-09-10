@@ -33,9 +33,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 	 */
 	private static final long serialVersionUID = -4185946661019573192L;
 
-	public static final String COMMAND_DRAW = "G0";
-	public static final String COMMAND_TRAVEL = "G1";
-	public static final double INCH_TO_CM = 2.54;
+	public static final String COMMAND_DRAW = "G1";
+	public static final String COMMAND_TRAVEL = "G0";
 	public static final int FIRMWARE_MAX_SEGMENTS = 32;
 	
 	private String[] configsAvailable;
@@ -763,11 +762,13 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 	
 	public String getPenDownString() {
-		return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenDownAngle());
+		//return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenDownAngle());
+		return "M280 P0 T400 S"+ StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
-		return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenUpAngle());
+		//return COMMAND_DRAW+" Z" + StringHelper.formatDouble(getPenUpAngle());
+		return "M280 P0 T100 S"+ StringHelper.formatDouble(getPenUpAngle());
 	}
 	
 	public String getTravelFeedrateString() {
@@ -806,30 +807,24 @@ public final class MakelangeloRobotSettings implements Serializable {
 		default: name= "0x"+Integer.toHexString(toolNumber);  break;  // display unknown RGB value as hex
 		}
 		
-		String changeString = String.format("%-20s", "Change to "+name);
-		String continueString = String.format("%-20s", "Click to continue");
-
-		out.write("M06 T" + toolNumber + "\n");
-		out.write("M117 "+changeString+continueString+"\n");
-		out.write("M300 S60 P250\n");  // beep
-		out.write("M226\n");  // pause for user input
-		out.write("M117\n");  // clear message
-		out.write("G00 F" + StringHelper.formatDouble(getTravelFeedRate()) + 
-					 " A" + StringHelper.formatDouble(getAcceleration()) + "\n");
+		out.write("M06 T"+toolNumber+"\n");
+		out.write("M0 Ready "+name+" and click\n");
 	}
 	
-	public static String padRight(String s, int n) {
+	private static String padRight(String s, int n) {
 	     return String.format("%1$-" + n + "s", s);  
 	}
 
 	// 7.22.6: feedrate changes here
 	public void writeMoveTo(Writer out, double x, double y,boolean isUp,boolean zMoved) throws IOException {
-		String command = isUp?COMMAND_TRAVEL:COMMAND_DRAW;
+		String command;
 		if(zMoved) {
 			command = isUp 
 					? getTravelFeedrateString() 
 					: getDrawFeedrateString();
 			zMoved=false;
+		} else {
+			command = isUp?COMMAND_TRAVEL:COMMAND_DRAW;
 		}
 		out.write(command
 				+" X" + StringHelper.formatDouble(x)
