@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -18,6 +20,7 @@ public class SelectSlider extends Select {
 	private JLabel label;
 	private JSlider field;
 	private JLabel value;
+	private Timer timer=null;
 	
 	public SelectSlider(String labelText,int top,int bottom,int defaultValue) {
 		super();
@@ -35,7 +38,13 @@ public class SelectSlider extends Select {
 			public void stateChanged(ChangeEvent e) {
 		        int n = field.getValue();
 
-		        notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",null,n));
+				if(timer!=null) timer.cancel();
+				timer = new Timer("Delayed response");
+				timer.schedule(new TimerTask() { 
+					public void run() {
+						notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",null,n));
+					}
+				}, 100L); // brief delay in case someone is typing fast
 				
 		        value.setText(Integer.toString(n));
 			}
