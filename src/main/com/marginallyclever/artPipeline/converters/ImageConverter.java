@@ -7,6 +7,7 @@ import com.marginallyclever.artPipeline.ImageManipulator;
 import com.marginallyclever.artPipeline.TransformedImage;
 import com.marginallyclever.artPipeline.io.image.LoadImage;
 import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
 
@@ -128,6 +129,11 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			return;
 		}
 		
+		double ox=turtle.getX()-P0.x;
+		double oy=turtle.getY()-P0.y;
+		boolean firstJump = MathHelper.lengthSquared(ox, oy)>2;
+		if(firstJump) turtle.jumpTo(P0.x,P0.y);
+			
 		double b;
 		double dx=P1.x-P0.x;
 		double dy=P1.y-P0.y;
@@ -142,9 +148,10 @@ public abstract class ImageConverter extends ImageManipulator implements Makelan
 			y = dy * n + P0.y;
 			
 			v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-			if(v<channelCutoff) turtle.penDown();
-			else turtle.penUp();
-			turtle.moveTo(x,y);
+
+			if(v<channelCutoff) turtle.moveTo(x,y);
+			else turtle.jumpTo(x,y);
+			
 		}
 	}
 	
