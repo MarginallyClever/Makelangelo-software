@@ -414,7 +414,7 @@ public class Turtle implements Cloneable {
 				// The previous line ends close to the start point of this line,
 				// so there's no need to go to the start point of this line since the pen is practically there.
 				// The start point of this line will be skipped.
-				//t.moveTo(line.a.x,line.a.y);
+				moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
 			moveTo(line.b.x,line.b.y);
