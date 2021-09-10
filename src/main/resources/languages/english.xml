@@ -388,7 +388,7 @@
 
 	<string>
 		<key>FileTypeGCode</key>
-		<value>GCODE (ngc)</value>
+		<value>GCODE (gcode)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string>
@@ -1763,6 +1763,36 @@
 		<key>Polyeder</key>
 		<value>Papercraft Polyhedron</value>
 		<hint>Generator</hint>
+	</string>
+	
+	<string>
+		<key>FirmwareUpdate</key>
+		<value>Update firmware</value>
+		<hint>build-in arduino hex flashing action</hint>
+	</string>
+	
+	<string>
+		<key>avrDude path</key>
+		<value>avrDude path</value>
+		<hint>FirmwareUpdate action</hint>
+	</string>
+	
+	<string>
+		<key>*.hex file</key>
+		<value>*.hex file</value>
+		<hint>FirmwareUpdate action</hint>
+	</string>
+	
+	<string>
+		<key>Port</key>
+		<value>Port</value>
+		<hint>FirmwareUpdate action</hint>
+	</string>
+	
+	<string>
+		<key>Refresh</key>
+		<value>Refresh</value>
+		<hint>FirmwareUpdate action</hint>
 	</string>
 	
 </language>
