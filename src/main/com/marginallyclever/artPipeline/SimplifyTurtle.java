@@ -1,13 +1,33 @@
 package com.marginallyclever.artPipeline;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.vecmath.Vector2d;
 
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
-public class SimplifyTurtle {
+public class SimplifyTurtle extends AbstractAction {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2930297421274921735L;
+	private MakelangeloRobot myRobot;
+	
+	public SimplifyTurtle(MakelangeloRobot robot) {
+		super(Translator.get("Simplify"));
+		myRobot=robot;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		myRobot.setTurtle(run(myRobot.getTurtle()));
+	}
+	
 	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
 		System.out.println("SimplifyTurtle begin @ "+os);
