@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.AbstractAction;
@@ -27,11 +25,8 @@ public class SelectButton extends Select {
 		
 		button = new JButton(labelText);
 		final Select parent = this;
-		button.addActionListener(new ActionListener() {
-        	@Override
-			public void actionPerformed(ActionEvent e) {
-				notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"click",null,null));
-			}
+		button.addActionListener((e) -> {
+			notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"click",null,null));
 		});
 
 		panel.add(button,BorderLayout.CENTER);
