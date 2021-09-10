@@ -21,7 +21,7 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 		super();
 		converter=arg0;
 		
-		add(intensityField = new SelectSlider(Translator.get("ConverterIntensity"),200,1,(int)(converter.getIntensity()*10.0)));
+		add(intensityField = new SelectSlider(Translator.get("ConverterIntensity"),100,1,(int)(converter.getIntensity()*10.0)));
 		finish();
 	}
 

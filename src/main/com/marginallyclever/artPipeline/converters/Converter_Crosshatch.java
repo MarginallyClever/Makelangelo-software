@@ -36,8 +36,8 @@ public class Converter_Crosshatch extends ImageConverter {
 	
 	@Override
 	public void finish() {
-		finish1();
-		//finish2();
+		//finish1();
+		finish2();
 	}
 	
 	public void finish2() {
@@ -45,11 +45,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 		turtle = new Turtle();
-		
-		finishPass(new int[]{15* 2,15* 4},0  ,img);
-		finishPass(new int[]{15* 6,15* 8},90 ,img);
-		finishPass(new int[]{15*10,15*12},45 ,img);
-		finishPass(new int[]{15*14,15*15},135,img);
+		double top = 164.0/(9.0*9.0);
+		finishPass(new int[]{(int)(2*2*top),(int)(3*3*top)},90,img);
+		finishPass(new int[]{(int)(4*4*top),(int)(5*5*top)},15,img);
+		finishPass(new int[]{(int)(6*6*top),(int)(7*7*top)},75,img);
+		finishPass(new int[]{(int)(8*8*top),(int)(9*9*top)},45,img);
 	}
 	
 	protected void finishPass(int [] passes,double angleDeg,TransformedImage img) {
@@ -57,7 +57,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angleDeg));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = settings.getPenDiameter()*2;
+		double stepSize = settings.getPenDiameter() * intensity/2.0;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -73,7 +73,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double maxLen = Math.sqrt(width*width+height*height);
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
-
+		double lowPass=0;
 		boolean useError=false;
 		
 		int i=0;
@@ -85,7 +85,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			double x1 = px + dy * maxLen;
 			double y1 = py - dx * maxLen;
 		
-			double l2 = passes[(i % passes.length)];
+			double l2 = lowPass + passes[(i % passes.length)];
 			if ((i % 2) == 0) {
 				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
 				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
@@ -116,7 +116,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double xStart = settings.getMarginLeft();
 		double xEnd   = settings.getMarginRight();
 
-		double stepSize = settings.getPenDiameter() * intensity;
+		double stepSize = settings.getPenDiameter() * intensity/10.0;
 		double x, y;
 		boolean flip = true;
 
