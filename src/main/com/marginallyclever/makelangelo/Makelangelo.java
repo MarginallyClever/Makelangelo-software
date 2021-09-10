@@ -81,6 +81,7 @@ import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.uploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -102,11 +103,9 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @since 0.0.1
  */
 public final class Makelangelo {
-	static final long serialVersionUID = 1L;
-
 	/**
-	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the VERSION based upon VERSION
-	 * defined in POM.xml. In this way we only define the VERSION once and prevent violating DRY.
+	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the 
+	 * VERSION based upon pom.xml.  In this way we only define the VERSION once and prevent violating DRY.
 	 */
 	public String VERSION;
 	
@@ -191,7 +190,6 @@ public final class Makelangelo {
 	}
 	
 	public void run() {
-        
 		createAppWindow();		
 		checkSharingPermission();
 
@@ -267,17 +265,8 @@ public final class Makelangelo {
 
 		menu.addSeparator();
 		
-		JMenuItem reorder = new JMenuItem(Translator.get("Reorder"));
-		menu.add(reorder);
-		reorder.addActionListener((e)->{
-			robot.setTurtle(ReorderTurtle.run(robot.getTurtle()));
-		});
-
-		JMenuItem simplify = new JMenuItem(Translator.get("Simplify"));
-		menu.add(simplify);
-		simplify.addActionListener((e)->{
-			robot.setTurtle(SimplifyTurtle.run(robot.getTurtle()));
-		});
+		menu.add(new SimplifyTurtle(robot));
+		menu.add(new ReorderTurtle(robot));
 
 		return menu;
 	}
@@ -368,6 +357,10 @@ public final class Makelangelo {
 		});
 		menu.add(buttonAdjustPreferences);
 
+		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
+		buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
+		menu.add(buttonFirmwareUpdate);
+		
 		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
 		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
 		menu.add(buttonCheckForUpdate);
@@ -379,6 +372,15 @@ public final class Makelangelo {
 		menu.add(buttonExit);
 
 		return menu;
+	}
+
+	private void runFirmwareUpdate() {
+		JDialog dialog = new JDialog(mainFrame,"Firmware Update");
+		
+		dialog.add(new FirmwareUploaderPanel());
+		dialog.pack();
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setVisible(true);
 	}
 
 	private JMenu createViewMenu() {
@@ -844,7 +846,7 @@ public final class Makelangelo {
 			for( LoadResource lft : imageLoaders ) {
 				FileFilter filter = lft.getFileNameFilter();
 				fc.addChoosableFileFilter(filter);
-			}		
+			}
 			// no wild card filter, please.
 			fc.setAcceptAllFileFilterUsed(false);
 			// remember the last filter used, if any
