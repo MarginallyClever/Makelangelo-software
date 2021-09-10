@@ -46,7 +46,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 
 /**
- * Reads in SVG file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */

@@ -18,7 +18,6 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
- * Reads in DXF file and converts it to a temporary gcode file, then calls LoadGCode. 
  * @author Dan Royer
  *
  */
