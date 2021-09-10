@@ -16,12 +16,11 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
- * LoadGCode loads gcode into memory. 
  * @author Dan Royer
  *
  */
 public class SaveGCode implements SaveResource {
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "gcode");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -31,7 +30,7 @@ public class SaveGCode implements SaveResource {
 	@Override
 	public boolean canSave(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
+		return ext.equalsIgnoreCase(".gcode");
 	}
 	
 	@Override

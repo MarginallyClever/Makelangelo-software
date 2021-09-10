@@ -13,13 +13,12 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
-/**
- * LoadGCode loads gcode into memory. 
+/** 
  * @author Dan Royer
  *
  */
 public class LoadGCode implements LoadResource {
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "ngc");
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeGCode"), "gcode");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -29,7 +28,7 @@ public class LoadGCode implements LoadResource {
 	@Override
 	public boolean canLoad(String filename) {
 		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".ngc") || ext.equalsIgnoreCase(".gc"));
+		return ext.equalsIgnoreCase(".gcode");
 	}
 	
 	// search all tokens for one that starts with key and return it.
