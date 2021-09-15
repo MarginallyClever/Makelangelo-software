@@ -12,9 +12,9 @@ It pairs really well with [Makelangelo-firmware](https://github.com/MarginallyCl
 
 **Together** and [join our Discord group](https://discord.gg/QtvHqAv8yp)
 
-# Get Started developing!
+# Start!
 
-Steps to get started poking the code:
+Steps to get started:
 
 1. Install The latest OpenJDK (java software)
 2. Install Makelangelo Software App
@@ -23,7 +23,7 @@ Then you should be able to run the application.
 
 ## Install The latest OpenJDK
 
-Get the Open Java Development Kit (OpenJDK) https://jdk.java.net/ .  The latest version is the "ready to use" edition.
+Get the Open Java Development Kit (OpenJDK) https://openjdk.java.net/.  The latest version is the "ready to use" edition.
 
 *OSX*: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-12.jdk) into your /Library/Java/JavaVirtualMachines/ folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
 
