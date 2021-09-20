@@ -290,7 +290,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 			boolean state=false;
 			if( myRobot.getConnection() == null ) state=true;
 			else if( myRobot.getConnection().isOpen() == false ) state=true;
-			else if( myRobot.isPortConfirmed() == false ) state=true;
+			else if( myRobot.getPortConfirmed() == false ) state=true;
 			
 			machineChoices.setEnabled( state );
 			machineChoices.addItemListener((e)->{
@@ -352,7 +352,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		boolean didSetHome=false;
 		
 		if(myRobot!=null) {
-			isConfirmed = myRobot.isPortConfirmed();
+			isConfirmed = myRobot.getPortConfirmed();
 			isRunning = myRobot.isRunning();
 			didSetHome = myRobot.didSetHome();
 		}

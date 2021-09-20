@@ -11,13 +11,12 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.artPipeline.io.gcode.SaveGCode;
-import com.marginallyclever.communications.NetworkConnection;
-import com.marginallyclever.communications.NetworkConnectionListener;
+import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
@@ -27,7 +26,6 @@ import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 
@@ -40,21 +38,14 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkConnectionListener, PreviewListener {
-	// Firmware check
-	private final String VERSION_CHECK_MESSAGE = new String("Firmware v");
-	private final long EXPECTED_FIRMWARE_VERSION = 10; // must match the version in the the firmware EEPROM
-	
+public class MakelangeloRobot implements NetworkSessionListener, PreviewListener {	
 	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
 
 	private TurtleRenderer turtleRenderer;
 	
 	// Talking to the real machine
-	private NetworkConnection connection = null;
-	private boolean identityConfirmed = false;
-	private boolean portConfirmed = false;
-	private boolean firmwareVersionChecked = false;
-	private boolean hardwareVersionChecked = false;
+	private NetworkSession connection = null;
+	private RobotIdentityConfirmation ric = new RobotIdentityConfirmation(this); 
 
 	// misc state
 	private boolean areMotorsEngaged;
@@ -85,7 +76,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	public MakelangeloRobot() {
 		super();
 		
-		portConfirmed = false;
 		areMotorsEngaged = true;
 		isRunning = false;
 		isPaused = false;
@@ -98,21 +88,38 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		setNextLineNumber(0);
 	}
 	
-	public NetworkConnection getConnection() {
+	public NetworkSession getConnection() {
 		return connection;
 	}
 
 	// @param c the connection.
-	public void openConnection(NetworkConnection c) {
+	public void openConnection(NetworkSession c) {
 		if (c == null) return;
 
 		Log.message("Opening connection...");
-		portConfirmed = false;
+		ric.reset();
+		ric.addRobotIdentityEventListener((evt)->{
+			switch(evt.flag) {
+				case RobotIdentityEvent.BAD_HARDWARE:
+					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, evt.data));
+					break;
+				case RobotIdentityEvent.BAD_FIRMWARE:
+					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, evt.data));
+				case RobotIdentityEvent.IDENTITY_CONFIRMED:
+					Log.message("Identity confirmed.");
+					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.CONNECTION_READY,this));
+					break;
+				default:
+					Log.error("Unexpected RobotIdentityEvent "+evt.flag);
+					break;
+			}
+		});
+		
+		c.addListener(ric);
+		
 		didSetHome = false;
-		firmwareVersionChecked = false;
-		hardwareVersionChecked = false;
-		this.connection = c;
-		this.connection.addListener(this);
+		connection = c;
+		connection.addListener(this);
 		try {
 			this.connection.sendMessage("M100\n");
 		} catch (Exception e) {
@@ -124,12 +131,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		if (this.connection == null)
 			return;
 
-		this.connection.closeConnection();
-		this.connection.removeListener(this);
+		connection.closeConnection();
+		connection.removeListener(this);
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
-		this.connection = null;
-		this.portConfirmed = false;
-		this.identityConfirmed=false;
+		connection = null;
 	}
 	
 	@Override
@@ -138,120 +143,18 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	}
 
 	@Override
-	public void sendBufferEmpty(NetworkConnection arg0) {
-		sendFileCommand();
-	}
-
-	@Override
-	public void dataAvailable(NetworkConnection arg0, String data) {
-		if (data.endsWith("\n")) data = data.substring(0, data.length() - 1);
-		Log.message("Recv: "+data);
-		
-		if(!identityConfirmed) {
-			identityConfirmed = whenTheIntroductionsFinishOK(data);
-			if(identityConfirmed) {
-				Log.message("Identity confirmed.");
-				notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.CONNECTION_READY,this));
-			}
-		}
-	}
-
-	private boolean whenTheIntroductionsFinishOK(String data) {
-		if(!portConfirmed) portConfirmed = doISeeAHello(data);
-		
-		if(!firmwareVersionChecked) {
-			boolean isGood=doIseeMyFavoriteFirmwareVersion(data);
-			if(isGood) {
-				firmwareVersionChecked=true;
-				// request the hardware version of this robot
-				sendLineToRobot("D10\n");
-				sendLineToRobot("M503\n");
-			}
-		}
-		
-		if(!hardwareVersionChecked) {
-			String version=doISeeAHardwareVersion(data);
-			if(version!=null) {
-				hardwareVersionChecked=true;
-				settings.setHardwareVersion(version);
-			}
-		}
-		
-		return portConfirmed && firmwareVersionChecked && hardwareVersionChecked;
-	}
-
-	private String doISeeAHardwareVersion(String data) {
-		if(data.lastIndexOf("D10") >= 0) {
-			String[] pieces = data.split(" ");
-			if (pieces.length > 1) {
-				String last = pieces[pieces.length - 1];
-				Log.message("Heard "+data);
-				Log.message("Hardware version check "+last);
-				last = last.replace("\r\n", "");
-				if (last.startsWith("V")) {
-					String versionFound = last.substring(1).trim();
-					Log.message("OK");
-					return versionFound;
-				} else {
-					Log.message("BAD");
-					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, last));
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private boolean doIseeMyFavoriteFirmwareVersion(String data) {
-		if (data.lastIndexOf(VERSION_CHECK_MESSAGE) >= 0) {
-			Log.message("Heard "+VERSION_CHECK_MESSAGE);
-			String afterV = data.substring(VERSION_CHECK_MESSAGE.length()).trim();
-			Log.message("Software version check "+afterV);
-			
-			long versionFound = 0;
-			try {
-				versionFound = Long.parseLong(afterV);
-			} finally {}
-			
-			if (versionFound == EXPECTED_FIRMWARE_VERSION) {
-				Log.message("OK");
-				return true;
-			} else {
-				Log.message("BAD");
-				notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_FIRMWARE, this, versionFound));
-			}
-		}
-		
-		return false;
-	}
-
-	// introductions
-	private boolean doISeeAHello(String data) {
-		ServiceLoader<MachineStyle> knownHardware = ServiceLoader.load(MachineStyle.class);
-		Iterator<MachineStyle> i = knownHardware.iterator();
-		while (i.hasNext()) {
-			MachineStyle ms = i.next();
-			String myHello = ms.getHello();
-			if (data.lastIndexOf(myHello) >= 0) {
-				Log.message("Heard "+myHello+".  Port confirmed.");
-				portConfirmed = true;
-				// which machine GUID is this?
-				String afterHello = data.substring(data.lastIndexOf(myHello) + myHello.length());
-				settings.saveConfig();
-				long id=findOrCreateA_UID(afterHello);
-				settings.loadConfig(id);
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	public boolean isPortConfirmed() {
-		return portConfirmed;
+	public void networkSessionEvent(NetworkSessionEvent evt) {
+		if(evt.flag == NetworkSessionEvent.DATA_AVAILABLE) dataAvailable((NetworkSession)evt.getSource(),(String)evt.data);
+		if(evt.flag == NetworkSessionEvent.TRANSPORT_ERROR) setNextLineNumber((int)evt.data);
+		if(evt.flag == NetworkSessionEvent.SEND_BUFFER_EMPTY) sendFileCommand();
 	}
 	
-	public long findOrCreateA_UID(String line) {
+	private void dataAvailable(NetworkSession arg0, String data) {
+		if (data.endsWith("\n")) data = data.substring(0, data.length() - 1);
+		Log.message("Recv: "+data);
+	}
+	
+	public long findOrCreateUID(String line) {
 		long newUID = -1;
 		
 		// try to get the UID in the line
@@ -283,11 +186,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	
 	private void notifyListeners(MakelangeloRobotEvent e) {
 		for (MakelangeloRobotListener listener : listeners) listener.makelangeloRobotUpdate(e);
-	}
-
-	@Override
-	public void lineError(NetworkConnection arg0, int lineNumber) {
-		setNextLineNumber(lineNumber);
 	}
 
 	// based on http://www.exampledepot.com/egs/java.net/Post.html
@@ -342,7 +240,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 
 	// Send the machine configuration to the robot.
 	public void sendConfig() {
-		if(!identityConfirmed) return;
+		if(!ric.getIdentityConfirmed()) return;
 
 		Log.message("Sending config.");
 		String config = settings.getGCodeConfig();
@@ -422,7 +320,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	 * @param line command to send
 	 */
 	private void sendLineWithNumberAndChecksum(String line, int lineNumber) {
-		if(!identityConfirmed || !isRunning()) return;
+		if(!ric.getIdentityConfirmed() || !isRunning()) return;
 
 		line = "N" + lineNumber + " " + line;
 		if(!line.endsWith(";")) line += ';';
@@ -432,11 +330,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	
 	// Take the next line from the file and send it to the robot, if permitted.
 	private void sendFileCommand() {
-		if(!isRunning() || isPaused() || !identityConfirmed) return;
+		if(!ric.getIdentityConfirmed() || !isRunning() || isPaused()) return;
 		
-		int total = gcodeCommands.size();
 		// are there any more commands?
-		if(nextLineNumber >= total) {
+		if(nextLineNumber >= gcodeCommands.size()) {
 			halt();
 			SoundSystem.playDrawingFinishedSound();
 		} else {
@@ -504,7 +401,7 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean sendLineToRobot(String line) {
-		if(getConnection()==null || !isPortConfirmed()) return false;
+		if(!ric.getPortConfirmed() || getConnection()==null ) return false;
 
 		// does it have a checksum? hide it from the log
 		String reportedLine = line;
@@ -708,9 +605,6 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 		decorator = arg0;
 	}
 
-	@SuppressWarnings("unused")
-	private MakelangeloFirmwareVisualizer visualizer = new MakelangeloFirmwareVisualizer();
-	
 	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];
@@ -738,10 +632,22 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 				turtleToRender.render(turtleRenderer);
 			}
 			
-			//visualizer.render(gl2,turtleToRender,settings);
+			//TODO
+			//MakelangeloFirmwareVisualizer viz = new MakelangeloFirmwareVisualizer(); 
+			//viz.render(gl2, turtleToRender, settings);
 		}
 	}
 	
+	
+	public void setTurtleRenderer(TurtleRenderer r) {
+		turtleRenderer = r;
+	}
+	
+	
+	public TurtleRenderer getTurtleRenderer() {
+		return turtleRenderer;
+	}
+		
 	private void paintLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
 
@@ -825,5 +731,10 @@ public class MakelangeloRobot implements NetworkConnectionListener, PreviewListe
 
 	public boolean isPenIsUp() {
 		return penIsUp;
+	}
+
+	
+	public boolean getPortConfirmed() {
+		return ric.getPortConfirmed();
 	}
 }
