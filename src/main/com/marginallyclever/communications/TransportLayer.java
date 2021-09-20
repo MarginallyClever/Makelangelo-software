@@ -18,7 +18,7 @@ public interface TransportLayer {
    * @param connectionName where to connect
    * @return a connection to the device at address <code>connectionName</code>
    */
-  public NetworkConnection openConnection(String connectionName);
+  public NetworkSession openConnection(String connectionName);
 
   /**
    * @return a panel with the gui options for this transport layer

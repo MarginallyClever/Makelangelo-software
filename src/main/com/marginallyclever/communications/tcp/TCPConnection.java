@@ -8,8 +8,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
 
-import com.marginallyclever.communications.NetworkConnectionListener;
-import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.convenience.log.Log;
 
@@ -20,7 +19,7 @@ import com.marginallyclever.convenience.log.Log;
  * @author Peter Colapietro
  * @since v7
  */
-public final class TCPConnection implements Runnable, NetworkConnection {
+public final class TCPConnection extends NetworkSession implements Runnable {
 	private SocketChannel socket;
 	private TransportLayer transportLayer;
 	private String connectionName = "";
@@ -42,8 +41,6 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 	private String inputBuffer = "";
 	ArrayList<String> commandQueue = new ArrayList<String>();
 
-	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<NetworkConnectionListener> listeners = new ArrayList<NetworkConnectionListener>();
 
 
 	public TCPConnection(TransportLayer layer) {
@@ -274,35 +271,6 @@ public final class TCPConnection implements Runnable, NetworkConnection {
 	@Override
 	public String getRecentConnection() {
 		return connectionName;
-	}
-
-	@Override
-	public void addListener(NetworkConnectionListener listener) {
-		listeners.add(listener);
-	}
-
-	@Override
-	public void removeListener(NetworkConnectionListener listener) {
-		listeners.remove(listener);
-	}
-
-	private void notifyLineError(int lineNumber) {
-		for (NetworkConnectionListener listener : listeners) {
-			listener.lineError(this,lineNumber);
-		}
-	}
-
-	private void notifySendBufferEmpty() {
-		for (NetworkConnectionListener listener : listeners) {
-			listener.sendBufferEmpty(this);
-		}
-	}
-
-	// tell all listeners data has arrived
-	private void notifyDataAvailable(String line) {
-		for (NetworkConnectionListener listener : listeners) {
-			listener.dataAvailable(this,line);
-		}
 	}
 
 	@Override

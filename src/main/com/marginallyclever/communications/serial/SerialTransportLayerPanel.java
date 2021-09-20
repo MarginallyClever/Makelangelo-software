@@ -4,7 +4,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JComboBox;
 
-import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayerPanel;
 
 public class SerialTransportLayerPanel extends TransportLayerPanel {
@@ -31,7 +31,7 @@ public class SerialTransportLayerPanel extends TransportLayerPanel {
 	}
 
 	@Override
-	public NetworkConnection openConnection() {
+	public NetworkSession openConnection() {
 		favorite = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
 		return layer.openConnection(favorite);
 	}

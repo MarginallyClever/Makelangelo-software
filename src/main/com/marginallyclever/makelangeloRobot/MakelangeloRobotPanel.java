@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.marginallyclever.communications.ConnectionManager;
-import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Makelangelo;
@@ -129,7 +129,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 				isConnected=false;
 				updateButtonAccess();
 			} else {
-				NetworkConnection s = ConnectionManager.requestNewConnection(makelangeloApp.getMainFrame());
+				NetworkSession s = ConnectionManager.requestNewConnection(makelangeloApp.getMainFrame());
 				if(s!=null) {
 					buttonConnect.setText(Translator.get("ButtonDisconnect"));
 					buttonConnect.setForeground(Color.RED);

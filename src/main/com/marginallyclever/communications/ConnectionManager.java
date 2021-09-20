@@ -28,7 +28,7 @@ public class ConnectionManager {
 	 * @param parent the root gui component
 	 * @return a new connection or null.
 	 */
-	public static NetworkConnection requestNewConnection(Component parent) {
+	public static NetworkSession requestNewConnection(Component parent) {
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();

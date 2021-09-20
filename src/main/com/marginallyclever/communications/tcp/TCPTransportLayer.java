@@ -1,6 +1,6 @@
 package com.marginallyclever.communications.tcp;
 
-import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
 import com.marginallyclever.convenience.log.Log;
@@ -21,7 +21,7 @@ public class TCPTransportLayer implements TransportLayer {
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
-	public NetworkConnection openConnection(String connectionName) {
+	public NetworkSession openConnection(String connectionName) {
 		/*
 		// check it
 		Log.message("Validating "+connectionName);

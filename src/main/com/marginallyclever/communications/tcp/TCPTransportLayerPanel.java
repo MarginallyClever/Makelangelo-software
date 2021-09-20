@@ -5,7 +5,7 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import com.marginallyclever.communications.NetworkConnection;
+import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayerPanel;
 
 public class TCPTransportLayerPanel extends TransportLayerPanel {
@@ -32,7 +32,7 @@ public class TCPTransportLayerPanel extends TransportLayerPanel {
 		portField.setText(portNumber);
 	}
 	
-	public NetworkConnection openConnection() {
+	public NetworkSession openConnection() {
 		connectionName = connectionField.getText();
 		portNumber = portField.getText();
 		return layer.openConnection(connectionField.getText()+":"+portNumber);
