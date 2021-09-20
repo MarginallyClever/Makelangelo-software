@@ -21,6 +21,7 @@ public class MakelangeloFirmwareVisualizer {
 			p=pp;
 		}
 	};
+	
 	private ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
 	
 	public MakelangeloFirmwareVisualizer() {}
