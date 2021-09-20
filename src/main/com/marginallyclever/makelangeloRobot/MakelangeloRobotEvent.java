@@ -1,21 +1,6 @@
 package com.marginallyclever.makelangeloRobot;
 
 public class MakelangeloRobotEvent {
-	public MakelangeloRobot subject;
-	public int type;
-	public Object extra;
-
-	public MakelangeloRobotEvent(int eventType, MakelangeloRobot robot) {
-		type = eventType;
-		subject = robot;
-		extra = null;
-	}
-
-	public MakelangeloRobotEvent(int eventType, MakelangeloRobot robot, Object extraData) {
-		this(eventType, robot);
-		extra = extraData;
-	}
-
 	// robot has disconnected
 	public static final int DISCONNECT = 0;
 	// robot is connected and identity confirmed.
@@ -36,4 +21,19 @@ public class MakelangeloRobotEvent {
 	public static final int NEW_GCODE = 8;
 	// motor engaged status has changed.  extra is a boolean with the new state.
 	public static final int MOTORS_ENGAGED = 9;
+	
+	public MakelangeloRobot subject;
+	public int type;
+	public Object extra;
+
+	public MakelangeloRobotEvent(int eventType, MakelangeloRobot robot) {
+		type = eventType;
+		subject = robot;
+		extra = null;
+	}
+
+	public MakelangeloRobotEvent(int eventType, MakelangeloRobot robot, Object extraData) {
+		this(eventType, robot);
+		extra = extraData;
+	}
 }
