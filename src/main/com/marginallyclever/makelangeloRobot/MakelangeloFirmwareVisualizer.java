@@ -9,8 +9,8 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class MakelangeloFirmwareVisualizer {
-	public static int limit;
-	Turtle previousTurtle=null;
+	private static int limit;
+	private Turtle previousTurtle=null;
 	
 	private class ColorPoint {
 		public Vector3d c;
@@ -21,7 +21,7 @@ public class MakelangeloFirmwareVisualizer {
 			p=pp;
 		}
 	};
-	ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
+	private ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
 	
 	public MakelangeloFirmwareVisualizer() {}
 	
