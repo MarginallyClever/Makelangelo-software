@@ -33,8 +33,12 @@ public class RobotIdentityConfirmation implements NetworkSessionListener {
 		hardwareVersionChecked = false;
 	}
 	
-	public boolean getIdentityConfirmed() {
-		return identityConfirmed;
+	public void start() {
+		try {
+			robot.sendLineToRobot("M100\n");
+		} catch (Exception e) {
+			Log.error(e.getMessage());
+		}
 	}
 
 	@Override
@@ -135,6 +139,10 @@ public class RobotIdentityConfirmation implements NetworkSessionListener {
 		}
 		
 		return false;
+	}
+	
+	public boolean getIdentityConfirmed() {
+		return identityConfirmed;
 	}
 
 	public boolean getPortConfirmed() {

@@ -86,18 +86,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		setPenX(0);
 		setPenY(0);
 		setNextLineNumber(0);
-	}
-	
-	public NetworkSession getConnection() {
-		return connection;
-	}
 
-	// @param c the connection.
-	public void openConnection(NetworkSession c) {
-		if (c == null) return;
-
-		Log.message("Opening connection...");
-		ric.reset();
 		ric.addRobotIdentityEventListener((evt)->{
 			switch(evt.flag) {
 				case RobotIdentityEvent.BAD_HARDWARE:
@@ -114,17 +103,26 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 					break;
 			}
 		});
-		
-		c.addListener(ric);
-		
+	}
+	
+	public NetworkSession getConnection() {
+		return connection;
+	}
+
+	// @param c the connection.
+	public void openConnection(NetworkSession c) {
+		if (c == null) return;
+
+		Log.message("Opening connection...");
 		didSetHome = false;
+		
+		ric.reset();
+
 		connection = c;
 		connection.addListener(this);
-		try {
-			this.connection.sendMessage("M100\n");
-		} catch (Exception e) {
-			Log.error(e.getMessage());
-		}
+		connection.addListener(ric);
+		
+		ric.start();
 	}
 
 	public void closeConnection() {
@@ -733,7 +731,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return penIsUp;
 	}
 
-	
 	public boolean getPortConfirmed() {
 		return ric.getPortConfirmed();
 	}
