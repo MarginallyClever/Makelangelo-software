@@ -269,7 +269,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 	}
 
 	@Override
-	public String getRecentConnection() {
+	public String getName() {
 		return connectionName;
 	}
 

@@ -22,12 +22,13 @@ public abstract class NetworkSession {
 
 	public abstract boolean isOpen();
 
-	public abstract String getRecentConnection();
+	public abstract String getName();
 
 	public abstract void sendMessage(String msg) throws Exception;
 
 	public abstract TransportLayer getTransportLayer();
 	
+	// OBSERVER PATTERN
 
 	public void addListener(NetworkSessionListener listener) {
 		listeners.add(listener);
@@ -41,6 +42,8 @@ public abstract class NetworkSession {
 		}
 	}
 
+	// OBSERVER CONVENIENCE METHODS
+	
 	protected void notifyLineError(int lineNumber) {
 		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.TRANSPORT_ERROR,lineNumber));	
 	}

@@ -246,7 +246,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 	}
 
 	@Override
-	public String getRecentConnection() {
+	public String getName() {
 		return connectionName;
 	}
 
