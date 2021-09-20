@@ -31,7 +31,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
  * @author Peter Colapietro
  * @since 7.1.4
  */
-public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotListener {
+public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEventListener {
 	/**
 	 *
 	 */
@@ -290,9 +290,9 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 			boolean state=false;
 			if( myRobot.getConnection() == null ) state=true;
 			else if( myRobot.getConnection().isOpen() == false ) state=true;
-			else if( myRobot.getPortConfirmed() == false ) state=true;
-			
+			else if( myRobot.getIdentityConfirmed() == false ) state=true;
 			machineChoices.setEnabled( state );
+			
 			machineChoices.addItemListener((e)->{
 				if(e.getStateChange()==ItemEvent.SELECTED) updateMachineChoice();
 			});
@@ -352,7 +352,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 		boolean didSetHome=false;
 		
 		if(myRobot!=null) {
-			isConfirmed = myRobot.getPortConfirmed();
+			isConfirmed = myRobot.getIdentityConfirmed();
 			isRunning = myRobot.isRunning();
 			didSetHome = myRobot.didSetHome();
 		}
@@ -383,7 +383,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotLis
 	}
 
 	@Override
-	public void makelangeloRobotUpdate(MakelangeloRobotEvent e) {
+	public void makelangeloRobotEvent(MakelangeloRobotEvent e) {
 		if(e.type==MakelangeloRobotEvent.CONNECTION_READY) {
 			String hardwareVersion = myRobot.getSettings().getHardwareVersion();
 			onConnect();

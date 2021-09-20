@@ -28,24 +28,24 @@ import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
-
 /**
- * MakelangeloRobot is the Controller for a physical robot, following a
- * Model-View-Controller design pattern. It also contains non-persistent Model
- * data. MakelangeloRobotPanel is one of the Views. MakelangeloRobotSettings is
- * the persistent Model data (machine configuration).
+ * {@link MakelangeloRobot} is the Controller for a physical robot, following a
+ * Model-View-Controller design pattern.  It also contains non-persistent model data. 
+ * {@link MakelangeloRobotPanel} is one of the Views. 
+ * {@link MakelangeloRobotSettings} is the persistent Model data (machine configuration).
  * 
  * @author dan
  * @since 7.2.10
  */
 public class MakelangeloRobot implements NetworkSessionListener, PreviewListener {	
 	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
-
-	private TurtleRenderer turtleRenderer;
-	
-	// Talking to the real machine
 	private NetworkSession connection = null;
-	private RobotIdentityConfirmation ric = new RobotIdentityConfirmation(this); 
+	private RobotIdentityConfirmation ric = new RobotIdentityConfirmationAfterMarlin(this);
+	
+	// rendering stuff
+	private TurtleRenderer turtleRenderer;
+	private Turtle turtleToRender = new Turtle();
+	private MakelangeloRobotDecorator decorator = null;
 
 	// misc state
 	private boolean areMotorsEngaged;
@@ -58,19 +58,13 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	private double penX;
 	private double penY;
 
-	private Turtle turtleToRender = new Turtle();
-	
-
-	// this list of gcode commands is store separate from the Turtle.
+	// this list of gcode commands is stored separate from the Turtle.
 	private ArrayList<String> gcodeCommands = new ArrayList<String>();
 	// what line in drawingCommands is going to be sent next?
 	protected int nextLineNumber;
 
-	// rendering stuff
-	private MakelangeloRobotDecorator decorator = null;
-
 	// Listeners which should be notified of a change to the percentage.
-	private ArrayList<MakelangeloRobotListener> listeners = new ArrayList<MakelangeloRobotListener>();
+	private ArrayList<MakelangeloRobotEventListener> listeners = new ArrayList<MakelangeloRobotEventListener>();
 
 	
 	public MakelangeloRobot() {
@@ -174,16 +168,16 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return newUID;
 	}
 
-	public void addListener(MakelangeloRobotListener listener) {
+	public void addListener(MakelangeloRobotEventListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(MakelangeloRobotListener listener) {
+	public void removeListener(MakelangeloRobotEventListener listener) {
 		listeners.remove(listener);
 	}
 	
 	private void notifyListeners(MakelangeloRobotEvent e) {
-		for (MakelangeloRobotListener listener : listeners) listener.makelangeloRobotUpdate(e);
+		for (MakelangeloRobotEventListener listener : listeners) listener.makelangeloRobotEvent(e);
 	}
 
 	// based on http://www.exampledepot.com/egs/java.net/Post.html
@@ -313,7 +307,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 
 	/**
-	 * removes comments, processes commands robot doesn't handle, add checksum information.
+	 * Removes comments, processes commands robot doesn't handle, add checksum information.
 	 *
 	 * @param line command to send
 	 */
@@ -731,7 +725,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return penIsUp;
 	}
 
-	public boolean getPortConfirmed() {
-		return ric.getPortConfirmed();
+	public boolean getIdentityConfirmed() {
+		return ric.getIdentityConfirmed();
 	}
 }
