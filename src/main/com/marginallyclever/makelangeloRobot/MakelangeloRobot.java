@@ -104,11 +104,11 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return connection;
 	}
 
-	// @param c the connection.
-	public void openConnection(NetworkSession c) {
-		if (c == null) return;
+	public void setNetworkSession(NetworkSession c) {
+		closeConnection();
+		
+		if(c == null) return;
 
-		Log.message("Opening connection...");
 		didFindHome = false;
 
 		connection = c;
@@ -119,8 +119,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 
 	public void closeConnection() {
-		if (this.connection == null)
-			return;
+		if(connection == null) return;
 
 		connection.closeConnection();
 		connection.removeListener(this);
@@ -136,7 +135,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {
-		if(evt.flag == NetworkSessionEvent.DATA_AVAILABLE) dataAvailable((NetworkSession)evt.getSource(),(String)evt.data);
+		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) dataAvailable((NetworkSession)evt.getSource(),(String)evt.data);
 		if(evt.flag == NetworkSessionEvent.TRANSPORT_ERROR) setLineNumber((int)evt.data);
 		if(evt.flag == NetworkSessionEvent.SEND_BUFFER_EMPTY) sendFileCommand();
 	}

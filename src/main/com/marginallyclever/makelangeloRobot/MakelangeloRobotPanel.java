@@ -40,9 +40,9 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	// god objects?
 	private MakelangeloRobot myRobot;
 	private Makelangelo makelangeloApp;
-	
+
 	// connect menu
-	private SelectPanel connectionPanel;
+	private SelectPanel connectionPanel;	
 	private SelectButton buttonConnect;
 	
 	// machine options
@@ -131,7 +131,9 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 			} else {
 				NetworkSession s = NetworkSessionManager.requestNewSession(makelangeloApp.getMainFrame());
 				if(s!=null) {
-					myRobot.openConnection(s);
+					Log.message("New network session opened...");
+					
+					myRobot.setNetworkSession(s);
 					isConnected=true;
 					
 					buttonConnect.setText(Translator.get("ButtonDisconnect"));
