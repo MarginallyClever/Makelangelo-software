@@ -32,8 +32,7 @@ public class TCPTransportLayer implements TransportLayer {
 		}
 		*/
 		Log.message("Connecting to "+connectionName);
-		//if(connectionName.equals(recentPort)) return null;
-		TCPConnection connection = new TCPConnection(this);
+		TCPConnection connection = new TCPConnection();
 
 		try {
 			connection.openConnection(connectionName);

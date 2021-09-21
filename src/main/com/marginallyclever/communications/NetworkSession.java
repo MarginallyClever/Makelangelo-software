@@ -9,24 +9,37 @@ import java.util.ArrayList;
  * @since v7
  */
 public abstract class NetworkSession {
-	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<NetworkSessionListener> listeners = new ArrayList<NetworkSessionListener>();
-	
-	// close this connection
+	private NetworkSessionLog log = new NetworkSessionLog();
+	private String name = "";
+		
 	public abstract void closeConnection();
 
-	// open a connection to a connection
 	public abstract void openConnection(String connectionName) throws Exception;
-
-	public abstract void reconnect() throws Exception;
 
 	public abstract boolean isOpen();
 
-	public abstract String getName();
-
 	public abstract void sendMessage(String msg) throws Exception;
-
-	public abstract TransportLayer getTransportLayer();
+	
+	public NetworkSessionLog getLog() {
+		return log;
+	}
+	
+	protected void clearLog() {
+		log.clear();
+	}
+	
+	protected void addLog(ConversationEvent e) {
+		log.addElement(e);
+	}
+	
+	protected void setName(String s) {
+		name=s;
+	}
+	
+	public String getName() {
+		return name;
+	}
 	
 	// OBSERVER PATTERN
 

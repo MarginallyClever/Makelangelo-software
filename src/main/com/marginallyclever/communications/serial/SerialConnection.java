@@ -7,6 +7,8 @@ import jssc.SerialPortException;
 
 import java.util.ArrayList;
 
+import com.marginallyclever.communications.ConversationEvent;
+import com.marginallyclever.communications.NetworkSessionLog;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.convenience.log.Log;
@@ -19,29 +21,24 @@ import com.marginallyclever.convenience.log.Log;
  * @since v7
  */
 public final class SerialConnection extends NetworkSession implements SerialPortEventListener {
-	private SerialPort serialPort;
-	private static final int BAUD_RATE = 250000;
+	public static final int BAUD_RATE = 250000;
+	public static final String CUE = "ok";
+	public static final String NOCHECKSUM = "NOCHECKSUM ";
+	public static final String BADCHECKSUM = "BADCHECKSUM ";
+	public static final String BADLINENUM = "BADLINENUM ";
+	public static final String NEWLINE = "\n";
+	public static final String COMMENT_START = ";";
 
-	private TransportLayer transportLayer;
-	private String connectionName = "";
+	private SerialPort serialPort;
 	private boolean portOpened = false;
 	private boolean waitingForCue = false;
 
-	static final String CUE = "ok";
-	static final String NOCHECKSUM = "NOCHECKSUM ";
-	static final String BADCHECKSUM = "BADCHECKSUM ";
-	static final String BADLINENUM = "BADLINENUM ";
-	static final String NEWLINE = "\n";
-	static final String COMMENT_START = ";";
-
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
-	ArrayList<String> commandQueue = new ArrayList<String>();
+	private ArrayList<String> commandQueue = new ArrayList<String>();
 
 
-	public SerialConnection(SerialTransportLayer layer) {
-		transportLayer = layer;
-	}
+	public SerialConnection() {}
 
 	@Override
 	public void sendMessage(String msg) throws Exception {
@@ -58,6 +55,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 					serialPort.removeEventListener();
 					serialPort.closePort();
 				} catch (SerialPortException e) {
+					Log.error(e.getLocalizedMessage());
 				}
 			}
 			portOpened = false;
@@ -71,13 +69,15 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 
 		closeConnection();
 
+		getLog().clear();
+		
 		// open the port
 		serialPort = new SerialPort(portName);
 		serialPort.openPort();// Open serial port
 		serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 		serialPort.addEventListener(this);
 
-		connectionName = portName;
+		setName(portName);
 		portOpened = true;
 		waitingForCue = false;
 	}
@@ -157,11 +157,13 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 			if(error_line != -1) {
 				notifyLineError(error_line);
 			} else {
-				// wait for the cue to send another command
-				if(oneLine.indexOf(CUE)==0) {
-					waitingForCue=false;
-				}
+				addLog(new ConversationEvent("in",oneLine,System.currentTimeMillis()));
 				notifyDataAvailable(oneLine);
+			}
+			
+			// wait for the cue to send another command
+			if(oneLine.indexOf(CUE)==0) {
+				waitingForCue=false;
 			}
 		}
 		if(waitingForCue==false) {
@@ -177,9 +179,8 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 			return;
 		}
 
-		String command;
 		try {
-			command=commandQueue.remove(0);
+			String command=commandQueue.remove(0);
 			if(command==null || command.length()==0) return;
 			/*
 			// remove any comments in the gcode
@@ -187,27 +188,21 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 			if(command.contains(COMMENT_START)) {
 				command = command.substring(0,line.indexOf(COMMENT_START));
 			}*/
-			// make sure there is a newline
-			// TODO don't put this in serialConnection, it's the wrong level of abstraction.
-			if(command.endsWith("\n") == false) {
-				command+=NEWLINE;
-			}
-			// send it
+			if(!command.endsWith("\n")) command+=NEWLINE;
+			
+			addLog(new ConversationEvent("out",command.trim(),System.currentTimeMillis()));
+			
 			serialPort.writeBytes(command.getBytes());
+			
 			waitingForCue=true;
 		}
-		catch(IndexOutOfBoundsException e1) {}
-		catch(SerialPortException e2) {}
+		catch(Exception e1) {
+			Log.error(e1.getLocalizedMessage());
+		}
 	}
 
 	public void deleteAllQueuedCommands() {
 		commandQueue.clear();
-	}
-
-	// connect to the last port
-	@Override
-	public void reconnect() throws Exception {
-		openConnection(connectionName);
 	}
 
 	/**
@@ -235,15 +230,5 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 	@Override
 	public boolean isOpen() {
 		return portOpened;
-	}
-
-	@Override
-	public String getName() {
-		return connectionName;
-	}
-
-	@Override
-	public TransportLayer getTransportLayer() {
-		return this.transportLayer;
 	}
 }

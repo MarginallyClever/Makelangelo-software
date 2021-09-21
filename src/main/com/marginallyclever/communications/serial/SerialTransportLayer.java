@@ -64,7 +64,7 @@ public class SerialTransportLayer implements TransportLayer {
 	public NetworkSession openConnection(String connectionName) {
 		//if(connectionName.equals(recentPort)) return null;
 
-		SerialConnection serialConnection = new SerialConnection(this);
+		SerialConnection serialConnection = new SerialConnection();
 
 		try {
 			serialConnection.openConnection(connectionName);

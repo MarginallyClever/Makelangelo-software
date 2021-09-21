@@ -7,9 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-
+import com.marginallyclever.communications.ConversationEvent;
 import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.convenience.log.Log;
 
 
@@ -20,39 +19,32 @@ import com.marginallyclever.convenience.log.Log;
  * @since v7
  */
 public final class TCPConnection extends NetworkSession implements Runnable {
+	public static final String CUE = "> ";
+	public static final String NOCHECKSUM = "NOCHECKSUM ";
+	public static final String BADCHECKSUM = "BADCHECKSUM ";
+	public static final String BADLINENUM = "BADLINENUM ";
+	public static final String NEWLINE = "\n";
+	public static final String COMMENT_START = ";";
+	public static final int DEFAULT_TCP_PORT = 9999;
+	
 	private SocketChannel socket;
-	private TransportLayer transportLayer;
-	private String connectionName = "";
 	private boolean portOpened = false;
 	private boolean waitingForCue = false;
 	private Thread thread;
 	private boolean keepPolling;
 
-
-	static final String CUE = "> ";
-	static final String NOCHECKSUM = "NOCHECKSUM ";
-	static final String BADCHECKSUM = "BADCHECKSUM ";
-	static final String BADLINENUM = "BADLINENUM ";
-	static final String NEWLINE = "\n";
-	static final String COMMENT_START = ";";
-	private static final int DEFAULT_TCP_PORT = 9999;
-	
 	// parsing input from Makelangelo
 	private String inputBuffer = "";
-	ArrayList<String> commandQueue = new ArrayList<String>();
+	private ArrayList<String> commandQueue = new ArrayList<String>();
 
 
-
-	public TCPConnection(TransportLayer layer) {
-		transportLayer = layer;
-	}
+	public TCPConnection() {}
 
 	@Override
 	public void sendMessage(String msg) throws Exception {
 		commandQueue.add(msg);
 		sendQueuedCommand();
 	}
-
 
 	@Override
 	public void closeConnection() {
@@ -78,6 +70,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 		if (portOpened) return;
 
 		closeConnection();
+		clearLog();
 		
 		if(ipAddress.startsWith("http://")) {
 			ipAddress = ipAddress.substring(7);
@@ -91,7 +84,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 		socket.connect(new InetSocketAddress(host,port));
 		thread = new Thread(this);
 		
-		connectionName = ipAddress;
+		setName(ipAddress);
 		portOpened = true;
 		waitingForCue = true;
 		keepPolling=true;
@@ -117,8 +110,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			}
 		}
 	}
-	
-	
+		
 	/**
 	 * Check if the robot reports an error and if so what line number.
 	 *
@@ -162,7 +154,6 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 		return -1;
 	}
 
-
 	public void dataAvailable(int len,String message) {
 		if(!portOpened) return;
 		String rawInput = message.substring(0,len);
@@ -199,7 +190,6 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 		}
 	}
 
-
 	protected void sendQueuedCommand() {
 		if(!portOpened || waitingForCue) return;
 
@@ -208,37 +198,33 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			return;
 		}
 
-		String command;
 		try {
-			command=commandQueue.remove(0);
+			String command=commandQueue.remove(0);
 			String line = command;
 			if(line.contains(COMMENT_START)) {
 				String [] lines = line.split(COMMENT_START);
 				command = lines[0];
 			}
-			if(line.endsWith("\n") == false) {
-				line+=NEWLINE;
-			}
+			if(!command.endsWith("\n")) command+=NEWLINE;
+
+			addLog(new ConversationEvent("out",command.trim(),System.currentTimeMillis()));
+			
 			byte[] lineBytes = line.getBytes();
 			ByteBuffer buf = ByteBuffer.allocate(lineBytes.length);
 			buf.clear();
 			buf.put(lineBytes);
 			buf.rewind();
 			socket.write(buf);
+			
 			waitingForCue=true;
 		}
-		catch(IndexOutOfBoundsException e1) {}
-		catch(IOException e1) {}
+		catch(Exception e1) {
+			Log.error(e1.getLocalizedMessage());
+		}
 	}
 
 	public void deleteAllQueuedCommands() {
 		commandQueue.clear();
-	}
-
-	// connect to the last port
-	@Override
-	public void reconnect() throws Exception {
-		openConnection(connectionName);
 	}
 
 	/**
@@ -266,15 +252,5 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 	@Override
 	public boolean isOpen() {
 		return portOpened;
-	}
-
-	@Override
-	public String getName() {
-		return connectionName;
-	}
-
-	@Override
-	public TransportLayer getTransportLayer() {
-		return this.transportLayer;
 	}
 }
