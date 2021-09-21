@@ -10,7 +10,6 @@ import java.util.ArrayList;
  */
 public abstract class NetworkSession {
 	private ArrayList<NetworkSessionListener> listeners = new ArrayList<NetworkSessionListener>();
-	private NetworkSessionLog log = new NetworkSessionLog();
 	private String name = "";
 		
 	public abstract void closeConnection();
@@ -20,19 +19,7 @@ public abstract class NetworkSession {
 	public abstract boolean isOpen();
 
 	public abstract void sendMessage(String msg) throws Exception;
-	
-	public NetworkSessionLog getLog() {
-		return log;
-	}
-	
-	protected void clearLog() {
-		log.clear();
-	}
-	
-	protected void addLog(ConversationEvent e) {
-		log.addElement(e);
-	}
-	
+		
 	protected void setName(String s) {
 		name=s;
 	}
@@ -46,10 +33,12 @@ public abstract class NetworkSession {
 	public void addListener(NetworkSessionListener listener) {
 		listeners.add(listener);
 	}
+	
 	public void removeListener(NetworkSessionListener listener) {
 		listeners.remove(listener);
 	}
-	protected void notifyListeners(NetworkSessionEvent evt) {
+	
+	private void notifyListeners(NetworkSessionEvent evt) {
 		for( NetworkSessionListener a : listeners ) {
 			a.networkSessionEvent(evt);
 		}
@@ -66,7 +55,12 @@ public abstract class NetworkSession {
 	}
 
 	// tell all listeners data has arrived
-	protected void notifyDataAvailable(String line) {
-		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_AVAILABLE,line));
+	protected void notifyDataReceived(String line) {
+		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_RECEIVED,line));
+	}
+
+	// tell all listeners data has arrived
+	protected void notifyDataSent(String line) {
+		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_SENT,line));
 	}
 }

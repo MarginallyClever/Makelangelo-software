@@ -7,16 +7,15 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
-import com.marginallyclever.communications.ConversationEvent;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.convenience.log.Log;
 
 
 /**
- * Created on 4/12/15.  Encapsulate all jssc serial receive/transmit implementation
+ * Encapsulate all TCP/IP receive/transmit implementation
  *
  * @author Peter Colapietro
- * @since v7
+ * @since v7 (4/12/15)
  */
 public final class TCPConnection extends NetworkSession implements Runnable {
 	public static final String CUE = "> ";
@@ -70,7 +69,6 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 		if (portOpened) return;
 
 		closeConnection();
-		clearLog();
 		
 		if(ipAddress.startsWith("http://")) {
 			ipAddress = ipAddress.substring(7);
@@ -176,7 +174,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 				// no error
 				if(!oneLine.trim().equals(CUE.trim())) 
 				{
-					notifyDataAvailable(oneLine);
+					notifyDataReceived(oneLine);
 				}
 			}
 
@@ -207,8 +205,6 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			}
 			if(!command.endsWith("\n")) command+=NEWLINE;
 
-			addLog(new ConversationEvent("out",command.trim(),System.currentTimeMillis()));
-			
 			byte[] lineBytes = line.getBytes();
 			ByteBuffer buf = ByteBuffer.allocate(lineBytes.length);
 			buf.clear();
@@ -217,6 +213,8 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			socket.write(buf);
 			
 			waitingForCue=true;
+
+			notifyDataSent(command);
 		}
 		catch(Exception e1) {
 			Log.error(e1.getLocalizedMessage());

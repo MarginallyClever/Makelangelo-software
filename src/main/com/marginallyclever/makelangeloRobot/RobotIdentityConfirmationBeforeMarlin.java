@@ -39,7 +39,7 @@ public class RobotIdentityConfirmationBeforeMarlin extends RobotIdentityConfirma
 
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {	
-		if(evt.flag == NetworkSessionEvent.DATA_AVAILABLE) {	
+		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {	
 			if(!getIdentityConfirmed()) {
 				if(whenTheIntroductionsFinishOK((String)evt.data)) {
 					setIdentityConfirmed(true);

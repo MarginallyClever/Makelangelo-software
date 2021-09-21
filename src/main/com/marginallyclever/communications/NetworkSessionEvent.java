@@ -13,8 +13,10 @@ public class NetworkSessionEvent extends EventObject {
 	public static final int TRANSPORT_ERROR=2;
 	// connection can accept more data.
 	public static final int SEND_BUFFER_EMPTY=3;
-	// data has arrived.  Data is (String)data.
-	public static final int DATA_AVAILABLE=4;
+	// something has arrived.  Data is (String)data.
+	public static final int DATA_RECEIVED=4;
+	// something has just been sent.  Data is (String)data.
+	public static final int DATA_SENT=5;
 
 	public int flag;
 	public Object data;

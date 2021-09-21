@@ -7,18 +7,15 @@ import jssc.SerialPortException;
 
 import java.util.ArrayList;
 
-import com.marginallyclever.communications.ConversationEvent;
-import com.marginallyclever.communications.NetworkSessionLog;
 import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.convenience.log.Log;
 
 
 /**
- * Created on 4/12/15.  Encapsulate all serial receive/transmit implementation and adds checksum calculations
+ * Encapsulate all serial receive/transmit implementation
  *
  * @author Peter Colapietro
- * @since v7
+ * @since v7 (4/12/15)
  */
 public final class SerialConnection extends NetworkSession implements SerialPortEventListener {
 	public static final int BAUD_RATE = 250000;
@@ -68,8 +65,6 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 		if (portOpened) return;
 
 		closeConnection();
-
-		getLog().clear();
 		
 		// open the port
 		serialPort = new SerialPort(portName);
@@ -157,8 +152,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 			if(error_line != -1) {
 				notifyLineError(error_line);
 			} else {
-				addLog(new ConversationEvent("in",oneLine,System.currentTimeMillis()));
-				notifyDataAvailable(oneLine);
+				notifyDataReceived(oneLine);
 			}
 			
 			// wait for the cue to send another command
@@ -189,12 +183,12 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 				command = command.substring(0,line.indexOf(COMMENT_START));
 			}*/
 			if(!command.endsWith("\n")) command+=NEWLINE;
-			
-			addLog(new ConversationEvent("out",command.trim(),System.currentTimeMillis()));
-			
+
 			serialPort.writeBytes(command.getBytes());
 			
 			waitingForCue=true;
+
+			notifyDataSent(command);
 		}
 		catch(Exception e1) {
 			Log.error(e1.getLocalizedMessage());
