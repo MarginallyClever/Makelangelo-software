@@ -9,14 +9,14 @@ import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 
 public class RobotIdentityConfirmationAfterMarlin extends RobotIdentityConfirmation {
 	private static final String EXPECTED_FIRMWARE_VERSION = "2.0.9"; // must match the version in the the firmware EEPROM
+	private static final String AUTHOR = "Author: (Marginally Clever,";
 	
 	private boolean firmwareVersionChecked = false;
 	private boolean hardwareVersionChecked = false;
-	private MakelangeloRobot robot; 
+	private String versionFound;
 	
-	public RobotIdentityConfirmationAfterMarlin(MakelangeloRobot robot) {
+	public RobotIdentityConfirmationAfterMarlin() {
 		super();
-		this.robot = robot;
 		reset();
 	} 
 	
@@ -29,6 +29,10 @@ public class RobotIdentityConfirmationAfterMarlin extends RobotIdentityConfirmat
 	
 	public void start() {}
 
+	public String getVersion() {
+		return versionFound;
+	}
+	
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {	
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {	
@@ -51,15 +55,14 @@ public class RobotIdentityConfirmationAfterMarlin extends RobotIdentityConfirmat
 		if(!hardwareVersionChecked) {
 			String version=doISeeAHardwareVersion(data);
 			if(version!=null) {
-				hardwareVersionChecked=true;
-				robot.getSettings().setHardwareVersion(version);
+				hardwareVersionChecked = true;
+				versionFound = version;
 			}
 		}
 		
 		return getPortConfirmed() && firmwareVersionChecked && hardwareVersionChecked;
 	}
 
-	public static final String AUTHOR = "Author: (Marginally Clever,";
 	
 	private String doISeeAHardwareVersion(String data) {
 		int a = data.lastIndexOf(AUTHOR); 

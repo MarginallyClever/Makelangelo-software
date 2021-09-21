@@ -10,6 +10,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 public class MakelangeloFirmwareVisualizer {
 	private static int limit;
+	
 	private Turtle previousTurtle=null;
 	
 	private class ColorPoint {
@@ -27,10 +28,9 @@ public class MakelangeloFirmwareVisualizer {
 	public MakelangeloFirmwareVisualizer() {}
 	
 	public void render(GL2 gl2,Turtle turtleToRender,MakelangeloRobotSettings settings) {
-		//if(previousTurtle!=turtleToRender) 
-		{
+		if(previousTurtle!=turtleToRender) {
 			recalculateBuffer(gl2,turtleToRender,settings);
-			//previousTurtle = turtleToRender;
+			previousTurtle = turtleToRender;
 		}
 		
 		drawBufferedTurtle(gl2);

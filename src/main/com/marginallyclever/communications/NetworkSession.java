@@ -45,14 +45,6 @@ public abstract class NetworkSession {
 	}
 
 	// OBSERVER CONVENIENCE METHODS
-	
-	protected void notifyLineError(int lineNumber) {
-		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.TRANSPORT_ERROR,lineNumber));	
-	}
-
-	protected void notifySendBufferEmpty() {
-		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.SEND_BUFFER_EMPTY,null));	
-	}
 
 	// tell all listeners data has arrived
 	protected void notifyDataReceived(String line) {

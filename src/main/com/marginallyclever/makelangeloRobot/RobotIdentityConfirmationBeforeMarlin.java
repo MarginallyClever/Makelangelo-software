@@ -31,7 +31,7 @@ public class RobotIdentityConfirmationBeforeMarlin extends RobotIdentityConfirma
 	
 	public void start() {
 		try {
-			robot.sendLineToRobot("M100\n");
+			robot.send("M100\n");
 		} catch (Exception e) {
 			Log.error(e.getMessage());
 		}
@@ -61,8 +61,8 @@ public class RobotIdentityConfirmationBeforeMarlin extends RobotIdentityConfirma
 			if(isGood) {
 				firmwareVersionChecked=true;
 				// request the hardware version of this robot
-				robot.sendLineToRobot("D10\n");
-				robot.sendLineToRobot("M503\n");
+				robot.send("D10\n");
+				robot.send("M503\n");
 			}
 		}
 		

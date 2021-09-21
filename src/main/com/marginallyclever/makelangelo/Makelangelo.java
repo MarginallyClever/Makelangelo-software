@@ -180,7 +180,7 @@ public final class Makelangelo {
 			if(previewPanel != null) previewPanel.repaint();
 		});
 		logPanel.addListener((command)->{
-			robot.sendLineToRobot(command);
+			robot.send(command);
 		});
 
 		Log.message("Starting virtual camera...");

@@ -4,10 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -37,10 +35,9 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkSessionListener, PreviewListener {	
+public class MakelangeloRobot implements NetworkSessionListener, PreviewListener, MarlinEventListener {	
 	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
-	private NetworkSession connection = null;
-	private RobotIdentityConfirmation ric = new RobotIdentityConfirmationAfterMarlin(this);
+	private MarlinFirmware2 marlin = new MarlinFirmware2();
 	
 	// rendering stuff
 	private TurtleRenderer turtleRenderer;
@@ -50,7 +47,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	// misc state
 	private boolean areMotorsEngaged;
 	private boolean isRunning;
-	private boolean isPaused;
 	private boolean penIsUp;
 	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
@@ -63,7 +59,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	// what line in drawingCommands is going to be sent next?
 	protected int nextLineNumber;
 
-	// Listeners which should be notified of a change to the percentage.
 	private ArrayList<MakelangeloRobotEventListener> listeners = new ArrayList<MakelangeloRobotEventListener>();
 
 	
@@ -72,7 +67,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		
 		areMotorsEngaged = true;
 		isRunning = false;
-		isPaused = false;
 		penIsUp = false;
 		penJustMoved = false;
 		penIsUpBeforePause = false;
@@ -81,7 +75,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		setPenY(0);
 		setLineNumber(0);
 
-		ric.addRobotIdentityEventListener((evt)->{
+		marlin.addRobotIdentityEventListener((evt)->{
 			switch(evt.flag) {
 				case RobotIdentityEvent.BAD_HARDWARE:
 					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, evt.data));
@@ -91,6 +85,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 					break;
 				case RobotIdentityEvent.IDENTITY_CONFIRMED:
 					Log.message("Identity confirmed.");
+					getSettings().setHardwareVersion(marlin.getVersion());
 					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.CONNECTION_READY,this));
 					break;
 				default:
@@ -100,49 +95,42 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		});
 	}
 	
-	public NetworkSession getConnection() {
-		return connection;
+	// OBSERVER PATTERN
+
+	public void addListener(MakelangeloRobotEventListener listener) {
+		listeners.add(listener);
 	}
+
+	public void removeListener(MakelangeloRobotEventListener listener) {
+		listeners.remove(listener);
+	}
+	
+	private void notifyListeners(MakelangeloRobotEvent e) {
+		for (MakelangeloRobotEventListener listener : listeners) listener.makelangeloRobotEvent(e);
+	}
+
+	// OBSERVER PATTERN ENDS
+	
 
 	public void setNetworkSession(NetworkSession c) {
-		closeConnection();
-		
-		if(c == null) return;
-
 		didFindHome = false;
-
-		connection = c;
-		connection.addListener(this);
-		connection.addListener(ric);
-		
-		ric.start();
+		if(c != null) c.addListener(this);
+		marlin.setNetworkSession(c);
 	}
 
-	public void closeConnection() {
+	private void closeConnection(NetworkSession connection) {
 		if(connection == null) return;
 
-		connection.closeConnection();
 		connection.removeListener(this);
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
-		connection = null;
-		ric.reset();
 	}
 	
-	@Override
-	public void finalize() {
-		if(connection != null) connection.removeListener(this);
-	}
-
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {
-		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) dataAvailable((NetworkSession)evt.getSource(),(String)evt.data);
-		if(evt.flag == NetworkSessionEvent.TRANSPORT_ERROR) setLineNumber((int)evt.data);
-		if(evt.flag == NetworkSessionEvent.SEND_BUFFER_EMPTY) sendFileCommand();
-	}
-	
-	private void dataAvailable(NetworkSession arg0, String data) {
-		if (data.endsWith("\n")) data = data.substring(0, data.length() - 1);
-		Log.message("Recv: "+data);
+		if(evt.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
+			halt();
+			closeConnection((NetworkSession)evt.getSource());
+		}
 	}
 	
 	public long findOrCreateUID(String line) {
@@ -165,18 +153,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return newUID;
 	}
 
-	public void addListener(MakelangeloRobotEventListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeListener(MakelangeloRobotEventListener listener) {
-		listeners.remove(listener);
-	}
-	
-	private void notifyListeners(MakelangeloRobotEvent e) {
-		for (MakelangeloRobotEventListener listener : listeners) listener.makelangeloRobotEvent(e);
-	}
-
 	// based on http://www.exampledepot.com/egs/java.net/Post.html
 	private long getNewRobotUID() {
 		long newUID = 0;
@@ -191,24 +167,15 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
 			URLConnection conn = url.openConnection();
 			// get results
-			InputStream connectionInputStream = conn.getInputStream();
-			Reader inputStreamReader = new InputStreamReader(connectionInputStream);
-			BufferedReader rd = new BufferedReader(inputStreamReader);
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String line = rd.readLine();
 			Log.message("Server says: '" + line + "'");
 			newUID = Long.parseLong(line);
-			// did read go ok?
 			if (newUID != 0) {
 				settings.createNewUID(newUID);
-
-				try {
-					// Tell the robot it's new UID.
-					connection.sendMessage("UID " + newUID);
-				} catch (Exception e) {
-					// FIXME has this ever happened? Deal with it better?
-					Log.error("UID to robot: " + e.getMessage());
-				}
+				marlin.sendNewUID(newUID);
 			}
+			
 		} catch (Exception e) {
 			Log.error("UID from server: " + e.getMessage());
 			return 0;
@@ -217,70 +184,37 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return newUID;
 	}
 
-	public String generateChecksum(String line) {
-		byte checksum = 0;
-
-		for (int i = 0; i < line.length(); ++i) {
-			checksum ^= line.charAt(i);
-		}
-
-		return "*" + Integer.toString(checksum);
-	}
-
 	// Send the machine configuration to the robot.
 	public void sendConfig() {
-		if(!ric.getIdentityConfirmed()) return;
+		if(!marlin.getIdentityConfirmed()) return;
 
 		Log.message("Sending config.");
 		String config = settings.getGCodeConfig();
-		String[] lines = config.split("\n");
-		for( String line : lines ) sendLineToRobot(line + "\n");
+		String [] lines = config.split("\n");
+		for( String line : lines ) send(line + "\n");
 		setHome();
-		sendLineToRobot("G0"
-				+" F" + StringHelper.formatDouble(settings.getTravelFeedRate()) 
-				+" A" + StringHelper.formatDouble(settings.getAcceleration())
-				+"\n");
 	}
 
 	public boolean isRunning() {
 		return isRunning;
 	}
-
-	public boolean isPaused() {
-		return isPaused;
-	}
-	
-	public void pause() {
-		if(isPaused) return;
-		isPaused = true;
 		
-		// if we're drawing, raise the pen so it doesn't make an ink blot.
-		penIsUpBeforePause = penIsUp;
-		if(!penIsUp) raisePen();
-	}
-	
-	public void unPause() {
-		if(!isPaused) return;
-		isPaused = false;
-		
-		if(!penIsUpBeforePause) lowerPen();
-		sendFileCommand();
-	}
-	
 	public void halt() {
 		isRunning = false;
-		isPaused = false;
-		raisePen();
+		penIsUpBeforePause = penIsUp;
+		if(!penIsUp) raisePen();
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.STOP,this));
 	}
 
-	public void setRunning() {
+	public void start() {
 		isRunning = true;
+		if(!penIsUpBeforePause) lowerPen();
+		sendFileCommand();
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.START,this));
 	}
 	
 	public void raisePen() {
-		sendLineToRobot(settings.getPenUpString());
+		send(settings.getPenUpString());
 		rememberRaisedPen();
 	}
 	
@@ -295,38 +229,17 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 	
 	public void lowerPen() {
-		sendLineToRobot(settings.getPenDownString());
+		send(settings.getPenDownString());
 		rememberLoweredPen();
 	}
 	
 	public void testPenAngle(double testAngle) {
-		sendLineToRobot(MakelangeloRobotSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
-	}
-
-	/**
-	 * Removes comments, processes commands robot doesn't handle, add checksum information.
-	 *
-	 * @param line command to send
-	 */
-	private void sendLineWithNumberAndChecksum(String line, int lineNumber) {
-		if(!ric.getIdentityConfirmed() || !isRunning()) return;
-
-		line = "N" + (lineNumber+1) + " " + line;
-
-		int n = line.indexOf(";");
-		if(n>=0) {
-			String a = line.substring(0,n);
-			String b = line.substring(n);
-			line = a + generateChecksum(a) + b;
-		} else {
-			line += generateChecksum(line);
-		}
-		sendLineToRobot(line);
+		send(MakelangeloRobotSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
 	}
 	
 	// Take the next line from the file and send it to the robot, if permitted.
 	private void sendFileCommand() {
-		if(!ric.getIdentityConfirmed() || !isRunning() || isPaused()) return;
+		if( !marlin.getIdentityConfirmed() || !isRunning() ) return;
 		
 		// are there any more commands?
 		if(nextLineNumber >= gcodeCommands.size()) {
@@ -334,7 +247,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			SoundSystem.playDrawingFinishedSound();
 		} else {
 			String line = gcodeCommands.get(nextLineNumber);
-			sendLineWithNumberAndChecksum(line, nextLineNumber);
+			marlin.sendLineWithNumberAndChecksum(line, nextLineNumber);
 			setLineNumber(nextLineNumber+1);
 		}
 	}
@@ -342,6 +255,14 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	private void setLineNumber(int count) {
 		nextLineNumber=count;
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.PROGRESS_SOFAR, this, nextLineNumber));
+	}
+	
+	public void send(String line) {
+		line = line.trim();
+		if(line.isEmpty()) return;
+
+		updateStateFromGCode(line);
+		marlin.send(line);
 	}
 	
 	// update the simulated position to match the real robot
@@ -382,8 +303,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 
 		setLineNumber(lineNumber);
 		sendLineNumber(lineNumber);
-		setRunning();
-		sendFileCommand();
+		start();
 	}
 	
 	/**
@@ -395,42 +315,13 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
 	}
 
-	/**
-	 * Sends a single command the robot. Could be anything.
-	 *
-	 * @param line command to send.
-	 * @return <code>true</code> if command was sent to the robot;
-	 *         <code>false</code> otherwise.
-	 */
-	public boolean sendLineToRobot(String line) {
-		if(!ric.getPortConfirmed() || connection==null ) return false;
-
-		// does it have a checksum? hide it from the log
-		String reportedLine = line;
-		if(reportedLine.trim().isEmpty()) return false;
-		Log.message("Send: "+reportedLine);
-
-		updateStateFromGCode(reportedLine);
-		
-		// make sure the line has a return on the end
-		if(!line.endsWith("\n")) line += "\n";
-
-		try {
-			connection.sendMessage(line);
-		} catch (Exception e) {
-			Log.error(e.getMessage());
-			return false;
-		}
-		return true;
-	}
-	
 	public void setDrawFeedRate(float feedRate) {
 		// remember it
 		settings.setDrawFeedRate(feedRate);
 		// get it again in case it was capped.
 		feedRate = settings.getDrawFeedRate();
 		// tell the robot
-		sendLineToRobot("G0 F" + StringHelper.formatDouble(feedRate));
+		send("G0 F" + StringHelper.formatDouble(feedRate));
 	}
 	
 	public void setTravelFeedRate(float feedRate) {
@@ -439,7 +330,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		// get it again in case it was capped.
 		feedRate = settings.getTravelFeedRate();
 		// tell the robot
-		sendLineToRobot("G1 F" + StringHelper.formatDouble(feedRate));
+		send("G1 F" + StringHelper.formatDouble(feedRate));
 	}
 	
 	/**
@@ -459,7 +350,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	
 	public void findHome() {
 		this.raisePen();
-		sendLineToRobot("G28 XY");
+		send("G28 XY");
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.HOME_FOUND,this));
@@ -467,9 +358,9 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 	
 	public void setHome() {
-		sendLineToRobot(settings.getGCodeTeleportToHomePosition());
+		send(settings.getGCodeTeleportToHomePosition());
 		// save home position
-		sendLineToRobot("D6"
+		send("D6"
 						+" X" + StringHelper.formatDouble(settings.getHomeX())
 						+" Y" + StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
@@ -481,33 +372,36 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 	
 	/**
-	 * @param x absolute position in mm
-	 * @param y absolute position in mm
+	 * @param x position in mm
+	 * @param y position in mm
 	 */
 	public void movePenAbsolute(double x, double y) {
 		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());	
-		sendLineToRobot(go
-						+ " X" + StringHelper.formatDouble(x)
-						+ " Y" + StringHelper.formatDouble(y));
+		
+		send(go
+			+ " X" + StringHelper.formatDouble(x)
+			+ " Y" + StringHelper.formatDouble(y));
+		
 		penX = x;
 		penY = y;
 		penJustMoved=true;
 	}
 	
 	/**
-	 * @param dx relative position in mm
-	 * @param dy relative position in mm
+	 * @param dx distance in mm
+	 * @param dy distance in mm
 	 */
-	public void movePenRelative(float dx, float dy) {
-		sendLineToRobot("G91"); // set relative mode
+	public void movePenRelative(double dx, double dy) {
 		penJustMoved=false;
 
 		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());
-		sendLineToRobot(go
-						+ " X" + StringHelper.formatDouble(dx)
-						+ " Y" + StringHelper.formatDouble(dy));
 		
-		sendLineToRobot("G90"); // return to absolute mode
+		send("G91"); // set relative mode
+		send(go
+			+ " X" + StringHelper.formatDouble(dx)
+			+ " Y" + StringHelper.formatDouble(dy));
+		send("G90"); // return to absolute mode
+		
 		penJustMoved=false;
 		penX += dx;
 		penY += dy;
@@ -539,33 +433,37 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 	
 	public void disengageMotors() {
-		sendLineToRobot("M18");
+		send("M18");
 		areMotorsEngaged = false;
 	}
 
 	public void engageMotors() {
-		sendLineToRobot("M17");
+		send("M17");
 		areMotorsEngaged = true;
 	}
 	
+	@Deprecated
 	public void jogLeftMotorOut() {
-		sendLineToRobot("D00 L400");
+		send("D00 L400");
 	}
 
+	@Deprecated
 	public void jogLeftMotorIn() {
-		sendLineToRobot("D00 L-400");
+		send("D00 L-400");
 	}
 
+	@Deprecated
 	public void jogRightMotorOut() {
-		sendLineToRobot("D00 R400");
+		send("D00 R400");
 	}
 
+	@Deprecated
 	public void jogRightMotorIn() {
-		sendLineToRobot("D00 R-400");
+		send("D00 R-400");
 	}
 
 	private void sendLineNumber(int newLineNumber) {
-		sendLineToRobot("M110 N" + newLineNumber);
+		send("M110 N" + newLineNumber);
 	}
 	
 	public MakelangeloRobotSettings getSettings() {
@@ -735,6 +633,16 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 
 	public boolean getIdentityConfirmed() {
-		return ric.getIdentityConfirmed();
+		return marlin.getIdentityConfirmed();
+	}
+
+	public void sendPenDown() {
+		send(getSettings().getPenDownString());
+	}
+
+	@Override
+	public void marlinEvent(MarlinEvent evt) {
+		if(evt.flag == MarlinEvent.TRANSPORT_ERROR) setLineNumber((int)evt.data);
+		if(evt.flag == MarlinEvent.SEND_BUFFER_EMPTY) sendFileCommand();
 	}
 }

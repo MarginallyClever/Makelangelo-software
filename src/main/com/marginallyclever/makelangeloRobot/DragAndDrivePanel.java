@@ -107,7 +107,7 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 				mouseLastX=x;
 				mouseLastY=y;
 				String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
-				robot.sendLineToRobot("G00 "+text);
+				robot.send("G00 "+text);
 				coordinates.setText(text);
 			} else {
 				coordinates.setText("");

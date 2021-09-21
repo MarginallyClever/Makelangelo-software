@@ -74,11 +74,11 @@ public class StartAtPanel extends SelectPanel {
 		return lineNumber;
 	}
 
-	public boolean isFindPreviousPenDown() {
+	public boolean getFindPreviousPenDown() {
 		return findPreviousPenDown;
 	}
 
-	public boolean isAddPenDownCommand() {
+	public boolean getAddPenDownCommand() {
 		return addPenDownCommand;
 	}
 }

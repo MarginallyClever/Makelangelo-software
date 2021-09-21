@@ -44,6 +44,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	// connect menu
 	private SelectPanel connectionPanel;	
 	private SelectButton buttonConnect;
+	private NetworkSession mySession;
 	
 	// machine options
 	protected int generatorChoice = 0;
@@ -56,15 +57,13 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	private SelectButton buttonCapture;
 
     // live controls
-	private SelectButton buttonStart, buttonStartAt, buttonPause, buttonHalt;
+	private SelectButton buttonStart, buttonStartAt, buttonHalt;
 
 	// driving controls
 	private CartesianButtons driveButtons;
 	private SelectButton goHome,findHome;
 	private SelectButton goPaperBorder,penUp,penDown;
 	private SelectButton toggleEngagedMotor;
-
-	private boolean isConnected;  // has pressed connect button
 	
 	public StatusBar statusBar;
 
@@ -121,25 +120,18 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 				
         buttonConnect = new SelectButton(Translator.get("ButtonConnect"));
         buttonConnect.addPropertyChangeListener((evt)->{
-			if(isConnected) {
-				myRobot.halt();
-				myRobot.closeConnection();
+			if(mySession!=null && mySession.isOpen()) {
+				mySession.closeConnection();
 				buttonConnect.setText(Translator.get("ButtonConnect"));
 				buttonConnect.setForeground(Color.GREEN);
-				isConnected=false;
-				updateButtonAccess();
+				mySession=null;
 			} else {
-				NetworkSession s = NetworkSessionManager.requestNewSession(makelangeloApp.getMainFrame());
-				if(s!=null) {
-					Log.message("New network session opened...");
-					
-					myRobot.setNetworkSession(s);
-					isConnected=true;
-					
+				mySession = NetworkSessionManager.requestNewSession(makelangeloApp.getMainFrame());
+				if(mySession!=null) {
+					Log.message("New network session opened...");					
+					myRobot.setNetworkSession(mySession);
 					buttonConnect.setText(Translator.get("ButtonDisconnect"));
 					buttonConnect.setForeground(Color.RED);
-					//updateMachineNumberPanel();
-					//updateButtonAccess();
 				}
 			}
 		});
@@ -162,25 +154,13 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 		
 		animationInterior.add(buttonStart = new SelectButton(Translator.get("Start")));
 		animationInterior.add(buttonStartAt = new SelectButton(Translator.get("StartAtLine")));
-		animationInterior.add(buttonPause = new SelectButton(Translator.get("Pause")));
 		animationInterior.add(buttonHalt = new SelectButton(Translator.get("Halt")));
 		
 		buttonHalt		.addPropertyChangeListener((evt)->{	myRobot.halt();			});
 		buttonStart		.addPropertyChangeListener((evt)->{	myRobot.startAt(0);		});
 		buttonStartAt	.addPropertyChangeListener((evt)->{	startAt();				});
-		buttonPause		.addPropertyChangeListener((evt)->{ updatePauseButton();	});
 		
 		return animationPanel;
-	}
-
-	private void updatePauseButton() {
-		if (myRobot.isPaused()) {
-			buttonPause.setText(Translator.get("Pause"));
-			myRobot.unPause();
-		} else {
-			buttonPause.setText(Translator.get("Unpause"));
-			myRobot.pause();
-		}
 	}
 	
 	private CollapsiblePanel createAxisDrivingControls() {
@@ -290,11 +270,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 			cMachine.gridx++;
 			
 			// if we're connected to a confirmed machine, don't let the user change the number panel or settings could get...weird.
-			boolean state=false;
-			if( myRobot.getConnection() == null ) state=true;
-			else if( myRobot.getConnection().isOpen() == false ) state=true;
-			else if( myRobot.getIdentityConfirmed() == false ) state=true;
-			machineChoices.setEnabled( state );
+			machineChoices.setEnabled( !myRobot.getIdentityConfirmed() );
 			
 			machineChoices.addItemListener((e)->{
 				if(e.getStateChange()==ItemEvent.SELECTED) updateMachineChoice();
@@ -336,8 +312,8 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 
 		int lineNumber = p.getLineNumber();
 		if (lineNumber != -1) {
-			if(p.isFindPreviousPenDown()) lineNumber = myRobot.findLastPenUpBefore(lineNumber);
-			if(p.isAddPenDownCommand()) myRobot.sendLineToRobot(myRobot.getSettings().getPenDownString());
+			if(p.getFindPreviousPenDown()) lineNumber = myRobot.findLastPenUpBefore(lineNumber);
+			if(p.getAddPenDownCommand()) myRobot.sendPenDown();
 			myRobot.startAt(lineNumber);
 		}
 	}
@@ -364,10 +340,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 
 		buttonStart.setEnabled(isConfirmed && didSetHome && !isRunning);
 		buttonStartAt.setEnabled(isConfirmed && didSetHome && !isRunning);
-		buttonPause.setEnabled(isConfirmed && isRunning);
 		buttonHalt.setEnabled(isConfirmed && isRunning);
-
-		if(!isConfirmed) buttonPause.setText(Translator.get("Pause"));
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
 		
