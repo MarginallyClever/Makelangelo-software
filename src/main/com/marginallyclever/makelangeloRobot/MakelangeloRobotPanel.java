@@ -13,7 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.communications.ConnectionManager;
+import com.marginallyclever.communications.NetworkSessionManager;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
@@ -129,14 +129,15 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 				isConnected=false;
 				updateButtonAccess();
 			} else {
-				NetworkSession s = ConnectionManager.requestNewConnection(makelangeloApp.getMainFrame());
+				NetworkSession s = NetworkSessionManager.requestNewSession(makelangeloApp.getMainFrame());
 				if(s!=null) {
+					myRobot.openConnection(s);
+					isConnected=true;
+					
 					buttonConnect.setText(Translator.get("ButtonDisconnect"));
 					buttonConnect.setForeground(Color.RED);
-					myRobot.openConnection( s );
 					//updateMachineNumberPanel();
 					//updateButtonAccess();
-					isConnected=true;
 				}
 			}
 		});
@@ -354,7 +355,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 		if(myRobot!=null) {
 			isConfirmed = myRobot.getIdentityConfirmed();
 			isRunning = myRobot.isRunning();
-			didSetHome = myRobot.didSetHome();
+			didSetHome = myRobot.didFindHome();
 		}
 		
 		buttonOpenSettings.setEnabled(!isRunning);
@@ -384,33 +385,30 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 
 	@Override
 	public void makelangeloRobotEvent(MakelangeloRobotEvent e) {
-		if(e.type==MakelangeloRobotEvent.CONNECTION_READY) {
+		switch(e.type) { 
+		case MakelangeloRobotEvent.CONNECTION_READY:
 			String hardwareVersion = myRobot.getSettings().getHardwareVersion();
 			onConnect();
 			myRobot.getSettings().setHardwareVersion(hardwareVersion);
-		}
-		if(e.type==MakelangeloRobotEvent.DISCONNECT) {
-			updateButtonAccess();
-		}
-		if(e.type==MakelangeloRobotEvent.START) {
+			break; 
+		case MakelangeloRobotEvent.START:
 			statusBar.start();
-			updateButtonAccess();
-		}
-		if(e.type==MakelangeloRobotEvent.STOP) updateButtonAccess();
-		if(e.type==MakelangeloRobotEvent.PROGRESS_SOFAR) { 
+			break; 
+		case MakelangeloRobotEvent.PROGRESS_SOFAR: 
 			statusBar.setProgress((int)e.extra, e.subject.getGCodeCommandsCount());
-		}
-		if(e.type==MakelangeloRobotEvent.NEW_GCODE) { 
+			break; 
+		case MakelangeloRobotEvent.NEW_GCODE: 
 			MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(e.subject.getSettings());
 			double eta= m.getTimeEstimate(e.subject.getTurtle());
 			Log.message("Run time estimate=" +Log.secondsToHumanReadable(eta));
-
 			statusBar.setProgressEstimate(eta, e.subject.getGCodeCommandsCount());
-			updateButtonAccess();
-		}
-		if(e.type==MakelangeloRobotEvent.MOTORS_ENGAGED) {
+			break; 
+		case MakelangeloRobotEvent.MOTORS_ENGAGED:
 			if(((boolean)e.extra)==true) motorsHaveBeenEngaged();
 			else 						 motorsHaveBeenDisengaged();
+			break;
+		default: break;
 		}
+		updateButtonAccess();
 	}
 }

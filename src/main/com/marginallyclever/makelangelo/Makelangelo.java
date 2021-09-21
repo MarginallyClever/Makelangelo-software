@@ -717,8 +717,6 @@ public final class Makelangelo {
 	
 	private void whenIdentityConfirmed(MakelangeloRobot r) {
 		if(previewPanel != null) previewPanel.repaint();
-
-		robot.sendConfig();
 	}
 
 	private void whenBadFirmwareDetected(String versionFound) {

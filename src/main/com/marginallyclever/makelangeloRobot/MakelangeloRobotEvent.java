@@ -21,6 +21,8 @@ public class MakelangeloRobotEvent {
 	public static final int NEW_GCODE = 8;
 	// motor engaged status has changed.  extra is a boolean with the new state.
 	public static final int MOTORS_ENGAGED = 9;
+	// robot has homed and is safe to drive.
+	public static final int HOME_FOUND = 10;
 	
 	public MakelangeloRobot subject;
 	public int type;

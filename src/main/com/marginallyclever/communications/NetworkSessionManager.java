@@ -17,7 +17,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author dan royer
  *
  */
-public class ConnectionManager {
+public class NetworkSessionManager {
 	private static ArrayList<TransportLayer> transportLayers = new ArrayList<TransportLayer>( Arrays.asList(
 			new SerialTransportLayer()
 			//, transportLayers.add(new TCPTransportLayer()
@@ -28,7 +28,7 @@ public class ConnectionManager {
 	 * @param parent the root gui component
 	 * @return a new connection or null.
 	 */
-	public static NetworkSession requestNewConnection(Component parent) {
+	public static NetworkSession requestNewSession(Component parent) {
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();

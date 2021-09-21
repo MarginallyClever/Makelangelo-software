@@ -10,6 +10,7 @@ public abstract class RobotIdentityConfirmation implements NetworkSessionListene
 	
 	
 	abstract public void reset();
+	
 	abstract public void start();
 
 	protected void setIdentityConfirmed(boolean state) {
@@ -23,6 +24,7 @@ public abstract class RobotIdentityConfirmation implements NetworkSessionListene
 	protected void setPortConfirmed(boolean state) {
 		portConfirmed=state;
 	}
+	
 	public boolean getPortConfirmed() {
 		return portConfirmed;
 	}

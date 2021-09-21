@@ -54,7 +54,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	private boolean penIsUp;
 	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
-	private boolean didSetHome;
+	private boolean didFindHome;
 	private double penX;
 	private double penY;
 
@@ -76,10 +76,10 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		penIsUp = false;
 		penJustMoved = false;
 		penIsUpBeforePause = false;
-		didSetHome = false;
+		didFindHome = false;
 		setPenX(0);
 		setPenY(0);
-		setNextLineNumber(0);
+		setLineNumber(0);
 
 		ric.addRobotIdentityEventListener((evt)->{
 			switch(evt.flag) {
@@ -87,7 +87,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, evt.data));
 					break;
 				case RobotIdentityEvent.BAD_FIRMWARE:
-					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_HARDWARE, this, evt.data));
+					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.BAD_FIRMWARE, this, evt.data));
+					break;
 				case RobotIdentityEvent.IDENTITY_CONFIRMED:
 					Log.message("Identity confirmed.");
 					notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.CONNECTION_READY,this));
@@ -108,9 +109,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		if (c == null) return;
 
 		Log.message("Opening connection...");
-		didSetHome = false;
-		
-		ric.reset();
+		didFindHome = false;
 
 		connection = c;
 		connection.addListener(this);
@@ -127,6 +126,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		connection.removeListener(this);
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
 		connection = null;
+		ric.reset();
 	}
 	
 	@Override
@@ -137,7 +137,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {
 		if(evt.flag == NetworkSessionEvent.DATA_AVAILABLE) dataAvailable((NetworkSession)evt.getSource(),(String)evt.data);
-		if(evt.flag == NetworkSessionEvent.TRANSPORT_ERROR) setNextLineNumber((int)evt.data);
+		if(evt.flag == NetworkSessionEvent.TRANSPORT_ERROR) setLineNumber((int)evt.data);
 		if(evt.flag == NetworkSessionEvent.SEND_BUFFER_EMPTY) sendFileCommand();
 	}
 	
@@ -156,9 +156,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 				newUID = Long.parseLong(lines[0]);
 				Log.message("UID found: "+newUID);
 			} catch (NumberFormatException e) {
-				Log.error("UID parsing failed.");
-				Log.error("line="+lines[0]);
-				Log.error(e.getMessage());
+				Log.error("UID parsing failed. line="+lines[0]+", error="+e.getLocalizedMessage());
 			}
 		}
 
@@ -314,9 +312,16 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	private void sendLineWithNumberAndChecksum(String line, int lineNumber) {
 		if(!ric.getIdentityConfirmed() || !isRunning()) return;
 
-		line = "N" + lineNumber + " " + line;
-		if(!line.endsWith(";")) line += ';';
-		line += generateChecksum(line);
+		line = "N" + (lineNumber+1) + " " + line;
+
+		int n = line.indexOf(";");
+		if(n>=0) {
+			String a = line.substring(0,n);
+			String b = line.substring(n);
+			line = a + generateChecksum(a) + b;
+		} else {
+			line += generateChecksum(line);
+		}
 		sendLineToRobot(line);
 	}
 	
@@ -331,11 +336,11 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		} else {
 			String line = gcodeCommands.get(nextLineNumber);
 			sendLineWithNumberAndChecksum(line, nextLineNumber);
-			setNextLineNumber(nextLineNumber+1);
+			setLineNumber(nextLineNumber+1);
 		}
 	}
 	
-	private void setNextLineNumber(int count) {
+	private void setLineNumber(int count) {
 		nextLineNumber=count;
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.PROGRESS_SOFAR, this, nextLineNumber));
 	}
@@ -346,6 +351,12 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			double px = this.getPenX();
 			double py = this.getPenY();
 
+			int star=line.indexOf("*");
+			if(star>=0) line = line.substring(0,star);
+
+			int semiColon=line.indexOf(";");
+			if(semiColon>=0) line = line.substring(0,semiColon);
+			
 			String[] tokens = line.split(" ");
 			for (String t : tokens) {
 				if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
@@ -370,7 +381,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		if(lineNumber>=gcodeCommands.size()) lineNumber = gcodeCommands.size();
 		if(lineNumber<0) lineNumber=0;
 
-		setNextLineNumber(lineNumber);
+		setLineNumber(lineNumber);
 		sendLineNumber(lineNumber);
 		setRunning();
 		sendFileCommand();
@@ -393,12 +404,10 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	 *         <code>false</code> otherwise.
 	 */
 	public boolean sendLineToRobot(String line) {
-		if(!ric.getPortConfirmed() || getConnection()==null ) return false;
+		if(!ric.getPortConfirmed() || connection==null ) return false;
 
 		// does it have a checksum? hide it from the log
 		String reportedLine = line;
-		int n = reportedLine.indexOf(";");
-		if(n>=0) reportedLine = reportedLine.substring(n);
 		if(reportedLine.trim().isEmpty()) return false;
 		Log.message("Send: "+reportedLine);
 
@@ -408,7 +417,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		if(!line.endsWith("\n")) line += "\n";
 
 		try {
-			getConnection().sendMessage(line);
+			connection.sendMessage(line);
 		} catch (Exception e) {
 			Log.error(e.getMessage());
 			return false;
@@ -454,6 +463,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		sendLineToRobot("G28 XY");
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
+		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.HOME_FOUND,this));
+		didFindHome = true;
 	}
 	
 	public void setHome() {
@@ -464,11 +475,10 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 						+" Y" + StringHelper.formatDouble(settings.getHomeY()));
 		setPenX((float) settings.getHomeX());
 		setPenY((float) settings.getHomeY());
-		didSetHome = true;
 	}
 	
-	public boolean didSetHome() {
-		return didSetHome;
+	public boolean didFindHome() {
+		return didFindHome;
 	}
 	
 	/**
@@ -555,7 +565,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		sendLineToRobot("D00 R-400");
 	}
 
-	public void sendLineNumber(int newLineNumber) {
+	private void sendLineNumber(int newLineNumber) {
 		sendLineToRobot("M110 N" + newLineNumber);
 	}
 	

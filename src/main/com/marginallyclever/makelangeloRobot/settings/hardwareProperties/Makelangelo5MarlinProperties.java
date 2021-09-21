@@ -27,7 +27,7 @@ public class Makelangelo5MarlinProperties extends Makelangelo3Properties {
 	
 	@Override
 	public String getVersion() {
-		return "5";
+		return "Makelangelo";
 	}
 	
 	@Override

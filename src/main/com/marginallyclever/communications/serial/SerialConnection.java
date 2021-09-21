@@ -20,14 +20,14 @@ import com.marginallyclever.convenience.log.Log;
  */
 public final class SerialConnection extends NetworkSession implements SerialPortEventListener {
 	private SerialPort serialPort;
-	private static final int BAUD_RATE = 57600;
+	private static final int BAUD_RATE = 250000;
 
 	private TransportLayer transportLayer;
 	private String connectionName = "";
 	private boolean portOpened = false;
 	private boolean waitingForCue = false;
 
-	static final String CUE = "> ";
+	static final String CUE = "ok";
 	static final String NOCHECKSUM = "NOCHECKSUM ";
 	static final String BADCHECKSUM = "BADCHECKSUM ";
 	static final String BADLINENUM = "BADLINENUM ";
@@ -79,10 +79,8 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 
 		connectionName = portName;
 		portOpened = true;
-		waitingForCue = true;
-
+		waitingForCue = false;
 	}
-
 
 	/**
 	 * Check if the robot reports an error and if so what line number.
@@ -127,7 +125,6 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 		return -1;
 	}
 
-
 	// Deal with something robot has sent.
 	@Override
 	public void serialEvent(SerialPortEvent events) {
@@ -160,22 +157,17 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 			if(error_line != -1) {
 				notifyLineError(error_line);
 			} else {
-				// no error
-				if(!oneLine.trim().equals(CUE.trim())) {
-					notifyDataAvailable(oneLine);
+				// wait for the cue to send another command
+				if(oneLine.indexOf(CUE)==0) {
+					waitingForCue=false;
 				}
-			}
-
-			// wait for the cue to send another command
-			if(oneLine.indexOf(CUE)==0) {
-				waitingForCue=false;
+				notifyDataAvailable(oneLine);
 			}
 		}
 		if(waitingForCue==false) {
 			sendQueuedCommand();
 		}
 	}
-
 
 	protected void sendQueuedCommand() {
 		if(!portOpened || waitingForCue) return;

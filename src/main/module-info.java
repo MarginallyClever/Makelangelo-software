@@ -81,6 +81,7 @@ module com.marginallyclever.makelangelo {
 	provides com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle with
 		com.marginallyclever.makelangeloRobot.machineStyles.CoreXY,
 		com.marginallyclever.makelangeloRobot.machineStyles.Cartesian,
+		com.marginallyclever.makelangeloRobot.machineStyles.Marlin,
 		com.marginallyclever.makelangeloRobot.machineStyles.Polargraph,
 		com.marginallyclever.makelangeloRobot.machineStyles.Zarplotter;
 	uses com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;

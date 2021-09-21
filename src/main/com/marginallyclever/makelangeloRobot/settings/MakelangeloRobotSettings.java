@@ -651,7 +651,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public void setHardwareVersion(String version) {		
 		String newVersion = "";
-	try {
+		try {
 			// get version numbers
 			ServiceLoader<MakelangeloHardwareProperties> knownHardware = ServiceLoader.load(MakelangeloHardwareProperties.class);
 			Iterator<MakelangeloHardwareProperties> i = knownHardware.iterator();
@@ -811,6 +811,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		out.write("M0 Ready "+name+" and click\n");
 	}
 	
+	@SuppressWarnings("unused")
 	private static String padRight(String s, int n) {
 	     return String.format("%1$-" + n + "s", s);  
 	}
