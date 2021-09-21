@@ -66,9 +66,10 @@ public class CartesianProperties extends Makelangelo2Properties {
 	protected void paintGantryAndHead(GL2 gl2, MakelangeloRobot robot) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		//double dx, dy;
-		double gx = robot.getPenX();
-		double gy = robot.getPenY();
-		double gz = (robot.isPenIsUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
+		Point2D pos = robot.getPos();
+		double gx = pos.x;
+		double gy = pos.y;
+		double gz = (robot.getPenIsUp() ? settings.getPenUpAngle() : settings.getPenDownAngle())/10;
 
 		double top = settings.getLimitTop();
 		double bottom = settings.getLimitBottom();

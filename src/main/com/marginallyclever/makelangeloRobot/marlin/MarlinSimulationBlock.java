@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import javax.vecmath.Vector3d;
 
 import com.marginallyclever.convenience.StringHelper;
 
-public class MakelangeloFirmwareSimulationBlock {
+public class MarlinSimulationBlock {
 	public static int counter=0;
 	public int id;
 	
@@ -44,7 +44,7 @@ public class MakelangeloFirmwareSimulationBlock {
 	
 	
 	// delta is calculated here in the constructor.
-	public MakelangeloFirmwareSimulationBlock(final Vector3d endPose,final Vector3d deltaPose) {
+	public MarlinSimulationBlock(final Vector3d endPose,final Vector3d deltaPose) {
 		end.set(endPose);
 		delta.set(deltaPose);
 		normal.set(deltaPose);

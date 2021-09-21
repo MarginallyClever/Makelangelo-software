@@ -1,10 +1,11 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.machineStyles.MachineStyle;
 
 public class RobotIdentityConfirmationBeforeMarlin extends RobotIdentityConfirmation {

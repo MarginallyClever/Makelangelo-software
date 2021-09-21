@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -63,7 +63,6 @@ public class RobotIdentityConfirmationAfterMarlin extends RobotIdentityConfirmat
 		return getPortConfirmed() && firmwareVersionChecked && hardwareVersionChecked;
 	}
 
-	
 	private String doISeeAHardwareVersion(String data) {
 		int a = data.lastIndexOf(AUTHOR); 
 		if(a >= 0) {

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import java.util.EventObject;
 

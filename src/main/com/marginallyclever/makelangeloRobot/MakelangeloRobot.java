@@ -16,6 +16,7 @@ import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.DefaultTurtleRenderer;
@@ -24,6 +25,10 @@ import com.marginallyclever.convenience.turtle.TurtleRenderer;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangeloRobot.marlin.MarlinEvent;
+import com.marginallyclever.makelangeloRobot.marlin.MarlinEventListener;
+import com.marginallyclever.makelangeloRobot.marlin.MarlinFirmware2;
+import com.marginallyclever.makelangeloRobot.marlin.RobotIdentityEvent;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
 /**
@@ -35,24 +40,21 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * @author dan
  * @since 7.2.10
  */
-public class MakelangeloRobot implements NetworkSessionListener, PreviewListener, MarlinEventListener {	
+public class MakelangeloRobot implements NetworkSessionListener, PreviewListener {	
 	private MakelangeloRobotSettings settings = new MakelangeloRobotSettings();
 	private MarlinFirmware2 marlin = new MarlinFirmware2();
 	
-	// rendering stuff
-	private TurtleRenderer turtleRenderer;
 	private Turtle turtleToRender = new Turtle();
+	private TurtleRenderer turtleRenderer;
 	private MakelangeloRobotDecorator decorator = null;
 
-	// misc state
 	private boolean areMotorsEngaged;
 	private boolean isRunning;
 	private boolean penIsUp;
 	private boolean penJustMoved;
 	private boolean penIsUpBeforePause;
 	private boolean didFindHome;
-	private double penX;
-	private double penY;
+	private Point2D pos = new Point2D();
 
 	// this list of gcode commands is stored separate from the Turtle.
 	private ArrayList<String> gcodeCommands = new ArrayList<String>();
@@ -71,9 +73,21 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		penJustMoved = false;
 		penIsUpBeforePause = false;
 		didFindHome = false;
-		setPenX(0);
-		setPenY(0);
+		pos.set(0,0);
 		setLineNumber(0);
+		
+		marlin.addListener((evt) -> {
+			if(evt.flag == MarlinEvent.TRANSPORT_ERROR) {
+				setLineNumber((int)evt.data);
+				sendFileCommand();
+			}
+			if(evt.flag == MarlinEvent.SEND_BUFFER_EMPTY) {
+				sendFileCommand();
+			}
+			if(evt.flag == MarlinEvent.DATA_RECEIVED) {
+				Log.message("Recv: "+(String)evt.data);
+			}
+		});
 
 		marlin.addRobotIdentityEventListener((evt)->{
 			switch(evt.flag) {
@@ -192,7 +206,6 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		String config = settings.getGCodeConfig();
 		String [] lines = config.split("\n");
 		for( String line : lines ) send(line + "\n");
-		setHome();
 	}
 
 	public boolean isRunning() {
@@ -261,6 +274,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		line = line.trim();
 		if(line.isEmpty()) return;
 
+		Log.message("Send: "+line);
+		
 		updateStateFromGCode(line);
 		marlin.send(line);
 	}
@@ -268,8 +283,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	// update the simulated position to match the real robot
 	private void updateStateFromGCode(String line) {
 		if (line.contains("G0") || line.contains("G1")) {
-			double px = this.getPenX();
-			double py = this.getPenY();
+			double px = pos.x;
+			double py = pos.y;
 
 			int star=line.indexOf("*");
 			if(star>=0) line = line.substring(0,star);
@@ -282,8 +297,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 				if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
 				if (t.startsWith("Y")) py = Float.parseFloat(t.substring(1));
 			}
-			this.setPenX(px);
-			this.setPenY(py);
+			pos.set(px,py);
 		}
 		
 		if(line.startsWith(settings.getPenUpString())) rememberRaisedPen();
@@ -344,27 +358,15 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 
 	public void goHome() {
 		movePenAbsolute(settings.getHomeX(),settings.getHomeY());
-		penX=settings.getHomeX();
-		penY=settings.getHomeY();
+		pos.set(settings.getHomeX(),settings.getHomeY());
 	}
 	
 	public void findHome() {
-		this.raisePen();
+		raisePen();
 		send("G28 XY");
-		setPenX((float) settings.getHomeX());
-		setPenY((float) settings.getHomeY());
+		pos.set(settings.getHomeX(),settings.getHomeY());
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.HOME_FOUND,this));
 		didFindHome = true;
-	}
-	
-	public void setHome() {
-		send(settings.getGCodeTeleportToHomePosition());
-		// save home position
-		send("D6"
-						+" X" + StringHelper.formatDouble(settings.getHomeX())
-						+" Y" + StringHelper.formatDouble(settings.getHomeY()));
-		setPenX((float) settings.getHomeX());
-		setPenY((float) settings.getHomeY());
 	}
 	
 	public boolean didFindHome() {
@@ -381,10 +383,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		send(go
 			+ " X" + StringHelper.formatDouble(x)
 			+ " Y" + StringHelper.formatDouble(y));
-		
-		penX = x;
-		penY = y;
-		penJustMoved=true;
+		pos.set(x,y);
+		penJustMoved = true;
 	}
 	
 	/**
@@ -392,7 +392,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	 * @param dy distance in mm
 	 */
 	public void movePenRelative(double dx, double dy) {
-		penJustMoved=false;
+		penJustMoved = false;
 
 		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());
 		
@@ -402,9 +402,9 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			+ " Y" + StringHelper.formatDouble(dy));
 		send("G90"); // return to absolute mode
 		
-		penJustMoved=false;
-		penX += dx;
-		penY += dy;
+		penJustMoved = false;
+		pos.x += dx;
+		pos.y += dy;
 	}
 	
 	private String getTravelOrMoveWithFeedrate() {
@@ -417,19 +417,19 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 	
 	public void movePenToEdgeLeft() {
-		movePenAbsolute(settings.getPaperLeft(),penY);
+		movePenAbsolute(settings.getPaperLeft(),pos.y);
 	}
 
 	public void movePenToEdgeRight() {
-		movePenAbsolute(settings.getPaperRight(),penY);
+		movePenAbsolute(settings.getPaperRight(),pos.y);
 	}
 	
 	public void movePenToEdgeTop() {
-		movePenAbsolute(getPenX(),settings.getPaperTop());
+		movePenAbsolute(pos.x,settings.getPaperTop());
 	}
 	
 	public void movePenToEdgeBottom() {
-		movePenAbsolute(getPenX(),settings.getPaperBottom());
+		movePenAbsolute(pos.x,settings.getPaperBottom());
 	}
 	
 	public void disengageMotors() {
@@ -509,10 +509,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		float[] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		
-		// outside physical limits
-		paintLimits(gl2);
-		paintPaper(gl2);
-		paintMargins(gl2);
+		drawPhysicalLimits(gl2);
 		
 		// hardware features
 		settings.getHardwareProperties().render(gl2, this);
@@ -535,9 +532,14 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			//MakelangeloFirmwareVisualizer viz = new MakelangeloFirmwareVisualizer(); 
 			//viz.render(gl2, turtleToRender, settings);
 		}
+	}	
+	
+	private void drawPhysicalLimits(GL2 gl2) {
+		paintLimits(gl2);
+		paintPaper(gl2);
+		paintMargins(gl2);		
 	}
-	
-	
+
 	public void setTurtleRenderer(TurtleRenderer r) {
 		turtleRenderer = r;
 	}
@@ -586,23 +588,13 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	}
 
 	// in mm
-	public double getPenX() {
-		return penX;
+	public Point2D getPos() {
+		return pos;
 	}
 	
 	// in mm
-	public void setPenX(double px) {
-		this.penX = px;
-	}
-
-	// in mm
-	public double getPenY() {
-		return penY;
-	}
-
-	// in mm
-	public void setPenY(double py) {
-		this.penY = py;
+	public void setPos(double x,double y) {
+		pos.set(x,y);
 	}
 
 	public int findLastPenUpBefore(int startAtLine) {
@@ -628,7 +620,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		return x;
 	}
 
-	public boolean isPenIsUp() {
+	public boolean getPenIsUp() {
 		return penIsUp;
 	}
 
@@ -638,11 +630,5 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 
 	public void sendPenDown() {
 		send(getSettings().getPenDownString());
-	}
-
-	@Override
-	public void marlinEvent(MarlinEvent evt) {
-		if(evt.flag == MarlinEvent.TRANSPORT_ERROR) setLineNumber((int)evt.data);
-		if(evt.flag == MarlinEvent.SEND_BUFFER_EMPTY) sendFileCommand();
 	}
 }

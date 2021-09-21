@@ -21,6 +21,7 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangeloRobot.marlin.MarlinSimulation;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloSettingsDialog;
 
 
@@ -168,7 +169,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	    driveButtons.addActionListener((e)->{
 	    	int id = e.getID();
 	    	if(CartesianButtons.isCenterZone(id)) {
-				myRobot.setHome();
+				myRobot.findHome();
 				updateButtonAccess();
 	    		return;
 	    	}
@@ -222,12 +223,12 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 		
 		goPaperBorder.addPropertyChangeListener((evt)->{
 			myRobot.movePenToEdgeTop();
+			myRobot.movePenToEdgeLeft();
 			myRobot.lowerPen();
 			myRobot.movePenToEdgeRight();
 			myRobot.movePenToEdgeBottom();
 			myRobot.movePenToEdgeLeft();
 			myRobot.movePenToEdgeTop();
-			myRobot.movePenAbsolute(0, myRobot.getPenY());
 			myRobot.raisePen();
 			myRobot.goHome();
 		});
@@ -373,7 +374,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 			statusBar.setProgress((int)e.extra, e.subject.getGCodeCommandsCount());
 			break; 
 		case MakelangeloRobotEvent.NEW_GCODE: 
-			MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(e.subject.getSettings());
+			MarlinSimulation m = new MarlinSimulation(e.subject.getSettings());
 			double eta= m.getTimeEstimate(e.subject.getTurtle());
 			Log.message("Run time estimate=" +Log.secondsToHumanReadable(eta));
 			statusBar.setProgressEstimate(eta, e.subject.getGCodeCommandsCount());

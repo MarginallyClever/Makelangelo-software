@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import java.util.ArrayList;
 
@@ -8,8 +8,8 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
 
-public class MakelangeloFirmwareVisualizer {
-	private static int limit;
+public class MarlinSimulationVisualizer {
+	//private static int limit;
 	
 	private Turtle previousTurtle=null;
 	
@@ -25,7 +25,7 @@ public class MakelangeloFirmwareVisualizer {
 	
 	private ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
 	
-	public MakelangeloFirmwareVisualizer() {}
+	public MarlinSimulationVisualizer() {}
 	
 	public void render(GL2 gl2,Turtle turtleToRender,MakelangeloRobotSettings settings) {
 		if(previousTurtle!=turtleToRender) {
@@ -54,7 +54,7 @@ public class MakelangeloFirmwareVisualizer {
 		buffer.clear();
 		
 		final int renderMode=2;
-		MakelangeloFirmwareSimulation m = new MakelangeloFirmwareSimulation(settings);
+		MarlinSimulation m = new MarlinSimulation(settings);
 		m.historyAction(turtleToRender, (block)->{
 			switch(renderMode) {
 			case 0: renderAccelDecel(block,settings); break;
@@ -64,7 +64,7 @@ public class MakelangeloFirmwareVisualizer {
 		});
 	}
 
-	private void renderAlternatingBlocks(MakelangeloFirmwareSimulationBlock block) {
+	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
 		Vector3d c;
 		switch(block.id % 3) {
 		case 0: c=new Vector3d(1,0,0); break;
@@ -75,8 +75,8 @@ public class MakelangeloFirmwareVisualizer {
 		buffer.add(new ColorPoint(c,block.end));
 	}
 
-	private void renderMinLength(MakelangeloFirmwareSimulationBlock block) {
-		double d = block.distance / (MakelangeloFirmwareSimulation.MIN_SEGMENT_LENGTH_MM*2.0);
+	private void renderMinLength(MarlinSimulationBlock block) {
+		double d = block.distance / (MarlinSimulation.MIN_SEGMENT_LENGTH_MM*2.0);
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;
@@ -84,7 +84,7 @@ public class MakelangeloFirmwareVisualizer {
 		buffer.add(new ColorPoint(new Vector3d(r,g,0),block.end));
 	}
 	
-	private void renderAccelDecel(MakelangeloFirmwareSimulationBlock block,MakelangeloRobotSettings settings) {
+	private void renderAccelDecel(MarlinSimulationBlock block,MakelangeloRobotSettings settings) {
 		double t,a,d;
 		boolean useDistance=true;
 		if(useDistance) {

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.marlin;
 
 import java.util.ArrayList;
 
@@ -113,8 +113,7 @@ public class MarlinFirmware2 implements NetworkSessionListener {
 
 	/**
 	 * Java string to int is very picky.  this method is slightly less picky.  Only works with positive whole numbers.
-	 *
-	 * @param src
+	 	 * @param src
 	 * @return the portion of the string that is actually a number
 	 */
 	private String getNumberPortion(String src) {
@@ -131,6 +130,8 @@ public class MarlinFirmware2 implements NetworkSessionListener {
 	}
 
 	public void send(String line) {
+		if(line==null || line.length()==0) return;
+		
 		commandQueue.add(line);
 		sendQueuedCommand();
 	}
@@ -138,14 +139,17 @@ public class MarlinFirmware2 implements NetworkSessionListener {
 	protected void sendQueuedCommand() {
 		if( !ric.getPortConfirmed() || waitingForCue ) return;
 
-		if(commandQueue.isEmpty()) return;
+		if(commandQueue.isEmpty()) {
+			notifySendBufferEmpty();
+			return;
+		}
 
 		try {
 			String command=commandQueue.remove(0);
-			if(command==null || command.length()==0) return;
 			
 			if(command.contains(COMMENT_START)) {
 				command = command.substring(0,command.indexOf(COMMENT_START));
+				if(command.length()==0) return;
 			}
 
 			if(!command.endsWith(NEWLINE)) command+=NEWLINE;
