@@ -385,7 +385,7 @@ public class Makelangelo2Properties implements MakelangeloHardwareProperties {
 	 * @return deg/s [>0]
 	 */
 	@Override
-	public float getZRate() {
+	public float getPenLiftTime() {
 		return 500;
 	}
 	

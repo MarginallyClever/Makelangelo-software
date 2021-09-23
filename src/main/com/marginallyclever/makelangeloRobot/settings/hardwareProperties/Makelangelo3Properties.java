@@ -213,7 +213,7 @@ public class Makelangelo3Properties extends Makelangelo2Properties {
 	 * @return deg/s [>0]
 	 */
 	@Override
-	public float getZRate() {
+	public float getPenLiftTime() {
 		return 50;
 	}
 	

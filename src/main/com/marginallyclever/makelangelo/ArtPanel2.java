@@ -14,8 +14,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.marginallyclever.artPipeline.generators.ImageGenerator;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
@@ -34,10 +34,10 @@ public class ArtPanel2 {
 		rootPanel.setLayout(new BoxLayout(rootPanel,BoxLayout.LINE_AXIS));
 		
 		SelectPanel firstLayer = new SelectPanel();
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
+		ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
 		final HashMap<SelectButton,JPanel> mani = new HashMap<SelectButton,JPanel>(); 
 		
-		for( ImageGenerator generator : imageGenerators ) {
+		for( TurtleGenerator generator : imageGenerators ) {
 			final SelectButton b = new SelectButton(generator.getName()); 
 			mani.put(b,generator.getPanel().getPanel());
 			firstLayer.add(b);

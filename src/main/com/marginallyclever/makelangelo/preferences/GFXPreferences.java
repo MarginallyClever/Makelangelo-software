@@ -41,14 +41,17 @@ public class GFXPreferences {
 		prefs.putBoolean("Draw all while running", drawAllWhileRunningCheckbox.isSelected());
 	}
 	
-	static public void cancel() {
-		
-	}
+	static public void cancel() {}
 	
 	static public boolean getShowPenUp() {
 		if(showPenUpCheckbox != null) return showPenUpCheckbox.isSelected();
 		
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		return prefs.getBoolean("show pen up",false);
+	}
+	
+	static public void setShowPenUp(boolean state) {
+		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		prefs.putBoolean("show pen up", state);
 	}
 }

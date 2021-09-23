@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 
-import com.marginallyclever.artPipeline.TransformedImage;
-import com.marginallyclever.artPipeline.imageFilters.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 
 public class Filter_CMYKTest {
 	  @Test

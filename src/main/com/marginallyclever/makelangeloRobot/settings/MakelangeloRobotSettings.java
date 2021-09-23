@@ -676,7 +676,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		drawFeedRate = hardwareProperties.getFeedrateDefault();
 		maxAcceleration = hardwareProperties.getAccelerationMax();
 
-		setPenLiftTime(hardwareProperties.getZRate());
+		setPenLiftTime(hardwareProperties.getPenLiftTime());
 		setPenDownAngle(hardwareProperties.getZAngleOn());
 		setPenUpAngle(hardwareProperties.getZAngleOff());
 

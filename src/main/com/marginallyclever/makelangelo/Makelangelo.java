@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -64,24 +65,25 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.artPipeline.ReorderTurtle;
-import com.marginallyclever.artPipeline.ResizeTurtleToPaper;
-import com.marginallyclever.artPipeline.SimplifyTurtle;
-import com.marginallyclever.artPipeline.generators.Generator_Text;
-import com.marginallyclever.artPipeline.generators.ImageGenerator;
-import com.marginallyclever.artPipeline.generators.ImageGeneratorPanel;
-import com.marginallyclever.artPipeline.io.LoadResource;
-import com.marginallyclever.artPipeline.io.SaveResource;
-import com.marginallyclever.artPipeline.io.image.LoadImage;
-import com.marginallyclever.artPipeline.io.image.LoadImagePanel;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
+import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
+import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
+import com.marginallyclever.makelangelo.makeArt.io.LoadResource;
+import com.marginallyclever.makelangelo.makeArt.io.SaveResource;
+import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
+import com.marginallyclever.makelangelo.makeArt.io.image.LoadImagePanel;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.Generator_Text;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
+import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.uploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
 import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
@@ -274,8 +276,8 @@ public final class Makelangelo {
 	private JMenu createGenerateMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuGenerate"));
 		
-		ServiceLoader<ImageGenerator> imageGenerators = ServiceLoader.load(ImageGenerator.class);
-		for( ImageGenerator ici : imageGenerators ) {
+		ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
+		for( TurtleGenerator ici : imageGenerators ) {
 			JMenuItem mi = new JMenuItem(ici.getName());
 			mi.addActionListener((e) -> runGeneratorDialog(ici));
 			menu.add(mi);
@@ -284,7 +286,7 @@ public final class Makelangelo {
 		return menu;
 	}
 	
-	private void runGeneratorDialog(ImageGenerator ici) {
+	private void runGeneratorDialog(TurtleGenerator ici) {
 		robot.setDecorator(ici);
 		ici.setRobot(robot);
 
@@ -296,7 +298,7 @@ public final class Makelangelo {
 		ici.generate();
 		
 		JDialog dialog = new JDialog(getMainFrame(),ici.getName());
-		ImageGeneratorPanel panel = ici.getPanel();
+		TurtleGeneratorPanel panel = ici.getPanel();
 		dialog.add(panel.getPanel());
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -404,6 +406,14 @@ public final class Makelangelo {
 					robot.getSettings().getPaperHeight());
 		});
 		menu.add(buttonZoomToFit);
+
+		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("MenuGraphicsPenUp"),GFXPreferences.getShowPenUp());
+		checkboxShowPenUpMoves.addActionListener((e) -> {
+			boolean b = !GFXPreferences.getShowPenUp();
+			checkboxShowPenUpMoves.setSelected(b);
+			GFXPreferences.setShowPenUp(b);
+		});
+		menu.add(checkboxShowPenUpMoves);
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
 		buttonViewLog.addActionListener((e) -> {

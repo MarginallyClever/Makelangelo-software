@@ -25,7 +25,7 @@ public class Makelangelo5MarlinProperties extends Makelangelo3Properties {
 	
 	@Override
 	public String getVersion() {
-		return "Makelangelo";
+		return "Makelangelo 5";
 	}
 	
 	@Override
@@ -385,8 +385,8 @@ public class Makelangelo5MarlinProperties extends Makelangelo3Properties {
 	 * @return deg/s [>0]
 	 */
 	@Override
-	public float getZRate() {
-		return 80;
+	public float getPenLiftTime() {
+		return 300;
 	}
 	
 	/**

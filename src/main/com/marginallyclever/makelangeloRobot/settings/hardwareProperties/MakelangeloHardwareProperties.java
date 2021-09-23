@@ -84,7 +84,7 @@ public interface MakelangeloHardwareProperties {
 	public float getAccelerationMax();
 
 	// @since hardware m2
-	public float getZRate();
+	public float getPenLiftTime();
 
 	// @since hardware m2
 	public float getZAngleOn();
