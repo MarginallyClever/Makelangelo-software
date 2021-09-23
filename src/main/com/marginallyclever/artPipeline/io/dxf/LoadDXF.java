@@ -163,19 +163,16 @@ public class LoadDXF extends ImageManipulator implements LoadResource {
 		previousY = settings.getHomeY();
 		turtle.setX(previousX);
 		turtle.setY(previousY);
-		
 
 		// convert each entity
-		@SuppressWarnings("unchecked")
-		Iterator<DXFLayer> layerIter = (Iterator<DXFLayer>)doc.getDXFLayerIterator();
+		Iterator<?> layerIter = doc.getDXFLayerIterator();
 		while (layerIter.hasNext()) {
-			DXFLayer layer = (DXFLayer) layerIter.next();
+			DXFLayer layer = (DXFLayer)layerIter.next();
 			int color = layer.getColor();
 			Log.message("Found layer " + layer.getName() + "(color index="+color+")");
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
-			@SuppressWarnings("unchecked")
-			Iterator<String> entityTypeIter = (Iterator<String>)layer.getDXFEntityTypeIterator();
+			Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
 			if (!entityTypeIter.hasNext()) {
 				continue;
 			}

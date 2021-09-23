@@ -65,7 +65,7 @@ public class PanelAdjustMachine extends SelectPanel {
 		
 		// Acceleration
 		{
-			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)robot.getSettings().getAcceleration());
+			acceleration = new SelectDouble(Translator.get("AdjustAcceleration"),(float)robot.getSettings().getMaxAcceleration());
 
 			if(robot.getSettings().getHardwareProperties().canAccelerate()) {
 				add(acceleration);

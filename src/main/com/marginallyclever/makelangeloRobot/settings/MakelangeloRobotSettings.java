@@ -19,11 +19,9 @@ import com.marginallyclever.makelangeloRobot.settings.hardwareProperties.Makelan
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
- * All the hardware settings for a single plotter robot. Does not store state
- * information.
+ * All the hardware settings for a single plotter robot. Does not store state information.
  * 
- * @author Dan Royer TODO move tool names into translations and add a color
- *         palette system for quantizing colors.
+ * @author Dan Royer 
  */
 public final class MakelangeloRobotSettings implements Serializable {
 	/**
@@ -33,7 +31,6 @@ public final class MakelangeloRobotSettings implements Serializable {
 
 	public static final String COMMAND_DRAW = "G1";
 	public static final String COMMAND_TRAVEL = "G0";
-	public static final int FIRMWARE_MAX_SEGMENTS = 32;
 
 	private String[] configsAvailable;
 
@@ -43,43 +40,47 @@ public final class MakelangeloRobotSettings implements Serializable {
 	private long robotUID;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
+
+	private String hardwareVersion;
+	
+	private MakelangeloHardwareProperties hardwareProperties;
+	
 	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
+
 	// paper area, in mm
 	private double paperLeft;
 	private double paperRight;
 	private double paperBottom;
 	private double paperTop;
-	private double rotation;
-	private double rotationRef;
 	// % from edge of paper.
 	private double paperMargin;
+	
+	// speed control
+	private double travelFeedRate;
+	private double drawFeedRate;
+	private double maxAcceleration;
+	
+	private double rotation;
+	private double rotationRef;
 
 	// for a while the robot would sign it's name at the end of a drawing
 	@Deprecated
 	private boolean shouldSignName;
 
-	private String hardwareVersion;
-	private MakelangeloHardwareProperties hardwareProperties;
-
 	private ColorRGB paperColor;
+	
+	private ColorRGB penDownColorDefault;
+	private ColorRGB penDownColor;
+	private ColorRGB penUpColor;
 
-	protected ColorRGB penDownColorDefault;
-	protected ColorRGB penDownColor;
-	protected ColorRGB penUpColor;
-
-	// speed control
-	private double travelFeedRate;
-	private double drawFeedRate;
-	private double accelerationMax;
-
-	private double diameter; // pen diameter (mm, >0)
-	private double penUpAngle; // pen up servo angle (deg,0...180)
-	private double penDownAngle; // pen down servo angle (deg,0...180)
-	private double zRate; // pen servo movement speed (deg/s)
+	private double penDiameter; // mm, >0
+	private double penUpAngle; // servo angle (degrees,0...180)
+	private double penDownAngle; // servo angle (degrees,0...180)
+	private double penLiftTime; // ms
 
 	/**
 	 * top left, bottom center, etc...
@@ -150,6 +151,16 @@ public final class MakelangeloRobotSettings implements Serializable {
 		listeners.add(listener);
 	}
 
+	public void removeListener(MakelangeloRobotSettingsListener listener) {
+		listeners.remove(listener);
+	}
+
+	public void notifyListeners() {
+		for (MakelangeloRobotSettingsListener listener : listeners) {
+			listener.settingsChangedEvent(this);
+		}
+	}
+
 	public void createNewUID(long newUID) {
 		// make sure a topLevelMachinesPreferenceNode node is created
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
@@ -163,8 +174,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		configsAvailable = new_list;
 	}
 
-	public double getAcceleration() {
-		return accelerationMax;
+	public double getMaxAcceleration() {
+		return maxAcceleration;
 	}
 
 	/**
@@ -449,8 +460,8 @@ public final class MakelangeloRobotSettings implements Serializable {
 		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation", Double.toString(rotation)));
 		rotationRef = 0;
 
-		accelerationMax = Float
-				.valueOf(uniqueMachinePreferencesNode.get("acceleration", Double.toString(accelerationMax)));
+		maxAcceleration = Float
+				.valueOf(uniqueMachinePreferencesNode.get("acceleration", Double.toString(maxAcceleration)));
 
 		startingPositionIndex = Integer
 				.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex", Integer.toString(startingPositionIndex)));
@@ -475,7 +486,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		setPenDiameter(Double.valueOf(prefs.get("diameter", Double.toString(getPenDiameter()))));
-		setPenUpTime(Double.valueOf(prefs.get("z_rate", Double.toString(getPenUpTime()))));
+		setPenLiftTime(Double.valueOf(prefs.get("z_rate", Double.toString(getPenLiftTime()))));
 		setPenDownAngle(Double.valueOf(prefs.get("z_on", Double.toString(getPenDownAngle()))));
 		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(getPenUpAngle()))));
 		// tool_number =
@@ -497,7 +508,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	protected void savePenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
 		prefs.put("diameter", Double.toString(getPenDiameter()));
-		prefs.put("z_rate", Double.toString(getPenUpTime()));
+		prefs.put("z_rate", Double.toString(getPenLiftTime()));
 		prefs.put("z_on", Double.toString(getPenDownAngle()));
 		prefs.put("z_off", Double.toString(getPenUpAngle()));
 		// prefs.put("tool_number", Integer.toString(toolNumber));
@@ -511,22 +522,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
 
-	public void notifySettingsChanged() {
-		for (MakelangeloRobotSettingsListener listener : listeners) {
-			listener.settingsChangedEvent(this);
-		}
-	}
-
-	public void removeListener(MakelangeloRobotSettingsListener listener) {
-		listeners.remove(listener);
-	}
-
 	// Save the machine configuration
 	public void saveConfig() {
 		// once cloud logic is finished.
 		// if(GetCanUseCloud() && SaveConfigToCloud() ) return;
 		saveConfigToLocal();
-		notifySettingsChanged();
+		notifyListeners();
 	}
 
 	protected void saveConfigToLocal() {
@@ -537,7 +538,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 		uniqueMachinePreferencesNode.put("limit_bottom", Double.toString(limitBottom));
 		uniqueMachinePreferencesNode.put("limit_right", Double.toString(limitRight));
 		uniqueMachinePreferencesNode.put("limit_left", Double.toString(limitLeft));
-		uniqueMachinePreferencesNode.put("acceleration", Double.toString(accelerationMax));
+		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
 		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
@@ -561,7 +562,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public void setAcceleration(double f) {
-		accelerationMax = f;
+		maxAcceleration = f;
 	}
 
 	public void setTravelFeedRate(double f) {
@@ -673,9 +674,9 @@ public final class MakelangeloRobotSettings implements Serializable {
 		// apply default hardware values
 		travelFeedRate = hardwareProperties.getFeedrateMax();
 		drawFeedRate = hardwareProperties.getFeedrateDefault();
-		accelerationMax = hardwareProperties.getAccelerationMax();
+		maxAcceleration = hardwareProperties.getAccelerationMax();
 
-		setPenUpTime(hardwareProperties.getZRate());
+		setPenLiftTime(hardwareProperties.getZRate());
 		setPenDownAngle(hardwareProperties.getZAngleOn());
 		setPenUpAngle(hardwareProperties.getZAngleOff());
 
@@ -716,7 +717,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public String getProgramStart() {
-		String a = StringHelper.formatDouble(getAcceleration());
+		String a = StringHelper.formatDouble(getMaxAcceleration());
 		String j = "3";
 		return hardwareProperties.getProgramStart() + "M201 X" + a + " Y" + a + "\n" // acceleration
 				+ "M205 X" + j + " Y" + j + "\n"; // jerk
@@ -727,7 +728,7 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public String getPenDownString() {
-		return "M280 P0 T" + getPenUpTime() + " S" + StringHelper.formatDouble(getPenDownAngle());
+		return "M280 P0 T" + getPenLiftTime() + " S" + StringHelper.formatDouble(getPenDownAngle());
 	}
 
 	public String getPenUpString() {
@@ -803,11 +804,11 @@ public final class MakelangeloRobotSettings implements Serializable {
 	}
 
 	public void setPenDiameter(double d) {
-		diameter = d;
+		penDiameter = d;
 	}
 
 	public double getPenDiameter() {
-		return diameter;
+		return penDiameter;
 	}
 
 	public double getPenUpAngle() {
@@ -826,12 +827,12 @@ public final class MakelangeloRobotSettings implements Serializable {
 		this.penDownAngle = angle;
 	}
 
-	public double getPenUpTime() {
-		return zRate;
+	public double getPenLiftTime() {
+		return penLiftTime;
 	}
 
-	public void setPenUpTime(double ms) {
-		this.zRate = ms;
+	public void setPenLiftTime(double ms) {
+		this.penLiftTime = ms;
 	}
 
 	public double getRotation() {

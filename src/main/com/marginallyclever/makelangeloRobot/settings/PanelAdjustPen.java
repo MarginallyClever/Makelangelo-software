@@ -45,7 +45,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
 	    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),settings.getDrawFeedRate()));
-	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getPenUpTime()));
+	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getPenLiftTime()));
 	    add(penUp = new SelectDouble(Translator.get("penToolUp"),settings.getPenUpAngle()));
 	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
 	    add(penDown = new SelectDouble(Translator.get("penToolDown"),settings.getPenDownAngle()));
@@ -81,7 +81,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 		settings.setPenDiameter(penDiameter.getValue());
 		settings.setTravelFeedRate(maxFeedRate.getValue());
 		settings.setDrawFeedRate(currentFeedRate.getValue());
-		settings.setPenUpTime(penZRate.getValue());
+		settings.setPenLiftTime(penZRate.getValue());
 		settings.setPenUpAngle(penUp.getValue());
 		settings.setPenDownAngle(penDown.getValue());
 		settings.setPenDownColor(selectPenDownColor.getColor());
