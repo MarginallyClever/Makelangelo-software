@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 
 /**
  * GUI for {@link Converter_SpiralPulse}
@@ -15,18 +15,18 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Converter_SpiralPulse converter;
-	private SelectFloat intensityField;	
-	private SelectFloat heightField;	
-	private SelectFloat spacingField;	
+	private SelectDouble intensityField;	
+	private SelectDouble heightField;	
+	private SelectDouble spacingField;	
 	
 	public Converter_SpiralPulse_Panel(Converter_SpiralPulse arg0) {
 		super();
 		
 		converter=arg0;
 
-		add(intensityField = new SelectFloat("ConverterIntensity",converter.getIntensity()));
-		add(spacingField = new SelectFloat("SpiralPulseSpacing",converter.getSpacing()));
-		add(heightField = new SelectFloat("SpiralPulseHeight",converter.getHeight()));
+		add(intensityField = new SelectDouble("ConverterIntensity",converter.getIntensity()));
+		add(spacingField = new SelectDouble("SpiralPulseSpacing",converter.getSpacing()));
+		add(heightField = new SelectDouble("SpiralPulseHeight",converter.getHeight()));
 		finish();
 	}
 

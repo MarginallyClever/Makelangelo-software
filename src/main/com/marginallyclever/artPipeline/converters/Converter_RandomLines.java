@@ -29,7 +29,7 @@ public class Converter_RandomLines extends ImageConverter {
 		TransformedImage img = bw.filter(sourceImage);
 
 
-		float stepSize = settings.getPenDiameter()*5;
+		double stepSize = settings.getPenDiameter()*5;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

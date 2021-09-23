@@ -12,7 +12,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * @author Dan Royer
  */
 public class Generator_GraphPaper extends ImageGenerator {
-	private static float angle = 0;
+	private static double angle = 0;
 
 	MakelangeloRobotPanel robotPanel;
 	
@@ -22,10 +22,10 @@ public class Generator_GraphPaper extends ImageGenerator {
 		return Translator.get("GraphPaperName");
 	}
 
-	static public float getAngle() {
+	static public double getAngle() {
 		return angle;
 	}
-	static public void setAngle(float value) {
+	static public void setAngle(double value) {
 		angle = value;
 	}
 	

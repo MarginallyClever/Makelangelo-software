@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -142,7 +140,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glPopMatrix();
 	}
 	
-
 	// draw left & right motor
 	protected void paintMotors( GL2 gl2,MakelangeloRobotSettings settings ) {
 		double top = settings.getLimitTop();
@@ -231,7 +228,6 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 		gl2.glPopMatrix();
 	}
 
-	
 	protected void paintPenHolderToCounterweights( GL2 gl2, MakelangeloRobot robot ) {
 		MakelangeloRobotSettings settings = robot.getSettings();
 		double dx,dy;
@@ -342,20 +338,18 @@ public class Makelangelo5Properties extends Makelangelo3Properties {
 	}
 
 	@Override
-	public void writeProgramStart(Writer out) throws IOException {
+	public String getProgramStart() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Makelangelo 5\n");
-		out.write("; "+formatter.format(date)+"\n");
-		out.write("G28 XY\n");  // force find home
+		return "; Makelangelo 5\n"
+				+"; "+formatter.format(date)+"\n"
+				+"G28\n";  // force find home
 	}
 	
 	@Override
-	public void writeProgramEnd(Writer out) throws IOException {
-		// be sure to lift pen
-		out.write("G0 Z90\n");
-		// move out of way for display
-		out.write("G0 X-300 Y300\n");
+	public String getProgramEnd() {
+		return "G0 Z90\n"  // be sure to lift pen
+				+"G0 X-300 Y300\n";  // move out of way for display
 	}
 
 	/**

@@ -2,7 +2,7 @@ package com.marginallyclever.artPipeline.converters;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 /**
@@ -16,7 +16,7 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	 */
 	private static final long serialVersionUID = -5791313991426136610L;
 	private SelectInteger numCells;
-	private SelectFloat minDotSize;
+	private SelectDouble minDotSize;
 	private Converter_VoronoiZigZag converter;
 	
 	public Converter_VoronoiZigZag_Panel(Converter_VoronoiZigZag converter_VoronoiZigZag) {
@@ -25,7 +25,7 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 		converter = converter_VoronoiZigZag;
 		
 		add(numCells = new SelectInteger("voronoiStipplingCellCount",converter.getNumCells()));
-		add(minDotSize = new SelectFloat("voronoiStipplingDotMin",converter.getMinDotSize()));
+		add(minDotSize = new SelectDouble("voronoiStipplingDotMin",converter.getMinDotSize()));
 		finish();
 	}
 

@@ -35,9 +35,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static boolean drawBorders = true;
 	private static int numCells = 1000;
-	private static float maxDotSize = 5.0f;
-	private static float minDotSize = 1.0f;
-	private static float cutoff = 0;
+	private static double maxDotSize = 5.0f;
+	private static double minDotSize = 1.0f;
+	private static double cutoff = 0;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
 	private double yMin, yMax;
@@ -292,7 +292,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	}
 	
 	protected void renderDots(GL2 gl2) {
-		float scale = maxDotSize - minDotSize;
+		double scale = maxDotSize - minDotSize;
 		gl2.glColor3f(0, 0, 0);
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
@@ -371,7 +371,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 	protected void writeOutCells() {
 		turtle = new Turtle();
 
-		float toolDiameter = settings.getPenDiameter();
+		double toolDiameter = settings.getPenDiameter();
 
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
@@ -552,26 +552,26 @@ public class Converter_VoronoiStippling extends ImageConverter implements Makela
 		return numCells;
 	}
 	
-	public void setMinDotSize(float value) {
+	public void setMinDotSize(double value) {
 		if(value<0.001) value=0.001f;
 		minDotSize = value;
 	}
-	public float getMinDotSize() {
+	public double getMinDotSize() {
 		return minDotSize;
 	}
 	
-	public void setCutoff(float value) {
+	public void setCutoff(double value) {
 		if(value<0f) value=0f;
 		cutoff = value;
 	}
-	public float getCutoff() {
+	public double getCutoff() {
 		return cutoff;
 	}
 	
-	public float getMaxDotSize() {
+	public double getMaxDotSize() {
 		return maxDotSize;
 	}
-	public void setMaxDotSize(float value) {
+	public void setMaxDotSize(double value) {
 		if(value<=minDotSize) value=minDotSize+1;
 		maxDotSize = value;
 	}

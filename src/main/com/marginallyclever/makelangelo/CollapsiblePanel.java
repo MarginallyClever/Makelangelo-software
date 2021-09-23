@@ -46,7 +46,7 @@ import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectFile;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
@@ -472,7 +472,7 @@ public class CollapsiblePanel extends JPanel {
 		SelectButton b = new SelectButton("B");
 		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
 		SelectFile d = new SelectFile("D",null);
-		SelectFloat e = new SelectFloat("E",0.0f);
+		SelectDouble e = new SelectDouble("E",0.0f);
 		SelectInteger f = new SelectInteger("FFF",0);
 		String [] list = {"cars","trains","planes","boats","rockets"};
 		SelectOneOfMany g = new SelectOneOfMany("G",list,0);

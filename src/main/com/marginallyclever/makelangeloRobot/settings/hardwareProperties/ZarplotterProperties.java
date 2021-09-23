@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -220,17 +218,17 @@ public class ZarplotterProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void writeProgramStart(Writer out) throws IOException {
+	public String getProgramStart() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Zarplotter\n");
-		out.write("; "+formatter.format(date)+"\n");
-		out.write("D0 R-500 L-500 U-500 V-500\n");  // tighten belts a little
-		out.write("M203 W500");  // raise top speed of servo (z axis)
+		return "; Zarplotter\n"
+				+"; "+formatter.format(date)+"\n"
+				+"D0 R-500 L-500 U-500 V-500\n"
+				+"M203 W500";  // raise top speed of servo (z axis)
 	}
 
 	@Override
-	public void writeProgramEnd(Writer out) throws IOException {
-		super.writeProgramEnd(out);
+	public String getProgramEnd() {
+		return super.getProgramEnd();
 	}
 }

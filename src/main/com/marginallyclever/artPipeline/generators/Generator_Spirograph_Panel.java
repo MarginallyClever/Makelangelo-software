@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
@@ -21,7 +21,7 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 	protected SelectBoolean field_isEpitrochoid;
 	protected SelectInteger field_majorRadius;
 	protected SelectInteger field_minorRadius;
-	protected SelectFloat field_pScale;
+	protected SelectDouble field_pScale;
 	protected SelectInteger field_numSamples;
 	protected Generator_Spirograph generator;
 	
@@ -33,7 +33,7 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 		add(field_isEpitrochoid = new SelectBoolean(Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
 		add(field_majorRadius = new SelectInteger(Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
 		add(field_minorRadius = new SelectInteger(Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
-		add(field_pScale = new SelectFloat(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
+		add(field_pScale = new SelectDouble(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
 		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
 		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Spirograph'>Learn more</a>"));
 		finish();
@@ -45,7 +45,7 @@ public class Generator_Spirograph_Panel extends ImageGeneratorPanel {
 		
 		int newMajorRadius = field_majorRadius.getValue();
 		int newMinorRadius = field_minorRadius.getValue();
-		float newPScale = field_pScale.getValue();
+		double newPScale = field_pScale.getValue();
 		int newNumSamples = field_numSamples.getValue();
 		boolean newEpitrochoid = field_isEpitrochoid.isSelected();
 

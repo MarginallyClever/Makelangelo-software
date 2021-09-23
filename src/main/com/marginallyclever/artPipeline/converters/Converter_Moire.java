@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Moire extends ImageConverter {
-	private static float blockScale = 4.0f;
+	private static double blockScale = 4.0f;
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
 	
@@ -33,10 +33,10 @@ public class Converter_Moire extends ImageConverter {
 		return new Converter_Moire_Panel(this);
 	}
 	
-	public float getScale() {
+	public double getScale() {
 		return blockScale;
 	}
-	public void setScale(float value) {
+	public void setScale(double value) {
 		if(value<1) value=1;
 		blockScale = value;
 	}
@@ -53,7 +53,7 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	
-	protected void convertLine(TransformedImage img,float spaceBetweenLines,float halfStep,Point2D a,Point2D b) {
+	protected void convertLine(TransformedImage img,double spaceBetweenLines,double halfStep,Point2D a,Point2D b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
 		
@@ -184,8 +184,8 @@ public class Converter_Moire extends ImageConverter {
 		double w=xRight-xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		float halfStep = settings.getPenDiameter();
-		float spaceBetweenLines = blockScale;
+		double halfStep = settings.getPenDiameter();
+		double spaceBetweenLines = blockScale;
 
 		// from top to bottom of the image...
 		Point2D a = new Point2D();

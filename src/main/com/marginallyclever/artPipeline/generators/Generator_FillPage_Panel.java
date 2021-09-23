@@ -3,7 +3,7 @@ package com.marginallyclever.artPipeline.generators;
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 
 /**
  * Panel for {@link Generator_FillPage}
@@ -15,7 +15,7 @@ public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private SelectFloat angle;
+	private SelectDouble angle;
 	private Generator_FillPage generator;
 	
 	Generator_FillPage_Panel(Generator_FillPage generator) {
@@ -23,7 +23,7 @@ public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(angle = new SelectFloat(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
+		add(angle = new SelectDouble(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
 		finish();
 	}
 
@@ -31,7 +31,7 @@ public class Generator_FillPage_Panel extends ImageGeneratorPanel {
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
 
-		float newOrder = angle.getValue();
+		double newOrder = angle.getValue();
 		
 		if(newOrder != Generator_FillPage.getAngle()) {
 			Generator_FillPage.setAngle(newOrder);

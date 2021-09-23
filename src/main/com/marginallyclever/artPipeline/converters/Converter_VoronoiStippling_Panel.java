@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectFloat;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 
 /**
@@ -17,9 +17,9 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private SelectFloat text_dot_max;
-	private SelectFloat text_dot_min;
-	private SelectFloat field_cutoff;
+	private SelectDouble text_dot_max;
+	private SelectDouble text_dot_min;
+	private SelectDouble field_cutoff;
 	private SelectInteger text_cells;
 	private SelectBoolean draw_borders;
 	private Converter_VoronoiStippling converter;
@@ -29,10 +29,10 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 		converter = converter_VoronoiStippling;
 		
 		add(text_cells = new SelectInteger(Translator.get("voronoiStipplingCellCount"),converter.getNumCells  ()));
-		add(text_dot_max = new SelectFloat(Translator.get("voronoiStipplingDotMax"),converter.getMaxDotSize   ()));
-		add(text_dot_min = new SelectFloat(Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize   ()));
+		add(text_dot_max = new SelectDouble(Translator.get("voronoiStipplingDotMax"),converter.getMaxDotSize   ()));
+		add(text_dot_min = new SelectDouble(Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize   ()));
 		add(draw_borders = new SelectBoolean(Translator.get("voronoiStipplingCutoff"),converter.getDrawBorders()));
-		add(field_cutoff = new SelectFloat(Translator.get("voronoiStipplingDrawBorders"),converter.getCutoff  ()));
+		add(field_cutoff = new SelectDouble(Translator.get("voronoiStipplingDrawBorders"),converter.getCutoff  ()));
 		finish();
 	}
 

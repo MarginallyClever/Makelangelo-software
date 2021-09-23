@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -377,20 +375,17 @@ public class MakelangeloCustomProperties extends Makelangelo3Properties {
 	}
 
 	@Override
-	public void writeProgramStart(Writer out) throws IOException {
+	public String getProgramStart() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Custom\n");
-		out.write("; "+formatter.format(date)+"\n");
-		out.write("G28 XY\n");  // force find home
+		return "; Custom\n"
+				+"; "+formatter.format(date)+"\n"
+				+"G28 XY\n";  // force find home
 	}
 	
 	@Override
-	public void writeProgramEnd(Writer out) throws IOException {
-		// be sure to lift pen
-		out.write("G0 Z90\n");
-		// move out of way for display
-		out.write("G0 X-300 Y300\n");
+	public String getProgramEnd() {
+		return "G0 Z90\n";  // be sure to lift pen
 	}
 
 	/**

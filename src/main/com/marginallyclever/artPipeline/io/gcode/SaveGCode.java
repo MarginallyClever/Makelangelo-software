@@ -40,9 +40,9 @@ public class SaveGCode implements SaveResource {
 		MakelangeloRobotSettings machine = robot.getSettings();
 		
 		try(OutputStreamWriter out = new OutputStreamWriter(outputStream)) {
-			machine.writeProgramStart(out);
-			machine.writeAbsoluteMode(out);
-			machine.writePenUp(out);
+			out.write(machine.getProgramStart());
+			out.write(machine.getAbsoluteMode());
+			out.write(machine.getPenUpString());
 			boolean isUp=true;
 			
 			TurtleMove previousMovement=null;
@@ -54,7 +54,7 @@ public class SaveGCode implements SaveResource {
 				case TRAVEL:
 					if(!isUp) {
 						// lift pen up
-						machine.writePenUp(out);
+						out.write(machine.getPenUpString());
 						isUp=true;
 						zMoved=true;
 					}
@@ -64,21 +64,23 @@ public class SaveGCode implements SaveResource {
 					if(isUp) {
 						// go to m and put pen down
 						if(previousMovement==null) previousMovement=m;
-						machine.writeMoveTo(out, previousMovement.x, previousMovement.y, true,true);
-						machine.writePenDown(out);
+						out.write(machine.getMoveTo(previousMovement.x, previousMovement.y, true,true));
+						out.write(machine.getPenDownString());
+						machine.getMoveTo(previousMovement.x, previousMovement.y, true,true);
 						isUp=false;
 						zMoved=true;
 					}
-					machine.writeMoveTo(out,m.x, m.y,false,zMoved);
+					machine.getMoveTo(m.x, m.y,false,zMoved);
 					previousMovement=m;
 					break;
 				case TOOL_CHANGE:
-					machine.writeChangeTo(out, m.getColor());
+					out.write(machine.getChangeTool(m.getColor()));
+					machine.getChangeTool(m.getColor());
 					break;
 				}
 			}
-			if(!isUp) machine.writePenUp(out);
-			machine.writeProgramEnd(out);
+			if(!isUp) out.write(machine.getPenUpString());
+			out.write(machine.getProgramEnd());
 			
 			out.flush();
 			out.close();

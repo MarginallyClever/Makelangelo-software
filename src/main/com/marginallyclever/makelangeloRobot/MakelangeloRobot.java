@@ -26,7 +26,6 @@ import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.SoundSystem;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangeloRobot.marlin.MarlinEvent;
-import com.marginallyclever.makelangeloRobot.marlin.MarlinEventListener;
 import com.marginallyclever.makelangeloRobot.marlin.MarlinFirmware2;
 import com.marginallyclever.makelangeloRobot.marlin.RobotIdentityEvent;
 import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
@@ -85,7 +84,8 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 				sendFileCommand();
 			}
 			if(evt.flag == MarlinEvent.DATA_RECEIVED) {
-				Log.message("Recv: "+(String)evt.data);
+				String msg = (String)evt.data;
+				Log.message("Recv: "+msg.trim());
 			}
 		});
 
@@ -260,6 +260,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 			SoundSystem.playDrawingFinishedSound();
 		} else {
 			String line = gcodeCommands.get(nextLineNumber);
+			Log.message("Send: "+line);
 			marlin.sendLineWithNumberAndChecksum(line, nextLineNumber);
 			setLineNumber(nextLineNumber+1);
 		}
@@ -329,22 +330,22 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.TOOL_CHANGE, this, toolNumber));
 	}
 
-	public void setDrawFeedRate(float feedRate) {
+	public void setDrawFeedRate(double feedRate) {
 		// remember it
 		settings.setDrawFeedRate(feedRate);
 		// get it again in case it was capped.
 		feedRate = settings.getDrawFeedRate();
 		// tell the robot
-		send("G0 F" + StringHelper.formatDouble(feedRate));
+		send("G1 F" + StringHelper.formatDouble(feedRate));
 	}
 	
-	public void setTravelFeedRate(float feedRate) {
+	public void setTravelFeedRate(double feedRate) {
 		// remember it
 		settings.setTravelFeedRate(feedRate);
 		// get it again in case it was capped.
 		feedRate = settings.getTravelFeedRate();
 		// tell the robot
-		send("G1 F" + StringHelper.formatDouble(feedRate));
+		send("G0 F" + StringHelper.formatDouble(feedRate));
 	}
 	
 	/**
@@ -363,7 +364,7 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 	
 	public void findHome() {
 		raisePen();
-		send("G28 XY");
+		send("G28");
 		pos.set(settings.getHomeX(),settings.getHomeY());
 		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.HOME_FOUND,this));
 		didFindHome = true;

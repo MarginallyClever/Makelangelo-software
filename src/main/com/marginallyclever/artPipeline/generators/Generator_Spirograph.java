@@ -14,7 +14,7 @@ public class Generator_Spirograph extends ImageGenerator {
 	private double xMax,xMin,yMax,yMin;
 	private double totalScale;
 
-	private static float pScale = 80; // controls complexity of curve
+	private static double pScale = 80; // controls complexity of curve
 	private static int minorRadius = 2; // controls complexity of curve
 	private static int majorRadius = 100; // controls complexity of curve
 	private static int numSamples = 2000;
@@ -49,11 +49,11 @@ public class Generator_Spirograph extends ImageGenerator {
 		minorRadius = arg0;
 	}
 	
-	static public float getPScale() {
+	static public double getPScale() {
 		return pScale;
 	}
 	
-	static public void setPScale(float arg0) {
+	static public void setPScale(double arg0) {
 		pScale = arg0;
 	}
 	
@@ -119,9 +119,8 @@ public class Generator_Spirograph extends ImageGenerator {
 	}
 	
 	protected void drawSpirograph(boolean write) {
-		float x=0,y=0;
-		
-		float dRadius,pScale1,pScale2;
+		double x=0,y=0;
+		double dRadius,pScale1,pScale2;
 		
 		if(isEpitrochoid) {
 			dRadius = majorRadius+minorRadius;
@@ -134,11 +133,11 @@ public class Generator_Spirograph extends ImageGenerator {
 			pScale2 = pScale;
 		}
 		
-		float t = 0;
+		double t = 0;
 
 		// move to starting position
-		x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
-		y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
+		x = dRadius*Math.cos(t) + pScale1*Math.cos(dRadius*t/minorRadius);
+		y = dRadius*Math.sin(t) - pScale2*Math.sin(dRadius*t/minorRadius);
 		turtle.moveTo(totalScale*x, totalScale*y);
 		turtle.penDown();
 
@@ -149,8 +148,8 @@ public class Generator_Spirograph extends ImageGenerator {
 		
 		for(float t1 = 0; t1<=numSamples;++t1) {
 			t = (float)( t1 * periodRadians );
-			x = dRadius*(float)Math.cos(t) + pScale1*(float)Math.cos(dRadius*t/minorRadius);
-			y = dRadius*(float)Math.sin(t) - pScale2*(float)Math.sin(dRadius*t/minorRadius);
+			x = dRadius*Math.cos(t) + pScale1*Math.cos(dRadius*t/minorRadius);
+			y = dRadius*Math.sin(t) - pScale2*Math.sin(dRadius*t/minorRadius);
 
 			turtle.moveTo(totalScale*x, totalScale*y);
 			// we are calculating max/min

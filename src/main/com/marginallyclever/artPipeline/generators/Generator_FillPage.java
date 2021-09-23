@@ -11,7 +11,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
  * @author Dan Royer
  */
 public class Generator_FillPage extends ImageGenerator {
-	private static float angle = 0;
+	private static double angle = 0;
 
 	MakelangeloRobotPanel robotPanel;
 	
@@ -21,10 +21,10 @@ public class Generator_FillPage extends ImageGenerator {
 		return Translator.get("FillPageName");
 	}
 
-	static public float getAngle() {
+	static public double getAngle() {
 		return angle;
 	}
-	static public void setAngle(float value) {
+	static public void setAngle(double value) {
 		angle = value;
 	}
 	
@@ -39,7 +39,7 @@ public class Generator_FillPage extends ImageGenerator {
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = settings.getPenDiameter();
+		double stepSize = settings.getPenDiameter();
 
 		// from top to bottom of the margin area...
 		double yBottom = settings.getMarginBottom();

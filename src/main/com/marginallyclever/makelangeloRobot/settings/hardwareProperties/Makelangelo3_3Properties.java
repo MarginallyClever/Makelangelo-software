@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -176,10 +174,12 @@ public class Makelangelo3_3Properties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void writeProgramStart(Writer out) throws IOException {
+	public String getProgramStart() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Makelangelo 3.3\n");
-		out.write("; "+formatter.format(date)+"\n");
+		Date date = new Date(System.currentTimeMillis());
+		String msg="";
+		msg +="; Makelangelo 3.3\n";
+		msg +="; "+formatter.format(date)+"\n";
+		return msg;
 	}
 }

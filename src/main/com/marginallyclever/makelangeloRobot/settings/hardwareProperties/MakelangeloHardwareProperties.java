@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
@@ -58,25 +57,22 @@ public interface MakelangeloHardwareProperties {
 	public void render(GL2 gl2, MakelangeloRobot robot);
 
 	/**
-	 * hardware specific gcode included at the start of each program
-	 * @param out
-	 * @throws IOException
+	 * @return Hardware specific gcode included at the start of each program
 	 */
-	public void writeProgramStart(Writer out) throws IOException;
+	public String getProgramStart();
 
 	/**
-	 * Hardware specific gcode sent on connect
-	 * @param settings
-	 * @return
+	 * @return Hardware specific gcode sent on connect
+	 * 
 	 */
 	public String getGCodeConfig(MakelangeloRobotSettings settings);
 
 	/**
 	 * hardware specific gcode at the end of each program
-	 * @param out
+	 * @return TODO
 	 * @throws IOException
 	 */
-	public void writeProgramEnd(Writer out) throws IOException;
+	public String getProgramEnd();
 
 	// @since hardware m2
 	public float getFeedrateMax();

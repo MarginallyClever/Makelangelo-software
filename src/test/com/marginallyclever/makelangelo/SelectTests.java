@@ -153,9 +153,9 @@ public class SelectTests {
 	@Test
 	public void testFloat() {
 		// test contructor(s)
-		SelectFloat b = new SelectFloat("test",0);
+		SelectDouble b = new SelectDouble("test",0);
 		assertEquals(0.0f,b.getValue(),1e-6);
-		b = new SelectFloat("test2",0.1f);
+		b = new SelectDouble("test2",0.1f);
 		assertEquals(0.1f,b.getValue(),1e-6);
 		
 		panel.add(b);

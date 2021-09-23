@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Multipass extends ImageConverter {
-	static private float angle=0;
+	static private double angle=0;
 	static private int passes=4;
 	
 	@Override
@@ -24,15 +24,18 @@ public class Converter_Multipass extends ImageConverter {
 		return new Converter_Multipass_Panel(this);
 	}
 	
-	public float getAngle() {
+	public double getAngle() {
 		return angle;
 	}
-	public void setAngle(float value) {
+	
+	public void setAngle(double value) {
 		angle = value;
 	}
+	
 	public int getPasses() {
 		return passes;
 	}
+	
 	public void setPasses(int value) {
 		if(passes<1) passes=1;
 		passes=value;
@@ -51,7 +54,7 @@ public class Converter_Multipass extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		float stepSize = settings.getPenDiameter();
+		double stepSize = settings.getPenDiameter();
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

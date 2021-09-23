@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @author Dan Royer
  */
 public class Converter_Pulse extends ImageConverter {
-	private static float blockScale = 6.0f;
+	private static double blockScale = 6.0f;
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
 	
@@ -26,10 +26,10 @@ public class Converter_Pulse extends ImageConverter {
 		return new Converter_Pulse_Panel(this);
 	}
 	
-	public float getScale() {
+	public double getScale() {
 		return blockScale;
 	}
-	public void setScale(float value) {
+	public void setScale(double value) {
 		if(value<1) value=1;
 		blockScale = value;
 	}
@@ -45,7 +45,7 @@ public class Converter_Pulse extends ImageConverter {
 		direction = value;
 	}
 	
-	protected void convertLine(TransformedImage img,float zigZagSpacing,float halfStep,Point2D a,Point2D b) {		
+	protected void convertLine(TransformedImage img,double zigZagSpacing,double halfStep,Point2D a,Point2D b) {		
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1/len);
@@ -89,10 +89,10 @@ public class Converter_Pulse extends ImageConverter {
 		double xRight  = settings.getMarginRight() ;
 		
 		// figure out how many lines we're going to have on this image.
-		float stepSize = settings.getPenDiameter() * blockScale;
-		float halfStep = stepSize / 2.0f;
-		float zigZagSpacing = settings.getPenDiameter();
-		float spaceBetweenLines = stepSize;
+		double stepSize = settings.getPenDiameter() * blockScale;
+		double halfStep = stepSize / 2.0f;
+		double zigZagSpacing = settings.getPenDiameter();
+		double spaceBetweenLines = stepSize;
 
 		// from top to bottom of the image...
 		double x, y = 0;

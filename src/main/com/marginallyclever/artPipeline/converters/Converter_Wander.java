@@ -57,9 +57,9 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	protected int outputChannel(TransformedImage img,ColorRGB newColor,int pointsPerChannel,double cutoff) {
-		float stepSize = settings.getPenDiameter()*5;
+		double stepSize = settings.getPenDiameter()*5.0;
 		if (stepSize < 1) stepSize = 1;
-		float halfStep = stepSize/2;
+		double halfStep = stepSize/2;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > cutoff.

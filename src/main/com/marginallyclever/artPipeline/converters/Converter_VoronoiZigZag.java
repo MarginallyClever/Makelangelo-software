@@ -32,7 +32,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 	private TransformedImage sourceImage;
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 3000;
-	private static float minDotSize = 1.0f;
+	private static double minDotSize = 1.0f;
 	private double[] xValuesIn = null;
 	private double[] yValuesIn = null;
 	private int[] solution = null;
@@ -556,11 +556,11 @@ public class Converter_VoronoiZigZag extends ImageConverter implements Makelange
 		return numCells;
 	}
 	
-	public void setMinDotSize(float value) {
+	public void setMinDotSize(double value) {
 		if(value<0.001) value=0.001f;
 		minDotSize = value;
 	}
-	public float getMinDotSize() {
+	public double getMinDotSize() {
 		return minDotSize;
 	}
 }

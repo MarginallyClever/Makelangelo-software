@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings.hardwareProperties;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -202,15 +200,16 @@ public class CartesianProperties extends Makelangelo2Properties {
 	}
 
 	@Override
-	public void writeProgramStart(Writer out) throws IOException {
+	public String getProgramStart() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
 		Date date = new Date(System.currentTimeMillis());  
-		out.write("; Cartesian\n");
-		out.write("; "+formatter.format(date)+"\n");
+		String msg = "; Cartesian\n";
+		msg +="; "+formatter.format(date)+"\n";
+		return msg;
 	}
 
 	@Override
-	public void writeProgramEnd(Writer out) throws IOException {
-		super.writeProgramEnd(out);
+	public String getProgramEnd() {
+		return super.getProgramEnd();
 	}
 }

@@ -597,7 +597,7 @@ public class MarlinSimulation {
 		
 		double fu = settings.getTravelFeedRate();
 		double fd = settings.getDrawFeedRate();
-		double fz = settings.getZRate();
+		double fz = settings.getPenUpTime();
 		double a = settings.getAcceleration();
 		double zu = settings.getPenUpAngle();
 		double zd = settings.getPenDownAngle();
