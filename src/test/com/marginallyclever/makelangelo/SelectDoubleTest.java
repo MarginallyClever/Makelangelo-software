@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 
-public class FloatFieldTest {
+public class SelectDoubleTest {
 	protected int testObservation;
 	
 	protected void testFloatField() throws Exception {

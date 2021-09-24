@@ -318,26 +318,26 @@ public class CartesianButtons extends JComponent {
 	}
 
 	public static void main(String[] args) {
-		JFrame frame = new JFrame("Button Test");
-		frame.setSize(400,400);
+		Log.start();
+		JFrame frame = new JFrame("CartesianButtons");
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// set look and feel
         try {
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
         	Log.error("Look and feel could not be set: "+e.getLocalizedMessage());
         }
-        
+
 		JPanel p = new JPanel();
 		frame.add(p);
-		CartesianButtons button = new CartesianButtons();
+        CartesianButtons button = new CartesianButtons();        
 		p.add(button);
 		button.addActionListener((e)->{
 			System.out.println(e.getActionCommand()+" "+button.getLabel(e.getID()));
 		});
-		
+
+		frame.pack();
 		frame.setVisible(true);
 	}
 }

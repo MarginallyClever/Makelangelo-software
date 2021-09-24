@@ -214,11 +214,9 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		gl2.glEnable(GL2.GL_BLEND);
 		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);  
 		
-		// background
 		paintBackground(gl2);
-		
-		// camera position & zoom
 		paintCamera(gl2);
+		
 		gl2.glLineWidth((float)camera.getZoom());
 
 		for( PreviewListener p : previewListeners ) {
