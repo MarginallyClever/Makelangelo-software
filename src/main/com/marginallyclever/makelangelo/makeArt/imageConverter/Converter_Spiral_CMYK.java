@@ -51,85 +51,73 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 
 		turtle = new Turtle();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),255.0*1.0,Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),255.0*1.0,Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),255.0*1.0,Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),255.0*1.0,Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
+		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
+		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
+		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
+		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
 		Log.message("Finishing...");
 	}
 
-	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cutoff,double cx,double cy) {
+	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cx,double cy) {
 		turtle.setColor(newColor);
 		
+		double maxr;
+		if (convertToCorners) {
+			// go right to the corners
+			double h2 = settings.getMarginHeight();
+			double w2 = settings.getMarginWidth();
+			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
+		} else {
+			// do the largest circle that still fits in the image.
+			double w = settings.getMarginWidth()/2.0f;
+			double h = settings.getMarginHeight()/2.0f;
+			maxr = h < w ? h : w;
+		}
+
 		double toolDiameter = settings.getPenDiameter();
 
 		int i, j;
 		int steps = 4;
-		double leveladd = cutoff / (double)(steps+1);
+		double leveladd = 255.0 / (double)(steps+1);
 		double level;
 		int z = 0;
 
-		float maxr;
-		if (convertToCorners) {
-			// go right to the corners
-			float h2 = (float)settings.getMarginHeight();
-			float w2 = (float)settings.getMarginWidth();
-			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
-		} else {
-			// do the largest circle that still fits in the image.
-			float w = (float)settings.getMarginWidth()/2.0f;
-			float h = (float)settings.getMarginHeight()/2.0f;
-			maxr = (float)( h < w ? h : w );
-		}
-
-		
-		double r = maxr, f;
+		double r = maxr;
 		double fx, fy;
-		boolean wasInside = false;
 		int numRings = 0;
-		int downMoves = 0;
 		j = 0;
 		while (r > toolDiameter) {
 			++j;
-			level = leveladd * (1+(j % steps));
+			double level0 = leveladd * (1+(j%steps));
+			double level1 = leveladd * (1+((j+1)%steps));
 			// find circumference of current circle
-			double circumference = Math.floor((2.0f * r - toolDiameter) * Math.PI);
-			if (circumference > 360.0f) circumference = 360.0f;
+			double c1 = Math.floor((2.0f * r - toolDiameter) * Math.PI);
 			
-			for (i = 1; i <= circumference; ++i) {
-				f = Math.PI * 2.0f * (double)i / circumference;
-				fx = cx+Math.cos(f) * r;
-				fy = cy+Math.sin(f) * r;
+			for (i = 0; i < c1; ++i) {
+				double p = (double)i / c1;
+				double f = Math.PI * 2.0 * p;
+				double r1 = r - toolDiameter * p;
+				fx = cx + Math.cos(f) * r1;
+				fy = cy + Math.sin(f) * r1;
 				
 				boolean isInside = isInsidePaperMargins(fx, fy);
-				if(isInside != wasInside) {
-					turtle.moveTo(fx,fy);
-					turtle.penUp();
-				}
-				
 				if(isInside) {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-					
-					if(z<level) {
-						turtle.penDown();
-						downMoves++;
-					} else {
-						turtle.penUp();
-					}
-					turtle.moveTo(fx, fy);
-				}
 
-				wasInside = isInside;
+					level = (level1-level0)*p + level0;
+					if(z<level) turtle.penDown();
+					else turtle.penUp();
+				} else turtle.penUp();
+				turtle.moveTo(fx, fy);
 			}
 			r -= toolDiameter;
 			++numRings;
 		}
 
-		Log.message(downMoves + " down moves.");
 		Log.message(numRings + " rings.");
 	}
 }
