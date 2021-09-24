@@ -12,11 +12,11 @@ import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 public class DefaultTurtleRenderer implements TurtleRenderer {
 	protected GL2 gl2;
 	
-	public ColorRGB colorTravel = new ColorRGB(0,255,0);
-	public ColorRGB colorDraw = new ColorRGB(0,0,0);
-	public boolean showPenUp = false;
-	public float lineWidth=1;
-	public float[] lineWidthBuf = new float[1];
+	private ColorRGB colorTravel = new ColorRGB(0,255,0);
+	private ColorRGB colorDraw = new ColorRGB(0,0,0);
+	private boolean showPenUp = false;
+	private float lineWidth=1;
+	private float[] lineWidthBuf = new float[1];
 	
 	public DefaultTurtleRenderer(GL2 gl2) {
 		this.gl2=gl2;

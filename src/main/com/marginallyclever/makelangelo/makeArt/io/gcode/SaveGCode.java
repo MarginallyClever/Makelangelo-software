@@ -51,7 +51,7 @@ public class SaveGCode implements SaveResource {
 				boolean zMoved=false;
 				
 				switch(m.type) {
-				case TRAVEL:
+				case TurtleMove.TRAVEL:
 					if(!isUp) {
 						// lift pen up
 						out.write(machine.getPenUpString());
@@ -60,7 +60,7 @@ public class SaveGCode implements SaveResource {
 					}
 					previousMovement=m;
 					break;
-				case DRAW:
+				case TurtleMove.DRAW:
 					if(isUp) {
 						// go to m and put pen down
 						if(previousMovement==null) previousMovement=m;
@@ -73,7 +73,7 @@ public class SaveGCode implements SaveResource {
 					machine.getMoveTo(m.x, m.y,false,zMoved);
 					previousMovement=m;
 					break;
-				case TOOL_CHANGE:
+				case TurtleMove.TOOL_CHANGE:
 					out.write(machine.getChangeTool(m.getColor()));
 					machine.getChangeTool(m.getColor());
 					break;

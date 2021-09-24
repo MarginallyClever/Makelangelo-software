@@ -36,7 +36,7 @@ import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
  * {@link MakelangeloRobotPanel} is one of the Views. 
  * {@link MakelangeloRobotSettings} is the persistent Model data (machine configuration).
  * 
- * @author dan
+ * @author Dan
  * @since 7.2.10
  */
 public class MakelangeloRobot implements NetworkSessionListener, PreviewListener {	
@@ -131,19 +131,14 @@ public class MakelangeloRobot implements NetworkSessionListener, PreviewListener
 		if(c != null) c.addListener(this);
 		marlin.setNetworkSession(c);
 	}
-
-	private void closeConnection(NetworkSession connection) {
-		if(connection == null) return;
-
-		connection.removeListener(this);
-		notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
-	}
 	
 	@Override
 	public void networkSessionEvent(NetworkSessionEvent evt) {
 		if(evt.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
 			halt();
-			closeConnection((NetworkSession)evt.getSource());
+			NetworkSession c = (NetworkSession)evt.getSource();
+			c.removeListener(this);
+			notifyListeners(new MakelangeloRobotEvent(MakelangeloRobotEvent.DISCONNECT,this));
 		}
 	}
 	

@@ -65,14 +65,14 @@ public class SaveSVG extends ImageManipulator implements SaveResource {
 
 			for( TurtleMove m : turtle.history ) {
 				switch(m.type) {
-				case TRAVEL:
+				case TurtleMove.TRAVEL:
 					if(!isUp) {
 						isUp=true;
 					}
 					x0=m.x;
 					y0=m.y;
 					break;
-				case DRAW:
+				case TurtleMove.DRAW:
 					if(isUp) {
 						isUp=false;
 					} else {
@@ -89,7 +89,7 @@ public class SaveSVG extends ImageManipulator implements SaveResource {
 					y0=m.y;
 					
 					break;
-				case TOOL_CHANGE:
+				case TurtleMove.TOOL_CHANGE:
 					break;
 				}
 			}

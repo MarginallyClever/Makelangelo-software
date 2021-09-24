@@ -96,7 +96,7 @@ public class Turtle implements Cloneable {
 		} else {
 			color = new ColorRGB(c);
 		}
-		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMoveType.TOOL_CHANGE) );
+		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMove.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
@@ -122,7 +122,7 @@ public class Turtle implements Cloneable {
 	public void moveTo(double x,double y) {
 		turtleX=x;
 		turtleY=y;
-		history.add( new TurtleMove(x, y, isUp ? TurtleMoveType.TRAVEL : TurtleMoveType.DRAW) );
+		history.add( new TurtleMove(x, y, isUp ? TurtleMove.TRAVEL : TurtleMove.DRAW) );
 	}
 	
 	/**
@@ -226,7 +226,7 @@ public class Turtle implements Cloneable {
 		TurtleMove old=null;
 		
 		for( TurtleMove m : history ) {
-			if(m.type == TurtleMoveType.DRAW) {
+			if(m.type == TurtleMove.DRAW) {
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
@@ -250,8 +250,8 @@ public class Turtle implements Cloneable {
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
+			case TurtleMove.DRAW:
+			case TurtleMove.TRAVEL:
 				m.x*=sx;
 				m.y*=sy;
 				break;
@@ -269,8 +269,8 @@ public class Turtle implements Cloneable {
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
+			case TurtleMove.DRAW:
+			case TurtleMove.TRAVEL:
 				m.x+=dx;
 				m.y+=dy;
 				break;
@@ -289,7 +289,7 @@ public class Turtle implements Cloneable {
 		int first=1;
 		for(i=0;i<history.size();i++) {
 			TurtleMove mov=history.get(i);
-			if (mov.type == TurtleMoveType.DRAW) {
+			if (mov.type == TurtleMove.DRAW) {
 				if(first == 1 || mov.x < xmin) xmin=mov.x;
 				if(first == 1 || mov.y < ymin) ymin=mov.y;
 				if(first == 1 || mov.x > xmax) xmax=mov.x;
@@ -322,21 +322,21 @@ public class Turtle implements Cloneable {
 					
 					boolean inShow = (showCount >= first && showCount < last);
 					switch (m.type) {
-					case TRAVEL:
+					case TurtleMove.TRAVEL:
 						if (inShow && previousMove != null) {
 							tr.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case DRAW:
+					case TurtleMove.DRAW:
 						if (inShow && previousMove != null) {
 							tr.draw(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TOOL_CHANGE:
+					case TurtleMove.TOOL_CHANGE:
 						tr.setPenDownColor(m.getColor());
 						break;
 					}
@@ -369,7 +369,7 @@ public class Turtle implements Cloneable {
 		
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case DRAW:
+			case TurtleMove.DRAW:
 				if(previousMovement!=null) {
 					LineSegment2D line = new LineSegment2D(
 							new Point2D(previousMovement.x,previousMovement.y),
@@ -381,10 +381,10 @@ public class Turtle implements Cloneable {
 				}
 				previousMovement = m;
 				break;
-			case TRAVEL:
+			case TurtleMove.TRAVEL:
 				previousMovement = m;
 				break;
-			case TOOL_CHANGE:
+			case TurtleMove.TOOL_CHANGE:
 				color = m.getColor();
 				break;
 			}

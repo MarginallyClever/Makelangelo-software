@@ -9,7 +9,6 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
-import com.marginallyclever.convenience.turtle.TurtleMoveType;
 
 public class CropTurtle {
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
@@ -29,8 +28,8 @@ public class CropTurtle {
 		
 		for( TurtleMove m : oldHistory ) {
 			switch(m.type) {
-			case DRAW:
-			case TRAVEL:
+			case TurtleMove.DRAW:
+			case TurtleMove.TRAVEL:
 				if(prev!=null) {
 					P0.set(prev.x, prev.y);
 					P1.set(m.x, m.y);
@@ -43,7 +42,7 @@ public class CropTurtle {
 						
 						if(startCropped && endCropped) {
 							// crosses rectangle, both ends out.
-							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
+							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMove.TRAVEL));
 							turtle.history.add(m);
 							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
 							turtle.history.add(m2);
@@ -55,7 +54,7 @@ public class CropTurtle {
 							turtle.history.add(m2);
 						} else {
 							// start cropped, coming back into rectangle
-							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMoveType.TRAVEL));
+							turtle.history.add(new TurtleMove(P0.x,P0.y,TurtleMove.TRAVEL));
 							turtle.history.add(m);
 						}
 					}
