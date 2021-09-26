@@ -52,10 +52,7 @@ public class CartesianButtons extends JComponent {
 		setMinimumSize(getPreferredSize());
 		setMaximumSize(getPreferredSize());
 
-		addMouseMotionListener(new MouseMotionListener() {
-			@Override
-			public void mouseDragged(MouseEvent e) {}
-
+		addMouseMotionListener(new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				if(!isEnabled()) return;
@@ -109,7 +106,6 @@ public class CartesianButtons extends JComponent {
 		labels[ZONE_CENTER]="Home";
 	}
 	
-
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
