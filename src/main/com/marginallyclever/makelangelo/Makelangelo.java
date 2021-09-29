@@ -129,12 +129,15 @@ public final class Makelangelo {
 	private PreviewPanel previewPanel;
 	private MakelangeloRobotPanel robotPanel;
 
+	JMenuItem buttonNewFile;
+	JMenuItem buttonOpenFile;
+	JMenuItem buttonReopenFile;
+	
 	private PiCaptureAction piCameraCaptureAction;
 	
 	// for drag + drop operations
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
-	
 	
 	public static void main(String[] argv) {
 		Log.start();
@@ -328,35 +331,27 @@ public final class Makelangelo {
 	private JMenu createFileMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
 
-		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
+		buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener((e) -> newFile());
 		menu.add(buttonNewFile);
 
-		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
+		buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openFile());
 		menu.add(buttonOpenFile);
 		
-		JMenuItem buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
+		buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
 		buttonReopenFile.addActionListener((e) -> reopenLastFile());
-		menu.add(buttonReopenFile);
+		buttonReopenFile.setEnabled(false);
+		menu.add(buttonReopenFile);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveGCODEAs"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
 		menu.add(buttonSaveFile);
 
-		// TODO
-		//buttonNewFile.setEnabled(!isRunning);
-		//buttonOpenFile.setEnabled(!isRunning);
-		//buttonReopenFile.setEnabled(!isRunning && !makelangeloApp.getLastFileIn().isEmpty());
-		//buttonSaveFile.setEnabled(myRobot!=null && myRobot.getTurtle().history.size()>0);
-		
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener((e)->{
-			appPreferences.run(mainFrame);
-			robotPanel.updateButtonAccess();
-		});
+		buttonAdjustPreferences.addActionListener((e)-> appPreferences.run(mainFrame));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
@@ -548,7 +543,7 @@ public final class Makelangelo {
 		previewPanel.addListener(robot);
 
 		Log.message("  assign panel to robot...");
-		robotPanel = new MakelangeloRobotPanel(this,robot);
+		robotPanel = new MakelangeloRobotPanel(contentPane,robot);
 
 		// major layout
 		Log.message("  vertical split...");
@@ -808,7 +803,7 @@ public final class Makelangelo {
 			}
 			success=true;
 		} catch(Exception e) {
-			e.printStackTrace();
+			Log.error("Load error: "+e.getLocalizedMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 
@@ -865,17 +860,21 @@ public final class Makelangelo {
 			// run the dialog
 			if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
 				String selectedFile = fc.getSelectedFile().getAbsolutePath();
+				Log.message("File selected by user: "+selectedFile);
 				FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
 	
 				// figure out which of the loaders was requested.
 				for( LoadResource loader : imageLoaders ) {
 					if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
+					Log.message("Found potential matching loader.");
 					boolean success = openFileOnDemandWithLoader(selectedFile,loader);
 					if(success) {
+						Log.message("Load success!");
 						lastFilterIn = selectedFilter;
 						lastFileIn = selectedFile;
+
 						SoundSystem.playConversionFinishedSound();
-						if( robotPanel != null ) robotPanel.updateButtonAccess();
+						updateButtonAccess();
 						break;
 					}
 				}
@@ -886,6 +885,14 @@ public final class Makelangelo {
 		}
 	}
 
+	private void updateButtonAccess() {
+		boolean isRunning = robot.isRunning();
+		
+		buttonNewFile.setEnabled(!isRunning);
+		buttonOpenFile.setEnabled(!isRunning);
+		buttonReopenFile.setEnabled(!isRunning && !lastFileIn.isEmpty());
+	}
+	
 	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
 		if(!a.getDescription().equals(b.getDescription())) return false;
 		String [] aa = a.getExtensions();
@@ -950,7 +957,7 @@ public final class Makelangelo {
 				if(success==true) {
 					lastFileOut = selectedFile;
 					lastFilterOut = selectedFilter;
-					if( robotPanel != null ) robotPanel.updateButtonAccess();
+					updateButtonAccess();
 					break;
 				}					
 			}
