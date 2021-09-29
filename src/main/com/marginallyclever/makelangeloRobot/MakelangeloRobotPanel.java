@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -17,7 +18,6 @@ import com.marginallyclever.communications.NetworkSessionManager;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
@@ -38,9 +38,8 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	 */
 	private static final long serialVersionUID = -4703402918904039337L;
 
-	// god objects?
+	private JComponent myParent;
 	private MakelangeloRobot myRobot;
-	private Makelangelo makelangeloApp;
 
 	// connect menu
 	private SelectPanel connectionPanel;	
@@ -72,10 +71,10 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 	 * @param gui
 	 * @param myRobot
 	 */
-	public MakelangeloRobotPanel(Makelangelo gui, MakelangeloRobot robot) {
+	public MakelangeloRobotPanel(JComponent parent,MakelangeloRobot robot) {
 		super();
 		
-		makelangeloApp = gui;
+		myParent = parent;
 		myRobot = robot;
 		robot.addListener(this);		
 		
@@ -127,7 +126,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 				buttonConnect.setForeground(Color.GREEN);
 				mySession=null;
 			} else {
-				mySession = NetworkSessionManager.requestNewSession(makelangeloApp.getMainFrame());
+				mySession = NetworkSessionManager.requestNewSession(myParent);
 				if(mySession!=null) {
 					Log.message("New network session opened...");					
 					myRobot.setNetworkSession(mySession);
@@ -309,7 +308,7 @@ public class MakelangeloRobotPanel extends JPanel implements MakelangeloRobotEve
 
 	private void startAt() {
 		StartAtPanel p = new StartAtPanel();
-		if(p.run(makelangeloApp.getMainFrame())==false) return;
+		if(p.run(myParent)==false) return;
 
 		int lineNumber = p.getLineNumber();
 		if (lineNumber != -1) {
