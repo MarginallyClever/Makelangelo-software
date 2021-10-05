@@ -9,7 +9,7 @@ public class StringHelper {
 	 * @param arg0
 	 * @return the formatted string
 	 */
-	static public String formatFloat(float arg0) {
+	public static String formatFloat(float arg0) {
 		//return Float.toString(roundOff(arg0));
 		return String.format(Locale.US,"%.3f", arg0);
 	}
@@ -19,8 +19,17 @@ public class StringHelper {
 	 * @param arg0
 	 * @return the formatted string
 	 */
-	static public String formatDouble(double arg0) {
+	public static String formatDouble(double arg0) {
 		//return Float.toString(roundOff(arg0));
 		return String.format(Locale.US,"%.3f", arg0);
+	}
+	
+	/**
+	 * @param s string to pad
+	 * @param n number of spaces to pad
+	 * @return newly formatted string.
+	 */
+	public static String padRight(String s, int n) {
+		return String.format("%1$-" + n + "s", s);
 	}
 }

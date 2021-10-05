@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangeloRobot.plotterControls;
 
 import java.awt.Color;
 import java.awt.Dimension;
