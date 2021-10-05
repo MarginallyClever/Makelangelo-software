@@ -753,30 +753,14 @@ public class PlotterSettings implements Serializable {
 
 		String name = "";
 		switch (toolNumber) {
-		case 0xff0000:
-			name = "red";
-			break;
-		case 0x00ff00:
-			name = "green";
-			break;
-		case 0x0000ff:
-			name = "blue";
-			break;
-		case 0x000000:
-			name = "black";
-			break;
-		case 0x00ffff:
-			name = "cyan";
-			break;
-		case 0xff00ff:
-			name = "magenta";
-			break;
-		case 0xffff00:
-			name = "yellow";
-			break;
-		case 0xffffff:
-			name = "white";
-			break;
+		case 0xff0000:			name = "red";			break;
+		case 0x00ff00:			name = "green";			break;
+		case 0x0000ff:			name = "blue";			break;
+		case 0x000000:			name = "black";			break;
+		case 0x00ffff:			name = "cyan";			break;
+		case 0xff00ff:			name = "magenta";		break;
+		case 0xffff00:			name = "yellow";		break;
+		case 0xffffff:			name = "white";			break;
 		default:
 			name = "0x" + Integer.toHexString(toolNumber);
 			break; // display unknown RGB value as hex
@@ -785,17 +769,14 @@ public class PlotterSettings implements Serializable {
 		return "M06 T" + toolNumber + "\n" + "M0 Ready " + name + " and click\n";
 	}
 
-	@SuppressWarnings("unused")
-	private static String padRight(String s, int n) {
-		return String.format("%1$-" + n + "s", s);
-	}
-
 	public String getMoveTo(double x, double y, boolean isUp, boolean zMoved) {
 		String command = isUp ? COMMAND_TRAVEL : COMMAND_DRAW;
 		if (zMoved) {
 			command += " " + (isUp ? getTravelFeedrateString() : getDrawFeedrateString());
 		}
-		return command + " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y) + "\n";
+		return command 
+				+ " X" + StringHelper.formatDouble(x) 
+				+ " Y" + StringHelper.formatDouble(y) + "\n";
 	}
 
 	public void setPenDiameter(double d) {
