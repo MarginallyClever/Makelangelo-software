@@ -8,20 +8,20 @@ import com.marginallyclever.convenience.log.Log;
  *
  */
 public class CommandLineOptions {
-	protected static String [] argv;
+	protected static String [] args;
 	
-	static public void setFromMain(String [] argv) {
-		CommandLineOptions.argv = argv;
+	static public void setFromMain(String [] args) {
+		CommandLineOptions.args = args;
 
-		for(int i=0;i<argv.length;++i) {
-			String msg = "START OPTION "+argv[i];
+		for(int i=0;i<args.length;++i) {
+			String msg = "START OPTION "+args[i];
 			Log.message(msg);
 		}
 	}
 	
 	static public boolean hasOption(String option) {
-		for(int i=0;i<argv.length;++i) {
-			if(argv[i].equals(option)) {
+		for(int i=0;i<args.length;++i) {
+			if(args[i].equals(option)) {
 				return true;
 			}
 		}
