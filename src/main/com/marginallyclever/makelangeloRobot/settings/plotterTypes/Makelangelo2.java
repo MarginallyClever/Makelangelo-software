@@ -111,7 +111,8 @@ public class Makelangelo2 implements PlotterType {
 		paintCalibrationPoint(gl2, settings);
 		paintMotors(gl2, settings);
 		paintControlBox(gl2, settings);
-		paintPenHolderToCounterweights(gl2, robot);
+		if(robot.getDidFindHome()) 
+			paintPenHolderToCounterweights(gl2, robot);
 	}
 
 	// draw left & right motor

@@ -67,8 +67,9 @@ public class MakelangeloCustom extends Makelangelo3 {
 //		paintCalibrationPoint(gl2,settings);
 		paintControlBox(gl2,settings);
 		paintMotors(gl2,settings);
-		paintPenHolderToCounterweights(gl2,robot);
 		paintSafeArea(gl2,robot);
+		if(robot.getDidFindHome()) 
+			paintPenHolderToCounterweights(gl2,robot);
 	}
 
 	/**
