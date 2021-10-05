@@ -101,14 +101,14 @@ public class JogInterface extends JPanel {
 	}
 
 	private void onToggleEngageMotorAction() {
-		if(myPlotter.areMotorsEngaged() )
+		if(myPlotter.getAreMotorsEngaged() )
 			myPlotter.disengageMotors();
 		else
 			myPlotter.engageMotors();
 	}
 
 	private void updateButtonStatus() {
-		toggleEngagedMotor.setText(Translator.get( myPlotter.areMotorsEngaged() ? "DisengageMotors" : "EngageMotors" ));
+		toggleEngagedMotor.setText(Translator.get( myPlotter.getAreMotorsEngaged() ? "DisengageMotors" : "EngageMotors" ));
 		bCartesian.setEnabled(myPlotter.getDidFindHome());
 	}
 

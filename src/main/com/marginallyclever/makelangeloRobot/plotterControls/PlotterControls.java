@@ -22,7 +22,7 @@ public class PlotterControls extends JPanel {
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab(JogInterface.class.getSimpleName(), new JogInterface(plotter));
 		pane.addTab(MarlinInterface.class.getSimpleName(), new MarlinInterface(plotter));
-		//pane.addTab(ProgramInterface.class.getSimpleName(), new ProgramInterface(plotter));
+		pane.addTab(ProgramInterface.class.getSimpleName(), new ProgramInterface(plotter));
 		
 		this.setLayout(new BorderLayout());
 		this.add(pane,BorderLayout.CENTER);

@@ -6,6 +6,7 @@ import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
@@ -15,8 +16,11 @@ import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
+import com.marginallyclever.makelangeloRobot.marlin.MarlinEvent;
 
 public class MarlinInterface extends JPanel {
 	private static final long serialVersionUID = 979851120390943303L;
@@ -40,9 +44,7 @@ public class MarlinInterface extends JPanel {
 		this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(chatInterface, BorderLayout.CENTER);
 
-		plotter.addListener((e) -> {
-			if(e.type == PlotterEvent.POSITION) sendGoto();	
-		});
+		plotter.addListener((e) -> onPlotterEvent(e));
 
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
@@ -54,6 +56,49 @@ public class MarlinInterface extends JPanel {
 				break;
 			}
 		});
+		
+		chatInterface.addNetworkSessionListener((e)->{
+			if(e.flag == MarlinEvent.TRANSPORT_ERROR) {
+				setLineNumber((int)e.data);
+				sendFileCommand();
+			}
+			if(e.flag == MarlinEvent.SEND_BUFFER_EMPTY) {
+				sendFileCommand();
+			}
+		});
+	}
+
+	private void whenBadFirmwareDetected(String versionFound) {
+		(new DialogBadFirmwareVersion()).display(this, versionFound);
+	}
+
+	private void whenBadHardwareDetected(String versionFound) {
+		JOptionPane.showMessageDialog(this, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
+	}
+	
+	private Object onPlotterEvent(PlotterEvent e) {
+		switch(e.type) {
+		case PlotterEvent.HOME_FOUND: sendFindHome();  break;
+		case PlotterEvent.POSITION: sendGoto(); break;
+		case PlotterEvent.PEN_UP: sendPenUp(); break;
+		case PlotterEvent.MOTORS_ENGAGED: sendEngage(); break;
+		}
+		return null;
+	}
+
+	private void sendFindHome() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void sendPenUp() {
+		sendCommand( myPlotter.getPenIsUp() 
+				? myPlotter.getSettings().getPenUpString()
+				: myPlotter.getSettings().getPenDownString() );
+	}
+
+	private void sendEngage() {
+		sendCommand( myPlotter.getAreMotorsEngaged() ? "M17" : "M18" );
 	}
 
 	private void onConnect() {
@@ -124,7 +169,10 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void sendGoto() {
-		sendCommand("G1" + getPosition(myPlotter));
+		sendCommand(
+				(myPlotter.getPenIsUp() ? "G0" : "G1")
+				+ getPosition(myPlotter)
+		);
 	}
 
 	private String getPosition(Plotter plotter) {
