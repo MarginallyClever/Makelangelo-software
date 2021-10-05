@@ -89,9 +89,9 @@ public class Converter_Pulse extends ImageConverter {
 		double xRight  = settings.getMarginRight() ;
 		
 		// figure out how many lines we're going to have on this image.
-		double stepSize = settings.getPenDiameter() * blockScale;
+		double stepSize = blockScale;
 		double halfStep = stepSize / 2.0f;
-		double zigZagSpacing = settings.getPenDiameter();
+		double zigZagSpacing = 1;
 		double spaceBetweenLines = stepSize;
 
 		// from top to bottom of the image...

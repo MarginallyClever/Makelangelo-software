@@ -57,7 +57,7 @@ public class Converter_Spiral extends ImageConverter {
 			maxr = h < w ? h : w;
 		}
 
-		double toolDiameter = settings.getPenDiameter();
+		double toolDiameter = 1;
 
 		int i, j;
 		final int steps = 4;

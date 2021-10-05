@@ -80,7 +80,7 @@ public class Converter_Moire extends ImageConverter {
 		}
 		
 		// find the maximum number of passes for any given line
-		double pd = settings.getPenDiameter()*0.7;
+		double pd = 0.7;
 		int maxPasses = (int)Math.floor( spaceBetweenLines / pd )-1;
 		// adjust to the maximum number used in *this* line.
 		int passesThisLine = (int)(maxPasses * maxPixel);
@@ -184,7 +184,7 @@ public class Converter_Moire extends ImageConverter {
 		double w=xRight-xLeft;
 		
 		// figure out how many lines we're going to have on this image.
-		double halfStep = settings.getPenDiameter();
+		double halfStep = 1;
 		double spaceBetweenLines = blockScale;
 
 		// from top to bottom of the image...

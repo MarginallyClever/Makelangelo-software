@@ -51,7 +51,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angleDeg));
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = settings.getPenDiameter() * intensity/2.0;
+		double stepSize = intensity/2.0;
 		if (stepSize < 1) stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.

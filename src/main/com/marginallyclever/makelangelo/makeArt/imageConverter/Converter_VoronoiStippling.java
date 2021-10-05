@@ -371,7 +371,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	protected void writeOutCells() {
 		turtle = new Turtle();
 
-		double toolDiameter = settings.getPenDiameter();
+		double toolDiameter = 1;
 
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {

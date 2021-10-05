@@ -74,7 +74,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 			maxr = h < w ? h : w;
 		}
 
-		double toolDiameter = settings.getPenDiameter();
+		double toolDiameter = 1;
 
 		int i, j;
 		int steps = 4;

@@ -53,9 +53,7 @@ public class Converter_Multipass extends ImageConverter {
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
 
-		// figure out how many lines we're going to have on this image.
-		double stepSize = settings.getPenDiameter();
-		if (stepSize < 1) stepSize = 1;
+		double stepSize = 1;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).

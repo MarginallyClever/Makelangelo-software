@@ -4,7 +4,6 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.PlotterPanel;
 
 /**
  * Completely fills the page with ink.
@@ -12,9 +11,6 @@ import com.marginallyclever.makelangeloRobot.PlotterPanel;
  */
 public class Generator_FillPage extends TurtleGenerator {
 	private static double angle = 0;
-
-	PlotterPanel robotPanel;
-	
 
 	@Override
 	public String getName() {
@@ -39,7 +35,7 @@ public class Generator_FillPage extends TurtleGenerator {
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = settings.getPenDiameter();
+		double stepSize = 1;
 
 		// from top to bottom of the margin area...
 		double yBottom = settings.getMarginBottom();

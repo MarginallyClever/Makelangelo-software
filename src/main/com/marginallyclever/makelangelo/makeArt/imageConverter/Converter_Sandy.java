@@ -79,7 +79,7 @@ public class Converter_Sandy extends ImageConverter {
 		double pulseFlip=1;
 		double t,t_step;
 		double flipSum;
-		double pulseSize = rStep*0.5 - settings.getPenDiameter()/2;//r_step * 0.6 * scale_z;
+		double pulseSize = rStep*0.5 - 0.5;//r_step * 0.6 * scale_z;
 
 		turtle = new Turtle();
 		turtle.lock();

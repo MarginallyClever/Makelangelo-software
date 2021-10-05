@@ -38,7 +38,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double toolDiameter = settings.getPenDiameter();
+		double toolDiameter = 1;
 
 		double maxr;
 		
@@ -57,9 +57,9 @@ public class Converter_SpiralPulse extends ImageConverter {
 		double r = maxr - toolDiameter*5.0f, f;
 		double fx, fy;
 		int numRings = 0;
-		double stepSize = settings.getPenDiameter() * height;
+		double stepSize = toolDiameter * height;
 		double halfStep = stepSize / 2.0f;
-		double zigZagSpacing = settings.getPenDiameter();
+		double zigZagSpacing = toolDiameter;
 		int n=1;
 		double PULSE_MINIMUM = 0.1f;
 		double ringSize = halfStep*spacing;

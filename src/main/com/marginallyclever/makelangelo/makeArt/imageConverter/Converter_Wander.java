@@ -57,7 +57,7 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	protected int outputChannel(TransformedImage img,ColorRGB newColor,int pointsPerChannel,double cutoff) {
-		double stepSize = settings.getPenDiameter()*5.0;
+		double stepSize = 5.0;
 		if (stepSize < 1) stepSize = 1;
 		double halfStep = stepSize/2;
 

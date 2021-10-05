@@ -62,7 +62,7 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = settings.getPenDiameter()*(double)passes/2.0;
+		double stepSize = (double)passes/2.0;
 
 		// from top to bottom of the margin area...
 		double height  = settings.getMarginTop() - settings.getMarginBottom();
