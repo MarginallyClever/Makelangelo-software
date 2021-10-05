@@ -90,7 +90,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				mouseOldX = e.getX();
 				mouseOldY = e.getY();
 			}
-			
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -116,7 +115,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			}
 		});
 		
-
 		// start animation system
 		Log.message("  starting animator...");
 		animator = new FPSAnimator(1);
