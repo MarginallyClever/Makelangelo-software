@@ -9,16 +9,16 @@ import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.Plotter;
 
 public class ReorderTurtle extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3473530693924971574L;
-	private MakelangeloRobot myRobot;
+	private Plotter myRobot;
 	
-	public ReorderTurtle(MakelangeloRobot robot) {
+	public ReorderTurtle(Plotter robot) {
 		super(Translator.get("Reorder"));
 		myRobot = robot;
 	}

@@ -19,7 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 
 
 public class LogPanel extends JPanel implements LogListener {
@@ -46,7 +48,6 @@ public class LogPanel extends JPanel implements LogListener {
 	public LogPanel() {
 		Log.addListener(this);
 
-		// put all the parts together
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints con1 = new GridBagConstraints();
 		con1.gridx = 0;
@@ -112,17 +113,8 @@ public class LogPanel extends JPanel implements LogListener {
 		boolean isLast = (lastVisible == listSize);
 
 		listModel.addElement(msg);
-
-		//int removed = 
 		trimLogPanel();
-
-		//System.out.print("** ");
-		if(isLast) {
-			//System.out.print("isLast ");
-			jumpToLogEnd();
-		}
-
-		//System.out.println(logArea.getLastVisibleIndex()+"/"+logArea.getLastVisibleIndex() + "\t" +listSize+"/"+listModel.getSize()+"\t"+removed+"\t"+msg);
+		if(isLast) jumpToLogEnd();
 	}
 
 	private int trimLogPanel() {
@@ -198,9 +190,12 @@ public class LogPanel extends JPanel implements LogListener {
 		commandLineText.setText("");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] argv) {
 		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(argv);
 		Translator.start();
+		
 		JFrame frame = new JFrame("Log");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(600, 400));

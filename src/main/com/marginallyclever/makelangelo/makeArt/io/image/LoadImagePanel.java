@@ -7,7 +7,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import javax.swing.JComboBox;
@@ -17,6 +16,22 @@ import javax.swing.JPanel;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Boxes;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_CMYK;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Crosshatch;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Moire;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Multipass;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Pulse;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_RandomLines;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Sandy;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Spiral;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Spiral_CMYK;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_SpiralPulse;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_VoronoiStippling;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_VoronoiZigZag;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Wander;
+
 import com.marginallyclever.util.PreferencesHelper;
 
 public class LoadImagePanel {
@@ -30,7 +45,7 @@ public class LoadImagePanel {
 	private static JComboBox<String> styleNames;
 	private static JComboBox<String> fillNames;
 	private JPanel cards;
-
+	
 	public LoadImagePanel(LoadImage loader) {
 		this.loader = loader;
 
@@ -46,16 +61,13 @@ public class LoadImagePanel {
 		cards.setPreferredSize(new Dimension(450,300));
 
 		ArrayList<String> imageConverterNames = new ArrayList<String>();
-		ServiceLoader<ImageConverter> converterServices = ServiceLoader.load(ImageConverter.class);
-		ArrayList<ImageConverter> converters = new ArrayList<ImageConverter>();
-		for( ImageConverter ici : converterServices ) {
-			converters.add(ici);
+		for( ImageConverter ici : ImageConverterFactory.converters ) {
 			imageConverterNames.add(ici.getName());
 			cards.add(ici.getPanel().getPanel(),ici.getName());
 		}
 		String [] converterNameArray = (String[]) imageConverterNames.toArray(new String[0]);
 		styleNames = new JComboBox<String>(converterNameArray);
-	
+
 		GridBagConstraints c = new GridBagConstraints();
 		int y = 0;
 		c.anchor = GridBagConstraints.EAST;
@@ -109,7 +121,7 @@ public class LoadImagePanel {
 				case 1:  loader.scaleToFitPaper();  break;
 				default: break;
 			}
-			loader.changeConverter(converters.get(styleNames.getSelectedIndex()));
+			loader.changeConverter(ImageConverterFactory.converters[styleNames.getSelectedIndex()]);
 		});
 		
 		fillNames.addItemListener((e) -> {
@@ -125,7 +137,7 @@ public class LoadImagePanel {
 		if(p>=styleNames.getItemCount()) p=0;
 		styleNames.setSelectedIndex(p);
 
-		loader.changeConverter(converters.get(p));
+		loader.changeConverter(ImageConverterFactory.converters[p]);
 	}
 	
 	public void run(Component parentComponent) {

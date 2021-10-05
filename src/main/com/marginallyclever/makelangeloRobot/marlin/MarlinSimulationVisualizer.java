@@ -6,7 +6,7 @@ import javax.vecmath.Vector3d;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 public class MarlinSimulationVisualizer {
 	//private static int limit;
@@ -27,7 +27,7 @@ public class MarlinSimulationVisualizer {
 	
 	public MarlinSimulationVisualizer() {}
 	
-	public void render(GL2 gl2,Turtle turtleToRender,MakelangeloRobotSettings settings) {
+	public void render(GL2 gl2,Turtle turtleToRender,PlotterSettings settings) {
 		if(previousTurtle!=turtleToRender) {
 			recalculateBuffer(gl2,turtleToRender,settings);
 			previousTurtle = turtleToRender;
@@ -50,7 +50,7 @@ public class MarlinSimulationVisualizer {
 		gl2.glPopMatrix();
 	}
 
-	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, final MakelangeloRobotSettings settings) {
+	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, final PlotterSettings settings) {
 		buffer.clear();
 		
 		final int renderMode=2;
@@ -84,7 +84,7 @@ public class MarlinSimulationVisualizer {
 		buffer.add(new ColorPoint(new Vector3d(r,g,0),block.end));
 	}
 	
-	private void renderAccelDecel(MarlinSimulationBlock block,MakelangeloRobotSettings settings) {
+	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
 		double t,a,d;
 		boolean useDistance=true;
 		if(useDistance) {

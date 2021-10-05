@@ -1,6 +1,0 @@
-com.marginallyclever.makelangelo.makeArt.io.dxf.LoadDXF
-com.marginallyclever.makelangelo.makeArt.io.gcode.LoadGCode
-com.marginallyclever.makelangelo.makeArt.io.image.LoadImage
-com.marginallyclever.makelangelo.makeArt.io.scratch.LoadScratch2
-com.marginallyclever.makelangelo.makeArt.io.scratch.LoadScratch3
-com.marginallyclever.makelangelo.makeArt.io.svg.LoadSVG

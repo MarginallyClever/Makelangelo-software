@@ -9,16 +9,16 @@ import javax.vecmath.Vector2d;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.Plotter;
 
 public class SimplifyTurtle extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2930297421274921735L;
-	private MakelangeloRobot myRobot;
+	private Plotter myRobot;
 	
-	public SimplifyTurtle(MakelangeloRobot robot) {
+	public SimplifyTurtle(Plotter robot) {
 		super(Translator.get("Simplify"));
 		myRobot=robot;
 	}

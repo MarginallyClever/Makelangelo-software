@@ -32,10 +32,10 @@ import com.marginallyclever.makelangelo.Makelangelo;
  * See org.slf4j.Logger
  */
 public class Log {
-	public static String LOG_FILE_PATH;
-	public static String LOG_FILE_NAME_TXT = "log.txt";
-	public final static String PROGRAM_START_STRING = "PROGRAM START";
-	public final static String PROGRAM_END_STRING = "PROGRAM END";
+	private static String LOG_FILE_PATH;
+	private static String LOG_FILE_NAME_TXT = "log.txt";
+	private final static String PROGRAM_START_STRING = "PROGRAM START";
+	private final static String PROGRAM_END_STRING = "PROGRAM END";
 	
 	private static Logger logger;
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -48,6 +48,10 @@ public class Log {
 	
 	public static void removeListener(LogListener listener) {
 		listeners.remove(listener);
+	}
+	
+	public static String getLogLocation() {
+		return LOG_FILE_PATH+LOG_FILE_NAME_TXT;
 	}
 	
 	public static void start() {
@@ -81,7 +85,7 @@ public class Log {
 	}
 	
 	private static boolean crashReportCheck() {
-		File oldLogFile = new File(LOG_FILE_PATH+LOG_FILE_NAME_TXT);
+		File oldLogFile = new File(getLogLocation());
 		if( oldLogFile.exists() ) {
 			// read last line of file
 			String ending = tail(oldLogFile);

@@ -3,10 +3,10 @@ package com.marginallyclever.makelangelo.makeArt;
 import java.awt.geom.Rectangle2D;
 
 import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 public class ResizeTurtleToPaper {
-	public static Turtle run(Turtle turtle,MakelangeloRobotSettings settings,boolean fillPage) {
+	public static Turtle run(Turtle turtle,PlotterSettings settings,boolean fillPage) {
 		Rectangle2D.Double turtleBounds = turtle.getBounds(); // image bounds
 
 		// find the scale

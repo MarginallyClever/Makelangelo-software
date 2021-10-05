@@ -13,7 +13,7 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
@@ -27,7 +27,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter implements MakelangeloRobotDecorator {
+public class Converter_VoronoiStippling extends ImageConverter implements PlotterDecorator {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();

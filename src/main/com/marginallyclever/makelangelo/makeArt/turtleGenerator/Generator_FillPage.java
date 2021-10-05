@@ -4,7 +4,7 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangeloRobot.PlotterPanel;
 
 /**
  * Completely fills the page with ink.
@@ -13,7 +13,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
 public class Generator_FillPage extends TurtleGenerator {
 	private static double angle = 0;
 
-	MakelangeloRobotPanel robotPanel;
+	PlotterPanel robotPanel;
 	
 
 	@Override

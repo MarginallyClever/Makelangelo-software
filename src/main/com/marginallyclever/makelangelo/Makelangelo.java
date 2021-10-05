@@ -22,9 +22,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -32,11 +30,9 @@ import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -48,7 +44,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -61,8 +56,6 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
@@ -72,21 +65,22 @@ import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
 import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
-import com.marginallyclever.makelangelo.makeArt.io.LoadResource;
-import com.marginallyclever.makelangelo.makeArt.io.SaveResource;
 import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.LoadImagePanel;
+import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
+import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.Generator_Text;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.preferences.GFXPreferences;
 import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotEvent;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotPanel;
+import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangeloRobot.PlotterEvent;
+import com.marginallyclever.makelangeloRobot.PlotterPanel;
 import com.marginallyclever.makelangeloRobot.PiCaptureAction;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
@@ -105,34 +99,36 @@ import com.marginallyclever.util.PropertiesFileHelper;
  * @since 0.0.1
  */
 public final class Makelangelo {
+	private static final String KEY_WINDOW_X = "windowX";
+	private static final String KEY_WINDOW_Y = "windowX";
+	private static final String KEY_WINDOW_WIDTH = "windowWidth";
+	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
+
 	/**
 	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the 
 	 * VERSION based upon pom.xml.  In this way we only define the VERSION once and prevent violating DRY.
 	 */
 	public String VERSION;
-	
-	private final static String FORUM_URL = "https://discord.gg/Q5TZFmB";
 
 	private MakelangeloAppPreferences appPreferences;
+	
 	private Camera camera;
-	private MakelangeloRobot robot;
+	private Plotter robot;
 
-	private String lastFileIn = "";
-	private FileFilter lastFilterIn = null;
-	private String lastFileOut = "";
-	private FileFilter lastFilterOut = null;
-	
 	// GUI elements
-	private JFrame mainFrame = null;
-	private JFrame logFrame = null;
-	private LogPanel logPanel = null;
+	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
-	private MakelangeloRobotPanel robotPanel;
+	private PlotterPanel robotPanel;
 
-	JMenuItem buttonNewFile;
-	JMenuItem buttonOpenFile;
-	JMenuItem buttonReopenFile;
-	
+	private JMenuItem buttonNewFile;
+	private JMenuItem buttonOpenFile;
+	private JMenuItem buttonReopenFile;
+
+	private SaveDialog saveDialog;
+	private LoadDialog loadDialog;	
+
+	private JFrame logFrame;
+
 	private PiCaptureAction piCameraCaptureAction;
 	
 	// for drag + drop operations
@@ -143,7 +139,8 @@ public final class Makelangelo {
 		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(argv);
-
+		Translator.start();
+		
 		// set look and feel
         try {
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -160,9 +157,7 @@ public final class Makelangelo {
 	}
 
 	public Makelangelo() {
-		Translator.start();
-		
-		logPanel = new LogPanel();
+		createLogFrame();
 		
 		Log.message("Locale="+Locale.getDefault().toString());
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
@@ -173,25 +168,23 @@ public final class Makelangelo {
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
-		robot = new MakelangeloRobot();
+		robot = new Plotter();
 		robot.addListener((e)->{
-			if(e.type==MakelangeloRobotEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
-			if(e.type==MakelangeloRobotEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
-			if(e.type==MakelangeloRobotEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
-			if(e.type==MakelangeloRobotEvent.DISCONNECT) whenDisconnected();
-			if(e.type==MakelangeloRobotEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
+			if(e.type==PlotterEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
+			if(e.type==PlotterEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
+			if(e.type==PlotterEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
+			if(e.type==PlotterEvent.DISCONNECT) whenDisconnected();
+			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
 		});
 		robot.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
-		logPanel.addListener((command)->{
-			robot.send(command);
-		});
 
+		saveDialog = new SaveDialog();
+		loadDialog = new LoadDialog();
+		
 		Log.message("Starting virtual camera...");
 		camera = new Camera();
-		
-		Log.message("Starting art pipeline...");
 	}
 	
 	public void run() {
@@ -279,8 +272,7 @@ public final class Makelangelo {
 	private JMenu createGenerateMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuGenerate"));
 		
-		ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
-		for( TurtleGenerator ici : imageGenerators ) {
+		for( TurtleGenerator ici : TurtleGeneratorFactory.available ) {
 			JMenuItem mi = new JMenuItem(ici.getName());
 			mi.addActionListener((e) -> runGeneratorDialog(ici));
 			menu.add(mi);
@@ -411,34 +403,7 @@ public final class Makelangelo {
 		menu.add(checkboxShowPenUpMoves);
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> {
-			if(logFrame == null) {
-				logFrame = new JFrame(Translator.get("Log"));
-				logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				logFrame.setPreferredSize(new Dimension(600,400));
-				logFrame.add(logPanel);
-				logFrame.pack();
-				logFrame.addWindowListener(new WindowListener() {
-					@Override
-					public void windowOpened(WindowEvent e) {}
-					@Override
-					public void windowIconified(WindowEvent e) {}
-					@Override
-					public void windowDeiconified(WindowEvent e) {}
-					@Override
-					public void windowDeactivated(WindowEvent e) {}
-					@Override
-					public void windowClosing(WindowEvent e) {}
-					@Override
-					public void windowClosed(WindowEvent e) {
-						logFrame=null;
-					}
-					@Override
-					public void windowActivated(WindowEvent e) {}
-				});
-			}
-			logFrame.setVisible(true);
-		});
+		buttonViewLog.addActionListener((e) -> logFrame.setVisible(true) );
 		menu.add(buttonViewLog);
 
 		return menu;
@@ -450,7 +415,7 @@ public final class Makelangelo {
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
 		buttonForums.addActionListener((e) -> {
 			try {
-				java.awt.Desktop.getDesktop().browse(URI.create(FORUM_URL));
+				java.awt.Desktop.getDesktop().browse(URI.create("https://discord.gg/Q5TZFmB"));
 			} catch (IOException e1) {
 				Log.error("Forum URL error: "+e1.getLocalizedMessage());
 				e1.printStackTrace();
@@ -503,7 +468,7 @@ public final class Makelangelo {
 				String results;
 				if (comp > 0) {
 					results = Translator.get("UpdateNotice");
-					// TODO downloadUthatpdate(), flashNewFirmwareToRobot();
+					// TODO downloadUpdate(), flashNewFirmwareToRobot();
 				} else if (comp < 0)
 					results = "This version is from the future?!";
 				else
@@ -514,8 +479,9 @@ public final class Makelangelo {
 			in.close();
 		} catch (Exception e) {
 			if (announceIfFailure) {
-				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed"));
+				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed") + e.getLocalizedMessage());
 			}
+			Log.error("Update check failed: "+e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -543,7 +509,7 @@ public final class Makelangelo {
 		previewPanel.addListener(robot);
 
 		Log.message("  assign panel to robot...");
-		robotPanel = new MakelangeloRobotPanel(contentPane,robot);
+		robotPanel = new PlotterPanel(robot);
 
 		// major layout
 		Log.message("  vertical split...");
@@ -581,7 +547,7 @@ public final class Makelangelo {
 			@Override
 			public void windowClosed(WindowEvent e) {}
 		});
-				
+		
 		Log.message("  adding menu bar...");
 		mainFrame.setJMenuBar(createMenuBar());
 		
@@ -599,25 +565,20 @@ public final class Makelangelo {
 		setupDropTarget();
 	}
 
+	private void createLogFrame() {
+		LogPanel logPanel = new LogPanel();
+		logPanel.addListener( (command)-> robot.send(command) );
+
+		logFrame = new JFrame(Translator.get("Log")+" @ "+Log.getLogLocation());
+		logFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		logFrame.setPreferredSize(new Dimension(600,400));
+		logFrame.add(logPanel);
+		logFrame.pack();
+	}
+
 	private void setupDropTarget() {
 		Log.message("  adding drag & drop support...");
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
-			@Override
-			public void dragEnter(DropTargetDragEvent dtde) {
-			}
-
-			@Override
-			public void dragOver(DropTargetDragEvent dtde) {
-			}
-
-			@Override
-			public void dropActionChanged(DropTargetDragEvent dtde) {
-			}
-
-			@Override
-			public void dragExit(DropTargetEvent dte) {
-			}
-
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
 			    try {
@@ -657,33 +618,40 @@ public final class Makelangelo {
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
 		// window size
-		int width = preferences.getInt("windowWidth", -1);
-		int height = preferences.getInt("windowHeight", -1);
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		int width = preferences.getInt(KEY_WINDOW_WIDTH, -1);
+		int height = preferences.getInt(KEY_WINDOW_HEIGHT, -1);
+    	int windowX = preferences.getInt(KEY_WINDOW_X, -1);
+    	int windowY = preferences.getInt(KEY_WINDOW_Y, -1);
+
 		if(width==-1 || height==-1) {
     		Log.message("...default size");
 			width = Math.min(screenSize.width,1200);
 			height = Math.min(screenSize.height,1020);
 		}
-
-		if (width > screenSize.width || height > screenSize.height) {
-			width = screenSize.width;
-			height = screenSize.height;
-		}
-
-		mainFrame.setSize(width, height);
-
-    	int windowX = preferences.getInt("windowX", -1);
-    	int windowY = preferences.getInt("windowY", -1);
         if(windowX==-1 || windowY==-1) {
     		Log.message("...default position");
         	// centered
         	windowX = (screenSize.width - width)/2;
         	windowY = (screenSize.height - height)/2;
         }
+        
+		mainFrame.setSize(width, height);
 		mainFrame.setLocation(windowX, windowY);
+	}
+
+	// save window position and size
+	private void saveWindowSizeAndPosition() {
+		Dimension size = this.mainFrame.getSize();
+		Point location = this.mainFrame.getLocation();
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+
+		preferences.putInt(KEY_WINDOW_WIDTH, size.width);
+		preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
+		preferences.putInt(KEY_WINDOW_X, location.x);
+		preferences.putInt(KEY_WINDOW_Y, location.y);
 	}
 
 	/**
@@ -720,7 +688,7 @@ public final class Makelangelo {
 		JOptionPane.showMessageDialog(mainFrame, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
 	}
 	
-	private void whenIdentityConfirmed(MakelangeloRobot r) {
+	private void whenIdentityConfirmed(Plotter r) {
 		if(previewPanel != null) previewPanel.repaint();
 	}
 
@@ -761,25 +729,12 @@ public final class Makelangelo {
 			}).start();
 		}
 	}
-
-	// save window position and size
-	private void saveWindowSizeAndPosition() {
-		Dimension size = this.mainFrame.getSize();
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
-		preferences.putInt("Default window width", size.width);
-		preferences.putInt("Default window height", size.height);
-
-		Point location = this.mainFrame.getLocation();
-		preferences.putInt("Default window location x", location.x);
-		preferences.putInt("Default window location y", location.y);
-	}
 	
 	public JFrame getMainFrame() {
 		return mainFrame;
 	}
 
-	public MakelangeloRobot getRobot() {
+	public Plotter getRobot() {
 		return robot;
 	}
 	
@@ -790,15 +745,15 @@ public final class Makelangelo {
 	 * @param loader the plugin to use
 	 * @return true if load is successful.
 	 */
-	public boolean openFileOnDemandWithLoader(String filename,LoadResource loader) {
+	private boolean openFileOnDemandWithLoader(String filename,TurtleLoader loader) {
 		boolean success = false;
 		try(final InputStream fileInputStream = new FileInputStream(filename)) {
 			if(loader instanceof LoadImage) {
 				LoadImage imageLoader = (LoadImage)loader;
-				imageLoader.load(fileInputStream, robot, mainFrame);
+				imageLoader.load(fileInputStream);
 				runImageConversionProcess(imageLoader);
 			} else {
-				Turtle t = loader.load(fileInputStream, robot ,mainFrame);
+				Turtle t = loader.load(fileInputStream);
 				robot.setTurtle(t);
 			}
 			success=true;
@@ -823,10 +778,11 @@ public final class Makelangelo {
 	public boolean openFileOnDemand(String filename) {
 		Log.message(Translator.get("OpeningFile") + filename + "...");
 
-		ServiceLoader<LoadResource> imageLoaders = ServiceLoader.load(LoadResource.class);
-		Iterator<LoadResource> i = imageLoaders.iterator();
+		TurtleFactory.getLoadExtensions();
+		ServiceLoader<TurtleLoader> imageLoaders = ServiceLoader.load(TurtleLoader.class);
+		Iterator<TurtleLoader> i = imageLoaders.iterator();
 		while(i.hasNext()) {
-			LoadResource loader = i.next();
+			TurtleLoader loader = i.next();
 			if(!loader.canLoad(filename)) continue;
 			
 			return openFileOnDemandWithLoader(filename,loader);
@@ -837,50 +793,22 @@ public final class Makelangelo {
 	}
 
 	public void reopenLastFile() {
-		openFileOnDemand(lastFileIn);
+		openFileOnDemand(loadDialog.getLastFileIn());
 	}
 
 	public void openFile() {
-		Log.message("Opening file...");
+		Log.message("Opening vector file...");
 		try {
-			JFileChooser fc = new JFileChooser();
-			// list available loaders
-			ServiceLoader<LoadResource> imageLoaders = ServiceLoader.load(LoadResource.class);
-			for( LoadResource lft : imageLoaders ) {
-				FileFilter filter = lft.getFileNameFilter();
-				fc.addChoosableFileFilter(filter);
-			}
-			// no wild card filter, please.
-			fc.setAcceptAllFileFilterUsed(false);
-			// remember the last filter used, if any
-			if(lastFilterIn!=null) fc.setFileFilter(lastFilterIn);
-			// remember the last path used, if any
-			fc.setCurrentDirectory((lastFileIn==null?null : new File(lastFileIn)));
-			
-			// run the dialog
-			if (fc.showOpenDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-				String selectedFile = fc.getSelectedFile().getAbsolutePath();
-				Log.message("File selected by user: "+selectedFile);
-				FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-	
-				// figure out which of the loaders was requested.
-				for( LoadResource loader : imageLoaders ) {
-					if( !isMatchingFileFilter(selectedFilter, (FileNameExtensionFilter)loader.getFileNameFilter()) ) continue;
-					Log.message("Found potential matching loader.");
-					boolean success = openFileOnDemandWithLoader(selectedFile,loader);
-					if(success) {
-						Log.message("Load success!");
-						lastFilterIn = selectedFilter;
-						lastFileIn = selectedFile;
-
-						SoundSystem.playConversionFinishedSound();
-						updateButtonAccess();
-						break;
-					}
-				}
+			Turtle t = loadDialog.run(mainFrame);
+			if(t!=null) {
+				Log.message("Load success!");
+				SoundSystem.playConversionFinishedSound();
+				robot.setTurtle(t);
+				updateButtonAccess();
 			}
 		}
 		catch(Exception e) {
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 			Log.error(e.getLocalizedMessage());
 		}
 	}
@@ -890,82 +818,18 @@ public final class Makelangelo {
 		
 		buttonNewFile.setEnabled(!isRunning);
 		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && !lastFileIn.isEmpty());
+		buttonReopenFile.setEnabled(!isRunning && !loadDialog.getLastFileIn().isEmpty());
 	}
-	
-	private boolean isMatchingFileFilter(FileNameExtensionFilter a,FileNameExtensionFilter b) {
-		if(!a.getDescription().equals(b.getDescription())) return false;
-		String [] aa = a.getExtensions();
-		String [] bb = b.getExtensions();
-		if(aa.length!=bb.length) return false;
-		for(int i=0;i<aa.length;++i) {
-			if(!aa[i].equals(bb[i])) return false;
+		
+	private void saveFile() {
+		Log.message("Saving vector file...");
+		try {
+			saveDialog.run(robot.getTurtle(), mainFrame);
+			updateButtonAccess();
+		} catch(Exception e) {
+			Log.error("Load error: "+e.getLocalizedMessage()); 
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-		return true;
 	}
-	
-	public void saveFile() {
-		// list all the known savable file types.
-		File lastDir = (lastFileOut==null?null : new File(lastFileOut));
-		JFileChooser fc = new JFileChooser(lastDir);
-		ServiceLoader<SaveResource> imageSavers = ServiceLoader.load(SaveResource.class);
-		for( SaveResource lft : imageSavers ) {
-			FileFilter filter = lft.getFileNameFilter();
-			fc.addChoosableFileFilter(filter);
-		}
-		
-		// do not allow wild card (*.*) file extensions
-		fc.setAcceptAllFileFilterUsed(false);
-		// remember the last path & filter used.
-		if(lastFilterOut!=null) fc.setFileFilter(lastFilterOut);
-		
-		// run the dialog
-		if (fc.showSaveDialog(getMainFrame()) == JFileChooser.APPROVE_OPTION) {
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter)fc.getFileFilter();
-			
-			// figure out which of the savers was requested.
-			for( SaveResource lft : imageSavers ) {
-				FileNameExtensionFilter filter = (FileNameExtensionFilter)lft.getFileNameFilter();
-				//if(!filter.accept(new File(selectedFile))) {
-				if( !isMatchingFileFilter(selectedFilter,filter) ) {
-					continue;
-				}
-					
-				// make sure a valid extension is added to the file.
-				String selectedFileLC = selectedFile.toLowerCase();
-				String[] exts = ((FileNameExtensionFilter)filter).getExtensions();
-				boolean foundExtension=false;
-				for(String ext : exts) {
-					if (selectedFileLC.endsWith('.'+ext.toLowerCase())) {
-						foundExtension=true;
-						break;
-					}
-				}
-				if(!foundExtension) {
-					selectedFile+='.'+exts[0];
-				}
 
-				// try to save now.
-				boolean success = false;
-				try (final OutputStream fileOutputStream = new FileOutputStream(selectedFile)) {
-					success=lft.save(fileOutputStream,robot,mainFrame);
-				} catch(IOException e) {
-					JOptionPane.showMessageDialog(getMainFrame(), "Save failed: "+e.getMessage());
-					//e.printStackTrace();
-				}
-				if(success==true) {
-					lastFileOut = selectedFile;
-					lastFilterOut = selectedFilter;
-					updateButtonAccess();
-					break;
-				}					
-			}
-			// No file filter was found.  Wait, what?!
-		}
-	}
-	
-	public String getLastFileIn() {
-		return lastFileIn;
-	}
 }

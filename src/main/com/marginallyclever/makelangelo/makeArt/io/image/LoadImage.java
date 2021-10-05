@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.io.image;
 
-import java.awt.Component;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,19 +16,21 @@ import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
-import com.marginallyclever.makelangelo.makeArt.io.LoadResource;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
+import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 
  * @author Dan Royer
  *
  */
-public class LoadImage implements LoadResource {
+public class LoadImage implements TurtleLoader {
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
-	private MakelangeloRobot myRobot;
+	
+	@Deprecated
+	private Plotter myRobot;
 	
 	private ImageConverterThread imageConverterThread; 
 	private ArrayList<ImageConverterThread> workerList = new ArrayList<ImageConverterThread>();
@@ -93,9 +94,7 @@ public class LoadImage implements LoadResource {
 	 * @return false if loading cancelled or failed.
 	 */
 	@Override
-	public Turtle load(InputStream in,MakelangeloRobot robot, Component parentComponent) throws Exception {
-		myRobot = robot;
-
+	public Turtle load(InputStream in) throws Exception {
 		img = new TransformedImage( ImageIO.read(in) );
 		
 		return null;
@@ -103,7 +102,7 @@ public class LoadImage implements LoadResource {
 
 	// adjust image to fill the paper
 	public void scaleToFillPaper() {
-		MakelangeloRobotSettings s = myRobot.getSettings();
+		PlotterSettings s = myRobot.getSettings();
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 
@@ -117,7 +116,7 @@ public class LoadImage implements LoadResource {
 	}
 	
 	public void scaleToFitPaper() {
-		MakelangeloRobotSettings s = myRobot.getSettings();
+		PlotterSettings s = myRobot.getSettings();
 		double width  = s.getMarginWidth();
 		double height = s.getMarginHeight();
 		

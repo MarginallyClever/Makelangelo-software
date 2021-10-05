@@ -2,32 +2,22 @@ package com.marginallyclever.makelangeloRobot;
 
 import static org.junit.Assert.fail;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
-
 import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 
 public class MakelangeloRobotPanelTest {
 
 	@Test
 	public void testNoMissingGeneratorPanels() {
+		Log.start();
 		Log.message("testNoMissingGeneratorPanels() begin.");
+		Translator.start();
 		try {
-			Log.message("Translator.start()...");
-			Translator.start();
-			Log.message("loading service...");
-			System.out.flush();
-			ServiceLoader<TurtleGenerator> imageGenerators = ServiceLoader.load(TurtleGenerator.class);
-			Log.message("iterating...");
-			System.out.flush();
-			Iterator<TurtleGenerator> ici = imageGenerators.iterator();
-			while(ici.hasNext()) {
-				TurtleGenerator c = ici.next();
-				Log.message("Creating panel for "+c.getName());
+			for( TurtleGenerator c : TurtleGeneratorFactory.available ) {
 				c.getPanel();
 			}
 		} catch(Exception e) {

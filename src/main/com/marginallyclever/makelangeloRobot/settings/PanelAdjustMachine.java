@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.Plotter;
 
 public class PanelAdjustMachine extends SelectPanel {
 	/**
@@ -14,7 +14,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected MakelangeloRobot robot;
+	protected Plotter robot;
 
 	protected SelectDouble machineWidth, machineHeight;
 	protected SelectDouble totalBeltNeeded;
@@ -28,7 +28,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	protected SelectButton buttonBpos;
 
 
-	public PanelAdjustMachine(MakelangeloRobot robot) {
+	public PanelAdjustMachine(Plotter robot) {
 		super();
 		
 		this.robot = robot;

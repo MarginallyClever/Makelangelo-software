@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
+import com.marginallyclever.makelangeloRobot.Plotter;
 
 
 public class PanelAdjustPen extends SelectPanel implements ActionListener {
@@ -17,7 +17,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected MakelangeloRobot robot;
+	protected Plotter robot;
 	
 	protected SelectDouble penDiameter;
 	protected SelectDouble maxFeedRate;
@@ -35,12 +35,12 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	protected SelectColor selectPenUpColor;
 
 	
-	public PanelAdjustPen(MakelangeloRobot robot) {
+	public PanelAdjustPen(Plotter robot) {
 		super();
 		
 		this.robot = robot;
 	    
-	    MakelangeloRobotSettings settings = robot.getSettings();
+	    PlotterSettings settings = robot.getSettings();
 	    
 	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
 	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
@@ -77,7 +77,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	
 	
 	public void save() {
-	    MakelangeloRobotSettings settings = robot.getSettings();
+	    PlotterSettings settings = robot.getSettings();
 		settings.setPenDiameter(penDiameter.getValue());
 		settings.setTravelFeedRate(maxFeedRate.getValue());
 		settings.setDrawFeedRate(currentFeedRate.getValue());

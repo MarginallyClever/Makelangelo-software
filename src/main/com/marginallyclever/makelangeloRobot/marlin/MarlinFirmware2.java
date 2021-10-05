@@ -18,7 +18,7 @@ public class MarlinFirmware2 implements NetworkSessionListener {
 	private ArrayList<MarlinEventListener> listeners = new ArrayList<MarlinEventListener>();
 	
 	private NetworkSession mySession = null;
-	private RobotIdentityConfirmationAfterMarlin ric = new RobotIdentityConfirmationAfterMarlin();
+	private RobotIdentityConfirmation ric = new RobotIdentityConfirmation();
 	private boolean waitingForCue = false;
 
 	// parsing input from Makelangelo

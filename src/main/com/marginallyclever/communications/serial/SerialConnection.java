@@ -32,7 +32,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 					serialPort.removeEventListener();
 					serialPort.closePort();
 				} catch (SerialPortException e) {
-					Log.error(e.getLocalizedMessage());
+					Log.error(e.getMessage());
 				}
 			}
 			portOpened = false;

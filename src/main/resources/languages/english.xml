@@ -387,33 +387,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>GCODE (gcode)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>Image (jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 for map data (dxf)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch2</key>
-		<value>Scratch 2 (SB2)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch3</key>
-		<value>Scratch 3 (SB3)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeSVG</key>
-		<value>Scaleable Vector Graphics 1.1 (svg)</value>
 		<hint>file open dialog</hint>
 	</string>
 

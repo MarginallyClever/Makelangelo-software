@@ -7,7 +7,7 @@ import javax.vecmath.Vector3d;
 
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.convenience.turtle.TurtleMove;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 
 /**
@@ -31,7 +31,7 @@ public class MarlinSimulation {
 	
 	// poseNow is the current position.  Roughly equivalent to Sixi2Live.poseReceived.
 	private Vector3d poseNow = new Vector3d();
-	private MakelangeloRobotSettings settings;
+	private PlotterSettings settings;
 	private double timeSum;
 	private LinkedList<MarlinSimulationBlock> queue = new LinkedList<MarlinSimulationBlock>();
 	
@@ -57,7 +57,7 @@ public class MarlinSimulation {
 	private double previousNominalSpeed=0;
 	private double junction_deviation = 0.05;
 	
-	public MarlinSimulation(MakelangeloRobotSettings settings) {
+	public MarlinSimulation(PlotterSettings settings) {
 		this.settings = settings;
 		XMAX=settings.getLimitRight();
 		XMIN=settings.getLimitLeft();

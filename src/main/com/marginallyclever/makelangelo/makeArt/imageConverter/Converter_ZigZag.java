@@ -14,7 +14,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_DitherFloydSteinberg;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 
 
 /**
@@ -23,7 +23,7 @@ import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
  *
  * @author Dan
  */
-public class Converter_ZigZag extends ImageConverter implements MakelangeloRobotDecorator {
+public class Converter_ZigZag extends ImageConverter implements PlotterDecorator {
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;

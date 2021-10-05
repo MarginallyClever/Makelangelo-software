@@ -2,14 +2,12 @@ package com.marginallyclever.makelangeloRobot;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
-
 import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
 
 public class LoadAndSaveImageTest {
 
@@ -18,10 +16,7 @@ public class LoadAndSaveImageTest {
 		Log.message("testNoMissingPanels() begin.");
 		try {
 			Translator.start();
-			ServiceLoader<ImageConverter> converters = ServiceLoader.load(ImageConverter.class);
-			Iterator<ImageConverter> ici = converters.iterator();
-			while(ici.hasNext()) {
-				ImageConverter c = ici.next();
+			for( ImageConverter c : ImageConverterFactory.converters ) {
 				Log.message("Creating panel for "+c.getName());
 				c.getPanel();
 			}

@@ -9,21 +9,13 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobotDecorator;
+import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 
 /**
- * Converts a BufferedImage to gcode
- * 
- * Image converters have to be listed in 
- * src/main/resources/META-INF/services/com.marginallyclever.makelangeloRobot.generators.ImageConverter
- * in order to be found by the ServiceLoader.  This is so that you could write an independent plugin and 
- * drop it in the same folder as makelangelo software to be "found" by the software.
- * 
- * Don't forget http://www.reverb-marketing.com/wiki/index.php/When_a_new_style_has_been_added_to_the_Makelangelo_software
+ * Converts a {@link BufferedImage} to {@link Turtle}
  * @author Dan Royer
- *
  */
-public abstract class ImageConverter extends ImageManipulator implements MakelangeloRobotDecorator {
+public abstract class ImageConverter extends ImageManipulator implements PlotterDecorator {
 	protected TransformedImage sourceImage;
 	protected boolean keepIterating=false;
 	protected Texture texture = null;

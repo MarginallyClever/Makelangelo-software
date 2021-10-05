@@ -70,7 +70,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 			firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
 			setCursor(Cursor.getDefaultCursor());
-			JOptionPane.showMessageDialog(this,e1.getLocalizedMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,e1.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
 		}
 
 		setCursor(Cursor.getDefaultCursor());
@@ -98,7 +98,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 			frame.pack();
 			frame.setVisible(true);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getLocalizedMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null,e.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

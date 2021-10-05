@@ -3,9 +3,8 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
 /**
- * All generators have a panel with options.  This is their shared root.
+ * All {@link TurtleGenerator} have a {@TurtleGeneratorPanel}.
  * @author Dan Royer
- *
  */
 public class TurtleGeneratorPanel extends SelectPanel {
 	/**

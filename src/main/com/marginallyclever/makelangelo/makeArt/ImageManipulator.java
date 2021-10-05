@@ -4,8 +4,8 @@ import javax.swing.ProgressMonitor;
 
 import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
-import com.marginallyclever.makelangeloRobot.MakelangeloRobot;
-import com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings;
+import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 
 /**
@@ -20,7 +20,8 @@ public abstract class ImageManipulator {
 	private ImageConverterThread thread;
 	
 	// helpers
-	protected MakelangeloRobotSettings settings;
+	@Deprecated
+	protected PlotterSettings settings;
 
 	
 	public void setThread(ImageConverterThread p) {
@@ -36,7 +37,7 @@ public abstract class ImageManipulator {
 		pm.setProgress(d);
 	}
 	
-	public void setRobot(MakelangeloRobot robot) {
+	public void setRobot(Plotter robot) {
 		settings = robot.getSettings();
 	}
 
