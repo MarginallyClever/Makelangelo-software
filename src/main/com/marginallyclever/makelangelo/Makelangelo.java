@@ -8,13 +8,9 @@ package com.marginallyclever.makelangelo;
 // io functions
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -45,17 +41,13 @@ import java.util.prefs.Preferences;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.border.LineBorder;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
@@ -80,7 +72,7 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
-import com.marginallyclever.makelangeloRobot.PlotterPanel;
+import com.marginallyclever.makelangeloRobot.plotterControls.PlotterControls;
 import com.marginallyclever.makelangeloRobot.PiCaptureAction;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
@@ -113,12 +105,11 @@ public final class Makelangelo {
 	private MakelangeloAppPreferences appPreferences;
 	
 	private Camera camera;
-	private Plotter robot;
+	private Plotter myPlotter;
 
 	// GUI elements
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
-	private PlotterPanel robotPanel;
 
 	private JMenuItem buttonNewFile;
 	private JMenuItem buttonOpenFile;
@@ -169,15 +160,11 @@ public final class Makelangelo {
 
 		Log.message("Starting robot...");
 		// create a robot and listen to it for important news
-		robot = new Plotter();
-		robot.addListener((e)->{
-			if(e.type==PlotterEvent.CONNECTION_READY) whenIdentityConfirmed(e.subject);
-			if(e.type==PlotterEvent.BAD_FIRMWARE) whenBadFirmwareDetected((String)e.extra);
-			if(e.type==PlotterEvent.BAD_HARDWARE) whenBadHardwareDetected((String)e.extra);
-			if(e.type==PlotterEvent.DISCONNECT) whenDisconnected();
+		myPlotter = new Plotter();
+		myPlotter.addListener((e)->{
 			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
 		});
-		robot.getSettings().addListener((e)->{
+		myPlotter.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
 
@@ -216,15 +203,36 @@ public final class Makelangelo {
 	 * If the menu bar exists, empty it. If it doesn't exist, create it.
 	 * @return the refreshed menu bar
 	 */
-	private JMenuBar createMenuBar() {
+	private JMenuBar getMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createGenerateMenu());
 		menuBar.add(createArtPipelineMenu());
 		menuBar.add(createViewMenu());
+		menuBar.add(createRobotMenu());
 		menuBar.add(createHelpMenu());
 		menuBar.updateUI();
+		
 		return menuBar;
+	}
+
+	private JMenu createRobotMenu() {
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("Open Controls"));
+		bOpenControls.addActionListener((e)-> openPlotterControls());
+
+		JMenu menu = new JMenu(Translator.get("Robot"));
+		menu.add(bOpenControls);
+		
+		return menu;
+	}
+
+	private void openPlotterControls() {
+		JDialog dialog = new JDialog(mainFrame,myPlotter.getClass().getSimpleName());
+		dialog.add(new PlotterControls(myPlotter));
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+		dialog.setVisible(true);
 	}
 
 	private JMenu createArtPipelineMenu() {
@@ -243,29 +251,29 @@ public final class Makelangelo {
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
 		fit.addActionListener((e)->{
-			robot.setTurtle(ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),false));
+			myPlotter.setTurtle(ResizeTurtleToPaper.run(myPlotter.getTurtle(),myPlotter.getSettings(),false));
 		});
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
 		fill.addActionListener((e)->{
-			robot.setTurtle(ResizeTurtleToPaper.run(robot.getTurtle(),robot.getSettings(),true));
+			myPlotter.setTurtle(ResizeTurtleToPaper.run(myPlotter.getTurtle(),myPlotter.getSettings(),true));
 		});
 
 		menu.addSeparator();
 		
 		JMenuItem flipH = new JMenuItem(Translator.get("FlipH"));
 		menu.add(flipH);
-		flipH.addActionListener((e) -> robot.getTurtle().scale(1, -1));
+		flipH.addActionListener((e) -> myPlotter.getTurtle().scale(1, -1));
 
 		JMenuItem flipV = new JMenuItem(Translator.get("FlipV"));
 		menu.add(flipV);
-		flipV.addActionListener((e) -> robot.getTurtle().scale(-1, 1));
+		flipV.addActionListener((e) -> myPlotter.getTurtle().scale(-1, 1));
 
 		menu.addSeparator();
 		
-		menu.add(new SimplifyTurtle(robot));
-		menu.add(new ReorderTurtle(robot));
+		menu.add(new SimplifyTurtle(myPlotter));
+		menu.add(new ReorderTurtle(myPlotter));
 
 		return menu;
 	}
@@ -283,12 +291,12 @@ public final class Makelangelo {
 	}
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
-		robot.setDecorator(ici);
-		ici.setRobot(robot);
+		myPlotter.setDecorator(ici);
+		ici.setRobot(myPlotter);
 
 		ici.addListener((t) -> {
 			signNameIfDesired(t);
-			robot.setTurtle(t);
+			myPlotter.setTurtle(t);
 		});
 		
 		ici.generate();
@@ -301,24 +309,24 @@ public final class Makelangelo {
 		dialog.pack();
 		dialog.setVisible(true);
 
-		robot.getSettings().setRotationRef(0);
-		robot.setDecorator(null);
+		myPlotter.getSettings().setRotationRef(0);
+		myPlotter.setDecorator(null);
 		
 		Log.message(Translator.get("Finished"));
 		SoundSystem.playConversionFinishedSound();
 	}
 
 	private void signNameIfDesired(Turtle t) {
-		if(!robot.getSettings().shouldSignName()) return;
+		if(!myPlotter.getSettings().shouldSignName()) return;
 		
 		Generator_Text ymh = new Generator_Text();
-		ymh.setRobot(robot);
+		ymh.setRobot(myPlotter);
 		ymh.signName();
 		t.history.addAll(ymh.turtle.history);
 	}
 	
 	private void newFile() {
-		robot.setTurtle(new Turtle());
+		myPlotter.setTurtle(new Turtle());
 	}
 
 	private JMenu createFileMenu() {
@@ -390,8 +398,8 @@ public final class Makelangelo {
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomToFit.addActionListener((e) -> {
 			camera.zoomToFit(
-					robot.getSettings().getPaperWidth(),
-					robot.getSettings().getPaperHeight());
+					myPlotter.getSettings().getPaperWidth(),
+					myPlotter.getSettings().getPaperHeight());
 		});
 		menu.add(buttonZoomToFit);
 
@@ -503,18 +511,10 @@ public final class Makelangelo {
 		Log.message("  create PreviewPanel...");
 		previewPanel = new PreviewPanel();
 		previewPanel.setCamera(camera);
-		previewPanel.addListener(robot);
-
-		Log.message("  assign panel to robot...");
-		robotPanel = new PlotterPanel(robot);
+		previewPanel.addListener(myPlotter);
 
 		// major layout
-		Log.message("  vertical split...");
-		Splitter splitLeftRight = new Splitter(JSplitPane.HORIZONTAL_SPLIT);
-		splitLeftRight.add(previewPanel);
-		splitLeftRight.add(new JScrollPane(robotPanel));
-
-		contentPane.add(splitLeftRight, BorderLayout.CENTER);
+		contentPane.add(previewPanel, BorderLayout.CENTER);
 
 		return contentPane;
 	}
@@ -546,13 +546,13 @@ public final class Makelangelo {
 		});
 		
 		Log.message("  adding menu bar...");
-		mainFrame.setJMenuBar(createMenuBar());
+		mainFrame.setJMenuBar(getMenuBar());
 		
 		mainFrame.setContentPane(createContentPane());
 
 		camera.zoomToFit(
-				robot.getSettings().getPaperWidth(),
-				robot.getSettings().getPaperHeight());
+				myPlotter.getSettings().getPaperWidth(),
+				myPlotter.getSettings().getPaperHeight());
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
@@ -645,50 +645,8 @@ public final class Makelangelo {
 	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
 	private void requestUserChangeTool(int toolNumber) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
-
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.insets = new Insets(10, 10, 10, 10);
-
-		JLabel fieldValue = new JLabel("");
-		fieldValue.setOpaque(true);
-		fieldValue.setMinimumSize(new Dimension(80, 20));
-		fieldValue.setMaximumSize(fieldValue.getMinimumSize());
-		fieldValue.setPreferredSize(fieldValue.getMinimumSize());
-		fieldValue.setSize(fieldValue.getMinimumSize());
-		fieldValue.setBackground(new Color(toolNumber));
-		fieldValue.setBorder(new LineBorder(Color.BLACK));
-		panel.add(fieldValue, c);
-
-		JLabel message = new JLabel(Translator.get("ChangeToolMessage"));
-		c.gridx = 1;
-		c.gridwidth = 3;
-		panel.add(message, c);
-
-		JOptionPane.showMessageDialog(mainFrame, panel, Translator.get("ChangeToolTitle"), JOptionPane.PLAIN_MESSAGE);
-	}
-	
-	private void whenIdentityConfirmed(Plotter r) {
-		if(previewPanel != null) previewPanel.repaint();
-	}
-
-	private void whenBadFirmwareDetected(String versionFound) {
-		(new DialogBadFirmwareVersion()).display(mainFrame, versionFound);
-	}
-
-	private void whenBadHardwareDetected(String versionFound) {
-		JOptionPane.showMessageDialog(mainFrame, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
-	}
-
-	private void whenDisconnected() {
-		if(previewPanel != null) previewPanel.repaint();
-		SoundSystem.playDisconnectSound();
+		ChangeToolPanel panel = new ChangeToolPanel(toolNumber);
+		panel.run(mainFrame);
 	}
 
 	private void onClose() {
@@ -696,10 +654,10 @@ public final class Makelangelo {
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 
 		if (result == JOptionPane.YES_OPTION) {
-			previewPanel.removeListener(robot);
+			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowSizeAndPosition();
-			robot.getSettings().saveConfig();
+			myPlotter.getSettings().saveConfig();
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
@@ -721,7 +679,7 @@ public final class Makelangelo {
 	}
 
 	public Plotter getRobot() {
-		return robot;
+		return myPlotter;
 	}
 	
 	/**
@@ -740,7 +698,7 @@ public final class Makelangelo {
 				runImageConversionProcess(imageLoader);
 			} else {
 				Turtle t = loader.load(fileInputStream);
-				robot.setTurtle(t);
+				myPlotter.setTurtle(t);
 			}
 			success=true;
 		} catch(Exception e) {
@@ -789,8 +747,8 @@ public final class Makelangelo {
 			if(t!=null) {
 				Log.message("Load success!");
 				SoundSystem.playConversionFinishedSound();
-				robot.setTurtle(t);
-				updateButtonAccess();
+				myPlotter.setTurtle(t);
+				buttonReopenFile.setEnabled(true);
 			}
 		}
 		catch(Exception e) {
@@ -798,20 +756,11 @@ public final class Makelangelo {
 			Log.error(e.getLocalizedMessage());
 		}
 	}
-
-	private void updateButtonAccess() {
-		boolean isRunning = robot.isRunning();
-		
-		buttonNewFile.setEnabled(!isRunning);
-		buttonOpenFile.setEnabled(!isRunning);
-		buttonReopenFile.setEnabled(!isRunning && !loadDialog.getLastFileIn().isEmpty());
-	}
 		
 	private void saveFile() {
 		Log.message("Saving vector file...");
 		try {
-			saveDialog.run(robot.getTurtle(), mainFrame);
-			updateButtonAccess();
+			saveDialog.run(myPlotter.getTurtle(), mainFrame);
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getLocalizedMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
