@@ -38,26 +38,22 @@ import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
  * @author Dan
  * @since 7.2.10
  */
-public class Plotter implements NetworkSessionListener, PreviewListener {	
+public class Plotter implements PreviewListener {	
 	private PlotterSettings settings = new PlotterSettings();
-	private MarlinFirmware2 marlin = new MarlinFirmware2();
 	
-	private Turtle turtleToRender = new Turtle();
+	private Turtle myTurtle = new Turtle();
+	
 	private TurtleRenderer turtleRenderer;
+	
 	private PlotterDecorator decorator = null;
 
 	private boolean areMotorsEngaged;
-	private boolean isRunning;
+		
 	private boolean penIsUp;
-	private boolean penJustMoved;
-	private boolean penIsUpBeforePause;
+		
 	private boolean didFindHome;
+	
 	private Point2D pos = new Point2D();
-
-	// this list of gcode commands is stored separate from the Turtle.
-	private ArrayList<String> gcodeCommands = new ArrayList<String>();
-	// what line in drawingCommands is going to be sent next?
-	protected int nextLineNumber;
 
 	private ArrayList<PlotterEventListener> listeners = new ArrayList<PlotterEventListener>();
 
@@ -66,46 +62,9 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 		super();
 		
 		areMotorsEngaged = true;
-		isRunning = false;
 		penIsUp = false;
-		penJustMoved = false;
-		penIsUpBeforePause = false;
 		didFindHome = false;
 		pos.set(0,0);
-		setLineNumber(0);
-		
-		marlin.addListener((evt) -> {
-			if(evt.flag == MarlinEvent.TRANSPORT_ERROR) {
-				setLineNumber((int)evt.data);
-				sendFileCommand();
-			}
-			if(evt.flag == MarlinEvent.SEND_BUFFER_EMPTY) {
-				sendFileCommand();
-			}
-			if(evt.flag == MarlinEvent.DATA_RECEIVED) {
-				String msg = (String)evt.data;
-				Log.message("Recv: "+msg.trim());
-			}
-		});
-
-		marlin.addRobotIdentityEventListener((evt)->{
-			switch(evt.flag) {
-				case RobotIdentityEvent.BAD_HARDWARE:
-					notifyListeners(new PlotterEvent(PlotterEvent.BAD_HARDWARE, this, evt.data));
-					break;
-				case RobotIdentityEvent.BAD_FIRMWARE:
-					notifyListeners(new PlotterEvent(PlotterEvent.BAD_FIRMWARE, this, evt.data));
-					break;
-				case RobotIdentityEvent.IDENTITY_CONFIRMED:
-					Log.message("Identity confirmed.");
-					getSettings().setHardwareVersion(marlin.getVersion());
-					notifyListeners(new PlotterEvent(PlotterEvent.CONNECTION_READY,this));
-					break;
-				default:
-					Log.error("Unexpected RobotIdentityEvent "+evt.flag);
-					break;
-			}
-		});
 	}
 	
 	// OBSERVER PATTERN
@@ -124,227 +83,29 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 
 	// OBSERVER PATTERN ENDS
 	
-
-	public void setNetworkSession(NetworkSession c) {
-		didFindHome = false;
-		if(c != null) c.addListener(this);
-		marlin.setNetworkSession(c);
-	}
-	
-	@Override
-	public void networkSessionEvent(NetworkSessionEvent evt) {
-		if(evt.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
-			halt();
-			NetworkSession c = (NetworkSession)evt.getSource();
-			c.removeListener(this);
-			notifyListeners(new PlotterEvent(PlotterEvent.DISCONNECT,this));
-		}
-	}
-	
-	public long findOrCreateUID(String line) {
-		long newUID = -1;
-		
-		// try to get the UID in the line
-		String[] lines = line.split("\\r?\\n");
-		if (lines.length > 0) {
-			try {
-				newUID = Long.parseLong(lines[0]);
-				Log.message("UID found: "+newUID);
-			} catch (NumberFormatException e) {
-				Log.error("UID parsing failed. line="+lines[0]+", error="+e.getLocalizedMessage());
-			}
-		}
-
-		// new robots have UID<=0
-		if(newUID <= 0) newUID = getNewRobotUID();
-		
-		return newUID;
-	}
-
-	// based on http://www.exampledepot.com/egs/java.net/Post.html
-	private long getNewRobotUID() {
-		long newUID = 0;
-
-		boolean pleaseGetAGUID = !CommandLineOptions.hasOption("-noguid");
-		if (!pleaseGetAGUID)
-			return 0;
-
-		Log.message("obtaining UID from server.");
-		try {
-			// Send request
-			URL url = new URL("https://www.marginallyclever.com/drawbot_getuid.php");
-			URLConnection conn = url.openConnection();
-			// get results
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String line = rd.readLine();
-			Log.message("Server says: '" + line + "'");
-			newUID = Long.parseLong(line);
-			if (newUID != 0) {
-				settings.createNewUID(newUID);
-				marlin.sendNewUID(newUID);
-			}
-			
-		} catch (Exception e) {
-			Log.error("UID from server: " + e.getMessage());
-			return 0;
-		}
-
-		return newUID;
-	}
-
-	// Send the machine configuration to the robot.
-	public void sendConfig() {
-		if(!marlin.getIdentityConfirmed()) return;
-
-		Log.message("Sending config.");
-		String config = settings.getGCodeConfig();
-		String [] lines = config.split("\n");
-		for( String line : lines ) send(line + "\n");
-	}
-
-	public boolean isRunning() {
-		return isRunning;
-	}
-		
-	public void halt() {
-		isRunning = false;
-		penIsUpBeforePause = penIsUp;
-		if(!penIsUp) raisePen();
-		notifyListeners(new PlotterEvent(PlotterEvent.STOP,this));
-	}
-
-	public void start() {
-		isRunning = true;
-		if(!penIsUpBeforePause) lowerPen();
-		sendFileCommand();
-		notifyListeners(new PlotterEvent(PlotterEvent.START,this));
-	}
-	
 	public void raisePen() {
-		send(settings.getPenUpString());
-		rememberRaisedPen();
-	}
-	
-	private void rememberRaisedPen() {
-		penJustMoved = !penIsUp;
-		penIsUp = true;
-	}
-	
-	private void rememberLoweredPen() {
-		penJustMoved = penIsUp;
-		penIsUp = false;
+		penIsUp=true;
+		notifyListeners(new PlotterEvent(PlotterEvent.PEN_UP,this,true));
 	}
 	
 	public void lowerPen() {
-		send(settings.getPenDownString());
-		rememberLoweredPen();
-	}
-	
-	public void testPenAngle(double testAngle) {
-		send(PlotterSettings.COMMAND_DRAW + " Z" + StringHelper.formatDouble(testAngle));
-	}
-	
-	// Take the next line from the file and send it to the robot, if permitted.
-	private void sendFileCommand() {
-		if( !marlin.getIdentityConfirmed() || !isRunning() ) return;
-		
-		// are there any more commands?
-		if(nextLineNumber >= gcodeCommands.size()) {
-			halt();
-			SoundSystem.playDrawingFinishedSound();
-		} else {
-			String line = gcodeCommands.get(nextLineNumber);
-			Log.message("Send: "+line);
-			marlin.sendLineWithNumberAndChecksum(line, nextLineNumber);
-			setLineNumber(nextLineNumber+1);
-		}
-	}
-	
-	private void setLineNumber(int count) {
-		nextLineNumber=count;
-		notifyListeners(new PlotterEvent(PlotterEvent.PROGRESS_SOFAR, this, nextLineNumber));
-	}
-	
-	public void send(String line) {
-		line = line.trim();
-		if(line.isEmpty()) return;
-
-		Log.message("Send: "+line);
-		
-		updateStateFromGCode(line);
-		marlin.send(line);
-	}
-	
-	// update the simulated position to match the real robot
-	private void updateStateFromGCode(String line) {
-		if (line.contains("G0") || line.contains("G1")) {
-			double px = pos.x;
-			double py = pos.y;
-
-			int star=line.indexOf("*");
-			if(star>=0) line = line.substring(0,star);
-
-			int semiColon=line.indexOf(";");
-			if(semiColon>=0) line = line.substring(0,semiColon);
-			
-			String[] tokens = line.split(" ");
-			for (String t : tokens) {
-				if (t.startsWith("X")) px = Float.parseFloat(t.substring(1));
-				if (t.startsWith("Y")) py = Float.parseFloat(t.substring(1));
-			}
-			pos.set(px,py);
-		}
-		
-		if(line.startsWith(settings.getPenUpString())) rememberRaisedPen();
-		if(line.startsWith(settings.getPenDownString())) rememberLoweredPen();
-		if(line.startsWith("M17")) rememberMotorsEngaged(true);
-		if(line.startsWith("M18")) rememberMotorsEngaged(false);
-	}
-	
-	private void rememberMotorsEngaged(boolean b) {
-		notifyListeners(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,b));
-		areMotorsEngaged=b;
-	}
-
-	public void startAt(int lineNumber) {
-		if(lineNumber>=gcodeCommands.size()) lineNumber = gcodeCommands.size();
-		if(lineNumber<0) lineNumber=0;
-
-		setLineNumber(lineNumber);
-		sendLineNumber(lineNumber);
-		start();
+		penIsUp = false;
+		notifyListeners(new PlotterEvent(PlotterEvent.PEN_UP,this,false));
 	}
 	
 	/**
 	 * Display a dialog asking the user to change the pen
 	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
-	@SuppressWarnings("unused")
+	@Deprecated
 	private void requestUserChangeTool(int toolNumber) {
 		notifyListeners(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
 	}
 
-	public void setDrawFeedRate(double feedRate) {
-		// remember it
-		settings.setDrawFeedRate(feedRate);
-		// get it again in case it was capped.
-		feedRate = settings.getDrawFeedRate();
-		// tell the robot
-		send("G1 F" + StringHelper.formatDouble(feedRate));
-	}
-	
-	public void setTravelFeedRate(double feedRate) {
-		// remember it
-		settings.setTravelFeedRate(feedRate);
-		// get it again in case it was capped.
-		feedRate = settings.getTravelFeedRate();
-		// tell the robot
-		send("G0 F" + StringHelper.formatDouble(feedRate));
-	}
-	
 	/**
 	 * @return travel or draw feed rate, depending on pen state.
 	 */
+	@Deprecated
 	public double getCurrentFeedRate() {
 		return penIsUp
 				? settings.getTravelFeedRate()
@@ -352,146 +113,90 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 	}
 
 	public void goHome() {
-		movePenAbsolute(settings.getHomeX(),settings.getHomeY());
+		moveTo(settings.getHomeX(),settings.getHomeY());
 		pos.set(settings.getHomeX(),settings.getHomeY());
+		didFindHome = true;
+		notifyListeners(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 	}
 	
 	public void findHome() {
 		raisePen();
-		send("G28");
 		pos.set(settings.getHomeX(),settings.getHomeY());
-		notifyListeners(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 		didFindHome = true;
+		notifyListeners(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 	}
 	
-	public boolean didFindHome() {
+	public boolean getDidFindHome() {
 		return didFindHome;
 	}
-	
-	/**
-	 * @param x position in mm
-	 * @param y position in mm
-	 */
-	public void movePenAbsolute(double x, double y) {
-		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());	
-		
-		send(go
-			+ " X" + StringHelper.formatDouble(x)
-			+ " Y" + StringHelper.formatDouble(y));
-		pos.set(x,y);
-		penJustMoved = true;
-	}
-	
-	/**
-	 * @param dx distance in mm
-	 * @param dy distance in mm
-	 */
-	public void movePenRelative(double dx, double dy) {
-		penJustMoved = false;
 
-		String go = (penJustMoved ? "" : getTravelOrMoveWithFeedrate());
-		
-		send("G91"); // set relative mode
-		send(go
-			+ " X" + StringHelper.formatDouble(dx)
-			+ " Y" + StringHelper.formatDouble(dy));
-		send("G90"); // return to absolute mode
-		
-		penJustMoved = false;
-		pos.x += dx;
-		pos.y += dy;
+	// in mm
+	public void setPos(double x,double y) {
+		pos.set(x,y);
+		notifyListeners(new PlotterEvent(PlotterEvent.POSITION,this));
 	}
 	
-	private String getTravelOrMoveWithFeedrate() {
-		if(penIsUp) return PlotterSettings.COMMAND_TRAVEL +" "+ settings.getTravelFeedrateString();
-		else        return PlotterSettings.COMMAND_DRAW   +" "+ settings.getDrawFeedrateString();
+	// in mm
+	public void setPos(Point2D p) {
+		pos.set(p);
+		notifyListeners(new PlotterEvent(PlotterEvent.POSITION,this));
+	}
+
+	// in mm
+	public void moveTo(double x, double y) {
+		setPos(x,y);
+	}
+
+	// in mm
+	public void moveTo(Point2D p) {
+		setPos(p);
+	}
+
+	// in mm
+	public Point2D getPos() {
+		return pos;
 	}
 	
-	public boolean areMotorsEngaged() {
+	public boolean getAreMotorsEngaged() {
 		return areMotorsEngaged;
 	}
 	
 	public void movePenToEdgeLeft() {
-		movePenAbsolute(settings.getPaperLeft(),pos.y);
+		moveTo(settings.getPaperLeft(),pos.y);
 	}
 
 	public void movePenToEdgeRight() {
-		movePenAbsolute(settings.getPaperRight(),pos.y);
+		moveTo(settings.getPaperRight(),pos.y);
 	}
 	
 	public void movePenToEdgeTop() {
-		movePenAbsolute(pos.x,settings.getPaperTop());
+		moveTo(pos.x,settings.getPaperTop());
 	}
 	
 	public void movePenToEdgeBottom() {
-		movePenAbsolute(pos.x,settings.getPaperBottom());
+		moveTo(pos.x,settings.getPaperBottom());
 	}
 	
 	public void disengageMotors() {
-		send("M18");
 		areMotorsEngaged = false;
+		notifyListeners(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,false));
 	}
 
 	public void engageMotors() {
-		send("M17");
 		areMotorsEngaged = true;
-	}
-	
-	@Deprecated
-	public void jogLeftMotorOut() {
-		send("D00 L400");
-	}
-
-	@Deprecated
-	public void jogLeftMotorIn() {
-		send("D00 L-400");
-	}
-
-	@Deprecated
-	public void jogRightMotorOut() {
-		send("D00 R400");
-	}
-
-	@Deprecated
-	public void jogRightMotorIn() {
-		send("D00 R-400");
-	}
-
-	private void sendLineNumber(int newLineNumber) {
-		send("M110 N" + newLineNumber);
+		notifyListeners(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,true));
 	}
 	
 	public PlotterSettings getSettings() {
 		return settings;
 	}
-
-	public int getGCodeCommandsCount() {
-		return gcodeCommands.size();
-	}
 	
 	public void setTurtle(Turtle turtle) {
-		try(final OutputStream fileOutputStream = new FileOutputStream("currentDrawing.ngc")) {
-			SaveGCode exportForDrawing = new SaveGCode();
-			exportForDrawing.save(fileOutputStream, this);
-
-			gcodeCommands.clear();
-			BufferedReader reader = new BufferedReader(new FileReader("currentDrawing.ngc"));
-			String line;
-			while((line = reader.readLine()) != null) {
-				gcodeCommands.add(line.trim());
-			}
-			reader.close();
-
-			turtleToRender = turtle;
-			notifyListeners(new PlotterEvent(PlotterEvent.NEW_GCODE,this));
-		} catch (Exception e) {
-			Log.error("setTurtle(): "+e.getMessage());
-			e.printStackTrace();
-		}
+		myTurtle = turtle;
 	}
 
 	public Turtle getTurtle() {
-		return turtleToRender;
+		return myTurtle;
 	}
 
 	public void setDecorator(PlotterDecorator arg0) {
@@ -513,13 +218,13 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 		if (decorator != null) {
 			// filters can also draw WYSIWYG previews while converting.
 			decorator.render(gl2);
-		} else if (turtleToRender != null) {
+		} else if (myTurtle != null) {
 			if(turtleRenderer==null) {
 				turtleRenderer = new DefaultTurtleRenderer(gl2);
 				//turtleRenderer = new BarberPoleTurtleRenderer(gl2);
 			}
 			if(turtleRenderer!=null) {
-				turtleToRender.render(turtleRenderer);
+				myTurtle.render(turtleRenderer);
 			}
 			
 			//TODO
@@ -537,8 +242,7 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 	public void setTurtleRenderer(TurtleRenderer r) {
 		turtleRenderer = r;
 	}
-	
-	
+		
 	public TurtleRenderer getTurtleRenderer() {
 		return turtleRenderer;
 	}
@@ -581,48 +285,7 @@ public class Plotter implements NetworkSessionListener, PreviewListener {
 		gl2.glPopMatrix();
 	}
 
-	// in mm
-	public Point2D getPos() {
-		return pos;
-	}
-	
-	// in mm
-	public void setPos(double x,double y) {
-		pos.set(x,y);
-	}
-
-	public int findLastPenUpBefore(int startAtLine) {
-		int total = gcodeCommands.size();
-		if (total == 0)
-			return 0;
-
-		String toMatch = settings.getPenUpString();
-
-		int x = startAtLine;
-		if (x >= total)
-			x = total - 1;
-
-		toMatch = toMatch.trim();
-		while (x > 1) {
-			String line = gcodeCommands.get(x).trim();
-			if (line.equals(toMatch)) {
-				return x;
-			}
-			--x;
-		}
-
-		return x;
-	}
-
 	public boolean getPenIsUp() {
 		return penIsUp;
-	}
-
-	public boolean getIdentityConfirmed() {
-		return marlin.getIdentityConfirmed();
-	}
-
-	public void sendPenDown() {
-		send(getSettings().getPenDownString());
 	}
 }
