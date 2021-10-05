@@ -11,18 +11,23 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import com.marginallyclever.communications.NetworkSessionManager;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
+import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.marlin.MarlinSimulation;
+import com.marginallyclever.makelangeloRobot.plotterControls.CartesianButtons;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettingsPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 
 /**
@@ -45,16 +50,12 @@ public class PlotterPanel extends JPanel implements PlotterEventListener {
 	private SelectButton buttonConnect;
 	private NetworkSession mySession;
 	
-	// machine options
-	protected int generatorChoice = 0;
-	
+	// machine options	
 	private String[] machineConfigurations;
 	private JComboBox<String> machineChoices;
 	private JButton buttonOpenSettings;
 	private JPanel machineNumberPanel;
 	
-	private SelectButton buttonCapture;
-
     // live controls
 	private SelectButton buttonStart, buttonStartAt, buttonHalt;
 
@@ -339,7 +340,7 @@ public class PlotterPanel extends JPanel implements PlotterEventListener {
 		if(myRobot!=null) {
 			isConfirmed = myRobot.getIdentityConfirmed();
 			isRunning = myRobot.isRunning();
-			didSetHome = myRobot.didFindHome();
+			didSetHome = myRobot.getDidFindHome();
 		}
 		
 		buttonOpenSettings.setEnabled(!isRunning);
@@ -349,9 +350,7 @@ public class PlotterPanel extends JPanel implements PlotterEventListener {
 		buttonHalt.setEnabled(isConfirmed && isRunning);
 
 		toggleEngagedMotor.setEnabled(isConfirmed && !isRunning);
-		
-		if(buttonCapture != null) buttonCapture.setEnabled(!isRunning);
-		
+				
 		driveButtons.setEnabled(isConfirmed && !isRunning);
 
 		goPaperBorder.setEnabled(isConfirmed && !isRunning && didSetHome);
@@ -391,5 +390,21 @@ public class PlotterPanel extends JPanel implements PlotterEventListener {
 		default: break;
 		}
 		updateButtonAccess();
+	}
+	
+	public static void main(String[] args) {
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e) {}
+		
+		JFrame frame = new JFrame("PlotterPanel");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PlotterPanel(new Plotter()));
+		frame.pack();
+		frame.setVisible(true);
 	}
 }
