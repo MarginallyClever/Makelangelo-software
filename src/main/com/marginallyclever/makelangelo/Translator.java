@@ -166,6 +166,11 @@ public final class Translator {
 				String name = p.toString();
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
+					if( name.endsWith("pom.xml") ) {
+						Log.message("pom.xml ignored.");
+						continue;
+					}
+					
 					// found an XML file in the /languages folder.  Good sign!
 					String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
 					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
