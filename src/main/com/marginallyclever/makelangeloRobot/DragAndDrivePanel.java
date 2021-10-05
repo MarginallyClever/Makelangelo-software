@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 /**
  * Drag cursor to drive plotter control. 
@@ -106,9 +107,9 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 			if(Math.sqrt(dx*dx+dy*dy)>=1) {
 				mouseLastX=x;
 				mouseLastY=y;
-				String text = "X"+(Math.round(x*100)/100.0)+" Y"+(Math.round(y*100)/100.0);
-				robot.send("G00 "+text);
-				coordinates.setText(text);
+				
+				robot.moveTo(x,y);
+				coordinates.setText("X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y));
 			} else {
 				coordinates.setText("");
 			}
