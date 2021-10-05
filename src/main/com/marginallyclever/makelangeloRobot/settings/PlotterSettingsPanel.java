@@ -25,6 +25,7 @@ import com.marginallyclever.makelangeloRobot.settings.plotterTypes.PlotterTypeFa
  * @author dan royer
  * @since 7.1.4
  */
+@Deprecated
 public class PlotterSettingsPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
@@ -34,7 +35,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 	protected JButton save;
 
 	private JComboBox<String> hardwareVersionChoices;
-	private ArrayList<String> availableHardwareVersions = PlotterTypeFactory.getHardwareVersions();;
+	private ArrayList<String> availableHardwareVersions = PlotterTypeFactory.getHardwareVersions();
 	private ArrayList<String> hardwareVersionNames = PlotterTypeFactory.getNames();
 
 	private JPanel modelPanel;
@@ -85,7 +86,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 			panelAdjustPaper.save();
 			panelAdjustPen.save();
 			robot.getSettings().saveConfig();
-			robot.sendConfig();
+			//robot.sendConfig();
 		});
 	}
 

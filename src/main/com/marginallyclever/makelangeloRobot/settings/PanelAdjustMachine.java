@@ -1,13 +1,12 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangeloRobot.Plotter;
 
+@Deprecated
 public class PanelAdjustMachine extends SelectPanel {
 	/**
 	 * 
@@ -71,7 +70,7 @@ public class PanelAdjustMachine extends SelectPanel {
 				add(acceleration);
 			}
 		}
-
+/*
 		// Jog motors
 		{
 			add(new SelectReadOnlyText(Translator.get("Left")));
@@ -86,7 +85,7 @@ public class PanelAdjustMachine extends SelectPanel {
 			if(!robot.getSettings().getHardwareProperties().canInvertMotors()) {
 				interiorPanel.setVisible(false);
 			}
-		}
+		}*/
 		finish();
 		updateLengthNeeded();
 	}
@@ -123,7 +122,7 @@ public class PanelAdjustMachine extends SelectPanel {
 			robot.getSettings().setAcceleration(accel);
 		}
 	}
-
+/*
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		super.propertyChange(evt);
@@ -137,5 +136,5 @@ public class PanelAdjustMachine extends SelectPanel {
 		else {
 			//updateLengthNeeded();
 		}
-	}
+	}*/
 }

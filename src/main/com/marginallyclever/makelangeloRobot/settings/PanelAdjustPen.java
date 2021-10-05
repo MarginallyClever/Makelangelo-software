@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectColor;
@@ -11,7 +8,8 @@ import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.Plotter;
 
 
-public class PanelAdjustPen extends SelectPanel implements ActionListener {
+@Deprecated
+public class PanelAdjustPen extends SelectPanel/* implements ActionListener*/ {
 	/**
 	 * 
 	 */
@@ -26,8 +24,8 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	protected SelectDouble penDown;
 	protected SelectDouble penZRate;
 
-	protected SelectButton buttonTestUp;
-	protected SelectButton buttonTestDown;
+	//protected SelectButton buttonTestUp;
+	//protected SelectButton buttonTestDown;
 	protected SelectButton buttonSave;
 	protected SelectButton buttonCancel;
 	
@@ -47,15 +45,15 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 	    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),settings.getDrawFeedRate()));
 	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getPenLiftTime()));
 	    add(penUp = new SelectDouble(Translator.get("penToolUp"),settings.getPenUpAngle()));
-	    add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
+	    //add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
 	    add(penDown = new SelectDouble(Translator.get("penToolDown"),settings.getPenDownAngle()));
-	    add(buttonTestDown = new SelectButton(Translator.get("penToolTest")));
+	    //add(buttonTestDown = new SelectButton(Translator.get("penToolTest")));
 		add(selectPenDownColor = new SelectColor(interiorPanel,Translator.get("pen down color"),robot.getSettings().getPenDownColor()));
 		add(selectPenUpColor = new SelectColor(interiorPanel,Translator.get("pen up color"),robot.getSettings().getPenUpColor()));
 		finish();
 	}
 	
-	
+	/*
 	public void actionPerformed(ActionEvent event) {
 		Object subject = event.getSource();
 
@@ -73,7 +71,7 @@ public class PanelAdjustPen extends SelectPanel implements ActionListener {
 					"G01 F" + currentFeedRate.getValue() + ";\n"
 					);
 		}
-	}
+	}*/
 	
 	
 	public void save() {
