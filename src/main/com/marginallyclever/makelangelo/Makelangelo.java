@@ -127,7 +127,7 @@ public final class Makelangelo {
 	private SaveDialog saveDialog;
 	private LoadDialog loadDialog;	
 
-	private JFrame logFrame;
+	private static JFrame logFrame;
 
 	private PiCaptureAction piCameraCaptureAction;
 	
@@ -135,19 +135,15 @@ public final class Makelangelo {
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
 	
-	public static void main(String[] argv) {
+	public static void main(String[] args) {
+		setSystemLookAndFeel();
+        
+		logFrame = LogPanel.createFrame();
 		Log.start();
 		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(argv);
+		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		// set look and feel
-        try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        	Log.error("Look and feel could not be set: "+e.getLocalizedMessage());
-        }
-        
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(()->{
@@ -156,8 +152,13 @@ public final class Makelangelo {
 		});
 	}
 
+	private static void setSystemLookAndFeel() {
+        try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
+	}
+
 	public Makelangelo() {
-		createLogFrame();
 		
 		Log.message("Locale="+Locale.getDefault().toString());
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
@@ -466,13 +467,9 @@ public final class Makelangelo {
 
 				int comp = line2.compareTo(VERSION);
 				String results;
-				if (comp > 0) {
-					results = Translator.get("UpdateNotice");
-					// TODO downloadUpdate(), flashNewFirmwareToRobot();
-				} else if (comp < 0)
-					results = "This version is from the future?!";
-				else
-					results = Translator.get("UpToDate");
+				if (comp > 0) results = Translator.get("UpdateNotice");
+				else if (comp < 0) results = "This version is from the future?!";
+				else results = Translator.get("UpToDate");
 
 				JOptionPane.showMessageDialog(mainFrame, results);
 			}
@@ -564,18 +561,7 @@ public final class Makelangelo {
 
 		setupDropTarget();
 	}
-
-	private void createLogFrame() {
-		LogPanel logPanel = new LogPanel();
-		logPanel.addListener( (command)-> robot.send(command) );
-
-		logFrame = new JFrame(Translator.get("Log")+" @ "+Log.getLogLocation());
-		logFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		logFrame.setPreferredSize(new Dimension(600,400));
-		logFrame.add(logPanel);
-		logFrame.pack();
-	}
-
+	
 	private void setupDropTarget() {
 		Log.message("  adding drag & drop support...");
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
