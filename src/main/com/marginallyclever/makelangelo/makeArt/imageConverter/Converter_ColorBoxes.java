@@ -48,8 +48,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 		int xi;
 		for (xi = 0; xi < nexterror.length; ++xi) nexterror[xi].set(0, 0, 0);
 
-		double xLeft   = settings.getMarginLeft();
-		double xRight  = settings.getMarginRight();
+		double xLeft   = myPaper.getMarginLeft();
+		double xRight  = myPaper.getMarginRight();
 		
 		if (direction > 0) {
 			start = xLeft;
@@ -126,8 +126,8 @@ public class Converter_ColorBoxes extends ImageConverter {
 			nexterror[y] = new ColorRGB(0, 0, 0);
 		}
 
-		double yBottom = settings.getMarginBottom();
-		double yTop    = settings.getMarginTop();
+		double yBottom = myPaper.getMarginBottom();
+		double yTop    = myPaper.getMarginTop();
 		
 		direction = 1;
 		for (y = (int)yBottom; y < yTop; y+= step4) {
@@ -147,7 +147,7 @@ public class Converter_ColorBoxes extends ImageConverter {
 	 * @param img the image to convert.
 	 */
 	public boolean convert(TransformedImage img) {
-		double pw = settings.getMarginWidth();
+		double pw = myPaper.getMarginWidth();
 
 		// figure out how many boxes we're going to have on this image.
 		step4 = 1;

@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Attempt to generate a magic circle weaving pattern as seen in https://github.com/i-make-robots/weaving_algorithm
@@ -61,8 +61,8 @@ public class Converter_MagicCircle extends ImageConverter {
 		double toolDiameter = 1 ;
 
 		// find the largest circle that still fits in the image.
-		double w = settings.getMarginWidth()/2.0f;
-		double h = settings.getMarginHeight()/2.0f;
+		double w = myPaper.getMarginWidth()/2.0f;
+		double h = myPaper.getMarginHeight()/2.0f;
 		double maxr = ( h < w ? h : w );
 
 		

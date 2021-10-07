@@ -52,7 +52,6 @@ import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
@@ -70,6 +69,8 @@ import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
 import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
 import com.marginallyclever.makelangeloRobot.plotterControls.PlotterControls;
@@ -106,7 +107,11 @@ public final class Makelangelo {
 	
 	private Camera camera;
 	private Plotter myPlotter;
+	private Paper myPaper = new Paper();
+	private Turtle myTurtle = new Turtle();
 
+	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	
 	// GUI elements
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
@@ -227,8 +232,8 @@ public final class Makelangelo {
 	}
 
 	private void openPlotterControls() {
-		JDialog dialog = new JDialog(mainFrame,myPlotter.getClass().getSimpleName());
-		dialog.add(new PlotterControls(myPlotter));
+		JDialog dialog = new JDialog(mainFrame,PlotterControls.class.getSimpleName());
+		dialog.add(new PlotterControls(myPlotter,myTurtle));
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
@@ -251,29 +256,29 @@ public final class Makelangelo {
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
 		fit.addActionListener((e)->{
-			myPlotter.setTurtle(ResizeTurtleToPaper.run(myPlotter.getTurtle(),myPlotter.getSettings(),false));
+			myTurtle=ResizeTurtleToPaper.run(myTurtle,myPaper,false);
 		});
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
 		fill.addActionListener((e)->{
-			myPlotter.setTurtle(ResizeTurtleToPaper.run(myPlotter.getTurtle(),myPlotter.getSettings(),true));
+			myTurtle=ResizeTurtleToPaper.run(myTurtle,myPaper,true);
 		});
 
 		menu.addSeparator();
 		
 		JMenuItem flipH = new JMenuItem(Translator.get("FlipH"));
 		menu.add(flipH);
-		flipH.addActionListener((e) -> myPlotter.getTurtle().scale(1, -1));
+		flipH.addActionListener((e) -> myTurtle.scale(1, -1));
 
 		JMenuItem flipV = new JMenuItem(Translator.get("FlipV"));
 		menu.add(flipV);
-		flipV.addActionListener((e) -> myPlotter.getTurtle().scale(-1, 1));
+		flipV.addActionListener((e) -> myTurtle.scale(-1, 1));
 
 		menu.addSeparator();
 		
-		menu.add(new SimplifyTurtle(myPlotter));
-		menu.add(new ReorderTurtle(myPlotter));
+		menu.add(new SimplifyTurtle(this));
+		menu.add(new ReorderTurtle(this));
 
 		return menu;
 	}
@@ -292,11 +297,11 @@ public final class Makelangelo {
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
 		myPlotter.setDecorator(ici);
-		ici.setRobot(myPlotter);
+		ici.setPaper(myPaper);
 
 		ici.addListener((t) -> {
 			signNameIfDesired(t);
-			myPlotter.setTurtle(t);
+			myTurtle=t;
 		});
 		
 		ici.generate();
@@ -309,7 +314,7 @@ public final class Makelangelo {
 		dialog.pack();
 		dialog.setVisible(true);
 
-		myPlotter.getSettings().setRotationRef(0);
+		myPaper.setRotationRef(0);
 		myPlotter.setDecorator(null);
 		
 		Log.message(Translator.get("Finished"));
@@ -320,13 +325,13 @@ public final class Makelangelo {
 		if(!myPlotter.getSettings().shouldSignName()) return;
 		
 		Generator_Text ymh = new Generator_Text();
-		ymh.setRobot(myPlotter);
+		ymh.setPaper(myPaper);
 		ymh.signName();
 		t.history.addAll(ymh.turtle.history);
 	}
 	
 	private void newFile() {
-		myPlotter.setTurtle(new Turtle());
+		myTurtle = new Turtle();
 	}
 
 	private JMenu createFileMenu() {
@@ -397,9 +402,7 @@ public final class Makelangelo {
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomToFit.addActionListener((e) -> {
-			camera.zoomToFit(
-					myPlotter.getSettings().getPaperWidth(),
-					myPlotter.getSettings().getPaperHeight());
+			camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
 		});
 		menu.add(buttonZoomToFit);
 
@@ -511,7 +514,9 @@ public final class Makelangelo {
 		Log.message("  create PreviewPanel...");
 		previewPanel = new PreviewPanel();
 		previewPanel.setCamera(camera);
+		previewPanel.addListener(myPaper);
 		previewPanel.addListener(myPlotter);
+		previewPanel.addListener(myTurtleRenderer);
 
 		// major layout
 		contentPane.add(previewPanel, BorderLayout.CENTER);
@@ -550,9 +555,7 @@ public final class Makelangelo {
 		
 		mainFrame.setContentPane(createContentPane());
 
-		camera.zoomToFit(
-				myPlotter.getSettings().getPaperWidth(),
-				myPlotter.getSettings().getPaperHeight());
+		camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
 		
 		Log.message("  make visible...");
 		mainFrame.setVisible(true);
@@ -697,8 +700,7 @@ public final class Makelangelo {
 				imageLoader.load(fileInputStream);
 				runImageConversionProcess(imageLoader);
 			} else {
-				Turtle t = loader.load(fileInputStream);
-				myPlotter.setTurtle(t);
+				myTurtle = loader.load(fileInputStream);
 			}
 			success=true;
 		} catch(Exception e) {
@@ -747,7 +749,6 @@ public final class Makelangelo {
 			if(t!=null) {
 				Log.message("Load success!");
 				SoundSystem.playConversionFinishedSound();
-				myPlotter.setTurtle(t);
 				buttonReopenFile.setEnabled(true);
 			}
 		}
@@ -760,11 +761,22 @@ public final class Makelangelo {
 	private void saveFile() {
 		Log.message("Saving vector file...");
 		try {
-			saveDialog.run(myPlotter.getTurtle(), mainFrame);
+			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getLocalizedMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
+	public Paper getPaper() {
+		return myPaper;
+	}
+
+	public void setTurtle(Turtle turtle) {
+		myTurtle = turtle;
+	}
+
+	public Turtle getTurtle() {
+		return myTurtle;
+	}
 }

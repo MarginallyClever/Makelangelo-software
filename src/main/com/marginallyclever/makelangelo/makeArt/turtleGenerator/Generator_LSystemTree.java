@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
 import java.security.SecureRandom;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * L System fractal
@@ -37,7 +37,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		random.setSeed(0xDEADBEEF);
 		
 		// move to starting position
-		turtle.moveTo(0,-settings.getMarginHeight()/2);
+		turtle.moveTo(0,-myPaper.getMarginHeight()/2);
 		turtle.turn(90);
 		turtle.penDown();
 		// do the curve

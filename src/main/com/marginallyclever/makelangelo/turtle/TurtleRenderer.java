@@ -1,9 +1,10 @@
-package com.marginallyclever.convenience.turtle;
+package com.marginallyclever.makelangelo.turtle;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 
 public abstract interface TurtleRenderer {
-	abstract void start();
+	abstract void start(GL2 gl2);
 
 	abstract void draw(TurtleMove p0, TurtleMove p1);
 	

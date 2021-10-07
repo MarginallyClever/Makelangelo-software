@@ -3,10 +3,10 @@ package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
 /**
@@ -65,8 +65,8 @@ public class Converter_CMYK extends ImageConverter {
 		double stepSize = (double)passes/2.0;
 
 		// from top to bottom of the margin area...
-		double height  = settings.getMarginTop() - settings.getMarginBottom();
-		double width   = settings.getMarginRight() - settings.getMarginLeft();
+		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
+		double width   = myPaper.getMarginRight() - myPaper.getMarginLeft();
 		double maxLen  = Math.sqrt(width*width+height*height);
 
 		double [] error0 = new double[(int)Math.ceil(maxLen)];

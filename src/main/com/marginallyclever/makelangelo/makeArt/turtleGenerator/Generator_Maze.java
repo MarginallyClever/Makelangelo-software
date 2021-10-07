@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Makes a "well formed" maze.
@@ -142,10 +142,10 @@ public class Generator_Maze extends TurtleGenerator {
 	}
 
 	private void drawMaze() {
-		yMin = (float)settings.getMarginBottom();
-		yMax = (float)settings.getMarginTop();
-		xMin = (float)settings.getMarginLeft();
-		xMax = (float)settings.getMarginRight();
+		yMin = (float)myPaper.getMarginBottom();
+		yMax = (float)myPaper.getMarginTop();
+		xMin = (float)myPaper.getMarginLeft();
+		xMax = (float)myPaper.getMarginRight();
 		
 		float w = (xMax - xMin) / columns;
 		float h = (yMax - yMin) / rows;

@@ -17,21 +17,6 @@ import javax.swing.JPanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Boxes;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_CMYK;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Crosshatch;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Moire;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Multipass;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Pulse;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_RandomLines;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Sandy;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Spiral;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Spiral_CMYK;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_SpiralPulse;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_VoronoiStippling;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_VoronoiZigZag;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.Converter_Wander;
-
 import com.marginallyclever.util.PreferencesHelper;
 
 public class LoadImagePanel {

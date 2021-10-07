@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Hilbert Curve fractal.
@@ -34,7 +34,7 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 	
 	@Override
 	public void generate() {
-		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
+		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
 		xMax = v;
 		yMax = v;
 		xMin = -v;

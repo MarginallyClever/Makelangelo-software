@@ -2,20 +2,20 @@ package com.marginallyclever.makelangelo.makeArt;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.Paper;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class ResizeTurtleToPaper {
-	public static Turtle run(Turtle turtle,PlotterSettings settings,boolean fillPage) {
+	public static Turtle run(Turtle turtle,Paper paper,boolean fillPage) {
 		Rectangle2D.Double turtleBounds = turtle.getBounds(); // image bounds
 
 		// find the scale
 		double iw = turtleBounds.width; // image width
 		double ih = turtleBounds.height; // image height
-		double pw = settings.getMarginWidth();
-		double ph = settings.getMarginHeight();
-		double px = (settings.getMarginRight()+settings.getMarginLeft())*0.5;
-		double py = (settings.getMarginTop()+settings.getMarginBottom())*0.5;
+		double pw = paper.getMarginWidth();
+		double ph = paper.getMarginHeight();
+		double px = (paper.getMarginRight()+paper.getMarginLeft())*0.5;
+		double py = (paper.getMarginTop()+paper.getMarginBottom())*0.5;
 		double ratioH = ph/ih;
 		double ratioW = pw/iw;
 		double ratio = 1;

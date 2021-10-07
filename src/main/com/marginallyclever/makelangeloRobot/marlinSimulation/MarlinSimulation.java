@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangeloRobot.marlin;
+package com.marginallyclever.makelangeloRobot.marlinSimulation;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.vecmath.Vector3d;
 
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 

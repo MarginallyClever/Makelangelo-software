@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public interface TurtleLoader {
 	/**

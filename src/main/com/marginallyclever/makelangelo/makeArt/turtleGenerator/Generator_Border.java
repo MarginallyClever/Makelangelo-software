@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
- * Draws a border around the paper.  Uses current paper settings.
+ * Draws a border around the paper.  Uses current paper myPaper.
  * @author Dan Royer
  *
  */
@@ -22,10 +22,10 @@ public class Generator_Border extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		float yMin = (float)settings.getMarginBottom();
-		float yMax = (float)settings.getMarginTop();
-		float xMin = (float)settings.getMarginLeft();
-		float xMax = (float)settings.getMarginRight();
+		double yMin = myPaper.getMarginBottom();
+		double yMax = myPaper.getMarginTop();
+		double xMin = myPaper.getMarginLeft();
+		double xMax = myPaper.getMarginRight();
 
 		turtle = new Turtle();
 		turtle.penUp();

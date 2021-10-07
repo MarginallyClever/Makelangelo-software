@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
@@ -34,8 +34,8 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	
 	@Override
 	public void generate() {
-		xMax = settings.getMarginWidth()/2.0f;
-		yMax = settings.getMarginHeight()/2.0f;
+		xMax = myPaper.getMarginWidth()/2.0f;
+		yMax = myPaper.getMarginHeight()/2.0f;
 		xMin = -xMax;
 		yMin = -yMax;
 

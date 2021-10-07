@@ -19,6 +19,7 @@ public class PlotterEvent {
 	*/
 	// requests tool change. extra is a 24 bit RGB value.
 	public static final int TOOL_CHANGE = 7;
+	
 	// new GCode commands have been given to the robot.
 	public static final int NEW_GCODE = 8;
 	// motor engaged status has changed.  extra is a boolean with the new state.
@@ -27,8 +28,8 @@ public class PlotterEvent {
 	public static final int HOME_FOUND = 10;
 	// robot has moved.
 	public static final int POSITION = 11;
-	// robot has lifted pen.  extra is true if pen is up, false if pen is down.
-	public static final int PEN_UP = 12;
+	// robot has raised or lowered pen.  extra is true if pen is up, false if pen is down.
+	public static final int PEN_UPDOWN = 12;
 	
 	public Plotter subject;
 	public int type;

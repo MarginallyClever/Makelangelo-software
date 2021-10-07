@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class TurtleFactory {
 	private static TurtleLoader [] loaders = {

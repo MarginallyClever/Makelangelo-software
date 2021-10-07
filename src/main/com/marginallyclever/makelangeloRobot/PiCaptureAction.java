@@ -88,8 +88,8 @@ public class PiCaptureAction extends AbstractAction {
 	private void runCapture() {
         // let's make the image the correct width and height for the paper
 		useImage = false;
-        double aspectRatio = makelangeloApp.getRobot().getSettings().getPaperWidth() 
-        					/ makelangeloApp.getRobot().getSettings().getPaperHeight();
+        double aspectRatio = makelangeloApp.getPaper().getPaperWidth() 
+        					/ makelangeloApp.getPaper().getPaperHeight();
 		final int captureH = 650;
         final int captureW = (int) ((double) captureH * aspectRatio);
 

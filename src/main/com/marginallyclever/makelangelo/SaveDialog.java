@@ -9,8 +9,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class SaveDialog {
 	private JFileChooser fc = new JFileChooser();

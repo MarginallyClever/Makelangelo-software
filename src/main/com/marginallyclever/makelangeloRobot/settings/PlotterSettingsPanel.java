@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -29,45 +28,39 @@ import com.marginallyclever.makelangeloRobot.settings.plotterTypes.PlotterTypeFa
 public class PlotterSettingsPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
-	protected Plotter robot;
-	protected Frame parentFrame;
-	protected JTabbedPane panes;
-	protected JButton save;
+	private Plotter robot;
 
 	private JComboBox<String> hardwareVersionChoices;
 	private ArrayList<String> availableHardwareVersions = PlotterTypeFactory.getHardwareVersions();
 	private ArrayList<String> hardwareVersionNames = PlotterTypeFactory.getNames();
 
+	private JTabbedPane panes = new JTabbedPane();
 	private JPanel modelPanel;
-	protected PanelAdjustMachine panelAdjustMachine;
-	protected PanelAdjustPaper panelAdjustPaper;
-	protected PanelAdjustPen panelAdjustPen;
-
-	protected int dialogWidth = 450;
-	protected int dialogHeight = 500;
-
+	private JButton buttonSave;
+	private JButton buttonCancel;
+	
 	public PlotterSettingsPanel(Plotter robot) {
 		super();
 		this.robot = robot;
-		
-		this.setLayout(new GridBagLayout());
+
+		buttonSave = new JButton(Translator.get("Save"));
+		buttonCancel = new JButton(Translator.get("Cancel"));
+
+		JPanel bottom = new JPanel(new FlowLayout());
+		bottom.add(buttonSave);
+		bottom.add(buttonCancel);
 
 		buildModelPanel();
 
 		// hardware model settings
-		panes = new JTabbedPane(JTabbedPane.TOP);
 		panes.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		// panes.setPreferredSize(new Dimension(dialogWidth,dialogHeight));
+		// panes.setPreferredSize(new Dimension(450,500));
 
 		rebuildTabbedPanes();
 
-		JPanel bottom = new JPanel(new FlowLayout());
-		JButton buttonSave = new JButton(Translator.get("Save"));
-		JButton buttonCancel = new JButton(Translator.get("Cancel"));
-		bottom.add(buttonSave);
-		bottom.add(buttonCancel);
 
 		// now assemble the dialog
+		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.weighty=0;
 		gbc.weightx=1;
@@ -82,9 +75,6 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		this.add(bottom,gbc);
 
 		buttonSave.addActionListener((e)->{
-			panelAdjustMachine.save();
-			panelAdjustPaper.save();
-			panelAdjustPen.save();
 			robot.getSettings().saveConfig();
 			//robot.sendConfig();
 		});
@@ -128,14 +118,17 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		int previouslySelectedTab = panes.getSelectedIndex();
 		panes.removeAll();
 
-		panelAdjustMachine = new PanelAdjustMachine(robot);
+		PanelAdjustMachine panelAdjustMachine = new PanelAdjustMachine(robot);
 		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine.getPanel());
+		buttonSave.addActionListener((e)-> panelAdjustMachine.save() );
 
-		panelAdjustPaper = new PanelAdjustPaper(robot);
-		panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getPanel());
+		//PanelAdjustPaper panelAdjustPaper = new PanelAdjustPaper(myPaper);
+		//panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getPanel());
+		//buttonSave.addActionListener((e)-> panelAdjustPaper.save() );
 
-		panelAdjustPen = new PanelAdjustPen(robot);
+		PenSettingsPanel panelAdjustPen = new PenSettingsPanel(robot);
 		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen.getPanel());
+		buttonSave.addActionListener((e)-> panelAdjustPen.save() );
 
 		// if one tab was selected, make sure to reselect it
 		if (previouslySelectedTab != -1) {

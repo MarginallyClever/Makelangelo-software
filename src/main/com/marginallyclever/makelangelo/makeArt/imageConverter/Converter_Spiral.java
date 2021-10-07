@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -47,13 +47,13 @@ public class Converter_Spiral extends ImageConverter {
 		double maxr;
 		if (convertToCorners) {
 			// go right to the corners
-			double h2 = settings.getMarginHeight();
-			double w2 = settings.getMarginWidth();
+			double h2 = myPaper.getMarginHeight();
+			double w2 = myPaper.getMarginWidth();
 			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
 		} else {
 			// do the largest circle that still fits in the image.
-			double w = settings.getMarginWidth()/2.0f;
-			double h = settings.getMarginHeight()/2.0f;
+			double w = myPaper.getMarginWidth()/2.0f;
+			double h = myPaper.getMarginHeight()/2.0f;
 			maxr = h < w ? h : w;
 		}
 

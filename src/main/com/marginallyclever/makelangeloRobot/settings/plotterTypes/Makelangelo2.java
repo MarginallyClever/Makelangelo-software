@@ -198,10 +198,10 @@ public class Makelangelo2 implements PlotterType {
 		// UNO
 		gl2.glColor3d(0, 0, 0.6);
 		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-4, 3);
-		gl2.glVertex2d(+4, 3);
-		gl2.glVertex2d(+4, -3);
-		gl2.glVertex2d(-4, -3);
+		gl2.glVertex2d(-40, 30);
+		gl2.glVertex2d(+40, 30);
+		gl2.glVertex2d(+40, -30);
+		gl2.glVertex2d(-40, -30);
 		gl2.glEnd();
 
 		gl2.glPopMatrix();

@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
 /**
@@ -43,15 +43,15 @@ public class Converter_Sandy extends ImageConverter {
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
 
-		double yBottom = settings.getLimitBottom();
-		double yTop    = settings.getLimitTop();
-		double xLeft   = settings.getLimitLeft();
-		double xRight  = settings.getLimitRight();
+		double yBottom = myPaper.getPaperBottom();
+		double yTop    = myPaper.getPaperTop();
+		double xLeft   = myPaper.getPaperLeft();
+		double xRight  = myPaper.getPaperRight();
 
-		double pBottom = settings.getMarginBottom() +1.0;
-		double pTop    = settings.getMarginTop()    -1.0;
-		double pLeft   = settings.getMarginLeft()   +1.0;
-		double pRight  = settings.getMarginRight()  -1.0;
+		double pBottom = myPaper.getMarginBottom() +1.0;
+		double pTop    = myPaper.getMarginTop()    -1.0;
+		double pLeft   = myPaper.getMarginLeft()   +1.0;
+		double pRight  = myPaper.getMarginRight()  -1.0;
 
 		double cx,cy;
 		double last_x=0,last_y=0;
@@ -91,7 +91,7 @@ public class Converter_Sandy extends ImageConverter {
 			for(r=rMin;r<rMax;r+=rStep) {
 				// go around in a circle
 				t=0;
-				t_step = settings.getPenDiameter()/r;
+				t_step = 1.0/r;
 				flipSum=0;
 				// go around the circle
 				for(t=0;t<Math.PI*2;t+=t_step) {

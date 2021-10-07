@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience.turtle;
+package com.marginallyclever.makelangelo.turtle;
 
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -298,65 +298,6 @@ public class Turtle implements Cloneable {
 			}
 		}
 		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
-	}
-	
-	public void render(TurtleRenderer tr) {
-		if(isLocked()) return;
-		try {
-			lock();
-			
-			TurtleMove previousMove = null;
-			
-			// the first and last command to show (in case we want to isolate part of the drawing)
-			int first = 0;
-			int last = history.size();
-			// where we're at in the drawing (to check if we're between first & last)
-			int showCount = 0;
-			
-			try {
-				tr.start();
-				showCount++;
-
-				for (TurtleMove m : history) {
-					if(m==null) throw new NullPointerException();
-					
-					boolean inShow = (showCount >= first && showCount < last);
-					switch (m.type) {
-					case TurtleMove.TRAVEL:
-						if (inShow && previousMove != null) {
-							tr.travel(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case TurtleMove.DRAW:
-						if (inShow && previousMove != null) {
-							tr.draw(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case TurtleMove.TOOL_CHANGE:
-						tr.setPenDownColor(m.getColor());
-						break;
-					}
-				}
-			}
-			catch(Exception e) {
-				//Log.error(e.getMessage());
-			}
-			finally {
-				tr.end();
-			}
-		}
-		catch(Exception e) {
-			Log.error(e.getMessage());
-		}
-		finally {
-			if(isLocked()) {
-				unlock();
-			}
-		}
 	}
 
 	// return a list of all the pen-down lines while remembering their color.

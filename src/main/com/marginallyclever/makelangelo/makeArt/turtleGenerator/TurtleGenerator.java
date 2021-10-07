@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 
 /**

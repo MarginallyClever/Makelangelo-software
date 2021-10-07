@@ -109,6 +109,7 @@ public final class PreferencesHelper {
 		SOUND,
 		FILE,
 		METRICS,
+		PAPER,
 		@Deprecated
 		LEGACY_MAKELANGELO_ROOT,
 		//MAKELANGELO_ROOT

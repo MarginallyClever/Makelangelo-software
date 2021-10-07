@@ -6,7 +6,7 @@ import java.util.Scanner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class LoadGCode implements TurtleLoader {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");

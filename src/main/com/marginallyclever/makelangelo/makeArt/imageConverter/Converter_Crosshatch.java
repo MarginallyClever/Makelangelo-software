@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -58,10 +58,10 @@ public class Converter_Crosshatch extends ImageConverter {
 		// Lift the pen any time the color value is > level (128 or more).
 
 		// from top to bottom of the margin area...
-		double yBottom = settings.getMarginBottom();
-		double yTop    = settings.getMarginTop();
-		double xLeft   = settings.getMarginLeft();
-		double xRight  = settings.getMarginRight();
+		double yBottom = myPaper.getMarginBottom();
+		double yTop    = myPaper.getMarginTop();
+		double xLeft   = myPaper.getMarginLeft();
+		double xRight  = myPaper.getMarginRight();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);

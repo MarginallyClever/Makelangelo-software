@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
@@ -64,8 +64,8 @@ public class Generator_Lissajous extends TurtleGenerator {
 	@Override
 	public void generate() {
 		// scale the step size so the curve fits on the paper
-		WIDTH = settings.getMarginWidth()/2.0;
-		HEIGHT = settings.getMarginHeight()/2.0;
+		WIDTH = myPaper.getMarginWidth()/2.0;
+		HEIGHT = myPaper.getMarginHeight()/2.0;
 
 		drawLissajous(true);
 

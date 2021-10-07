@@ -2,11 +2,9 @@ package com.marginallyclever.makelangelo.makeArt;
 
 import javax.swing.ProgressMonitor;
 
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
-import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
-
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * shared methods for image manipulation (generating, converting, or filtering)
@@ -18,12 +16,10 @@ public abstract class ImageManipulator {
 	// threading
 	private ProgressMonitor pm;
 	private ImageConverterThread thread;
-	
-	// helpers
-	@Deprecated
-	protected PlotterSettings settings;
 
-	
+	// helpers
+	protected Paper myPaper;
+		
 	public void setThread(ImageConverterThread p) {
 		thread = p;
 	}
@@ -37,8 +33,8 @@ public abstract class ImageManipulator {
 		pm.setProgress(d);
 	}
 	
-	public void setRobot(Plotter robot) {
-		settings = robot.getSettings();
+	public void setPaper(Paper p) {
+		myPaper = p;
 	}
 
 	public boolean isThreadCancelled() {
@@ -55,10 +51,6 @@ public abstract class ImageManipulator {
 	}
 
 	protected boolean isInsidePaperMargins(double x,double y) {
-		if( x < settings.getMarginLeft()  ) return false;
-		if( x > settings.getMarginRight() ) return false;
-		if( y < settings.getMarginBottom()) return false;
-		if( y > settings.getMarginTop()   ) return false;
-		return true;
+		return myPaper.isInsidePaperMargins(x,y);
 	}
 }

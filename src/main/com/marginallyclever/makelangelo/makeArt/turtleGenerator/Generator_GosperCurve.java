@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Gosper curve fractal.
@@ -35,7 +35,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	
 	@Override
 	public void generate() {
-		double v = Math.min(settings.getMarginWidth(),settings.getMarginHeight());
+		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
 
 		turtle = new Turtle();
 		

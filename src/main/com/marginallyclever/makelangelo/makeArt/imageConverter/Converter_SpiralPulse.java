@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -44,13 +44,13 @@ public class Converter_SpiralPulse extends ImageConverter {
 		
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)settings.getMarginHeight();
-			float w2 = (float)settings.getMarginWidth();
+			float h2 = (float)myPaper.getMarginHeight();
+			float w2 = (float)myPaper.getMarginWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the margin.
-			float w = (float)(settings.getMarginWidth())/2.0f;
-			float h = (float)(settings.getMarginHeight())/2.0f;
+			float w = (float)(myPaper.getMarginWidth())/2.0f;
+			float h = (float)(myPaper.getMarginHeight())/2.0f;
 			maxr = (float)( h < w ? h : w );
 		}
 		

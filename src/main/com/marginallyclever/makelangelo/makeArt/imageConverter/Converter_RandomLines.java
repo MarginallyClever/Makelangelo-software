@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
 /**
@@ -37,10 +37,10 @@ public class Converter_RandomLines extends ImageConverter {
 		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)settings.getMarginBottom();
-		float yTop    = (float)settings.getMarginTop()   ;
-		float xLeft   = (float)settings.getMarginLeft()  ;
-		float xRight  = (float)settings.getMarginRight() ;
+		float yBottom = (float)myPaper.getMarginBottom();
+		float yTop    = (float)myPaper.getMarginTop()   ;
+		float xLeft   = (float)myPaper.getMarginLeft()  ;
+		float xRight  = (float)myPaper.getMarginRight() ;
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 

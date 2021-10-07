@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangeloRobot.marlin;
+package com.marginallyclever.makelangeloRobot.marlinSimulation;
 
 import javax.vecmath.Vector3d;
 

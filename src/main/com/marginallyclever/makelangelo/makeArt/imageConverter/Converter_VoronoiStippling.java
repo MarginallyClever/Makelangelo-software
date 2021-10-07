@@ -9,10 +9,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
@@ -181,10 +181,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
-		yMin = settings.getMarginBottom();
-		yMax = settings.getMarginTop();
-		xMin = settings.getMarginLeft();
-		xMax = settings.getMarginRight();
+		yMin = myPaper.getMarginBottom();
+		yMax = myPaper.getMarginTop();
+		xMin = myPaper.getMarginLeft();
+		xMax = myPaper.getMarginRight();
 
 		keepIterating=true;
 		restart();

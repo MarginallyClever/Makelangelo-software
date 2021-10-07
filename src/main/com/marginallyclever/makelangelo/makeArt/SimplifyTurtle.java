@@ -7,25 +7,25 @@ import javax.swing.AbstractAction;
 import javax.vecmath.Vector2d;
 
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class SimplifyTurtle extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2930297421274921735L;
-	private Plotter myRobot;
+	private Makelangelo myMakelangelo;
 	
-	public SimplifyTurtle(Plotter robot) {
+	public SimplifyTurtle(Makelangelo m) {
 		super(Translator.get("Simplify"));
-		myRobot=robot;
+		myMakelangelo=m;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		myRobot.setTurtle(run(myRobot.getTurtle()));
+		myMakelangelo.setTurtle(run(myMakelangelo.getTurtle()));
 	}
 	
 	public static Turtle run(Turtle turtle) {

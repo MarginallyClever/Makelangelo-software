@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Draws a papercraft Achimedean Solid (https://en.wikipedia.org/wiki/Archimedean_solid).  Cut, crease, fold, and glue to assemble.

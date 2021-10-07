@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
@@ -84,8 +84,8 @@ public class Generator_Spirograph extends TurtleGenerator {
 		drawSpirograph(false);
 
 		// scale the step size so the spirograph fits on the paper
-		double paperWidth  = settings.getMarginWidth();
-		double paperHeight = settings.getMarginHeight();
+		double paperWidth  = myPaper.getMarginWidth();
+		double paperHeight = myPaper.getMarginHeight();
 
 		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
 		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the

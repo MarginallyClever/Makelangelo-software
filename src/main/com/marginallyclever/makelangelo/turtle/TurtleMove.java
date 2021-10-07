@@ -1,6 +1,9 @@
-package com.marginallyclever.convenience.turtle;
+package com.marginallyclever.makelangelo.turtle;
+
+import java.awt.Color;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.StringHelper;
 
 public class TurtleMove {
 	public static final int TRAVEL=0;  // move without drawing
@@ -26,5 +29,17 @@ public class TurtleMove {
 
 	public ColorRGB getColor() {
 		return new ColorRGB((int)x);
+	}
+	
+	public String toString() {
+		switch(type) {
+		case TOOL_CHANGE:
+			Color c = new Color((int)x);
+			return "COLOR R"+c.getRed()+" G"+c.getGreen()+" B"+c.getBlue();
+		case TRAVEL:
+			return "TRAVEL X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
+		default:
+			return "DRAW X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
+		}
 	}
 }

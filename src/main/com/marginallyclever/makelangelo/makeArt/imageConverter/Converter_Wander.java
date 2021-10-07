@@ -6,11 +6,11 @@ import java.util.LinkedList;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
 /**
@@ -65,10 +65,10 @@ public class Converter_Wander extends ImageConverter {
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		double yBottom = settings.getMarginBottom();
-		double yTop    = settings.getMarginTop()   ;
-		double xLeft   = settings.getMarginLeft()  ;
-		double xRight  = settings.getMarginRight() ;
+		double yBottom = myPaper.getMarginBottom();
+		double yTop    = myPaper.getMarginTop()   ;
+		double xLeft   = myPaper.getMarginLeft()  ;
+		double xRight  = myPaper.getMarginRight() ;
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;

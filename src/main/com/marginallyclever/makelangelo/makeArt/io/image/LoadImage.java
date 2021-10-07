@@ -12,13 +12,13 @@ import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 
@@ -28,6 +28,7 @@ import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 public class LoadImage implements TurtleLoader {
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
+	private Paper myPaper;
 	
 	@Deprecated
 	private Plotter myRobot;
@@ -102,9 +103,8 @@ public class LoadImage implements TurtleLoader {
 
 	// adjust image to fill the paper
 	public void scaleToFillPaper() {
-		PlotterSettings s = myRobot.getSettings();
-		double width  = s.getMarginWidth();
-		double height = s.getMarginHeight();
+		double width  = myPaper.getMarginWidth();
+		double height = myPaper.getMarginHeight();
 
 		float f;
 		if( width > height ) {
@@ -116,9 +116,8 @@ public class LoadImage implements TurtleLoader {
 	}
 	
 	public void scaleToFitPaper() {
-		PlotterSettings s = myRobot.getSettings();
-		double width  = s.getMarginWidth();
-		double height = s.getMarginHeight();
+		double width  = myPaper.getMarginWidth();
+		double height = myPaper.getMarginHeight();
 		
 		float f;
 		if( width < height ) {
@@ -149,7 +148,7 @@ public class LoadImage implements TurtleLoader {
 		pm.setMillisToPopup(0);
 		
 		chosenConverter.setProgressMonitor(pm);
-		chosenConverter.setRobot(myRobot);
+		chosenConverter.setPaper(myPaper);
 		chosenConverter.setImage(img);
 		
 		myRobot.setDecorator(chosenConverter);

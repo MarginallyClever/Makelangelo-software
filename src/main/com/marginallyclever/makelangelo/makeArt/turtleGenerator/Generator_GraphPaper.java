@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * 1cm and 10cm grid lines
@@ -48,10 +48,10 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
 		// from top to bottom of the margin area...
-		double yBottom = settings.getMarginBottom();
-		double yTop    = settings.getMarginTop()   ;
-		double xLeft   = settings.getMarginLeft()  ;
-		double xRight  = settings.getMarginRight() ;
+		double yBottom = myPaper.getMarginBottom();
+		double yTop    = myPaper.getMarginTop()   ;
+		double xLeft   = myPaper.getMarginLeft()  ;
+		double xRight  = myPaper.getMarginRight() ;
 		double dy = (yTop - yBottom)/2;
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
@@ -59,8 +59,8 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(settings.getMarginRight(),settings.getMarginTop());
-		Point2D rMin = new Point2D(settings.getMarginLeft(),settings.getMarginBottom());
+		Point2D rMax = new Point2D(myPaper.getMarginRight(),myPaper.getMarginTop());
+		Point2D rMin = new Point2D(myPaper.getMarginLeft(),myPaper.getMarginBottom());
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize_mm) {

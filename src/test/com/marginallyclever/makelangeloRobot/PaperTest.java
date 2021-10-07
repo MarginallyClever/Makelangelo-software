@@ -2,10 +2,9 @@ package com.marginallyclever.makelangeloRobot;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.Paper;
 
-
-public class MakelangeloRobotTest {
+public class PaperTest {
 	/*
 	@Test
 	public void testChangeToolMessage() {
@@ -21,14 +20,14 @@ public class MakelangeloRobotTest {
 	
 	@Test
 	public void testPaperSettingChanges() {
-		PlotterSettings a = new PlotterSettings();
-		a.loadConfig(0);
+		Paper a = new Paper();
+		a.loadConfig();
 		double w = a.getPaperWidth();
 		double h = a.getPaperHeight();
 		a.setPaperSize(w/2,h/2,0,0);
 		a.saveConfig();
-		PlotterSettings b = new PlotterSettings();
-		b.loadConfig(0);
+		Paper b = new Paper();
+		b.loadConfig();
 		assert(w/2 == b.getPaperWidth());
 		assert(h/2 == b.getPaperHeight());
 		a.setPaperSize(w,h,0,0);

@@ -20,9 +20,9 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * LoadAndSaveSB2 loads limited set of Scratch commands into memory. 

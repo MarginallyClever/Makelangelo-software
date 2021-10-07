@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
 import java.beans.PropertyChangeEvent;
+
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectColor;
@@ -8,15 +10,14 @@ import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectSlider;
-import com.marginallyclever.makelangeloRobot.Plotter;
 
-public class PanelAdjustPaper extends SelectPanel {
+public class PaperSettingsPanel extends SelectPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected Plotter robot;
+	protected Paper myPaper;
 	
 	private SelectOneOfMany paperSizes;
 	private SelectDouble pw, ph,sx,sy,ang;
@@ -70,8 +71,8 @@ public class PanelAdjustPaper extends SelectPanel {
 		new PaperSize("Arch E1",762,1067)
 	};
 
-	public PanelAdjustPaper(Plotter robot) {
-		this.robot = robot;
+	public PaperSettingsPanel(Paper paper) {
+		this.myPaper = paper;
 		
 		beingModified=false;
 
@@ -84,26 +85,26 @@ public class PanelAdjustPaper extends SelectPanel {
 		}
 		
 		add(paperSizes = new SelectOneOfMany(Translator.get("PaperSize"),commonPaperNames,0));
-		double top = robot.getSettings().getPaperTop();
-		double bot = robot.getSettings().getPaperBottom();
-		double left = robot.getSettings().getPaperLeft();
-		double right = robot.getSettings().getPaperRight();
-		double rot = robot.getSettings().getRotation();
+		double top = myPaper.getPaperTop();
+		double bot = myPaper.getPaperBottom();
+		double left = myPaper.getPaperLeft();
+		double right = myPaper.getPaperRight();
+		double rot = myPaper.getRotation();
 		add(pw = new SelectDouble(Translator.get("PaperWidth"),(float)(right-left)));
 		add(ph = new SelectDouble(Translator.get("PaperHeight"),(float)(top-bot))); 
 		add(sx = new SelectDouble("Shift X",(float)(left+right)/2.0f)); 
 		add(sy = new SelectDouble("Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("Rotation",(float)rot));
 		add(isLandscape = new SelectBoolean("\u21cb",false));
-		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (robot.getSettings().getPaperMargin() * 100)));
-		add(paperColor = new SelectColor(interiorPanel,Translator.get("paper color"),robot.getSettings().getPaperColor()));
+		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
+		add(paperColor = new SelectColor(interiorPanel,Translator.get("paper color"),myPaper.getPaperColor()));
 		finish();
 		updateValues();
 	}
 	
 	void updateValues() {
-		double w = robot.getSettings().getPaperWidth();
-		double h = robot.getSettings().getPaperHeight();
+		double w = myPaper.getPaperWidth();
+		double h = myPaper.getPaperHeight();
 
 		int i = getCurrentPaperSizeChoice( h, w );
 		if(i!=0) {
@@ -197,13 +198,12 @@ public class PanelAdjustPaper extends SelectPanel {
 		if( phf<=0 ) data_is_sane=false;
 
 		if (data_is_sane) {
-			PlotterSettings s = robot.getSettings();
-			s.setPaperSize(pwf,phf,shiftxf,shiftyf);
-			s.setRotation(rot);
-			s.setPaperColor(paperColor.getColor());
+			myPaper.setPaperSize(pwf,phf,shiftxf,shiftyf);
+			myPaper.setRotation(rot);
+			myPaper.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
-			s.setPaperMargin(pm);
+			myPaper.setPaperMargin(pm);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
-import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,22 +46,11 @@ public class PlotterSettings implements Serializable {
 	private double limitRight;
 	private double limitBottom;
 	private double limitTop;
-
-	// paper area, in mm
-	private double paperLeft;
-	private double paperRight;
-	private double paperBottom;
-	private double paperTop;
-	// % from edge of paper.
-	private double paperMargin;
 	
 	// speed control
 	private double travelFeedRate;
 	private double drawFeedRate;
 	private double maxAcceleration;
-	
-	private double rotation;
-	private double rotationRef;
 
 	// for a while the robot would sign it's name at the end of a drawing
 	@Deprecated
@@ -112,22 +100,11 @@ public class PlotterSettings implements Serializable {
 		listeners = new ArrayList<PlotterSettingsListener>();
 		shouldSignName = false;
 
-		// paper area
-		double pw = 420 * 0.1; // cm
-		double ph = 594 * 0.1; // cm
-
-		paperTop = ph / 2;
-		paperBottom = -ph / 2;
-		paperLeft = -pw / 2;
-		paperRight = pw / 2;
-		paperMargin = 0.9;
-
 		penDownColor = penDownColorDefault = new ColorRGB(0, 0, 0); // BLACK
 		penUpColor = new ColorRGB(0, 255, 0); // blue
 		startingPositionIndex = 4;
 
-		// default hardware version is 2
-		setHardwareVersion("2");
+		setHardwareVersion("5");
 
 		// which configurations are available?
 		try {
@@ -204,6 +181,7 @@ public class PlotterSettings implements Serializable {
 		return getHome().y;
 	}
 
+	@Deprecated
 	public String getGCodeTeleportToHomePosition() {
 		return "G92 X" + getHomeX() + " Y" + getHomeY();
 	}
@@ -213,10 +191,12 @@ public class PlotterSettings implements Serializable {
 		return getHardwareProperties().getGCodeConfig(this);
 	}
 
+	@Deprecated
 	public String getAbsoluteMode() {
 		return "G90\n";
 	}
 
+	@Deprecated
 	public String getRelativeMode() {
 		return "G91\n";
 	}
@@ -233,32 +213,6 @@ public class PlotterSettings implements Serializable {
 
 		return -1;
 	}
-
-	/*
-	 * // TODO finish these cloud storage methods. Security will be a problem.
-	 * 
-	 * public boolean GetCanUseCloud() { return
-	 * topLevelMachinesPreferenceNode.getBoolean("can_use_cloud", false); }
-	 * 
-	 * public void SetCanUseCloud(boolean b) {
-	 * topLevelMachinesPreferenceNode.putBoolean("can_use_cloud", b); }
-	 * 
-	 * protected boolean SaveConfigToCloud() { return false; }
-	 * 
-	 * protected boolean LoadConfigFromCloud() { // Ask for credentials: MC login,
-	 * password. auto-remember login name. //String login = new String(); //String
-	 * password = new String();
-	 * 
-	 * //try { // Send query //URL url = new
-	 * URL("https://marginallyclever.com/drawbot_getmachineconfig.php?name="+login+
-	 * "pass="+password+"&id="+robot_uid); //URLConnection conn =
-	 * url.openConnection(); //BufferedReader rd = new BufferedReader(new
-	 * InputStreamReader(conn.getInputStream())); // read data
-	 * 
-	 * // close connection //rd.close(); //} catch (Exception e) {}
-	 * 
-	 * return false; }
-	 */
 
 	boolean isNumeric(String s) {
 		try {
@@ -325,103 +279,8 @@ public class PlotterSettings implements Serializable {
 		return configsAvailable.length;
 	}
 
-	/**
-	 * @return paper height in mm.
-	 */
-	public double getPaperHeight() {
-		return paperTop - paperBottom;
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginHeight() {
-		return getMarginTop() - getMarginBottom();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginWidth() {
-		return getMarginRight() - getMarginLeft();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getPaperWidth() {
-		return paperRight - paperLeft;
-	}
-
-	/**
-	 * @return paper left edge in mm.
-	 */
-	public double getPaperLeft() {
-		return paperLeft;
-	}
-
-	/**
-	 * @return paper right edge in mm.
-	 */
-	public double getPaperRight() {
-		return paperRight;
-	}
-
-	/**
-	 * @return paper top edge in mm.
-	 */
-	public double getPaperTop() {
-		return paperTop;
-	}
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getPaperBottom() {
-		return paperBottom;
-	}
-
-	/**
-	 * @return paper left edge in mm.
-	 */
-	public double getMarginLeft() {
-		return getPaperLeft() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper right edge in mm.
-	 */
-	public double getMarginRight() {
-		return getPaperRight() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper top edge in mm.
-	 */
-	public double getMarginTop() {
-		return getPaperTop() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper bottom edge in mm.
-	 */
-	public double getMarginBottom() {
-		return getPaperBottom() * getPaperMargin();
-	}
-
-	/**
-	 * @return paper margin %.
-	 */
-	public double getPaperMargin() {
-		return paperMargin;
-	}
-
 	public long getUID() {
 		return robotUID;
-	}
-
-	public boolean isPaperConfigured() {
-		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
 
 	public boolean isRegistered() {
@@ -435,12 +294,7 @@ public class PlotterSettings implements Serializable {
 	 */
 	public void loadConfig(long uid) {
 		robotUID = uid;
-		// once cloud logic is finished.
-		// if( GetCanUseCloud() && LoadConfigFromCloud() ) return;
-		loadConfigFromLocal();
-	}
 
-	protected void loadConfigFromLocal() {
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
 				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
@@ -448,14 +302,6 @@ public class PlotterSettings implements Serializable {
 		limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
 		limitLeft = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
 		limitRight = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
-
-		paperLeft = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_left", Double.toString(paperLeft)));
-		paperRight = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_right", Double.toString(paperRight)));
-		paperTop = Double.parseDouble(uniqueMachinePreferencesNode.get("paper_top", Double.toString(paperTop)));
-		paperBottom = Double
-				.parseDouble(uniqueMachinePreferencesNode.get("paper_bottom", Double.toString(paperBottom)));
-		rotation = Double.parseDouble(uniqueMachinePreferencesNode.get("rotation", Double.toString(rotation)));
-		rotationRef = 0;
 
 		maxAcceleration = Float
 				.valueOf(uniqueMachinePreferencesNode.get("acceleration", Double.toString(maxAcceleration)));
@@ -469,14 +315,11 @@ public class PlotterSettings implements Serializable {
 		b = uniqueMachinePreferencesNode.getInt("paperColorB", paperColor.getBlue());
 		paperColor = new ColorRGB(r, g, b);
 
-		paperMargin = Double.valueOf(uniqueMachinePreferencesNode.get("paper_margin", Double.toString(paperMargin)));
 		// setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",
 		// Integer.toString(getCurrentToolNumber()))));
-		setRegistered(
-				Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered))));
+		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered))));
 
 		loadPenConfig(uniqueMachinePreferencesNode);
-
 		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareVersion));
 	}
 
@@ -519,15 +362,7 @@ public class PlotterSettings implements Serializable {
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
 	}
 
-	// Save the machine configuration
 	public void saveConfig() {
-		// once cloud logic is finished.
-		// if(GetCanUseCloud() && SaveConfigToCloud() ) return;
-		saveConfigToLocal();
-		notifyListeners();
-	}
-
-	protected void saveConfigToLocal() {
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
 				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
@@ -538,17 +373,10 @@ public class PlotterSettings implements Serializable {
 		uniqueMachinePreferencesNode.put("acceleration", Double.toString(maxAcceleration));
 		uniqueMachinePreferencesNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
-		uniqueMachinePreferencesNode.putDouble("paper_left", paperLeft);
-		uniqueMachinePreferencesNode.putDouble("paper_right", paperRight);
-		uniqueMachinePreferencesNode.putDouble("paper_top", paperTop);
-		uniqueMachinePreferencesNode.putDouble("paper_bottom", paperBottom);
-		uniqueMachinePreferencesNode.putDouble("rotation", rotation);
-
 		uniqueMachinePreferencesNode.putInt("paperColorR", paperColor.getRed());
 		uniqueMachinePreferencesNode.putInt("paperColorG", paperColor.getGreen());
 		uniqueMachinePreferencesNode.putInt("paperColorB", paperColor.getBlue());
 
-		uniqueMachinePreferencesNode.put("paper_margin", Double.toString(paperMargin));
 		// uniqueMachinePreferencesNode.put("current_tool",
 		// Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
@@ -556,6 +384,7 @@ public class PlotterSettings implements Serializable {
 		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareVersion);
 
 		savePenConfig(uniqueMachinePreferencesNode);
+		notifyListeners();
 	}
 
 	public void setAcceleration(double f) {
@@ -608,17 +437,6 @@ public class PlotterSettings implements Serializable {
 		this.limitRight = width / 2.0;
 		this.limitBottom = -height / 2.0;
 		this.limitTop = height / 2.0;
-	}
-
-	public void setPaperMargin(double paperMargin) {
-		this.paperMargin = paperMargin;
-	}
-
-	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		this.paperLeft = -width / 2 + shiftx;
-		this.paperRight = width / 2 + shiftx;
-		this.paperTop = height / 2 + shifty;
-		this.paperBottom = -height / 2 + shifty;
 	}
 
 	public void setRegistered(boolean isRegistered) {
@@ -679,14 +497,6 @@ public class PlotterSettings implements Serializable {
 		setPenDiameter(0.8f);
 	}
 
-	public ColorRGB getPaperColor() {
-		return paperColor;
-	}
-
-	public void setPaperColor(ColorRGB arg0) {
-		paperColor = arg0;
-	}
-
 	public ColorRGB getPenDownColorDefault() {
 		return penDownColorDefault;
 	}
@@ -711,6 +521,7 @@ public class PlotterSettings implements Serializable {
 		return penUpColor;
 	}
 
+	@Deprecated
 	public String getProgramStart() {
 		String a = StringHelper.formatDouble(getMaxAcceleration());
 		String j = "3";
@@ -718,36 +529,44 @@ public class PlotterSettings implements Serializable {
 				+ "M205 X" + j + " Y" + j + "\n"; // jerk
 	}
 
+	@Deprecated
 	public String getProgramEnd() {
 		return hardwareProperties.getProgramEnd();
 	}
 
+	@Deprecated
 	public String getPenDownString() {
 		return "M280 P0 T" + getPenLiftTime() + " S" + StringHelper.formatDouble(getPenDownAngle()) + "\n";
 	}
 
+	@Deprecated
 	public String getPenUpString() {
 		return "M280 P0 T100 S" + StringHelper.formatDouble(getPenUpAngle()) + "\n";
 	}
 
+	@Deprecated
 	public String getTravelFeedrateString() {
 		return "F" + StringHelper.formatDouble(travelFeedRate) + "\n";
 	}
 
+	@Deprecated
 	public String getDrawFeedrateString() {
 		return "F" + StringHelper.formatDouble(drawFeedRate) + "\n";
 	}
 
+	@Deprecated
 	public String getChangeTool(ColorRGB newPenDownColor) {
 		penDownColor = newPenDownColor;
 		return getChangeToolInternal();
 	}
 
+	@Deprecated
 	public String getChangeToDefaultColor() {
 		penDownColor = penDownColorDefault;
 		return getChangeToolInternal();
 	}
 
+	@Deprecated
 	protected String getChangeToolInternal() {
 		int toolNumber = penDownColor.toInt() & 0xffffff; // ignore alpha channel
 
@@ -769,6 +588,7 @@ public class PlotterSettings implements Serializable {
 		return "M06 T" + toolNumber + "\n" + "M0 Ready " + name + " and click\n";
 	}
 
+	@Deprecated
 	public String getMoveTo(double x, double y, boolean isUp, boolean zMoved) {
 		String command = isUp ? COMMAND_TRAVEL : COMMAND_DRAW;
 		if (zMoved) {
@@ -809,31 +629,5 @@ public class PlotterSettings implements Serializable {
 
 	public void setPenLiftTime(double ms) {
 		this.penLiftTime = ms;
-	}
-
-	public double getRotation() {
-		return this.rotation;
-	}
-
-	public void setRotation(double rot) {
-		this.rotation = rot;
-	}
-
-	public void setRotationRef(double ang) {
-		this.rotationRef = ang;
-
-	}
-
-	public double getRotationRef() {
-		return this.rotationRef;
-	}
-
-	public Rectangle2D.Double getMarginRectangle() {
-		Rectangle2D.Double rectangle = new Rectangle2D.Double();
-		rectangle.x = getMarginLeft();
-		rectangle.y = getMarginBottom();
-		rectangle.width = getMarginRight() - rectangle.x;
-		rectangle.height = getMarginTop() - rectangle.y;
-		return rectangle;
 	}
 }

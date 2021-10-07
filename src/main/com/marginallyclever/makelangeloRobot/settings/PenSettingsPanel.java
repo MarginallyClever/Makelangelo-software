@@ -9,7 +9,7 @@ import com.marginallyclever.makelangeloRobot.Plotter;
 
 
 @Deprecated
-public class PanelAdjustPen extends SelectPanel/* implements ActionListener*/ {
+public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ {
 	/**
 	 * 
 	 */
@@ -33,7 +33,7 @@ public class PanelAdjustPen extends SelectPanel/* implements ActionListener*/ {
 	protected SelectColor selectPenUpColor;
 
 	
-	public PanelAdjustPen(Plotter robot) {
+	public PenSettingsPanel(Plotter robot) {
 		super();
 		
 		this.robot = robot;

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Draws a border around the paper.  Uses current paper settings.

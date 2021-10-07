@@ -7,8 +7,8 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 public class CropTurtle {
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {

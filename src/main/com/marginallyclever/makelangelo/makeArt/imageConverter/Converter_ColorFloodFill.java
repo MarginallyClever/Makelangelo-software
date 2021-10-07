@@ -10,10 +10,10 @@ import java.util.LinkedList;
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_GaussianBlur;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * @author Dan Royer
@@ -172,7 +172,11 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param colorIndex index into the list of colors at the top of the class
 	 */
-	void scanForContiguousBlocks(int colorIndex) {
+	private void scanColor(int colorIndex) {
+		// "please change to tool X and press any key to continue"
+		turtle.penUp();
+		turtle.setColor(palette.getColor(colorIndex));
+		
 		ColorRGB originalColor;
 		int quantized_color;
 
@@ -199,15 +203,6 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		Log.message("Found " + z + " blobs.");
 	}
 
-	private void scanColor(int i) {
-		// "please change to tool X and press any key to continue"
-		turtle.penUp();
-		turtle.setColor(settings.getPenDownColorDefault());
-		Log.message("Color " + i );
-
-		scanForContiguousBlocks(i);
-	}
-
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *
@@ -229,10 +224,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		g.setPaint(new Color(0, 0, 0));
 		g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
-		yBottom = settings.getMarginBottom();
-		yTop    = settings.getMarginTop();
-		xLeft   = settings.getMarginLeft();
-		xRight  = settings.getMarginRight();
+		yBottom = myPaper.getMarginBottom();
+		yTop    = myPaper.getMarginTop();
+		xLeft   = myPaper.getMarginLeft();
+		xRight  = myPaper.getMarginRight();
 		
 		diameter = 1;
 

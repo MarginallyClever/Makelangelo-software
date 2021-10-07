@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import java.util.Stack;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * generates a fibonacci spiral
@@ -56,8 +56,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		xMax = (float)(settings.getMarginWidth () /2.0f);
-		yMax = (float)(settings.getMarginHeight() /2.0f);
+		xMax = (float)(myPaper.getMarginWidth () /2.0f);
+		yMax = (float)(myPaper.getMarginHeight() /2.0f);
 		Log.message("xMax="+xMax);
 		Log.message("yMax="+yMax);
 		

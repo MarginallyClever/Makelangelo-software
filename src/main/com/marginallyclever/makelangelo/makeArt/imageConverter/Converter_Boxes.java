@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * A grid of boxes across the paper, and make the boxes bigger if the image is darker in that area.
@@ -50,10 +50,10 @@ public class Converter_Boxes extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(sourceImage);
 
-		double yBottom = settings.getMarginBottom();
-		double yTop    = settings.getMarginTop();
-		double xLeft   = settings.getMarginLeft();
-		double xRight  = settings.getMarginRight();
+		double yBottom = myPaper.getMarginBottom();
+		double yTop    = myPaper.getMarginTop();
+		double xLeft   = myPaper.getMarginLeft();
+		double xRight  = myPaper.getMarginRight();
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.

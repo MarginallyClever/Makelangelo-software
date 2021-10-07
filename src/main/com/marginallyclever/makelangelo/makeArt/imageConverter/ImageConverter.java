@@ -114,8 +114,8 @@ public abstract class ImageConverter extends ImageManipulator implements Plotter
 		Point2D P0 = new Point2D(x0,y0);
 		Point2D P1 = new Point2D(x1,y1);
 
-		Point2D rMax = new Point2D(settings.getMarginRight(),settings.getMarginTop());
-		Point2D rMin = new Point2D(settings.getMarginLeft(),settings.getMarginBottom());
+		Point2D rMax = new Point2D(myPaper.getMarginRight(),myPaper.getMarginTop());
+		Point2D rMin = new Point2D(myPaper.getMarginLeft(),myPaper.getMarginBottom());
 		if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 			// entire line clipped
 			return;

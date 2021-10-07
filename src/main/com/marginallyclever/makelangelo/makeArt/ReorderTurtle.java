@@ -7,25 +7,25 @@ import javax.swing.AbstractAction;
 
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class ReorderTurtle extends AbstractAction {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3473530693924971574L;
-	private Plotter myRobot;
+	private Makelangelo myMakelangelo;
 	
-	public ReorderTurtle(Plotter robot) {
+	public ReorderTurtle(Makelangelo m) {
 		super(Translator.get("Reorder"));
-		myRobot = robot;
+		myMakelangelo = m;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		myRobot.setTurtle(run(myRobot.getTurtle()));
+		myMakelangelo.setTurtle(run(myMakelangelo.getTurtle()));
 	}
 	
 	public static Turtle run(Turtle turtle) {

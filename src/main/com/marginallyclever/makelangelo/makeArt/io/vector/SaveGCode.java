@@ -6,9 +6,8 @@ import java.io.OutputStreamWriter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
@@ -25,15 +24,12 @@ public class SaveGCode implements TurtleSaver {
 	}
 	
 	@Override
-	public boolean save(OutputStream outputStream,Plotter robot) throws Exception {
+	public boolean save(OutputStream outputStream,Turtle turtle) throws Exception {
 		Log.message("saving...");
-		Turtle turtle = robot.getTurtle();
 		PlotterSettings machine = robot.getSettings();
 		
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		out.write(machine.getProgramStart());
-		out.write(machine.getAbsoluteMode());
-		out.write(machine.getPenUpString());
 		boolean isUp=true;
 		
 		TurtleMove previousMovement=null;

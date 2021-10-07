@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import java.awt.geom.Rectangle2D;
+
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
@@ -7,11 +9,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
-import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
  * @author Dan Royer
@@ -30,18 +30,11 @@ public class SaveDXF extends ImageManipulator implements TurtleSaver {
 		return filter;
 	}
 
-	/**
-	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
-	 * @param outputStream where to write the data
-	 * @param robot the robot from which the data is obtained
-	 * @return true if save succeeded.
-	 */
 	@Override
-	public boolean save(OutputStream outputStream, Plotter robot) throws Exception {
+	public boolean save(OutputStream outputStream,Turtle turtle) throws Exception {
 		Log.message("saving...");
-		Turtle turtle = robot.getTurtle();
-		PlotterSettings settings = robot.getSettings();
 		
+		Rectangle2D.Double box = turtle.getBounds();
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		// header
 		out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
@@ -49,16 +42,16 @@ public class SaveDXF extends ImageManipulator implements TurtleSaver {
 		out.write("2\nHEADER\n");
 		out.write("9\n$ACADVER\n1\nAC1006\n");
 		out.write("9\n$INSBASE\n");
-		out.write("10\n"+settings.getPaperLeft()+"\n");
-		out.write("20\n"+settings.getPaperBottom()+"\n");
+		out.write("10\n"+box.x+"\n");
+		out.write("20\n"+box.y+"\n");
 		out.write("30\n0.0\n");
 		out.write("9\n$EXTMIN\n");
-		out.write("10\n"+settings.getPaperLeft()+"\n");
-		out.write("20\n"+settings.getPaperBottom()+"\n");
+		out.write("10\n"+box.x+"\n");
+		out.write("20\n"+box.y+"\n");
 		out.write("30\n0.0\n");
 		out.write("9\n$EXTMAX\n");
-		out.write("10\n"+settings.getPaperRight()+"\n");
-		out.write("20\n"+settings.getPaperTop()+"\n");
+		out.write("10\n"+(box.x+box.width)+"\n");
+		out.write("20\n"+(box.y+box.height)+"\n");
 		out.write("30\n0.0\n");
 		out.write("0\nENDSEC\n");
 
@@ -108,23 +101,9 @@ public class SaveDXF extends ImageManipulator implements TurtleSaver {
 		out.write("2\nENTITIES\n");
 
 		boolean isUp=true;
-		double x0 = settings.getHomeX();
-		double y0 = settings.getHomeY();
-		
-		String matchUp = settings.getPenUpString();
-		String matchDown = settings.getPenDownString();
-		
-		if(matchUp.contains(";")) {
-			matchUp = matchUp.substring(0, matchUp.indexOf(";"));
-		}
-		matchUp = matchUp.replaceAll("\n", "");
-
-		if(matchDown.contains(";")) {
-			matchDown = matchDown.substring(0, matchDown.indexOf(";"));
-		}
-		matchDown = matchDown.replaceAll("\n", "");
-		
-		
+		double x0 = turtle.history.get(0).x;
+		double y0 = turtle.history.get(0).y;
+				
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case TurtleMove.TRAVEL:

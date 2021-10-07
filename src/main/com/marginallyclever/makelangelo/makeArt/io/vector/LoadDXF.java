@@ -28,9 +28,9 @@ import org.kabeja.parser.ParserBuilder;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * @author Dan Royer

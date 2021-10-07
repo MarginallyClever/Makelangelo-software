@@ -14,13 +14,15 @@ import javax.swing.JPanel;
 
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
+
 /**
  * Drag cursor to drive plotter control. 
  * @author droyer
  * @since 7.4.5
  * @deprecated
  */
-public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMotionListener {
+@Deprecated
+public class DragAndDrivePanel extends JPanel {
 	/**
 	 * 
 	 */
@@ -51,8 +53,6 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 
 		dragAndDrive = new JPanel(new GridBagLayout());
 		dragAndDrive.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		dragAndDrive.addMouseListener(this);
-		dragAndDrive.addMouseMotionListener(this);
 
 		coordinates = new JLabel(Translator.get("ClickAndDrag"));
 		GridBagConstraints c = new GridBagConstraints();
@@ -60,36 +60,48 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 
 		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
 		Dimension dims = new Dimension();
-		dims.setSize( 150, 150 * (double)robot.getSettings().getPaperWidth()/(double)robot.getSettings().getPaperHeight());
+		double w = robot.getSettings().getLimitRight()-robot.getSettings().getLimitLeft();
+		double h = robot.getSettings().getLimitTop()-robot.getSettings().getLimitBottom();
+		dims.setSize( 150, 150 * w / h);
 		dragAndDrive.setPreferredSize(dims);
 		dragAndDrive.add(coordinates,c);
-	}
+		
 
-
-	public void mouseClicked(MouseEvent e) {}
-	public void mouseDragged(MouseEvent e) {
-		mouseAction(e);
+		dragAndDrive.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mouseOn=true;
+				mouseAction(e);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				mouseOn=false;
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				mouseInside=true;
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				mouseInside=false;
+				mouseOn=false;
+			}			
+		});
+		dragAndDrive.addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				mouseAction(e);
+			}
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				mouseAction(e);
+			}
+		});
 	}
-	public void mouseEntered(MouseEvent e) {
-		mouseInside=true;
-	}
-	public void mouseExited(MouseEvent e) {
-		mouseInside=false;
-		mouseOn=false;
-	}
-	public void mouseMoved(MouseEvent e) {
-		mouseAction(e);
-	}
-	public void mousePressed(MouseEvent e) {
-		mouseOn=true;
-		mouseAction(e);
-	}
-	public void mouseReleased(MouseEvent e) {
-		mouseOn=false;
-	}
-	public void mouseWheelMoved(MouseEvent e) {}
-
-	public void mouseAction(MouseEvent e) {
+	
+	private void mouseAction(MouseEvent e) {
 		if(mouseInside && mouseOn) {
 			double x = (double)e.getX();
 			double y = (double)e.getY();
@@ -100,8 +112,10 @@ public class DragAndDrivePanel extends JPanel implements MouseListener, MouseMot
 			double cy = h/2.0;
 			x = x - cx;
 			y = cy - y;
-			x *= 10 * robot.getSettings().getPaperWidth()  / w;
-			y *= 10 * robot.getSettings().getPaperHeight() / h;
+			double w2 = robot.getSettings().getLimitRight()-robot.getSettings().getLimitLeft();
+			double h2 = robot.getSettings().getLimitTop()-robot.getSettings().getLimitBottom();
+			x *= 10 * w2 / w;
+			y *= 10 * h2 / h;
 			double dx = x-mouseLastX;
 			double dy = y-mouseLastY;
 			if(Math.sqrt(dx*dx+dy*dy)>=1) {

@@ -17,8 +17,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.Turtle;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Your message here.  understands font families, styles, sizes, and alignment
@@ -106,24 +106,24 @@ public class Generator_Text extends TurtleGenerator {
 	}
 	
 	protected void setupTransform() {
-		double imageHeight = settings.getPaperHeight()*settings.getPaperMargin();
-		double imageWidth = settings.getPaperWidth()*settings.getPaperMargin();
+		double imageHeight = myPaper.getPaperHeight()*myPaper.getPaperMargin();
+		double imageWidth = myPaper.getPaperWidth()*myPaper.getPaperMargin();
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > settings.getPaperWidth()) {
-			float resize = (float) settings.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > myPaper.getPaperWidth()) {
+			float resize = (float) myPaper.getPaperWidth() / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = settings.getPaperWidth();
+			newWidth = myPaper.getPaperWidth();
 		}
-		if (newHeight > settings.getPaperHeight()) {
-			float resize = (float) settings.getPaperHeight() / (float) newHeight;
+		if (newHeight > myPaper.getPaperHeight()) {
+			float resize = (float) myPaper.getPaperHeight() / (float) newHeight;
 			newWidth *= resize;
-			newHeight = settings.getPaperHeight();
+			newHeight = myPaper.getPaperHeight();
 		}
-		newWidth *= settings.getPaperMargin();
-		newHeight *= settings.getPaperMargin();
+		newWidth *= myPaper.getPaperMargin();
+		newHeight *= myPaper.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -139,18 +139,18 @@ public class Generator_Text extends TurtleGenerator {
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > settings.getPaperWidth()) {
-			float resize = (float) settings.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > myPaper.getPaperWidth()) {
+			float resize = (float) myPaper.getPaperWidth() / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = settings.getPaperWidth();
+			newWidth = myPaper.getPaperWidth();
 		}
-		if (newHeight > settings.getPaperHeight()) {
-			float resize = (float) settings.getPaperHeight() / (float) newHeight;
+		if (newHeight > myPaper.getPaperHeight()) {
+			float resize = (float) myPaper.getPaperHeight() / (float) newHeight;
 			newWidth *= resize;
-			newHeight = settings.getPaperHeight();
+			newHeight = myPaper.getPaperHeight();
 		}
-		newWidth *= settings.getPaperMargin();
-		newHeight *= settings.getPaperMargin();
+		newWidth *= myPaper.getPaperMargin();
+		newHeight *= myPaper.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -301,7 +301,7 @@ public class Generator_Text extends TurtleGenerator {
 		turtle = new Turtle();
 		posx=0;
 		posy=0;
-		textFindCharsPerLine(settings.getPaperWidth()*settings.getPaperMargin());
+		textFindCharsPerLine(myPaper.getPaperWidth()*myPaper.getPaperMargin());
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
 		writeBeautifulMessage(fontName,lastSize,lastMessage);
@@ -586,12 +586,12 @@ public class Generator_Text extends TurtleGenerator {
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition(
-				(float)(settings.getPaperWidth() *10.0f*settings.getPaperMargin()),
-				(float)(settings.getPaperHeight()*10.0f*settings.getPaperMargin()));
+				(float)(myPaper.getPaperWidth() *10.0f*myPaper.getPaperMargin()),
+				(float)(myPaper.getPaperHeight()*10.0f*myPaper.getPaperMargin()));
 
 		textSetCharsPerLine(25);
 
-		textCreateMessageNow( "Makelangelo #" + Long.toString(settings.getUID()) );
+		textCreateMessageNow("Makelangelo robot");
 		//TextCreateMessageNow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?/\"':;[]!@#$%^&*()_+-=\\|~`{}.");
 	}
 }

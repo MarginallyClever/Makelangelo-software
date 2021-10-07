@@ -8,9 +8,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
-import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
  * @author Dan Royer
@@ -29,14 +29,10 @@ public class SaveSVG extends ImageManipulator implements TurtleSaver {
 
 	/**
 	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
-	 * @param outputStream where to write the data
-	 * @param robot the robot from which the data is obtained
-	 * @return true if save succeeded.
 	 */
 	@Override
-	public boolean save(OutputStream outputStream, Plotter robot) throws Exception {
+	public boolean save(OutputStream outputStream, Turtle turtle) throws Exception {
 		Log.message("saving...");
-		turtle = robot.getTurtle();
 
 		Rectangle2D.Double dim= turtle.getBounds();
 		
@@ -47,30 +43,25 @@ public class SaveSVG extends ImageManipulator implements TurtleSaver {
 		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+dim.getX()+" "+dim.getY()+" "+dim.getWidth()+" "+dim.getHeight()+"\">\n");
 
 		boolean isUp=true;
-		double x0 = robot.getSettings().getHomeX();
-		double y0 = robot.getSettings().getHomeY();
+		double x0 = turtle.history.get(0).x;
+		double y0 = turtle.history.get(0).y;
 
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case TurtleMove.TRAVEL:
-				if(!isUp) {
-					isUp=true;
-				}
+				if(!isUp) isUp=true;
 				x0=m.x;
 				y0=m.y;
 				break;
 			case TurtleMove.DRAW:
-				if(isUp) {
-					isUp=false;
-				} else {
+				if(isUp) isUp=false;
+				else {
 					out.write("  <line");
 					out.write(" x1=\""+StringHelper.formatDouble(x0)+"\"");
 					out.write(" y1=\""+StringHelper.formatDouble(-y0)+"\"");
 					out.write(" x2=\""+StringHelper.formatDouble(m.x)+"\"");
 					out.write(" y2=\""+StringHelper.formatDouble(-m.y)+"\"");
-					out.write(" stroke=\"black\"");
-					//out.write(" stroke-width=\"1\"");
-					out.write(" />\n");
+					out.write(" stroke=\"black\" />\n");
 				}
 				x0=m.x;
 				y0=m.y;

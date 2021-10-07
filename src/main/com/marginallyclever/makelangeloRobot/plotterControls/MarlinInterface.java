@@ -3,6 +3,9 @@ package com.marginallyclever.makelangeloRobot.plotterControls;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +16,7 @@ import javax.swing.UIManager;
 
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
@@ -20,20 +24,35 @@ import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
-import com.marginallyclever.makelangeloRobot.marlin.MarlinEvent;
+
+// TODO add a timeout check in case "ok" is not received somehow.
 
 public class MarlinInterface extends JPanel {
 	private static final long serialVersionUID = 979851120390943303L;
+	// number of commands we'll hold on to in case there's a resend.
+	private static final int HISTORY_BUFFER_LIMIT = 50;
+	// Marlin can buffer this many commands from serial, before processing.
+	private static final int MARLIN_SEND_LIMIT = 20;
+	// Marlin says this when a resend is needed, followed by the last well-received line number.
+	private static final String STR_RESEND = "Resend: ";
+	// Marlin sends this event when the robot is ready to receive more.
+	public static final String IDLE = "idle";
+
 	private Plotter myPlotter;
+
+	private int lineNumberToSend;
+	private int lineNumberAdded;
 	
-	private int lineNumber;
+	// don't send more than 20 at a time.
+	private int busyCount=MARLIN_SEND_LIMIT;
 
 	private TextInterfaceToNetworkSession chatInterface = new TextInterfaceToNetworkSession();
 
 	private JButton bESTOP = new JButton("EMERGENCY STOP");
 	private JButton bGetPosition = new JButton("M114");
-	private JButton bSetHome = new JButton("Set Home");
 	private JButton bGoHome = new JButton("Go Home");
+	
+	private ArrayList<MarlinCommand> myHistory = new ArrayList<MarlinCommand>();
 
 	public MarlinInterface(Plotter plotter) {
 		super();
@@ -50,91 +69,118 @@ public class MarlinInterface extends JPanel {
 			switch (e.getID()) {
 			case ChooseConnectionPanel.CONNECTION_OPENED:
 				onConnect();
+				notifyListeners(e);
 				break;
 			case ChooseConnectionPanel.CONNECTION_CLOSED:
 				updateButtonAccess();
+				notifyListeners(e);
 				break;
 			}
 		});
-		
-		chatInterface.addNetworkSessionListener((e)->{
-			if(e.flag == MarlinEvent.TRANSPORT_ERROR) {
-				setLineNumber((int)e.data);
-				sendFileCommand();
-			}
-			if(e.flag == MarlinEvent.SEND_BUFFER_EMPTY) {
-				sendFileCommand();
-			}
-		});
+	}
+	
+	public void addNetworkSessionListener(NetworkSessionListener a) {
+		chatInterface.addNetworkSessionListener(a);
 	}
 
+	@SuppressWarnings("unused")
 	private void whenBadFirmwareDetected(String versionFound) {
 		(new DialogBadFirmwareVersion()).display(this, versionFound);
 	}
 
+	@SuppressWarnings("unused")
 	private void whenBadHardwareDetected(String versionFound) {
 		JOptionPane.showMessageDialog(this, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
 	}
 	
-	private Object onPlotterEvent(PlotterEvent e) {
+	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
 		case PlotterEvent.HOME_FOUND: sendFindHome();  break;
 		case PlotterEvent.POSITION: sendGoto(); break;
-		case PlotterEvent.PEN_UP: sendPenUp(); break;
+		case PlotterEvent.PEN_UPDOWN: sendPenUpDown(); break;
 		case PlotterEvent.MOTORS_ENGAGED: sendEngage(); break;
+		default: break;
 		}
-		return null;
 	}
 
 	private void sendFindHome() {
-		// TODO Auto-generated method stub
-		
+		queueAndSendCommand("G28 XY");
 	}
 
-	private void sendPenUp() {
-		sendCommand( myPlotter.getPenIsUp() 
+	private void sendPenUpDown() {
+		queueAndSendCommand( myPlotter.getPenIsUp() 
 				? myPlotter.getSettings().getPenUpString()
 				: myPlotter.getSettings().getPenDownString() );
 	}
 
 	private void sendEngage() {
-		sendCommand( myPlotter.getAreMotorsEngaged() ? "M17" : "M18" );
+		queueAndSendCommand( myPlotter.getAreMotorsEngaged() ? "M17" : "M18" );
 	}
 
 	private void onConnect() {
 		setupListener();
-		
-		lineNumber=0;
-		
-		// you are at the position I say you are at.
-		new java.util.Timer().schedule(new java.util.TimerTask() {
-			@Override
-			public void run() {
-				updateButtonAccess();
-				sendSetHome();
-			}
-		}, 1000 // 1s delay
-		);
+		lineNumberToSend=0;
+		lineNumberAdded=0;
+		myHistory.clear();
+		updateButtonAccess();
 	}
+	
 
 	private void setupListener() {
 		chatInterface.addNetworkSessionListener((evt) -> {
 			if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 				String message = ((String)evt.data).trim();
-				if (message.startsWith("X:") && message.contains("Count")) {
+				if(message.startsWith("X:") && message.contains("Count")) {
 					//System.out.println("FOUND " + message);
 					processM114Reply(message);
-				}
+				} else if(message.startsWith("ok")) {
+					busyCount++;
+					sendQueuedCommand();
+					if(busyCount>0) {
+						clearOldHistory();
+						fireIdleNotice();
+					}
+				} else if(message.contains(STR_RESEND)) {
+					String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
+					int n = Integer.valueOf(numberPart);
+					if(n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
+						// no problem.
+						lineNumberToSend=n;
+					}
+				} 
 			}
 		});
 	}
 	
-	private void sendCommand(String str) {
-		lineNumber++;
-		str = "N"+lineNumber+" "+str;
+	private void fireIdleNotice() {
+		notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED,MarlinInterface.IDLE));
+	}
+
+	private void clearOldHistory() {
+		while(myHistory.get(0).lineNumber<lineNumberAdded-HISTORY_BUFFER_LIMIT) {
+			myHistory.remove(0);
+		}
+	}
+
+	public void queueAndSendCommand(String str) {
+		lineNumberAdded++;
+		str = "N"+lineNumberAdded+" "+str;
 		str += generateChecksum(str);
+		myHistory.add(new MarlinCommand(lineNumberAdded,str));
 		
-		chatInterface.sendCommand(str);
+		if(busyCount>0) sendQueuedCommand();
+	}
+	
+	private void sendQueuedCommand() {
+		for( MarlinCommand mc : myHistory ) {
+			if(mc.lineNumber == lineNumberToSend) {
+				busyCount--;
+				lineNumberToSend++;
+				chatInterface.sendCommand(mc.command);
+				return;
+			}
+		}
+		// got here without hitting a line?  history no longer contains line?!  
 	}
 
 	private String generateChecksum(String line) {
@@ -147,6 +193,10 @@ public class MarlinInterface extends JPanel {
 		return "*" + Integer.toString(checksum);
 	}
 
+	public boolean getIsBusy() {
+		return busyCount<=0;
+	}
+	
 	// format is normally X:0.00 Y:270.00 Z:0.00 Count X:0 Y:0 Z:0 U:0 V:0 W:0
 	// trim everything after and including "Count", then read the state data.
 	private void processM114Reply(String message) {
@@ -169,7 +219,7 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void sendGoto() {
-		sendCommand(
+		queueAndSendCommand(
 				(myPlotter.getPenIsUp() ? "G0" : "G1")
 				+ getPosition(myPlotter)
 		);
@@ -192,13 +242,11 @@ public class MarlinInterface extends JPanel {
 
 		bESTOP.addActionListener((e) -> sendESTOP() );
 		bGetPosition.addActionListener((e) -> sendGetPosition() );
-		bSetHome.addActionListener((e) -> sendSetHome() );
 		bGoHome.addActionListener((e) -> sendGoHome() );
 
 		bar.add(bESTOP);
 		bar.addSeparator();
 		bar.add(bGetPosition);
-		bar.add(bSetHome);
 		bar.add(bGoHome);
 		
 		updateButtonAccess();
@@ -207,11 +255,11 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void sendESTOP() {
-		sendCommand("M112");
+		queueAndSendCommand("M112");
 	}
 
 	private void sendGetPosition() {
-		sendCommand("M114");
+		queueAndSendCommand("M114");
 	}
 
 	private void updateButtonAccess() {
@@ -219,14 +267,7 @@ public class MarlinInterface extends JPanel {
 
 		bESTOP.setEnabled(isConnected);
 		bGetPosition.setEnabled(isConnected);
-		bSetHome.setEnabled(isConnected);
 		bGoHome.setEnabled(isConnected);
-	}
-
-	private void sendSetHome() {
-		Plotter temp = new Plotter();
-		sendCommand("G92"+getPosition(temp));
-		myPlotter.setPos(temp.getPos());
 	}
 
 	private void sendGoHome() {
@@ -237,6 +278,24 @@ public class MarlinInterface extends JPanel {
 	public void setNetworkSession(NetworkSession session) {
 		chatInterface.setNetworkSession(session);
 	}
+	
+	// OBSERVER PATTERN
+	
+	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+
+	public void addListener(ActionListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(ActionListener listener) {
+		listeners.remove(listener);
+	}
+	
+	private void notifyListeners(ActionEvent e) {
+		for (ActionListener listener : listeners) listener.actionPerformed(e);
+	}
+
+	// OBSERVER PATTERN ENDS
 
 	// TEST
 

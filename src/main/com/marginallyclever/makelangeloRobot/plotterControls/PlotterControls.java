@@ -1,33 +1,139 @@
 package com.marginallyclever.makelangeloRobot.plotterControls;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.UIManager;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class PlotterControls extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private Plotter myPlotter;
+	private Turtle myTurtle;
+	private JogInterface jogInterface;
+	private MarlinInterface marlinInterface;
+	private ProgramInterface programInterface;
+
+	private JButton bRewind = new JButton(Translator.get("Rewind"));
+	private JButton bStart = new JButton(Translator.get("Play"));
+	private JButton bPause = new JButton(Translator.get("Pause"));
+	private JProgressBar progress = new JProgressBar(0,100); 
 	
-	public PlotterControls(Plotter plotter) {
+	private boolean isRunning=false;
+	private boolean penIsUpBeforePause=false;
+		
+	public PlotterControls(Plotter plotter,Turtle turtle) {
 		super();
+		myPlotter=plotter;
+		myTurtle=turtle;
+		
+		jogInterface = new JogInterface(plotter);
+		marlinInterface = new MarlinInterface(plotter);
+		programInterface = new ProgramInterface(plotter,turtle);
 		
 		JTabbedPane pane = new JTabbedPane();
-		pane.addTab(JogInterface.class.getSimpleName(), new JogInterface(plotter));
-		pane.addTab(MarlinInterface.class.getSimpleName(), new MarlinInterface(plotter));
-		pane.addTab(ProgramInterface.class.getSimpleName(), new ProgramInterface(plotter));
+		pane.addTab(JogInterface.class.getSimpleName(), jogInterface);
+		pane.addTab(MarlinInterface.class.getSimpleName(), marlinInterface);
+		pane.addTab(ProgramInterface.class.getSimpleName(), programInterface);
 		
 		this.setLayout(new BorderLayout());
 		this.add(pane,BorderLayout.CENTER);
+		this.add(getToolBar(),BorderLayout.NORTH);
+		this.add(progress,BorderLayout.SOUTH);
+		
+		marlinInterface.addListener((e)->{
+			if(e.getActionCommand().contentEquals(MarlinInterface.IDLE) ) {
+				programInterface.step();
+				updateProgressBar();
+			}
+		});
 	}
 	
+	private JToolBar getToolBar() {
+		JToolBar bar = new JToolBar();
+		bar.add(bRewind);
+		bar.add(bStart);
+		bar.add(bPause);
+		
+		bRewind.addActionListener((e)-> rewind());
+		bStart.addActionListener((e)-> play());
+		bPause.addActionListener((e)-> pause());
+		
+		updateButtonStatus();
+		
+		return bar;
+	}
+	
+	public void startAt(int lineNumber) {
+		int count = programInterface.getMoveCount();
+		if(lineNumber>=count) lineNumber = count;
+		if(lineNumber<0) lineNumber=0;
+
+		programInterface.setLineNumber(lineNumber);
+		play();
+	}
+	
+	private void updateProgressBar() {
+		progress.setValue((int)(100.0*programInterface.getLineNumber()/programInterface.getMoveCount()));
+	}
+
+	private void rewind() {
+		programInterface.rewind();
+		progress.setValue(0);
+	}
+
+	private void play() {
+		isRunning = true;
+		if(!penIsUpBeforePause) myPlotter.lowerPen();
+		programInterface.step();
+	}
+
+	private void pause() {
+		isRunning = false;
+		penIsUpBeforePause = myPlotter.getPenIsUp();
+		if(!penIsUpBeforePause) myPlotter.raisePen();
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	private void updateButtonStatus() {
+		bRewind.setEnabled(false);
+		bStart.setEnabled(false);
+		bPause.setEnabled(false);
+	}
+	
+	@SuppressWarnings("unused")
+	private int findLastPenUpBefore(int startAtLine) {
+		ArrayList<TurtleMove> history = myTurtle.history;
+		int total = history.size();
+		int x = startAtLine;
+		if(x >= total) x = total-1;
+		if(x<0) return 0;
+
+		while (x > 1) {
+			TurtleMove m = history.get(x);
+			if(m.type == TurtleMove.TRAVEL) return x;
+			--x;
+		}
+
+		return x;
+	}
+
 	// TEST
 	
 	public static void main(String[] args) {
@@ -41,7 +147,7 @@ public class PlotterControls extends JPanel {
 		
 		JFrame frame = new JFrame(PlotterControls.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterControls(new Plotter()));
+		frame.add(new PlotterControls(new Plotter(),new Turtle()));
 		frame.pack();
 		frame.setVisible(true);
 	}

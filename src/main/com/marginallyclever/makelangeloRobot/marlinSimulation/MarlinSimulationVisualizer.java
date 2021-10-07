@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangeloRobot.marlin;
+package com.marginallyclever.makelangeloRobot.marlinSimulation;
 
 import java.util.ArrayList;
 
 import javax.vecmath.Vector3d;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 public class MarlinSimulationVisualizer {
