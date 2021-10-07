@@ -10,7 +10,6 @@ import java.util.prefs.Preferences;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangeloRobot.settings.plotterTypes.Makelangelo2;
 import com.marginallyclever.makelangeloRobot.settings.plotterTypes.PlotterType;
@@ -18,15 +17,12 @@ import com.marginallyclever.makelangeloRobot.settings.plotterTypes.PlotterTypeFa
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
- * All the hardware settings for a single plotter robot. Does not store state information.
- * 
+ * {@link PlotterSettings} stores the customized settings for a single plotter robot.
+ * {@link Plotter} stores the raplidly changing state information (while drawing).
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {
 	private static final long serialVersionUID = -4185946661019573192L;
-
-	public static final String COMMAND_DRAW = "G1";
-	public static final String COMMAND_TRAVEL = "G0";
 
 	private String[] configsAvailable;
 
@@ -164,7 +160,7 @@ public class PlotterSettings implements Serializable {
 	}
 
 	public Point2D getHome() {
-		return getHardwareProperties().getHome(this);
+		return getHardwareProperties().getHome();
 	}
 
 	/**
@@ -179,16 +175,6 @@ public class PlotterSettings implements Serializable {
 	 */
 	public double getHomeY() {
 		return getHome().y;
-	}
-
-	@Deprecated
-	public String getGCodeTeleportToHomePosition() {
-		return "G92 X" + getHomeX() + " Y" + getHomeY();
-	}
-
-	// return the strings that will tell a makelangelo robot its physical limits.
-	public String getGCodeConfig() {
-		return getHardwareProperties().getGCodeConfig(this);
 	}
 
 	@Deprecated
@@ -519,84 +505,6 @@ public class PlotterSettings implements Serializable {
 
 	public ColorRGB getPenUpColor() {
 		return penUpColor;
-	}
-
-	@Deprecated
-	public String getProgramStart() {
-		String a = StringHelper.formatDouble(getMaxAcceleration());
-		String j = "3";
-		return hardwareProperties.getProgramStart() + "M201 X" + a + " Y" + a + "\n" // acceleration
-				+ "M205 X" + j + " Y" + j + "\n"; // jerk
-	}
-
-	@Deprecated
-	public String getProgramEnd() {
-		return hardwareProperties.getProgramEnd();
-	}
-
-	@Deprecated
-	public String getPenDownString() {
-		return "M280 P0 T" + getPenLiftTime() + " S" + StringHelper.formatDouble(getPenDownAngle()) + "\n";
-	}
-
-	@Deprecated
-	public String getPenUpString() {
-		return "M280 P0 T100 S" + StringHelper.formatDouble(getPenUpAngle()) + "\n";
-	}
-
-	@Deprecated
-	public String getTravelFeedrateString() {
-		return "F" + StringHelper.formatDouble(travelFeedRate) + "\n";
-	}
-
-	@Deprecated
-	public String getDrawFeedrateString() {
-		return "F" + StringHelper.formatDouble(drawFeedRate) + "\n";
-	}
-
-	@Deprecated
-	public String getChangeTool(ColorRGB newPenDownColor) {
-		penDownColor = newPenDownColor;
-		return getChangeToolInternal();
-	}
-
-	@Deprecated
-	public String getChangeToDefaultColor() {
-		penDownColor = penDownColorDefault;
-		return getChangeToolInternal();
-	}
-
-	@Deprecated
-	protected String getChangeToolInternal() {
-		int toolNumber = penDownColor.toInt() & 0xffffff; // ignore alpha channel
-
-		String name = "";
-		switch (toolNumber) {
-		case 0xff0000:			name = "red";			break;
-		case 0x00ff00:			name = "green";			break;
-		case 0x0000ff:			name = "blue";			break;
-		case 0x000000:			name = "black";			break;
-		case 0x00ffff:			name = "cyan";			break;
-		case 0xff00ff:			name = "magenta";		break;
-		case 0xffff00:			name = "yellow";		break;
-		case 0xffffff:			name = "white";			break;
-		default:
-			name = "0x" + Integer.toHexString(toolNumber);
-			break; // display unknown RGB value as hex
-		}
-
-		return "M06 T" + toolNumber + "\n" + "M0 Ready " + name + " and click\n";
-	}
-
-	@Deprecated
-	public String getMoveTo(double x, double y, boolean isUp, boolean zMoved) {
-		String command = isUp ? COMMAND_TRAVEL : COMMAND_DRAW;
-		if (zMoved) {
-			command += " " + (isUp ? getTravelFeedrateString() : getDrawFeedrateString());
-		}
-		return command 
-				+ " X" + StringHelper.formatDouble(x) 
-				+ " Y" + StringHelper.formatDouble(y) + "\n";
 	}
 
 	public void setPenDiameter(double d) {

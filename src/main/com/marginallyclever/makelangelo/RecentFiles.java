@@ -4,10 +4,10 @@ import java.util.prefs.Preferences;
 
 import com.marginallyclever.util.PreferencesHelper;
 
+@Deprecated
 public final class RecentFiles<P extends Preferences> {
 	public final int MAX_FILES = 10;
 
-	@SuppressWarnings("deprecation")
 	private P prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 

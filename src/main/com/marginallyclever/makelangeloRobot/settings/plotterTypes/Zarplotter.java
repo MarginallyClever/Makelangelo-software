@@ -1,13 +1,15 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
+/**
+ * Deprecated because it cannot find home.
+ * @author Dan Royer
+ */
+@Deprecated
 public class Zarplotter extends Makelangelo2 {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
@@ -16,7 +18,7 @@ public class Zarplotter extends Makelangelo2 {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public Point2D getHome(PlotterSettings settings) {
+	public Point2D getHome() {
 		return new Point2D(0,0);
 	}
 	
@@ -52,16 +54,12 @@ public class Zarplotter extends Makelangelo2 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintMotors(gl2,settings);
-		paintControlBox(gl2,settings);
+		paintMotors(gl2,robot);
+		paintControlBox(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);		
 	}
 
-	
 	@Override
 	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
@@ -114,29 +112,13 @@ public class Zarplotter extends Makelangelo2 {
 		gl2.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
 		gl2.glEnd();
 	}
-	
-	@Override
-	protected void paintCalibrationPoint(GL2 gl2, PlotterSettings settings) {
-		gl2.glPushMatrix();
-		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
-
-		gl2.glColor3f(0.8f, 0.8f, 0.8f);
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2f(-0.25f, 0.0f);
-		gl2.glVertex2f(0.25f, 0.0f);
-		gl2.glVertex2f(0.0f, -0.25f);
-		gl2.glVertex2f(0.0f, 0.25f);
-		gl2.glEnd();
-
-		gl2.glPopMatrix();
-	}
 
 	@Override
-	protected void paintMotors(GL2 gl2,PlotterSettings settings) {
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double right = settings.getLimitRight();
-		double left = settings.getLimitLeft();
+	protected void paintMotors(GL2 gl2,Plotter robot) {
+		double top = robot.getLimitTop();
+		double bottom = robot.getLimitBottom();
+		double right = robot.getLimitRight();
+		double left = robot.getLimitLeft();
 
 
 		gl2.glPushMatrix();		gl2.glTranslated(left , top   , 0);		gl2.glRotated(270, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
@@ -167,13 +149,8 @@ public class Zarplotter extends Makelangelo2 {
 		gl2.glEnd();
 	}
 	
-	/**
-	 * paint the controller and the LCD panel
-	 * @param gl2
-	 * @param settings
-	 */
-	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
-		double cy = settings.getLimitTop();
+	private void paintControlBox(GL2 gl2,Plotter robot) {
+		double cy = robot.getLimitTop();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -202,34 +179,5 @@ public class Zarplotter extends Makelangelo2 {
 		gl2.glEnd();
 
 		gl2.glPopMatrix();
-	}
-
-	/**
-	 * @return home X coordinate in mm
-	 */ 
-	public double getHomeX() {
-		return 0;
-	}
-	
-	/**
-	 * @return home Y coordinate in mm
-	 */
-	public double getHomeY() {
-		return 0;
-	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());  
-		return "; Zarplotter\n"
-				+"; "+formatter.format(date)+"\n"
-				+"D0 R-500 L-500 U-500 V-500\n"
-				+"M203 W500";  // raise top speed of servo (z axis)
-	}
-
-	@Override
-	public String getProgramEnd() {
-		return super.getProgramEnd();
 	}
 }

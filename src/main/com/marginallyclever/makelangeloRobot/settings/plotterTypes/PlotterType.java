@@ -3,7 +3,6 @@ package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 /**
  * Each unique plotter derives {@link PlotterType} and extends it with custom features and graphics.
@@ -14,7 +13,7 @@ public abstract interface PlotterType {
 
 	public String getName();
 
-	public Point2D getHome(PlotterSettings settings);
+	public Point2D getHome();
 
 	public boolean canChangeMachineSize();
 
@@ -52,17 +51,8 @@ public abstract interface PlotterType {
 	/**
 	 * @return Hardware specific gcode sent on connect
 	 */
-	public String getGCodeConfig(PlotterSettings settings);
-
-	/**
-	 * @return Hardware specific gcode included at the start of each program
-	 */
-	public String getProgramStart();
-
-	/**
-	 * @return hardware specific gcode at the end of each program 
-	 */
-	public String getProgramEnd();
+	@Deprecated
+	public String getGCodeConfig(Plotter robot);
 
 	public float getFeedrateMax();
 

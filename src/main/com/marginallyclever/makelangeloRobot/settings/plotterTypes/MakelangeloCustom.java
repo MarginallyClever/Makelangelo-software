@@ -1,15 +1,12 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
-public class MakelangeloCustom extends Makelangelo3 {
+public class MakelangeloCustom extends Makelangelo3_3 {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -18,8 +15,8 @@ public class MakelangeloCustom extends Makelangelo3 {
 	public final static double MOTOR_WIDTH = 42;
 
 	@Override
-	public Point2D getHome(PlotterSettings settings) {
-		return new Point2D(0,settings.getLimitBottom());
+	public Point2D getHome() {
+		return new Point2D(0,0);
 	}
 
 	@Override
@@ -374,21 +371,7 @@ public class MakelangeloCustom extends Makelangelo3 {
 		drawArc(gl2, (float)right, (float)top, (float)belt, (float)(Math.PI*1.5-sideang), (float)(Math.PI*1.5-botang));
 		drawArc(gl2, (float)left, (float)top, (float)belt, (float)(Math.PI*1.5+botang), (float)(Math.PI*1.5+sideang));
 	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());  
-		return "; Custom\n"
-				+"; "+formatter.format(date)+"\n"
-				+"G28 XY\n";  // force find home
-	}
 	
-	@Override
-	public String getProgramEnd() {
-		return "G0 Z90\n";  // be sure to lift pen
-	}
-
 	/**
 	 * @since software 7.22.6
 	 * @return mm/s [>0]
@@ -434,11 +417,11 @@ public class MakelangeloCustom extends Makelangelo3 {
 	}
 
 	@Override
-    public String getGCodeConfig(PlotterSettings settings) {
-		String result = super.getGCodeConfig(settings);
+    public String getGCodeConfig(Plotter robot) {
+		String result = super.getGCodeConfig(robot);
 		double beltlen = Math.sqrt(
-						Math.pow(settings.getHomeX()-settings.getLimitLeft(),2)+
-						Math.pow(settings.getLimitTop()-settings.getLimitBottom(),2)
+						Math.pow(getHome().x-robot.getLimitLeft(),2)+
+						Math.pow(robot.getLimitTop()-robot.getLimitBottom(),2)
 						);
         String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
         result +="\n"+belt;

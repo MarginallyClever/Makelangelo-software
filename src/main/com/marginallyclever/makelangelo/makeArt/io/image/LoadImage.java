@@ -18,7 +18,6 @@ import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.Plotter;
 
 /**
  * LoadImage uses an InputStream of data to create gcode. 
@@ -29,10 +28,7 @@ public class LoadImage implements TurtleLoader {
 	private ImageConverter chosenConverter;
 	private TransformedImage img;
 	private Paper myPaper;
-	
-	@Deprecated
-	private Plotter myRobot;
-	
+		
 	private ImageConverterThread imageConverterThread; 
 	private ArrayList<ImageConverterThread> workerList = new ArrayList<ImageConverterThread>();
 	private int workerCount = 0;
@@ -42,9 +38,6 @@ public class LoadImage implements TurtleLoader {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeImage"),
 			IMAGE_FILE_EXTENSIONS.toArray(new String[IMAGE_FILE_EXTENSIONS.size()]));
 	private ProgressMonitor pm;
-	
-	
-	public LoadImage() {}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -129,7 +122,10 @@ public class LoadImage implements TurtleLoader {
 	}
 	
 	private void stopWorker() {
-		if(chosenConverter!=null) chosenConverter.stopIterating();
+		if(chosenConverter!=null) {
+			chosenConverter.stopIterating();
+			// TODO removePreviewListener(chosenConverter);
+		}
 		if(imageConverterThread!=null) {
 			Log.message("Stopping worker");
 			if(imageConverterThread.cancel(true)) {
@@ -151,7 +147,7 @@ public class LoadImage implements TurtleLoader {
 		chosenConverter.setPaper(myPaper);
 		chosenConverter.setImage(img);
 		
-		myRobot.setDecorator(chosenConverter);
+		// TODO addPreviewListener(chosenConverter);
 		
 		imageConverterThread = getNewWorker(chosenConverter,workerCount);
 		addWorker(imageConverterThread);
@@ -182,11 +178,13 @@ public class LoadImage implements TurtleLoader {
 	// called when thread is finished, no matter how the thread is finished.
 	public void done(ImageConverterThread thread) {
 		if(thread.isDone()) {
-			if(myRobot!=null) myRobot.setTurtle(chosenConverter.turtle);
-			if(pm!=null) pm.setProgress(100);
+			// TODO send notice new turtle "chosenConverter.turtle"
 		}
-		if(myRobot!=null) myRobot.setDecorator(null);
-		if(pm!=null) pm.close();
+		if(pm!=null) {
+			pm.setProgress(100);
+			pm.close();
+		}
+		// TODO removePreviewListener(chosenConverter); 
 		removeWorker(thread);
 	}
 	

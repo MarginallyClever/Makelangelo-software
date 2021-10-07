@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.vecmath.Vector2d;
 
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -30,22 +31,22 @@ public class SimplifyTurtle extends AbstractAction {
 	
 	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
-		System.out.println("SimplifyTurtle begin @ "+os);
+		Log.message("SimplifyTurtle begin @ "+os);
 		
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
-		System.out.println("  Converted to "+originalCount+" lines.");
+		Log.message("  Converted to "+originalCount+" lines.");
 
 		double minimumStepSize = 1e-1;
 		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,minimumStepSize); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
-		System.out.println("  - "+shortCount+" shorts = "+longCount+" lines.");
+		Log.message("  - "+shortCount+" shorts = "+longCount+" lines.");
 
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines,1.0);
 		int ns = t.history.size();
-		System.out.println("SimplifyTurtle end @ "+ns);
+		Log.message("SimplifyTurtle end @ "+ns);
 		
 		return t;
 	}

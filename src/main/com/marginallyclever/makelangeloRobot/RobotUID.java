@@ -5,8 +5,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.CommandLineOptions;
 
 /**
  * Was used in Makelangelo-firmware to get the GUID from the arduino board.

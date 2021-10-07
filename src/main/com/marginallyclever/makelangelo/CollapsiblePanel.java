@@ -65,6 +65,7 @@ import java.util.Vector;
 /**
  * The user-triggered collapsable panel containing the component (trigger) in the titled border
  */
+@Deprecated
 public class CollapsiblePanel extends JPanel {
 	/**
 	 * 

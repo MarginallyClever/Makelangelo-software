@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import javax.swing.JSplitPane;
 
-// manages the vertical split in the GUI
+@Deprecated
 public class Splitter extends JSplitPane {
   static final long serialVersionUID = 1;
 

@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 

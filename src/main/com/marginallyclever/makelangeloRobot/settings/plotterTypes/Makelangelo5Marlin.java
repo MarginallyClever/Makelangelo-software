@@ -1,27 +1,16 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
-public class Makelangelo5Marlin extends Makelangelo3 {
+public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
-
-	@Override
-	public Point2D getHome(PlotterSettings settings) {
-		double beltLeft = 1035;
-		double beltRight = 1035;
-		
-		return super.FK(beltLeft,beltRight);
-	}
 	
 	@Override
 	public String getVersion() {
@@ -63,11 +52,8 @@ public class Makelangelo5Marlin extends Makelangelo3 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
+		paintControlBox(gl2,robot);
+		paintMotors(gl2,robot);
 		paintSafeArea(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
@@ -78,11 +64,11 @@ public class Makelangelo5Marlin extends Makelangelo3 {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		double top = settings.getLimitTop();
+	private void paintControlBox(GL2 gl2,Plotter robot) {
+		double cy = robot.getLimitTop();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+		double top = robot.getLimitTop();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -338,22 +324,7 @@ public class Makelangelo5Marlin extends Makelangelo3 {
 		gl2.glVertex2d(left-70f, top-1000);
 		gl2.glEnd();
 	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis()); 
-		return "; Makelangelo 5 Marlin\n"
-				+"; "+formatter.format(date)+"\n"
-				+"G28\n";  // force find home
-	}
 	
-	@Override
-	public String getProgramEnd() {
-		return "G0 Z90\n" // be sure to lift pen
-			+ "G0 X-300 Y300\n";// move out of way for display
-	}
-
 	/**
 	 * @since software 7.22.6
 	 * @return mm/s [>0]

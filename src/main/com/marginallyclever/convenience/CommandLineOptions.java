@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.convenience;
 
 import com.marginallyclever.convenience.log.Log;
 

@@ -32,48 +32,24 @@ import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
- *
+ * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  * @author Dan Royer
  * @author Peter Colapietro
- * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
  */
 public final class Translator {
-
-	/**
-	 * Working directory. This represents the directory where the java executable launched the jar from.
-	 */
+	// Working directory. This represents the directory where the java executable launched the jar from.
 	public static final String WORKING_DIRECTORY = /*File.separator + */"languages"/*+File.separator*/;
-
-
-	/**
-	 * The name of the preferences node containing the user's choice.
-	 */
+	// The name of the preferences node containing the user's choice.
 	private static final String LANGUAGE_KEY = "language";
-
-	/**
-	 *
-	 */
+	// TODO get a better way to store user preference.
 	private static final Preferences languagePreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LANGUAGE);
-
-
-	/**
-	 * The default choice when nothing has been selected.
-	 */
+	// The default choice when nothing has been selected.
 	private static String defaultLanguage = "English";
-
-	/**
-	 * The current choice
-	 */
+	// The current choice
 	private static String currentLanguage;
-
-	/**
-	 * a list of all languages and their translations strings
-	 */
+	// a list of all languages and their translations strings
 	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
 
-	/**
-	 *
-	 */
 	static public void start() {
 		Log.message("starting translator...");
 		

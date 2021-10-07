@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -31,7 +32,7 @@ public class ReorderTurtle extends AbstractAction {
 	public static Turtle run(Turtle turtle) {
 		if(turtle.history.size()==0) return turtle;
 		
-		System.out.println("reorder() start @ "+turtle.history.size()+" instructions.");
+		Log.message("reorder() start @ "+turtle.history.size()+" instructions.");
 		
 		// history is made of changes, travels, and draws
 		// look at the section between two changes.
@@ -40,22 +41,22 @@ public class ReorderTurtle extends AbstractAction {
 		
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
-		System.out.println("  Converted to "+originalCount+" lines.");
+		Log.message("  Converted to "+originalCount+" lines.");
 
 		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,0.00001);
 		int uniqueCount = uniqueLines.size();
 		int duplicateCount = originalCount - uniqueCount;
-		System.out.println("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
+		Log.message("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
 
 		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
 		Turtle t = new Turtle();
 		t.addLineSegments(orderedLines, 2.0);
-		System.out.println("reorder() end @ "+t.history.size()+" instructions.");
+		Log.message("reorder() end @ "+t.history.size()+" instructions.");
 		return t;
 	}
 
 	private static ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
-		System.out.println("  greedyReordering()");
+		Log.message("  greedyReordering()");
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
 
@@ -92,7 +93,7 @@ public class ReorderTurtle extends AbstractAction {
 	}
 
 	private static ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
-		System.out.println("  removeDuplicates()");
+		Log.message("  removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 
 		for(LineSegment2D candidateLine : originalLines) {

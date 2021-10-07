@@ -60,8 +60,8 @@ public class DragAndDrivePanel extends JPanel {
 
 		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
 		Dimension dims = new Dimension();
-		double w = robot.getSettings().getLimitRight()-robot.getSettings().getLimitLeft();
-		double h = robot.getSettings().getLimitTop()-robot.getSettings().getLimitBottom();
+		double w = robot.getLimitRight()-robot.getLimitLeft();
+		double h = robot.getLimitTop()-robot.getLimitBottom();
 		dims.setSize( 150, 150 * w / h);
 		dragAndDrive.setPreferredSize(dims);
 		dragAndDrive.add(coordinates,c);
@@ -112,8 +112,8 @@ public class DragAndDrivePanel extends JPanel {
 			double cy = h/2.0;
 			x = x - cx;
 			y = cy - y;
-			double w2 = robot.getSettings().getLimitRight()-robot.getSettings().getLimitLeft();
-			double h2 = robot.getSettings().getLimitTop()-robot.getSettings().getLimitBottom();
+			double w2 = robot.getLimitRight()-robot.getLimitLeft();
+			double h2 = robot.getLimitTop()-robot.getLimitBottom();
 			x *= 10 * w2 / w;
 			y *= 10 * h2 / h;
 			double dx = x-mouseLastX;

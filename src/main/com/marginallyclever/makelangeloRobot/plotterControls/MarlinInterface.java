@@ -83,34 +83,81 @@ public class MarlinInterface extends JPanel {
 		chatInterface.addNetworkSessionListener(a);
 	}
 
-	@SuppressWarnings("unused")
+	@Deprecated
 	private void whenBadFirmwareDetected(String versionFound) {
 		(new DialogBadFirmwareVersion()).display(this, versionFound);
 	}
 
-	@SuppressWarnings("unused")
+	@Deprecated
 	private void whenBadHardwareDetected(String versionFound) {
 		JOptionPane.showMessageDialog(this, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
 	}
 	
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
-		case PlotterEvent.HOME_FOUND: sendFindHome();  break;
-		case PlotterEvent.POSITION: sendGoto(); break;
-		case PlotterEvent.PEN_UPDOWN: sendPenUpDown(); break;
-		case PlotterEvent.MOTORS_ENGAGED: sendEngage(); break;
+		case PlotterEvent.HOME_FOUND:
+			sendFindHome();
+			break;
+		case PlotterEvent.POSITION:
+			sendGoto();
+			break;
+		case PlotterEvent.PEN_UPDOWN:
+			sendPenUpDown();
+			break;
+		case PlotterEvent.MOTORS_ENGAGED:
+			sendEngage();
+			break;
+		case PlotterEvent.TOOL_CHANGE:
+			sendToolChange((int)e.extra);
+			break;
 		default: break;
 		}
+	}
+
+	private void sendToolChange(int toolNumber) {
+		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
 	private void sendFindHome() {
 		queueAndSendCommand("G28 XY");
 	}
 
+	public static String getPenUpString(Plotter p) {
+		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T" + (int)p.getPenLiftTime();
+	}
+
+	public static String getPenDownString(Plotter p) {
+		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T100";
+	}
+
+	public static String getToolChangeString(int toolNumber) {
+		toolNumber &=0xFFFFFF;
+		return "M06 T" + toolNumber + "\n" + "M0 Ready " + getColorName(toolNumber) + " and click\n";
+	}
+	
+	private static String getColorName(int toolNumber) {
+		String name = "";
+		switch (toolNumber) {
+		case 0xff0000:  name = "red";		break;
+		case 0x00ff00:  name = "green";		break;
+		case 0x0000ff:  name = "blue";		break;
+		case 0x000000:  name = "black";		break;
+		case 0x00ffff:  name = "cyan";		break;
+		case 0xff00ff:  name = "magenta";	break;
+		case 0xffff00:  name = "yellow";	break;
+		case 0xffffff:  name = "white";		break;
+		default:
+			name = "0x" + Integer.toHexString(toolNumber);
+			break; // display unknown RGB value as hex
+		}
+		return name;
+	}
+	
 	private void sendPenUpDown() {
-		queueAndSendCommand( myPlotter.getPenIsUp() 
-				? myPlotter.getSettings().getPenUpString()
-				: myPlotter.getSettings().getPenDownString() );
+		String s = myPlotter.getPenIsUp() 
+				? MarlinInterface.getPenUpString(myPlotter)
+				: MarlinInterface.getPenDownString(myPlotter);
+		queueAndSendCommand(s);
 	}
 
 	private void sendEngage() {
@@ -219,17 +266,24 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void sendGoto() {
-		queueAndSendCommand(
-				(myPlotter.getPenIsUp() ? "G0" : "G1")
-				+ getPosition(myPlotter)
-		);
+		Point2D p = myPlotter.getPos();
+		queueAndSendCommand( myPlotter.getPenIsUp() 
+				? MarlinInterface.getTravelTo(p.x,p.y)
+				: MarlinInterface.getDrawTo(p.x,p.y) );
+	}
+	
+	public static String getTravelTo(double x,double y) {
+		return "G1"+getPosition(x,y);
+	}
+	
+	public static String getDrawTo(double x,double y) {
+		return "G0"+getPosition(x,y);
 	}
 
-	private String getPosition(Plotter plotter) {
-		String action="";
-		Point2D p = plotter.getPos();
-		action += " X" + StringHelper.formatDouble(p.x);
-		action += " Y" + StringHelper.formatDouble(p.y);
+	private static String getPosition(double x,double y) {
+		String action=
+				" X" + StringHelper.formatDouble(x) +
+				" Y" + StringHelper.formatDouble(y);
 		return action;
 	}
 

@@ -2,6 +2,11 @@ package com.marginallyclever.makelangeloRobot.settings;
 
 import java.beans.PropertyChangeEvent;
 
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -10,6 +15,7 @@ import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class PaperSettingsPanel extends SelectPanel {
 	/**
@@ -205,5 +211,23 @@ public class PaperSettingsPanel extends SelectPanel {
 			double pm = (100 - paperMargin.getValue()) * 0.01;
 			myPaper.setPaperMargin(pm);
 		}
+	}
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e) {}
+		
+		JFrame frame = new JFrame(PaperSettingsPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PaperSettingsPanel(new Paper()));
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

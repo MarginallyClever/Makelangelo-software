@@ -1,14 +1,15 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
+/**
+ * Should be deprecated because it cannot find home.
+ * @author Dan Royer
+ *
+ */
 public class Makelangelo2 implements PlotterType {
 	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
 	public final static float MOTOR_SIZE= 21f; // cm
@@ -21,7 +22,7 @@ public class Makelangelo2 implements PlotterType {
 	 * @param beltR length of belt (mm)
 	 * @return cartesian coordinate 
 	 */
-	public Point2D FK(double beltL, double beltR) {
+	private Point2D FK(double beltL, double beltR) {
 		  double limit_ymax = getHeight()/2;
 		  
 		  // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
@@ -57,8 +58,8 @@ public class Makelangelo2 implements PlotterType {
 	}
 	
 	@Override
-	public Point2D getHome(PlotterSettings settings) {
-		return FK(1025,1025);  // default calibration length for M2 belts.
+	public Point2D getHome() {
+		return FK(1035,1035);  // default calibration length for M2 belts.
 	}
 	
 	@Override
@@ -106,20 +107,16 @@ public class Makelangelo2 implements PlotterType {
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2, settings);
-		paintMotors(gl2, settings);
-		paintControlBox(gl2, settings);
+		paintMotors(gl2, robot);
+		paintControlBox(gl2, robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2, robot);
 	}
 
-	// draw left & right motor
-	protected void paintMotors(GL2 gl2, PlotterSettings settings) {
-		double top = settings.getLimitTop();
-		double right = settings.getLimitRight();
-		double left = settings.getLimitLeft();
+	protected void paintMotors(GL2 gl2,Plotter robot) {
+		double top = robot.getLimitTop();
+		double right = robot.getLimitRight();
+		double left = robot.getLimitLeft();
 
 		gl2.glColor3f(1, 0.8f, 0.5f);
 		// left frame
@@ -161,10 +158,10 @@ public class Makelangelo2 implements PlotterType {
 		gl2.glEnd();
 	}
 
-	protected void paintControlBox(GL2 gl2, PlotterSettings settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+	private void paintControlBox(GL2 gl2, Plotter robot) {
+		double cy = robot.getLimitTop();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -208,19 +205,18 @@ public class Makelangelo2 implements PlotterType {
 	}
 
 	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
 		double dx, dy;
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = robot.getLimitTop();
+		double bottom = robot.getLimitBottom();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
 
 		double mw = right - left;
-		double mh = top - settings.getLimitBottom();
+		double mh = top - bottom;
 		double suggestedLength = Math.sqrt(mw * mw + mh * mh) + 50;
 
 		dx = gx - left;
@@ -313,49 +309,6 @@ public class Makelangelo2 implements PlotterType {
 	}
 
 	/**
-	 * draw calibration point
-	 * 
-	 * @param gl2
-	 */
-	protected void paintCalibrationPoint(GL2 gl2, PlotterSettings settings) {
-		gl2.glColor3f(0.8f, 0.8f, 0.8f);
-		gl2.glPushMatrix();
-		gl2.glTranslated(settings.getHomeX(), settings.getHomeY(), 0);
-
-		// gondola
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		float f;
-		for (f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-			gl2.glVertex2d(Math.cos(f) * (PEN_HOLDER_RADIUS_2 + 0.1), Math.sin(f) * (PEN_HOLDER_RADIUS_2 + 0.1));
-		}
-		gl2.glEnd();
-
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2f(-0.25f, 0.0f);
-		gl2.glVertex2f(0.25f, 0.0f);
-		gl2.glVertex2f(0.0f, -0.25f);
-		gl2.glVertex2f(0.0f, 0.25f);
-		gl2.glEnd();
-
-		gl2.glPopMatrix();
-	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());  
-		String str = "; Makelangelo 2\n";
-		str+="; "+formatter.format(date)+"\n";
-		str+="M203 U500\n";  // raise top speed of servo (z axis)
-		return str;
-	}
-
-	@Override
-	public String getProgramEnd() {
-		return "; Program End\n";
-	}
-
-	/**
 	 * @since software 7.22.6
 	 * @return mm/s [>0]
 	 */
@@ -409,10 +362,10 @@ public class Makelangelo2 implements PlotterType {
 	}
 
 	@Override
-	public String getGCodeConfig(PlotterSettings settings) {
+	public String getGCodeConfig(Plotter robot) {
 		String result;
-		String xAxis = "M101 A0 T"+StringHelper.formatDouble(settings.getLimitRight())+" B"+StringHelper.formatDouble(settings.getLimitLeft());
-		String yAxis = "M101 A1 T"+StringHelper.formatDouble(settings.getLimitTop())+" B"+StringHelper.formatDouble(settings.getLimitBottom());
+		String xAxis = "M101 A0 T"+StringHelper.formatDouble(robot.getLimitRight())+" B"+StringHelper.formatDouble(robot.getLimitLeft());
+		String yAxis = "M101 A1 T"+StringHelper.formatDouble(robot.getLimitTop())+" B"+StringHelper.formatDouble(robot.getLimitBottom());
 		String zAxis = "M101 A2 T170 B10";
 		result = xAxis+"\n"+yAxis+"\n"+zAxis;
 		return result;

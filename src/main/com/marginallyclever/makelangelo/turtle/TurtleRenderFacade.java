@@ -14,7 +14,7 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	private TurtleRenderer tr=defaultRenderer;
 	
-	private Turtle myTurtle;
+	private Turtle myTurtle = new Turtle();
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -74,5 +74,13 @@ public class TurtleRenderFacade implements PreviewListener {
 				myTurtle.unlock();
 			}
 		}
+	}
+
+	public Turtle getTurtle() {
+		return myTurtle;
+	}
+
+	public void setTurtle(Turtle turtle) {
+		this.myTurtle = turtle;
 	}
 }

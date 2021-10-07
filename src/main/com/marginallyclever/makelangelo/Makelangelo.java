@@ -50,6 +50,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
@@ -60,7 +61,6 @@ import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.LoadImagePanel;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.Generator_Text;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
@@ -164,8 +164,8 @@ public final class Makelangelo {
 		appPreferences = new MakelangeloAppPreferences();
 
 		Log.message("Starting robot...");
-		// create a robot and listen to it for important news
 		myPlotter = new Plotter();
+		
 		myPlotter.addListener((e)->{
 			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
 		});
@@ -256,13 +256,13 @@ public final class Makelangelo {
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
 		fit.addActionListener((e)->{
-			myTurtle=ResizeTurtleToPaper.run(myTurtle,myPaper,false);
+			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false));
 		});
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
 		fill.addActionListener((e)->{
-			myTurtle=ResizeTurtleToPaper.run(myTurtle,myPaper,true);
+			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true));
 		});
 
 		menu.addSeparator();
@@ -296,13 +296,10 @@ public final class Makelangelo {
 	}
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
-		myPlotter.setDecorator(ici);
+		// TODO addPreviewListener(ici);
 		ici.setPaper(myPaper);
 
-		ici.addListener((t) -> {
-			signNameIfDesired(t);
-			myTurtle=t;
-		});
+		ici.addListener((t) -> setTurtle(t) );
 		
 		ici.generate();
 		
@@ -315,23 +312,13 @@ public final class Makelangelo {
 		dialog.setVisible(true);
 
 		myPaper.setRotationRef(0);
-		myPlotter.setDecorator(null);
+		// TODO removePreviewListener(ici);
 		
 		Log.message(Translator.get("Finished"));
-		SoundSystem.playConversionFinishedSound();
-	}
-
-	private void signNameIfDesired(Turtle t) {
-		if(!myPlotter.getSettings().shouldSignName()) return;
-		
-		Generator_Text ymh = new Generator_Text();
-		ymh.setPaper(myPaper);
-		ymh.signName();
-		t.history.addAll(ymh.turtle.history);
 	}
 	
 	private void newFile() {
-		myTurtle = new Turtle();
+		setTurtle(new Turtle());
 	}
 
 	private JMenu createFileMenu() {
@@ -700,7 +687,7 @@ public final class Makelangelo {
 				imageLoader.load(fileInputStream);
 				runImageConversionProcess(imageLoader);
 			} else {
-				myTurtle = loader.load(fileInputStream);
+				setTurtle(loader.load(fileInputStream));
 			}
 			success=true;
 		} catch(Exception e) {
@@ -748,7 +735,6 @@ public final class Makelangelo {
 			Turtle t = loadDialog.run(mainFrame);
 			if(t!=null) {
 				Log.message("Load success!");
-				SoundSystem.playConversionFinishedSound();
 				buttonReopenFile.setEnabled(true);
 			}
 		}
@@ -763,7 +749,7 @@ public final class Makelangelo {
 		try {
 			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
-			Log.error("Load error: "+e.getLocalizedMessage()); 
+			Log.error("Save error: "+e.getLocalizedMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -774,6 +760,7 @@ public final class Makelangelo {
 
 	public void setTurtle(Turtle turtle) {
 		myTurtle = turtle;
+		myTurtleRenderer.setTurtle(turtle);
 	}
 
 	public Turtle getTurtle() {

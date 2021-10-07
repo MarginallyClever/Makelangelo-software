@@ -2,6 +2,7 @@ package com.marginallyclever.makelangeloRobot.plotterControls;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
@@ -11,8 +12,8 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -27,6 +28,7 @@ public class PlotterControls extends JPanel {
 	private MarlinInterface marlinInterface;
 	private ProgramInterface programInterface;
 
+	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
 	private JButton bRewind = new JButton(Translator.get("Rewind"));
 	private JButton bStart = new JButton(Translator.get("Play"));
 	private JButton bPause = new JButton(Translator.get("Pause"));
@@ -64,10 +66,12 @@ public class PlotterControls extends JPanel {
 	
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
+		bar.add(bSaveGCode);
 		bar.add(bRewind);
 		bar.add(bStart);
 		bar.add(bPause);
 		
+		bSaveGCode.addActionListener((e)-> saveGCode());
 		bRewind.addActionListener((e)-> rewind());
 		bStart.addActionListener((e)-> play());
 		bPause.addActionListener((e)-> pause());
@@ -77,6 +81,17 @@ public class PlotterControls extends JPanel {
 		return bar;
 	}
 	
+	private void saveGCode() {
+		Log.message("Saving to gcode...");
+		SaveGCode save = new SaveGCode();
+		try {
+			save.run(myTurtle, myPlotter, this);
+		} catch(Exception e) {
+			Log.error("Export error: "+e.getLocalizedMessage()); 
+			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	public void startAt(int lineNumber) {
 		int count = programInterface.getMoveCount();
 		if(lineNumber>=count) lineNumber = count;

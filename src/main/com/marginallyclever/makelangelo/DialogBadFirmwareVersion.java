@@ -11,7 +11,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 
-
+@Deprecated
 public class DialogBadFirmwareVersion {
 	/**
 	 * <p>

@@ -14,8 +14,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
@@ -32,7 +32,7 @@ import com.marginallyclever.makelangelo.Makelangelo;
  * See org.slf4j.Logger
  */
 public class Log {
-	private static String LOG_FILE_PATH;
+	private static String LOG_FILE_PATH = FileAccess.getUserDirectory()+File.separator;
 	private static String LOG_FILE_NAME_TXT = "log.txt";
 	private final static String PROGRAM_START_STRING = "PROGRAM START";
 	private final static String PROGRAM_END_STRING = "PROGRAM END";
@@ -55,11 +55,6 @@ public class Log {
 	}
 	
 	public static void start() {
-		LOG_FILE_PATH = FileAccess.getUserDirectory();
-		if(!LOG_FILE_PATH.endsWith(File.separator)) {
-			LOG_FILE_PATH+=File.separator;
-		}
-			
 		System.out.println("log dir="+LOG_FILE_PATH);
 
 		boolean hadCrashed = crashReportCheck();
@@ -70,7 +65,8 @@ public class Log {
 		write(PROGRAM_START_STRING);
 		write("------------------------------------------------");
 		Properties p = System.getProperties();
-		Set<String> names = p.stringPropertyNames();
+		ArrayList<String> names = new ArrayList<String>(p.stringPropertyNames());
+		Collections.sort(names);
 		for(String n : names) {
 			write(n+" = "+p.get(n));
 		}

@@ -1,7 +1,8 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -14,28 +15,30 @@ public class TurtleFactory {
 		new LoadGCode(),
 		new LoadScratch2(),
 		new LoadScratch3(),
-		new LoadSVG()
+		new LoadSVG(),
 	};
 	
 	private static TurtleSaver [] savers = {
 		new SaveDXF(),
 		new SaveSVG(),
-		new SaveGCode()
 	};
 	
 	public static Turtle load(String filename) throws Exception {
-		if(filename == null || filename.trim().length()==0) return null;
+		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
 
 		for( TurtleLoader loader : loaders ) {
-			if(isValidExtension(filename,loader)) {			
-				return loadTurtleWithLoader(filename,loader);
+			if(isValidExtension(filename,loader.getFileNameFilter())) {
+				FileInputStream in = new FileInputStream(filename);
+				Turtle result = loader.load(in);
+				in.close();
+				return result;
 			}
 		}
 		throw new Exception("TurtleFactory could not load '"+filename+"'.");
 	}
 	
-	private static boolean isValidExtension(String filename, TurtleLoader loader) {
-		String [] extensions = loader.getFileNameFilter().getExtensions();
+	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {
+		String [] extensions = filter.getExtensions();
 		for( String e : extensions ) {
 			if(filename.endsWith(e)) return true;
 		}
@@ -57,13 +60,18 @@ public class TurtleFactory {
 		}
 		return filters;
 	}
-	
-	private static Turtle loadTurtleWithLoader(String filename,TurtleLoader loader) throws Exception {
-		InputStream fileInputStream = new FileInputStream(filename);
-		return loader.load(fileInputStream);
-	}
 
-	public static void save(Turtle t,String filename) throws Exception {
-		
+	public static void save(Turtle turtle,String filename) throws Exception {
+		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
+
+		for( TurtleSaver saver : savers ) {
+			if(isValidExtension(filename,saver.getFileNameFilter())) {
+				FileOutputStream out = new FileOutputStream(filename); 
+				saver.save(out,turtle);
+				out.close();
+				break;
+			}
+		}
+		throw new Exception("TurtleFactory could not save '"+filename+"'.");
 	}
 }

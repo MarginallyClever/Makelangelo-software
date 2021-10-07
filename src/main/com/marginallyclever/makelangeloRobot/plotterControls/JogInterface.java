@@ -8,9 +8,9 @@ import javax.swing.UIManager;
 
 import java.awt.BorderLayout;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;

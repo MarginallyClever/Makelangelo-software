@@ -1,11 +1,7 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 public class Makelangelo3_3 extends Makelangelo2 {
 	@Override
@@ -40,11 +36,8 @@ public class Makelangelo3_3 extends Makelangelo2 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
+		paintControlBox(gl2,robot);
+		paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);		
 	}
@@ -54,10 +47,10 @@ public class Makelangelo3_3 extends Makelangelo2 {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+	private void paintControlBox(GL2 gl2,Plotter robot) {
+		double cy = robot.getLimitTop();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -173,14 +166,5 @@ public class Makelangelo3_3 extends Makelangelo2 {
 		// clean up
 		gl2.glPopMatrix();
 	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());
-		String msg="";
-		msg +="; Makelangelo 3.3\n";
-		msg +="; "+formatter.format(date)+"\n";
-		return msg;
-	}
+	
 }

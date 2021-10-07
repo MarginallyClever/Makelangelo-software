@@ -16,8 +16,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -96,6 +96,10 @@ public class ProgramInterface extends JPanel {
 			listView.clearSelection();
 		}
 	}
+
+	public int getLineNumber() {
+		return listView.getSelectedIndex();
+	}
 	
 	// TEST
 	
@@ -113,9 +117,5 @@ public class ProgramInterface extends JPanel {
 		frame.add(new ProgramInterface(new Plotter(),new Turtle()));
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public int getLineNumber() {
-		return listView.getSelectedIndex();
 	}
 }

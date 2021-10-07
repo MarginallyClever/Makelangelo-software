@@ -2,6 +2,7 @@ package com.marginallyclever.makelangeloRobot;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;

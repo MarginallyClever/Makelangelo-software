@@ -1,10 +1,16 @@
 package com.marginallyclever.makelangeloRobot.settings;
 
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangeloRobot.Plotter;
+import com.marginallyclever.util.PreferencesHelper;
 
 @Deprecated
 public class PanelAdjustMachine extends SelectPanel {
@@ -137,4 +143,22 @@ public class PanelAdjustMachine extends SelectPanel {
 			//updateLengthNeeded();
 		}
 	}*/
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch(Exception e) {}
+		
+		JFrame frame = new JFrame(PanelAdjustMachine.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PanelAdjustMachine(new Plotter()));
+		frame.pack();
+		frame.setVisible(true);
+	}
 }

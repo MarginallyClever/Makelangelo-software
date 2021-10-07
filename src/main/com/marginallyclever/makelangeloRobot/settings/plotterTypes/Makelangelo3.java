@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
+/**
+ * Deprecated because it cannot find home.
+ * @author Dan Royer
+ */
+@Deprecated
 public class Makelangelo3 extends Makelangelo2 {
 	@Override
 	public String getVersion() {
@@ -40,24 +41,66 @@ public class Makelangelo3 extends Makelangelo2 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintCalibrationPoint(gl2,settings);
-		paintControlBox(gl2,settings);
-		paintMotors(gl2,settings);
+		paintControlBox(gl2,robot);
+		paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);		
 	}
 
+	protected void paintMotors(GL2 gl2,Plotter robot) {
+		double top = robot.getLimitTop();
+		double right = robot.getLimitRight();
+		double left = robot.getLimitLeft();
+
+		gl2.glColor3f(1, 0.8f, 0.5f);
+		// left frame
+		gl2.glPushMatrix();
+		// gl2.glTranslatef(-2.1f, 2.1f, 0);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(left + FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(left + FRAME_SIZE, top             );
+		gl2.glVertex2d(left             , top - FRAME_SIZE);
+		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
+		gl2.glEnd();
+		gl2.glPopMatrix();
+
+		// right frame
+		gl2.glPushMatrix();
+		// gl2.glTranslatef(2.1f, 2.1f, 0);
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right - FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right - FRAME_SIZE, top             );
+		gl2.glVertex2d(right             , top - FRAME_SIZE);
+		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
+		gl2.glEnd();
+		gl2.glPopMatrix();
+
+		// left motor
+		gl2.glColor3f(0, 0, 0);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left - MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(left + MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(left + MOTOR_SIZE, top - MOTOR_SIZE);
+		gl2.glVertex2d(left - MOTOR_SIZE, top - MOTOR_SIZE);
+		// right motor
+		gl2.glVertex2d(right - MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(right + MOTOR_SIZE, top + MOTOR_SIZE);
+		gl2.glVertex2d(right + MOTOR_SIZE, top - MOTOR_SIZE);
+		gl2.glVertex2d(right - MOTOR_SIZE, top - MOTOR_SIZE);
+		gl2.glEnd();
+	}
+	
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+	private void paintControlBox(GL2 gl2,Plotter robot) {
+		double cy = robot.getLimitTop();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -172,15 +215,6 @@ public class Makelangelo3 extends Makelangelo2 {
 
 		// clean up
 		gl2.glPopMatrix();
-	}
-
-	@Override
-	public String getProgramStart() {
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());
-		String msg="; Makelangelo 3\n";
-		msg+="; "+formatter.format(date)+"\n";
-		return msg;
 	}
 
 	/**

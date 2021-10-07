@@ -9,34 +9,30 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
 
 /**
- * {@link Plotter} is the Controller for a physical robot, following a
- * Model-View-Controller design pattern.  It also contains non-persistent model data. 
- * {@link PlotterPanel} is one of the Views. 
- * {@link PlotterSettings} is the persistent Model data (machine configuration).
+ * {@link Plotter} is a virtual plotter.  Other systems listen and react to it.
  * 
  * @author Dan
  * @since 7.2.10
  */
-public class Plotter implements PreviewListener {	
+public class Plotter implements PreviewListener, Cloneable {	
 	private PlotterSettings settings = new PlotterSettings();
 
-	private PlotterDecorator decorator = null;
 	// are motors actively engaged?  when disengaged pen can drift and re-homing is required.
-	private boolean areMotorsEngaged;
+	private boolean areMotorsEngaged = true;
 	// did the robot find home?  if it has not then the pen position is undefined.
-	private boolean didFindHome;
+	private boolean didFindHome = false;
 	// if pen is "up" then it is not drawing.
-	private boolean penIsUp;
+	private boolean penIsUp = false;
 	// current pen position
-	private Point2D pos = new Point2D();
-
-	public Plotter() {
-		super();
-		
-		areMotorsEngaged = true;
-		penIsUp = false;
-		didFindHome = false;
-		pos.set(0,0);
+	private Point2D pos = new Point2D(0,0);
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Plotter b = (Plotter)super.clone();
+		b.listeners = new ArrayList<PlotterEventListener>();
+		b.pos = new Point2D();
+		b.pos.set(this.pos);
+		return b;
 	}
 	
 	// OBSERVER PATTERN
@@ -69,16 +65,6 @@ public class Plotter implements PreviewListener {
 	
 	private void requestUserChangeTool(int toolNumber) {
 		notifyListeners(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
-	}
-
-	/**
-	 * @return travel or draw feed rate, depending on pen state.
-	 */
-	@Deprecated
-	public double getCurrentFeedRate() {
-		return penIsUp
-				? settings.getTravelFeedRate()
-				: settings.getDrawFeedRate();
 	}
 
 	public void goHome() {
@@ -143,11 +129,7 @@ public class Plotter implements PreviewListener {
 	public PlotterSettings getSettings() {
 		return settings;
 	}
-
-	public void setDecorator(PlotterDecorator arg0) {
-		decorator = arg0;
-	}
-
+	
 	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];
@@ -159,11 +141,6 @@ public class Plotter implements PreviewListener {
 		settings.getHardwareProperties().render(gl2, this);
 
 		gl2.glLineWidth(lineWidthBuf[0]);
-		
-		if (decorator != null) {
-			// filters can also draw WYSIWYG previews while converting.
-			decorator.render(gl2);
-		}
 	}	
 	
 	private void drawPhysicalLimits(GL2 gl2) {
@@ -197,4 +174,33 @@ public class Plotter implements PreviewListener {
 			break;
 		}
 	}
+
+	public double getPenUpAngle() {
+		return settings.getPenUpAngle();
+	}
+
+	public double getPenDownAngle() {
+		return settings.getPenDownAngle();
+	}
+
+	public double getPenLiftTime() {
+		return settings.getPenLiftTime();
+	}
+
+	public double getLimitBottom() {
+		return settings.getLimitBottom();
+	}
+
+	public double getLimitLeft() {
+		return settings.getLimitLeft();
+	}
+
+	public double getLimitRight() {
+		return settings.getLimitRight();
+	}
+
+	public double getLimitTop() {
+		return settings.getLimitTop();
+	}
+	
 }

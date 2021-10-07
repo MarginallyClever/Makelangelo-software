@@ -6,13 +6,13 @@ import java.util.Iterator;
 
 public class PlotterTypeFactory {
 	private static PlotterType [] available = {
-		new Cartesian(),
-		new Makelangelo2(),
-		new Makelangelo3_3(),
-		new Makelangelo3(),
 		new Makelangelo5Marlin(),
+		new Makelangelo3_3(),
 		new MakelangeloCustom(),
-		new Zarplotter()
+		new Cartesian(),
+		//new Makelangelo2(),
+		//new Makelangelo3(),
+		//new Zarplotter()
 	};
 	
 	public static ArrayList<String> getHardwareVersions() {

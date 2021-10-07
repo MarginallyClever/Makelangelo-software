@@ -10,7 +10,7 @@ import javax.sound.sampled.Clip;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preferences.SoundPreferences;
 
-
+@Deprecated
 public class SoundSystem {
 	static public void playSound(String url) {
 		if (url.isEmpty()) return;
