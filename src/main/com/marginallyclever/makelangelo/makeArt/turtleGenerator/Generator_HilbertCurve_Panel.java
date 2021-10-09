@@ -23,7 +23,7 @@ public class Generator_HilbertCurve_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
 		finish();
 	}
 

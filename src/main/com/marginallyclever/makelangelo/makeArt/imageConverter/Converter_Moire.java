@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -29,30 +30,34 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Moire_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
+		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
 	}
 	
 	public double getScale() {
 		return blockScale;
 	}
+	
 	public void setScale(double value) {
 		if(value<1) value=1;
 		blockScale = value;
 	}
+	
 	public String[] getDirections() {
 		return directionChoices;
 	}
+	
 	public int getDirectionIndex() {
 		return direction;
 	}
+	
 	public void setDirectionIndex(int value) {
 		if(value<0) value=0;
 		if(value>=directionChoices.length) value=directionChoices.length-1;
 		direction = value;
 	}
 
-	
 	protected void convertLine(TransformedImage img,double spaceBetweenLines,double halfStep,Point2D a,Point2D b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
@@ -173,7 +178,7 @@ public class Converter_Moire extends ImageConverter {
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 		
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop();
@@ -215,6 +220,7 @@ public class Converter_Moire extends ImageConverter {
 		}
 		Log.message("Moire end");
 	}
+
 }
 
 

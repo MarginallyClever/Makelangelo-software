@@ -39,7 +39,7 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 		xMin = -xMax;
 		yMin = -yMax;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		double xx = xMax - xMin;
 		double yy = yMax - yMin;
@@ -56,26 +56,26 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 		turtle.penDown();
 		// do the curve
 		if( (order&1) == 0 ) {
-			drawCurve(order, maxSize,-60);
+			drawCurve(turtle,order, maxSize,-60);
 		} else {
 			turtle.turn(60);
-			drawCurve(order, maxSize,-60);
+			drawCurve(turtle,order, maxSize,-60);
 		}
 
 		notifyListeners(turtle);
 	}
 
 
-	private void drawCurve(int n, double distance,double angle) {
+	private void drawCurve(Turtle turtle,int n, double distance,double angle) {
 		if (n == 0) {
 			turtle.forward(distance);
 			return;
 		}
 		
-		drawCurve(n-1,distance/2.0f,-angle);
+		drawCurve(turtle,n-1,distance/2.0f,-angle);
 		turtle.turn(angle);
-		drawCurve(n-1,distance/2.0f,angle);
+		drawCurve(turtle,n-1,distance/2.0f,angle);
 		turtle.turn(angle);
-		drawCurve(n-1,distance/2.0f,-angle);
+		drawCurve(turtle,n-1,distance/2.0f,-angle);
 	}
 }

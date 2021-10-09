@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
-import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 
 import javax.swing.DefaultComboBoxModel;
@@ -18,24 +17,21 @@ public class SelectOneOfMany extends Select {
 	private JComboBox<String> field = new JComboBox<String>();
 	private DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>)field.getModel();
 	
-	public SelectOneOfMany(String labelKey) {
-		super();
+	public SelectOneOfMany(String internalName,String labelKey) {
+		super(internalName);
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
 
-		final Select parent = this;
-		field.addActionListener((e)->{
-			notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null, field.getSelectedIndex()));
-		});
+		field.addActionListener((e)-> notifyPropertyChangeListeners(null, field.getSelectedIndex()) );
 
-		panel.removeAll();
-		panel.setBorder(new EmptyBorder(0,0,0,1));
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		myPanel.removeAll();
+		myPanel.setBorder(new EmptyBorder(0,0,0,1));
+		myPanel.add(label,BorderLayout.LINE_START);
+		myPanel.add(field,BorderLayout.LINE_END);
 	}
 	
-	public SelectOneOfMany(String labelKey,String[] options,int defaultValue) {
-		this(labelKey);
+	public SelectOneOfMany(String internalName,String labelKey,String[] options,int defaultValue) {
+		this(internalName,labelKey);
 		
 		setNewList(options);
 		field.setSelectedIndex(defaultValue);

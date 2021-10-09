@@ -28,12 +28,12 @@ public class Generator_LSystemTree_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(field_order      = new SelectSlider(Translator.get("HilbertCurveOrder"),10,1,generator.getOrder()));
-		add(field_branches   = new SelectSlider(Translator.get("LSystemBranches"),8,1,generator.getBranches()));
-		add(field_orderScale = new SelectSlider(Translator.get("LSystemOrderScale"),100,1,(int)(generator.getScale()*100)));
-		add(field_angle      = new SelectSlider(Translator.get("LSystemAngle"),360,1,(int)generator.getAngle()));
-		add(field_noise      = new SelectSlider(Translator.get("LSystemNoise"),100,0,(int)generator.getNoise()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/L-system'>Learn more</a>"));
+		add(field_order      = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,generator.getOrder()));
+		add(field_branches   = new SelectSlider("branches",Translator.get("LSystemBranches"),8,1,generator.getBranches()));
+		add(field_orderScale = new SelectSlider("scale",Translator.get("LSystemOrderScale"),100,1,(int)(generator.getScale()*100)));
+		add(field_angle      = new SelectSlider("angle",Translator.get("LSystemAngle"),360,1,(int)generator.getAngle()));
+		add(field_noise      = new SelectSlider("noise",Translator.get("LSystemNoise"),100,0,(int)generator.getNoise()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/L-system'>Learn more</a>"));
 		finish();
 	}
 

@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
@@ -21,8 +23,8 @@ public class Converter_Spiral extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Spiral_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("toCorners")) setToCorners((boolean)evt.getNewValue());
 	}
 
 	public boolean getToCorners() {
@@ -42,7 +44,7 @@ public class Converter_Spiral extends ImageConverter {
 
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 
 		double maxr;
 		if (convertToCorners) {

@@ -1,15 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 
-
-/**
- * 
- * @author Dan Royer
- */
+@Deprecated
 public class Converter_ColorBoxes extends ImageConverter {
 	private ColorPalette palette;
 	private double step1;
@@ -24,7 +22,6 @@ public class Converter_ColorBoxes extends ImageConverter {
 	// TODO make this a parameter
 	public boolean draw_filled = false;
 
-
 	public Converter_ColorBoxes() {
 		palette = new ColorPalette();
 		palette.addColor(new ColorRGB(0, 0, 0));
@@ -33,11 +30,9 @@ public class Converter_ColorBoxes extends ImageConverter {
 		palette.addColor(new ColorRGB(0, 0, 255));
 	}
 
-
 	public String getName() {
 		return Translator.get("RGBName");
 	}
-
 
 	private void ditherDirection(TransformedImage img, int y, ColorRGB[] error, ColorRGB[] nexterror, int direction) {
 		ColorRGB oldPixel = new ColorRGB(0, 0, 0);
@@ -111,7 +106,6 @@ public class Converter_ColorBoxes extends ImageConverter {
 			x+=direction*step4;
 		}
 	}
-	
 
 	protected void scan(int tool_index, TransformedImage img, String colorName, ColorRGB newPenColor) {
 		palette_mask = tool_index;
@@ -140,13 +134,12 @@ public class Converter_ColorBoxes extends ImageConverter {
 		}
 	}
 
-
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
-	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img) {
+	@Override
+	public void finish() {
 		double pw = myPaper.getMarginWidth();
 
 		// figure out how many boxes we're going to have on this image.
@@ -160,17 +153,14 @@ public class Converter_ColorBoxes extends ImageConverter {
 		error = new ColorRGB[(int) Math.ceil(stepsTotal)];
 		nexterror = new ColorRGB[(int) Math.ceil(stepsTotal)];
 
-		try {
-			scan(0, img, "Black",new ColorRGB(  0,  0,  0));  // black
-			scan(1, img, "Red"  ,new ColorRGB(255,  0,  0));  // red
-			scan(2, img, "Green",new ColorRGB(  0,255,  0));  // green
-			scan(3, img, "Blue" ,new ColorRGB(  0,  0,255));  // blue
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return true;
+		scan(0, myImage, "Black",new ColorRGB(  0,  0,  0));  // black
+		scan(1, myImage, "Red"  ,new ColorRGB(255,  0,  0));  // red
+		scan(2, myImage, "Green",new ColorRGB(  0,255,  0));  // green
+		scan(3, myImage, "Blue" ,new ColorRGB(  0,  0,255));  // blue
 	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {}
 }
 
 

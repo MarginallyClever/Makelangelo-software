@@ -36,7 +36,7 @@ public class Generator_Dragon extends TurtleGenerator {
 		
 	@Override
 	public void generate() {
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 
 		// create the sequence of moves
         sequence = new ArrayList<Integer>();

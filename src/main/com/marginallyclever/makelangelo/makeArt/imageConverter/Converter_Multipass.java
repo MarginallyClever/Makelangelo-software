@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
@@ -20,8 +22,9 @@ public class Converter_Multipass extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Multipass_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("angle")) setAngle((double)evt.getNewValue());
+		if(evt.getPropertyName().equals("levels")) setPasses((int)evt.getNewValue());		
 	}
 	
 	public double getAngle() {
@@ -48,7 +51,7 @@ public class Converter_Multipass extends ImageConverter {
 	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 		
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));

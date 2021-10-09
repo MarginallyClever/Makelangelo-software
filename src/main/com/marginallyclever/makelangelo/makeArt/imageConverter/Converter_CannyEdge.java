@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -18,7 +19,6 @@ public class Converter_CannyEdge extends ImageConverter {
 	public String getName() {
 		return Translator.get("CannyEdgeConverterName");
 	}
-
 
 	/**
 	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
@@ -112,6 +112,18 @@ public class Converter_CannyEdge extends ImageConverter {
 		    moveTo(out, (float)machine.getHomeX(), (float)machine.getHomeY(),true);
 	    }*/
 		return true;
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void finish() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

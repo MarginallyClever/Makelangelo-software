@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -24,13 +23,12 @@ public class SelectFile extends Select {
 	private JTextField field;
 	private JButton chooseButton;
 	
-	public SelectFile(String labelValue,String defaultValue) {
-		super();
+	public SelectFile(String internalName,String labelValue,String defaultValue) {
+		super(internalName);
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
 
 		field = new JTextField(defaultValue, 16);
-		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -48,7 +46,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", null,null));
+				notifyPropertyChangeListeners(null,field.getText());
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));
@@ -64,9 +62,9 @@ public class SelectFile extends Select {
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
 		
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(panel2,BorderLayout.CENTER);
-		panel.add(chooseButton,BorderLayout.LINE_END);
+		myPanel.add(label,BorderLayout.LINE_START);
+		myPanel.add(panel2,BorderLayout.CENTER);
+		myPanel.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
 	public String getText() {

@@ -1,42 +1,70 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeListener;
+
+import javax.swing.ProgressMonitor;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
-import com.marginallyclever.makelangeloRobot.PlotterDecorator;
+import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Converts a {@link BufferedImage} to {@link Turtle}
  * @author Dan Royer
  */
-public abstract class ImageConverter extends ImageManipulator implements PlotterDecorator {
-	protected TransformedImage sourceImage;
+public abstract class ImageConverter implements PropertyChangeListener {
+	protected TransformedImage myImage;
+	protected Paper myPaper;
+	public Turtle turtle = new Turtle();
+
+	// for previewing the image
+	private Texture texture = null;
+	
 	protected boolean keepIterating=false;
-	protected Texture texture = null;
+	private ProgressMonitor pm;
+	private ImageConverterThread thread;
 
-	public static LoadImage loadImage;
+	/**
+	 * @return the translated name.
+	 */
+	abstract public String getName();
 
-	public void restart() {
-		if(!keepIterating) {
-			if(loadImage!=null) {
-				loadImage.reconvert();
-			}
-			return;
-		}
+	public void setPaper(Paper p) {
+		myPaper = p;
 	}
 	
+	public void setThread(ImageConverterThread p) {
+		thread = p;
+	}
+
+	public void setProgressMonitor(ProgressMonitor p) {
+		pm = p;
+	}
+	
+	public void setProgress(int d) {
+		if(pm==null) return;
+		pm.setProgress(d);
+	}
+
+	public boolean isThreadCancelled() {
+		if(thread!=null && thread.isCancelled()) return true;
+		if(pm!=null && !pm.isCanceled()) return true;
+		return false;
+	}
+		
 	/**
 	 * set the image to be transformed.
 	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
 	 */
 	public void setImage(TransformedImage img) {
-		sourceImage=img;
+		myImage=img;
 		texture = null;
 	}
 	
@@ -47,37 +75,26 @@ public abstract class ImageConverter extends ImageManipulator implements Plotter
 	public boolean iterate() {
 		return false;
 	}
-	
+
 	public void stopIterating() {
 		keepIterating=false;
 	}
-	
-	/**
-	 * for "run once" converters, return do the entire conversion and write to disk.
-	 * for iterative solvers, the iteration is now done, write to disk.
-	 */
-	public void finish() {}
-	
-	/**
-	 * @return the gui panel with options for this manipulator
-	 */
-	public ImageConverterPanel getPanel() {
-		return null;
-	}
 
+	abstract public void finish();
+	
 	/**
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2) {
+	protected void render(GL2 gl2) {
 		if( texture==null ) {
-			if( sourceImage!=null) {
-				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), sourceImage.getSourceImage(), false);
+			if( myImage!=null) {
+				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
 			}
 		}
 		if(texture!=null) {
-			double w = sourceImage.getSourceImage().getWidth() * sourceImage.getScaleX();
-			double h = sourceImage.getSourceImage().getHeight() * sourceImage.getScaleY();
+			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
+			double h = myImage.getSourceImage().getHeight() * myImage.getScaleY();
 			gl2.glEnable(GL2.GL_TEXTURE_2D);
 			gl2.glEnable(GL2.GL_BLEND);
 			gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -147,7 +164,6 @@ public abstract class ImageConverter extends ImageManipulator implements Plotter
 		}
 	}
 	
-
 	/**
 	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
 	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
@@ -204,5 +220,9 @@ public abstract class ImageConverter extends ImageManipulator implements Plotter
 			wasInside=isInside;
 		}
 		turtle.penUp();
+	}
+
+	protected boolean isInsidePaperMargins(double x,double y) {
+		return myPaper.isInsidePaperMargins(x,y);
 	}
 }

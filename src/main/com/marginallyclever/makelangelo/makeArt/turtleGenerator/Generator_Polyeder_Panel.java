@@ -27,9 +27,9 @@ public class Generator_Polyeder_Panel extends TurtleGeneratorPanel {
 		this.generator = generator;
 		String [] models=generator.getModelNames();
 
-		add(size = new SelectInteger(Translator.get("Size"),generator.getLastSize()));
-		add(flap = new SelectInteger(Translator.get("Flap"),generator.getLastFlap()));
-		add(model = new SelectOneOfMany(Translator.get("Model"),models,generator.getLastModel()));
+		add(size = new SelectInteger("size",Translator.get("Size"),generator.getLastSize()));
+		add(flap = new SelectInteger("flap",Translator.get("Flap"),generator.getLastFlap()));
+		add(model = new SelectOneOfMany("model",Translator.get("Model"),models,generator.getLastModel()));
 		finish();
 	}
 

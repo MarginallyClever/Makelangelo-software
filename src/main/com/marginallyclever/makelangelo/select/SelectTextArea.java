@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.beans.PropertyChangeEvent;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -23,15 +21,14 @@ public class SelectTextArea extends Select {
 	private JTextArea field;
 	private JScrollPane pane;
 	
-	public SelectTextArea(String labelKey,String defaultText) {
-		super();
+	public SelectTextArea(String internalName,String labelKey,String defaultText) {
+		super(internalName);
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JTextArea(defaultText,4,20);
 		field.setLineWrap(true);
 		field.setWrapStyleWord(true);
 		field.setBorder(BorderFactory.createLoweredBevelBorder());
-		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -49,27 +46,25 @@ public class SelectTextArea extends Select {
 			}
 			
 			void validate() {
-				// TODO don't leave these null
-				PropertyChangeEvent evt = new PropertyChangeEvent(parent,"field",null,null); 
-				notifyPropertyChangeListeners(evt);
+				notifyPropertyChangeListeners(null,field.getText());
 			}
 		});
 		
 		pane = new JScrollPane(field);
 		
 		// resize the JScrollPane if the containing panel resizes
-		panel.addComponentListener(new ComponentAdapter() {
+		myPanel.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				pane.setPreferredSize(panel.getSize());
+				pane.setPreferredSize(myPanel.getSize());
 				pane.revalidate();
 			}
 		});
 		pane.setMinimumSize(new Dimension(500, 100));
 		pane.setPreferredSize(new Dimension(200, 350));
 		
-		panel.add(label,BorderLayout.PAGE_START);
-		panel.add(pane,BorderLayout.CENTER);
+		myPanel.add(label,BorderLayout.PAGE_START);
+		myPanel.add(pane,BorderLayout.CENTER);
 	}
 
 	public String getText() {

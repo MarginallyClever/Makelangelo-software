@@ -28,7 +28,7 @@ public class SaveDialog {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 	
-	public void run(Turtle t,JFrame parent) throws Exception {		
+	public void run(Turtle t,JFrame parent) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());

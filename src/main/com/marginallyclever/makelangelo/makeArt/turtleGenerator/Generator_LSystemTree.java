@@ -31,7 +31,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	
 	@Override
 	public void generate() {
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 
 		random = new SecureRandom();
 		random.setSeed(0xDEADBEEF);
@@ -41,14 +41,14 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		turtle.turn(90);
 		turtle.penDown();
 		// do the curve
-		lSystemTree(order, 10);
+		lSystemTree(turtle,order, 10);
 
 		notifyListeners(turtle);
 	}
 
 
 	// recursive L System tree fractal
-	private void lSystemTree(int n, double distance) {
+	private void lSystemTree(Turtle turtle,int n, double distance) {
 		if (n == 0) return;
 
 		turtle.forward(distance);
@@ -59,7 +59,7 @@ public class Generator_LSystemTree extends TurtleGenerator {
 			double len = distance*orderScale;
 			turtle.turn(-(angleSpan/2.0f));
 			for(int i=0;i<numBranches;++i) {
-				lSystemTree(n-1,len - len*random.nextDouble()*(noise/100.0f) );
+				lSystemTree(turtle,n-1,len - len*random.nextDouble()*(noise/100.0f) );
 				if(noise>0) {
 					turtle.turn(angleStep + (random.nextDouble()-0.5)*(noise/100.0f)*angleStep);
 				} else {

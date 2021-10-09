@@ -62,24 +62,24 @@ public class Generator_Lissajous extends TurtleGenerator {
 	}
 		
 	@Override
-	public void generate() {
+	public void generate() {		
 		// scale the step size so the curve fits on the paper
 		WIDTH = myPaper.getMarginWidth()/2.0;
 		HEIGHT = myPaper.getMarginHeight()/2.0;
 
-		drawLissajous(true);
+		Turtle turtle = drawLissajous(true);
 
 		notifyListeners(turtle);
 	}
 	
 	// see https://www.openprocessing.org/sketch/26608/
 	// based on code by Javier Romero (http://www.fjromero.com/processing/lissajous/)
-	protected void drawLissajous(boolean write) {
+	protected Turtle drawLissajous(boolean write) {
 		double x,y,t;
 
 		//x = AX*sin(a*t + delta) + screen_width/2;
 		//y = BX*sin(b*t) + screen_height/2;
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		for(int t1=0; t1<=numSamples; ++t1) {
 			t = ( Math.PI*2.0 * t1 / (double)numSamples );
@@ -89,5 +89,6 @@ public class Generator_Lissajous extends TurtleGenerator {
 			turtle.moveTo(x, y);
 			turtle.penDown();
 		}
+		return turtle;
 	}
 }

@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,8 +26,8 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Spiral_CMYK_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("toCorners")) setToCorners((boolean)evt.getNewValue());
 	}
 
 	public boolean getToCorners() {
@@ -42,7 +44,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 	@Override
 	public void finish() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(myImage);
 
 		double separation; 
 		float h2 = (float)myPaper.getPaperHeight();
@@ -55,7 +57,6 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
 		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
 		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
-		Log.message("Finishing...");
 	}
 
 	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cx,double cy) {

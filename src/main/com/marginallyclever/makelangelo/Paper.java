@@ -109,10 +109,12 @@ public class Paper implements PreviewListener {
 		return rectangle;
 	}
 
+	// TODO clean up this name
 	public ColorRGB getPaperColor() {
 		return paperColor;
 	}
 
+	// TODO clean up this name
 	public void setPaperColor(ColorRGB arg0) {
 		paperColor = arg0;
 	}
@@ -120,6 +122,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper height in mm.
 	 */
+	// TODO clean up this name
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
@@ -127,20 +130,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper width in mm.
 	 */
-	public double getMarginHeight() {
-		return getMarginTop() - getMarginBottom();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginWidth() {
-		return getMarginRight() - getMarginLeft();
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
+	// TODO clean up this name
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}
@@ -148,6 +138,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper left edge in mm.
 	 */
+	// TODO clean up this name
 	public double getPaperLeft() {
 		return paperLeft;
 	}
@@ -155,6 +146,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper right edge in mm.
 	 */
+	// TODO clean up this name
 	public double getPaperRight() {
 		return paperRight;
 	}
@@ -162,6 +154,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper top edge in mm.
 	 */
+	// TODO clean up this name
 	public double getPaperTop() {
 		return paperTop;
 	}
@@ -169,6 +162,7 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper bottom edge in mm.
 	 */
+	// TODO clean up this name
 	public double getPaperBottom() {
 		return paperBottom;
 	}
@@ -202,16 +196,33 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
+	 * @return paper width in mm.
+	 */
+	public double getMarginHeight() {
+		return getMarginTop() - getMarginBottom();
+	}
+
+	/**
+	 * @return paper width in mm.
+	 */
+	public double getMarginWidth() {
+		return getMarginRight() - getMarginLeft();
+	}
+
+	/**
 	 * @return paper margin %.
 	 */
+	// TODO clean up this name
 	public double getPaperMargin() {
 		return paperMargin;
 	}
 
+	// TODO clean up this name
 	public boolean isPaperConfigured() {
 		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
 
+	// TODO clean up this name
 	public boolean isInsidePaperMargins(double x,double y) {
 		if( x < getMarginLeft()  ) return false;
 		if( x > getMarginRight() ) return false;

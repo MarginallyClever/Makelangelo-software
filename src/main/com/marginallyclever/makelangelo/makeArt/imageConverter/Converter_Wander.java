@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;
 
 import com.marginallyclever.convenience.ColorRGB;
@@ -43,8 +44,9 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Wander_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("count")) setLineCount((int)evt.getNewValue());
+		if(evt.getPropertyName().equals("cmyk")) setCMYK((boolean)evt.getNewValue());
 	}
 
 	@Override
@@ -168,7 +170,7 @@ public class Converter_Wander extends ImageConverter {
 	
 	protected void finishCMYK() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(myImage);
 		
 		turtle = new Turtle();
 		
@@ -182,7 +184,7 @@ public class Converter_Wander extends ImageConverter {
 	protected void finishBlackAndWhite() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 		
 		outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0);
 	}

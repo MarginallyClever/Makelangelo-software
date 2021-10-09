@@ -16,9 +16,9 @@ public class SelectDoubleTest {
 	
 	protected void testFloatField() throws Exception {
 		// test contructor(s)
-		SelectDouble b = new SelectDouble("test",0);
+		SelectDouble b = new SelectDouble("test","test",0);
 		assertEquals(0.0f,b.getValue(),1e-6);
-		b = new SelectDouble("test2",0.1f);
+		b = new SelectDouble("test2","test2",0.1f);
 		assertEquals(0.1f,b.getValue(),1e-6);
 		
 		// test observer fires

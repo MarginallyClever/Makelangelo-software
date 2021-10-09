@@ -8,7 +8,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
@@ -16,11 +15,8 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
-public class SaveSVG extends ImageManipulator implements TurtleSaver {
+public class SaveSVG implements TurtleSaver {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
-	
-	@Override
-	public String getName() { return "SVG"; }
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

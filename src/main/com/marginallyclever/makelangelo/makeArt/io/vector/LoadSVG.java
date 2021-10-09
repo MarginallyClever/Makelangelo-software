@@ -38,18 +38,15 @@ import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
-public class LoadSVG extends ImageManipulator implements TurtleLoader {
+public class LoadSVG implements TurtleLoader {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
-		
-	@Override
-	public String getName() { return "SVG"; }
+	private Turtle myTurtle;
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -69,8 +66,8 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 		
-	    turtle = new Turtle();
-		turtle.setColor(new ColorRGB(0,0,0));
+	    myTurtle = new Turtle();
+		myTurtle.setColor(new ColorRGB(0,0,0));
 		try {
 			parseAll(document);
 		} catch(Exception e) {
@@ -78,11 +75,11 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 			throw new Exception("Failed to load some elements (1): "+e.getLocalizedMessage());
 		}
 		
-		Rectangle2D.Double r = turtle.getBounds();
-		turtle.translate(-r.width/2,-r.height/2);
-		turtle.scale(1, -1);
+		Rectangle2D.Double r = myTurtle.getBounds();
+		myTurtle.translate(-r.width/2,-r.height/2);
+		myTurtle.scale(1, -1);
 		
-		return turtle;
+		return myTurtle;
 	}
 	
 	private void parseAll(Document document) throws Exception {
@@ -119,12 +116,12 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 
 			SVGPoint item = (SVGPoint)pointList.getItem(0);
 			v2 = transform(item.getX(),item.getY(),m);
-			turtle.jumpTo(v2.x,v2.y);
+			myTurtle.jumpTo(v2.x,v2.y);
 			
 			for( int i=1; i<numPoints; ++i ) {
 				item = (SVGPoint)pointList.getItem(i);
 				v2 = transform(item.getX(),item.getY(),m);
-				turtle.moveTo(v2.x,v2.y);
+				myTurtle.moveTo(v2.x,v2.y);
 			}
 		}
 	}
@@ -148,9 +145,9 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 			if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
 			if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));
 			v2 = transform(x1,y1,m);
-			turtle.jumpTo(v2.x,v2.y);
+			myTurtle.jumpTo(v2.x,v2.y);
 			v2 = transform(x2,y2,m);
-			turtle.moveTo(v2.x,v2.y);
+			myTurtle.moveTo(v2.x,v2.y);
 	    }
 	}
 
@@ -230,11 +227,11 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 			//double y3=y+h;
 
 			Vector3d v2 = transform(x1,y0,m);
-			turtle.jumpTo(v2.x,v2.y);
-			arcTurtle(turtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m); 
-			arcTurtle(turtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
-			arcTurtle(turtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
-			arcTurtle(turtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
+			myTurtle.jumpTo(v2.x,v2.y);
+			arcTurtle(myTurtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m); 
+			arcTurtle(myTurtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
+			arcTurtle(myTurtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
+			arcTurtle(myTurtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
 	    }
 	}
 
@@ -283,7 +280,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 			if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
 			if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
 			v2 = transform(cx+r,cy,m);
-			turtle.jumpTo(v2.x,v2.y);
+			myTurtle.jumpTo(v2.x,v2.y);
 			
 			double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
 			for(double i=1;i<circ;++i) {
@@ -291,10 +288,10 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 				double s=r*Math.sin(v);
 				double c=r*Math.cos(v);
 				v2 = transform(cx+c,cy+s,m);
-				turtle.moveTo(v2.x,v2.y);
+				myTurtle.moveTo(v2.x,v2.y);
 			}
 			v2 = transform(cx+r,cy,m);
-			turtle.moveTo(v2.x,v2.y);
+			myTurtle.moveTo(v2.x,v2.y);
 	    }
 	}
 
@@ -315,7 +312,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 			if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
 			if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
 			v2 = transform(cx+rx,cy,m);
-			turtle.jumpTo(v2.x,v2.y);
+			myTurtle.jumpTo(v2.x,v2.y);
 			
 			double circ = Math.min(3,Math.floor(Math.PI * ry*rx)); 
 			for(double i=1;i<circ;++i) {
@@ -323,10 +320,10 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 				double s=ry*Math.sin(v);
 				double c=rx*Math.cos(v);
 				v2 = transform(cx+c,cy+s,m);
-				turtle.moveTo(v2.x,v2.y);
+				myTurtle.moveTo(v2.x,v2.y);
 			}
 			v2 = transform(cx+rx,cy,m);
-			turtle.moveTo(v2.x,v2.y);
+			myTurtle.moveTo(v2.x,v2.y);
 	    }
 	}
 	
@@ -335,8 +332,8 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 	 * @param paths the source of the elements
 	 */
 	private void parsePathElements(NodeList paths) throws Exception {
-	    double x=turtle.getX();
-	    double y=turtle.getY();
+	    double x=myTurtle.getX();
+	    double y=myTurtle.getY();
 		double firstX=0;
 		double firstY=0;
 		
@@ -364,7 +361,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
 					{
 						//System.out.println("Close path");
-						turtle.moveTo(firstX,firstY);
+						myTurtle.moveTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
@@ -374,7 +371,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 						v = transform(path.getX(),path.getY(),m);
 						firstX = x = v.x;
 						firstY = y = v.y;
-						turtle.jumpTo(firstX,firstY);
+						myTurtle.jumpTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
@@ -382,9 +379,9 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 						//System.out.println("Move Rel");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 						v = transform(path.getX(),path.getY(),m);
-						firstX = x = v.x + turtle.getX();
-						firstY = y = v.y + turtle.getY();
-						turtle.jumpTo(firstX,firstY);
+						firstX = x = v.x + myTurtle.getX();
+						firstY = y = v.y + myTurtle.getY();
+						myTurtle.jumpTo(firstX,firstY);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
@@ -394,7 +391,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 						v = transform(path.getX(),path.getY(),m);
 						x = v.x;
 						y = v.y;
-						turtle.moveTo(x,y);
+						myTurtle.moveTo(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
@@ -402,9 +399,9 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 						//System.out.println("Line REL");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 						v = transform(path.getX(),path.getY(),m);
-						x = v.x + turtle.getX();
-						y = v.y + turtle.getY();
-						turtle.moveTo(x,y);
+						x = v.x + myTurtle.getX();
+						y = v.y + myTurtle.getY();
+						myTurtle.moveTo(x,y);
 					}
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
@@ -430,7 +427,7 @@ public class LoadSVG extends ImageManipulator implements TurtleLoader {
 						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
 						ArrayList<Point2D> points = b.generateCurvePoints(0.05);
 						for(Point2D p2 : points) {
-							turtle.moveTo(p2.x, p2.y);
+							myTurtle.moveTo(p2.x, p2.y);
 							x = p2.x;
 							y = p2.y;
 						}

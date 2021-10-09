@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,8 +13,8 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
@@ -27,7 +28,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter implements PlotterDecorator {
+public class Converter_VoronoiStippling extends ImageConverter implements PreviewListener {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -44,21 +45,16 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	private double xMin, xMax;
 	private int iterations;
 
-	/**
-	 * @author Dan Royer
-	 */
-	protected class QuadGraph {
+	private class QuadGraph {
 		public Rectangle2D bounds;
 		public ArrayList<VoronoiCell> sites;
 		public QuadGraph[] children;
-		public boolean flag;
 		
 		public QuadGraph(double x,double y,double x2,double y2) {
 			bounds = new Rectangle2D.Double(x,y,0,0);
 			bounds.add(x2,y2);
 			sites = new ArrayList<VoronoiCell>();
 			children=null;
-			flag=false;
 		}
 		
 		public void split(int depth) {
@@ -163,7 +159,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		}
 	}
 	
-	protected QuadGraph tree;
+	private QuadGraph tree;
 	
 	@Override
 	public String getName() {
@@ -171,15 +167,22 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_VoronoiStippling_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("drawBorder")) setDrawBorders((boolean)evt.getNewValue());
+		else {
+			if(evt.getPropertyName().equals("cells")) setNumCells((int)evt.getNewValue());
+			if(evt.getPropertyName().equals("max")) setMinDotSize((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("min")) setMaxDotSize((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("cutoff")) setCutoff((double)evt.getNewValue());
+			restart();
+		}
 	}
 
 	@Override
 	public void setImage(TransformedImage img) {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		sourceImage = bw.filter(img);
+		myImage = bw.filter(img);
 		
 		yMin = myPaper.getMarginBottom();
 		yMax = myPaper.getMarginTop();
@@ -189,7 +192,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		keepIterating=true;
 		restart();
 	}
-	
+
+	@Override
 	public boolean iterate() {
 		//float totalMagnitude = 
 				evolveCells();
@@ -197,12 +201,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		return keepIterating;
 	}
 	
-	public void restart() {
-		if(!keepIterating) {
-			loadImage.reconvert();
-			return;
-		}
-		
+	private void restart() {		
 		while(lock.isLocked());
 		lock.lock();
 		iterations=0;
@@ -218,9 +217,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	}
 
 	@Override
-	public void render(GL2 gl2) {
-		super.render(gl2);
-		
+	public void render(GL2 gl2) {		
 		while(lock.isLocked());
 		lock.lock();
 		
@@ -246,7 +243,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		lock.unlock();
 	}
 
-	protected void renderPolygons(GL2 gl2) {
+	@SuppressWarnings("unused")
+	private void renderPolygons(GL2 gl2) {
 		gl2.glColor4d(1,1,0,0.25);
 		Iterator<VoronoiCell> ci = cells.iterator();
 		while(ci.hasNext()) {
@@ -265,8 +263,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 			return;
 		}
 	}
-	
-	protected void renderFirstCellBounds(GL2 gl2) {
+
+	@SuppressWarnings("unused")
+	private void renderFirstCellBounds(GL2 gl2) {
 		gl2.glColor3f(1,0,0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		Rectangle2D bounds = cells.get(0).region.getBounds2D();
@@ -278,8 +277,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		}
 		gl2.glEnd();
 	}
-	
-	protected void renderPoints(GL2 gl2) {
+
+	@SuppressWarnings("unused")
+	private void renderPoints(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL2.GL_POINTS);
 		Iterator<VoronoiCell> ci = cells.iterator();
@@ -291,7 +291,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		gl2.glEnd();
 	}
 	
-	protected void renderDots(GL2 gl2) {
+	private void renderDots(GL2 gl2) {
 		double scale = maxDotSize - minDotSize;
 		gl2.glColor3f(0, 0, 0);
 		Iterator<VoronoiCell> ci = cells.iterator();
@@ -313,7 +313,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	}
 	
 	// set some starting points in a grid
-	protected void initializeCells(double minDistanceBetweenSites) {
+	private void initializeCells(double minDistanceBetweenSites) {
 		Log.message("Initializing cells");
 
 		// convert the cells to sites used in the Voronoi class.
@@ -330,8 +330,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 			for(int i=0;i<30;++i) {
 				x = xMin + Math.random()*(xMax-xMin);
 				y = yMin + Math.random()*(yMax-yMin);
-				if(sourceImage.canSampleAt((float)x, (float)y)) {
-					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+				if(myImage.canSampleAt((float)x, (float)y)) {
+					float v = myImage.sample1x1Unchecked((float)x, (float)y);
 					if(Math.random()*255 >= v) break;
 				}
 			}
@@ -343,11 +343,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		voronoiTesselator.Init(minDistanceBetweenSites);
 	}
 
-
 	/**
 	 * Jiggle the dots until they make a nice picture
 	 */
-	protected float evolveCells() {
+	private float evolveCells() {
 		float totalMagnitude=0;
 		try {
 			while(lock.isLocked());
@@ -364,11 +363,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		return totalMagnitude;
 	}
 
-
 	/**
 	 * write cell centroids to gcode.
 	 */
-	protected void writeOutCells() {
+	private void writeOutCells() {
 		turtle = new Turtle();
 
 		double toolDiameter = 1;
@@ -411,12 +409,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		}
 	}
 
-
 	/**
 	 *  I have a set of points.  I want a list of cell borders.
 	 *  cell borders are halfway between any point and it's nearest neighbors.
 	 */
-	protected void tessellateVoronoiDiagram() {
+	private void tessellateVoronoiDiagram() {
 		iterations++;
 
 		int i=0;
@@ -445,9 +442,9 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	}
 
 
-	protected void adjustCell(VoronoiCell c,double x,double y) {
+	private void adjustCell(VoronoiCell c,double x,double y) {
 		c.hits++;
-		double sampleWeight = 255.0 - sourceImage.sample1x1Unchecked( (float)x, (float)y );
+		double sampleWeight = 255.0 - myImage.sample1x1Unchecked( (float)x, (float)y );
 		c.weight += sampleWeight;
 		c.wx += x * sampleWeight;
 		c.wy += y * sampleWeight;
@@ -459,7 +456,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 	 * the center of the pixel must be inside the cell to be counted.
 	 * @return the total magnitude movement of all centers
 	 */
-	protected float adjustCentroids() {
+	private float adjustCentroids() {
 		double x, y;
 		float totalMagnitude=0;
 		
@@ -484,7 +481,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 		double v=5;
 		for(y=yMin; y<=yMax; ++y) {			
 			for(x=xMin; x<=xMax; ++x) {
-				if(!sourceImage.canSampleAt((float)x, (float)y)) continue;
+				if(!myImage.canSampleAt((float)x, (float)y)) continue;
 				// binary search over the cells to find the best fit.
 				
 				test.setRect(x-v, y-v, v*2, v*2);
@@ -548,6 +545,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Plotte
 			}
 		}
 	}
+	
 	public int getNumCells() {
 		return numCells;
 	}

@@ -27,7 +27,7 @@ public class Generator_Border extends TurtleGenerator {
 		double xMin = myPaper.getMarginLeft();
 		double xMax = myPaper.getMarginRight();
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		turtle.penUp();
 		turtle.moveTo(xMin,yMax);
 		turtle.penDown();

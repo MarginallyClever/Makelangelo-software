@@ -29,12 +29,10 @@ import org.json.JSONTokener;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * LoadAndSaveSB3 loads limited set of Scratch commands into memory. 
- * 
  * We ignore monitors, which are visual displays of variables, booleans, and lists.  They don't contain any real information we need.
  * 
  * @author Dan Royer
@@ -42,7 +40,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
-public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
+public class LoadScratch3 implements TurtleLoader {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -72,6 +70,7 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 	private LinkedList<ScratchList> scratchLists;
 	private JSONObject blocks;
 	private Set<?> blockKeys;
+	private Turtle myTurtle;
 
 	//private int indent=0;
 	private boolean penUp=false;
@@ -91,7 +90,7 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 	public Turtle load(InputStream in) throws Exception {
 		Log.message(Translator.get("FileTypeSB3")+"...");
 		// reset the turtle object
-		turtle = new Turtle();
+		myTurtle = new Turtle();
 		
 		// open zip file
     	Log.message("Searching for project.json...");
@@ -167,7 +166,7 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 		Log.message("found  " +scripts.length() + " scripts");
 		Log.message("finished scripts");
 
-		return turtle;
+		return myTurtle;
 	}
 
 
@@ -227,7 +226,7 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 			case "event_whenflagclicked":
 				// gcode preamble
 				// reset the turtle object
-				turtle = new Turtle();
+				myTurtle = new Turtle();
 				// make sure machine state is the default.
 				break;
 				
@@ -288,10 +287,10 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 			case "motion_gotoxy":
 				break;
 			case "pen_penDown":
-				turtle.penDown();
+				myTurtle.penDown();
 				break;
 			case "pen_penUp":
-				turtle.penUp();
+				myTurtle.penUp();
 				break;
 			default:
 				Log.message("Ignored "+opcode);
@@ -453,7 +452,7 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 				if(name.equals("whenGreenFlag")) {
 					// gcode preamble
 	    			// reset the turtle object
-	    			turtle = new Turtle();
+	    			myTurtle = new Turtle();
 					Log.message("**START**");
 					continue;
 				} else if(name.equals("doRepeat")) {
@@ -522,11 +521,11 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 					Log.message("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
-					turtle.penUp();
+					myTurtle.penUp();
 					Log.message("pen up");
 					continue;
 				} else if(name.equals("putPenDown")) {
-					turtle.penDown();
+					myTurtle.penDown();
 					Log.message("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
@@ -534,47 +533,47 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 					Object o3 = (Object)scriptIter.next();
 					double y = resolveValue(o3);
 					
-					turtle.moveTo(x,y);
-					Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					myTurtle.moveTo(x,y);
+					Log.message("Move to ("+myTurtle.getX()+","+myTurtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX()+v,turtle.getY());
+					myTurtle.moveTo(myTurtle.getX()+v,myTurtle.getY());
 					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX(),turtle.getY()+v);
+					myTurtle.moveTo(myTurtle.getX(),myTurtle.getY()+v);
 					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.forward(v);
+					myTurtle.forward(v);
 					Log.message("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
-					turtle.turn(-degrees);
+					myTurtle.turn(-degrees);
 					Log.message("Right "+degrees+" degrees.");
 				} else if(name.equals("turnLeft:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
-					turtle.turn(degrees);
+					myTurtle.turn(degrees);
 					Log.message("Left "+degrees+" degrees.");
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.moveTo(v,turtle.getY());
+					myTurtle.moveTo(v,myTurtle.getY());
 					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
-					turtle.moveTo(turtle.getX(),v);
+					myTurtle.moveTo(myTurtle.getX(),v);
 					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
-					turtle.setAngle(degrees);
+					myTurtle.setAngle(degrees);
 					//Log.message("Turn to "+degrees);
 				} else if(name.equals("setVar:to:")) {
 					// set variable
@@ -693,13 +692,13 @@ public class LoadScratch3 extends ImageManipulator implements TurtleLoader {
 			String firstName = obj.toString();
 			
 			if(firstName.equals("xpos")) {
-				return turtle.getX();
+				return myTurtle.getX();
 			}
 			if(firstName.equals("ypos")) {
-				return turtle.getY();
+				return myTurtle.getY();
 			}
 			if(firstName.equals("heading")) {
-				return turtle.getAngle();
+				return myTurtle.getAngle();
 			}
 
 			try {

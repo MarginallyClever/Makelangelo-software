@@ -21,11 +21,11 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 7101530052729740681L;
 	private FirmwareUploader firmwareUploader = new FirmwareUploader();
-	private SelectFile sourceAVRDude = new SelectFile(Translator.get("avrDude path"),firmwareUploader.arduinoPath);
-	private SelectFile sourceHex = new SelectFile(Translator.get("*.hex file"),"");
-	private SelectOneOfMany port = new SelectOneOfMany(Translator.get("Port"));
-	private SelectButton refreshButton = new SelectButton(Translator.get("Refresh"));
-	private SelectButton goButton = new SelectButton(Translator.get("Start")); 
+	private SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.arduinoPath);
+	private SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
+	private SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
+	private SelectButton refreshButton = new SelectButton("refresh",Translator.get("Refresh"));
+	private SelectButton goButton = new SelectButton("start",Translator.get("Start")); 
 	
 	public FirmwareUploaderPanel() {
 		super();

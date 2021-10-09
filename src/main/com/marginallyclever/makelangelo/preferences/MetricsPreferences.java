@@ -16,7 +16,7 @@ public class MetricsPreferences {
 	static public SelectPanel buildPanel() {
 		panel = new SelectPanel();
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
-		collectAnonymousMetricsCheckbox = new SelectBoolean(
+		collectAnonymousMetricsCheckbox = new SelectBoolean("collect",
 				Translator.get("collectAnonymousMetrics"),
 				prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, false));
 

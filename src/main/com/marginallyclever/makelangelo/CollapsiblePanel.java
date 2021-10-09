@@ -469,18 +469,18 @@ public class CollapsiblePanel extends JPanel {
 		CollapsiblePanel cpanel = new CollapsiblePanel("Interior");
 		
 		SelectPanel panel2 = cpanel.getContentPane();
-		SelectBoolean a = new SelectBoolean("AAAAAAAAAAA",false);
-		SelectButton b = new SelectButton("B");
-		SelectColor c = new SelectColor(frame,"CCCCCC",new ColorRGB(0,0,0));
-		SelectFile d = new SelectFile("D",null);
-		SelectDouble e = new SelectDouble("E",0.0f);
-		SelectInteger f = new SelectInteger("FFF",0);
+		SelectBoolean a = new SelectBoolean("A","AAAAAAAAAAA",false);
+		SelectButton b = new SelectButton("B","B");
+		SelectColor c = new SelectColor("C","CCCCCC",new ColorRGB(0,0,0),frame);
+		SelectFile d = new SelectFile("D","D",null);
+		SelectDouble e = new SelectDouble("E","E",0.0f);
+		SelectInteger f = new SelectInteger("F","FFF",0);
 		String [] list = {"cars","trains","planes","boats","rockets"};
-		SelectOneOfMany g = new SelectOneOfMany("G",list,0);
+		SelectOneOfMany g = new SelectOneOfMany("G","G",list,0);
 		String ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-		SelectReadOnlyText h = new SelectReadOnlyText("H "+ipsum);
-		SelectSlider i = new SelectSlider("I",200,0,100);
-		SelectTextArea j = new SelectTextArea("J",ipsum);
+		SelectReadOnlyText h = new SelectReadOnlyText("H","H "+ipsum);
+		SelectSlider i = new SelectSlider("I","I",200,0,100);
+		SelectTextArea j = new SelectTextArea("J","J",ipsum);
 		
 		panel2.add(a);
 		panel2.add(b);

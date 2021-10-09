@@ -4,14 +4,14 @@ import javax.swing.SwingWorker;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
-public class ImageConverterThread extends SwingWorker<Void, Void> {
+public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private ImageConverter chosenConverter;
 	private String name;
-	private LoadImage listener;
 
-	public ImageConverterThread(LoadImage createdBy,ImageConverter converter,String name) {
-		listener = createdBy;
+	public ImageConverterThread(ImageConverter converter,String name) {
+		super();
 		chosenConverter = converter;
 		this.name = name;
 		
@@ -19,9 +19,11 @@ public class ImageConverterThread extends SwingWorker<Void, Void> {
 	}
 	
 	@Override
-	protected Void doInBackground() throws Exception {
+	protected Turtle doInBackground() throws Exception {
 		Log.message("Starting "+name);
-
+		
+		Turtle turtle = new Turtle();
+		
 		int loopCount=0;
 		while(!isCancelled() && chosenConverter.iterate()) {
 			loopCount++;
@@ -35,7 +37,7 @@ public class ImageConverterThread extends SwingWorker<Void, Void> {
 
 		Log.message("Ending "+name+" after "+loopCount+" loop(s).");
 		
-		return null;
+		return turtle;
 	}
 	
 	@Override
@@ -43,14 +45,12 @@ public class ImageConverterThread extends SwingWorker<Void, Void> {
 		String state;
 
 		if(isCancelled()) {
-			state = "Cancelled";
+			state = "cancelled";
 		} else {
 			chosenConverter.finish();
-			state = "Finished";
+			state = "finished";
 		}
 		
 		Log.message(state+" thread "+name);
-
-		listener.done(this);
 	}
 }

@@ -25,9 +25,7 @@ public class Generator_Package extends TurtleGenerator {
 		return new Generator_Package_Panel(this);
 	}
 
-	
-	void drawRect(int x1,int y1,int x2,int y2)
-	{
+	void drawRect(Turtle turtle,int x1,int y1,int x2,int y2) {
 		turtle.moveTo(x1,y1);
 		turtle.penDown();
 		turtle.moveTo(x2,y1);
@@ -37,8 +35,7 @@ public class Generator_Package extends TurtleGenerator {
 		turtle.penUp();
 	}
 	
-	void drawLine(int x1,int y1,int x2,int y2)
-	{
+	void drawLine(Turtle turtle,int x1,int y1,int x2,int y2) {
 		turtle.moveTo(x1,y1);
 		turtle.penDown();
 		turtle.moveTo(x2,y2);
@@ -65,7 +62,7 @@ public class Generator_Package extends TurtleGenerator {
 		int y7=y6+height+5;
 		
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		turtle.penUp();
 		// show extent
 		turtle.moveTo(x1,y1);
@@ -75,20 +72,20 @@ public class Generator_Package extends TurtleGenerator {
 		turtle.moveTo(x1,y1);
 		// start drawing
 
-		drawRect(x2,y2,x3,y7);
-		drawRect(x1,y3,x4,y6);
+		drawRect(turtle,x2,y2,x3,y7);
+		drawRect(turtle,x1,y3,x4,y6);
 
-		drawLine(x1,y4,x4,y4);
-		drawLine(x1,y5,x4,y5);
+		drawLine(turtle,x1,y4,x4,y4);
+		drawLine(turtle,x1,y5,x4,y5);
 		
-		drawLine(x1,y3,x2,y4); // 4 diags
-		drawLine(x3,y5,x4,y6);
-		drawLine(x1,y6,x2,y5);
-		drawLine(x3,y4,x4,y3);
+		drawLine(turtle,x1,y3,x2,y4); // 4 diags
+		drawLine(turtle,x3,y5,x4,y6);
+		drawLine(turtle,x1,y6,x2,y5);
+		drawLine(turtle,x3,y4,x4,y3);
 
-		drawRect(x2+20,y6-1,x3-20,y6+1); // lasche
-		drawRect(x2,y5-1,x3,y5+1); // lasche
-		drawRect(x2+20,y1,x3-20,y2); // lasche
+		drawRect(turtle,x2+20,y6-1,x3-20,y6+1); // lasche
+		drawRect(turtle,x2,y5-1,x3,y5+1); // lasche
+		drawRect(turtle,x2+20,y1,x3-20,y2); // lasche
 
 		notifyListeners(turtle);
 	}

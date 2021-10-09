@@ -76,7 +76,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 		if(scale1>scale2) scale1=scale2;
 		
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
@@ -98,7 +98,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		// do the curve, one square at a time.
 		while(!fibonacciSequence.isEmpty()) {
 			int o = fibonacciSequence.pop();
-			fibonacciCell(o*scale1);
+			fibonacciCell(turtle,o*scale1);
 		}
 
 		notifyListeners(turtle);
@@ -106,7 +106,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 
 	// L System tree
-	private void fibonacciCell(float size) {
+	private void fibonacciCell(Turtle turtle,float size) {
 		// make the square around the cell
 		turtle.forward(size);
 		turtle.turn(90);

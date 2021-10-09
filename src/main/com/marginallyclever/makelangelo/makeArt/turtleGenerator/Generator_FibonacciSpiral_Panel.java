@@ -23,8 +23,8 @@ public class Generator_FibonacciSpiral_Panel extends TurtleGeneratorPanel {
 		super();
 		this.generator = generator_FibonacciSpiral;
 		
-		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Fibonacci_number'>Learn more</a>"));
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Fibonacci_number'>Learn more</a>"));
 		finish();
 	}
 

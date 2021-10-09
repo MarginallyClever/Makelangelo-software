@@ -42,7 +42,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 		xMin = -v;
 		yMin = -v;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		double xx = xMax - xMin;
 		double yy = yMax - yMin;
@@ -57,28 +57,28 @@ public class Generator_KochCurve extends TurtleGenerator {
 		}
 		
 		turtle.penDown();
-		drawTriangle(order, maxSize);
+		drawTriangle(turtle,order, maxSize);
 
 		notifyListeners(turtle);
 	}
 
 
 	// L System tree
-	private void drawTriangle(int n, double distance) {
+	private void drawTriangle(Turtle turtle,int n, double distance) {
 		if (n == 0) {
 			turtle.forward(distance);
 			return;
 		}
-		drawTriangle(n-1,distance/3.0f);
+		drawTriangle(turtle,n-1,distance/3.0f);
 		if(n>1) {
 			turtle.turn(-60);
-			drawTriangle(n-1,distance/3.0f);
+			drawTriangle(turtle,n-1,distance/3.0f);
 			turtle.turn(120);
-			drawTriangle(n-1,distance/3.0f);
+			drawTriangle(turtle,n-1,distance/3.0f);
 			turtle.turn(-60);
 		} else {
 			turtle.forward(distance/3.0f);
 		}
-		drawTriangle(n-1,distance/3.0f);
+		drawTriangle(turtle,n-1,distance/3.0f);
 	}
 }

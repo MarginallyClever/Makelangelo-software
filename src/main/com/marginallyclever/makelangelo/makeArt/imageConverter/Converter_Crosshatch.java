@@ -1,42 +1,39 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-/**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename,
- * but change the extension to .ngc
- *
- * @author Dan Royer
- */
 public class Converter_Crosshatch extends ImageConverter {
-	private static float intensity=2.0f;
+	private static double intensity=2.0f;
 	
 	@Override
 	public String getName() {
 		return Translator.get("Crosshatch");
 	}
-	
+
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Crosshatch_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("intensity")) {
+			setIntensity((float)((int)evt.getNewValue())/10.0f);
+		}
 	}
 
-	public void setIntensity(float arg0) {
+	public void setIntensity(double arg0) {
 		intensity=arg0;
 	}
 	
-	public float getIntensity() {
+	public double getIntensity() {
 		return intensity;
 	}
 	
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 
 		turtle = new Turtle();
 		double top = 192.0/8.0;
@@ -46,7 +43,7 @@ public class Converter_Crosshatch extends ImageConverter {
 		finishPass(new int[]{(int)(8*top)},45,img);
 	}
 	
-	protected void finishPass(int [] passes,double angleDeg,TransformedImage img) {
+	private void finishPass(int [] passes,double angleDeg,TransformedImage img) {
 		double dx = Math.cos(Math.toRadians(angleDeg));
 		double dy = Math.sin(Math.toRadians(angleDeg));
 

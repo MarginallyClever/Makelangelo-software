@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
@@ -32,8 +30,8 @@ public class SelectColor extends Select {
 	 * @param labelValue
 	 * @param defaultValue
 	 */
-	public SelectColor(final Component parentComponent,String labelValue,ColorRGB defaultValue) {
-		super();
+	public SelectColor(String internalName,String labelValue,ColorRGB defaultValue,final Component parentComponent) {
+		super(internalName);
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
 
@@ -47,22 +45,21 @@ public class SelectColor extends Select {
 		field.setBorder(new LineBorder(Color.BLACK));
 
 		chooseButton = new JButton("...");
-		final Select parent = this;
 		chooseButton.addActionListener(new ActionListener() {
         	@Override
 			public void actionPerformed(ActionEvent e) {
 				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
 				field.setBackground(c);
-				notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",null,null));
+				notifyPropertyChangeListeners(null,c);
 			}
 		});
 
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
 		
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(panel2,BorderLayout.CENTER);
-		panel.add(chooseButton,BorderLayout.LINE_END);
+		myPanel.add(label,BorderLayout.LINE_START);
+		myPanel.add(panel2,BorderLayout.CENTER);
+		myPanel.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
 	public ColorRGB getColor() {
@@ -72,6 +69,6 @@ public class SelectColor extends Select {
 	
 	public void setColor(ColorRGB c) {
 		field.setBackground(new Color(c.red,c.green,c.blue));
-		notifyPropertyChangeListeners(new PropertyChangeEvent(this,"color",null,null));
+		notifyPropertyChangeListeners(null,c);
 	}
 }

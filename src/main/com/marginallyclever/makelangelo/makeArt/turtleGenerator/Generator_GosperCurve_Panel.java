@@ -24,8 +24,8 @@ public class Generator_GosperCurve_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),6,1,Generator_GosperCurve.getOrder()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>Learn more</a>"));
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),6,1,Generator_GosperCurve.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>Learn more</a>"));
 		finish();
 	}
 

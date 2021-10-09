@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
@@ -24,10 +26,11 @@ public class Converter_SpiralPulse extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_SpiralPulse_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("intensity")) setIntensity((double)evt.getNewValue());
+		if(evt.getPropertyName().equals("spacing")) setSpacing((double)evt.getNewValue());
+		if(evt.getPropertyName().equals("height")) setHeight((double)evt.getNewValue());
 	}
-
 
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
@@ -36,7 +39,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 	public void finish() {
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 
 		double toolDiameter = 1;
 

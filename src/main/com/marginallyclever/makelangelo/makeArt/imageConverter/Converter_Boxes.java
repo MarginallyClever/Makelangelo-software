@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
@@ -19,11 +21,11 @@ public class Converter_Boxes extends ImageConverter {
 	public String getName() {
 		return Translator.get("BoxGeneratorName");
 	}
-
-
+	
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Boxes_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("size")) setBoxMaxSize((int)evt.getNewValue());
+		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
 	}
 
 	public void setBoxMaxSize(int arg0) {
@@ -41,14 +43,11 @@ public class Converter_Boxes extends ImageConverter {
 		return cutoff;
 	}
 	
-	/**
-	 * turn the image into a grid of boxes.  box size is affected by source image darkness.
-	 */
 	@Override
 	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop();
@@ -64,7 +63,7 @@ public class Converter_Boxes extends ImageConverter {
 		double steps = pw / fullStep;
 		if (steps < 1) steps = 1;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		// from top to bottom of the image...
 		double x, y, z;
@@ -128,6 +127,7 @@ public class Converter_Boxes extends ImageConverter {
 			}
 		}
 	}
+	
 }
 
 

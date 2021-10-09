@@ -9,7 +9,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
@@ -17,14 +16,9 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
  * @author Dan Royer
  *
  */
-public class SaveDXF extends ImageManipulator implements TurtleSaver {
+public class SaveDXF implements TurtleSaver {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
-	
-	@Override
-	public String getName() {
-		return "DXF";
-	}
-	
+		
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;

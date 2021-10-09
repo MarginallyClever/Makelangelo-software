@@ -14,7 +14,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	
 	@Override
 	public String getVersion() {
-		return "Makelangelo 5";
+		return "5";
 	}
 	
 	@Override

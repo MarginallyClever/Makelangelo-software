@@ -21,14 +21,13 @@ import org.json.JSONTokener;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * LoadAndSaveSB2 loads limited set of Scratch commands into memory. 
  * @author Admin
  */
-public class LoadScratch2 extends ImageManipulator implements TurtleLoader {
+public class LoadScratch2 implements TurtleLoader {
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {

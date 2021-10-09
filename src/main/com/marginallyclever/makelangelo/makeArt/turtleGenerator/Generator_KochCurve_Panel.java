@@ -24,8 +24,8 @@ public class Generator_KochCurve_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(fieldOrder = new SelectSlider(Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Koch_curve'>Learn more</a>"));
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Koch_curve'>Learn more</a>"));
 		finish();
 	}
 

@@ -106,51 +106,29 @@ public class Generator_Text extends TurtleGenerator {
 	}
 	
 	protected void setupTransform() {
-		double imageHeight = myPaper.getPaperHeight()*myPaper.getPaperMargin();
-		double imageWidth = myPaper.getPaperWidth()*myPaper.getPaperMargin();
-
-		double newWidth = imageWidth;
-		double newHeight = imageHeight;
-
-		if (imageWidth > myPaper.getPaperWidth()) {
-			float resize = (float) myPaper.getPaperWidth() / (float) imageWidth;
-			newHeight *= resize;
-			newWidth = myPaper.getPaperWidth();
-		}
-		if (newHeight > myPaper.getPaperHeight()) {
-			float resize = (float) myPaper.getPaperHeight() / (float) newHeight;
-			newWidth *= resize;
-			newHeight = myPaper.getPaperHeight();
-		}
-		newWidth *= myPaper.getPaperMargin();
-		newHeight *= myPaper.getPaperMargin();
-
-		textFindCharsPerLine(newWidth);
-
-		posx = 0;
-		posy = 0;
+		double imageHeight = myPaper.getMarginHeight();
+		double imageWidth = myPaper.getMarginWidth();
+		setupTransform(imageHeight,imageWidth);
 	}
 
 
-	protected void setupTransform(int width, int height) {
-		int imageHeight = height;
-		int imageWidth = width;
+	protected void setupTransform(double width, double height) {
+		double imageHeight = height;
+		double imageWidth = width;
 
 		double newWidth = imageWidth;
 		double newHeight = imageHeight;
 
-		if (imageWidth > myPaper.getPaperWidth()) {
-			float resize = (float) myPaper.getPaperWidth() / (float) imageWidth;
+		if (imageWidth > myPaper.getMarginWidth()) {
+			float resize = (float) myPaper.getMarginWidth() / (float) imageWidth;
 			newHeight *= resize;
-			newWidth = myPaper.getPaperWidth();
+			newWidth = myPaper.getMarginWidth();
 		}
-		if (newHeight > myPaper.getPaperHeight()) {
-			float resize = (float) myPaper.getPaperHeight() / (float) newHeight;
+		if (newHeight > myPaper.getMarginHeight()) {
+			float resize = (float) myPaper.getMarginHeight() / (float) newHeight;
 			newWidth *= resize;
-			newHeight = myPaper.getPaperHeight();
+			newHeight = myPaper.getMarginHeight();
 		}
-		newWidth *= myPaper.getPaperMargin();
-		newHeight *= myPaper.getPaperMargin();
 
 		textFindCharsPerLine(newWidth);
 
@@ -159,9 +137,10 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	
-	private void writeBeautifulMessage(String fontName,int fontSize, String message) {
+	private Turtle writeBeautifulMessage(String fontName,int fontSize, String message) {
+		Turtle turtle = new Turtle();
 		if(message.length()<=0) {
-			return;
+			return turtle;
 		}
 		
 		String[] messagePieces=message.split("\n");
@@ -204,13 +183,14 @@ public class Generator_Text extends TurtleGenerator {
 			//Shape s = textLayout.getOutline(null);
 			//Rectangle bounds = s.getBounds();
 
-			writeBeautifulString(font,frc,piece, dx, dy);
+			writeBeautifulString(turtle,font,frc,piece, dx, dy);
 			
 			dy += fontSize;//bounds.getHeight();
 		}
+		return turtle;
 	}
 	
-	private void writeBeautifulString(Font font, FontRenderContext frc,String text,float dx, float dy) { 
+	private void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,float dx, float dy) { 
 		TextLayout textLayout = new TextLayout(text,font,frc);
 		Shape s = textLayout.getOutline(null);		
 		PathIterator pi = s.getPathIterator(null);
@@ -298,13 +278,12 @@ public class Generator_Text extends TurtleGenerator {
 	public void generate() {
 		String fontName = fontNames[lastFont];
 
-		turtle = new Turtle();
 		posx=0;
 		posy=0;
 		textFindCharsPerLine(myPaper.getPaperWidth()*myPaper.getPaperMargin());
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
-		writeBeautifulMessage(fontName,lastSize,lastMessage);
+		Turtle turtle = writeBeautifulMessage(fontName,lastSize,lastMessage);
 
 		notifyListeners(turtle);
 	}
@@ -397,7 +376,7 @@ public class Generator_Text extends TurtleGenerator {
 		// find size of text block
 		Rectangle2D r = textCalculateBounds(text);
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 
 		if (draw_bounding_box) {
 			// draw bounding box
@@ -426,7 +405,7 @@ public class Generator_Text extends TurtleGenerator {
 				turtle.moveTo(message_start, turtle.getY() + interline);
 			}
 
-			textDrawLine(lines[i]);
+			textDrawLine(turtle,lines[i]);
 		}
 		
 		turtle.penUp();
@@ -473,7 +452,7 @@ public class Generator_Text extends TurtleGenerator {
 		return len;
 	}
 
-	private void textDrawLine(String a1) {
+	private void textDrawLine(Turtle turtle,String a1) {
 		String ud = ALPHABET_FOLDER;
 
 		Log.message( a1 +"("+ a1.length() +")" );
@@ -586,8 +565,8 @@ public class Generator_Text extends TurtleGenerator {
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition(
-				(float)(myPaper.getPaperWidth() *10.0f*myPaper.getPaperMargin()),
-				(float)(myPaper.getPaperHeight()*10.0f*myPaper.getPaperMargin()));
+				(float)(myPaper.getMarginWidth() *10.0f),
+				(float)(myPaper.getMarginHeight()*10.0f));
 
 		textSetCharsPerLine(25);
 

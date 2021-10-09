@@ -32,18 +32,18 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	
 	@Override
 	public void generate() {
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		turtle.setColor(new ColorRGB(255,0,0));
-		lines(10,0);
-		lines(10,90);
+		lines(turtle,10,0);
+		lines(turtle,10,90);
 		turtle.setColor(new ColorRGB(0,0,0));
-		lines(100,0);
-		lines(100,90);
+		lines(turtle,100,0);
+		lines(turtle,100,90);
 
 		notifyListeners(turtle);
 	}
 
-	protected void lines(float stepSize_mm,int angle_deg) {
+	protected void lines(Turtle turtle,float stepSize_mm,int angle_deg) {
 		double majorX = Math.cos(Math.toRadians(angle_deg));
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
@@ -59,8 +59,8 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(myPaper.getMarginRight(),myPaper.getMarginTop());
-		Point2D rMin = new Point2D(myPaper.getMarginLeft(),myPaper.getMarginBottom());
+		Point2D rMax = new Point2D(xRight,yTop);
+		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize_mm) {

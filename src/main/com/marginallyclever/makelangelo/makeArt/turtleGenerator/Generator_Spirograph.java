@@ -11,9 +11,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  *
  */
 public class Generator_Spirograph extends TurtleGenerator {
-	private double xMax,xMin,yMax,yMin;
-	private double totalScale;
-
 	private static double pScale = 80; // controls complexity of curve
 	private static int minorRadius = 2; // controls complexity of curve
 	private static int majorRadius = 100; // controls complexity of curve
@@ -73,52 +70,14 @@ public class Generator_Spirograph extends TurtleGenerator {
 		
 	@Override
 	public void generate() {
-		xMax = Float.NEGATIVE_INFINITY;
-		yMax = Float.NEGATIVE_INFINITY;
-		xMin = Float.POSITIVE_INFINITY;
-		yMin = Float.POSITIVE_INFINITY;
-		
-		// generate the spiral once to find the max/min
-		totalScale=1;
-		turtle = new Turtle();
-		drawSpirograph(false);
-
-		// scale the step size so the spirograph fits on the paper
-		double paperWidth  = myPaper.getMarginWidth();
-		double paperHeight = myPaper.getMarginHeight();
-
-		// Spirographs are not always symmetric, So instead of using width, use 2 * the larger xMax or -xMin, yMax or -yMin
-		// the other option is to translate the position of the spirograph. Also add a small margin to allow for the
-		// Imagemanipulator.EPSILON_MARGIN
-
-		final float MARGIN = 1;
-		float drawingWidth = MARGIN;
-		float drawingHeight = MARGIN;
-
-		if ( xMax > -xMin) {
-			drawingWidth += 2 * xMax;
-		} else {
-			drawingWidth += 2 * -xMin;
-		}
-
-		if ( yMax > -yMin) {
-			drawingHeight += 2 * yMax;
-		} else {
-			drawingHeight += 2 * -yMin;
-		}
-
-		double largestX = paperWidth/drawingWidth;
-		double largestY = paperHeight/drawingHeight;
-		totalScale =  largestX < largestY ? largestX : largestY;
-
-		// draw the spirograph for real this time
-		turtle = new Turtle();
-		drawSpirograph(true);
+		Turtle turtle = drawSpirograph();
 
 		notifyListeners(turtle);
 	}
 	
-	protected void drawSpirograph(boolean write) {
+	protected Turtle drawSpirograph() {
+		Turtle turtle = new Turtle();
+		
 		double x=0,y=0;
 		double dRadius,pScale1,pScale2;
 		
@@ -138,7 +97,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 		// move to starting position
 		x = dRadius*Math.cos(t) + pScale1*Math.cos(dRadius*t/minorRadius);
 		y = dRadius*Math.sin(t) - pScale2*Math.sin(dRadius*t/minorRadius);
-		turtle.moveTo(totalScale*x, totalScale*y);
+		turtle.moveTo(x, y);
 		turtle.penDown();
 
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
@@ -151,13 +110,10 @@ public class Generator_Spirograph extends TurtleGenerator {
 			x = dRadius*Math.cos(t) + pScale1*Math.cos(dRadius*t/minorRadius);
 			y = dRadius*Math.sin(t) - pScale2*Math.sin(dRadius*t/minorRadius);
 
-			turtle.moveTo(totalScale*x, totalScale*y);
-			// we are calculating max/min
-			if(xMin>x) xMin=x;
-			if(xMax<x) xMax=x;
-			if(yMin>y) yMin=y;
-			if(yMax<y) yMax=y;
+			turtle.moveTo(x, y);
 		}
+		
+		return turtle;
 	}
 	
 	/**

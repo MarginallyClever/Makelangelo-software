@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,8 +12,8 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 import com.marginallyclever.voronoi.VoronoiCell;
 import com.marginallyclever.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.voronoi.VoronoiTesselator;
@@ -24,7 +25,7 @@ import com.marginallyclever.voronoi.VoronoiTesselator;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDecorator {
+public class Converter_VoronoiZigZag extends ImageConverter implements PreviewListener {
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -54,13 +55,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_VoronoiZigZag_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("count")) setNumCells((int)evt.getNewValue());
+		if(evt.getPropertyName().equals("min")) setMinDotSize((double)evt.getNewValue());
+		restart();
 	}
 	
 	@Override
 	public void setImage(TransformedImage img) {
-		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		sourceImage = bw.filter(img);
 		
@@ -75,10 +77,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 	}
 
 	public void restart() {
-		if(!keepIterating) {
-			loadImage.reconvert();
-			return;
-		}
 		lowNoise=false;
 		keepIterating=true;
 		initializeCells(0.5);
@@ -325,7 +323,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 		}
 	}
 
-	protected double calculateWeight(int a, int b) {
+	private double calculateWeight(int a, int b) {
 		assert (a >= 0 && a < cells.length);
 		assert (b >= 0 && b < cells.length);
 		double x = cells[a].centroid.x - cells[b].centroid.x;
@@ -334,7 +332,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 	}
 
 	// set some starting points in a grid
-	protected void initializeCells(double minDistanceBetweenSites) {
+	private void initializeCells(double minDistanceBetweenSites) {
 		Log.message("Initializing cells");
 
 		cells = new VoronoiCell[numCells];
@@ -370,7 +368,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 	/**
 	 * Jiggle the dots until they make a nice picture
 	 */
-	protected double evolveCells() {
+	private double evolveCells() {
 		double totalWeight=0;
 		try {
 			while(lock.isLocked());
@@ -387,8 +385,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 		return totalWeight;
 	}
 
-	// write cell centroids to gcode.
-	protected void writeOutCells() {
+	// write cell centroids to a {@link Turtle}.
+	private void writeOutCells() {
 		turtle = new Turtle();
 		
 		if (graphEdges != null) {
@@ -419,7 +417,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 
 	// I have a set of points. I want a list of cell borders.
 	// cell borders are halfway between any point and it's nearest neighbors.
-	protected void tessellateVoronoiDiagram() {
+	private void tessellateVoronoiDiagram() {
 		// convert the cells to sites used in the Voronoi class.
 		int i;
 		for (i = 0; i < numCells; ++i) {
@@ -444,14 +442,13 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 		}
 	}
 
-
 	/**
 	 * Find the weighted center of each cell.
 	 * weight is based on the intensity of the color of each pixel inside the cell
 	 * the center of the pixel must be inside the cell to be counted.
 	 * @return the total magnitude movement of all centers
 	 */
-	protected float adjustCentroids() {
+	private float adjustCentroids() {
 		double totalCellWeight, wx, wy, x, y;
 		double stepSize;
 		double minX,maxX,minY,maxY;
@@ -552,6 +549,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 		if(value<1) value=1;
 		numCells = value;
 	}
+	
 	public int getNumCells() {
 		return numCells;
 	}
@@ -560,6 +558,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PlotterDe
 		if(value<0.001) value=0.001f;
 		minDotSize = value;
 	}
+	
 	public double getMinDotSize() {
 		return minDotSize;
 	}

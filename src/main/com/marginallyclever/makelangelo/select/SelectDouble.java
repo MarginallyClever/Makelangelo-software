@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,8 +26,8 @@ public class SelectDouble extends Select {
 	private double value;
 	private Timer timer;
 
-	public SelectDouble(String labelKey, Locale locale, double defaultValue) {
-		super();
+	public SelectDouble(String internalName,String labelKey, Locale locale, double defaultValue) {
+		super(internalName);
 
 		value = defaultValue;
 		
@@ -41,7 +40,6 @@ public class SelectDouble extends Select {
 		field.setMinimumSize(d);
 		field.setText(StringHelper.formatDouble(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
-		final Select parent = this;
 		field.getDocument().addDocumentListener(new DocumentListener() {
         	@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -62,48 +60,46 @@ public class SelectDouble extends Select {
 			}
 
 			public void validate() {
-				float newNumber;
-
 				try {
-					newNumber = Float.valueOf(field.getText());
+					double newValue = Float.valueOf(field.getText());
+					field.setForeground(UIManager.getColor("Textfield.foreground"));
+					if(value != newValue) {
+						double oldValue = value; 
+						value = newValue;
+						
+						if(timer!=null) timer.cancel();
+						timer = new Timer("Delayed response");
+						timer.schedule(new TimerTask() { 
+							public void run() {
+								notifyPropertyChangeListeners(oldValue,newValue);
+							}
+						}, 100L); // brief delay in case someone is typing fast
+					}
 				} catch (NumberFormatException e) {
 					field.setForeground(Color.RED);
 					return;
 				}
-				
-				field.setForeground(UIManager.getColor("Textfield.foreground"));
-				if(value != newNumber) {
-					value = newNumber;
-					
-					if(timer!=null) timer.cancel();
-					timer = new Timer("Delayed response");
-					timer.schedule(new TimerTask() { 
-						public void run() {
-							notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
-						}
-					}, 100L); // brief delay in case someone is typing fast
-				}
 			}
 		});
 
-		panel.add(label, BorderLayout.LINE_START);
-		panel.add(field, BorderLayout.LINE_END);
+		myPanel.add(label, BorderLayout.LINE_START);
+		myPanel.add(field, BorderLayout.LINE_END);
 	}
 
-	public SelectDouble(String labelKey, Locale locale) {
-		this(labelKey, locale, 0);
+	public SelectDouble(String internalName,String labelKey, Locale locale) {
+		this(internalName,labelKey, locale, 0);
 	}
 
-	public SelectDouble(String labelKey, double defaultValue) {
-		this(labelKey, Locale.getDefault(), defaultValue);
+	public SelectDouble(String internalName,String labelKey, double defaultValue) {
+		this(internalName,labelKey, Locale.getDefault(), defaultValue);
 	}
 
-	public SelectDouble(String labelKey) {
-		this(labelKey, Locale.getDefault(), 0);
+	public SelectDouble(String internalName,String labelKey) {
+		this(internalName,labelKey, Locale.getDefault(), 0);
 	}
 
-	protected SelectDouble() {
-		this("", Locale.getDefault(), 0);
+	protected SelectDouble(String internalName) {
+		this(internalName,"", Locale.getDefault(), 0);
 	}
 
 	public void setReadOnly() {

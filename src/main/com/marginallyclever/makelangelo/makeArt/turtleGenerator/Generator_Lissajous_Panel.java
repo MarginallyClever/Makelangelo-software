@@ -26,11 +26,11 @@ public class Generator_Lissajous_Panel extends TurtleGeneratorPanel {
 		super();
 		this.generator = generator;
 
-		add(field_a = new SelectSlider(Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
-		add(field_b = new SelectSlider(Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
-		add(field_delta = new SelectSlider(Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
-		add(field_numSamples = new SelectSlider(Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Lissajous_curve'>Learn more</a>"));
+		add(field_a = new SelectSlider("a",Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
+		add(field_b = new SelectSlider("b",Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
+		add(field_delta = new SelectSlider("delta",Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
+		add(field_numSamples = new SelectSlider("samples",Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Lissajous_curve'>Learn more</a>"));
 		finish();
 	}
 

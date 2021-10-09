@@ -23,9 +23,9 @@ public class TCPTransportLayerPanel extends TransportLayerPanel {
 		this.layer=tcpLayer;
 		
 		this.setLayout(new GridLayout(0, 1));
-		this.add(new JLabel("IP (a.b.c.d)"));  // TODO translate me?
+		this.add(new JLabel("IP address"));  // TODO translate me
 		this.add(connectionField = new JTextField());
-		this.add(new JLabel("Port"));  // TODO translate me?
+		this.add(new JLabel("Port"));  // TODO translate me
 		this.add(portField = new JTextField());
 		
 		connectionField.setText(connectionName);

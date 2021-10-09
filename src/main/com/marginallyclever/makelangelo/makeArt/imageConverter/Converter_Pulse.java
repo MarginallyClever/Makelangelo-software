@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
@@ -22,8 +24,9 @@ public class Converter_Pulse extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Pulse_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
+		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
 	}
 	
 	public double getScale() {
@@ -81,7 +84,7 @@ public class Converter_Pulse extends ImageConverter {
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 		
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop()   ;

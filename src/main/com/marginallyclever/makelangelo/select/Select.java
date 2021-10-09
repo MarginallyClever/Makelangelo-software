@@ -15,12 +15,13 @@ import javax.swing.JPanel;
  * @since 7.24.0
  */
 public class Select implements FocusListener {
-	protected JPanel panel;
-	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	protected JPanel myPanel= new JPanel();
+	private String myName = "";
 	
-	protected Select() {
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout(2,0));
+	protected Select(String name) {
+		super();
+		myName=name;
+		myPanel.setLayout(new BorderLayout(2,0));
 	}
 	
 	@Override
@@ -29,9 +30,17 @@ public class Select implements FocusListener {
 	@Override
 	public void focusLost(FocusEvent e) {}
 	
-	JPanel getPanel() {
-		return panel;
+	public JPanel getPanel() {
+		return myPanel;
 	}
+
+	public String getMyName() {
+		return myName;
+	}
+
+	// OBSERVER PATTERN
+	
+	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);
@@ -41,7 +50,8 @@ public class Select implements FocusListener {
 		propertyChangeListeners.remove(p);
 	}
 	
-	public void notifyPropertyChangeListeners(PropertyChangeEvent evt) {
+	public void notifyPropertyChangeListeners(Object oldValue,Object newValue) {
+		PropertyChangeEvent evt = new PropertyChangeEvent(this,myName,oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);
 		}

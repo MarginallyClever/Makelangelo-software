@@ -1,10 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
@@ -18,26 +14,22 @@ public class SelectBoolean extends Select {
 	private JLabel label;
 	private JCheckBox field;
 	
-	public SelectBoolean(String labelKey,boolean arg0) {
-		super();
+	public SelectBoolean(String internalName,String labelKey,boolean arg0) {
+		super(internalName);
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
 		
 		field = new JCheckBox();
 		field.setSelected(arg0);
 		field.setBorder(new EmptyBorder(0,0,0,0));
-		final Select parent = this;
-		field.addItemListener(new ItemListener() {
-        	@Override
-			public void itemStateChanged(ItemEvent e) {
-				boolean newValue = field.isSelected();
-				boolean oldValue = !newValue;
-				notifyPropertyChangeListeners(new PropertyChangeEvent(parent, "value", oldValue, newValue));
-			}
+		field.addItemListener((e)-> {
+			boolean newValue = field.isSelected();
+			boolean oldValue = !newValue;
+			notifyPropertyChangeListeners(oldValue, newValue);
 		});
 
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		myPanel.add(label,BorderLayout.LINE_START);
+		myPanel.add(field,BorderLayout.LINE_END);
 	}
 	
 	public boolean isSelected() {

@@ -43,10 +43,10 @@ public class SelectTests {
 	@Test
 	public void testBoolean() {
 		// test contructor(s)
-		SelectBoolean b = new SelectBoolean("test",true);
+		SelectBoolean b = new SelectBoolean("test","test",true);
 		assertTrue(b.isSelected());
 		// test constructor works
-		b = new SelectBoolean("test2",false);
+		b = new SelectBoolean("test2","test2",false);
 		assertFalse(b.isSelected());
 		
 		panel.add(b);
@@ -73,7 +73,7 @@ public class SelectTests {
 	@Test
 	public void testButton() {
 		// test contructor(s)
-		SelectButton b = new SelectButton("test");
+		SelectButton b = new SelectButton("test","test");
 		panel.add(b);
 
 		// test observer fires
@@ -92,14 +92,14 @@ public class SelectTests {
 	@Test
 	public void testColor() {
 		// test contructor(s)
-		SelectColor b = new SelectColor(frame,"test",new ColorRGB(0,0,0));
+		SelectColor b = new SelectColor("test","test",new ColorRGB(0,0,0),frame);
 		ColorRGB c = b.getColor();
 		assertTrue(c.red  ==0);
 		assertTrue(c.green==0);
 		assertTrue(c.blue ==0);
 		
 		// test constructor sets value ok.
-		b = new SelectColor(frame,"test2",new ColorRGB(1,2,3));
+		b = new SelectColor("test2","test2",new ColorRGB(1,2,3),frame);
 		c = b.getColor();
 		assertTrue(c.red  ==1);
 		assertTrue(c.green==2);
@@ -129,9 +129,9 @@ public class SelectTests {
 	@Test
 	public void testFile() {
 		// test contructor(s)
-		SelectFile b = new SelectFile("test",null);
+		SelectFile b = new SelectFile("test","test",null);
 		assert(b.getText().isEmpty());
-		b = new SelectFile("test2","something");
+		b = new SelectFile("test2","test2","something");
 		assert(b.getText().contentEquals("something"));
 		
 		panel.add(b);
@@ -153,9 +153,9 @@ public class SelectTests {
 	@Test
 	public void testFloat() {
 		// test contructor(s)
-		SelectDouble b = new SelectDouble("test",0);
+		SelectDouble b = new SelectDouble("test","test",0);
 		assertEquals(0.0f,b.getValue(),1e-6);
-		b = new SelectDouble("test2",0.1f);
+		b = new SelectDouble("test2","test2",0.1f);
 		assertEquals(0.1f,b.getValue(),1e-6);
 		
 		panel.add(b);
@@ -177,9 +177,9 @@ public class SelectTests {
 	@Test
 	public void testInteger() {
 		// test contructor(s)
-		SelectInteger b = new SelectInteger("test",0);
+		SelectInteger b = new SelectInteger("test","test",0);
 		assertTrue(b.getValue()==0);
-		b = new SelectInteger("test2",1);
+		b = new SelectInteger("test2","test2",1);
 		assertTrue(b.getValue()==1);
 		
 		panel.add(b);
@@ -203,10 +203,10 @@ public class SelectTests {
 		String [] list = {"a","b","c","d"};
 		
 		// test contructor(s)
-		SelectOneOfMany b = new SelectOneOfMany("test",list,0);
+		SelectOneOfMany b = new SelectOneOfMany("test","test",list,0);
 		assertTrue(b.getSelectedIndex()==0);
 		assertTrue(b.getSelectedItem().contentEquals("a"));
-		b = new SelectOneOfMany("test2",list,1);
+		b = new SelectOneOfMany("test2","test2",list,1);
 		assertTrue(b.getSelectedIndex()==1);
 		assertTrue(b.getSelectedItem().contentEquals("b"));
 		
@@ -230,9 +230,9 @@ public class SelectTests {
 	@Test
 	public void testSlider() {
 		// test contructor(s)
-		SelectSlider b = new SelectSlider("test",100,0,10);
+		SelectSlider b = new SelectSlider("test","test",100,0,10);
 		assertTrue(b.getValue()==10);
-		b = new SelectSlider("test2",100,0,20);
+		b = new SelectSlider("test2","test2",100,0,20);
 		assertTrue(b.getValue()==20);
 		
 		panel.add(b);
@@ -256,9 +256,9 @@ public class SelectTests {
 	@Test
 	public void testTextArea() {
 		// test contructor(s)
-		SelectTextArea b = new SelectTextArea("test","first test");
+		SelectTextArea b = new SelectTextArea("test","test","first test");
 		assertTrue(b.getText().contentEquals("first test"));
-		b = new SelectTextArea("test2","second test");
+		b = new SelectTextArea("test2","test2","second test");
 		assertTrue(b.getText().contentEquals("second test"));
 		
 		panel.add(b);

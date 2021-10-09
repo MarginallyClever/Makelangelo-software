@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.select;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Timer;
@@ -30,8 +29,8 @@ public class SelectInteger extends Select {
 	private int value;
 	private Timer timer=null;
 
-	public SelectInteger(String labelKey,Locale locale,int defaultValue) {
-		super();
+	public SelectInteger(String internalName,String labelKey,Locale locale,int defaultValue) {
+		super(internalName);
 		
 		value = defaultValue;
 		
@@ -45,9 +44,6 @@ public class SelectInteger extends Select {
 		field.setMinimumSize(d);
 		field.setValue((Integer)defaultValue);
 		field.setHorizontalAlignment(JTextField.RIGHT);
-
-		final Select parent = this;
-
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -65,19 +61,18 @@ public class SelectInteger extends Select {
 			}
 			
 			public void validate() {
-				int newNumber;
-				
 				try {
-					newNumber = Integer.valueOf(field.getText());
+					int newNumber = Integer.valueOf(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newNumber) {
+						int oldValue = value;
 						value = newNumber;
 						
 						if(timer!=null) timer.cancel();
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								notifyPropertyChangeListeners(new PropertyChangeEvent(parent,"value",value,newNumber));
+								notifyPropertyChangeListeners(oldValue,newNumber);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}
@@ -88,20 +83,20 @@ public class SelectInteger extends Select {
 			}
 		});
 
-		panel.add(label,BorderLayout.LINE_START);
-		panel.add(field,BorderLayout.LINE_END);
+		myPanel.add(label,BorderLayout.LINE_START);
+		myPanel.add(field,BorderLayout.LINE_END);
 	}
 
-	public SelectInteger(String labelKey,Locale locale) {
-		this(labelKey,locale,0);
+	public SelectInteger(String internalName,String labelKey,Locale locale) {
+		this(internalName,labelKey,locale,0);
 	}
 	
-	public SelectInteger(String labelKey,int defaultValue) {
-		this(labelKey,Locale.getDefault(),defaultValue);
+	public SelectInteger(String internalName,String labelKey,int defaultValue) {
+		this(internalName,labelKey,Locale.getDefault(),defaultValue);
 	}
 	
-	public SelectInteger() {
-		super();
+	public SelectInteger(String internalName) {
+		super(internalName);
 		createAndAttachFormatter(Locale.getDefault());
 	}
 	

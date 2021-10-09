@@ -23,7 +23,7 @@ public class Generator_FillPage_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(angle = new SelectDouble(Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
+		add(angle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
 		finish();
 	}
 

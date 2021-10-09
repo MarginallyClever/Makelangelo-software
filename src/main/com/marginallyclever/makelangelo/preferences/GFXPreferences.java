@@ -19,10 +19,10 @@ public class GFXPreferences {
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		
 		panel = new SelectPanel();
-		showPenUpCheckbox = new SelectBoolean(Translator.get("MenuGraphicsPenUp"),prefs.getBoolean("show pen up", false));
-		antialiasOnCheckbox = new SelectBoolean(Translator.get("MenuGraphicsAntialias"),prefs.getBoolean("antialias", true));
-		speedOverQualityCheckbox = new SelectBoolean(Translator.get("MenuGraphicsSpeedVSQuality"),prefs.getBoolean("speed over quality", true));
-		drawAllWhileRunningCheckbox = new SelectBoolean(Translator.get("MenuGraphicsDrawWhileRunning"),prefs.getBoolean("Draw all while running", true));
+		showPenUpCheckbox = new SelectBoolean("penup",Translator.get("MenuGraphicsPenUp"),prefs.getBoolean("show pen up", false));
+		antialiasOnCheckbox = new SelectBoolean("antialias",Translator.get("MenuGraphicsAntialias"),prefs.getBoolean("antialias", true));
+		speedOverQualityCheckbox = new SelectBoolean("SpeedVSQuality",Translator.get("MenuGraphicsSpeedVSQuality"),prefs.getBoolean("speed over quality", true));
+		drawAllWhileRunningCheckbox = new SelectBoolean("drawWhileRunning",Translator.get("MenuGraphicsDrawWhileRunning"),prefs.getBoolean("Draw all while running", true));
 
 		panel.add(showPenUpCheckbox);
 		panel.add(drawAllWhileRunningCheckbox);

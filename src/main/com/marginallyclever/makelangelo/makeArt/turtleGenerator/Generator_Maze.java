@@ -23,7 +23,7 @@ public class Generator_Maze extends TurtleGenerator {
 	}
 
 	protected static int rows = 5, columns = 5;
-	protected float xMax, xMin, yMax, yMin;
+	protected double xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
 	
@@ -136,21 +136,21 @@ public class Generator_Maze extends TurtleGenerator {
 		}
 
 		// draw the maze
-		drawMaze();
+		Turtle turtle = drawMaze();
 
 		notifyListeners(turtle);
 	}
 
-	private void drawMaze() {
-		yMin = (float)myPaper.getMarginBottom();
-		yMax = (float)myPaper.getMarginTop();
-		xMin = (float)myPaper.getMarginLeft();
-		xMax = (float)myPaper.getMarginRight();
+	private Turtle drawMaze() {
+		yMin = myPaper.getMarginBottom();
+		yMax = myPaper.getMarginTop();
+		xMin = myPaper.getMarginLeft();
+		xMax = myPaper.getMarginRight();
 		
-		float w = (xMax - xMin) / columns;
-		float h = (yMax - yMin) / rows;
+		double w = (xMax - xMin) / columns;
+		double h = (yMax - yMin) / rows;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		
 		// Draw outside edge
 		turtle.jumpTo(xMin, yMax);
@@ -174,20 +174,21 @@ public class Generator_Maze extends TurtleGenerator {
 			int by = cells[b].y;
 			if (ay == by) {
 				// vertical wall
-				float x = xMin + (ax + 1) * w;
-				float y0 = yMin + (ay + 0) * h;
-				float y1 = yMin + (ay + 1) * h;
+				double x = xMin + (ax + 1) * w;
+				double y0 = yMin + (ay + 0) * h;
+				double y1 = yMin + (ay + 1) * h;
 				turtle.jumpTo(x, y0);
 				turtle.moveTo(x, y1);
 			} else if (ax == bx) {
 				// horizontal wall
-				float x0 = xMin + (ax + 0) * w;
-				float x1 = xMin + (ax + 1) * w;
-				float y = yMin + (ay + 1) * h;
+				double x0 = xMin + (ax + 0) * w;
+				double x1 = xMin + (ax + 1) * w;
+				double y = yMin + (ay + 1) * h;
 				turtle.jumpTo(x0, y);
 				turtle.moveTo(x1, y);
 			}
 		}
+		return turtle;
 	}
 
 	private int chooseUnvisitedNeighbor(int currentCell) {

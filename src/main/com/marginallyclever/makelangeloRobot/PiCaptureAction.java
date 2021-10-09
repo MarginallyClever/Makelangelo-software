@@ -325,7 +325,7 @@ public class PiCaptureAction extends AbstractAction {
 
 		if (useImage) {
 			// process the image
-			makelangeloApp.openFileOnDemand("/home/pi/Pictures/capture.jpg");
+			makelangeloApp.openLoadFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
 

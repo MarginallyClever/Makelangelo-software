@@ -17,7 +17,7 @@ public class StartAtPanel extends SelectPanel {
 	private boolean findPreviousPenDown = true;
 	private boolean addPenDownCommand = false;
 
-	private SelectInteger starting_line = new SelectInteger("StartAtLine",0);
+	private SelectInteger starting_line = new SelectInteger("lineNumber","StartAtLine",0);
 	private SelectOneOfMany comboBox;
 	private String [] optionsList;
 	
@@ -32,7 +32,7 @@ public class StartAtPanel extends SelectPanel {
 			Translator.get("StartAtExactly"),
 		};
 
-		comboBox = new SelectOneOfMany(Translator.get("StartAt"),optionsList,0);
+		comboBox = new SelectOneOfMany("startAt",Translator.get("StartAt"),optionsList,0);
 
 		this.add(comboBox);		
 	}

@@ -25,17 +25,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -48,7 +44,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
@@ -57,10 +52,7 @@ import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
 import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
-import com.marginallyclever.makelangelo.makeArt.io.image.LoadImage;
-import com.marginallyclever.makelangelo.makeArt.io.image.LoadImagePanel;
-import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleLoader;
+import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
@@ -115,19 +107,15 @@ public final class Makelangelo {
 	// GUI elements
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
-
-	private JMenuItem buttonNewFile;
-	private JMenuItem buttonOpenFile;
-	private JMenuItem buttonReopenFile;
-
-	private SaveDialog saveDialog;
-	private LoadDialog loadDialog;	
-
 	private static JFrame logFrame;
+	private JMenuItem buttonReopenFile;
+	private SaveDialog saveDialog;
+	
+	private String previousFile;
 
 	private PiCaptureAction piCameraCaptureAction;
 	
-	// for drag + drop operations
+	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
 	
@@ -155,7 +143,6 @@ public final class Makelangelo {
 	}
 
 	public Makelangelo() {
-		
 		Log.message("Locale="+Locale.getDefault().toString());
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
 		
@@ -174,7 +161,6 @@ public final class Makelangelo {
 		});
 
 		saveDialog = new SaveDialog();
-		loadDialog = new LoadDialog();
 		
 		Log.message("Starting virtual camera...");
 		camera = new Camera();
@@ -324,20 +310,20 @@ public final class Makelangelo {
 	private JMenu createFileMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
 
-		buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
+		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener((e) -> newFile());
 		menu.add(buttonNewFile);
 
-		buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener((e) -> openFile());
+		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
+		buttonOpenFile.addActionListener((e) -> openLoadFile(""));
 		menu.add(buttonOpenFile);
-		
+				
 		buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
 		buttonReopenFile.addActionListener((e) -> reopenLastFile());
 		buttonReopenFile.setEnabled(false);
 		menu.add(buttonReopenFile);		
 		
-		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveGCODEAs"));
+		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
 		menu.add(buttonSaveFile);
 
@@ -362,6 +348,29 @@ public final class Makelangelo {
 		menu.add(buttonExit);
 
 		return menu;
+	}
+
+	public void openLoadFile(String previousFile) {
+		Log.message("Loading file...");
+		try {
+			LoadFilePanel loader = new LoadFilePanel(myPaper,previousFile);
+			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
+			previewPanel.addListener(loader);
+			
+			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
+			dialog.add(loader);
+			dialog.setLocationRelativeTo(mainFrame);
+			dialog.setMinimumSize(new Dimension(500,500));
+			dialog.pack();
+			dialog.setVisible(true);
+			
+			previewPanel.removeListener(loader);
+			previousFile = loader.getLastFileIn();
+			buttonReopenFile.setEnabled(true);
+		} catch(Exception e) {
+			Log.error("Load error: "+e.getMessage()); 
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void runFirmwareUpdate() {
@@ -570,7 +579,7 @@ public final class Makelangelo {
 			        			if( list.size()>0 ) {
 			        				o = list.get(0);
 			        				if( o instanceof File ) {
-			        					openFileOnDemand(((File)o).getAbsolutePath());
+			        					openLoadFile(((File)o).getAbsolutePath());
 						        		dtde.dropComplete(true);
 			        					return;
 			        				}
@@ -672,76 +681,8 @@ public final class Makelangelo {
 		return myPlotter;
 	}
 	
-	/**
-	 * Open a file with a given LoadAndSaveFileType plugin.  
-	 * The loader might spawn a new thread and return before the load is actually finished.
-	 * @param filename absolute path of the file to load
-	 * @param loader the plugin to use
-	 * @return true if load is successful.
-	 */
-	private boolean openFileOnDemandWithLoader(String filename,TurtleLoader loader) {
-		boolean success = false;
-		try(final InputStream fileInputStream = new FileInputStream(filename)) {
-			if(loader instanceof LoadImage) {
-				LoadImage imageLoader = (LoadImage)loader;
-				imageLoader.load(fileInputStream);
-				runImageConversionProcess(imageLoader);
-			} else {
-				setTurtle(loader.load(fileInputStream));
-			}
-			success=true;
-		} catch(Exception e) {
-			Log.error("Load error: "+e.getLocalizedMessage()); 
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
-		}
-
-		return success;
-	}
-	
-	private void runImageConversionProcess(LoadImage imageLoader) {
-		LoadImagePanel panel = new LoadImagePanel(imageLoader);
-		panel.run(mainFrame);
-	}
-	
-	/**
-	 * User has asked that a file be opened.
-	 * @param filename the file to be opened.
-	 * @return true if file was loaded successfully.  false if it failed.
-	 */
-	public boolean openFileOnDemand(String filename) {
-		Log.message(Translator.get("OpeningFile") + filename + "...");
-
-		TurtleFactory.getLoadExtensions();
-		ServiceLoader<TurtleLoader> imageLoaders = ServiceLoader.load(TurtleLoader.class);
-		Iterator<TurtleLoader> i = imageLoaders.iterator();
-		while(i.hasNext()) {
-			TurtleLoader loader = i.next();
-			if(!loader.canLoad(filename)) continue;
-			
-			return openFileOnDemandWithLoader(filename,loader);
-		}
-		
-		Log.error(Translator.get("UnknownFileType"));
-		return false;
-	}
-
 	public void reopenLastFile() {
-		openFileOnDemand(loadDialog.getLastFileIn());
-	}
-
-	public void openFile() {
-		Log.message("Opening vector file...");
-		try {
-			Turtle t = loadDialog.run(mainFrame);
-			if(t!=null) {
-				Log.message("Load success!");
-				buttonReopenFile.setEnabled(true);
-			}
-		}
-		catch(Exception e) {
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
-			Log.error(e.getLocalizedMessage());
-		}
+		openLoadFile(previousFile);
 	}
 		
 	private void saveFile() {

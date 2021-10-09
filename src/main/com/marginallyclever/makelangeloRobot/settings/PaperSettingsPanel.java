@@ -90,20 +90,20 @@ public class PaperSettingsPanel extends SelectPanel {
 			commonPaperNames[i+1] = commonPaperSizes[i].toString();
 		}
 		
-		add(paperSizes = new SelectOneOfMany(Translator.get("PaperSize"),commonPaperNames,0));
+		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSize"),commonPaperNames,0));
 		double top = myPaper.getPaperTop();
 		double bot = myPaper.getPaperBottom();
 		double left = myPaper.getPaperLeft();
 		double right = myPaper.getPaperRight();
 		double rot = myPaper.getRotation();
-		add(pw = new SelectDouble(Translator.get("PaperWidth"),(float)(right-left)));
-		add(ph = new SelectDouble(Translator.get("PaperHeight"),(float)(top-bot))); 
-		add(sx = new SelectDouble("Shift X",(float)(left+right)/2.0f)); 
-		add(sy = new SelectDouble("Shift y",(float)(top+bot)/2.0f)); 
-		add(ang = new SelectDouble("Rotation",(float)rot));
-		add(isLandscape = new SelectBoolean("\u21cb",false));
-		add(paperMargin = new SelectSlider(Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
-		add(paperColor = new SelectColor(interiorPanel,Translator.get("paper color"),myPaper.getPaperColor()));
+		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(float)(right-left)));
+		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(float)(top-bot))); 
+		add(sx = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
+		add(sy = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
+		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
+		add(isLandscape = new SelectBoolean("landscape","\u21cb",false));
+		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
+		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),interiorPanel));
 		finish();
 		updateValues();
 	}

@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -24,13 +26,14 @@ public class Converter_CMYK extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_CMYK_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("passes")) setPasses((int)evt.getNewValue());
 	}
 	
 	public int getPasses() {
 		return passes;
 	}
+	
 	public void setPasses(int value) {
 		if(passes<1) passes=1;
 		passes=value;
@@ -42,7 +45,7 @@ public class Converter_CMYK extends ImageConverter {
 	@Override
 	public void finish() {
 		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(sourceImage);
+		cmyk.filter(myImage);
 		
 		turtle = new Turtle();
 		
@@ -50,7 +53,6 @@ public class Converter_CMYK extends ImageConverter {
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
 		Log.message("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
 		Log.message("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
-		Log.message("Finishing...");
 	}
 	
 	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {

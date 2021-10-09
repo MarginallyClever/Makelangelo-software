@@ -165,7 +165,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 		return new Generator_Polyeder_Panel(this);
 	}
 
-	void geneneratePolygonStep(Transform t) {
+	private void geneneratePolygonStep(Turtle turtle,Transform t) {
 		int i;
 		if(models == null) return;
 		if(modelid < 0 || modelid >= models.size()) return;
@@ -230,7 +230,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 				t1.walk(new Point2D(size/(2*Math.tan(Math.PI/code)),0));
 				t1.rotate(Math.PI);
 				// recursion.
-				geneneratePolygonStep(t1);
+				geneneratePolygonStep(turtle,t1);
 			}
 		}
 	}
@@ -239,12 +239,12 @@ public class Generator_Polyeder extends TurtleGenerator {
 	public void generate() {
 		instructionPtr=0;
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		turtle.penUp();
 
 		Transform t = new Transform();
 		Log.message("start");
-		geneneratePolygonStep(t);
+		geneneratePolygonStep(turtle,t);
 		Log.message("end");
 
 		notifyListeners(turtle);

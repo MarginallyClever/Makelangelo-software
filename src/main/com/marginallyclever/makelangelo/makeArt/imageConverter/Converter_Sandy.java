@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import java.beans.PropertyChangeEvent;
+
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
@@ -14,16 +16,15 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Sandy extends ImageConverter {
 	private static int blockScale=150;
 	private static int direction=0;
-	private String [] directionChoices = new String[]{ 
-			Translator.get("top right"),
-			Translator.get("top left"), 
-			Translator.get("bottom left"), 
-			Translator.get("bottom right"), 
-			Translator.get("center")
-			};
+	private String [] directionChoices = new String[] { 
+		Translator.get("top right"),
+		Translator.get("top left"), 
+		Translator.get("bottom left"), 
+		Translator.get("bottom right"), 
+		Translator.get("center")
+	};
 	
 	public Converter_Sandy() {}
-	
 	
 	@Override
 	public String getName() {
@@ -31,14 +32,15 @@ public class Converter_Sandy extends ImageConverter {
 	}
 
 	@Override
-	public ImageConverterPanel getPanel() {
-		return new Converter_Sandy_Panel(this);
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(evt.getPropertyName().equals("rings")) setScale((int)evt.getNewValue());
+		if(evt.getPropertyName().equals("direction")) setDirection((int)evt.getNewValue());
 	}
 	
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		TransformedImage img = bw.filter(sourceImage);
+		TransformedImage img = bw.filter(myImage);
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin

@@ -29,22 +29,18 @@ import org.kabeja.parser.ParserBuilder;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * @author Dan Royer
  *
  */
-public class LoadDXF extends ImageManipulator implements TurtleLoader {
+public class LoadDXF implements TurtleLoader {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
+	private Turtle myTurtle;
 	
-	@Override
-	public String getName() {
-		return "DXF";
-	}
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -153,7 +149,7 @@ public class LoadDXF extends ImageManipulator implements TurtleLoader {
 		imageCenterX = (bounds.getMaximumX() + bounds.getMinimumX()) / 2.0;
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
 
-		turtle = new Turtle();
+		myTurtle = new Turtle();
 		
 		// convert each entity
 		Iterator<?> layerIter = doc.getDXFLayerIterator();
@@ -169,7 +165,7 @@ public class LoadDXF extends ImageManipulator implements TurtleLoader {
 			}
 
 			// ignore the color index, DXF is dumb.
-			turtle.setColor(new ColorRGB(0,0,0));
+			myTurtle.setColor(new ColorRGB(0,0,0));
 			
 			// Sort the entities on this layer into the buckets.
 			// Buckets are arranged in an XY grid.
@@ -201,7 +197,7 @@ public class LoadDXF extends ImageManipulator implements TurtleLoader {
 			}
 		}
 
-		return turtle;
+		return myTurtle;
 	}
 
 	private void parseEntity(DXFEntity e) {
@@ -267,8 +263,8 @@ public class LoadDXF extends ImageManipulator implements TurtleLoader {
 	}
 	
 	private void parseDXFLineEnds(double x,double y,double x2,double y2) {
-		turtle.jumpTo(x,y);
-		turtle.moveTo(x2,y2);
+		myTurtle.jumpTo(x,y);
+		myTurtle.moveTo(x2,y2);
 		previousX = x2;
 		previousY = y2;
 	}
@@ -332,10 +328,10 @@ public class LoadDXF extends ImageManipulator implements TurtleLoader {
 	
 	private void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
 		if (first == true) {
-			turtle.jumpTo(x,y);
+			myTurtle.jumpTo(x,y);
 		} else {
-			turtle.penDown();
-			turtle.moveTo(x,y);
+			myTurtle.penDown();
+			myTurtle.moveTo(x,y);
 		}
 		previousX = x;
 		previousY = y;

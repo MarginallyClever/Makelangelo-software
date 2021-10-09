@@ -46,12 +46,12 @@ public class Generator_FillPage extends TurtleGenerator {
 		double dx = (xRight - xLeft)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(myPaper.getMarginRight(),myPaper.getMarginTop());
-		Point2D rMin = new Point2D(myPaper.getMarginLeft(),myPaper.getMarginBottom());
+		Point2D rMax = new Point2D(xRight,yTop);
+		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize) {

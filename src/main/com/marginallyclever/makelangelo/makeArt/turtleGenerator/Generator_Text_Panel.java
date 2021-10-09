@@ -27,9 +27,9 @@ public class Generator_Text_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 
-		add(fontChoices = new SelectOneOfMany(Translator.get("FontFace"),generator.getFontNames(),generator.getLastFont()));
-		add(size = new SelectInteger(Translator.get("TextSize"),generator.getLastSize()));
-		add(text = new SelectTextArea(Translator.get("TextMessage"),generator.getLastMessage()));
+		add(fontChoices = new SelectOneOfMany("face",Translator.get("FontFace"),generator.getFontNames(),generator.getLastFont()));
+		add(size = new SelectInteger("size",Translator.get("TextSize"),generator.getLastSize()));
+		add(text = new SelectTextArea("message",Translator.get("TextMessage"),generator.getLastMessage()));
 		finish();
 	}
 

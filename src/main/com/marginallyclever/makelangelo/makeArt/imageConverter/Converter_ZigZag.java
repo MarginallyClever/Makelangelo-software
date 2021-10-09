@@ -1,21 +1,17 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-
 import java.awt.Point;
-import java.io.IOException;
-import java.io.Writer;
+import java.beans.PropertyChangeEvent;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_DitherFloydSteinberg;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.PlotterDecorator;
-
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -23,7 +19,8 @@ import com.marginallyclever.makelangeloRobot.PlotterDecorator;
  *
  * @author Dan
  */
-public class Converter_ZigZag extends ImageConverter implements PlotterDecorator {
+@Deprecated
+public class Converter_ZigZag extends ImageConverter implements PreviewListener {
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;
@@ -38,13 +35,12 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 	
 	private ReentrantLock lock = new ReentrantLock();
 
-	
+	@Override
 	public String getName() {
 		return Translator.get("ZigZagName");
 	}
 
-
-	public String formatTime(long millis) {
+	private String formatTime(long millis) {
 		String elapsed = "";
 		long s = millis / 1000;
 		long m = s / 60;
@@ -57,8 +53,7 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		return elapsed;
 	}
 
-
-	public void updateProgress(double len, int color) {
+	private void updateProgress(double len, int color) {
 		t_elapsed = System.currentTimeMillis() - t_start;
 		double new_progress = 100.0 * (double) t_elapsed / (double) time_limit;
 		if (new_progress > progress + 0.1) {
@@ -73,10 +68,9 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		}
 	}
 
-
 	// we have s1,s2...e-1,e
 	// check if s1,e-1,...s2,e is shorter
-	public int flipTests() {
+	private int flipTests() {
 		int start, end, j, once = 0;
 
 		for (start = 0; start < numPoints - 2 && !isThreadCancelled(); ++start) {
@@ -121,7 +115,7 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		return once;
 	}
 
-
+	@Override
 	public void render(GL2 gl2) {
 		if (points == null || solution == null) return;
 
@@ -140,15 +134,13 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		lock.unlock();
 	}
 
-
-	protected float calculateWeight(int a, int b) {
+	private float calculateWeight(int a, int b) {
 		float x = points[a].x - points[b].x;
 		float y = points[a].y - points[b].y;
 		return x * x + y * y;
 	}
 
-
-	private void generateTSP(Writer out) throws IOException {
+	private void generateTSP() {
 		greedyTour();
 
 		Log.message("Running Kernighan–Lin optimization...");
@@ -173,9 +165,8 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 			updateProgress(len, 2);
 		}
 
-		convertAndSaveToGCode(out);
+		convertAndSaveToGCode();
 	}
-
 
 	private double calculateLength(int a, int b) {
 		return Math.sqrt(calculateWeight(a, b));
@@ -233,13 +224,12 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		} while (scount < numPoints);
 	}
 
-
 	/**
 	 * Open a file and write out the edge list as a set of GCode commands.
 	 * Since all the points are connected in a single loop,
 	 * start at the tsp point closest to the calibration point and go around until you get back to the start.
 	 */
-	private void convertAndSaveToGCode(Writer out) throws IOException {
+	private void convertAndSaveToGCode() {
 		// find the tsp point closest to the calibration point
 		int i;
 		int besti = -1;
@@ -269,8 +259,7 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		turtle.penUp();
 	}
 
-
-	protected void connectTheDots(TransformedImage img) {
+	private void connectTheDots() {
 		// from top to bottom of the margin area...
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop()   ;
@@ -283,7 +272,7 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		numPoints = 0;
 		for (y = yBottom; y < yTop; ++y) {
 			for (x = xLeft; x < xRight; ++x) {
-				i = img.sample1x1(x, y);
+				i = myImage.sample1x1(x, y);
 				if (i == 0) {
 					++numPoints;
 				}
@@ -298,7 +287,7 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		numPoints = 0;
 		for (y = yBottom; y < yTop; ++y) {
 			for (x = xLeft; x < xRight; ++x) {
-				i = img.sample1x1(x, y);
+				i = myImage.sample1x1(x, y);
 				if (i == 0) {
 					Point p = new Point();
 					p.setLocation( x, y );
@@ -308,26 +297,25 @@ public class Converter_ZigZag extends ImageConverter implements PlotterDecorator
 		}
 	}
 
-	/**
-	 * The main entry point
-	 *
-	 * @param img the image to convert.
-	 */
-	public boolean convert(TransformedImage img,Writer out) throws IOException {
+	public void finish() {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		img = bw.filter(img);
+		myImage = bw.filter(myImage);
 
 		// Dither
 		Filter_DitherFloydSteinberg fs = new Filter_DitherFloydSteinberg();
-		img = fs.filter(img);
+		myImage = fs.filter(myImage);
 
 		// connect the dots
-		connectTheDots(img);
+		connectTheDots();
 		// Shorten the line that connects the dots
-		generateTSP(out);
+		generateTSP();
+	}
 
-		return true;
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

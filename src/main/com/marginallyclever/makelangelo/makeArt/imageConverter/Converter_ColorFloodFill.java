@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;
 
 import com.marginallyclever.convenience.ColorPalette;
@@ -19,6 +20,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  * @since 7.1.4
  */
+@Deprecated
 public class Converter_ColorFloodFill extends ImageConverter {
 	private ColorPalette palette;
 	private float diameter;
@@ -208,9 +210,11 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	 *
 	 * @param img the image to convert.
 	 */
-	public boolean convert(TransformedImage img) {
+
+	@Override
+	public void finish() {
 		Filter_GaussianBlur blur = new Filter_GaussianBlur(1);
-		img = blur.filter(img);
+		TransformedImage img = blur.filter(myImage);
 		//    Histogram h = new Histogram();
 		//    h.getHistogramOf(img);
 
@@ -242,9 +246,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		scanColor(3);  // blue
 
 		turtle.penUp();
-		
-		return true;
 	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {}
 }
 
 

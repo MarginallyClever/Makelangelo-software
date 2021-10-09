@@ -21,8 +21,8 @@ public class SelectReadOnlyText extends Select {
 	
 	private JLabel label;
 	
-	public SelectReadOnlyText(String labelKey) {
-		super();
+	public SelectReadOnlyText(String internalName,String labelKey) {
+		super(internalName);
 		
 		label = new JLabel("<html>"+ labelKey+"</html>",JLabel.LEADING);
 		label.addMouseListener(new MouseAdapter() {
@@ -37,7 +37,7 @@ public class SelectReadOnlyText extends Select {
 		        }
 			}
 		});
-		panel.add(label,BorderLayout.CENTER);
+		myPanel.add(label,BorderLayout.CENTER);
 	}
 	
 

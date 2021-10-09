@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
+import java.awt.geom.Rectangle2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -8,11 +10,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Generator_GosperCurve extends TurtleGenerator {
-	private double turtleStep = 10.0f;
-	private double xMax = 0;
-	private double xMin = 0;
-	private double yMax = 0;
-	private double yMin = 0;
 	private static int order = 4; // controls complexity of curve
 	
 	@Override
@@ -37,107 +34,83 @@ public class Generator_GosperCurve extends TurtleGenerator {
 	public void generate() {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
 
-		turtle = new Turtle();
-		
-		turtleStep = 10;
-		
-		xMax = 0;
-		xMin = 0;
-		yMax = 0;
-		yMin = 0;
-		
-		gosperA(order);
-
-		turtle = new Turtle();
+		Turtle turtle = new Turtle();
+		gosperA(turtle,order);
 
 		// scale the image to fit on the paper
-		double w = xMax-xMin;
-		double h = yMax-yMin;
-		if(w>h) {
-			double f = v/w;
-			h*=f;
-			turtleStep*=f;
-			xMax*=f;
-			xMin*=f;
-			yMax*=f;
-			yMin*=f;
-		} else {
-			double f = v/h;
-			w*=f;
-			turtleStep*=f;
-			xMax*=f;
-			xMin*=f;
-			yMax*=f;
-			yMin*=f;
+		Rectangle2D.Double dims = turtle.getBounds();
+		double tw = dims.getWidth();
+		double th = dims.getHeight();
+		if(tw>v) {
+			double s = v/tw;
+			turtle.scale(s,s);
+			th *= s;
+			tw *= s;
 		}
-		// adjust the start position to center the image
-		double x = (xMax+xMin)/-2;
-		double y = (yMax+yMin)/-2;
+		if(th>v) {
+			double s = v/th;
+			turtle.scale(s,s);
+			th *= s;
+			tw *= s;
+		}
+		double tx = dims.getX();
+		double ty = dims.getY();
 		
-		// move to starting position
-		turtle.penUp();
-		turtle.moveTo(x,y);
-		turtle.penDown();
-		// do the curve
-		gosperA(order);
+		turtle.translate(-tx-tw/2, -ty-th/2);
 
 		notifyListeners(turtle);
 	}
 
 
 	// Gosper curve A = A-B--B+A++AA+B-
-	private void gosperA(int n) {
+	private void gosperA(Turtle turtle,int n) {
 		if (n == 0) {
-			gosperForward();
+			gosperForward(turtle);
 			return;
 		}
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		gosperA(n-1);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 	}
 
 
 	// Gosper curve B = +A-BB--B-A++A+B
-	public void gosperB(int n) {
+	public void gosperB(Turtle turtle,int n) {
 		if (n == 0) {
-			gosperForward();
+			gosperForward(turtle);
 			return;
 		}
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(-60);
-		gosperB(n-1);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
 		turtle.turn(-60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 		turtle.turn(-60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
 		turtle.turn(60);
-		gosperA(n-1);
+		gosperA(turtle,n-1);
 		turtle.turn(60);
-		gosperB(n-1);
+		gosperB(turtle,n-1);
 	}
 
 
-	public void gosperForward() {
-		turtle.forward(turtleStep);
-		if(xMax<turtle.getX()) xMax=turtle.getX();
-		if(xMin>turtle.getX()) xMin=turtle.getX();
-		if(yMax<turtle.getY()) yMax=turtle.getY();
-		if(yMin>turtle.getY()) yMin=turtle.getY();
+	public void gosperForward(Turtle turtle) {
+		turtle.forward(1.0);
 	}
 }

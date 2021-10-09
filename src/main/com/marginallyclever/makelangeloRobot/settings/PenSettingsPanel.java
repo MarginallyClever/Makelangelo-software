@@ -46,16 +46,16 @@ public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ 
 	    
 	    PlotterSettings settings = robot.getSettings();
 	    
-	    add(penDiameter = new SelectDouble(Translator.get("penToolDiameter"),settings.getPenDiameter()));
-	    add(maxFeedRate = new SelectDouble(Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
-	    add(currentFeedRate = new SelectDouble(Translator.get("Speed"),settings.getDrawFeedRate()));
-	    add(penZRate = new SelectDouble(Translator.get("penToolLiftSpeed"),settings.getPenLiftTime()));
-	    add(penUp = new SelectDouble(Translator.get("penToolUp"),settings.getPenUpAngle()));
-	    //add(buttonTestUp = new SelectButton(Translator.get("penToolTest")));
-	    add(penDown = new SelectDouble(Translator.get("penToolDown"),settings.getPenDownAngle()));
-	    //add(buttonTestDown = new SelectButton(Translator.get("penToolTest")));
-		add(selectPenDownColor = new SelectColor(interiorPanel,Translator.get("pen down color"),robot.getSettings().getPenDownColor()));
-		add(selectPenUpColor = new SelectColor(interiorPanel,Translator.get("pen up color"),robot.getSettings().getPenUpColor()));
+	    add(penDiameter = new SelectDouble("diameter",Translator.get("penToolDiameter"),settings.getPenDiameter()));
+	    add(maxFeedRate = new SelectDouble("feedrate",Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
+	    add(currentFeedRate = new SelectDouble("speed",Translator.get("Speed"),settings.getDrawFeedRate()));
+	    add(penZRate = new SelectDouble("liftSpeed",Translator.get("penToolLiftSpeed"),settings.getPenLiftTime()));
+	    add(penUp = new SelectDouble("up",Translator.get("penToolUp"),settings.getPenUpAngle()));
+	    //add(buttonTestUp = new SelectButton("testUp",Translator.get("penToolTest")));
+	    add(penDown = new SelectDouble("down",Translator.get("penToolDown"),settings.getPenDownAngle()));
+	    //add(buttonTestDown = new SelectButton("testDown",Translator.get("penToolTest")));
+		add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),robot.getSettings().getPenDownColor(),interiorPanel));
+		add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),robot.getSettings().getPenUpColor(),interiorPanel));
 		finish();
 	}
 	

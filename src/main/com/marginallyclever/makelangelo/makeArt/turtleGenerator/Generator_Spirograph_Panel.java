@@ -30,12 +30,12 @@ public class Generator_Spirograph_Panel extends TurtleGeneratorPanel {
 		
 		this.generator = generator;
 		
-		add(field_isEpitrochoid = new SelectBoolean(Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
-		add(field_majorRadius = new SelectInteger(Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
-		add(field_minorRadius = new SelectInteger(Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
-		add(field_pScale = new SelectDouble(Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
-		add(field_numSamples = new SelectInteger(Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
-		add(new SelectReadOnlyText("<a href='https://en.wikipedia.org/wiki/Spirograph'>Learn more</a>"));
+		add(field_isEpitrochoid = new SelectBoolean("Epitrochoid",Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
+		add(field_majorRadius = new SelectInteger("MajorRadius",Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
+		add(field_minorRadius = new SelectInteger("MinorRadius",Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
+		add(field_pScale = new SelectDouble("PScale",Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
+		add(field_numSamples = new SelectInteger("NumSamples",Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Spirograph'>Learn more</a>"));
 		finish();
 	}
 

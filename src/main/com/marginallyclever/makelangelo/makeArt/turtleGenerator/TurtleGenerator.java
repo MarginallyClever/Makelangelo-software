@@ -3,27 +3,17 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.makeArt.ImageManipulator;
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangeloRobot.PlotterDecorator;
 
 /**
  * Generators create gcode from user input.  Fractals might be one example.
  * @author dan royer
  */
-public abstract class TurtleGenerator extends ImageManipulator implements PlotterDecorator {
-	private ArrayList<TurtleGeneratorListener> listeners = new ArrayList<TurtleGeneratorListener>();
-	public void addListener(TurtleGeneratorListener a) {
-		listeners.add(a);
-	}
+public abstract class TurtleGenerator {
+	protected Paper myPaper;
 	
-	public void removeListener(TurtleGeneratorListener a) {
-		listeners.remove(a);
-	}
-	
-	protected void notifyListeners(Turtle turtle) {
-		for( TurtleGeneratorListener a : listeners ) a.turtleReady(turtle);
-	}
+	abstract public String getName();
 	
 	/**
 	 * @return true if generate succeeded.
@@ -42,4 +32,23 @@ public abstract class TurtleGenerator extends ImageManipulator implements Plotte
 	 * draw the results as the calculation is being performed.
 	 */
 	public void render(GL2 gl2) {}
+	
+	// OBSERVER PATTERN
+
+	private ArrayList<TurtleGeneratorListener> listeners = new ArrayList<TurtleGeneratorListener>();
+	public void addListener(TurtleGeneratorListener a) {
+		listeners.add(a);
+	}
+	
+	public void removeListener(TurtleGeneratorListener a) {
+		listeners.remove(a);
+	}
+	
+	protected void notifyListeners(Turtle turtle) {
+		for( TurtleGeneratorListener a : listeners ) a.turtleReady(turtle);
+	}
+
+	public void setPaper(Paper paper) {
+		myPaper = paper;
+	}
 }
