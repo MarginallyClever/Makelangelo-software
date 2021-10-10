@@ -68,12 +68,7 @@ public class LoadSVG implements TurtleLoader {
 		
 	    myTurtle = new Turtle();
 		myTurtle.setColor(new ColorRGB(0,0,0));
-		try {
-			parseAll(document);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw new Exception("Failed to load some elements (1): "+e.getLocalizedMessage());
-		}
+		parseAll(document);
 		
 		Rectangle2D.Double r = myTurtle.getBounds();
 		myTurtle.translate(-r.width/2,-r.height/2);
@@ -85,13 +80,19 @@ public class LoadSVG implements TurtleLoader {
 	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
+		Log.message("...parse path");
 		parsePathElements(    documentElement.getElementsByTagName( "path"     ));
+		Log.message("...parse polylines");
 		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
+		Log.message("...parse polygons");
 		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
+		Log.message("...parse lines");
 		parseLineElements(    documentElement.getElementsByTagName( "line"     ));
+		Log.message("...parse rects");
 		parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		
+		Log.message("...parse circles");
 		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
+		Log.message("...parse ellipses");
 		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
 	}
 	
