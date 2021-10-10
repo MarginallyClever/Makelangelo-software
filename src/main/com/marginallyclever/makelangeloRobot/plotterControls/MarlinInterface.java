@@ -39,11 +39,18 @@ public class MarlinInterface extends JPanel {
 	private static final String STR_RESEND = "Resend: ";
 	// Marlin sends this event when the robot is ready to receive more.
 	public static final String IDLE = "idle";
+	
+	public static final String STR_OK = "ok";
+	
+	public static final String STR_ECHO = "echo:";
+
+	public static final String STR_ERROR = "Error:";
 
 	private Plotter myPlotter;
 
 	private int lineNumberToSend;
 	private int lineNumberAdded;
+	private boolean ignoreNextOK=false;
 	
 	// don't send more than 20 at a time.
 	private int busyCount=MARLIN_SEND_LIMIT;
@@ -123,19 +130,6 @@ public class MarlinInterface extends JPanel {
 	private void sendFindHome() {
 		queueAndSendCommand("G28 XY");
 	}
-
-	public static String getPenUpString(Plotter p) {
-		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T" + (int)p.getPenLiftTime();
-	}
-
-	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T100";
-	}
-
-	public static String getToolChangeString(int toolNumber) {
-		toolNumber &=0xFFFFFF;
-		return "M06 T" + toolNumber + "\n" + "M0 Ready " + getColorName(toolNumber) + " and click\n";
-	}
 	
 	private static String getColorName(int toolNumber) {
 		String name = "";
@@ -170,37 +164,56 @@ public class MarlinInterface extends JPanel {
 		setupListener();
 		lineNumberToSend=1;
 		lineNumberAdded=0;
+		ignoreNextOK=false;
 		myHistory.clear();
 		updateButtonAccess();
 	}
 	
-
 	private void setupListener() {
 		chatInterface.addNetworkSessionListener((evt) -> {
 			if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 				String message = ((String)evt.data).trim();
+				System.out.println("MarlinInterface heard "+message.trim());
 				if(message.startsWith("X:") && message.contains("Count")) {
 					//System.out.println("FOUND " + message);
 					processM114Reply(message);
-				} else if(message.startsWith("ok")) {
-					busyCount++;
-					sendQueuedCommand();
-					if(busyCount>0) {
-						clearOldHistory();
-						fireIdleNotice();
-					}
-				} else if(message.contains(STR_RESEND)) {
-					String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
-					int n = Integer.valueOf(numberPart);
-					if(n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
-						// no problem.
-						lineNumberToSend=n;
-					}
-				} 
+				} else if(message.startsWith(STR_OK)) onHearOK();
+				else if(message.contains(STR_RESEND)) onHearResend(message);
+				else if(message.startsWith(STR_ECHO)) {
+				} else if(message.startsWith(STR_ERROR)) {
+				}
 			}
 		});
 	}
 	
+	private void onHearResend(String message) {
+		String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
+		try {
+			int n = Integer.valueOf(numberPart);
+			if(n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
+				// no problem.
+				lineNumberToSend=n-1;
+			} else {
+				// line is no longer in the buffer.  should not be possible!
+			}
+		} catch(NumberFormatException e) {
+			Log.message("Resend request for '"+message+"' failed: "+e.getMessage());
+		}
+	}
+
+	private void onHearOK() {
+		if(ignoreNextOK) {
+			System.out.println("...ignored");
+		} else {
+			busyCount++;
+			sendQueuedCommand();
+			if(busyCount<MARLIN_SEND_LIMIT) {
+				clearOldHistory();
+				fireIdleNotice();
+			}
+		}
+	}
+
 	private void fireIdleNotice() {
 		notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED,MarlinInterface.IDLE));
 	}
@@ -213,9 +226,9 @@ public class MarlinInterface extends JPanel {
 
 	public void queueAndSendCommand(String str) {
 		lineNumberAdded++;
-		str = "N"+lineNumberAdded+" "+str;
-		str += generateChecksum(str);
-		myHistory.add(new MarlinCommand(lineNumberAdded,str));
+		String assembled = "N"+lineNumberAdded+" "+str;
+		assembled += generateChecksum(assembled);
+		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
 		
 		if(busyCount>0) sendQueuedCommand();
 	}
@@ -225,6 +238,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
+				System.out.println("MarlinInterface sending "+mc.command);
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -269,17 +283,22 @@ public class MarlinInterface extends JPanel {
 
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
-		queueAndSendCommand( myPlotter.getPenIsUp() 
+		String msg = myPlotter.getPenIsUp() 
 				? MarlinInterface.getTravelTo(p.x,p.y)
-				: MarlinInterface.getDrawTo(p.x,p.y) );
+				: MarlinInterface.getDrawTo(p.x,p.y);
+		queueAndSendCommand( msg );
 	}
 	
+	// "By convention, most G-code generators use G0 for non-extrusion movements"
+	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getTravelTo(double x,double y) {
-		return "G1"+getPosition(x,y);
+		return "G0"+getPosition(x,y);
 	}
 	
+	// "By convention, most G-code generators use G0 for non-extrusion movements"
+	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getDrawTo(double x,double y) {
-		return "G0"+getPosition(x,y);
+		return "G1"+getPosition(x,y)+" F8000";
 	}
 
 	private static String getPosition(double x,double y) {
@@ -287,6 +306,19 @@ public class MarlinInterface extends JPanel {
 				" X" + StringHelper.formatDouble(x) +
 				" Y" + StringHelper.formatDouble(y);
 		return action;
+	}
+
+	public static String getPenUpString(Plotter p) {
+		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T" + (int)p.getPenLiftTime();
+	}
+
+	public static String getPenDownString(Plotter p) {
+		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T100";
+	}
+
+	public static String getToolChangeString(int toolNumber) {
+		toolNumber &=0xFFFFFF;
+		return "M0 Ready " + getColorName(toolNumber) + " and click";
 	}
 
 	private JToolBar getToolBar() {
