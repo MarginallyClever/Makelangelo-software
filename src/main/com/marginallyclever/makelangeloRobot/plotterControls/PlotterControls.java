@@ -112,12 +112,14 @@ public class PlotterControls extends JPanel {
 
 	private void play() {
 		isRunning = true;
+		updateButtonStatus();
 		if(!penIsUpBeforePause) myPlotter.lowerPen();
 		programInterface.step();
 	}
 
 	private void pause() {
 		isRunning = false;
+		updateButtonStatus();
 		penIsUpBeforePause = myPlotter.getPenIsUp();
 		if(!penIsUpBeforePause) myPlotter.raisePen();
 	}
@@ -127,9 +129,9 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void updateButtonStatus() {
-		bRewind.setEnabled(false);
-		bStart.setEnabled(false);
-		bPause.setEnabled(false);
+		bRewind.setEnabled(!isRunning);
+		bStart.setEnabled(!isRunning);
+		bPause.setEnabled(isRunning);
 	}
 	
 	@SuppressWarnings("unused")
