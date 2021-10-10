@@ -150,10 +150,10 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void sendPenUpDown() {
-		String s = myPlotter.getPenIsUp() 
+		String str = myPlotter.getPenIsUp() 
 				? MarlinInterface.getPenUpString(myPlotter)
 				: MarlinInterface.getPenDownString(myPlotter);
-		queueAndSendCommand(s);
+		queueAndSendCommand(str);
 	}
 
 	private void sendEngage() {
@@ -313,7 +313,7 @@ public class MarlinInterface extends JPanel {
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S"+(int)p.getPenUpAngle()  +" T100";
+		return "M280 P0 S"+(int)p.getPenDownAngle()  +" T100";
 	}
 
 	public static String getToolChangeString(int toolNumber) {
