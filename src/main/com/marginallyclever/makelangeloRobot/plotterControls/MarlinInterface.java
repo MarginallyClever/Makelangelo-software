@@ -17,6 +17,7 @@ import javax.swing.UIManager;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
@@ -24,6 +25,7 @@ import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
+import com.marginallyclever.util.PreferencesHelper;
 
 // TODO add a timeout check in case "ok" is not received somehow.
 
@@ -166,7 +168,7 @@ public class MarlinInterface extends JPanel {
 
 	private void onConnect() {
 		setupListener();
-		lineNumberToSend=0;
+		lineNumberToSend=1;
 		lineNumberAdded=0;
 		myHistory.clear();
 		updateButtonAccess();
@@ -355,11 +357,12 @@ public class MarlinInterface extends JPanel {
 
 	public static void main(String[] args) {
 		Log.start();
-
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 
 		JFrame frame = new JFrame(MarlinInterface.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
