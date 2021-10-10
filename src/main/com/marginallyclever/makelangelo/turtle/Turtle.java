@@ -341,13 +341,15 @@ public class Turtle implements Cloneable {
 		jumpTo(first.a.x,first.a.y);
 		Point2D currentPosition = new Point2D(first.b.x, first.b.y);
 		
+		double minJumpSquared = minimumJumpSize*minimumJumpSize;
+		
 		for( LineSegment2D line : orderedLines ) {
 			// change color if needed
 			if(line.c!=getColor()) {
 				setColor(line.c);
 			}
 			
-			if(lengthSquared(currentPosition, line.a) > minimumJumpSize) {
+			if(lengthSquared(currentPosition, line.a) > minJumpSquared) {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
 				jumpTo(line.a.x,line.a.y);
@@ -355,7 +357,7 @@ public class Turtle implements Cloneable {
 				// The previous line ends close to the start point of this line,
 				// so there's no need to go to the start point of this line since the pen is practically there.
 				// The start point of this line will be skipped.
-				moveTo(line.a.x,line.a.y);
+				//moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
 			moveTo(line.b.x,line.b.y);
