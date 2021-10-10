@@ -51,20 +51,20 @@ public class SimplifyTurtle extends AbstractAction {
 		return t;
 	}
 
-	private static ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double d) {
+	private static ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double minimumLength) {
 		ArrayList<LineSegment2D> toKeep = new ArrayList<LineSegment2D>();
 		int count = toTest.size();
 		if(count==0) return toKeep;
 		
 		toKeep.add(toTest.get(0));
-		LineSegment2D first = toKeep.get(toKeep.size()-1); 
+		LineSegment2D first = toKeep.get(0); 
 
 		for(int i=1;i<count;++i) {
 			LineSegment2D second = toTest.get(i);
 			// sequential with no jump?
-			if(first.b.distanceSquared(second.a)<d) {
+			if(first.b.distanceSquared(second.a)<minimumLength) {
 				// very short?
-				if(second.a.distanceSquared(second.b)<d) {
+				if(second.a.distanceSquared(second.b)<minimumLength) {
 					first.b=second.b;
 					continue;
 				}
