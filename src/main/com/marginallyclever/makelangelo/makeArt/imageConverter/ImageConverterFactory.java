@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import javax.swing.JPanel;
-
 public class ImageConverterFactory {
 	// storing this list here so it's easier to find.
 	public static final ImageConverterPanel [] list = {
@@ -20,13 +18,4 @@ public class ImageConverterFactory {
 		new Converter_VoronoiZigZag_Panel(new Converter_VoronoiZigZag()),
 		new Converter_Wander_Panel(new Converter_Wander()),
 	};
-
-	public static JPanel getPanel(ImageConverter i) {
-		for( ImageConverterPanel p : list ) {
-			if(p.getConverter() == i) return p;
-		}
-		
-		return null;
-	}
-
 }
