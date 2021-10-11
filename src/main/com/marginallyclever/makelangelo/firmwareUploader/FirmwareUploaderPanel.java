@@ -6,14 +6,20 @@ import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import org.apache.commons.io.FilenameUtils;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class FirmwareUploaderPanel extends SelectPanel {
 	/**
@@ -39,8 +45,23 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		goButton.addPropertyChangeListener((e)->{
 			if(AVRDudeExists()) uploadNow();
 		});
+		
+		checkForHexFileInCurrentWorkingDirectory();
 	}
 	
+	private void checkForHexFileInCurrentWorkingDirectory() {
+		String path = FileAccess.getWorkingDirectory();
+		File folder = new File(path);
+		File [] contents = folder.listFiles();
+		for( File c : contents ) {
+			String ext = FilenameUtils.getExtension(c.getAbsolutePath());
+			if(ext.equalsIgnoreCase("hex")) {
+				sourceHex.setText(c.getAbsolutePath());
+				return;
+			}
+		}
+	}
+
 	private void refreshLayout() {
 		setLayout(new FlowLayout());
 		add(sourceAVRDude);
@@ -89,7 +110,13 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	
 	public static void main(String[] args) {
 		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
 		Translator.start();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {}
+
 		try {
 			JFrame frame = new JFrame("FirmwareUploaderPanel");
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
