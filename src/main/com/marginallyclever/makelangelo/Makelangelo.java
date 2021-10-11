@@ -209,7 +209,7 @@ public final class Makelangelo {
 	}
 
 	private JMenu createRobotMenu() {
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("Open Controls"));
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
 
 		JMenu menu = new JMenu(Translator.get("Robot"));
