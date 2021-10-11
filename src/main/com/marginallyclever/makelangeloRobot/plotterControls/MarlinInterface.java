@@ -264,7 +264,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				System.out.println("MarlinInterface sending "+mc.command);
+				System.out.println("MarlinInterface sending '"+mc.command+"'.");
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -282,9 +282,8 @@ public class MarlinInterface extends JPanel {
 	private String generateChecksum(String line) {
 		byte checksum = 0;
 
-		for(int i=0; i<line.length(); ++i) {
-			checksum ^= (byte)line.charAt(i);
-		}
+		int i=line.length();
+		while(i>0) checksum ^= (byte)line.charAt(--i);
 
 		return "*" + Integer.toString(checksum);
 	}
