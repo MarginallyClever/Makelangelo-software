@@ -58,8 +58,7 @@ public class LogPanel extends JPanel implements LogListener {
 	@Override
 	public void logEvent(String msg) {
 		msg = cleanMessage(msg);
-		if (msg.length() == 0)
-			return;
+		if (msg.length() == 0) return;
 		inBoundQueue.offer(msg);
 		repaint();
 	}
