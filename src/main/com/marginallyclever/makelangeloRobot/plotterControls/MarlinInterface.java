@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import com.marginallyclever.communications.NetworkSession;
@@ -27,42 +29,42 @@ import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
 import com.marginallyclever.util.PreferencesHelper;
 
-// TODO add a timeout check in case "ok" is not received somehow.
-
 public class MarlinInterface extends JPanel {
 	private static final long serialVersionUID = 979851120390943303L;
 	// number of commands we'll hold on to in case there's a resend.
 	private static final int HISTORY_BUFFER_LIMIT = 50;
 	// Marlin can buffer this many commands from serial, before processing.
 	private static final int MARLIN_SEND_LIMIT = 20;
+	// If nothing is heard for this many ms then send a ping to check if the connection is still live. 
+	private static final int TIMEOUT_DELAY = 2000;
 	// Marlin says this when a resend is needed, followed by the last well-received line number.
 	private static final String STR_RESEND = "Resend: ";
 	// Marlin sends this event when the robot is ready to receive more.
+	private static final String STR_OK = "ok";
+	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
 	
-	public static final String STR_OK = "ok";
-	
-	public static final String STR_ECHO = "echo:";
-
-	public static final String STR_ERROR = "Error:";
+	//private static final String STR_ECHO = "echo:";
+	//private static final String STR_ERROR = "Error:";
 
 	private Plotter myPlotter;
-
-	private int lineNumberToSend;
-	private int lineNumberAdded;
-	private boolean ignoreNextOK=false;
-	
-	// don't send more than 20 at a time.
-	private int busyCount=MARLIN_SEND_LIMIT;
-
 	private TextInterfaceToNetworkSession chatInterface = new TextInterfaceToNetworkSession();
+	private ArrayList<MarlinCommand> myHistory = new ArrayList<MarlinCommand>();
 
 	private JButton bESTOP = new JButton("EMERGENCY STOP");
 	private JButton bGetPosition = new JButton("M114");
 	private JButton bGoHome = new JButton("Go Home");
-	
-	private ArrayList<MarlinCommand> myHistory = new ArrayList<MarlinCommand>();
 
+	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
+	private int lineNumberToSend;
+	// the last line number added to the queue.
+	private int lineNumberAdded;
+	// don't send more than this many at a time without acknowledgement.
+	private int busyCount=MARLIN_SEND_LIMIT;
+	
+	private Timer timeoutChecker = new Timer(5000,(e)->onTimeoutCheck());
+	private long lastReceivedTime;
+	
 	public MarlinInterface(Plotter plotter) {
 		super();
 
@@ -77,17 +79,20 @@ public class MarlinInterface extends JPanel {
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
 			case ChooseConnectionPanel.CONNECTION_OPENED:
+				System.out.println("MarlinInterface connected.");
 				onConnect();
 				notifyListeners(e);
 				break;
 			case ChooseConnectionPanel.CONNECTION_CLOSED:
+				System.out.println("MarlinInterface disconnected.");
+				onClose();
 				updateButtonAccess();
 				notifyListeners(e);
 				break;
 			}
 		});
 	}
-	
+
 	public void addNetworkSessionListener(NetworkSessionListener a) {
 		chatInterface.addNetworkSessionListener(a);
 	}
@@ -105,18 +110,23 @@ public class MarlinInterface extends JPanel {
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
 		case PlotterEvent.HOME_FOUND:
+			System.out.println("MarlinInterface heard plotter home.");
 			sendFindHome();
 			break;
 		case PlotterEvent.POSITION:
+			System.out.println("MarlinInterface heard plotter move.");
 			sendGoto();
 			break;
 		case PlotterEvent.PEN_UPDOWN:
+			System.out.println("MarlinInterface heard plotter up/down.");
 			sendPenUpDown();
 			break;
 		case PlotterEvent.MOTORS_ENGAGED:
+			System.out.println("MarlinInterface heard plotter engage.");
 			sendEngage();
 			break;
 		case PlotterEvent.TOOL_CHANGE:
+			System.out.println("MarlinInterface heard plotter tool change.");
 			sendToolChange((int)e.extra);
 			break;
 		default: break;
@@ -164,23 +174,33 @@ public class MarlinInterface extends JPanel {
 		setupListener();
 		lineNumberToSend=1;
 		lineNumberAdded=0;
-		ignoreNextOK=false;
 		myHistory.clear();
 		updateButtonAccess();
+		timeoutChecker.start();
 	}
 	
+	private void onClose() {
+		timeoutChecker.stop();
+	}
+	
+	private void onTimeoutCheck() {
+		if(System.currentTimeMillis()-lastReceivedTime>TIMEOUT_DELAY) {
+			chatInterface.sendCommand("M400");
+		}
+	}
+
 	private void setupListener() {
 		chatInterface.addNetworkSessionListener((evt) -> {
 			if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+				lastReceivedTime=System.currentTimeMillis();
 				String message = ((String)evt.data).trim();
-				System.out.println("MarlinInterface heard "+message.trim());
+				System.out.println("MarlinInterface received '"+message.trim()+"'.");
 				if(message.startsWith("X:") && message.contains("Count")) {
-					//System.out.println("FOUND " + message);
 					processM114Reply(message);
-				} else if(message.startsWith(STR_OK)) onHearOK();
-				else if(message.contains(STR_RESEND)) onHearResend(message);
-				else if(message.startsWith(STR_ECHO)) {
-				} else if(message.startsWith(STR_ERROR)) {
+				} else if(message.startsWith(STR_OK)) {
+					onHearOK();
+				} else if(message.contains(STR_RESEND)) {
+					onHearResend(message);
 				}
 			}
 		});
@@ -204,11 +224,14 @@ public class MarlinInterface extends JPanel {
 	private void onHearOK() {
 		busyCount++;
 		sendQueuedCommand();
-		if(lineNumberToSend<lineNumberAdded && busyCount<MARLIN_SEND_LIMIT) {
-			clearOldHistory();
-			fireIdleNotice();
+		clearOldHistory();
+		if(lineNumberToSend>=lineNumberAdded) {
+			SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	    			fireIdleNotice();
+	            }
+	        });
 		}
-		ignoreNextOK=false;
 	}
 
 	private void fireIdleNotice() {
@@ -216,21 +239,28 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void clearOldHistory() {
-		while(myHistory.get(0).lineNumber<lineNumberAdded-HISTORY_BUFFER_LIMIT) {
+		while(myHistory.size()>0 && myHistory.get(0).lineNumber<lineNumberAdded-HISTORY_BUFFER_LIMIT) {
 			myHistory.remove(0);
 		}
 	}
 
 	public void queueAndSendCommand(String str) {
+		if(str.trim().length()==0) return;
+		
 		lineNumberAdded++;
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
+		System.out.println("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
 	private void sendQueuedCommand() {
+		if(myHistory.size()==0) return;
+		
+		int smallest = Integer.MAX_VALUE;
 		for( MarlinCommand mc : myHistory ) {
+			if(smallest > mc.lineNumber) smallest = mc.lineNumber;
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
@@ -239,7 +269,14 @@ public class MarlinInterface extends JPanel {
 				return;
 			}
 		}
-		// got here without hitting a line?  history no longer contains line?!  
+		
+		if(smallest>lineNumberToSend) {
+			// history no longer contains the line?!
+			System.out.println("MarlinInterface did not find "+lineNumberToSend);
+			for( MarlinCommand mc : myHistory ) {
+				System.out.println("..."+mc.lineNumber+": "+mc.command);
+			}
+		}
 	}
 
 	private String generateChecksum(String line) {
@@ -313,8 +350,8 @@ public class MarlinInterface extends JPanel {
 	}
 
 	public static String getToolChangeString(int toolNumber) {
-		toolNumber &=0xFFFFFF;
-		return "M0 Ready " + getColorName(toolNumber) + " and click";
+		String colorName = getColorName(toolNumber & 0xFFFFFF);
+		return "M0 Ready "+colorName+" and click";
 	}
 
 	private JToolBar getToolBar() {
@@ -361,6 +398,10 @@ public class MarlinInterface extends JPanel {
 
 	public void setNetworkSession(NetworkSession session) {
 		chatInterface.setNetworkSession(session);
+	}
+
+	public void closeConnection() {
+		this.chatInterface.closeConnection();
 	}
 	
 	// OBSERVER PATTERN
