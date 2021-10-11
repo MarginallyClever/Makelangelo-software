@@ -23,6 +23,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.event.WindowAdapter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -218,12 +219,21 @@ public final class Makelangelo {
 	}
 
 	private void openPlotterControls() {
+		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle);
 		JDialog dialog = new JDialog(mainFrame,PlotterControls.class.getSimpleName());
-		dialog.add(new PlotterControls(myPlotter,myTurtle));
+		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
+		// make sure pc closes the connection when the dialog is closed.
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				plotterControls.closeConnection();
+			}
+		});
 		dialog.setVisible(true);
+		
 	}
 
 	private JMenu createArtPipelineMenu() {

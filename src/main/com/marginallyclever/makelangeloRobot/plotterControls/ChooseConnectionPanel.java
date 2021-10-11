@@ -86,6 +86,10 @@ public class ChooseConnectionPanel extends JPanel {
 		}
 	}
 
+	public void closeConnection() {
+		onClose();
+	}
+
 	// OBSERVER PATTERN
 	
 	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();

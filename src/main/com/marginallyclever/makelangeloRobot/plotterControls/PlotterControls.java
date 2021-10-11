@@ -180,4 +180,8 @@ public class PlotterControls extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 	}
+
+	public void closeConnection() {
+		marlinInterface.closeConnection();
+	}
 }

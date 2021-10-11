@@ -90,6 +90,14 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 			myInterface.addToHistory(mySession.getName(),((String)evt.data).trim());
 		}
 	}
+
+	public boolean getIsConnected() { 
+		return (mySession!=null && mySession.isOpen());
+	}
+
+	public void closeConnection() {
+		myConnectionChoice.closeConnection();
+	}
 	
 	// OBSERVER PATTERN
 	
@@ -129,9 +137,5 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		frame.add(new TextInterfaceToNetworkSession());
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public boolean getIsConnected() { 
-		return (mySession!=null && mySession.isOpen());
 	}
 }
