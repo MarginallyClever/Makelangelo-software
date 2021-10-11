@@ -292,11 +292,8 @@ public final class Makelangelo {
 	}
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
-		// TODO addPreviewListener(ici);
 		ici.setPaper(myPaper);
-
-		ici.addListener((t) -> setTurtle(t) );
-		
+		ici.addListener((t) -> setTurtle(t));
 		ici.generate();
 		
 		JDialog dialog = new JDialog(getMainFrame(),ici.getName());
@@ -305,12 +302,14 @@ public final class Makelangelo {
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				myPaper.setRotationRef(0);
+				Log.message(Translator.get("Finished"));
+			}
+		});
 		dialog.setVisible(true);
-
-		myPaper.setRotationRef(0);
-		// TODO removePreviewListener(ici);
-		
-		Log.message(Translator.get("Finished"));
 	}
 	
 	private void newFile() {

@@ -10,7 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class TextInterfaceWithHistory extends JPanel {
 	/**
@@ -79,10 +82,14 @@ public class TextInterfaceWithHistory extends JPanel {
 
 	public static void main(String[] args) {
 		Log.start();
-		JFrame frame = new JFrame(TextInterfaceWithHistory.class.getSimpleName());
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
+
+		JFrame frame = new JFrame(TextInterfaceWithHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new TextInterfaceWithHistory());
 		frame.pack();
