@@ -43,12 +43,12 @@ public class ReorderTurtle extends AbstractAction {
 		int originalCount = originalLines.size();
 		Log.message("  Converted to "+originalCount+" lines.");
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,0.00001);
+		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
 		int uniqueCount = uniqueLines.size();
 		int duplicateCount = originalCount - uniqueCount;
 		Log.message("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
 
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
+		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
 		Turtle t = new Turtle();
 		t.addLineSegments(orderedLines, 2.0);
 		Log.message("reorder() end @ "+t.history.size()+" instructions.");
