@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -33,6 +35,7 @@ public class ConversationHistoryList extends JPanel {
 	private static final long serialVersionUID = 6287436679006933618L;
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
 	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
+	private ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<ConversationEvent>();
 	private JFileChooser chooser = new JFileChooser();
 
 	private JButton bClear = new JButton("Clear");
@@ -132,8 +135,35 @@ public class ConversationHistoryList extends JPanel {
 		return listView.getSelectedValue().toString();
 	}
 
-	public void addElement(String src,String str) {
-		listModel.addElement(new ConversationEvent(src, str));
+	public void addElement(String src,String str) { 
+		inBoundQueue.add(new ConversationEvent(src, str));
+		repaint();
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		addQueuedMessages();
+		super.paint(g);
+	}
+
+	private void addQueuedMessages() {
+		while(!inBoundQueue.isEmpty()) {
+			ConversationEvent msg = inBoundQueue.poll();
+			if(msg!=null) addMessage(msg);
+		}
+		
+	}
+	
+	private void addMessage(ConversationEvent msg) {
+		int listSize = listModel.getSize() - 1;
+		int lastVisible = listView.getLastVisibleIndex();
+		boolean isLast = (lastVisible == listSize);
+
+		listModel.addElement(msg);
+		if(isLast) jumpToEnd();
+	}
+	
+	private void jumpToEnd() {
 		listView.ensureIndexIsVisible(listModel.getSize()-1);
 	}
 	
