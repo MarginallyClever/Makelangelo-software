@@ -591,6 +591,32 @@
 	</string>
 
 	<string>
+		<key>Robot</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>OpenControls</key>
+		<value>Kontrollen öffnen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>SaveGCode</key>
+		<value>Gcode file/SD speichern</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Rewind</key>
+		<value>Zurückspulen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Play</key>
+		<value>Zeichnen</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
 		<key>SetHome</key>
 		<value>Home setzen</value>
 		<hint>manual driving dialog</hint>

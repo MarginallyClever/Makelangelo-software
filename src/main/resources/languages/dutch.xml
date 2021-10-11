@@ -329,6 +329,32 @@
 	</string>
 
 	<string>
+		<key>Robot</key>
+		<value>Makelangelo</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>OpenControls</key>
+		<value>Open Controls</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>SaveGCode</key>
+		<value>Save Gcode to file/SD</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Rewind</key>
+		<value>Rewind</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Play</key>
+		<value>Draw</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
 		<key>SetHome</key>
 		<value>Set home</value>
 		<hint>manual driving dialog</hint>
