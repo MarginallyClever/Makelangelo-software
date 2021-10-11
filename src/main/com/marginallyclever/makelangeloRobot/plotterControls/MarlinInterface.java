@@ -192,7 +192,7 @@ public class MarlinInterface extends JPanel {
 			int n = Integer.valueOf(numberPart);
 			if(n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
 				// no problem.
-				lineNumberToSend=n-1;
+				lineNumberToSend=n;
 			} else {
 				// line is no longer in the buffer.  should not be possible!
 			}
@@ -202,16 +202,13 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void onHearOK() {
-		if(ignoreNextOK) {
-			System.out.println("...ignored");
-		} else {
-			busyCount++;
-			sendQueuedCommand();
-			if(busyCount<MARLIN_SEND_LIMIT) {
-				clearOldHistory();
-				fireIdleNotice();
-			}
+		busyCount++;
+		sendQueuedCommand();
+		if(lineNumberToSend<lineNumberAdded && busyCount<MARLIN_SEND_LIMIT) {
+			clearOldHistory();
+			fireIdleNotice();
 		}
+		ignoreNextOK=false;
 	}
 
 	private void fireIdleNotice() {
@@ -226,10 +223,9 @@ public class MarlinInterface extends JPanel {
 
 	public void queueAndSendCommand(String str) {
 		lineNumberAdded++;
-		String assembled = "N"+lineNumberAdded+" "+str;
-		assembled += generateChecksum(assembled);
+		String withLineNumber = "N"+lineNumberAdded+" "+str;
+		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -249,8 +245,8 @@ public class MarlinInterface extends JPanel {
 	private String generateChecksum(String line) {
 		byte checksum = 0;
 
-		for (int i = 0; i < line.length(); ++i) {
-			checksum ^= line.charAt(i);
+		for(int i=0; i<line.length(); ++i) {
+			checksum ^= (byte)line.charAt(i);
 		}
 
 		return "*" + Integer.toString(checksum);
