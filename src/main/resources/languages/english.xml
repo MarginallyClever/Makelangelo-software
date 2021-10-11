@@ -702,7 +702,7 @@
 	</string>
 	<string>
 		<key>MenuMakelangelo</key>
-		<value>Makelangelo</value>
+		<value>File</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -1575,7 +1575,7 @@
 
 	<string>
 		<key>Art Pipeline</key>
-		<value>Art Pipeline</value>
+		<value>Tools</value>
 		<hint></hint>
 	</string>
 
