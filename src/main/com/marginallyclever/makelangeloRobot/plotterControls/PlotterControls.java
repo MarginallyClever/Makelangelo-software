@@ -31,6 +31,7 @@ public class PlotterControls extends JPanel {
 	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
 	private JButton bRewind = new JButton(Translator.get("Rewind"));
 	private JButton bStart = new JButton(Translator.get("Play"));
+	private JButton bStep = new JButton(Translator.get("Step"));
 	private JButton bPause = new JButton(Translator.get("Pause"));
 	private JProgressBar progress = new JProgressBar(0,100); 
 	
@@ -58,9 +59,13 @@ public class PlotterControls extends JPanel {
 		
 		marlinInterface.addListener((e)->{
 			if(e.getActionCommand().contentEquals(MarlinInterface.IDLE) ) {
-				programInterface.step();
-				updateProgressBar();
+				System.out.println("PlotterControls heard idle");
+				if(isRunning) {
+					System.out.println("PlotterControls is running");
+					programInterface.step();
+				}
 			}
+			updateProgressBar();
 		});
 	}
 	
@@ -70,17 +75,23 @@ public class PlotterControls extends JPanel {
 		bar.add(bRewind);
 		bar.add(bStart);
 		bar.add(bPause);
+		bar.add(bStep);
 		
 		bSaveGCode.addActionListener((e)-> saveGCode());
 		bRewind.addActionListener((e)-> rewind());
 		bStart.addActionListener((e)-> play());
 		bPause.addActionListener((e)-> pause());
+		bStep.addActionListener((e)-> step());
 		
 		updateButtonStatus();
 		
 		return bar;
 	}
 	
+	private void step() {
+		programInterface.step();
+	}
+
 	private void saveGCode() {
 		Log.message("Saving to gcode...");
 		SaveGCode save = new SaveGCode();
@@ -132,6 +143,7 @@ public class PlotterControls extends JPanel {
 		bRewind.setEnabled(!isRunning);
 		bStart.setEnabled(!isRunning);
 		bPause.setEnabled(isRunning);
+		bStep.setEnabled(!isRunning);
 	}
 	
 	@SuppressWarnings("unused")
