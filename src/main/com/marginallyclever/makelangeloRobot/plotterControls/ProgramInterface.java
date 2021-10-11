@@ -84,7 +84,10 @@ public class ProgramInterface extends JPanel {
 
 	public void step() {
 		int now = listView.getSelectedIndex();
-		if(now==-1) return;
+		if(now==-1) {
+			System.out.println("Can't find next line.");
+			return;
+		}
 		
 		TurtleMove move = listModel.get(now);
 		System.out.println("Step to ("+now+"):"+move.toString());
