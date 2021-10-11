@@ -15,7 +15,10 @@ import javax.swing.UIManager;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
 	/**
@@ -40,7 +43,6 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 			if(mySession==null) return;
 			
 			String str = evt.getActionCommand();
-			str = str.toUpperCase();
 			if(!str.endsWith("\n")) str+="\n";
 			
 			try {
@@ -128,10 +130,14 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	
 	public static void main(String[] args) {
 		Log.start();
-		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
+		
+		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(600, 400));
 		frame.add(new TextInterfaceToNetworkSession());
