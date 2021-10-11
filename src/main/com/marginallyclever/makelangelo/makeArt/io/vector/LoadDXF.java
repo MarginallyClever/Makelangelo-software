@@ -37,6 +37,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class LoadDXF implements TurtleLoader {
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
+	private Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
 	private Turtle myTurtle;
@@ -141,7 +142,6 @@ public class LoadDXF implements TurtleLoader {
 		Log.message(Translator.get("FileTypeDXF2")+"...");
 
 		// Read in the DXF file
-		Parser parser = ParserBuilder.createDefaultParser();
 		parser.parse(in, DXFParser.DEFAULT_ENCODING);
 		
 		DXFDocument doc = parser.getDocument();
