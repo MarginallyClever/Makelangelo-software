@@ -37,7 +37,7 @@ public class SimplifyTurtle extends AbstractAction {
 		int originalCount = originalLines.size();
 		Log.message("  Converted to "+originalCount+" lines.");
 
-		double minimumStepSize = 1e-1;
+		double minimumStepSize = 1e-3;
 		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,minimumStepSize); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
