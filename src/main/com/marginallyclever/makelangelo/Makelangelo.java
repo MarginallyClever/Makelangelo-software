@@ -109,9 +109,9 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
 	private static JFrame logFrame;
-	private JMenuItem buttonReopenFile;
 	private SaveDialog saveDialog;
 	
+	private JMenuItem buttonReopenFile;
 	private String previousFile;
 
 	private PiCaptureAction piCameraCaptureAction;
@@ -360,23 +360,31 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	public void openLoadFile(String previousFile) {
+	public void openLoadFile(String filename) {
 		Log.message("Loading file...");
 		try {
-			LoadFilePanel loader = new LoadFilePanel(myPaper,previousFile);
+			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
 			previewPanel.addListener(loader);
+			if(filename!=null && !filename.trim().isEmpty() ) {
+				loader.load(filename);
+			}
 			
 			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
 			dialog.add(loader);
 			dialog.setLocationRelativeTo(mainFrame);
 			dialog.setMinimumSize(new Dimension(500,500));
 			dialog.pack();
+			dialog.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					previewPanel.removeListener(loader);
+					previousFile = loader.getLastFileIn();
+					buttonReopenFile.setEnabled(true);
+				}
+			});
 			dialog.setVisible(true);
 			
-			previewPanel.removeListener(loader);
-			previousFile = loader.getLastFileIn();
-			buttonReopenFile.setEnabled(true);
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
