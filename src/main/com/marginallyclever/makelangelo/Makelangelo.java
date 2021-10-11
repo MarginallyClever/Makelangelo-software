@@ -419,16 +419,16 @@ public final class Makelangelo {
 			GFXPreferences.setShowPenUp(b);
 		});
 		menu.add(checkboxShowPenUpMoves);
-		
-		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> logFrame.setVisible(true) );
-		menu.add(buttonViewLog);
 
 		return menu;
 	}
 
 	private JMenu createHelpMenu() {
 		JMenu menu = new JMenu(Translator.get("Help"));
+		
+		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
+		buttonViewLog.addActionListener((e) -> logFrame.setVisible(true) );
+		menu.add(buttonViewLog);
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
 		buttonForums.addActionListener((e) -> {
