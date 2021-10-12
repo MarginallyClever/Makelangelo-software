@@ -32,7 +32,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	public TextInterfaceToNetworkSession() {
 		super();
 
-		this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToNetworkSession.class.getSimpleName()));
+		//this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToNetworkSession.class.getSimpleName()));
 		setLayout(new BorderLayout());
 		
 		add(myConnectionChoice,BorderLayout.NORTH);

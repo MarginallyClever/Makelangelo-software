@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -32,7 +31,7 @@ public class TextInterfaceToListeners extends JPanel {
 		commandLine.addActionListener((e)->sendNow());
 		send.addActionListener((e)->sendNow());
 		
-		this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToListeners.class.getSimpleName()));
+		//this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToListeners.class.getSimpleName()));
 		setLayout(new GridBagLayout());
 		
 		GridBagConstraints c = new GridBagConstraints();

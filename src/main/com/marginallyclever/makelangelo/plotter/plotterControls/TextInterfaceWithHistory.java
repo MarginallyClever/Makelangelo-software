@@ -26,9 +26,9 @@ public class TextInterfaceWithHistory extends JPanel {
 	public TextInterfaceWithHistory() {
 		super();
 
-		this.setBorder(BorderFactory.createTitledBorder(TextInterfaceWithHistory.class.getSimpleName()));
 		setLayout(new GridBagLayout());
 
+		//this.setBorder(BorderFactory.createTitledBorder(TextInterfaceWithHistory.class.getSimpleName()));
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridy++;
 		c.fill = GridBagConstraints.BOTH;
