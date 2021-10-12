@@ -11,13 +11,13 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
@@ -29,76 +29,45 @@ import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Raspi camera capture to file for image processing
  */
-public class PiCaptureAction extends AbstractAction {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+public class PiCaptureAction {
     private static final int BUTTON_HEIGHT = 25;
 
-	private RPiCamera piCamera;
+	private RPiCamera piCamera = new RPiCamera("/home/pi/Pictures");
 	
 	// picam controls
 	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
 	private Makelangelo makelangeloApp;
 	private BufferedImage buffImg;
 	private boolean useImage;
-	private int awb, drc, exp, contrast, quality, sharpness;
+	private int awb=1;
+	private int drc=1;
+	private int exp=11;
+	private int contrast = 0;
+	private int quality = 75;
+	private int sharpness = 0;
 	
-
-	public PiCaptureAction(Makelangelo gui,String text) throws FailedToRunRaspistillException {
-		super(text);
-		makelangeloApp=gui;
-        setup();
+	public PiCaptureAction() throws FailedToRunRaspistillException {
+		super();
 	}
 	
-    public PiCaptureAction(Makelangelo gui,String text, ImageIcon icon,
-                      String desc, Integer mnemonic) throws FailedToRunRaspistillException {
-        super(text, icon);
-        putValue(SHORT_DESCRIPTION, desc);
-        putValue(MNEMONIC_KEY, mnemonic);
-		makelangeloApp=gui;
-        setup();
-    }
-	
-    private void setup() throws FailedToRunRaspistillException {
-		// Create a piCamera
-		piCamera = new RPiCamera("/home/pi/Pictures");
-
-		// set the initial parameter settings.
-		awb = 1;  // Auto
-		drc = 1;  // High
-		exp = 11; // VeryLong
-		contrast = 0;
-		quality = 75;
-		sharpness = 0;
-    }
-
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		runCapture();
-	}
-	
-	private void runCapture() {
+	public void run(JFrame mainFrame, Paper myPaper) {
         // let's make the image the correct width and height for the paper
 		useImage = false;
-        double aspectRatio = makelangeloApp.getPaper().getPaperWidth() 
-        					/ makelangeloApp.getPaper().getPaperHeight();
+        double aspectRatio = myPaper.getPaperWidth() / myPaper.getPaperHeight();
 		final int captureH = 650;
         final int captureW = (int) ((double) captureH * aspectRatio);
 
-        JFrame mainFrame = makelangeloApp.getMainFrame();
 		final JDialog dialog = new JDialog(mainFrame,Translator.get("CaptureImageTitle"), true);
         dialog.setLocation(mainFrame.getLocation());
 
-        final JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
 		final GridBagConstraints cMain = new GridBagConstraints();
 		cMain.fill=GridBagConstraints.HORIZONTAL;
 		cMain.anchor=GridBagConstraints.NORTH;
@@ -228,34 +197,32 @@ public class PiCaptureAction extends AbstractAction {
         cMain.insets = new Insets(10,0,0,0);  //top padding
 
         buttonCaptureImage = new JButton(Translator.get("CaptureImage"));
-		buttonCaptureImage.addActionListener(new ActionListener() {
-        	@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					JFrame mainFrame = makelangeloApp.getMainFrame();
-					piCamera.turnOnPreview(
-							mainFrame.getLocationOnScreen().x + 50,
-							mainFrame.getLocationOnScreen().y + 100,
-							captureW,
-							captureH);
-					piCamera.setAWB(AWB.valueOf(((String)awbComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setDRC(DRC.valueOf(((String)drcComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setExposure(Exposure.valueOf(((String)expComboBox.getSelectedItem()).toUpperCase()));
-					piCamera.setEncoding(Encoding.JPG);
-					piCamera.setWidth(captureW);
-					piCamera.setHeight(captureH);
-					piCamera.setContrast(contrastSlider.getValue());
-					piCamera.setQuality(qualitySlider.getValue());
-					piCamera.setSharpness(sharpnessSlider.getValue());
-					piCamera.setTimeout(3000);
-					buffImg = piCamera.takeBufferedStill();
-					Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
-					ImageIcon icon = new ImageIcon(buffImg);
-					imageLabel.setIcon(icon);
-					buttonUseCapture.setEnabled(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		buttonCaptureImage.addActionListener((arg0)->{
+			try {
+				piCamera.turnOnPreview(
+						mainFrame.getLocationOnScreen().x + 50,
+						mainFrame.getLocationOnScreen().y + 100,
+						captureW,
+						captureH);
+				piCamera.setAWB(AWB.valueOf(((String)awbComboBox.getSelectedItem()).toUpperCase()));
+				piCamera.setDRC(DRC.valueOf(((String)drcComboBox.getSelectedItem()).toUpperCase()));
+				piCamera.setExposure(Exposure.valueOf(((String)expComboBox.getSelectedItem()).toUpperCase()));
+				piCamera.setEncoding(Encoding.JPG);
+				piCamera.setWidth(captureW);
+				piCamera.setHeight(captureH);
+				piCamera.setContrast(contrastSlider.getValue());
+				piCamera.setQuality(qualitySlider.getValue());
+				piCamera.setSharpness(sharpnessSlider.getValue());
+				piCamera.setTimeout(3000);
+				buffImg = piCamera.takeBufferedStill();
+				Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
+				ImageIcon icon = new ImageIcon(buffImg);
+				imageLabel.setIcon(icon);
+				buttonUseCapture.setEnabled(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.error("PiCaptureAction: "+e.getMessage());
+				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 		});
 		buttonCaptureImage.setPreferredSize(new Dimension(89, BUTTON_HEIGHT));

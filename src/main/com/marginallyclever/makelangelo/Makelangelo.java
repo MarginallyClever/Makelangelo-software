@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -113,8 +114,6 @@ public final class Makelangelo {
 	
 	private RecentFiles recentFiles;
 
-	private PiCaptureAction piCameraCaptureAction;
-	
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
@@ -152,7 +151,6 @@ public final class Makelangelo {
 
 		Log.message("Starting robot...");
 		myPlotter = new Plotter();
-		
 		myPlotter.addListener((e)->{
 			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
 		});
@@ -198,7 +196,7 @@ public final class Makelangelo {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createGenerateMenu());
-		menuBar.add(createArtPipelineMenu());
+		menuBar.add(createToolsMenu());
 		menuBar.add(createViewMenu());
 		menuBar.add(createRobotMenu());
 		menuBar.add(createHelpMenu());
@@ -235,13 +233,18 @@ public final class Makelangelo {
 		
 	}
 
-	private JMenu createArtPipelineMenu() {
+	private JMenu createToolsMenu() {
 		JMenu menu = new JMenu(Translator.get("Art Pipeline"));
 
 		try {
-			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("MenuCaptureImage"));	
-			if (piCameraCaptureAction != null) {
-		        menu.add(piCameraCaptureAction);
+			PiCaptureAction pc = new PiCaptureAction();
+			
+			if(pc != null) {
+				JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
+				bCapture.addActionListener((e)->{
+					pc.run(mainFrame,myPaper);
+				});
+		        menu.add(bCapture);
 				menu.addSeparator();
 		    } 
 		} catch (FailedToRunRaspistillException e) {
@@ -295,7 +298,7 @@ public final class Makelangelo {
 		ici.addListener((t) -> setTurtle(t));
 		ici.generate();
 		
-		JDialog dialog = new JDialog(getMainFrame(),ici.getName());
+		JDialog dialog = new JDialog(mainFrame,ici.getName());
 		TurtleGeneratorPanel panel = ici.getPanel();
 		dialog.add(panel.getPanel());
 		dialog.setLocationRelativeTo(mainFrame);
@@ -688,14 +691,6 @@ public final class Makelangelo {
 			}).start();
 		}
 	}
-	
-	public JFrame getMainFrame() {
-		return mainFrame;
-	}
-
-	public Plotter getRobot() {
-		return myPlotter;
-	}
 			
 	private void saveFile() {
 		Log.message("Saving vector file...");
@@ -705,10 +700,6 @@ public final class Makelangelo {
 			Log.error("Save error: "+e.getLocalizedMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-	}
-
-	public Paper getPaper() {
-		return myPaper;
 	}
 
 	public void setTurtle(Turtle turtle) {
