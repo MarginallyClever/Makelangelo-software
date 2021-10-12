@@ -29,6 +29,7 @@ public class PlotterControls extends JPanel {
 	private ProgramInterface programInterface;
 
 	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
+	private JButton bGoHome= new JButton(Translator.get("GoHome"));
 	private JButton bRewind = new JButton(Translator.get("Rewind"));
 	private JButton bStart = new JButton(Translator.get("Play"));
 	private JButton bStep = new JButton(Translator.get("Step"));
@@ -72,12 +73,16 @@ public class PlotterControls extends JPanel {
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 		bar.add(bSaveGCode);
+		bar.addSeparator();
+		bar.add(bGoHome);
+		bar.addSeparator();
 		bar.add(bRewind);
 		bar.add(bStart);
 		bar.add(bPause);
 		bar.add(bStep);
 		
 		bSaveGCode.addActionListener((e)-> saveGCode());
+		bGoHome.addActionListener((e)-> goHome());
 		bRewind.addActionListener((e)-> rewind());
 		bStart.addActionListener((e)-> play());
 		bPause.addActionListener((e)-> pause());
@@ -88,6 +93,11 @@ public class PlotterControls extends JPanel {
 		return bar;
 	}
 	
+	private void goHome() {
+		myPlotter.findHome();
+		updateButtonStatus();
+	}
+
 	private void step() {
 		programInterface.step();
 	}
@@ -125,7 +135,14 @@ public class PlotterControls extends JPanel {
 		isRunning = true;
 		updateButtonStatus();
 		if(!penIsUpBeforePause) myPlotter.lowerPen();
+		rewindIfNoProgramLineSelected();
 		programInterface.step();
+	}
+
+	private void rewindIfNoProgramLineSelected() {
+		if(programInterface.getLineNumber()==-1) {
+			programInterface.rewind();
+		}
 	}
 
 	private void pause() {
@@ -140,10 +157,11 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void updateButtonStatus() {
-		bRewind.setEnabled(!isRunning);
-		bStart.setEnabled(!isRunning);
-		bPause.setEnabled(isRunning);
-		bStep.setEnabled(!isRunning);
+		boolean isHomed=myPlotter.getDidFindHome();
+		bRewind.setEnabled(isHomed && !isRunning);
+		bStart.setEnabled(isHomed && !isRunning);
+		bPause.setEnabled(isHomed && isRunning);
+		bStep.setEnabled(isHomed && !isRunning);
 	}
 	
 	@SuppressWarnings("unused")
