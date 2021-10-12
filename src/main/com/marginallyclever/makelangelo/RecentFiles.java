@@ -77,17 +77,14 @@ public final class RecentFiles extends JMenu {
 	}
 
 	private void updateLists() {
-		reportStoredList();
 		this.removeAll();
 
 		for(int i=0;i<MAX_FILES;++i) {
 			prefs.remove(getNodeName(i));
 		}
 		
-		System.out.println("list:");
 		int i=0;
 		for( String f : fileList ) {
-			System.out.println("  adding "+f);
 			prefs.put(getNodeName(i++), f);
 			JMenuItem item = new JMenuItem(f);
 			this.add(item);
@@ -95,14 +92,7 @@ public final class RecentFiles extends JMenu {
 		}
 		
 	}
-	
-	private void reportStoredList() {
-		System.out.println("prefs:");
-		for(int i=0;i<MAX_FILES;++i) {
-			System.out.println("..."+prefs.get(getNodeName(i), ""));
-		}
-	}
-	
+		
 	private void loadFromStorage() {
 		Log.message("loading recent files:");
 		for(int i=0;i<MAX_FILES;++i) {
