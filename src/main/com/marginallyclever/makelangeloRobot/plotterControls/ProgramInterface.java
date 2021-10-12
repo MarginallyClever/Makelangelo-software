@@ -95,6 +95,7 @@ public class ProgramInterface extends JPanel {
 		myPlotter.turtleMove(move);
 		
 		listView.setSelectedIndex(now+1);
+		listView.ensureIndexIsVisible(now+1);
 		if(listView.getSelectedIndex()==now) {
 			listView.clearSelection();
 		}
