@@ -105,6 +105,7 @@ public class ProgramInterface extends JPanel {
 		if(selected == now) {
 			// could not advance. reached the end.
 			listView.clearSelection();
+			myPlotter.raisePen();
 		}
 	}
 	
