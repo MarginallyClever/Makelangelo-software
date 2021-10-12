@@ -43,6 +43,7 @@ public class MarlinInterface extends JPanel {
 	private static final String STR_OK = "ok";
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
+	private static final double MARLIN_DRAW_FEEDRATE = 7500.0;  // mm/min
 	
 	//private static final String STR_ECHO = "echo:";
 	//private static final String STR_ERROR = "Error:";
@@ -224,7 +225,6 @@ public class MarlinInterface extends JPanel {
 	private void onHearOK() {
 		busyCount++;
 		sendQueuedCommand();
-		clearOldHistory();
 		if(lineNumberToSend>=lineNumberAdded) {
 			SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
@@ -256,6 +256,8 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void sendQueuedCommand() {
+		clearOldHistory();
+		
 		if(myHistory.size()==0) return;
 		
 		int smallest = Integer.MAX_VALUE;
@@ -330,7 +332,7 @@ public class MarlinInterface extends JPanel {
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getDrawTo(double x,double y) {
-		return "G1"+getPosition(x,y)+" F8000";
+		return "G1"+getPosition(x,y)+" F"+MARLIN_DRAW_FEEDRATE;
 	}
 
 	private static String getPosition(double x,double y) {
