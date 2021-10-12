@@ -216,7 +216,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
+	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
 		Point2D pos = robot.getPos();
@@ -248,7 +248,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggestedLength - right_a)/2;
 
-		paintPlotter(gl2,(float)gx,(float)gy);
+		paintPlotter(gl2,robot,(float)gx,(float)gy);
 
 		// belts
 		gl2.glBegin(GL2.GL_LINES);
@@ -288,11 +288,13 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glEnd();
 	}
 
-	protected void paintPlotter(GL2 gl2,float gx,float gy) {
+	protected void paintPlotter(GL2 gl2,Plotter robot,float gx,float gy) {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
-		
+		drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_5);
+		if(robot.getPenIsUp()) {
+			drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_5+5);
+		}
 	}
 	
 	protected void drawCircle(GL2 gl2,float x,float y,float r) {

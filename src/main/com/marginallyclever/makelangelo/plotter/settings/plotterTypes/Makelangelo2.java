@@ -261,13 +261,10 @@ public class Makelangelo2 implements PlotterType {
 		gl2.glEnd();
 
 		// gondola
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		float f;
-		for (f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-			gl2.glVertex2d(gx + Math.cos(f) * PEN_HOLDER_RADIUS_2, gy + Math.sin(f) * PEN_HOLDER_RADIUS_2);
+		drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_2,20);
+		if(robot.getPenIsUp()) {
+			drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_2+5,20);
 		}
-		gl2.glEnd();
 
 		// counterweight left
 		gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -306,6 +303,20 @@ public class Makelangelo2 implements PlotterType {
 		 * for(v=0;v<=1.0;v+=0.1) { double vi = (end-start)*v + start;
 		 * gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r); } gl2.glEnd();
 		 */
+	}
+
+	private void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		float f;
+		for (f = 0; f < steps;++f) {
+			double f2 = Math.PI*2.0 * (double)f/(double)steps;
+			gl2.glVertex2d(
+					gx + Math.cos(f2) * PEN_HOLDER_RADIUS_2, 
+					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
+		}
+		gl2.glEnd();
+
 	}
 
 	/**
