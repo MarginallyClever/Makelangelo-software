@@ -64,10 +64,10 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
-import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.PlotterEvent;
-import com.marginallyclever.makelangeloRobot.plotterControls.PlotterControls;
-import com.marginallyclever.makelangeloRobot.PiCaptureAction;
+import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -111,8 +111,7 @@ public final class Makelangelo {
 	private static JFrame logFrame;
 	private SaveDialog saveDialog;
 	
-	private JMenuItem buttonReopenFile;
-	private String previousFile;
+	private RecentFiles recentFiles;
 
 	private PiCaptureAction piCameraCaptureAction;
 	
@@ -326,11 +325,12 @@ public final class Makelangelo {
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openLoadFile(""));
 		menu.add(buttonOpenFile);
-				
-		buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
-		buttonReopenFile.addActionListener((e) -> reopenLastFile());
-		buttonReopenFile.setEnabled(false);
-		menu.add(buttonReopenFile);		
+		
+		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
+		recentFiles.addSubmenuListener((e)->{
+			openLoadFile(((JMenuItem)e.getSource()).getText());	
+		});
+		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
@@ -360,7 +360,7 @@ public final class Makelangelo {
 	}
 
 	public void openLoadFile(String filename) {
-		Log.message("Loading file...");
+		Log.message("Loading file "+filename+"...");
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
@@ -378,8 +378,7 @@ public final class Makelangelo {
 				@Override
 				public void windowClosing(WindowEvent e) {
 					previewPanel.removeListener(loader);
-					previousFile = loader.getLastFileIn();
-					buttonReopenFile.setEnabled(true);
+					recentFiles.addFilename(loader.getLastFileIn());
 				}
 			});
 			dialog.setVisible(true);
@@ -387,6 +386,7 @@ public final class Makelangelo {
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			recentFiles.removeFilename(filename);
 		}
 	}
 
@@ -668,7 +668,6 @@ public final class Makelangelo {
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
-
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -697,11 +696,7 @@ public final class Makelangelo {
 	public Plotter getRobot() {
 		return myPlotter;
 	}
-	
-	public void reopenLastFile() {
-		openLoadFile(previousFile);
-	}
-		
+			
 	private void saveFile() {
 		Log.message("Saving vector file...");
 		try {
