@@ -22,7 +22,7 @@ import com.marginallyclever.makelangelo.Translator;
  * @deprecated
  */
 @Deprecated
-public class DragAndDrivePanel extends JPanel {
+public class DragAndDrive extends JPanel {
 	/**
 	 * 
 	 */
@@ -34,7 +34,7 @@ public class DragAndDrivePanel extends JPanel {
 	private double mouseLastX, mouseLastY;
 	private Plotter robot;
 	
-	DragAndDrivePanel(Plotter robot) {
+	DragAndDrive(Plotter robot) {
 		super(new GridBagLayout());
 
 		this.robot = robot;

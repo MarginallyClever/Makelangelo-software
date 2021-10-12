@@ -3,7 +3,6 @@ package com.marginallyclever.makelangeloRobot.plotterControls;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,7 +30,7 @@ import javax.swing.event.ListSelectionListener;
 
 import com.marginallyclever.convenience.log.Log;
 
-public class ConversationHistoryList extends JPanel {
+public class ConversationHistory extends JPanel {
 	private static final long serialVersionUID = 6287436679006933618L;
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
 	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
@@ -42,7 +41,7 @@ public class ConversationHistoryList extends JPanel {
 	private JButton bSave = new JButton("Save");
 
 	
-	public ConversationHistoryList() {
+	public ConversationHistory() {
 		super();
 		createCellRenderingSystem();
 
@@ -50,9 +49,8 @@ public class ConversationHistoryList extends JPanel {
 		scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		listView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listView.setPreferredSize(new Dimension(500,500));
 
-		this.setBorder(BorderFactory.createTitledBorder(ConversationHistoryList.class.getSimpleName()));
+		this.setBorder(BorderFactory.createTitledBorder(ConversationHistory.class.getSimpleName()));
 		this.setLayout(new BorderLayout());
 		this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(scrollPane, BorderLayout.CENTER);
@@ -172,9 +170,9 @@ public class ConversationHistoryList extends JPanel {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
-		JFrame frame = new JFrame(ConversationHistoryList.class.getSimpleName());
+		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ConversationHistoryList());
+		frame.add(new ConversationHistory());
 		frame.pack();
 		frame.setVisible(true);
 	}

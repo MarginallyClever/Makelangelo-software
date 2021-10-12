@@ -26,7 +26,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	 */
 	private static final long serialVersionUID = 1032123255711692874L;
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
-	private ChooseConnectionPanel myConnectionChoice = new ChooseConnectionPanel();
+	private ChooseConnection myConnectionChoice = new ChooseConnection();
 	private NetworkSession mySession;
 
 	public TextInterfaceToNetworkSession() {
@@ -53,10 +53,10 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		});
 		myConnectionChoice.addActionListener((e)->{
 			switch(e.getID()) {
-			case ChooseConnectionPanel.CONNECTION_OPENED: 
+			case ChooseConnection.CONNECTION_OPENED: 
 				setNetworkSession(myConnectionChoice.getNetworkSession());
 				break;
-			case ChooseConnectionPanel.CONNECTION_CLOSED:
+			case ChooseConnection.CONNECTION_CLOSED:
 				setNetworkSession(null);
 				break;
 			}

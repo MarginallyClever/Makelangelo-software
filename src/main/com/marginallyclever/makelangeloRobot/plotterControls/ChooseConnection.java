@@ -18,7 +18,7 @@ import com.marginallyclever.communications.NetworkSessionManager;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 
-public class ChooseConnectionPanel extends JPanel {
+public class ChooseConnection extends JPanel {
 	private static final long serialVersionUID = 4773092967249064165L;
 	public static final int CONNECTION_OPENED = 1;
 	public static final int CONNECTION_CLOSED = 2;
@@ -27,7 +27,7 @@ public class ChooseConnectionPanel extends JPanel {
 	private JLabel connectionName = new JLabel(Translator.get("NotConnected"),JLabel.LEADING);
 	private NetworkSession mySession;
 	
-	public ChooseConnectionPanel() {
+	public ChooseConnection() {
 		super();
 
 		bConnect.setText(Translator.get("ButtonConnect"));
@@ -47,7 +47,7 @@ public class ChooseConnectionPanel extends JPanel {
 			NetworkSession s = NetworkSessionManager.requestNewSession(this);
 			if(s!=null) {
 				onOpen(s);
-				notifyListeners(new ActionEvent(this,ChooseConnectionPanel.CONNECTION_OPENED,""));
+				notifyListeners(new ActionEvent(this,ChooseConnection.CONNECTION_OPENED,""));
 			}
 		}
 	}
@@ -56,7 +56,7 @@ public class ChooseConnectionPanel extends JPanel {
 		if(mySession!=null) {
 			mySession.closeConnection();
 			mySession=null;
-			notifyListeners(new ActionEvent(this,ChooseConnectionPanel.CONNECTION_CLOSED,""));
+			notifyListeners(new ActionEvent(this,ChooseConnection.CONNECTION_CLOSED,""));
 		}
 		bConnect.setText(Translator.get("ButtonConnect"));
 		bConnect.setForeground(Color.GREEN);
@@ -115,9 +115,9 @@ public class ChooseConnectionPanel extends JPanel {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
-		JFrame frame = new JFrame(ChooseConnectionPanel.class.getSimpleName());
+		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ChooseConnectionPanel());
+		frame.add(new ChooseConnection());
 		frame.pack();
 		frame.setVisible(true);
 	}

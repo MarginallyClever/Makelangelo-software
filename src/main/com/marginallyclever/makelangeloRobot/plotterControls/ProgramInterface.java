@@ -48,9 +48,13 @@ public class ProgramInterface extends JPanel {
 		//this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(scrollPane, BorderLayout.CENTER);
 
-		listModel.addAll(turtle.history);
+		addTurtleToList(turtle);
 	}
 	
+	private void addTurtleToList(Turtle turtle) {
+		listModel.addAll(turtle.history);
+	}
+
 	private void createCellRenderingSystem() {
 		listView.setCellRenderer(new ListCellRenderer<TurtleMove>() {
 			private DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer(); 
@@ -95,12 +99,14 @@ public class ProgramInterface extends JPanel {
 		myPlotter.turtleMove(move);
 		
 		listView.setSelectedIndex(now+1);
-		listView.ensureIndexIsVisible(now+1);
-		if(listView.getSelectedIndex()==now) {
+		int selected = listView.getSelectedIndex();
+		listView.ensureIndexIsVisible(selected);
+		if(selected == now) {
+			// could not advance. reached the end.
 			listView.clearSelection();
 		}
 	}
-
+	
 	public int getLineNumber() {
 		return listView.getSelectedIndex();
 	}

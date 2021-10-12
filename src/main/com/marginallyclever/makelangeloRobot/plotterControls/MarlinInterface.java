@@ -79,13 +79,13 @@ public class MarlinInterface extends JPanel {
 
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
-			case ChooseConnectionPanel.CONNECTION_OPENED:
-				System.out.println("MarlinInterface connected.");
+			case ChooseConnection.CONNECTION_OPENED:
+				//System.out.println("MarlinInterface connected.");
 				onConnect();
 				notifyListeners(e);
 				break;
-			case ChooseConnectionPanel.CONNECTION_CLOSED:
-				System.out.println("MarlinInterface disconnected.");
+			case ChooseConnection.CONNECTION_CLOSED:
+				//System.out.println("MarlinInterface disconnected.");
 				onClose();
 				updateButtonAccess();
 				notifyListeners(e);
@@ -111,23 +111,23 @@ public class MarlinInterface extends JPanel {
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
 		case PlotterEvent.HOME_FOUND:
-			System.out.println("MarlinInterface heard plotter home.");
+			//System.out.println("MarlinInterface heard plotter home.");
 			sendFindHome();
 			break;
 		case PlotterEvent.POSITION:
-			System.out.println("MarlinInterface heard plotter move.");
+			//System.out.println("MarlinInterface heard plotter move.");
 			sendGoto();
 			break;
 		case PlotterEvent.PEN_UPDOWN:
-			System.out.println("MarlinInterface heard plotter up/down.");
+			//System.out.println("MarlinInterface heard plotter up/down.");
 			sendPenUpDown();
 			break;
 		case PlotterEvent.MOTORS_ENGAGED:
-			System.out.println("MarlinInterface heard plotter engage.");
+			//System.out.println("MarlinInterface heard plotter engage.");
 			sendEngage();
 			break;
 		case PlotterEvent.TOOL_CHANGE:
-			System.out.println("MarlinInterface heard plotter tool change.");
+			//System.out.println("MarlinInterface heard plotter tool change.");
 			sendToolChange((int)e.extra);
 			break;
 		default: break;
@@ -195,7 +195,7 @@ public class MarlinInterface extends JPanel {
 			if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 				lastReceivedTime=System.currentTimeMillis();
 				String message = ((String)evt.data).trim();
-				System.out.println("MarlinInterface received '"+message.trim()+"'.");
+				//System.out.println("MarlinInterface received '"+message.trim()+"'.");
 				if(message.startsWith("X:") && message.contains("Count")) {
 					processM114Reply(message);
 				} else if(message.startsWith(STR_OK)) {
@@ -223,15 +223,16 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void onHearOK() {
-		busyCount++;
-		sendQueuedCommand();
-		if(lineNumberToSend>=lineNumberAdded) {
-			SwingUtilities.invokeLater(new Runnable() {
-	            public void run() {
-	    			fireIdleNotice();
-	            }
-	        });
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+        		busyCount++;
+        		sendQueuedCommand();
+            	clearOldHistory();
+        		if(lineNumberToSend>=lineNumberAdded) {
+        			fireIdleNotice();
+        		}
+            }
+        });
 	}
 
 	private void fireIdleNotice() {
@@ -251,7 +252,7 @@ public class MarlinInterface extends JPanel {
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		System.out.println("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
+		//System.out.println("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -266,7 +267,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				System.out.println("MarlinInterface sending '"+mc.command+"'.");
+				//System.out.println("MarlinInterface sending '"+mc.command+"'.");
 				chatInterface.sendCommand(mc.command);
 				return;
 			}

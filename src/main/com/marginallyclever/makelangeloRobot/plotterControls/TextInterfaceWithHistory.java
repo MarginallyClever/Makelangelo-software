@@ -21,7 +21,7 @@ public class TextInterfaceWithHistory extends JPanel {
 	 */
 	private static final long serialVersionUID = 5542831703742185676L;
 	private TextInterfaceToListeners myInterface = new TextInterfaceToListeners();
-	private ConversationHistoryList myHistory = new ConversationHistoryList();
+	private ConversationHistory myHistory = new ConversationHistory();
 	
 	public TextInterfaceWithHistory() {
 		super();
