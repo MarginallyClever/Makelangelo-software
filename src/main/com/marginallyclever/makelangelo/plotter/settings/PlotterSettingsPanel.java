@@ -16,7 +16,7 @@ import javax.swing.JTabbedPane;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.settings.plotterTypes.PlotterTypeFactory;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 
 /**
  * Controls related to configuring a Makelangelo machine

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;

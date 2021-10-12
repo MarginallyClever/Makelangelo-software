@@ -1,35 +1,42 @@
-package com.marginallyclever.makelangelo.plotter.settings.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-public class Makelangelo5Marlin extends Makelangelo3_3 {
+public class MakelangeloCustom extends Makelangelo3_3 {
+	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
-	
+
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+
 	@Override
 	public String getVersion() {
-		return "5";
+		return "0";
 	}
 	
 	@Override
 	public String getName() {
-		return "Makelangelo 5+ with Marlin";
+		return "Makelangelo (Custom)";
 	}
 	
 	@Override
 	public boolean canInvertMotors() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean canChangeMachineSize() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -37,8 +44,8 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		return true;
 	}
 	
-	public float getWidth() { return 650; }
-	public float getHeight() { return 1000; }
+	public float getWidth() { return 3*12*25.4f; }
+	public float getHeight() { return 4*12*25.4f; }
 
 	@Override
 	public boolean canAutoHome() {
@@ -52,8 +59,11 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		paintControlBox(gl2,robot);
-		paintMotors(gl2,robot);
+		PlotterSettings settings = robot.getSettings();
+
+//		paintCalibrationPoint(gl2,settings);
+		paintControlBox(gl2,settings);
+		paintMotors(gl2,settings);
 		paintSafeArea(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
@@ -64,11 +74,11 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 * @param gl2
 	 * @param settings
 	 */
-	private void paintControlBox(GL2 gl2,Plotter robot) {
-		double cy = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
-		double top = robot.getLimitTop();
+	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
+		double cy = settings.getLimitTop();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+		double top = settings.getLimitTop();
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -216,7 +226,8 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	
+	protected void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
 		Point2D pos = robot.getPos();
@@ -248,7 +259,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		double right_a = Math.sqrt(dx*dx+dy*dy);
 		double right_b = (suggestedLength - right_a)/2;
 
-		paintPlotter(gl2,robot,(float)gx,(float)gy);
+		paintPlotter(gl2,(float)gx,(float)gy);
 
 		// belts
 		gl2.glBegin(GL2.GL_LINES);
@@ -288,13 +299,11 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glEnd();
 	}
 
-	protected void paintPlotter(GL2 gl2,Plotter robot,float gx,float gy) {
+	protected void paintPlotter(GL2 gl2,float gx,float gy) {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_5);
-		if(robot.getPenIsUp()) {
-			drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_5+5);
-		}
+		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
+		
 	}
 	
 	protected void drawCircle(GL2 gl2,float x,float y,float r) {
@@ -310,21 +319,57 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 	
+	protected void drawArc(GL2 gl2,float x,float y,float r, float a1, float a2) {
+		gl2.glTranslatef(x, y, 0);
+		gl2.glBegin(GL2.GL_LINES);
+		float f;
+		int i;
+		int steps=10;
+		float delta=(a2-a1)/(float) steps;
+		f=a1;
+		for(i=0;i<steps;i++) {
+			gl2.glVertex2d(	Math.cos(f)*r,Math.sin(f)*r);
+			gl2.glVertex2d(	Math.cos(f+delta)*r,Math.sin(f+delta)*r);
+			f += delta;
+		}
+		gl2.glEnd();
+		gl2.glTranslatef(-x, -y, 0);
+	}
+	
 	protected void paintSafeArea(GL2 gl2,Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
+		double topcrit_ang=20*3.14/180.0;
+		double sidecrit_ang=20*3.14/180.0;
 		double top = settings.getLimitTop();
-		//double bottom = settings.getLimitBottom();
+		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
+		double top_crit=top-(right-left)/2.0*Math.tan(topcrit_ang);
+		double side_crit=(top-top_crit)*Math.tan(sidecrit_ang);
+		double belt=Math.sqrt(Math.pow(top-bottom,2)+Math.pow((right-left)/2.0f,2));
+		double bot_crit=top-Math.sqrt(Math.pow(top-bottom,2)-Math.pow(right-left,2)*0.75);
+		double botang=Math.asin((right-left)/(2*belt));
+		double sideang=Math.asin((right-left)/(belt));
+		
+		gl2.glColor4f(1f,0.4f,0.4f,0.75f);
 
-		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
+		gl2.glBegin(GL2.GL_LINES);
 
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(left-70f, top+70f);
-		gl2.glVertex2d(right+90f, top+70f);
-		gl2.glVertex2d(right+90f, top-1000);
-		gl2.glVertex2d(left-70f, top-1000);
+		gl2.glVertex2d(left+side_crit, bot_crit);
+		gl2.glVertex2d(left, top);
+
+		gl2.glVertex2d(left, top);
+		gl2.glVertex2d((right+left)/2, top_crit);
+
+		gl2.glVertex2d((right+left)/2, top_crit);
+		gl2.glVertex2d(right, top);
+
+		gl2.glVertex2d(right, top);
+		gl2.glVertex2d(right-side_crit, bot_crit);
+
 		gl2.glEnd();
+		drawArc(gl2, (float)right, (float)top, (float)belt, (float)(Math.PI*1.5-sideang), (float)(Math.PI*1.5-botang));
+		drawArc(gl2, (float)left, (float)top, (float)belt, (float)(Math.PI*1.5+botang), (float)(Math.PI*1.5+sideang));
 	}
 	
 	/**
@@ -333,16 +378,15 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 */
 	@Override
 	public float getFeedrateMax() {
-		return 12000;
+		return 100;
 	}
-	
 	/**
 	 * @since software 7.22.6
 	 * @return mm/s [>0]
 	 */
 	@Override
 	public float getFeedrateDefault() {
-		return 9000;
+		return 100;
 	}
 	
 	/**
@@ -351,7 +395,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 */
 	@Override
 	public float getAccelerationMax() {
-		return 2000;
+		return 150;
 	}
 
 	/**
@@ -360,7 +404,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 */
 	@Override
 	public float getPenLiftTime() {
-		return 300;
+		return 80;
 	}
 	
 	/**
@@ -371,8 +415,17 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public float getZAngleOn() {
 		return 30;
 	}
-	
-	public String getGCodeConfig(PlotterSettings settings) {
-		return "";
-	}
+
+	@Override
+    public String getGCodeConfig(Plotter robot) {
+		String result = super.getGCodeConfig(robot);
+		double beltlen = Math.sqrt(
+						Math.pow(getHome().x-robot.getLimitLeft(),2)+
+						Math.pow(robot.getLimitTop()-robot.getLimitBottom(),2)
+						);
+        String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
+        result +="\n"+belt;
+        return result;
+    }
+
 }

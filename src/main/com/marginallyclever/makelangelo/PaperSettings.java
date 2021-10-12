@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo;
 
 import java.beans.PropertyChangeEvent;
 
@@ -7,8 +7,6 @@ import javax.swing.UIManager;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Paper;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectDouble;
@@ -17,7 +15,7 @@ import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class PaperSettingsPanel extends SelectPanel {
+public class PaperSettings extends SelectPanel {
 	/**
 	 * 
 	 */
@@ -77,7 +75,7 @@ public class PaperSettingsPanel extends SelectPanel {
 		new PaperSize("Arch E1",762,1067)
 	};
 
-	public PaperSettingsPanel(Paper paper) {
+	public PaperSettings(Paper paper) {
 		this.myPaper = paper;
 		
 		beingModified=false;
@@ -224,9 +222,9 @@ public class PaperSettingsPanel extends SelectPanel {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
 		
-		JFrame frame = new JFrame(PaperSettingsPanel.class.getSimpleName());
+		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PaperSettingsPanel(new Paper()));
+		frame.add(new PaperSettings(new Paper()));
 		frame.pack();
 		frame.setVisible(true);
 	}

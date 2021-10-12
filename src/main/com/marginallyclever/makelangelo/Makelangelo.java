@@ -69,6 +69,7 @@ import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -117,29 +118,6 @@ public final class Makelangelo {
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
-	
-	public static void main(String[] args) {
-		setSystemLookAndFeel();
-        
-		logFrame = LogPanel.createFrame();
-		Log.start();
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(()->{
-			Makelangelo makelangeloProgram = new Makelangelo();
-			makelangeloProgram.run();
-		});
-	}
-
-	private static void setSystemLookAndFeel() {
-        try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
-	}
 
 	public Makelangelo() {
 		Log.message("Locale="+Locale.getDefault().toString());
@@ -149,6 +127,15 @@ public final class Makelangelo {
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences();
 
+		startRobot();
+
+		saveDialog = new SaveDialog();
+		
+		Log.message("Starting virtual camera...");
+		camera = new Camera();
+	}
+	
+	private void startRobot() {
 		Log.message("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addListener((e)->{
@@ -157,19 +144,23 @@ public final class Makelangelo {
 		myPlotter.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
-
-		saveDialog = new SaveDialog();
-		
-		Log.message("Starting virtual camera...");
-		camera = new Camera();
+		if(previewPanel != null) {
+			previewPanel.addListener(myPlotter);
+		}
 	}
-	
+
 	public void run() {
 		createAppWindow();		
 		checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
+	}
+
+	private static void setSystemLookAndFeel() {
+        try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
 	}
 
 	// check if we need to ask about sharing
@@ -691,7 +682,7 @@ public final class Makelangelo {
 			}).start();
 		}
 	}
-			
+	
 	private void saveFile() {
 		Log.message("Saving vector file...");
 		try {
@@ -709,5 +700,23 @@ public final class Makelangelo {
 
 	public Turtle getTurtle() {
 		return myTurtle;
+	}
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		logFrame = LogPanel.createFrame();
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+		setSystemLookAndFeel();
+		
+		// Schedule a job for the event-dispatching thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(()->{
+			Makelangelo makelangeloProgram = new Makelangelo();
+			makelangeloProgram.run();
+		});
 	}
 }

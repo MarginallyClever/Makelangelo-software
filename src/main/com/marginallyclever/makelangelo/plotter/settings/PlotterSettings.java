@@ -11,9 +11,9 @@ import java.util.prefs.Preferences;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.plotter.settings.plotterTypes.Makelangelo2;
-import com.marginallyclever.makelangelo.plotter.settings.plotterTypes.PlotterType;
-import com.marginallyclever.makelangelo.plotter.settings.plotterTypes.PlotterTypeFactory;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo2;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**

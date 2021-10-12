@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
