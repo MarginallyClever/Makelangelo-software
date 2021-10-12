@@ -348,7 +348,7 @@ public class MarlinInterface extends JPanel {
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S"+(int)p.getPenDownAngle()  +" T100";
+		return "M280 P0 S"+(int)p.getPenDownAngle()  +" T50";
 	}
 
 	public static String getToolChangeString(int toolNumber) {
