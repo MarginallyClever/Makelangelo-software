@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeArt;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyclever.makelangelo.Paper;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class ResizeTurtleToPaper {

@@ -58,9 +58,11 @@ import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.preferences.GFXPreferences;
-import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
-import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -97,7 +99,7 @@ public final class Makelangelo {
 	 */
 	public String VERSION;
 
-	private MakelangeloAppPreferences appPreferences;
+	private MakelangeloSettingPanel mySettingPanel;
 	
 	private Camera camera;
 	private Plotter myPlotter;
@@ -124,7 +126,7 @@ public final class Makelangelo {
 		
 		Log.message("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-		appPreferences = new MakelangeloAppPreferences();
+		mySettingPanel = new MakelangeloSettingPanel();
 
 		startRobot();
 
@@ -185,6 +187,7 @@ public final class Makelangelo {
 	private JMenuBar getMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
+		menuBar.add(createPaperSettingsMenu());
 		menuBar.add(createGenerateMenu());
 		menuBar.add(createToolsMenu());
 		menuBar.add(createViewMenu());
@@ -193,6 +196,32 @@ public final class Makelangelo {
 		menuBar.updateUI();
 		
 		return menuBar;
+	}
+
+	private JMenu createPaperSettingsMenu() {
+		JMenu menu = new JMenu(Translator.get("Paper"));
+		
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("Paper"));
+		bOpenControls.addActionListener((e)-> openPaperSettings());
+		menu.add(bOpenControls);
+		
+		return menu;
+	}
+
+	private void openPaperSettings() {
+		PaperSettings paperSettings = new PaperSettings(myPaper);
+		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		dialog.add(paperSettings);
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+		// make sure pc closes the connection when the dialog is closed.
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+			}
+		});
+		dialog.setVisible(true);
 	}
 
 	private JMenu createRobotMenu() {
@@ -332,7 +361,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener((e)-> appPreferences.run(mainFrame));
+		buttonAdjustPreferences.addActionListener((e)-> mySettingPanel.run(mainFrame));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));

@@ -130,6 +130,10 @@ public class Plotter implements PreviewListener, Cloneable {
 		return settings;
 	}
 	
+	public void setSettings(PlotterSettings s) {
+		settings=s;
+	}
+	
 	@Override
 	public void render(GL2 gl2) {
 		float[] lineWidthBuf = new float[1];

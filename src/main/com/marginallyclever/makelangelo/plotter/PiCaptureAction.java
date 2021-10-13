@@ -29,8 +29,8 @@ import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.paper.Paper;
 
 /**
  * Raspi camera capture to file for image processing

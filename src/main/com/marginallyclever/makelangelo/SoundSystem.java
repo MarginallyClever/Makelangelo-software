@@ -8,7 +8,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.preferences.SoundPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.SoundPreferences;
 
 @Deprecated
 public class SoundSystem {

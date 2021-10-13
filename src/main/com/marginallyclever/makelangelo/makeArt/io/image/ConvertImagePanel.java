@@ -29,12 +29,12 @@ import javax.swing.SwingWorker.StateValue;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterPanel;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
