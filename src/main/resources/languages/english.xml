@@ -843,6 +843,16 @@
 		<value>Save to file/SD card</value>
 		<hint>menu or dialog title</hint>
 	</string>
+	<string>
+		<key>MenuSaveFile</key>
+		<value>Save</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Step</key>
+		<value>Step</value>
+		<hint>menu or dialog title</hint>
+	</string>
 
 	<string>
 		<key>MenuDraw</key>
@@ -1794,6 +1804,11 @@
 		<key>Refresh</key>
 		<value>Refresh</value>
 		<hint>FirmwareUpdate action</hint>
+	</string>
+	<string>
+		<key>NotConnected</key>
+		<value>Not connected</value>
+		<hint>Network session information</hint>
 	</string>
 	
 </language>
