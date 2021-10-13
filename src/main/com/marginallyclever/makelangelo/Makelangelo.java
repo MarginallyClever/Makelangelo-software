@@ -219,6 +219,7 @@ public final class Makelangelo {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				paperSettings.save();
 			}
 		});
 		dialog.setVisible(true);
