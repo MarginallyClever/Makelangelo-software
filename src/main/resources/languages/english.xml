@@ -298,12 +298,6 @@
 	</string>
 
 	<string>
-		<key>EstimatedTime</key>
-		<value>Estimated draw time: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-
-	<string>
 		<key>LoadError</key>
 		<value>File could not be loaded:</value>
 		<hint>status message.</hint>
@@ -1145,6 +1139,24 @@
 	</string>
 
 	<string>
+		<key>EstimatedTime</key>
+		<value>Estimated draw time: </value>
+		<hint>status message. keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>GetTimeEstimate</key>
+		<value>Estimate time</value>
+		<hint>status message. keep the space at the end.</hint>
+	</string>
+	
+	<string>
+		<key>EstimatedTimeIs</key>
+		<value>Estimated time is %1</value>
+		<hint>status message. keep the space at the end.</hint>
+	</string>
+
+	<string>
 		<key>DisengageMotors</key>
 		<value>Disengage</value>
 		<hint>Manual driving dialog</hint>
@@ -1809,6 +1821,18 @@
 		<key>NotConnected</key>
 		<value>Not connected</value>
 		<hint>Network session information</hint>
+	</string>
+
+	<string>
+		<key>MenuPaper</key>
+		<value>Paper</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>OpenPaperSettings</key>
+		<value>Open settings</value>
+		<hint></hint>
 	</string>
 	
 </language>
