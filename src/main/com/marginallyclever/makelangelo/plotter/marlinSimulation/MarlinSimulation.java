@@ -19,8 +19,8 @@ public class MarlinSimulation {
 	public static final int MAX_SEGMENTS = 32;
 	public static final long MIN_SEGMENT_TIME_US = 25000;
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
-	public static double MAX_FEEDRATE = 200.0;   // mm/s
-	public static double MAX_ACCELERATION = 1000.0;  // mm/s/s
+	public static double MAX_FEEDRATE = 12000.0;   // mm/s
+	public static double MAX_ACCELERATION = 5000.0;  // mm/s/s
 	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
 	public static final int SEGMENTS_PER_SECOND = 10;
@@ -49,7 +49,7 @@ public class MarlinSimulation {
 		DOT_PRODUCT,
 		NONE,
 	};
-	private JerkType jerkType = JerkType.JUNCTION_DEVIATION;
+	private JerkType jerkType = JerkType.CLASSIC_JERK;
 
 	// Unit vector of previous path line segment
 	private Vector3d previousNormal = new Vector3d();
