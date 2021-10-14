@@ -32,4 +32,12 @@ public class StringHelper {
 	public static String padRight(String s, int n) {
 		return String.format("%1$-" + n + "s", s);
 	}
+
+	public static String getElapsedTime(int seconds) {
+	    seconds /= 60;
+	    long minutes = seconds % 60;
+	    seconds /= 60;
+	    long hours = seconds % 24;
+	    return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+	}
 }
