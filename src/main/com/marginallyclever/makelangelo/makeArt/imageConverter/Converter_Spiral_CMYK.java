@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -52,6 +53,10 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		separation = (w2<h2) ? w2/4 : h2/4;
 
 		turtle = new Turtle();
+		if(turtle.history.get(turtle.history.size()-1).type==TurtleMove.TOOL_CHANGE) {
+			// remove extra change color at the start of the turtle
+			turtle.history.remove(turtle.history.size()-1);
+		}
 		
 		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);

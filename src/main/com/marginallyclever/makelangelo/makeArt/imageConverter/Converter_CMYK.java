@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 
 /**
@@ -48,6 +49,10 @@ public class Converter_CMYK extends ImageConverter {
 		cmyk.filter(myImage);
 		
 		turtle = new Turtle();
+		if(turtle.history.get(turtle.history.size()-1).type==TurtleMove.TOOL_CHANGE) {
+			// remove extra change color at the start of the turtle
+			turtle.history.remove(turtle.history.size()-1);
+		}
 		
 		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
