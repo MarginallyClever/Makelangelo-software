@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -64,10 +65,11 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
-import com.marginallyclever.makelangeloRobot.Plotter;
-import com.marginallyclever.makelangeloRobot.PlotterEvent;
-import com.marginallyclever.makelangeloRobot.plotterControls.PlotterControls;
-import com.marginallyclever.makelangeloRobot.PiCaptureAction;
+import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -109,39 +111,13 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
 	private static JFrame logFrame;
-	private JMenuItem buttonReopenFile;
 	private SaveDialog saveDialog;
 	
-	private String previousFile;
+	private RecentFiles recentFiles;
 
-	private PiCaptureAction piCameraCaptureAction;
-	
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
-	
-	public static void main(String[] args) {
-		setSystemLookAndFeel();
-        
-		logFrame = LogPanel.createFrame();
-		Log.start();
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(()->{
-			Makelangelo makelangeloProgram = new Makelangelo();
-			makelangeloProgram.run();
-		});
-	}
-
-	private static void setSystemLookAndFeel() {
-        try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
-	}
 
 	public Makelangelo() {
 		Log.message("Locale="+Locale.getDefault().toString());
@@ -151,15 +127,7 @@ public final class Makelangelo {
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		appPreferences = new MakelangeloAppPreferences();
 
-		Log.message("Starting robot...");
-		myPlotter = new Plotter();
-		
-		myPlotter.addListener((e)->{
-			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
-		});
-		myPlotter.getSettings().addListener((e)->{
-			if(previewPanel != null) previewPanel.repaint();
-		});
+		startRobot();
 
 		saveDialog = new SaveDialog();
 		
@@ -167,12 +135,32 @@ public final class Makelangelo {
 		camera = new Camera();
 	}
 	
+	private void startRobot() {
+		Log.message("Starting robot...");
+		myPlotter = new Plotter();
+		myPlotter.addListener((e)->{
+			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
+		});
+		myPlotter.getSettings().addListener((e)->{
+			if(previewPanel != null) previewPanel.repaint();
+		});
+		if(previewPanel != null) {
+			previewPanel.addListener(myPlotter);
+		}
+	}
+
 	public void run() {
 		createAppWindow();		
 		checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
+	}
+
+	private static void setSystemLookAndFeel() {
+        try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
 	}
 
 	// check if we need to ask about sharing
@@ -199,7 +187,7 @@ public final class Makelangelo {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		menuBar.add(createGenerateMenu());
-		menuBar.add(createArtPipelineMenu());
+		menuBar.add(createToolsMenu());
 		menuBar.add(createViewMenu());
 		menuBar.add(createRobotMenu());
 		menuBar.add(createHelpMenu());
@@ -236,13 +224,18 @@ public final class Makelangelo {
 		
 	}
 
-	private JMenu createArtPipelineMenu() {
+	private JMenu createToolsMenu() {
 		JMenu menu = new JMenu(Translator.get("Art Pipeline"));
 
 		try {
-			piCameraCaptureAction = new PiCaptureAction(this, Translator.get("MenuCaptureImage"));	
-			if (piCameraCaptureAction != null) {
-		        menu.add(piCameraCaptureAction);
+			PiCaptureAction pc = new PiCaptureAction();
+			
+			if(pc != null) {
+				JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
+				bCapture.addActionListener((e)->{
+					pc.run(mainFrame,myPaper);
+				});
+		        menu.add(bCapture);
 				menu.addSeparator();
 		    } 
 		} catch (FailedToRunRaspistillException e) {
@@ -292,25 +285,24 @@ public final class Makelangelo {
 	}
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
-		// TODO addPreviewListener(ici);
 		ici.setPaper(myPaper);
-
-		ici.addListener((t) -> setTurtle(t) );
-		
+		ici.addListener((t) -> setTurtle(t));
 		ici.generate();
 		
-		JDialog dialog = new JDialog(getMainFrame(),ici.getName());
+		JDialog dialog = new JDialog(mainFrame,ici.getName());
 		TurtleGeneratorPanel panel = ici.getPanel();
 		dialog.add(panel.getPanel());
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				myPaper.setRotationRef(0);
+				Log.message(Translator.get("Finished"));
+			}
+		});
 		dialog.setVisible(true);
-
-		myPaper.setRotationRef(0);
-		// TODO removePreviewListener(ici);
-		
-		Log.message(Translator.get("Finished"));
 	}
 	
 	private void newFile() {
@@ -327,11 +319,12 @@ public final class Makelangelo {
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openLoadFile(""));
 		menu.add(buttonOpenFile);
-				
-		buttonReopenFile = new JMenuItem(Translator.get("MenuReopenFile"));
-		buttonReopenFile.addActionListener((e) -> reopenLastFile());
-		buttonReopenFile.setEnabled(false);
-		menu.add(buttonReopenFile);		
+		
+		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
+		recentFiles.addSubmenuListener((e)->{
+			openLoadFile(((JMenuItem)e.getSource()).getText());	
+		});
+		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
@@ -360,26 +353,34 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	public void openLoadFile(String previousFile) {
-		Log.message("Loading file...");
+	public void openLoadFile(String filename) {
+		Log.message("Loading file "+filename+"...");
 		try {
-			LoadFilePanel loader = new LoadFilePanel(myPaper,previousFile);
+			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
 			previewPanel.addListener(loader);
+			if(filename!=null && !filename.trim().isEmpty() ) {
+				loader.load(filename);
+			}
 			
 			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
 			dialog.add(loader);
 			dialog.setLocationRelativeTo(mainFrame);
 			dialog.setMinimumSize(new Dimension(500,500));
 			dialog.pack();
+			dialog.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					previewPanel.removeListener(loader);
+					recentFiles.addFilename(loader.getLastFileIn());
+				}
+			});
 			dialog.setVisible(true);
 			
-			previewPanel.removeListener(loader);
-			previousFile = loader.getLastFileIn();
-			buttonReopenFile.setEnabled(true);
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			recentFiles.removeFilename(filename);
 		}
 	}
 
@@ -661,7 +662,6 @@ public final class Makelangelo {
 	private void onClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
-
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -683,18 +683,6 @@ public final class Makelangelo {
 		}
 	}
 	
-	public JFrame getMainFrame() {
-		return mainFrame;
-	}
-
-	public Plotter getRobot() {
-		return myPlotter;
-	}
-	
-	public void reopenLastFile() {
-		openLoadFile(previousFile);
-	}
-		
 	private void saveFile() {
 		Log.message("Saving vector file...");
 		try {
@@ -705,10 +693,6 @@ public final class Makelangelo {
 		}
 	}
 
-	public Paper getPaper() {
-		return myPaper;
-	}
-
 	public void setTurtle(Turtle turtle) {
 		myTurtle = turtle;
 		myTurtleRenderer.setTurtle(turtle);
@@ -716,5 +700,23 @@ public final class Makelangelo {
 
 	public Turtle getTurtle() {
 		return myTurtle;
+	}
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		logFrame = LogPanel.createFrame();
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+		setSystemLookAndFeel();
+		
+		// Schedule a job for the event-dispatching thread:
+		// creating and showing this application's GUI.
+		javax.swing.SwingUtilities.invokeLater(()->{
+			Makelangelo makelangeloProgram = new Makelangelo();
+			makelangeloProgram.run();
+		});
 	}
 }

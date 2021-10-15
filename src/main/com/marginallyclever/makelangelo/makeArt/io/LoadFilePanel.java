@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.makeArt.io;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
@@ -23,6 +22,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.ConvertImagePanel;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
@@ -41,17 +41,15 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private ConvertImagePanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
 	private JPanel mySubPanel = new JPanel();
-	
-	public LoadFilePanel(Paper paper,String previousFile) {
+
+	private String previousFile="";
+
+	public LoadFilePanel(Paper paper,String filename) {
 		super();
 		myPaper = paper;
 		setLayout(new BorderLayout());
-		add(getFileSelectionPanel(previousFile),BorderLayout.NORTH);
+		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		add(mySubPanel,BorderLayout.CENTER);
-		
-		if(previousFile!=null && !previousFile.trim().isEmpty() ) {
-			load(previousFile);
-		}
 	}
 	
 	private JPanel getFileSelectionPanel(String previousFile) {
@@ -79,10 +77,10 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		}
 	}
 	
-	private void load(String selectedFile) {
+	public void load(String filename) {
 		try {
-			if(ConvertImagePanel.isFilenameForAnImage(selectedFile)) {
-				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(selectedFile)) );
+			if(ConvertImagePanel.isFilenameForAnImage(filename)) {
+				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
 				myConvertImage = new ConvertImagePanel(myPaper,image);
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
@@ -94,9 +92,11 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				mySubPanel.add(myConvertImage);
 				mySubPreviewListener = myConvertImage;
 			} else {
-				Turtle t = TurtleFactory.load(selectedFile);
+				Turtle t = TurtleFactory.load(filename);
+				t=ResizeTurtleToPaper.run(t,myPaper,false);
 				notifyListeners(new ActionEvent(t,0,"turtle"));
 			}
+			previousFile = filename;
 		} catch(Exception e) {
 			Log.error("Load error:"+e.getMessage());
 			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
@@ -139,6 +139,10 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		}
 	}
 
+	public String getLastFileIn() {
+		return previousFile;
+	}
+
 	// TEST
 	
 	public static void main(String[] args) {
@@ -156,10 +160,4 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
-	public String getLastFileIn() {
-		File f = fc.getSelectedFile();
-		return f==null?"":f.getAbsolutePath();
-	}
-	
 }

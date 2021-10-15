@@ -1,17 +1,34 @@
 package com.marginallyclever.makelangelo;
 
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
 
-@Deprecated
-public final class RecentFiles<P extends Preferences> {
+public final class RecentFiles extends JMenu {
+	private static final long serialVersionUID = -4331360984016876093L;
+
 	public final int MAX_FILES = 10;
 
-	private P prefs = PreferencesHelper
+	@SuppressWarnings("deprecation")
+	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	private String[] fileList;
+	private ArrayList<String> fileList = new ArrayList<String>();
+	private ActionListener submenuListener;
+
+	// Load recent files from prefs
+	public RecentFiles(String label) {
+		super(label);
+		
+		loadFromStorage();
+		updateLists();
+	}
 
 	/**
 	 * changes the order of the recent files list in the File submenu, saves the
@@ -19,70 +36,84 @@ public final class RecentFiles<P extends Preferences> {
 	 *
 	 * @param filename the file to push to the top of the list.
 	 */
-	public void add(String filename) {
-		String[] newFiles = new String[fileList.length];
-
-		newFiles[0] = filename;
-
-		int i, j = 1;
-		for (i = 0; i < fileList.length; ++i) {
-			if (!filename.equals(fileList[i]) && !fileList[i].equals("")) {
-				newFiles[j++] = fileList[i];
-				if (j == fileList.length)
-					break;
-			}
+	public void addFilename(String filename) {
+		if(filename==null || filename.trim().isEmpty()) return;
+		
+		int i = getIndexOf(filename);
+		if(i==-1) {
+			fileList.add(0,filename);
+		} else {
+			// bump to the head of the list
+			fileList.add(0,fileList.remove(i));
 		}
-
-		fileList = newFiles;
-
-		// update prefs
-		for (i = 0; i < fileList.length; ++i) {
-			if (fileList[i] != null && !fileList[i].isEmpty()) {
-				prefs.put("recent-files-" + i, fileList[i]);
+		updateLists();
+	}
+	
+	private int getIndexOf(String filename) {
+		int i=0;
+		for( String j : fileList ) {
+			if(j.contentEquals(filename)) {
+				return i;
 			}
+			++i;
 		}
+		return -1;
 	}
 
 	public int getMaxFiles() {
-		return fileList.length;
+		return MAX_FILES;
 	}
 
-	public String get(int index) {
-		if (index < 0 || index >= fileList.length)
-			return "";
-
-		return fileList[index];
+	public String getFile(int index) {
+		return fileList.get(index);
 	}
 
-	// A file failed to load. Remove it from recent files, refresh the menu bar.
-	public void remove(String filename) {
-		int i;
-		for (i = 0; i < fileList.length - 1; ++i) {
-			if (fileList[i].equals(filename)) {
-				break;
+	public void removeFilename(String filename) {
+		int i = getIndexOf(filename);
+		if(i==-1) return;
+		
+		fileList.remove(i);
+		updateLists();
+	}
+
+	private void updateLists() {
+		this.removeAll();
+
+		for(int i=0;i<MAX_FILES;++i) {
+			prefs.remove(getNodeName(i));
+		}
+		
+		int i=0;
+		for( String f : fileList ) {
+			prefs.put(getNodeName(i++), f);
+			JMenuItem item = new JMenuItem(f);
+			this.add(item);
+			item.addActionListener(submenuListener);
+		}
+		
+	}
+		
+	private void loadFromStorage() {
+		Log.message("loading recent files:");
+		for(int i=0;i<MAX_FILES;++i) {
+			String name = getNodeName(i);
+			String value = prefs.get(name, "");
+			if(!value.trim().isEmpty()) {
+				Log.message("..."+value);
+				fileList.add(value);
+			} else {
+				Log.message("...done");
+				return;
 			}
 		}
-		for (; i < fileList.length - 1; ++i) {
-			fileList[i] = fileList[i + 1];
-		}
-		fileList[fileList.length - 1] = "";
-
-		// update prefs
-		for (i = 0; i < fileList.length; ++i) {
-			if (fileList[i] != null && !fileList[i].isEmpty()) {
-				prefs.put("recent-files-" + i, fileList[i]);
-			}
-		}
-		prefs.remove("recent-files-" + (i - 1));
+	}
+	
+	private String getNodeName(int i) {
+		return "recent-files-"+i;
 	}
 
-	// Load recent files from prefs
-	public RecentFiles() {
-		fileList = new String[MAX_FILES];
-
-		int i;
-		for (i = 0; i < fileList.length; ++i) {
-			fileList[i] = prefs.get("recent-files-" + i, "");
-		}
+	public void addSubmenuListener(ActionListener object) {
+		submenuListener = object;
+		updateLists();
 	}
 }

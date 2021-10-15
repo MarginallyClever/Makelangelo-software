@@ -11,12 +11,12 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiCell;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiGraphEdge;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiTesselator;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.voronoi.VoronoiCell;
-import com.marginallyclever.voronoi.VoronoiGraphEdge;
-import com.marginallyclever.voronoi.VoronoiTesselator;
 
 /**
  * Dithering using a particle system

@@ -1604,7 +1604,11 @@
 
 	<string>
 		<key>Art Pipeline</key>
+<<<<<<< HEAD
 		<value>Edit</value>
+=======
+		<value>Tools</value>
+>>>>>>> 2fe7798ebc76e549b762eea1d1e2f44e064b3ace
 		<hint></hint>
 	</string>
 
