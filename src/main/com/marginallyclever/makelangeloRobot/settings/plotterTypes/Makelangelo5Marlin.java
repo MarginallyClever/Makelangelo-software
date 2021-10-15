@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangeloRobot.settings.plotterTypes;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLDrawable;
+import com.jogamp.opengl.util.gl2.GLUT;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.settings.PlotterSettings;
@@ -52,11 +54,35 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		paintControlBox(gl2,robot);
-		paintMotors(gl2,robot);
+		
 		paintSafeArea(gl2,robot);
+		paintControlBox(gl2,robot);
+		paintLogo(gl2,robot);
+		paintMotors(gl2,robot);
+		
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
+	}
+
+
+	/**
+	 * paint the Marginally Clever Logo
+	 * @param gl2
+	 * @param settings
+	 */
+	private void paintLogo(GL2 gl2,Plotter robot) {
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+		double top = robot.getLimitTop();
+		
+		final float LOGO_X= ((float)left-(float)right)/2;
+		final float LOGO_Y=0;
+		final float LOGO_RADIUS = 30f; ///mm
+
+		gl2.glColor3f(0,0,0);
+		drawCircle(gl2,(float)left-LOGO_X, (float)top-LOGO_Y, LOGO_RADIUS);
+		//Todo show Marginally clever logo
+		gl2.glPopMatrix();
 	}
 
 	/**
@@ -114,7 +140,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		// RUMBA in v3 (135mm*75mm)
 		float h = 75f/2;
 		float w = 135f/2;
-		gl2.glColor3d(0.9,0.9,0.9);
+		gl2.glColor3d(0.9,0.9,0.9); // #color RUMBA
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
@@ -122,9 +148,20 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
+		/* border around RUMBA
+		gl2.glLineWidth(1);
+		gl2.glColor3f(0,0,0); 
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glVertex2d(-w-1, h+1);
+		gl2.glVertex2d(+w+1, h+1);
+		gl2.glVertex2d(+w+1, -h-1);
+		gl2.glVertex2d(-w-1, -h-1);
+		gl2.glEnd();
+		*/
 		renderLCD(gl2);
-
 		gl2.glPopMatrix();
+
+
 	}
 	
 
@@ -315,14 +352,25 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
 
-		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
+		//gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
+		gl2.glColor4f(1,1,1,1); // #color Safe area
 
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(left-70f, top+70f);
-		gl2.glVertex2d(right+90f, top+70f);
-		gl2.glVertex2d(right+90f, top-1000);
+		gl2.glVertex2d(right+70f, top+70f);
+		gl2.glVertex2d(right+70f, top-1000);
 		gl2.glVertex2d(left-70f, top-1000);
 		gl2.glEnd();
+
+		/* filled rectangle for safe area
+		gl2.glColor3d(0.9,0.9,0.9); // #color Safe area
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left-70f, top+70f);
+		gl2.glVertex2d(right+70f, top+70f);
+		gl2.glVertex2d(right+70f, top-1000);
+		gl2.glVertex2d(left-70f, top-1000);
+		gl2.glEnd();
+		*/
 	}
 	
 	/**

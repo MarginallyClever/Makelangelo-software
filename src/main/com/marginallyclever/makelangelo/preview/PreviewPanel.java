@@ -38,7 +38,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private Camera camera;
 	
 	// background color, rgb values 0...255
-	public ColorRGB backgroundColor = new ColorRGB(212, 212, 255);
+	public ColorRGB backgroundColor = new ColorRGB(204, 204, 204); // Window Background #color 
+
 
 	// motion control
 	// private boolean mouseIn=false;

@@ -23,7 +23,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
+//import com.marginallyclever.makelangelo.DialogBadFirmwareVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangeloRobot.Plotter;
 import com.marginallyclever.makelangeloRobot.PlotterEvent;
@@ -97,7 +97,7 @@ public class MarlinInterface extends JPanel {
 		chatInterface.addNetworkSessionListener(a);
 	}
 
-	@Deprecated
+	/*@Deprecated
 	private void whenBadFirmwareDetected(String versionFound) {
 		(new DialogBadFirmwareVersion()).display(this, versionFound);
 	}
@@ -105,7 +105,7 @@ public class MarlinInterface extends JPanel {
 	@Deprecated
 	private void whenBadHardwareDetected(String versionFound) {
 		JOptionPane.showMessageDialog(this, Translator.get("hardwareVersionBadMessage", new String[]{versionFound}));
-	}
+	}*/
 	
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
