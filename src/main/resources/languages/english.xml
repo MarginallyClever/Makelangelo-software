@@ -1825,4 +1825,15 @@
 		<hint></hint>
 	</string>
 	
+	<string>
+		<key>FileTypeImage</key>
+		<value>Image</value>
+		<hint>load file dialog</hint>
+	</string>
+	
+	<string>
+		<key>FileTypeScratch3</key>
+		<value>Image</value>
+		<hint>load file dialog</hint>
+	</string>
 </language>

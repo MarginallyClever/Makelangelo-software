@@ -110,7 +110,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		}
 		
 		// add image formats
-		FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("ImageFile"),ConvertImagePanel.IMAGE_FILE_EXTENSIONS);
+		FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("FileTypeImage"),ConvertImagePanel.IMAGE_FILE_EXTENSIONS);
 		fc.addChoosableFileFilter(images);
 		
 		// no wild card filter, please.
