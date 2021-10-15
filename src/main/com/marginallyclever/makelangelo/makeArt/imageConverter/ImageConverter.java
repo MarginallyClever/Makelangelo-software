@@ -10,9 +10,9 @@ import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Paper;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**

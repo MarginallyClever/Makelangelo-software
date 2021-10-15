@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.preferences;
+package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -26,13 +26,13 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class MakelangeloAppPreferences {	
+public class MakelangeloSettingPanel {	
 	transient private JPanel panel; 
 	transient private JButton buttonExport;
 	transient private JButton buttonImport;
 	transient private JButton buttonReset;
 	
-	public MakelangeloAppPreferences() {
+	public MakelangeloSettingPanel() {
 		super();
 	}
 	

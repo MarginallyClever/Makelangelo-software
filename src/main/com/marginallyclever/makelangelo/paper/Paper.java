@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.paper;
 
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;

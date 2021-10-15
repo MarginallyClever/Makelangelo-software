@@ -44,6 +44,9 @@ public class MarlinInterface extends JPanel {
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
 	private static final double MARLIN_DRAW_FEEDRATE = 7500.0;  // mm/min
+
+	private static final String STR_FEEDRATE = "echo:  M203";
+	private static final String STR_ACCELERATION = "echo:  M201";
 	
 	//private static final String STR_ECHO = "echo:";
 	//private static final String STR_ERROR = "Error:";
@@ -63,7 +66,7 @@ public class MarlinInterface extends JPanel {
 	// don't send more than this many at a time without acknowledgement.
 	private int busyCount=MARLIN_SEND_LIMIT;
 	
-	private Timer timeoutChecker = new Timer(5000,(e)->onTimeoutCheck());
+	private Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
 	
 	public MarlinInterface(Plotter plotter) {
@@ -80,12 +83,10 @@ public class MarlinInterface extends JPanel {
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
 			case ChooseConnection.CONNECTION_OPENED:
-				//System.out.println("MarlinInterface connected.");
 				onConnect();
 				notifyListeners(e);
 				break;
 			case ChooseConnection.CONNECTION_CLOSED:
-				//System.out.println("MarlinInterface disconnected.");
 				onClose();
 				updateButtonAccess();
 				notifyListeners(e);
@@ -172,6 +173,7 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void onConnect() {
+		Log.message("MarlinInterface connected.");
 		setupListener();
 		lineNumberToSend=1;
 		lineNumberAdded=0;
@@ -181,6 +183,7 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void onClose() {
+		Log.message("MarlinInterface disconnected.");
 		timeoutChecker.stop();
 	}
 	
@@ -191,22 +194,51 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void setupListener() {
-		chatInterface.addNetworkSessionListener((evt) -> {
-			if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
-				lastReceivedTime=System.currentTimeMillis();
-				String message = ((String)evt.data).trim();
-				//System.out.println("MarlinInterface received '"+message.trim()+"'.");
-				if(message.startsWith("X:") && message.contains("Count")) {
-					processM114Reply(message);
-				} else if(message.startsWith(STR_OK)) {
-					onHearOK();
-				} else if(message.contains(STR_RESEND)) {
-					onHearResend(message);
-				}
-			}
-		});
+		chatInterface.addNetworkSessionListener((evt) -> onDataReceived(evt));
 	}
 	
+	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+	private void onDataReceived(NetworkSessionEvent evt){
+		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+			lastReceivedTime=System.currentTimeMillis();
+			String message = ((String)evt.data).trim();
+			//Log.message("MarlinInterface received '"+message.trim()+"'.");
+			if(message.startsWith("X:") && message.contains("Count")) {
+				onHearM114(message);
+			} else if(message.startsWith(STR_FEEDRATE)) {
+				onHearFeedrate(message);
+			} else if(message.startsWith(STR_ACCELERATION)) {
+				onHearAcceleration(message);
+			} else if(message.startsWith(STR_OK)) {
+				onHearOK();
+			} else if(message.contains(STR_RESEND)) {
+				onHearResend(message);
+			}
+		}
+	}
+	
+	// format is "echo:  M201 X5400.00 Y5400.00 Z5400.00"
+	// I only care about the x value when reading.
+	private void onHearAcceleration(String message) {
+		message = message.substring(STR_ACCELERATION.length());
+		String [] parts = message.split("\s");
+		if(parts.length!=4) return;  // TODO exception when M201 is broken?
+		double v=Double.valueOf(parts[1].substring(1));
+		Log.message("MarlinInterface found acceleration "+v);
+		myPlotter.getSettings().setAcceleration(v);
+	}
+
+	// format is "echo:  M203 X5400.00 Y5400.00 Z5400.00"
+	// I only care about the x value when reading.
+	private void onHearFeedrate(String message) {
+		message = message.substring(STR_FEEDRATE.length());
+		String [] parts = message.split("\s");
+		if(parts.length!=4) return;  // TODO exception when M201 is broken?
+		double v=Double.valueOf(parts[1].substring(1));
+		Log.message("MarlinInterface found feedrate "+v);
+		myPlotter.getSettings().setDrawFeedRate(v);
+	}
+
 	private void onHearResend(String message) {
 		String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
 		try {
@@ -297,7 +329,7 @@ public class MarlinInterface extends JPanel {
 	
 	// format is normally X:0.00 Y:270.00 Z:0.00 Count X:0 Y:0 Z:0 U:0 V:0 W:0
 	// trim everything after and including "Count", then read the state data.
-	private void processM114Reply(String message) {
+	private void onHearM114(String message) {
 		try {
 			message = message.substring(0, message.indexOf("Count"));
 			String[] majorParts = message.split("\b");

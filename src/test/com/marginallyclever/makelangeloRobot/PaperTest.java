@@ -2,7 +2,7 @@ package com.marginallyclever.makelangeloRobot;
 
 import org.junit.Test;
 
-import com.marginallyclever.makelangelo.Paper;
+import com.marginallyclever.makelangelo.paper.Paper;
 
 public class PaperTest {
 	/*

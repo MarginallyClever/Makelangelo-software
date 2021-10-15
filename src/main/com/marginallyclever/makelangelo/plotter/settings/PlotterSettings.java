@@ -378,12 +378,8 @@ public class PlotterSettings implements Serializable {
 	}
 
 	public void setTravelFeedRate(double f) {
-		if (f < 0.001)
-			f = 0.001f;
+		if(f < 0.001) f = 0.001f;
 		travelFeedRate = f;
-
-		if (drawFeedRate > travelFeedRate)
-			drawFeedRate = travelFeedRate;
 	}
 
 	public double getTravelFeedRate() {
@@ -395,10 +391,7 @@ public class PlotterSettings implements Serializable {
 	}
 
 	public void setDrawFeedRate(double f) {
-		if (f < 0.001)
-			f = 0.001f;
-		if (f > travelFeedRate)
-			f = travelFeedRate;
+		if(f < 0.001) f = 0.001f;
 		drawFeedRate = f;
 	}
 

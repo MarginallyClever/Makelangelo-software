@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.Paper;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**

@@ -298,12 +298,6 @@
 	</string>
 
 	<string>
-		<key>EstimatedTime</key>
-		<value>Estimated draw time: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-
-	<string>
 		<key>LoadError</key>
 		<value>File could not be loaded:</value>
 		<hint>status message.</hint>
@@ -857,6 +851,16 @@
 		<value>Save to file/SD card</value>
 		<hint>menu or dialog title</hint>
 	</string>
+	<string>
+		<key>MenuSaveFile</key>
+		<value>Save</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>Step</key>
+		<value>Step</value>
+		<hint>menu or dialog title</hint>
+	</string>
 
 
 
@@ -1161,6 +1165,24 @@
 		<key>StatusRemaining</key>
 		<value>Estimated time left: </value>
 		<hint>time machine will be drawing</hint>
+	</string>
+
+	<string>
+		<key>EstimatedTime</key>
+		<value>Estimated draw time: </value>
+		<hint>status message. keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>GetTimeEstimate</key>
+		<value>Estimate time</value>
+		<hint>status message. keep the space at the end.</hint>
+	</string>
+	
+	<string>
+		<key>EstimatedTimeIs</key>
+		<value>Estimated time is %1</value>
+		<hint>status message. keep the space at the end.</hint>
 	</string>
 
 	<string>
@@ -1604,11 +1626,7 @@
 
 	<string>
 		<key>Art Pipeline</key>
-<<<<<<< HEAD
-		<value>Edit</value>
-=======
 		<value>Tools</value>
->>>>>>> 2fe7798ebc76e549b762eea1d1e2f44e064b3ace
 		<hint></hint>
 	</string>
 
@@ -1828,5 +1846,22 @@
 		<value>Refresh</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
+	<string>
+		<key>NotConnected</key>
+		<value>Not connected</value>
+		<hint>Network session information</hint>
+	</string>
 
+	<string>
+		<key>MenuPaper</key>
+		<value>Paper</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>OpenPaperSettings</key>
+		<value>Open settings</value>
+		<hint></hint>
+	</string>
+	
 </language>

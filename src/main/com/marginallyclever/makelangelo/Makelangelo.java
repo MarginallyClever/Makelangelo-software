@@ -48,6 +48,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
@@ -58,9 +59,11 @@ import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.preferences.GFXPreferences;
-import com.marginallyclever.makelangelo.preferences.MakelangeloAppPreferences;
-import com.marginallyclever.makelangelo.preferences.MetricsPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -68,8 +71,8 @@ import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 
@@ -98,7 +101,7 @@ public final class Makelangelo {
 	 */
 	public String VERSION;
 
-	private MakelangeloAppPreferences appPreferences;
+	private MakelangeloSettingPanel mySettingPanel;
 	
 	private Camera camera;
 	private Plotter myPlotter;
@@ -125,7 +128,7 @@ public final class Makelangelo {
 		
 		Log.message("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-		appPreferences = new MakelangeloAppPreferences();
+		mySettingPanel = new MakelangeloSettingPanel();
 
 		startRobot();
 
@@ -186,6 +189,7 @@ public final class Makelangelo {
 	private JMenuBar getMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
+		menuBar.add(createPaperSettingsMenu());
 		menuBar.add(createGenerateMenu());
 		menuBar.add(createToolsMenu());
 		menuBar.add(createViewMenu());
@@ -196,14 +200,55 @@ public final class Makelangelo {
 		return menuBar;
 	}
 
-	private JMenu createRobotMenu() {
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
-		bOpenControls.addActionListener((e)-> openPlotterControls());
-
-		JMenu menu = new JMenu(Translator.get("Robot"));
+	private JMenu createPaperSettingsMenu() {
+		JMenu menu = new JMenu(Translator.get("MenuPaper"));
+		
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenPaperSettings"));
+		bOpenControls.addActionListener((e)-> openPaperSettings());
 		menu.add(bOpenControls);
 		
 		return menu;
+	}
+
+	private void openPaperSettings() {
+		PaperSettings paperSettings = new PaperSettings(myPaper);
+		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		dialog.add(paperSettings);
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+		// make sure pc closes the connection when the dialog is closed.
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				paperSettings.save();
+			}
+		});
+		dialog.setVisible(true);
+	}
+
+	private JMenu createRobotMenu() {
+		JMenu menu = new JMenu(Translator.get("Robot"));
+
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
+		JMenuItem bEstimate = new JMenuItem(Translator.get("GetTimeEstimate"));
+
+		bOpenControls.addActionListener((e)-> openPlotterControls());
+		bEstimate.addActionListener((e)-> estimateTime());
+
+		menu.add(bEstimate);
+		menu.add(bOpenControls);
+
+		
+		return menu;
+	}
+
+	private void estimateTime() {
+		MarlinSimulation ms = new MarlinSimulation(myPlotter.getSettings());
+		int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(myTurtle));
+		String timeAsString = StringHelper.getElapsedTime(estimatedSeconds);
+		String message = Translator.get("EstimatedTimeIs",new String[]{timeAsString});
+		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void openPlotterControls() {
@@ -333,7 +378,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener((e)-> appPreferences.run(mainFrame));
+		buttonAdjustPreferences.addActionListener((e)-> mySettingPanel.run(mainFrame));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
@@ -420,15 +465,23 @@ public final class Makelangelo {
 			GFXPreferences.setShowPenUp(b);
 		});
 		menu.add(checkboxShowPenUpMoves);
+		
+		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
+		buttonViewLog.addActionListener((e) -> showLogDialog() );
+		menu.add(buttonViewLog);
 
 		return menu;
 	}
 
+	private void showLogDialog() {
+		logFrame.setVisible(true);
+	}
+	
 	private JMenu createHelpMenu() {
 		JMenu menu = new JMenu(Translator.get("Help"));
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> logFrame.setVisible(true) );
+		buttonViewLog.addActionListener((e) -> showLogDialog() );
 		menu.add(buttonViewLog);
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));

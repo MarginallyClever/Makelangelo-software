@@ -26,7 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.preferences.LanguagePreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import com.marginallyclever.util.PreferencesHelper;
 

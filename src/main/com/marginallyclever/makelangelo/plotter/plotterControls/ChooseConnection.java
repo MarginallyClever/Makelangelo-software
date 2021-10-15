@@ -53,6 +53,7 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onClose() {
+		Log.message("ChooseConnection closed.");
 		if(mySession!=null) {
 			mySession.closeConnection();
 			mySession=null;
@@ -64,6 +65,8 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onOpen(NetworkSession s) {
+		Log.message("ChooseConnection open to "+s.getName());
+
 		mySession = s;
 		mySession.addListener((e)->{
 			if(e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
