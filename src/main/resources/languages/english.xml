@@ -474,7 +474,7 @@
 	</string>
 	<string>
 		<key>MenuGraphicsPenUp</key>
-		<value>Show pen up moves</value>
+		<value>Show travel moves</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
