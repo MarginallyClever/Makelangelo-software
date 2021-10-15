@@ -148,9 +148,8 @@ public class Plotter implements PreviewListener, Cloneable {
 	}	
 	
 	private void drawPhysicalLimits(GL2 gl2) {
-		gl2.glLineWidth(2);
-
-		gl2.glColor3f(0.7f, 0.7f, 0.7f); // #color Machine Hardware Drawing Limits
+		gl2.glLineWidth(1);
+		gl2.glColor3f(0.9f, 0.9f, 0.9f); // #color Machine Hardware Drawing Limits
 		
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());

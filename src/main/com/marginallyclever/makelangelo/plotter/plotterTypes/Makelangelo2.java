@@ -122,25 +122,25 @@ public class Makelangelo2 implements PlotterType {
 		// left frame
 		gl2.glPushMatrix();
 		// gl2.glTranslatef(-2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		/*gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(left + FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(left + FRAME_SIZE, top             );
 		gl2.glVertex2d(left             , top - FRAME_SIZE);
 		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();
+		gl2.glEnd();*/
 		gl2.glPopMatrix();
 
 		// right frame
 		gl2.glPushMatrix();
 		// gl2.glTranslatef(2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		/*gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(right - FRAME_SIZE, top + FRAME_SIZE);
 		gl2.glVertex2d(right - FRAME_SIZE, top             );
 		gl2.glVertex2d(right             , top - FRAME_SIZE);
 		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();
+		gl2.glEnd();*/
 		gl2.glPopMatrix();
 
 		// left motor

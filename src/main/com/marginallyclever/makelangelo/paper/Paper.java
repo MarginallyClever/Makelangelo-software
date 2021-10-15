@@ -45,7 +45,7 @@ public class Paper implements PreviewListener {
 	
 	private void renderMargin(GL2 gl2) {
 		gl2.glLineWidth(1);
-		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin #color
+		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(getMarginLeft(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginTop());

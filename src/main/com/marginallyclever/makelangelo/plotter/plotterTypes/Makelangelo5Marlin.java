@@ -58,7 +58,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		paintSafeArea(gl2,robot);
 		paintControlBox(gl2,robot);
 		paintLogo(gl2,robot);
-		paintMotors(gl2,robot);
+		paintMotors(gl2,robot); //Weird diamonds
 		
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
@@ -104,13 +104,14 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		final float SUCTION_CUP_RADIUS = 32.5f; ///mm
 		final float FRAME_SIZE=50f; //mm
 
-		gl2.glColor3f(1,1f,1f);
+		gl2.glColor3f(1,1f,1f); // #color of suction cups
 		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		
-		gl2.glColor3f(1,0.8f,0.5f);
+		gl2.glColor3f(0.957f, 0.643f, 0.376f); // #color of Makelangelo Base
+		
 		// frame
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(left-FRAME_SIZE, top+FRAME_SIZE);
@@ -140,7 +141,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		// RUMBA in v3 (135mm*75mm)
 		float h = 75f/2;
 		float w = 135f/2;
-		gl2.glColor3d(0.9,0.9,0.9); // #color RUMBA
+		gl2.glColor3d(0.9,0.9,0.9); // background #color RUMBA
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
@@ -160,8 +161,6 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		*/
 		renderLCD(gl2);
 		gl2.glPopMatrix();
-
-
 	}
 	
 
