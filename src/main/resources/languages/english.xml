@@ -569,21 +569,6 @@
 	</string>
 
 	<string>
-		<key>SetHome</key>
-		<value>Set home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>Go home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
 		<key>GoPaperBorder</key>
 		<value>Border</value>
 		<hint>manual driving dialog</hint>
@@ -609,14 +594,30 @@
 		<value>Right</value>
 		<hint>manual driving dialog</hint>
 	</string>
+	
 	<string>
-		<key>PenUp</key>
+		<key>JogInterface.PenUp</key>
 		<value>Pen up</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenDown</key>
+		<key>JogInterface.PenDown</key>
 		<value>Pen down</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>JogInterface.DisengageMotors</key>
+		<value>Disengage</value>
+		<hint>Manual driving dialog</hint>
+	</string>
+	<string>
+		<key>JogInterface.EngageMotors</key>
+		<value>Engage</value>
+		<hint>Manual driving dialog</hint>
+	</string>
+	<string>
+		<key>JogInterface.FindHome</key>
+		<value>Find home</value>
 		<hint>manual driving dialog</hint>
 	</string>
 
@@ -1154,17 +1155,6 @@
 		<key>EstimatedTimeIs</key>
 		<value>Estimated time is %1</value>
 		<hint>status message. keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>DisengageMotors</key>
-		<value>Disengage</value>
-		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>EngageMotors</key>
-		<value>Engage</value>
-		<hint>Manual driving dialog</hint>
 	</string>
 
 	<string>

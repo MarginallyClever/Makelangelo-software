@@ -66,13 +66,6 @@ public class Plotter implements PreviewListener, Cloneable {
 	private void requestUserChangeTool(int toolNumber) {
 		notifyListeners(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
 	}
-
-	public void goHome() {
-		moveTo(settings.getHomeX(),settings.getHomeY());
-		pos.set(settings.getHomeX(),settings.getHomeY());
-		didFindHome = true;
-		notifyListeners(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
-	}
 	
 	public void findHome() {
 		raisePen();
