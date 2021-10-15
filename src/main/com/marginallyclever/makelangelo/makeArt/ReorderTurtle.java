@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
@@ -34,14 +35,32 @@ public class ReorderTurtle extends AbstractAction {
 		
 		Log.message("reorder() start @ "+turtle.history.size()+" instructions.");
 		
-		// history is made of changes, travels, and draws
-		// look at the section between two changes.
-		//   look at all pen down moves in the section.
-		//     if two pen down moves share a start/end, then they are connected in sequence.
+		Turtle output = new Turtle();
+		output.history.clear();
 		
+		// history is made of changes, travels, and draws
+		ArrayList<Turtle> colors = turtle.splitByToolChange();
+		Log.message("reorder() layers: "+colors.size());
+		for( Turtle t2 : colors ) {
+			output.add(reorderTurtle(t2));
+		}
+		
+		Log.message("reorder() end @ "+output.history.size()+" instructions.");
+		return output;
+	}
+
+	/**
+	 * Reorder drawing moves to minimize travel moves.
+	 * look at all pen down moves.
+	 * if two pen down moves share a start/end, then they are connected in sequence.
+	 * 
+	 * @param turtle
+	 */
+	private static Turtle reorderTurtle(Turtle turtle) {
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
-		Log.message("  Converted to "+originalCount+" lines.");
+		ColorRGB c = turtle.getFirstColor();
+		Log.message("  "+c.toString()+" converted to "+originalCount+" lines.");
 
 		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
 		int uniqueCount = uniqueLines.size();
@@ -49,9 +68,8 @@ public class ReorderTurtle extends AbstractAction {
 		Log.message("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
 
 		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
-		Turtle t = new Turtle();
-		t.addLineSegments(orderedLines, 2.0);
-		Log.message("reorder() end @ "+t.history.size()+" instructions.");
+		Turtle t = new Turtle(c);
+		t.addLineSegments(orderedLines, 1.0);
 		return t;
 	}
 
