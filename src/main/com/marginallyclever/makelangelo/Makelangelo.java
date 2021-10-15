@@ -141,14 +141,18 @@ public final class Makelangelo {
 	private void startRobot() {
 		Log.message("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addListener((e)->{
-			if(e.type==PlotterEvent.TOOL_CHANGE) requestUserChangeTool((int)e.extra);
-		});
+		myPlotter.addListener((e)-> onPlotterEvent(e));
 		myPlotter.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
+		}
+	}
+
+	private void onPlotterEvent(PlotterEvent e) {
+		if(e.type==PlotterEvent.TOOL_CHANGE) {
+			requestUserChangeTool((int)e.extra);
 		}
 	}
 
