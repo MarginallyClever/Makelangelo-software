@@ -29,7 +29,7 @@ public class PlotterControls extends JPanel {
 	private ProgramInterface programInterface;
 
 	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
-	private JButton bGoHome= new JButton(Translator.get("GoHome"));
+	private JButton bGoHome= new JButton(Translator.get("FindHome"));
 	private JButton bRewind = new JButton(Translator.get("Rewind"));
 	private JButton bStart = new JButton(Translator.get("Play"));
 	private JButton bStep = new JButton(Translator.get("Step"));
