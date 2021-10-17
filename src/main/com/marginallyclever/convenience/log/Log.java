@@ -41,7 +41,6 @@ public class Log {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static ArrayList<LogListener> listeners = new ArrayList<LogListener>();
 
-	
 	public static void addListener(LogListener listener) {
 		listeners.add(listener);
 	}
