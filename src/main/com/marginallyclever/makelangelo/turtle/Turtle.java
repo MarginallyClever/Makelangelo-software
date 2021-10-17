@@ -97,7 +97,7 @@ public class Turtle implements Cloneable {
 			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
 		}
 		color = new ColorRGB(c);
-		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMove.TOOL_CHANGE) );
+		history.add( new TurtleMove(c.toInt(),0,TurtleMove.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
