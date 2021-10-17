@@ -17,9 +17,6 @@ import com.marginallyclever.util.PreferencesHelper;
 
 
 public class LogPanel extends JPanel implements LogListener {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2753297349917155256L;
 	private static final int LOG_LENGTH = 5000;
 
