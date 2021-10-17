@@ -149,7 +149,6 @@ public class ConversationHistory extends JPanel {
 			ConversationEvent msg = inBoundQueue.poll();
 			if(msg!=null) addMessage(msg);
 		}
-		
 	}
 	
 	private void addMessage(ConversationEvent msg) {
@@ -164,6 +163,8 @@ public class ConversationHistory extends JPanel {
 	private void jumpToEnd() {
 		listView.ensureIndexIsVisible(listModel.getSize()-1);
 	}
+	
+	// TEST
 	
 	public static void main(String[] args) {
 		Log.start();

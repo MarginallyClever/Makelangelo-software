@@ -8,7 +8,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>

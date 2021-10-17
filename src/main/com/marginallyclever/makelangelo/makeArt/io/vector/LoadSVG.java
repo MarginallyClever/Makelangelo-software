@@ -45,6 +45,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * See https://www.w3.org/TR/SVG/paths.html
  */
 public class LoadSVG implements TurtleLoader {
+	private static final String LABEL_STROKE="stroke:";
+	
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	private Turtle myTurtle;
 	
@@ -151,19 +153,13 @@ public class LoadSVG implements TurtleLoader {
 			myTurtle.moveTo(v2.x,v2.y);
 	    }
 	}
-
+	
 	private boolean isElementStrokeNone(Element element) {
 		if(element.hasAttribute("style")) {
-			// we have a style
-			String style = element.getAttribute("style");
-			// stripe whitespace and smash to lower case
-			style = style.toLowerCase().replace(" ","");
-			// does the style contain "stroke:"?
-			String strokeLabelName="stroke:";
-			if(style.contains(strokeLabelName)) {
-				// is the stroke none?
-				int k = style.indexOf(strokeLabelName);
-				String strokeStyleName = style.substring(k+strokeLabelName.length());
+			String style = element.getAttribute("style").toLowerCase().replace("\s","");
+			if(style.contains(LABEL_STROKE)) {
+				int k = style.indexOf(LABEL_STROKE);
+				String strokeStyleName = style.substring(k+LABEL_STROKE.length());
 				if(strokeStyleName.contentEquals("none") || strokeStyleName.contentEquals("white") )
 					// it is!  bail.
 					return true;
