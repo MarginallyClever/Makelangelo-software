@@ -38,8 +38,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private Camera camera;
 	
 	// background color, rgb values 0...255
-	public ColorRGB backgroundColor = new ColorRGB(212, 212, 255);
-
+	public ColorRGB backgroundColor = new ColorRGB(255-67,255-67,255-67);
+	
 	// motion control
 	// private boolean mouseIn=false;
 	private int buttonPressed = MouseEvent.NOBUTTON;
@@ -241,6 +241,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	 * @param gl2
 	 */
 	private void paintBackground(GL2 gl2) {
+		int b=70;
+		backgroundColor = new ColorRGB(255-b,255-b,255-b);
 		// Clear The Screen And The Depth Buffer
 		gl2.glClearColor(
 				(float)backgroundColor.getRed()/255.0f,

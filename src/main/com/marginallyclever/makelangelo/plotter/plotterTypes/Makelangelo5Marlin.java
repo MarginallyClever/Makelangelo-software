@@ -1,6 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
+import java.io.IOException;
+
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
@@ -11,6 +16,8 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
+	private static Texture texture1;
+	private static Texture texture2;
 	
 	@Override
 	public String getVersion() {
@@ -52,11 +59,67 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
-		paintControlBox(gl2,robot);
-		paintMotors(gl2,robot);
+		if(Makelangelo5Marlin.texture1==null) 
+		{
+			Makelangelo5Marlin.texture1 = loadTexture(gl2,"/resources/makelangelo5.png");
+		}
+		if(Makelangelo5Marlin.texture2==null) {
+			Makelangelo5Marlin.texture2 = loadTexture(gl2,"/resources/makelangelo5-motors.png");
+		}
+		
+	    if(Makelangelo5Marlin.texture1==null) {
+			paintControlBoxPlain(gl2,robot);
+	    } else {
+	    	Makelangelo5Marlin.texture1.bind(gl2);
+			paintControlBoxFancy(gl2,robot);
+	    }
+		
 		paintSafeArea(gl2,robot);
+		
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
+		
+	    if(Makelangelo5Marlin.texture2==null) {
+			paintMotors(gl2,robot);
+	    } else {
+	    	Makelangelo5Marlin.texture2.bind(gl2);
+			paintControlBoxFancy(gl2,robot);
+	    }
+	}
+
+	private void paintControlBoxFancy(GL2 gl2, Plotter robot) {
+		double left = robot.getLimitLeft();
+		// double top = robot.getLimitTop();
+		
+		final double scale = 650.0/811.0;  // machine is 650 motor-to-motor.  texture is 811.  scale accordingly.
+		final double TW = 1024*scale;
+		final double TH = 1024*scale;
+		final double ox = left-106*scale;  // 106 taken from offset in texture map
+		final double oy = -15-190*scale;  // 109 taken from offset in texture map.  TODO why -15 instead of top?
+
+		gl2.glColor4d(1, 1, 1,1);
+		gl2.glEnable(GL2.GL_TEXTURE_2D);
+
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glTexCoord2d(0,0);  gl2.glVertex2d(ox, oy);
+		gl2.glTexCoord2d(1,0);  gl2.glVertex2d(ox+TW, oy);
+		gl2.glTexCoord2d(1,1);  gl2.glVertex2d(ox+TW, oy+TH);
+		gl2.glTexCoord2d(0,1);  gl2.glVertex2d(ox, oy+TH);
+		gl2.glEnd();
+		
+		gl2.glDisable(GL2.GL_TEXTURE_2D);
+	}
+
+	private Texture loadTexture(GL2 gl2,String name) {
+		Texture tex=null;
+		try {
+		  tex=TextureIO.newTexture(FileAccess.open(name), false, name.substring(name.lastIndexOf('.')+1));
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+			System.out.println(FileAccess.getWorkingDirectory());
+			//Log.error("I can't load "+name);
+		}
+		return tex;
 	}
 
 	/**
@@ -64,7 +127,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 * @param gl2
 	 * @param settings
 	 */
-	private void paintControlBox(GL2 gl2,Plotter robot) {
+	private void paintControlBoxPlain(GL2 gl2,Plotter robot) {
 		double cy = robot.getLimitTop();
 		double left = robot.getLimitLeft();
 		double right = robot.getLimitRight();
@@ -84,7 +147,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		
-		gl2.glColor3f(1,0.8f,0.5f);
+		gl2.glColor3d(1,0.8f,0.5f);
 		// frame
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(left-FRAME_SIZE, top+FRAME_SIZE);
