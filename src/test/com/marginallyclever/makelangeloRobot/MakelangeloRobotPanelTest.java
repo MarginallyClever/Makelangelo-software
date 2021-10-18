@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangeloRobot;
 
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;

@@ -4,8 +4,10 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
@@ -61,7 +63,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 	/**
 	 * @throws Exception
 	 */
-	@org.junit.After
+	@AfterAll
 	public void tearDown() throws Exception {
 		marginallyCleverJsonPreferenceNode.removeNode();
 	}
@@ -81,7 +83,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 		for (String childNodeName : childrenPreferenceNodeNames) {
 			Log.message("child node name: "+ childNodeName);
 			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
-			Assert.assertTrue(isMachineNameAnInteger);
+			assertTrue(isMachineNameAnInteger);
 			//Machine configurations numbered -1 and below should not exist.
 			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
 			//Assert.assertFalse(isMachineNameLessThanZero);

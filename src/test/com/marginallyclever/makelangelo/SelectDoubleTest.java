@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Locale;
-import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectDouble;

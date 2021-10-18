@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.marginallyclever.convenience.log.Log;
 

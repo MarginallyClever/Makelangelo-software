@@ -359,7 +359,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.7.0</version>
+			<version>5.8.1</version>
 			<scope>test</scope>
 		</dependency>
 
