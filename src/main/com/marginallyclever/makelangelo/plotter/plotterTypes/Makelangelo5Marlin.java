@@ -30,10 +30,10 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	}
 	
 	@Override
-	public boolean canInvertMotors() {
-		return false;
+	public Point2D getHome() {
+		return new Point2D(0,-482.65);  // assumes 1m belts on 650x1000 machine.
 	}
-
+	
 	@Override
 	public boolean canChangeMachineSize() {
 		return false;
@@ -44,8 +44,12 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		return true;
 	}
 	
-	public float getWidth() { return 650; }
-	public float getHeight() { return 1000; }
+	public float getWidth() {
+		return 650;
+	}
+	public float getHeight() {
+		return 1000;
+	}
 
 	@Override
 	public boolean canAutoHome() {

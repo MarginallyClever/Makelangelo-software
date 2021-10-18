@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
@@ -29,11 +28,6 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 		return "Makelangelo (Custom)";
 	}
 	
-	@Override
-	public boolean canInvertMotors() {
-		return true;
-	}
-
 	@Override
 	public boolean canChangeMachineSize() {
 		return true;
@@ -415,17 +409,4 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 	public float getZAngleOn() {
 		return 30;
 	}
-
-	@Override
-    public String getGCodeConfig(Plotter robot) {
-		String result = super.getGCodeConfig(robot);
-		double beltlen = Math.sqrt(
-						Math.pow(getHome().x-robot.getLimitLeft(),2)+
-						Math.pow(robot.getLimitTop()-robot.getLimitBottom(),2)
-						);
-        String belt="D7 R"+StringHelper.formatDouble(beltlen)+" L"+StringHelper.formatDouble(beltlen);
-        result +="\n"+belt;
-        return result;
-    }
-
 }

@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Makelangelo3_3 extends Makelangelo2 {
+public class Makelangelo3_3 extends Polargraph {
 	@Override
 	public String getVersion() {
 		return "4";
@@ -165,6 +166,11 @@ public class Makelangelo3_3 extends Makelangelo2 {
 
 		// clean up
 		gl2.glPopMatrix();
+	}
+
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
 	}
 	
 }

@@ -199,47 +199,4 @@ public class Plotter implements PreviewListener, Cloneable {
 	public double getLimitTop() {
 		return settings.getLimitTop();
 	}
-	
-	/**
-	 * convert from belt length mm to cartesian position.
-	 * @param beltLeft length of belt (mm)
-	 * @param beltRight length of belt (mm)
-	 * @return cartesian coordinate 
-	 */
-	public Point2D FK(double beltLeft, double beltRight) {
-		double width = settings.getHardwareProperties().getWidth();
-		double height = settings.getHardwareProperties().getHeight();
-		double limit_ymax = height / 2.0;
-
-		// use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
-		double a = beltLeft;
-		double b = width;
-		double c = beltRight;
-		double theta = ((a * a + b * b - c * c) / (2.0 * a * b));
-
-		double x = theta * a - width / 2.0; // theta*a + limit_xmin;
-		double y = limit_ymax - Math.sqrt(1.0 - theta * theta) * a;
-
-		return new Point2D(x, y);
-	}
-	
-	/**
-	 * convert from cartesian space to belt lengths.
-	 * @param x
-	 * @param y
-	 * @return Point2D with x=belt left and y=belt right.
-	 */
-	public Point2D IK(double x,double y) {
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		double top = settings.getLimitTop();
-		
-		double dy = top-y;
-		double dx = left-x;
-		double b1 = Math.sqrt(dx*dx+dy*dy);
-		dx = right-x;
-		double b2 = Math.sqrt(dx*dx+dy*dy);
-		
-		return new Point2D(b1,b2);
-	}
 }
