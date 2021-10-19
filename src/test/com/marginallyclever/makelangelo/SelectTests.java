@@ -18,7 +18,7 @@ public class SelectTests {
 	private int testObservation; 
 	
 	@BeforeAll
-	static public void beforeAll() {
+	public static void beforeAll() {
 		frame = new JFrame("Select Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
@@ -26,7 +26,7 @@ public class SelectTests {
 	}
 	
 	@AfterAll
-	static public void afterAll() {
+	public static void afterAll() {
 		frame.dispose();
 	}
 	

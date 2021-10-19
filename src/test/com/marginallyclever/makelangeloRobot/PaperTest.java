@@ -1,10 +1,24 @@
 package com.marginallyclever.makelangeloRobot;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class PaperTest {
+	@BeforeAll
+	public static void beforeAll() {
+		Log.start();
+		PreferencesHelper.start();
+	}
+	@AfterAll
+	public static void afterAll() {
+		Log.end();
+	}
+	
 	/*
 	@Test
 	public void testChangeToolMessage() {

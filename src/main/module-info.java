@@ -5,9 +5,9 @@ module com.marginallyclever.makelangelo {
 	requires org.apache.commons.io;
 	requires org.json;
 	requires org.jetbrains.annotations;
-	requires org.junit.jupiter.api;
 	requires org.slf4j;
 	
+	requires junit;
 	requires jrpicam;
 	requires jogamp.fat;
 	requires kabeja;
@@ -15,4 +15,6 @@ module com.marginallyclever.makelangelo {
 	requires vecmath;
 	requires batik.all;
 	requires xml.apis.ext;
+	
+	opens com.marginallyclever.makelangelo;
 }

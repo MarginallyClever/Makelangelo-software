@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.imageConverter;
 public class ImageConverterFactory {
 	// storing this list here so it's easier to find.
 	public static final ImageConverterPanel [] list = {
-		new Converter_Boxes_Panel(new Converter_Boxes()),
+		new Converter_Boxxy_Panel(new Converter_Boxxy()),
 		new Converter_CMYK_Panel(new Converter_CMYK()),
 		new Converter_Crosshatch_Panel(new Converter_Crosshatch()),
 		new Converter_Moire_Panel(new Converter_Moire()),

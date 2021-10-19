@@ -40,7 +40,7 @@ public class Select implements FocusListener {
 
 	// OBSERVER PATTERN
 	
-	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);
@@ -50,7 +50,7 @@ public class Select implements FocusListener {
 		propertyChangeListeners.remove(p);
 	}
 	
-	public void notifyPropertyChangeListeners(Object oldValue,Object newValue) {
+	protected void notifyPropertyChangeListeners(Object oldValue,Object newValue) {
 		PropertyChangeEvent evt = new PropertyChangeEvent(this,myName,oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);

@@ -1833,7 +1833,13 @@
 	
 	<string>
 		<key>FileTypeScratch3</key>
-		<value>Image</value>
+		<value>Scratch 3</value>
+		<hint>load file dialog</hint>
+	</string>
+	
+	<string>
+		<key>Open</key>
+		<value>Open file...</value>
 		<hint>load file dialog</hint>
 	</string>
 </language>

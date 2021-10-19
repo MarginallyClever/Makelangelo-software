@@ -125,7 +125,6 @@ public final class Makelangelo {
 	public Makelangelo() {
 		Log.message("Locale="+Locale.getDefault().toString());
 		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
-		
 		Log.message("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		mySettingPanel = new MakelangeloSettingPanel();

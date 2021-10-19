@@ -65,7 +65,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 
 	// OBSERVER PATTERN
 	
-	protected ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);

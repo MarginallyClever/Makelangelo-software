@@ -76,7 +76,8 @@ public class Log {
 	}
 	
 	public static void end() {
-		logger.info(PROGRAM_END_STRING);
+		//logger.info(PROGRAM_END_STRING);
+		write(PROGRAM_END_STRING);
 	}
 	
 	private static boolean crashReportCheck() {

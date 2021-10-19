@@ -121,6 +121,9 @@ public class SelectInteger extends Select {
 	}
 	
 	public void setValue(int arg0) {
-		field.setText(Integer.toString(arg0));
+		if(value!=arg0) {
+			field.setText(Integer.toString(arg0));
+			notifyPropertyChangeListeners(value, arg0);
+		}
 	}
 }

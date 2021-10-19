@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
@@ -111,6 +112,9 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 		cards.setPreferredSize(new Dimension(449,325));
 		cards.setBorder(BorderFactory.createLoweredBevelBorder());
 		this.add(cards,c);
+
+		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
+		changeConverter(ImageConverterFactory.list[first]);
 	}
 	
 	private JComboBox<String> getStyleSelection() {
@@ -121,17 +125,23 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 		}
 		
 		JComboBox<String> box = new JComboBox<String>((String[])imageConverterNames.toArray(new String[0]));
-		box.addItemListener((e) -> {
-		    CardLayout cl = (CardLayout)(cards.getLayout());
-		    cl.show(cards, (String)e.getItem());
-		    scaleLoader(fillNames.getSelectedIndex());
-			changeConverter(ImageConverterFactory.list[box.getSelectedIndex()]);
-			setPreferredDrawStyle(box.getSelectedIndex());
-		});
+		box.addItemListener((e) -> onConverterChanged(e));
 
 		box.setSelectedIndex(getPreferredDrawStyle());
 
 		return box;
+	}
+
+	private void onConverterChanged(ItemEvent e) {
+		Log.message("onConverterChanged");
+				
+	    CardLayout cl = (CardLayout)(cards.getLayout());
+	    cl.show(cards, (String)e.getItem());
+	    scaleLoader(fillNames.getSelectedIndex());
+
+		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
+		changeConverter(ImageConverterFactory.list[first]);
+		setPreferredDrawStyle(first);
 	}
 
 	private JComboBox<String> getFillSelection() {
@@ -237,6 +247,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 	}
 	
 	private void reconvert() {
+		Log.message("reconvert");
 		stopConversion();
 		startConversion(myConverterPanel);
 	}

@@ -6,13 +6,27 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class Filter_CMYKTest {
-	@Test
+	@BeforeAll
+	public static void beforeAll() {
+		Log.start();
+		PreferencesHelper.start();
+	}
+	@AfterAll
+	public static void afterAll() {
+		Log.end();
+	}
+	
+	//@Test
 	public void testConversion() {
 		try {
 			final String PATH_NAME = "target/classes/bill-murray";

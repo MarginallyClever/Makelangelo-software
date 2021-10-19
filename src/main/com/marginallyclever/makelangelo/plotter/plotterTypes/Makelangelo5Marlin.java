@@ -65,10 +65,10 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public void render(GL2 gl2,Plotter robot) {
 		if(Makelangelo5Marlin.texture1==null) 
 		{
-			Makelangelo5Marlin.texture1 = loadTexture(gl2,"/resources/makelangelo5.png");
+			Makelangelo5Marlin.texture1 = loadTexture(gl2,"/makelangelo5.png");
 		}
 		if(Makelangelo5Marlin.texture2==null) {
-			Makelangelo5Marlin.texture2 = loadTexture(gl2,"/resources/makelangelo5-motors.png");
+			Makelangelo5Marlin.texture2 = loadTexture(gl2,"/makelangelo5-motors.png");
 		}
 		
 	    if(Makelangelo5Marlin.texture1==null) {

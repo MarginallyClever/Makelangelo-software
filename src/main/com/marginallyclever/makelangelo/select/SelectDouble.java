@@ -115,6 +115,7 @@ public class SelectDouble extends Select {
 		if(newValue!=value) {
 			//Log.message("new "+newValue+" old "+oldValue);
 			field.setText(StringHelper.formatDouble(newValue));
+			notifyPropertyChangeListeners(value, newValue);
 		}
 	}
 	

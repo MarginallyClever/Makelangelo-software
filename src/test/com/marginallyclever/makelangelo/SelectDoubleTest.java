@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import com.marginallyclever.convenience.log.Log;
@@ -24,12 +22,7 @@ public class SelectDoubleTest {
 		
 		// test observer fires
 		testObservation=0;
-		b.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				++testObservation;
-			}
-		});
+		b.addPropertyChangeListener((evt) -> ++testObservation );
 		
 		b.setValue(2000.34f);
 		Log.message("text="+b.getText()+" value="+b.getValue());
