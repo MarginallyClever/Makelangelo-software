@@ -9,9 +9,9 @@ import com.marginallyclever.convenience.log.Log;
 
 
 public class FirmwareUploader {
-	public String arduinoPath = "C:/Program Files (x86)/Arduino/hardware/tools/avr/";
-	public String avrdudePath = "bin/avrdude";
-	public String confPath = "etc/avrdude.conf";
+	public String arduinoPath = "";
+	public String avrdudePath = "\\avrdude.exe";
+	public String confPath = "\\avrdude.conf";
 	
 	public FirmwareUploader() {
 		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)

@@ -52,3 +52,6 @@ docs/
 
 ## packaging
 packaging/*
+firmware.hex
+avrdude.conf
+avrdude.exe
