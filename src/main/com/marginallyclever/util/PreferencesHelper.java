@@ -25,7 +25,7 @@ public final class PreferencesHelper {
 	/**
 	 * Internal mapping of all Makelangelo preference nodes.
 	 */
-	private static Map<MakelangeloPreferenceKey, ? extends Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
+	private static Map<MakelangeloPreferenceKey, Preferences> CLASS_TO_PREFERENCE_NODE_MAP;
 
 	/**
 	 * Future Makelagelo root preference node path name.
@@ -51,23 +51,11 @@ public final class PreferencesHelper {
 	 * See com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings
 	 */
 	private static final String MACHINES_PATH_NAME = "Machines";
-
-	/**
-	 *
-	 */
 	private static final String LANGUAGE_PATH_NAME = "Language";
-	/**
-	 *
-	 */
 	private static final String SOUND_PATH_NAME = "Sound";
-	/**
-	 *
-	 */
 	private static final String METRICS_PATH_NAME = "Metrics";
-	/**
-	 *
-	 */
 	private static final String FILE_PATH_NAME = "File";
+	private static final String PAPER_PATH_NAME = "Paper";
 
 	/**
 	 * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
@@ -92,6 +80,7 @@ public final class PreferencesHelper {
 		initialMap.put(MakelangeloPreferenceKey.LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
+		initialMap.put(MakelangeloPreferenceKey.PAPER, legacyMakelangeloPreferenceNode.node(PAPER_PATH_NAME));
 		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
 		
 		Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;

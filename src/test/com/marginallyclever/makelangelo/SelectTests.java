@@ -5,8 +5,9 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JFrame;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
@@ -16,26 +17,26 @@ public class SelectTests {
 	private SelectPanel panel;
 	private int testObservation; 
 	
-	@BeforeClass
-	static public void beforeAll() {
+	@BeforeAll
+	public static void beforeAll() {
 		frame = new JFrame("Select Test");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
 	}
 	
-	@AfterClass
-	static public void afterAll() {
+	@AfterAll
+	public static void afterAll() {
 		frame.dispose();
 	}
 	
-	@Before
+	@BeforeEach
 	public void beforeEach() {
 		panel = new SelectPanel();
 		frame.getContentPane().add(panel.getPanel());
 	}
 	
-	@After
+	@AfterEach
 	public void afterEach() {
 		frame.getContentPane().removeAll();
 	}

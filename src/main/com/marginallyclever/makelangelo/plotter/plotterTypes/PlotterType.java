@@ -19,8 +19,6 @@ public abstract interface PlotterType {
 
 	public boolean canAccelerate();
 
-	public boolean canInvertMotors();
-
 	/**
 	 * @return true if the machine has limit switches and can find home on its own.
 	 */
@@ -47,12 +45,6 @@ public abstract interface PlotterType {
 	 * @param robot the machine to draw.  TODO wtf?
 	 */
 	public void render(GL2 gl2, Plotter robot);
-
-	/**
-	 * @return Hardware specific gcode sent on connect
-	 */
-	@Deprecated
-	public String getGCodeConfig(Plotter robot);
 
 	public float getFeedrateMax();
 

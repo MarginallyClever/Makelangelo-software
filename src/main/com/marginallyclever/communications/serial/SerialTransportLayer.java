@@ -1,11 +1,8 @@
 package com.marginallyclever.communications.serial;
 
-import org.junit.Test;
-
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.convenience.log.Log;
 
 import java.util.regex.Pattern;
 import jssc.SerialPortList;
@@ -28,7 +25,7 @@ public class SerialTransportLayer implements TransportLayer {
 	 * find all available serial ports
 	 * @return a list of port names
 	 */
-	public String[] listConnections() {
+	public static String[] listConnections() {
 		String OS = System.getProperty("os.name").toLowerCase();
 
 		String [] portsDetected;
@@ -61,6 +58,7 @@ public class SerialTransportLayer implements TransportLayer {
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
+	@Override
 	public NetworkSession openConnection(String connectionName) {
 		//if(connectionName.equals(recentPort)) return null;
 
@@ -80,19 +78,5 @@ public class SerialTransportLayer implements TransportLayer {
 	 */
 	public TransportLayerPanel getTransportLayerPanel() {
 		return new SerialTransportLayerPanel(this);
-	}
-	
-	@Test
-	public void scanConnections() {
-		String [] connectionNames = listConnections();
-		if(connectionNames.length<=0) {
-			Log.message("No serial connections found.");
-			return;
-		}
-		
-		NetworkSession [] connections = new NetworkSession[connectionNames.length];
-		for(int i=0;i<connectionNames.length;++i) {
-			connections[i] = openConnection(connectionNames[i]);
-		}
 	}
 }

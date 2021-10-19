@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
  * @author Dan Royer
  */
 @Deprecated
-public class Zarplotter extends Makelangelo2 {
+public class Zarplotter extends Polargraph {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
@@ -32,11 +32,6 @@ public class Zarplotter extends Makelangelo2 {
 		return "Zarplotter";
 	}
 
-	@Override
-	public boolean canInvertMotors() {
-		return false;
-	}
-	
 	@Override
 	public boolean canAutoHome() {
 		return false;

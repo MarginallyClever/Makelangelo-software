@@ -71,7 +71,7 @@ public class SaveGCode {
 			case TurtleMove.TRAVEL:
 				if(!isUp) {
 					// lift pen up
-					out.write(MarlinInterface.getPenUpString(robot)+"\n");
+					out.write(MarlinPlotterInterface.getPenUpString(robot)+"\n");
 					isUp=true;
 				}
 				previousMovement=m;
@@ -80,19 +80,19 @@ public class SaveGCode {
 				if(isUp) {
 					// go to m and put pen down
 					if(previousMovement==null) previousMovement=m;
-					out.write(MarlinInterface.getTravelTo(previousMovement.x, previousMovement.y)+"\n");
-					out.write(MarlinInterface.getPenDownString(robot)+"\n");
+					out.write(MarlinPlotterInterface.getTravelToString(previousMovement.x, previousMovement.y)+"\n");
+					out.write(MarlinPlotterInterface.getPenDownString(robot)+"\n");
 					isUp=false;
 				}
-				out.write(MarlinInterface.getDrawTo(m.x, m.y)+"\n");
+				out.write(MarlinPlotterInterface.getDrawToString(m.x, m.y)+"\n");
 				previousMovement=m;
 				break;
 			case TurtleMove.TOOL_CHANGE:
-				out.write(MarlinInterface.getToolChangeString(m.getColor().toInt())+"\n");
+				out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt())+"\n");
 				break;
 			}
 		}
-		if(!isUp) out.write(MarlinInterface.getPenUpString(robot)+"\n");
+		if(!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot)+"\n");
 		
 		out.flush();
 		out.close();

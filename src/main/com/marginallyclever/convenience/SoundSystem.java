@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.convenience;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

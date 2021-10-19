@@ -93,13 +93,13 @@ public class ProgramInterface extends JPanel {
 			System.out.println("Can't find next line.");
 			return;
 		}
+		// Increment the line as soon as possible so that step() does not get called twice on the same line.
+		listView.setSelectedIndex(now+1);
 		
 		TurtleMove move = listModel.get(now);
 		//System.out.println("Step to ("+now+"):"+move.toString());
-
 		myPlotter.turtleMove(move);
 		
-		listView.setSelectedIndex(now+1);
 		int selected = listView.getSelectedIndex();
 		listView.ensureIndexIsVisible(selected);
 		if(selected == now) {

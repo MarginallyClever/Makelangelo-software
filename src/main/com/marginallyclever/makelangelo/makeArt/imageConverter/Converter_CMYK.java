@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.convenience.ColorRGB;
@@ -9,7 +8,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
 
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
@@ -48,6 +46,8 @@ public class Converter_CMYK extends ImageConverter {
 		cmyk.filter(myImage);
 		
 		turtle = new Turtle();
+		// remove extra change color at the start of the turtle
+		turtle.history.clear();
 		
 		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
 		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));

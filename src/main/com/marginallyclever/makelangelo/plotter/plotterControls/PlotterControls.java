@@ -29,7 +29,7 @@ public class PlotterControls extends JPanel {
 	private ProgramInterface programInterface;
 
 	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
-	private JButton bGoHome= new JButton(Translator.get("GoHome"));
+	private JButton bFindHome= new JButton(Translator.get("FindHome"));
 	private JButton bRewind = new JButton(Translator.get("Rewind"));
 	private JButton bStart = new JButton(Translator.get("Play"));
 	private JButton bStep = new JButton(Translator.get("Step"));
@@ -45,7 +45,7 @@ public class PlotterControls extends JPanel {
 		myTurtle=turtle;
 		
 		jogInterface = new JogInterface(plotter);
-		marlinInterface = new MarlinInterface(plotter);
+		marlinInterface = new MarlinPlotterInterface(plotter);
 		programInterface = new ProgramInterface(plotter,turtle);
 		
 		JTabbedPane pane = new JTabbedPane();
@@ -74,7 +74,7 @@ public class PlotterControls extends JPanel {
 		JToolBar bar = new JToolBar();
 		bar.add(bSaveGCode);
 		bar.addSeparator();
-		bar.add(bGoHome);
+		bar.add(bFindHome);
 		bar.addSeparator();
 		bar.add(bRewind);
 		bar.add(bStart);
@@ -82,7 +82,7 @@ public class PlotterControls extends JPanel {
 		bar.add(bStep);
 		
 		bSaveGCode.addActionListener((e)-> saveGCode());
-		bGoHome.addActionListener((e)-> goHome());
+		bFindHome.addActionListener((e)-> findHome());
 		bRewind.addActionListener((e)-> rewind());
 		bStart.addActionListener((e)-> play());
 		bPause.addActionListener((e)-> pause());
@@ -93,7 +93,7 @@ public class PlotterControls extends JPanel {
 		return bar;
 	}
 	
-	private void goHome() {
+	private void findHome() {
 		myPlotter.findHome();
 		updateButtonStatus();
 	}

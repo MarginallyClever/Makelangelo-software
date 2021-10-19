@@ -90,10 +90,9 @@ public class DialogAbout {
 		
 		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
-		final String menuAboutValue = Translator.get("MenuAbout");
 		if (icon == null) {
 			icon = getImageIcon("resources/logo.png");
 		}
-		JOptionPane.showMessageDialog(parent, bottomText, menuAboutValue, JOptionPane.INFORMATION_MESSAGE, icon);
+		JOptionPane.showMessageDialog(parent, bottomText, Translator.get("MenuAbout"), JOptionPane.INFORMATION_MESSAGE, icon);
 	}
 }

@@ -41,7 +41,6 @@ public class Log {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static ArrayList<LogListener> listeners = new ArrayList<LogListener>();
 
-	
 	public static void addListener(LogListener listener) {
 		listeners.add(listener);
 	}
@@ -77,7 +76,8 @@ public class Log {
 	}
 	
 	public static void end() {
-		logger.info(PROGRAM_END_STRING);
+		//logger.info(PROGRAM_END_STRING);
+		write(PROGRAM_END_STRING);
 	}
 	
 	private static boolean crashReportCheck() {

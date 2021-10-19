@@ -1,15 +1,28 @@
 package com.marginallyclever.makelangelo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.util.PreferencesHelper;
 
 
 public class VersionTest {
+	@BeforeAll
+	public static void beforeAll() {
+		Log.start();
+		PreferencesHelper.start();
+		Translator.start();
+	}
+	@AfterAll
+	public static void afterAll() {
+		Log.end();
+	}
+	
 	@Test
 	public void checkVersion() throws IllegalStateException {
-		Log.start();
-		
 		Makelangelo m = new Makelangelo();
 		
 		String [] toks = m.VERSION.split("\\.");
@@ -21,7 +34,5 @@ public class VersionTest {
 		} catch(NumberFormatException e) {
 			throw new IllegalStateException("Makelangelo.VERSION must start with a number, not a letter.");
 		}
-		
-		Log.end();
 	}
 }

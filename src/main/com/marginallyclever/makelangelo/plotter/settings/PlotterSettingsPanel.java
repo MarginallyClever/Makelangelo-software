@@ -58,7 +58,6 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 
 		rebuildTabbedPanes();
 
-
 		// now assemble the dialog
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();

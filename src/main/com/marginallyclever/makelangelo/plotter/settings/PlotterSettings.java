@@ -11,7 +11,7 @@ import java.util.prefs.Preferences;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo2;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5Marlin;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 import com.marginallyclever.util.PreferencesHelper;
@@ -449,13 +449,14 @@ public class PlotterSettings implements Serializable {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.error("Hardware version instance failed. Defaulting to v2");
-			hardwareProperties = new Makelangelo2();
-			newVersion = "2";
+			Log.error("Hardware version instance failed. Defaulting to v5");
+			hardwareProperties = new Makelangelo5Marlin();
+			newVersion = hardwareProperties.getVersion();
 		}
 		if (newVersion == "") {
-			Log.error("Unknown hardware version requested. Defaulting to v2");
-			hardwareProperties = new Makelangelo2();
+			Log.error("Unknown hardware version requested. Defaulting to v5");
+			hardwareProperties = new Makelangelo5Marlin();
+			newVersion = hardwareProperties.getVersion();
 		}
 
 		hardwareVersion = newVersion;

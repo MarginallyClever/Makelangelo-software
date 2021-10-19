@@ -1,12 +1,11 @@
 package com.marginallyclever.makelangelo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Locale;
-import org.junit.Test;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectDouble;
@@ -23,12 +22,7 @@ public class SelectDoubleTest {
 		
 		// test observer fires
 		testObservation=0;
-		b.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				++testObservation;
-			}
-		});
+		b.addPropertyChangeListener((evt) -> ++testObservation );
 		
 		b.setValue(2000.34f);
 		Log.message("text="+b.getText()+" value="+b.getValue());

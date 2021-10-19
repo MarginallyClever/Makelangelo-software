@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Cartesian extends Makelangelo2 {
+public class Cartesian extends Polargraph {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
@@ -26,11 +26,6 @@ public class Cartesian extends Makelangelo2 {
 		return "Cartesian";
 	}
 
-	@Override
-	public boolean canInvertMotors() {
-		return false;
-	}
-	
 	@Override
 	public boolean canAutoHome() {
 		return false;

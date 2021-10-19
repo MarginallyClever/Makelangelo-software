@@ -20,11 +20,7 @@ public class JogInterface extends JPanel {
 	private static final long serialVersionUID = -7408469373702327861L;
 	private Plotter myPlotter;
 	private CartesianButtons bCartesian = new CartesianButtons();
-	private JButton goHome;
-	private JButton findHome;
-	private JButton penUp;
-	private JButton penDown;
-	private JButton toggleEngagedMotor;
+	private JButton toggleEngageMotor;
 	
 	public JogInterface(Plotter plotter) {
 		super();
@@ -77,25 +73,22 @@ public class JogInterface extends JPanel {
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 
-		penUp    = new JButton(Translator.get("PenUp"));
-		penDown  = new JButton(Translator.get("PenDown"));
-		goHome   = new JButton(Translator.get("GoHome"));
-		findHome = new JButton(Translator.get("FindHome"));
-		toggleEngagedMotor = new JButton(Translator.get("DisengageMotors"));
+		JButton penUp    = new JButton(Translator.get("JogInterface.PenUp"));
+		JButton penDown  = new JButton(Translator.get("JogInterface.PenDown"));
+		JButton findHome = new JButton(Translator.get("JogInterface.FindHome"));
+		toggleEngageMotor = new JButton(Translator.get("JogInterface.DisengageMotors"));
 
-		bar.add(goHome);
 		bar.add(findHome);
 		bar.addSeparator();
 		bar.add(penUp);
 		bar.add(penDown);
 		bar.addSeparator();
-		bar.add(toggleEngagedMotor);
+		bar.add(toggleEngageMotor);
 		
 		penUp.addActionListener((e)-> myPlotter.raisePen());
 		penDown.addActionListener((e)-> myPlotter.lowerPen());
-		goHome.addActionListener((e)-> myPlotter.goHome());
 		findHome.addActionListener((e)-> myPlotter.findHome());
-		toggleEngagedMotor.addActionListener((e)-> onToggleEngageMotorAction());
+		toggleEngageMotor.addActionListener((e)-> onToggleEngageMotorAction());
 		
 		return bar;
 	}
@@ -108,7 +101,7 @@ public class JogInterface extends JPanel {
 	}
 
 	private void updateButtonStatus() {
-		toggleEngagedMotor.setText(Translator.get( myPlotter.getAreMotorsEngaged() ? "DisengageMotors" : "EngageMotors" ));
+		toggleEngageMotor.setText(Translator.get( myPlotter.getAreMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors" ));
 		bCartesian.setEnabled(myPlotter.getDidFindHome());
 	}
 

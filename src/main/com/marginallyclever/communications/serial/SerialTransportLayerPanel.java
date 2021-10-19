@@ -22,7 +22,7 @@ public class SerialTransportLayerPanel extends TransportLayerPanel {
 		this.setLayout(new GridLayout(0, 1));
 		add(connectionComboBox = new JComboBox<String>());
 	    
-	    String [] portsDetected = layer.listConnections();
+	    String [] portsDetected = SerialTransportLayer.listConnections();
 		int i;
 	    for(i=0;i<portsDetected.length;++i) {
 	    	connectionComboBox.addItem(portsDetected[i]);

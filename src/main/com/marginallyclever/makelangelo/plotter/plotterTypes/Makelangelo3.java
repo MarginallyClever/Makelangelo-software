@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 /**
@@ -8,7 +9,7 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
  * @author Dan Royer
  */
 @Deprecated
-public class Makelangelo3 extends Makelangelo2 {
+public class Makelangelo3 extends Polargraph {
 	@Override
 	public String getVersion() {
 		return "3";
@@ -17,6 +18,11 @@ public class Makelangelo3 extends Makelangelo2 {
 	@Override
 	public String getName() {
 		return "Makelangelo 3.0-3.2";
+	}
+
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
 	}
 
 	@Override

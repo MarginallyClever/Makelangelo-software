@@ -4,8 +4,11 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
@@ -18,17 +21,9 @@ import com.marginallyclever.util.UnitTestHelper;
  * @author Peter Colapietro
  * @since v7.1.4
  */
-public class PreferencesHelperTest<A extends AbstractPreferences> {
-
-	/**
-	 *
-	 */
-	private A preferenceNode;
-
-	/**
-	 *
-	 */
-	private MarginallyCleverPreferences marginallyCleverJsonPreferenceNode;
+public class PreferencesHelperTest {
+	private static AbstractPreferences preferenceNode;
+	private static MarginallyCleverPreferences marginallyCleverJsonPreferenceNode;
 
 
 	/**
@@ -58,20 +53,26 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 		CLIENT_CODE_STACK_INDEX = i;
 	}
 	
+	@BeforeAll
+	public static void beforeAll() {
+		Log.start();
+		PreferencesHelper.start();
+		preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
+		marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
+	}
+	
 	/**
 	 * @throws Exception
 	 */
-	@org.junit.After
-	public void tearDown() throws Exception {
+	@AfterAll
+	public static void afterAll() throws Exception {
 		marginallyCleverJsonPreferenceNode.removeNode();
+		Log.end();
 	}
 
 	@Test
 	@SuppressWarnings("deprecation")
 	public void testMachineConfigurationNames() throws BackingStoreException {
-		Log.start();
-		preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
-		marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
 
 		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
 		Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
@@ -81,7 +82,7 @@ public class PreferencesHelperTest<A extends AbstractPreferences> {
 		for (String childNodeName : childrenPreferenceNodeNames) {
 			Log.message("child node name: "+ childNodeName);
 			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
-			Assert.assertTrue(isMachineNameAnInteger);
+			assertTrue(isMachineNameAnInteger);
 			//Machine configurations numbered -1 and below should not exist.
 			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
 			//Assert.assertFalse(isMachineNameLessThanZero);

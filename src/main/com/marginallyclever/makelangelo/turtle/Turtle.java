@@ -19,28 +19,26 @@ import com.marginallyclever.convenience.log.Log;
 public class Turtle implements Cloneable {
 	public ArrayList<TurtleMove> history;
 
-	private ReentrantLock lock;
+	private ReentrantLock lock = new ReentrantLock();
 
 	// current state
-	private double turtleX, turtleY;
-	private double turtleDx, turtleDy;
+	private double px, py;
+	private double nx, ny;  // normal of angle. aka sin() and cos() of angle.
 	private double angle;
 	private boolean isUp;
 	private ColorRGB color;
 
-	
 	public Turtle() {
 		super();
-		lock = new ReentrantLock();
-		reset();
+		reset(new ColorRGB(0,0,0));
 	}
 	
 	public Turtle(Turtle t) {
 		this();
-		turtleX = t.turtleX;
-		turtleY = t.turtleY;
-		turtleDx = t.turtleDx;
-		turtleDy = t.turtleDy;
+		px = t.px;
+		py = t.py;
+		nx = t.nx;
+		ny = t.ny;
 		angle = t.angle;
 		isUp = t.isUp;
 		t.color.set(t.color);
@@ -48,6 +46,11 @@ public class Turtle implements Cloneable {
 		for( TurtleMove m : t.history ) {
 			history.add(new TurtleMove(m));
 		}
+	}
+	
+	public Turtle(ColorRGB firstColor) {
+		super();
+		reset(firstColor);
 	}
 
 	@Override
@@ -62,14 +65,14 @@ public class Turtle implements Cloneable {
 	/**
 	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
 	 */
-	protected void reset() {
-		turtleX = 0;
-		turtleY = 0;
+	private void reset(ColorRGB c) {
+		px = 0;
+		py = 0;
 		setAngle(0);
 		penUp();
 		history = new ArrayList<TurtleMove>();
 		// default turtle color is black.
-		setColor(new ColorRGB(0,0,0));
+		setColor(c);
 	}
 	
 	// multithreading lock safety
@@ -92,11 +95,9 @@ public class Turtle implements Cloneable {
 	public void setColor(ColorRGB c) {
 		if(color!=null) {
 			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
-			color.set(c);
-		} else {
-			color = new ColorRGB(c);
 		}
-		history.add( new TurtleMove(c.toInt(),0/*tool diameter?*/,TurtleMove.TOOL_CHANGE) );
+		color = new ColorRGB(c);
+		history.add( new TurtleMove(c.toInt(),0,TurtleMove.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
@@ -120,17 +121,17 @@ public class Turtle implements Cloneable {
 	 * @param y 
 	 */
 	public void moveTo(double x,double y) {
-		turtleX=x;
-		turtleY=y;
+		px=x;
+		py=y;
 		history.add( new TurtleMove(x, y, isUp ? TurtleMove.TRAVEL : TurtleMove.DRAW) );
 	}
-	
+		
 	/**
 	 * Absolute position
 	 * @param arg0 x axis
 	 */
 	public void setX(double arg0) {
-		moveTo(arg0,turtleY);
+		moveTo(arg0,py);
 	}
 	
 	/**
@@ -138,15 +139,15 @@ public class Turtle implements Cloneable {
 	 * @param arg0 y axis
 	 */
 	public void setY(double arg0) {
-		moveTo(turtleX,arg0);
+		moveTo(px,arg0);
 	}
 	
 	public double getX() {
-		return turtleX;
+		return px;
 	}
 	
 	public double getY() {
-		return turtleY;
+		return py;
 	}
 	
 	public void penUp() {
@@ -184,8 +185,8 @@ public class Turtle implements Cloneable {
 	public void setAngle(double degrees) {
 		angle=degrees;
 		double radians=Math.toRadians(angle);
-		turtleDx = Math.cos(radians);
-		turtleDy = Math.sin(radians);
+		nx = Math.cos(radians);
+		ny = Math.sin(radians);
 	}
 
 	/**
@@ -194,8 +195,8 @@ public class Turtle implements Cloneable {
 	 */
 	public void forward(double stepSize) {
 		moveTo(
-			turtleX + turtleDx * stepSize,
-			turtleY + turtleDy * stepSize
+			px + nx * stepSize,
+			py + ny * stepSize
 		);
 	}
 
@@ -339,7 +340,7 @@ public class Turtle implements Cloneable {
 		
 		LineSegment2D first = orderedLines.get(0); 
 		jumpTo(first.a.x,first.a.y);
-		Point2D currentPosition = new Point2D(first.b.x, first.b.y);
+		moveTo(first.b.x,first.b.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
 		
@@ -349,25 +350,65 @@ public class Turtle implements Cloneable {
 				setColor(line.c);
 			}
 			
-			if(lengthSquared(currentPosition, line.a) > minJumpSquared) {
+			if(distanceSquared(line.a) > minJumpSquared) {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
 				jumpTo(line.a.x,line.a.y);
-			} else {
-				// The previous line ends close to the start point of this line,
-				// so there's no need to go to the start point of this line since the pen is practically there.
-				// The start point of this line will be skipped.
-				//moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
 			moveTo(line.b.x,line.b.y);
-			currentPosition.set(line.b.x,line.b.y);
 		}
 	}
 
-	private double lengthSquared(Point2D a,Point2D b) {
-		double dx = a.x-b.x;
-		double dy = a.y-b.y;
+	private double distanceSquared(Point2D b) {
+		double dx = px-b.x;
+		double dy = py-b.y;
 		return dx*dx + dy*dy; 
+	}
+	
+	public ArrayList<Turtle> splitByToolChange() {
+		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		Turtle t = new Turtle();
+		list.add(t);
+		
+		for( TurtleMove m : history) {
+			if(m.type==TurtleMove.TOOL_CHANGE) {
+				t = new Turtle();
+				t.history.clear();
+				list.add(t);
+			}
+			t.history.add(m);
+		}
+		Log.message("Turtle.splitByToolChange() into "+list.size()+" sections.");
+
+		ArrayList<Turtle> notEmptyList = new ArrayList<Turtle>();
+		for( Turtle t2 : list ) {
+			if(t2.getHasAnyDrawingMoves()) {
+				notEmptyList.add(t2);
+			}
+		}
+		Log.message("Turtle.splitByToolChange() "+notEmptyList.size()+" not-empty sections.");
+		
+		return notEmptyList;
+	}
+	
+	public boolean getHasAnyDrawingMoves() {
+		for( TurtleMove m : history) {
+			if(m.type==TurtleMove.DRAW) return true;
+		}
+		return false;
+	}
+
+	public void add(Turtle t) {
+		this.history.addAll(t.history);
+	}
+
+	public ColorRGB getFirstColor() {
+		for( TurtleMove m : history) {
+			if(m.type==TurtleMove.TOOL_CHANGE)
+				return m.getColor();
+		}
+		
+		return new ColorRGB(0,0,0);
 	}
 }
