@@ -18,6 +18,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public final static double MOTOR_WIDTH = 42;
 	private static Texture texture1;
 	private static Texture texture2;
+	private static Texture texture3;
 	
 	@Override
 	public String getVersion() {
@@ -70,6 +71,11 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		if(Makelangelo5Marlin.texture2==null) {
 			Makelangelo5Marlin.texture2 = loadTexture(gl2,"/makelangelo5-motors.png");
 		}
+
+		if(Makelangelo5Marlin.texture3==null) 
+		{
+			Makelangelo5Marlin.texture3 = loadTexture(gl2,"/logo.png");
+		}
 		
 	    if(Makelangelo5Marlin.texture1==null) {
 			paintControlBoxPlain(gl2,robot);
@@ -89,6 +95,14 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	    	Makelangelo5Marlin.texture2.bind(gl2);
 			paintControlBoxFancy(gl2,robot);
 	    }
+
+	    if(Makelangelo5Marlin.texture3==null) {
+			//paintLogo(gl2,robot);
+	    } else {
+	    	Makelangelo5Marlin.texture3.bind(gl2);
+			paintLogoFancy(gl2,robot);
+	    }
+
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot) {
@@ -131,19 +145,33 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	 * @param gl2
 	 * @param settings
 	 */
-	private void paintLogo(GL2 gl2,Plotter robot) {
+	private void paintLogoFancy(GL2 gl2,Plotter robot) {
 		double left = robot.getLimitLeft();
 		double right = robot.getLimitRight();
 		double top = robot.getLimitTop();
-		
-		final float LOGO_X= ((float)left-(float)right)/2;
-		final float LOGO_Y=0;
-		final float LOGO_RADIUS = 30f; ///mm
+		double bottom = robot.getLimitBottom();
 
-		gl2.glColor3f(0,0,0);
-		drawCircle(gl2,(float)left-LOGO_X, (float)top-LOGO_Y, LOGO_RADIUS);
-		//Todo show Marginally clever logo
-		gl2.glPopMatrix();
+		final double scale = 0.5;
+		final double TW = 128*scale;
+		final double TH = 128*scale;
+
+		final float LOGO_X= ((float)left - (float)right)/2 - 65; // bottom left corner of safe Area
+		final float LOGO_Y= 0 - 490;
+
+		//final float LOGO_X= 0 - ((float)left - (float)right)/2 - 160; // different coordinates in the main Wooden Base
+		//final float LOGO_Y= 0 + 470;
+
+		gl2.glColor4d(1, 1, 1, 1);
+		gl2.glEnable(GL2.GL_TEXTURE_2D);
+
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glTexCoord2d(0,0);  gl2.glVertex2d(LOGO_X, LOGO_Y);
+		gl2.glTexCoord2d(1,0);  gl2.glVertex2d(LOGO_X+TW, LOGO_Y);
+		gl2.glTexCoord2d(1,1);  gl2.glVertex2d(LOGO_X+TW, LOGO_Y+TH);
+		gl2.glTexCoord2d(0,1);  gl2.glVertex2d(LOGO_X, LOGO_Y+TH);
+		gl2.glEnd();
+		
+		gl2.glDisable(GL2.GL_TEXTURE_2D);
 	}
 
 	/**
