@@ -627,7 +627,11 @@
 		<value>Find home</value>
 		<hint>manual driving dialog</hint>
 	</string>
-
+	<string>
+		<key>FindHome</key>
+		<value>Find home</value>
+		<hint>manual driving dialog</hint>
+	</string>
 	<string>
 		<key>Set</key>
 		<value>Set</value>
