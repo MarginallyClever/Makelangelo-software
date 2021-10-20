@@ -83,25 +83,27 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private void uploadNow() {
 		goButton.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
+
+		String status = "Finished!";
+		int messageType = JOptionPane.PLAIN_MESSAGE;
 		try {
 			firmwareUploader.arduinoPath = sourceAVRDude.getText();
 			firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
-			setCursor(Cursor.getDefaultCursor());
-			JOptionPane.showMessageDialog(this,e1.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
+			status = e1.getMessage();
+			messageType = JOptionPane.ERROR_MESSAGE;
 		}
 
 		setCursor(Cursor.getDefaultCursor());
 		goButton.setEnabled(true);
-		JOptionPane.showMessageDialog(this,"Finished!","Firmware upload status",JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(this,status,"Firmware upload status",messageType);
 	}
 	
 	private boolean AVRDudeExists() {
 		File f = new File(sourceAVRDude.getText());
 		boolean state = f.exists(); 
 		if(!state) {
-			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload status",JOptionPane.ERROR_MESSAGE);
 		}
 		return state;
 	}
