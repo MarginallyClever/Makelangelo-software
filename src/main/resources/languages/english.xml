@@ -369,6 +369,13 @@
 		<value>Opening </value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
+
+	<string>
+		<key>Open</key>
+		<value>Open File dialog </value>
+		<hint></hint>
+	</string>
+
 	<string>
 		<key>UnknownFileType</key>
 		<value>Unknown file type</value>
@@ -620,7 +627,11 @@
 		<value>Find home</value>
 		<hint>manual driving dialog</hint>
 	</string>
-
+	<string>
+		<key>FindHome</key>
+		<value>Find home</value>
+		<hint>manual driving dialog</hint>
+	</string>
 	<string>
 		<key>Set</key>
 		<value>Set</value>
@@ -828,6 +839,13 @@
 		<value>Open File...</value>
 		<hint></hint>
 	</string>
+
+	<string>
+		<key>MenuSaveFile</key>
+		<value>Save File...</value>
+		<hint></hint>
+	</string>
+
 	<string>
 		<key>MenuReopenFile</key>
 		<value>Reopen last file</value>
@@ -849,11 +867,26 @@
 		<hint>menu or dialog title</hint>
 	</string>
 
+
+
 	<string>
 		<key>MenuDraw</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
+	<string>
+		<key>Step</key>
+		<value>Step</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>NotConnected</key>
+		<value>Not Connected</value>
+		<hint>menu or dialog title</hint>
+	</string>
+
 	<string>
 		<key>Halt</key>
 		<value>Halt</value>
@@ -880,7 +913,7 @@
 		<value>Zoom to fit</value>
 		<hint>menu or dialog title</hint>
 	</string>
-	
+
 	<string>
 		<key>ShowLog</key>
 		<value>Show Log</value>
@@ -1742,13 +1775,13 @@
 		<value>Flip vertical</value>
 		<hint>Art Pipeline</hint>
 	</string>
-	
+
 	<string>
 		<key>Reorder</key>
 		<value>Reorder</value>
 		<hint>Art Pipeline</hint>
 	</string>
-	
+
 	<string>
 		<key>Simplify</key>
 		<value>Simplify</value>
@@ -1765,7 +1798,7 @@
 		<value>Graph Paper</value>
 		<hint>Generator</hint>
 	</string>
-	
+
 	<string>
 		<key>Package</key>
 		<value>Papercraft Box</value>
@@ -1777,31 +1810,31 @@
 		<value>Papercraft Polyhedron</value>
 		<hint>Generator</hint>
 	</string>
-	
+
 	<string>
 		<key>FirmwareUpdate</key>
 		<value>Update firmware</value>
 		<hint>build-in arduino hex flashing action</hint>
 	</string>
-	
+
 	<string>
 		<key>avrDude path</key>
 		<value>avrDude path</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
-	
+
 	<string>
 		<key>*.hex file</key>
 		<value>*.hex file</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
-	
+
 	<string>
 		<key>Port</key>
 		<value>Port</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
-	
+
 	<string>
 		<key>Refresh</key>
 		<value>Refresh</value>

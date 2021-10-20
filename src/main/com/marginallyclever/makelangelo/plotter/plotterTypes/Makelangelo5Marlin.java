@@ -18,6 +18,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	public final static double MOTOR_WIDTH = 42;
 	private static Texture texture1;
 	private static Texture texture2;
+	private static Texture texture3;
 	
 	@Override
 	public String getVersion() {
@@ -70,6 +71,11 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		if(Makelangelo5Marlin.texture2==null) {
 			Makelangelo5Marlin.texture2 = loadTexture(gl2,"/makelangelo5-motors.png");
 		}
+
+		if(Makelangelo5Marlin.texture3==null) 
+		{
+			Makelangelo5Marlin.texture3 = loadTexture(gl2,"/logo.png");
+		}
 		
 	    if(Makelangelo5Marlin.texture1==null) {
 			paintControlBoxPlain(gl2,robot);
@@ -89,6 +95,14 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	    	Makelangelo5Marlin.texture2.bind(gl2);
 			paintControlBoxFancy(gl2,robot);
 	    }
+
+	    if(Makelangelo5Marlin.texture3==null) {
+			//paintLogo(gl2,robot);
+	    } else {
+	    	Makelangelo5Marlin.texture3.bind(gl2);
+			paintLogoFancy(gl2,robot);
+	    }
+
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot) {
@@ -127,6 +141,40 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	}
 
 	/**
+	 * paint the Marginally Clever Logo
+	 * @param gl2
+	 * @param settings
+	 */
+	private void paintLogoFancy(GL2 gl2,Plotter robot) {
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+		double top = robot.getLimitTop();
+		double bottom = robot.getLimitBottom();
+
+		final double scale = 0.5;
+		final double TW = 128*scale;
+		final double TH = 128*scale;
+
+		final float LOGO_X= ((float)left - (float)right)/2 - 65; // bottom left corner of safe Area
+		final float LOGO_Y= 0 - 490;
+
+		//final float LOGO_X= 0 - ((float)left - (float)right)/2 - 160; // different coordinates in the main Wooden Base
+		//final float LOGO_Y= 0 + 470;
+
+		gl2.glColor4d(1, 1, 1, 1);
+		gl2.glEnable(GL2.GL_TEXTURE_2D);
+
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glTexCoord2d(0,0);  gl2.glVertex2d(LOGO_X, LOGO_Y);
+		gl2.glTexCoord2d(1,0);  gl2.glVertex2d(LOGO_X+TW, LOGO_Y);
+		gl2.glTexCoord2d(1,1);  gl2.glVertex2d(LOGO_X+TW, LOGO_Y+TH);
+		gl2.glTexCoord2d(0,1);  gl2.glVertex2d(LOGO_X, LOGO_Y+TH);
+		gl2.glEnd();
+		
+		gl2.glDisable(GL2.GL_TEXTURE_2D);
+	}
+
+	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
 	 * @param settings
@@ -145,7 +193,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		final float SUCTION_CUP_RADIUS = 32.5f; ///mm
 		final float FRAME_SIZE=50f; //mm
 
-		gl2.glColor3f(1,1f,1f);
+		gl2.glColor3f(1,1f,1f); // #color of suction cups
 		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
 		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
@@ -181,7 +229,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		// RUMBA in v3 (135mm*75mm)
 		float h = 75f/2;
 		float w = 135f/2;
-		gl2.glColor3d(0.9,0.9,0.9);
+		gl2.glColor3d(0.9,0.9,0.9); // background #color RUMBA
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
@@ -189,8 +237,17 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
+		/* border around RUMBA
+		gl2.glLineWidth(1);
+		gl2.glColor3f(0,0,0); 
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glVertex2d(-w-1, h+1);
+		gl2.glVertex2d(+w+1, h+1);
+		gl2.glVertex2d(+w+1, -h-1);
+		gl2.glVertex2d(-w-1, -h-1);
+		gl2.glEnd();
+		*/
 		renderLCD(gl2);
-
 		gl2.glPopMatrix();
 	}
 	
@@ -384,14 +441,25 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
 
-		gl2.glColor4f(0.5f,0.5f,0.75f,0.75f);
+		//gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
+		gl2.glColor4f(1,1,1,1); // #color Safe area
 
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(left-70f, top+70f);
-		gl2.glVertex2d(right+90f, top+70f);
-		gl2.glVertex2d(right+90f, top-1000);
+		gl2.glVertex2d(right+70f, top+70f);
+		gl2.glVertex2d(right+70f, top-1000);
 		gl2.glVertex2d(left-70f, top-1000);
 		gl2.glEnd();
+
+		/* filled rectangle for safe area
+		gl2.glColor3d(0.9,0.9,0.9); // #color Safe area
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left-70f, top+70f);
+		gl2.glVertex2d(right+70f, top+70f);
+		gl2.glVertex2d(right+70f, top-1000);
+		gl2.glVertex2d(left-70f, top-1000);
+		gl2.glEnd();
+		*/
 	}
 	
 	/**

@@ -23,7 +23,7 @@ public class Paper implements PreviewListener {
 	private double rotation;
 	private double rotationRef;
 	
-	ColorRGB paperColor = new ColorRGB(255,255,255);
+	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
 	public Paper() {
 		// paper area
@@ -34,7 +34,7 @@ public class Paper implements PreviewListener {
 		paperBottom = -ph / 2;
 		paperLeft = -pw / 2;
 		paperRight = pw / 2;
-		paperMargin = 0.9;
+		paperMargin = 0.95;
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class Paper implements PreviewListener {
 	
 	private void renderMargin(GL2 gl2) {
 		gl2.glLineWidth(1);
-		gl2.glColor3f(0.9f, 0.9f, 0.9f);
+		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(getMarginLeft(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginTop());
@@ -69,7 +69,7 @@ public class Paper implements PreviewListener {
 
 	public void loadConfig() {
 		Preferences paperPreferenceNode = 
-				PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
+		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
 		paperLeft = Double.parseDouble(paperPreferenceNode.get("paper_left", Double.toString(paperLeft)));
 		paperRight = Double.parseDouble(paperPreferenceNode.get("paper_right", Double.toString(paperRight)));
 		paperTop = Double.parseDouble(paperPreferenceNode.get("paper_top", Double.toString(paperTop)));
@@ -80,7 +80,7 @@ public class Paper implements PreviewListener {
 	}
 	public void saveConfig() {
 		Preferences paperPreferenceNode = 
-				PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
+		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
 		paperPreferenceNode.putDouble("paper_left", paperLeft);
 		paperPreferenceNode.putDouble("paper_right", paperRight);
 		paperPreferenceNode.putDouble("paper_top", paperTop);
