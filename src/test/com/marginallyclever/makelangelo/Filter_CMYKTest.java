@@ -16,18 +16,10 @@ import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class Filter_CMYKTest {
-	@BeforeAll
-	public static void beforeAll() {
-		Log.start();
-		PreferencesHelper.start();
-	}
-	@AfterAll
-	public static void afterAll() {
-		Log.end();
-	}
-	
 	//@Test
 	public void testConversion() {
+		Log.start();
+		PreferencesHelper.start();
 		try {
 			final String PATH_NAME = "target/classes/bill-murray";
 			final String EXT = "jpg";
@@ -45,5 +37,6 @@ public class Filter_CMYKTest {
 			e1.printStackTrace();
 			assert (false);
 		}
+		Log.end();
 	}
 }
