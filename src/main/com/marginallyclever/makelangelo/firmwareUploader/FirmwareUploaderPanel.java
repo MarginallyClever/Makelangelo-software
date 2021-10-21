@@ -27,7 +27,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	 */
 	private static final long serialVersionUID = 7101530052729740681L;
 	private FirmwareUploader firmwareUploader = new FirmwareUploader();
-	private SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.arduinoPath);
+	private SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
 	private SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
 	private SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private SelectButton refreshButton = new SelectButton("refresh",Translator.get("Refresh"));
@@ -87,7 +87,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		String status = "Finished!";
 		int messageType = JOptionPane.PLAIN_MESSAGE;
 		try {
-			firmwareUploader.arduinoPath = sourceAVRDude.getText();
+			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
 			firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
 			status = e1.getMessage();

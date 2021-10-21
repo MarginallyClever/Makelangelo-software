@@ -4,27 +4,57 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
 
 
 public class FirmwareUploader {
-	public String arduinoPath = "";
-	public String avrdudePath = "\\avrdude.exe";
-	public String confPath = "\\avrdude.conf";
-	
+	private String avrdudePath = "";
+
 	public FirmwareUploader() {
+		String OS = System.getProperty("os.name").toLowerCase();
+		String name = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
+		
 		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
-		File f = new File(arduinoPath);
-		if(!f.exists()) arduinoPath = System.getProperty("user.dir");
+		File f = new File(name);
+		if(f.exists()) {
+			avrdudePath = f.getAbsolutePath();
+			return;
+		}
+		
+		// arduinoPath
+		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+name);
+		if(f.exists()) {
+			avrdudePath = f.getAbsolutePath();
+			return;
+		} 
+		
+		f = new File(FileAccess.getUserDirectory() + File.separator+name);
+		if(f.exists()) {
+			avrdudePath = f.getAbsolutePath();
+		}
 	}
 	
 	public void run(String hexPath,String portName) throws Exception {
 		Log.message("update started");
 		
+		Path p = Path.of(avrdudePath);
+		File f = p.resolve("avrdude.conf").toFile();
+		if(!f.exists()) {
+			Log.message("trying etc/avrdude.conf");
+			f = p.resolve("../etc/avrdude.conf").toFile();
+			if(!f.exists()) {
+				throw new Exception("Cannot find nearby avrdude.conf");
+			}
+		}
+		
+		String confPath = f.getAbsolutePath();
+		
 		String [] options = new String[]{
-	    		arduinoPath+avrdudePath,
-	    		"-C"+arduinoPath+confPath,
+				avrdudePath,
+	    		"-C"+confPath,
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
 	    		"-cwiring",
@@ -79,7 +109,16 @@ public class FirmwareUploader {
 			Log.message("update: "+s);		
 	}
 	
-	// test
+	public String getAvrdudePath() {
+		return avrdudePath;
+	}
+
+	public void setAvrdudePath(String avrdudePath) {
+		this.avrdudePath = avrdudePath;
+	}
+	
+	// TEST
+	
 	public void main(String[] args) {
 		Log.start();
 		FirmwareUploader fu = new FirmwareUploader();
