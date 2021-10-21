@@ -9,10 +9,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up JDK
+    - name: Set up JDK 17
       uses: actions/setup-java@v1
       with:
-        java-version: 15
+        java-version: 17
 
     # from https://github.com/marketplace/actions/cache
     - name: Cache Maven packages
