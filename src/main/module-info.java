@@ -15,5 +15,4 @@ module com.marginallyclever.makelangelo {
 	requires vecmath;
 	requires batik.all;
 	requires xml.apis.ext;
-	requires org.junit.jupiter.api;
 }
