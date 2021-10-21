@@ -15,6 +15,4 @@ module com.marginallyclever.makelangelo {
 	requires vecmath;
 	requires batik.all;
 	requires xml.apis.ext;
-	
-	opens com.marginallyclever.makelangelo;
 }
