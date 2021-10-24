@@ -29,8 +29,10 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPathSeg;
 import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
 import org.w3c.dom.svg.SVGPathSegLinetoAbs;
+import org.w3c.dom.svg.SVGPathSegLinetoRel;
 import org.w3c.dom.svg.SVGPathSegList;
 import org.w3c.dom.svg.SVGPathSegMovetoAbs;
+import org.w3c.dom.svg.SVGPathSegMovetoRel;
 import org.w3c.dom.svg.SVGPoint;
 import org.w3c.dom.svg.SVGPointList;
 
@@ -329,10 +331,10 @@ public class LoadSVG implements TurtleLoader {
 	 * @param paths the source of the elements
 	 */
 	private void parsePathElements(NodeList paths) throws Exception {
-	    double x=myTurtle.getX();
-	    double y=myTurtle.getY();
 		double firstX=0;
 		double firstY=0;
+		double px=0;
+		double py=0;
 		
 	    int pathCount = paths.getLength();
 	    for( int iPath = 0; iPath < pathCount; iPath++ ) {
@@ -349,88 +351,92 @@ public class LoadSVG implements TurtleLoader {
 			Vector3d v;
 			
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
-	    	int pathObjects = pathList.getNumberOfItems();
-			//Log.message("Node has "+pathObjects+" elements.");
+	    	int itemCount = pathList.getNumberOfItems();
+	    	Log.message("Node has "+itemCount+" elements.");
 
-			for (int i = 0; i < pathObjects; i++) {
+			for(int i=0; i<itemCount; i++) {
 				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
 				switch( item.getPathSegType() ) {
-				case SVGPathSeg.PATHSEG_CLOSEPATH:  // z
+				case SVGPathSeg.PATHSEG_CLOSEPATH:  // Z z
 					{
-						//System.out.println("Close path");
-						myTurtle.moveTo(firstX,firstY);
+						Log.message("Close path");
+						v = transform(firstX,firstY,m);
+						myTurtle.moveTo(v.x,v.y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // m
+				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
 					{
-						//System.out.println("Move Abs");
+						Log.message("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						v = transform(path.getX(),path.getY(),m);
-						firstX = x = v.x;
-						firstY = y = v.y;
-						myTurtle.jumpTo(firstX,firstY);
+						px = path.getX();
+						py = path.getY();
+						firstX = px;
+						firstY = py;
+						v = transform(px,py,m);
+						myTurtle.jumpTo(v.x,v.y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_MOVETO_REL:  // M
+				case SVGPathSeg.PATHSEG_MOVETO_REL:  // m
 					{
-						//System.out.println("Move Rel");
-						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						v = transform(path.getX(),path.getY(),m);
-						firstX = x = v.x + myTurtle.getX();
-						firstY = y = v.y + myTurtle.getY();
-						myTurtle.jumpTo(firstX,firstY);
+						Log.message("Move Rel");
+						SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
+						px += path.getX();
+						py += path.getY();
+						firstX = px;
+						firstY = py;
+						v = transform(px,py,m);
+						myTurtle.jumpTo(v.x,v.y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_LINETO_ABS:  // l
+				case SVGPathSeg.PATHSEG_LINETO_ABS:  // L H V
 					{
-						//System.out.println("Line Abs");
+						Log.message("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						v = transform(path.getX(),path.getY(),m);
-						x = v.x;
-						y = v.y;
-						myTurtle.moveTo(x,y);
+						px = path.getX();
+						py = path.getY();
+						v = transform(px,py,m);
+						myTurtle.moveTo(v.x,v.y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_LINETO_REL:  // L
+				case SVGPathSeg.PATHSEG_LINETO_REL:  // l h v
 					{
-						//System.out.println("Line REL");
-						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						v = transform(path.getX(),path.getY(),m);
-						x = v.x + myTurtle.getX();
-						y = v.y + myTurtle.getY();
-						myTurtle.moveTo(x,y);
+						Log.message("Line Rel");
+						SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
+						px += path.getX();
+						py += path.getY();
+						v = transform(px,py,m);
+						myTurtle.moveTo(v.x,v.y);
 					}
 					break;
-				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // c
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // C c
 					{
-						//System.out.println("Curve Cubic Abs");
+						Log.message("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
 						// x0,y0 is the first point
-						double x0=x;
-						double y0=y;
-						// x1,y1 is the second control point
-						v = transform(path.getX1(),path.getY1(),m);
-						double x1=v.x;
-						double y1=v.y;
-						// x2,y2 is the third control point
-						v = transform(path.getX2(),path.getY2(),m);
-						double x2=v.x;
-						double y2=v.y;
-						// x3,y3 is the fourth control point
-						v = transform(path.getX(),path.getY(),m);
-						double x3=v.x;
-						double y3=v.y;
+						double x0=px;
+						double y0=py;
+						// x3,y3 is the end point
+						double x3=path.getX();
+						double y3=path.getY();
+						// x1,y1 is the first control point
+						double x1=path.getX1();
+						double y1=path.getY1();
+						// x2,y2 is the second control point
+						double x2=path.getX2();
+						double y2=path.getY2();
 						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
-						ArrayList<Point2D> points = b.generateCurvePoints(0.05);
+						ArrayList<Point2D> points = b.generateCurvePoints(0.1);
 						for(Point2D p2 : points) {
-							myTurtle.moveTo(p2.x, p2.y);
-							x = p2.x;
-							y = p2.y;
+							v = transform(p2.x,p2.y,m);
+							myTurtle.moveTo(v.x,v.y);
 						}
+						px=x3;
+						py=y3;
 					}
 					break; 
 				default:
+					Log.message("path type "+item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
 					throw new Exception("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
 						+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
 				}
@@ -455,7 +461,8 @@ public class LoadSVG implements TurtleLoader {
 
 		try {
 			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
-			SVGMatrix svgMatrix = svgge.getScreenCTM();
+			
+			SVGMatrix svgMatrix = svgge.getCTM();
 			// [ a c e ]
 			// [ b d f ]
 			// [ 0 0 1 ]
@@ -475,7 +482,7 @@ public class LoadSVG implements TurtleLoader {
 	 * 
 	 * @param document
 	 *            The document to enhance.
-	 * @link http://wiki.apache.org/xmlgraphics-batik/BootSvgAndCssDom
+	 * @link https://cwiki.apache.org/confluence/display/XMLGRAPHICSBATIK/BootSvgAndCssDom
 	 */
 	private void initSVGDOM(Document document) {
 		UserAgent userAgent = new UserAgentAdapter();
@@ -488,12 +495,8 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
-		SVGDocument ret = null;
-
 		String parser = XMLResourceDescriptor.getXMLParserClassName();
         SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-        ret = (SVGDocument) factory.createDocument("",in);
-
-		return ret;
+        return (SVGDocument) factory.createDocument("",in);
 	}
 }
