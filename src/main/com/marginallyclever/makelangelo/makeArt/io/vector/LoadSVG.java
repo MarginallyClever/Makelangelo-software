@@ -439,7 +439,7 @@ public class LoadSVG implements TurtleLoader {
 	}
     
 	private Vector3d transform(double x, double y, Matrix3d m) {
-		Vector3d p = new Vector3d(x,y,0);
+		Vector3d p = new Vector3d(x,y,1);
 		m.transform(p);
 		return p;
 	}
@@ -459,15 +459,9 @@ public class LoadSVG implements TurtleLoader {
 			// [ a c e ]
 			// [ b d f ]
 			// [ 0 0 1 ]
-			m.m00 = svgMatrix.getA();
-			m.m01 = svgMatrix.getC();
-			m.m02 = svgMatrix.getE();
-			m.m10 = svgMatrix.getB();
-			m.m11 = svgMatrix.getD();
-			m.m12 = svgMatrix.getF();
-			m.m20 = 0;
-			m.m21 = 0;
-			m.m22 = 1;
+			m.m00 = svgMatrix.getA();	m.m10 = svgMatrix.getB();	m.m20 = 0;
+			m.m01 = svgMatrix.getC();	m.m11 = svgMatrix.getD();	m.m21 = 0;
+			m.m02 = svgMatrix.getE();	m.m12 = svgMatrix.getF();	m.m22 = 1;
 		}
 		catch(Exception e) {
 			m.setIdentity();
