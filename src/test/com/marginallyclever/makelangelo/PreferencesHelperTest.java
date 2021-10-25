@@ -53,6 +53,7 @@ public class PreferencesHelperTest {
 		CLIENT_CODE_STACK_INDEX = i;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@BeforeAll
 	public static void beforeAll() {
 		Log.start();
@@ -71,9 +72,7 @@ public class PreferencesHelperTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
 	public void testMachineConfigurationNames() throws BackingStoreException {
-
 		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
 		Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
 		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);

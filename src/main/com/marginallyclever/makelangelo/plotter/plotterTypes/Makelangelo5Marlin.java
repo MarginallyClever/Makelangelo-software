@@ -148,8 +148,6 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 	private void paintLogoFancy(GL2 gl2,Plotter robot) {
 		double left = robot.getLimitLeft();
 		double right = robot.getLimitRight();
-		double top = robot.getLimitTop();
-		double bottom = robot.getLimitBottom();
 
 		final double scale = 0.5;
 		final double TW = 128*scale;
