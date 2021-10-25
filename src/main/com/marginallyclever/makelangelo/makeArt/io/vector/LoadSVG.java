@@ -366,8 +366,8 @@ public class LoadSVG implements TurtleLoader {
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
 					{
-						Log.message("Move Abs");
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
+						Log.message("Move Abs x"+path.getX()+" y"+path.getY());
 						px = path.getX();
 						py = path.getY();
 						firstX = px;
@@ -378,8 +378,8 @@ public class LoadSVG implements TurtleLoader {
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // m
 					{
-						Log.message("Move Rel");
 						SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
+						Log.message("Move Rel x"+path.getX()+" y"+path.getY());
 						px += path.getX();
 						py += path.getY();
 						firstX = px;
@@ -390,8 +390,8 @@ public class LoadSVG implements TurtleLoader {
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // L H V
 					{
-						Log.message("Line Abs");
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
+						Log.message("Line Abs x"+path.getX()+" y"+path.getY());
 						px = path.getX();
 						py = path.getY();
 						v = transform(px,py,m);
@@ -400,8 +400,8 @@ public class LoadSVG implements TurtleLoader {
 					break;
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // l h v
 					{
-						Log.message("Line Rel");
 						SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
+						Log.message("Line Rel x"+path.getX()+" y"+path.getY());
 						px += path.getX();
 						py += path.getY();
 						v = transform(px,py,m);
@@ -410,8 +410,10 @@ public class LoadSVG implements TurtleLoader {
 					break;
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // C c
 					{
-						Log.message("Curve Cubic Abs");
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
+						Log.message("Curve Cubic Abs x"+path.getX() +"  y"+path.getY() );
+						Log.message("               1x"+path.getX1()+" 1y"+path.getY1());
+						Log.message("               2x"+path.getX2()+" 2y"+path.getY2());
 
 						// x0,y0 is the first point
 						double x0=px;
