@@ -349,19 +349,24 @@ public class LoadSVG implements TurtleLoader {
 			
 			Matrix3d m = getMatrixFromElement(element);
 			Vector3d v;
-			
+
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
+	    	//SVGPathSegList pathList = element.getPathSegList();
 	    	int itemCount = pathList.getNumberOfItems();
 	    	Log.message("Node has "+itemCount+" elements.");
-
+	    	int sinceClosePath=0;
+	    	
 			for(int i=0; i<itemCount; i++) {
-				SVGPathSeg item = (SVGPathSeg) pathList.getItem(i);
+				++sinceClosePath;
+				SVGPathSeg item = pathList.getItem(i);
+				Log.message("segType="+item.getClass().getSimpleName());
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // Z z
 					{
 						Log.message("Close path");
 						v = transform(firstX,firstY,m);
 						myTurtle.moveTo(v.x,v.y);
+						sinceClosePath=0;
 					}
 					break;
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
@@ -370,8 +375,10 @@ public class LoadSVG implements TurtleLoader {
 						Log.message("Move Abs x"+path.getX()+" y"+path.getY());
 						px = path.getX();
 						py = path.getY();
-						firstX = px;
-						firstY = py;
+						if(sinceClosePath==1) {
+							firstX = px;
+							firstY = py;
+						}
 						v = transform(px,py,m);
 						myTurtle.jumpTo(v.x,v.y);
 					}
@@ -382,8 +389,10 @@ public class LoadSVG implements TurtleLoader {
 						Log.message("Move Rel x"+path.getX()+" y"+path.getY());
 						px += path.getX();
 						py += path.getY();
-						firstX = px;
-						firstY = py;
+						if(sinceClosePath==1) {
+							firstX = px;
+							firstY = py;
+						}
 						v = transform(px,py,m);
 						myTurtle.jumpTo(v.x,v.y);
 					}
@@ -436,11 +445,13 @@ public class LoadSVG implements TurtleLoader {
 						px=x3;
 						py=y3;
 					}
-					break; 
+					break;
 				default:
-					Log.message("path type "+item.getPathSegTypeAsLetter()+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
-					throw new Exception("Found unexpected SVG Path type "+item.getPathSegTypeAsLetter()
-						+" "+item.getPathSegType()+" = "+((SVGItem)item).getValueAsString());
+					{
+						String m2="Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString();
+						Log.message(m2);
+						throw new Exception(m2);
+					}
 				}
 			}
 		}
@@ -490,7 +501,7 @@ public class LoadSVG implements TurtleLoader {
 		UserAgent userAgent = new UserAgentAdapter();
 		DocumentLoader loader = new DocumentLoader(userAgent);
 		BridgeContext bridgeContext = new BridgeContext(userAgent, loader);
-		bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
+		bridgeContext.setDynamicState(BridgeContext.STATIC);
 
 		// Enable CSS- and SVG-specific enhancements.
 		(new GVTBuilder()).build(bridgeContext, document);
