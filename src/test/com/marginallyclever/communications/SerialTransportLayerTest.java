@@ -17,11 +17,12 @@ public class SerialTransportLayerTest {
 			return;
 		}
 		
-		NetworkSession [] connections = new NetworkSession[connectionNames.length];
 		for(int i=0;i<connectionNames.length;++i) {
-			connections[i] = layer.openConnection(connectionNames[i]);
-			System.out.println("Found SerialTransportLayer "+connections[i].getName());
-			connections[i].closeConnection();
+			NetworkSession c = layer.openConnection(connectionNames[i]);
+			if(c!=null) {
+				System.out.println("Found SerialTransportLayer "+c.getName());
+				c.closeConnection();
+			}
 		}
 	}
 }
