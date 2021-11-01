@@ -63,7 +63,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			setRequestedGLCapabilities(caps);
 		} catch(GLException e) {
 			Log.error("I failed the very first call to OpenGL.  Are your native libraries missing?");
-			System.exit(1);
+//			System.exit(1);
 		}
 
 		addGLEventListener(this);
