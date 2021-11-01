@@ -41,10 +41,11 @@ public class FirmwareUploader {
 		Log.message("update started");
 		
 		Path p = Path.of(avrdudePath);
-		File f = p.resolve("avrdude.conf").toFile();
+		Log.message("Trying "+(p.resolve("../avrdude.conf").toString()));
+		File f = p.resolve("../avrdude.conf").toFile();
 		if(!f.exists()) {
-			Log.message("trying etc/avrdude.conf");
-			f = p.resolve("../etc/avrdude.conf").toFile();
+			Log.message("Trying 2 "+(p.resolve("../../etc/avrdude.conf").toString()));
+			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
 				throw new Exception("Cannot find nearby avrdude.conf");
 			}
