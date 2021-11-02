@@ -10,10 +10,9 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 
-public class MakelangeloRobotPanelTest {
+public class MakelangeloRobotPanelGUITest {
 
 	@Test
-	@Disabled("for the CI")
 	public void testNoMissingGeneratorPanels() {
 		Log.start();
 		Log.message("testNoMissingGeneratorPanels() begin.");

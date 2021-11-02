@@ -180,6 +180,12 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*GUITest</exclude>
+						<exclude>**/*IntegrationTest</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<!-- End of plugins defined originally only in Super POM -->
 			<plugin>
