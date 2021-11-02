@@ -1,14 +1,13 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.select.SelectDouble;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SelectDoubleTest {
 	protected int testObservation;

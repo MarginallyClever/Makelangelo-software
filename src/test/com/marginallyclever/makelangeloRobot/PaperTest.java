@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangeloRobot;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.util.PreferencesHelper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PaperTest {
 	@BeforeEach
@@ -31,7 +31,7 @@ public class PaperTest {
 		r.changeToTool((255<< 8)+(255<< 0));
 	}
 	*/
-	
+
 	@Test
 	public void testPaperSettingChanges() {
 		Paper a = new Paper();
@@ -42,8 +42,8 @@ public class PaperTest {
 		a.saveConfig();
 		Paper b = new Paper();
 		b.loadConfig();
-		assert(w/2 == b.getPaperWidth());
-		assert(h/2 == b.getPaperHeight());
+		Assertions.assertEquals(w/2, b.getPaperWidth());
+		Assertions.assertEquals(h/2, b.getPaperHeight());
 		a.setPaperSize(w,h,0,0);
 		a.saveConfig();
 		// TODO: this is a potentially destructive change if the test fails.

@@ -1,19 +1,18 @@
 package com.marginallyclever.makelangelo;
 
-import java.util.prefs.AbstractPreferences;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.UnitTestHelper;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.prefs.AbstractPreferences;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created on 5/25/15.
