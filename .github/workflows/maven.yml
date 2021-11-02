@@ -24,11 +24,15 @@ jobs:
           ${{ runner.os }}-maven-
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-    - name: Build with Maven
+    - name: Build and Test with Maven
       timeout-minutes: 15
-      run: ./mvnw -B package --file pom.xml
+      run: ./mvnw -B test
 
-    - name: prepare package for release
+    - name: Package with Maven
+      run: ./mvnw -B clean package -DskipTests
+
+    - name: Prepare package for release
+      if: github.ref == 'refs/heads/master'
       run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
 
     # from https://github.com/marketplace/actions/deploy-nightly
