@@ -17,21 +17,28 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 Steps to get started:
 
 1. Install The latest OpenJDK (java software)
-2. Install Makelangelo Software App
+2. Grab a nightly build and run it directly *or* Install Makelangelo Software App from the source
 
 Then you should be able to run the application.
 
-## Install The latest OpenJDK
+## 1. Install The latest OpenJDK
 
-Get the Open Java Development Kit (OpenJDK) https://openjdk.java.net/.  The latest version is the "ready to use" edition.
+Get the Open Java Development Kit (OpenJDK) https://openjdk.java.net/. The minimum required version 17.
 
-*OSX*: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-12.jdk) into your /Library/Java/JavaVirtualMachines/ folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
+- **OSX**: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-17.jdk) into your `/Library/Java/JavaVirtualMachines/` folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
+- **Windows**: https://stackoverflow.com/a/52531093 _untested_
+- **Linux**: https://linuxize.com/post/install-java-on-ubuntu-18-04/ _untested_
 
-*Windows*: https://stackoverflow.com/a/52531093 _untested_
+## 2. Grab a nightly build
 
-*Linux*: https://linuxize.com/post/install-java-on-ubuntu-18-04/ _untested_
+Download a [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) corresponding to the latest commit from master. Depending on your OS, double clic on the file starting with `makelangelo-nightly-` or run the following command:
+```
+java -jar makelangelo-nightly-XXXXX.jar
+```
 
-## Install Makelangelo Software App
+🎉 Application should now launch.
+
+## 2 bis. Install Makelangelo Software App from the source
 
 * Goto https://github.com/MarginallyClever/Makelangelo-software/
 * Download this zip file: https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip and extract it. Note the folder for later.

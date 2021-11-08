@@ -43,6 +43,7 @@ bin/
 java/.project
 ## Auto Eclipse Checkstyle configuration
 .checkstyle
+.jar
 
 ## Auto generated documentation
 latex/
