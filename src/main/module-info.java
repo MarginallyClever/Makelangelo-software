@@ -6,8 +6,7 @@ module com.marginallyclever.makelangelo {
 	requires org.json;
 	requires org.jetbrains.annotations;
 	requires org.slf4j;
-	
-	requires junit;
+
 	requires jrpicam;
 	requires jogamp.fat;
 	requires kabeja;

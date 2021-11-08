@@ -3,26 +3,27 @@ package com.marginallyclever.communications;
 import org.junit.jupiter.api.Test;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
-import com.marginallyclever.convenience.log.Log;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SerialTransportLayerTest {
-	
+
 	@Test
 	public void scanConnections() {
 		SerialTransportLayer layer = new SerialTransportLayer();
-				
+
 		String [] connectionNames = SerialTransportLayer.listConnections();
-		if(connectionNames.length<=0) {
-			Log.message("No serial connections found.");
-			return;
-		}
-		
-		for(int i=0;i<connectionNames.length;++i) {
-			NetworkSession c = layer.openConnection(connectionNames[i]);
-			if(c!=null) {
-				System.out.println("Found SerialTransportLayer "+c.getName());
+		assertFalse(connectionNames.length<=0, "No serial connections found.");
+
+		for (String connectionName : connectionNames) {
+			NetworkSession c = layer.openConnection(connectionName);
+			if (c != null) {
+				assertNotNull(c.getName());
+				System.out.println("Found SerialTransportLayer " + c.getName());
 				c.closeConnection();
 			}
 		}
 	}
 }
+

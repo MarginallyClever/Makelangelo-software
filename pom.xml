@@ -180,6 +180,12 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*GUITest</exclude>
+						<exclude>**/*IntegrationTest</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 			<!-- End of plugins defined originally only in Super POM -->
 			<plugin>
@@ -368,13 +374,6 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20201115</version>
-		</dependency>
-
-		<!-- used in LoadAndSaveSB2 -->
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 
 		<dependency>
