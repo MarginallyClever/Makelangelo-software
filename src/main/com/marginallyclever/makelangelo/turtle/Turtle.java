@@ -27,6 +27,7 @@ public class Turtle implements Cloneable {
 	private double angle;
 	private boolean isUp;
 	private ColorRGB color;
+	private double diameter=1;
 
 	public Turtle() {
 		super();
@@ -35,16 +36,17 @@ public class Turtle implements Cloneable {
 	
 	public Turtle(Turtle t) {
 		this();
-		px = t.px;
-		py = t.py;
-		nx = t.nx;
-		ny = t.ny;
-		angle = t.angle;
-		isUp = t.isUp;
-		t.color.set(t.color);
+		this.px = t.px;
+		this.py = t.py;
+		this.nx = t.nx;
+		this.ny = t.ny;
+		this.angle = t.angle;
+		this.isUp = t.isUp;
+		this.color.set(t.color);
+		this.diameter = t.diameter; 
 
 		for( TurtleMove m : t.history ) {
-			history.add(new TurtleMove(m));
+			this.history.add(new TurtleMove(m));
 		}
 	}
 	

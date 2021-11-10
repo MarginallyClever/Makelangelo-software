@@ -13,4 +13,6 @@ public abstract interface TurtleRenderer {
 	abstract void end();
 
 	abstract void setPenDownColor(ColorRGB color);
+	
+	abstract void setPenDiameter(double d);
 }

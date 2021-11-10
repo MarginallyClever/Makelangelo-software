@@ -55,6 +55,7 @@ public class TurtleRenderFacade implements PreviewListener {
 						break;
 					case TurtleMove.TOOL_CHANGE:
 						tr.setPenDownColor(m.getColor());
+						tr.setPenDiameter(m.getDiameter());
 						break;
 					}
 				}

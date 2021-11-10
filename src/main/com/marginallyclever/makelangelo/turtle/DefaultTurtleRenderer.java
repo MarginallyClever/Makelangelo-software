@@ -65,4 +65,9 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void setPenDownColor(ColorRGB color) {
 		colorDraw.set(color);
 	}
+	
+	@Override
+	public void setPenDiameter(double d) {
+		lineWidth=(float)d;
+	}
 }
