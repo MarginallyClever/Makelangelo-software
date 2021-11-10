@@ -99,11 +99,21 @@ public class Turtle implements Cloneable {
 			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
 		}
 		color = new ColorRGB(c);
-		history.add( new TurtleMove(c.toInt(),0,TurtleMove.TOOL_CHANGE) );
+		history.add( new TurtleMove(color.toInt(),diameter,TurtleMove.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
 		return color;
+	}
+	
+	public void setDiameter(double d) {
+		if(diameter==d) return;
+		diameter=d;
+		history.add( new TurtleMove(color.toInt(),diameter,TurtleMove.TOOL_CHANGE) );
+	}
+	
+	public double getDiameter() {
+		return diameter;
 	}
 	
 	/**

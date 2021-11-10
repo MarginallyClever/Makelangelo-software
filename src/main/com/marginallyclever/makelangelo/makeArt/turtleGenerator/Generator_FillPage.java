@@ -11,6 +11,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_FillPage extends TurtleGenerator {
 	private static double angle = 0;
+	private static double penDiameter = 0;
 
 	@Override
 	public String getName() {
@@ -21,9 +22,17 @@ public class Generator_FillPage extends TurtleGenerator {
 		return angle;
 	}
 	static public void setAngle(double value) {
-		angle = value;
+		Generator_FillPage.angle = value;
 	}
 	
+	public static double getPenDiameter() {
+		return penDiameter;
+	}
+
+	public static void setPenDiameter(double penDiameter) {
+		Generator_FillPage.penDiameter = penDiameter;
+	}
+
 	@Override
 	public TurtleGeneratorPanel getPanel() {
 		return new Generator_FillPage_Panel(this);
@@ -34,8 +43,6 @@ public class Generator_FillPage extends TurtleGenerator {
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
-		// figure out how many lines we're going to have on this image.
-		double stepSize = 1;
 
 		// from top to bottom of the margin area...
 		double yBottom = myPaper.getMarginBottom();
@@ -47,6 +54,7 @@ public class Generator_FillPage extends TurtleGenerator {
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
 		Turtle turtle = new Turtle();
+		turtle.setDiameter(penDiameter);
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
@@ -54,7 +62,7 @@ public class Generator_FillPage extends TurtleGenerator {
 		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
-		for(double a = -radius;a<radius;a+=stepSize) {
+		for(double a = -radius;a<radius;a+=penDiameter) {
 			double majorPX = majorX * a;
 			double majorPY = majorY * a;
 			P0.set( majorPX - majorY * radius,
