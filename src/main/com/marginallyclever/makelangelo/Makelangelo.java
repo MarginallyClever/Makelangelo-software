@@ -302,6 +302,10 @@ public final class Makelangelo {
 			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true));
 		});
 
+		JMenuItem scale = new JMenuItem(Translator.get("Scale"));
+		menu.add(scale);
+		scale.addActionListener((e) -> runScalePanel());
+
 		menu.addSeparator();
 		
 		JMenuItem flipH = new JMenuItem(Translator.get("FlipH"));
@@ -318,6 +322,10 @@ public final class Makelangelo {
 		menu.add(new ReorderTurtle(this));
 
 		return menu;
+	}
+
+	private void runScalePanel() {
+		ScaleTurtlePanel.runAsDialog(mainFrame, myTurtle);
 	}
 
 	private JMenu createGenerateMenu() {

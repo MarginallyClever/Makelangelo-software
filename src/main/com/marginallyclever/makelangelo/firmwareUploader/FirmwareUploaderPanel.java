@@ -118,7 +118,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		} catch (Exception e) {}
 
 		try {
-			JFrame frame = new JFrame("FirmwareUploaderPanel");
+			JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			//frame.setPreferredSize(new Dimension(600, 400));
 			frame.add(new FirmwareUploaderPanel());

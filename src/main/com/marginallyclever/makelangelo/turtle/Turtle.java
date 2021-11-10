@@ -238,8 +238,11 @@ public class Turtle implements Cloneable {
 		top.y=-Float.MAX_VALUE;
 		TurtleMove old=null;
 		
+		int hits=0;
+		
 		for( TurtleMove m : history ) {
 			if(m.type == TurtleMove.DRAW) {
+				hits++;
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
 				if(bottom.x>m.x) bottom.x=m.x;
@@ -252,6 +255,11 @@ public class Turtle implements Cloneable {
 				}
 			}
 			old=m;
+		}
+		
+		if(hits==0) {
+			bottom.set(0,0);
+			top.set(0,0);
 		}
 	}
 

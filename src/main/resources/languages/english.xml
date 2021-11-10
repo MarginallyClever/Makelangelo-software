@@ -164,6 +164,11 @@
 	</string>
 
 	<string>
+		<key>OK</key>
+		<value>OK</value>
+		<hint>used in many places</hint>
+	</string>
+	<string>
 		<key>Cancel</key>
 		<value>Cancel</value>
 		<hint>used in many places</hint>
@@ -183,6 +188,19 @@
 		<key>CouldNotFind</key>
 		<value>Could not find </value>
 		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
+	</string>
+
+	<string>
+		<key>Scale</key>
+		<value>Scale</value>
+	</string>
+	<string>
+		<key>Width</key>
+		<value>Width</value>
+	</string>
+	<string>
+		<key>Height</key>
+		<value>Height</value>
 	</string>
 
 	<string>
