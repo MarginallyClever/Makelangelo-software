@@ -157,7 +157,7 @@ public final class Makelangelo {
 
 	public void run() {
 		createAppWindow();		
-		checkSharingPermission();
+		//checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
@@ -170,6 +170,7 @@ public final class Makelangelo {
 	}
 
 	// check if we need to ask about sharing
+	@SuppressWarnings("unused")
 	private void checkSharingPermission() {
 		Log.message("Checking sharing permissions...");
 		
