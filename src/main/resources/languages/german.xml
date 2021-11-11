@@ -1623,4 +1623,26 @@
 		<value>Ordnung</value>
 		<hint/>
 	</string>
+
+	<string>
+		<key>Scale</key>
+		<value>Skalieren</value>
+	</string>
+	<string>
+		<key>Width</key>
+		<value>Breite</value>
+	</string>
+	<string>
+		<key>Height</key>
+		<value>Höhe</value>
+	</string>
+	<string>
+		<key>OK</key>
+		<value>OK</value>
+	</string>
+	<string>
+		<key>Cancel</key>
+		<value>Abbrechen</value>
+	</string>
+	
 </language>
