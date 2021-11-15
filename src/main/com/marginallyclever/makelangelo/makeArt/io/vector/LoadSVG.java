@@ -267,6 +267,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d v2;
 
 	    int pathNodeCount = node.getLength();
+	    Log.message(pathNodeCount+" circles.");
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element)) 
@@ -281,7 +282,10 @@ public class LoadSVG implements TurtleLoader {
 			v2 = transform(cx+r,cy,m);
 			myTurtle.jumpTo(v2.x,v2.y);
 			
-			double circ = Math.min(3,Math.floor(Math.PI * r*r)); 
+			double circ = Math.PI * 2.0 * r;
+			circ = Math.ceil(Math.min(Math.max(3,circ),360));
+			
+		    Log.message("circ="+circ);
 			for(double i=1;i<circ;++i) {
 				double v = (Math.PI*2.0) * (i/circ);
 				double s=r*Math.sin(v);
