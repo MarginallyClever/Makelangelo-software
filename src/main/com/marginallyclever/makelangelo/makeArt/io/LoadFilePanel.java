@@ -90,6 +90,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				mySubPreviewListener = myConvertImage;
 			} else {
 				Turtle t = TurtleFactory.load(filename);
+				//t.scale(1, -1);
 				//t=ResizeTurtleToPaper.run(t,myPaper,false);
 				notifyListeners(new ActionEvent(t,0,"turtle"));
 			}
