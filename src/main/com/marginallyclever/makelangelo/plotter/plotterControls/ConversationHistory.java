@@ -140,26 +140,22 @@ public class ConversationHistory extends JPanel {
 	
 	@Override
 	public void paint(Graphics g) {
+		boolean isLast = (listView.getLastVisibleIndex() == listModel.getSize()-1);
+		
 		addQueuedMessages();
+		
+		if(isLast) jumpToEnd();
+		
 		super.paint(g);
 	}
 
 	private void addQueuedMessages() {
 		while(!inBoundQueue.isEmpty()) {
 			ConversationEvent msg = inBoundQueue.poll();
-			if(msg!=null) addMessage(msg);
+			if(msg!=null) listModel.addElement(msg);
 		}
 	}
-	
-	private void addMessage(ConversationEvent msg) {
-		int listSize = listModel.getSize() - 1;
-		int lastVisible = listView.getLastVisibleIndex();
-		boolean isLast = (lastVisible == listSize);
-
-		listModel.addElement(msg);
-		if(isLast) jumpToEnd();
-	}
-	
+		
 	private void jumpToEnd() {
 		listView.ensureIndexIsVisible(listModel.getSize()-1);
 	}
