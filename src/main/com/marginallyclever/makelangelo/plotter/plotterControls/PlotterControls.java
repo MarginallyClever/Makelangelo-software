@@ -63,7 +63,7 @@ public class PlotterControls extends JPanel {
 				//System.out.println("PlotterControls heard idle");
 				if(isRunning) {
 					//System.out.println("PlotterControls is running");
-					programInterface.step();
+					step();
 				}
 			}
 			updateProgressBar();
@@ -100,6 +100,10 @@ public class PlotterControls extends JPanel {
 
 	private void step() {
 		programInterface.step();
+		if(programInterface.getLineNumber()==-1) {
+			// done
+			pause();
+		}
 	}
 
 	private void saveGCode() {
@@ -136,7 +140,7 @@ public class PlotterControls extends JPanel {
 		updateButtonStatus();
 		if(!penIsUpBeforePause) myPlotter.lowerPen();
 		rewindIfNoProgramLineSelected();
-		programInterface.step();
+		step();
 	}
 
 	private void rewindIfNoProgramLineSelected() {

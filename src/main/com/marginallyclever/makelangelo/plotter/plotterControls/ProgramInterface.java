@@ -89,10 +89,8 @@ public class ProgramInterface extends JPanel {
 
 	public void step() {
 		int now = listView.getSelectedIndex();
-		if(now==-1) {
-			System.out.println("Can't find next line.");
-			return;
-		}
+		if(now==-1) return;
+		
 		// Increment the line as soon as possible so that step() does not get called twice on the same line.
 		listView.setSelectedIndex(now+1);
 		
@@ -112,7 +110,7 @@ public class ProgramInterface extends JPanel {
 	public int getLineNumber() {
 		return listView.getSelectedIndex();
 	}
-		
+	
 	// TEST
 	
 	public static void main(String[] args) {
