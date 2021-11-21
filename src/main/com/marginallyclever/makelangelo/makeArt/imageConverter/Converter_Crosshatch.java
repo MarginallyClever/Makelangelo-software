@@ -5,10 +5,15 @@ import java.beans.PropertyChangeEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class Converter_Crosshatch extends ImageConverter {
 	private static double intensity=2.0f;
+	private static double pass90=8.0f;
+	private static double pass75=16.0f;
+	private static double pass15=64.0f;
+	private static double pass45=128.0f;
 	
 	@Override
 	public String getName() {
@@ -20,6 +25,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		if(evt.getPropertyName().equals("intensity")) {
 			setIntensity((float)((int)evt.getNewValue())/10.0f);
 		}
+		if(evt.getPropertyName().equals("pass90")) pass90=(int)evt.getNewValue();
+		if(evt.getPropertyName().equals("pass75")) pass75=(int)evt.getNewValue();
+		if(evt.getPropertyName().equals("pass15")) pass15=(int)evt.getNewValue();
+		if(evt.getPropertyName().equals("pass45")) pass45=(int)evt.getNewValue();
+		
 	}
 
 	public void setIntensity(double arg0) {
@@ -30,17 +40,32 @@ public class Converter_Crosshatch extends ImageConverter {
 		return intensity;
 	}
 	
+	public double getPass90() {
+		return pass90;
+	}
+
+	public double getPass75() {
+		return pass75;
+	}
+
+	public double getPass15() {
+		return pass15;
+	}
+
+	public double getPass45() {
+		return pass45;
+	} 
+	
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
-
+		
 		turtle = new Turtle();
-		double top = 192.0/8.0;
-		finishPass(new int[]{(int)(1*top)},90,img);
-		finishPass(new int[]{(int)(2*top)},15,img);
-		finishPass(new int[]{(int)(4*top)},75,img);
-		finishPass(new int[]{(int)(8*top)},45,img);
+		finishPass(new int[]{(int)pass90},90,img);
+		finishPass(new int[]{(int)pass75},15,img);
+		finishPass(new int[]{(int)pass15},75,img);
+		finishPass(new int[]{(int)pass45},45,img);
 	}
 	
 	private void finishPass(int [] passes,double angleDeg,TransformedImage img) {
@@ -64,7 +89,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		double maxLen = Math.sqrt(width*width+height*height);
 		double [] error0 = new double[(int)Math.ceil(maxLen)];
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
-		double lowPass=0;
 		boolean useError=false;
 		
 		int i=0;
@@ -76,7 +100,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			double x1 = px + dy * maxLen;
 			double y1 = py - dx * maxLen;
 		
-			double l2 = lowPass + passes[(i % passes.length)];
+			double l2 = passes[(i % passes.length)];
 			if ((i % 2) == 0) {
 				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
 				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
