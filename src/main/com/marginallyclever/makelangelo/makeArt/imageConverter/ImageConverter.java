@@ -198,7 +198,7 @@ public abstract class ImageConverter implements PropertyChangeListener {
 			isInside=isInsidePaperMargins(x, y);
 			if(isInside) {
 				oldPixel = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
-				int b2 = (int)b;
+				int b2 = (int)Math.min(b, error0.length-2);
 				oldPixel += error0[b2];
 				newPixel = oldPixel>=channelCutoff? 255:0;
 				double quantError = oldPixel - newPixel;
