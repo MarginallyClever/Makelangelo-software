@@ -12,26 +12,26 @@ import com.marginallyclever.util.PreferencesHelper;
 
 public class TranslatorTest {
 	@BeforeEach
-	void beforeEach() {
+	public void beforeEach() {
 		Log.start();
 		PreferencesHelper.start();
 		Translator.start();
 	}
 	
 	@AfterEach
-	void afterEach() {
+	public void afterEach() {
 		Log.end();
 	}
 	
 	@Test
-	void loadLanguage() {
+	public void loadLanguage() {
 		int current = Translator.getCurrentLanguageIndex();
 		String [] available = Translator.getLanguageList();
 		System.out.println("current language="+available[current]);
 	}
 	
 	@Test
-	void changeLanguageTest() {
+	public void changeLanguageTest() {
 		String [] available = Translator.getLanguageList();
 		assertTrue(available.length>1,"More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
