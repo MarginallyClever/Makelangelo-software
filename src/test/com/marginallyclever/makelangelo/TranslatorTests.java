@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Timeout;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
 
-public class TranslatorTest {
+public class TranslatorTests {
 	@BeforeEach
 	@Timeout(15)
 	public void beforeEach() {
@@ -31,13 +31,13 @@ public class TranslatorTest {
 	
 	@Test
 	@Timeout(15)
-	public void loadLanguage() {
-		System.out.println("loadLanguage() start");
+	public void loadLanguageTest() {
+		System.out.println("loadLanguageTest() start");
 		Translator.start();
 		int current = Translator.getCurrentLanguageIndex();
 		String [] available = Translator.getLanguageList();
 		System.out.println("current language="+available[current]);
-		System.out.println("loadLanguage() end");
+		System.out.println("loadLanguageTest() end");
 	}
 	
 	@Test
