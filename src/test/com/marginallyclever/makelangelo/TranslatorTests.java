@@ -45,17 +45,26 @@ public class TranslatorTests {
 	public void changeLanguageTest() {
 		System.out.println("changeLanguageTest() start");
 		Translator.start();
+		System.out.println("...a");
 		String [] available = Translator.getLanguageList();
+		System.out.println("...b");
 		assertTrue(available.length>1,"More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
+		System.out.println("...c");
 		int next = (current+1)%available.length;
+		System.out.println("...d");
 		Translator.setCurrentLanguage(available[next]);
+		System.out.println("...e");
 		Translator.saveConfig();
+		System.out.println("...f");
 		Translator.loadConfig();
+		System.out.println("...g");
 		int read = Translator.getCurrentLanguageIndex();
+		System.out.println("...h");
 		assertEquals(read,next,"Changing language failed.");
 		// return to previous state
 		Translator.setCurrentLanguage(available[current]);
+		System.out.println("...i");
 		Translator.saveConfig();
 		System.out.println("changeLanguageTest() end");
 	}
