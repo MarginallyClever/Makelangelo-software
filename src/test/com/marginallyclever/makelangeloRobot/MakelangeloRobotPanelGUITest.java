@@ -14,7 +14,6 @@ public class MakelangeloRobotPanelGUITest {
     @Test
     public void testNoMissingGeneratorPanels() {
         Log.start();
-        Log.message("testNoMissingGeneratorPanels() begin.");
         Translator.start();
         try {
             for (TurtleGenerator c : TurtleGeneratorFactory.available) {

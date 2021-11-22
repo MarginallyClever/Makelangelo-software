@@ -9,11 +9,8 @@ import org.junit.jupiter.api.Test;
 public class MakelangeloGUITest {
     @Test
     public void checkVersion() throws IllegalStateException {
-        System.out.println("Log.start");
         Log.start();
-        System.out.println("PreferencesHelper.start");
         PreferencesHelper.start();
-        System.out.println("Translator.start");
         Translator.start();
         String version = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
         System.out.println("version " + version);

@@ -14,6 +14,7 @@ public class PaperTest {
 		Log.start();
 		PreferencesHelper.start();
 	}
+	
 	@AfterEach
 	public void afterEach() {
 		Log.end();

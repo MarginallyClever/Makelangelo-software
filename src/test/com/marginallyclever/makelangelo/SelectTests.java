@@ -5,8 +5,6 @@ import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static org.junit.jupiter.api.Assertions.*;
 
