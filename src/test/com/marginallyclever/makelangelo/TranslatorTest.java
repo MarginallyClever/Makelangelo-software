@@ -13,14 +13,20 @@ import com.marginallyclever.util.PreferencesHelper;
 
 public class TranslatorTest {
 	@BeforeEach
+	@Timeout(15)
 	public void beforeEach() {
+		System.out.println("beforeEach() start");
 		Log.start();
 		PreferencesHelper.start();
+		System.out.println("beforeEach() end");
 	}
 	
 	@AfterEach
+	@Timeout(15)
 	public void afterEach() {
+		System.out.println("afterEach() start");
 		Log.end();
+		System.out.println("afterEach() end");
 	}
 	
 	@Test
