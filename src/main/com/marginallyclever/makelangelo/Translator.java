@@ -113,7 +113,9 @@ public final class Translator {
 	 * @throws IllegalStateException No language files found
 	 */
 	static public void loadLanguages() {
-		try {			
+		languages.clear();
+		
+		try {
 			URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
 			Log.message("Looking for translations in "+uri.toString());
 			
@@ -148,33 +150,7 @@ public final class Translator {
 					}
 					
 					// found an XML file in the /languages folder.  Good sign!
-					String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-					InputStream stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
-					String actualFilename = "Jar:"+nameInsideJar;
-					File externalFile = new File(name);
-					if(externalFile.exists()) {
-						stream = new FileInputStream(new File(name));
-						actualFilename = name;
-					}
-					if( stream != null ) {
-						Log.message("Found "+actualFilename);
-						TranslatorLanguage lang = new TranslatorLanguage();
-						try {
-							lang.loadFromInputStream(stream);
-						} catch(Exception e) {
-							Log.error("Failed to load "+actualFilename);
-							// if the xml file is invalid then an exception can occur.
-							// make sure lang is empty in case of a partial-load failure.
-							lang = new TranslatorLanguage();
-						}
-						
-						if( !lang.getName().isEmpty() && 
-							!lang.getAuthor().isEmpty()) {
-							// we loaded a language file that seems pretty legit.
-							languages.put(lang.getName(), lang);
-							++found;
-						}
-					}
+					if(attemptToLoadLanguageXML(name)) found++;
 				}
 			}
 			walk.close();
@@ -185,13 +161,7 @@ public final class Translator {
 				throw new IllegalStateException("No translations found.");
 			}
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		catch (IllegalStateException e) {
+		catch(Exception e) {
 			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
@@ -206,6 +176,39 @@ public final class Translator {
 			languages.put(languageContainer.getName(), languageContainer);
 		}
 	}
+
+	private static boolean attemptToLoadLanguageXML(String name) throws Exception {
+		String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+		InputStream stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
+		String actualFilename = "Jar:"+nameInsideJar;
+		File externalFile = new File(name);
+		if(externalFile.exists()) {
+			stream = new FileInputStream(new File(name));
+			actualFilename = name;
+		}
+		if( stream == null ) return false;
+		
+		Log.message("Found "+actualFilename);
+		TranslatorLanguage lang = new TranslatorLanguage();
+		try {
+			lang.loadFromInputStream(stream);
+		} catch(Exception e) {
+			Log.error("Failed to load "+actualFilename);
+			// if the xml file is invalid then an exception can occur.
+			// make sure lang is empty in case of a partial-load failure.
+			lang = new TranslatorLanguage();
+		}
+		
+		if( !lang.getName().isEmpty() && 
+			!lang.getAuthor().isEmpty()) {
+			// we loaded a language file that seems pretty legit.
+			languages.put(lang.getName(), lang);
+			return true;
+		}
+		
+		return false;
+	}
+
 
 	/**
 	 * @param key name of key to find in translation list

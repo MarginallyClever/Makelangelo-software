@@ -3,17 +3,17 @@ package com.marginallyclever.makelangelo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class TranslatorTests {
 	@BeforeEach
-	@Timeout(15)
 	public void beforeEach() {
 		System.out.println("beforeEach() start");
 		Log.start();
@@ -22,7 +22,6 @@ public class TranslatorTests {
 	}
 	
 	@AfterEach
-	@Timeout(15)
 	public void afterEach() {
 		System.out.println("afterEach() start");
 		Log.end();
@@ -30,7 +29,16 @@ public class TranslatorTests {
 	}
 	
 	@Test
-	@Timeout(15)
+	public void startTranslatorTwiceTest() {
+		System.out.println("startTranslatorTwiceTest() start");
+		Translator.start();
+		System.out.println(Arrays.toString(Translator.getLanguageList()));
+		Translator.start();
+		System.out.println(Arrays.toString(Translator.getLanguageList()));
+		System.out.println("startTranslatorTwiceTest() end");
+	}
+	
+	@Test
 	public void loadLanguageTest() {
 		System.out.println("loadLanguageTest() start");
 		Translator.start();
@@ -41,7 +49,6 @@ public class TranslatorTests {
 	}
 	
 	@Test
-	@Timeout(15)
 	public void changeLanguageTest() {
 		System.out.println("changeLanguageTest() start");
 		Translator.start();
