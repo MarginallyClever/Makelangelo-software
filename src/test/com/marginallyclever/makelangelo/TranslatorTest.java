@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
@@ -25,13 +26,16 @@ public class TranslatorTest {
 	
 	@Test
 	public void loadLanguage() {
+		System.out.println("loadLanguage() start");
 		int current = Translator.getCurrentLanguageIndex();
 		String [] available = Translator.getLanguageList();
 		System.out.println("current language="+available[current]);
+		System.out.println("loadLanguage() end");
 	}
 	
 	@Test
 	public void changeLanguageTest() {
+		System.out.println("changeLanguageTest() start");
 		String [] available = Translator.getLanguageList();
 		assertTrue(available.length>1,"More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
@@ -44,5 +48,6 @@ public class TranslatorTest {
 		// return to previous state
 		Translator.setCurrentLanguage(available[current]);
 		Translator.saveConfig();
+		System.out.println("changeLanguageTest() end");
 	}
 }
