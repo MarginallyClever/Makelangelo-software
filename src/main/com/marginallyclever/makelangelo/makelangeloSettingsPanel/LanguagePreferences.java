@@ -1,16 +1,13 @@
 package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.ScaleTurtlePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class LanguagePreferences {
@@ -32,7 +29,11 @@ public class LanguagePreferences {
 		return panel;
 	}
 	
-	static public void save() {}
+	static public void save() {
+		Log.message("Changing to language "+languageList[languageOptions.getSelectedIndex()]);
+		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
+		Translator.saveConfig();
+	}
 	
 	static public void cancel() {}
 
@@ -48,8 +49,7 @@ public class LanguagePreferences {
 			result = JOptionPane.showConfirmDialog(null, panel, "Language", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
 		} while(result != JOptionPane.OK_OPTION);
 		
-		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
-		Translator.saveConfig();
+		save();
 	}
 	
 	// TEST
