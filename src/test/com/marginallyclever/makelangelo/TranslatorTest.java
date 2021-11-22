@@ -16,7 +16,6 @@ public class TranslatorTest {
 	public void beforeEach() {
 		Log.start();
 		PreferencesHelper.start();
-		Translator.start();
 	}
 	
 	@AfterEach
@@ -25,8 +24,10 @@ public class TranslatorTest {
 	}
 	
 	@Test
+	@Timeout(15)
 	public void loadLanguage() {
 		System.out.println("loadLanguage() start");
+		Translator.start();
 		int current = Translator.getCurrentLanguageIndex();
 		String [] available = Translator.getLanguageList();
 		System.out.println("current language="+available[current]);
@@ -34,8 +35,10 @@ public class TranslatorTest {
 	}
 	
 	@Test
+	@Timeout(15)
 	public void changeLanguageTest() {
 		System.out.println("changeLanguageTest() start");
+		Translator.start();
 		String [] available = Translator.getLanguageList();
 		assertTrue(available.length>1,"More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
