@@ -54,6 +54,8 @@ public class Log {
 	}
 	
 	public static void start() {
+		if(logger!=null) return;  // already started
+		
 		System.out.println("log dir="+LOG_FILE_PATH);
 
 		boolean hadCrashed = crashReportCheck();
@@ -76,8 +78,8 @@ public class Log {
 	}
 	
 	public static void end() {
-		//logger.info(PROGRAM_END_STRING);
-		write(PROGRAM_END_STRING);
+		logger.info(PROGRAM_END_STRING);
+		//write(PROGRAM_END_STRING);
 	}
 	
 	private static boolean crashReportCheck() {
@@ -122,7 +124,7 @@ public class Log {
 	        long fileLength = fileHandler.length() - 1;
 	        StringBuilder sb = new StringBuilder();
 
-	        for(long filePointer = fileLength; filePointer != -1; filePointer--){
+	        for(long filePointer = fileLength; filePointer != -1; filePointer--) {
 	            fileHandler.seek( filePointer );
 	            int readByte = fileHandler.readByte();
 
@@ -131,7 +133,6 @@ public class Log {
 	                    continue;
 	                }
 	                break;
-
 	            } else if( readByte == 0xD ) {  // 13, carriage-return '\r'
 	                if( filePointer == fileLength - 1 ) {
 	                    continue;
@@ -171,8 +172,8 @@ public class Log {
 		final String cleanMsg = sdf.format(Calendar.getInstance().getTime())+" "+msg;
 		
 		// TODO why have logger if it's not being used?
-		//logger.info(msg);
-		
+		logger.info(msg);
+		/*
 		try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream("log.txt", true), StandardCharsets.UTF_8)) {
 			PrintWriter logToFile = new PrintWriter(fileWriter);
 			logToFile.write(cleanMsg+"\n");
@@ -180,17 +181,15 @@ public class Log {
 		} catch (IOException e) {
 			logger.error("{}", e);
 		}
-		
+		*/
 		SwingUtilities.invokeLater(new Runnable() {
             public void run() {
         		for( LogListener listener : listeners ) {
         			listener.logEvent(cleanMsg);
         		}
-        		//System.out.println(msg);
             }
          });
 	}
-
 
 	public static String secondsToHumanReadable(double totalTime) {
 		return millisecondsToHumanReadable((long)(totalTime*1000));
@@ -216,7 +215,6 @@ public class Log {
 		return elapsed;
 	}
 	
-
 	/**
 	 * Appends a message to the log file.  Color will be red.
 	 * @param message append text as red HTML
@@ -227,9 +225,18 @@ public class Log {
 
 	/**
 	 * Appends a message to the log file.  Color will be green.
-	 * @param message append text as green HTML
+	 * @param str append text as green HTML
 	 */
-	public static void message(String message) {
-		write(message);		
+	public static void message(String str) {
+		write(str);
+	}
+	
+	/**
+	 * Appends a message to the log file.  Color will be green.
+	 * @param str append text as green HTML
+	 */
+	public static void message2(String str) {
+		write(str);
+		System.out.println(str);
 	}
 }

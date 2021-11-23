@@ -50,14 +50,14 @@ public final class Translator {
 	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
 
 	static public void start() {
-		Log.message("starting translator...");
+		Log.message2("starting translator...");
 		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		Log.message("Default language = "+defaultLanguage);
+		Log.message2("Default language = "+defaultLanguage);
 		
 		loadLanguages();
-		loadConfig();
+		load();
 
 		if (isThisTheFirstTimeLoadingLanguageFiles()) {
 			LanguagePreferences.chooseLanguage();
@@ -94,14 +94,16 @@ public final class Translator {
 	/**
 	 * save the user's current language choice
 	 */
-	static public void saveConfig() {
+	static public void save() {
+		Log.message2("Translator::save()");
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 * load the user's language choice
 	 */
-	static public void loadConfig() {
+	static public void load() {
+		Log.message2("Translator::load()");
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
 
@@ -116,7 +118,7 @@ public final class Translator {
 		
 		try {
 			URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-			Log.message("Looking for translations in "+uri.toString());
+			Log.message2("Looking for translations in "+uri.toString());
 			
 			Path myPath;
 			if (uri.getScheme().equals("jar")) {
@@ -127,7 +129,7 @@ public final class Translator {
 			}
 
 			Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
-			Log.message("rootDir="+rootPath.toString());
+			Log.message2("rootDir="+rootPath.toString());
 			
 			// we'll look inside the JAR file first, then look in the working directory.
 			// this way new translation files in the working directory will replace the old
@@ -144,7 +146,7 @@ public final class Translator {
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					if( name.endsWith("pom.xml") ) {
-						Log.message("pom.xml ignored.");
+						Log.message2("pom.xml ignored.");
 						continue;
 					}
 					
