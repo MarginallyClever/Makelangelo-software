@@ -57,7 +57,7 @@ public final class Translator {
 		Log.message2("Default language = "+defaultLanguage);
 		
 		loadLanguages();
-		load();
+		loadConfig();
 
 		if (isThisTheFirstTimeLoadingLanguageFiles()) {
 			LanguagePreferences.chooseLanguage();
@@ -94,16 +94,19 @@ public final class Translator {
 	/**
 	 * save the user's current language choice
 	 */
-	static public void save() {
-		Log.message2("Translator::save()");
+	static public void saveConfig() {
+		Log.message2("Translator::saveConfig()");
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 * load the user's language choice
 	 */
-	static public void load() {
-		Log.message2("Translator::load()");
+	static public void loadConfig() {
+		Log.message2("Translator::loadConfig()");
+		Log.message2(languagePreferenceNode.toString());
+		Log.message2(LANGUAGE_KEY);
+		Log.message2(defaultLanguage);
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
 

@@ -62,9 +62,9 @@ public class TranslatorTests {
 		System.out.println("...d");
 		Translator.setCurrentLanguage(available[next]);
 		System.out.println("...e");
-		Translator.save();
+		Translator.saveConfig();
 		System.out.println("...f");
-		Translator.load();
+		Translator.loadConfig();
 		System.out.println("...g");
 		int read = Translator.getCurrentLanguageIndex();
 		System.out.println("...h");
@@ -72,7 +72,7 @@ public class TranslatorTests {
 		// return to previous state
 		Translator.setCurrentLanguage(available[current]);
 		System.out.println("...i");
-		Translator.save();
+		Translator.saveConfig();
 		System.out.println("changeLanguageTest() end");
 	}
 }
