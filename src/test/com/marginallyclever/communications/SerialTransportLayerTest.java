@@ -4,11 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SerialTransportLayerTest {
-
 	@Test
 	public void scanConnections() {
 		SerialTransportLayer layer = new SerialTransportLayer();

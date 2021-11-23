@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -93,7 +92,7 @@ public final class Translator {
 	}
 
 	/**
-	 * save the user's current langauge choice
+	 * save the user's current language choice
 	 */
 	static public void saveConfig() {
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
