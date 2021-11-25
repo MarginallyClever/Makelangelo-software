@@ -48,7 +48,7 @@ public class TranslatorTests {
 		System.out.println("loadLanguageTest() end");
 	}
 	
-	@Test
+	//@Test
 	public void changeLanguageTest() {
 		System.out.println("changeLanguageTest() start");
 		Translator.start();
