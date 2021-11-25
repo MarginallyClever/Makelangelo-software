@@ -28,7 +28,7 @@ public class TranslatorTests {
 		System.out.println("afterAll() end");
 	}
 	
-	//@Test
+	@Test
 	public void startTranslatorTwiceTest() {
 		System.out.println("startTranslatorTwiceTest() start");
 		Translator.start();
@@ -38,7 +38,7 @@ public class TranslatorTests {
 		System.out.println("startTranslatorTwiceTest() end");
 	}
 	
-	//@Test
+	@Test
 	public void loadLanguageTest() {
 		System.out.println("loadLanguageTest() start");
 		Translator.start();
@@ -48,7 +48,7 @@ public class TranslatorTests {
 		System.out.println("loadLanguageTest() end");
 	}
 	
-	//@Test
+	@Test
 	public void changeLanguageTest() {
 		System.out.println("changeLanguageTest() start");
 		Translator.start();
