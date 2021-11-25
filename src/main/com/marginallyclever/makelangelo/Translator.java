@@ -49,11 +49,11 @@ public final class Translator {
 	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
 
 	static public void start() {
-		Log.message2("starting translator...");
+		Log.message("starting translator...");
 		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		Log.message2("Default language = "+defaultLanguage);
+		Log.message("Default language = "+defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
@@ -90,7 +90,7 @@ public final class Translator {
 	 * save the user's current language choice
 	 */
 	static public void saveConfig() {
-		Log.message2("Translator::saveConfig()");
+		Log.message("Translator::saveConfig()");
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
@@ -98,10 +98,10 @@ public final class Translator {
 	 * load the user's language choice
 	 */
 	static public void loadConfig() {
-		Log.message2("Translator::loadConfig()");
-		Log.message2(languagePreferenceNode.toString());
-		Log.message2(LANGUAGE_KEY);
-		Log.message2(defaultLanguage);
+		Log.message("Translator::loadConfig()");
+		Log.message(languagePreferenceNode.toString());
+		Log.message(LANGUAGE_KEY);
+		Log.message(defaultLanguage);
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
 
@@ -124,7 +124,7 @@ public final class Translator {
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					if( name.endsWith("pom.xml") ) {
-						Log.message2("pom.xml ignored.");
+						Log.message("pom.xml ignored.");
 						continue;
 					}
 					
@@ -158,7 +158,7 @@ public final class Translator {
 
 	private static Stream<Path> getLanguagePaths() throws Exception {
 		URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-		Log.message2("Looking for translations in "+uri.toString());
+		Log.message("Looking for translations in "+uri.toString());
 		
 		Path myPath;
 		if (uri.getScheme().equals("jar")) {
@@ -169,7 +169,7 @@ public final class Translator {
 		}
 
 		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
-		Log.message2("rootDir="+rootPath.toString());
+		Log.message("rootDir="+rootPath.toString());
 		
 		// we'll look inside the JAR file first, then look in the working directory.
 		// this way new translation files in the working directory will replace the old JAR files.
