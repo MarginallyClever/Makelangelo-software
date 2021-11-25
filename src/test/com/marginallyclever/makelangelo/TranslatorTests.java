@@ -5,27 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class TranslatorTests {
-	@BeforeEach
-	public void beforeEach() {
-		System.out.println("beforeEach() start");
+	@BeforeAll
+	public void beforeAll() {
+		System.out.println("beforeAll() start");
 		Log.start();
 		PreferencesHelper.start();
-		System.out.println("beforeEach() end");
+		System.out.println("beforeAll() end");
 	}
 	
-	@AfterEach
-	public void afterEach() {
-		System.out.println("afterEach() start");
+	@AfterAll
+	public void afterAll() {
+		System.out.println("afterAll() start");
 		Log.end();
-		System.out.println("afterEach() end");
+		System.out.println("afterAll() end");
 	}
 	
 	@Test
