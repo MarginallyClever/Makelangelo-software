@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -54,10 +55,12 @@ public class LogPanel extends JPanel implements LogListener {
 	// appends a message to the log tab and system out.
 	@Override
 	public void logEvent(String msg) {
-		msg = cleanMessage(msg);
-		if (msg.length() == 0) return;
-		inBoundQueue.offer(msg);
-		repaint();
+		SwingUtilities.invokeLater(()->{
+			String cleanMsg = cleanMessage(msg);
+			if(cleanMsg.length() == 0) return;
+			inBoundQueue.offer(cleanMsg);
+			repaint();
+		});
 	}
 	
 	@Override

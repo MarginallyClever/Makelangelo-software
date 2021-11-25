@@ -17,8 +17,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Properties;
 
-import javax.swing.SwingUtilities;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +38,8 @@ public class Log {
 	private static Logger logger;
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static ArrayList<LogListener> listeners = new ArrayList<LogListener>();
-
+	private static Writer fileWriter;
+	
 	public static void addListener(LogListener listener) {
 		listeners.add(listener);
 	}
@@ -62,6 +61,11 @@ public class Log {
 		deleteOldLog();
 		
 		logger = LoggerFactory.getLogger(Makelangelo.class);
+		try {
+			fileWriter = new OutputStreamWriter(new FileOutputStream(LOG_FILE_NAME_TXT, true), StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			logger.error("{}", e);
+		}
 		
 		write(PROGRAM_START_STRING);
 		write("------------------------------------------------");
@@ -78,8 +82,8 @@ public class Log {
 	}
 	
 	public static void end() {
-		logger.info(PROGRAM_END_STRING);
-		//write(PROGRAM_END_STRING);
+		//logger.info(PROGRAM_END_STRING);
+		write(PROGRAM_END_STRING);
 	}
 	
 	private static boolean crashReportCheck() {
@@ -173,22 +177,20 @@ public class Log {
 		
 		// TODO why have logger if it's not being used?
 		logger.info(msg);
-		/*
-		try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream("log.txt", true), StandardCharsets.UTF_8)) {
-			PrintWriter logToFile = new PrintWriter(fileWriter);
-			logToFile.write(cleanMsg+"\n");
-			logToFile.flush();
-		} catch (IOException e) {
-			logger.error("{}", e);
+		writeToFile(cleanMsg);
+		tellListeners(cleanMsg);
+	}
+	
+	private static void tellListeners(String cleanMsg) {
+		for( LogListener listener : listeners ) {
+			listener.logEvent(cleanMsg);
 		}
-		*/
-		SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-        		for( LogListener listener : listeners ) {
-        			listener.logEvent(cleanMsg);
-        		}
-            }
-         });
+	}
+
+	private static void writeToFile(String cleanMsg) {
+		PrintWriter logToFile = new PrintWriter(fileWriter);
+		logToFile.write(cleanMsg+"\n");
+		logToFile.flush();
 	}
 
 	public static String secondsToHumanReadable(double totalTime) {
