@@ -14,7 +14,7 @@ import com.marginallyclever.util.PreferencesHelper;
 
 public class TranslatorTests {
 	@BeforeAll
-	public void beforeAll() {
+	public static void beforeAll() {
 		System.out.println("beforeAll() start");
 		Log.start();
 		PreferencesHelper.start();
@@ -22,7 +22,7 @@ public class TranslatorTests {
 	}
 	
 	@AfterAll
-	public void afterAll() {
+	public static void afterAll() {
 		System.out.println("afterAll() start");
 		Log.end();
 		System.out.println("afterAll() end");
