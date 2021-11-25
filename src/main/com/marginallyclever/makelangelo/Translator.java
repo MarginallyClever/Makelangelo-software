@@ -120,28 +120,8 @@ public final class Translator {
 		languages.clear();
 		
 		try {
-			URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-			Log.message2("Looking for translations in "+uri.toString());
-			
-			Path myPath;
-			if (uri.getScheme().equals("jar")) {
-				FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
-				myPath = fileSystem.getPath(WORKING_DIRECTORY);
-			} else {
-				myPath = Paths.get(uri);
-			}
-
-			Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
-			Log.message2("rootDir="+rootPath.toString());
-			
-			// we'll look inside the JAR file first, then look in the working directory.
-			// this way new translation files in the working directory will replace the old
-			// JAR files.
 			int found=0;
-			Stream<Path> walk = Stream.concat(
-					Files.walk(myPath, 1),	// check inside the JAR file.
-					Files.walk(rootPath,1)	// then check the working directory
-					);
+			Stream<Path> walk = getLanguagePaths();
 			Iterator<Path> it = walk.iterator();
 			while( it.hasNext() ) {
 				Path p = it.next();
@@ -180,6 +160,32 @@ public final class Translator {
 			languages.put(languageContainer.getName(), languageContainer);
 		}
 	}
+
+	private static Stream<Path> getLanguagePaths() throws Exception {
+		URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
+		Log.message2("Looking for translations in "+uri.toString());
+		
+		Path myPath;
+		if (uri.getScheme().equals("jar")) {
+			FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+			myPath = fileSystem.getPath(WORKING_DIRECTORY);
+		} else {
+			myPath = Paths.get(uri);
+		}
+
+		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
+		Log.message2("rootDir="+rootPath.toString());
+		
+		// we'll look inside the JAR file first, then look in the working directory.
+		// this way new translation files in the working directory will replace the old JAR files.
+		Stream<Path> walk = Stream.concat(
+				Files.walk(myPath, 1),	// check inside the JAR file.
+				Files.walk(rootPath,1)	// then check the working directory
+				);
+
+		return walk;
+	}
+
 
 	private static boolean attemptToLoadLanguageXML(String name) throws Exception {
 		String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
