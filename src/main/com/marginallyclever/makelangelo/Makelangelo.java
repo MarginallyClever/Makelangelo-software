@@ -60,6 +60,7 @@ import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -775,6 +776,11 @@ public final class Makelangelo {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
+
+		if(Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
+			LanguagePreferences.chooseLanguage();
+		}
+		
 		setSystemLookAndFeel();
 		
 		// Schedule a job for the event-dispatching thread:

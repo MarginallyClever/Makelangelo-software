@@ -25,7 +25,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
 import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -58,17 +57,13 @@ public final class Translator {
 		
 		loadLanguages();
 		loadConfig();
-
-		if (isThisTheFirstTimeLoadingLanguageFiles()) {
-			LanguagePreferences.chooseLanguage();
-		}
 	}
 	
 
 	/**
 	 * @return true if this is the first time loading language files (probably on install)
 	 */
-	static private boolean isThisTheFirstTimeLoadingLanguageFiles() {
+	static public boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
 		try {
 			if (doesLanguagePreferenceExist()) {
