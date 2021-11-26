@@ -45,6 +45,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -721,8 +722,10 @@ public final class Makelangelo {
 	 * @param toolNumber a 24 bit RGB color of the new pen.
 	 */
 	private void requestUserChangeTool(int toolNumber) {
-		ChangeToolPanel panel = new ChangeToolPanel(toolNumber);
-		panel.run(mainFrame);
+		SwingUtilities.invokeLater(()->{
+			ChangeToolPanel panel = new ChangeToolPanel(toolNumber);
+			panel.run(mainFrame);
+		});
 	}
 
 	private void onClose() {
