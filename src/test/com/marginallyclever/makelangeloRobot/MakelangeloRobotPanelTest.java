@@ -5,11 +5,13 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MakelangeloRobotPanelGUITest {
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
+public class MakelangeloRobotPanelTest {
 
     @Test
     public void testNoMissingGeneratorPanels() {

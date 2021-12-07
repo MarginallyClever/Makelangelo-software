@@ -5,8 +5,10 @@ import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-public class MakelangeloGUITest {
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
+public class MakelangeloTest {
     @Test
     public void checkVersion() throws IllegalStateException {
         Log.start();

@@ -3,12 +3,14 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import javax.swing.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SelectTests {
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
+public class SelectGUITest {
     private static JFrame frame;
     private SelectPanel panel;
     private int testObservation;
