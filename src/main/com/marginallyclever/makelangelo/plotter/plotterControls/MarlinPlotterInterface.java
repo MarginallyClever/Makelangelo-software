@@ -16,11 +16,8 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
  */
 public class MarlinPlotterInterface extends MarlinInterface {
 	private static final long serialVersionUID = -7114823910724405882L;
-
 	private static final double MARLIN_DRAW_FEEDRATE = 7500.0;  // mm/min
-	
 	private static final String STR_FEEDRATE = "echo:  M203";
-	
 	private static final String STR_ACCELERATION = "echo:  M201";
 	
 	private Plotter myPlotter;
@@ -36,23 +33,23 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
 		case PlotterEvent.HOME_FOUND:
-			//System.out.println("MarlinInterface heard plotter home.");
+			//System.out.println("MarlinPlotterInterface heard plotter home.");
 			sendFindHome();
 			break;
 		case PlotterEvent.POSITION:
-			//System.out.println("MarlinInterface heard plotter move.");
+			//System.out.println("MarlinPlotterInterface heard plotter move.");
 			sendGoto();
 			break;
 		case PlotterEvent.PEN_UPDOWN:
-			//System.out.println("MarlinInterface heard plotter up/down.");
+			//System.out.println("MarlinPlotterInterface heard plotter up/down.");
 			sendPenUpDown();
 			break;
 		case PlotterEvent.MOTORS_ENGAGED:
-			//System.out.println("MarlinInterface heard plotter engage.");
+			//System.out.println("MarlinPlotterInterface heard plotter engage.");
 			sendEngage();
 			break;
 		case PlotterEvent.TOOL_CHANGE:
-			//System.out.println("MarlinInterface heard plotter tool change.");
+			//System.out.println("MarlinPlotterInterface heard plotter tool change.");
 			sendToolChange((int)e.extra);
 			break;
 		default: break;
@@ -91,7 +88,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			String message = ((String)evt.data).trim();
-			//Log.message("MarlinInterface received '"+message.trim()+"'.");
+			//Log.message("MarlinPlotterInterface received '"+message.trim()+"'.");
 			if(message.startsWith("X:") && message.contains("Count")) {
 				onHearM114(message);
 			} else if(message.startsWith(STR_FEEDRATE)) {
@@ -126,23 +123,31 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// format is "echo:  M201 X5400.00 Y5400.00 Z5400.00"
 	// I only care about the x value when reading.
 	private void onHearAcceleration(String message) {
-		message = message.substring(STR_ACCELERATION.length());
-		String [] parts = message.split("\s");
-		if(parts.length!=4) return;  // TODO exception when M201 is broken?
-		double v=Double.valueOf(parts[1].substring(1));
-		Log.message("MarlinInterface found acceleration "+v);
-		myPlotter.getSettings().setAcceleration(v);
+		try {
+			message = message.substring(STR_ACCELERATION.length());
+			String [] parts = message.split("\s");
+			if(parts.length!=4) throw new Exception("M201 format bad: "+message);
+			double v=Double.valueOf(parts[1].substring(1));
+			Log.message("MarlinPlotterInterface found acceleration "+v);
+			myPlotter.getSettings().setAcceleration(v);
+		} catch (Exception e) {
+			Log.error("M201 error: "+e.getMessage());
+		}
 	}
 
 	// format is "echo:  M203 X5400.00 Y5400.00 Z5400.00"
 	// I only care about the x value when reading.
 	private void onHearFeedrate(String message) {
-		message = message.substring(STR_FEEDRATE.length());
-		String [] parts = message.split("\s");
-		if(parts.length!=4) return;  // TODO exception when M201 is broken?
-		double v=Double.valueOf(parts[1].substring(1));
-		Log.message("MarlinInterface found feedrate "+v);
-		myPlotter.getSettings().setDrawFeedRate(v);
+		try {
+			message = message.substring(STR_FEEDRATE.length());
+			String [] parts = message.split("\s");
+			if(parts.length!=4) throw new Exception("M203 format bad: "+message);
+			double v=Double.valueOf(parts[1].substring(1));
+			Log.message("MarlinPlotterInterface found feedrate "+v);
+			myPlotter.getSettings().setDrawFeedRate(v);
+		} catch (Exception e) {
+			Log.error("M203 error: "+e.getMessage());
+		}
 	}
 	
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
