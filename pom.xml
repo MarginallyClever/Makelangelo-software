@@ -9,7 +9,6 @@
 	<version>7.30.1</version>
 	<name>Makelangelo</name>
 	<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
-
 It pairs really well with Makelangelo-firmware, the code in the brain of the robot that receives instructions and moves the motors.  </description>
 	<url>http://www.makelangelo.com/</url>
 
@@ -293,9 +292,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
 	</build>
-
 
 	<dependencyManagement>
 		<dependencies>
