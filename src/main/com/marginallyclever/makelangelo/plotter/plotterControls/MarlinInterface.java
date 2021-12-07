@@ -91,7 +91,7 @@ public class MarlinInterface extends JPanel {
 
 	private void onConnect() {
 		Log.message("MarlinInterface connected.");
-		setupListener();
+		setupNetworkListener();
 		lineNumberToSend=1;
 		lineNumberAdded=0;
 		myHistory.clear();
@@ -110,7 +110,7 @@ public class MarlinInterface extends JPanel {
 		}
 	}
 
-	private void setupListener() {
+	private void setupNetworkListener() {
 		chatInterface.addNetworkSessionListener((evt) -> onDataReceived(evt));
 	}
 	
@@ -144,15 +144,13 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void onHearOK() {
-		SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-        		busyCount++;
-        		sendQueuedCommand();
-            	clearOldHistory();
-        		if(lineNumberToSend>=lineNumberAdded) {
-        			fireIdleNotice();
-        		}
-            }
+		SwingUtilities.invokeLater(() -> {
+    		busyCount++;
+    		sendQueuedCommand();
+        	clearOldHistory();
+    		if(lineNumberToSend>=lineNumberAdded) {
+    			fireIdleNotice();
+    		}
         });
 	}
 
@@ -161,11 +159,11 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void clearOldHistory() {
-		while(myHistory.size()>0 && myHistory.get(0).lineNumber<lineNumberAdded-HISTORY_BUFFER_LIMIT) {
+		while(myHistory.size()>0 && myHistory.get(0).lineNumber < lineNumberAdded-HISTORY_BUFFER_LIMIT) {
 			myHistory.remove(0);
 		}
 	}
-
+	
 	public void queueAndSendCommand(String str) {
 		if(str.trim().length()==0) return;
 		
