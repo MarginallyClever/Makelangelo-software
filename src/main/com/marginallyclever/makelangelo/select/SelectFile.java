@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * A file selection dialog
@@ -22,6 +23,8 @@ public class SelectFile extends Select {
 	private JLabel label;
 	private JTextField field;
 	private JButton chooseButton;
+	private FileFilter filter = null;
+	private JFileChooser choose = new JFileChooser();
 	
 	public SelectFile(String internalName,String labelValue,String defaultValue) {
 		super(internalName);
@@ -71,8 +74,8 @@ public class SelectFile extends Select {
 		return field.getText();
 	}
 	
-	static private String selectFile(String cancelValue) {
-		JFileChooser choose = new JFileChooser();
+	private String selectFile(String cancelValue) {
+		choose.setFileFilter(filter);
 		int returnVal = choose.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = choose.getSelectedFile();
@@ -81,6 +84,10 @@ public class SelectFile extends Select {
 			return cancelValue;
 		}
 	}
+	
+	public void setFilter(FileFilter filter) {
+		this.filter = filter;
+	}
 
 	/**
 	 * Will notify observers that the value has changed.
@@ -88,5 +95,13 @@ public class SelectFile extends Select {
 	 */
 	public void setText(String string) {
 		field.setText(string);
+	}
+
+	public void setPathOnly() {
+		choose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	}
+	
+	public void setFileOnly() {
+		choose.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	}
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -39,6 +40,8 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		updateCOMPortList();
 		refreshLayout();
 		
+		sourceAVRDude.setPathOnly();
+		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
 		refreshButton.addPropertyChangeListener((e)->{
 			updateCOMPortList();
 		});
