@@ -44,7 +44,7 @@ jobs:
       with:
         # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
         # in your browser and copy the full "upload_url" value including the {?name,label} part
-        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/28176830/assets{?name,label}
+        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
         release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
         asset_path: ./target/to-upload.jar # path to archive to upload
         asset_name: makelangelo-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
