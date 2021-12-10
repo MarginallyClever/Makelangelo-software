@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 
 /**
@@ -29,11 +30,13 @@ public class NetworkSessionManager {
 	 * @return a new connection or null.
 	 */
 	public static NetworkSession requestNewSession(Component parent) {
+		Log.message("NetworkSessionManager.requestNewSession()");
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();
 		top.add(tabs);
 		for( TransportLayer t : transportLayers ) {
+			Log.message("  "+t.getName());
 			tabs.addTab(t.getName(), t.getTransportLayerPanel());
 		}
 
