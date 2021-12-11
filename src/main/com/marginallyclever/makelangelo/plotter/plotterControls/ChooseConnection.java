@@ -45,7 +45,7 @@ public class ChooseConnection extends JPanel {
 		if(mySession!=null) {
 			onClose();
 		} else {
-			Log.message(" NetworkSessionManager.requestNewSession");
+			Log.message("NetworkSessionManager.requestNewSession");
 			NetworkSession s = NetworkSessionManager.requestNewSession(this);
 			if(s!=null) {
 				onOpen(s);
