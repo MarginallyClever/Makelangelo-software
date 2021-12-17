@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_FillPage extends TurtleGenerator {
 	private static double angle = 0;
-	private static double penDiameter = 0;
+	private static double penDiameter = 0.8;
 
 	@Override
 	public String getName() {
@@ -62,6 +62,7 @@ public class Generator_FillPage extends TurtleGenerator {
 		Point2D rMin = new Point2D(xLeft,yBottom);
 		
 		int i=0;
+		if ( penDiameter > 0 )
 		for(double a = -radius;a<radius;a+=penDiameter) {
 			double majorPX = majorX * a;
 			double majorPY = majorY * a;
