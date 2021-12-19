@@ -119,6 +119,14 @@ public class Paper implements PreviewListener {
 		paperColor = arg0;
 	}
 
+	public double getCenterX() {
+		return 0;
+	}
+
+	public double getCenterY() {
+		return 0;
+	}
+	
 	/**
 	 * @return paper height in mm.
 	 */
@@ -140,7 +148,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperLeft() {
-		return paperLeft;
+		return paperLeft + getCenterX();
 	}
 
 	/**
@@ -148,7 +156,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperRight() {
-		return paperRight;
+		return paperRight + getCenterX();
 	}
 
 	/**
@@ -156,7 +164,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperTop() {
-		return paperTop;
+		return paperTop + getCenterY();
 	}
 
 	/**
@@ -164,35 +172,35 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperBottom() {
-		return paperBottom;
+		return paperBottom + getCenterY();
 	}
 
 	/**
 	 * @return paper left edge in mm.
 	 */
 	public double getMarginLeft() {
-		return getPaperLeft() * getPaperMargin();
+		return getPaperMargin() * paperLeft + getCenterX();
 	}
 
 	/**
 	 * @return paper right edge in mm.
 	 */
 	public double getMarginRight() {
-		return getPaperRight() * getPaperMargin();
+		return getPaperMargin() * paperRight + getCenterX();
 	}
 
 	/**
 	 * @return paper top edge in mm.
 	 */
 	public double getMarginTop() {
-		return getPaperTop() * getPaperMargin();
+		return getPaperMargin() * paperTop + getCenterY();
 	}
 
 	/**
 	 * @return paper bottom edge in mm.
 	 */
 	public double getMarginBottom() {
-		return getPaperBottom() * getPaperMargin();
+		return getPaperMargin() * paperBottom + getCenterY();
 	}
 
 	/**
