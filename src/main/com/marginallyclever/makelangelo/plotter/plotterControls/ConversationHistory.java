@@ -164,9 +164,6 @@ public class ConversationHistory extends JPanel {
 	
 	public static void main(String[] args) {
 		Log.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) {}
 		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ConversationHistory());
