@@ -24,9 +24,10 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 2141566275423257798L;
-	
-	protected JPanel interiorPanel = new JPanel();
-	private GridBagConstraints gbc;
+
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private JPanel interiorPanel = new JPanel();
+	private GridBagConstraints gbc = new GridBagConstraints();
 	
 	public SelectPanel() {
 		super();
@@ -36,11 +37,10 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		//interiorPanel.setBorder(new LineBorder(Color.RED));
 		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
 
-		gbc = new GridBagConstraints();
-		gbc.weightx=1;
-		gbc.gridx  =0;
-		gbc.gridy  =0;
-		gbc.fill      = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
@@ -64,8 +64,6 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	// OBSERVER PATTERN
-	
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);
