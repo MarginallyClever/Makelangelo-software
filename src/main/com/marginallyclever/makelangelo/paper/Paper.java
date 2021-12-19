@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class Paper implements PreviewListener {
+	// default paper size = A2
 	private static final int DEFAULT_WIDTH=420; // mm
 	private static final int DEFAULT_HEIGHT=594; // mm
 	

@@ -7,12 +7,7 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -31,22 +26,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
+
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.StringHelper;
@@ -65,7 +51,9 @@ import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePrefere
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.paper.PaperMenuItem;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
+import com.marginallyclever.makelangelo.paper.PaperSize;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -103,20 +91,20 @@ public final class Makelangelo {
 	 */
 	public String VERSION;
 
-	private MakelangeloSettingPanel mySettingPanel;
+	private final MakelangeloSettingPanel mySettingPanel;
 	
-	private Camera camera;
+	private final Camera camera;
 	private Plotter myPlotter;
-	private Paper myPaper = new Paper();
+	private final Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
 
-	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	
 	// GUI elements
 	private JFrame mainFrame;
 	private PreviewPanel previewPanel;
 	private static JFrame logFrame;
-	private SaveDialog saveDialog;
+	private final SaveDialog saveDialog;
 	
 	private RecentFiles recentFiles;
 
@@ -208,7 +196,28 @@ public final class Makelangelo {
 
 	private JMenu createPaperSettingsMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuPaper"));
-		
+		PaperSettings paperSettings = new PaperSettings(myPaper);
+
+		// update menu with the current selected paper
+		menu.addChangeListener(l -> {
+			JMenu source = (JMenu) l.getSource();
+			for (Component component : source.getMenuComponents()) {
+				if (component instanceof  PaperMenuItem) {
+					PaperMenuItem paperMenuItem = (PaperMenuItem) component;
+					paperMenuItem.updateSelected();
+				}
+			}
+		});
+
+		ButtonGroup group = new ButtonGroup();
+		for (PaperSize paper: PaperSettings.commonPaperSizes) {
+			JRadioButtonMenuItem rbMenuItem = new PaperMenuItem(paperSettings, paper);
+			group.add(rbMenuItem);
+			menu.add(rbMenuItem);
+		}
+
+		menu.addSeparator();
+
 		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenPaperSettings"));
 		bOpenControls.addActionListener((e)-> openPaperSettings());
 		menu.add(bOpenControls);
