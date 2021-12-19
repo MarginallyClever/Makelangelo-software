@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;

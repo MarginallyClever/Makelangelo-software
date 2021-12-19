@@ -33,9 +33,9 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		super();
 		
 		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		interiorPanel.setLayout(new GridBagLayout());
+		getInteriorPanel().setLayout(new GridBagLayout());
 		//interiorPanel.setBorder(new LineBorder(Color.RED));
-		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
+		getInteriorPanel().setBorder(new EmptyBorder(5,5,5,5));
 
 		gbc.weightx = 1;
 		gbc.gridx = 0;
@@ -44,23 +44,23 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
-		add(interiorPanel);
+		add(getInteriorPanel());
 	}
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		interiorPanel.add(c.getPanel(),gbc);
+		getInteriorPanel().add(c.getPanel(),gbc);
 		c.addPropertyChangeListener(this);
 	}
 	
 	public void finish() {
 		gbc.weighty=1;
 		gbc.gridy++;
-		interiorPanel.add(new JLabel(""),gbc);
+		getInteriorPanel().add(new JLabel(""),gbc);
 	}
 	
 	public JPanel getPanel() {
-		return interiorPanel;
+		return getInteriorPanel();
 	}
 
 	// OBSERVER PATTERN
@@ -124,5 +124,9 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		frame.getContentPane().add(panel.getPanel());
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public JPanel getInteriorPanel() {
+		return interiorPanel;
 	}
 }

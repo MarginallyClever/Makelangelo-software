@@ -13,8 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;

@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
-import javax.swing.UIManager;
 import javax.swing.SwingWorker.StateValue;
 
 import com.jogamp.opengl.GL2;

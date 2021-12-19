@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;

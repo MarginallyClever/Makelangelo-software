@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
 import javax.swing.JFrame;
-import javax.swing.UIManager;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -54,8 +52,8 @@ public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ 
 	    //add(buttonTestUp = new SelectButton("testUp",Translator.get("penToolTest")));
 	    add(penDown = new SelectDouble("down",Translator.get("penToolDown"),settings.getPenDownAngle()));
 	    //add(buttonTestDown = new SelectButton("testDown",Translator.get("penToolTest")));
-		add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),robot.getSettings().getPenDownColor(),interiorPanel));
-		add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),robot.getSettings().getPenUpColor(),interiorPanel));
+		add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),robot.getSettings().getPenDownColor(),getInteriorPanel()));
+		add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),robot.getSettings().getPenUpColor(),getInteriorPanel()));
 		finish();
 	}
 	

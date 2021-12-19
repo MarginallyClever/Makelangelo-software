@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
-import javax.smartcardio.CommandAPDU;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;

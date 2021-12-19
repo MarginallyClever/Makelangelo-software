@@ -7,8 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
-
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 

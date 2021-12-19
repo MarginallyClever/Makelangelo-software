@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
 import com.marginallyclever.convenience.CommandLineOptions;

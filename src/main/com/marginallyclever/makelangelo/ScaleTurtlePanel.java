@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 
 import org.apache.batik.ext.swing.GridBagConstants;

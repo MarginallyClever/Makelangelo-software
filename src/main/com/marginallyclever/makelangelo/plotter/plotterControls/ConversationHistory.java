@@ -24,7 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionListener;
 

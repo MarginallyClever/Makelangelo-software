@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
 import com.marginallyclever.convenience.CommandLineOptions;
