@@ -22,6 +22,8 @@ public class Paper implements PreviewListener {
 	
 	private double rotation;
 	private double rotationRef;
+	private double centerX=0;
+	private double centerY=0;
 	
 	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
@@ -29,11 +31,8 @@ public class Paper implements PreviewListener {
 		// paper area
 		double pw = DEFAULT_WIDTH;
 		double ph = DEFAULT_HEIGHT;
+		setPaperSize(pw, ph, 0, 0);
 
-		paperTop = ph / 2;
-		paperBottom = -ph / 2;
-		paperLeft = -pw / 2;
-		paperRight = pw / 2;
 		paperMargin = 0.95;
 	}
 	
@@ -78,6 +77,7 @@ public class Paper implements PreviewListener {
 		rotation = Double.parseDouble(paperPreferenceNode.get("rotation", Double.toString(rotation)));
 		rotationRef = 0;
 	}
+	
 	public void saveConfig() {
 		Preferences paperPreferenceNode = 
 		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
@@ -94,10 +94,12 @@ public class Paper implements PreviewListener {
 	}
 
 	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		this.paperLeft = -width / 2 + shiftx;
-		this.paperRight = width / 2 + shiftx;
-		this.paperTop = height / 2 + shifty;
-		this.paperBottom = -height / 2 + shifty;
+		this.centerX=shiftx;
+		this.centerY=shifty;
+		this.paperLeft = -width / 2;
+		this.paperRight = width / 2;
+		this.paperTop = height / 2;
+		this.paperBottom = -height / 2;
 	}
 
 	public Rectangle2D.Double getMarginRectangle() {
@@ -120,11 +122,11 @@ public class Paper implements PreviewListener {
 	}
 
 	public double getCenterX() {
-		return 0;
+		return centerX;
 	}
 
 	public double getCenterY() {
-		return 0;
+		return centerY;
 	}
 	
 	/**
