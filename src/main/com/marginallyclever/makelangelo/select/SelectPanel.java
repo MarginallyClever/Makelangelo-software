@@ -24,48 +24,46 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 2141566275423257798L;
-	
-	protected JPanel interiorPanel = new JPanel();
-	private GridBagConstraints gbc;
+
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private JPanel interiorPanel = new JPanel();
+	private GridBagConstraints gbc = new GridBagConstraints();
 	
 	public SelectPanel() {
 		super();
 		
 		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		interiorPanel.setLayout(new GridBagLayout());
+		getInteriorPanel().setLayout(new GridBagLayout());
 		//interiorPanel.setBorder(new LineBorder(Color.RED));
-		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
+		getInteriorPanel().setBorder(new EmptyBorder(5,5,5,5));
 
-		gbc = new GridBagConstraints();
-		gbc.weightx=1;
-		gbc.gridx  =0;
-		gbc.gridy  =0;
-		gbc.fill      = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
-		add(interiorPanel);
+		add(getInteriorPanel());
 	}
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		interiorPanel.add(c.getPanel(),gbc);
+		getInteriorPanel().add(c.getPanel(),gbc);
 		c.addPropertyChangeListener(this);
 	}
 	
 	public void finish() {
 		gbc.weighty=1;
 		gbc.gridy++;
-		interiorPanel.add(new JLabel(""),gbc);
+		getInteriorPanel().add(new JLabel(""),gbc);
 	}
 	
 	public JPanel getPanel() {
-		return interiorPanel;
+		return getInteriorPanel();
 	}
 
 	// OBSERVER PATTERN
-	
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);
@@ -126,5 +124,9 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		frame.getContentPane().add(panel.getPanel());
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public JPanel getInteriorPanel() {
+		return interiorPanel;
 	}
 }

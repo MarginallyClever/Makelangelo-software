@@ -3,8 +3,6 @@ package com.marginallyclever.makelangelo.paper;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.JFrame;
-import javax.swing.UIManager;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -83,7 +81,7 @@ public class PaperSettings extends SelectPanel {
 		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
 		add(isLandscape = new SelectBoolean("landscape","\u21cb",false));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
-		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),interiorPanel));
+		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),getInteriorPanel()));
 		finish();
 
 		updateValuesFromPaper();
@@ -216,9 +214,6 @@ public class PaperSettings extends SelectPanel {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) {}
 		
 		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

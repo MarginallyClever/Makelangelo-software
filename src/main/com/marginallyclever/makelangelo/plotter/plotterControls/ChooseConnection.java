@@ -10,8 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionManager;
@@ -45,7 +43,7 @@ public class ChooseConnection extends JPanel {
 		if(mySession!=null) {
 			onClose();
 		} else {
-			Log.message(" NetworkSessionManager.requestNewSession");
+			Log.message("NetworkSessionManager.requestNewSession");
 			NetworkSession s = NetworkSessionManager.requestNewSession(this);
 			if(s!=null) {
 				onOpen(s);
@@ -117,9 +115,6 @@ public class ChooseConnection extends JPanel {
 	
 	public static void main(String[] args) {
 		Log.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) {}
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChooseConnection());

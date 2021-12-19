@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
@@ -59,9 +57,6 @@ public class LanguagePreferences {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {}
 
 		try {
 			chooseLanguage();

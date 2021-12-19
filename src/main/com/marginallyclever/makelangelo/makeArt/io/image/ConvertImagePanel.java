@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
-import javax.swing.UIManager;
 import javax.swing.SwingWorker.StateValue;
 
 import com.jogamp.opengl.GL2;
@@ -358,9 +357,6 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) {}
 
 		try {
 			TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
