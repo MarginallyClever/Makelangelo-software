@@ -167,7 +167,7 @@ public final class Makelangelo {
 	}
 
 	private static void setSystemLookAndFeel() {
-		if(!CommandLineOptions.hasOption("-nofl")) {
+		if(!CommandLineOptions.hasOption("-nolf")) {
 	        try {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	        } catch (Exception e) {}
