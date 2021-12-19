@@ -16,10 +16,12 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
         });
     }
 
-    public void updateSelected() {
+    public boolean updateSelected() {
         double w = paperSettings.getCurrentPaper().getPaperWidth();
         double h = paperSettings.getCurrentPaper().getPaperHeight();
-        setSelected(paperSize.width == w && paperSize.height == h);
+        boolean selected = paperSize.width == w && paperSize.height == h;
+        setSelected(selected);
+        return selected;
     }
 
 }

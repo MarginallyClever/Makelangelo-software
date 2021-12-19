@@ -198,18 +198,23 @@ public final class Makelangelo {
 		JMenu menu = new JMenu(Translator.get("MenuPaper"));
 		PaperSettings paperSettings = new PaperSettings(myPaper);
 
+		ButtonGroup group = new ButtonGroup();
+
 		// update menu with the current selected paper
 		menu.addChangeListener(l -> {
 			JMenu source = (JMenu) l.getSource();
+			boolean selected = false;
 			for (Component component : source.getMenuComponents()) {
 				if (component instanceof  PaperMenuItem) {
 					PaperMenuItem paperMenuItem = (PaperMenuItem) component;
-					paperMenuItem.updateSelected();
+					selected = paperMenuItem.updateSelected() || selected;
 				}
+			}
+			if (!selected) {
+				group.clearSelection();
 			}
 		});
 
-		ButtonGroup group = new ButtonGroup();
 		for (PaperSize paper: PaperSettings.commonPaperSizes) {
 			JRadioButtonMenuItem rbMenuItem = new PaperMenuItem(paperSettings, paper);
 			group.add(rbMenuItem);
