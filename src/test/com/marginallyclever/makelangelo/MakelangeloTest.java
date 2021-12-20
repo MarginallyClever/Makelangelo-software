@@ -1,19 +1,14 @@
 package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class MakelangeloTest {
     @Test
     public void checkVersion() throws IllegalStateException {
         Log.start();
-        PreferencesHelper.start();
-        Translator.start();
         String version = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
         System.out.println("version " + version);
         String[] toks = version.split("\\.");
