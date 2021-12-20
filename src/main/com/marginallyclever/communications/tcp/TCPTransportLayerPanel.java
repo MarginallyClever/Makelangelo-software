@@ -20,6 +20,8 @@ public class TCPTransportLayerPanel extends TransportLayerPanel {
 	private static String connectionName = "192.168.1.183";
 	
 	TCPTransportLayerPanel(TCPTransportLayer tcpLayer) {
+		super();
+		
 		this.layer=tcpLayer;
 		
 		this.setLayout(new GridLayout(0, 1));

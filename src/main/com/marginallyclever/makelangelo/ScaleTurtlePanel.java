@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 
 import org.apache.batik.ext.swing.GridBagConstants;
@@ -226,9 +225,6 @@ public class ScaleTurtlePanel extends JPanel {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {}
 
 		try {
 			JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());

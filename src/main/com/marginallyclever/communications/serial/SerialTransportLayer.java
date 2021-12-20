@@ -3,6 +3,7 @@ package com.marginallyclever.communications.serial;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
+import com.marginallyclever.convenience.log.Log;
 
 import java.util.regex.Pattern;
 import jssc.SerialPortList;
@@ -22,7 +23,7 @@ public class SerialTransportLayer implements TransportLayer {
 	}
 	
 	/**
-	 * find all available serial ports
+	 * find all available serial ports.
 	 * @return a list of port names
 	 */
 	public static String[] listConnections() {
@@ -52,11 +53,12 @@ public class SerialTransportLayer implements TransportLayer {
 			Log.message("OS ERROR");
 			Log.message("OS NAME=" + System.getProperty("os.name"));
 		}*/
+		
 		return portsDetected;
 	}
 
 	/**
-	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
+	 * @return {@code NetworkSession} if connection successful.  return null on failure.
 	 */
 	@Override
 	public NetworkSession openConnection(String connectionName) {
@@ -78,5 +80,15 @@ public class SerialTransportLayer implements TransportLayer {
 	 */
 	public TransportLayerPanel getTransportLayerPanel() {
 		return new SerialTransportLayerPanel(this);
+	}
+	
+	public static void main(String[] args) {
+		Log.start();
+		Log.message("connections:");
+		String [] list = SerialTransportLayer.listConnections();
+		for(String s : list ) {
+			Log.message(s);
+		}
+		Log.end();
 	}
 }

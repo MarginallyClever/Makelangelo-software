@@ -318,12 +318,6 @@ public class CartesianButtons extends JComponent {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-        	Log.error("Look and feel could not be set: "+e.getLocalizedMessage());
-        }
-
 		JPanel p = new JPanel();
 		frame.add(p);
         CartesianButtons button = new CartesianButtons();        
