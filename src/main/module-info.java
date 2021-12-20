@@ -14,8 +14,6 @@ module com.marginallyclever.makelangelo {
 	requires transitive vecmath;
 	requires transitive batik.all;
 	requires transitive xml.apis.ext;
-	requires junit;
-	requires org.junit.jupiter.api;
 	
 	exports com.marginallyclever.makelangelo;
 	exports com.marginallyclever.makelangelo.select;
