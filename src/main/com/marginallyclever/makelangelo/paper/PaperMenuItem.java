@@ -19,7 +19,8 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
     public boolean updateSelected() {
         double w = paperSettings.getCurrentPaper().getPaperWidth();
         double h = paperSettings.getCurrentPaper().getPaperHeight();
-        boolean match = paperSize.width == w && paperSize.height == h;
+        boolean match = (!paperSettings.isLandscapeSelected() && paperSize.width == w && paperSize.height == h)
+                || (paperSettings.isLandscapeSelected() && paperSize.width == h && paperSize.height == w);
         setSelected(match);
         return match;
     }
