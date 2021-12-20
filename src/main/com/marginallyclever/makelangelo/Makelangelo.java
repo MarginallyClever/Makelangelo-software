@@ -207,7 +207,7 @@ public final class Makelangelo {
 			for (Component component : source.getMenuComponents()) {
 				if (component instanceof  PaperMenuItem) {
 					PaperMenuItem paperMenuItem = (PaperMenuItem) component;
-					selected = paperMenuItem.updateSelected() || selected;
+					selected |= paperMenuItem.updateSelected();
 				}
 			}
 			if (!selected) {
