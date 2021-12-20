@@ -1,10 +1,3 @@
-18/12/2021 PPAC : Mon fork pour corriger des petit bug ... enfin c'est surement deja fait par l'auteur originel mais pas commité ....
-
-Car cette version se trouve avec des petit defaut donc le plus critique pour moi est un histoire de LookAndFeel et le contournement c'est d'un trouver un qui passe.
-
-
-
-
 # Makelangelo Software
 
 Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the [Makelangelo Robot](http://www.makelangelo.com/).
