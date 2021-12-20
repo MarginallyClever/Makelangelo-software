@@ -206,19 +206,4 @@ public class PaperSettings extends SelectPanel {
 			myPaper.setPaperMargin(pm);
 		}
 	}
-	
-	// TEST
-	
-	public static void main(String[] args) {
-		Log.start();
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		
-		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PaperSettings(new Paper()));
-		frame.pack();
-		frame.setVisible(true);
-	}
 }
