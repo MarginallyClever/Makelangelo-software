@@ -169,7 +169,7 @@ public class MarlinInterface extends JPanel {
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		//System.out.println("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
+		//Log.message("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -184,7 +184,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				//System.out.println("MarlinInterface sending '"+mc.command+"'.");
+				//Log.message("MarlinInterface sending '"+mc.command+"'.");
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -192,9 +192,9 @@ public class MarlinInterface extends JPanel {
 		
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
-			System.out.println("MarlinInterface did not find "+lineNumberToSend);
+			Log.message("MarlinInterface did not find "+lineNumberToSend);
 			for( MarlinCommand mc : myHistory ) {
-				System.out.println("..."+mc.lineNumber+": "+mc.command);
+				Log.message("..."+mc.lineNumber+": "+mc.command);
 			}
 		}
 	}
