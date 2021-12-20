@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,7 +24,6 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	 */
 	private static final long serialVersionUID = 2141566275423257798L;
 
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 	private JPanel interiorPanel = new JPanel();
 	private GridBagConstraints gbc = new GridBagConstraints();
 	
@@ -33,9 +31,9 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		super();
 		
 		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		getInteriorPanel().setLayout(new GridBagLayout());
+		interiorPanel.setLayout(new GridBagLayout());
 		//interiorPanel.setBorder(new LineBorder(Color.RED));
-		getInteriorPanel().setBorder(new EmptyBorder(5,5,5,5));
+		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
 
 		gbc.weightx = 1;
 		gbc.gridx = 0;
@@ -44,40 +42,29 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
-		add(getInteriorPanel());
+		add(interiorPanel);
 	}
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		getInteriorPanel().add(c.getPanel(),gbc);
+		interiorPanel.add(c.getPanel(),gbc);
 		c.addPropertyChangeListener(this);
 	}
 	
 	public void finish() {
 		gbc.weighty=1;
 		gbc.gridy++;
-		getInteriorPanel().add(new JLabel(""),gbc);
+		interiorPanel.add(new JLabel(""),gbc);
 	}
 	
 	public JPanel getPanel() {
-		return getInteriorPanel();
+		return interiorPanel;
 	}
 
-	// OBSERVER PATTERN
-	
-	public void addPropertyChangeListener(PropertyChangeListener p) {
-		propertyChangeListeners.add(p);
-	}
-	
-	public void removePropertyChangeListener(PropertyChangeListener p) {
-		propertyChangeListeners.remove(p);
-	}
-	
+	// OBSERVER PATTERN	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		for( PropertyChangeListener p : propertyChangeListeners ) {
-			p.propertyChange(evt);
-		}
+		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
 	}
 	
 	/**
@@ -124,9 +111,5 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		frame.getContentPane().add(panel.getPanel());
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public JPanel getInteriorPanel() {
-		return interiorPanel;
 	}
 }
