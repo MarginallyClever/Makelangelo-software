@@ -743,11 +743,10 @@ public final class Makelangelo {
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
 			// exiting
-			new Thread(new Runnable() {
-				public void run() {
-					previewPanel.stop();
-					mainFrame.dispose();
-				}
+			new Thread(() -> {
+				previewPanel.stop();
+				mainFrame.dispose();
+				System.exit(0);
 			}).start();
 		}
 	}
