@@ -19,9 +19,9 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
     public boolean updateSelected() {
         double w = paperSettings.getCurrentPaper().getPaperWidth();
         double h = paperSettings.getCurrentPaper().getPaperHeight();
-        boolean selected = paperSize.width == w && paperSize.height == h;
-        setSelected(selected);
-        return selected;
+        boolean match = paperSize.width == w && paperSize.height == h;
+        setSelected(match);
+        return match;
     }
 
 }
