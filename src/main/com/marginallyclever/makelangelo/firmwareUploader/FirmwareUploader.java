@@ -105,7 +105,7 @@ public class FirmwareUploader {
 		while ((s = stdError.readLine()) != null)
 			Log.message("update: "+s);
 
-		System.out.println("command out:\n");
+		Log.message("command out:\n");
 		while ((s = stdInput.readLine()) != null)
 			Log.message("update: "+s);		
 	}

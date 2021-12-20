@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 import javax.vecmath.Vector3d;
 
 import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.log.Log;
 
 public class MarlinSimulationBlock {
 	public static int counter=0;
@@ -58,27 +59,26 @@ public class MarlinSimulationBlock {
 	}
 	
 	public void report() {
-		System.out.print("S");
-		System.out.print("\t"+id);
-		System.out.print("\t"+start);
-		System.out.print("\t"+end);
-		System.out.print("\t"+delta);
-		System.out.print("\t"+normal);
-		System.out.print("\t"+StringHelper.formatDouble(end_s));
-		System.out.print("\t"+StringHelper.formatDouble(feedrate));
-		System.out.print("\t"+StringHelper.formatDouble(distance));
-		System.out.print("\t"+StringHelper.formatDouble(nominalSpeed));
-		System.out.print("\t"+StringHelper.formatDouble(entrySpeed));
-		System.out.print("\t"+StringHelper.formatDouble(exitSpeed));
-		System.out.print("\t"+StringHelper.formatDouble(entrySpeedMax));
-		System.out.print("\t"+StringHelper.formatDouble(allowableSpeed));
-		System.out.print("\t"+StringHelper.formatDouble(acceleration));
-		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilD));
-		System.out.print("\t"+StringHelper.formatDouble(plateauD));
-		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterD));
-		System.out.print("\t"+StringHelper.formatDouble(accelerateUntilT));
-		System.out.print("\t"+StringHelper.formatDouble(decelerateAfterT));
-		System.out.print("\t"+(nominalLength?1:0));
-		System.out.println();
+		String res = "S" + "\t" + id +
+				"\t" + start +
+				"\t" + end +
+				"\t" + delta +
+				"\t" + normal +
+				"\t" + StringHelper.formatDouble(end_s) +
+				"\t" + StringHelper.formatDouble(feedrate) +
+				"\t" + StringHelper.formatDouble(distance) +
+				"\t" + StringHelper.formatDouble(nominalSpeed) +
+				"\t" + StringHelper.formatDouble(entrySpeed) +
+				"\t" + StringHelper.formatDouble(exitSpeed) +
+				"\t" + StringHelper.formatDouble(entrySpeedMax) +
+				"\t" + StringHelper.formatDouble(allowableSpeed) +
+				"\t" + StringHelper.formatDouble(acceleration) +
+				"\t" + StringHelper.formatDouble(accelerateUntilD) +
+				"\t" + StringHelper.formatDouble(plateauD) +
+				"\t" + StringHelper.formatDouble(decelerateAfterD) +
+				"\t" + StringHelper.formatDouble(accelerateUntilT) +
+				"\t" + StringHelper.formatDouble(decelerateAfterT) +
+				"\t" + (nominalLength ? 1 : 0);
+		Log.message(res);
 	}
 }

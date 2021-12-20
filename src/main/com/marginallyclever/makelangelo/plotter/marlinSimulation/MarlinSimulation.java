@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import javax.vecmath.Vector3d;
 
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -125,8 +126,7 @@ public class MarlinSimulation {
 		Vector3d temp = new Vector3d();
 		temp.scale(fraction,seg.delta);
 		poseNow.add(temp,seg.start);
-		if(verbose) System.out.println(poseNow+" ");
-		if(verbose) System.out.println();
+		if(verbose) Log.message(poseNow+" ");
 	}*/
 
 	/**
@@ -558,7 +558,7 @@ public class MarlinSimulation {
 		block.decelerateAfterT = block.end_s - decelerateT;
 		
 		if(Double.isNaN(block.end_s)) {
-			System.out.println("recalculateTrapezoidSegment() Uh oh");
+			Log.message("recalculateTrapezoidSegment() Uh oh");
 		}
 	}
 	

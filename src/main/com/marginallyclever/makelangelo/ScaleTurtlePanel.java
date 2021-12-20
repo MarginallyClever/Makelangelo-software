@@ -142,7 +142,7 @@ public class ScaleTurtlePanel extends JPanel {
 			h1*=0.01;
 		}
 
-		System.out.println("new scale="+w1+" by "+h1);
+		Log.message("new scale="+w1+" by "+h1);
 		revertOriginalTurtle();
 		originalTurtle.scale(w1, h1);
 	}

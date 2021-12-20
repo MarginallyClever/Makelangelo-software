@@ -55,7 +55,7 @@ public class CartesianButtons extends JComponent {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				if(!isEnabled()) return;
-				//System.out.println("moved"); 
+				//Log.message("moved"); 
 				int zone = getZoneUnderPoint(e.getPoint());
 				if( highlightZone != zone ) {
 					highlightZone = zone;
@@ -71,17 +71,17 @@ public class CartesianButtons extends JComponent {
 				if(!isEnabled()) return; 
 				highlightZone = getZoneUnderPoint(e.getPoint());
 				highlightColor = getColorButtonSelect();
-				//System.out.println("pressed");
+				//Log.message("pressed");
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				highlightColor = getColorButtonHighlight();
-				//System.out.println("released");
+				//Log.message("released");
 				int zone = getZoneUnderPoint(e.getPoint());
 				if(highlightZone == zone) { 
-					//System.out.println("clicked zone "+zone);
+					//Log.message("clicked zone "+zone);
 					notifyActionListeners(new ActionEvent(this,zone,"clicked"));
 				}
 				highlightZone=-1;
@@ -209,7 +209,7 @@ public class CartesianButtons extends JComponent {
 		if(zone>=NUM_ZONES_PER_QUADRANT) return -1;  // miss
 		zone = NUM_ZONES_PER_QUADRANT-1-zone;
 		
-		//System.out.println(dx+"\t"+dy+"\t"+mouseAngle+"\t"+quadrant+"\t"+len);
+		//Log.message(dx+"\t"+dy+"\t"+mouseAngle+"\t"+quadrant+"\t"+len);
 
 		return quadrant*NUM_ZONES_PER_QUADRANT+zone;
 	}
@@ -329,7 +329,7 @@ public class CartesianButtons extends JComponent {
         CartesianButtons button = new CartesianButtons();        
 		p.add(button);
 		button.addActionListener((e)->{
-			System.out.println(e.getActionCommand()+" "+button.getLabel(e.getID()));
+			Log.message(e.getActionCommand()+" "+button.getLabel(e.getID()));
 		});
 
 		frame.pack();

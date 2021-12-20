@@ -232,13 +232,5 @@ public class Log {
 	public static void message(String str) {
 		write(str);
 	}
-	
-	/**
-	 * Appends a message to the log file.  Color will be green.
-	 * @param str append text as green HTML
-	 */
-	public static void message2(String str) {
-		write(str);
-		System.out.println(str);
-	}
+
 }

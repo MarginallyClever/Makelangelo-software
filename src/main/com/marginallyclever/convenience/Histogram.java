@@ -1,5 +1,7 @@
 package com.marginallyclever.convenience;
 
+import com.marginallyclever.convenience.log.Log;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.security.InvalidParameterException;
@@ -61,12 +63,6 @@ public class Histogram {
 		}
 	}
 
-	public void reportGrey() {
-		for( int i=0;i<256;++i ) {
-			System.out.println(i+"="+(int)red[i]);
-		}
-	}
-
 	/**
 	 * Split a histogram into numLevels regions of equal weight.  the total weight is the sum of all the histogram values.
 	 * @param numLevels must be >0
@@ -74,8 +70,6 @@ public class Histogram {
 	 */
 	public double[] getLevels(int numLevels) throws InvalidParameterException {
 		if(numLevels<1) throw new InvalidParameterException("numLevels must be greater than zero.");
-		
-		//reportGrey();
 		
 		// sum the total score of the histogram.
 		long total = 0;
@@ -94,7 +88,7 @@ public class Histogram {
 			if(sum>=costPerLevel) {
 				levels[j++]=i;
 				sum-=costPerLevel;
-				System.out.println("Level @ " + i);
+				Log.message("Level @ " + i);
 			}
 		}
 		
@@ -110,22 +104,18 @@ public class Histogram {
 	public double[] getLevelsMapped(double [] input) throws InvalidParameterException {
 		if(input==null || input.length<1) throw new InvalidParameterException("input length must be greater than zero.");
 		
-		//reportGrey();
-		
 		// sum the total score of the histogram.
 		double totalWeight = 0;
 		
 		for(int i=0;i<256;++i) {
 			totalWeight+=red[i];
 		}
-		System.out.println("Total weight="+totalWeight);
+		Log.message("Total weight="+totalWeight);
 		
 		double[] levels = new double[input.length];
 
 		for(int j=0;j<input.length;++j) {
 			double weightScaled = totalWeight*input[j];
-			System.out.print("Level "+input[j]+" ("+(input[j]*100.0)+") -> "+weightScaled+" = ");
-			
 			int i;
 			for(i=0;i<256;++i) {
 				weightScaled-=red[i];
@@ -135,7 +125,7 @@ public class Histogram {
 			}
 			i = Math.min(i,255);
 			levels[j]=i;
-			System.out.println(i);
+			Log.message("Level "+input[j]+" ("+(input[j]*100.0)+") -> "+weightScaled+" = " + i);
 		}
 		
 		return levels;

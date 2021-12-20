@@ -95,7 +95,7 @@ public class ProgramInterface extends JPanel {
 		listView.setSelectedIndex(now+1);
 		
 		TurtleMove move = listModel.get(now);
-		//System.out.println("Step to ("+now+"):"+move.toString());
+		//Log.message("Step to ("+now+"):"+move.toString());
 		myPlotter.turtleMove(move);
 		
 		int selected = listView.getSelectedIndex();
