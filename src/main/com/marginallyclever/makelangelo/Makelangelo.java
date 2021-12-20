@@ -154,9 +154,11 @@ public final class Makelangelo {
 	}
 
 	private static void setSystemLookAndFeel() {
-        try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
+		if(!CommandLineOptions.hasOption("-nolf")) {
+	        try {
+	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	        } catch (Exception e) {}
+		}
 	}
 
 	// check if we need to ask about sharing

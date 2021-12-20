@@ -23,6 +23,8 @@ public class Paper implements PreviewListener {
 	
 	private double rotation;
 	private double rotationRef;
+	private double centerX=0;
+	private double centerY=0;
 	
 	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
@@ -30,11 +32,8 @@ public class Paper implements PreviewListener {
 		// paper area
 		double pw = DEFAULT_WIDTH;
 		double ph = DEFAULT_HEIGHT;
+		setPaperSize(pw, ph, 0, 0);
 
-		paperTop = ph / 2;
-		paperBottom = -ph / 2;
-		paperLeft = -pw / 2;
-		paperRight = pw / 2;
 		paperMargin = 0.95;
 	}
 	
@@ -79,6 +78,7 @@ public class Paper implements PreviewListener {
 		rotation = Double.parseDouble(paperPreferenceNode.get("rotation", Double.toString(rotation)));
 		rotationRef = 0;
 	}
+	
 	public void saveConfig() {
 		Preferences paperPreferenceNode = 
 		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
@@ -95,10 +95,12 @@ public class Paper implements PreviewListener {
 	}
 
 	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		this.paperLeft = -width / 2 + shiftx;
-		this.paperRight = width / 2 + shiftx;
-		this.paperTop = height / 2 + shifty;
-		this.paperBottom = -height / 2 + shifty;
+		this.centerX=shiftx;
+		this.centerY=shifty;
+		this.paperLeft = -width / 2;
+		this.paperRight = width / 2;
+		this.paperTop = height / 2;
+		this.paperBottom = -height / 2;
 	}
 
 	public Rectangle2D.Double getMarginRectangle() {
@@ -120,6 +122,14 @@ public class Paper implements PreviewListener {
 		paperColor = arg0;
 	}
 
+	public double getCenterX() {
+		return centerX;
+	}
+
+	public double getCenterY() {
+		return centerY;
+	}
+	
 	/**
 	 * @return paper height in mm.
 	 */
@@ -141,7 +151,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperLeft() {
-		return paperLeft;
+		return paperLeft + getCenterX();
 	}
 
 	/**
@@ -149,7 +159,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperRight() {
-		return paperRight;
+		return paperRight + getCenterX();
 	}
 
 	/**
@@ -157,7 +167,7 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperTop() {
-		return paperTop;
+		return paperTop + getCenterY();
 	}
 
 	/**
@@ -165,35 +175,35 @@ public class Paper implements PreviewListener {
 	 */
 	// TODO clean up this name
 	public double getPaperBottom() {
-		return paperBottom;
+		return paperBottom + getCenterY();
 	}
 
 	/**
 	 * @return paper left edge in mm.
 	 */
 	public double getMarginLeft() {
-		return getPaperLeft() * getPaperMargin();
+		return getPaperMargin() * paperLeft + getCenterX();
 	}
 
 	/**
 	 * @return paper right edge in mm.
 	 */
 	public double getMarginRight() {
-		return getPaperRight() * getPaperMargin();
+		return getPaperMargin() * paperRight + getCenterX();
 	}
 
 	/**
 	 * @return paper top edge in mm.
 	 */
 	public double getMarginTop() {
-		return getPaperTop() * getPaperMargin();
+		return getPaperMargin() * paperTop + getCenterY();
 	}
 
 	/**
 	 * @return paper bottom edge in mm.
 	 */
 	public double getMarginBottom() {
-		return getPaperBottom() * getPaperMargin();
+		return getPaperMargin() * paperBottom + getCenterY();
 	}
 
 	/**
