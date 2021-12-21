@@ -22,7 +22,6 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.event.WindowAdapter;
 import java.io.BufferedReader;
 import java.io.File;
@@ -418,7 +417,9 @@ public final class Makelangelo {
 		Log.message("Loading file "+filename+"...");
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
-			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
+			loader.addActionListener((e)->{
+				setTurtle((Turtle)(e).getSource());
+			});
 			previewPanel.addListener(loader);
 			if(filename!=null && !filename.trim().isEmpty() ) {
 				loader.load(filename);
