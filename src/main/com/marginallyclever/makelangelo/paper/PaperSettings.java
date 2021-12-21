@@ -75,7 +75,7 @@ public class PaperSettings extends SelectPanel {
 		add(shiftX = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
 		add(shiftY = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
-		add(isLandscape = new SelectBoolean("landscape","\u21cb",false));
+		add(isLandscape = new SelectBoolean("landscape","Landscape",false));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),getPanel()));
 		finish();

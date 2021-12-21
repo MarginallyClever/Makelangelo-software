@@ -22,7 +22,7 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
         boolean match = (!currentPaper.isLandscape() && paperSize.width == w && paperSize.height == h)
                 || (currentPaper.isLandscape() && paperSize.width == h && paperSize.height == w);
         setSelected(match);
-        setText(paperSize.toString() + (match && currentPaper.isLandscape()?" \u21cb":""));
+        setText(paperSize.toString() + (match && currentPaper.isLandscape()?" (landscape)":""));
         return match;
     }
 
