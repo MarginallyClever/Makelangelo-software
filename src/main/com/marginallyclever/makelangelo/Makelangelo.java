@@ -420,24 +420,23 @@ public final class Makelangelo {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()) );
 			previewPanel.addListener(loader);
-			if(filename!=null && !filename.trim().isEmpty() ) {
+			if (filename!=null && !filename.trim().isEmpty()) {
 				loader.load(filename);
+			} else {
+				JDialog dialog = new JDialog(mainFrame, LoadFilePanel.class.getSimpleName());
+				dialog.add(loader);
+				dialog.setLocationRelativeTo(mainFrame);
+				dialog.setMinimumSize(new Dimension(500, 500));
+				dialog.pack();
+				dialog.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						previewPanel.removeListener(loader);
+						recentFiles.addFilename(loader.getLastFileIn());
+					}
+				});
+				dialog.setVisible(true);
 			}
-			
-			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
-			dialog.add(loader);
-			dialog.setLocationRelativeTo(mainFrame);
-			dialog.setMinimumSize(new Dimension(500,500));
-			dialog.pack();
-			dialog.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					previewPanel.removeListener(loader);
-					recentFiles.addFilename(loader.getLastFileIn());
-				}
-			});
-			dialog.setVisible(true);
-			
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
