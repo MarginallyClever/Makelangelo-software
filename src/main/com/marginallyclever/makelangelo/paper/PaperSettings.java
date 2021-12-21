@@ -1,11 +1,16 @@
 package com.marginallyclever.makelangelo.paper;
 
+import java.beans.PropertyChangeEvent;
+
+import javax.swing.JFrame;
+
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.*;
 
-import java.beans.PropertyChangeEvent;
 import java.io.Serial;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class PaperSettings extends SelectPanel {
 	@Serial
@@ -248,5 +253,20 @@ public class PaperSettings extends SelectPanel {
 
 	public boolean isLandscapeSelected() {
 		return isLandscape.isSelected();
+	}
+
+	// TEST
+
+	public static void main(String[] args) {
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+
+		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PaperSettings(new Paper()));
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

@@ -24,6 +24,10 @@ import javax.swing.text.NumberFormatter;
  * @since 7.24.0
  */
 public class SelectInteger extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3071134838779161675L;
 	private JLabel label;
 	private JFormattedTextField field;
 	private int value;
@@ -83,8 +87,8 @@ public class SelectInteger extends Select {
 			}
 		});
 
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(field,BorderLayout.LINE_END);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(field,BorderLayout.LINE_END);
 	}
 
 	public SelectInteger(String internalName,String labelKey,Locale locale) {

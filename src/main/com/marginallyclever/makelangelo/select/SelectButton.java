@@ -12,6 +12,10 @@ import javax.swing.JButton;
  * @since 7.24.0
  */
 public class SelectButton extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7096181261934634708L;
 	private JButton button;
 
 	public SelectButton(String internalName,AbstractAction action) {
@@ -27,7 +31,7 @@ public class SelectButton extends Select {
 			notifyPropertyChangeListeners(null,null);
 		});
 
-		myPanel.add(button,BorderLayout.CENTER);
+		this.add(button,BorderLayout.CENTER);
 	}
 	
 	public void doClick() {

@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 /**
@@ -14,33 +13,16 @@ import javax.swing.JPanel;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class Select implements FocusListener {
-	protected JPanel myPanel= new JPanel();
-	private String myName = "";
-	
-	protected Select(String name) {
-		super();
-		myName=name;
-		myPanel.setLayout(new BorderLayout(2,0));
-	}
-	
-	@Override
-	public void focusGained(FocusEvent e) {}
-
-	@Override
-	public void focusLost(FocusEvent e) {}
-	
-	public JPanel getPanel() {
-		return myPanel;
-	}
-
-	public String getMyName() {
-		return myName;
-	}
-
-	// OBSERVER PATTERN
-	
+public class Select extends JPanel {
+	private static final long serialVersionUID = 5289951183273734129L;
 	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+		
+	protected Select(String name) {
+		super(new BorderLayout(2,0));
+		setName(name);
+	}
+	
+	// OBSERVER PATTERN
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		propertyChangeListeners.add(p);
@@ -51,7 +33,7 @@ public class Select implements FocusListener {
 	}
 	
 	protected void notifyPropertyChangeListeners(Object oldValue,Object newValue) {
-		PropertyChangeEvent evt = new PropertyChangeEvent(this,myName,oldValue,newValue);
+		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);
 		}

@@ -25,6 +25,7 @@ import java.awt.geom.Rectangle2D;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class ScaleTurtlePanel extends JPanel {
@@ -34,8 +35,8 @@ public class ScaleTurtlePanel extends JPanel {
 	private static final long serialVersionUID = -4566997988723228869L;
 	private final String [] unitTypes = new String[]{"mm","%"};
 	
-	private Turtle originalTurtle;
-	private Turtle myTurtle = new Turtle();
+	private Turtle turtleToChange;
+	private Turtle turtleOriginal = new Turtle();
 	private JSpinner width;
 	private JSpinner height;
 	private JComboBox<String> units = new JComboBox<String>(unitTypes); 
@@ -46,10 +47,10 @@ public class ScaleTurtlePanel extends JPanel {
 	
 	public ScaleTurtlePanel(Turtle t) {
 		super();
-		originalTurtle = t;
-		myTurtle=new Turtle(t);
+		turtleToChange = t;
+		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
-		myOriginalBounds = myTurtle.getBounds();
+		myOriginalBounds = turtleToChange.getBounds();
 		width = new JSpinner(new SpinnerNumberModel(Double.valueOf(myOriginalBounds.width),null,null,0.1));
 		height = new JSpinner(new SpinnerNumberModel(Double.valueOf(myOriginalBounds.height),null,null,0.1));
 		
@@ -141,15 +142,18 @@ public class ScaleTurtlePanel extends JPanel {
 			h1*=0.01;
 		}
 
-		Log.message("new scale="+w1+" by "+h1);
+		Log.message("scale "+ow+"x"+oh+" -> "+w1+"x"+h1 +" units="+units.getSelectedIndex());
 		revertOriginalTurtle();
-		originalTurtle.scale(w1, h1);
+		turtleToChange.scale(w1, h1);
 	}
 
 	private void revertOriginalTurtle() {
 		// reset original turtle to original scale.
-		originalTurtle.history.clear();
-		originalTurtle.history.addAll(myTurtle.history);
+		turtleToChange.history.clear();
+		// deep copy
+		for(TurtleMove m : turtleOriginal.history) {
+			turtleToChange.history.add(new TurtleMove(m));
+		}
 	}
 	
 	private void onUnitChange(ActionEvent e) {

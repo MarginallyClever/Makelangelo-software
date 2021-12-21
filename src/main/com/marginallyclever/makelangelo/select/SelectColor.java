@@ -20,6 +20,10 @@ import com.marginallyclever.convenience.ColorRGB;
  * @since 7.24.0
  */
 public class SelectColor extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8898817786685388020L;
 	private JLabel label;
 	private JLabel field;
 	private JButton chooseButton;
@@ -57,9 +61,9 @@ public class SelectColor extends Select {
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
 		
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(panel2,BorderLayout.CENTER);
-		myPanel.add(chooseButton,BorderLayout.LINE_END);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(panel2,BorderLayout.CENTER);
+		this.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
 	public ColorRGB getColor() {

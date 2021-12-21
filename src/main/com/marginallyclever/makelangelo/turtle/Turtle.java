@@ -44,7 +44,7 @@ public class Turtle implements Cloneable {
 		this.isUp = t.isUp;
 		this.color.set(t.color);
 		this.diameter = t.diameter; 
-
+		// deep copy
 		for( TurtleMove m : t.history ) {
 			this.history.add(new TurtleMove(m));
 		}

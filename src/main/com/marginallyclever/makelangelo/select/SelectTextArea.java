@@ -17,6 +17,10 @@ import javax.swing.event.DocumentListener;
  * @since 7.24.0
  */
 public class SelectTextArea extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5584940645277024457L;
 	private JLabel label;
 	private JTextArea field;
 	private JScrollPane pane;
@@ -53,18 +57,18 @@ public class SelectTextArea extends Select {
 		pane = new JScrollPane(field);
 		
 		// resize the JScrollPane if the containing panel resizes
-		myPanel.addComponentListener(new ComponentAdapter() {
+		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				pane.setPreferredSize(myPanel.getSize());
+				pane.setPreferredSize(getSize());
 				pane.revalidate();
 			}
 		});
 		pane.setMinimumSize(new Dimension(500, 100));
 		pane.setPreferredSize(new Dimension(200, 350));
 		
-		myPanel.add(label,BorderLayout.PAGE_START);
-		myPanel.add(pane,BorderLayout.CENTER);
+		this.add(label,BorderLayout.PAGE_START);
+		this.add(pane,BorderLayout.CENTER);
 	}
 
 	public String getText() {
