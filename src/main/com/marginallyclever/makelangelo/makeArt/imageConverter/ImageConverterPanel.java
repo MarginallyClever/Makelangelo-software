@@ -1,10 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-
 import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
 
 /**
  * All converters have a panel with options.  This is their shared root.
