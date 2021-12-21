@@ -408,7 +408,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 
 		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener((e) -> onClose());
+		buttonExit.addActionListener((e) -> onClosing());
 		menu.add(buttonExit);
 
 		return menu;
@@ -606,24 +606,11 @@ public final class Makelangelo {
 
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.addWindowListener(new WindowListener() {
+		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				onClose();
+				onClosing();
 			}
-	
-			@Override
-			public void windowDeactivated(WindowEvent e) {}
-			@Override
-			public void windowDeiconified(WindowEvent e) {}
-			@Override
-			public void windowIconified(WindowEvent e) {}
-			@Override
-			public void windowOpened(WindowEvent e) {}
-			@Override
-			public void windowActivated(WindowEvent e) {}
-			@Override
-			public void windowClosed(WindowEvent e) {}
 		});
 		
 		Log.message("  adding menu bar...");
@@ -730,7 +717,7 @@ public final class Makelangelo {
 		});
 	}
 
-	private void onClose() {
+	private void onClosing() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
@@ -745,11 +732,9 @@ public final class Makelangelo {
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
 			// exiting
-			new Thread(new Runnable() {
-				public void run() {
-					previewPanel.stop();
-					mainFrame.dispose();
-				}
+			new Thread(()->{
+				previewPanel.stop();
+				mainFrame.dispose();
 			}).start();
 		}
 	}
@@ -788,8 +773,6 @@ public final class Makelangelo {
 		
 		setSystemLookAndFeel();
 		
-		// Schedule a job for the event-dispatching thread:
-		// creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(()->{
 			Makelangelo makelangeloProgram = new Makelangelo();
 			makelangeloProgram.run();
