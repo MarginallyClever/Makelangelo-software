@@ -580,13 +580,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>暂停</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>取消暂停</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -606,12 +601,12 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -658,12 +653,12 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenUp</key>
+		<key>JogInterface.PenUp</key>
 		<value>抬笔</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenDown</key>
+		<key>JogInterface.PenDown</key>
 		<value>落笔</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -1176,12 +1171,12 @@
 	</string>
 
 	<string>
-		<key>DisengageMotors</key>
+		<key>JogInterface.DisengageMotors</key>
 		<value>关闭</value>
 		<hint>Manual driving dialog</hint>
 	</string>
 	<string>
-		<key>EngageMotors</key>
+		<key>JogInterface.EngageMotors</key>
 		<value>启用</value>
 		<hint>Manual driving dialog</hint>
 	</string>

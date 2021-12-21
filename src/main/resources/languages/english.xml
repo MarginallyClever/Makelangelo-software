@@ -557,13 +557,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>Unpause</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -578,17 +573,17 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>SaveGCode</key>
+		<key>PlotterControls.SaveGCode</key>
 		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -642,11 +637,6 @@
 	</string>
 	<string>
 		<key>JogInterface.FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
 		<value>Find home</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -870,32 +860,19 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
-		<value>Save to file/SD card</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
 		<key>MenuSaveFile</key>
 		<value>Save</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Step</key>
+		<key>PlotterControls.Step</key>
 		<value>Step</value>
 		<hint>menu or dialog title</hint>
 	</string>
-
-
 
 	<string>
 		<key>MenuDraw</key>
 		<value>Draw</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>Step</key>
-		<value>Step</value>
 		<hint>menu or dialog title</hint>
 	</string>
 

@@ -26,48 +26,48 @@ public class PlotterControls extends JPanel {
 	private MarlinInterface marlinInterface;
 	private ProgramInterface programInterface;
 
-	private JButton bSaveGCode = new JButton(Translator.get("SaveGCode"));
-	private JButton bFindHome= new JButton(Translator.get("FindHome"));
-	private JButton bRewind = new JButton(Translator.get("Rewind"));
-	private JButton bStart = new JButton(Translator.get("Play"));
-	private JButton bStep = new JButton(Translator.get("Step"));
-	private JButton bPause = new JButton(Translator.get("Pause"));
-	private JProgressBar progress = new JProgressBar(0,100); 
-	
-	private boolean isRunning=false;
-	private boolean penIsUpBeforePause=false;
-		
-	public PlotterControls(Plotter plotter,Turtle turtle) {
+	private JButton bSaveGCode = new JButton(Translator.get("PlotterControls.SaveGCode"));
+	private JButton bFindHome = new JButton(Translator.get("JogInterface.FindHome"));
+	private JButton bRewind = new JButton(Translator.get("PlotterControls.Rewind"));
+	private JButton bStart = new JButton(Translator.get("PlotterControls.Play"));
+	private JButton bStep = new JButton(Translator.get("PlotterControls.Step"));
+	private JButton bPause = new JButton(Translator.get("PlotterControls.Pause"));
+	private JProgressBar progress = new JProgressBar(0, 100);
+
+	private boolean isRunning = false;
+	private boolean penIsUpBeforePause = false;
+
+	public PlotterControls(Plotter plotter, Turtle turtle) {
 		super();
-		myPlotter=plotter;
-		myTurtle=turtle;
-		
+		myPlotter = plotter;
+		myTurtle = turtle;
+
 		jogInterface = new JogInterface(plotter);
 		marlinInterface = new MarlinPlotterInterface(plotter);
-		programInterface = new ProgramInterface(plotter,turtle);
-		
+		programInterface = new ProgramInterface(plotter, turtle);
+
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab(JogInterface.class.getSimpleName(), jogInterface);
 		pane.addTab(MarlinInterface.class.getSimpleName(), marlinInterface);
 		pane.addTab(ProgramInterface.class.getSimpleName(), programInterface);
-		
+
 		this.setLayout(new BorderLayout());
-		this.add(pane,BorderLayout.CENTER);
-		this.add(getToolBar(),BorderLayout.NORTH);
-		this.add(progress,BorderLayout.SOUTH);
-		
-		marlinInterface.addListener((e)->{
-			if(e.getActionCommand().contentEquals(MarlinInterface.IDLE) ) {
-				//Log.message("PlotterControls heard idle");
-				if(isRunning) {
-					//Log.message("PlotterControls is running");
+		this.add(pane, BorderLayout.CENTER);
+		this.add(getToolBar(), BorderLayout.NORTH);
+		this.add(progress, BorderLayout.SOUTH);
+
+		marlinInterface.addListener((e) -> {
+			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE)) {
+				// Log.message("PlotterControls heard idle");
+				if (isRunning) {
+					// Log.message("PlotterControls is running");
 					step();
 				}
 			}
 			updateProgressBar();
 		});
 	}
-	
+
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
@@ -77,18 +77,18 @@ public class PlotterControls extends JPanel {
 		bar.add(bStart);
 		bar.add(bPause);
 		bar.add(bStep);
-		
-		bFindHome.addActionListener((e)-> findHome());
-		bRewind.addActionListener((e)-> rewind());
-		bStart.addActionListener((e)-> play());
-		bPause.addActionListener((e)-> pause());
-		bStep.addActionListener((e)-> step());
-		
+
+		bFindHome.addActionListener((e) -> jogInterface.findHome());
+		bRewind.addActionListener((e) -> rewind());
+		bStart.addActionListener((e) -> play());
+		bPause.addActionListener((e) -> pause());
+		bStep.addActionListener((e) -> step());
+
 		updateButtonStatus();
-		
+
 		return bar;
 	}
-	
+
 	private void findHome() {
 		myPlotter.findHome();
 		updateButtonStatus();
@@ -96,7 +96,7 @@ public class PlotterControls extends JPanel {
 
 	private void step() {
 		programInterface.step();
-		if(programInterface.getLineNumber()==-1) {
+		if (programInterface.getLineNumber() == -1) {
 			// done
 			pause();
 		}
@@ -104,15 +104,17 @@ public class PlotterControls extends JPanel {
 
 	public void startAt(int lineNumber) {
 		int count = programInterface.getMoveCount();
-		if(lineNumber>=count) lineNumber = count;
-		if(lineNumber<0) lineNumber=0;
+		if (lineNumber >= count)
+			lineNumber = count;
+		if (lineNumber < 0)
+			lineNumber = 0;
 
 		programInterface.setLineNumber(lineNumber);
 		play();
 	}
-	
+
 	private void updateProgressBar() {
-		progress.setValue((int)(100.0*programInterface.getLineNumber()/programInterface.getMoveCount()));
+		progress.setValue((int) (100.0 * programInterface.getLineNumber() / programInterface.getMoveCount()));
 	}
 
 	private void rewind() {
@@ -123,13 +125,14 @@ public class PlotterControls extends JPanel {
 	private void play() {
 		isRunning = true;
 		updateButtonStatus();
-		if(!penIsUpBeforePause) myPlotter.lowerPen();
+		if (!penIsUpBeforePause)
+			myPlotter.lowerPen();
 		rewindIfNoProgramLineSelected();
 		step();
 	}
 
 	private void rewindIfNoProgramLineSelected() {
-		if(programInterface.getLineNumber()==-1) {
+		if (programInterface.getLineNumber() == -1) {
 			programInterface.rewind();
 		}
 	}
@@ -138,7 +141,8 @@ public class PlotterControls extends JPanel {
 		isRunning = false;
 		updateButtonStatus();
 		penIsUpBeforePause = myPlotter.getPenIsUp();
-		if(!penIsUpBeforePause) myPlotter.raisePen();
+		if (!penIsUpBeforePause)
+			myPlotter.raisePen();
 	}
 
 	public boolean isRunning() {
@@ -146,24 +150,27 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void updateButtonStatus() {
-		boolean isHomed=myPlotter.getDidFindHome();
+		boolean isHomed = myPlotter.getDidFindHome();
 		bRewind.setEnabled(isHomed && !isRunning);
 		bStart.setEnabled(isHomed && !isRunning);
 		bPause.setEnabled(isHomed && isRunning);
 		bStep.setEnabled(isHomed && !isRunning);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
 		ArrayList<TurtleMove> history = myTurtle.history;
 		int total = history.size();
 		int x = startAtLine;
-		if(x >= total) x = total-1;
-		if(x<0) return 0;
+		if (x >= total)
+			x = total - 1;
+		if (x < 0)
+			return 0;
 
 		while (x > 1) {
 			TurtleMove m = history.get(x);
-			if(m.type == TurtleMove.TRAVEL) return x;
+			if (m.type == TurtleMove.TRAVEL)
+				return x;
 			--x;
 		}
 
@@ -171,16 +178,16 @@ public class PlotterControls extends JPanel {
 	}
 
 	// TEST
-	
+
 	public static void main(String[] args) {
 		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		
+
 		JFrame frame = new JFrame(PlotterControls.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterControls(new Plotter(),new Turtle()));
+		frame.add(new PlotterControls(new Plotter(), new Turtle()));
 		frame.pack();
 		frame.setVisible(true);
 	}
