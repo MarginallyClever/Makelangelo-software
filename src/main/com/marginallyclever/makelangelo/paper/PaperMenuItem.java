@@ -8,7 +8,6 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
     private final PaperSettings paperSettings;
 
     public PaperMenuItem(PaperSettings paperSettings, PaperSize paperSize) {
-        super(paperSize.toString());
         this.paperSettings = paperSettings;
         this.paperSize = paperSize;
         addActionListener((e)-> {
@@ -17,11 +16,13 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
     }
 
     public boolean updateSelected() {
-        double w = paperSettings.getCurrentPaper().getPaperWidth();
-        double h = paperSettings.getCurrentPaper().getPaperHeight();
-        boolean match = (!paperSettings.isLandscapeSelected() && paperSize.width == w && paperSize.height == h)
-                || (paperSettings.isLandscapeSelected() && paperSize.width == h && paperSize.height == w);
+        Paper currentPaper = paperSettings.getCurrentPaper();
+        double w = currentPaper.getPaperWidth();
+        double h = currentPaper.getPaperHeight();
+        boolean match = (!currentPaper.isLandscape() && paperSize.width == w && paperSize.height == h)
+                || (currentPaper.isLandscape() && paperSize.width == h && paperSize.height == w);
         setSelected(match);
+        setText(paperSize.toString() + (match && currentPaper.isLandscape()?" \u21cb":""));
         return match;
     }
 

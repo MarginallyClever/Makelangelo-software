@@ -25,8 +25,9 @@ public class Paper implements PreviewListener {
 	private double rotationRef;
 	private double centerX=0;
 	private double centerY=0;
+	private boolean isLandscape = false;
 	
-	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
+	private ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
 	public Paper() {
 		// paper area
@@ -74,7 +75,7 @@ public class Paper implements PreviewListener {
 		paperRight = Double.parseDouble(paperPreferenceNode.get("paper_right", Double.toString(paperRight)));
 		paperTop = Double.parseDouble(paperPreferenceNode.get("paper_top", Double.toString(paperTop)));
 		paperBottom = Double.parseDouble(paperPreferenceNode.get("paper_bottom", Double.toString(paperBottom)));
-		paperMargin = Double.valueOf(paperPreferenceNode.get("paper_margin", Double.toString(paperMargin)));
+		paperMargin = Double.parseDouble(paperPreferenceNode.get("paper_margin", Double.toString(paperMargin)));
 		rotation = Double.parseDouble(paperPreferenceNode.get("rotation", Double.toString(rotation)));
 		rotationRef = 0;
 	}
@@ -238,8 +239,7 @@ public class Paper implements PreviewListener {
 		if( x < getMarginLeft()  ) return false;
 		if( x > getMarginRight() ) return false;
 		if( y < getMarginBottom()) return false;
-		if( y > getMarginTop()   ) return false;
-		return true;
+		return !(y > getMarginTop());
 	}
 
 	public double getRotation() {
@@ -256,5 +256,13 @@ public class Paper implements PreviewListener {
 
 	public double getRotationRef() {
 		return this.rotationRef;
+	}
+
+	public boolean isLandscape() {
+		return isLandscape;
+	}
+
+	public void setLandscape(boolean landscape) {
+		isLandscape = landscape;
 	}
 }
