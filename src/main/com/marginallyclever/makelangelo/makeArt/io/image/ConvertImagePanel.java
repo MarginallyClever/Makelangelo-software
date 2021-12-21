@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,10 +35,11 @@ import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFac
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
 import com.marginallyclever.util.PreferencesHelper;
 
 
-public class ConvertImagePanel extends JPanel implements PreviewListener, PropertyChangeListener {
+public class ConvertImagePanel extends JPanel implements PreviewListener, SelectPanelChangeListener {
 	private static final long serialVersionUID = 5574250944369730761L;
 	// Set of image file extensions.
 	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif"};
@@ -125,7 +125,6 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 		
 		JComboBox<String> box = new JComboBox<String>((String[])imageConverterNames.toArray(new String[0]));
 		box.addItemListener((e) -> onConverterChanged(e));
-
 		box.setSelectedIndex(getPreferredDrawStyle());
 
 		return box;
@@ -139,8 +138,8 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 	    scaleLoader(fillNames.getSelectedIndex());
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
-		changeConverter(ImageConverterFactory.list[first]);
 		setPreferredDrawStyle(first);
+		changeConverter(ImageConverterFactory.list[first]);
 	}
 
 	private JComboBox<String> getFillSelection() {
@@ -220,35 +219,41 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 
 	private void stopConversion() {
 		Log.message("Stop conversion");
-		if(myConverterPanel!=null) myConverterPanel.removePropertyChangeListener(this);
 		if(imageConverterThread!=null) imageConverterThread.cancel(true);
 		stopWorker();
 	}
 	
-	private void startConversion(ImageConverterPanel chosenPanel) {
-		if(chosenPanel==null || myImage==null) return;
-		Log.message("Start conversion "+chosenPanel.getName());
-		if(chosenPanel!=null) chosenPanel.addPropertyChangeListener(this);
-		myConverterPanel = chosenPanel;
+	private void startConversion() {
+		if(myConverterPanel==null || myImage==null) return;
+		Log.message("startConversion() "+myConverterPanel.getName());
 		startWorker();
 	}
 	
 	private void changeConverter(ImageConverterPanel chosenPanel) {
 		if( chosenPanel == myConverterPanel ) return;
-		Log.message("Changing converter");
+		Log.message("changeConverter() "+chosenPanel.getName());
 		stopConversion();
-		startConversion(chosenPanel);
+
+		if(myConverterPanel!=null) {
+			myConverterPanel.removeSelectPanelChangeListener(this);
+		}
+		if(chosenPanel!=null) {
+			chosenPanel.addSelectPanelChangeListener(this);
+		}
+		myConverterPanel = chosenPanel;
+		
+		startConversion();
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void selectPanelPropertyChange(PropertyChangeEvent evt) {
 		reconvert();
 	}
 	
 	private void reconvert() {
-		Log.message("reconvert");
+		Log.message("reconvert()");
 		stopConversion();
-		startConversion(myConverterPanel);
+		startConversion();
 	}
 	
 	private void stopWorker() {
@@ -267,8 +272,10 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 	}
 
 	private void startWorker() {
-		Log.message("Starting thread "+workerCount);
-
+		if(myImage==null || myPaper==null) return;
+		
+		Log.message("startWorker()");
+		
 		ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
 		pm.setMillisToPopup(0);
@@ -285,8 +292,8 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 		imageConverterThread.execute();
 	}
 	
-	private ImageConverterThread getNewWorker(ImageConverter chosenConverter2, int workerCount2) {
-		ImageConverterThread thread = new ImageConverterThread(chosenConverter2,Integer.toString(workerCount2));
+	private ImageConverterThread getNewWorker(ImageConverter converter, int workerCount2) {
+		ImageConverterThread thread = new ImageConverterThread(converter,Integer.toString(workerCount2));
 		
 		thread.addPropertyChangeListener((evt) -> {
 			String propertyName = evt.getPropertyName(); 
@@ -299,11 +306,11 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 			if(propertyName.equals("state")) {
 				if(evt.getNewValue()==StateValue.DONE) {
 					if (imageConverterThread.isDone()) {
-						Log.message(Translator.get("Finished"));
-						notifyListeners(new ActionEvent(chosenConverter2.turtle,0,"turtle"));
+						Log.message("Finished");
+						notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
 					} else if (imageConverterThread.isCancelled() || pm.isCanceled()) {
+						Log.message("Cancelled");
 						if(pm.isCanceled()) imageConverterThread.cancel(true);
-						Log.message(Translator.get("Cancelled"));
 					}
 					removeWorker(thread);
 				}
@@ -321,6 +328,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Proper
 	
 	private void removeWorker(ImageConverterThread thread) {
 		workerList.remove(thread);
+		workerCount--;
 		Log.message("Removed worker.  "+workerList.size()+" workers now.");
 		if(imageConverterThread==thread)
 			imageConverterThread=null;

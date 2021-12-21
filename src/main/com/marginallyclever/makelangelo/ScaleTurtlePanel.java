@@ -13,6 +13,7 @@ import java.io.Serial;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class ScaleTurtlePanel extends JPanel {
@@ -21,23 +22,25 @@ public class ScaleTurtlePanel extends JPanel {
 	 */
 	@Serial
 	private static final long serialVersionUID = -4566997988723228869L;
-
-	private final Turtle originalTurtle;
-	private final Turtle myTurtle;
+	private final String [] unitTypes = new String[]{"mm","%"};
+	
+	private final Turtle turtleToChange;
+	private final Turtle turtleOriginal = new Turtle();
 	private final JSpinner width;
 	private final JSpinner height;
-	private final JComboBox<String> units = new JComboBox<String>(new String[]{"mm","%"});
+	private final JComboBox<String> units = new JComboBox<String>(unitTypes); 
 	private final JCheckBox lockRatio = new JCheckBox("🔒");
 	private final Rectangle2D.Double myOriginalBounds;
+
 	private double ratioAtTimeOfLock=1;
 	private boolean ignoreChange=false;
 	
 	public ScaleTurtlePanel(Turtle t) {
 		super();
-		originalTurtle = t;
-		myTurtle=new Turtle(t);
+		turtleToChange = t;
+		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
-		myOriginalBounds = myTurtle.getBounds();
+		myOriginalBounds = turtleToChange.getBounds();
 		width = new JSpinner(new SpinnerNumberModel(myOriginalBounds.width,null,null,1));
 		height = new JSpinner(new SpinnerNumberModel(myOriginalBounds.height,null,null,1));
 		
@@ -132,15 +135,18 @@ public class ScaleTurtlePanel extends JPanel {
 			h1*=0.01;
 		}
 
-		Log.message("new scale="+w1+" by "+h1);
+		Log.message("scale "+ow+"x"+oh+" -> "+w1+"x"+h1 +" units="+units.getSelectedIndex());
 		revertOriginalTurtle();
-		originalTurtle.scale(w1, h1);
+		turtleToChange.scale(w1, h1);
 	}
 
 	private void revertOriginalTurtle() {
 		// reset original turtle to original scale.
-		originalTurtle.history.clear();
-		originalTurtle.history.addAll(myTurtle.history);
+		turtleToChange.history.clear();
+		// deep copy
+		for(TurtleMove m : turtleOriginal.history) {
+			turtleToChange.history.add(new TurtleMove(m));
+		}
 	}
 	
 	private void onUnitChange(ActionEvent e) {

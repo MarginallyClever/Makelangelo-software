@@ -56,9 +56,16 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("count")) setNumCells((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("min")) setMinDotSize((double)evt.getNewValue());
-		restart();
+		boolean isDirty=false;
+		if(evt.getPropertyName().equals("count")) {
+			isDirty=true;
+			setNumCells((int)evt.getNewValue());
+		}
+		if(evt.getPropertyName().equals("min")) {
+			isDirty=true;
+			setMinDotSize((double)evt.getNewValue());
+		}
+		if(isDirty) restart();
 	}
 	
 	@Override
@@ -77,6 +84,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	}
 
 	public void restart() {
+		if(myImage==null) return;
+		
 		lowNoise=false;
 		keepIterating=true;
 		initializeCells(0.5);

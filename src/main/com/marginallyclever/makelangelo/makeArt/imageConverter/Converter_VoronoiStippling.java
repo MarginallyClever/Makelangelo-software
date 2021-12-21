@@ -161,6 +161,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	
 	private QuadGraph tree;
 	
+	public Converter_VoronoiStippling() {
+		super();
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("voronoiStipplingName");
@@ -170,11 +174,24 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	public void propertyChange(PropertyChangeEvent evt) {
 		if(evt.getPropertyName().equals("drawBorder")) setDrawBorders((boolean)evt.getNewValue());
 		else {
-			if(evt.getPropertyName().equals("cells")) setNumCells((int)evt.getNewValue());
-			if(evt.getPropertyName().equals("max")) setMinDotSize((double)evt.getNewValue());
-			if(evt.getPropertyName().equals("min")) setMaxDotSize((double)evt.getNewValue());
-			if(evt.getPropertyName().equals("cutoff")) setCutoff((double)evt.getNewValue());
-			restart();
+			boolean isDirty=false;
+			if(evt.getPropertyName().equals("cells")) {
+				isDirty=true;
+				setNumCells((int)evt.getNewValue());
+			}
+			if(evt.getPropertyName().equals("max")) {
+				isDirty=true;
+				setMinDotSize((double)evt.getNewValue());
+			}
+			if(evt.getPropertyName().equals("min")) {
+				isDirty=true;
+				setMaxDotSize((double)evt.getNewValue());
+			}
+			if(evt.getPropertyName().equals("cutoff")) {
+				isDirty=true;
+				setCutoff((double)evt.getNewValue());
+			}
+			if(isDirty) restart();
 		}
 	}
 
@@ -202,11 +219,15 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	}
 	
 	private void restart() {		
+		if(myImage==null) return;
+		
 		while(lock.isLocked());
 		lock.lock();
+		
 		iterations=0;
 		keepIterating=true;
 		initializeCells(0.5);
+		
 		lock.unlock();
 	}
 

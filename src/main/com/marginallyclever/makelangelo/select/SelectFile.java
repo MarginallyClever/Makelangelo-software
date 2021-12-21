@@ -20,6 +20,10 @@ import javax.swing.filechooser.FileFilter;
  * @since 7.24.0
  */
 public class SelectFile extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1731350044217921795L;
 	private JLabel label;
 	private JTextField field;
 	private JButton chooseButton;
@@ -65,9 +69,9 @@ public class SelectFile extends Select {
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
 		
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(panel2,BorderLayout.CENTER);
-		myPanel.add(chooseButton,BorderLayout.LINE_END);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(panel2,BorderLayout.CENTER);
+		this.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
 	public String getText() {

@@ -16,6 +16,10 @@ import javax.swing.JLabel;
  * @since 7.24.0
  */
 public class SelectReadOnlyText extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8918068053490064344L;
 	private static final String A_HREF = "<a href='";
 	private static final String HREF_CLOSED = "'>";
 	
@@ -37,7 +41,7 @@ public class SelectReadOnlyText extends Select {
 		        }
 			}
 		});
-		myPanel.add(label,BorderLayout.CENTER);
+		this.add(label,BorderLayout.CENTER);
 	}
 	
 

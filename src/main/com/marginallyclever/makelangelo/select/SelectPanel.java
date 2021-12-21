@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -47,7 +48,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		interiorPanel.add(c.getPanel(),gbc);
+		interiorPanel.add(c,gbc);
 		c.addPropertyChangeListener(this);
 	}
 	
@@ -62,9 +63,26 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	}
 
 	// OBSERVER PATTERN	
+	private ArrayList<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
+
+	public void removeSelectPanelChangeListener(SelectPanelChangeListener ear) {
+		listeners.remove(ear);
+	}
+
+	public void addSelectPanelChangeListener(SelectPanelChangeListener ear) {
+		listeners.add(ear);
+	}
+	
+	protected void fireSelectPanelChangeEvent(PropertyChangeEvent evt) {
+		for(SelectPanelChangeListener ear : listeners) {
+			ear.selectPanelPropertyChange(evt);
+		}
+		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+	}
+	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+		fireSelectPanelChangeEvent(evt);
 	}
 	
 	/**

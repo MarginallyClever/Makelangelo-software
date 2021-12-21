@@ -61,10 +61,10 @@ public abstract class ImageConverter implements PropertyChangeListener {
 		
 	/**
 	 * set the image to be transformed.
-	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
+	 * @param img the {@code TransformedImage} this filter is using as source material.
 	 */
 	public void setImage(TransformedImage img) {
-		myImage=img;
+		myImage = img;
 		texture = null;
 	}
 	

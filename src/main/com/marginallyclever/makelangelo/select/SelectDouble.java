@@ -21,6 +21,10 @@ import com.marginallyclever.convenience.StringHelper;
  * @since 7.24.0
  */
 public class SelectDouble extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7904178922597267242L;
 	private JLabel label;
 	private JTextField field;
 	private double value;
@@ -32,7 +36,9 @@ public class SelectDouble extends Select {
 		value = defaultValue;
 		
 		label = new JLabel(labelKey, JLabel.LEADING);
+		label.setName(internalName+".label");
 		field = new JTextField();
+		field.setName(internalName+".field");
 		
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
@@ -82,8 +88,8 @@ public class SelectDouble extends Select {
 			}
 		});
 
-		myPanel.add(label, BorderLayout.LINE_START);
-		myPanel.add(field, BorderLayout.LINE_END);
+		this.add(label, BorderLayout.LINE_START);
+		this.add(field, BorderLayout.LINE_END);
 	}
 
 	public SelectDouble(String internalName,String labelKey, Locale locale) {
