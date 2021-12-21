@@ -1,14 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FilenameUtils;
@@ -19,27 +15,26 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 public class SaveGCode {
-	private JFileChooser fc = new JFileChooser();
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
-	
+	private final JFileChooser fc = new JFileChooser();
+
 	public SaveGCode() {
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
 		fc.addChoosableFileFilter(filter);
 		// do not allow wild card (*.*) file extensions
 		fc.setAcceptAllFileFilterUsed(false);
 	}
-	
+
 	public SaveGCode(String lastDir) {
 		// remember the last path used, if any
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
-	
-	public void run(Turtle turtle,Plotter robot,JComponent parent) throws Exception {		
+
+	public void run(Turtle turtle, Plotter robot, JFrame parent) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
-			Log.message("File selected by user: "+withExtension);
-			OutputStream out = new FileOutputStream(new File(withExtension));
-			save(out,turtle,robot);
+			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
+			Log.message("File selected by user: "+fileWithExtension);
+			save(fileWithExtension,turtle,robot);
 		}
 	}
 
@@ -51,52 +46,48 @@ public class SaveGCode {
 		return name + "." + extensions[0];
 	}
 	
-	private void save(OutputStream outputStream,Turtle turtle,Plotter robot) throws Exception {
+	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		Log.message("saving...");
 		
-		OutputStreamWriter out = new OutputStreamWriter(outputStream);
+		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
 
-		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");  
-		Date date = new Date(System.currentTimeMillis());  
-		out.write("; "+formatter.format(date)+"\n");
-		out.write("G28\n");  // go home
-		
-		boolean isUp=true;
-		
-		TurtleMove previousMovement=null;
-		for(int i=0;i<turtle.history.size();++i) {
-			TurtleMove m = turtle.history.get(i);
-			
-			switch(m.type) {
-			case TurtleMove.TRAVEL:
-				if(!isUp) {
-					// lift pen up
-					out.write(MarlinPlotterInterface.getPenUpString(robot)+"\n");
-					isUp=true;
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+			Date date = new Date(System.currentTimeMillis());
+			out.write("; " + formatter.format(date) + "\n");
+			out.write("G28\n");  // go home
+
+			boolean isUp = true;
+
+			TurtleMove previousMovement = null;
+			for (int i = 0; i < turtle.history.size(); ++i) {
+				TurtleMove m = turtle.history.get(i);
+
+				switch (m.type) {
+					case TurtleMove.TRAVEL -> {
+						if (!isUp) {
+							// lift pen up
+							out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
+							isUp = true;
+						}
+						previousMovement = m;
+					}
+					case TurtleMove.DRAW -> {
+						if (isUp) {
+							// go to m and put pen down
+							if (previousMovement == null) previousMovement = m;
+							out.write(MarlinPlotterInterface.getTravelToString(previousMovement.x, previousMovement.y) + "\n");
+							out.write(MarlinPlotterInterface.getPenDownString(robot) + "\n");
+							isUp = false;
+						}
+						out.write(MarlinPlotterInterface.getDrawToString(m.x, m.y) + "\n");
+						previousMovement = m;
+					}
+					case TurtleMove.TOOL_CHANGE -> out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
 				}
-				previousMovement=m;
-				break;
-			case TurtleMove.DRAW:
-				if(isUp) {
-					// go to m and put pen down
-					if(previousMovement==null) previousMovement=m;
-					out.write(MarlinPlotterInterface.getTravelToString(previousMovement.x, previousMovement.y)+"\n");
-					out.write(MarlinPlotterInterface.getPenDownString(robot)+"\n");
-					isUp=false;
-				}
-				out.write(MarlinPlotterInterface.getDrawToString(m.x, m.y)+"\n");
-				previousMovement=m;
-				break;
-			case TurtleMove.TOOL_CHANGE:
-				out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt())+"\n");
-				break;
 			}
+			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 		}
-		if(!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot)+"\n");
-		
-		out.flush();
-		out.close();
-		
+
 		Log.message("done.");
 	}
 }

@@ -70,8 +70,7 @@ public class PlotterControls extends JPanel {
 	
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
-		bar.add(bSaveGCode);
-		bar.addSeparator();
+		bar.setFloatable(false);
 		bar.add(bFindHome);
 		bar.addSeparator();
 		bar.add(bRewind);
@@ -79,7 +78,6 @@ public class PlotterControls extends JPanel {
 		bar.add(bPause);
 		bar.add(bStep);
 		
-		bSaveGCode.addActionListener((e)-> saveGCode());
 		bFindHome.addActionListener((e)-> findHome());
 		bRewind.addActionListener((e)-> rewind());
 		bStart.addActionListener((e)-> play());
@@ -101,17 +99,6 @@ public class PlotterControls extends JPanel {
 		if(programInterface.getLineNumber()==-1) {
 			// done
 			pause();
-		}
-	}
-
-	private void saveGCode() {
-		Log.message("Saving to gcode...");
-		SaveGCode save = new SaveGCode();
-		try {
-			save.run(myTurtle, myPlotter, this);
-		} catch(Exception e) {
-			Log.error("Export error: "+e.getLocalizedMessage()); 
-			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
