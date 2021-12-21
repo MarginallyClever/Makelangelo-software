@@ -25,7 +25,7 @@ public class ScaleTurtlePanel extends JPanel {
 	private final String [] unitTypes = new String[]{"mm","%"};
 	
 	private final Turtle turtleToChange;
-	private final Turtle turtleOriginal = new Turtle();
+	private Turtle turtleOriginal;
 	private final JSpinner width;
 	private final JSpinner height;
 	private final JComboBox<String> units = new JComboBox<String>(unitTypes); 
