@@ -47,7 +47,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	
 	public void add(Select c) {
 		gbc.gridy++;
-		interiorPanel.add(c.getPanel(),gbc);
+		interiorPanel.add(c,gbc);
 		c.addPropertyChangeListener(this);
 	}
 	

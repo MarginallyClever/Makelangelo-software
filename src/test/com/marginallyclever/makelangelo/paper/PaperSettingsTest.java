@@ -1,43 +1,53 @@
 package com.marginallyclever.makelangelo.paper;
 
-import javax.swing.JFrame;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
+
+import static org.assertj.swing.launcher.ApplicationLauncher.application;
+
+import java.awt.Frame;
+
+import static org.assertj.swing.finder.WindowFinder.findFrame;
+
+import org.assertj.swing.core.GenericTypeMatcher;
+import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 
 /**
  * {@code PaperSettings} tests
  * @author Dan Royer
  *
  */
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
-public class PaperSettingsTest {
-	@Before
-	public void before() {
+//@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
+public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
+	private FrameFixture window;
+
+	@Override
+	protected void onSetUp() {
 		Log.start();
 		PreferencesHelper.start();
 		Translator.start();
-	}
-	
-	@After
-	public void after() {
-		Log.end();
+		application(PaperSettings.class).start();
+		
+		final String title = PaperSettings.class.getSimpleName();
+		
+		window = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+		  protected boolean isMatching(Frame frame) {
+		    return title.equals(frame.getTitle()) && frame.isShowing();
+		  }
+		}).using(robot());
 	}
 	
 	@Test
-	@Timeout(10)
 	public void runPaperSettings() {
-		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PaperSettings(new Paper()));
-		frame.pack();
-		frame.setVisible(true);
+		window.comboBox("size").selectItem(1);
+		window.textBox("width.field").equals("1682");
+		window.textBox("height.field").equals("2378");
+		window.comboBox("size").selectItem(1);
+		window.checkBox("landscape").click();
+		window.close();
 	}
 }

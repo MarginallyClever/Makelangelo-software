@@ -11,6 +11,10 @@ import javax.swing.border.EmptyBorder;
  * @since 7.24.0
  */
 public class SelectBoolean extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 598928132833398652L;
 	private JLabel label;
 	private JCheckBox field;
 	
@@ -28,8 +32,8 @@ public class SelectBoolean extends Select {
 			notifyPropertyChangeListeners(oldValue, newValue);
 		});
 
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(field,BorderLayout.LINE_END);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(field,BorderLayout.LINE_END);
 	}
 	
 	public boolean isSelected() {

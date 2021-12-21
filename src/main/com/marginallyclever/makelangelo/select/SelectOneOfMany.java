@@ -13,6 +13,10 @@ import javax.swing.border.EmptyBorder;
  * @since 7.24.0
  */
 public class SelectOneOfMany extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8598766351908283067L;
 	private JLabel label;
 	private JComboBox<String> field = new JComboBox<String>();
 	private DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>)field.getModel();
@@ -24,10 +28,10 @@ public class SelectOneOfMany extends Select {
 
 		field.addActionListener((e)-> notifyPropertyChangeListeners(null, field.getSelectedIndex()) );
 
-		myPanel.removeAll();
-		myPanel.setBorder(new EmptyBorder(0,0,0,1));
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(field,BorderLayout.LINE_END);
+		this.removeAll();
+		this.setBorder(new EmptyBorder(0,0,0,1));
+		this.add(label,BorderLayout.LINE_START);
+		this.add(field,BorderLayout.LINE_END);
 	}
 	
 	public SelectOneOfMany(String internalName,String labelKey,String[] options,int defaultValue) {

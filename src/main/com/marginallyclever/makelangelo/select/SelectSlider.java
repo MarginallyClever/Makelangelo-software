@@ -7,6 +7,10 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 public class SelectSlider extends Select {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6440245611041406805L;
 	private JLabel label;
 	private JSlider field;
 	private JLabel value;
@@ -36,9 +40,9 @@ public class SelectSlider extends Select {
 		value.setPreferredSize(dim);
 		value.setMaximumSize(dim);
 		
-		myPanel.add(label,BorderLayout.LINE_START);
-		myPanel.add(field,BorderLayout.CENTER);
-		myPanel.add(value,BorderLayout.LINE_END);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(field,BorderLayout.CENTER);
+		this.add(value,BorderLayout.LINE_END);
 	}
 	
 	public int getValue() {
