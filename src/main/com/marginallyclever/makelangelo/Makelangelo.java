@@ -7,12 +7,7 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -421,7 +416,10 @@ public final class Makelangelo {
 		menu.addSeparator();
 
 		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener((e) -> onClosing());
+		buttonExit.addActionListener((e) -> {
+			WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
+		});
 		menu.add(buttonExit);
 
 		return menu;
