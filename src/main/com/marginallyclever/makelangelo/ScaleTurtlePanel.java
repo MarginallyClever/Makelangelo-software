@@ -1,26 +1,14 @@
 package com.marginallyclever.makelangelo;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
 import org.apache.batik.ext.swing.GridBagConstants;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.Serial;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
@@ -31,16 +19,16 @@ public class ScaleTurtlePanel extends JPanel {
 	/**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = -4566997988723228869L;
-	private final String [] unitTypes = new String[]{"mm","%"};
-	
-	private Turtle originalTurtle;
-	private Turtle myTurtle = new Turtle();
-	private JSpinner width;
-	private JSpinner height;
-	private JComboBox<String> units = new JComboBox<String>(unitTypes); 
-	private JCheckBox lockRatio = new JCheckBox("🔒");
-	private Rectangle2D.Double myOriginalBounds;
+
+	private final Turtle originalTurtle;
+	private final Turtle myTurtle;
+	private final JSpinner width;
+	private final JSpinner height;
+	private final JComboBox<String> units = new JComboBox<String>(new String[]{"mm","%"});
+	private final JCheckBox lockRatio = new JCheckBox("🔒");
+	private final Rectangle2D.Double myOriginalBounds;
 	private double ratioAtTimeOfLock=1;
 	private boolean ignoreChange=false;
 	
@@ -50,12 +38,13 @@ public class ScaleTurtlePanel extends JPanel {
 		myTurtle=new Turtle(t);
 
 		myOriginalBounds = myTurtle.getBounds();
-		width = new JSpinner(new SpinnerNumberModel(Double.valueOf(myOriginalBounds.width),null,null,0.1));
-		height = new JSpinner(new SpinnerNumberModel(Double.valueOf(myOriginalBounds.height),null,null,0.1));
+		width = new JSpinner(new SpinnerNumberModel(myOriginalBounds.width,null,null,1));
+		height = new JSpinner(new SpinnerNumberModel(myOriginalBounds.height,null,null,1));
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.insets=new Insets(2,2,2,2);
+		c.insets=new Insets(10,10,3,10);
+
 		c.gridx=0;
 		c.gridy=0;
 		c.weightx=1;
@@ -91,19 +80,21 @@ public class ScaleTurtlePanel extends JPanel {
 		c.anchor=GridBagConstants.CENTER;
 		add(units,c);
 		
-		width.addChangeListener((e)->onWidthChange(e));
-		height.addChangeListener((e)->onHeightChange(e));
-		units.addActionListener((e)->onUnitChange(e));
-		lockRatio.addActionListener((e)->onLockChange(e));
-		
+		width.addChangeListener(this::onWidthChange);
+		height.addChangeListener(this::onHeightChange);
+		units.addActionListener(this::onUnitChange);
+		lockRatio.addActionListener(e -> onLockChange());
+		lockRatio.setSelected(true);
+		onLockChange();
+
 		updateMinimumWidth(width);
 		updateMinimumWidth(height);
 	}
 	
 	private void updateMinimumWidth(JSpinner spinner) {
-		JComponent field = ((JSpinner.DefaultEditor) spinner.getEditor());
+		JComponent field = spinner.getEditor();
 	    Dimension prefSize = field.getPreferredSize();
-	    prefSize = new Dimension(40, prefSize.height);
+	    prefSize = new Dimension(80, prefSize.height);
 	    field.setPreferredSize(prefSize);
 	}
 
@@ -174,7 +165,7 @@ public class ScaleTurtlePanel extends JPanel {
 		ignoreChange=false;
 	}
 
-	private void onLockChange(ActionEvent e) {
+	private void onLockChange() {
 		if(lockRatio.isSelected()) {
 			ratioAtTimeOfLock = (Double)width.getValue() / (Double)height.getValue();
 		}
@@ -226,12 +217,9 @@ public class ScaleTurtlePanel extends JPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			runAsDialog(frame,new Turtle());
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-		}
+		JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		runAsDialog(frame,new Turtle());
 	}
+
 }
