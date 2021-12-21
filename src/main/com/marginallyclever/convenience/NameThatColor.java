@@ -15,7 +15,7 @@ public class NameThatColor {
 		}
 	};
 
-	public ArrayList<NamedColor> colors;
+	private ArrayList<NamedColor> colors;
 
 	public NameThatColor() {
 		colors = new ArrayList<NamedColor>();

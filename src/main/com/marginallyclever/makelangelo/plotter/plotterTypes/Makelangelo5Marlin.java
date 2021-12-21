@@ -7,6 +7,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
@@ -133,8 +134,8 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		try {
 		  tex=TextureIO.newTexture(FileAccess.open(name), false, name.substring(name.lastIndexOf('.')+1));
 		} catch(IOException e) {
-			System.out.println(e.getMessage());
-			System.out.println(FileAccess.getWorkingDirectory());
+			Log.message(e.getMessage());
+			Log.message(FileAccess.getWorkingDirectory());
 			//Log.error("I can't load "+name);
 		}
 		return tex;

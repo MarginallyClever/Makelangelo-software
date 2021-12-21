@@ -58,9 +58,9 @@ public class PlotterControls extends JPanel {
 		
 		marlinInterface.addListener((e)->{
 			if(e.getActionCommand().contentEquals(MarlinInterface.IDLE) ) {
-				//System.out.println("PlotterControls heard idle");
+				//Log.message("PlotterControls heard idle");
 				if(isRunning) {
-					//System.out.println("PlotterControls is running");
+					//Log.message("PlotterControls is running");
 					step();
 				}
 			}
