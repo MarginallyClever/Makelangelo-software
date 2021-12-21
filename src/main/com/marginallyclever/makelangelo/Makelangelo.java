@@ -66,6 +66,7 @@ import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSett
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
+import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -238,17 +239,30 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
 		JMenuItem bEstimate = new JMenuItem(Translator.get("GetTimeEstimate"));
-
-		bOpenControls.addActionListener((e)-> openPlotterControls());
 		bEstimate.addActionListener((e)-> estimateTime());
-
 		menu.add(bEstimate);
+
+		JMenuItem bSaveToSD = new JMenuItem(Translator.get("SaveGCode"));
+		bSaveToSD.addActionListener((e)-> saveGCode());
+		menu.add(bSaveToSD);
+
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
+		bOpenControls.addActionListener((e)-> openPlotterControls());
 		menu.add(bOpenControls);
 
-		
 		return menu;
+	}
+
+	private void saveGCode() {
+		Log.message("Saving to gcode...");
+		SaveGCode save = new SaveGCode();
+		try {
+			save.run(myTurtle, myPlotter, mainFrame);
+		} catch(Exception e) {
+			Log.error("Export error: "+e.getLocalizedMessage());
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void estimateTime() {
