@@ -573,7 +573,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>PlotterControls.SaveGCode</key>
+		<key>SaveGCode</key>
 		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -1702,7 +1702,7 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>SpiralToCorners</key>
 		<value>Spiral to corners</value>
 		<hint></hint>
 	</string>
@@ -1732,7 +1732,19 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>voronoiStipplingCellCount</key>
+		<value>Number of cells</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>voronoiStipplingDotMin</key>
+		<value>Min dot size</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>
@@ -1753,6 +1765,27 @@
 		<key>GosperCurveOrder</key>
 		<value>Order</value>
 		<hint></hint>
+	</string>
+
+	<string>
+		<key>pass90</key>
+		<value>Pass 90</value>
+	</string>
+	<string>
+		<key>pass75</key>
+		<value>Pass 75</value>
+	</string>
+	<string>
+		<key>pass45</key>
+		<value>Pass 45</value>
+	</string>
+	<string>
+		<key>pass15</key>
+		<value>Pass 15</value>
+	</string>
+	<string>
+		<key>Direction</key>
+		<value>Direction</value>
 	</string>
 
 	<string>
