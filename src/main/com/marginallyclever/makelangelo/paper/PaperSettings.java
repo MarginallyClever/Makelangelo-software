@@ -46,7 +46,6 @@ public class PaperSettings extends SelectPanel {
 	};
 
 	private final Paper myPaper;
-	private final SelectOneOfMany paperSizes;
 	private final SelectDouble pw, ph, shiftX, shiftY, ang;
 	private final SelectBoolean isLandscape;
 	private final SelectSlider paperMargin;
@@ -54,14 +53,6 @@ public class PaperSettings extends SelectPanel {
 
 	public PaperSettings(Paper paper) {
 		this.myPaper = paper;
-		
-		// common paper sizes
-		String[] commonPaperNames = new String[commonPaperSizes.length+1];
-		commonPaperNames[0]="---";
-		int i;
-		for(i=0;i<commonPaperSizes.length;++i) {
-			commonPaperNames[i+1] = commonPaperSizes[i].toString();
-		}
 
 		double top = myPaper.getPaperTop();
 		double bot = myPaper.getPaperBottom();
@@ -69,48 +60,26 @@ public class PaperSettings extends SelectPanel {
 		double right = myPaper.getPaperRight();
 		double rot = myPaper.getRotation();
 		
-		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSize"),commonPaperNames,0));
 		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(float)(right-left)));
 		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(float)(top-bot))); 
 		add(shiftX = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
 		add(shiftY = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
-		add(isLandscape = new SelectBoolean("landscape","Landscape",false));
+		add(isLandscape = new SelectBoolean("landscape","Landscape",myPaper.isLandscape()));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),getPanel()));
 		finish();
 
 		getValuesFromPaper();
 		
-		paperSizes.addPropertyChangeListener(this::onPaperSizeChange);
-		pw.addPropertyChangeListener(this::onPaperDimensionsChange);
-		ph.addPropertyChangeListener(this::onPaperDimensionsChange);
+		pw.addPropertyChangeListener((e) -> setPaperFromPanel());
+		ph.addPropertyChangeListener((e) -> setPaperFromPanel());
 		shiftX.addPropertyChangeListener((e) -> setPaperFromPanel());
 		shiftY.addPropertyChangeListener((e) -> setPaperFromPanel());
 		ang.addPropertyChangeListener((e) -> setPaperFromPanel());
 		isLandscape.addPropertyChangeListener(this::onLandscapeChange);
 		paperMargin.addPropertyChangeListener((e) -> setPaperFromPanel());
 		paperColor.addPropertyChangeListener((e) -> setPaperFromPanel());
-	}
-	
-	private void onPaperDimensionsChange(PropertyChangeEvent e) {
-		Log.message("onPaperDimensionsChange()");
-		double w=getPaperWidthFromPanel();
-		double h=getPaperHeightFromPanel();
-
-		int i = getCurrentPaperSizeChoice( h, w );
-		if(i!=0) {
-			Log.message("landscape "+i+" found");
-			isLandscape.setSelected(true);
-		} else {
-			i = getCurrentPaperSizeChoice( w, h );
-			if(i!=0) {
-				Log.message("portrait "+i+" found");
-				isLandscape.setSelected(false);
-			}
-		}
-		if(paperSizes.getSelectedIndex()!=i) paperSizes.setSelectedIndex(i);
-		Log.message("onPaperDimensionsChange() done");
 	}
 
 	private void onLandscapeChange(PropertyChangeEvent e) {
@@ -121,17 +90,6 @@ public class PaperSettings extends SelectPanel {
 		ph.setValue(w);
 
 		Log.message("onLandscapeChange() done");
-	}
-
-	private void onPaperSizeChange(PropertyChangeEvent e) {
-		Log.message("onPaperSizeChange()");
-		final int selectedIndex = paperSizes.getSelectedIndex();
-		if (selectedIndex != 0) {
-			Log.message("found index " + selectedIndex);
-			PaperSize s = commonPaperSizes[selectedIndex - 1];
-			changePaperSize(s);
-		}
-		Log.message("onPaperSizeChange() done");
 	}
 
 	public void changePaperSize(PaperSize s) {

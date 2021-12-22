@@ -8,6 +8,7 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
     private final PaperSettings paperSettings;
 
     public PaperMenuItem(PaperSettings paperSettings, PaperSize paperSize) {
+        super(paperSize.toString());
         this.paperSettings = paperSettings;
         this.paperSize = paperSize;
         addActionListener((e)-> {
@@ -22,7 +23,6 @@ public class PaperMenuItem extends JRadioButtonMenuItem {
         boolean match = (!currentPaper.isLandscape() && paperSize.width == w && paperSize.height == h)
                 || (currentPaper.isLandscape() && paperSize.width == h && paperSize.height == w);
         setSelected(match);
-        setText(paperSize.toString() + (match && currentPaper.isLandscape()?" (landscape)":""));
         return match;
     }
 
