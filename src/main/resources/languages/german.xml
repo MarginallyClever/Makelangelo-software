@@ -557,13 +557,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>Weiter</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -583,12 +578,12 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Zurückspulen</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Zeichnen</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -642,11 +637,6 @@
 	</string>
 	<string>
 		<key>JogInterface.FindHome</key>
-		<value>Zuhause finden</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
 		<value>Zuhause finden</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -879,7 +869,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Step</key>
+		<key>PlotterControls.Step</key>
 		<value>Schritt</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -889,12 +879,6 @@
 	<string>
 		<key>MenuDraw</key>
 		<value>Zeichnen</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>Step</key>
-		<value>Schritt</value>
 		<hint>menu or dialog title</hint>
 	</string>
 

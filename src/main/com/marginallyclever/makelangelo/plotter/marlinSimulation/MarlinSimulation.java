@@ -17,15 +17,18 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
  * @since 7.24.0
  */
 public class MarlinSimulation {
-	public static final int MAX_SEGMENTS = 32;
-	public static final long MIN_SEGMENT_TIME_US = 25000;
+	public static final int BLOCK_BUFFER_SIZE = 16;
+	public static final long DEFAULT_MINSEGMENTTIME = 20000;  // us
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
-	public static double MAX_FEEDRATE = 12000.0;   // mm/s
-	public static double MAX_ACCELERATION = 5000.0;  // mm/s/s
+	public static final double DEFAULT_FEEDRATE = 3000;   // mm/s
+	public static final double DEFAULT_ACCELERATION = 3000;  // mm/s/s
+	public static final double DEFAULT_TRAVEL_ACCELERATION = 3000;  // mm/s/s
+	public static final double MAX_FEEDRATE = 90*60;   // mm/s
+	public static final double MAX_ACCELERATION = 40*60;  // mm/s/s
 	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
-	public static final int SEGMENTS_PER_SECOND = 10;
-	public static final double [] MAX_JERK = { 8, 8, 0.3 };
+	public static final int SEGMENTS_PER_SECOND = 5;
+	public static final double [] MAX_JERK = { 10, 10, 0.3 };
 	public static final double GRAVITYmag = 9800.0;  // mm/s/s
 	
 	private static final boolean JD_HANDLE_SMALL_SEGMENTS = false;
@@ -88,7 +91,7 @@ public class MarlinSimulation {
 			}
 		}
 		
-		readyForCommands=(queue.size()<MAX_SEGMENTS);
+		readyForCommands=(queue.size()<BLOCK_BUFFER_SIZE);
 	}
 	
 	protected void updatePositions(MakelangeloFirmwareSimulationSegment seg) {
@@ -176,9 +179,9 @@ public class MarlinSimulation {
 		double inverse_secs = feedrate / next.distance;
 		
 		// slow down if the buffer is nearly empty.
-		if( queue.size() >= 2 && queue.size() <= (MAX_SEGMENTS/2)-1 ) {
+		if( queue.size() >= 2 && queue.size() <= (BLOCK_BUFFER_SIZE/2)-1 ) {
 			long segment_time_us = (long)Math.round(1000000.0f / inverse_secs);
-			long timeDiff = MIN_SEGMENT_TIME_US - segment_time_us;
+			long timeDiff = DEFAULT_MINSEGMENTTIME - segment_time_us;
 			if( timeDiff>0 ) {
 				double nst = segment_time_us + Math.round(2 * timeDiff / queue.size());
 				inverse_secs = 1000000.0 / nst;
@@ -631,7 +634,7 @@ public class MarlinSimulation {
 			default:
 				break;
 			}
-			while(queue.size()>MAX_SEGMENTS) consumer.run(queue.remove(0));
+			while(queue.size()>BLOCK_BUFFER_SIZE) consumer.run(queue.remove(0));
 		}
 		while(queue.size()>0) consumer.run(queue.remove(0));
 	}

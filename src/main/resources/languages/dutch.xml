@@ -318,13 +318,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>Hervatten</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -344,12 +339,12 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -386,12 +381,12 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenUp</key>
+		<key>JogInterface.PenUp</key>
 		<value>Pen omhoog</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenDown</key>
+		<key>JogInterface.PenDown</key>
 		<value>Pen omlaag</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -812,7 +807,7 @@
 	</string>
 
 	<string>
-		<key>DisengageMotors</key>
+		<key>JogInterface.DisengageMotors</key>
 		<value>Motoren uitzetten</value>
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
@@ -946,10 +941,5 @@
 		<key>PaperSize</key>
 		<value>Papier Grootte</value>
 		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>DisengageMotors</key>
-		<value>Stop motoren</value>
-		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 </language>

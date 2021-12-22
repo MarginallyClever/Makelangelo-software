@@ -214,9 +214,7 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Calculate the limits of drawing lines in this turtle history
-	 * @param top maximum limits
-	 * @param bottom minimum limits
-	 */
+	 **/
 	public Rectangle2D.Double getBounds() {
 		Point2D top = new Point2D();
 		Point2D bottom = new Point2D();
@@ -230,7 +228,12 @@ public class Turtle implements Cloneable {
 		
 		return r;
 	}
-	
+        
+	/**
+	 * Calculate the limits of drawing lines in this turtle history
+	 * @param top maximum limits
+	 * @param bottom minimum limits
+	 */
 	private void getBounds(Point2D top,Point2D bottom) {
 		bottom.x=Float.MAX_VALUE;
 		bottom.y=Float.MAX_VALUE;

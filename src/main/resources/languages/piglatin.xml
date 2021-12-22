@@ -329,13 +329,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>ausePay</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>Unpauseyay</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -355,12 +350,12 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -397,12 +392,12 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenUp</key>
+		<key>JogInterface.PenUp</key>
 		<value>enPay upyay</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>PenDown</key>
+		<key>JogInterface.PenDown</key>
 		<value>enPay ownday</value>
 		<hint>manual driving dialog</hint>
 	</string>

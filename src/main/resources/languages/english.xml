@@ -556,13 +556,8 @@
 	</string>
 
 	<string>
-		<key>Pause</key>
+		<key>PlotterControls.Pause</key>
 		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Unpause</key>
-		<value>Unpause</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -582,12 +577,12 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Rewind</key>
+		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Play</key>
+		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -641,11 +636,6 @@
 	</string>
 	<string>
 		<key>JogInterface.FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
 		<value>Find home</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -869,32 +859,19 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
-		<value>Save to file/SD card</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
 		<key>MenuSaveFile</key>
 		<value>Save</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>Step</key>
+		<key>PlotterControls.Step</key>
 		<value>Step</value>
 		<hint>menu or dialog title</hint>
 	</string>
-
-
 
 	<string>
 		<key>MenuDraw</key>
 		<value>Draw</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>Step</key>
-		<value>Step</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -1672,8 +1649,18 @@
 	</string>
 
 	<string>
-		<key>Sandy Noble Style</key>
+		<key>SandyNoble.title</key>
 		<value>Sandy Noble Style</value>
+		<hint></hint>
+	</string>
+	<string>
+		<key>SandyNoble.rings</key>
+		<value>Rings</value>
+		<hint></hint>
+	</string>
+	<string>
+		<key>SandyNoble.center</key>
+		<value>Center</value>
 		<hint></hint>
 	</string>
 
@@ -1714,19 +1701,25 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>Spiral to corners</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.intensity</key>
+		<value>Intensity</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>SpiralPulse.spacing</key>
 		<value>Space between rings</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>Pulse height</value>
 		<hint></hint>
 	</string>
@@ -1744,7 +1737,19 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>voronoiStipplingCellCount</key>
+		<value>Number of cells</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>voronoiStipplingDotMin</key>
+		<value>Min dot size</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>
@@ -1765,6 +1770,27 @@
 		<key>GosperCurveOrder</key>
 		<value>Order</value>
 		<hint></hint>
+	</string>
+
+	<string>
+		<key>pass90</key>
+		<value>Pass 90</value>
+	</string>
+	<string>
+		<key>pass75</key>
+		<value>Pass 75</value>
+	</string>
+	<string>
+		<key>pass45</key>
+		<value>Pass 45</value>
+	</string>
+	<string>
+		<key>pass15</key>
+		<value>Pass 15</value>
+	</string>
+	<string>
+		<key>Direction</key>
+		<value>Direction</value>
 	</string>
 
 	<string>
