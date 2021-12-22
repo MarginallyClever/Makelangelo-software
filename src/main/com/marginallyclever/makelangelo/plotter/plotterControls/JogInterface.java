@@ -31,7 +31,7 @@ public class JogInterface extends JPanel {
 		bCartesian.addActionListener((e)->{
 	    	int id = e.getID();
 	    	if(CartesianButtons.isCenterZone(id)) {
-				myPlotter.findHome();
+	    		findHome();
 	    		return;
 	    	}
 	    	int q=CartesianButtons.getQuadrant(id);
@@ -65,6 +65,11 @@ public class JogInterface extends JPanel {
 				updateButtonStatus();
 			}
 		});
+		updateButtonStatus();
+	}
+	
+	public void findHome() {
+		myPlotter.findHome();
 		updateButtonStatus();
 	}
 	
