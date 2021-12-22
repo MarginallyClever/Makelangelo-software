@@ -10,6 +10,7 @@ import java.util.Collections;
  * @author Dan Royer
  *
  */
+@Deprecated(since="7.30.0")
 public class Sequence2D {
 	public ArrayList<LineSegment2D> lines;
 	public boolean isClosed;
