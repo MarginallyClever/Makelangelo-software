@@ -8,7 +8,7 @@ public class Converter_Spiral_CMYK_Panel extends ImageConverterPanel {
 	
 	public Converter_Spiral_CMYK_Panel(Converter_Spiral_CMYK converter) {
 		super(converter);
-		add(new SelectBoolean("toCorners", Translator.get("SpiralToCorners"),converter.getToCorners()));
+		add(new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),converter.getToCorners()));
 		finish();
 	}
 }
