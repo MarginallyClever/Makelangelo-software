@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 
 public class Converter_Spiral_CMYK_Panel extends ImageConverterPanel {
@@ -7,7 +8,7 @@ public class Converter_Spiral_CMYK_Panel extends ImageConverterPanel {
 	
 	public Converter_Spiral_CMYK_Panel(Converter_Spiral_CMYK converter) {
 		super(converter);
-		add(new SelectBoolean("toCorners","SpiralToCorners",converter.getToCorners()));
+		add(new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),converter.getToCorners()));
 		finish();
 	}
 }
