@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.paper;
 
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
@@ -50,6 +51,8 @@ public class PaperSettings extends SelectPanel {
 	private final SelectBoolean isLandscape;
 	private final SelectSlider paperMargin;
 	private final SelectColor paperColor;
+	private final JButton saveButton;
+	private JDialog parent;
 
 	public PaperSettings(Paper paper) {
 		this.myPaper = paper;
@@ -59,19 +62,23 @@ public class PaperSettings extends SelectPanel {
 		double left = myPaper.getPaperLeft();
 		double right = myPaper.getPaperRight();
 		double rot = myPaper.getRotation();
-		
-		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(float)(right-left)));
-		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(float)(top-bot))); 
+
+		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),myPaper.getPaperWidth()));
+		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),myPaper.getPaperHeight()));
 		add(shiftX = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
 		add(shiftY = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
 		add(isLandscape = new SelectBoolean("landscape","Landscape",myPaper.isLandscape()));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),getPanel()));
+
 		finish();
 
-		getValuesFromPaper();
-		
+		saveButton = new JButton(Translator.get("Save"));
+		JPanel buttonPane = new JPanel();
+		buttonPane.add(saveButton);
+		getPanel().add(buttonPane);
+
 		pw.addPropertyChangeListener((e) -> setPaperFromPanel());
 		ph.addPropertyChangeListener((e) -> setPaperFromPanel());
 		shiftX.addPropertyChangeListener((e) -> setPaperFromPanel());
@@ -80,6 +87,7 @@ public class PaperSettings extends SelectPanel {
 		isLandscape.addPropertyChangeListener(this::onLandscapeChange);
 		paperMargin.addPropertyChangeListener((e) -> setPaperFromPanel());
 		paperColor.addPropertyChangeListener((e) -> setPaperFromPanel());
+		saveButton.addActionListener((e)-> parent.dispose());
 	}
 
 	private void onLandscapeChange(PropertyChangeEvent e) {
@@ -159,14 +167,6 @@ public class PaperSettings extends SelectPanel {
 	}
 
 	/**
-	 * Load the values from {@code myPaper} into this panel
-	 */
-	private void getValuesFromPaper() {
-		pw.setValue(myPaper.getPaperWidth());
-		ph.setValue(myPaper.getPaperHeight());
-	}
-
-	/**
 	 * Find the index of {@code commonPaperSizes} that matches the desired width and height.
 	 * @param paperWidth mm
 	 * @param paperHeight mm
@@ -211,6 +211,10 @@ public class PaperSettings extends SelectPanel {
 
 	public boolean isLandscapeSelected() {
 		return isLandscape.isSelected();
+	}
+
+	public void setParent(JDialog parent) {
+		this.parent = parent;
 	}
 
 	// TEST
