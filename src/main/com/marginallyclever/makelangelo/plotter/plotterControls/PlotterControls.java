@@ -78,7 +78,7 @@ public class PlotterControls extends JPanel {
 		bar.add(bPause);
 		bar.add(bStep);
 
-		bFindHome.addActionListener((e) -> jogInterface.findHome());
+		bFindHome.addActionListener((e) -> findHome());
 		bRewind.addActionListener((e) -> rewind());
 		bStart.addActionListener((e) -> play());
 		bPause.addActionListener((e) -> pause());
