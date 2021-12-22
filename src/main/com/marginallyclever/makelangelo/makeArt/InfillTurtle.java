@@ -18,7 +18,7 @@ public class InfillTurtle {
 	public InfillTurtle() {}
 	
 	public Turtle run(Turtle input) throws Exception {
-		confirmTurtleIsClosedLoop(input);
+		//confirmTurtleIsClosedLoop(input);
 		
 		ArrayList<LineSegment2D> segments = infillFromTurtle(input);
 		

@@ -47,6 +47,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
 import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
@@ -353,6 +354,7 @@ public final class Makelangelo {
 		
 		menu.add(new SimplifyTurtle(this));
 		menu.add(new ReorderTurtle(this));
+		menu.add(new InfillTurtleAction(this));
 
 		return menu;
 	}
