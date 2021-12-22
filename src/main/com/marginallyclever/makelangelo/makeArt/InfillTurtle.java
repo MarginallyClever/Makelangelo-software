@@ -31,6 +31,7 @@ public class InfillTurtle {
 		return t;
 	}
 
+	@SuppressWarnings("unused")
 	private void confirmTurtleIsClosedLoop(Turtle input) throws Exception {
 		throw new Exception("I cannot confirm this Turtle path is a closed loop.");
 	}
