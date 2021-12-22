@@ -1919,4 +1919,9 @@
 		<value>Open file...</value>
 		<hint>load file dialog</hint>
 	</string>
+	<string>
+		<key>InfillTurtleAction.title</key>
+		<value>Fill in closed loops</value>
+		<hint></hint>
+	</string>
 </language>
