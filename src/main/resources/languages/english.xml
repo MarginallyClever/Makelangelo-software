@@ -1702,19 +1702,25 @@
 	</string>
 
 	<string>
-		<key>SpiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>Spiral to corners</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.intensity</key>
+		<value>Intensity</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>SpiralPulse.spacing</key>
 		<value>Space between rings</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>Pulse height</value>
 		<hint></hint>
 	</string>
