@@ -178,7 +178,6 @@
 		<value>Save</value>
 		<hint>used in many places</hint>
 	</string>
-
 	<string>
 		<key>Load</key>
 		<value>Load</value>
@@ -1873,9 +1872,13 @@
 	<string>
 		<key>OpenPaperSettings</key>
 		<value>Advanced settings</value>
-		<hint></hint>
 	</string>
-	
+
+	<string>
+		<key>PaperSettingsDialogName</key>
+		<value>Custom paper size settings</value>
+	</string>
+
 	<string>
 		<key>FileTypeImage</key>
 		<value>Image</value>
