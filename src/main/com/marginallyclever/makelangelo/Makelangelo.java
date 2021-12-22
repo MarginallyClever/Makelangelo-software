@@ -109,6 +109,7 @@ public final class Makelangelo {
 	
 	// GUI elements
 	private JFrame mainFrame;
+	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
 	private static JFrame logFrame;
 	private SaveDialog saveDialog;
@@ -186,21 +187,34 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * If the menu bar exists, empty it. If it doesn't exist, create it.
-	 * @return the refreshed menu bar
+	 * Build the main menu
 	 */
-	private JMenuBar getMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(createFileMenu());
-		menuBar.add(createPaperSettingsMenu());
-		menuBar.add(createGenerateMenu());
-		menuBar.add(createToolsMenu());
-		menuBar.add(createViewMenu());
-		menuBar.add(createRobotMenu());
-		menuBar.add(createHelpMenu());
-		menuBar.updateUI();
+	private void buildMenuBar() {
+		Log.message("  adding menu bar...");
 		
-		return menuBar;
+		mainMenuBar = new JMenuBar();
+		mainMenuBar.add(createFileMenu());
+		mainMenuBar.add(createPaperSettingsMenu());
+		mainMenuBar.add(createGenerateMenu());
+		mainMenuBar.add(createToolsMenu());
+		mainMenuBar.add(createViewMenu());
+		mainMenuBar.add(createRobotMenu());
+		mainMenuBar.add(createHelpMenu());
+		mainMenuBar.updateUI();
+		
+		mainFrame.setJMenuBar(mainMenuBar);
+	}
+
+	/**
+	 * Change the enable state of the menu items inside the {@code mainMenuBar}.
+	 * Remember that enabling the menuBar does not affect the children.
+	 * @param b the new state
+	 */
+	private void enableMenuBar(boolean b) {
+		int c = mainMenuBar.getMenuCount();
+		while(--c>=0) {
+			mainMenuBar.getMenu(c).setEnabled(b);
+		}
 	}
 
 	private JMenu createPaperSettingsMenu() {
@@ -220,13 +234,16 @@ public final class Makelangelo {
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
-		// make sure pc closes the connection when the dialog is closed.
+
+		enableMenuBar(false);
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
 				paperSettings.save();
 			}
 		});
+		
 		dialog.setVisible(true);
 	}
 
@@ -274,15 +291,18 @@ public final class Makelangelo {
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
-		// make sure pc closes the connection when the dialog is closed.
+
+		enableMenuBar(false);
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
+				// make sure to close the connection when the dialog is closed.
 				plotterControls.closeConnection();
 			}
 		});
-		dialog.setVisible(true);
 		
+		dialog.setVisible(true);
 	}
 
 	private JMenu createToolsMenu() {
@@ -364,13 +384,18 @@ public final class Makelangelo {
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
+		
+
+		enableMenuBar(false);
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
 				myPaper.setRotationRef(0);
 				Log.message(Translator.get("Finished"));
 			}
 		});
+		
 		dialog.setVisible(true);
 	}
 	
@@ -442,15 +467,18 @@ public final class Makelangelo {
 			dialog.setLocationRelativeTo(mainFrame);
 			dialog.setMinimumSize(new Dimension(500,500));
 			dialog.pack();
+
+			enableMenuBar(false);
 			dialog.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
+					enableMenuBar(true);
 					previewPanel.removeListener(loader);
 					recentFiles.addFilename(loader.getLastFileIn());
 				}
 			});
-			dialog.setVisible(true);
 			
+			dialog.setVisible(true);
 		} catch(Exception e) {
 			Log.error("Load error: "+e.getMessage()); 
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
@@ -460,10 +488,18 @@ public final class Makelangelo {
 
 	private void runFirmwareUpdate() {
 		JDialog dialog = new JDialog(mainFrame,"Firmware Update");
-		
 		dialog.add(new FirmwareUploaderPanel());
 		dialog.pack();
 		dialog.setLocationRelativeTo(mainFrame);
+
+		enableMenuBar(false);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
+			}
+		});
+		
 		dialog.setVisible(true);
 	}
 
@@ -626,8 +662,7 @@ public final class Makelangelo {
 			}
 		});
 		
-		Log.message("  adding menu bar...");
-		mainFrame.setJMenuBar(getMenuBar());
+		buildMenuBar();
 		
 		mainFrame.setContentPane(createContentPane());
 
