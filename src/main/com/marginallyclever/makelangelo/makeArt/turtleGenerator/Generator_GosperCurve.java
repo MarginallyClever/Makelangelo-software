@@ -35,6 +35,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
 
 		Turtle turtle = new Turtle();
+                turtle.penDown();
 		gosperA(turtle,order);
 
 		// scale the image to fit on the paper
