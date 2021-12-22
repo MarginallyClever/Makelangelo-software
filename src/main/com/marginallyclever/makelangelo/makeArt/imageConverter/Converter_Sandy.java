@@ -28,7 +28,7 @@ public class Converter_Sandy extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("Sandy Noble Style");
+		return Translator.get("SandyNoble.title");
 	}
 
 	@Override
