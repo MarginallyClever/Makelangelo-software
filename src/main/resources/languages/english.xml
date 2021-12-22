@@ -1650,8 +1650,18 @@
 	</string>
 
 	<string>
-		<key>Sandy Noble Style</key>
+		<key>SandyNoble.title</key>
 		<value>Sandy Noble Style</value>
+		<hint></hint>
+	</string>
+	<string>
+		<key>SandyNoble.rings</key>
+		<value>Rings</value>
+		<hint></hint>
+	</string>
+	<string>
+		<key>SandyNoble.center</key>
+		<value>Center</value>
 		<hint></hint>
 	</string>
 
