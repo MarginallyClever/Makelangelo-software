@@ -377,6 +377,8 @@ public class Turtle implements Cloneable {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
 				jumpTo(line.a.x,line.a.y);
+			} else {
+				moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
 			moveTo(line.b.x,line.b.y);
