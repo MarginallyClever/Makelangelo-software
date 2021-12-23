@@ -167,7 +167,7 @@ public class MarlinSimulation {
 	 * @param to destination position
 	 * @param feedrate velocity (mm/s)
 	 * @param acceleration (mm/s/s)
-	 * @param cartesian move (mm)
+	 * @param cartesianDelta move (mm)
 	 */
 	protected void bufferSegment(final Vector3d to, final double feedrate, final double acceleration,final Vector3d cartesianDelta) {
 		MarlinSimulationBlock next = new MarlinSimulationBlock(to,cartesianDelta);
