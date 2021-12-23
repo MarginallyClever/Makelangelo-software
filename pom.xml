@@ -67,9 +67,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 	</pluginRepositories>
 
 	<build>
-		<sourceDirectory>${project.basedir}/src/main</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
-		<!-- See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html 
+		<!-- See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
 			and http://stackoverflow.com/a/3697482 -->
 		<resources>
 			<resource>
