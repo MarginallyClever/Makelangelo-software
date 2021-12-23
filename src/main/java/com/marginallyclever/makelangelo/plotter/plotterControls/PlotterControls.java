@@ -177,10 +177,13 @@ public class PlotterControls extends JPanel {
 		return x;
 	}
 
+	public void closeConnection() {
+		marlinInterface.closeConnection();
+	}
+
 	// TEST
 
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
@@ -192,7 +195,4 @@ public class PlotterControls extends JPanel {
 		frame.setVisible(true);
 	}
 
-	public void closeConnection() {
-		marlinInterface.closeConnection();
-	}
 }

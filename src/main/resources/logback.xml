@@ -2,17 +2,32 @@
 <!DOCTYPE configuration>
 <configuration>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- encoders are assigned the type
-             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <if condition='property("DEV").equals("true")'>
+        <then>
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d %-5level %logger{35} - %msg %n</pattern>
+                </encoder>
+            </appender>
+
+            <logger name="com.marginallyclever.convenience.log.LoggerInitializer" level="error" />
+            <root>
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>log.txt</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="java.util.prefs" level="off" />
+    <logger name="com.marginallyclever" level="debug" />
 
-    <root level="error">
-        <appender-ref ref="STDOUT" />
+    <root level="info">
+        <appender-ref ref="FILE" />
     </root>
+
 </configuration>

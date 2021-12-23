@@ -3,10 +3,10 @@ package com.marginallyclever.communications.serial;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.convenience.log.Log;
-
 import java.util.regex.Pattern;
 import jssc.SerialPortList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -16,6 +16,9 @@ import jssc.SerialPortList;
  * @since v7.1.0.0
  */
 public class SerialTransportLayer implements TransportLayer {
+
+	private static final Logger logger = LoggerFactory.getLogger(SerialTransportLayer.class);
+
 	public SerialTransportLayer() {}
 
 	public String getName() {
@@ -83,12 +86,10 @@ public class SerialTransportLayer implements TransportLayer {
 	}
 	
 	public static void main(String[] args) {
-		Log.start();
-		Log.message("connections:");
+		logger.debug("connections:");
 		String [] list = SerialTransportLayer.listConnections();
 		for(String s : list ) {
-			Log.message(s);
+			logger.debug(s);
 		}
-		Log.end();
 	}
 }

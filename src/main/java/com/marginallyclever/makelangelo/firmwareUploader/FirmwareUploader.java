@@ -120,13 +120,8 @@ public class FirmwareUploader {
 	
 	// TEST
 	
-	public void main(String[] args) {
-		Log.start();
+	public void main(String[] args) throws Exception {
 		FirmwareUploader fu = new FirmwareUploader();
-		try {
-			fu.run("./firmware.hex", "COM3");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		fu.run("./firmware.hex", "COM3");
 	}
 }

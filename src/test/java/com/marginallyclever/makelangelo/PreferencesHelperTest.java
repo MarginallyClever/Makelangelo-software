@@ -55,7 +55,6 @@ public class PreferencesHelperTest {
 	@SuppressWarnings("deprecation")
 	@BeforeAll
 	public static void beforeAll() {
-		Log.start();
 		PreferencesHelper.start();
 		preferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 		marginallyCleverJsonPreferenceNode = new MarginallyCleverPreferences(preferenceNode, "JSON");
@@ -67,7 +66,6 @@ public class PreferencesHelperTest {
 	@AfterAll
 	public static void afterAll() throws Exception {
 		marginallyCleverJsonPreferenceNode.removeNode();
-		Log.end();
 	}
 
 	@Test
@@ -90,7 +88,6 @@ public class PreferencesHelperTest {
 			}
 		}
 		machinesPreferenceNode.flush();
-		Log.end();
 		Log.message("end: "+ thisMethodsName);
 	}
 }

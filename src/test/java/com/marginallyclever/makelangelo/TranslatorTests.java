@@ -15,15 +15,9 @@ import com.marginallyclever.util.PreferencesHelper;
 public class TranslatorTests {
 	@BeforeAll
 	public static void beforeAll() {
-		Log.start();
 		PreferencesHelper.start();
 	}
-	
-	@AfterAll
-	public static void afterAll() {
-		Log.end();
-	}
-	
+
 	@Test
 	public void startTranslatorTwiceTest() {
 		Translator.start();

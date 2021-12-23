@@ -145,7 +145,6 @@ public class PanelAdjustMachine extends SelectPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

@@ -20,7 +20,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker.StateValue;
@@ -360,23 +359,16 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	
 	// TEST
 	
-	public static void main(String[] args) {
-		Log.start();
+	public static void main(String[] args) throws Exception {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
-			JFrame frame = new JFrame(ConvertImagePanel.class.getSimpleName());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.add(new ConvertImagePanel(new Paper(),image));
-			frame.pack();
-			frame.setVisible(true);
-		} catch(Exception e) {
-			e.printStackTrace();
-			Log.error(e.getMessage());
-			JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
-		}
+		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
+		JFrame frame = new JFrame(ConvertImagePanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new ConvertImagePanel(new Paper(),image));
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

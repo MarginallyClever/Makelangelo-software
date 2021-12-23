@@ -313,7 +313,6 @@ public class CartesianButtons extends JComponent {
 	}
 
 	public static void main(String[] args) {
-		Log.start();
 		JFrame frame = new JFrame("CartesianButtons");
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -100,7 +100,7 @@ public class LogPanel extends JPanel implements LogListener {
 	}
 
 	public static JFrame createFrame() {
-		JFrame frame = new JFrame(Log.getLogLocation());
+		JFrame frame = new JFrame(LoggerInitializer.getLogLocation().toString());
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setPreferredSize(new Dimension(600, 400));
 		frame.add(new LogPanel());
@@ -108,8 +108,9 @@ public class LogPanel extends JPanel implements LogListener {
 		return frame;
 	}
 
+	// TEST
+
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

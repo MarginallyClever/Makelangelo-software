@@ -141,7 +141,6 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

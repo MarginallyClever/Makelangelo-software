@@ -27,7 +27,6 @@ public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 
 	@Override
 	protected void onSetUp() {
-		Log.start();
 		PreferencesHelper.start();
 		Translator.start();
 		application(PaperSettings.class).start();

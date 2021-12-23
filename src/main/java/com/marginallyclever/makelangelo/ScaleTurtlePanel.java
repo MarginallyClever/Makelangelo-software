@@ -218,7 +218,6 @@ public class ScaleTurtlePanel extends JPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

@@ -52,16 +52,11 @@ public class LanguagePreferences {
 	
 	// TEST
 	
-	public static void main(String[] args) {
-		Log.start();
+	public static void main(String[] args) throws Exception {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			chooseLanguage();
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-		}
+		chooseLanguage();
 	}
 }

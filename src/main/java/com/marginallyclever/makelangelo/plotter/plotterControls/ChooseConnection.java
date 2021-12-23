@@ -114,7 +114,6 @@ public class ChooseConnection extends JPanel {
 	// TEST 
 	
 	public static void main(String[] args) {
-		Log.start();
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChooseConnection());

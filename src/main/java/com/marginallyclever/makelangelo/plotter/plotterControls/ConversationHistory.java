@@ -162,7 +162,6 @@ public class ConversationHistory extends JPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ConversationHistory());

@@ -44,8 +44,8 @@ import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.convenience.log.LoggerInitializer;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
@@ -73,6 +73,8 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
@@ -93,6 +95,8 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 
+	private static Logger logger;
+
 	/**
 	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the 
 	 * VERSION based upon pom.xml.  In this way we only define the VERSION once and prevent violating DRY.
@@ -112,7 +116,7 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
-	private static JFrame logFrame;
+	private JFrame logFrame;
 	private SaveDialog saveDialog;
 	
 	private RecentFiles recentFiles;
@@ -122,9 +126,9 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
-		Log.message("Locale="+Locale.getDefault().toString());
-		Log.message("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
-		Log.message("Starting preferences...");
+		logger.debug("Locale="+Locale.getDefault().toString());
+		logger.debug("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
+		logger.debug("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		mySettingPanel = new MakelangeloSettingPanel();
 
@@ -132,12 +136,12 @@ public final class Makelangelo {
 
 		saveDialog = new SaveDialog();
 		
-		Log.message("Starting virtual camera...");
+		logger.debug("Starting virtual camera...");
 		camera = new Camera();
 	}
 	
 	private void startRobot() {
-		Log.message("Starting robot...");
+		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addListener((e)-> onPlotterEvent(e));
 		myPlotter.getSettings().addListener((e)->{
@@ -173,7 +177,7 @@ public final class Makelangelo {
 	// check if we need to ask about sharing
 	@SuppressWarnings("unused")
 	private void checkSharingPermission() {
-		Log.message("Checking sharing permissions...");
+		logger.debug("Checking sharing permissions...");
 		
 		final String SHARING_CHECK_STRING = "Last version sharing checked";
 		
@@ -191,7 +195,7 @@ public final class Makelangelo {
 	 * Build the main menu
 	 */
 	private void buildMenuBar() {
-		Log.message("  adding menu bar...");
+		logger.debug("  adding menu bar...");
 		
 		mainMenuBar = new JMenuBar();
 		mainMenuBar.add(createFileMenu());
@@ -267,12 +271,12 @@ public final class Makelangelo {
 	}
 
 	private void saveGCode() {
-		Log.message("Saving to gcode...");
+		logger.debug("Saving to gcode...");
 		SaveGCode save = new SaveGCode();
 		try {
 			save.run(myTurtle, myPlotter, mainFrame);
 		} catch(Exception e) {
-			Log.error("Export error: "+e.getLocalizedMessage());
+			logger.error("Error while exporting the gcode", e);
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -321,7 +325,7 @@ public final class Makelangelo {
 				menu.addSeparator();
 		    } 
 		} catch (FailedToRunRaspistillException e) {
-			Log.message("Raspistill unavailable.");
+			logger.debug("Raspistill unavailable.");
 		}
 
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
@@ -377,7 +381,7 @@ public final class Makelangelo {
 	
 	private void runGeneratorDialog(TurtleGenerator ici) {
 		ici.setPaper(myPaper);
-		ici.addListener((t) -> setTurtle(t));
+		ici.addListener(this::setTurtle);
 		ici.generate();
 		
 		JDialog dialog = new JDialog(mainFrame,ici.getName());
@@ -394,7 +398,7 @@ public final class Makelangelo {
 			public void windowClosing(WindowEvent e) {
 				enableMenuBar(true);
 				myPaper.setRotationRef(0);
-				Log.message(Translator.get("Finished"));
+				logger.debug(Translator.get("Finished"));
 			}
 		});
 		
@@ -453,7 +457,7 @@ public final class Makelangelo {
 	}
 
 	public void openLoadFile(String filename) {
-		Log.message("Loading file "+filename+"...");
+		logger.debug("Loading file "+filename+"...");
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)->{
@@ -482,7 +486,7 @@ public final class Makelangelo {
 			
 			dialog.setVisible(true);
 		} catch(Exception e) {
-			Log.error("Load error: "+e.getMessage()); 
+			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 			recentFiles.removeFilename(filename);
 		}
@@ -533,31 +537,25 @@ public final class Makelangelo {
 		});
 		menu.add(checkboxShowPenUpMoves);
 		
-		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> showLogDialog() );
-		menu.add(buttonViewLog);
-
 		return menu;
 	}
 
-	private void showLogDialog() {
-		logFrame.setVisible(true);
-	}
-	
 	private JMenu createHelpMenu() {
 		JMenu menu = new JMenu(Translator.get("Help"));
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> showLogDialog() );
+		buttonViewLog.addActionListener((e) -> {
+			logFrame = LogPanel.createFrame();
+			logFrame.setVisible(true);
+		});
 		menu.add(buttonViewLog);
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
 		buttonForums.addActionListener((e) -> {
 			try {
 				java.awt.Desktop.getDesktop().browse(URI.create("https://discord.gg/Q5TZFmB"));
-			} catch (IOException e1) {
-				Log.error("Forum URL error: "+e1.getLocalizedMessage());
-				e1.printStackTrace();
+			} catch (IOException ioe) {
+				logger.error("Can't open the browser to discord", ioe);
 			}
 		});
 		menu.add(buttonForums);
@@ -577,7 +575,7 @@ public final class Makelangelo {
 	 * redirect notice to find the latest release tag.
 	 */
 	private void checkForUpdate(boolean announceIfFailure) {
-		Log.message("checking for updates...");
+		logger.debug("checking for updates...");
 		try {
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
@@ -600,8 +598,8 @@ public final class Makelangelo {
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				Log.message("latest release: " + line2 + "; this version: " + VERSION);
-				// Log.message(inputLine.compareTo(VERSION));
+				logger.debug("latest release: " + line2 + "; this version: " + VERSION);
+				// logger.debug(inputLine.compareTo(VERSION));
 
 				int comp = line2.compareTo(VERSION);
 				String results;
@@ -616,8 +614,7 @@ public final class Makelangelo {
 			if (announceIfFailure) {
 				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed") + e.getLocalizedMessage());
 			}
-			Log.error("Update check failed: "+e.getMessage());
-			e.printStackTrace();
+			logger.error("Update check failed", e);
 		}
 	}
 
@@ -633,12 +630,12 @@ public final class Makelangelo {
 	 */
 
 	private Container createContentPane() {
-		Log.message("create content pane...");
+		logger.debug("create content pane...");
 
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.setOpaque(true);
 
-		Log.message("  create PreviewPanel...");
+		logger.debug("  create PreviewPanel...");
 		previewPanel = new PreviewPanel();
 		previewPanel.setCamera(camera);
 		previewPanel.addListener(myPaper);
@@ -653,7 +650,7 @@ public final class Makelangelo {
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
 	private void createAppWindow() {
-		Log.message("Creating GUI...");
+		logger.debug("Creating GUI...");
 
 		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -670,7 +667,7 @@ public final class Makelangelo {
 
 		camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
 		
-		Log.message("  make visible...");
+		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
 		
 		setWindowSizeAndPosition();
@@ -679,7 +676,7 @@ public final class Makelangelo {
 	}
 	
 	private void setupDropTarget() {
-		Log.message("  adding drag & drop support...");
+		logger.debug("  adding drag & drop support...");
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
@@ -707,7 +704,7 @@ public final class Makelangelo {
 			        Log.message("Drop failed: " + dtde);
 			        dtde.rejectDrop();
 			    } catch (Exception e) {
-			        Log.error("Drop error" + e.getMessage());
+					logger.error("Drop error", e);
 			        dtde.rejectDrop();
 			    }
 			}
@@ -715,7 +712,7 @@ public final class Makelangelo {
 	}
 
 	private void setWindowSizeAndPosition() {
-		Log.message("adjust window size...");
+		logger.debug("adjust window size...");
 
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -728,12 +725,12 @@ public final class Makelangelo {
     	int windowY = preferences.getInt(KEY_WINDOW_Y, -1);
 
 		if(width==-1 || height==-1) {
-    		Log.message("...default size");
+    		logger.debug("...default size");
 			width = Math.min(screenSize.width,1200);
 			height = Math.min(screenSize.height,1020);
 		}
         if(windowX==-1 || windowY==-1) {
-    		Log.message("...default position");
+    		logger.debug("...default position");
         	// centered
         	windowX = (screenSize.width - width)/2;
         	windowY = (screenSize.height - height)/2;
@@ -776,8 +773,8 @@ public final class Makelangelo {
 			saveWindowSizeAndPosition();
 			myPlotter.getSettings().saveConfig();
 
-			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
-			Log.end();
+			// LoggerInitializer.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
+			LoggerInitializer.end();
 
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
@@ -790,11 +787,11 @@ public final class Makelangelo {
 	}
 	
 	private void saveFile() {
-		Log.message("Saving vector file...");
+		logger.debug("Saving vector file...");
 		try {
 			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
-			Log.error("Save error: "+e.getLocalizedMessage()); 
+			logger.error("Error while saving the vector file", e);
 			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -808,11 +805,10 @@ public final class Makelangelo {
 		return myTurtle;
 	}
 	
-	// TEST
-	
 	public static void main(String[] args) {
-		logFrame = LogPanel.createFrame();
-		Log.start();
+		LoggerInitializer.start();
+		logger = LoggerFactory.getLogger(Makelangelo.class);
+
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

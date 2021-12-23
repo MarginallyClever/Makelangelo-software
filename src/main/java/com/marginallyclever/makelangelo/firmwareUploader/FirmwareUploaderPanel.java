@@ -110,21 +110,16 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		return state;
 	}
 	
-	public static void main(String[] args) {
-		Log.start();
+	public static void main(String[] args) throws Exception {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			//frame.setPreferredSize(new Dimension(600, 400));
-			frame.add(new FirmwareUploaderPanel());
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
-		}
+		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frame.setPreferredSize(new Dimension(600, 400));
+		frame.add(new FirmwareUploaderPanel());
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

@@ -11,15 +11,9 @@ import org.junit.jupiter.api.Test;
 public class PaperTest {
 	@BeforeEach
 	public void beforeEach() {
-		Log.start();
 		PreferencesHelper.start();
 	}
-	
-	@AfterEach
-	public void afterEach() {
-		Log.end();
-	}
-	
+
 	/*
 	@Test
 	public void testChangeToolMessage() {
