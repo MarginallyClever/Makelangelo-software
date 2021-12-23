@@ -684,7 +684,7 @@ public final class Makelangelo {
 			        Transferable tr = dtde.getTransferable();
 			        DataFlavor[] flavors = tr.getTransferDataFlavors();
 			        for (int i = 0; i < flavors.length; i++) {
-			        	Log.message("Possible flavor: " + flavors[i].getMimeType());
+			        	logger.debug("Possible flavor: " + flavors[i].getMimeType());
 			        	if (flavors[i].isFlavorJavaFileListType()) {
 			        		dtde.acceptDrop(DnDConstants.ACTION_COPY);
 			        		Object o = tr.getTransferData(flavors[i]);
@@ -701,7 +701,7 @@ public final class Makelangelo {
 			        		}
 			        	}
 			        }
-			        Log.message("Drop failed: " + dtde);
+			        logger.debug("Drop failed: " + dtde);
 			        dtde.rejectDrop();
 			    } catch (Exception e) {
 					logger.error("Drop error", e);
