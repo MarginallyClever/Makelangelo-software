@@ -89,7 +89,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
  */
 public final class Makelangelo {
 	private static final String KEY_WINDOW_X = "windowX";
-	private static final String KEY_WINDOW_Y = "windowX";
+	private static final String KEY_WINDOW_Y = "windowY";
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 
