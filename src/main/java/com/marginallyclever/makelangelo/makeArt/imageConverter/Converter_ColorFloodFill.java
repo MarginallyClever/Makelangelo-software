@@ -208,7 +208,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 *
-	 * @param img the image to convert.
+	 * {@link #myImage} the image to convert.
 	 */
 
 	@Override
