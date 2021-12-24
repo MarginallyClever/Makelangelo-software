@@ -5,6 +5,7 @@ import java.util.prefs.Preferences;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -12,7 +13,7 @@ public class Paper implements PreviewListener {
 	private static final int DEFAULT_WIDTH=420; // mm
 	private static final int DEFAULT_HEIGHT=594; // mm
 	
-	// paper area, in mm
+	// paper border position ( from the center of the paper)
 	private double paperLeft;
 	private double paperRight;
 	private double paperBottom;
@@ -20,20 +21,29 @@ public class Paper implements PreviewListener {
 	// % from edge of paper.
 	private double paperMargin;
 	
+	// not used by renderer, ... need a coordinats reccalculation of the paper corner position and a reveiw of the render algo ?
 	private double rotation;
 	private double rotationRef;
-	private double centerX=0;
-	private double centerY=0;
+
+	// shift apply to the center of the paper
+	private double centerX=0.0d;
+	private double centerY=0.0d;
 	
 	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
 	public Paper() {
-		// paper area
+		// paper area (default values)
 		double pw = DEFAULT_WIDTH;
 		double ph = DEFAULT_HEIGHT;
-		setPaperSize(pw, ph, 0, 0);
-
+		//setPaperSize(pw, ph, 0, 0);//have a saveToPrefAtTheEndNow ... so
+		setPaperSizeNoSave(pw, ph, 0, 0);		
+		
 		paperMargin = 0.95;
+
+		// If prefs values exist this load the pref values using last setPaperSize(...) setted values as default.
+		loadConfig();
+		
+
 	}
 	
 	@Override
@@ -42,10 +52,17 @@ public class Paper implements PreviewListener {
 		renderMargin(gl2);
 	}
 	
+	/**
+	 * TODO review to use rotation ... ? but no src attached to the jar so ... ???
+	 * The trick is that concept have been mix
+	 * getPaper* getMargin* for distances from the center coordinate of the machine.
+	 * @param gl2 
+	 */
 	private void renderMargin(GL2 gl2) {
 		gl2.glLineWidth(1);
 		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
 		gl2.glBegin(GL2.GL_LINE_LOOP);
+		
 		gl2.glVertex2d(getMarginLeft(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginBottom());
@@ -53,6 +70,13 @@ public class Paper implements PreviewListener {
 		gl2.glEnd();
 	}
 
+	/**
+	 * TODO review to take in account rotation ...
+	 * The trick is that concept have been mix
+	 * this.paper* for distances from the center of the paper.
+	 * getPaper* getMargin* for distances from the center coordinate of the machine.
+	 * @param gl2 
+	 */
 	private void renderPaper(GL2 gl2) {
 		gl2.glColor3d(
 				(double)paperColor.getRed() / 255.0, 
@@ -66,40 +90,86 @@ public class Paper implements PreviewListener {
 		gl2.glEnd();
 	}
 
-	public void loadConfig() {
-		Preferences paperPreferenceNode = 
-		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
-		paperLeft = Double.parseDouble(paperPreferenceNode.get("paper_left", Double.toString(paperLeft)));
-		paperRight = Double.parseDouble(paperPreferenceNode.get("paper_right", Double.toString(paperRight)));
-		paperTop = Double.parseDouble(paperPreferenceNode.get("paper_top", Double.toString(paperTop)));
-		paperBottom = Double.parseDouble(paperPreferenceNode.get("paper_bottom", Double.toString(paperBottom)));
-		paperMargin = Double.valueOf(paperPreferenceNode.get("paper_margin", Double.toString(paperMargin)));
-		rotation = Double.parseDouble(paperPreferenceNode.get("rotation", Double.toString(rotation)));
-		rotationRef = 0;
-	}
+	/**
+	 * To keep for dev modification debug purpose.
+	 */
+	private static boolean debugPaperSave = true;
 	
+	/**
+	    for debug purpose can be modified.
+	    @return description (position left,right,top,bottom and deducted width and height) of the paper.
+	*/
+	@Override
+	public String toString() {
+	    return String.format("Paper left=%5.2f right=%5.2f top=%5.2f bottom=%5.2f (-> Width = %5.2f Height = %5.2f) centerShift(X=%5.2f Y=%5.2f) color %s", 
+	    paperLeft,paperRight,paperTop,paperBottom,getPaperWidth(),getPaperHeight()
+		    ,centerX,centerY,paperColor
+	);
+	}
+
+
+	private static final String PREF_KEY_ROTATION = "rotation";
+	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
+	private static final String PREF_KEY_PAPER_BOTTOM = "paper_bottom";
+	private static final String PREF_KEY_PAPER_TOP = "paper_top";
+	private static final String PREF_KEY_PAPER_RIGHT = "paper_right";
+	private static final String PREF_KEY_PAPER_LEFT = "paper_left";
+	private static final String PREF_KEY_PAPER_COLOR = "paper_color";
+	private static final String PREF_KEY_PAPER_CENTER_X = "paper_center_X";
+	private static final String PREF_KEY_PAPER_CENTER_Y = "paper_center_Y";
+
+	final static Preferences paperPreferenceNode
+		= PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
+
+	/** 
+	 * TODO control values consictancy ? 
+	 * TODO color hase RGB hexa string value ?
+	 */
+	public void loadConfig() {
+		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::loadConfig() befor "+this.toString());
+		paperLeft = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_LEFT, Double.toString(paperLeft)));
+		paperRight = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_RIGHT, Double.toString(paperRight)));
+		paperTop = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_TOP, Double.toString(paperTop)));
+		paperBottom = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_BOTTOM, Double.toString(paperBottom)));
+		paperMargin = Double.valueOf(paperPreferenceNode.get(PREF_KEY_PAPER_MARGIN, Double.toString(paperMargin)));
+		rotation = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_ROTATION, Double.toString(rotation)));
+		int colorFromPref = Integer.parseInt(paperPreferenceNode.get(PREF_KEY_PAPER_COLOR, Integer.toString(paperColor.toInt())));
+		paperColor = new ColorRGB(colorFromPref);
+		rotationRef = 0;
+		centerX=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_X, Double.toString(rotation)));
+		centerY=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_Y, Double.toString(rotation)));
+		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::loadConfig() after "+this.toString());
+	}
+
 	public void saveConfig() {
-		Preferences paperPreferenceNode = 
-		PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
-		paperPreferenceNode.putDouble("paper_left", paperLeft);
-		paperPreferenceNode.putDouble("paper_right", paperRight);
-		paperPreferenceNode.putDouble("paper_top", paperTop);
-		paperPreferenceNode.putDouble("paper_bottom", paperBottom);
-		paperPreferenceNode.put("paper_margin", Double.toString(paperMargin));
-		paperPreferenceNode.putDouble("rotation", rotation);
+		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::saveConfig() "+this.toString() );
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_LEFT, paperLeft);
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_RIGHT, paperRight);
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_TOP, paperTop);
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_BOTTOM, paperBottom);
+		paperPreferenceNode.put(PREF_KEY_PAPER_MARGIN, Double.toString(paperMargin));
+		paperPreferenceNode.putDouble(PREF_KEY_ROTATION, rotation);
+		paperPreferenceNode.putInt(PREF_KEY_PAPER_COLOR, paperColor.toInt());
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_X, centerX);
+		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_Y, centerY);
 	}
 
 	public void setPaperMargin(double paperMargin) {
 		this.paperMargin = paperMargin;
+		saveConfig();
 	}
 
-	public void setPaperSize(double width, double height, double shiftx, double shifty) {
+	private void setPaperSizeNoSave(double width, double height, double shiftx, double shifty) {
 		this.centerX=shiftx;
 		this.centerY=shifty;
 		this.paperLeft = -width / 2;
 		this.paperRight = width / 2;
 		this.paperTop = height / 2;
-		this.paperBottom = -height / 2;
+		this.paperBottom = -height / 2;		
+	}
+	public void setPaperSize(double width, double height, double shiftx, double shifty) {
+		   setPaperSizeNoSave(width, height, shiftx, shifty);
+		saveConfig();
 	}
 
 	public Rectangle2D.Double getMarginRectangle() {
@@ -119,6 +189,7 @@ public class Paper implements PreviewListener {
 	// TODO clean up this name
 	public void setPaperColor(ColorRGB arg0) {
 		paperColor = arg0;
+		saveConfig();
 	}
 
 	public double getCenterX() {
@@ -247,10 +318,12 @@ public class Paper implements PreviewListener {
 
 	public void setRotation(double rot) {
 		this.rotation = rot;
+		saveConfig();
 	}
 
 	public void setRotationRef(double ang) {
 		this.rotationRef = ang;
+		saveConfig();
 	}
 
 	public double getRotationRef() {
