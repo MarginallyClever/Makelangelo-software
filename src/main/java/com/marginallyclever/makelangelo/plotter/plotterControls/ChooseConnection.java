@@ -1,22 +1,21 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import java.awt.Color;
-import java.awt.FlowLayout;
+import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.NetworkSessionManager;
+import com.marginallyclever.makelangelo.Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionManager;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-
 public class ChooseConnection extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
+	
 	private static final long serialVersionUID = 4773092967249064165L;
 	public static final int CONNECTION_OPENED = 1;
 	public static final int CONNECTION_CLOSED = 2;
@@ -39,11 +38,11 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onConnectAction() {
-		Log.message("ChooseConnection onConnectAction()");
+		logger.debug("ChooseConnection onConnectAction()");
 		if(mySession!=null) {
 			onClose();
 		} else {
-			Log.message("NetworkSessionManager.requestNewSession");
+			logger.debug("NetworkSessionManager.requestNewSession");
 			NetworkSession s = NetworkSessionManager.requestNewSession(this);
 			if(s!=null) {
 				onOpen(s);
@@ -53,7 +52,7 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onClose() {
-		Log.message("ChooseConnection closed.");
+		logger.debug("ChooseConnection closed.");
 		if(mySession!=null) {
 			mySession.closeConnection();
 			mySession=null;
@@ -65,7 +64,7 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onOpen(NetworkSession s) {
-		Log.message("ChooseConnection open to "+s.getName());
+		logger.debug("ChooseConnection open to "+s.getName());
 
 		mySession = s;
 		mySession.addListener((e)->{

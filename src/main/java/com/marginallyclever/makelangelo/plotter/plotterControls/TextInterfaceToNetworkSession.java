@@ -1,21 +1,17 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
 	/**

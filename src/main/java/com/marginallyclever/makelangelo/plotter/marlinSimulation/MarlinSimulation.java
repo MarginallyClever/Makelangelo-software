@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import javax.vecmath.Vector3d;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.vecmath.Vector3d;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -17,6 +17,9 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
  * @since 7.24.0
  */
 public class MarlinSimulation {
+
+	private static final Logger logger = LoggerFactory.getLogger(MarlinSimulation.class);
+	
 	public static final int BLOCK_BUFFER_SIZE = 16;
 	public static final long DEFAULT_MINSEGMENTTIME = 20000;  // us
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
@@ -129,7 +132,7 @@ public class MarlinSimulation {
 		Vector3d temp = new Vector3d();
 		temp.scale(fraction,seg.delta);
 		poseNow.add(temp,seg.start);
-		if(verbose) Log.message(poseNow+" ");
+		if(verbose) logger.debug(poseNow+" ");
 	}*/
 
 	/**
@@ -561,7 +564,7 @@ public class MarlinSimulation {
 		block.decelerateAfterT = block.end_s - decelerateT;
 		
 		if(Double.isNaN(block.end_s)) {
-			Log.message("recalculateTrapezoidSegment() Uh oh");
+			logger.debug("recalculateTrapezoidSegment() Uh oh");
 		}
 	}
 	

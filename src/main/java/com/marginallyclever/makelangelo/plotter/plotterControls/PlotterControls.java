@@ -1,23 +1,15 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 public class PlotterControls extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -59,9 +51,9 @@ public class PlotterControls extends JPanel {
 
 		marlinInterface.addListener((e) -> {
 			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE)) {
-				// Log.message("PlotterControls heard idle");
+				// logger.debug("PlotterControls heard idle");
 				if (isRunning) {
-					// Log.message("PlotterControls is running");
+					// logger.debug("PlotterControls is running");
 					step();
 				}
 			}

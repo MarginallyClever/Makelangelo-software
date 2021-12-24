@@ -1,18 +1,10 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
-
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
+
+import javax.swing.*;
+import java.awt.*;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {
