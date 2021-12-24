@@ -1,14 +1,19 @@
 package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
-import javax.swing.JOptionPane;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 
 public class LanguagePreferences {
+
+	private static final Logger logger = LoggerFactory.getLogger(LanguagePreferences.class);
+	
 	static private SelectPanel panel;
 	static private String[] languageList;
 	static private SelectOneOfMany languageOptions;
@@ -28,7 +33,7 @@ public class LanguagePreferences {
 	}
 	
 	static public void save() {
-		Log.message("Changing to language "+languageList[languageOptions.getSelectedIndex()]);
+		logger.debug("Changing to language "+languageList[languageOptions.getSelectedIndex()]);
 		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
 		Translator.saveConfig();
 	}
