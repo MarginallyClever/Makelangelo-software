@@ -9,6 +9,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
@@ -159,7 +160,7 @@ public class PlotterControls extends JPanel {
 
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
-		ArrayList<TurtleMove> history = myTurtle.history;
+		List<TurtleMove> history = myTurtle.history;
 		int total = history.size();
 		int x = startAtLine;
 		if (x >= total)

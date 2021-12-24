@@ -5,7 +5,6 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JFrame;
 
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectColor;
@@ -14,8 +13,13 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PaperSettings extends SelectPanel {
+
+	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
+	
 	private static final long serialVersionUID = 2824594482225714527L;
 
 	private static PaperSize commonPaperSizes [] = {
@@ -96,39 +100,39 @@ public class PaperSettings extends SelectPanel {
 	}
 	
 	private void onPaperDimensionsChange(PropertyChangeEvent e) {
-		Log.message("onPaperDimensionsChange()");
+		logger.debug("onPaperDimensionsChange()");
 		double w=getPaperWidthFromPanel();
 		double h=getPaperHeightFromPanel();
 
 		int i = getCurrentPaperSizeChoice( h, w );
 		if(i!=0) {
-			Log.message("landscape "+i+" found");
+			logger.debug("landscape {} found", i);
 			isLandscape.setSelected(true);
 		} else {
 			i = getCurrentPaperSizeChoice( w, h );
 			if(i!=0) {
-				Log.message("portrait "+i+" found");			
+				logger.debug("portrait {} found", i);
 				isLandscape.setSelected(false);
 			}
 		}
 		if(paperSizes.getSelectedIndex()!=i) paperSizes.setSelectedIndex(i);
-		Log.message("onPaperDimensionsChange() done");
+		logger.debug("onPaperDimensionsChange() done");
 	}
 
 	private void onLandscapeChange(PropertyChangeEvent e) {
-		Log.message("onLandscapeChange()");
+		logger.debug("onLandscapeChange()");
 		double w = pw.getValue();
 		double h = ph.getValue();
 		pw.setValue(h);
 		ph.setValue(w);
-		Log.message("onLandscapeChange() done");
+		logger.debug("onLandscapeChange() done");
 	}
 
 	private void onPaperSizeChange(PropertyChangeEvent e) {
-		Log.message("onPaperSizeChange()");
+		logger.debug("onPaperSizeChange()");
 		final int selectedIndex = paperSizes.getSelectedIndex();
 		if(selectedIndex != 0) {
-			Log.message("found index "+selectedIndex);
+			logger.debug("found index "+selectedIndex);
 			PaperSize s = commonPaperSizes[selectedIndex-1];
 			double w = s.width;
 			double h = s.height;
@@ -149,7 +153,7 @@ public class PaperSettings extends SelectPanel {
 			}
 			if(isDirty)	setPaperFromPanel();
 		}
-		Log.message("onPaperSizeChange() done");
+		logger.debug("onPaperSizeChange() done");
 	}
 	
 	/**
@@ -159,8 +163,8 @@ public class PaperSettings extends SelectPanel {
 		double w=0;
 		try {
 			w = ((Number)pw.getValue()).doubleValue();
-		} catch(Exception err) {
-			Log.error(err.getMessage());
+		} catch(Exception e) {
+			logger.error("Failed to get paper width", e);
 		}
 		return w;
 	}
@@ -172,8 +176,8 @@ public class PaperSettings extends SelectPanel {
 		double h=0;
 		try {
 			h = ((Number)ph.getValue()).doubleValue();
-		} catch(Exception err) {
-			Log.error(err.getMessage());
+		} catch(Exception e) {
+			logger.error("Failed to get paper height", e);
 		}
 		return h;
 	}
@@ -182,7 +186,7 @@ public class PaperSettings extends SelectPanel {
 	 * Apply this panel values to {@code myPaper}
 	 */
 	private void setPaperFromPanel() {
-		Log.message("updatePaperFromPanel()");
+		logger.debug("updatePaperFromPanel()");
 		double w = ((Number)pw.getValue()).doubleValue();
 		double h = ((Number)ph.getValue()).doubleValue();
 		double sx = ((Number)shiftX.getValue()).doubleValue();
