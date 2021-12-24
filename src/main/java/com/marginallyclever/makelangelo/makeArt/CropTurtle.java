@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeArt;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;
@@ -14,7 +15,7 @@ public class CropTurtle {
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
 		Log.message("crop start @ "+turtle.history.size());
 
-		ArrayList<TurtleMove> oldHistory = turtle.history;
+		List<TurtleMove> oldHistory = turtle.history;
 		turtle.history = new ArrayList<TurtleMove>();
 		
 		// limits we will need for rectangle
