@@ -82,10 +82,9 @@ public class PaperSettings extends SelectPanel {
 		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),getPanel()));
 		finish();
 
-		getValuesFromPaper();// the paper load this value from the pref when instancied.
+		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
+		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
-		onPaperDimensionsChange(null);//to set the SelectOneOfMany paperSizes to the correcte value
-		//onPaperSizeChange(null); //now the set the landscape ?
 		paperSizes.addPropertyChangeListener((e)->onPaperSizeChange(e));
 		pw.addPropertyChangeListener((e)->onPaperDimensionsChange(e));
 		ph.addPropertyChangeListener((e)->onPaperDimensionsChange(e));

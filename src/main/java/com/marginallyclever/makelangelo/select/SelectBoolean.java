@@ -42,19 +42,22 @@ public class SelectBoolean extends Select {
 
 	/**
 	 * This is to discuss ... 
-	 * Maybe on some JRE this have to be done but for my a doClick() will make an infinit events call loop.
+	 * Maybe on some JRE this have to be done.
+	 * But for the implementation i have done,
+	 * a doClick() will make an infinit events call loop.
 	 * 
 	 */
-	boolean debugPPAC37_OnStrangeSystemeSwingEventNotTaken = false;
+	static boolean DEV_IF_NO_PPAC_CHANGE_DO_CLICK_CREATE_A_LOOP = true;
 	
 	public void setSelected(boolean b) {	    
-	    if ( debugPPAC37_OnStrangeSystemeSwingEventNotTaken ){
+	    if ( !DEV_IF_NO_PPAC_CHANGE_DO_CLICK_CREATE_A_LOOP ){
 		// calling setSelected() does not fire the itemListener, which means the observer would not fire.
 		if(field.isSelected()!=b) {
 			// causes the observer to fire.
 			field.doClick();//PPAC37 this cause my some events inifint loop for Papper Setting ( check box and open the comboBox = loop !!!!! 
 		}
 	    }else{
+		//This work for me ... 
 		field.setSelected(b);
 	    }
 	}
