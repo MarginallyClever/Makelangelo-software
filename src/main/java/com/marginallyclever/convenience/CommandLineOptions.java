@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience;
 
-import com.marginallyclever.convenience.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Store command line options for use in the app
@@ -8,20 +9,23 @@ import com.marginallyclever.convenience.log.Log;
  *
  */
 public class CommandLineOptions {
+
+	private static final Logger logger = LoggerFactory.getLogger(CommandLineOptions.class);
 	protected static String [] args;
 	
 	static public void setFromMain(String [] args) {
 		CommandLineOptions.args = args;
 
-		for(int i=0;i<args.length;++i) {
-			String msg = "START OPTION "+args[i];
-			Log.message(msg);
+		if (logger.isDebugEnabled()) {
+			for (String arg : args) {
+				logger.debug("START OPTION {}", arg);
+			}
 		}
 	}
 	
 	static public boolean hasOption(String option) {
-		for(int i=0;i<args.length;++i) {
-			if(args[i].equals(option)) {
+		for (String arg : args) {
+			if (arg.equals(option)) {
 				return true;
 			}
 		}

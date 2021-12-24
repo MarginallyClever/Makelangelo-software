@@ -5,8 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,42 +44,6 @@ public class LoggerInitializer {
         logger.info(PROGRAM_END_STRING);
     }
 
-    /**
-     * https://stackoverflow.com/a/7322581
-     * @param file file to read
-     * @return the last line in the file
-     */
-    public static String tail( File file ) {
-        try (RandomAccessFile fileHandler = new RandomAccessFile( file, "r" )) {
-            long fileLength = fileHandler.length() - 1;
-            StringBuilder sb = new StringBuilder();
-
-            for(long filePointer = fileLength; filePointer != -1; filePointer--) {
-                fileHandler.seek( filePointer );
-                int readByte = fileHandler.readByte();
-
-                if( readByte == 0xA ) {  // 10, line feed, '\n'
-                    if( filePointer == fileLength ) {
-                        continue;
-                    }
-                    break;
-                } else if( readByte == 0xD ) {  // 13, carriage-return '\r'
-                    if( filePointer == fileLength - 1 ) {
-                        continue;
-                    }
-                    break;
-                }
-
-                sb.append( ( char ) readByte );
-            }
-
-            return sb.reverse().toString();
-        } catch(IOException e ) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     public static File getLogLocation() {
         return new File(FileAccess.getUserDirectory(), LOG_FILE_NAME_TXT);
     }
@@ -90,7 +52,7 @@ public class LoggerInitializer {
         File oldLogFile = getLogLocation();
         if( oldLogFile.exists() ) {
             // read last line of file
-            String ending = tail(oldLogFile);
+            String ending = FileAccess.tail(oldLogFile);
             return !ending.contains(PROGRAM_END_STRING);
         }
         return false;
