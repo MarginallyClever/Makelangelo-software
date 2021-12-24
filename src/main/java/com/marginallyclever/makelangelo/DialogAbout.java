@@ -1,23 +1,20 @@
 package com.marginallyclever.makelangelo;
 
-import java.awt.Component;
-import java.awt.Desktop;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.JTextComponent;
-
-import org.apache.commons.io.IOUtils;
-
-import com.marginallyclever.convenience.log.Log;
-
-public class DialogAbout {	
+public class DialogAbout {
+	private static final Logger logger = LoggerFactory.getLogger(DialogAbout.class);	
 	/**
 	 * @return byte array containing data for image icon.
 	 */
@@ -27,7 +24,7 @@ public class DialogAbout {
 			final byte[] imageData = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(iconResourceName));
 			icon = new ImageIcon(imageData);
 		} catch (NullPointerException | IOException e) {
-			Log.error("Error getting image icon: " + e);
+			logger.warn("Error getting image icon {}", iconResourceName, e);
 		}
 		return icon;
 	}

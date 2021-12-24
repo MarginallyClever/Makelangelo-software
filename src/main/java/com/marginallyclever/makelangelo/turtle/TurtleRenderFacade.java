@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
