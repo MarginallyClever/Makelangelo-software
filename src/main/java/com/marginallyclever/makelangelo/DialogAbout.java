@@ -14,7 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class DialogAbout {
-	private static final Logger logger = LoggerFactory.getLogger(DialogAbout.class);	
+	private static final Logger logger = LoggerFactory.getLogger(DialogAbout.class);
 	/**
 	 * @return byte array containing data for image icon.
 	 */

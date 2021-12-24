@@ -1,35 +1,21 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.Writer;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * LoadAndSaveSB3 loads limited set of Scratch commands into memory. 
@@ -41,6 +27,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 @SuppressWarnings(value = { "unused" }) // TODO until this is finished
 
 public class LoadScratch3 implements TurtleLoader {
+	private static final Logger logger = LoggerFactory.getLogger(LoadScratch3.class);
 	private final String PROJECT_JSON = "project.json";
 	
 	private class ScratchVariable {
@@ -88,12 +75,12 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		Log.message(Translator.get("FileTypeSB3")+"...");
+		logger.debug(Translator.get("FileTypeSB3")+"...");
 		// reset the turtle object
 		myTurtle = new Turtle();
 		
 		// open zip file
-    	Log.message("Searching for project.json...");
+    	logger.debug("Searching for project.json...");
     	
 		ZipInputStream zipInputStream = new ZipInputStream(in);
 		
@@ -103,7 +90,7 @@ public class LoadScratch3 implements TurtleLoader {
 		boolean found=false;
 		while((entry = zipInputStream.getNextEntry())!=null) {
 	        if( entry.getName().equals(PROJECT_JSON) ) {
-	        	Log.message("Found project.json...");
+	        	logger.debug("Found project.json...");
 	        	
 		        // read buffered stream into temp file.
 	        	tempZipFile = File.createTempFile("project", "json");
@@ -127,7 +114,7 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 		
 		// parse JSON
-        Log.message("Parsing JSON file...");
+        logger.debug("Parsing JSON file...");
 
         JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
         JSONObject tree = new JSONObject(tokener);
@@ -149,7 +136,7 @@ public class LoadScratch3 implements TurtleLoader {
 		// read the sketch(es)
 		JSONArray children = (JSONArray)tree.get("children");
 		if(children==null) throw new Exception("JSON node 'children' missing.");
-		//Log.message("found children");
+		//logger.debug("found children");
 		
 		// look for the first child with a script
 		Iterator<?> childIter = children.iterator();
@@ -163,8 +150,8 @@ public class LoadScratch3 implements TurtleLoader {
 		
 		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
-		Log.message("found  " +scripts.length() + " scripts");
-		Log.message("finished scripts");
+		logger.debug("found {} scripts", scripts.length());
+		logger.debug("finished scripts");
 
 		return myTurtle;
 	}
@@ -184,7 +171,7 @@ public class LoadScratch3 implements TurtleLoader {
 			if( (Boolean)targetN.get("isStage") == true ) continue;
 			blocks = (JSONObject)targetN.get("blocks");
 			// we found the blocks.
-			Log.message("found  " +blocks.length() + " blocks");
+			logger.debug("found {} blocks", blocks.length());
 			// get the keys, too.
 			blockKeys = blocks.keySet();
 			// find the first block, which should be the only toplevel block.
@@ -194,9 +181,9 @@ public class LoadScratch3 implements TurtleLoader {
 				String opcode = (String)block.get("opcode");
 				if(topLevel && opcode.equals("event_whenflagclicked")) {
 					// found!
-					Log.message("**START**");
+					logger.debug("**START**");
 					parseScratchCode(k);
-					Log.message("**END**");
+					logger.debug("**END**");
 				}
 			}
 		}
@@ -232,35 +219,35 @@ public class LoadScratch3 implements TurtleLoader {
 				
 			// C BLOCKS START
 			case "control_repeat":
-				Log.message("REPEAT");
+				logger.debug("REPEAT");
 				inputs = (JSONObject)currentBlock.get("inputs");
 				condition =(JSONArray)inputs.get("TIMES");
 				substack = (JSONArray)inputs.get("SUBSTACK");
 				break;
 			case "control_repeat_until":
-				Log.message("REPEAT UNTIL");
+				logger.debug("REPEAT UNTIL");
 				inputs = (JSONObject)currentBlock.get("inputs");
 				condition =(JSONArray)inputs.get("CONDITION");
 				substack = (JSONArray)inputs.get("SUBSTACK");
 				break;
 			case "control_forever":
-				Log.message("FOREVER");
+				logger.debug("FOREVER");
 				inputs = (JSONObject)currentBlock.get("inputs");
 				substack = (JSONArray)inputs.get("SUBSTACK");
 				break;
 			case "control_if":
-				Log.message("IF");
+				logger.debug("IF");
 				inputs = (JSONObject)currentBlock.get("inputs");
 				condition =(JSONArray)inputs.get("CONDITION");
 				substack = (JSONArray)inputs.get("SUBSTACK");
 				break;
 			case "control_if_else":
-				Log.message("IF");
+				logger.debug("IF");
 				inputs = (JSONObject)currentBlock.get("inputs");
 				condition =(JSONArray)inputs.get("CONDITION");
 				substack = (JSONArray)inputs.get("SUBSTACK");
 				substack = (JSONArray)inputs.get("SUBSTACK2");
-				Log.message("IF ELSE");
+				logger.debug("IF ELSE");
 				break;
 			// C BLOCKS END
 			
@@ -293,7 +280,7 @@ public class LoadScratch3 implements TurtleLoader {
 				myTurtle.penUp();
 				break;
 			default:
-				Log.message("Ignored "+opcode);
+				logger.debug("Ignored {}", opcode);
 			}
 
 			currentBlock = findNextBlock(currentBlock);
@@ -347,14 +334,14 @@ public class LoadScratch3 implements TurtleLoader {
 				String name = (String)details.get(0);
 				Number value = (Number)details.get(1);
 				try {
-					Log.message("Variable "+name+" "+k+" "+value.floatValue());
+					logger.debug("Variable {} {} {}", name, k, value.floatValue());
 					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
 				} catch (Exception e) {
 					throw new Exception("Variables must be numbers.");
 				}
 			}
 		}
-		Log.message(scratchVariables.toString());
+		logger.debug(scratchVariables.toString());
 	}
 
 	/**
@@ -375,10 +362,10 @@ public class LoadScratch3 implements TurtleLoader {
 			Iterator<?> keyIter = keys.iterator();
 			while( keyIter.hasNext() ) {
 				String key = (String)keyIter.next();
-				Log.message("list key:"+key);
+				logger.debug("list key:"+key);
 				JSONArray elem = (JSONArray)listOfLists.get(key);
 				String listName = (String)elem.get(0);
-				Log.message("  list name:"+listName);
+				logger.debug("  list name:"+listName);
 				Object contents = (Object)elem.get(1);
 				ScratchList list = new ScratchList(listName);
 				// fill the list with any given contents
@@ -392,12 +379,12 @@ public class LoadScratch3 implements TurtleLoader {
 						if(varValue instanceof Number) {
 							Number num = (Number)varValue;
 							value = (float)num.doubleValue();
-							Log.message("  list float:"+value);
+							logger.debug("  list float:"+value);
 							list.contents.add(value);
 						} else if(varValue instanceof String) {
 							try {
 								value = Double.parseDouble((String)varValue);
-								Log.message("  list string:"+value);
+								logger.debug("  list string:"+value);
 								list.contents.add(value);
 							} catch (Exception e) {
 								throw new Exception("List variables must be numbers.");
@@ -433,8 +420,8 @@ public class LoadScratch3 implements TurtleLoader {
 	private void parseScratchCode(JSONArray script,Writer out) throws Exception {
 		if(script==null) return;
 		
-		//for(int j=0;j<indent;++j) Log.message("  ");
-		//Log.message("size="+script.size());
+		//for(int j=0;j<indent;++j) logger.debug("  ");
+		//logger.debug("size="+script.size());
 		//indent++;
 		
 		Iterator<?> scriptIter = script.iterator();
@@ -446,31 +433,31 @@ public class LoadScratch3 implements TurtleLoader {
 				parseScratchCode(arr,out);
 			} else {
 				String name = o.toString();
-				//for(int j=0;j<indent;++j) Log.message("  ");
-				//Log.message(i+"="+name);
+				//for(int j=0;j<indent;++j) logger.debug("  ");
+				//logger.debug(i+"="+name);
 				
 				if(name.equals("whenGreenFlag")) {
 					// gcode preamble
 	    			// reset the turtle object
 	    			myTurtle = new Turtle();
-					Log.message("**START**");
+					logger.debug("**START**");
 					continue;
 				} else if(name.equals("doRepeat")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
 					int count = (int)resolveValue(o2);
-					//Log.message("Repeat "+count+" times:");
+					//logger.debug("Repeat "+count+" times:");
 					for(int i=0;i<count;++i) {
 						parseScratchCode((JSONArray)o3,out);
 					}
 				} else if(name.equals("doUntil")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
-					//Log.message("Do Until {");
+					//logger.debug("Do Until {");
 					while(!resolveBoolean((JSONArray)o2)) {
 						parseScratchCode((JSONArray)o3,out);
 					}
-					//Log.message("}");
+					//logger.debug("}");
 				} else if(name.equals("doIf")) {
 					Object o2 = (Object)scriptIter.next();
 					Object o3 = (Object)scriptIter.next();
@@ -518,15 +505,15 @@ public class LoadScratch3 implements TurtleLoader {
 					// dwell - does nothing.
 					Object o2 = (Object)scriptIter.next();
 					double seconds = resolveValue(o2);
-					Log.message("dwell "+seconds+" seconds.");
+					logger.debug("dwell "+seconds+" seconds.");
 					continue;
 				} else if(name.equals("putPenUp")) {
 					myTurtle.penUp();
-					Log.message("pen up");
+					logger.debug("pen up");
 					continue;
 				} else if(name.equals("putPenDown")) {
 					myTurtle.penDown();
-					Log.message("pen down");
+					logger.debug("pen down");
 				} else if(name.equals("gotoX:y:")) {
 					Object o2 = (Object)scriptIter.next();
 					double x = resolveValue(o2);
@@ -534,47 +521,47 @@ public class LoadScratch3 implements TurtleLoader {
 					double y = resolveValue(o3);
 					
 					myTurtle.moveTo(x,y);
-					Log.message("Move to ("+myTurtle.getX()+","+myTurtle.getY()+")");
+					logger.debug("Move to ("+myTurtle.getX()+","+myTurtle.getY()+")");
 				} else if(name.equals("changeXposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					myTurtle.moveTo(myTurtle.getX()+v,myTurtle.getY());
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//logger.debug("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("changeYposBy:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					myTurtle.moveTo(myTurtle.getX(),myTurtle.getY()+v);
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//logger.debug("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("forward:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					myTurtle.forward(v);
-					Log.message("Move forward "+v+" mm");
+					logger.debug("Move forward "+v+" mm");
 				} else if(name.equals("turnRight:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					myTurtle.turn(-degrees);
-					Log.message("Right "+degrees+" degrees.");
+					logger.debug("Right "+degrees+" degrees.");
 				} else if(name.equals("turnLeft:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					myTurtle.turn(degrees);
-					Log.message("Left "+degrees+" degrees.");
+					logger.debug("Left "+degrees+" degrees.");
 				} else if(name.equals("xpos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					myTurtle.moveTo(v,myTurtle.getY());
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//logger.debug("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("ypos:")) {
 					Object o2 = (Object)scriptIter.next();
 					double v = resolveValue(o2);
 					myTurtle.moveTo(myTurtle.getX(),v);
-					//Log.message("Move to ("+turtle.getX()+","+turtle.getY()+")");
+					//logger.debug("Move to ("+turtle.getX()+","+turtle.getY()+")");
 				} else if(name.equals("heading:")) {
 					Object o2 = (Object)scriptIter.next();
 					double degrees = resolveValue(o2);
 					myTurtle.setAngle(degrees);
-					//Log.message("Turn to "+degrees);
+					//logger.debug("Turn to "+degrees);
 				} else if(name.equals("setVar:to:")) {
 					// set variable
 					String varName = (String)scriptIter.next();
@@ -587,7 +574,7 @@ public class LoadScratch3 implements TurtleLoader {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value = v;
-							Log.message("Set "+varName+" to "+v);
+							logger.debug("Set "+varName+" to "+v);
 							foundVar=true;
 						}
 					}
@@ -606,7 +593,7 @@ public class LoadScratch3 implements TurtleLoader {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value += v;
-							Log.message("Change "+varName+" by "+v+" to "+sv.value);
+							logger.debug("Change "+varName+" by "+v+" to "+sv.value);
 							foundVar=true;
 						}
 					}

@@ -11,11 +11,11 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SimplifyTurtle extends AbstractAction {
-	/**
-	 * 
-	 */
+	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtle.class);
 	private static final long serialVersionUID = 2930297421274921735L;
 	private Makelangelo myMakelangelo;
 	
@@ -31,22 +31,22 @@ public class SimplifyTurtle extends AbstractAction {
 	
 	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
-		Log.message("SimplifyTurtle begin @ "+os);
+		logger.debug("SimplifyTurtle begin @ {}", os);
 		
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
-		Log.message("  Converted to "+originalCount+" lines.");
+		logger.debug("  Converted to {} lines.", originalCount);
 
 		double minimumStepSize = 1e-3;
 		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,minimumStepSize); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
-		Log.message("  - "+shortCount+" shorts = "+longCount+" lines.");
+		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
 
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines,1.0);
 		int ns = t.history.size();
-		Log.message("SimplifyTurtle end @ "+ns);
+		logger.debug("SimplifyTurtle end @ {}", ns);
 		
 		return t;
 	}

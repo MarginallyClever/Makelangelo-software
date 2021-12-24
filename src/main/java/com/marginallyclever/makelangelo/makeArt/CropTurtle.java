@@ -1,19 +1,22 @@
 package com.marginallyclever.makelangelo.makeArt;
 
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.MathHelper;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-
 public class CropTurtle {
+	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
+	
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
-		Log.message("crop start @ "+turtle.history.size());
+		logger.debug("crop start @ "+turtle.history.size());
 
 		List<TurtleMove> oldHistory = turtle.history;
 		turtle.history = new ArrayList<TurtleMove>();
@@ -71,7 +74,7 @@ public class CropTurtle {
 		
 		// There may be some dumb travel moves left. (several travels in a row.)
 	
-		Log.message("crop end @ "+turtle.history.size());
+		logger.debug("crop end @ "+turtle.history.size());
 
 	}
 }

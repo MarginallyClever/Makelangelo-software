@@ -11,12 +11,15 @@ import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dan Royer
  *
  */
 public class SaveDXF implements TurtleSaver {
+	private static final Logger logger = LoggerFactory.getLogger(SaveDXF.class);
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 		
 	@Override
@@ -26,7 +29,7 @@ public class SaveDXF implements TurtleSaver {
 
 	@Override
 	public boolean save(OutputStream outputStream,Turtle turtle) throws Exception {
-		Log.message("saving...");
+		logger.debug("saving...");
 		
 		Rectangle2D.Double box = turtle.getBounds();
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
@@ -129,7 +132,7 @@ public class SaveDXF implements TurtleSaver {
 		out.write("0\nEOF\n");
 		out.flush();
 		
-		Log.message("done.");
+		logger.debug("done.");
 		return true;
 	}
 

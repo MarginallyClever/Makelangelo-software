@@ -10,12 +10,15 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
 public class SaveSVG implements TurtleSaver {
+	private static final Logger logger = LoggerFactory.getLogger(SaveSVG.class);
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	
 	@Override
@@ -28,7 +31,7 @@ public class SaveSVG implements TurtleSaver {
 	 */
 	@Override
 	public boolean save(OutputStream outputStream, Turtle turtle) throws Exception {
-		Log.message("saving...");
+		logger.debug("saving...");
 
 		Rectangle2D.Double dim= turtle.getBounds();
 		
@@ -70,7 +73,7 @@ public class SaveSVG implements TurtleSaver {
 		
 		out.write("</svg>");
 		out.flush();
-		Log.message("done.");
+		logger.debug("done.");
 		return true;
 	}
 }

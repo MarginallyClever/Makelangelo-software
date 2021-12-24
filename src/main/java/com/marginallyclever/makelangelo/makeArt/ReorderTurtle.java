@@ -12,11 +12,13 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReorderTurtle extends AbstractAction {
-	/**
-	 * 
-	 */
+
+	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtle.class);
+	
 	private static final long serialVersionUID = 3473530693924971574L;
 	private Makelangelo myMakelangelo;
 	
@@ -33,19 +35,19 @@ public class ReorderTurtle extends AbstractAction {
 	public static Turtle run(Turtle turtle) {
 		if(turtle.history.size()==0) return turtle;
 		
-		Log.message("reorder() start @ "+turtle.history.size()+" instructions.");
+		logger.debug("reorder() start @ "+turtle.history.size()+" instructions.");
 		
 		Turtle output = new Turtle();
 		output.history.clear();
 		
 		// history is made of changes, travels, and draws
 		ArrayList<Turtle> colors = turtle.splitByToolChange();
-		Log.message("reorder() layers: "+colors.size());
+		logger.debug("reorder() layers: "+colors.size());
 		for( Turtle t2 : colors ) {
 			output.add(reorderTurtle(t2));
 		}
 		
-		Log.message("reorder() end @ "+output.history.size()+" instructions.");
+		logger.debug("reorder() end @ "+output.history.size()+" instructions.");
 		return output;
 	}
 
@@ -60,12 +62,12 @@ public class ReorderTurtle extends AbstractAction {
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
 		ColorRGB c = turtle.getFirstColor();
-		Log.message("  "+c.toString()+" converted to "+originalCount+" lines.");
+		logger.debug("  "+c.toString()+" converted to "+originalCount+" lines.");
 
 		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
 		int uniqueCount = uniqueLines.size();
 		int duplicateCount = originalCount - uniqueCount;
-		Log.message("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
+		logger.debug("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
 
 		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
 		Turtle t = new Turtle(c);
@@ -74,7 +76,7 @@ public class ReorderTurtle extends AbstractAction {
 	}
 
 	private static ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
-		Log.message("  greedyReordering()");
+		logger.debug("  greedyReordering()");
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
 
@@ -111,7 +113,7 @@ public class ReorderTurtle extends AbstractAction {
 	}
 
 	private static ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
-		Log.message("  removeDuplicates()");
+		logger.debug("  removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 
 		for(LineSegment2D candidateLine : originalLines) {
