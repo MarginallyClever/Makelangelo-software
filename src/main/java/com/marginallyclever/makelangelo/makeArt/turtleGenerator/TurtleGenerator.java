@@ -16,7 +16,7 @@ public abstract class TurtleGenerator {
 	abstract public String getName();
 	
 	/**
-	 * @return true if generate succeeded.
+	 * generate
 	 */
 	abstract public void generate();
 	

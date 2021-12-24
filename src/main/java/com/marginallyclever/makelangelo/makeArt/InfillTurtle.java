@@ -23,12 +23,17 @@ public class InfillTurtle {
 		Log.message("InfillTurtle.run()");
 		// confirmTurtleIsClosedLoop(input);
 
-		ArrayList<LineSegment2D> segments = infillFromTurtle(input);
+		Turtle result = new Turtle();
 
-		Turtle t = new Turtle();
-		t.addLineSegments(segments, minimumJumpSize);
+		ArrayList<Turtle> list = input.splitByToolChange();
+		for(Turtle t : list) {
+			ArrayList<LineSegment2D> segments = infillFromTurtle(t);
+			Turtle t2 = new Turtle();
+			t2.addLineSegments(segments, minimumJumpSize);
+			result.add(t2);
+		}
 
-		return t;
+		return result;
 	}
 
 	@SuppressWarnings("unused")

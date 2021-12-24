@@ -16,7 +16,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
- * Converts a {@link BufferedImage} to {@link Turtle}
+ * Converts a {@link TransformedImage} to {@link Turtle}
  * @author Dan Royer
  */
 public abstract class ImageConverter implements PropertyChangeListener {

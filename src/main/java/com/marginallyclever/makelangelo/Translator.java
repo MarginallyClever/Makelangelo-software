@@ -66,20 +66,20 @@ public final class Translator {
 	static public boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
 		try {
-			if (doesLanguagePreferenceExist()) {  
+			if (doesLanguagePreferenceExist()) {
 
-                        // Does the language preference have a language name value 
-                        // that matches a language name value in an available language .xml file
-                        String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
-                        if ( ! languages.keySet().contains(languageNameFromPref)){
-                            Log.message("Translator::isThisTheFirstTimeLoadingLanguageFiles() Language Name \""+languageNameFromPref+"\" not available ...");
-                            
-                            // To avoid some null issues in Translator.get(String key),
-                            // lets say it's the first run (to ask the user to select a valid language name)
-                            return true;
-                        }
-                        
-				return false;
+                            // Does the language preference have a language name value 
+                            // that matches a language name value in an available language .xml file
+                            String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
+                            if (!languages.keySet().contains(languageNameFromPref)) {
+				Log.message("Translator::isThisTheFirstTimeLoadingLanguageFiles() Language Name \"" + languageNameFromPref + "\" not available ...");
+
+				// To avoid some null issues in Translator.get(String key),
+				// lets say it's the first run (to ask the user to select a valid language name)
+				return true;
+                            }
+			
+                            return false;
 			}
 		} catch (BackingStoreException e) {
 			Log.error(e.getMessage());

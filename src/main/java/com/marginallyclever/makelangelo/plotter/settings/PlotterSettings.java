@@ -18,7 +18,7 @@ import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
- * {@link Plotter} stores the raplidly changing state information (while drawing).
+ * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the raplidly changing state information (while drawing).
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {
