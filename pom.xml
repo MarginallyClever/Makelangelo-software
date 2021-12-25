@@ -352,7 +352,12 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.2.0</version>
+			<version>1.2.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.1.6</version>
 		</dependency>
 
 		<dependency>

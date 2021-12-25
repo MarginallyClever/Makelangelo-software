@@ -1,10 +1,11 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
-import java.util.Stack;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Stack;
 
 /**
  * generates a fibonacci spiral
@@ -12,6 +13,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  *
  */
 public class Generator_FibonacciSpiral extends TurtleGenerator {
+	private static final Logger logger = LoggerFactory.getLogger(Generator_FibonacciSpiral.class);
+
 	private float xMax = 70;
 	private float yMax = 70;
 	private static int order = 7; // controls complexity of curve
@@ -58,8 +61,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	public void generate() {
 		xMax = (float)(myPaper.getMarginWidth () /2.0f);
 		yMax = (float)(myPaper.getMarginHeight() /2.0f);
-		Log.message("xMax="+xMax);
-		Log.message("yMax="+yMax);
+		logger.debug("xMax={}", xMax);
+		logger.debug("yMax={}", yMax);
 		
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);
@@ -67,11 +70,11 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		// scale the fractal to fit on the page
 		// short side
 		float s1 = fibonacciSequence.peek();
-		Log.message("s1="+s1);
+		logger.debug("s1={}", s1);
 		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
 		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
-		Log.message("s2="+s2);
+		logger.debug("s2={}", s2);
 		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
 		if(scale1>scale2) scale1=scale2;
@@ -80,14 +83,14 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
-		Log.message("shortSide="+shortSide);
+		logger.debug("shortSide={}", shortSide);
 		if( xMax < yMax ) {
-			Log.message("tall thin");
+			logger.debug("tall thin");
 			// tall thin paper, top left corner
 			turtle.moveTo(shortSide,yMax);
 			turtle.turn(180);
 		} else {
-			Log.message("short wide");
+			logger.debug("short wide");
 			// short wide paper, bottom left corner
 			turtle.moveTo(-xMax,shortSide);
 			turtle.turn(-90);

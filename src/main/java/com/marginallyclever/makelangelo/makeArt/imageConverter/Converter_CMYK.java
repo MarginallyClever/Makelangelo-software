@@ -3,17 +3,19 @@ package com.marginallyclever.makelangelo.makeArt.imageConverter;
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
  */
 public class Converter_CMYK extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK.class);
 	static protected int passes=1;
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 	// Lift the pen any time the color value is > cutoff
@@ -49,10 +51,10 @@ public class Converter_CMYK extends ImageConverter {
 		// remove extra change color at the start of the turtle
 		turtle.history.clear();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
-		Log.message("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
+		logger.debug("Cyan...");			outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
+		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
 	}
 	
 	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {

@@ -1,20 +1,16 @@
 package com.marginallyclever.makelangelo.paper;
 
-import org.junit.Test;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
-
-import static org.assertj.swing.launcher.ApplicationLauncher.application;
-
-import java.awt.Frame;
-
-import static org.assertj.swing.finder.WindowFinder.findFrame;
-
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
+import org.junit.Test;
+
+import java.awt.*;
+
+import static org.assertj.swing.finder.WindowFinder.findFrame;
+import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 /**
  * {@code PaperSettings} tests
@@ -27,7 +23,6 @@ public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 
 	@Override
 	protected void onSetUp() {
-		Log.start();
 		PreferencesHelper.start();
 		Translator.start();
 		application(PaperSettings.class).start();

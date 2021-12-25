@@ -1,22 +1,15 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
 public class PlotterControls extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -58,9 +51,9 @@ public class PlotterControls extends JPanel {
 
 		marlinInterface.addListener((e) -> {
 			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE)) {
-				// Log.message("PlotterControls heard idle");
+				// logger.debug("PlotterControls heard idle");
 				if (isRunning) {
-					// Log.message("PlotterControls is running");
+					// logger.debug("PlotterControls is running");
 					step();
 				}
 			}
@@ -159,7 +152,7 @@ public class PlotterControls extends JPanel {
 
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
-		ArrayList<TurtleMove> history = myTurtle.history;
+		List<TurtleMove> history = myTurtle.history;
 		int total = history.size();
 		int x = startAtLine;
 		if (x >= total)
@@ -177,10 +170,13 @@ public class PlotterControls extends JPanel {
 		return x;
 	}
 
+	public void closeConnection() {
+		marlinInterface.closeConnection();
+	}
+
 	// TEST
 
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
@@ -192,7 +188,4 @@ public class PlotterControls extends JPanel {
 		frame.setVisible(true);
 	}
 
-	public void closeConnection() {
-		marlinInterface.closeConnection();
-	}
 }

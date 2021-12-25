@@ -1,13 +1,14 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeEvent;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -18,6 +19,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan
  */
 public class Converter_Spiral_CMYK extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_Spiral_CMYK.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
 	@Override
@@ -55,10 +57,14 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		// remove extra change color at the start of the turtle
 		turtle.history.clear();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
+		logger.debug("Yellow...");
+		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
+		logger.debug("Cyan...");
+		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
+		logger.debug("Magenta...");
+		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
+		logger.debug("Black...");
+		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
 	}
 
 	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cx,double cy) {
@@ -108,7 +114,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {
-						e.printStackTrace();
+						logger.error("Failed to sample", e);
 					}
 
 					level = (level1-level0)*p + level0;
@@ -121,7 +127,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 			++numRings;
 		}
 
-		Log.message(numRings + " rings.");
+		logger.debug("{} rings.", numRings);
 	}
 }
 

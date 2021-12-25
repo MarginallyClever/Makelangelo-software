@@ -1,52 +1,34 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import java.awt.geom.Rectangle2D;
-import java.io.InputStream;
-import java.util.ArrayList;
+import com.marginallyclever.convenience.Bezier;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.apache.batik.anim.dom.*;
+import org.apache.batik.bridge.*;
+import org.apache.batik.dom.svg.SVGItem;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.svg.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
-
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.anim.dom.SVGGraphicsElement;
-import org.apache.batik.anim.dom.SVGOMPathElement;
-import org.apache.batik.anim.dom.SVGOMPolylineElement;
-import org.apache.batik.anim.dom.SVGOMSVGElement;
-import org.apache.batik.anim.dom.SVGPointShapeElement;
-import org.apache.batik.bridge.BridgeContext;
-import org.apache.batik.bridge.DocumentLoader;
-import org.apache.batik.bridge.GVTBuilder;
-import org.apache.batik.bridge.UserAgent;
-import org.apache.batik.bridge.UserAgentAdapter;
-import org.apache.batik.dom.svg.SVGItem;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGMatrix;
-import org.w3c.dom.svg.SVGPathSeg;
-import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
-import org.w3c.dom.svg.SVGPathSegLinetoAbs;
-import org.w3c.dom.svg.SVGPathSegLinetoRel;
-import org.w3c.dom.svg.SVGPathSegList;
-import org.w3c.dom.svg.SVGPathSegMovetoAbs;
-import org.w3c.dom.svg.SVGPathSegMovetoRel;
-import org.w3c.dom.svg.SVGPoint;
-import org.w3c.dom.svg.SVGPointList;
-
-import com.marginallyclever.convenience.Bezier;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import java.awt.geom.Rectangle2D;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * @author Dan Royer
  * See https://www.w3.org/TR/SVG/paths.html
  */
 public class LoadSVG implements TurtleLoader {
+	private static final Logger logger = LoggerFactory.getLogger(LoadSVG.class);
+	
 	private static final String LABEL_STROKE="stroke:";
 	
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
@@ -65,7 +47,7 @@ public class LoadSVG implements TurtleLoader {
 
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		Log.message("Loading...");
+		logger.debug("Loading...");
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
@@ -84,19 +66,19 @@ public class LoadSVG implements TurtleLoader {
 	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		Log.message("...parse path");
+		logger.debug("...parse path");
 		parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		Log.message("...parse polylines");
+		logger.debug("...parse polylines");
 		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		Log.message("...parse polygons");
+		logger.debug("...parse polygons");
 		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		Log.message("...parse lines");
+		logger.debug("...parse lines");
 		parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		Log.message("...parse rects");
+		logger.debug("...parse rects");
 		parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		Log.message("...parse circles");
+		logger.debug("...parse circles");
 		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		Log.message("...parse ellipses");
+		logger.debug("...parse ellipses");
 		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
 	}
 	
@@ -117,7 +99,7 @@ public class LoadSVG implements TurtleLoader {
 
 	    	SVGPointList pointList = element.getAnimatedPoints();
 	    	int numPoints = pointList.getNumberOfItems();
-			//Log.message("New Node has "+pathObjects+" elements.");
+			//logger.debug("New Node has "+pathObjects+" elements.");
 
 			SVGPoint item = (SVGPoint)pointList.getItem(0);
 			v2 = transform(item.getX(),item.getY(),m);
@@ -267,7 +249,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d v2;
 
 	    int pathNodeCount = node.getLength();
-	    Log.message(pathNodeCount+" circles.");
+	    logger.debug("{} circles.", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element)) 
@@ -285,7 +267,7 @@ public class LoadSVG implements TurtleLoader {
 			double circ = Math.PI * 2.0 * r;
 			circ = Math.ceil(Math.min(Math.max(3,circ),360));
 			
-		    Log.message("circ="+circ);
+		    logger.debug("circ={}", circ);
 			for(double i=1;i<circ;++i) {
 				double v = (Math.PI*2.0) * (i/circ);
 				double s=r*Math.sin(v);
@@ -343,7 +325,7 @@ public class LoadSVG implements TurtleLoader {
 	    int pathCount = paths.getLength();
 	    for( int iPath = 0; iPath < pathCount; iPath++ ) {
 	    	if(paths.item( iPath ).getClass() == SVGOMPolylineElement.class) {
-	    		Log.message("Node is a polyline.");
+	    		logger.debug("Node is a polyline.");
 	    		parsePolylineElements(paths);
 	    		continue;
 	    	}
@@ -357,17 +339,17 @@ public class LoadSVG implements TurtleLoader {
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
 	    	//SVGPathSegList pathList = element.getPathSegList();
 	    	int itemCount = pathList.getNumberOfItems();
-	    	Log.message("Node has "+itemCount+" elements.");
+	    	logger.debug("Node has {} elements.", itemCount);
 	    	int sinceClosePath=0;
 	    	
 			for(int i=0; i<itemCount; i++) {
 				++sinceClosePath;
 				SVGPathSeg item = pathList.getItem(i);
-				Log.message("segType="+item.getClass().getSimpleName());
+				logger.debug("segType={}", item.getClass().getSimpleName());
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // Z z
 					{
-						Log.message("Close path");
+						logger.debug("Close path");
 						v = transform(firstX,firstY,m);
 						myTurtle.moveTo(v.x,v.y);
 						sinceClosePath=0;
@@ -376,7 +358,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
 					{
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						Log.message("Move Abs x"+path.getX()+" y"+path.getY());
+						logger.debug("Move Abs x{} y{}", path.getX(), path.getY());
 						px = path.getX();
 						py = path.getY();
 						if(sinceClosePath==1) {
@@ -390,7 +372,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // m
 					{
 						SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
-						Log.message("Move Rel x"+path.getX()+" y"+path.getY());
+						logger.debug("Move Rel x{} y{}", path.getX(), path.getY());
 						px += path.getX();
 						py += path.getY();
 						if(sinceClosePath==1) {
@@ -404,7 +386,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // L H V
 					{
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						Log.message("Line Abs x"+path.getX()+" y"+path.getY());
+						logger.debug("Line Abs x{} y{}", path.getX(), path.getY());
 						px = path.getX();
 						py = path.getY();
 						v = transform(px,py,m);
@@ -414,7 +396,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // l h v
 					{
 						SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
-						Log.message("Line Rel x"+path.getX()+" y"+path.getY());
+						logger.debug("Line Rel x{} y{}", path.getX(), path.getY());
 						px += path.getX();
 						py += path.getY();
 						v = transform(px,py,m);
@@ -424,9 +406,9 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // C c
 					{
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
-						Log.message("Curve Cubic Abs x"+path.getX() +"  y"+path.getY() );
-						Log.message("               1x"+path.getX1()+" 1y"+path.getY1());
-						Log.message("               2x"+path.getX2()+" 2y"+path.getY2());
+						logger.debug("Curve Cubic Abs x{}  y{}", path.getX(), path.getY());
+						logger.debug("               1x{} 1y{}", path.getX1(), path.getY1());
+						logger.debug("               2x{} 2y{}", path.getX2(), path.getY2());
 
 						// x0,y0 is the first point
 						double x0=px;
@@ -453,7 +435,7 @@ public class LoadSVG implements TurtleLoader {
 				default:
 					{
 						String m2="Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString();
-						Log.message(m2);
+						logger.debug(m2);
 						throw new Exception(m2);
 					}
 				}

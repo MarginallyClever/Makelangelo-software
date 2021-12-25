@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience;
 
-import com.marginallyclever.convenience.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -13,6 +14,8 @@ import java.security.InvalidParameterException;
  * @since 7.1.4-SNAPSHOT?
  */
 public class Histogram {
+	private static final Logger logger = LoggerFactory.getLogger(Histogram.class);
+	
 	public char[] red = new char[256];
 	public char[] green = new char[256];
 	public char[] blue = new char[256];
@@ -88,7 +91,7 @@ public class Histogram {
 			if(sum>=costPerLevel) {
 				levels[j++]=i;
 				sum-=costPerLevel;
-				Log.message("Level @ " + i);
+				logger.debug("Level @ {}", i);
 			}
 		}
 		
@@ -110,7 +113,7 @@ public class Histogram {
 		for(int i=0;i<256;++i) {
 			totalWeight+=red[i];
 		}
-		Log.message("Total weight="+totalWeight);
+		logger.debug("Total weight={}", totalWeight);
 		
 		double[] levels = new double[input.length];
 
@@ -125,7 +128,7 @@ public class Histogram {
 			}
 			i = Math.min(i,255);
 			levels[j]=i;
-			Log.message("Level "+input[j]+" ("+(input[j]*100.0)+") -> "+weightScaled+" = " + i);
+			logger.debug("Level {} ({}) -> {} = {}", input[j], (input[j]*100.0), weightScaled, i);
 		}
 		
 		return levels;

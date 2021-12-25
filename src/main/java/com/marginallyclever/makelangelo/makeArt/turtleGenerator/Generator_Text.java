@@ -16,9 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Your message here.  understands font families, styles, sizes, and alignment
@@ -26,6 +27,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  *
  */
 public class Generator_Text extends TurtleGenerator {
+	private static final Logger logger = LoggerFactory.getLogger(Generator_Text.class);
+	
 	// text properties
 	private float kerning = 5.0f;
 	private float letterWidth = 10.0f;
@@ -144,7 +147,7 @@ public class Generator_Text extends TurtleGenerator {
 		}
 		
 		String[] messagePieces=message.split("\n");
-		Log.message("lines of text="+messagePieces.length);
+		logger.debug("lines of text={}", messagePieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);
@@ -205,20 +208,20 @@ public class Generator_Text extends TurtleGenerator {
 			int type = pi.currentSegment(coords);
 			switch(type) {
 			case PathIterator.SEG_CLOSE:
-				//Log.message("CLOSE");
+				//logger.debug("CLOSE");
 				turtle.moveTo(start[0]-dx, -start[1]-dy);
 				turtle.penUp();
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
-				//Log.message("LINE");
+				//logger.debug("LINE");
 				turtle.moveTo(coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_MOVETO:
-				//Log.message("MOVE");
+				//logger.debug("MOVE");
 				// move without drawing
 				start[0] = coords2[0] = coords[0];
 				start[1] = coords2[1] = coords[1];
@@ -236,7 +239,7 @@ public class Generator_Text extends TurtleGenerator {
 				// B(3,1) = 3 * t * (1 - t)^2
 				// B(3,2) = 3 * t^2 * (1 - t)
 				// B(3,3) = t^3
-				//Log.message("CUBIC");
+				//logger.debug("CUBIC");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					float t1 = (1.0f-t);
@@ -253,7 +256,7 @@ public class Generator_Text extends TurtleGenerator {
 				coords2[1] = coords[5];
 				break;
 			case PathIterator.SEG_QUADTO:
-				//Log.message("QUAD");
+				//logger.debug("QUAD");
 				for(i=0;i<n;++i) {
 					float t = i/n;
 					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
@@ -304,13 +307,13 @@ public class Generator_Text extends TurtleGenerator {
 
 	public void textSetCharsPerLine(int numChars) {
 		charsPerLine = numChars;
-		//Log.message("MAX="+numChars);
+		//logger.debug("MAX="+numChars);
 	}
 
 
 	public void textFindCharsPerLine(double width) {
 		charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letterWidth + kerning));
-		//Log.message("MAX="+chars_per_line);
+		//logger.debug("MAX="+chars_per_line);
 	}
 
 
@@ -358,10 +361,10 @@ public class Generator_Text extends TurtleGenerator {
 			break;
 		}
 		/*
-	    Log.message(num_lines + " lines");
-	    Log.message("longest "+len+" chars");
-	    Log.message("x "+xmin+" to "+xmax);
-	    Log.message("y "+ymin+" to "+ymax);
+	    logger.debug("{} lines", num_lines);
+	    logger.debug("longest {} chars", len);
+	    logger.debug("x {} to {}", xmin, xmax);
+	    logger.debug("y {} to {}", ymin, ymax);
 		 */
 		Rectangle2D r = new Rectangle2D.Float();
 		r.setRect(xmin, ymin, xmax - xmin, ymax - ymin);
@@ -455,7 +458,7 @@ public class Generator_Text extends TurtleGenerator {
 	private void textDrawLine(Turtle turtle,String a1) {
 		String ud = ALPHABET_FOLDER;
 
-		Log.message( a1 +"("+ a1.length() +")" );
+		logger.debug("{} ({})", a1, a1.length());
 		
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {
@@ -548,13 +551,11 @@ public class Generator_Text extends TurtleGenerator {
 					}
 				}
 				catch(IOException e) {
-					e.printStackTrace();
+					logger.error("Failed to load font", e);
 				}
 			} else {
 				// file not found
-				Log.message("file not found. Making best guess as to where it is.");
-				Log.message(fn);
-				Log.message(" NOK");
+				logger.debug("file not found. Making best guess as to where it is. {} NOK", fn);
 			}
 		}
 	}

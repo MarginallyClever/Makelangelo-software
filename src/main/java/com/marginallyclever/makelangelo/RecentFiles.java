@@ -1,16 +1,17 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.util.PreferencesHelper;
-
 public final class RecentFiles extends JMenu {
+	private static final Logger logger = LoggerFactory.getLogger(RecentFiles.class);
+	
 	private static final long serialVersionUID = -4331360984016876093L;
 
 	public final int MAX_FILES = 10;
@@ -94,15 +95,15 @@ public final class RecentFiles extends JMenu {
 	}
 		
 	private void loadFromStorage() {
-		Log.message("loading recent files:");
+		logger.debug("loading recent files:");
 		for(int i=0;i<MAX_FILES;++i) {
 			String name = getNodeName(i);
 			String value = prefs.get(name, "");
 			if(!value.trim().isEmpty()) {
-				Log.message("..."+value);
+				logger.debug("...{}", value);
 				fileList.add(value);
 			} else {
-				Log.message("...done");
+				logger.debug("...done");
 				return;
 			}
 		}

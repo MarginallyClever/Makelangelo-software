@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangeloRobot;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
@@ -15,7 +14,6 @@ public class MakelangeloRobotPanelTest {
 
     @Test
     public void testNoMissingGeneratorPanels() {
-        Log.start();
         Translator.start();
         try {
             for (TurtleGenerator c : TurtleGeneratorFactory.available) {
@@ -24,6 +22,5 @@ public class MakelangeloRobotPanelTest {
         } catch (Exception e) {
             fail("Missing panel! " + e.getLocalizedMessage());
         }
-        Log.message("testNoMissingGeneratorPanels() complete.");
     }
 }

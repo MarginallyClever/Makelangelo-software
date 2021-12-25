@@ -1,12 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
-import java.util.ArrayList;
-
-import javax.vecmath.Vector3d;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import javax.vecmath.Vector3d;
+import java.util.ArrayList;
 
 public class MarlinSimulationVisualizer {
 	//private static int limit;

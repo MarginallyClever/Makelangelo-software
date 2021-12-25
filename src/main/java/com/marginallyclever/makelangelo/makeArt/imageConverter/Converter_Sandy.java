@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.beans.PropertyChangeEvent;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeEvent;
 
 
 /**
@@ -14,6 +15,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Converter_Sandy extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_Sandy.class);
 	private static int blockScale=150;
 	private static int direction=0;
 	private String [] directionChoices = new String[] { 
@@ -85,7 +87,7 @@ public class Converter_Sandy extends ImageConverter {
 
 		turtle = new Turtle();
 		turtle.lock();
-		Log.message("Sandy started.");
+		logger.debug("Sandy started.");
 		//Thread.dumpStack();
 		
 		try {
@@ -137,10 +139,10 @@ public class Converter_Sandy extends ImageConverter {
 				t_dir=-t_dir;
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			logger.error("Sandy failed", e);
 		} finally {
 			turtle.unlock();
-			Log.message("Sandy finished.");
+			logger.debug("Sandy finished.");
 		}
 	}
 

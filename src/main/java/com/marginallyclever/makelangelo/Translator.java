@@ -1,32 +1,23 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.convenience.FileAccess;
+import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
+import com.marginallyclever.util.PreferencesHelper;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.nio.file.*;
+import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
-import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
@@ -35,6 +26,8 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Peter Colapietro
  */
 public final class Translator {
+	private static final Logger logger = LoggerFactory.getLogger(Translator.class);
+	
 	// Working directory. This represents the directory where the java executable launched the jar from.
 	public static final String WORKING_DIRECTORY = /*File.separator + */"languages"/*+File.separator*/;
 	// The name of the preferences node containing the user's choice.
@@ -48,12 +41,12 @@ public final class Translator {
 	// a list of all languages and their translations strings
 	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
 
-	static public void start() {
-		Log.message("starting translator...");
+	public static void start() {
+		logger.debug("starting translator...");
 		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		Log.message("Default language = "+defaultLanguage);
+		logger.debug("Default language = {}", defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
@@ -63,26 +56,26 @@ public final class Translator {
 	/**
 	 * @return true if this is the first time loading language files (probably on install)
 	 */
-	static public boolean isThisTheFirstTimeLoadingLanguageFiles() {
+	public static boolean isThisTheFirstTimeLoadingLanguageFiles() {
 		// Did the language file disappear?  Offer the language dialog.
 		try {
 			if (doesLanguagePreferenceExist()) {
 
-                            // Does the language preference have a language name value 
-                            // that matches a language name value in an available language .xml file
-                            String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
-                            if (!languages.keySet().contains(languageNameFromPref)) {
-				Log.message("Translator::isThisTheFirstTimeLoadingLanguageFiles() Language Name \"" + languageNameFromPref + "\" not available ...");
+				// Does the language preference have a language name value 
+				// that matches a language name value in an available language .xml file
+				String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
+				if (!languages.containsKey(languageNameFromPref)) {
+					logger.debug("Translator::isThisTheFirstTimeLoadingLanguageFiles() Language Name '{}' not available ...", languageNameFromPref);
 
-				// To avoid some null issues in Translator.get(String key),
-				// lets say it's the first run (to ask the user to select a valid language name)
-				return true;
-                            }
-			
-                            return false;
+					// To avoid some null issues in Translator.get(String key),
+					// lets say it's the first run (to ask the user to select a valid language name)
+					return true;
+				}
+
+				return false;
 			}
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to load language", e);
 		}
 		return true;
 	}
@@ -92,38 +85,34 @@ public final class Translator {
 	 * @throws BackingStoreException
 	 */
 	static private boolean doesLanguagePreferenceExist() throws BackingStoreException {
-		if (Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY)) {
-			return true;
-		}
-		return false;
+		return Arrays.asList(languagePreferenceNode.keys()).contains(LANGUAGE_KEY);
 	}
 
 	/**
 	 * save the user's current language choice
 	 */
-	static public void saveConfig() {
-		Log.message("Translator::saveConfig()");
+	public static void saveConfig() {
+		logger.debug("Translator::saveConfig()");
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
 	/**
 	 * load the user's language choice
 	 */
-	static public void loadConfig() {
-		Log.message("Translator::loadConfig()");
-		Log.message(languagePreferenceNode.toString());
-		Log.message(LANGUAGE_KEY);
-		Log.message(defaultLanguage);
+	public static void loadConfig() {
+		logger.debug("Translator::loadConfig()");
+		logger.debug(languagePreferenceNode.toString());
+		logger.debug(LANGUAGE_KEY);
+		logger.debug(defaultLanguage);
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
-
 
 	/**
 	 * Scan folder for language files.
 	 * See http://stackoverflow.com/questions/1429172/how-do-i-list-the-files-inside-a-jar-file
 	 * @throws IllegalStateException No language files found
 	 */
-	static public void loadLanguages() {
+	public static void loadLanguages() {
 		languages.clear();
 		
 		try {
@@ -136,7 +125,7 @@ public final class Translator {
 				//if( f.isDirectory() || f.isHidden() ) continue;
 				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
 					if( name.endsWith("pom.xml") ) {
-						Log.message("pom.xml ignored.");
+						logger.debug("pom.xml ignored.");
 						continue;
 					}
 					
@@ -146,23 +135,23 @@ public final class Translator {
 			}
 			walk.close();
 			
-			//Log.message("total found: "+found);
+			//logger.debug("total found: "+found);
 	
 			if(found==0) {
 				throw new IllegalStateException("No translations found.");
 			}
 		}
 		catch(Exception e) {
-			Log.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
+			logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), defaultLanguage, WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
-			Log.message("default path requested: "+path);
+			logger.debug("default path requested: {}", path);
 			URL pathFound = Translator.class.getClassLoader().getResource(path);
-			Log.message("path found: "+pathFound);
+			logger.debug("path found: {}", pathFound);
 			try (InputStream s = pathFound.openStream()) {
 				languageContainer.loadFromInputStream(s);
 			} catch (IOException ie) {
-				Log.error(ie.getMessage());
+				logger.error(ie.getMessage());
 			}
 			languages.put(languageContainer.getName(), languageContainer);
 		}
@@ -170,7 +159,7 @@ public final class Translator {
 
 	private static Stream<Path> getLanguagePaths() throws Exception {
 		URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-		Log.message("Looking for translations in "+uri.toString());
+		logger.debug("Looking for translations in {}", uri.toString());
 		
 		Path myPath;
 		if (uri.getScheme().equals("jar")) {
@@ -181,7 +170,7 @@ public final class Translator {
 		}
 
 		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
-		Log.message("rootDir="+rootPath.toString());
+		logger.debug("rootDir={}", rootPath.toString());
 		
 		// we'll look inside the JAR file first, then look in the working directory.
 		// this way new translation files in the working directory will replace the old JAR files.
@@ -205,12 +194,12 @@ public final class Translator {
 		}
 		if( stream == null ) return false;
 		
-		Log.message("Found "+actualFilename);
+		logger.debug("Found {}", actualFilename);
 		TranslatorLanguage lang = new TranslatorLanguage();
 		try {
 			lang.loadFromInputStream(stream);
 		} catch(Exception e) {
-			Log.error("Failed to load "+actualFilename);
+			logger.error("Failed to load {}", actualFilename);
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
@@ -231,7 +220,7 @@ public final class Translator {
 	 * @param key name of key to find in translation list
 	 * @return the translated value for key, or "missing:key".
 	 */
-	static public String get(String key) {
+	public static String get(String key) {
 		return languages.get(currentLanguage).get(key);
 	}
 
@@ -242,7 +231,7 @@ public final class Translator {
 	 * @param params 
 	 * @return the translated value for key, or "missing:key".
 	 */
-	static public String get(String key,String [] params) {
+	public static String get(String key,String [] params) {
 		String modified = get(key);
 		int n=1;
 		for(String p : params) {
@@ -255,7 +244,7 @@ public final class Translator {
 	/**
 	 * @return the list of language names
 	 */
-	static public String[] getLanguageList() {
+	public static String[] getLanguageList() {
 		final String[] choices = new String[languages.keySet().size()];
 		final Object[] lang_keys = languages.keySet().toArray();
 
@@ -269,11 +258,11 @@ public final class Translator {
 	/**
 	 * @param currentLanguage the name of the language to make active.
 	 */
-	static public void setCurrentLanguage(String currentLanguage) {
+	public static void setCurrentLanguage(String currentLanguage) {
 		Translator.currentLanguage = currentLanguage;
 	}
 
-	static public int getCurrentLanguageIndex() {
+	public static int getCurrentLanguageIndex() {
 		String [] set = getLanguageList();
 		// find the current language
 		for( int i=0;i<set.length; ++i) {

@@ -1,18 +1,10 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
-
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
+
+import javax.swing.*;
+import java.awt.*;
 
 // manages the status bar at the bottom of the application window
 public class StatusBar extends JPanel {
@@ -105,7 +97,7 @@ public class StatusBar extends JPanel {
 		long remaining = total_time - t_draw_now;
 
 		mLines.setText(sofar + " / " + total + " "+StringHelper.formatDouble(100*(double)sofar/(double)total)+"%");
-		mTime.setText(Log.millisecondsToHumanReadable(t_draw_now) + " / " + Log.millisecondsToHumanReadable(remaining));
+		mTime.setText(millisecondsToHumanReadable(t_draw_now) + " / " + millisecondsToHumanReadable(remaining));
 	}
 
 	/**
@@ -119,8 +111,33 @@ public class StatusBar extends JPanel {
 		bar.setValue(0);
 
 		mLines.setText(0 + " / " + totalLines + " "+StringHelper.formatDouble(0)+"%");
-		mTime.setText("0s / "+Log.secondsToHumanReadable(seconds));
+		mTime.setText("0s / "+secondsToHumanReadable(seconds));
 	}
+
+	public static String secondsToHumanReadable(double totalTime) {
+		return millisecondsToHumanReadable((long)(totalTime*1000));
+	}
+
+	/**
+	 * Turns milliseconds into h:m:s
+	 * @param millis milliseconds
+	 * @return human-readable string
+	 */
+	public static String millisecondsToHumanReadable(long millis) {
+		long s = millis / 1000;
+		long m = s / 60;
+		long h = m / 60;
+		m %= 60;
+		s %= 60;
+
+		String elapsed = "";
+		if (h > 0) elapsed += h + "h";
+		if (h > 0 || m > 0) elapsed += m + "m";
+		elapsed += s + "s ";
+
+		return elapsed;
+	}
+
 }
 
 /**
