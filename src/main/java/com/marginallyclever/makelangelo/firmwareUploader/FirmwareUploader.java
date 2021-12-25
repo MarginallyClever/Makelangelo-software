@@ -8,10 +8,15 @@ import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 
 public class FirmwareUploader {
-	private String avrdudePath = "";
+	private String avrdudePath = "avrdude";// if this is in the path juste the cmd
 
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
@@ -47,7 +52,9 @@ public class FirmwareUploader {
 			Log.message("Trying 2 "+(p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
-				throw new Exception("Cannot find nearby avrdude.conf");
+			    // TODO to reactive the throw juste for demo purpose of process exec.
+				//throw new Exception("Cannot find nearby avrdude.conf");
+				   System.err.println("Cannot find nearby avrdude.conf ");
 			}
 		}
 		
@@ -63,7 +70,16 @@ public class FirmwareUploader {
 	    		"-b115200",
 	    		"-D","-Uflash:w:"+hexPath+":i"
 		    }; 
-	    runCommand(options);
+	    
+		//runCommand(options);
+		
+		System.out.println("(During)Commande exec result : ");
+		String ouptups = execBashCommand(options, null);
+		// For simple test :  String ouptups =  execBashCommand(new String[]{"ls"}, null);
+
+		System.out.println("");
+		System.out.println("(After)Commande exec result : is a succes = " + lastExecSucces);
+		System.out.println(ouptups);
 
 		Log.message("update finished");
 	}
@@ -120,7 +136,7 @@ public class FirmwareUploader {
 	
 	// TEST
 	
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		Log.start();
 		FirmwareUploader fu = new FirmwareUploader();
 		try {
@@ -129,4 +145,158 @@ public class FirmwareUploader {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
+
+	static boolean debugRuntimeExecPre = true;
+	static boolean lastExecSucces = false;
+
+	public static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn) {
+	    lastExecSucces = false;
+	    final StringBuffer res = new StringBuffer();
+	    res.setLength(0);
+	    if (debugRuntimeExecPre) {
+		System.out.printf("Running : ");
+		for (String arg : cmdArray) {
+		    System.out.printf("%s ", arg);
+		}
+		System.out.printf("\n");
+	    }
+	    res.append("Running : ");
+	    for (String arg : cmdArray) {
+		res.append(String.format("%s ", arg));
+	    }
+	    res.append("\n");
+
+	    try {
+		Date dStar = new Date();
+		Process process;
+		ProcessBuilder pb = new ProcessBuilder(cmdArray);
+		Map<String, String> env = pb.environment();
+		//env.put("VAR1", "myValue");
+		//env.remove("OTHERVAR");
+		//env.put("VAR2", env.get("VAR1") + "suffix");
+		//pb.directory(new File("myDir"));
+
+		pb = pb.redirectErrorStream(true);
+		//Process 
+		process = pb.start();
+
+		if (streamGobblerProcessIn == null) {
+		    // StreamGobblerReadLineBufferedSpecial 
+		    streamGobblerProcessIn = new StreamGobblerReadLineBufferedSpecial(process.getInputStream(), "out") {
+
+			@Override
+			public void readEvent(Date d, int intread) {
+    //                    System.out.printf("%s : '%c' = %d\n",d.toLocaleString(),(char)intread, intread );
+    //                    System.out.flush();
+			}
+
+			@Override
+			public void readLineEventWithCounter(Date d, int lineNum, String s) {
+			}
+
+			@Override
+			public void doFinish() {
+			    super.doFinish();
+			}
+
+			@Override
+			public void readLineEvent(Date d, String s) {
+			    System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
+			    System.out.flush();
+			    res.append(s);
+			    res.append("\n");
+			}
+		    };
+
+		} else {
+		    //streamGobblerProcessIn.setInputStream(process.getInputStream());
+		}
+
+		StreamGobblerReadLineBufferedSpecial streamGobblerProcessErr = new StreamGobblerReadLineBufferedSpecial(process.getErrorStream(), "err") {
+
+		    @Override
+		    public void doFinish() {
+			super.doFinish();
+		    }
+
+		    @Override
+		    public void readLineEvent(Date d, String s) {
+			System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
+			System.out.flush();
+			res.append(s);
+			res.append("\n");
+		    }
+
+		    @Override
+		    public void readEvent(Date d, int intread) {
+    //                    System.out.printf("%s :: '%c' = %d\n",d.toLocaleString(),(char)intread, intread );
+    //                    System.out.flush();
+		    }
+
+		    @Override
+		    public void readLineEventWithCounter(Date d, int lineNum, String s) {
+		    }
+		};
+		streamGobblerProcessErr.start();
+
+		streamGobblerProcessIn.start();
+
+		OutputStream p_out = process.getOutputStream();
+		if (p_out != null) {
+		    // p_out.write(10);
+		    if (debugRuntimeExecPre) {
+			System.out.printf("%s %s\n", "out on", p_out.getClass().getCanonicalName());
+		    }
+		    if (p_out instanceof BufferedOutputStream) {
+			BufferedOutputStream p_out_buf = (BufferedOutputStream) p_out;
+			p_out_buf.close();
+		    }
+		    p_out.flush();
+		    p_out.close();
+		} else {
+		    System.out.printf("%s\n", "out off");
+		}
+		// Pour etre certain d'avoir un StringBuilder bien remplie jusqu'au bout
+		streamGobblerProcessErr.join();
+		streamGobblerProcessIn.join();
+		// todo le cas d'un process interactif ou planté ou sans fin
+		process.waitFor();
+		int ret = process.exitValue();
+		Date dEnd = new Date();
+
+		if (ret == 0) {
+		    lastExecSucces = true;
+		}
+
+		if (debugRuntimeExecPre) {
+		    System.out.printf("Running : ", ret);
+		    for (String arg : cmdArray) {
+			System.out.printf("%s ", arg);
+		    }
+    //                System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret,dEnd.getTime() - dStar.getTime(),streamGobblerProcessIn.readCount ,streamGobblerProcessErr.readCount );
+		}
+    //            System.out.printf("#Exec exitValue = %d\n", ret);
+
+		if (debugRuntimeExecPre) {
+		    System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount);
+		}
+		res.append(String.format("exitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
+
+	    } catch (IOException | InterruptedException e) {
+		if (debugRuntimeExecPre) {
+		    System.out.printf("Running : ");
+		    for (String arg : cmdArray) {
+			System.out.printf("%s ", arg);
+		    }
+		    System.out.printf("\nexit on error = %s\n", e.getMessage());
+		}
+		res.append(e.getMessage());
+
+	    }
+	    return res.toString();
+	}
+
 }
