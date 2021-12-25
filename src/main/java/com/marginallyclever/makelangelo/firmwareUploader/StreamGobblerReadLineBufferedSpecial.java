@@ -1,7 +1,7 @@
 /*
  * StreamGobbler.java
- * Sources : http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
- * Modif : Pierre PACAUD ( lecture char/char et divers fonction pour event via surcharge )
+ * Sources (year 2012 ?) : http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
+ * Modif : PPAC37 ( lecture char/char et divers fonctions pour événements via surcharges de méthodes )
  */
 package com.marginallyclever.makelangelo.firmwareUploader;
 
@@ -13,15 +13,13 @@ import java.util.Date;
  * ligne ... TODO ? ajout timer ou delais depuis dernier event ou info diverse
  * sur flux de sortie vers process ?
  *
- * @author p317
+ * @author PPAC37
  */
-public class StreamGobblerReadLineBufferedSpecial extends //
-        //ThreadForActionEventAutoVectored
-        Thread {
+public class StreamGobblerReadLineBufferedSpecial extends Thread {
 
-    InputStream is;
-    String type;
-    OutputStream os;
+    private InputStream is;
+    private String type;
+    private OutputStream os;
     //
     boolean haveFinish = false;
     boolean timeTag = true;
@@ -56,9 +54,7 @@ public class StreamGobblerReadLineBufferedSpecial extends //
             }
 
             InputStreamReader isr = new InputStreamReader(is);
-            // BufferedReader br = new BufferedReader(isr);
-
-            // char cRead;
+	    
             int intRead;
             while ((intRead = isr.read()) != -1) {
                 readCount++;
@@ -68,30 +64,16 @@ public class StreamGobblerReadLineBufferedSpecial extends //
                 }
                 //
                 Date dNow = new Date();
-                //
+                // for line by lines events
                 if (intRead != '\n') {
                     stringBuilder.appendCodePoint(intRead);
                 } else {
                     eventAndFlushSB(dNow);
                 }
-                //
+                // for char by char events
                 readEvent(dNow, intRead);
             }
-//            String line=null;
-//            while ( !haveFinish && (line = br.readLine()) != null)
-//            {
-//                Date dNow = new Date();
-//                readLineEvent(dNow,line);
-//                if (pw != null)
-//                    pw.println(line);
-////                if ( timeTag ) {
-////                    String dateTagString = new Date().toString();
-////                    System.out.println(type +"("+dateTagString+ ")>" + line);
-////                }else{
-//              //      System.out.println(type + ">" + line);
-////                }
-//                    if ( haveFinish) return;
-//            }
+	    
             if (pw != null) {
                 pw.flush();
             }
@@ -131,7 +113,7 @@ public class StreamGobblerReadLineBufferedSpecial extends //
     }
 
     /**
-     * Lecture char par char<br/>
+     * Lecture char par char.
      * A surcharger pour avoir chaque caractéres lus (byte read)
      *
      * @param d
@@ -142,7 +124,7 @@ public class StreamGobblerReadLineBufferedSpecial extends //
     }
 
     /**
-     * Lecture ligne par ligne<br/>
+     * Lecture ligne par ligne.
      * A surcharger pour avoir chaque ligne lus ( cumul des byte read entre
      * chaque retour a la ligne '\n' lu )
      */
@@ -162,13 +144,13 @@ public class StreamGobblerReadLineBufferedSpecial extends //
     //
     //
     /**
-     * A surcharger pour avoir l'event de debut du run
+     * A surcharger pour avoir l'event de debut du run.
      */
     public void fireUpdateRunBegin() {
     }
 
     /**
-     * A surcharger pour avoir l'event de fin du run
+     * A surcharger pour avoir l'event de fin du run.
      */
     public void fireUpdateRunEnd() {
     }

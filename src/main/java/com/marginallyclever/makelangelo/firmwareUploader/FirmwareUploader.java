@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 public class FirmwareUploader {
-	private String avrdudePath = "avrdude";// if this is in the path juste the cmd
+	private String avrdudePath = "avrdude";// if this is in the path juste the cmd (linux) (for windows avrdude.exe )
 
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
@@ -73,13 +73,16 @@ public class FirmwareUploader {
 	    
 		//runCommand(options);
 		
+		//
+		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
+		//
 		System.out.println("(During)Commande exec result : ");
-		String ouptups = execBashCommand(options, null);
+		String fullExecCmdOutputsAsTexte = execBashCommand(options, null);
 		// For simple test :  String ouptups =  execBashCommand(new String[]{"ls"}, null);
 
 		System.out.println("");
 		System.out.println("(After)Commande exec result : is a succes = " + lastExecSucces);
-		System.out.println(ouptups);
+		System.out.println(fullExecCmdOutputsAsTexte);
 
 		Log.message("update finished");
 	}
@@ -146,6 +149,9 @@ public class FirmwareUploader {
 		}
 	}
 	
+	//
+	//
+	//
 	
 	public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
 
@@ -184,7 +190,6 @@ public class FirmwareUploader {
 		process = pb.start();
 
 		if (streamGobblerProcessIn == null) {
-		    // StreamGobblerReadLineBufferedSpecial 
 		    streamGobblerProcessIn = new StreamGobblerReadLineBufferedSpecial(process.getInputStream(), "out") {
 
 			@Override
@@ -240,11 +245,13 @@ public class FirmwareUploader {
 		    public void readLineEventWithCounter(Date d, int lineNum, String s) {
 		    }
 		};
+		
 		streamGobblerProcessErr.start();
 
 		streamGobblerProcessIn.start();
 
 		OutputStream p_out = process.getOutputStream();
+		
 		if (p_out != null) {
 		    // p_out.write(10);
 		    if (debugRuntimeExecPre) {
@@ -257,12 +264,18 @@ public class FirmwareUploader {
 		    p_out.flush();
 		    p_out.close();
 		} else {
-		    System.out.printf("%s\n", "out off");
+		     if (debugRuntimeExecPre) {
+			 System.out.printf("%s\n", "out off");
+		     }
 		}
 		// Pour etre certain d'avoir un StringBuilder bien remplie jusqu'au bout
+		// il faut attendre que les thread qui lisent les sorties du process se termine
 		streamGobblerProcessErr.join();
 		streamGobblerProcessIn.join();
-		// todo le cas d'un process interactif ou planté ou sans fin
+		
+		// TO REVIEW / TODO le cas d'un process interactif ou planté ou sans fin ...
+		
+		// Wait for the process to end.
 		process.waitFor();
 		int ret = process.exitValue();
 		Date dEnd = new Date();
@@ -276,10 +289,8 @@ public class FirmwareUploader {
 		    for (String arg : cmdArray) {
 			System.out.printf("%s ", arg);
 		    }
-    //                System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret,dEnd.getTime() - dStar.getTime(),streamGobblerProcessIn.readCount ,streamGobblerProcessErr.readCount );
-		}
-    //            System.out.printf("#Exec exitValue = %d\n", ret);
-
+   		}
+   
 		if (debugRuntimeExecPre) {
 		    System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount);
 		}
