@@ -101,7 +101,18 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		JOptionPane.showMessageDialog(this,status,"Firmware upload status",messageType);
 	}
 	
+	/**
+	 * TO REVIEW.
+	 * arvdude can be in the env path so no need to find it ...
+	 * @return 
+	 */
 	private boolean AVRDudeExists() {
+		FirmwareUploader.execBashCommand(new String[]{"avrdude", "--version"}, null);
+		if ( FirmwareUploader.lastExecSucces ) {
+		    return true;
+		}
+		
+	
 		File f = new File(sourceAVRDude.getText());
 		boolean state = f.exists(); 
 		if(!state) {
