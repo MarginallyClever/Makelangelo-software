@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.select.SelectTextArea;
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,28 @@ import java.util.Map;
 public class FirmwareUploader {
 	private String avrdudePath = "avrdude";// if this is in the path juste the cmd (linux) (for windows avrdude.exe )
 
+	/**
+	 * TODO TO REVIEW : if avrdude is in the path .
+	 * 
+	 * symply a Process exec "avrdude --version" that return 0 ?
+	 * 
+	 * or on mac os : ?
+	 * 
+	 * or on linux : using the whereis commande : 
+	 * 
+	 * OK : 
+	 * <code>$ whereis -b avrdude
+	 * avrdude: /usr/bin/avrdude /etc/avrdude.conf
+	 * </code>
+	 * 
+	 * Not found : 
+	 * <code>$ whereis -b avrdude
+	 * avrdude:
+	 * </code>
+	 * 
+	 * or on windows : ??? parse the path env variable and check eatch dirs in the path to maybe find it ?
+	 * 
+	 */
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
 		String name = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
@@ -42,7 +65,14 @@ public class FirmwareUploader {
 		}
 	}
 	
-	public void run(String hexPath,String portName) throws Exception {
+	/**
+	 * TO REVIEW : in some case ( avrdude correctly installed on the environment (in the path) ) ) there is no need to give the .conf file path to the avrdude command.
+	 * @param hexPath
+	 * @param portName
+	 * @throws Exception 
+	 */
+	public String run(String hexPath,String portName, SelectTextArea textAreaThatCanBeNullForPosibleLogs) throws Exception {
+	    String resRunLog = "";
 		Log.message("update started");
 		
 		Path p = Path.of(avrdudePath);
@@ -62,7 +92,7 @@ public class FirmwareUploader {
 		
 		String [] options = new String[]{
 				avrdudePath,
-	    		"-C"+confPath,
+	    		//"-C"+confPath, //TODO In some case there is no need to give the .conf file.
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
 	    		"-cwiring",
@@ -77,14 +107,15 @@ public class FirmwareUploader {
 		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
 		//
 		System.out.println("(During)Commande exec result : ");
-		String fullExecCmdOutputsAsTexte = execBashCommand(options, null);
+		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs);
 		// For simple test :  String ouptups =  execBashCommand(new String[]{"ls"}, null);
-
+		resRunLog = fullExecCmdOutputsAsTexte;
 		System.out.println("");
 		System.out.println("(After)Commande exec result : is a succes = " + lastExecSucces);
 		System.out.println(fullExecCmdOutputsAsTexte);
 
 		Log.message("update finished");
+		return resRunLog;
 	}
 
 	private void runCommand(String[] cmd) throws Exception {
@@ -143,7 +174,7 @@ public class FirmwareUploader {
 		Log.start();
 		FirmwareUploader fu = new FirmwareUploader();
 		try {
-			fu.run("./firmware.hex", "COM3");
+			fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -158,7 +189,21 @@ public class FirmwareUploader {
 	static boolean debugRuntimeExecPre = true;
 	static boolean lastExecSucces = false;
 
-	public static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn) {
+	// TODO ! a return 
+	class ExecBashCommandResult{
+	    boolean haveStart = true;
+	    boolean isFinis = false;
+	    Integer returnCode = null;
+	    String logs = "";
+	    
+	    //TODO 
+	    
+	    
+	}
+	// TO REVIEW / TODO le cas d'un process interactif ou sans fin ...
+	// TO REVEIW ( as this is a way to exec commands on the user system ... )
+	// should be a least private for security (and all methodes that using it ) ?
+	protected static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult) {
 	    lastExecSucces = false;
 	    final StringBuffer res = new StringBuffer();
 	    res.setLength(0);
@@ -179,13 +224,15 @@ public class FirmwareUploader {
 		Date dStar = new Date();
 		Process process;
 		ProcessBuilder pb = new ProcessBuilder(cmdArray);
-		Map<String, String> env = pb.environment();
+		//Map<String, String> env = pb.environment();
 		//env.put("VAR1", "myValue");
 		//env.remove("OTHERVAR");
 		//env.put("VAR2", env.get("VAR1") + "suffix");
 		//pb.directory(new File("myDir"));
 
+		// To merge err on out // TO REVIEW for specials case.
 		pb = pb.redirectErrorStream(true);
+		
 		//Process 
 		process = pb.start();
 
@@ -194,8 +241,6 @@ public class FirmwareUploader {
 
 			@Override
 			public void readEvent(Date d, int intread) {
-    //                    System.out.printf("%s : '%c' = %d\n",d.toLocaleString(),(char)intread, intread );
-    //                    System.out.flush();
 			}
 
 			@Override
@@ -209,17 +254,26 @@ public class FirmwareUploader {
 
 			@Override
 			public void readLineEvent(Date d, String s) {
+			    if ( debugRuntimeExecPre){
 			    System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
 			    System.out.flush();
+			    }
 			    res.append(s);
 			    res.append("\n");
+			    if ( execResult != null){
+				execResult.append(s+"\n");
+			    }
 			}
 		    };
 
 		} else {
+		    // This was a try for interactive command (that ask input from user ...) but not implemented here.
 		    //streamGobblerProcessIn.setInputStream(process.getInputStream());
 		}
 
+		// Normaly has the error stream is merged in out strem (see ProcessBuilder redirectErrorStream(true); )
+		// this will not be use but to keep if we dont want the merge.
+		// for the error stream.
 		StreamGobblerReadLineBufferedSpecial streamGobblerProcessErr = new StreamGobblerReadLineBufferedSpecial(process.getErrorStream(), "err") {
 
 		    @Override
@@ -229,16 +283,16 @@ public class FirmwareUploader {
 
 		    @Override
 		    public void readLineEvent(Date d, String s) {
+			if ( debugRuntimeExecPre){
 			System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
 			System.out.flush();
+			}
 			res.append(s);
 			res.append("\n");
 		    }
 
 		    @Override
 		    public void readEvent(Date d, int intread) {
-    //                    System.out.printf("%s :: '%c' = %d\n",d.toLocaleString(),(char)intread, intread );
-    //                    System.out.flush();
 		    }
 
 		    @Override
@@ -267,13 +321,15 @@ public class FirmwareUploader {
 		     if (debugRuntimeExecPre) {
 			 System.out.printf("%s\n", "out off");
 		     }
-		}
+		}		
+		
+		// TODO a timer to kill the process if it never terminate ...
+		
 		// Pour etre certain d'avoir un StringBuilder bien remplie jusqu'au bout
 		// il faut attendre que les thread qui lisent les sorties du process se termine
 		streamGobblerProcessErr.join();
 		streamGobblerProcessIn.join();
 		
-		// TO REVIEW / TODO le cas d'un process interactif ou planté ou sans fin ...
 		
 		// Wait for the process to end.
 		process.waitFor();
@@ -294,9 +350,11 @@ public class FirmwareUploader {
 		if (debugRuntimeExecPre) {
 		    System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount);
 		}
+		
 		res.append(String.format("exitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
 
 	    } catch (IOException | InterruptedException e) {
+		
 		if (debugRuntimeExecPre) {
 		    System.out.printf("Running : ");
 		    for (String arg : cmdArray) {
@@ -304,9 +362,10 @@ public class FirmwareUploader {
 		    }
 		    System.out.printf("\nexit on error = %s\n", e.getMessage());
 		}
+		
 		res.append(e.getMessage());
-
 	    }
+	    
 	    return res.toString();
 	}
 

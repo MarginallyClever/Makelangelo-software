@@ -108,4 +108,10 @@ public class SelectFile extends Select {
 	public void setFileOnly() {
 		choose.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	}
+
+    public void setFileHidingEnabled(boolean b) {
+	choose.setFileHidingEnabled(b);
+    }
+	
+	
 }

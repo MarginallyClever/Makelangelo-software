@@ -78,4 +78,14 @@ public class SelectTextArea extends Select {
 	public void setText(String str) {
 		field.setText(str);
 	}
+
+    public void append(String str) {
+	field.append(str);
+    }
+
+    public void setEditable(boolean b) {
+	field.setEditable(b);
+    }
+	
+	
 }
