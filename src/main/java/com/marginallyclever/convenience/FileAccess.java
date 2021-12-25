@@ -83,6 +83,10 @@ public class FileAccess {
         fos.close();
 	}
 
+	/**
+	 * Return the current directory
+	 * @return the current directory
+	 */
 	public static String getUserDirectory() {
 		return System.getProperty("user.dir");
 	}

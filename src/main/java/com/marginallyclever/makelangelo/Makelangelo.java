@@ -44,8 +44,8 @@ import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.convenience.log.LoggerInitializer;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
@@ -774,7 +774,7 @@ public final class Makelangelo {
 			myPlotter.getSettings().saveConfig();
 
 			// LoggerInitializer.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
-			LoggerInitializer.end();
+			Log.end();
 
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
@@ -806,7 +806,8 @@ public final class Makelangelo {
 	}
 	
 	public static void main(String[] args) {
-		LoggerInitializer.start();
+		Log.start();
+		// lazy init to be able to purge old files
 		logger = LoggerFactory.getLogger(Makelangelo.class);
 
 		PreferencesHelper.start();

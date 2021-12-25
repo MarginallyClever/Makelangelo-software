@@ -1,66 +1,75 @@
 package com.marginallyclever.convenience.log;
 
+import com.marginallyclever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 /**
- * static log methods available everywhere
- * @author Dan Royer
- * @since Makelangelo 7.3.0
+ * Initialize log file and purge old
  */
 public class Log {
 
-	private static final Logger logger = LoggerFactory.getLogger(Log.class);
-	private static final List<LogListener> listeners = new ArrayList<>();
+	private static Logger logger;
 
-	/**
-	 * Appends a message to the log file
-	 * @param msg HTML to put in the log file
-	 */
-	@Deprecated
-	public static void write(String msg) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		final String cleanMsg = sdf.format(Calendar.getInstance().getTime())+" "+msg;
+	// must be consistent with logback.xml
+	private static final String LOG_FILE_NAME_TXT = "log.txt";
+	private static final String PROGRAM_START_STRING = "PROGRAM START";
+	private static final String PROGRAM_END_STRING = "PROGRAM END";
 
-		logger.info(msg);
-		notifyListeners(cleanMsg);
-	}
+	public static void start() {
+		boolean hadCrashed = crashReportCheck();
+		deletePreviousLog();
 
-	/**
-	 * Appends a message to the log file.  Color will be red.
-	 * @param message append text as red HTML
-	 */
-	@Deprecated
-	public static void error(String message) {
-		write("ERROR "+message);
-	}
+		// lazy init to be able to purge old file
+		logger = LoggerFactory.getLogger(Log.class);
+		// custom logger name to separate a long debug info from useful info
+		logger.info(PROGRAM_START_STRING);
+		logger.info("------------------------------------------------");
+		Properties p = System.getProperties();
+		List<String> names = new ArrayList<>(p.stringPropertyNames());
+		Collections.sort(names);
+		for (String name : names) {
+			logger.info("{} = {}", name, p.get(name));
+		}
+		logger.info("------------------------------------------------");
 
-	/**
-	 * Appends a message to the log file.  Color will be green.
-	 * @param str append text as green HTML
-	 */
-	@Deprecated
-	public static void message(String str) {
-		write(str);
-	}
-
-
-	public static void addListener(LogListener listener) {
-		listeners.add(listener);
-	}
-
-	public static void removeListener(LogListener listener) {
-		listeners.remove(listener);
-	}
-
-	private static void notifyListeners(String cleanMsg) {
-		for( LogListener listener : listeners ) {
-			listener.logEvent(cleanMsg);
+		if (hadCrashed) {
+			logger.warn("Crash detected on previous run");
 		}
 	}
+
+	public static void end() {
+		logger.info(PROGRAM_END_STRING);
+	}
+
+	public static File getLogLocation() {
+		return new File(FileAccess.getUserDirectory(), LOG_FILE_NAME_TXT);
+	}
+
+	private static boolean crashReportCheck() {
+		File oldLogFile = getLogLocation();
+		if( oldLogFile.exists() ) {
+			// read last line of file
+			String ending = FileAccess.tail(oldLogFile);
+			return !ending.contains(PROGRAM_END_STRING);
+		}
+		return false;
+	}
+
+	/**
+	 * wipe the previous log file
+	 */
+	private static void deletePreviousLog() {
+		File toDelete = getLogLocation();
+		if (toDelete.exists() && toDelete.isFile()) {
+			toDelete.delete();
+		}
+	}
+
 }
