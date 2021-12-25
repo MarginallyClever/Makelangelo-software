@@ -1924,4 +1924,9 @@
 		<value>Fill in closed loops</value>
 		<hint></hint>
 	</string>
+
+	<string>
+		<key>CopyClipboard</key>
+		<value>Copy to clipboard</value>
+	</string>
 </language>

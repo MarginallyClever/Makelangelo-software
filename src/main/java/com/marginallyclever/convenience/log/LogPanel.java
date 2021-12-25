@@ -1,6 +1,5 @@
 package com.marginallyclever.convenience.log;
 
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -8,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,11 +19,13 @@ public class LogPanel extends JPanel {
 
 	private static final long serialVersionUID = -2753297349917155256L;
 
-	public LogPanel() {
-		JTextArea logArea = new JTextArea();
-		this.setLayout(new BorderLayout());
-		this.add(new JScrollPane(logArea), BorderLayout.CENTER);
+	private final JTextArea logArea = new JTextArea();
 
+	public LogPanel() {
+		this.setLayout(new BorderLayout());
+		JScrollPane scrollPane = new JScrollPane(logArea);
+		this.add(scrollPane, BorderLayout.CENTER);
+		scrollPane.setPreferredSize(new Dimension(1000, 400));
 		File log = Log.getLogLocation();
 		try (BufferedReader br = new BufferedReader(new FileReader(log))) {
 			String b;
@@ -38,23 +41,40 @@ public class LogPanel extends JPanel {
 		}
 	}
 
-	public static JFrame createFrame() {
-		JFrame frame = new JFrame(Log.getLogLocation().toString());
-		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		frame.setPreferredSize(new Dimension(1000, 400));
-		frame.add(new LogPanel());
-		frame.pack();
-		return frame;
+	private String getText() {
+		return logArea.getText();
+	}
+
+	public static void runAsDialog(JFrame frame) {
+		JDialog dialog = new JDialog(frame, Log.getLogLocation().toString(), Dialog.ModalityType.DOCUMENT_MODAL);
+
+		JButton okButton = new JButton(Translator.get("CopyClipboard"));
+
+		JPanel outerPanel = new JPanel(new BorderLayout());
+		LogPanel logPanel = new LogPanel();
+		outerPanel.add(logPanel,BorderLayout.CENTER);
+
+		outerPanel.add(okButton,BorderLayout.SOUTH);
+
+		okButton.addActionListener((e)-> {
+			StringSelection stringSelection = new StringSelection(logPanel.getText());
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(stringSelection, null);
+		});
+
+		dialog.add(outerPanel);
+		dialog.pack();
+		dialog.setVisible(true);
 	}
 
 	// TEST
 
 	public static void main(String[] args) {
 		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
 		Translator.start();
-		JFrame frame = createFrame();
+
+		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		runAsDialog(frame);
 	}
 }

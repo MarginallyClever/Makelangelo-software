@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
@@ -216,7 +215,6 @@ public class ScaleTurtlePanel extends JPanel {
 	
 	public static void main(String[] args) {
 		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
 		JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());

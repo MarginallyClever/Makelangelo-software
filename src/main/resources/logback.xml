@@ -10,7 +10,7 @@
                 </encoder>
             </appender>
 
-            <logger name="com.marginallyclever.convenience.log.LoggerInitializer" level="error" />
+            <logger name="com.marginallyclever.convenience.log.Log" level="error" />
             <root>
                 <appender-ref ref="STDOUT" />
             </root>

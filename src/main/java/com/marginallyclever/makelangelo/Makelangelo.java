@@ -7,40 +7,6 @@ package com.marginallyclever.makelangelo;
 
 // io functions
 
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Locale;
-import java.util.prefs.Preferences;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.StringHelper;
@@ -61,20 +27,43 @@ import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSett
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
-import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
-import com.marginallyclever.makelangelo.preview.Camera;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
+import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.preview.Camera;
+import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Locale;
+import java.util.prefs.Preferences;
 
 /**
  * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
@@ -544,10 +533,7 @@ public final class Makelangelo {
 		JMenu menu = new JMenu(Translator.get("Help"));
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> {
-			logFrame = LogPanel.createFrame();
-			logFrame.setVisible(true);
-		});
+		buttonViewLog.addActionListener((e) -> runLogPanel());
 		menu.add(buttonViewLog);
 
 		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
@@ -569,7 +555,11 @@ public final class Makelangelo {
 
 		return menu;
 	}
-	
+
+	private void runLogPanel() {
+		LogPanel.runAsDialog(mainFrame);
+	}
+
 	/**
 	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
 	 * redirect notice to find the latest release tag.
@@ -773,7 +763,7 @@ public final class Makelangelo {
 			saveWindowSizeAndPosition();
 			myPlotter.getSettings().saveConfig();
 
-			// LoggerInitializer.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
+			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
 
 			// Run this on another thread than the AWT event queue to
