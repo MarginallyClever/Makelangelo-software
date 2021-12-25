@@ -1,10 +1,23 @@
 package com.marginallyclever.makelangelo.makeArt.io.image;
 
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
+import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterPanel;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
+import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.SwingWorker.StateValue;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -15,30 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker.StateValue;
-
-import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
-import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverterPanel;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
-import com.marginallyclever.util.PreferencesHelper;
-
 
 public class ConvertImagePanel extends JPanel implements PreviewListener, SelectPanelChangeListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConvertImagePanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
 	// Set of image file extensions.
 	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif"};
@@ -130,7 +123,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	}
 
 	private void onConverterChanged(ItemEvent e) {
-		Log.message("onConverterChanged");
+		logger.debug("onConverterChanged");
 				
 	    CardLayout cl = (CardLayout)(cards.getLayout());
 	    cl.show(cards, (String)e.getItem());
@@ -217,20 +210,20 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	}
 
 	private void stopConversion() {
-		Log.message("Stop conversion");
+		logger.debug("Stop conversion");
 		if(imageConverterThread!=null) imageConverterThread.cancel(true);
 		stopWorker();
 	}
 	
 	private void startConversion() {
 		if(myConverterPanel==null || myImage==null) return;
-		Log.message("startConversion() "+myConverterPanel.getName());
+		logger.debug("startConversion() "+myConverterPanel.getName());
 		startWorker();
 	}
 	
 	private void changeConverter(ImageConverterPanel chosenPanel) {
 		if( chosenPanel == myConverterPanel ) return;
-		Log.message("changeConverter() "+chosenPanel.getName());
+		logger.debug("changeConverter() "+chosenPanel.getName());
 		stopConversion();
 
 		if(myConverterPanel!=null) {
@@ -250,7 +243,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	}
 	
 	private void reconvert() {
-		Log.message("reconvert()");
+		logger.debug("reconvert()");
 		stopConversion();
 		startConversion();
 	}
@@ -261,11 +254,11 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 			// TODO removePreviewListener(chosenConverter);
 		}
 		if(imageConverterThread!=null) {
-			Log.message("Stopping worker");
+			logger.debug("Stopping worker");
 			if(imageConverterThread.cancel(true)) {
-				Log.message("stop OK");
+				logger.debug("stop OK");
 			} else {
-				Log.message("stop FAILED");
+				logger.debug("stop FAILED");
 			}
 		}
 	}
@@ -273,7 +266,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private void startWorker() {
 		if(myImage==null || myPaper==null) return;
 		
-		Log.message("startWorker()");
+		logger.debug("startWorker()");
 		
 		ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
 		pm.setProgress(0);
@@ -305,10 +298,10 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 			if(propertyName.equals("state")) {
 				if(evt.getNewValue()==StateValue.DONE) {
 					if (imageConverterThread.isDone()) {
-						Log.message("Finished");
+						logger.debug("Finished");
 						notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
 					} else if (imageConverterThread.isCancelled() || pm.isCanceled()) {
-						Log.message("Cancelled");
+						logger.debug("Cancelled");
 						if(pm.isCanceled()) imageConverterThread.cancel(true);
 					}
 					removeWorker(thread);
@@ -322,13 +315,13 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private void addWorker(ImageConverterThread thread) {
 		workerList.add(thread);
 		workerCount++;
-		Log.message("Added worker.  "+workerList.size()+" workers now.");
+		logger.debug("Added worker. {} workers now.", workerList.size());
 	}
 	
 	private void removeWorker(ImageConverterThread thread) {
 		workerList.remove(thread);
 		workerCount--;
-		Log.message("Removed worker.  "+workerList.size()+" workers now.");
+		logger.debug("Removed worker. {} workers now.", workerList.size());
 		if(imageConverterThread==thread)
 			imageConverterThread=null;
 	}

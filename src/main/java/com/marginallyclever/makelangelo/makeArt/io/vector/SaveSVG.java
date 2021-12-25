@@ -1,17 +1,15 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import java.awt.geom.Rectangle2D;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.geom.Rectangle2D;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  * @author Dan Royer

@@ -1,14 +1,12 @@
 package com.marginallyclever.communications.serial;
 
-import java.awt.GridLayout;
-
-import javax.swing.JComboBox;
-
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayerPanel;
-import com.marginallyclever.convenience.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class SerialTransportLayerPanel extends TransportLayerPanel {
 	private static final Logger logger = LoggerFactory.getLogger(SerialTransportLayerPanel.class);

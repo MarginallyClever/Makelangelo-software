@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.MarginallyCleverPreferences;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.UnitTestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since v7.1.4
  */
 public class PreferencesHelperTest {
+	private static final Logger logger = LoggerFactory.getLogger(PreferencesHelperTest.class);
 	private static AbstractPreferences preferenceNode;
 	private static MarginallyCleverPreferences marginallyCleverJsonPreferenceNode;
 
@@ -71,23 +73,23 @@ public class PreferencesHelperTest {
 	@Test
 	public void testMachineConfigurationNames() throws BackingStoreException {
 		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-		Log.message("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+		logger.debug("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
 		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Log.message("node name: " + machinesPreferenceNode.name());
+		logger.debug("node name: " + machinesPreferenceNode.name());
 		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
 		for (String childNodeName : childrenPreferenceNodeNames) {
-			Log.message("child node name: "+ childNodeName);
+			logger.debug("child node name: "+ childNodeName);
 			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
 			assertTrue(isMachineNameAnInteger);
 			//Machine configurations numbered -1 and below should not exist.
 			final boolean isMachineNameLessThanZero = Integer.parseInt(childNodeName) < 0;
 			//Assert.assertFalse(isMachineNameLessThanZero);
 			if(isMachineNameLessThanZero) {
-				Log.message("REMOVED");
+				logger.debug("REMOVED");
 				machinesPreferenceNode.remove(childNodeName);
 			}
 		}
 		machinesPreferenceNode.flush();
-		Log.message("end: "+ thisMethodsName);
+		logger.debug("end: "+ thisMethodsName);
 	}
 }

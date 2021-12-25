@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.util.PreferencesHelper;

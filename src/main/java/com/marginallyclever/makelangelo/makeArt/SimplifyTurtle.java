@@ -1,18 +1,16 @@
 package com.marginallyclever.makelangelo.makeArt;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-
-import javax.swing.AbstractAction;
-import javax.vecmath.Vector2d;
-
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.vecmath.Vector2d;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class SimplifyTurtle extends AbstractAction {
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtle.class);

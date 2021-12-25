@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
 
-import java.util.ArrayList;
-
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * Draws a papercraft Achimedean Solid (https://en.wikipedia.org/wiki/Archimedean_solid).  Cut, crease, fold, and glue to assemble.
@@ -19,6 +20,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  *
  */
 public class Generator_Polyeder extends TurtleGenerator {
+
+	private static final Logger logger = LoggerFactory.getLogger(Generator_Polyeder.class);
 	/**
 	 * Helper class that describe a solid
 	 * @author Guenther Sohler
@@ -94,7 +97,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 		
 		public void dump()
 		{
-			Log.message(""+org.x+"/"+org.y+" x:"+x_x+"/"+x_y+" "+" y:"+y_x+"/"+y_y+" ");
+			logger.debug("{}/{} x:{}/{} y:{}/{}", org.x, org.y, x_x, x_y, y_x, y_y);
 		}
 	}
 	
@@ -224,7 +227,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 			// this way following with '1,0' would mean "add a flap on the first side and nothing on the second".
 			for(i=(instructionPtr>1)?1:0;i<code;i++)
 			{
-				Log.message("turn "+i);
+				logger.debug("turn {}", i);
 				Transform t1=t.dup();
 				t1.rotate(2*Math.PI*i/(double)code);
 				t1.walk(new Point2D(size/(2*Math.tan(Math.PI/code)),0));
@@ -243,9 +246,9 @@ public class Generator_Polyeder extends TurtleGenerator {
 		turtle.penUp();
 
 		Transform t = new Transform();
-		Log.message("start");
+		logger.debug("start");
 		geneneratePolygonStep(turtle,t);
-		Log.message("end");
+		logger.debug("end");
 
 		notifyListeners(turtle);
 	}

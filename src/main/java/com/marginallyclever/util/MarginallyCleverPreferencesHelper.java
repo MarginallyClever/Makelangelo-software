@@ -1,6 +1,5 @@
 package com.marginallyclever.util;
 
-import com.marginallyclever.convenience.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +91,7 @@ final class MarginallyCleverPreferencesHelper {
       try {
         parsedMachineName = Long.parseLong(childNodeName);
       } catch (NumberFormatException e) {
-        Log.error(e.getMessage());
+        logger.error("Failed to convert {} to a number", childNodeName, e);
       }
       boolean isMachineNameAnInteger = false;
       if (parsedMachineName != null) {

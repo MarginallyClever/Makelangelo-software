@@ -1,24 +1,11 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import java.awt.geom.Rectangle2D;
-import java.io.InputStream;
-import java.util.ArrayList;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.Vector3d;
-
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.anim.dom.SVGGraphicsElement;
-import org.apache.batik.anim.dom.SVGOMPathElement;
-import org.apache.batik.anim.dom.SVGOMPolylineElement;
-import org.apache.batik.anim.dom.SVGOMSVGElement;
-import org.apache.batik.anim.dom.SVGPointShapeElement;
-import org.apache.batik.bridge.BridgeContext;
-import org.apache.batik.bridge.DocumentLoader;
-import org.apache.batik.bridge.GVTBuilder;
-import org.apache.batik.bridge.UserAgent;
-import org.apache.batik.bridge.UserAgentAdapter;
+import com.marginallyclever.convenience.Bezier;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.apache.batik.anim.dom.*;
+import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SVGItem;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.slf4j.Logger;
@@ -26,23 +13,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGMatrix;
-import org.w3c.dom.svg.SVGPathSeg;
-import org.w3c.dom.svg.SVGPathSegCurvetoCubicAbs;
-import org.w3c.dom.svg.SVGPathSegLinetoAbs;
-import org.w3c.dom.svg.SVGPathSegLinetoRel;
-import org.w3c.dom.svg.SVGPathSegList;
-import org.w3c.dom.svg.SVGPathSegMovetoAbs;
-import org.w3c.dom.svg.SVGPathSegMovetoRel;
-import org.w3c.dom.svg.SVGPoint;
-import org.w3c.dom.svg.SVGPointList;
+import org.w3c.dom.svg.*;
 
-import com.marginallyclever.convenience.Bezier;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Vector3d;
+import java.awt.geom.Rectangle2D;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 /**
  * @author Dan Royer
