@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.beans.PropertyChangeEvent;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeEvent;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -15,6 +16,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan
  */
 public class Converter_Spiral extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_Spiral.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
 	@Override
@@ -104,7 +106,7 @@ public class Converter_Spiral extends ImageConverter {
 			++numRings;
 		}
 
-		Log.message(numRings + " rings.");
+		logger.debug("{} rings.", numRings);
 	}
 }
 
