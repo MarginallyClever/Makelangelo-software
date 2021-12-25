@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionListener;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ConversationHistory extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
 	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
@@ -79,9 +83,9 @@ public class ConversationHistory extends JPanel {
 		if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			try {
 				saveFile(chooser.getSelectedFile());
-			} catch (IOException e1) {
-				JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(),"runSaveAction error",JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
+			} catch (IOException e) {
+				logger.error("Failed to save file", e);
+				JOptionPane.showMessageDialog(this, e.getLocalizedMessage(),"runSaveAction error",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

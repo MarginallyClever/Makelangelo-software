@@ -330,7 +330,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				scount++;
 			} while (scount < solutionContains - 2);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to find a greedy tour solution", e);
 		}
 	}
 
@@ -388,7 +388,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			lock.unlock();
 			totalWeight = adjustCentroids();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to evolve", e);
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
 				lock.unlock();
 			}
@@ -448,7 +448,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				cells[e.site2].addPoint((float)e.x1, (float)e.y1);
 				cells[e.site2].addPoint((float)e.x2, (float)e.y2);
 			} catch(Exception err) {
-				err.printStackTrace();
+				logger.error("Failed to tessellate", err);
 			}
 		}
 	}

@@ -1,5 +1,8 @@
 package com.marginallyclever.convenience;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +17,7 @@ import java.util.zip.ZipInputStream;
  */
 public class FileAccess {
 
+	private static final Logger logger = LoggerFactory.getLogger(FileAccess.class);
 	/**
 	 * Open a file.  open() looks in three places:<br>
 	 *  - The file may be contained inside a zip, as indicated by the filename "zipname:filename".<br>
@@ -132,7 +136,7 @@ public class FileAccess {
 
 			return sb.reverse().toString();
 		} catch(IOException e ) {
-			e.printStackTrace();
+			logger.warn("Failed to read the last lines of the file {}", file, e);
 			return "";
 		}
 	}

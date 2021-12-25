@@ -90,7 +90,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 						logger.debug("Preferences file was created.");
 					}
 				} catch (IOException e) {
-					logger.error( e.getMessage() );
+					logger.error("Failed to create preference file {}", preferencesFile, e);
 				}
 			}
 			logger.debug("Preferences file is {}", preferencesFile);

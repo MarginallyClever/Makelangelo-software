@@ -337,7 +337,7 @@ public class LoadScratch3 implements TurtleLoader {
 					logger.debug("Variable {} {} {}", name, k, value.floatValue());
 					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
 				} catch (Exception e) {
-					throw new Exception("Variables must be numbers.");
+					throw new Exception("Variables must be numbers.", e);
 				}
 			}
 		}
@@ -387,7 +387,7 @@ public class LoadScratch3 implements TurtleLoader {
 								logger.debug("  list string:{}", value);
 								list.contents.add(value);
 							} catch (Exception e) {
-								throw new Exception("List variables must be numbers.");
+								throw new Exception("List variables must be numbers.", e);
 							}
 						} else throw new Exception("List variable "+listName+"("+list.contents.size()+") is "+varValue.toString());
 					}
@@ -692,7 +692,7 @@ public class LoadScratch3 implements TurtleLoader {
 				float v = Float.parseFloat(firstName);
 				return v;
 			} catch (Exception e) {
-				throw new Exception("Unresolved string value '"+obj.toString()+"'");
+				throw new Exception("Unresolved string value '"+obj.toString()+"'", e);
 			}
 		}
 		

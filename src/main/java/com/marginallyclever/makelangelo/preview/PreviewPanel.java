@@ -161,7 +161,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				// Debug ..
 				gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null));
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to init OpenGL debug pipeline", e);
 			}
 		}
 
@@ -171,7 +171,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				gl = gl.getContext().setGL(
 						GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }));
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to init OpenGL trace", e);
 			}
 		}
 		

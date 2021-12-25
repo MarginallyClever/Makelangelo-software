@@ -93,7 +93,7 @@ public class Converter_Spiral extends ImageConverter {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {
-						e.printStackTrace();
+						logger.error("Failed to sample", e);
 					}
 
 					level = (level1-level0)*p + level0;

@@ -72,6 +72,7 @@ public class SerialTransportLayer implements TransportLayer {
 		try {
 			serialConnection.openConnection(connectionName);
 		} catch (Exception e) {
+			logger.error("Failed to open the serial {}; Ignoring", connectionName, e);
 			return null;
 		}
 

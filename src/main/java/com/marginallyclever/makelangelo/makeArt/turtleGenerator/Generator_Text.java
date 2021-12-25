@@ -551,13 +551,11 @@ public class Generator_Text extends TurtleGenerator {
 					}
 				}
 				catch(IOException e) {
-					e.printStackTrace();
+					logger.error("Failed to load font", e);
 				}
 			} else {
 				// file not found
-				logger.debug("file not found. Making best guess as to where it is.");
-				logger.debug(fn);
-				logger.debug(" NOK");
+				logger.debug("file not found. Making best guess as to where it is. {} NOK", fn);
 			}
 		}
 	}

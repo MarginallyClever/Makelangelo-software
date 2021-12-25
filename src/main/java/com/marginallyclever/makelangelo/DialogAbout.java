@@ -64,9 +64,8 @@ public class DialogAbout {
 						try {
 							URI u = hyperlinkEvent.getURL().toURI();
 							Desktop.getDesktop().browse(u);
-						} catch (IOException | URISyntaxException exception) {
-							// Auto-generated catch block
-							exception.printStackTrace();
+						} catch (IOException | URISyntaxException e) {
+							logger.error("Failed to open the browser to the url", e);
 						}
 					}
 

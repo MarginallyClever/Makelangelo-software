@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Component;
 import java.awt.Desktop;
 import java.io.IOException;
@@ -13,6 +16,7 @@ import javax.swing.text.JTextComponent;
 
 @Deprecated
 public class DialogBadFirmwareVersion {
+	private static final Logger logger = LoggerFactory.getLogger(DialogBadFirmwareVersion.class);
 	/**
 	 * <p>
 	 * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
@@ -48,7 +52,7 @@ public class DialogBadFirmwareVersion {
 						try {
 							Desktop.getDesktop().browse(hyperlinkEvent.getURL().toURI());
 						} catch (IOException | URISyntaxException e) {
-							e.printStackTrace();
+							logger.error("Failed to open the browser to the firmware url", e);
 						}
 					}
 

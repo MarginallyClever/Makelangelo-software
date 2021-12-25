@@ -379,7 +379,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 			totalMagnitude=adjustCentroids();
 			lock.unlock();
 		} catch (Exception e) {
-			logger.error("Failed to evole cells", e);
+			logger.error("Failed to evolve cells", e);
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
 				lock.unlock();
 			}
