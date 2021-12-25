@@ -361,10 +361,10 @@ public class Generator_Text extends TurtleGenerator {
 			break;
 		}
 		/*
-	    logger.debug(num_lines + " lines");
-	    logger.debug("longest "+len+" chars");
-	    logger.debug("x "+xmin+" to "+xmax);
-	    logger.debug("y "+ymin+" to "+ymax);
+	    logger.debug("{} lines", num_lines);
+	    logger.debug("longest {} chars", len);
+	    logger.debug("x {} to {}", xmin, xmax);
+	    logger.debug("y {} to {}", ymin, ymax);
 		 */
 		Rectangle2D r = new Rectangle2D.Float();
 		r.setRect(xmin, ymin, xmax - xmin, ymax - ymin);
@@ -458,7 +458,7 @@ public class Generator_Text extends TurtleGenerator {
 	private void textDrawLine(Turtle turtle,String a1) {
 		String ud = ALPHABET_FOLDER;
 
-		logger.debug( a1 +"("+ a1.length() +")" );
+		logger.debug("{} ({})", a1, a1.length());
 		
 		int i = 0;
 		for (i = 0; i < a1.length(); ++i) {

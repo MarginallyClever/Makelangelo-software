@@ -202,7 +202,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 				}
 			}
 		}
-		logger.debug("Found " + z + " blobs.");
+		logger.debug("Found {} blobs.", z);
 	}
 
 	/**

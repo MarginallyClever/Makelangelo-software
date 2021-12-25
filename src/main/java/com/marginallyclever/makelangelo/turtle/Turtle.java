@@ -335,7 +335,7 @@ public class Turtle implements Cloneable {
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
-		logger.debug("  Found "+history.size()+" instructions.");
+		logger.debug("  Found {} instructions.", history.size());
 		
 		for( TurtleMove m : history ) {
 			switch(m.type) {

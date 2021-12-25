@@ -457,7 +457,7 @@ public final class Makelangelo {
 	}
 
 	public void openLoadFile(String filename) {
-		logger.debug("Loading file "+filename+"...");
+		logger.debug("Loading file {}...", filename);
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)->{

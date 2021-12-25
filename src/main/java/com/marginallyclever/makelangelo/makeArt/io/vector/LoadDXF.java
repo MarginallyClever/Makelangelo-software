@@ -116,7 +116,7 @@ public class LoadDXF implements TurtleLoader {
 				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
 				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
 				// I don't know this entity type.
-				logger.error("Unknown DXF type " + e.getType());
+				logger.error("Unknown DXF type {}", e.getType());
 			}
 		}
 		
@@ -125,7 +125,7 @@ public class LoadDXF implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		logger.debug(Translator.get("FileTypeDXF2")+"...");
+		logger.debug("{}...", Translator.get("FileTypeDXF2"));
 
 		// Read in the DXF file
 		parser.parse(in, DXFParser.DEFAULT_ENCODING);
@@ -142,7 +142,7 @@ public class LoadDXF implements TurtleLoader {
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer)layerIter.next();
 			int color = layer.getColor();
-			logger.debug("Found layer " + layer.getName() + "(color index="+color+")");
+			logger.debug("Found layer {}(color index={})", layer.getName(), color);
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();

@@ -498,7 +498,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 			}
 		}
 		if( fails>0 ) {
-			logger.debug(iterations+" failed "+fails+" times");
+			logger.debug("{} failed {} times", iterations, fails);
 		}
 
 		Rectangle2D test = new Rectangle2D.Double();

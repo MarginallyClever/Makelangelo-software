@@ -33,7 +33,7 @@ public class ReorderTurtle extends AbstractAction {
 	public static Turtle run(Turtle turtle) {
 		if(turtle.history.size()==0) return turtle;
 		
-		logger.debug("reorder() start @ "+turtle.history.size()+" instructions.");
+		logger.debug("reorder() start @ {} instructions.", turtle.history.size());
 		
 		Turtle output = new Turtle();
 		output.history.clear();
@@ -45,7 +45,7 @@ public class ReorderTurtle extends AbstractAction {
 			output.add(reorderTurtle(t2));
 		}
 		
-		logger.debug("reorder() end @ "+output.history.size()+" instructions.");
+		logger.debug("reorder() end @ {} instructions.", output.history.size());
 		return output;
 	}
 
@@ -60,12 +60,12 @@ public class ReorderTurtle extends AbstractAction {
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
 		ColorRGB c = turtle.getFirstColor();
-		logger.debug("  "+c.toString()+" converted to "+originalCount+" lines.");
+		logger.debug("  {} converted to {} lines.", c.toString(), originalCount);
 
 		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
 		int uniqueCount = uniqueLines.size();
 		int duplicateCount = originalCount - uniqueCount;
-		logger.debug("  - "+duplicateCount+" duplicates = "+uniqueCount+" lines.");
+		logger.debug("  - {} duplicates = {} lines.", duplicateCount, uniqueCount);
 
 		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
 		Turtle t = new Turtle(c);

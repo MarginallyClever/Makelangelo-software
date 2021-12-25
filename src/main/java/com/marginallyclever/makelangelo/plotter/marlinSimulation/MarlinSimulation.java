@@ -132,7 +132,7 @@ public class MarlinSimulation {
 		Vector3d temp = new Vector3d();
 		temp.scale(fraction,seg.delta);
 		poseNow.add(temp,seg.start);
-		if(verbose) logger.debug(poseNow+" ");
+		if(verbose) logger.debug("{} ", poseNow);
 	}*/
 
 	/**

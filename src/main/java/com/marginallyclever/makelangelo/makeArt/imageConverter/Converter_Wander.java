@@ -129,7 +129,7 @@ public class Converter_Wander extends ImageConverter {
 		}
 
 		// sort the points by nearest neighbor first.
-		logger.debug("Sorting "+actualPoints+" points...");
+		logger.debug("Sorting {} points...", actualPoints);
 		for(int j=0;j<buckets.size();++j) {
 			//logger.debug(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 

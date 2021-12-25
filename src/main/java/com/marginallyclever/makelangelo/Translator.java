@@ -142,7 +142,7 @@ public final class Translator {
 			}
 		}
 		catch(Exception e) {
-			logger.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
+			logger.error("{}. Defaulting to {}. Language folder expected to be located at {}", e.getMessage(), defaultLanguage, WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
 			logger.debug("default path requested: {}", path);

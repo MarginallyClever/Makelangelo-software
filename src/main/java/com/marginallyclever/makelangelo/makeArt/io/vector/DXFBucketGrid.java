@@ -73,11 +73,11 @@ public class DXFBucketGrid {
 
 		for (DXFBucket b : buckets) {
 			if (b.contents.size() > 0) {
-				logger.debug("bucket " + b.x + "," + b.y + " has " + b.contents.size() + " entities.");
+				logger.debug("bucket {},{} has {} entities.", b.x, b.y, b.contents.size());
 				total += b.contents.size();
 			}
 		}
-		logger.debug(total+" total entities in buckets (including duplicates).");
+		logger.debug("{} total entities in buckets (including duplicates).", total);
 	}
 	
 	/**

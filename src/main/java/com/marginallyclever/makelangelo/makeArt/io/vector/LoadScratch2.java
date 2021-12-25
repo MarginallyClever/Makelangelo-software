@@ -65,7 +65,7 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		logger.debug(Translator.get("FileTypeSB2")+"...");
+		logger.debug("{}...", Translator.get("FileTypeSB2"));
 
 		turtle = new Turtle();
 		
@@ -134,7 +134,7 @@ public class LoadScratch2 implements TurtleLoader {
 		
 		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
 
-		logger.debug("found  " +scripts.length() + " top-level event scripts");
+		logger.debug("found  {} top-level event scripts", scripts.length());
 		
 		JSONArray greenFlagScript = null;
 		
@@ -189,7 +189,7 @@ public class LoadScratch2 implements TurtleLoader {
 				//logger.debug("var:"+elem.toString());
 				JSONObject elem = (JSONObject)varIter.next();
 				String varName = (String)elem.get("name");
-				Object varValue = (Object)elem.get("value");
+				Object varValue = elem.get("value");
 				float value;
 				if(varValue instanceof Number) {
 					Number num = (Number)varValue;
@@ -216,14 +216,14 @@ public class LoadScratch2 implements TurtleLoader {
 		scratchLists = new LinkedList<ScratchList>();
 		JSONArray listOfLists = (JSONArray)tree.get("lists");
 		if(listOfLists == null) return;
-		logger.debug("Found "+listOfLists.length()+" lists.");
+		logger.debug("Found {} lists.", listOfLists.length());
 		Iterator<?> listIter = listOfLists.iterator();
 		while( listIter.hasNext() ) {
 			//logger.debug("var:"+elem.toString());
 			JSONObject elem = (JSONObject)listIter.next();
 			String listName = (String)elem.get("listName");
 			logger.debug("  Found list {}", listName);
-			Object contents = (Object)elem.get("contents");
+			Object contents = elem.get("contents");
 			ScratchList list = new ScratchList(listName);
 			// fill the list with any given contents
 			if( contents != null && contents instanceof JSONArray ) {
@@ -285,7 +285,7 @@ public class LoadScratch2 implements TurtleLoader {
 		Iterator<?> scriptIter = script.iterator();
 		// Find the script with the green flag.  Assumes only one green flag per script.
 		while( scriptIter.hasNext() ) {
-			Object o = (Object)scriptIter.next();
+			Object o = scriptIter.next();
 			if( o instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)o;
 				parseScratchCode(arr);
@@ -302,7 +302,7 @@ public class LoadScratch2 implements TurtleLoader {
 				scriptIter.next();
 				continue;
 			} else if(name.equals("doBroadcastAndWait")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				//logger.debug(getIndent()+"broadcast "+(String)o2);
 				JSONArray arr = subRoutines.get(o2);
 				parseScratchCode(arr);
@@ -310,31 +310,31 @@ public class LoadScratch2 implements TurtleLoader {
 				//logger.debug(getIndent()+"stop");
 				break;
 			} else if(name.equals("doRepeat")) {
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				int count = (int)resolveValue(o2);
 				//logger.debug(getIndent()+"Repeat "+count+" times:");
 				for(int i=0;i<count;++i) {
 					parseScratchCode((JSONArray)o3);
 				}
 			} else if(name.equals("doUntil")) {
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				//logger.debug(getIndent()+"Do Until");
 				while(!resolveBoolean((JSONArray)o2)) {
 					parseScratchCode((JSONArray)o3);
 				}
 			} else if(name.equals("doIf")) {
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				if(resolveBoolean((JSONArray)o2)) {
 					//logger.debug(getIndent()+"if(true)");
 					parseScratchCode((JSONArray)o3);
 				}
 			} else if(name.equals("doIfElse")) {
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
-				Object o4 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
+				Object o4 = scriptIter.next();
 				if(resolveBoolean((JSONArray)o2)) {
 					//logger.debug(getIndent()+"if(true)");
 					parseScratchCode((JSONArray)o3);
@@ -344,97 +344,96 @@ public class LoadScratch2 implements TurtleLoader {
 				}
 			} else if(name.equals("append:toList:")) {
 				// "append:toList:", new value, list name 
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				double value = resolveValue(o2);
 				scratchLists.get(getListByID(o3)).contents.add(value);
 			} else if(name.equals("deleteLine:ofList:")) {
 				// "deleteLine:ofList:", index, list name 
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				int listIndex = (int)resolveListIndex(o2,o3);
 				scratchLists.get(getListByID(o3)).contents.remove(listIndex);
 			} else if(name.equals("insert:at:ofList:")) {
 				// "insert:at:ofList:", new value, index, list name 
-				Object o4 = (Object)scriptIter.next();
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o4 = scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				double newValue = resolveValue(o4);
 				int listIndex = (int)resolveListIndex(o2,o3);
 				scratchLists.get(getListByID(o3)).contents.add(listIndex,newValue);
 			} else if(name.equals("setLine:ofList:to:")) {
 				// "setLine:ofList:to:", index, list name, new value
-				Object o4 = (Object)scriptIter.next();
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o4 = scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				double newValue = resolveValue(o4);
 				int listIndex = (int)resolveListIndex(o2,o3);
 				scratchLists.get(getListByID(o3)).contents.set(listIndex,newValue);
 			} else if(name.equals("wait:elapsed:from:")) {
 				// dwell - does nothing.
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double seconds = resolveValue(o2);
-				logger.debug(getIndent()+"dwell "+seconds+" seconds.");
+				logger.debug("{} dwell {} seconds.", getIndent(), seconds);
 				continue;
 			} else if(name.equals("putPenUp")) {
 				turtle.penUp();
-				logger.debug(getIndent()+"pen up");
+				logger.debug("{} pen up", getIndent());
 				continue;
 			} else if(name.equals("putPenDown")) {
 				turtle.penDown();
-				logger.debug(getIndent()+"pen down");
+				logger.debug("{} pen down", getIndent());
 			} else if(name.equals("gotoX:y:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double x = resolveValue(o2);
-				Object o3 = (Object)scriptIter.next();
+				Object o3 = scriptIter.next();
 				double y = resolveValue(o3);
-				
 				turtle.moveTo(x,y);
-				logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+				logger.debug("{}Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
 			} else if(name.equals("changeXposBy:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double v = resolveValue(o2);
 				turtle.moveTo(turtle.getX()+v,turtle.getY());
 				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("changeYposBy:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double v = resolveValue(o2);
 				turtle.moveTo(turtle.getX(),turtle.getY()+v);
 				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("forward:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double v = resolveValue(o2);
 				turtle.forward(v);
-				logger.debug(getIndent()+"Move forward "+v+" mm");
+				logger.debug("{} Move forward {} mm", getIndent(), v);
 			} else if(name.equals("turnRight:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double degrees = resolveValue(o2);
 				turtle.turn(-degrees);
-				logger.debug(getIndent()+"Right "+degrees+" degrees.");
+				logger.debug("{} Right {} degrees.", getIndent(), degrees);
 			} else if(name.equals("turnLeft:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double degrees = resolveValue(o2);
 				turtle.turn(degrees);
-				logger.debug(getIndent()+"Left "+degrees+" degrees.");
+				logger.debug("{} Left {} degrees.", getIndent(), degrees);
 			} else if(name.equals("xpos:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double v = resolveValue(o2);
 				turtle.moveTo(v,turtle.getY());
-				logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
+				logger.debug("{} Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
 			} else if(name.equals("ypos:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double v = resolveValue(o2);
 				turtle.moveTo(turtle.getX(),v);
 				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
 			} else if(name.equals("heading:")) {
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				double degrees = resolveValue(o2);
 				turtle.setAngle(degrees);
 				//logger.debug(getIndent()+"Turn to "+degrees);
 			} else if(name.equals("setVar:to:")) {
 				// set variable
 				String varName = (String)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o3 = scriptIter.next();
 				float v = (float)resolveValue(o3);
 
 				boolean foundVar=false;
@@ -453,7 +452,7 @@ public class LoadScratch2 implements TurtleLoader {
 			} else if(name.equals("changeVar:by:")) {
 				// set variable
 				String varName = (String)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o3 = scriptIter.next();
 				float v = (float)resolveValue(o3);
 
 				boolean foundVar=false;
@@ -498,38 +497,38 @@ public class LoadScratch2 implements TurtleLoader {
 		Object first = scriptIter.next();
 		String name = first.toString();
 		if(name.equals(">")) {
-			Object o2 = (Object)scriptIter.next();
-			Object o3 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
+			Object o3 = scriptIter.next();
 			double a = resolveValue(o2);
 			double b = resolveValue(o3);
 			return a > b;
 		}
 		if(name.equals("<")) {
-			Object o2 = (Object)scriptIter.next();
-			Object o3 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
+			Object o3 = scriptIter.next();
 			double a = resolveValue(o2);
 			double b = resolveValue(o3);
 			return a < b;
 		}
 		if(name.equals("=")) {
-			Object o2 = (Object)scriptIter.next();
-			Object o3 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
+			Object o3 = scriptIter.next();
 			double a = resolveValue(o2);
 			double b = resolveValue(o3);
 			return a == b; 
 		}
 		if(name.equals("not")) {
-			Object o2 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
 			return !resolveBoolean(o2);
 		}
 		if(name.equals("&")) {
-			Object o2 = (Object)scriptIter.next();
-			Object o3 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
+			Object o3 = scriptIter.next();
 			return resolveBoolean(o2) && resolveBoolean(o3);
 		}
 		if(name.equals("|")) {
-			Object o2 = (Object)scriptIter.next();
-			Object o3 = (Object)scriptIter.next();
+			Object o2 = scriptIter.next();
+			Object o3 = scriptIter.next();
 			return resolveBoolean(o2) || resolveBoolean(o3);
 		}
 		
@@ -580,47 +579,47 @@ public class LoadScratch2 implements TurtleLoader {
 			String firstName = first.toString();
 			if(firstName.equals("/")) {
 				// divide
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				float a = (float)resolveValue(o2);
 				float b = (float)resolveValue(o3);
 				return a/b;
 			}
 			if(firstName.equals("*")) {
 				// multiply
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				float a = (float)resolveValue(o2);
 				float b = (float)resolveValue(o3);
 				return a*b;
 			}
 			if(firstName.equals("+")) {
 				// add
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				float a = (float)resolveValue(o2);
 				float b = (float)resolveValue(o3);
 				return a+b;
 			}
 			if(firstName.equals("-")) {
 				// subtract
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				float a = (float)resolveValue(o2);
 				float b = (float)resolveValue(o3);
 				return a-b;
 			}
 			if(firstName.equals("%")) {
 				// modulus
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				float a = (float)resolveValue(o2);
 				float b = (float)resolveValue(o3);
 				return a%b;
 			}
 			if(firstName.equals("randomFrom:to:")) {
-				Object o2 = (Object)scriptIter.next();
-				Object o3 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
+				Object o3 = scriptIter.next();
 				int a = (int)resolveValue(o2);
 				int b = (int)resolveValue(o3);
 				if(a>b) {
@@ -644,7 +643,7 @@ public class LoadScratch2 implements TurtleLoader {
 			}
 			if(firstName.equals("computeFunction:of:")) {
 				String functionName = (String)scriptIter.next();
-				Object o2 = (Object)scriptIter.next();
+				Object o2 = scriptIter.next();
 				
 				float a = (float)resolveValue(o2);
 

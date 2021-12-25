@@ -31,7 +31,7 @@ public class RobotUID {
 				newUID = Long.parseLong(lines[0]);
 				logger.debug("UID found: {}", newUID);
 			} catch (NumberFormatException e) {
-				logger.error("UID parsing failed. line="+lines[0]+", error="+e.getLocalizedMessage());
+				logger.error("UID parsing failed. line={}, error={}", lines[0], e.getMessage());
 			}
 		}
 

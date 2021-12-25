@@ -281,7 +281,7 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 			}
 		}
 
-		logger.debug(numPoints + " points.");
+		logger.debug("{} points.", numPoints);
 		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 

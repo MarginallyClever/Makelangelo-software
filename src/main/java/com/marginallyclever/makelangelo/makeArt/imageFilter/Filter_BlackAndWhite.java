@@ -154,7 +154,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 		double histogram_area = 0;
 		// logger.debug("histogram:");
 		for (i = 1; i < 255; ++i) {
-			logger.debug(i + "=" + histogram[i]);
+			logger.debug("{}={}", i, histogram[i]);
 			histogram_area += histogram[i];
 		}
 		double histogram_zone = histogram_area / (double) levels;

@@ -192,7 +192,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				logger.debug(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
+				logger.debug("{}: {}mm", formatTime(t_elapsed), StringHelper.formatDouble(len));
 			}
 			progress = new_progress;
 			setProgress((int) progress);

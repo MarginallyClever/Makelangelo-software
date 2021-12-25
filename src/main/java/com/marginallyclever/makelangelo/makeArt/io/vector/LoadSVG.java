@@ -249,7 +249,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d v2;
 
 	    int pathNodeCount = node.getLength();
-	    logger.debug(pathNodeCount+" circles.");
+	    logger.debug("{} circles.", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element)) 
@@ -339,7 +339,7 @@ public class LoadSVG implements TurtleLoader {
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
 	    	//SVGPathSegList pathList = element.getPathSegList();
 	    	int itemCount = pathList.getNumberOfItems();
-	    	logger.debug("Node has "+itemCount+" elements.");
+	    	logger.debug("Node has {} elements.", itemCount);
 	    	int sinceClosePath=0;
 	    	
 			for(int i=0; i<itemCount; i++) {
