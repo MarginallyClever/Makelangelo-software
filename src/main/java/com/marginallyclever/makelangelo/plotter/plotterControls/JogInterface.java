@@ -52,7 +52,7 @@ public class JogInterface extends JPanel {
 	    		x/=10;
 	    		y/=10;
 	    	}
-	    	logger.debug("Move "+x+","+y);
+	    	logger.debug("Move {},{}", x, y);
 	    	Point2D p = plotter.getPos();
 	    	p.x+=x;
 	    	p.y+=y;

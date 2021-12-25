@@ -132,7 +132,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M201 format bad: "+message);
 			double v=Double.valueOf(parts[1].substring(1));
-			logger.debug("MarlinPlotterInterface found acceleration "+v);
+			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
 			logger.error("M201 error: {}", message, e);
@@ -147,7 +147,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M203 format bad: "+message);
 			double v=Double.valueOf(parts[1].substring(1));
-			logger.debug("MarlinPlotterInterface found feedrate "+v);
+			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
 			logger.error("M203 error: {}", message, e);

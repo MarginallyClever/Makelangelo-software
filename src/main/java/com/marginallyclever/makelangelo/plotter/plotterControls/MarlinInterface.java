@@ -133,7 +133,7 @@ public class MarlinInterface extends JPanel {
 				// line is no longer in the buffer.  should not be possible!
 			}
 		} catch(NumberFormatException e) {
-			logger.debug("Resend request for '"+message+"' failed: "+e.getMessage());
+			logger.debug("Resend request for '{}' failed: {}", message, e.getMessage());
 		}
 	}
 
@@ -188,9 +188,9 @@ public class MarlinInterface extends JPanel {
 		
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
-			logger.debug("MarlinInterface did not find "+lineNumberToSend);
+			logger.debug("MarlinInterface did not find {}", lineNumberToSend);
 			for( MarlinCommand mc : myHistory ) {
-				logger.debug("..."+mc.lineNumber+": "+mc.command);
+				logger.debug("...{}: {}", mc.lineNumber, mc.command);
 			}
 		}
 	}

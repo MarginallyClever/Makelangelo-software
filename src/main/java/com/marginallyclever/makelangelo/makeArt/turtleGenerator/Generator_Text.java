@@ -147,7 +147,7 @@ public class Generator_Text extends TurtleGenerator {
 		}
 		
 		String[] messagePieces=message.split("\n");
-		logger.debug("lines of text="+messagePieces.length);
+		logger.debug("lines of text={}", messagePieces.length);
 		
 		Font font = new Font(fontName, Font.PLAIN, fontSize);
 		FontRenderContext frc = new FontRenderContext(null,true,true);

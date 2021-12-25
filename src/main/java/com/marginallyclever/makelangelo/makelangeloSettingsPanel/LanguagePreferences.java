@@ -33,7 +33,7 @@ public class LanguagePreferences {
 	}
 	
 	static public void save() {
-		logger.debug("Changing to language "+languageList[languageOptions.getSelectedIndex()]);
+		logger.debug("Changing to language {}", languageList[languageOptions.getSelectedIndex()]);
 		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
 		Translator.saveConfig();
 	}

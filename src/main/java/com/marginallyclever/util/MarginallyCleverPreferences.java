@@ -56,7 +56,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    */
   public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);
-    logger.debug("Instantiating node "+ name);
+    logger.debug("Instantiating node {}", name);
     root = new TreeMap<String, String>();
     children = new TreeMap<String, Preferences>();
     try {

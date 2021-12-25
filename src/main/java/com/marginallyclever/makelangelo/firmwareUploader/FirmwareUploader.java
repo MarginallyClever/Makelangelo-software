@@ -45,10 +45,10 @@ public class FirmwareUploader {
 		logger.debug("update started");
 		
 		Path p = Path.of(avrdudePath);
-		logger.debug("Trying "+(p.resolve("../avrdude.conf").toString()));
+		logger.debug("Trying {}", (p.resolve("../avrdude.conf").toString()));
 		File f = p.resolve("../avrdude.conf").toFile();
 		if(!f.exists()) {
-			logger.debug("Trying 2 "+(p.resolve("../../etc/avrdude.conf").toString()));
+			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
 				throw new Exception("Cannot find nearby avrdude.conf");
@@ -107,11 +107,11 @@ public class FirmwareUploader {
 
 		logger.debug("update: errors (if any)\n");
 		while ((s = stdError.readLine()) != null)
-			logger.debug("update: "+s);
+			logger.debug("update: {}", s);
 
 		logger.debug("command out:\n");
 		while ((s = stdInput.readLine()) != null)
-			logger.debug("update: "+s);		
+			logger.debug("update: {}", s);
 	}
 	
 	public String getAvrdudePath() {

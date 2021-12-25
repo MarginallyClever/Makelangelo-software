@@ -22,7 +22,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	
 	@Override
 	protected Turtle doInBackground() throws Exception {
-		logger.debug("Starting "+name);
+		logger.debug("Starting {}", name);
 		
 		Turtle turtle = new Turtle();
 		

@@ -32,7 +32,7 @@ public class SaveDialog {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
-			logger.debug("File selected by user: "+withExtension);
+			logger.debug("File selected by user: {}", withExtension);
 			TurtleFactory.save(t,withExtension);
 		}
 	}

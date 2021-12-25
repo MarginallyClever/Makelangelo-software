@@ -61,8 +61,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	public void generate() {
 		xMax = (float)(myPaper.getMarginWidth () /2.0f);
 		yMax = (float)(myPaper.getMarginHeight() /2.0f);
-		logger.debug("xMax="+xMax);
-		logger.debug("yMax="+yMax);
+		logger.debug("xMax={}", xMax);
+		logger.debug("yMax={}", yMax);
 		
 		// build the Fibonacci sequence.
 		buildFibonacciSequence(order);
@@ -70,11 +70,11 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		// scale the fractal to fit on the page
 		// short side
 		float s1 = fibonacciSequence.peek();
-		logger.debug("s1="+s1);
+		logger.debug("s1={}", s1);
 		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
 		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
-		logger.debug("s2="+s2);
+		logger.debug("s2={}", s2);
 		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
 		if(scale1>scale2) scale1=scale2;
@@ -83,7 +83,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
-		logger.debug("shortSide="+shortSide);
+		logger.debug("shortSide={}", shortSide);
 		if( xMax < yMax ) {
 			logger.debug("tall thin");
 			// tall thin paper, top left corner

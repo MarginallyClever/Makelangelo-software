@@ -160,7 +160,7 @@ public class LoadScratch2 implements TurtleLoader {
 					greenFlagScript = scripts02;
 				} else if(firstType.equals("whenIReceive")) {
 	    			String firstName = (String)((JSONArray)scriptContents).get(1);
-					logger.debug("Found subroutine "+firstName);
+					logger.debug("Found subroutine {}", firstName);
 	    			subRoutines.put(firstName, ((JSONArray)scriptContents));
 				}
 			}
@@ -222,7 +222,7 @@ public class LoadScratch2 implements TurtleLoader {
 			//logger.debug("var:"+elem.toString());
 			JSONObject elem = (JSONObject)listIter.next();
 			String listName = (String)elem.get("listName");
-			logger.debug("  Found list "+listName);
+			logger.debug("  Found list {}", listName);
 			Object contents = (Object)elem.get("contents");
 			ScratchList list = new ScratchList(listName);
 			// fill the list with any given contents

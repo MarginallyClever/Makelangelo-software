@@ -37,7 +37,7 @@ public class SaveGCode {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
-			logger.debug("File selected by user: "+fileWithExtension);
+			logger.debug("File selected by user: {}", fileWithExtension);
 			save(fileWithExtension,turtle,robot);
 		}
 	}

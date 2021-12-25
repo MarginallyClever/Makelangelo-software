@@ -132,7 +132,7 @@ public class PaperSettings extends SelectPanel {
 		logger.debug("onPaperSizeChange()");
 		final int selectedIndex = paperSizes.getSelectedIndex();
 		if(selectedIndex != 0) {
-			logger.debug("found index "+selectedIndex);
+			logger.debug("found index {}", selectedIndex);
 			PaperSize s = commonPaperSizes[selectedIndex-1];
 			double w = s.width;
 			double h = s.height;

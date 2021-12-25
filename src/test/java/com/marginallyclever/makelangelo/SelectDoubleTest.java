@@ -26,7 +26,7 @@ public class SelectDoubleTest {
 		b.addPropertyChangeListener((evt) -> ++testObservation );
 		
 		b.setValue(2000.34f);
-		logger.debug("text="+b.getText()+" value="+b.getValue());
+		logger.debug("text={} value={}", b.getText(), b.getValue());
 		assertTrue(testObservation>0);
 		assertEquals(2000.34f,b.getValue(),1e-6);	
 	}
@@ -38,7 +38,7 @@ public class SelectDoubleTest {
 		Locale [] list = Locale.getAvailableLocales();
 		
 		for( Locale loc : list ) {
-			logger.debug("Locale="+loc.toString()+" "+loc.getDisplayLanguage());
+			logger.debug("Locale={} {}", loc.toString(), loc.getDisplayLanguage());
 			Locale.setDefault(loc);
 			testFloatField();
 		}

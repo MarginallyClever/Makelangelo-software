@@ -91,7 +91,7 @@ public class Histogram {
 			if(sum>=costPerLevel) {
 				levels[j++]=i;
 				sum-=costPerLevel;
-				logger.debug("Level @ " + i);
+				logger.debug("Level @ {}", i);
 			}
 		}
 		
@@ -113,7 +113,7 @@ public class Histogram {
 		for(int i=0;i<256;++i) {
 			totalWeight+=red[i];
 		}
-		logger.debug("Total weight="+totalWeight);
+		logger.debug("Total weight={}", totalWeight);
 		
 		double[] levels = new double[input.length];
 
@@ -128,7 +128,7 @@ public class Histogram {
 			}
 			i = Math.min(i,255);
 			levels[j]=i;
-			logger.debug("Level "+input[j]+" ("+(input[j]*100.0)+") -> "+weightScaled+" = " + i);
+			logger.debug("Level {} ({}) -> {} = {}", input[j], (input[j]*100.0), weightScaled, i);
 		}
 		
 		return levels;

@@ -65,7 +65,7 @@ public class DXFBucketGrid {
 				return;
 			}
 		}
-		logger.debug("Not added "+p);
+		logger.debug("Not added {}", p);
 	}
 	
 	public void countEntitiesInBuckets() {

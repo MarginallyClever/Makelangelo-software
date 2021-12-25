@@ -131,7 +131,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			logger.debug("node name:"+preferenceNode);
+			logger.debug("node name:{}", preferenceNode);
 			logKeyValuesForPreferenceNode(preferenceNode);
 			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
 			for (String childNodeName : childrenPreferenceNodeNames) {

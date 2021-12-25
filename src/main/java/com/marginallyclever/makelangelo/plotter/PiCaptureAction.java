@@ -216,7 +216,7 @@ public class PiCaptureAction {
 				piCamera.setSharpness(sharpnessSlider.getValue());
 				piCamera.setTimeout(3000);
 				buffImg = piCamera.takeBufferedStill();
-				logger.debug("Executed this command:\n\t" + piCamera.getPrevCommand());
+				logger.debug("Executed this command:\n\t{}", piCamera.getPrevCommand());
 				ImageIcon icon = new ImageIcon(buffImg);
 				imageLabel.setIcon(icon);
 				buttonUseCapture.setEnabled(true);

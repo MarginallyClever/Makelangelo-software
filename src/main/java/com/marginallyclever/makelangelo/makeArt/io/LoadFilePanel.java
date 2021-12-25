@@ -65,7 +65,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
                         mySubPanel.removeAll();
                     
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			logger.debug("File selected by user: "+selectedFile);
+			logger.debug("File selected by user: {}", selectedFile);
 			filename.setText(selectedFile);
 			
 			load(selectedFile);

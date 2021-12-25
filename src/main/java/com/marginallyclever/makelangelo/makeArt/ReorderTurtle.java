@@ -40,7 +40,7 @@ public class ReorderTurtle extends AbstractAction {
 		
 		// history is made of changes, travels, and draws
 		ArrayList<Turtle> colors = turtle.splitByToolChange();
-		logger.debug("reorder() layers: "+colors.size());
+		logger.debug("reorder() layers: {}", colors.size());
 		for( Turtle t2 : colors ) {
 			output.add(reorderTurtle(t2));
 		}

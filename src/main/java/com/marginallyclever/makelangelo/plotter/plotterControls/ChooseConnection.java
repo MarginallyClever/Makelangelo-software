@@ -64,7 +64,7 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onOpen(NetworkSession s) {
-		logger.debug("ChooseConnection open to "+s.getName());
+		logger.debug("ChooseConnection open to {}", s.getName());
 
 		mySession = s;
 		mySession.addListener((e)->{

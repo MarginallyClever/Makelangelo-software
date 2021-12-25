@@ -73,12 +73,12 @@ public class PreferencesHelperTest {
 	@Test
 	public void testMachineConfigurationNames() throws BackingStoreException {
 		final String thisMethodsName = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
-		logger.debug("start: " + PreferencesHelperTest.class.getName() + "#"+ thisMethodsName);
+		logger.debug("start: {}#{}", PreferencesHelperTest.class.getName(), thisMethodsName);
 		final Preferences machinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		logger.debug("node name: " + machinesPreferenceNode.name());
+		logger.debug("node name: {}", machinesPreferenceNode.name());
 		final String[] childrenPreferenceNodeNames = machinesPreferenceNode.childrenNames();
 		for (String childNodeName : childrenPreferenceNodeNames) {
-			logger.debug("child node name: "+ childNodeName);
+			logger.debug("child node name: {}", childNodeName);
 			final boolean isMachineNameAnInteger = UnitTestHelper.isInteger(childNodeName);
 			assertTrue(isMachineNameAnInteger);
 			//Machine configurations numbered -1 and below should not exist.
@@ -90,6 +90,6 @@ public class PreferencesHelperTest {
 			}
 		}
 		machinesPreferenceNode.flush();
-		logger.debug("end: "+ thisMethodsName);
+		logger.debug("end: {}", thisMethodsName);
 	}
 }

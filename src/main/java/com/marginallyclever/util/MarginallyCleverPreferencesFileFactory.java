@@ -93,7 +93,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 					logger.error( e.getMessage() );
 				}
 			}
-			logger.debug("Preferences file is "+ preferencesFile);
+			logger.debug("Preferences file is {}", preferencesFile);
 		}
 		return preferencesFile;
 	}

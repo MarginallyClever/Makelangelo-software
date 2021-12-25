@@ -100,7 +100,7 @@ public final class RecentFiles extends JMenu {
 			String name = getNodeName(i);
 			String value = prefs.get(name, "");
 			if(!value.trim().isEmpty()) {
-				logger.debug("..."+value);
+				logger.debug("...{}", value);
 				fileList.add(value);
 			} else {
 				logger.debug("...done");

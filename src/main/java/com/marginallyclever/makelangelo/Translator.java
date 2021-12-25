@@ -46,7 +46,7 @@ public final class Translator {
 		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		logger.debug("Default language = "+defaultLanguage);
+		logger.debug("Default language = {}", defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
@@ -145,9 +145,9 @@ public final class Translator {
 			logger.error( e.getMessage()+". Defaulting to "+defaultLanguage+". Language folder expected to be located at "+ WORKING_DIRECTORY);
 			final TranslatorLanguage languageContainer  = new TranslatorLanguage();
 			String path = MarginallyCleverTranslationXmlFileHelper.getDefaultLanguageFilePath();
-			logger.debug("default path requested: "+path);
+			logger.debug("default path requested: {}", path);
 			URL pathFound = Translator.class.getClassLoader().getResource(path);
-			logger.debug("path found: "+pathFound);
+			logger.debug("path found: {}", pathFound);
 			try (InputStream s = pathFound.openStream()) {
 				languageContainer.loadFromInputStream(s);
 			} catch (IOException ie) {

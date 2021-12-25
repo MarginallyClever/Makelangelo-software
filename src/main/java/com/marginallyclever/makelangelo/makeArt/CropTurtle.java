@@ -16,7 +16,7 @@ public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
 	
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
-		logger.debug("crop start @ "+turtle.history.size());
+		logger.debug("crop start @ {}", turtle.history.size());
 
 		List<TurtleMove> oldHistory = turtle.history;
 		turtle.history = new ArrayList<TurtleMove>();
@@ -74,7 +74,7 @@ public class CropTurtle {
 		
 		// There may be some dumb travel moves left. (several travels in a row.)
 	
-		logger.debug("crop end @ "+turtle.history.size());
+		logger.debug("crop end @ {}", turtle.history.size());
 
 	}
 }

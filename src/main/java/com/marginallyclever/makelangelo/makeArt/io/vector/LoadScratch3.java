@@ -362,10 +362,10 @@ public class LoadScratch3 implements TurtleLoader {
 			Iterator<?> keyIter = keys.iterator();
 			while( keyIter.hasNext() ) {
 				String key = (String)keyIter.next();
-				logger.debug("list key:"+key);
+				logger.debug("list key:{}", key);
 				JSONArray elem = (JSONArray)listOfLists.get(key);
 				String listName = (String)elem.get(0);
-				logger.debug("  list name:"+listName);
+				logger.debug("  list name:{}", listName);
 				Object contents = (Object)elem.get(1);
 				ScratchList list = new ScratchList(listName);
 				// fill the list with any given contents
@@ -379,12 +379,12 @@ public class LoadScratch3 implements TurtleLoader {
 						if(varValue instanceof Number) {
 							Number num = (Number)varValue;
 							value = (float)num.doubleValue();
-							logger.debug("  list float:"+value);
+							logger.debug("  list float:{}", value);
 							list.contents.add(value);
 						} else if(varValue instanceof String) {
 							try {
 								value = Double.parseDouble((String)varValue);
-								logger.debug("  list string:"+value);
+								logger.debug("  list string:{}", value);
 								list.contents.add(value);
 							} catch (Exception e) {
 								throw new Exception("List variables must be numbers.");
@@ -574,7 +574,7 @@ public class LoadScratch3 implements TurtleLoader {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value = v;
-							logger.debug("Set "+varName+" to "+v);
+							logger.debug("Set {} to {}", varName, v);
 							foundVar=true;
 						}
 					}
@@ -593,7 +593,7 @@ public class LoadScratch3 implements TurtleLoader {
 						ScratchVariable sv = svi.next();
 						if(sv.name.equals(varName)) {
 							sv.value += v;
-							logger.debug("Change "+varName+" by "+v+" to "+sv.value);
+							logger.debug("Change {} by {} to {}", varName, v, sv.value);
 							foundVar=true;
 						}
 					}

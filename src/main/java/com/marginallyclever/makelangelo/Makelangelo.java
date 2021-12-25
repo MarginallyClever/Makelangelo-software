@@ -126,8 +126,8 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
-		logger.debug("Locale="+Locale.getDefault().toString());
-		logger.debug("Headless="+(GraphicsEnvironment.isHeadless()?"Y":"N"));
+		logger.debug("Locale={}", Locale.getDefault().toString());
+		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		logger.debug("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		mySettingPanel = new MakelangeloSettingPanel();
@@ -598,7 +598,7 @@ public final class Makelangelo {
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				logger.debug("latest release: " + line2 + "; this version: " + VERSION);
+				logger.debug("latest release: {}; this version: {}", line2, VERSION);
 				// logger.debug(inputLine.compareTo(VERSION));
 
 				int comp = line2.compareTo(VERSION);
@@ -684,7 +684,7 @@ public final class Makelangelo {
 			        Transferable tr = dtde.getTransferable();
 			        DataFlavor[] flavors = tr.getTransferDataFlavors();
 			        for (int i = 0; i < flavors.length; i++) {
-			        	logger.debug("Possible flavor: " + flavors[i].getMimeType());
+			        	logger.debug("Possible flavor: {}", flavors[i].getMimeType());
 			        	if (flavors[i].isFlavorJavaFileListType()) {
 			        		dtde.acceptDrop(DnDConstants.ACTION_COPY);
 			        		Object o = tr.getTransferData(flavors[i]);
@@ -701,7 +701,7 @@ public final class Makelangelo {
 			        		}
 			        	}
 			        }
-			        logger.debug("Drop failed: " + dtde);
+			        logger.debug("Drop failed: {}", dtde);
 			        dtde.rejectDrop();
 			    } catch (Exception e) {
 					logger.error("Drop error", e);

@@ -80,8 +80,8 @@ public class InfillTurtle {
 		after.y = before.y - before.height * percent;
 		after.height = before.height * (1.0 + percent * 2.0);
 		after.width = before.width * (1.0 + percent * 2.0);
-		logger.debug("    before="+before.toString());
-		logger.debug("    after="+after.toString());
+		logger.debug("    before={}", before.toString());
+		logger.debug("    after={}", after.toString());
 		return after;
 	}
 
@@ -136,7 +136,7 @@ public class InfillTurtle {
 	 *         sort by ascending y value.
 	 */
 	private ArrayList<LineSegment2D> sortIntersectionsIntoSegments(ArrayList<Point2D> intersections, ColorRGB color) {
-		logger.debug("  sortIntersectionsIntoSegments() " + intersections.size());
+		logger.debug("  sortIntersectionsIntoSegments() {}", intersections.size());
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {

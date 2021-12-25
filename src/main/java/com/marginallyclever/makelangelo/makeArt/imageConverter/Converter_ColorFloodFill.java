@@ -185,7 +185,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		float x, y;
 		int z = 0;
 
-		logger.debug("Palette color " + palette.getColor(colorIndex).toString() );
+		logger.debug("Palette color {}", palette.getColor(colorIndex).toString());
 
 		for (y = (int)yBottom; y < yTop; y += diameter) {
 			for (x = (int)xLeft; x < xRight; x += diameter) {

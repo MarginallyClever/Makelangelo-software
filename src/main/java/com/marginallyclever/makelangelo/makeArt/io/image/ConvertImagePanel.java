@@ -217,13 +217,13 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	
 	private void startConversion() {
 		if(myConverterPanel==null || myImage==null) return;
-		logger.debug("startConversion() "+myConverterPanel.getName());
+		logger.debug("startConversion() {}", myConverterPanel.getName());
 		startWorker();
 	}
 	
 	private void changeConverter(ImageConverterPanel chosenPanel) {
 		if( chosenPanel == myConverterPanel ) return;
-		logger.debug("changeConverter() "+chosenPanel.getName());
+		logger.debug("changeConverter() {}", chosenPanel.getName());
 		stopConversion();
 
 		if(myConverterPanel!=null) {

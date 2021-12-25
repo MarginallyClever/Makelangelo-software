@@ -267,7 +267,7 @@ public class LoadSVG implements TurtleLoader {
 			double circ = Math.PI * 2.0 * r;
 			circ = Math.ceil(Math.min(Math.max(3,circ),360));
 			
-		    logger.debug("circ="+circ);
+		    logger.debug("circ={}", circ);
 			for(double i=1;i<circ;++i) {
 				double v = (Math.PI*2.0) * (i/circ);
 				double s=r*Math.sin(v);
@@ -345,7 +345,7 @@ public class LoadSVG implements TurtleLoader {
 			for(int i=0; i<itemCount; i++) {
 				++sinceClosePath;
 				SVGPathSeg item = pathList.getItem(i);
-				logger.debug("segType="+item.getClass().getSimpleName());
+				logger.debug("segType={}", item.getClass().getSimpleName());
 				switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_CLOSEPATH:  // Z z
 					{
@@ -358,7 +358,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
 					{
 						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						logger.debug("Move Abs x"+path.getX()+" y"+path.getY());
+						logger.debug("Move Abs x{} y{}", path.getX(), path.getY());
 						px = path.getX();
 						py = path.getY();
 						if(sinceClosePath==1) {
@@ -372,7 +372,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_MOVETO_REL:  // m
 					{
 						SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
-						logger.debug("Move Rel x"+path.getX()+" y"+path.getY());
+						logger.debug("Move Rel x{} y{}", path.getX(), path.getY());
 						px += path.getX();
 						py += path.getY();
 						if(sinceClosePath==1) {
@@ -386,7 +386,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_LINETO_ABS:  // L H V
 					{
 						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						logger.debug("Line Abs x"+path.getX()+" y"+path.getY());
+						logger.debug("Line Abs x{} y{}", path.getX(), path.getY());
 						px = path.getX();
 						py = path.getY();
 						v = transform(px,py,m);
@@ -396,7 +396,7 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_LINETO_REL:  // l h v
 					{
 						SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
-						logger.debug("Line Rel x"+path.getX()+" y"+path.getY());
+						logger.debug("Line Rel x{} y{}", path.getX(), path.getY());
 						px += path.getX();
 						py += path.getY();
 						v = transform(px,py,m);
@@ -406,9 +406,9 @@ public class LoadSVG implements TurtleLoader {
 				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // C c
 					{
 						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
-						logger.debug("Curve Cubic Abs x"+path.getX() +"  y"+path.getY() );
-						logger.debug("               1x"+path.getX1()+" 1y"+path.getY1());
-						logger.debug("               2x"+path.getX2()+" 2y"+path.getY2());
+						logger.debug("Curve Cubic Abs x{}  y{}", path.getX(), path.getY());
+						logger.debug("               1x{} 1y{}", path.getX1(), path.getY1());
+						logger.debug("               2x{} 2y{}", path.getX2(), path.getY2());
 
 						// x0,y0 is the first point
 						double x0=px;
