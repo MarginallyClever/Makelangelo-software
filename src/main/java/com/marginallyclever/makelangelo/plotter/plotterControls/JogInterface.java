@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class JogInterface extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(JogInterface.class);
@@ -75,12 +77,11 @@ public class JogInterface extends JPanel {
 	
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
+		bar.setFloatable(false);
+		JButton penUp    = new ButtonIcon("JogInterface.PenUp", "/images/arrow_up.png");
+		JButton penDown  = new ButtonIcon("JogInterface.PenDown", "/images/arrow_down.png");
+		toggleEngageMotor = new ButtonIcon("JogInterface.DisengageMotors", "/images/lock_open.png");
 
-		JButton penUp    = new JButton(Translator.get("JogInterface.PenUp"));
-		JButton penDown  = new JButton(Translator.get("JogInterface.PenDown"));
-		toggleEngageMotor = new JButton(Translator.get("JogInterface.DisengageMotors"));
-
-		bar.addSeparator();
 		bar.add(penUp);
 		bar.add(penDown);
 		bar.addSeparator();
@@ -88,15 +89,17 @@ public class JogInterface extends JPanel {
 		
 		penUp.addActionListener((e)-> myPlotter.raisePen());
 		penDown.addActionListener((e)-> myPlotter.lowerPen());
-		toggleEngageMotor.addActionListener((e)-> onToggleEngageMotorAction());
+		toggleEngageMotor.addActionListener(this::onToggleEngageMotorAction);
 		
 		return bar;
 	}
 
-	private void onToggleEngageMotorAction() {
+	private void onToggleEngageMotorAction(ActionEvent e) {
 		if (myPlotter.getAreMotorsEngaged()) {
+			((ButtonIcon) e.getSource()).replaceIcon("/images/lock.png");
 			myPlotter.disengageMotors();
 		} else {
+			((ButtonIcon) e.getSource()).replaceIcon("/images/lock_open.png");
 			myPlotter.engageMotors();
 		}
 	}

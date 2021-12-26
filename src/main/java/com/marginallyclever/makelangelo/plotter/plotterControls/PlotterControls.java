@@ -1,17 +1,21 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class PlotterControls extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(PlotterControls.class);
 	private static final long serialVersionUID = 1L;
 	private Plotter myPlotter;
 	private Turtle myTurtle;
@@ -19,12 +23,11 @@ public class PlotterControls extends JPanel {
 	private MarlinInterface marlinInterface;
 	private ProgramInterface programInterface;
 
-	//private JButton bSaveGCode = new JButton(Translator.get("PlotterControls.SaveGCode"));
-	private JButton bFindHome = new JButton(Translator.get("JogInterface.FindHome"));
-	private JButton bRewind = new JButton(Translator.get("PlotterControls.Rewind"));
-	private JButton bStart = new JButton(Translator.get("PlotterControls.Play"));
-	private JButton bStep = new JButton(Translator.get("PlotterControls.Step"));
-	private JButton bPause = new JButton(Translator.get("PlotterControls.Pause"));
+	private JButton bFindHome;
+	private JButton bRewind;
+	private JButton bStart;
+	private JButton bStep;
+	private JButton bPause;
 	private JProgressBar progress = new JProgressBar(0, 100);
 
 	private boolean isRunning = false;
@@ -61,15 +64,20 @@ public class PlotterControls extends JPanel {
 		});
 	}
 
-	private JToolBar getToolBar() {
-		JToolBar bar = new JToolBar();
-		bar.setFloatable(false);
-		bar.add(bFindHome);
-		bar.addSeparator();
-		bar.add(bRewind);
-		bar.add(bStart);
-		bar.add(bPause);
-		bar.add(bStep);
+	private JPanel getToolBar() {
+
+		bFindHome = new PlotterButton("JogInterface.FindHome", "/images/house.png");
+		bRewind = new PlotterButton("PlotterControls.Rewind", "/images/control_start_blue.png");
+		bStart = new PlotterButton("PlotterControls.Play", "/images/control_play_blue.png");
+		bStep = new PlotterButton("PlotterControls.Step", "/images/control_fastforward_blue.png");
+		bPause = new PlotterButton("PlotterControls.Pause", "/images/control_pause_blue.png");
+
+		JPanel panel = new JPanel();
+		panel.add(bFindHome);
+		panel.add(bRewind);
+		panel.add(bStart);
+		panel.add(bPause);
+		panel.add(bStep);
 
 		bFindHome.addActionListener((e) -> findHome());
 		bRewind.addActionListener((e) -> rewind());
@@ -79,7 +87,7 @@ public class PlotterControls extends JPanel {
 
 		updateButtonStatus();
 
-		return bar;
+		return panel;
 	}
 
 	private void findHome() {
@@ -174,6 +182,14 @@ public class PlotterControls extends JPanel {
 		marlinInterface.closeConnection();
 	}
 
+	static class PlotterButton extends ButtonIcon{
+
+		PlotterButton(String translationKey, String iconPath) {
+			super(translationKey, iconPath);
+			setMargin(new Insets(5, 5, 5, 5));
+		}
+	}
+
 	// TEST
 
 	public static void main(String[] args) {
@@ -181,7 +197,7 @@ public class PlotterControls extends JPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		JFrame frame = new JFrame(PlotterControls.class.getSimpleName());
+		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new PlotterControls(new Plotter(), new Turtle()));
 		frame.pack();

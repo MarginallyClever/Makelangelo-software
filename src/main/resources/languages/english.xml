@@ -556,11 +556,7 @@
 		<hint>start at dialog</hint>
 	</string>
 
-	<string>
-		<key>PlotterControls.Pause</key>
-		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
+
 
 	<string>
 		<key>Robot</key>
@@ -575,6 +571,16 @@
 	<string>
 		<key>SaveGCode</key>
 		<value>Save Gcode to file/SD</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Title</key>
+		<value>Robot control</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Pause</key>
+		<value>Pause</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
