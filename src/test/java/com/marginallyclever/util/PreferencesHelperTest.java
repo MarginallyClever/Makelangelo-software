@@ -1,15 +1,10 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.util;
 
-import com.marginallyclever.util.MarginallyCleverPreferences;
-import com.marginallyclever.util.PreferencesHelper;
-import com.marginallyclever.util.UnitTestHelper;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 

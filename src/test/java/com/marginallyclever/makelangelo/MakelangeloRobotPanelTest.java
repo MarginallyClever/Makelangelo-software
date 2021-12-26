@@ -1,6 +1,5 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import org.junit.jupiter.api.Test;
