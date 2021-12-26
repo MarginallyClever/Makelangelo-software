@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
-/**
- * @(#)Makelangelo.java drawbot application with GUI
+/*
+  @(#)Makelangelo.java drawbot application with GUI
  * @author Dan Royer (dan@marginallyclever.com)
  * @version 1.00 2012/2/28
  */
@@ -138,7 +138,7 @@ public final class Makelangelo {
 	private void startRobot() {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addListener((e)-> onPlotterEvent(e));
+		myPlotter.addListener(this::onPlotterEvent);
 		myPlotter.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
@@ -286,7 +286,7 @@ public final class Makelangelo {
 
 	private void openPlotterControls() {
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle);
-		JDialog dialog = new JDialog(mainFrame,PlotterControls.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
 		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -310,30 +310,22 @@ public final class Makelangelo {
 
 		try {
 			PiCaptureAction pc = new PiCaptureAction();
-			
-			if(pc != null) {
-				JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
-				bCapture.addActionListener((e)->{
-					pc.run(mainFrame,myPaper);
-				});
-		        menu.add(bCapture);
-				menu.addSeparator();
-		    } 
+
+			JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
+			bCapture.addActionListener((e)-> pc.run(mainFrame,myPaper));
+			menu.add(bCapture);
+			menu.addSeparator();
 		} catch (FailedToRunRaspistillException e) {
 			logger.debug("Raspistill unavailable.");
 		}
 
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
-		fit.addActionListener((e)->{
-			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false));
-		});
+		fit.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false)));
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
-		fill.addActionListener((e)->{
-			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true));
-		});
+		fill.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true)));
 
 		JMenuItem scale = new JMenuItem(Translator.get("Scale"));
 		menu.add(scale);
@@ -416,9 +408,7 @@ public final class Makelangelo {
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
-		recentFiles.addSubmenuListener((e)->{
-			openLoadFile(((JMenuItem)e.getSource()).getText());	
-		});
+		recentFiles.addSubmenuListener((e)-> openLoadFile(((JMenuItem)e.getSource()).getText()));
 		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
@@ -456,9 +446,7 @@ public final class Makelangelo {
 		logger.debug("Loading file {}...", filename);
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
-			loader.addActionListener((e)->{
-				setTurtle((Turtle)(e).getSource());
-			});
+			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
 			previewPanel.addListener(loader);
 			if(filename!=null && !filename.trim().isEmpty() ) {
 				loader.load(filename);
@@ -520,9 +508,7 @@ public final class Makelangelo {
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomToFit.addActionListener((e) -> {
-			camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
-		});
+		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight()));
 		menu.add(buttonZoomToFit);
 
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("MenuGraphicsPenUp"),GFXPreferences.getShowPenUp());
