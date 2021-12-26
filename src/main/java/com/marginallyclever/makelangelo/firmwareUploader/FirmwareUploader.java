@@ -11,7 +11,9 @@ import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
+import java.nio.file.FileSystem;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -19,8 +21,7 @@ public class FirmwareUploader {
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
 
-	//private String avrdudePath = "";
-	private String avrdudePath = "avrdude";// if this is in the path juste the cmd (linux) (for windows avrdude.exe )
+	private String avrdudePath = "";
 
 	/**
 	 * TODO TO REVIEW : if avrdude is in the path .
@@ -41,12 +42,16 @@ public class FirmwareUploader {
 	 * avrdude:
 	 * </code>
 	 * 
-	 * or on windows : ??? parse the path env variable and check eatch dirs in the path to maybe find it ?
+	 * or on windows : ??? 
+	 * 
+	 * or if ther is a PATH env var : parse the path env variable and check eatch dirs in the path to maybe find it ?
 	 * 
 	 */
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
 		String name = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
+		
+		// TODO to reorder : first "." then env PATH then "~" the posible "arduino programfile dir"
 		
 		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
 		File f = new File(name);
@@ -55,6 +60,7 @@ public class FirmwareUploader {
 			return;
 		}
 		
+		// TO rework ... windows env variable "%PROGRAMFILES%" ?? to chechk 
 		// arduinoPath
 		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+name);
 		if(f.exists()) {
@@ -62,9 +68,19 @@ public class FirmwareUploader {
 			return;
 		} 
 		
+		// user home 
 		f = new File(FileAccess.getUserDirectory() + File.separator+name);
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
+		}
+		
+		
+		if ( avrdudePath != null && avrdudePath.length()==0){
+		    //Search the env system PATH.
+		    ArrayList<String> searchCommandFromEnvPath = FirmwareUploader.searchCommandFromEnvPath(name, true);
+		    if (searchCommandFromEnvPath != null && searchCommandFromEnvPath.size() > 0) {
+			avrdudePath = searchCommandFromEnvPath.get(0);
+		    }	    
 		}
 	}
 	
@@ -87,9 +103,9 @@ public class FirmwareUploader {
 			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
-			    // TODO to reactive the throw juste for demo purpose of process exec.
-				//throw new Exception("Cannot find nearby avrdude.conf");
-				   System.err.println("Cannot find nearby avrdude.conf ");
+			    // TODO reactivat the throw ( disable juste for demo purpose of process exec.)
+			    //throw new Exception("Cannot find nearby avrdude.conf");
+			    logger.error("Cannot find nearby avrdude.conf ");// TODO traduction
 			}
 		}
 		
@@ -97,7 +113,7 @@ public class FirmwareUploader {
 		
 		String [] options = new String[]{
 				avrdudePath,
-	    		//"-C"+confPath, //TODO In some case there is no need to give the .conf file.
+	    		//"-C"+confPath, // TODO In some case there is no need to give the .conf file.
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
 	    		"-cwiring",
@@ -111,31 +127,44 @@ public class FirmwareUploader {
 		//
 		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
 		//
-		System.out.println("(During)Commande exec result : ");
+		logger.debug("(During)Commande exec result : ");
 		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs);
 		// For simple test :  String ouptups =  execBashCommand(new String[]{"ls"}, null);
 		resRunLog = fullExecCmdOutputsAsTexte;
-		System.out.println("");
-		System.out.println("(After)Commande exec result : is a succes = " + lastExecSucces);
-		System.out.println(fullExecCmdOutputsAsTexte);
+		logger.debug("(After)Commande exec result : is a succes = " + lastExecSucces);
+		logger.debug(fullExecCmdOutputsAsTexte);
 
 		logger.debug("update finished");
 		//Log.message("update finished");
 		return resRunLog;
 	}
 
+	/**
+	 * 
+	 * @param cmd
+	 * @throws Exception
+	 * @deprecated cause it don't use process exit code value.
+	 */
+	@Deprecated
 	private void runCommand(String[] cmd) throws Exception {
 		Process p = Runtime.getRuntime().exec(cmd);
 		//runStreamReaders(p);
 		runBufferedReaders(p);
 	}
 
+	/**
+	 * 
+	 * @param p
+	 * @throws IOException
+	 * @deprecated as some error and output stream can be interlaced.
+	 */
+	@Deprecated
 	@SuppressWarnings("unused")
 	private void runStreamReaders(Process p) throws IOException {
 		InputStreamReader stdInput = new InputStreamReader(p.getInputStream());
 		InputStreamReader stdError = new InputStreamReader(p.getErrorStream());
 
-		System.out.println("errors (if any):\n");
+		logger.debug("errors (if any):\n");
 		boolean errorOpen=true;
 		boolean inputOpen=true;
 		int s;
@@ -166,8 +195,12 @@ public class FirmwareUploader {
 			logger.debug("update: {}", s);
 	}
 	
+	/**
+	 * Return the path of the arvdude executable file to use.
+	 * @return 
+	 */
 	public String getAvrdudePath() {
-		return avrdudePath;
+	    return avrdudePath;
 	}
 
 	public void setAvrdudePath(String avrdudePath) {
@@ -193,8 +226,7 @@ public class FirmwareUploader {
 	//
 	//
 	
-	//Not Thread safe (have to create a new at eatch need)
-	//public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
+	//public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");//Not Thread safe (have to create a new at eatch need)
 
 	static boolean debugRuntimeExecPre = true;
 	static boolean lastExecSucces = false;
@@ -222,17 +254,10 @@ public class FirmwareUploader {
 	    
 	    // Only for dev debug (can be remove)
 	    if (debugRuntimeExecPre) {
-		System.out.printf("Running : ");
-		for (String arg : cmdArray) {
-		    System.out.printf("%s ", arg);
-		}
-		System.out.printf("\n");
+		logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));
 	    }
-	    
-	    res.append("Running : ");
-	    for (String arg : cmdArray) {
-		res.append(String.format("%s ", arg));
-	    }
+	    //
+	    res.append("Running : "+processStringArrayCommandToPlainString(cmdArray));
 	    res.append("\n");
 
 	    try {
@@ -279,8 +304,7 @@ public class FirmwareUploader {
 			@Override
 			public void readLineEvent(Date d, String s) {
 			    if ( debugRuntimeExecPre){				
-			    System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
-			    System.out.flush();
+				logger.debug(String.format("%s : [%3d][%s]", simpleDateFormat.format(d), s.length(), s));
 			    }
 			    res.append(s);
 			    res.append("\n");
@@ -311,10 +335,8 @@ public class FirmwareUploader {
 
 		    @Override
 		    public void readLineEvent(Date d, String s) {
-			if ( debugRuntimeExecPre){
-			    
-			System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
-			System.out.flush();
+			if ( debugRuntimeExecPre){			    
+			    logger.debug(String.format("%s : [%3d][%s]", simpleDateFormat.format(d), s.length(), s));
 			}
 			res.append(s);
 			res.append("\n");
@@ -342,7 +364,7 @@ public class FirmwareUploader {
 //		    if (p_out != null) {
 //			// p_out.write(10);
 //			if (debugRuntimeExecPre) {
-//			    System.out.printf("%s %s\n", "out on", p_out.getClass().getCanonicalName());
+//			    logger.debug(String.format("%s %s", "out on", p_out.getClass().getCanonicalName()));
 //			}
 //			if (p_out instanceof BufferedOutputStream) {
 //			    BufferedOutputStream p_out_buf = (BufferedOutputStream) p_out;
@@ -352,7 +374,7 @@ public class FirmwareUploader {
 //			p_out.close();
 //		    } else {
 //			 if (debugRuntimeExecPre) {
-//			     System.out.printf("%s\n", "out off");
+//			     logger.debug(String.format("%s", "out off"));
 //			 }
 //		    }
 //		}
@@ -375,32 +397,97 @@ public class FirmwareUploader {
 		lastExecSucces = (ret == 0);
 
 		if (debugRuntimeExecPre) {
-		    System.out.printf("Running : ", ret);
-		    for (String arg : cmdArray) {
-			System.out.printf("%s ", arg);
-		    }
-   		}
-   
-		if (debugRuntimeExecPre) {
-		    System.out.printf("\nexitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount);
+		    logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));   		
+		    logger.debug(String.format("exitValue = %d (in %d ms : out %d err %d)", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
 		}
 		
 		res.append(String.format("exitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
 
 	    } catch (IOException | InterruptedException e) {
 		
-		if (debugRuntimeExecPre) {
-		    System.out.printf("Running : ");
-		    for (String arg : cmdArray) {
-			System.out.printf("%s ", arg);
-		    }
-		    System.out.printf("\nexit on error = %s\n", e.getMessage());
+		// 
+		if (debugRuntimeExecPre) {		    
+		    logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));
+		    logger.debug(" exit on error : {}", e.getMessage());
 		}
 		
 		res.append(e.getMessage());
+		
+		logger.error("Failed to uploade firmware : {}", e.getMessage());
 	    }
 	    
 	    return res.toString();
+	}
+	
+	
+	/**
+	 * Utility function to get a plaine String from a String array.
+	 * 
+	 * TODO : char protection " " ...
+	 * 
+	 * @param cmdArray
+	 * @return 
+	 */
+	public static String processStringArrayCommandToPlainString(String[] cmdArray) {
+	    StringBuilder sbCommande = new StringBuilder();
+	    if (cmdArray != null && cmdArray.length > 0) {
+		for (String arg : cmdArray) {
+		    // TODO to be usable in a cut and past to a consol, may have to do some char protection or ...
+		    //arg = arg.replaceAll(" ","\\ ");
+		    //if ( arg.contains("\""))
+		    // ...
+			
+		    sbCommande.append(arg + " ");
+		}
+		if (sbCommande.length() > 0) {
+		    //To remove a posible space add from the for 
+		    sbCommande.setLength(sbCommande.length() - 1);
+		}
+	    }
+	    return sbCommande.toString();
+	}
+	
+	//
+	//
+	//
+	
+	/**
+	 * Utility function to find if an executable file with the name commandName is in the systeme PATH.
+	 * 
+	 * ( do not check the systeme OS so under windows you need to specifiy a "cmdName.exe" or "cmdName.com" or ... )
+	 * 
+	 * ( do not work for bash specific command like "export" or "set" ... )
+	 * 
+	 * ( on some system/JRE configuration, File.canExecute() can alwayse return true.)
+	 * 
+	 * @param commandName the name of the commande to find.
+	 * @param addCurrentPwdFirst to check in the currend directory. (may not be in the system PATH (security reasons))
+	 * @return an arrayList of the executable files matching ( in the order of the system PATH ).
+	 */
+	public static ArrayList<String> searchCommandFromEnvPath(String commandName, boolean addCurrentPwdFirst) {
+	    ArrayList<String> res = new ArrayList<>();
+	    try { // if in an applet to avoid security exception ?
+
+		if (addCurrentPwdFirst) {
+		    File f = new File(commandName);
+		    if (f.exists() && f.canExecute()) {
+			res.add(f.toString());
+		    }
+		}
+		
+		String pathDelimiter = File.pathSeparator;
+		//String pathDelimiter = System.getProperty("path.separator");
+		String envPathVariable = System.getenv("PATH");
+		for (String s : envPathVariable.split(pathDelimiter)) {
+		    //System.out.println("> "+s);
+		    File f = new File(s, commandName);
+		    if (f.exists() && f.canExecute()) {
+			res.add(f.toString());
+		    }
+		}
+	    } catch (Exception e) {
+	    }
+	    return res;
 	}
 
 }

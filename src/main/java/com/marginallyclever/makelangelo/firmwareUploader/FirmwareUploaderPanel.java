@@ -32,6 +32,8 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private SelectButton goButton = new SelectButton("start",Translator.get("Start")); 
 	private SelectTextArea selectTextAreaForAvrdudeExecLog = new SelectTextArea("avrdude_logs",Translator.get("avrdude.logs"),""); 
 	
+	final String msg_firmware_upload_status = "Firmware upload status"; // TODO traduction
+	
 	public FirmwareUploaderPanel() {
 		super();
 		
@@ -52,6 +54,9 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		checkForHexFileInCurrentWorkingDirectory();
 	}
 	
+	/**
+	 * TODO user home dir ?
+	 */
 	private void checkForHexFileInCurrentWorkingDirectory() {
 		String path = FileAccess.getWorkingDirectory();
 		File folder = new File(path);
@@ -97,10 +102,9 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		    
 		    // TODO clean the mess ... do it better ...
 		    
-		    class MeaningOfLifeFinder extends SwingWorker<String, Object> {
+		    class RunExecAvrDudeProcess extends SwingWorker<String, Object> {
 			// TODO traduction
-			final String msg_firmware_upload_status = "Firmware upload status";				
-
+			
 			boolean resExecValueIsZero = false;
 
 			@Override
@@ -155,7 +159,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		    }
 		    
 		    // running the SwingWorker ( a thread )
-		    (new MeaningOfLifeFinder()).execute();
+		    (new RunExecAvrDudeProcess()).execute();
 		    //			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
 		    //			 firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		    //			
@@ -164,14 +168,14 @@ public class FirmwareUploaderPanel extends SelectPanel {
 
 		    //firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
-		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),"Firmware upload status",JOptionPane.ERROR_MESSAGE);
+		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 //		    status = e1.getMessage();
 //		    messageType = JOptionPane.ERROR_MESSAGE;
 		}
 
 		//setCursor(Cursor.getDefaultCursor());
 		//goButton.setEnabled(true);
-		//JOptionPane.showMessageDialog(this,status,"Firmware upload status",messageType);
+		//JOptionPane.showMessageDialog(this,status,msg_firmware_upload_status,messageType);
 	}
 	
 	/**
@@ -181,7 +185,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	 */
 	private boolean AVRDudeExists() {
 	    
-		FirmwareUploader.execBashCommand(new String[]{"avrdude", "--version"}, null,null);
+	  	FirmwareUploader.execBashCommand(new String[]{sourceAVRDude.getText().trim()/*"avrdude"*/, "-?"}, null,null);
 		if ( FirmwareUploader.lastExecSucces ) {
 		    return true;
 		}		
@@ -189,7 +193,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		File f = new File(sourceAVRDude.getText());
 		boolean state = f.exists(); 
 		if(!state) {
-			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,"AVRDude not found.",msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 		}
 		return state;
 	}
