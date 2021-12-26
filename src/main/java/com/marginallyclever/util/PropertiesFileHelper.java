@@ -1,11 +1,12 @@
 package com.marginallyclever.util;
 
+import com.marginallyclever.makelangelo.Makelangelo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Makelangelo;
 
 /**
  * Created on 5/10/15.
@@ -14,7 +15,7 @@ import com.marginallyclever.makelangelo.Makelangelo;
  * @since v7.1.2
  */
 public final class PropertiesFileHelper {
-
+  private static final Logger logger = LoggerFactory.getLogger(PropertiesFileHelper.class);
   /**
    *
    */
@@ -38,10 +39,10 @@ public final class PropertiesFileHelper {
 
       //get the property value and print it out
       makelangeloVersionPropertyValue = prop.getProperty("makelangelo.version");
-      Log.message("makelangelo.version="+ makelangeloVersionPropertyValue);
+      logger.debug("makelangelo.version={}", makelangeloVersionPropertyValue);
 
     } catch (IllegalStateException | IOException ex) {
-      Log.error( ex.getMessage() );
+      logger.error("Failed to load {}", MAKELANGELO_PROPERTIES_FILENAME, ex);
     }
     return makelangeloVersionPropertyValue;
   }

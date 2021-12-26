@@ -1,17 +1,20 @@
 package com.marginallyclever.convenience;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.SoundPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.SoundPreferences;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 
 @Deprecated
 public class SoundSystem {
+
+	private static final Logger logger = LoggerFactory.getLogger(SoundSystem.class);
+
 	static public void playSound(String url) {
 		if (url.isEmpty()) return;
 
@@ -22,7 +25,7 @@ public class SoundSystem {
 			clip.open(inputStream);
 			clip.start();
 		} catch (Exception e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to play sound", e);
 		}
 	}
 

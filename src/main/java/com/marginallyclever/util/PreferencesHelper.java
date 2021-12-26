@@ -1,5 +1,10 @@
 package com.marginallyclever.util;
 
+import org.json.JSONObject;
+import org.json.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,17 +16,15 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.json.JSONObject;
-import org.json.Property;
-
-import com.marginallyclever.convenience.log.Log;
-
 /**
  * Helper class to be used when accessing preferences.
  * @author Peter Colapietro
  * @since v7.1.4
  */
 public final class PreferencesHelper {
+
+	private static final Logger logger = LoggerFactory.getLogger(PreferencesHelper.class);
+	
 	/**
 	 * Internal mapping of all Makelangelo preference nodes.
 	 */
@@ -71,7 +74,7 @@ public final class PreferencesHelper {
 		try {
 			legacyMakelangeloPreferenceNode.sync();
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to sync pref", e);
 		}
 		//initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
 		initialMap.put(MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
@@ -128,7 +131,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			Log.message("node name:"+preferenceNode);
+			logger.debug("node name:{}", preferenceNode);
 			logKeyValuesForPreferenceNode(preferenceNode);
 			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
 			for (String childNodeName : childrenPreferenceNodeNames) {
@@ -136,7 +139,7 @@ public final class PreferencesHelper {
 				logPreferenceNode(childNode);
 			}
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to load preference", e);
 		}
 	}
 
@@ -147,7 +150,7 @@ public final class PreferencesHelper {
 	public static <P extends Preferences> void logKeyValuesForPreferenceNode(P preferenceNode) throws BackingStoreException {
 		final String[] keys = preferenceNode.keys();
 		for (String key : keys) {
-			Log.message("key:"+key+" value:"+ preferenceNode.get(key, null));
+			logger.debug("key:{} value:{}", key, preferenceNode.get(key, null));
 		}
 	}
 
@@ -169,7 +172,7 @@ public final class PreferencesHelper {
 				copyPreferenceNode(sourcePreferenceNode.node(childName), destinationChildNode);
 			}
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to copy preference", e);
 		}
 	}
 
@@ -206,7 +209,7 @@ public final class PreferencesHelper {
 		try {
 			preferenceNode.clear();
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to clear preference", e);
 		}
 	}
 
@@ -224,7 +227,7 @@ public final class PreferencesHelper {
 				childNode.clear();
 			}
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to deep clear preference", e);
 		}
 	}
 
@@ -243,7 +246,7 @@ public final class PreferencesHelper {
 		try {
 			PreferencesHelper.clearAll(destinationPreferenceNode);
 		} catch (BackingStoreException e) {
-			Log.error(e.getMessage());
+			logger.error(e.getMessage());
 		}
 		PreferencesHelper.copyPreferenceNode(sourcePreferenceNode, destinationPreferenceNode);
 		final File preferencesFile = MarginallyCleverPreferencesFileFactory.getPropertiesPreferencesFile();
@@ -251,7 +254,7 @@ public final class PreferencesHelper {
 		try (final FileInputStream inStream = new FileInputStream(preferencesFile)) {
 			p.load(inStream);
 		} catch (IOException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to copy preference file {}", preferencesFile, e);
 		}
 		logPropertiesNode(p);
 		logAncestryable(destinationPreferenceNode);
@@ -262,7 +265,7 @@ public final class PreferencesHelper {
 	 */
 	public static void logAncestryable(Ancestryable preferenceNode) {
 		final JSONObject object = new JSONObject(preferenceNode.getChildren());
-		Log.message( object.toString());
+		logger.debug( object.toString());
 	}
 
 	/**
@@ -270,7 +273,7 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Properties> void logPropertiesNode(P properties) {
 		final JSONObject jsonObject = Property.toJSONObject(properties);
-		Log.message( jsonObject.toString());
+		logger.debug( jsonObject.toString());
 	}
 
 }

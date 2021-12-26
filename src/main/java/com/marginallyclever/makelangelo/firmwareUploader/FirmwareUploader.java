@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.firmwareUploader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -7,16 +10,16 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 
 public class FirmwareUploader {
+
+	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
+
+	//private String avrdudePath = "";
 	private String avrdudePath = "avrdude";// if this is in the path juste the cmd (linux) (for windows avrdude.exe )
 
 	/**
@@ -65,6 +68,7 @@ public class FirmwareUploader {
 		}
 	}
 	
+//	public void run(String hexPath,String portName) throws Exception {
 	/**
 	 * TO REVIEW : in some case ( avrdude correctly installed on the environment (in the path) ) ) there is no need to give the .conf file path to the avrdude command.
 	 * @param hexPath
@@ -72,14 +76,15 @@ public class FirmwareUploader {
 	 * @throws Exception 
 	 */
 	public String run(String hexPath,String portName, SelectTextArea textAreaThatCanBeNullForPosibleLogs) throws Exception {
-	    String resRunLog = "";
-		Log.message("update started");
+		logger.debug("update started");
+	    
+		String resRunLog = "";
 		
 		Path p = Path.of(avrdudePath);
-		Log.message("Trying "+(p.resolve("../avrdude.conf").toString()));
+		logger.debug("Trying {}", (p.resolve("../avrdude.conf").toString()));
 		File f = p.resolve("../avrdude.conf").toFile();
 		if(!f.exists()) {
-			Log.message("Trying 2 "+(p.resolve("../../etc/avrdude.conf").toString()));
+			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
 			    // TODO to reactive the throw juste for demo purpose of process exec.
@@ -114,7 +119,8 @@ public class FirmwareUploader {
 		System.out.println("(After)Commande exec result : is a succes = " + lastExecSucces);
 		System.out.println(fullExecCmdOutputsAsTexte);
 
-		Log.message("update finished");
+		logger.debug("update finished");
+		//Log.message("update finished");
 		return resRunLog;
 	}
 
@@ -151,13 +157,13 @@ public class FirmwareUploader {
 
 		String s = null;
 
-		Log.message("update: errors (if any)\n");
+		logger.debug("update: errors (if any)\n");
 		while ((s = stdError.readLine()) != null)
-			Log.message("update: "+s);
+			logger.debug("update: {}", s);
 
-		Log.message("command out:\n");
+		logger.debug("command out:\n");
 		while ((s = stdInput.readLine()) != null)
-			Log.message("update: "+s);		
+			logger.debug("update: {}", s);
 	}
 	
 	public String getAvrdudePath() {
@@ -170,14 +176,17 @@ public class FirmwareUploader {
 	
 	// TEST
 	
-	public static void main(String[] args) {
-		Log.start();
+	public static void main(String[] args) throws Exception {
 		FirmwareUploader fu = new FirmwareUploader();
+		
+		//fu.run("./firmware.hex", "COM3");
+		
 		try {
 			fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	//

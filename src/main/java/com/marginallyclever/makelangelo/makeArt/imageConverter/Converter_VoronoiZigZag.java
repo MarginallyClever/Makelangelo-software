@@ -1,12 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.awt.Rectangle;
-import java.beans.PropertyChangeEvent;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
@@ -17,6 +11,13 @@ import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiTe
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Dithering using a particle system
@@ -26,6 +27,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @since 7.0.0?
  */
 public class Converter_VoronoiZigZag extends ImageConverter implements PreviewListener {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiZigZag.class);
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -101,7 +103,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				lowNoise=true;
 				greedyTour();
 				renderMode = 1;
-				Log.message("Running Lin/Kerighan optimization...");
+				logger.debug("Running Lin/Kerighan optimization...");
 			}			
 		}
 		return keepIterating;
@@ -190,7 +192,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
+				logger.debug("{}: {}mm", formatTime(t_elapsed), StringHelper.formatDouble(len));
 			}
 			progress = new_progress;
 			setProgress((int) progress);
@@ -281,7 +283,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	 * points have been "found".
 	 */
 	private void greedyTour() {
-		Log.message("Finding greedy tour solution...");
+		logger.debug("Finding greedy tour solution...");
 
 		int i, j;
 		double w, bestw;
@@ -328,7 +330,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				scount++;
 			} while (scount < solutionContains - 2);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to find a greedy tour solution", e);
 		}
 	}
 
@@ -342,7 +344,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 	// set some starting points in a grid
 	private void initializeCells(double minDistanceBetweenSites) {
-		Log.message("Initializing cells");
+		logger.debug("Initializing cells");
 
 		cells = new VoronoiCell[numCells];
 		// convert the cells to sites used in the Voronoi class.
@@ -386,7 +388,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			lock.unlock();
 			totalWeight = adjustCentroids();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to evolve", e);
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
 				lock.unlock();
 			}
@@ -446,7 +448,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				cells[e.site2].addPoint((float)e.x1, (float)e.y1);
 				cells[e.site2].addPoint((float)e.x2, (float)e.y2);
 			} catch(Exception err) {
-				err.printStackTrace();
+				logger.error("Failed to tessellate", err);
 			}
 		}
 	}

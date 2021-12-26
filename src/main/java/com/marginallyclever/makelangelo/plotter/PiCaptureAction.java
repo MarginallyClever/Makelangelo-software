@@ -27,17 +27,18 @@ import com.hopding.jrpicam.enums.DRC;
 import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.paper.Paper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Raspi camera capture to file for image processing
  */
 public class PiCaptureAction {
     private static final int BUTTON_HEIGHT = 25;
-
+	private static final Logger logger = LoggerFactory.getLogger(PiCaptureAction.class);
 	private RPiCamera piCamera = new RPiCamera("/home/pi/Pictures");
 	
 	// picam controls
@@ -215,13 +216,12 @@ public class PiCaptureAction {
 				piCamera.setSharpness(sharpnessSlider.getValue());
 				piCamera.setTimeout(3000);
 				buffImg = piCamera.takeBufferedStill();
-				Log.message("Executed this command:\n\t" + piCamera.getPrevCommand());
+				logger.debug("Executed this command:\n\t{}", piCamera.getPrevCommand());
 				ImageIcon icon = new ImageIcon(buffImg);
 				imageLabel.setIcon(icon);
 				buttonUseCapture.setEnabled(true);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.error("PiCaptureAction: "+e.getMessage());
+				logger.error("PiCaptureAction: ", e);
 				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 		});
@@ -247,7 +247,7 @@ public class PiCaptureAction {
 					ImageIO.write(buffImg, "jpg", saveFile);
 					useImage = true;
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error("Error while saving {}", saveFile, e);
 				}
 
 				dialog.dispose();
@@ -280,13 +280,13 @@ public class PiCaptureAction {
 
 		// Take a still image and save it as "/home/pi/Pictures/cameraCapture.jpg"
 
-		Log.message("We are about to display dialog\n");
+		logger.debug("We are about to display dialog\n");
 		dialog.add(panel);
 		dialog.pack();
 		dialog.setVisible(true);
-//			Log.message("We are about to take a still image\n");
+//			logger.debug("We are about to take a still image\n");
 //			File image = piCamera.takeStill("cameraCapture.jpg", captureW, captureH);
-//			Log.message("New JPG capture saved to:\n\t" + image.getAbsolutePath());
+//			logger.debug("New JPG capture saved to:\n\t" + image.getAbsolutePath());
 //			piCamera.turnOffPreview();
 		// setup for reopen
 

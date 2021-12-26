@@ -1,9 +1,7 @@
 package com.marginallyclever.makelangeloRobot;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.util.PreferencesHelper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,15 +9,9 @@ import org.junit.jupiter.api.Test;
 public class PaperTest {
 	@BeforeEach
 	public void beforeEach() {
-		Log.start();
 		PreferencesHelper.start();
 	}
-	
-	@AfterEach
-	public void afterEach() {
-		Log.end();
-	}
-	
+
 	/*
 	@Test
 	public void testChangeToolMessage() {

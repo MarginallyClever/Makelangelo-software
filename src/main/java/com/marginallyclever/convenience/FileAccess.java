@@ -1,11 +1,9 @@
 package com.marginallyclever.convenience;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
@@ -19,6 +17,7 @@ import java.util.zip.ZipInputStream;
  */
 public class FileAccess {
 
+	private static final Logger logger = LoggerFactory.getLogger(FileAccess.class);
 	/**
 	 * Open a file.  open() looks in three places:<br>
 	 *  - The file may be contained inside a zip, as indicated by the filename "zipname:filename".<br>
@@ -88,6 +87,10 @@ public class FileAccess {
         fos.close();
 	}
 
+	/**
+	 * Return the current directory
+	 * @return the current directory
+	 */
 	public static String getUserDirectory() {
 		return System.getProperty("user.dir");
 	}
@@ -100,5 +103,41 @@ public class FileAccess {
 		Path currentRelativePath = Paths.get("");
 		String s = currentRelativePath.toAbsolutePath().toString();
 		return s;
+	}
+
+	/**
+	 * https://stackoverflow.com/a/7322581
+	 * @param file file to read
+	 * @return the last line in the file
+	 */
+	public static String tail( File file ) {
+		try (RandomAccessFile fileHandler = new RandomAccessFile( file, "r" )) {
+			long fileLength = fileHandler.length() - 1;
+			StringBuilder sb = new StringBuilder();
+
+			for(long filePointer = fileLength; filePointer != -1; filePointer--) {
+				fileHandler.seek( filePointer );
+				int readByte = fileHandler.readByte();
+
+				if( readByte == 0xA ) {  // 10, line feed, '\n'
+					if( filePointer == fileLength ) {
+						continue;
+					}
+					break;
+				} else if( readByte == 0xD ) {  // 13, carriage-return '\r'
+					if( filePointer == fileLength - 1 ) {
+						continue;
+					}
+					break;
+				}
+
+				sb.append( ( char ) readByte );
+			}
+
+			return sb.reverse().toString();
+		} catch(IOException e ) {
+			logger.warn("Failed to read the last lines of the file {}", file, e);
+			return "";
+		}
 	}
 }

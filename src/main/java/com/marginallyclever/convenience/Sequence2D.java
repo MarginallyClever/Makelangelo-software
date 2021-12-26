@@ -1,5 +1,8 @@
 package com.marginallyclever.convenience;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -12,6 +15,7 @@ import java.util.Collections;
  */
 @Deprecated(since="7.30.0")
 public class Sequence2D {
+	private static final Logger logger = LoggerFactory.getLogger(Sequence2D.class);
 	public ArrayList<LineSegment2D> lines;
 	public boolean isClosed;
 	
@@ -24,7 +28,7 @@ public class Sequence2D {
 		try {
 			Collections.reverse(lines);
 		} catch(Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to flip", e);
 		}
 		for( LineSegment2D line : lines ) {
 			line.flip();

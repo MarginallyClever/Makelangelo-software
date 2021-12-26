@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import com.marginallyclever.communications.NetworkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -16,6 +18,8 @@ import com.marginallyclever.communications.NetworkSession;
  * @since v7 (4/12/15)
  */
 public final class TCPConnection extends NetworkSession implements Runnable {
+	private static final Logger logger = LoggerFactory.getLogger(TCPConnection.class);
+
 	public static final int DEFAULT_TCP_PORT = 9999;
 	
 	private SocketChannel socket;
@@ -38,7 +42,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			try {
 				socket.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 		}
 		portOpened = false;
@@ -85,7 +89,7 @@ public final class TCPConnection extends NetworkSession implements Runnable {
 			}
 			catch (IOException e) {
 				if(keepPolling) {
-					e.printStackTrace();
+					logger.error("Failed to read TCP Connection", e);
 					closeConnection();
 				}
 			}

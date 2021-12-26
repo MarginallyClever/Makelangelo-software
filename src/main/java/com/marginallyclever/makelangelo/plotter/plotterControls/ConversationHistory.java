@@ -1,35 +1,20 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.EtchedBorder;
-import javax.swing.event.ListSelectionListener;
-
-import com.marginallyclever.convenience.log.Log;
-
 public class ConversationHistory extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
 	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
@@ -98,9 +83,9 @@ public class ConversationHistory extends JPanel {
 		if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 			try {
 				saveFile(chooser.getSelectedFile());
-			} catch (IOException e1) {
-				JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(),"runSaveAction error",JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
+			} catch (IOException e) {
+				logger.error("Failed to save file", e);
+				JOptionPane.showMessageDialog(this, e.getLocalizedMessage(),"runSaveAction error",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -162,7 +147,6 @@ public class ConversationHistory extends JPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ConversationHistory());

@@ -79,13 +79,13 @@ public class SelectTextArea extends Select {
 		field.setText(str);
 	}
 
-    public void append(String str) {
-	field.append(str);
-    }
+	public void append(String str) {
+	    field.append(str);
+	}
 
-    public void setEditable(boolean b) {
-	field.setEditable(b);
-    }
+	public void setEditable(boolean b) {
+	    field.setEditable(b);
+	}
 	
 	
 }

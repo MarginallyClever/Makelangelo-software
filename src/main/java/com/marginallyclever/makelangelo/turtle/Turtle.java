@@ -1,14 +1,16 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -17,7 +19,10 @@ import com.marginallyclever.convenience.log.Log;
  *
  */
 public class Turtle implements Cloneable {
-	public ArrayList<TurtleMove> history;
+
+	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
+	
+	public List<TurtleMove> history;
 
 	private ReentrantLock lock = new ReentrantLock();
 
@@ -321,7 +326,7 @@ public class Turtle implements Cloneable {
 				first=0;
 			}
 		}
-		Log.message("extent is ("+xmin+"/"+ymin+" "+xmax+"/"+ymax+" ");
+		logger.debug("extent is ({}/{} {}/{}", xmin, ymin, xmax, ymax);
 	}
 
 	// return a list of all the pen-down lines while remembering their color.
@@ -330,7 +335,7 @@ public class Turtle implements Cloneable {
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
-		Log.message("  Found "+history.size()+" instructions.");
+		logger.debug("  Found {} instructions.", history.size());
 		
 		for( TurtleMove m : history ) {
 			switch(m.type) {
@@ -404,7 +409,7 @@ public class Turtle implements Cloneable {
 			}
 			t.history.add(m);
 		}
-		Log.message("Turtle.splitByToolChange() into "+list.size()+" sections.");
+		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
 		ArrayList<Turtle> notEmptyList = new ArrayList<Turtle>();
 		for( Turtle t2 : list ) {
@@ -412,7 +417,7 @@ public class Turtle implements Cloneable {
 				notEmptyList.add(t2);
 			}
 		}
-		Log.message("Turtle.splitByToolChange() "+notEmptyList.size()+" not-empty sections.");
+		logger.debug("Turtle.splitByToolChange() {} not-empty sections.", notEmptyList.size());
 		
 		return notEmptyList;
 	}

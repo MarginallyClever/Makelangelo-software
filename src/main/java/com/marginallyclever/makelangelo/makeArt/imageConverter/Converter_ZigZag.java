@@ -1,17 +1,18 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.awt.Point;
-import java.beans.PropertyChangeEvent;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_DitherFloydSteinberg;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -21,6 +22,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 @Deprecated
 public class Converter_ZigZag extends ImageConverter implements PreviewListener {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_ZigZag.class);
 	// processing tools
 	long t_elapsed, t_start;
 	double progress;
@@ -61,7 +63,7 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 			len = getTourLength(solution);
 			if (old_len > len) {
 				old_len = len;
-				Log.message(formatTime(t_elapsed) + ": " + StringHelper.formatDouble(len) + "mm");
+				logger.debug("{}: {}mm",formatTime(t_elapsed),  StringHelper.formatDouble(len));
 			}
 			progress = new_progress;
 			setProgress((int) progress);
@@ -143,7 +145,7 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 	private void generateTSP() {
 		greedyTour();
 
-		Log.message("Running Kernighan–Lin optimization...");
+		logger.debug("Running Kernighan–Lin optimization...");
 
 		len = getTourLength(solution);
 		old_len = len;
@@ -190,7 +192,7 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 	 * Starting with point 0, find the next nearest point and repeat until all points have been "found".
 	 */
 	private void greedyTour() {
-		Log.message("Finding greedy tour solution...");
+		logger.debug("Finding greedy tour solution...");
 
 		int i;
 		float w, bestw;
@@ -279,7 +281,7 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 			}
 		}
 
-		Log.message(numPoints + " points.");
+		logger.debug("{} points.", numPoints);
 		points = new Point[numPoints + 1];
 		solution = new int[numPoints + 1];
 

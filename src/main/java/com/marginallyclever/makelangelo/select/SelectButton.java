@@ -47,6 +47,7 @@ public class SelectButton extends Select {
 	}
 
 	public void setForeground(Color fg) {
+	    if ( button != null) // PPAC so strange i need that on my system ... TO REVIEW ! A BUG ?
 		button.setForeground(fg);
 	}
 }

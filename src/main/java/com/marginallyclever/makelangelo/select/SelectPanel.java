@@ -15,7 +15,7 @@ import javax.swing.border.EmptyBorder;
 import com.marginallyclever.convenience.ColorRGB;
 
 /**
- * A container for all Select elements, to facilitate formating as a group.
+ * A container for all Select elements, to facilitate formatting as a group.
  * @author Dan Royer
  * @since 7.24.0
  */
@@ -89,7 +89,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	 * Run this to visually examine every panel element and how they look in next to each other.
 	 * @param args ignored
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		JFrame frame = new JFrame("Select Look and feel");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

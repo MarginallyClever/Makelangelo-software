@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import org.kabeja.dxf.helpers.Point;
-
-import com.marginallyclever.convenience.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -15,6 +14,9 @@ import java.util.List;
  *
  */
 public class DXFBucketGrid {
+
+	private static final Logger logger = LoggerFactory.getLogger(DXFBucketGrid.class);
+	
 	private List<DXFBucket> buckets;
 	
 	/**
@@ -28,7 +30,7 @@ public class DXFBucketGrid {
 		int totalCells = cellsWide * cellsHigh;
 		assert(totalCells>0);
 		
-		//Log.message("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
+		//logger.debug("OUTER BOUNDS ("+topLeft.getX()+","+topLeft.getY()+")-("+bottomRight.getX()+","+bottomRight.getY()+")");
 		buckets = new ArrayList<DXFBucket>();
 		double dx = bottomRight.getX() - topLeft.getX(); 
 		double dy = bottomRight.getY() - topLeft.getY();
@@ -42,7 +44,7 @@ public class DXFBucketGrid {
 				b.topLeft    .setY( ( y    / (double)cellsHigh) * dy + topLeft.getY());
 				b.bottomRight.setX( ((x+1) / (double)cellsWide) * dx + topLeft.getX());
 				b.bottomRight.setY( ((y+1) / (double)cellsHigh) * dy + topLeft.getY());
-				//Log.message(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
+				//logger.debug(x+","+y+" = ("+b.topLeft.getX()+","+b.topLeft.getY()+")-("+b.bottomRight.getX()+","+b.bottomRight.getY()+")");
 			}
 		}
 	}
@@ -53,33 +55,29 @@ public class DXFBucketGrid {
 	 * @param p the point.  Could be the start or the end of the entity
 	 */
 	public void addEntity(DXFBucketEntity e,Point p) {
-		Iterator<DXFBucket> ib = buckets.iterator();
-		while(ib.hasNext()) {
-			DXFBucket b = ib.next();
-			if(b.topLeft.getY() <= p.getY() && 
-				b.topLeft.getX() <= p.getX() && 
-				b.bottomRight.getY() >= p.getY() && 
-				b.bottomRight.getX() >= p.getX()) {
+		for (DXFBucket b : buckets) {
+			if (b.topLeft.getY() <= p.getY() &&
+					b.topLeft.getX() <= p.getX() &&
+					b.bottomRight.getY() >= p.getY() &&
+					b.bottomRight.getX() >= p.getX()) {
 				// inside this bucket's region
-				b.push(e,p);
+				b.push(e, p);
 				return;
 			}
 		}
-		Log.message("Not added "+p);
+		logger.debug("Not added {}", p);
 	}
 	
 	public void countEntitiesInBuckets() {
 		int total=0;
 
-		Iterator<DXFBucket> ib = buckets.iterator();
-		while(ib.hasNext()) {
-			DXFBucket b = ib.next();
-			if(b.contents.size()>0) {
-				Log.message("bucket "+b.x+","+b.y+" has "+b.contents.size()+" entities.");
-				total+=b.contents.size();
+		for (DXFBucket b : buckets) {
+			if (b.contents.size() > 0) {
+				logger.debug("bucket {},{} has {} entities.", b.x, b.y, b.contents.size());
+				total += b.contents.size();
 			}
 		}
-		Log.message(total+" total entities in buckets (including duplicates).");
+		logger.debug("{} total entities in buckets (including duplicates).", total);
 	}
 	
 	/**
@@ -89,17 +87,14 @@ public class DXFBucketGrid {
 	protected void dumpEverythingIntoABucket(List<DXFGroup> groups) {
 		DXFGroup group = new DXFGroup();
 		groups.add(group);
-		
-		Iterator<DXFBucket> ib = buckets.iterator();
-		while(ib.hasNext()) {
-			DXFBucket bucket = ib.next();
-			Iterator<DXFBucketEntity> bei = bucket.contents.iterator();
-			while(bei.hasNext()) {
-				group.addLast(bei.next());
+
+		for (DXFBucket bucket : buckets) {
+			for (DXFBucketEntity dxfBucketEntity : bucket.contents) {
+				group.addLast(dxfBucketEntity);
 			}
 		}
-		//Log.message(groups.size()+ " groups after dump.");
-		//Log.message(group.entities.size()+ " entities after dump.");
+		//logger.debug(groups.size()+ " groups after dump.");
+		//logger.debug(group.entities.size()+ " entities after dump.");
 	}
 	
 	@Deprecated
@@ -162,11 +157,11 @@ public class DXFBucketGrid {
 						thisBucket = otherBucket;
 					}
 				}
-				//Log.message();
+				//logger.debug();
 			} while(!sourceBucket.contents.isEmpty());
 		}
 
-		//Log.message(groups.size()+ " groups after sort.");
+		//logger.debug(groups.size()+ " groups after sort.");
 	}
 	
 	/**
@@ -176,29 +171,25 @@ public class DXFBucketGrid {
 	 */
 	protected DXFBucket findNonEmptyBucket(Point p,double epsilon) {
 		if(p==null) {
-			Iterator<DXFBucket> bucketIter = buckets.iterator();
-			while(bucketIter.hasNext()) {
-				DXFBucket bucket = bucketIter.next();
-				if(!bucket.contents.isEmpty()) return bucket;
+			for (DXFBucket bucket : buckets) {
+				if (!bucket.contents.isEmpty()) return bucket;
 			}
 		} else {
 			DXFBucket bestBucket = null;
 			double bestD=epsilon*epsilon;
-			Iterator<DXFBucket> bucketIter = buckets.iterator();
-			while(bucketIter.hasNext()) {
-				DXFBucket bucket = bucketIter.next();
-				if(!bucket.contents.isEmpty()) {
-					if(bestBucket==null) {
+			for (DXFBucket bucket : buckets) {
+				if (!bucket.contents.isEmpty()) {
+					if (bestBucket == null) {
 						bestBucket = bucket;
-						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX())/2;
-						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY())/2;
-						bestD = dx*dx + dy*dy; 	
+						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX()) / 2;
+						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY()) / 2;
+						bestD = dx * dx + dy * dy;
 					} else {
-						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX())/2;
-						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY())/2;
-						double d = dx*dx + dy*dy; 	
-						if(bestD>d) {
-							bestD=d;
+						double dx = (bestBucket.topLeft.getX() + bestBucket.bottomRight.getX()) / 2;
+						double dy = (bestBucket.topLeft.getY() + bestBucket.bottomRight.getY()) / 2;
+						double d = dx * dx + dy * dy;
+						if (bestD > d) {
+							bestD = d;
 							bestBucket = bucket;
 						}
 					}

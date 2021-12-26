@@ -7,11 +7,12 @@ import java.util.ListIterator;
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -19,6 +20,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Converter_Moire extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_Moire.class);
 	private static double blockScale = 4.0f;
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
@@ -90,7 +92,7 @@ public class Converter_Moire extends ImageConverter {
 		// adjust to the maximum number used in *this* line.
 		int passesThisLine = (int)(maxPasses * maxPixel);
 
-		//Log.message(passesThisLine+"/"+maxPasses);
+		//logger.debug(passesThisLine+"/"+maxPasses);
 		
 		if(passesThisLine==0) return;  // empty line!
 
@@ -198,7 +200,7 @@ public class Converter_Moire extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		Log.message("Moire start");
+		logger.debug("Moire start");
 		if (direction == 0) {
 			// horizontal
 			yBottom -= h;
@@ -218,7 +220,7 @@ public class Converter_Moire extends ImageConverter {
 				convertLine(img,spaceBetweenLines,halfStep,a,b);
 			}
 		}
-		Log.message("Moire end");
+		logger.debug("Moire end");
 	}
 
 }
