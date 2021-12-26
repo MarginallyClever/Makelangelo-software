@@ -7,15 +7,12 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class PlotterControls extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(PlotterControls.class);
 	private static final long serialVersionUID = 1L;
 	private Plotter myPlotter;
 	private Turtle myTurtle;
