@@ -78,10 +78,8 @@ public class JogInterface extends JPanel {
 
 		JButton penUp    = new JButton(Translator.get("JogInterface.PenUp"));
 		JButton penDown  = new JButton(Translator.get("JogInterface.PenDown"));
-		JButton findHome = new JButton(Translator.get("JogInterface.FindHome"));
 		toggleEngageMotor = new JButton(Translator.get("JogInterface.DisengageMotors"));
 
-		bar.add(findHome);
 		bar.addSeparator();
 		bar.add(penUp);
 		bar.add(penDown);
@@ -90,17 +88,17 @@ public class JogInterface extends JPanel {
 		
 		penUp.addActionListener((e)-> myPlotter.raisePen());
 		penDown.addActionListener((e)-> myPlotter.lowerPen());
-		findHome.addActionListener((e)-> myPlotter.findHome());
 		toggleEngageMotor.addActionListener((e)-> onToggleEngageMotorAction());
 		
 		return bar;
 	}
 
 	private void onToggleEngageMotorAction() {
-		if(myPlotter.getAreMotorsEngaged() )
+		if (myPlotter.getAreMotorsEngaged()) {
 			myPlotter.disengageMotors();
-		else
+		} else {
 			myPlotter.engageMotors();
+		}
 	}
 
 	private void updateButtonStatus() {
