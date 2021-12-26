@@ -40,7 +40,6 @@ bin/
 *.orig
 
 *.log
-log.txt
 java/.project
 ## Auto Eclipse Checkstyle configuration
 .checkstyle

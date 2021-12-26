@@ -48,15 +48,15 @@ public class LogPanel extends JPanel {
 	public static void runAsDialog(JFrame frame) {
 		JDialog dialog = new JDialog(frame, Log.getLogLocation().toString(), Dialog.ModalityType.DOCUMENT_MODAL);
 
-		JButton okButton = new JButton(Translator.get("CopyClipboard"));
+		JButton copyClipboardButton = new JButton(Translator.get("CopyClipboard"));
 
 		JPanel outerPanel = new JPanel(new BorderLayout());
 		LogPanel logPanel = new LogPanel();
 		outerPanel.add(logPanel,BorderLayout.CENTER);
 
-		outerPanel.add(okButton,BorderLayout.SOUTH);
+		outerPanel.add(copyClipboardButton,BorderLayout.SOUTH);
 
-		okButton.addActionListener((e)-> {
+		copyClipboardButton.addActionListener((e)-> {
 			StringSelection stringSelection = new StringSelection(logPanel.getText());
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(stringSelection, null);
