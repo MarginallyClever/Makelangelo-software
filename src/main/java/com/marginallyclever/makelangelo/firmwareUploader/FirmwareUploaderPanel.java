@@ -42,7 +42,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		
 		sourceAVRDude.setPathOnly();
 		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
-		sourceHex.setFileHidingEnabled(false);// if this is in my .pio dir from a VSCode build ...
+		sourceHex.setFileHidingEnabled(false);// if this is in my .pio (hidden dir) from a VSCode build ...
 		refreshButton.addPropertyChangeListener((e)->{
 			updateCOMPortList();
 		});
@@ -93,20 +93,20 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private void uploadNow() {
 		goButton.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
+		firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );		    
 
-//		String status = "Finished!";
-//		int messageType = JOptionPane.PLAIN_MESSAGE;
 		try {
 		    // As this is a long action that can block this as to be done in a thread.
 		    // and sometimes avrdude do not exit ... 
-		    
-		    // TODO clean the mess ... do it better ...
+		    // TODO do it better ...
 		    
 		    class RunExecAvrDudeProcess extends SwingWorker<String, Object> {
-			// TODO traduction
 			
 			boolean resExecValueIsZero = false;
 
+			
+			
 			@Override
 			public String doInBackground() {
 			    try {
@@ -139,8 +139,6 @@ public class FirmwareUploaderPanel extends SelectPanel {
 				}
 			    } catch (Exception e1) {
 				JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, e1.getMessage(), msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
-				//			status = e1.getMessage();
-				//			messageType = JOptionPane.ERROR_MESSAGE;
 			    }
 			    return "done ?";// result normaly later availabel via get() in the done() methode ... but not used in this imlementation.
 			}
@@ -162,15 +160,8 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		    (new RunExecAvrDudeProcess()).execute();
 		    //			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
 		    //			 firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
-		    //			
-		    //status = e1.getMessage();
-		    //messageType = JOptionPane.ERROR_MESSAGE;
-
-		    //firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
 		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
-//		    status = e1.getMessage();
-//		    messageType = JOptionPane.ERROR_MESSAGE;
 		}
 
 		//setCursor(Cursor.getDefaultCursor());

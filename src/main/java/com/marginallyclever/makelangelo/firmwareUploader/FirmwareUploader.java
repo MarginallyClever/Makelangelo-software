@@ -24,49 +24,57 @@ public class FirmwareUploader {
 	private String avrdudePath = "";
 
 	/**
-	 * TODO TO REVIEW : if avrdude is in the path .
-	 * 
-	 * symply a Process exec "avrdude --version" that return 0 ?
-	 * 
-	 * or on mac os : ?
-	 * 
-	 * or on linux : using the whereis commande : 
-	 * 
-	 * OK : 
-	 * <code>$ whereis -b avrdude
-	 * avrdude: /usr/bin/avrdude /etc/avrdude.conf
-	 * </code>
-	 * 
-	 * Not found : 
-	 * <code>$ whereis -b avrdude
-	 * avrdude:
-	 * </code>
-	 * 
-	 * or on windows : ??? 
-	 * 
-	 * or if ther is a PATH env var : parse the path env variable and check eatch dirs in the path to maybe find it ?
-	 * 
+	 * TODO to reorder : first ".", then env PATH, then posible "arduino programfile dir", then user home.
 	 */
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
-		String name = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
+		boolean isWindowsOS = (OS.indexOf("win") >= 0);
+		String name =  isWindowsOS ? "avrdude.exe": "avrdude";
 		
-		// TODO to reorder : first "." then env PATH then "~" the posible "arduino programfile dir"
-		
-		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
+//		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
 		File f = new File(name);
-		if(f.exists()) {
-			avrdudePath = f.getAbsolutePath();
-			return;
+//		if(f.exists()) {
+//			avrdudePath = f.getAbsolutePath();
+//			return;
+//		}
+						
+		try {
+		    if (isWindowsOS) { // only if Windows OS.
+			// Communly used variable name for path to programFilesDir on Windows OS.
+			String[] windowsOSVarNameForProgFileDir = {
+			    "PROGRAMFILES"//C:\Program Files				
+			    ,"PROGRAMFILES(x86)"//C:\Program Files (x86)
+			    ,"CommunProgramFiles"//
+			    ,"CommunProgramFiles(x86)"//
+			};
+			String FromProgramFileAduinoIdeDirToAvrdudeDir = "Arduino\\hardware\\tools\\avr\\bin";
+				
+			for (String varName : windowsOSVarNameForProgFileDir) {
+			    String varValue = System.getenv(varName);
+			    System.out.println(varName+"="+varValue);
+			    if ( varValue != null && !varValue.isBlank() ){
+				File posibleAvrdudeDir = new File(varValue, FromProgramFileAduinoIdeDirToAvrdudeDir);
+				if (posibleAvrdudeDir.exists() && posibleAvrdudeDir.isDirectory()) {
+				    File posibleAvrdudePath = new File(posibleAvrdudeDir, name);
+				    if (posibleAvrdudePath.exists() && posibleAvrdudePath.canExecute()) {
+					avrdudePath = posibleAvrdudePath.getAbsolutePath();
+					logger.debug(name+" : \""+posibleAvrdudePath.getAbsolutePath()+"\"");
+					System.out.println(name+" : \""+posibleAvrdudePath.getAbsolutePath()+"\"");
+				    }
+				}
+			    } else{
+					    
+			    }
+			}
+		    }
+		} catch (Exception e) {
+
 		}
-		
-		// TO rework ... windows env variable "%PROGRAMFILES%" ?? to chechk 
-		// arduinoPath
-		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+name);
-		if(f.exists()) {
-			avrdudePath = f.getAbsolutePath();
-			return;
-		} 
+//		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+name);
+//		if(f.exists()) {
+//			avrdudePath = f.getAbsolutePath();
+//			return;
+//		} 
 		
 		// user home 
 		f = new File(FileAccess.getUserDirectory() + File.separator+name);
@@ -74,8 +82,8 @@ public class FirmwareUploader {
 			avrdudePath = f.getAbsolutePath();
 		}
 		
-		
-		if ( avrdudePath != null && avrdudePath.length()==0){
+		// PWD (".") and PATH dirs.
+		if ( avrdudePath != null && avrdudePath.isBlank()){
 		    //Search the env system PATH.
 		    ArrayList<String> searchCommandFromEnvPath = FirmwareUploader.searchCommandFromEnvPath(name, true);
 		    if (searchCommandFromEnvPath != null && searchCommandFromEnvPath.size() > 0) {
@@ -86,7 +94,7 @@ public class FirmwareUploader {
 	
 //	public void run(String hexPath,String portName) throws Exception {
 	/**
-	 * TO REVIEW : in some case ( avrdude correctly installed on the environment (in the path) ) ) there is no need to give the .conf file path to the avrdude command.
+	 *  TODO to review return normaly not used.
 	 * @param hexPath
 	 * @param portName
 	 * @throws Exception 
@@ -103,7 +111,7 @@ public class FirmwareUploader {
 			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
-			    // TODO reactivat the throw ( disable juste for demo purpose of process exec.)
+			    // in some case ( avrdude correctly installed on the environment (in the path) ) ) there is no need to give the .conf file path to the avrdude command.
 			    //throw new Exception("Cannot find nearby avrdude.conf");
 			    logger.error("Cannot find nearby avrdude.conf ");// TODO traduction
 			}
@@ -111,9 +119,10 @@ public class FirmwareUploader {
 		
 		String confPath = f.getAbsolutePath();
 		
+		//In some case there is no need to give the .conf file.
 		String [] options = new String[]{
 				avrdudePath,
-	    		//"-C"+confPath, // TODO In some case there is no need to give the .conf file.
+	    		//"-C"+confPath, // OK 
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
 	    		"-cwiring",
@@ -121,21 +130,35 @@ public class FirmwareUploader {
 	    		"-b115200",
 	    		"-D","-Uflash:w:"+hexPath+":i"
 		    }; 
-	    
+		
+		//In some case you need the .conf file. (not in the same path of avrdude ...)
+		if ( f.exists() && f.canRead()){
+		    options = new String[]{
+				avrdudePath,
+	    		"-C"+confPath, 
+	    		//"-v","-v","-v","-v",
+	    		"-patmega2560",
+	    		"-cwiring",
+	    		"-P"+portName,
+	    		"-b115200",
+	    		"-D","-Uflash:w:"+hexPath+":i"
+		    }; 
+		}
+		
+		// depreated : 
 		//runCommand(options);
 		
-		//
+		// Running the command ...
 		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
 		//
 		logger.debug("(During)Commande exec result : ");
 		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs);
-		// For simple test :  String ouptups =  execBashCommand(new String[]{"ls"}, null);
+		// For simple test :  String fullExecCmdOutputsAsTexte =  execBashCommand(new String[]{"ls"}, null);
 		resRunLog = fullExecCmdOutputsAsTexte;
 		logger.debug("(After)Commande exec result : is a succes = " + lastExecSucces);
 		logger.debug(fullExecCmdOutputsAsTexte);
 
 		logger.debug("update finished");
-		//Log.message("update finished");
 		return resRunLog;
 	}
 
@@ -180,6 +203,7 @@ public class FirmwareUploader {
 		} while(errorOpen && inputOpen);
 	}
 	
+	@Deprecated
 	private void runBufferedReaders(Process p) throws IOException {
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -215,9 +239,11 @@ public class FirmwareUploader {
 		//fu.run("./firmware.hex", "COM3");
 		
 		try {
-			fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );
+			//fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );//Windows
+			fu.run("./firmware.hex", "/dev/ttyACM0", new SelectTextArea("test","test","") );//linux 
 		} catch(Exception e) {
 			e.printStackTrace();
+			logger.error("error: {}", e.getMessage());
 		}
 		
 	}
@@ -288,9 +314,9 @@ public class FirmwareUploader {
 			// ! to be thread safe do not move this SimpleDateFormat (so eatch thread have one) ?
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
 			
-			@Override
-			public void readEvent(Date d, int intread) {
-			}
+//			@Override
+//			public void readEvent(Date d, int intread) {
+//			}
 
 			@Override
 			public void readLineEventWithCounter(Date d, int lineNum, String s) {
