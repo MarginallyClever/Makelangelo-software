@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageFilter;
 
-import java.awt.image.BufferedImage;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.image.BufferedImage;
 
 
 /**
@@ -12,6 +13,7 @@ import com.marginallyclever.makelangelo.makeArt.TransformedImage;
  * @author Dan
  */
 public class Filter_CMYK extends ImageFilter {
+  private static final Logger logger = LoggerFactory.getLogger(Filter_CMYK.class);
   protected static double levels = 2;
     
   protected TransformedImage channelCyan;
@@ -104,23 +106,23 @@ public class Filter_CMYK extends ImageFilter {
     }
 
     double histogram_area = 0;
-    //Log.message("histogram:");
+    //logger.debug("histogram:");
     for (i = 1; i < 255; ++i) {
-      Log.message(i + "=" + histogram[i]);
+      logger.debug("{}={}", i, histogram[i]);
       histogram_area += histogram[i];
     }
     double histogram_zone = histogram_area / (double) levels;
-    //Log.message("histogram area: "+histogram_area);
-    //Log.message("histogram zone: "+histogram_zone);
+    //logger.debug("histogram area: "+histogram_area);
+    //logger.debug("histogram zone: "+histogram_zone);
 
     double histogram_sum = 0;
     x = 0;
     y = 0;
     for (i = 1; i < 255; ++i) {
       histogram_sum += histogram[i];
-      //Log.message("mapping "+i+" to "+x);
+      //logger.debug("mapping "+i+" to "+x);
       if (histogram_sum > histogram_zone) {
-        //Log.message("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
+        //logger.debug("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
         histogram_sum -= histogram_zone;
         x += (int) (256.0 / (double) levels);
         ++y;
@@ -128,7 +130,7 @@ public class Filter_CMYK extends ImageFilter {
       histogram[i] = x;
     }
 
-    //Log.message("y="+y+" x="+x);
+    //logger.debug("y="+y+" x="+x);
     int pixel, b;
 
     for (y = 0; y < h; ++y) {

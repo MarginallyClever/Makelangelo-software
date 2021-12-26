@@ -1,41 +1,28 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.kabeja.dxf.Bounds;
-import org.kabeja.dxf.DXFCircle;
-import org.kabeja.dxf.DXFConstants;
-import org.kabeja.dxf.DXFDocument;
-import org.kabeja.dxf.DXFEntity;
-import org.kabeja.dxf.DXFLWPolyline;
-import org.kabeja.dxf.DXFLayer;
-import org.kabeja.dxf.DXFLine;
-import org.kabeja.dxf.DXFPolyline;
-import org.kabeja.dxf.DXFSpline;
-import org.kabeja.dxf.DXFVertex;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
 import org.kabeja.dxf.helpers.Point;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * @author Dan Royer
  *
  */
 public class LoadDXF implements TurtleLoader {
+	private static final Logger logger = LoggerFactory.getLogger(LoadDXF.class);
+	
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 	private Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
@@ -61,38 +48,37 @@ public class LoadDXF implements TurtleLoader {
 	 * @param groups
 	 */
 	private void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
-		//Log.message("Sorting layer "+layer.getName()+" into buckets...");
+		//logger.debug("Sorting layer "+layer.getName()+" into buckets...");
 
 		Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
 		while (entityTypeIter.hasNext()) {
 			String entityType = (String)entityTypeIter.next();
 			List<?> entityList = layer.getDXFEntities(entityType);
-			Iterator<?> iter = entityList.iterator();
-			while(iter.hasNext()) {
-				DXFEntity e = (DXFEntity)iter.next();
+			for (Object o : entityList) {
+				DXFEntity e = (DXFEntity) o;
 				DXFBucketEntity be = new DXFBucketEntity(e);
-				
-				if(e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-					DXFLine line = (DXFLine)e;
+
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
+					DXFLine line = (DXFLine) e;
 					grid.addEntity(be, line.getStartPoint());
 					grid.addEntity(be, line.getEndPoint());
 					continue;
 				}
-				if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {
-					DXFCircle circle = (DXFCircle)e;
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {
+					DXFCircle circle = (DXFCircle) e;
 					double r = circle.getRadius();
 					Point center = circle.getCenterPoint();
 					double cx = center.getX();
 					double cy = center.getY();
 
-					Point a = new Point(cx+r,cy,0);
+					Point a = new Point(cx + r, cy, 0);
 					Point b = new Point();
-					for(double i=1;i<=40;++i) {  // hard coded 40?  gross!
-						double v = (Math.PI*2.0) * (i/40.0);
-						double s=r*Math.sin(v);
-						double c=r*Math.cos(v);
-						b.setX(cx+c);
-						b.setY(cy+s);
+					for (double i = 1; i <= 40; ++i) {  // hard coded 40?  gross!
+						double v = (Math.PI * 2.0) * (i / 40.0);
+						double s = r * Math.sin(v);
+						double c = r * Math.cos(v);
+						b.setX(cx + c);
+						b.setY(cy + s);
 						grid.addEntity(be, a);
 						grid.addEntity(be, b);
 						a.setX(b.getX());
@@ -100,27 +86,27 @@ public class LoadDXF implements TurtleLoader {
 					}
 					continue;
 				}
-				if(e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-					e = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
+					e = DXFSplineConverter.toDXFPolyline((DXFSpline) e);
 					// fall through to the next case, polyline.
 				}
-				if(e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-					DXFPolyline polyLine = (DXFPolyline)e;
-					
-					if(!polyLine.isClosed()) {
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
+					DXFPolyline polyLine = (DXFPolyline) e;
+
+					if (!polyLine.isClosed()) {
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount() - 1).getPoint());
 					} else {
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 					}
 					continue;
 				}
-				if(e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-					DXFLWPolyline polyLine = (DXFLWPolyline)e;
-					if(!polyLine.isClosed()) {
+				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
+					DXFLWPolyline polyLine = (DXFLWPolyline) e;
+					if (!polyLine.isClosed()) {
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount()-1).getPoint());
+						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount() - 1).getPoint());
 					} else {
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
 						grid.addEntity(be, polyLine.getVertex(0).getPoint());
@@ -130,7 +116,7 @@ public class LoadDXF implements TurtleLoader {
 				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
 				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
 				// I don't know this entity type.
-				Log.error("Unknown DXF type "+e.getType());
+				logger.error("Unknown DXF type {}", e.getType());
 			}
 		}
 		
@@ -139,7 +125,7 @@ public class LoadDXF implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		Log.message(Translator.get("FileTypeDXF2")+"...");
+		logger.debug("{}...", Translator.get("FileTypeDXF2"));
 
 		// Read in the DXF file
 		parser.parse(in, DXFParser.DEFAULT_ENCODING);
@@ -156,7 +142,7 @@ public class LoadDXF implements TurtleLoader {
 		while (layerIter.hasNext()) {
 			DXFLayer layer = (DXFLayer)layerIter.next();
 			int color = layer.getColor();
-			Log.message("Found layer " + layer.getName() + "(color index="+color+")");
+			logger.debug("Found layer {}(color index={})", layer.getName(), color);
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
@@ -187,12 +173,9 @@ public class LoadDXF implements TurtleLoader {
 			grid.dumpEverythingIntoABucket(groups);
 			removeDuplicates(groups);
 
-			Iterator<DXFGroup> groupIter = groups.iterator();
-			while(groupIter.hasNext()) {
-				DXFGroup g = groupIter.next();
-				Iterator<DXFBucketEntity> ents = g.entities.iterator();
-				while(ents.hasNext()) {
-					parseEntity(ents.next().entity);
+			for (DXFGroup g : groups) {
+				for (DXFBucketEntity dxfBucketEntity : g.entities) {
+					parseEntity(dxfBucketEntity.entity);
 				}
 			}
 		}
@@ -230,7 +213,7 @@ public class LoadDXF implements TurtleLoader {
 			int after = group.entities.size();
 			totalRemoved += before - after;
 		}
-		if(totalRemoved!=0) Log.message(totalRemoved+" duplicates removed.");
+		if(totalRemoved!=0) logger.debug("{} duplicates removed.", totalRemoved);
 	}
 	
 	private double TX(double x) {
@@ -327,7 +310,7 @@ public class LoadDXF implements TurtleLoader {
 	}
 	
 	private void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
-		if (first == true) {
+		if (first) {
 			myTurtle.jumpTo(x,y);
 		} else {
 			myTurtle.penDown();

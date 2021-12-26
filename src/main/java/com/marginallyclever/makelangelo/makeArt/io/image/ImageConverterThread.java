@@ -1,12 +1,14 @@
 package com.marginallyclever.makelangelo.makeArt.io.image;
 
-import javax.swing.SwingWorker;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.ImageConverter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 
 public class ImageConverterThread extends SwingWorker<Turtle, Void> {
+	private static final Logger logger = LoggerFactory.getLogger(ImageConverterThread.class);
 	private ImageConverter chosenConverter;
 	private String name;
 
@@ -20,7 +22,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	
 	@Override
 	protected Turtle doInBackground() throws Exception {
-		Log.message("Starting "+name);
+		logger.debug("Starting {}", name);
 		
 		Turtle turtle = new Turtle();
 		
@@ -30,12 +32,12 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
-				Log.message("Thread interrupted.");
+				logger.debug("Thread interrupted.");
 				break;
 			}
 		}
 
-		Log.message("Ending "+name+" after "+loopCount+" loop(s).");
+		logger.debug("Ending {} after {} loop(s).", name, loopCount);
 		
 		return turtle;
 	}
@@ -51,6 +53,6 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 			state = "finished";
 		}
 		
-		Log.message(state+" thread "+name);
+		logger.debug("{} thread {}", state, name);
 	}
 }

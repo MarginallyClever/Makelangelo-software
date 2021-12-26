@@ -1,20 +1,17 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.prefs.Preferences;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5Marlin;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.prefs.Preferences;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
@@ -22,11 +19,14 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {
+
+	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
+	
 	private static final long serialVersionUID = -4185946661019573192L;
 
 	private String[] configsAvailable;
 
-	private ArrayList<PlotterSettingsListener> listeners;
+	private List<PlotterSettingsListener> listeners;
 
 	// Each robot has a global unique identifier
 	private long robotUID;
@@ -108,7 +108,7 @@ public class PlotterSettings implements Serializable {
 					.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
 		} catch (Exception e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to load preferences", e);
 			configsAvailable = new String[1];
 			configsAvailable[0] = "Default";
 		}
@@ -448,13 +448,12 @@ public class PlotterSettings implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			Log.error("Hardware version instance failed. Defaulting to v5");
+			logger.error("Hardware version instance failed. Defaulting to v5", e);
 			hardwareProperties = new Makelangelo5Marlin();
 			newVersion = hardwareProperties.getVersion();
 		}
-		if (newVersion == "") {
-			Log.error("Unknown hardware version requested. Defaulting to v5");
+		if (newVersion.equals("")) {
+			logger.error("Unknown hardware version requested. Defaulting to v5");
 			hardwareProperties = new Makelangelo5Marlin();
 			newVersion = hardwareProperties.getVersion();
 		}

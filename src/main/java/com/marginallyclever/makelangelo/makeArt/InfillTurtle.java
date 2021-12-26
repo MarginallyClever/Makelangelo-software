@@ -1,17 +1,20 @@
 package com.marginallyclever.makelangelo.makeArt;
 
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-
 public class InfillTurtle {
+	private static final Logger logger = LoggerFactory.getLogger(InfillTurtle.class);
+	
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 	private double penDiameter = 0.8; // TODO adjust me before running infill
 	private double minimumJumpSize = 0.4;
@@ -20,7 +23,7 @@ public class InfillTurtle {
 	}
 
 	public Turtle run(Turtle input) throws Exception {
-		Log.message("InfillTurtle.run()");
+		logger.debug("InfillTurtle.run()");
 		// confirmTurtleIsClosedLoop(input);
 
 		Turtle result = new Turtle();
@@ -42,7 +45,7 @@ public class InfillTurtle {
 	}
 
 	private ArrayList<LineSegment2D> infillFromTurtle(Turtle input) throws Exception {
-		Log.message("  infillFromTurtle()");
+		logger.debug("  infillFromTurtle()");
 		// make sure line segments don't start on another line, leading to an odd number
 		// of intersections.
 		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
@@ -70,15 +73,15 @@ public class InfillTurtle {
 	 * @return the larger bounds
 	 */
 	private Rectangle2D.Double addPaddingToBounds(Rectangle2D.Double before, double percent) {
-		Log.message("  addPaddingToBounds()");
+		logger.debug("  addPaddingToBounds()");
 		percent*=0.01;
 		Rectangle2D.Double after = new Rectangle2D.Double();
 		after.x = before.x - before.width * percent;
 		after.y = before.y - before.height * percent;
 		after.height = before.height * (1.0 + percent * 2.0);
 		after.width = before.width * (1.0 + percent * 2.0);
-		Log.message("    before="+before.toString());
-		Log.message("    after="+after.toString());
+		logger.debug("    before={}", before.toString());
+		logger.debug("    after={}", after.toString());
 		return after;
 	}
 
@@ -101,7 +104,7 @@ public class InfillTurtle {
 	 * @return a list of remaining {@code LineSegment2D}.
 	 */
 	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, ArrayList<LineSegment2D> convertedPath) throws Exception {
-		Log.message("  trimLineToPath()");
+		logger.debug("  trimLineToPath()");
 		ArrayList<Point2D> intersections = new ArrayList<Point2D>();
 
 		for (LineSegment2D s : convertedPath) {
@@ -109,7 +112,7 @@ public class InfillTurtle {
 			if (p != null) intersections.add(p);
 		}
 
-		Log.message("    done testing");
+		logger.debug("    done testing");
 		int size = intersections.size();
 		if (size % 2 != 0) {
 			throw new Exception("odd number of intersections");
@@ -133,18 +136,18 @@ public class InfillTurtle {
 	 *         sort by ascending y value.
 	 */
 	private ArrayList<LineSegment2D> sortIntersectionsIntoSegments(ArrayList<Point2D> intersections, ColorRGB color) {
-		Log.message("  sortIntersectionsIntoSegments() " + intersections.size());
+		logger.debug("  sortIntersectionsIntoSegments() {}", intersections.size());
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {
-			Log.message("    sort by Y");
+			logger.debug("    sort by Y");
 			Collections.sort(intersections, new ComparePointsByY());
 		} else {
-			Log.message("    sort by X");
+			logger.debug("    sort by X");
 			Collections.sort(intersections, new ComparePointsByX());
 		}
 
-		Log.message("  convert to segments");
+		logger.debug("  convert to segments");
 		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
 		int i = 0;
 		while (i < intersections.size()) {
@@ -152,7 +155,7 @@ public class InfillTurtle {
 			i += 2;
 		}
 
-		Log.message("  done");
+		logger.debug("  done");
 		return results;
 	}
 

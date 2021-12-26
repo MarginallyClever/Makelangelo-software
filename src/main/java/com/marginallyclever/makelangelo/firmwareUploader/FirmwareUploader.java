@@ -1,16 +1,20 @@
 package com.marginallyclever.makelangelo.firmwareUploader;
 
+import com.marginallyclever.convenience.FileAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 
-import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.convenience.log.Log;
-
 
 public class FirmwareUploader {
+
+	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
+
 	private String avrdudePath = "";
 
 	public FirmwareUploader() {
@@ -38,13 +42,13 @@ public class FirmwareUploader {
 	}
 	
 	public void run(String hexPath,String portName) throws Exception {
-		Log.message("update started");
+		logger.debug("update started");
 		
 		Path p = Path.of(avrdudePath);
-		Log.message("Trying "+(p.resolve("../avrdude.conf").toString()));
+		logger.debug("Trying {}", (p.resolve("../avrdude.conf").toString()));
 		File f = p.resolve("../avrdude.conf").toFile();
 		if(!f.exists()) {
-			Log.message("Trying 2 "+(p.resolve("../../etc/avrdude.conf").toString()));
+			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
 			f = p.resolve("../../etc/avrdude.conf").toFile();
 			if(!f.exists()) {
 				throw new Exception("Cannot find nearby avrdude.conf");
@@ -65,7 +69,7 @@ public class FirmwareUploader {
 		    }; 
 	    runCommand(options);
 
-		Log.message("update finished");
+		logger.debug("update finished");
 	}
 
 	private void runCommand(String[] cmd) throws Exception {
@@ -101,13 +105,13 @@ public class FirmwareUploader {
 
 		String s = null;
 
-		Log.message("update: errors (if any)\n");
+		logger.debug("update: errors (if any)\n");
 		while ((s = stdError.readLine()) != null)
-			Log.message("update: "+s);
+			logger.debug("update: {}", s);
 
-		Log.message("command out:\n");
+		logger.debug("command out:\n");
 		while ((s = stdInput.readLine()) != null)
-			Log.message("update: "+s);		
+			logger.debug("update: {}", s);
 	}
 	
 	public String getAvrdudePath() {
@@ -120,13 +124,8 @@ public class FirmwareUploader {
 	
 	// TEST
 	
-	public void main(String[] args) {
-		Log.start();
+	public void main(String[] args) throws Exception {
 		FirmwareUploader fu = new FirmwareUploader();
-		try {
-			fu.run("./firmware.hex", "COM3");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		fu.run("./firmware.hex", "COM3");
 	}
 }

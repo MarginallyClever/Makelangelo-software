@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -11,8 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import com.marginallyclever.convenience.log.Log;
-
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -23,9 +24,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class CartesianButtons extends JComponent {
-	/**
-	 * 
-	 */
+	private static final Logger logger = LoggerFactory.getLogger(CartesianButtons.class);
+
 	private static final long serialVersionUID = 1L;
 	
 	public static final int NUM_ZONES_PER_QUADRANT=3;
@@ -313,7 +313,6 @@ public class CartesianButtons extends JComponent {
 	}
 
 	public static void main(String[] args) {
-		Log.start();
 		JFrame frame = new JFrame("CartesianButtons");
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -323,7 +322,7 @@ public class CartesianButtons extends JComponent {
         CartesianButtons button = new CartesianButtons();        
 		p.add(button);
 		button.addActionListener((e)->{
-			Log.message(e.getActionCommand()+" "+button.getLabel(e.getID()));
+			logger.debug("{} {}", e.getActionCommand(), button.getLabel(e.getID()));
 		});
 
 		frame.pack();

@@ -1,17 +1,15 @@
 package com.marginallyclever.communications;
 
-import java.awt.Component;
-import java.awt.GridLayout;
+import com.marginallyclever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.makelangelo.Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
-import com.marginallyclever.communications.serial.SerialTransportLayer;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
+import java.util.List;
 
 /**
  * handles requests between the UI and the various transport layers 
@@ -19,7 +17,10 @@ import com.marginallyclever.makelangelo.Translator;
  *
  */
 public class NetworkSessionManager {
-	private static ArrayList<TransportLayer> transportLayers = new ArrayList<TransportLayer>( Arrays.asList(
+
+	private static final Logger logger = LoggerFactory.getLogger(NetworkSessionManager.class);
+	
+	private static List<TransportLayer> transportLayers = new ArrayList<TransportLayer>( Arrays.asList(
 			new SerialTransportLayer()
 			//, transportLayers.add(new TCPTransportLayer()
 			));
@@ -30,13 +31,13 @@ public class NetworkSessionManager {
 	 * @return a new connection or null.
 	 */
 	public static NetworkSession requestNewSession(Component parent) {
-		Log.message("NetworkSessionManager.requestNewSession()");
+		logger.debug("NetworkSessionManager.requestNewSession()");
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0,1));
 		JTabbedPane tabs = new JTabbedPane();
 		top.add(tabs);
 		for( TransportLayer t : transportLayers ) {
-			Log.message("  "+t.getName());
+			logger.debug("  {}" ,t.getName());
 			tabs.addTab(t.getName(), t.getTransportLayerPanel());
 		}
 

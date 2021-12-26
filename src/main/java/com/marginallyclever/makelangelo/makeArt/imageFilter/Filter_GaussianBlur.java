@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -16,6 +18,7 @@ import com.marginallyclever.makelangelo.makeArt.TransformedImage;
  * @author Dan
  */
 public class Filter_GaussianBlur extends ImageFilter {
+	private static final Logger logger = LoggerFactory.getLogger(Filter_GaussianBlur.class);
 	int radius = 1;
 
 
@@ -110,7 +113,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 			File outputfile = new File("saved.png");
 			ImageIO.write(img.getSourceImage(), "png", outputfile);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to save image", e);
 		}
 
 		return after;

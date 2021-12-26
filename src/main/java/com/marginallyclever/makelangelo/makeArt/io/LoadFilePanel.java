@@ -1,24 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.io;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.ConvertImagePanel;
@@ -27,8 +10,21 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 
 public class LoadFilePanel extends JPanel implements PreviewListener {
+	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
+	
 	private static final long serialVersionUID = 1L;
 	private Paper myPaper;
 
@@ -69,7 +65,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
                         mySubPanel.removeAll();
                     
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			Log.message("File selected by user: "+selectedFile);
+			logger.debug("File selected by user: {}", selectedFile);
 			filename.setText(selectedFile);
 			
 			load(selectedFile);
@@ -83,7 +79,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 				myConvertImage = new ConvertImagePanel(myPaper,image);
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
-				myConvertImage.addActionListener((e)-> notifyListeners(e) );
+				myConvertImage.addActionListener(this::notifyListeners);
 				
 				mySubPanel.add(myConvertImage);
 				mySubPreviewListener = myConvertImage;
@@ -93,7 +89,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 			}
 			previousFile = filename;
 		} catch(Exception e) {
-			Log.error("Load error:"+e.getMessage());
+			logger.error("Failed to load {}", filename, e);
 			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -141,7 +137,6 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

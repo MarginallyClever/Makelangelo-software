@@ -49,10 +49,10 @@ java -jar makelangelo-nightly-XXXXX.jar
 
 ### Eclipse IDE building
 * Go to Eclipse website: https://www.eclipse.org/downloads/, choose "Eclipse IDE for Java developers" and install the latest version.
-* Launch '"clipse IDE" when done and go to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
+* Launch "Eclipse IDE" when done and go to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
 * If you see the "Welcome!" tab, close it.
 * select Run > Debug As > Java Application
-* select "Makelangelo - com.marginallyclever.makelangelo" and click OK.  (It should be the top of the list)
+* select "Makelangelo - com.marginallyclever.makelangelo" and click OK. (It should be the top of the list)
 * Wait while the progress bar in the bottom right fills up. This is a one time thing while it installs other dependencies and packages and puts everything together.
 * "Errors exist...Proceed with launch?" Select Proceed.
 
@@ -68,6 +68,10 @@ java -jar makelangelo-nightly-XXXXX.jar
   * in the previously opened console, run `java -jar target/Makelangelo*-with-dependencies.jar`
 
 🎉 Application should now launch.
+
+## Development
+
+When launching the application, set the environnement variable `DEV` to `true` in order to get the application log on the stdout.
 
 ## Thank you
 

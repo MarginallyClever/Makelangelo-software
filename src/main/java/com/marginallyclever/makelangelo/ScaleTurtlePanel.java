@@ -1,26 +1,22 @@
 package com.marginallyclever.makelangelo;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-
-import org.apache.batik.ext.swing.GridBagConstants;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.geom.Rectangle2D;
-import java.io.Serial;
-
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
+import org.apache.batik.ext.swing.GridBagConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.geom.Rectangle2D;
 
 public class ScaleTurtlePanel extends JPanel {
-	/**
-	 * 
-	 */
-	@Serial
+
+	private static final Logger logger = LoggerFactory.getLogger(ScaleTurtlePanel.class);
+	
 	private static final long serialVersionUID = -4566997988723228869L;
 	private final String [] unitTypes = new String[]{"mm","%"};
 	
@@ -135,7 +131,7 @@ public class ScaleTurtlePanel extends JPanel {
 			h1*=0.01;
 		}
 
-		Log.message("scale "+ow+"x"+oh+" -> "+w1+"x"+h1 +" units="+units.getSelectedIndex());
+		logger.debug("scale {}x{} -> {}x{} units={}", ow, oh, w1, h1, units.getSelectedIndex());
 		revertOriginalTurtle();
 		turtleToChange.scale(w1, h1);
 	}
@@ -218,9 +214,7 @@ public class ScaleTurtlePanel extends JPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
 		JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());

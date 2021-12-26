@@ -1,25 +1,20 @@
 package com.marginallyclever.makelangelo.firmwareUploader;
 
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.io.File;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.apache.commons.io.FilenameUtils;
-
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
+import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
 
 public class FirmwareUploaderPanel extends SelectPanel {
 	/**
@@ -110,21 +105,16 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		return state;
 	}
 	
-	public static void main(String[] args) {
-		Log.start();
+	public static void main(String[] args) throws Exception {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			//frame.setPreferredSize(new Dimension(600, 400));
-			frame.add(new FirmwareUploaderPanel());
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
-		}
+		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frame.setPreferredSize(new Dimension(600, 400));
+		frame.add(new FirmwareUploaderPanel());
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

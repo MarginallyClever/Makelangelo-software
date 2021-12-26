@@ -1,26 +1,15 @@
 package com.marginallyclever.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.marginallyclever.convenience.log.Log;
 
 /**
  * Created on 6/7/15.
@@ -31,7 +20,8 @@ import com.marginallyclever.convenience.log.Log;
  * @since v7.1.4
  */
 public class MarginallyCleverPreferences extends AbstractPreferences implements Ancestryable {
-
+  private static final Logger logger = LoggerFactory.getLogger(MarginallyCleverPreferences.class);
+  
   /**
    *
    */
@@ -66,13 +56,13 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    */
   public MarginallyCleverPreferences(AbstractPreferences parent, String name) {
     super(parent, name);
-    Log.message("Instantiating node "+ name);
+    logger.debug("Instantiating node {}", name);
     root = new TreeMap<String, String>();
     children = new TreeMap<String, Preferences>();
     try {
       sync();
     } catch (BackingStoreException e) {
-      Log.error("Unable to sync on creation of node "+name+". "+e);
+      logger.error("Unable to sync on creation of node {}.", name, e);
     }
   }
 
@@ -82,7 +72,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
     try {
       flush();
     } catch (BackingStoreException e) {
-    	Log.error("Unable to flush after putting "+key+". "+e);
+    	logger.error("Unable to flush after putting {}.", key, e);
     }
   }
 
@@ -97,7 +87,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
     try {
       flush();
     } catch (BackingStoreException e) {
-    	Log.error("Unable to flush after removing "+key+". "+e);
+    	logger.error("Unable to flush after removing {}.", key, e);
     }
   }
 
@@ -109,14 +99,14 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
 
   @NotNull
   @Override
-  protected String[] keysSpi() throws BackingStoreException {
+  protected String[] keysSpi() {
     final Set<String> keySet = root.keySet();
     return keySet.toArray(new String[keySet.size()]);
   }
 
   @NotNull
   @Override
-  protected String[] childrenNamesSpi() throws BackingStoreException {
+  protected String[] childrenNamesSpi() {
     final Set<String> childrenNames = children.keySet();
     return childrenNames.toArray(new String[childrenNames.size()]);
   }
@@ -136,7 +126,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
       try {
         isChildRemoved = getIsRemoved(childPreferenceNode);
       } catch (ReflectiveOperationException e) {
-        Log.error( e.getMessage() );
+        logger.error( e.getMessage() );
       }
     }
     if (childPreferenceNode == null || isChildRemoved) {
@@ -155,7 +145,7 @@ public class MarginallyCleverPreferences extends AbstractPreferences implements 
    * @throws ReflectiveOperationException
    */
   private boolean getIsRemoved(AbstractPreferences abstractPreference) throws ReflectiveOperationException {
-    Log.message( abstractPreference.toString() );
+    logger.debug( abstractPreference.toString() );
     final Method declaredMethod = AbstractPreferences.class.getDeclaredMethod("isRemoved");
     declaredMethod.setAccessible(true);
     Object isRemoved = declaredMethod.invoke(abstractPreference, new Object[]{null});

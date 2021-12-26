@@ -1,17 +1,20 @@
 package com.marginallyclever.makelangelo.plotter.plotterTypes;
 
-import java.io.IOException;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class Makelangelo5Marlin extends Makelangelo3_3 {
+	private static final Logger logger = LoggerFactory.getLogger(Makelangelo5Marlin.class);
+	
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
@@ -134,9 +137,7 @@ public class Makelangelo5Marlin extends Makelangelo3_3 {
 		try {
 		  tex=TextureIO.newTexture(FileAccess.open(name), false, name.substring(name.lastIndexOf('.')+1));
 		} catch(IOException e) {
-			Log.message(e.getMessage());
-			Log.message(FileAccess.getWorkingDirectory());
-			//Log.error("I can't load "+name);
+			logger.debug("Can't load {}", name, e);
 		}
 		return tex;
 	}

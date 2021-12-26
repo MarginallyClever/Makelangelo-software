@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.util.PreferencesHelper;
@@ -13,7 +12,6 @@ import java.io.IOException;
 public class Filter_CMYKTest {
     //@Test
     public void testConversion() throws IOException {
-        Log.start();
         PreferencesHelper.start();
         final String PATH_NAME = "target/classes/bill-murray";
         final String EXT = "jpg";
@@ -27,6 +25,5 @@ public class Filter_CMYKTest {
         ImageIO.write(filter.getM().getSourceImage(), EXT, new File(PATH_NAME + "M." + EXT));
         ImageIO.write(filter.getY().getSourceImage(), EXT, new File(PATH_NAME + "Y." + EXT));
         ImageIO.write(filter.getK().getSourceImage(), EXT, new File(PATH_NAME + "K." + EXT));
-        Log.end();
     }
 }
