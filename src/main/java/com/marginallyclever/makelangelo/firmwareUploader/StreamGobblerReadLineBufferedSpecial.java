@@ -13,6 +13,7 @@ import java.util.Date;
  * ligne ... TODO ? ajout timer ou delais depuis dernier event ou info diverse
  * sur flux de sortie vers process ?
  *
+ * TODO an interface class ... StreamGobbler listener ?
  * @author PPAC37
  */
 public class StreamGobblerReadLineBufferedSpecial extends Thread {

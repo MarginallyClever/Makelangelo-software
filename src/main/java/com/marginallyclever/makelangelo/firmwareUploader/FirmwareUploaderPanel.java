@@ -103,37 +103,47 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		    // TODO clean the mess ... do it better ...
 		    
 		    class MeaningOfLifeFinder extends SwingWorker<String, Object> {
+			// TODO traduction
+			final String msg_firmware_upload_status = "Firmware upload status";				
 
 			boolean resExecValueIsZero = false;
 
 			@Override
 			public String doInBackground() {
 			    try {
+				// TODO traduction
+				final String msg_please_selecte_a_Port_ = "Please selecte a Port !";
+				final String msg_please_selecte_a_hex_file_ = "Please selecte a .hex file !";
+				final String msg_finished = "Finished!";
+				final String msg_errors_refer_to_the_avrdudelog_s = "Errors! refer to the avrdude.log s";
+				
+				
 				if ( port.getSelectedItem().isBlank()){
-				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Please selecte a Port !","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+				    
+				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_please_selecte_a_Port_, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 				
 				}else if ( sourceHex.getText().isBlank()){
-				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Please selecte a .hex file !","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_please_selecte_a_hex_file_, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 				
 				}else{
 				    
-				selectTextAreaForAvrdudeExecLog.setText("");// To clearn if précédent logs
-				// TODO in the case the port was wrong or nothing was connected avrdude may not finish ... waiting for ?
-				// So a timeout have to by added
-				String resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
-				// TODO a better way to get the exec return code (badly done so if there is multiple concurent exec can be anyone result ...)
-				if ( firmwareUploader.lastExecSucces  ) {
-				    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Finished!","Firmware upload status",JOptionPane.PLAIN_MESSAGE);
-				}else{
-				    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Errors! refer to the avrdude.log s","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+					selectTextAreaForAvrdudeExecLog.setText("");// To clearn if précédent logs
+					// TODO in the case the port was wrong or nothing was connected avrdude may not finish ... waiting for ?
+					// So a timeout have to by added
+					String resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
+					// TODO a better way to get the exec return code (badly done so if there is multiple concurent exec can be anyone result ...)
+					if ( firmwareUploader.lastExecSucces  ) {
+					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_finished, msg_firmware_upload_status,JOptionPane.PLAIN_MESSAGE);
+					}else{
+					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_errors_refer_to_the_avrdudelog_s, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
+					}
 				}
-				}
-				//execResult.setText(resExec);
 			    } catch (Exception e1) {
+				JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, e1.getMessage(), msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 				//			status = e1.getMessage();
 				//			messageType = JOptionPane.ERROR_MESSAGE;
 			    }
-			    return "done ?";// result normaly later availabel via get() in the done() methode ...
+			    return "done ?";// result normaly later availabel via get() in the done() methode ... but not used in this imlementation.
 			}
 
 			@Override
@@ -149,7 +159,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 			}
 		    }
 		    
-		    // running the SwingWorker ( a thread)
+		    // running the SwingWorker ( a thread )
 		    (new MeaningOfLifeFinder()).execute();
 		    //			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
 		    //			 firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());

@@ -184,12 +184,13 @@ public class FirmwareUploader {
 	//
 	//
 	
-	public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
+	//Not Thread safe (have to create a new at eatch need)
+	//public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
 
 	static boolean debugRuntimeExecPre = true;
 	static boolean lastExecSucces = false;
 
-	// TODO ! a return 
+	// TODO ! for a clean multiple info return.
 	class ExecBashCommandResult{
 	    boolean haveStart = true;
 	    boolean isFinis = false;
@@ -204,9 +205,13 @@ public class FirmwareUploader {
 	// TO REVEIW ( as this is a way to exec commands on the user system ... )
 	// should be a least private for security (and all methodes that using it ) ?
 	protected static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult) {
+	    
+	    
 	    lastExecSucces = false;
 	    final StringBuffer res = new StringBuffer();
 	    res.setLength(0);
+	    
+	    // Only for dev debug (can be remove)
 	    if (debugRuntimeExecPre) {
 		System.out.printf("Running : ");
 		for (String arg : cmdArray) {
@@ -214,6 +219,7 @@ public class FirmwareUploader {
 		}
 		System.out.printf("\n");
 	    }
+	    
 	    res.append("Running : ");
 	    for (String arg : cmdArray) {
 		res.append(String.format("%s ", arg));
@@ -224,6 +230,8 @@ public class FirmwareUploader {
 		Date dStar = new Date();
 		Process process;
 		ProcessBuilder pb = new ProcessBuilder(cmdArray);
+		
+		// If you want to "alter" the environement given to the process befor running the process
 		//Map<String, String> env = pb.environment();
 		//env.put("VAR1", "myValue");
 		//env.remove("OTHERVAR");
@@ -236,9 +244,16 @@ public class FirmwareUploader {
 		//Process 
 		process = pb.start();
 
+		// As the process is started we can now get is streams ( standard output, error output of the command ).
+		
+		// N.B. : confusing naming, from our program's point of view the getInputStream() is the "output" of the process ("output" for the process point of view).
 		if (streamGobblerProcessIn == null) {
+		    // to connecte the "output" of the process as an input streamGobbler.
 		    streamGobblerProcessIn = new StreamGobblerReadLineBufferedSpecial(process.getInputStream(), "out") {
-
+			
+			// ! to be thread safe do not move this SimpleDateFormat (so eatch thread have one) ?
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
+			
 			@Override
 			public void readEvent(Date d, int intread) {
 			}
@@ -254,7 +269,7 @@ public class FirmwareUploader {
 
 			@Override
 			public void readLineEvent(Date d, String s) {
-			    if ( debugRuntimeExecPre){
+			    if ( debugRuntimeExecPre){				
 			    System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
 			    System.out.flush();
 			    }
@@ -267,15 +282,19 @@ public class FirmwareUploader {
 		    };
 
 		} else {
+		    //TODO a revoir ... 
 		    // This was a try for interactive command (that ask input from user ...) but not implemented here.
 		    //streamGobblerProcessIn.setInputStream(process.getInputStream());
 		}
 
 		// Normaly has the error stream is merged in out strem (see ProcessBuilder redirectErrorStream(true); )
 		// this will not be use but to keep if we dont want the merge.
-		// for the error stream.
+		// for the process output error stream.
 		StreamGobblerReadLineBufferedSpecial streamGobblerProcessErr = new StreamGobblerReadLineBufferedSpecial(process.getErrorStream(), "err") {
-
+		    
+		    // ! to be thread safe do not move this SimpleDateFormat (so eatch thread have one) ?
+		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
+		    
 		    @Override
 		    public void doFinish() {
 			super.doFinish();
@@ -284,6 +303,7 @@ public class FirmwareUploader {
 		    @Override
 		    public void readLineEvent(Date d, String s) {
 			if ( debugRuntimeExecPre){
+			    
 			System.out.printf("%s : [%3d][%s]\n", simpleDateFormat.format(d), s.length(), s);
 			System.out.flush();
 			}
@@ -300,30 +320,37 @@ public class FirmwareUploader {
 		    }
 		};
 		
+		// Starting the Threads that take care of the process outputs...
 		streamGobblerProcessErr.start();
 
 		streamGobblerProcessIn.start();
 
-		OutputStream p_out = process.getOutputStream();
 		
-		if (p_out != null) {
-		    // p_out.write(10);
-		    if (debugRuntimeExecPre) {
-			System.out.printf("%s %s\n", "out on", p_out.getClass().getCanonicalName());
-		    }
-		    if (p_out instanceof BufferedOutputStream) {
-			BufferedOutputStream p_out_buf = (BufferedOutputStream) p_out;
-			p_out_buf.close();
-		    }
-		    p_out.flush();
-		    p_out.close();
-		} else {
-		     if (debugRuntimeExecPre) {
-			 System.out.printf("%s\n", "out off");
-		     }
-		}		
+//		{
+//		    // only for interactive commande ( a commande that require input from the user ... )
+//		    // if we need to send input to the Process (not implemented ...)
+//		    OutputStream p_out = process.getOutputStream();
+//		    if (p_out != null) {
+//			// p_out.write(10);
+//			if (debugRuntimeExecPre) {
+//			    System.out.printf("%s %s\n", "out on", p_out.getClass().getCanonicalName());
+//			}
+//			if (p_out instanceof BufferedOutputStream) {
+//			    BufferedOutputStream p_out_buf = (BufferedOutputStream) p_out;
+//			    p_out_buf.close();
+//			}
+//			p_out.flush();
+//			p_out.close();
+//		    } else {
+//			 if (debugRuntimeExecPre) {
+//			     System.out.printf("%s\n", "out off");
+//			 }
+//		    }
+//		}
 		
 		// TODO a timer to kill the process if it never terminate ...
+		//if ( notAnInteractiveCommandWithAnProcessInputStremOpen && delaisFromLastReadEvent > ??? ) process.destroy(); // ??
+		
 		
 		// Pour etre certain d'avoir un StringBuilder bien remplie jusqu'au bout
 		// il faut attendre que les thread qui lisent les sorties du process se termine
@@ -335,10 +362,8 @@ public class FirmwareUploader {
 		process.waitFor();
 		int ret = process.exitValue();
 		Date dEnd = new Date();
-
-		if (ret == 0) {
-		    lastExecSucces = true;
-		}
+		
+		lastExecSucces = (ret == 0);
 
 		if (debugRuntimeExecPre) {
 		    System.out.printf("Running : ", ret);
