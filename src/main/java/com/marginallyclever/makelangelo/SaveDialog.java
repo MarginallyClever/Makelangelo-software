@@ -1,18 +1,18 @@
 package com.marginallyclever.makelangelo;
 
-import java.io.File;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 
 public class SaveDialog {
+	private static final Logger logger = LoggerFactory.getLogger(SaveDialog.class);
+	
 	private JFileChooser fc = new JFileChooser();
 	
 	public SaveDialog() {
@@ -32,7 +32,7 @@ public class SaveDialog {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
-			Log.message("File selected by user: "+withExtension);
+			logger.debug("File selected by user: {}", withExtension);
 			TurtleFactory.save(t,withExtension);
 		}
 	}

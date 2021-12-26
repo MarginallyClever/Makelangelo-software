@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import javax.swing.JFrame;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.swing.*;
 
 @Deprecated
 public class PanelAdjustMachine extends SelectPanel {
@@ -145,7 +145,6 @@ public class PanelAdjustMachine extends SelectPanel {
 	// TEST
 	
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

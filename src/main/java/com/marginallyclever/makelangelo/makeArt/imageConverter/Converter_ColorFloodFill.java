@@ -1,20 +1,19 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.util.LinkedList;
-
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.util.LinkedList;
 
 /**
  * @author Dan Royer
@@ -22,6 +21,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 @Deprecated
 public class Converter_ColorFloodFill extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_ColorFloodFill.class);
 	private ColorPalette palette;
 	private float diameter;
 	private float lastX, lastY;
@@ -147,10 +147,10 @@ public class Converter_ColorFloodFill extends ImageConverter {
 			float dx = a.x - lastX;
 			float dy = a.y - lastY;
 			if ((dx * dx + dy * dy) > diameter * diameter * 2.0f) {
-				//Log.message("Jump at "+x+", "+y+"\n");
+				//logger.debug("Jump at "+x+", "+y+"\n");
 				turtle.jumpTo(a.getX(),a.getY());
 			} else {
-				//Log.message("Move to "+x+", "+y+"\n");
+				//logger.debug("Move to "+x+", "+y+"\n");
 				turtle.moveTo(a.x, a.y);
 			}
 			// update the last position.
@@ -185,7 +185,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		float x, y;
 		int z = 0;
 
-		Log.message("Palette color " + palette.getColor(colorIndex).toString() );
+		logger.debug("Palette color {}", palette.getColor(colorIndex).toString());
 
 		for (y = (int)yBottom; y < yTop; y += diameter) {
 			for (x = (int)xLeft; x < xRight; x += diameter) {
@@ -202,7 +202,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 				}
 			}
 		}
-		Log.message("Found " + z + " blobs.");
+		logger.debug("Found {} blobs.", z);
 	}
 
 	/**

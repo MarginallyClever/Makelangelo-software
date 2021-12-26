@@ -1,32 +1,23 @@
 package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+public class MakelangeloSettingPanel {
 
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.util.PreferencesHelper;
+	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
 
-public class MakelangeloSettingPanel {	
 	transient private JPanel panel; 
 	transient private JButton buttonExport;
 	transient private JButton buttonImport;
@@ -110,8 +101,8 @@ public class MakelangeloSettingPanel {
 			try (final OutputStream fileOutputStream = new FileOutputStream(file)) {
 				Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 				prefs.exportSubtree(fileOutputStream);
-			} catch (IOException | BackingStoreException pe) {
-				Log.error(pe.getMessage());
+			} catch (IOException | BackingStoreException e) {
+				logger.error("Failed to export preferences to {}", file, e);
 			}
 		}
 	}
@@ -128,8 +119,8 @@ public class MakelangeloSettingPanel {
 				prefs.flush();
 				Preferences.importPreferences(fileInputStream);
 				prefs.flush();
-			} catch (IOException | InvalidPreferencesFormatException | BackingStoreException pe) {
-				Log.error(pe.getMessage());
+			} catch (IOException | InvalidPreferencesFormatException | BackingStoreException e) {
+				logger.error("Failed to import preferences from {}", file, e);
 			}
 		}
 	}
@@ -144,8 +135,8 @@ public class MakelangeloSettingPanel {
 				prefs.removeNode();
 				Preferences.userRoot().flush();
 				PreferencesHelper.start();
-			} catch (BackingStoreException e1) {
-				Log.error(e1.getMessage());
+			} catch (BackingStoreException e) {
+				logger.error("Failed to reset preferences", e);
 			}
 		}
 	}

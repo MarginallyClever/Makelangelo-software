@@ -9,23 +9,26 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.marginallyclever.convenience.log.Log;
-
 public class TranslatorLanguage {
+
+	private static final Logger logger = LoggerFactory.getLogger(TranslatorLanguage.class);
+	
 	private String name = "";
 	private String author = "";
 	private Map<String, String> strings = new HashMap<String, String>();
 
 
 	/**
-	 * @param language_file
+	 * @param languageFile
 	 */
-	public void loadFromString(String language_file) {
+	public void loadFromString(String languageFile) {
 		final DocumentBuilder db = getDocumentBuilder();
 		if (db == null) {
 			return;
@@ -34,9 +37,9 @@ public class TranslatorLanguage {
 		try {
 			//Using factory get an instance of document builder
 			//parse using builder to get DOM representation of the XML file
-			dom = db.parse(language_file);
+			dom = db.parse(languageFile);
 		} catch (SAXException | IOException e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to load file {}", languageFile, e);
 		}
 		if (dom == null) {
 			return;
@@ -56,7 +59,7 @@ public class TranslatorLanguage {
 			Document dom = db.parse(inputStream);
 			load(dom);
 		} catch (SAXException | IOException e) {
-			Log.error( e.getMessage() );
+			logger.error("Failed to parse language file", e);
 		}
 	}
 
@@ -76,7 +79,7 @@ public class TranslatorLanguage {
 				String value = getTextValue(el, "value");
 
 				// store key/value pairs into a map
-				//Log.message(language_file +"\t"+key+"\t=\t"+value);
+				//logger.debug(language_file +"\t"+key+"\t=\t"+value);
 				strings.put(key, value);
 			}
 		}
@@ -87,10 +90,7 @@ public class TranslatorLanguage {
 		try {
 			db = buildDocumentBuilder().newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			Log.error( e.getMessage() );
-		}
-		if(db == null) {
-			return null;
+			logger.error("Failed to create a new document", e);
 		}
 		return db;
 	}

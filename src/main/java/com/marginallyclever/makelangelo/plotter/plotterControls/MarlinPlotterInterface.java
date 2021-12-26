@@ -3,9 +3,10 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * In the OSI model of network interfaces this is the Application layer which is
@@ -15,6 +16,9 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
  * @author Dan Royer
  */
 public class MarlinPlotterInterface extends MarlinInterface {
+
+	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterInterface.class);
+	
 	private static final long serialVersionUID = -7114823910724405882L;
 	private static final double MARLIN_DRAW_FEEDRATE = 7500.0;  // mm/min
 	private static final String STR_FEEDRATE = "echo:  M203";
@@ -33,23 +37,23 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	private void onPlotterEvent(PlotterEvent e) {
 		switch(e.type) {
 		case PlotterEvent.HOME_FOUND:
-			//Log.message("MarlinPlotterInterface heard plotter home.");
+			//logger.debug("MarlinPlotterInterface heard plotter home.");
 			sendFindHome();
 			break;
 		case PlotterEvent.POSITION:
-			//Log.message("MarlinPlotterInterface heard plotter move.");
+			//logger.debug("MarlinPlotterInterface heard plotter move.");
 			sendGoto();
 			break;
 		case PlotterEvent.PEN_UPDOWN:
-			//Log.message("MarlinPlotterInterface heard plotter up/down.");
+			//logger.debug("MarlinPlotterInterface heard plotter up/down.");
 			sendPenUpDown();
 			break;
 		case PlotterEvent.MOTORS_ENGAGED:
-			//Log.message("MarlinPlotterInterface heard plotter engage.");
+			//logger.debug("MarlinPlotterInterface heard plotter engage.");
 			sendEngage();
 			break;
 		case PlotterEvent.TOOL_CHANGE:
-			//Log.message("MarlinPlotterInterface heard plotter tool change.");
+			//logger.debug("MarlinPlotterInterface heard plotter tool change.");
 			sendToolChange((int)e.extra);
 			break;
 		default: break;
@@ -88,7 +92,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			String message = ((String)evt.data).trim();
-			//Log.message("MarlinPlotterInterface received '"+message.trim()+"'.");
+			//logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
 			if(message.startsWith("X:") && message.contains("Count")) {
 				onHearM114(message);
 			} else if(message.startsWith(STR_FEEDRATE)) {
@@ -116,7 +120,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			
 			myPlotter.setPos(pos);
 		} catch (NumberFormatException e) {
-			Log.error("M114 error: "+e.getMessage());
+			logger.error("M114 error: {}", message, e);
 		}
 	}
 	
@@ -128,10 +132,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M201 format bad: "+message);
 			double v=Double.valueOf(parts[1].substring(1));
-			Log.message("MarlinPlotterInterface found acceleration "+v);
+			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
-			Log.error("M201 error: "+e.getMessage());
+			logger.error("M201 error: {}", message, e);
 		}
 	}
 
@@ -143,10 +147,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M203 format bad: "+message);
 			double v=Double.valueOf(parts[1].substring(1));
-			Log.message("MarlinPlotterInterface found feedrate "+v);
+			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
-			Log.error("M203 error: "+e.getMessage());
+			logger.error("M203 error: {}", message, e);
 		}
 	}
 	
@@ -163,10 +167,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private static String getPosition(double x,double y) {
-		String action=
-				" X" + StringHelper.formatDouble(x) +
-				" Y" + StringHelper.formatDouble(y);
-		return action;
+		return " X" + StringHelper.formatDouble(x) +
+		" Y" + StringHelper.formatDouble(y);
 	}
 
 	public static String getPenUpString(Plotter p) {

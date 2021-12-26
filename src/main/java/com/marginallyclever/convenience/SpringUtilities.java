@@ -32,10 +32,11 @@
 
 package com.marginallyclever.convenience;
  
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import javax.swing.SpringLayout;
-
-import com.marginallyclever.convenience.log.Log;
 
 import java.awt.*;
  
@@ -46,14 +47,17 @@ import java.awt.*;
  * SpringBox and SpringCompactGrid.
  */
 public class SpringUtilities {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpringUtilities.class);
+    
     /**
      * A debugging utility that prints to stdout the component's
      * minimum, preferred, and maximum sizes.
      */
     public static void printSizes(Component c) {
-        Log.message("minimumSize = " + c.getMinimumSize());
-        Log.message("preferredSize = " + c.getPreferredSize());
-        Log.message("maximumSize = " + c.getMaximumSize());
+        logger.debug("minimumSize = {}",c.getMinimumSize());
+        logger.debug("preferredSize = {}",c.getPreferredSize());
+        logger.debug("maximumSize = {}",c.getMaximumSize());
     }
  
     /**
@@ -78,7 +82,7 @@ public class SpringUtilities {
         try {
             layout = (SpringLayout)parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeGrid must use SpringLayout.");
+            logger.error("The first argument to makeGrid must use SpringLayout.", exc);
             return;
         }
  
@@ -181,7 +185,7 @@ public class SpringUtilities {
         try {
             layout = (SpringLayout)parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+            logger.error("The first argument to makeCompactGrid must use SpringLayout.", exc);
             return;
         }
  

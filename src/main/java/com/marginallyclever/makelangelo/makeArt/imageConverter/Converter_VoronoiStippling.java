@@ -1,15 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiCell;
@@ -18,6 +10,15 @@ import com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi.VoronoiTe
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -29,6 +30,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @since 7.0.0?
  */
 public class Converter_VoronoiStippling extends ImageConverter implements PreviewListener {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiStippling.class);
+	
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
@@ -214,7 +217,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	public boolean iterate() {
 		//float totalMagnitude = 
 				evolveCells();
-		//Log.message(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
+		//logger.debug(totalMagnitude+"\t"+numCells+"\t"+(totalMagnitude/(float)numCells));
 		return keepIterating;
 	}
 	
@@ -335,7 +338,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	
 	// set some starting points in a grid
 	private void initializeCells(double minDistanceBetweenSites) {
-		Log.message("Initializing cells");
+		logger.debug("Initializing cells");
 
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[numCells];
@@ -376,7 +379,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 			totalMagnitude=adjustCentroids();
 			lock.unlock();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Failed to evolve cells", e);
 			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
 				lock.unlock();
 			}
@@ -495,7 +498,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 			}
 		}
 		if( fails>0 ) {
-			Log.message(iterations+" failed "+fails+" times");
+			logger.debug("{} failed {} times", iterations, fails);
 		}
 
 		Rectangle2D test = new Rectangle2D.Double();

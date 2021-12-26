@@ -7,6 +7,6 @@ import com.jogamp.opengl.GL2;
  * @author Dan Royer
  *
  */
-public abstract interface PreviewListener {
-	public void render(GL2 gl2);
+public interface PreviewListener {
+	void render(GL2 gl2);
 }

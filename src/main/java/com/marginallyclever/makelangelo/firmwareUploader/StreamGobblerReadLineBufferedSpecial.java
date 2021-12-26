@@ -1,18 +1,22 @@
 /*
- * StreamGobbler.java
- * Sources (year 2012 ?) : http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html
- * Modif : PPAC37 ( lecture char/char et divers fonctions pour événements via surcharges de méthodes )
+ * Based on StreamGobbler.java from http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html (year 2012 ?).
+ * Altered by PPAC37 ( lecture char/char et divers fonctions pour événements via surcharges de méthodes )
  */
 package com.marginallyclever.makelangelo.firmwareUploader;
 
 import java.io.*;
 import java.util.Date;
 
-/**
+/** StreamGobbler (Threaded), to take care of a stream of a process running.
+ * 
  * TODO revision pour les process interactif qui ne font pas de retour a la
- * ligne ... TODO ? ajout timer ou delais depuis dernier event ou info diverse
+ * ligne ... 
+ * 
+ * TODO ? ajout timer ou delais depuis dernier event ou info diverse
  * sur flux de sortie vers process ?
  *
+ * TODO ? interface class ... StreamGobbler listener ?
+ * 
  * @author PPAC37
  */
 public class StreamGobblerReadLineBufferedSpecial extends Thread {
@@ -80,7 +84,7 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        // Pour le cas d'une ligne final sans retour a la ligne.
+        // For the case of a final line with no line return.
         if (stringBuilder.length() != 0) {
             eventAndFlushSB(new Date());
         }
@@ -113,25 +117,30 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
     }
 
     /**
-     * Lecture char par char.
-     * A surcharger pour avoir chaque caractéres lus (byte read)
-     *
-     * @param d
-     * @param intread
+     * To Override to have read byte events.
+     * Be prepared to take care of non printable chars (used for exemple for some progress status to refresh the progress)
+     * @param d the time of the event 
+     * @param intread the int value read from the stream.
      */
     public void readEvent(Date d, int intread) {
         System.out.println("@todo StreamGobbler[" + type + "].readEvent( '" + (char) intread + "' = " + intread + " )");
     }
 
     /**
-     * Lecture ligne par ligne.
-     * A surcharger pour avoir chaque ligne lus ( cumul des byte read entre
-     * chaque retour a la ligne '\n' lu )
+     * To Override to have read lines events.
+     * @param d the time of the event.
+     * @param s the line readed from the stream.
      */
     public void readLineEvent(Date d, String s) {
         System.out.println("@todo StreamGobbler[" + type + "].readLineEvent( " + s + " )");
     }
 
+    /**
+     * To Override to have read lines events (with a line number).
+     * @param d the time of the event.
+     * @param lineNum the line number in the stream.
+     * @param s the line readed from the stream.
+     */
     public void readLineEventWithCounter(Date d, int lineNum, String s) {
         System.out.println("@todo StreamGobbler[" + type + "].readLineEventWithCounter( " + s + " )");
     }
@@ -144,13 +153,13 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
     //
     //
     /**
-     * A surcharger pour avoir l'event de debut du run.
+     * To Override to have a posible start event.
      */
     public void fireUpdateRunBegin() {
     }
 
     /**
-     * A surcharger pour avoir l'event de fin du run.
+     * To Override to have a posible end event.
      */
     public void fireUpdateRunEnd() {
     }

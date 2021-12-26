@@ -1,25 +1,19 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * In the OSI model of network interfaces this is the Presentation/Syntax layer which
@@ -29,6 +23,8 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  */
 public class MarlinInterface extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(MarlinInterface.class);
+	
 	private static final long serialVersionUID = 979851120390943303L;
 	// number of commands we'll hold on to in case there's a resend.
 	private static final int HISTORY_BUFFER_LIMIT = 250;
@@ -88,7 +84,7 @@ public class MarlinInterface extends JPanel {
 	}
 
 	private void onConnect() {
-		Log.message("MarlinInterface connected.");
+		logger.debug("MarlinInterface connected.");
 		setupNetworkListener();
 		lineNumberToSend=1;
 		lineNumberAdded=0;
@@ -98,7 +94,7 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void onClose() {
-		Log.message("MarlinInterface disconnected.");
+		logger.debug("MarlinInterface disconnected.");
 		timeoutChecker.stop();
 	}
 	
@@ -117,7 +113,7 @@ public class MarlinInterface extends JPanel {
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			lastReceivedTime=System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
-			//Log.message("MarlinInterface received '"+message.trim()+"'.");
+			//logger.debug("MarlinInterface received '"+message.trim()+"'.");
 			if(message.startsWith(STR_OK)) {
 				onHearOK();
 			} else if(message.contains(STR_RESEND)) {
@@ -137,7 +133,7 @@ public class MarlinInterface extends JPanel {
 				// line is no longer in the buffer.  should not be possible!
 			}
 		} catch(NumberFormatException e) {
-			Log.message("Resend request for '"+message+"' failed: "+e.getMessage());
+			logger.debug("Resend request for '{}' failed: {}", message, e.getMessage());
 		}
 	}
 
@@ -169,7 +165,7 @@ public class MarlinInterface extends JPanel {
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		//Log.message("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
+		//logger.debug("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -184,7 +180,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				//Log.message("MarlinInterface sending '"+mc.command+"'.");
+				//logger.debug("MarlinInterface sending '"+mc.command+"'.");
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -192,9 +188,9 @@ public class MarlinInterface extends JPanel {
 		
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
-			Log.message("MarlinInterface did not find "+lineNumberToSend);
+			logger.debug("MarlinInterface did not find {}", lineNumberToSend);
 			for( MarlinCommand mc : myHistory ) {
-				Log.message("..."+mc.lineNumber+": "+mc.command);
+				logger.debug("...{}: {}", mc.lineNumber, mc.command);
 			}
 		}
 	}
@@ -270,7 +266,6 @@ public class MarlinInterface extends JPanel {
 	// TEST
 
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();

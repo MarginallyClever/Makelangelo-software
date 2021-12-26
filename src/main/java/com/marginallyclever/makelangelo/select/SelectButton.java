@@ -50,6 +50,6 @@ public class SelectButton extends Select {
 
 	@Override
 	public void setForeground(Color fg) {
-		if(button!=null) button.setForeground(fg);
+	    if ( button != null) button.setForeground(fg);
 	}
 }

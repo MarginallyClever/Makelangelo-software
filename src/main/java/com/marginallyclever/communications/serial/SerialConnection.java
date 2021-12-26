@@ -1,12 +1,12 @@
 package com.marginallyclever.communications.serial;
 
+import com.marginallyclever.communications.NetworkSession;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.convenience.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -17,6 +17,7 @@ import com.marginallyclever.convenience.log.Log;
  */
 public final class SerialConnection extends NetworkSession implements SerialPortEventListener {
 	public static final int BAUD_RATE = 250000;
+	private static final Logger logger = LoggerFactory.getLogger(SerialConnection.class);
 
 	private SerialPort serialPort;
 	private boolean portOpened = false;
@@ -32,7 +33,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 					serialPort.removeEventListener();
 					serialPort.closePort();
 				} catch (SerialPortException e) {
-					Log.error(e.getMessage());
+					logger.error("Close failed", e);
 				}
 			}
 			portOpened = false;

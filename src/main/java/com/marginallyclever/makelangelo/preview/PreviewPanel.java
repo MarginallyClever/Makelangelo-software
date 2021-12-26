@@ -1,25 +1,20 @@
 package com.marginallyclever.makelangelo.preview;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
-import java.util.prefs.Preferences;
-
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.GLException;
-import com.jogamp.opengl.GLPipelineFactory;
-import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * OpenGL hardware accelerated WYSIWYG view.
@@ -27,13 +22,16 @@ import com.marginallyclever.util.PreferencesHelper;
  *
  */
 public class PreviewPanel extends GLJPanel implements GLEventListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
+	
 	static final long serialVersionUID = 2;
 
 	// Use debug pipeline?
 	private static final boolean DEBUG_GL_ON = false;
 	private static final boolean TRACE_GL_ON = false;
 
-	private ArrayList<PreviewListener> previewListeners = new ArrayList<PreviewListener>();
+	private List<PreviewListener> previewListeners = new ArrayList<>();
 	
 	private Camera camera;
 	
@@ -54,7 +52,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		super();
 		
 		try {
-			Log.message("  get GL capabilities...");
+			logger.debug("  get GL capabilities...");
 			GLProfile glProfile = GLProfile.getDefault();
 			GLCapabilities caps = new GLCapabilities(glProfile);
 			// caps.setSampleBuffers(true);
@@ -62,7 +60,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			// caps.setNumSamples(4);
 			setRequestedGLCapabilities(caps);
 		} catch(GLException e) {
-			Log.error("I failed the very first call to OpenGL.  Are your native libraries missing?");
+			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
 			System.exit(1);
 		}
 
@@ -116,7 +114,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		});
 		
 		// start animation system
-		Log.message("  starting animator...");
+		logger.debug("  starting animator...");
 		animator = new FPSAnimator(1);
 		animator.add(this);
 		animator.start();
@@ -163,7 +161,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				// Debug ..
 				gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null));
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to init OpenGL debug pipeline", e);
 			}
 		}
 
@@ -173,7 +171,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				gl = gl.getContext().setGL(
 						GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }));
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed to init OpenGL trace", e);
 			}
 		}
 		
@@ -191,7 +189,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		// long now_time = System.currentTimeMillis();
 		// float dt = (now_time - last_time)*0.001f;
 		// last_time = now_time;
-		// Log.message(dt);
+		// logger.debug(dt);
 
 		// draw the world
 		GL2 gl2 = glautodrawable.getGL().getGL2();

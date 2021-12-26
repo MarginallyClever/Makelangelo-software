@@ -1,17 +1,18 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.util.LinkedList;
-
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.util.LinkedList;
 
 
 /**
@@ -19,6 +20,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Converter_Wander extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_Wander.class);
+	
 	static protected int numLines = 9000;
 	static protected boolean isCMYK = false;
 	
@@ -77,7 +80,7 @@ public class Converter_Wander extends ImageConverter {
 		double width = xRight - xLeft-1;
 		Point2D a = null;
 		
-		//Log.message("Creating buckets in a Z pattern...");
+		//logger.debug("Creating buckets in a Z pattern...");
 		buckets = new LinkedList<Bucket>();
 		int actualPoints=0;
 		double wMod = width/5.0;
@@ -99,7 +102,7 @@ public class Converter_Wander extends ImageConverter {
 			}
 		}
 
-		//Log.message("Finding points...");
+		//logger.debug("Finding points...");
 		for(int i=0;i<pointsPerChannel;++i) {
 			int v, tries=0;
 			double endPX,endPY; 
@@ -126,9 +129,9 @@ public class Converter_Wander extends ImageConverter {
 		}
 
 		// sort the points by nearest neighbor first.
-		Log.message("Sorting "+actualPoints+" points...");
+		logger.debug("Sorting {} points...", actualPoints);
 		for(int j=0;j<buckets.size();++j) {
-			//Log.message(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
+			//logger.debug(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
 			a = new Point2D.Double(0,0);
@@ -153,7 +156,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		
 		// draw the sorted list of points.
-		Log.message("Drawing points...");	
+		logger.debug("Drawing points...");	
 		turtle.setColor(newColor);
 	
 		for(int j=0;j<buckets.size();++j) {
@@ -174,11 +177,11 @@ public class Converter_Wander extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		Log.message("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines,255.0*3.0/4.0);
-		Log.message("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines,128.0);
-		Log.message("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines,128.0);
-		Log.message("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines,128.0);
-		Log.message("Finishing...");
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines,255.0*3.0/4.0);
+		logger.debug("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines,128.0);
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines,128.0);
+		logger.debug("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines,128.0);
+		logger.debug("Finishing...");
 	}
 	
 	protected void finishBlackAndWhite() {

@@ -1,10 +1,14 @@
 package com.marginallyclever.makelangelo.turtle;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TurtleRenderFacade implements PreviewListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
+
 	private TurtleRenderer defaultRenderer = new DefaultTurtleRenderer();
 
 	//private TurtleRenderer barberPole = new BarberPoleTurtleRenderer();
@@ -68,7 +72,7 @@ public class TurtleRenderFacade implements PreviewListener {
 			}
 		}
 		catch(Exception e) {
-			Log.error(e.getMessage());
+			logger.error("Failed to render the turtle", e);
 		}
 		finally {
 			if(myTurtle.isLocked()) {

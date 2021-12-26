@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.makeArt.imageFilter;
 
-import java.awt.image.BufferedImage;
-
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Converts an image to N shades of grey.
@@ -11,6 +12,7 @@ import com.marginallyclever.makelangelo.makeArt.TransformedImage;
  * @author Dan
  */
 public class Filter_BlackAndWhite extends ImageFilter {
+	private static final Logger logger = LoggerFactory.getLogger(Filter_BlackAndWhite.class);
 	double levels = 2;
 
 	public Filter_BlackAndWhite(int _levels) {
@@ -49,10 +51,10 @@ public class Filter_BlackAndWhite extends ImageFilter {
 		if (levels != 0)
 			ilevels = 1.0 / levels;
 
-		// Log.message("min_intensity="+min_intensity);
-		// Log.message("max_intensity="+max_intensity);
-		// Log.message("levels="+levels);
-		// Log.message("inverse="+ilevels);
+		// logger.debug("min_intensity="+min_intensity);
+		// logger.debug("max_intensity="+max_intensity);
+		// logger.debug("levels="+levels);
+		// logger.debug("inverse="+ilevels);
 
 		double pixel;
 
@@ -66,7 +68,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 				double a = (pixel - min_intensity) / intensity_range;
 				double c = a * levels * ilevels;
 				int b = (int) Math.max(Math.min(c * 255.0, 255), 0);
-				// if(b==255) Log.message(x+"\t"+y+"\t"+i+"\t"+b);
+				// if(b==255) logger.debug(x+"\t"+y+"\t"+i+"\t"+b);
 				afterBI.setRGB(x, y, ImageFilter.encode32bit(b));
 			}
 		}
@@ -150,23 +152,23 @@ public class Filter_BlackAndWhite extends ImageFilter {
 		}
 
 		double histogram_area = 0;
-		// Log.message("histogram:");
+		// logger.debug("histogram:");
 		for (i = 1; i < 255; ++i) {
-			Log.message(i + "=" + histogram[i]);
+			logger.debug("{}={}", i, histogram[i]);
 			histogram_area += histogram[i];
 		}
 		double histogram_zone = histogram_area / (double) levels;
-		// Log.message("histogram area: "+histogram_area);
-		// Log.message("histogram zone: "+histogram_zone);
+		// logger.debug("histogram area: "+histogram_area);
+		// logger.debug("histogram zone: "+histogram_zone);
 
 		double histogram_sum = 0;
 		x = 0;
 		y = 0;
 		for (i = 1; i < 255; ++i) {
 			histogram_sum += histogram[i];
-			// Log.message("mapping "+i+" to "+x);
+			// logger.debug("mapping "+i+" to "+x);
 			if (histogram_sum > histogram_zone) {
-				// Log.message("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
+				// logger.debug("level up at "+i+" "+histogram_sum+" vs "+histogram_zone);
 				histogram_sum -= histogram_zone;
 				x += (int) (256.0 / (double) levels);
 				++y;
@@ -174,7 +176,7 @@ public class Filter_BlackAndWhite extends ImageFilter {
 			histogram[i] = x;
 		}
 
-		// Log.message("y="+y+" x="+x);
+		// logger.debug("y="+y+" x="+x);
 		int pixel, b;
 
 		for (y = 0; y < h; ++y) {

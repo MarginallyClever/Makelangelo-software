@@ -1,19 +1,8 @@
 package com.marginallyclever.makelangelo.firmwareUploader;
 
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.io.File;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.apache.commons.io.FilenameUtils;
-
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
@@ -21,6 +10,12 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
 import com.marginallyclever.util.PreferencesHelper;
+import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
@@ -37,6 +32,8 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private SelectButton goButton = new SelectButton("start",Translator.get("Start")); 
 	private SelectTextArea selectTextAreaForAvrdudeExecLog = new SelectTextArea("avrdude_logs",Translator.get("avrdude.logs"),""); 
 	
+	final String msg_firmware_upload_status = "Firmware upload status"; // TODO traduction
+	
 	public FirmwareUploaderPanel() {
 		super();
 		
@@ -45,7 +42,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		
 		sourceAVRDude.setPathOnly();
 		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
-		sourceHex.setFileHidingEnabled(false);// if this is in my .pio dir from a VSCode build ...
+		sourceHex.setFileHidingEnabled(false);// if this is in my .pio (hidden dir) from a VSCode build ...
 		refreshButton.addPropertyChangeListener((e)->{
 			updateCOMPortList();
 		});
@@ -57,6 +54,9 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		checkForHexFileInCurrentWorkingDirectory();
 	}
 	
+	/**
+	 * TODO user home dir ?
+	 */
 	private void checkForHexFileInCurrentWorkingDirectory() {
 		String path = FileAccess.getWorkingDirectory();
 		File folder = new File(path);
@@ -93,47 +93,54 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private void uploadNow() {
 		goButton.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
+		firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );		    
 
-//		String status = "Finished!";
-//		int messageType = JOptionPane.PLAIN_MESSAGE;
 		try {
 		    // As this is a long action that can block this as to be done in a thread.
 		    // and sometimes avrdude do not exit ... 
+		    // TODO do it better ...
 		    
-		    // TODO clean the mess ... do it better ...
-		    
-		    class MeaningOfLifeFinder extends SwingWorker<String, Object> {
-
+		    class RunExecAvrDudeProcess extends SwingWorker<String, Object> {
+			
 			boolean resExecValueIsZero = false;
 
+			
+			
 			@Override
 			public String doInBackground() {
 			    try {
+				// TODO traduction
+				final String msg_please_selecte_a_Port_ = "Please selecte a Port !";
+				final String msg_please_selecte_a_hex_file_ = "Please selecte a .hex file !";
+				final String msg_finished = "Finished!";
+				final String msg_errors_refer_to_the_avrdudelog_s = "Errors! refer to the avrdude.log s";
+				
+				
 				if ( port.getSelectedItem().isBlank()){
-				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Please selecte a Port !","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+				    
+				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_please_selecte_a_Port_, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 				
 				}else if ( sourceHex.getText().isBlank()){
-				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Please selecte a .hex file !","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+				        JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_please_selecte_a_hex_file_, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 				
 				}else{
 				    
-				selectTextAreaForAvrdudeExecLog.setText("");// To clearn if précédent logs
-				// TODO in the case the port was wrong or nothing was connected avrdude may not finish ... waiting for ?
-				// So a timeout have to by added
-				String resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
-				// TODO a better way to get the exec return code (badly done so if there is multiple concurent exec can be anyone result ...)
-				if ( firmwareUploader.lastExecSucces  ) {
-				    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Finished!","Firmware upload status",JOptionPane.PLAIN_MESSAGE);
-				}else{
-				    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,"Errors! refer to the avrdude.log s","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+					selectTextAreaForAvrdudeExecLog.setText("");// To clearn if précédent logs
+					// TODO in the case the port was wrong or nothing was connected avrdude may not finish ... waiting for ?
+					// So a timeout have to by added
+					String resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
+					// TODO a better way to get the exec return code (badly done so if there is multiple concurent exec can be anyone result ...)
+					if ( firmwareUploader.lastExecSucces  ) {
+					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_finished, msg_firmware_upload_status,JOptionPane.PLAIN_MESSAGE);
+					}else{
+					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_errors_refer_to_the_avrdudelog_s, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
+					}
 				}
-				}
-				//execResult.setText(resExec);
 			    } catch (Exception e1) {
-				//			status = e1.getMessage();
-				//			messageType = JOptionPane.ERROR_MESSAGE;
+				JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, e1.getMessage(), msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 			    }
-			    return "done ?";// result normaly later availabel via get() in the done() methode ...
+			    return "done ?";// result normaly later availabel via get() in the done() methode ... but not used in this imlementation.
 			}
 
 			@Override
@@ -149,24 +156,17 @@ public class FirmwareUploaderPanel extends SelectPanel {
 			}
 		    }
 		    
-		    // running the SwingWorker ( a thread)
-		    (new MeaningOfLifeFinder()).execute();
+		    // running the SwingWorker ( a thread )
+		    (new RunExecAvrDudeProcess()).execute();
 		    //			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
 		    //			 firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
-		    //			
-		    //status = e1.getMessage();
-		    //messageType = JOptionPane.ERROR_MESSAGE;
-
-		    //firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
 		} catch (Exception e1) {
-		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),"Firmware upload status",JOptionPane.ERROR_MESSAGE);
-//		    status = e1.getMessage();
-//		    messageType = JOptionPane.ERROR_MESSAGE;
+		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 		}
 
 		//setCursor(Cursor.getDefaultCursor());
 		//goButton.setEnabled(true);
-		//JOptionPane.showMessageDialog(this,status,"Firmware upload status",messageType);
+		//JOptionPane.showMessageDialog(this,status,msg_firmware_upload_status,messageType);
 	}
 	
 	/**
@@ -176,7 +176,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	 */
 	private boolean AVRDudeExists() {
 	    
-		FirmwareUploader.execBashCommand(new String[]{"avrdude", "--version"}, null,null);
+	  	FirmwareUploader.execBashCommand(new String[]{sourceAVRDude.getText().trim()/*"avrdude"*/, "-?"}, null,null);
 		if ( FirmwareUploader.lastExecSucces ) {
 		    return true;
 		}		
@@ -184,26 +184,25 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		File f = new File(sourceAVRDude.getText());
 		boolean state = f.exists(); 
 		if(!state) {
-			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,"AVRDude not found.",msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 		}
 		return state;
 	}
 	
 	public static void main(String[] args) {
-		Log.start();
+	    try{
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		try {
-			JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			//frame.setPreferredSize(new Dimension(600, 400));
-			frame.add(new FirmwareUploaderPanel());
-			frame.pack();
-			frame.setVisible(true);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage(),"Firmware upload error",JOptionPane.ERROR_MESSAGE);
-		}
+		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frame.setPreferredSize(new Dimension(600, 400));
+		frame.add(new FirmwareUploaderPanel());
+		frame.pack();
+		frame.setVisible(true);
+	    }catch ( Exception e){
+		e.printStackTrace();
+	    }
 	}
 }

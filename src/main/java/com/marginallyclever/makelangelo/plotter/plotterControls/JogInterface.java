@@ -1,20 +1,20 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class JogInterface extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(JogInterface.class);
+	
 	private static final long serialVersionUID = -7408469373702327861L;
 	private Plotter myPlotter;
 	private CartesianButtons bCartesian = new CartesianButtons();
@@ -52,7 +52,7 @@ public class JogInterface extends JPanel {
 	    		x/=10;
 	    		y/=10;
 	    	}
-	    	Log.message("Move "+x+","+y);
+	    	logger.debug("Move {},{}", x, y);
 	    	Point2D p = plotter.getPos();
 	    	p.x+=x;
 	    	p.y+=y;
@@ -109,7 +109,6 @@ public class JogInterface extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		Log.start();
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
