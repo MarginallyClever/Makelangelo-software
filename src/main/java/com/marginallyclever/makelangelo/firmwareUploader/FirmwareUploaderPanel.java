@@ -27,23 +27,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Panel to do Firmware Update (via serial port on a USB connection).
+ * A Panel to do Firmware Update (via a serial port on a USB connection) from a binary firmware file (.hex) with the commmand avrdude.
  * 
  * using avrdude path, a .hex file path (binary firmware file), a COM port (serial port (USB)).
  * <p>
  * TODO user input vérification ( files exist (and redable) , valid serial COM port selected )
- * TODO GUI 
  * 
- * Minimal size
- * Run exec command TextArea in a JScroolPane.
+ * TODO GUI Strange behaviour of SelectTextArea in a SelectPanel to correct. or .... Run exec command TextArea in a JScroolPane.
  * 
- * Window resize :
+ * TODO Minimal size ! for window resize.
  * 
  * <p>
- * User case
+ * User case :
  * 
  * ? if no avrdude found ? url to get it / install it ? or to get ArduinoIDE ( that embed avrdude) or XLoader ...
  * 
+ * 
+ * ? border for fiel with values not ok ... ?
+ * jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(5, 5, 5, 5, new java.awt.Color(255, 204, 51)));
+        
  * 
  * 
  */
@@ -52,51 +54,102 @@ public class FirmwareUploaderPanel extends
 	JPanel 
 {
 	
+	/**
+	 * a specifc logger for this class.
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploaderPanel.class);
 
 	/**
-	 * 
+	 * For serialisation need. TODO check if this is usefull as it look to me there is no serialisation used.
 	 */
 	private static final long serialVersionUID = 7101530052729740681L;
 	
+	/**
+	 *The class that provides the functional needed methods implementation.
+	 * (to disociate the GUI of the core function. an instance of firmwareUploader must be able to be called and do the job without a graphical interface.)
+	 */
 	private FirmwareUploader firmwareUploader = new FirmwareUploader();
 	
+	/**
+	 * User interface to select/change the arvdude used.
+	 * 
+	 * Should be automaticaly filed with the return of ...
+	 */
 	private SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
 	
+	/**
+	 * User interface to select/change the binary firmware file (.hex) to use.
+	 * 
+	 * Sould be a valid readable file.
+	 */
 	private SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
 	
+	/**
+	 * User interface to select/change the Serial COM port to use.
+	 * Can be refresh. Sould be filed with available COM Port.
+	 */
 	private SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
+	
+	/**
+	 * User interface to refresh the port aivalable.
+	 * 
+	 * Sould be groupe with the SelectOneOfMany port in an unique class.
+	 */
 	private SelectButton refreshButton = new SelectButton("refresh",Translator.get("Refresh"));
 	
+	/**
+	 * User interface to run the firmware update process.
+	 * 
+	 * ( that use as input the sourceAVRDude, sourceHex,port from the user)
+	 * 
+	 * All the input should be check ( files exist ( canExecut for sourceAVRDude, canRead for sourceHex), available for port))
+	 */
 	private SelectButton goButton = new SelectButton("start",Translator.get("Start")); 
 	
+	/**
+	 * A JTextArea in a JScroolPane to have the output of the execution of avrdude.
+	 * 
+	 * Should not be editable.
+	 * 
+	 * Should be automatiquely scrool to the last line/char added.
+	 */
 	private SelectTextArea selectTextAreaForAvrdudeExecLog = new SelectTextArea("avrdude_logs",Translator.get("avrdude.logs"),""); 
 	
+	/**
+	 * The title for all JDialogueMessage to inform the user.
+	 * of the state/validity of the inputs (sourceAVRDude, sourceHex, port valid or not)
+	 * of execution ( avrdude not found, avrdude exit code error, avrdude exit code success )
+	 * 
+	 */
 	final String msg_firmware_upload_status = "Firmware upload status"; // TODO traduction
 	
 	public FirmwareUploaderPanel() {
 		super();
-		
+		// populating the port select
 		updateCOMPortList();
 		refreshLayout();
-		
+		// preparing and populating the avrdude source path
 		sourceAVRDude.setPathOnly();
 		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
 		sourceHex.setFileHidingEnabled(false);// if this is in my .pio (hidden dir) from a VSCode build ...
+		// implementing the port select refresh content
 		refreshButton.addPropertyChangeListener((e)->{
 			updateCOMPortList();
 		});
+		// implementing the "start" button to run the avrdude command
 		goButton.addPropertyChangeListener((e)->{
 			if(AVRDudeExists()) uploadNow();
 		});
 		// just for logs, no edition :
 		selectTextAreaForAvrdudeExecLog.setEditable(false);
-		
+		// 
 		checkForHexFileInCurrentWorkingDirectory();
 	}
 	
 	/**
-	 * TODO user home dir ?
+	 * To automaticaly popolate the hex source file ... the first of the .hex files found in the currend PWD/"." dir.
+	 * 
+	 * TODO user home dir ? download dir ?
 	 */
 	private void checkForHexFileInCurrentWorkingDirectory() {
 		String path = FileAccess.getWorkingDirectory();
@@ -111,6 +164,9 @@ public class FirmwareUploaderPanel extends
 		}
 	}
 
+	/**
+	 * panel content initialisation. (adding all this sub JComponants for the GUI)
+	 */
 	private void refreshLayout() {
 		setLayout(new BorderLayout(0, 0));
 
@@ -135,17 +191,22 @@ public class FirmwareUploaderPanel extends
 		return SerialTransportLayer.listConnections();
 	}
 
+	/**
+	 * As this is a long action that can block this as to be done in a thread.
+	 * and sometimes avrdude do not exit ... 
+	 * 
+	 * TODO do it better ... / more resiliant.
+	 */
 	private void uploadNow() {
+		// disabling the "start" button to avoid concurent run (a Serial com port can only be used by one application and have to be free/liberated)
 		goButton.setEnabled(false);
+		// GUI interaction to notify the yuser ther is some computings ...
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
+		// preparing the firmwareUploader instance to give it the inputs to use.
 		firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );		    
 
 		try {
-		    // As this is a long action that can block this as to be done in a thread.
-		    // and sometimes avrdude do not exit ... 
-		    // TODO do it better ...
-		    
+		    // Threaded class to do the work
 		    class RunExecAvrDudeProcess extends SwingWorker<String, Object> {
 			
 			boolean resExecValueIsZero = false;
@@ -153,7 +214,11 @@ public class FirmwareUploaderPanel extends
 			@Override
 			public String doInBackground() {
 			    try {
-				// TODO traduction
+				// TODO all checks sould be done in the "functionnals needs" implementation class (FirmwareUploader) ! 
+				// but it may be easyer to do it in here also, to get a more user friendly GUI interface. not bound to the basic "functionnals needs".
+				// 
+				// we only need a way to distinc the inputus paraméter in defaut from the exception thrown to help the user ( border red the field)
+				// TODO traduction TODO simplyfy the message, TODO move that in a location so it can be modifield easyly
 				final String msg_please_selecte_a_Port_ = "Please selecte a port"+/*port.getTexte()+*/"!";
 				final String msg_please_selecte_a_hex_file_ = "Please selecte an existing redable firmware binary (.hex) file!";
 				final String msg_finished = "Finished!";
@@ -172,9 +237,9 @@ public class FirmwareUploaderPanel extends
 					selectTextAreaForAvrdudeExecLog.setText("");// To empty
 					// TODO in the case the port was wrong or nothing was connected avrdude may not finish ... waiting for ?
 					// So a timeout have to by added
-					String resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
+					boolean resExec = firmwareUploader.run(sourceHex.getText(), port.getSelectedItem(), selectTextAreaForAvrdudeExecLog);
 					// TODO a better way to get the exec return code (badly done so if there is multiple concurent exec can be anyone result ...)
-					if ( firmwareUploader.lastExecSucces  ) {
+					if ( resExec ) {
 					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_finished, msg_firmware_upload_status,JOptionPane.PLAIN_MESSAGE);
 					}else{
 					    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_errors_refer_to_the_avrdudelog_s, msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
@@ -200,17 +265,13 @@ public class FirmwareUploaderPanel extends
 			}
 		    }
 		    
-		    // running the SwingWorker ( a thread )
+		    // instanciation and running the SwingWorker ( the threaded class to do the job )
 		    (new RunExecAvrDudeProcess()).execute();
-		    //			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
-		    //			 firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
+		    
 		} catch (Exception e1) {
 		     JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog,e1.getMessage(),msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);
 		}
 
-		//setCursor(Cursor.getDefaultCursor());
-		//goButton.setEnabled(true);
-		//JOptionPane.showMessageDialog(this,status,msg_firmware_upload_status,messageType);
 	}
 	
 	/**
@@ -220,9 +281,9 @@ public class FirmwareUploaderPanel extends
 	 */
 	private boolean AVRDudeExists() {
 	    
-	  	FirmwareUploader.execBashCommand(new String[]{sourceAVRDude.getText().trim()/*"avrdude"*/, "-?"}, null,null,true);
-		if ( FirmwareUploader.lastExecSucces ) {
-		    return true;
+	  	boolean resExec = FirmwareUploader.execBashCommand(new String[]{sourceAVRDude.getText().trim()/*"avrdude"*/, "-?"}, null,null,true);
+		if ( resExec) {
+		    return resExec;
 		}		
 	
 		File f = new File(sourceAVRDude.getText());

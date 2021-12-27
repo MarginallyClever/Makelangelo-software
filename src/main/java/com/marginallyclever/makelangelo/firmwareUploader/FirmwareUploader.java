@@ -11,8 +11,6 @@ import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
-import static java.awt.image.ImageObserver.PROPERTIES;
-import java.nio.file.FileSystem;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -100,10 +98,9 @@ public class FirmwareUploader {
 	 * @param portName
 	 * @throws Exception 
 	 */
-	public String run(String hexPath,String portName, SelectTextArea textAreaThatCanBeNullForPosibleLogs) throws Exception {
+	public boolean run(String hexPath,String portName, SelectTextArea textAreaThatCanBeNullForPosibleLogs) throws Exception {
 		logger.debug("update started");
 	    
-		String resRunLog = "";
 		
 		Path p = Path.of(avrdudePath);
 		logger.debug("Trying {}", (p.resolve("../avrdude.conf").toString()));
@@ -153,73 +150,14 @@ public class FirmwareUploader {
 		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
 		//
 		logger.debug("(During)Commande exec result : ");
-		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs,false);
+		boolean resExec =  execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs,false);
 		// For simple test :  String fullExecCmdOutputsAsTexte =  execBashCommand(new String[]{"ls"}, null);
-		resRunLog = fullExecCmdOutputsAsTexte;
-		logger.debug("(After)Commande exec result : is a succes = " + lastExecSucces);
-		logger.debug(fullExecCmdOutputsAsTexte);
-
+		
+		
 		logger.debug("update finished");
-		return resRunLog;
+		return resExec;
 	}
 
-	/**
-	 * 
-	 * @param cmd
-	 * @throws Exception
-	 * @deprecated cause it don't use process exit code value.
-	 */
-	@Deprecated
-	private void runCommand(String[] cmd) throws Exception {
-		Process p = Runtime.getRuntime().exec(cmd);
-		//runStreamReaders(p);
-		runBufferedReaders(p);
-	}
-
-	/**
-	 * 
-	 * @param p
-	 * @throws IOException
-	 * @deprecated as some error and output stream can be interlaced.
-	 */
-	@Deprecated
-	@SuppressWarnings("unused")
-	private void runStreamReaders(Process p) throws IOException {
-		InputStreamReader stdInput = new InputStreamReader(p.getInputStream());
-		InputStreamReader stdError = new InputStreamReader(p.getErrorStream());
-
-		logger.debug("errors (if any):\n");
-		boolean errorOpen=true;
-		boolean inputOpen=true;
-		int s;
-		do {
-			if(stdError.ready()) {
-				if((s = stdError.read()) != -1) System.out.print((char)s);
-				else errorOpen=false;
-			}
-			if(stdInput.ready()) {
-				if((s = stdInput.read()) != -1) System.out.print((char)s);
-				else inputOpen=false;
-			}
-		} while(errorOpen && inputOpen);
-	}
-	
-	@Deprecated
-	private void runBufferedReaders(Process p) throws IOException {
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-		String s = null;
-
-		logger.debug("update: errors (if any)\n");
-		while ((s = stdError.readLine()) != null)
-			logger.debug("update: {}", s);
-
-		logger.debug("command out:\n");
-		while ((s = stdInput.readLine()) != null)
-			logger.debug("update: {}", s);
-	}
-	
 	/**
 	 * Return the path of the arvdude executable file to use.
 	 * @return 
@@ -228,6 +166,10 @@ public class FirmwareUploader {
 	    return avrdudePath;
 	}
 
+	/**
+	 * TODO should be a valid path. (File exist(), canExecute() )
+	 * @param avrdudePath 
+	 */
 	public void setAvrdudePath(String avrdudePath) {
 		this.avrdudePath = avrdudePath;
 	}
@@ -253,39 +195,30 @@ public class FirmwareUploader {
 	//
 	//
 	
-	//public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");//Not Thread safe (have to create a new at eatch need)
-
+	/**
+	 * Only for dev prurpose TODO to remove as we have a logger with debug level.
+	 */
 	static boolean debugRuntimeExecPre = true;
-	static boolean lastExecSucces = false;
 
-	// TODO ! for a clean multiple info return.
-	class ExecBashCommandResult{
-	    boolean haveStart = true;
-	    boolean isFinis = false;
-	    Integer returnCode = null;
-	    String logs = "";
-	    
-	    //TODO 
-	    
-	    
-	}
+	
 	// TO REVIEW / TODO le cas d'un process interactif ou sans fin ...
 	// TO REVEIW ( as this is a way to exec commands on the user system ... )
 	// should be a least private for security (and all methodes that using it ) ?
-	protected static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult,boolean onlyOnNewLine) {
+	/**
+	 * 
+	 * @param cmdArray the command Array (command and arguments) used to create the process. somethign like  <code>new String[]{"ls", "-l"}</code>
+	 * @param streamGobblerProcessIn can be null, the streamGobbler to take care of the Process outputs ( normal output and error output merged). Only to be usable in other usage than the one actualy implimented)
+	 * @param execResult a GUI Element ( basicaly a JTextArea) to show the output of the command executed.
+	 * @param onlyOnNewLine to take care of the command output char by char or line by line. (may have to take care of non printable char in char by char mode for some command not implemented ) 
+	 * @return true if the Process.exitValue() == 0 (normaly this means the command have been executed and terminated succeffuly with no errors (but the programme executed by the command have to use exitValues diffrent from 0 in the case of termination on an error ... ))
+	 */
+	protected static boolean execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult,boolean onlyOnNewLine) {
 	    
-	    
-	    lastExecSucces = false;
-	    final StringBuffer res = new StringBuffer();
-	    res.setLength(0);
 	    
 	    // Only for dev debug (can be remove)
 	    if (debugRuntimeExecPre) {
 		logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));
 	    }
-	    //
-	    res.append("Running : "+processStringArrayCommandToPlainString(cmdArray));
-	    res.append("\n");
 
 	    try {
 		Date dStar = new Date();
@@ -338,8 +271,6 @@ public class FirmwareUploader {
 			    if ( debugRuntimeExecPre){				
 				logger.debug(String.format("%s : [%3d][%s]", simpleDateFormat.format(d), s.length(), s));
 			    }
-			    res.append(s);
-			    res.append("\n");
 			    
 			    if ( execResult != null && onlyOnNewLine){
 				execResult.append(s+"\n");
@@ -347,13 +278,9 @@ public class FirmwareUploader {
 			}
 		    };
 
-		} else {
-		    //TODO a revoir ... 
-		    // This was a try for interactive command (that ask input from user ...) but not implemented here.
-		    //streamGobblerProcessIn.setInputStream(process.getInputStream());
-		}
+		} 
 
-		// Normaly has the error stream is merged in out strem (see ProcessBuilder redirectErrorStream(true); )
+		// Normaly has the error stream is merged in out stream (see ProcessBuilder redirectErrorStream(true); )
 		// this will not be use but to keep if we dont want the merge.
 		// for the process output error stream.
 		StreamGobblerReadLineBufferedSpecial streamGobblerProcessErr = new StreamGobblerReadLineBufferedSpecial(process.getErrorStream(), "err") {
@@ -371,8 +298,6 @@ public class FirmwareUploader {
 			if ( debugRuntimeExecPre){			    
 			    logger.debug(String.format("%s : [%3d][%s]", simpleDateFormat.format(d), s.length(), s));
 			}
-			res.append(s);
-			res.append("\n");
 		    }
 
 		    @Override
@@ -388,29 +313,6 @@ public class FirmwareUploader {
 		streamGobblerProcessErr.start();
 
 		streamGobblerProcessIn.start();
-
-		
-//		{
-//		    // only for interactive commande ( a commande that require input from the user ... )
-//		    // if we need to send input to the Process (not implemented ...)
-//		    OutputStream p_out = process.getOutputStream();
-//		    if (p_out != null) {
-//			// p_out.write(10);
-//			if (debugRuntimeExecPre) {
-//			    logger.debug(String.format("%s %s", "out on", p_out.getClass().getCanonicalName()));
-//			}
-//			if (p_out instanceof BufferedOutputStream) {
-//			    BufferedOutputStream p_out_buf = (BufferedOutputStream) p_out;
-//			    p_out_buf.close();
-//			}
-//			p_out.flush();
-//			p_out.close();
-//		    } else {
-//			 if (debugRuntimeExecPre) {
-//			     logger.debug(String.format("%s", "out off"));
-//			 }
-//		    }
-//		}
 		
 		// TODO a timer to kill the process if it never terminate ...
 		//if ( notAnInteractiveCommandWithAnProcessInputStremOpen && delaisFromLastReadEvent > ??? ) process.destroy(); // ??
@@ -427,15 +329,15 @@ public class FirmwareUploader {
 		int ret = process.exitValue();
 		Date dEnd = new Date();
 		
-		lastExecSucces = (ret == 0);
 
 		if (debugRuntimeExecPre) {
 		    logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));   		
 		    logger.debug(String.format("exitValue = %d (in %d ms : out %d err %d)", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
-		}
+		}	
 		
-		res.append(String.format("exitValue = %d (in %d ms : out %d err %d)\n", ret, dEnd.getTime() - dStar.getTime(), streamGobblerProcessIn.readCount, streamGobblerProcessErr.readCount));
-
+		
+		return (ret == 0);// normaly a 0 value as process.exitValue() means a success (no errors). 
+		
 	    } catch (IOException | InterruptedException e) {
 		
 		// 
@@ -443,13 +345,11 @@ public class FirmwareUploader {
 		    logger.debug("Running : "+processStringArrayCommandToPlainString(cmdArray));
 		    logger.debug(" exit on error : {}", e.getMessage());
 		}
-		
-		res.append(e.getMessage());
-		
+				
 		logger.error("Failed to uploade firmware : {}", e.getMessage());
 	    }
 	    
-	    return res.toString();
+	    return false; // Something go wrong.
 	}
 	
 	
