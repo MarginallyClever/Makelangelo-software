@@ -21,7 +21,6 @@ public class MetricsPreferences {
 				prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, false));
 
 		panel.add(collectAnonymousMetricsCheckbox);
-		panel.finish();
 
 		return panel;
 	}

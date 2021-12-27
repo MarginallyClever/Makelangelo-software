@@ -42,6 +42,10 @@ public class SelectButton extends Select {
 	public void setText(String label) {
 		if(button!=null) button.setText(label);
 	}
+	
+	public void setEnabled(boolean b) {
+		if(button!=null) button.setEnabled(b);
+	}
 
 	@Override
 	public void setEnabled(boolean b) {
@@ -50,6 +54,6 @@ public class SelectButton extends Select {
 
 	@Override
 	public void setForeground(Color fg) {
-	    if ( button != null) button.setForeground(fg);
+		if(button!=null) button.setForeground(fg);
 	}
 }

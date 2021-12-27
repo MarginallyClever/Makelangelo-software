@@ -18,13 +18,13 @@ public class Log {
 	private static Logger logger;
 
 	// must be consistent with logback.xml
-	private static final String LOG_FILE_NAME_TXT = "log.txt";
+	private static final String LOG_FILE_NAME_TXT = "makelangelo.log";
+	private static final String LOG_FILE_NAME_PATTERN = "makelangelo\\..*\\.log";
 	private static final String PROGRAM_START_STRING = "PROGRAM START";
 	private static final String PROGRAM_END_STRING = "PROGRAM END";
 
 	public static void start() {
-		boolean hadCrashed = crashReportCheck();
-		deletePreviousLog();
+
 
 		// lazy init to be able to purge old file
 		logger = LoggerFactory.getLogger(Log.class);
@@ -39,7 +39,7 @@ public class Log {
 		}
 		logger.info("------------------------------------------------");
 
-		if (hadCrashed) {
+		if (crashReportCheck()) {
 			logger.warn("Crash detected on previous run");
 		}
 	}
@@ -52,24 +52,21 @@ public class Log {
 		return new File(FileAccess.getUserDirectory(), LOG_FILE_NAME_TXT);
 	}
 
-	private static boolean crashReportCheck() {
-		File oldLogFile = getLogLocation();
-		if( oldLogFile.exists() ) {
-			// read last line of file
-			String ending = FileAccess.tail(oldLogFile);
-			return !ending.contains(PROGRAM_END_STRING);
-		}
-		return false;
-	}
-
 	/**
-	 * wipe the previous log file
+	 * check if a previous log does not contain PROGRAM_END_STRING to look for previously crash and delete it
 	 */
-	private static void deletePreviousLog() {
-		File toDelete = getLogLocation();
-		if (toDelete.exists() && toDelete.isFile()) {
-			toDelete.delete();
+	private static boolean crashReportCheck() {
+		File [] files = new File(FileAccess.getUserDirectory()).listFiles((dir1, name) -> name.matches(LOG_FILE_NAME_PATTERN));
+
+		boolean ending = false;
+
+		for (File oldLogFile : files) {
+			if (oldLogFile.exists() && oldLogFile.isFile()) {
+				ending |= FileAccess.tail(oldLogFile).contains(PROGRAM_END_STRING);
+				oldLogFile.delete();
+			}
 		}
+		return !ending;
 	}
 
 }

@@ -409,6 +409,19 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<version>3.9.2</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- qoi image format support -->
+		<dependency>
+		    <groupId>me.saharnooby</groupId>
+		    <artifactId>qoi-java</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
+		<!-- Also add this, if you want to use QOI with ImageIO -->
+		<dependency>
+		    <groupId>me.saharnooby</groupId>
+		    <artifactId>qoi-java-awt</artifactId>
+		    <version>1.2.0</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

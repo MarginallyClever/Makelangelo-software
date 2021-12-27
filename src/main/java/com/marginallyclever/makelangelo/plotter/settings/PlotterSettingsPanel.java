@@ -118,7 +118,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		panes.removeAll();
 
 		PanelAdjustMachine panelAdjustMachine = new PanelAdjustMachine(robot);
-		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine.getPanel());
+		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine);
 		buttonSave.addActionListener((e)-> panelAdjustMachine.save() );
 
 		//PanelAdjustPaper panelAdjustPaper = new PanelAdjustPaper(myPaper);
@@ -126,7 +126,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		//buttonSave.addActionListener((e)-> panelAdjustPaper.save() );
 
 		PenSettingsPanel panelAdjustPen = new PenSettingsPanel(robot);
-		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen.getPanel());
+		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen);
 		buttonSave.addActionListener((e)-> panelAdjustPen.save() );
 
 		// if one tab was selected, make sure to reselect it

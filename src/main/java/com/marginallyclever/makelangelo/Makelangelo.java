@@ -98,6 +98,7 @@ public final class Makelangelo {
 	private Plotter myPlotter;
 	private Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
+	private boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	
@@ -115,6 +116,11 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
+		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+		if ((os.contains("mac")) || (os.contains("darwin"))) {
+			isMacOS = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		logger.debug("Starting preferences...");
@@ -185,7 +191,7 @@ public final class Makelangelo {
 	 */
 	private void buildMenuBar() {
 		logger.debug("  adding menu bar...");
-		
+
 		mainMenuBar = new JMenuBar();
 		mainMenuBar.add(createFileMenu());
 		mainMenuBar.add(createPaperSettingsMenu());
@@ -237,7 +243,7 @@ public final class Makelangelo {
 				paperSettings.save();
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
@@ -295,7 +301,7 @@ public final class Makelangelo {
 				plotterControls.closeConnection();
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
@@ -375,11 +381,11 @@ public final class Makelangelo {
 		
 		JDialog dialog = new JDialog(mainFrame,ici.getName());
 		TurtleGeneratorPanel panel = ici.getPanel();
-		dialog.add(panel.getPanel());
+		dialog.add(panel);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
-		
+
 
 		enableMenuBar(false);
 		dialog.addWindowListener(new WindowAdapter() {
@@ -390,7 +396,7 @@ public final class Makelangelo {
 				logger.debug(Translator.get("Finished"));
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 	
@@ -433,15 +439,16 @@ public final class Makelangelo {
 		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
 		menu.add(buttonCheckForUpdate);
 
-		menu.addSeparator();
+		if (!isMacOS) {
+			menu.addSeparator();
 
-		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener((e) -> {
-			WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
-		});
-		menu.add(buttonExit);
-
+			JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
+			buttonExit.addActionListener((e) -> {
+				WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
+			});
+			menu.add(buttonExit);
+		}
 		return menu;
 	}
 
@@ -472,7 +479,7 @@ public final class Makelangelo {
 					recentFiles.addFilename(loader.getLastFileIn());
 				}
 			});
-			
+
 			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
@@ -494,7 +501,7 @@ public final class Makelangelo {
 				enableMenuBar(true);
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
@@ -525,7 +532,7 @@ public final class Makelangelo {
 			GFXPreferences.setShowPenUp(b);
 		});
 		menu.add(checkboxShowPenUpMoves);
-		
+
 		return menu;
 	}
 
@@ -794,7 +801,7 @@ public final class Makelangelo {
 	public Turtle getTurtle() {
 		return myTurtle;
 	}
-	
+
 	public static void main(String[] args) {
 		Log.start();
 		// lazy init to be able to purge old files
@@ -809,7 +816,7 @@ public final class Makelangelo {
 		}
 		
 		setSystemLookAndFeel();
-		
+
 		javax.swing.SwingUtilities.invokeLater(()->{
 			Makelangelo makelangeloProgram = new Makelangelo();
 			makelangeloProgram.run();

@@ -34,7 +34,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private static final Logger logger = LoggerFactory.getLogger(ConvertImagePanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
 	// Set of image file extensions.
-	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif"};
+	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif","qoi"};
 
 	@SuppressWarnings("deprecation")
 	private Preferences prefs = PreferencesHelper

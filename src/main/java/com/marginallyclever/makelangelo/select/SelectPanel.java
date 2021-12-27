@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -30,6 +30,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	
 	public SelectPanel() {
 		super();
+		this.setLayout(new BorderLayout());
 		
 		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
 		interiorPanel.setLayout(new GridBagLayout());
@@ -43,7 +44,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets.set(5, 5, 5, 5); 
 		
-		add(interiorPanel);
+		add(interiorPanel,BorderLayout.PAGE_START);
 	}
 	
 	public void add(Select c) {
@@ -52,16 +53,6 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		c.addPropertyChangeListener(this);
 	}
 	
-	public void finish() {
-		gbc.weighty=1;
-		gbc.gridy++;
-		interiorPanel.add(new JLabel(""),gbc);
-	}
-	
-	public JPanel getPanel() {
-		return interiorPanel;
-	}
-
 	// OBSERVER PATTERN	
 	private ArrayList<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
 
@@ -119,14 +110,13 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		panel.add(j);
 		
 		// test finish
-		panel.finish();
-		panel.getPanel().setPreferredSize(new Dimension(400,600));
+		panel.setPreferredSize(new Dimension(400,600));
 		
 		panel.addPropertyChangeListener((evt)-> {
 			System.out.println("Event: "+evt.toString());
 		});
 
-		frame.getContentPane().add(panel.getPanel());
+		frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
 	}

@@ -13,6 +13,5 @@ public class Converter_Crosshatch_Panel extends ImageConverterPanel {
 		add(new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)converter.getPass75()));
 		add(new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)converter.getPass15()));
 		add(new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)converter.getPass45()));
-		finish();
 	}
 }

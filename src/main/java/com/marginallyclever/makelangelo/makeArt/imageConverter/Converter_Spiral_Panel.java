@@ -9,6 +9,5 @@ public class Converter_Spiral_Panel extends ImageConverterPanel {
 	public Converter_Spiral_Panel(Converter_Spiral converter) {
 		super(converter);
 		add(new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),converter.getToCorners()));
-		finish();
 	}
 }
