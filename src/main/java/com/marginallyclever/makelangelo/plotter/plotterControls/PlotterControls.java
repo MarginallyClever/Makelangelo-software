@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.communications.NetworkSessionItem;
+import com.marginallyclever.communications.NetworkSessionUIManager;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -9,23 +11,25 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
 
 public class PlotterControls extends JPanel {
-	private static final long serialVersionUID = 1L;
-	private Plotter myPlotter;
-	private Turtle myTurtle;
-	private JogInterface jogInterface;
-	private MarlinInterface marlinInterface;
-	private ProgramInterface programInterface;
+	private final Plotter myPlotter;
+	private final Turtle myTurtle;
+	private final JogInterface jogInterface;
+	private final MarlinInterface marlinInterface;
+	private final ProgramInterface programInterface;
 
+	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
+	private ConnectionButton connectionButton = new ConnectionButton(connectionComboBox);
 	private JButton bFindHome;
 	private JButton bRewind;
 	private JButton bStart;
 	private JButton bStep;
 	private JButton bPause;
-	private JProgressBar progress = new JProgressBar(0, 100);
+	private final JProgressBar progress = new JProgressBar(0, 100);
 
 	private boolean isRunning = false;
 	private boolean penIsUpBeforePause = false;
@@ -39,37 +43,61 @@ public class PlotterControls extends JPanel {
 		marlinInterface = new MarlinPlotterInterface(plotter);
 		programInterface = new ProgramInterface(plotter, turtle);
 
+		JPanel panelDebug = new JPanel();
+		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DebugControls"));
+		panelDebug.setBorder(border);
 		JTabbedPane pane = new JTabbedPane();
-		pane.addTab(JogInterface.class.getSimpleName(), jogInterface);
-		pane.addTab(MarlinInterface.class.getSimpleName(), marlinInterface);
-		pane.addTab(ProgramInterface.class.getSimpleName(), programInterface);
+		pane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
+		pane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
+		pane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
+		panelDebug.add(pane);
 
 		this.setLayout(new BorderLayout());
-		this.add(pane, BorderLayout.CENTER);
-		this.add(getToolBar(), BorderLayout.NORTH);
+		this.add(panelDebug, BorderLayout.CENTER);
+		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
 		marlinInterface.addListener((e) -> {
-			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE)) {
-				// logger.debug("PlotterControls heard idle");
-				if (isRunning) {
-					// logger.debug("PlotterControls is running");
-					step();
-				}
+			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE) && isRunning) {
+				step();
 			}
 			updateProgressBar();
 		});
 	}
 
-	private JPanel getToolBar() {
+	private JPanel getButtonsPanels() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		panel.add(getConnectPanel(), BorderLayout.NORTH);
+		panel.add(getDrawPanel(), BorderLayout.CENTER);
+		return panel;
+	}
 
-		bFindHome = new PlotterButton("JogInterface.FindHome", "/images/house.png");
-		bRewind = new PlotterButton("PlotterControls.Rewind", "/images/control_start_blue.png");
-		bStart = new PlotterButton("PlotterControls.Play", "/images/control_play_blue.png");
-		bStep = new PlotterButton("PlotterControls.Step", "/images/control_fastforward_blue.png");
-		bPause = new PlotterButton("PlotterControls.Pause", "/images/control_pause_blue.png");
+	private JPanel getConnectPanel() {
+		JPanel panel = new JPanel();
+		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
+		panel.setBorder(border);
+		panel.add(connectionComboBox);
+
+		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
+			connectionComboBox.addItem(connection);
+		}
+		panel.add(connectionButton);
+		//panel.add(new PlotterButton("PlotterControls.Connect", "/images/connect.png"));
+		return panel;
+	}
+
+	private JPanel getDrawPanel() {
+
+		bFindHome = new ButtonIcon("PlotterControls.FindHome", "/images/house.png");
+		bRewind = new ButtonIcon("PlotterControls.Rewind", "/images/control_start_blue.png");
+		bStart = new ButtonIcon("PlotterControls.Play", "/images/control_play_blue.png");
+		bStep = new ButtonIcon("PlotterControls.Step", "/images/control_fastforward_blue.png");
+		bPause = new ButtonIcon("PlotterControls.Pause", "/images/control_pause_blue.png");
 
 		JPanel panel = new JPanel();
+		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
+		panel.setBorder(border);
 		panel.add(bFindHome);
 		panel.add(bRewind);
 		panel.add(bStart);
@@ -177,14 +205,6 @@ public class PlotterControls extends JPanel {
 
 	public void closeConnection() {
 		marlinInterface.closeConnection();
-	}
-
-	static class PlotterButton extends ButtonIcon{
-
-		PlotterButton(String translationKey, String iconPath) {
-			super(translationKey, iconPath);
-			setMargin(new Insets(5, 5, 5, 5));
-		}
 	}
 
 	// TEST

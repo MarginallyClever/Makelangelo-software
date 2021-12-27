@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.ArrayList;
 
 /**
@@ -43,7 +44,7 @@ public class MarlinInterface extends JPanel {
 	//private static final String STR_ERROR = "Error:";
 
 	private TextInterfaceToNetworkSession chatInterface = new TextInterfaceToNetworkSession();
-	private ArrayList<MarlinCommand> myHistory = new ArrayList<MarlinCommand>();
+	private List<MarlinCommand> myHistory = new ArrayList<>();
 
 	private JButton bESTOP = new JButton("EMERGENCY STOP");
 
@@ -66,11 +67,11 @@ public class MarlinInterface extends JPanel {
 
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
-			case ChooseConnection.CONNECTION_OPENED:
+			case ConnectionButton.CONNECTION_OPENED:
 				onConnect();
 				notifyListeners(e);
 				break;
-			case ChooseConnection.CONNECTION_CLOSED:
+			case ConnectionButton.CONNECTION_CLOSED:
 				onClose();
 				updateButtonAccess();
 				notifyListeners(e);
@@ -113,7 +114,7 @@ public class MarlinInterface extends JPanel {
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			lastReceivedTime=System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
-			//logger.debug("MarlinInterface received '"+message.trim()+"'.");
+			//logger.debug("MarlinInterface received '{}', message.trim());
 			if(message.startsWith(STR_OK)) {
 				onHearOK();
 			} else if(message.contains(STR_RESEND)) {
@@ -165,7 +166,7 @@ public class MarlinInterface extends JPanel {
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		//logger.debug("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
+		//logger.debug("MarlinInterface queued '{}'. busyCount={}", assembled, busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -180,7 +181,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				//logger.debug("MarlinInterface sending '"+mc.command+"'.");
+				//logger.debug("MarlinInterface sending '{}', mc.command);
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -188,7 +189,7 @@ public class MarlinInterface extends JPanel {
 		
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
-			logger.debug("MarlinInterface did not find {}", lineNumberToSend);
+			logger.warn("MarlinInterface did not find {}", lineNumberToSend);
 			for( MarlinCommand mc : myHistory ) {
 				logger.debug("...{}: {}", mc.lineNumber, mc.command);
 			}
@@ -247,7 +248,7 @@ public class MarlinInterface extends JPanel {
 	
 	// OBSERVER PATTERN
 	
-	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+	private List<ActionListener> listeners = new ArrayList<>();
 
 	public void addListener(ActionListener listener) {
 		listeners.add(listener);

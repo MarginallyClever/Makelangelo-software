@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.ArrayList;
 
 public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
@@ -19,7 +20,6 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	 */
 	private static final long serialVersionUID = 1032123255711692874L;
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
-	private ChooseConnection myConnectionChoice = new ChooseConnection();
 	private NetworkSession mySession;
 
 	public TextInterfaceToNetworkSession() {
@@ -28,7 +28,6 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		//this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToNetworkSession.class.getSimpleName()));
 		setLayout(new BorderLayout());
 		
-		add(myConnectionChoice,BorderLayout.NORTH);
 		add(myInterface,BorderLayout.CENTER);
 		
 		myInterface.setEnabled(false);
@@ -44,18 +43,6 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 				JOptionPane.showMessageDialog(this,e1.getLocalizedMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			}
 		});
-		myConnectionChoice.addActionListener((e)->{
-			switch(e.getID()) {
-			case ChooseConnection.CONNECTION_OPENED: 
-				setNetworkSession(myConnectionChoice.getNetworkSession());
-				break;
-			case ChooseConnection.CONNECTION_CLOSED:
-				setNetworkSession(null);
-				break;
-			}
-			
-			notifyListeners(e);
-		});
 	}
 	
 	public void setNetworkSession(NetworkSession session) {
@@ -63,7 +50,6 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		mySession = session;
 		if(mySession!=null) mySession.addListener(this);
 		
-		myConnectionChoice.setNetworkSession(session);
 		myInterface.setEnabled(mySession!=null);
 	}
 
@@ -91,12 +77,13 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	}
 
 	public void closeConnection() {
-		myConnectionChoice.closeConnection();
+		throw new UnsupportedOperationException();
 	}
-	
+
 	// OBSERVER PATTERN
 	
-	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+	private List<ActionListener> listeners = new ArrayList<>();
+
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);
 	}

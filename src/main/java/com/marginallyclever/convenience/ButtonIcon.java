@@ -14,7 +14,7 @@ public class ButtonIcon extends JButton {
         super(Translator.get(translationKey));
         setIcon(createImageIcon(iconPath));
         setFont(new Font("Arial", Font.PLAIN, 15));
-        setMargin(new Insets(5, 5, 5, 5));
+        setMargin(new Insets(1, 1, 1, 3));
     }
 
     public void replaceIcon(String iconPath) {

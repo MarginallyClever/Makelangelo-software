@@ -573,10 +573,26 @@
 		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
 	<string>
 		<key>PlotterControls.Title</key>
-		<value>Robot control</value>
+		<value>Robot controls</value>
 		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.ConnectControls</key>
+		<value>Connect</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DrawControls</key>
+		<value>Draw controls</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.FindHome</key>
+		<value>Find home</value>
+		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>PlotterControls.Pause</key>
@@ -592,6 +608,31 @@
 		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Connect</key>
+		<value>Connect</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.MarlinTab</key>
+		<value>Marlin debug</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.ProgramTab</key>
+		<value>Program debug</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.JogTab</key>
+		<value>Robot controls</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DebugControls</key>
+		<value>Debug controls</value>
+		<hint>panel title</hint>
 	</string>
 
 	<string>
@@ -640,11 +681,6 @@
 		<key>JogInterface.EngageMotors</key>
 		<value>Engage</value>
 		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Set</key>

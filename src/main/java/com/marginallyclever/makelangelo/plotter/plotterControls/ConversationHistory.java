@@ -42,7 +42,7 @@ public class ConversationHistory extends JPanel {
 	
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
-		bar.setRollover(true);
+		bar.setFloatable(false);
 
 		bar.add(bClear);
 		bar.add(bSave);
