@@ -87,5 +87,8 @@ public class SelectTextArea extends Select {
 	    field.setEditable(b);
 	}
 	
+	public JTextArea getFeild(){
+	    return field;
+	}
 	
 }

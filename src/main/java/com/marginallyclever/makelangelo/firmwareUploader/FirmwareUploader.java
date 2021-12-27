@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
+import static java.awt.image.ImageObserver.PROPERTIES;
 import java.nio.file.FileSystem;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -152,7 +153,7 @@ public class FirmwareUploader {
 		// Only for non interactive (no inputs) commande (that terminate ... TODO timer for non terminating commandes).
 		//
 		logger.debug("(During)Commande exec result : ");
-		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs);
+		String fullExecCmdOutputsAsTexte = execBashCommand(options, null,textAreaThatCanBeNullForPosibleLogs,false);
 		// For simple test :  String fullExecCmdOutputsAsTexte =  execBashCommand(new String[]{"ls"}, null);
 		resRunLog = fullExecCmdOutputsAsTexte;
 		logger.debug("(After)Commande exec result : is a succes = " + lastExecSucces);
@@ -271,7 +272,7 @@ public class FirmwareUploader {
 	// TO REVIEW / TODO le cas d'un process interactif ou sans fin ...
 	// TO REVEIW ( as this is a way to exec commands on the user system ... )
 	// should be a least private for security (and all methodes that using it ) ?
-	protected static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult) {
+	protected static String execBashCommand(String[] cmdArray, StreamGobblerReadLineBufferedSpecial streamGobblerProcessIn,SelectTextArea  execResult,boolean onlyOnNewLine) {
 	    
 	    
 	    lastExecSucces = false;
@@ -314,9 +315,14 @@ public class FirmwareUploader {
 			// ! to be thread safe do not move this SimpleDateFormat (so eatch thread have one) ?
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy hh:mm:ss");
 			
-//			@Override
-//			public void readEvent(Date d, int intread) {
-//			}
+			@Override
+			public void readEvent(Date d, int intread) {
+			     if ( execResult != null && !onlyOnNewLine){
+				execResult.append(""+(char)intread);
+				//TODO a better way to scrool the JTextArea.
+				execResult.getFeild().setCaretPosition(execResult.getFeild().getText().length());
+			    }
+			}
 
 			@Override
 			public void readLineEventWithCounter(Date d, int lineNum, String s) {
@@ -334,7 +340,8 @@ public class FirmwareUploader {
 			    }
 			    res.append(s);
 			    res.append("\n");
-			    if ( execResult != null){
+			    
+			    if ( execResult != null && onlyOnNewLine){
 				execResult.append(s+"\n");
 			    }
 			}
