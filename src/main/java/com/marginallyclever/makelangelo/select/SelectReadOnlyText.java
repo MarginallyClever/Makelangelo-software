@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import javax.swing.JLabel;
 
 /**
- * Read only HTML-rich text that can display a clickable link.  Can work with AT MOST one clickable link.
+ * Read only HTML-rich text that can display AT MOST one clickable link.
  * @author Dan Royer
  * @since 7.24.0
  */
@@ -20,8 +20,8 @@ public class SelectReadOnlyText extends Select {
 	 * 
 	 */
 	private static final long serialVersionUID = -8918068053490064344L;
-	private static final String A_HREF = "<a href='";
-	private static final String HREF_CLOSED = "'>";
+	private static final String A_HREF = "<a href=";
+	private static final String HREF_CLOSED = ">";
 	
 	private JLabel label;
 	
@@ -32,12 +32,14 @@ public class SelectReadOnlyText extends Select {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-		        JLabel l = (JLabel) evt.getSource();
+		        String text = label.getText();
 		        try {
-		            URI uri = new java.net.URI(getPlainLink(label.getText()));
+		        	String link = getPlainLink(text);
+		        	if(link==null) return;
+		            URI uri = new java.net.URI(link);
 		            Desktop.getDesktop().browse(uri);
-		        } catch (URISyntaxException | IOException use) {
-		            throw new AssertionError(use + ": " + l.getText()); //NOI18N
+		        } catch (URISyntaxException | IOException e) {
+		            throw new AssertionError(e.getMessage() + ": " + text); //NOI18N
 		        }
 			}
 		});
@@ -46,6 +48,10 @@ public class SelectReadOnlyText extends Select {
 	
 
 	private String getPlainLink(String s) {
-	    return s.substring(s.indexOf(A_HREF) + A_HREF.length(), s.indexOf(HREF_CLOSED));
+		int first = s.indexOf(A_HREF);
+		if(first<0) return null;
+		int last = s.indexOf(HREF_CLOSED,first);
+		if(last<0) return null;
+	    return s.substring(first + A_HREF.length()+1, last-1);
 	}
 }
