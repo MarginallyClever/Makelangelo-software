@@ -11,6 +11,5 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectDouble("size",Translator.get("HilbertCurveSize"),converter.getScale()));
 		add(new SelectOneOfMany("direction",Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
-		finish();
 	}
 }

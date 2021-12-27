@@ -90,7 +90,6 @@ public class PanelAdjustMachine extends SelectPanel {
 				interiorPanel.setVisible(false);
 			}
 		}*/
-		finish();
 		updateLengthNeeded();
 	}
 	

@@ -52,9 +52,8 @@ public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ 
 	    //add(buttonTestUp = new SelectButton("testUp",Translator.get("penToolTest")));
 	    add(penDown = new SelectDouble("down",Translator.get("penToolDown"),settings.getPenDownAngle()));
 	    //add(buttonTestDown = new SelectButton("testDown",Translator.get("penToolTest")));
-		add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),robot.getSettings().getPenDownColor(),this.getPanel()));
-		add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),robot.getSettings().getPenUpColor(),this.getPanel()));
-		finish();
+		add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),robot.getSettings().getPenDownColor(),this));
+		add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),robot.getSettings().getPenUpColor(),this));
 	}
 	
 	/*

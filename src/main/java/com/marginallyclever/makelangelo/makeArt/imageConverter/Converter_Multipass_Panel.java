@@ -10,6 +10,5 @@ public class Converter_Multipass_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),converter.getAngle()));
 		add(new SelectInteger("level",Translator.get("ConverterMultipassLevels"),converter.getPasses()));
-		finish();
 	}
 }

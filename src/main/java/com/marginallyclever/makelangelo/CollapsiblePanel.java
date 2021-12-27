@@ -492,9 +492,8 @@ public class CollapsiblePanel extends JPanel {
 		panel2.add(h);
 		panel2.add(i);
 		panel2.add(j);
-		// test finish
-		panel2.finish();
-		panel2.getPanel().setPreferredSize(new Dimension(400,600));
+		
+		panel2.setPreferredSize(new Dimension(400,600));
 
 		frame.getContentPane().add(cpanel);
 		frame.pack();

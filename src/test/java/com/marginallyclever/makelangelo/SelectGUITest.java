@@ -31,7 +31,7 @@ public class SelectGUITest {
     @BeforeEach
     public void beforeEach() {
         panel = new SelectPanel();
-        frame.getContentPane().add(panel.getPanel());
+        frame.getContentPane().add(panel);
     }
 
     @AfterEach

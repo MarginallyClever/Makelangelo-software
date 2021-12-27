@@ -11,6 +11,5 @@ public class Converter_CMYK_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectInteger("passes",Translator.get("ConverterCMYKPasses"),converter.getPasses()));
 		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
-		finish();
 	}
 }

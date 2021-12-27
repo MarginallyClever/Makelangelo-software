@@ -15,6 +15,5 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 		add(new SelectDouble("min",Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize   ()));
 		add(new SelectBoolean("cutoff",Translator.get("voronoiStipplingCutoff"),converter.getDrawBorders()));
 		add(new SelectDouble("drawBorder",Translator.get("voronoiStipplingDrawBorders"),converter.getCutoff  ()));
-		finish();
 	}
 }

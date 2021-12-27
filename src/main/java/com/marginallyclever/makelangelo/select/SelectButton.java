@@ -35,18 +35,18 @@ public class SelectButton extends Select {
 	}
 	
 	public void doClick() {
-		button.doClick();
+		if(button!=null) button.doClick();
 	}
 	
 	public void setText(String label) {
-		button.setText(label);
+		if(button!=null) button.setText(label);
 	}
 	
 	public void setEnabled(boolean b) {
-		button.setEnabled(b);
+		if(button!=null) button.setEnabled(b);
 	}
 
 	public void setForeground(Color fg) {
-		button.setForeground(fg);
+		if(button!=null) button.setForeground(fg);
 	}
 }

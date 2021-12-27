@@ -25,7 +25,6 @@ public class Generator_Dragon_Panel extends TurtleGeneratorPanel {
 
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Dragon_curve'>Learn more</a>"));
-		finish();
 	}
 
 	@Override
