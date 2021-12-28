@@ -28,7 +28,6 @@ public class Generator_Package_Panel extends TurtleGeneratorPanel {
 		add(width = new SelectInteger("width",Translator.get("Width"),generator.getLastWidth()));
 		add(height = new SelectInteger("height",Translator.get("Height"),generator.getLastHeight()));
 		add(length = new SelectInteger("length",Translator.get("Length"),generator.getLastLength()));
-		finish();
 	}
 
 	@Override

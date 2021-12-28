@@ -28,7 +28,6 @@ public class GFXPreferences {
 		panel.add(drawAllWhileRunningCheckbox);
 		panel.add(antialiasOnCheckbox);
 		panel.add(speedOverQualityCheckbox);
-		panel.finish();
 
 		return panel;
 	}

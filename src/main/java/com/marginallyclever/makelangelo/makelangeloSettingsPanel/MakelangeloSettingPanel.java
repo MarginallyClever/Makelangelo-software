@@ -72,10 +72,10 @@ public class MakelangeloSettingPanel {
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
 		panel.add(pane,c);
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
+		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
+		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

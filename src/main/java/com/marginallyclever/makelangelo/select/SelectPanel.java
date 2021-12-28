@@ -1,14 +1,13 @@
 package com.marginallyclever.makelangelo.select;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -26,42 +25,24 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	private static final long serialVersionUID = 2141566275423257798L;
 
 	private JPanel interiorPanel = new JPanel();
-	private GridBagConstraints gbc = new GridBagConstraints();
 	
 	public SelectPanel() {
-		super();
-		
-		//interiorPanel.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		interiorPanel.setLayout(new GridBagLayout());
-		//interiorPanel.setBorder(new LineBorder(Color.RED));
-		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
+		super(new BorderLayout());
+		add(interiorPanel,BorderLayout.PAGE_START);
 
-		gbc.weightx = 1;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.insets.set(5, 5, 5, 5); 
+		//interiorPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 		
-		add(interiorPanel);
+		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
+		interiorPanel.setLayout(new BoxLayout(interiorPanel, BoxLayout.Y_AXIS));
 	}
 	
 	public void add(Select c) {
-		gbc.gridy++;
-		interiorPanel.add(c,gbc);
+		//gbc.gridy++;
+		//interiorPanel.add(c,gbc);
+		interiorPanel.add(c);
 		c.addPropertyChangeListener(this);
 	}
 	
-	public void finish() {
-		gbc.weighty=1;
-		gbc.gridy++;
-		interiorPanel.add(new JLabel(""),gbc);
-	}
-	
-	public JPanel getPanel() {
-		return interiorPanel;
-	}
-
 	// OBSERVER PATTERN	
 	private ArrayList<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
 
@@ -102,7 +83,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		SelectInteger f = new SelectInteger("F","FFF",0);
 		String [] list = {"cars","trains","planes","boats","rockets"};
 		SelectOneOfMany g = new SelectOneOfMany("G","G",list,0);
-		String ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+		String ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. <a href=\"http://google.com\">Google</a> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 		SelectReadOnlyText h = new SelectReadOnlyText("H","H "+ipsum);
 		SelectSlider i = new SelectSlider("I","I",200,0,100);
 		SelectTextArea j = new SelectTextArea("J","J",ipsum);
@@ -119,14 +100,13 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		panel.add(j);
 		
 		// test finish
-		panel.finish();
-		panel.getPanel().setPreferredSize(new Dimension(400,600));
+		panel.setPreferredSize(new Dimension(400,600));
 		
 		panel.addPropertyChangeListener((evt)-> {
 			System.out.println("Event: "+evt.toString());
 		});
 
-		frame.getContentPane().add(panel.getPanel());
+		frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
 	}

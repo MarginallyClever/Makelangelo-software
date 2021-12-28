@@ -10,6 +10,5 @@ public class Converter_Boxxy_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,1,converter.getBoxMasSize()));
 		add(new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,converter.getCutoff()));
-		finish();
 	}
 }

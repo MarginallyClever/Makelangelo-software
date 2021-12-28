@@ -18,7 +18,7 @@ public class SelectButton extends Select {
 	private static final long serialVersionUID = 7096181261934634708L;
 	private JButton button;
 
-	public SelectButton(String internalName, AbstractAction action) {
+	public SelectButton(String internalName,AbstractAction action) {
 		super(internalName);
 		button = new JButton(action);
 	}
@@ -35,20 +35,18 @@ public class SelectButton extends Select {
 	}
 	
 	public void doClick() {
-		button.doClick();
+		if(button!=null) button.doClick();
 	}
 	
 	public void setText(String label) {
-		button.setText(label);
+		if(button!=null) button.setText(label);
 	}
 	
 	public void setEnabled(boolean b) {
-		button.setEnabled(b);
+		if(button!=null) button.setEnabled(b);
 	}
 
 	public void setForeground(Color fg) {
-		if (button != null) {
-			button.setForeground(fg);
-		}
+		if(button!=null) button.setForeground(fg);
 	}
 }

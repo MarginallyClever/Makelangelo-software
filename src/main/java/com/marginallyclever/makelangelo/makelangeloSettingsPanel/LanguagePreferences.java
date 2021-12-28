@@ -27,7 +27,6 @@ public class LanguagePreferences {
 		languageOptions = new SelectOneOfMany("language","Language",languageList,currentIndex);
 		
 		panel.add(languageOptions);
-		panel.finish();
 
 		return panel;
 	}

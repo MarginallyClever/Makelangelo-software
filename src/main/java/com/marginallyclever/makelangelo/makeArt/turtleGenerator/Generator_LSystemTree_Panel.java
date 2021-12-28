@@ -34,7 +34,6 @@ public class Generator_LSystemTree_Panel extends TurtleGeneratorPanel {
 		add(field_angle      = new SelectSlider("angle",Translator.get("LSystemAngle"),360,1,(int)generator.getAngle()));
 		add(field_noise      = new SelectSlider("noise",Translator.get("LSystemNoise"),100,0,(int)generator.getNoise()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/L-system'>Learn more</a>"));
-		finish();
 	}
 
 	@Override

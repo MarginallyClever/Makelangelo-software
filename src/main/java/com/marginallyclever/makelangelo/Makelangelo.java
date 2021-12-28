@@ -373,7 +373,7 @@ public final class Makelangelo {
 		
 		JDialog dialog = new JDialog(mainFrame,ici.getName());
 		TurtleGeneratorPanel panel = ici.getPanel();
-		dialog.add(panel.getPanel());
+		dialog.add(panel);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();

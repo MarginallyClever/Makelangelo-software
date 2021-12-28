@@ -24,7 +24,6 @@ public class Generator_GraphPaper_Panel extends TurtleGeneratorPanel {
 		this.generator = generator_GraphPaper;
 
 		add(angle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_GraphPaper.getAngle()));
-		finish();
 	}
 
 	@Override
