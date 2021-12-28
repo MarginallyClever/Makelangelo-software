@@ -4,6 +4,7 @@ import com.marginallyclever.communications.NetworkSessionItem;
 import com.marginallyclever.communications.NetworkSessionUIManager;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -34,7 +35,7 @@ public class PlotterControls extends JPanel {
 	private boolean isRunning = false;
 	private boolean penIsUpBeforePause = false;
 
-	public PlotterControls(Plotter plotter, Turtle turtle) {
+	public PlotterControls(Plotter plotter, Turtle turtle, Window parentWindow) {
 		super();
 		myPlotter = plotter;
 		myTurtle = turtle;
@@ -43,9 +44,7 @@ public class PlotterControls extends JPanel {
 		marlinInterface = new MarlinPlotterInterface(plotter);
 		programInterface = new ProgramInterface(plotter, turtle);
 
-		JPanel panelDebug = new JPanel();
-		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DebugControls"));
-		panelDebug.setBorder(border);
+		CollapsiblePanel panelDebug = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.DebugControls"));
 		JTabbedPane pane = new JTabbedPane();
 		pane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
 		pane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
@@ -223,7 +222,7 @@ public class PlotterControls extends JPanel {
 
 		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterControls(new Plotter(), new Turtle()));
+		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
 		frame.setVisible(true);
 	}
