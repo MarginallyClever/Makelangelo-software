@@ -63,6 +63,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -657,7 +658,7 @@ public final class Makelangelo {
 	}
 	
 	private void setupDropTarget() {
-		logger.debug("  adding drag & drop support...");
+		logger.debug("adding drag & drop support...");
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
@@ -732,6 +733,11 @@ public final class Makelangelo {
 		preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
 		preferences.putInt(KEY_WINDOW_X, location.x);
 		preferences.putInt(KEY_WINDOW_Y, location.y);
+		try {
+			preferences.sync();
+		} catch (BackingStoreException e) {
+			logger.error("Failed to store size of the window", e);
+		}
 	}
 
 	/**
