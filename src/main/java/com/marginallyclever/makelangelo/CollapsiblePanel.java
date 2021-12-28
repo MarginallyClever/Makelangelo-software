@@ -15,11 +15,11 @@ public class CollapsiblePanel extends JPanel {
     private String title = "";
     private final TitledBorder border;
     private final JPanel innerPannel;
-    private final JFrame parentFrame;
+    private final Window parentWindow;
     private Dimension previousDimension;
 
-    public CollapsiblePanel(JFrame parentFrame, String title) {
-        this.parentFrame = parentFrame;
+    public CollapsiblePanel(Window parentWindow, String title) {
+        this.parentWindow = parentWindow;
         this.title = title;
         border = BorderFactory.createTitledBorder(title);
         setBorder(border);
@@ -127,17 +127,17 @@ public class CollapsiblePanel extends JPanel {
         }
         updateBorderTitle();
         if (visible) {
-            Dimension toggle = new Dimension(parentFrame.getWidth(), previousDimension.height);
-            parentFrame.setPreferredSize(toggle);
+            Dimension toggle = new Dimension(parentWindow.getWidth(), previousDimension.height);
+            parentWindow.setPreferredSize(toggle);
         } else {
-            previousDimension = parentFrame.getSize();
+            previousDimension = parentWindow.getSize();
             int height = previousDimension.height - innerPannel.getHeight();
             Dimension toggle = new Dimension(previousDimension.width, height);
-            parentFrame.setPreferredSize(toggle);
+            parentWindow.setPreferredSize(toggle);
         }
-        parentFrame.validate();
-        parentFrame.repaint();
-        parentFrame.pack();
+        parentWindow.validate();
+        parentWindow.repaint();
+        parentWindow.pack();
         repaint();
     }
 
