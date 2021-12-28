@@ -528,11 +528,9 @@ public final class Makelangelo {
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
-			System.out.println("was "+b);
 			GFXPreferences.setShowPenUp(!b);
 		});
 		GFXPreferences.addListener((e)->{
-			System.out.println("is now "+(boolean)e.getNewValue());
 			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
 		});
 		menu.add(checkboxShowPenUpMoves);

@@ -84,7 +84,6 @@ public class GFXPreferences {
 		if(old != state) {
 			Preferences prefs = getMyNode();
 			prefs.putBoolean("show pen up", state);
-			System.out.println("new state ="+state);
 			firePropertyChange(new PropertyChangeEvent(prefs,"show pen up",old,state));
 		}
 	}
