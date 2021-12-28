@@ -25,8 +25,8 @@ public class NetworkSessionUIManager {
 			//new TCPTransportLayer()
 			));
 
-
 	public static List<NetworkSessionItem> getConnectionsItems() {
+		logger.debug("Fetching connections");
 		List<NetworkSessionItem> items = new ArrayList<>();
 		for (TransportLayer transportLayer : transportLayers) {
 			logger.debug("  {}" ,transportLayer.getName());
@@ -36,15 +36,5 @@ public class NetworkSessionUIManager {
 			}
 		}
 		return items;
-	}
-
-	/**
-	 * create a GUI to give the user transport layer options.
-	 * @param parent the root gui component
-	 * @return a new connection or null.
-	 */
-	public static NetworkSession requestNewSession(NetworkSessionItem networkSessionItem) {
-		logger.debug("requestNewSession {}", networkSessionItem);
-		return networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
 	}
 }

@@ -615,6 +615,11 @@
 		<hint>title</hint>
 	</string>
 	<string>
+		<key>PlotterControls.EmergencyStop</key>
+		<value>Emergency Stop</value>
+		<hint>button</hint>
+	</string>
+	<string>
 		<key>PlotterControls.MarlinTab</key>
 		<value>Marlin debug</value>
 		<hint>panel tab title</hint>
@@ -633,6 +638,16 @@
 		<key>PlotterControls.DebugControls</key>
 		<value>Debug controls</value>
 		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>ConversationHistory.Clear</key>
+		<value>Clear</value>
+		<hint>button</hint>
+	</string>
+	<string>
+		<key>ConversationHistory.Save</key>
+		<value>Save</value>
+		<hint>button</hint>
 	</string>
 
 	<string>

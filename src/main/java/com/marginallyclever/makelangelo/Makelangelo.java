@@ -289,7 +289,6 @@ public final class Makelangelo {
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
 
 		enableMenuBar(false);

@@ -23,13 +23,14 @@ public class PlotterControls extends JPanel {
 	private final MarlinInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
-	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
+	private JComboBox<NetworkSessionItem> connectionComboBox;
 	private ConnectionButton connectionButton = new ConnectionButton(connectionComboBox);
 	private ButtonIcon bFindHome;
 	private ButtonIcon bRewind;
 	private ButtonIcon bStart;
 	private ButtonIcon bStep;
 	private ButtonIcon bPause;
+	private ButtonIcon bEmergencyStop;
 	private final JProgressBar progress = new JProgressBar(0, 100);
 
 	private boolean isRunning = false;
@@ -44,12 +45,15 @@ public class PlotterControls extends JPanel {
 		marlinInterface = new MarlinPlotterInterface(plotter);
 		programInterface = new ProgramInterface(plotter, turtle);
 
-		CollapsiblePanel panelDebug = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.DebugControls"));
-		JTabbedPane pane = new JTabbedPane();
-		pane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
-		pane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
-		pane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
-		panelDebug.add(pane);
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+		jogInterface.setPreferredSize(new Dimension(580, 300));
+		tabbedPane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
+		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
+		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
+
+		CollapsiblePanel panelDebug = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.DebugControls"), 570);
+		panelDebug.add(tabbedPane);
 
 		this.setLayout(new BorderLayout());
 		this.add(panelDebug, BorderLayout.CENTER);
@@ -76,54 +80,72 @@ public class PlotterControls extends JPanel {
 		JPanel panel = new JPanel();
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
 		panel.setBorder(border);
+		connectionComboBox = new JComboBox<>();
 		panel.add(connectionComboBox);
 
 		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-		refresh.addActionListener(e -> addConnectionsItems());
+		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
 		panel.add(refresh);
-		addConnectionsItems();
+		addConnectionsItems(connectionComboBox);
+
+		connectionButton = new ConnectionButton(connectionComboBox);
 		panel.add(connectionButton);
+		connectionButton.addActionListener(e -> {
+			switch (e.getID()) {
+				case ConnectionButton.CONNECTION_OPENED -> {
+					updateButtonStatusOnConnect();
+				}
+				case ConnectionButton.CONNECTION_CLOSED -> {
+					updateButtonStatusOnDisconnect();
+				}
+			}
+		});
 		return panel;
 	}
 
-	private void addConnectionsItems() {
-		connectionComboBox.removeAllItems();
+	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
+		comboBox.removeAllItems();
 		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
-			connectionComboBox.addItem(connection);
+			comboBox.addItem(connection);
 		}
 	}
 
 	private JPanel getDrawPanel() {
+
+		JPanel panel = new JPanel();
+		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
+		panel.setBorder(border);
 
 		bFindHome = new ButtonIcon("PlotterControls.FindHome", "/images/house.png");
 		bRewind = new ButtonIcon("PlotterControls.Rewind", "/images/control_start_blue.png");
 		bStart = new ButtonIcon("PlotterControls.Play", "/images/control_play_blue.png");
 		bStep = new ButtonIcon("PlotterControls.Step", "/images/control_fastforward_blue.png");
 		bPause = new ButtonIcon("PlotterControls.Pause", "/images/control_pause_blue.png");
+		bEmergencyStop = new ButtonIcon("PlotterControls.EmergencyStop", "/images/stop.png");
+		bEmergencyStop.setForeground(Color.RED);
 
-		JPanel panel = new JPanel();
-		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
-		panel.setBorder(border);
 		panel.add(bFindHome);
 		panel.add(bRewind);
 		panel.add(bStart);
 		panel.add(bPause);
 		panel.add(bStep);
+		panel.add(bEmergencyStop);
 
 		bFindHome.addActionListener(e -> findHome());
 		bRewind.addActionListener(e -> rewind());
 		bStart.addActionListener(e -> play());
 		bPause.addActionListener(e -> pause());
 		bStep.addActionListener(e -> step());
+		bEmergencyStop.addActionListener(e -> marlinInterface.sendESTOP());
 
-		updateButtonStatus();
+		updateButtonStatusOnDisconnect();
 
 		return panel;
 	}
 
 	private void findHome() {
 		jogInterface.findHome();
-		updateButtonStatus();
+		updateButtonStatusConnected();
 	}
 
 	private void step() {
@@ -156,7 +178,7 @@ public class PlotterControls extends JPanel {
 
 	private void play() {
 		isRunning = true;
-		updateButtonStatus();
+		updateButtonStatusConnected();
 		if (!penIsUpBeforePause)
 			myPlotter.lowerPen();
 		rewindIfNoProgramLineSelected();
@@ -171,7 +193,7 @@ public class PlotterControls extends JPanel {
 
 	private void pause() {
 		isRunning = false;
-		updateButtonStatus();
+		updateButtonStatusConnected();
 		penIsUpBeforePause = myPlotter.getPenIsUp();
 		if (!penIsUpBeforePause)
 			myPlotter.raisePen();
@@ -181,13 +203,29 @@ public class PlotterControls extends JPanel {
 		return isRunning;
 	}
 
-	private void updateButtonStatus() {
+	private void updateButtonStatusConnected() {
 		boolean isHomed = myPlotter.getDidFindHome();
 		bRewind.setEnabled(isHomed && !isRunning);
 		bStart.setEnabled(isHomed && !isRunning);
 		bPause.setEnabled(isHomed && isRunning);
 		bStep.setEnabled(isHomed && !isRunning);
 	}
+
+	private void updateButtonStatusOnConnect() {
+		bFindHome.setEnabled(true);
+		bEmergencyStop.setEnabled(true);
+		updateButtonStatusConnected();
+	}
+
+	private void updateButtonStatusOnDisconnect() {
+		bFindHome.setEnabled(false);
+		bEmergencyStop.setEnabled(false);
+		bRewind.setEnabled(false);
+		bStart.setEnabled(false);
+		bPause.setEnabled(false);
+		bStep.setEnabled(false);
+	}
+
 
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {

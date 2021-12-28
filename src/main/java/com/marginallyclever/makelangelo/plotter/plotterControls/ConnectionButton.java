@@ -44,10 +44,11 @@ public class ConnectionButton extends JPanel {
 		if (mySession != null) {
 			onClose();
 		} else {
-			NetworkSession s = NetworkSessionUIManager.requestNewSession(connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex()));
-			if (s!=null) {
+			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+			NetworkSession s = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
+			if (s != null) {
 				onOpen(s);
-				notifyListeners(new ActionEvent(this, ConnectionButton.CONNECTION_OPENED,""));
+				notifyListeners(new ActionEvent(this, CONNECTION_OPENED,""));
 			}
 		}
 	}
@@ -57,7 +58,7 @@ public class ConnectionButton extends JPanel {
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
-			notifyListeners(new ActionEvent(this, ConnectionButton.CONNECTION_CLOSED,""));
+			notifyListeners(new ActionEvent(this, CONNECTION_CLOSED,""));
 		}
 		connectionComboBox.setEnabled(true);
 		bConnect.setText(Translator.get("ButtonConnect"));
@@ -97,7 +98,7 @@ public class ConnectionButton extends JPanel {
 
 	// OBSERVER PATTERN
 	
-	private List<ActionListener> listeners = new ArrayList<ActionListener>();
+	private final List<ActionListener> listeners = new ArrayList<ActionListener>();
 	
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);

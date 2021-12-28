@@ -1,5 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.convenience.ButtonIcon;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +25,8 @@ public class ConversationHistory extends JPanel {
 	private ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<ConversationEvent>();
 	private JFileChooser chooser = new JFileChooser();
 
-	private JButton bClear = new JButton("Clear");
-	private JButton bSave = new JButton("Save");
+	private ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
+	private ButtonIcon bSave = new ButtonIcon("ConversationHistory.Save", "/images/disk.png");
 
 	
 	public ConversationHistory() {
@@ -44,9 +48,9 @@ public class ConversationHistory extends JPanel {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
 
-		bar.add(bClear);
 		bar.add(bSave);
-		
+		bar.add(bClear);
+
 		bClear.addActionListener( (e) -> runNewAction() );
 		bSave.addActionListener( (e) -> runSaveAction() );
 		
@@ -147,6 +151,10 @@ public class ConversationHistory extends JPanel {
 	// TEST
 	
 	public static void main(String[] args) {
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+
 		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ConversationHistory());

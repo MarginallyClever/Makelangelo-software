@@ -77,7 +77,9 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	}
 
 	public void closeConnection() {
-		throw new UnsupportedOperationException();
+		if (mySession != null) {
+			mySession.closeConnection();
+		}
 	}
 
 	// OBSERVER PATTERN
@@ -115,7 +117,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		
 		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setPreferredSize(new Dimension(600, 400));
+//		frame.setPreferredSize(new Dimension(600, 400));
 		frame.add(new TextInterfaceToNetworkSession());
 		frame.pack();
 		frame.setVisible(true);

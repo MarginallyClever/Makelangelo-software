@@ -46,8 +46,6 @@ public class MarlinInterface extends JPanel {
 	private TextInterfaceToNetworkSession chatInterface = new TextInterfaceToNetworkSession();
 	private List<MarlinCommand> myHistory = new ArrayList<>();
 
-	private JButton bESTOP = new JButton("EMERGENCY STOP");
-
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
 	private int lineNumberToSend;
 	// the last line number added to the queue.
@@ -62,20 +60,18 @@ public class MarlinInterface extends JPanel {
 		super();
 
 		this.setLayout(new BorderLayout());
-		this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(chatInterface, BorderLayout.CENTER);
 
 		chatInterface.addActionListener((e) -> {
 			switch (e.getID()) {
-			case ConnectionButton.CONNECTION_OPENED:
-				onConnect();
-				notifyListeners(e);
-				break;
-			case ConnectionButton.CONNECTION_CLOSED:
-				onClose();
-				updateButtonAccess();
-				notifyListeners(e);
-				break;
+				case ConnectionButton.CONNECTION_OPENED -> {
+					onConnect();
+					notifyListeners(e);
+				}
+				case ConnectionButton.CONNECTION_CLOSED -> {
+					onClose();
+					notifyListeners(e);
+				}
 			}
 		});
 	}
@@ -90,7 +86,6 @@ public class MarlinInterface extends JPanel {
 		lineNumberToSend=1;
 		lineNumberAdded=0;
 		myHistory.clear();
-		updateButtonAccess();
 		timeoutChecker.start();
 	}
 	
@@ -209,33 +204,10 @@ public class MarlinInterface extends JPanel {
 		return busyCount<=0;
 	}
 
-	
-	protected JToolBar getToolBar() {
-		JToolBar bar = new JToolBar();
-		bar.setRollover(true);
-
-		bESTOP.setFont(getFont().deriveFont(Font.BOLD));
-		bESTOP.setForeground(Color.RED);
-
-		bESTOP.addActionListener((e) -> sendESTOP() );
-		bar.add(bESTOP);
-		//bar.addSeparator();
-		
-		updateButtonAccess();
-
-		return bar;
-	}
-
-	private void sendESTOP() {
+	public void sendESTOP() {
 		chatInterface.sendCommand("M112");
 		chatInterface.sendCommand("M112");
 		chatInterface.sendCommand("M112");
-	}
-
-	private void updateButtonAccess() {
-		boolean isConnected = chatInterface.getIsConnected();
-
-		bESTOP.setEnabled(isConnected);
 	}
 
 	public void setNetworkSession(NetworkSession session) {
