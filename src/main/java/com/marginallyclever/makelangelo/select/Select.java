@@ -32,7 +32,7 @@ public class Select extends JPanel {
 		propertyChangeListeners.remove(p);
 	}
 	
-	protected void notifyPropertyChangeListeners(Object oldValue,Object newValue) {
+	protected void firePropertyChange(Object oldValue,Object newValue) {
 		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);

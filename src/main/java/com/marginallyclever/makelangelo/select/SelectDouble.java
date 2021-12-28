@@ -77,7 +77,7 @@ public class SelectDouble extends Select {
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								notifyPropertyChangeListeners(oldValue,newValue);
+								firePropertyChange(oldValue,newValue);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}
@@ -121,7 +121,7 @@ public class SelectDouble extends Select {
 		if(newValue!=value) {
 			//Log.message("new "+newValue+" old "+oldValue);
 			field.setText(StringHelper.formatDouble(newValue));
-			notifyPropertyChangeListeners(value, newValue);
+			firePropertyChange(value, newValue);
 		}
 	}
 	

@@ -521,22 +521,22 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuGraphicsPenUp</key>
+		<key>GFXPreferences.showPenUp</key>
 		<value>显示抬笔移动</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuGraphicsAntialias</key>
+		<key>GFXPreferences.antialias</key>
 		<value>Antialias lines</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuGraphicsSpeedVSQuality</key>
+		<key>GFXPreferences.speedVSQuality</key>
 		<value>速度vs质量</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuGraphicsDrawWhileRunning</key>
+		<key>GFXPreferences.showAllWhileDrawing</key>
 		<value>绘图时显示整个图像</value>
 		<hint>graphics settings dialog</hint>
 	</string>
@@ -893,22 +893,22 @@
 	</string>
 
 	<string>
-		<key>MenuPreview</key>
+		<key>MenuView</key>
 		<value>查看</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>ZoomIn</key>
+		<key>MenuView.zoomIn</key>
 		<value>放大 +</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>ZoomOut</key>
+		<key>MenuView.zoomOut</key>
 		<value>缩小 -</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>ZoomFit</key>
+		<key>MenuView.zoomFit</key>
 		<value>适度缩放</value>
 		<hint>menu or dialog title</hint>
 	</string>

@@ -127,15 +127,14 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 						</goals>
 					</execution>
 				</executions>
-			</plugin> <!-- 
+			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.3</version>
 				<configuration>
-					<source>8</source>
 					<destDir>${project.basedir}/docs</destDir>
 				</configuration> 
-			</plugin> -->
+			</plugin>
 
 			<!-- Beginning of plugins defined originally only in Super POM -->
 			<plugin>

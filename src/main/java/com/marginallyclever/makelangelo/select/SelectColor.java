@@ -54,7 +54,7 @@ public class SelectColor extends Select {
 			public void actionPerformed(ActionEvent e) {
 				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
 				field.setBackground(c);
-				notifyPropertyChangeListeners(null,c);
+				firePropertyChange(null,c);
 			}
 		});
 
@@ -73,6 +73,6 @@ public class SelectColor extends Select {
 	
 	public void setColor(ColorRGB c) {
 		field.setBackground(new Color(c.red,c.green,c.blue));
-		notifyPropertyChangeListeners(null,c);
+		firePropertyChange(null,c);
 	}
 }

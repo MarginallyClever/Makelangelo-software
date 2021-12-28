@@ -93,7 +93,7 @@ public final class Makelangelo {
 	 */
 	public String VERSION;
 
-	private MakelangeloSettingPanel mySettingPanel;
+	private MakelangeloSettingPanel myPreferencesPanel;
 	
 	private Camera camera;
 	private Plotter myPlotter;
@@ -125,7 +125,7 @@ public final class Makelangelo {
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		logger.debug("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-		mySettingPanel = new MakelangeloSettingPanel();
+		myPreferencesPanel = new MakelangeloSettingPanel();
 
 		startRobot();
 
@@ -417,7 +417,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener((e)-> mySettingPanel.run(mainFrame));
+		buttonAdjustPreferences.addActionListener((e)-> myPreferencesPanel.run(mainFrame));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
@@ -493,28 +493,30 @@ public final class Makelangelo {
 	}
 
 	private JMenu createViewMenu() {
-		JMenu menu = new JMenu(Translator.get("MenuPreview"));
+		JMenu menu = new JMenu(Translator.get("MenuView"));
 		
-		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
+		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomOut.addActionListener((e) -> camera.zoomOut());
 		menu.add(buttonZoomOut);
 
-		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomIn.addActionListener((e) -> camera.zoomIn());
 		menu.add(buttonZoomIn);
 		
-		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight()));
 		menu.add(buttonZoomToFit);
 
-		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("MenuGraphicsPenUp"),GFXPreferences.getShowPenUp());
+		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
 		checkboxShowPenUpMoves.addActionListener((e) -> {
-			boolean b = !GFXPreferences.getShowPenUp();
-			checkboxShowPenUpMoves.setSelected(b);
-			GFXPreferences.setShowPenUp(b);
+			boolean b = GFXPreferences.getShowPenUp();
+			GFXPreferences.setShowPenUp(!b);
+		});
+		GFXPreferences.addListener((e)->{
+			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
 		});
 		menu.add(checkboxShowPenUpMoves);
 
