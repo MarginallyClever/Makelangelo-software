@@ -31,7 +31,7 @@ public class SelectSlider extends Select {
 	        
 			if(field.getValueIsAdjusting()) return;
 			
-			notifyPropertyChangeListeners(null,n);			
+			firePropertyChange(null,n);			
 		});
 		field.setValue(defaultValue);
 

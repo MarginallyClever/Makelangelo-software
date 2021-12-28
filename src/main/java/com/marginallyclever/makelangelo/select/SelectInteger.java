@@ -76,7 +76,7 @@ public class SelectInteger extends Select {
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								notifyPropertyChangeListeners(oldValue,newNumber);
+								firePropertyChange(oldValue,newNumber);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}
@@ -127,7 +127,7 @@ public class SelectInteger extends Select {
 	public void setValue(int arg0) {
 		if(value!=arg0) {
 			field.setText(Integer.toString(arg0));
-			notifyPropertyChangeListeners(value, arg0);
+			firePropertyChange(value, arg0);
 		}
 	}
 }
