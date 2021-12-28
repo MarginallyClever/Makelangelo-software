@@ -106,7 +106,6 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
-	private JFrame logFrame;
 	private SaveDialog saveDialog;
 	
 	private RecentFiles recentFiles;

@@ -41,11 +41,14 @@ public class SerialTransportLayer implements TransportLayer {
 			portsDetected = SerialPortList.getPortNames(Pattern.compile("cu"));
 
 			Arrays.sort(portsDetected, (o1, o2) -> {
-				// Bluetooth-Incoming-Port is not useful, so put it at the end of the list
-				if (o2.contains("Bluetooth-Incoming-Port")) {
-					return -1;
-				} else if (o1.contains("Bluetooth-Incoming-Port")) {
+				// cu.usbserial* are most used, so put it on the top of the list
+				if (o1.contains("cu.usbserial") && o2.contains("cu.usbserial")) {
+					return o1.compareTo(o2);
+				}
+				if (o2.contains("cu.usbserial")) {
 					return 1;
+				} else if (o1.contains("cu.usbserial")) {
+					return -1;
 				}
 				return o1.compareTo(o2);
 			});

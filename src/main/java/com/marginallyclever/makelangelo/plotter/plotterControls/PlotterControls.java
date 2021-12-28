@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionItem;
 import com.marginallyclever.communications.NetworkSessionUIManager;
 import com.marginallyclever.convenience.ButtonIcon;
@@ -23,7 +24,7 @@ public class PlotterControls extends JPanel {
 	private final MarlinInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
-	private JComboBox<NetworkSessionItem> connectionComboBox;
+	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
 	private ConnectionButton connectionButton = new ConnectionButton(connectionComboBox);
 	private ButtonIcon bFindHome;
 	private ButtonIcon bRewind;
@@ -42,9 +43,8 @@ public class PlotterControls extends JPanel {
 		myTurtle = turtle;
 
 		jogInterface = new JogInterface(plotter);
-		marlinInterface = new MarlinPlotterInterface(plotter);
+		marlinInterface = new MarlinPlotterInterface(plotter, connectionButton);
 		programInterface = new ProgramInterface(plotter, turtle);
-
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 		jogInterface.setPreferredSize(new Dimension(580, 300));
@@ -52,17 +52,19 @@ public class PlotterControls extends JPanel {
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
 
-		CollapsiblePanel panelDebug = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.DebugControls"), 570);
-		panelDebug.add(tabbedPane);
+		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), 570);
+		collapsiblePanel.add(tabbedPane);
 
 		this.setLayout(new BorderLayout());
-		this.add(panelDebug, BorderLayout.CENTER);
+		this.add(collapsiblePanel, BorderLayout.CENTER);
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
 		marlinInterface.addListener(e -> {
-			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE) && isRunning) {
+			if (e.getActionCommand().equals(MarlinInterface.IDLE) && isRunning) {
 				step();
+			} else if (e.getActionCommand().equals(MarlinInterface.ERROR)) {
+				JOptionPane.showMessageDialog(this,  Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			}
 			updateProgressBar();
 		});
@@ -80,7 +82,6 @@ public class PlotterControls extends JPanel {
 		JPanel panel = new JPanel();
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
 		panel.setBorder(border);
-		connectionComboBox = new JComboBox<>();
 		panel.add(connectionComboBox);
 
 		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
@@ -88,16 +89,11 @@ public class PlotterControls extends JPanel {
 		panel.add(refresh);
 		addConnectionsItems(connectionComboBox);
 
-		connectionButton = new ConnectionButton(connectionComboBox);
 		panel.add(connectionButton);
-		connectionButton.addActionListener(e -> {
-			switch (e.getID()) {
-				case ConnectionButton.CONNECTION_OPENED -> {
-					updateButtonStatusOnConnect();
-				}
-				case ConnectionButton.CONNECTION_CLOSED -> {
-					updateButtonStatusOnDisconnect();
-				}
+		connectionButton.addListener(e -> {
+			switch (e.flag) {
+				case NetworkSessionEvent.CONNECTION_OPENED -> updateButtonStatusOnConnect();
+				case NetworkSessionEvent.CONNECTION_CLOSED -> updateButtonStatusOnDisconnect();
 			}
 		});
 		return panel;
@@ -136,7 +132,11 @@ public class PlotterControls extends JPanel {
 		bStart.addActionListener(e -> play());
 		bPause.addActionListener(e -> pause());
 		bStep.addActionListener(e -> step());
-		bEmergencyStop.addActionListener(e -> marlinInterface.sendESTOP());
+		bEmergencyStop.addActionListener(e ->
+		{
+			marlinInterface.sendESTOP();
+			connectionButton.closeConnection();
+		});
 
 		updateButtonStatusOnDisconnect();
 
@@ -226,7 +226,6 @@ public class PlotterControls extends JPanel {
 		bStep.setEnabled(false);
 	}
 
-
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
 		List<TurtleMove> history = myTurtle.history;
@@ -248,7 +247,7 @@ public class PlotterControls extends JPanel {
 	}
 
 	public void closeConnection() {
-		marlinInterface.closeConnection();
+		connectionButton.closeConnection();
 	}
 
 	// TEST

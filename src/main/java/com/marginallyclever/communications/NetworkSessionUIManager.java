@@ -31,6 +31,7 @@ public class NetworkSessionUIManager {
 		for (TransportLayer transportLayer : transportLayers) {
 			logger.debug("  {}" ,transportLayer.getName());
 			for (String connection: transportLayer.listConnections()) {
+				logger.debug("    {}", connection);
 				NetworkSessionItem nsi = new NetworkSessionItem(transportLayer, connection);
 				items.add(nsi);
 			}

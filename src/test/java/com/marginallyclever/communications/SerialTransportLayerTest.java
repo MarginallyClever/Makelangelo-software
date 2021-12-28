@@ -20,13 +20,13 @@ public class SerialTransportLayerTest {
 
 		try (MockedStatic<SerialPortList> serialPortListMocked = Mockito.mockStatic(SerialPortList.class)) {
 			System.setProperty("os.name", "mac");
-			serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenReturn(new String[]{"/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.usbserial-1444140", "/dev/cu.usbserial-1410"});
+			serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenReturn(new String[]{"/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.usbserial-1444140", "/dev/cu.usbserial-1410"});
 			List<String> connectionNames = new SerialTransportLayer().listConnections();
-			assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port"), connectionNames);
+			assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33"), connectionNames);
 
-			serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenReturn(new String[]{"/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.usbserial-1410"});
+			serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenReturn(new String[]{"/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.usbserial-1410"});
 			connectionNames = new SerialTransportLayer().listConnections();
-			assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port"), connectionNames);
+			assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33"), connectionNames);
 		} finally {
 			System.setProperty("os.name", osName);
 		}

@@ -1,9 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionItem;
-import com.marginallyclever.communications.NetworkSessionUIManager;
+import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
 import org.slf4j.Logger;
@@ -20,7 +17,9 @@ public class ConnectionButton extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ConnectionButton.class);
 	
 	private static final long serialVersionUID = 4773092967249064165L;
+	@Deprecated
 	public static final int CONNECTION_OPENED = 1;
+	@Deprecated
 	public static final int CONNECTION_CLOSED = 2;
 	
 	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
@@ -45,10 +44,10 @@ public class ConnectionButton extends JPanel {
 			onClose();
 		} else {
 			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			NetworkSession s = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
-			if (s != null) {
-				onOpen(s);
-				notifyListeners(new ActionEvent(this, CONNECTION_OPENED,""));
+			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
+			if (networkSession != null) {
+				onOpen(networkSession);
+				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_OPENED, networkSession));
 			}
 		}
 	}
@@ -58,7 +57,7 @@ public class ConnectionButton extends JPanel {
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
-			notifyListeners(new ActionEvent(this, CONNECTION_CLOSED,""));
+			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED,null));
 		}
 		connectionComboBox.setEnabled(true);
 		bConnect.setText(Translator.get("ButtonConnect"));
@@ -97,20 +96,20 @@ public class ConnectionButton extends JPanel {
 	}
 
 	// OBSERVER PATTERN
-	
-	private final List<ActionListener> listeners = new ArrayList<ActionListener>();
-	
-	public void addActionListener(ActionListener a) {
-		listeners.add(a);
+
+	private List<NetworkSessionListener> listeners = new ArrayList<>();
+
+	public void addListener(NetworkSessionListener listener) {
+		listeners.add(listener);
 	}
-	
-	public void removeActionListener(ActionListener a) {
-		listeners.remove(a);
+
+	public void removeListener(NetworkSessionListener listener) {
+		listeners.remove(listener);
 	}
-	
-	private void notifyListeners(ActionEvent e) {
-		for( ActionListener a : listeners ) {
-			a.actionPerformed(e);
+
+	private void notifyListeners(NetworkSessionEvent evt) {
+		for( NetworkSessionListener a : listeners ) {
+			a.networkSessionEvent(evt);
 		}
 	}
 

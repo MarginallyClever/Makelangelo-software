@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.NetworkSessionItem;
 import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -22,10 +23,9 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
 	private NetworkSession mySession;
 
-	public TextInterfaceToNetworkSession() {
+	public TextInterfaceToNetworkSession(ConnectionButton connectionButton) {
 		super();
 
-		//this.setBorder(BorderFactory.createTitledBorder(TextInterfaceToNetworkSession.class.getSimpleName()));
 		setLayout(new BorderLayout());
 		
 		add(myInterface,BorderLayout.CENTER);
@@ -43,8 +43,16 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 				JOptionPane.showMessageDialog(this,e1.getLocalizedMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			}
 		});
+		connectionButton.addListener((e)->{
+			switch (e.flag) {
+				case NetworkSessionEvent.CONNECTION_OPENED -> setNetworkSession((NetworkSession) e.data);
+				case NetworkSessionEvent.CONNECTION_CLOSED -> setNetworkSession(null);
+			}
+
+			notifyListeners(e);
+		});
 	}
-	
+
 	public void setNetworkSession(NetworkSession session) {
 		if(mySession!=null) mySession.removeListener(this);
 		mySession = session;
@@ -83,20 +91,20 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	}
 
 	// OBSERVER PATTERN
-	
-	private List<ActionListener> listeners = new ArrayList<>();
 
-	public void addActionListener(ActionListener a) {
-		listeners.add(a);
+	private List<NetworkSessionListener> listeners = new ArrayList<>();
+
+	public void addListener(NetworkSessionListener listener) {
+		listeners.add(listener);
 	}
-	
-	public void removeActionListener(ActionListener a) {
-		listeners.remove(a);
+
+	public void removeListener(NetworkSessionListener listener) {
+		listeners.remove(listener);
 	}
-	
-	private void notifyListeners(ActionEvent e) {
-		for( ActionListener a : listeners ) {
-			a.actionPerformed(e);
+
+	private void notifyListeners(NetworkSessionEvent evt) {
+		for( NetworkSessionListener a : listeners ) {
+			a.networkSessionEvent(evt);
 		}
 	}
 
@@ -118,7 +126,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new TextInterfaceToNetworkSession());
+		frame.add(new TextInterfaceToNetworkSession(new ConnectionButton(new JComboBox<NetworkSessionItem>())));
 		frame.pack();
 		frame.setVisible(true);
 	}

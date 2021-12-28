@@ -621,12 +621,12 @@
 	</string>
 	<string>
 		<key>PlotterControls.MarlinTab</key>
-		<value>Marlin debug</value>
+		<value>Marlin</value>
 		<hint>panel tab title</hint>
 	</string>
 	<string>
 		<key>PlotterControls.ProgramTab</key>
-		<value>Program debug</value>
+		<value>Program</value>
 		<hint>panel tab title</hint>
 	</string>
 	<string>
@@ -635,10 +635,21 @@
 		<hint>panel tab title</hint>
 	</string>
 	<string>
-		<key>PlotterControls.DebugControls</key>
-		<value>Debug controls</value>
+		<key>PlotterControls.AdvancedControls</key>
+		<value>Advanced controls</value>
 		<hint>panel title</hint>
 	</string>
+	<string>
+		<key>PlotterControls.FatalErrorTitle</key>
+		<value>Fatal Error</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.FatalError</key>
+		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
+		<hint>texte</hint>
+	</string>
+
 	<string>
 		<key>ConversationHistory.Clear</key>
 		<value>Clear</value>

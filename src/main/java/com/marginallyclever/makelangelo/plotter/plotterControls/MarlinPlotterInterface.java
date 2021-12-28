@@ -26,12 +26,12 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	
 	private Plotter myPlotter;
 	
-	public MarlinPlotterInterface(Plotter plotter) {
-		super();
+	public MarlinPlotterInterface(Plotter plotter, ConnectionButton connectionButton) {
+		super(connectionButton);
 		
 		myPlotter = plotter;
 
-		plotter.addListener((e) -> onPlotterEvent(e));
+		plotter.addListener(this::onPlotterEvent);
 	}
 	
 	private void onPlotterEvent(PlotterEvent e) {
@@ -93,11 +93,11 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			String message = ((String)evt.data).trim();
 			//logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
-			if(message.startsWith("X:") && message.contains("Count")) {
+			if (message.startsWith("X:") && message.contains("Count")) {
 				onHearM114(message);
-			} else if(message.startsWith(STR_FEEDRATE)) {
+			} else if (message.startsWith(STR_FEEDRATE)) {
 				onHearFeedrate(message);
-			} else if(message.startsWith(STR_ACCELERATION)) {
+			} else if (message.startsWith(STR_ACCELERATION)) {
 				onHearAcceleration(message);
 			}
 		}
@@ -131,11 +131,11 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			message = message.substring(STR_ACCELERATION.length());
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M201 format bad: "+message);
-			double v=Double.valueOf(parts[1].substring(1));
+			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
-			logger.error("M201 error: {}", message, e);
+			logger.warn("M201 error: {}", message, e);
 		}
 	}
 
@@ -146,14 +146,14 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			message = message.substring(STR_FEEDRATE.length());
 			String [] parts = message.split("\s");
 			if(parts.length!=4) throw new Exception("M203 format bad: "+message);
-			double v=Double.valueOf(parts[1].substring(1));
+			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
-			logger.error("M203 error: {}", message, e);
+			logger.warn("M203 error: {}", message, e);
 		}
 	}
-	
+
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getTravelToString(double x,double y) {
