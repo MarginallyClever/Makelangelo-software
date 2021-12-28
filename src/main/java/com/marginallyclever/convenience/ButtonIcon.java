@@ -11,7 +11,10 @@ public class ButtonIcon extends JButton {
     private static final Logger logger = LoggerFactory.getLogger(ButtonIcon.class);
 
     public ButtonIcon(String translationKey, String iconPath) {
-        super(Translator.get(translationKey));
+        super();
+        if (translationKey != null && !translationKey.isEmpty() && !translationKey.isBlank()) {
+            setText(Translator.get(translationKey));
+        }
         setIcon(createImageIcon(iconPath));
         setFont(new Font("Arial", Font.PLAIN, 15));
         setMargin(new Insets(1, 1, 1, 3));

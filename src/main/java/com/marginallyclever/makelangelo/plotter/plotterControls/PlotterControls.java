@@ -24,11 +24,11 @@ public class PlotterControls extends JPanel {
 
 	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
 	private ConnectionButton connectionButton = new ConnectionButton(connectionComboBox);
-	private JButton bFindHome;
-	private JButton bRewind;
-	private JButton bStart;
-	private JButton bStep;
-	private JButton bPause;
+	private ButtonIcon bFindHome;
+	private ButtonIcon bRewind;
+	private ButtonIcon bStart;
+	private ButtonIcon bStep;
+	private ButtonIcon bPause;
 	private final JProgressBar progress = new JProgressBar(0, 100);
 
 	private boolean isRunning = false;
@@ -57,7 +57,7 @@ public class PlotterControls extends JPanel {
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
-		marlinInterface.addListener((e) -> {
+		marlinInterface.addListener(e -> {
 			if (e.getActionCommand().contentEquals(MarlinInterface.IDLE) && isRunning) {
 				step();
 			}
@@ -79,12 +79,19 @@ public class PlotterControls extends JPanel {
 		panel.setBorder(border);
 		panel.add(connectionComboBox);
 
+		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
+		refresh.addActionListener(e -> addConnectionsItems());
+		panel.add(refresh);
+		addConnectionsItems();
+		panel.add(connectionButton);
+		return panel;
+	}
+
+	private void addConnectionsItems() {
+		connectionComboBox.removeAllItems();
 		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
 			connectionComboBox.addItem(connection);
 		}
-		panel.add(connectionButton);
-		//panel.add(new PlotterButton("PlotterControls.Connect", "/images/connect.png"));
-		return panel;
 	}
 
 	private JPanel getDrawPanel() {
@@ -104,11 +111,11 @@ public class PlotterControls extends JPanel {
 		panel.add(bPause);
 		panel.add(bStep);
 
-		bFindHome.addActionListener((e) -> findHome());
-		bRewind.addActionListener((e) -> rewind());
-		bStart.addActionListener((e) -> play());
-		bPause.addActionListener((e) -> pause());
-		bStep.addActionListener((e) -> step());
+		bFindHome.addActionListener(e -> findHome());
+		bRewind.addActionListener(e -> rewind());
+		bStart.addActionListener(e -> play());
+		bPause.addActionListener(e -> pause());
+		bStep.addActionListener(e -> step());
 
 		updateButtonStatus();
 
