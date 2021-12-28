@@ -5,43 +5,26 @@ import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import javax.swing.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class SelectGUITest {
-//    private static JFrame frame;
     private SelectPanel panel;
     private int testObservation;
 
     @BeforeAll
-    public static void beforeAll() {
-//	try{
-//        frame = new JFrame("Select Test");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
-//	}catch (Exception e){
-//	    e.printStackTrace();
-//	}
-    }
+    public static void beforeAll() {}
 
     @AfterAll
-    public static void afterAll() {
-//        frame.dispose();
-    }
+    public static void afterAll() {}
 
     @BeforeEach
     public void beforeEach() {
         panel = new SelectPanel();
-//        frame.getContentPane().add(panel);
     }
 
     @AfterEach
-    public void afterEach() {
-//        frame.getContentPane().removeAll();
-    }
+    public void afterEach() {}
 
     @Test
     public void testBoolean() {
