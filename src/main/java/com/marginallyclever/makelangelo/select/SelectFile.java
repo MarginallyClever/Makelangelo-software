@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URI;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -67,15 +68,65 @@ public class SelectFile extends Select {
 		});
 		
 		JPanel panel2 = new JPanel(new BorderLayout());
-		panel2.add(field,BorderLayout.LINE_END);
+		//
+		panel2.add(field,BorderLayout.LINE_END); // (so the size of the text field is 13 chars no more / no less do not resize even on windows resize.)
+		//panel2.add(field,BorderLayout.CENTER); // As set in center the field can expend to use maximun space, usefull for long filename and/or on windows resize.		
 		
 		this.add(label,BorderLayout.LINE_START);
 		this.add(panel2,BorderLayout.CENTER);
 		this.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
+	/**
+	 * PPAC37 : For my this is odd to use getText() that return a String, and not a getFile() that return a File in a Select*File*. 
+	 * 
+	 * In the case of a drag and drop directly in the text field, the text can be a URI.
+	 * ex : file:///home/q6/firmw%20are.hex and therefore to not have to handle this particular case downstream, use getFile which does it.
+	 * @return
+	 * @deprecated use getFile
+	 */
+	@Deprecated
 	public String getText() {
 		return field.getText();
+	}
+	
+	/**
+	 * To get a File from the value of field.getText().
+	 * <p>
+	 *  take care of a posible URI.
+	 * <p>
+	 * do not check if the file exist or if it can be read.
+	 * 
+	 * NOT IMPLEMENTED : if Multiple files the first.
+	 * <p>
+	 * <ul>
+	 * <li>
+	 * On my system if i drop 2 file from "Fichiers" ( the File exploreur on my linux Ubuntu 18.04 for the Graphical serveur i use gnome3 ) 
+	 * <code>file:///home/q6/firmw%20are.hex file:///home/q6/makelangelo.properties</code>
+	 * </li>
+	 * <li>
+	 * On my Win7 if i drop to file from the Windows Explorateur de fichiers
+	 * </li>
+	 * </ul>
+	 * 
+	 * 
+	 * @return null if not a valid uri file or isBlank text field.
+	 */
+	public File getFile(){
+	    String s = field.getText(); 	    
+	    if (s != null && !s.isBlank()) {
+		// maybe a uri if a drag and drop ex : "file:///home/q6/firmw%20are.hex"; 
+		if (s.startsWith("file://")) {
+		    try {
+			URI uri = new URI(s);
+			s = uri.getPath(); // To decode the uri is anyspécial char ( like a space ' ' is normaly coded "%20" in its uri forms.
+		    } catch (Exception e) {
+
+		    }
+		}
+		return new File(s);
+	    }
+	    return null;	    
 	}
 	
 	private String selectFile(String cancelValue) {

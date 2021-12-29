@@ -88,7 +88,8 @@ public class FileAccess {
 	}
 
 	/**
-	 * Return the current directory
+	 * Return the current directory.
+	 * from <code>System.getProperty("user.dir");</code>
 	 * @return the current directory
 	 */
 	public static String getUserDirectory() {
