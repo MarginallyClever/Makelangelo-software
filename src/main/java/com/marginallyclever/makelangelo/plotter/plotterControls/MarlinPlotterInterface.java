@@ -108,12 +108,12 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	private void onHearM114(String message) {
 		try {
 			message = message.substring(0, message.indexOf("Count"));
-			String[] majorParts = message.split("\b");
+			String[] majorParts = message.split("\s");
 			Point2D pos = myPlotter.getPos();
 			
 			for (String s : majorParts) {
 				String[] minorParts = s.split(":");
-				Double v = Double.valueOf(minorParts[1]);
+				Double v = Double.valueOf(minorParts[1].trim());
 				if(minorParts[0].equalsIgnoreCase("X")) pos.x=v;
 				if(minorParts[0].equalsIgnoreCase("Y")) pos.y=v;
 			}
