@@ -5,39 +5,26 @@ import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import javax.swing.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class SelectGUITest {
-    private static JFrame frame;
     private SelectPanel panel;
     private int testObservation;
 
     @BeforeAll
-    public static void beforeAll() {
-        frame = new JFrame("Select Test");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-    }
+    public static void beforeAll() {}
 
     @AfterAll
-    public static void afterAll() {
-        frame.dispose();
-    }
+    public static void afterAll() {}
 
     @BeforeEach
     public void beforeEach() {
         panel = new SelectPanel();
-        frame.getContentPane().add(panel.getPanel());
     }
 
     @AfterEach
-    public void afterEach() {
-        frame.getContentPane().removeAll();
-    }
+    public void afterEach() {}
 
     @Test
     public void testBoolean() {
@@ -80,14 +67,14 @@ public class SelectGUITest {
     @Test
     public void testColor() {
         // test contructor(s)
-        SelectColor b = new SelectColor("test", "test", new ColorRGB(0, 0, 0), frame);
+        SelectColor b = new SelectColor("test", "test", new ColorRGB(0, 0, 0), panel);
         ColorRGB c = b.getColor();
         assertEquals(0, c.red);
         assertEquals(0, c.green);
         assertEquals(0, c.blue);
 
         // test constructor sets value ok.
-        b = new SelectColor("test2", "test2", new ColorRGB(1, 2, 3), frame);
+        b = new SelectColor("test2", "test2", new ColorRGB(1, 2, 3), panel);
         c = b.getColor();
         assertEquals(1, c.red);
         assertEquals(2, c.green);

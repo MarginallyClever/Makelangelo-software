@@ -26,7 +26,6 @@ public class Generator_FillPage_Panel extends TurtleGeneratorPanel {
 
 		add(angle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle()));
 		add(penDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),Generator_FillPage.getPenDiameter()));
-		finish();
 	}
 
 	@Override

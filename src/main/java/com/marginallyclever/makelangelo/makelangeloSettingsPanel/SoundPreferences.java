@@ -27,7 +27,6 @@ public class SoundPreferences {
 		panel.add(sound_disconnect = new SelectFile("disconnect",Translator.get("MenuSoundsDisconnect"),prefs.get("sound_disconnect", "")));
 		panel.add(sound_conversion_finished = new SelectFile("convert",Translator.get("MenuSoundsFinishConvert"),prefs.get("sound_conversion_finished", "")));
 		panel.add(sound_drawing_finished = new SelectFile("finish",Translator.get("MenuSoundsFinishDraw"),prefs.get("sound_drawing_finished", "")));
-		panel.finish();
 		return panel;
 	}
 	

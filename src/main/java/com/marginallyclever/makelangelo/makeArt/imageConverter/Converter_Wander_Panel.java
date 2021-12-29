@@ -11,6 +11,5 @@ public class Converter_Wander_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectInteger("count",Translator.get("ConverterWanderLineCount"),converter.getLineCount()));
 		add(new SelectBoolean("cmyk",Translator.get("ConverterWanderCMYK"),converter.isCMYK()));
-		finish();
 	}
 }

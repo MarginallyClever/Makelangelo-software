@@ -92,12 +92,13 @@ public final class Makelangelo {
 	 */
 	public String VERSION;
 
-	private MakelangeloSettingPanel mySettingPanel;
+	private MakelangeloSettingPanel myPreferencesPanel;
 	
 	private Camera camera;
 	private Plotter myPlotter;
 	private Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
+	private boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	
@@ -105,7 +106,6 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
-	private JFrame logFrame;
 	private SaveDialog saveDialog;
 	
 	private RecentFiles recentFiles;
@@ -115,11 +115,16 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
+		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+		if ((os.contains("mac")) || (os.contains("darwin"))) {
+			isMacOS = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		logger.debug("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
-		mySettingPanel = new MakelangeloSettingPanel();
+		myPreferencesPanel = new MakelangeloSettingPanel();
 
 		startRobot();
 
@@ -185,7 +190,7 @@ public final class Makelangelo {
 	 */
 	private void buildMenuBar() {
 		logger.debug("  adding menu bar...");
-		
+
 		mainMenuBar = new JMenuBar();
 		mainMenuBar.add(createFileMenu());
 		mainMenuBar.add(createPaperSettingsMenu());
@@ -237,7 +242,7 @@ public final class Makelangelo {
 				paperSettings.save();
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
@@ -295,7 +300,7 @@ public final class Makelangelo {
 				plotterControls.closeConnection();
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
@@ -375,11 +380,11 @@ public final class Makelangelo {
 		
 		JDialog dialog = new JDialog(mainFrame,ici.getName());
 		TurtleGeneratorPanel panel = ici.getPanel();
-		dialog.add(panel.getPanel());
+		dialog.add(panel);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
-		
+
 
 		enableMenuBar(false);
 		dialog.addWindowListener(new WindowAdapter() {
@@ -390,7 +395,7 @@ public final class Makelangelo {
 				logger.debug(Translator.get("Finished"));
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 	
@@ -422,7 +427,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
-		buttonAdjustPreferences.addActionListener((e)-> mySettingPanel.run(mainFrame));
+		buttonAdjustPreferences.addActionListener((e)-> myPreferencesPanel.run(mainFrame));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
@@ -433,15 +438,16 @@ public final class Makelangelo {
 		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
 		menu.add(buttonCheckForUpdate);
 
-		menu.addSeparator();
+		if (!isMacOS) {
+			menu.addSeparator();
 
-		JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-		buttonExit.addActionListener((e) -> {
-			WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
-			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
-		});
-		menu.add(buttonExit);
-
+			JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
+			buttonExit.addActionListener((e) -> {
+				WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
+			});
+			menu.add(buttonExit);
+		}
 		return menu;
 	}
 
@@ -472,7 +478,7 @@ public final class Makelangelo {
 					recentFiles.addFilename(loader.getLastFileIn());
 				}
 			});
-			
+
 			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
@@ -494,38 +500,40 @@ public final class Makelangelo {
 				enableMenuBar(true);
 			}
 		});
-		
+
 		dialog.setVisible(true);
 	}
 
 	private JMenu createViewMenu() {
-		JMenu menu = new JMenu(Translator.get("MenuPreview"));
+		JMenu menu = new JMenu(Translator.get("MenuView"));
 		
-		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("ZoomOut"), KeyEvent.VK_MINUS);
+		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomOut.addActionListener((e) -> camera.zoomOut());
 		menu.add(buttonZoomOut);
 
-		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("ZoomIn"), KeyEvent.VK_EQUALS);
+		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomIn.addActionListener((e) -> camera.zoomIn());
 		menu.add(buttonZoomIn);
 		
-		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("ZoomFit"), KeyEvent.VK_0);
+		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
 		buttonZoomToFit.addActionListener((e) -> {
 			camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
 		});
 		menu.add(buttonZoomToFit);
 
-		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("MenuGraphicsPenUp"),GFXPreferences.getShowPenUp());
+		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
 		checkboxShowPenUpMoves.addActionListener((e) -> {
-			boolean b = !GFXPreferences.getShowPenUp();
-			checkboxShowPenUpMoves.setSelected(b);
-			GFXPreferences.setShowPenUp(b);
+			boolean b = GFXPreferences.getShowPenUp();
+			GFXPreferences.setShowPenUp(!b);
+		});
+		GFXPreferences.addListener((e)->{
+			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
 		});
 		menu.add(checkboxShowPenUpMoves);
-		
+
 		return menu;
 	}
 
@@ -794,7 +802,7 @@ public final class Makelangelo {
 	public Turtle getTurtle() {
 		return myTurtle;
 	}
-	
+
 	public static void main(String[] args) {
 		Log.start();
 		// lazy init to be able to purge old files
@@ -809,7 +817,7 @@ public final class Makelangelo {
 		}
 		
 		setSystemLookAndFeel();
-		
+
 		javax.swing.SwingUtilities.invokeLater(()->{
 			Makelangelo makelangeloProgram = new Makelangelo();
 			makelangeloProgram.run();

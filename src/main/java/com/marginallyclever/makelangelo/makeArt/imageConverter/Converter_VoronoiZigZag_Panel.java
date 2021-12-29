@@ -12,6 +12,5 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 		
 		add(new SelectInteger("count", Translator.get("voronoiStipplingCellCount"),converter.getNumCells()));
 		add(new SelectDouble("min",Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize()));
-		finish();
 	}
 }

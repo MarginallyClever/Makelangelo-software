@@ -15,7 +15,7 @@ import java.util.prefs.Preferences;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
- * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the raplidly changing state information (while drawing).
+ * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {

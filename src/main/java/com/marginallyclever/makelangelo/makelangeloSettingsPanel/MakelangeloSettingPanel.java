@@ -14,14 +14,17 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
+/**
+ * Application settings
+ * @author Dan Royer
+ *
+ */
 public class MakelangeloSettingPanel {
-
 	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
-
-	transient private JPanel panel; 
-	transient private JButton buttonExport;
-	transient private JButton buttonImport;
-	transient private JButton buttonReset;
+	private transient JPanel panel; 
+	private transient JButton buttonExport;
+	private transient JButton buttonImport;
+	private transient JButton buttonReset;
 	
 	public MakelangeloSettingPanel() {
 		super();
@@ -72,10 +75,10 @@ public class MakelangeloSettingPanel {
 		JTabbedPane pane = new JTabbedPane();
 		pane.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
 		panel.add(pane,c);
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel().getPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel().getPanel());
+		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
+		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
+		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
 
 		
 		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);

@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -27,8 +25,10 @@ public class SelectTextArea extends Select {
 	
 	public SelectTextArea(String internalName,String labelKey,String defaultText) {
 		super(internalName);
+		//this.setBorder(BorderFactory.createLineBorder(Color.RED));
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
+		
 		field = new JTextArea(defaultText,4,20);
 		field.setLineWrap(true);
 		field.setWrapStyleWord(true);
@@ -50,22 +50,12 @@ public class SelectTextArea extends Select {
 			}
 			
 			void validate() {
-				notifyPropertyChangeListeners(null,field.getText());
+				firePropertyChange(null,field.getText());
 			}
 		});
 		
 		pane = new JScrollPane(field);
-		
-		// resize the JScrollPane if the containing panel resizes
-		this.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-				pane.setPreferredSize(getSize());
-				pane.revalidate();
-			}
-		});
-		pane.setMinimumSize(new Dimension(500, 100));
-		pane.setPreferredSize(new Dimension(200, 350));
+		pane.setPreferredSize(new Dimension(200, 150));
 		
 		this.add(label,BorderLayout.PAGE_START);
 		this.add(pane,BorderLayout.CENTER);

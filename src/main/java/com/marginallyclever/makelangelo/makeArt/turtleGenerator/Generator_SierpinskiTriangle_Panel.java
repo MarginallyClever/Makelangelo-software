@@ -26,7 +26,6 @@ public class Generator_SierpinskiTriangle_Panel extends TurtleGeneratorPanel {
 		
 		add(field_order = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,Generator_SierpinskiTriangle.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle'>Learn more</a>"));
-		finish();
 	}
 
 	@Override
