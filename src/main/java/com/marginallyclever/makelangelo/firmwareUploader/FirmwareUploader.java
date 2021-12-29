@@ -43,7 +43,7 @@ import java.util.Date;
  * continue in terminal mode.
  *
  * </li>
- * </lu>
+ * </ul>
  * <p>
  * NOT IMPLEMENTED :
  * <ul>
@@ -56,7 +56,7 @@ import java.util.Date;
  * <li>read and save flash and eeprom content before writing new flash (.hex
  * file)</li>
  * <li></li>
- * </lu>
+ * </ul>
  */
 public class FirmwareUploader {
 
