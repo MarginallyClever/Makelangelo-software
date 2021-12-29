@@ -16,17 +16,17 @@ public class SelectButton extends Select {
 	 * 
 	 */
 	private static final long serialVersionUID = 7096181261934634708L;
-	private JButton button = new JButton();
+	private JButton button;
 
 	public SelectButton(String internalName,AbstractAction action) {
 		super(internalName);
-		button.setAction(action);
+		button = new JButton(action);
 	}
 	
 	public SelectButton(String internalName,String labelText) {
 		super(internalName);
 		
-		button.setText(labelText);
+		button = new JButton(labelText);
 		button.addActionListener((e) -> {
 			// TODO this should be notifyActionEventListeners()?
 			notifyPropertyChangeListeners(null,null);
@@ -47,7 +47,6 @@ public class SelectButton extends Select {
 		if(button!=null) button.setEnabled(b);
 	}
 
-	@Override
 	public void setForeground(Color fg) {
 		if(button!=null) button.setForeground(fg);
 	}
