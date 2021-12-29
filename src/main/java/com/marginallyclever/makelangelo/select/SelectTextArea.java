@@ -50,7 +50,7 @@ public class SelectTextArea extends Select {
 			}
 			
 			void validate() {
-				notifyPropertyChangeListeners(null,field.getText());
+				firePropertyChange(null,field.getText());
 			}
 		});
 		

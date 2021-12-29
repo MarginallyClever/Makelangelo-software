@@ -28,8 +28,7 @@ public class SelectButton extends Select {
 		
 		button = new JButton(labelText);
 		button.addActionListener((e) -> {
-			// TODO this should be notifyActionEventListeners()?
-			notifyPropertyChangeListeners(null,null);
+			firePropertyChange(null,null);
 		});
 
 		this.add(button,BorderLayout.CENTER);

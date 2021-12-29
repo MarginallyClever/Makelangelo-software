@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
@@ -29,7 +30,7 @@ public class SelectBoolean extends Select {
 		field.addItemListener((e)-> {
 			boolean newValue = field.isSelected();
 			boolean oldValue = !newValue;
-			notifyPropertyChangeListeners(oldValue, newValue);
+			firePropertyChange(oldValue, newValue);
 		});
 
 		this.add(label,BorderLayout.LINE_START);
@@ -41,10 +42,7 @@ public class SelectBoolean extends Select {
 	}
 
 	public void setSelected(boolean b) {
-		// calling setSelected() does not fire the itemListener, which means the observer would not fire.
-		if(field.isSelected()!=b) {
-			// causes the observer to fire.
-			field.doClick();
-		}
-	}
+		// calling setSelected() does not fire change events
+		field.setSelected(b);
+	}	
 }

@@ -54,7 +54,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				notifyPropertyChangeListeners(null,field.getText());
+				firePropertyChange(null,field.getText());
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));

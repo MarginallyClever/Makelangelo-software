@@ -14,14 +14,17 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
+/**
+ * Application settings
+ * @author Dan Royer
+ *
+ */
 public class MakelangeloSettingPanel {
-
 	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
-
-	transient private JPanel panel; 
-	transient private JButton buttonExport;
-	transient private JButton buttonImport;
-	transient private JButton buttonReset;
+	private transient JPanel panel; 
+	private transient JButton buttonExport;
+	private transient JButton buttonImport;
+	private transient JButton buttonReset;
 	
 	public MakelangeloSettingPanel() {
 		super();
