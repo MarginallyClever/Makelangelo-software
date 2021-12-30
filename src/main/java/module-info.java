@@ -17,4 +17,6 @@ module com.marginallyclever.makelangelo {
 	requires transitive xml.apis.ext;
 	
 	exports com.marginallyclever.makelangelo;
+	exports com.marginallyclever.makelangelo.turtle;
+	exports com.marginallyclever.convenience;
 }
