@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SelectDoubleTest {
 	private static final Logger logger = LoggerFactory.getLogger(SelectDoubleTest.class);
@@ -20,14 +19,7 @@ public class SelectDoubleTest {
 		assertEquals(0.0f,b.getValue(),1e-6);
 		b = new SelectDouble("test2","test2",0.1f);
 		assertEquals(0.1f,b.getValue(),1e-6);
-		
-		// test observer fires
-		testObservation=0;
-		b.addPropertyChangeListener((evt) -> ++testObservation );
-		
 		b.setValue(2000.34f);
-		logger.debug("text={} value={}", b.getText(), b.getValue());
-		assertTrue(testObservation>0);
 		assertEquals(2000.34f,b.getValue(),1e-6);	
 	}
 	
