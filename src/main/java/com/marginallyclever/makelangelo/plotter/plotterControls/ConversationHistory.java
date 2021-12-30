@@ -13,6 +13,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * {@link ConversationHistory} maintains a history of the dialog between two or more parties.
+ * New entries can be added with {@code addElement(senderName,message)}.
+ * {@link ListSelectionListener}s will be notified if the user selects a line entry in the history.
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class ConversationHistory extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;

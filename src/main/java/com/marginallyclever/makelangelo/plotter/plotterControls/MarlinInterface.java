@@ -16,11 +16,14 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
+ * The {@link MarlinInterface} manages communication with a remote device running Marlin firmware.
+ * 
  * In the OSI model of network interfaces this is the Presentation/Syntax layer which
  * "ensures that data is in a usable format and is where data encryption occurs".
- * In our case the "encryption" is checksum and resend-control.
+ * That means checksum verification and resend control.
  * 
  * @author Dan Royer
+ * @since 7.28.0
  */
 public class MarlinInterface extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinInterface.class);

@@ -11,15 +11,27 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * {@link PlotterControls} brings together three separate panels and wraps all
+ * the lower level features in a human friendly, intuitive interface. - The
+ * {@link MarlinInterface}, which manages the two way network connection to a
+ * robot running Marlin firmware. - The {@link JogInterface}, which is a
+ * human-friendly way to drive a {@link Plotter} - The {@link ProgramInterface},
+ * which is a buffer for queueing commands to a {@link Plotter}
+ * 
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class PlotterControls extends JPanel {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1201865024705737250L;
 	private Plotter myPlotter;
 	private Turtle myTurtle;
 	private JogInterface jogInterface;
 	private MarlinInterface marlinInterface;
 	private ProgramInterface programInterface;
 
-	//private JButton bSaveGCode = new JButton(Translator.get("PlotterControls.SaveGCode"));
+	// private JButton bSaveGCode = new
+	// JButton(Translator.get("PlotterControls.SaveGCode"));
 	private JButton bFindHome = new JButton(Translator.get("JogInterface.FindHome"));
 	private JButton bRewind = new JButton(Translator.get("PlotterControls.Rewind"));
 	private JButton bStart = new JButton(Translator.get("PlotterControls.Play"));

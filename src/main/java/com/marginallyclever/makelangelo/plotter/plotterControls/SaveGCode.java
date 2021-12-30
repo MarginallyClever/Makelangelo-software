@@ -16,6 +16,12 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Save the {@link ProgramInterface} instruction buffer to a gcode file of the user's choosing.
+ * Relies on {@link MarlinPlotterInterface} to translate the instructions into gcode.
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class SaveGCode {
 	private static final Logger logger = LoggerFactory.getLogger(SaveGCode.class);
 	
@@ -58,6 +64,7 @@ public class SaveGCode {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
+			// TODO MarlinPlotterInterface.getFindHomeString()?
 			out.write("G28\n");  // go home
 
 			boolean isUp = true;

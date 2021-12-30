@@ -1,5 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+/**
+ * {@link MarlinCommand} is used by {@link MarlinInterface} to buffer outgoing messages.
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class MarlinCommand {
 	// for quick retrieval
 	public int lineNumber;

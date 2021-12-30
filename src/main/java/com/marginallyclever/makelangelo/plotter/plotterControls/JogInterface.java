@@ -11,7 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-
+/**
+ * {@link JogInterface} provides cartesian driving controls for a {@link Plotter}.
+ * It also includes buttons to engage/disengage the motors; find home; and raise/lower the pen.
+ * Cartesian driving is disabled until the "find home" action has completed.
+ * 
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class JogInterface extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(JogInterface.class);
 	
