@@ -50,17 +50,12 @@ public class Paper implements PreviewListener {
 	
 	public Paper() {
 		// paper area (default values)
-		double pw = DEFAULT_WIDTH;
-		double ph = DEFAULT_HEIGHT;
-		//setPaperSize(pw, ph, 0, 0);//have a saveToPrefAtTheEndNow ... so
-		setPaperSizeNoSave(pw, ph, 0, 0);		
+		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);		
 		
 		paperMargin = 0.95;
 
 		// If prefs values exist this load the pref values using last setPaperSize(...) setted values as default.
 		loadConfig();
-		
-
 	}
 	
 	@Override
@@ -157,7 +152,7 @@ public class Paper implements PreviewListener {
 		saveConfig();
 	}
 
-	private void setPaperSizeNoSave(double width, double height, double shiftx, double shifty) {
+	public void setPaperSize(double width, double height, double shiftx, double shifty) {
 		this.centerX=shiftx;
 		this.centerY=shifty;
 		this.paperLeft = -width / 2;
@@ -165,11 +160,7 @@ public class Paper implements PreviewListener {
 		this.paperTop = height / 2;
 		this.paperBottom = -height / 2;		
 	}
-	public void setPaperSize(double width, double height, double shiftx, double shifty) {
-		   setPaperSizeNoSave(width, height, shiftx, shifty);
-		saveConfig();
-	}
-
+	
 	public Rectangle2D.Double getMarginRectangle() {
 		Rectangle2D.Double rectangle = new Rectangle2D.Double();
 		rectangle.x = getMarginLeft();

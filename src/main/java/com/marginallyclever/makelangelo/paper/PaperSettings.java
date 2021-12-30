@@ -196,6 +196,7 @@ public class PaperSettings extends SelectPanel {
 		myPaper.setRotation(rot);
 		myPaper.setPaperColor(paperColor.getColor());
 		myPaper.setPaperMargin((100 - paperMargin.getValue()) * 0.01);
+		myPaper.saveConfig();
 	}
 
 	/**
@@ -241,6 +242,7 @@ public class PaperSettings extends SelectPanel {
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
 			myPaper.setPaperMargin(pm);
+			myPaper.saveConfig();
 		}
 	}
 	
