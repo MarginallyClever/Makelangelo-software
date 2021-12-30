@@ -6,6 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Vector3d;
 
+/**
+ * {@link MarlinSimulationBlock} is one block in the queue of blocks inside a {@link MarlinSimulation}.
+ * For more details, please see Marlin documentation.
+ * @author Dan Royer
+ * @since 7.24.0
+ */
 public class MarlinSimulationBlock {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinSimulationBlock.class);
 

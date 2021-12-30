@@ -70,10 +70,24 @@ public class ProgramInterface extends JPanel {
 		});
 	}
 
+	/**
+	 * Move the play head to the lineNumber-th instruction.  
+	 * Does not tell the {@link Plotter} to do anything.
+	 */
 	public void setLineNumber(int lineNumber) {
 		listView.setSelectedIndex(lineNumber);
 	}
 
+	/**
+	 * @return the currently selected instruction.
+	 */
+	public int getLineNumber() {
+		return listView.getSelectedIndex();
+	}
+
+	/**
+	 * @return the total number of instructions in the buffer.
+	 */
 	public int getMoveCount() {
 		return myTurtle.history.size();
 	}
@@ -83,7 +97,7 @@ public class ProgramInterface extends JPanel {
 	 * Does not tell the {@link Plotter} to do anything.
 	 */
 	public void rewind() {
-		listView.setSelectedIndex(0);
+		setLineNumber(0);
 	}
 
 	/**
@@ -111,10 +125,6 @@ public class ProgramInterface extends JPanel {
 			listView.clearSelection();
 			myPlotter.raisePen();
 		}
-	}
-
-	public int getLineNumber() {
-		return listView.getSelectedIndex();
 	}
 
 	// TEST
