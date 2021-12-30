@@ -44,6 +44,7 @@ public class ConnectionButton extends JPanel {
 			onClose();
 		} else {
 			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+			if(networkSessionItem==null) return;  // no connections at all
 			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
 			if (networkSession != null) {
 				onOpen(networkSession);
