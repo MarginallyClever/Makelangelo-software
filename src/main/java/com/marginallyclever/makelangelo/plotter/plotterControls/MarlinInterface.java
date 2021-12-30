@@ -110,14 +110,10 @@ public class MarlinInterface extends JPanel {
 			lastReceivedTime = System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
 
-			if (logger.isTraceEnabled() && !message.startsWith(STR_OK)) {
-				logger.trace("received '{}'", message.trim());
-			}
-
+			logger.trace("received '{}'", message.trim());
 			if (message.startsWith(STR_OK)) {
 				onHearOK();
 			} else if (message.contains(STR_RESEND)) {
-				logger.trace("received '{}'", message.trim());
 				onHearResend(message);
 			} else if (message.startsWith(STR_ERROR)) {
 				onHearError(message);
