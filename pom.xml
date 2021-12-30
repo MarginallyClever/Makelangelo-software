@@ -130,10 +130,7 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.3.1</version><!--
-				<configuration>
-					<destDir>${project.basedir}/docs</destDir>
-				</configuration>--> 
+				<version>3.3.1</version>
 			</plugin>
 
 			<!-- Beginning of plugins defined originally only in Super POM -->
