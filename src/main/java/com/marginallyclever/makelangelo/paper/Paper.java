@@ -3,6 +3,9 @@ package com.marginallyclever.makelangelo.paper;
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.log.Log;
@@ -10,8 +13,22 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class Paper implements PreviewListener {
+	private static Logger logger = LoggerFactory.getLogger(Paper.class);
 	private static final int DEFAULT_WIDTH=420; // mm
 	private static final int DEFAULT_HEIGHT=594; // mm
+
+	private static final String PREF_KEY_ROTATION = "rotation";
+	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
+	private static final String PREF_KEY_PAPER_BOTTOM = "paper_bottom";
+	private static final String PREF_KEY_PAPER_TOP = "paper_top";
+	private static final String PREF_KEY_PAPER_RIGHT = "paper_right";
+	private static final String PREF_KEY_PAPER_LEFT = "paper_left";
+	private static final String PREF_KEY_PAPER_COLOR = "paper_color";
+	private static final String PREF_KEY_PAPER_CENTER_X = "paper_center_X";
+	private static final String PREF_KEY_PAPER_CENTER_Y = "paper_center_Y";
+
+	private static final Preferences paperPreferenceNode
+		= PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
 	
 	// paper border position ( from the center of the paper)
 	private double paperLeft;
@@ -91,42 +108,23 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
-	 * To keep for dev modification debug purpose.
-	 */
-	private static boolean debugPaperSave = true;
-	
-	/**
 	    for debug purpose can be modified.
 	    @return description (position left,right,top,bottom and deducted width and height) of the paper.
 	*/
 	@Override
 	public String toString() {
-	    return String.format("Paper left=%5.2f right=%5.2f top=%5.2f bottom=%5.2f (-> Width = %5.2f Height = %5.2f) centerShift(X=%5.2f Y=%5.2f) color %s", 
-	    paperLeft,paperRight,paperTop,paperBottom,getPaperWidth(),getPaperHeight()
-		    ,centerX,centerY,paperColor
-	);
+		return String.format(
+				"Paper left=%5.2f right=%5.2f top=%5.2f bottom=%5.2f (-> Width = %5.2f Height = %5.2f) centerShift(X=%5.2f Y=%5.2f) color %s",
+				paperLeft, paperRight, paperTop, paperBottom, getPaperWidth(), getPaperHeight(), centerX, centerY,
+				paperColor);
 	}
-
-
-	private static final String PREF_KEY_ROTATION = "rotation";
-	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
-	private static final String PREF_KEY_PAPER_BOTTOM = "paper_bottom";
-	private static final String PREF_KEY_PAPER_TOP = "paper_top";
-	private static final String PREF_KEY_PAPER_RIGHT = "paper_right";
-	private static final String PREF_KEY_PAPER_LEFT = "paper_left";
-	private static final String PREF_KEY_PAPER_COLOR = "paper_color";
-	private static final String PREF_KEY_PAPER_CENTER_X = "paper_center_X";
-	private static final String PREF_KEY_PAPER_CENTER_Y = "paper_center_Y";
-
-	final static Preferences paperPreferenceNode
-		= PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
 
 	/** 
 	 * TODO control values consictancy ? 
 	 * TODO color hase RGB hexa string value ?
 	 */
 	public void loadConfig() {
-		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::loadConfig() befor "+this.toString());
+		logger.debug(Paper.class.getSimpleName()+"::loadConfig() before "+this.toString());
 		paperLeft = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_LEFT, Double.toString(paperLeft)));
 		paperRight = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_RIGHT, Double.toString(paperRight)));
 		paperTop = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_TOP, Double.toString(paperTop)));
@@ -138,11 +136,11 @@ public class Paper implements PreviewListener {
 		rotationRef = 0;
 		centerX=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_X, Double.toString(rotation)));
 		centerY=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_Y, Double.toString(rotation)));
-		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::loadConfig() after "+this.toString());
+		logger.debug(Paper.class.getSimpleName()+"::loadConfig() after "+this.toString());
 	}
 
 	public void saveConfig() {
-		if ( debugPaperSave ) Log.message(Paper.class.getSimpleName()+"::saveConfig() "+this.toString() );
+		logger.debug(Paper.class.getSimpleName()+"::saveConfig() "+this.toString() );
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_LEFT, paperLeft);
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_RIGHT, paperRight);
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_TOP, paperTop);
