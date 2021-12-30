@@ -47,7 +47,7 @@ public class PlotterControls extends JPanel {
 		programInterface = new ProgramInterface(plotter, turtle);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		jogInterface.setPreferredSize(new Dimension(580, 300));
+		jogInterface.setPreferredSize(new Dimension(780, 300));
 		tabbedPane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
@@ -258,6 +258,7 @@ public class PlotterControls extends JPanel {
 		Translator.start();
 
 		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
+		frame.setPreferredSize(new Dimension(850, 220));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
