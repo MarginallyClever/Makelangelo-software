@@ -42,7 +42,6 @@ public class SelectBoolean extends Select {
 	}
 
 	public void setSelected(boolean b) {
-		// calling setSelected() does not fire change events
 		field.setSelected(b);
 	}	
 

@@ -117,12 +117,12 @@ public class SelectDouble extends Select {
 		return value;
 	}
 
+	/**
+	 * Set the value visible in the field.  Do not fire a property change event.
+	 * @param newValue
+	 */
 	public void setValue(double newValue) {
-		if(newValue!=value) {
-			//Log.message("new "+newValue+" old "+oldValue);
-			field.setText(StringHelper.formatDouble(newValue));
-			firePropertyChange(value, newValue);
-		}
+		field.setText(StringHelper.formatDouble(newValue));
 	}
 	
 	public String getText() {

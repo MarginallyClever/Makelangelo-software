@@ -125,6 +125,7 @@ public class PaperSettings extends SelectPanel {
 		double h = ph.getValue();
 		pw.setValue(h);
 		ph.setValue(w);
+		setPaperFromPanel();
 		logger.debug("onLandscapeChange() done");
 	}
 
