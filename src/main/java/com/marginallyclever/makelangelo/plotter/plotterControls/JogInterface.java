@@ -78,17 +78,21 @@ public class JogInterface extends JPanel {
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
+		JButton home    = new ButtonIcon("JogInterface.Home", "/images/house.png");
 		JButton penUp    = new ButtonIcon("JogInterface.PenUp", "/images/arrow_up.png");
 		JButton penDown  = new ButtonIcon("JogInterface.PenDown", "/images/arrow_down.png");
 		toggleEngageMotor = new ButtonIcon("JogInterface.DisengageMotors", "/images/lock_open.png");
 
+		bar.add(home);
+		bar.addSeparator();
 		bar.add(penUp);
 		bar.add(penDown);
 		bar.addSeparator();
 		bar.add(toggleEngageMotor);
-		
-		penUp.addActionListener((e)-> myPlotter.raisePen());
-		penDown.addActionListener((e)-> myPlotter.lowerPen());
+
+		home.addActionListener(e -> myPlotter.findHome());
+		penUp.addActionListener(e-> myPlotter.raisePen());
+		penDown.addActionListener(e-> myPlotter.lowerPen());
 		toggleEngageMotor.addActionListener(this::onToggleEngageMotorAction);
 		
 		return bar;
