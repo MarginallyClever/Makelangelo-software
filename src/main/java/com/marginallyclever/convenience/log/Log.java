@@ -24,8 +24,6 @@ public class Log {
 	private static final String PROGRAM_END_STRING = "PROGRAM END";
 
 	public static void start() {
-
-
 		// lazy init to be able to purge old file
 		logger = LoggerFactory.getLogger(Log.class);
 		// custom logger name to separate a long debug info from useful info

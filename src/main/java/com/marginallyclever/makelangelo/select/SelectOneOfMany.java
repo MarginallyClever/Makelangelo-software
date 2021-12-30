@@ -67,6 +67,7 @@ public class SelectOneOfMany extends Select {
 
 	public void setSelectedIndex(int index) {
 		field.setSelectedIndex(index);
+		field.repaint();// Some times it need it ! but why ? normaly the swing events listener take care of that ...
 	}
 
 	public void setNewList(String[] list) {

@@ -36,13 +36,16 @@ public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 		}).using(robot());
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void runPaperSettings() {
 		window.comboBox("size").selectItem(1);
-		window.textBox("width.field").equals("1682");
-		window.textBox("height.field").equals("2378");
+		assert(window.textBox("width.field").equals("1682"));
+		assert(window.textBox("height.field").equals("2378"));
 		window.comboBox("size").selectItem(1);
 		window.checkBox("landscape").click();
+		assert(window.textBox("height.field").equals("1682"));
+		assert(window.textBox("width.field").equals("2378"));
 		window.close();
 	}
 }

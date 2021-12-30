@@ -45,4 +45,5 @@ public class SelectBoolean extends Select {
 		// calling setSelected() does not fire change events
 		field.setSelected(b);
 	}	
+
 }

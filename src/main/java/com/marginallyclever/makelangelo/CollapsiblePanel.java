@@ -12,7 +12,11 @@ import java.awt.event.*;
  * The user-triggered collapsable panel containing the component (trigger) in the titled border
  */
 public class CollapsiblePanel extends JPanel {
-    private String title = "";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 154827706727963515L;
+	private String title = "";
     private final TitledBorder border;
     private final JPanel innerPannel;
     private final Window parentWindow;
