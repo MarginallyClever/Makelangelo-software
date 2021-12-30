@@ -157,8 +157,13 @@ public class ConversationHistory extends JPanel {
 
 		JFrame frame = new JFrame(ConversationHistory.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ConversationHistory());
+		ConversationHistory ch = new ConversationHistory();
+		frame.add(ch);
 		frame.pack();
 		frame.setVisible(true);
+
+		ch.addElement("You", "N2 G28 XY*48");
+		ch.addElement("/dev/cu.usbserial-1410", "X:0.00 Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000");
+		ch.addElement("/dev/cu.usbserial-1410", "echo:; Advanced (B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate> X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>):");
 	}
 }
