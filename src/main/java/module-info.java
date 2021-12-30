@@ -15,4 +15,6 @@ module com.marginallyclever.makelangelo {
 	requires transitive vecmath;
 	requires transitive batik.all;
 	requires transitive xml.apis.ext;
+	
+	exports com.marginallyclever.makelangelo;
 }
