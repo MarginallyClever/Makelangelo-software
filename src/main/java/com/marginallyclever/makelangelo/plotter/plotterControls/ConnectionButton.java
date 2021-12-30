@@ -13,6 +13,13 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ConnectionButton provides a human interface to open or close a
+ * connection to a remote device available through a {@link NetworkSession}.
+ *
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class ConnectionButton extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ConnectionButton.class);
 	

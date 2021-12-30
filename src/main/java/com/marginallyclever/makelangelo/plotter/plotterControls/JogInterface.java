@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * {@link JogInterface} provides cartesian driving controls for a {@link Plotter}.

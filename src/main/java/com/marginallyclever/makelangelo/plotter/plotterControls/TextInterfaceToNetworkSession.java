@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 /**
  * {@link TextInterfaceToNetworkSession} provides a method to open and close a 
- * {@link @NetworkSession} connection through a {@link ChooseConnection} 
+ * {@link NetworkSession} connection through a {@link ConnectionButton}
  * interface and allow two way communication through a {@link TextInterfaceWithHistory} interface. 
  * @author Dan Royer
  * @since 7.28.0
