@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
-/*
-  @(#)Makelangelo.java drawbot application with GUI
+/**
+ * @(#)Makelangelo.java drawbot application with GUI
  * @author Dan Royer (dan@marginallyclever.com)
  * @version 1.00 2012/2/28
  */
