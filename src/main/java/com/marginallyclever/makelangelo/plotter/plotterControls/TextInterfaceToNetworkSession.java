@@ -15,10 +15,14 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * {@link TextInterfaceToNetworkSession} provides a method to open and close a 
+ * {@link @NetworkSession} connection through a {@link ChooseConnection} 
+ * interface and allow two way communication through a {@link TextInterfaceWithHistory} interface. 
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1032123255711692874L;
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
 	private NetworkSession mySession;

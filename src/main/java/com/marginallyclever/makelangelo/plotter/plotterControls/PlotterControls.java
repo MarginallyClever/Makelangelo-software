@@ -17,7 +17,19 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * {@link PlotterControls} brings together three separate panels and wraps all
+ * the lower level features in a human friendly, intuitive interface. - The
+ * {@link MarlinInterface}, which manages the two way network connection to a
+ * robot running Marlin firmware. - The {@link JogInterface}, which is a
+ * human-friendly way to drive a {@link Plotter} - The {@link ProgramInterface},
+ * which is a buffer for queueing commands to a {@link Plotter}
+ *
+ * @author Dan Royer
+ * @since 7.28.0
+ */
 public class PlotterControls extends JPanel {
+    private static final long serialVersionUID = -1201865024705737250L;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;

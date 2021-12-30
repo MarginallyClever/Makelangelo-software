@@ -12,7 +12,8 @@ import java.util.LinkedList;
 
 
 /**
- * Simulating the firmware inside a Makelangelo to more accurately estimate the time to draw an image.
+ * {@link MarlinSimulation} is used to estimate the time to draw a set of gcode commands by a robot running Marlin 3D printer firmware.
+ * It is meant to be a 1:1 Java replica of Marlin's 'Planner' and 'Motor' classes.
  * @author Dan Royer
  * @since 7.24.0
  */

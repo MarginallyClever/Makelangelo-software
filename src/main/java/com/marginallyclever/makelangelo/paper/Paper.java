@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
