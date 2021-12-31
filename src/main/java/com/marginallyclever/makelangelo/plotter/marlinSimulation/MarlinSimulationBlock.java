@@ -4,7 +4,7 @@ import com.marginallyclever.convenience.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.vecmath.Vector3d;
+import org.joml.Vector3d;
 
 /**
  * {@link MarlinSimulationBlock} is one block in the queue of blocks inside a {@link MarlinSimulation}.

@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import javax.vecmath.Vector3d;
+import org.joml.Vector3d;
 import java.util.ArrayList;
 
 /**
@@ -116,8 +116,7 @@ public class MarlinSimulationVisualizer {
 		if(showNominal) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.nominalSpeed / settings.getDrawFeedRate();
-			o.scale(f*5);
-			o.add(block.start);
+			o.mul(f*5).add(block.start);
 			Vector3d black = new Vector3d(1-f,f,0);
 			buffer.add(new ColorPoint(black,block.start));
 			buffer.add(new ColorPoint(black,o));
@@ -127,8 +126,7 @@ public class MarlinSimulationVisualizer {
 		if(showEntry) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.entrySpeed / settings.getDrawFeedRate();
-			o.scale(f*5);
-			o.add(block.start);
+			o.mul(f*5).add(block.start);
 			Vector3d red = new Vector3d(1-f,0,f);
 			buffer.add(new ColorPoint(red,block.start));
 			buffer.add(new ColorPoint(red,o));
@@ -138,8 +136,7 @@ public class MarlinSimulationVisualizer {
 		if(showExit) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.exitSpeed / settings.getDrawFeedRate();
-			o.scale(f*-5);
-			o.add(block.start);
+			o.mul(f*-5).add(block.start);
 			Vector3d black = new Vector3d(0,1-f,f);
 			buffer.add(new ColorPoint(black,block.start));
 			buffer.add(new ColorPoint(black,o));
@@ -151,8 +148,7 @@ public class MarlinSimulationVisualizer {
 		if(a>0) {
 			// accel part of block
 			Vector3d p0 = new Vector3d(block.delta);
-			p0.scale(a/t);
-			p0.add(block.start);
+			p0.mul(a/t).add(block.start);
 			Vector3d green = new Vector3d(0,v,0);
 			buffer.add(new ColorPoint(green,block.start));
 			buffer.add(new ColorPoint(green,p0));
@@ -161,8 +157,7 @@ public class MarlinSimulationVisualizer {
 		if(a<d) {
 			// nominal part of block
 			Vector3d p1 = new Vector3d(block.delta);
-			p1.scale(d/t);
-			p1.add(block.start);
+			p1.mul(d/t).add(block.start);
 			Vector3d blue = new Vector3d(0,0,v);
 			buffer.add(new ColorPoint(blue,pLast));
 			buffer.add(new ColorPoint(blue,p1));
