@@ -6,6 +6,8 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 
 ![sreenshot](screenshot.png)
 
+[workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg)
+
 ## Where to go from here
 
 **On your own**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
@@ -72,8 +74,6 @@ java -jar makelangelo-nightly-XXXXX.jar
 ## Development
 
 When launching the application, set the environnement variable `DEV` to `true` in order to get the application log on the stdout.
-
-[workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/<WORKFLOW_FILE>/badge.svg)
 
 ## Thank you
 
