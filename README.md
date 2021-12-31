@@ -4,9 +4,9 @@ Makelangelo Software is a Java program that prepares art for CNC plotters.  It i
 
 It pairs really well with [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph), the code in the brain of the robot that receives instructions and moves the motors.  
 
-![sreenshot](screenshot.png)
+![screenshot](screenshot.png)
 
-[workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg)
+![workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg)
 
 ## Where to go from here
 
