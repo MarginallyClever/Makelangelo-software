@@ -73,6 +73,8 @@ java -jar makelangelo-nightly-XXXXX.jar
 
 When launching the application, set the environnement variable `DEV` to `true` in order to get the application log on the stdout.
 
+[workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/<WORKFLOW_FILE>/badge.svg)
+
 ## Thank you
 
 Did this program help you?  Like Open Source software?  Want to show support?
