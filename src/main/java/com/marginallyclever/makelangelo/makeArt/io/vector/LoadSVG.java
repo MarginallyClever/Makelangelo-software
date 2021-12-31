@@ -8,6 +8,8 @@ import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SVGItem;
 import org.apache.batik.util.XMLResourceDescriptor;
+import org.joml.Matrix3d;
+import org.joml.Vector3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -16,8 +18,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.Vector3d;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -450,14 +450,12 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private Matrix3d getMatrixFromElement(Element element) {
+		Matrix3d m = new Matrix3d();
+		
 		if(!(element instanceof SVGGraphicsElement)) {
-			Matrix3d m = new Matrix3d();
-			m.setIdentity();
 			return m;
 		}
 		
-		Matrix3d m = new Matrix3d();
-
 		try {
 			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
 			
@@ -470,7 +468,7 @@ public class LoadSVG implements TurtleLoader {
 			m.m02 = svgMatrix.getE();	m.m12 = svgMatrix.getF();	m.m22 = 1;
 		}
 		catch(Exception e) {
-			m.setIdentity();
+			m.identity();
 		}
 		return m;
 	}
