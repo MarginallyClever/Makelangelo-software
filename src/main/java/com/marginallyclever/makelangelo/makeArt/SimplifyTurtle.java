@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import org.joml.Vector2d;
+import javax.vecmath.Vector2d;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 

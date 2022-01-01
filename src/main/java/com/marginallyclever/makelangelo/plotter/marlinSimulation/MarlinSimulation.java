@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.joml.Vector3d;
+import javax.vecmath.Vector3d;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -155,7 +155,8 @@ public class MarlinSimulation {
 		int maxSeg = (int)Math.ceil(len / MIN_SEGMENT_LENGTH_MM); 
 		if(segments>maxSeg) segments=maxSeg;
 		if(segments<1) segments=1;
-		Vector3d deltaSegment = new Vector3d(delta).mul(1.0/segments);
+		Vector3d deltaSegment = new Vector3d(delta);
+		deltaSegment.scale(1.0/segments);
 		
 		Vector3d temp = new Vector3d(poseNow);
 		while(--segments>0) {

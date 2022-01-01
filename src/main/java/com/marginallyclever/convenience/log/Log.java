@@ -14,6 +14,7 @@ import java.util.Properties;
  * Initialize log file and purge old
  */
 public class Log {
+
 	private static Logger logger;
 
 	// must be consistent with logback.xml

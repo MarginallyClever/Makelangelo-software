@@ -6,19 +6,17 @@ module com.marginallyclever.makelangelo {
 	requires org.json;
 	requires org.jetbrains.annotations;
 	requires org.slf4j;
-	requires org.joml;
-	requires ch.qos.logback.core;
+	requires logback.core;
 
 	requires transitive jrpicam;
 	requires transitive jogamp.fat;
 	requires transitive kabeja;
 	requires transitive jssc;
+	requires transitive vecmath;
 	requires transitive batik.all;
 	requires transitive xml.apis.ext;
 	
 	exports com.marginallyclever.makelangelo;
 	exports com.marginallyclever.makelangelo.turtle;
 	exports com.marginallyclever.convenience;
-	
-	exports com.marginallyclever.convenience.log to logback.core;
 }
