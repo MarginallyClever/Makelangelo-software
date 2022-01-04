@@ -113,10 +113,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			for (String s : majorParts) {
 				String[] minorParts = s.split(":");
 				double v = Double.parseDouble(minorParts[1].trim());
-				if (minorParts[0].equalsIgnoreCase("X"))
-					pos.x = v;
-				if (minorParts[0].equalsIgnoreCase("Y"))
-					pos.y = v;
+				if (minorParts[0].equalsIgnoreCase("X")) pos.x = v;
+				if (minorParts[0].equalsIgnoreCase("Y")) pos.y = v;
 			}
 
 			myPlotter.setPos(pos);
