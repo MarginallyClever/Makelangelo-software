@@ -116,7 +116,7 @@ public class MarlinInterface extends JPanel {
 		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			lastReceivedTime=System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
-			//logger.debug("MarlinInterface received '"+message.trim()+"'.");
+			logger.debug("MarlinInterface received '"+message.trim()+"'.");
 			if(message.startsWith(STR_OK)) {
 				onHearOK();
 			} else if(message.contains(STR_RESEND)) {
@@ -183,7 +183,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				//logger.debug("MarlinInterface sending '"+mc.command+"'.");
+				logger.debug("MarlinInterface sending '"+mc.command+"'.");
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
