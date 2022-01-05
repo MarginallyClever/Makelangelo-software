@@ -1,11 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionItem;
-import com.marginallyclever.communications.NetworkSessionListener;
+import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,19 +29,31 @@ public class ChooseConnection extends JPanel {
 	public static final int CONNECTION_CLOSED = 2;
 	
 	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
+	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
 	private NetworkSession mySession;
-	private final JComboBox<NetworkSessionItem> connectionComboBox;
-	
-	public ChooseConnection(JComboBox<NetworkSessionItem> connectionComboBox) {
+
+	public ChooseConnection() {
 		super();
 
-		this.connectionComboBox = connectionComboBox;
+		this.add(connectionComboBox);
+
+		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
+		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
+		this.add(refresh);
+		addConnectionsItems(connectionComboBox);
 
 		bConnect.setForeground(Color.GREEN);
 		bConnect.addActionListener((e)-> onConnectAction() );
 		
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.add(bConnect);
+	}
+
+	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
+		comboBox.removeAllItems();
+		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
+			comboBox.addItem(connection);
+		}
 	}
 
 	private void onConnectAction() {
@@ -125,11 +135,12 @@ public class ChooseConnection extends JPanel {
 	// TEST 
 	
 	public static void main(String[] args) {
+		PreferencesHelper.start();
+		Translator.start();
+
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
-		connectionComboBox.addItem(new NetworkSessionItem(null, "/dev/cu.144"));
-		frame.add(new ChooseConnection(connectionComboBox));
+		frame.add(new ChooseConnection());
 		frame.pack();
 		frame.setVisible(true);
 	}

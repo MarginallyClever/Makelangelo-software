@@ -36,8 +36,8 @@ public class PlotterControls extends JPanel {
 	private final MarlinInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
-	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
-	private ChooseConnection chooseConnection = new ChooseConnection(connectionComboBox);
+
+	private ChooseConnection chooseConnection = new ChooseConnection();
 	private ButtonIcon bFindHome;
 	private ButtonIcon bRewind;
 	private ButtonIcon bStart;
@@ -94,13 +94,6 @@ public class PlotterControls extends JPanel {
 		JPanel panel = new JPanel();
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
 		panel.setBorder(border);
-		panel.add(connectionComboBox);
-
-		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
-		panel.add(refresh);
-		addConnectionsItems(connectionComboBox);
-
 		panel.add(chooseConnection);
 		chooseConnection.addListener(e -> {
 			switch (e.flag) {
@@ -109,13 +102,6 @@ public class PlotterControls extends JPanel {
 			}
 		});
 		return panel;
-	}
-
-	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
-		comboBox.removeAllItems();
-		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
-			comboBox.addItem(connection);
-		}
 	}
 
 	private JPanel getDrawPanel() {

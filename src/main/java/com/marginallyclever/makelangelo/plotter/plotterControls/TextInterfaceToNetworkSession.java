@@ -128,7 +128,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new TextInterfaceToNetworkSession(new ChooseConnection(new JComboBox<NetworkSessionItem>())));
+		frame.add(new TextInterfaceToNetworkSession(new ChooseConnection()));
 		frame.pack();
 		frame.setVisible(true);
 	}

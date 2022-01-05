@@ -252,7 +252,7 @@ public class MarlinInterface extends JPanel {
 
 		JFrame frame = new JFrame(MarlinInterface.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new MarlinInterface(new ChooseConnection(new JComboBox<NetworkSessionItem>())));
+		frame.add(new MarlinInterface(new ChooseConnection()));
 		frame.pack();
 		frame.setVisible(true);
 	}
