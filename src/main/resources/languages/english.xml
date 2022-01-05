@@ -689,7 +689,7 @@
 	</string>
 
 	<string>
-		<key>JogInterface.Home</key>
+		<key>JogInterface.FindHome</key>
 		<value>Home</value>
 		<hint>manual driving dialog</hint>
 	</string>
