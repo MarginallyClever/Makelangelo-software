@@ -10,14 +10,12 @@ import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link TextInterfaceToNetworkSession} provides a method to open and close a 
- * {@link NetworkSession} connection through a {@link ConnectionButton}
+ * {@link NetworkSession} connection through a {@link ChooseConnection}
  * interface and allow two way communication through a {@link TextInterfaceWithHistory} interface. 
  * @author Dan Royer
  * @since 7.28.0
@@ -27,7 +25,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
 	private NetworkSession mySession;
 
-	public TextInterfaceToNetworkSession(ConnectionButton connectionButton) {
+	public TextInterfaceToNetworkSession(ChooseConnection chooseConnection) {
 		super();
 
 		setLayout(new BorderLayout());
@@ -47,7 +45,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 				JOptionPane.showMessageDialog(this,e1.getLocalizedMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			}
 		});
-		connectionButton.addListener((e)->{
+		chooseConnection.addListener((e)->{
 			switch (e.flag) {
 				case NetworkSessionEvent.CONNECTION_OPENED -> setNetworkSession((NetworkSession) e.data);
 				case NetworkSessionEvent.CONNECTION_CLOSED -> setNetworkSession(null);
@@ -130,7 +128,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new TextInterfaceToNetworkSession(new ConnectionButton(new JComboBox<NetworkSessionItem>())));
+		frame.add(new TextInterfaceToNetworkSession(new ChooseConnection(new JComboBox<NetworkSessionItem>())));
 		frame.pack();
 		frame.setVisible(true);
 	}

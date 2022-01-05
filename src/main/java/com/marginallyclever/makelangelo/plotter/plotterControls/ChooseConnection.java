@@ -1,6 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.*;
+import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.NetworkSessionItem;
+import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
 import org.slf4j.Logger;
@@ -8,20 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ConnectionButton provides a human interface to open or close a
+ * ChooseConnection provides a human interface to open or close a
  * connection to a remote device available through a {@link NetworkSession}.
  *
  * @author Dan Royer
  * @since 7.28.0
  */
-public class ConnectionButton extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(ConnectionButton.class);
+public class ChooseConnection extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
 	
 	private static final long serialVersionUID = 4773092967249064165L;
 	@Deprecated
@@ -33,7 +34,7 @@ public class ConnectionButton extends JPanel {
 	private NetworkSession mySession;
 	private final JComboBox<NetworkSessionItem> connectionComboBox;
 	
-	public ConnectionButton(JComboBox<NetworkSessionItem> connectionComboBox) {
+	public ChooseConnection(JComboBox<NetworkSessionItem> connectionComboBox) {
 		super();
 
 		this.connectionComboBox = connectionComboBox;
@@ -124,11 +125,11 @@ public class ConnectionButton extends JPanel {
 	// TEST 
 	
 	public static void main(String[] args) {
-		JFrame frame = new JFrame(ConnectionButton.class.getSimpleName());
+		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
 		connectionComboBox.addItem(new NetworkSessionItem(null, "/dev/cu.144"));
-		frame.add(new ConnectionButton(connectionComboBox));
+		frame.add(new ChooseConnection(connectionComboBox));
 		frame.pack();
 		frame.setVisible(true);
 	}

@@ -37,7 +37,7 @@ public class PlotterControls extends JPanel {
 	private final ProgramInterface programInterface;
 
 	private JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
-	private ConnectionButton connectionButton = new ConnectionButton(connectionComboBox);
+	private ChooseConnection chooseConnection = new ChooseConnection(connectionComboBox);
 	private ButtonIcon bFindHome;
 	private ButtonIcon bRewind;
 	private ButtonIcon bStart;
@@ -55,7 +55,7 @@ public class PlotterControls extends JPanel {
 		myTurtle = turtle;
 
 		jogInterface = new JogInterface(plotter);
-		marlinInterface = new MarlinPlotterInterface(plotter, connectionButton);
+		marlinInterface = new MarlinPlotterInterface(plotter, chooseConnection);
 		programInterface = new ProgramInterface(plotter, turtle);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -101,8 +101,8 @@ public class PlotterControls extends JPanel {
 		panel.add(refresh);
 		addConnectionsItems(connectionComboBox);
 
-		panel.add(connectionButton);
-		connectionButton.addListener(e -> {
+		panel.add(chooseConnection);
+		chooseConnection.addListener(e -> {
 			switch (e.flag) {
 				case NetworkSessionEvent.CONNECTION_OPENED -> updateButtonStatusOnConnect();
 				case NetworkSessionEvent.CONNECTION_CLOSED -> updateButtonStatusOnDisconnect();
@@ -147,7 +147,7 @@ public class PlotterControls extends JPanel {
 		bEmergencyStop.addActionListener(e ->
 		{
 			marlinInterface.sendESTOP();
-			connectionButton.closeConnection();
+			chooseConnection.closeConnection();
 		});
 
 		updateButtonStatusOnDisconnect();
@@ -259,7 +259,7 @@ public class PlotterControls extends JPanel {
 	}
 
 	public void closeConnection() {
-		connectionButton.closeConnection();
+		chooseConnection.closeConnection();
 	}
 
 	// TEST

@@ -26,8 +26,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private Plotter myPlotter;
 
-	public MarlinPlotterInterface(Plotter plotter, ConnectionButton connectionButton) {
-		super(connectionButton);
+	public MarlinPlotterInterface(Plotter plotter, ChooseConnection chooseConnection) {
+		super(chooseConnection);
 
 		myPlotter = plotter;
 

@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionItem;
 import com.marginallyclever.communications.NetworkSessionListener;
@@ -14,8 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The {@link MarlinInterface} manages communication with a remote device running Marlin firmware.
@@ -63,11 +62,11 @@ public class MarlinInterface extends JPanel {
 	private Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
 	
-	public MarlinInterface(ConnectionButton connectionButton) {
+	public MarlinInterface(ChooseConnection chooseConnection) {
 		super();
 
 		this.setLayout(new BorderLayout());
-		chatInterface = new TextInterfaceToNetworkSession(connectionButton);
+		chatInterface = new TextInterfaceToNetworkSession(chooseConnection);
 		this.add(chatInterface, BorderLayout.CENTER);
 
 		chatInterface.addListener((e) -> {
@@ -253,7 +252,7 @@ public class MarlinInterface extends JPanel {
 
 		JFrame frame = new JFrame(MarlinInterface.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new MarlinInterface(new ConnectionButton(new JComboBox<NetworkSessionItem>())));
+		frame.add(new MarlinInterface(new ChooseConnection(new JComboBox<NetworkSessionItem>())));
 		frame.pack();
 		frame.setVisible(true);
 	}
