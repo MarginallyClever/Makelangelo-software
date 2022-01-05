@@ -81,19 +81,12 @@ public class SelectGUITest {
         assertEquals(3, c.blue);
 
         panel.add(b);
-
-        // test observer fires
-        testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
-
         // test setValue
         b.setColor(new ColorRGB(255, 128, 64));
         c = b.getColor();
         assertEquals(255, c.red);
         assertEquals(128, c.green);
         assertEquals(64, c.blue);
-
-        assertTrue(testObservation > 0);
     }
 
     @Test
@@ -106,13 +99,8 @@ public class SelectGUITest {
 
         panel.add(b);
 
-        // test observer fires
-        testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
-
         // test setText
         b.setText("some path");
-        assertTrue(testObservation > 0);
     }
 
     @Test
@@ -125,12 +113,7 @@ public class SelectGUITest {
 
         panel.add(b);
 
-        // test observer fires
-        testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
-
         b.setValue(0.2f);
-        assertTrue(testObservation > 0);
         assertEquals(0.2f, b.getValue(), 1e-6);
     }
 
@@ -144,12 +127,7 @@ public class SelectGUITest {
 
         panel.add(b);
 
-        // test observer fires
-        testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
-
         b.setValue(2);
-        assertTrue(testObservation > 0);
         assertEquals(2, b.getValue());
     }
 
