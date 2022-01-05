@@ -1,6 +1,6 @@
 package com.marginallyclever.communications;
 
 
-public interface NetworkSessionListener {	
-	void networkSessionEvent(NetworkSessionEvent evt);
+public interface NetworkSessionListener {
+	public void networkSessionEvent(NetworkSessionEvent evt);
 }
