@@ -65,7 +65,7 @@ public final class Translator {
 				// that matches a language name value in an available language .xml file
 				String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 				if (!languages.containsKey(languageNameFromPref)) {
-					logger.debug("Translator::isThisTheFirstTimeLoadingLanguageFiles() Language Name '{}' not available ...", languageNameFromPref);
+					logger.debug("isThisTheFirstTimeLoadingLanguageFiles() Language Name '{}' not available ...", languageNameFromPref);
 
 					// To avoid some null issues in Translator.get(String key),
 					// lets say it's the first run (to ask the user to select a valid language name)
@@ -92,7 +92,7 @@ public final class Translator {
 	 * save the user's current language choice
 	 */
 	public static void saveConfig() {
-		logger.debug("Translator::saveConfig()");
+		logger.debug("saveConfig()");
 		languagePreferenceNode.put(LANGUAGE_KEY, currentLanguage);
 	}
 
@@ -100,10 +100,7 @@ public final class Translator {
 	 * load the user's language choice
 	 */
 	public static void loadConfig() {
-		logger.debug("Translator::loadConfig()");
-		logger.debug(languagePreferenceNode.toString());
-		logger.debug(LANGUAGE_KEY);
-		logger.debug(defaultLanguage);
+		logger.debug("loadConfig: {}={}", languagePreferenceNode.toString(), defaultLanguage);
 		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 	}
 

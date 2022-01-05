@@ -26,12 +26,12 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private Plotter myPlotter;
 
-	public MarlinPlotterInterface(Plotter plotter) {
-		super();
+	public MarlinPlotterInterface(Plotter plotter, ChooseConnection chooseConnection) {
+		super(chooseConnection);
 
 		myPlotter = plotter;
 
-		plotter.addListener((e) -> onPlotterEvent(e));
+		plotter.addListener(this::onPlotterEvent);
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {
@@ -89,9 +89,9 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		super.onDataReceived(evt);
 
-		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
-			String message = ((String) evt.data).trim();
-			// logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
+		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+			String message = ((String)evt.data).trim();
+			//logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
 			if (message.startsWith("X:") && message.contains("Count")) {
 				onHearM114(message);
 			} else if (message.startsWith(STR_FEEDRATE)) {
@@ -137,7 +137,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
-			logger.error("M201 error: {}", message, e);
+			logger.warn("M201 error: {}", message, e);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
-			logger.error("M203 error: {}", message, e);
+			logger.warn("M203 error: {}", message, e);
 		}
 	}
 

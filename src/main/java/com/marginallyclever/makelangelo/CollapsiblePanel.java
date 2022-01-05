@@ -21,6 +21,14 @@ public class CollapsiblePanel extends JPanel {
     private final JPanel innerPannel;
     private final Window parentWindow;
     private Dimension previousDimension;
+    private int heightCollapsibleComponent;
+    private boolean collapsedByDefault = false;
+
+    public CollapsiblePanel(Window parentWindow, String title, int heightCollapsibleComponent) {
+        this(parentWindow, title);
+        this.heightCollapsibleComponent = heightCollapsibleComponent;
+        collapsedByDefault = true;
+    }
 
     public CollapsiblePanel(Window parentWindow, String title) {
         this.parentWindow = parentWindow;
@@ -65,6 +73,7 @@ public class CollapsiblePanel extends JPanel {
     @Override
     public Component add(Component comp) {
         comp.addComponentListener(contentComponentListener);
+        comp.setVisible(!collapsedByDefault);
         Component r = innerPannel.add(comp);
         updateBorderTitle();
         return r;
@@ -73,6 +82,7 @@ public class CollapsiblePanel extends JPanel {
     @Override
     public Component add(String name, Component comp) {
         comp.addComponentListener(contentComponentListener);
+        comp.setVisible(!collapsedByDefault);
         Component r = innerPannel.add(name, comp);
         updateBorderTitle();
         return r;
@@ -81,6 +91,7 @@ public class CollapsiblePanel extends JPanel {
     @Override
     public Component add(Component comp, int index) {
         comp.addComponentListener(contentComponentListener);
+        comp.setVisible(!collapsedByDefault);
         Component r = innerPannel.add(comp, index);
         updateBorderTitle();
         return r;
@@ -89,6 +100,7 @@ public class CollapsiblePanel extends JPanel {
     @Override
     public void add(Component comp, Object constraints) {
         comp.addComponentListener(contentComponentListener);
+        comp.setVisible(!collapsedByDefault);
         innerPannel.add(comp, constraints);
         updateBorderTitle();
     }
@@ -96,6 +108,7 @@ public class CollapsiblePanel extends JPanel {
     @Override
     public void add(Component comp, Object constraints, int index) {
         comp.addComponentListener(contentComponentListener);
+        comp.setVisible(!collapsedByDefault);
         innerPannel.add(comp, constraints, index);
         updateBorderTitle();
     }
@@ -131,7 +144,8 @@ public class CollapsiblePanel extends JPanel {
         }
         updateBorderTitle();
         if (visible) {
-            Dimension toggle = new Dimension(parentWindow.getWidth(), previousDimension.height);
+            int height = previousDimension == null? heightCollapsibleComponent: previousDimension.height;
+            Dimension toggle = new Dimension(parentWindow.getWidth(), height);
             parentWindow.setPreferredSize(toggle);
         } else {
             previousDimension = parentWindow.getSize();
@@ -162,11 +176,8 @@ public class CollapsiblePanel extends JPanel {
         return false;
     }
 
-    /**
-     * Run this to visually examine every panel element and how they look in next to each other.
-     *
-     * @param args ignored
-     */
+    // TEST
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Collapsible Panel");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -176,7 +187,7 @@ public class CollapsiblePanel extends JPanel {
         SelectBoolean a = new SelectBoolean("A", "AAAAAAAAAAA", false);
         jPanel.add(a, BorderLayout.NORTH);
 
-        CollapsiblePanel cpanel = new CollapsiblePanel(frame, "lot of buttons");
+        CollapsiblePanel cpanel = new CollapsiblePanel(frame, "lot of buttons", 400);
         jPanel.add(cpanel, BorderLayout.CENTER);
 
         SelectButton b = new SelectButton("B", "B");
@@ -201,7 +212,7 @@ public class CollapsiblePanel extends JPanel {
         cpanel.add(i);
         cpanel.add(j);
 
-        frame.setPreferredSize(new Dimension(600, 400));
+        frame.setPreferredSize(new Dimension(600, 90));
         frame.add(jPanel);
         frame.pack();
         frame.setVisible(true);

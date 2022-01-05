@@ -74,7 +74,7 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	}
 	
 	private String[] getListOfCOMPorts() {
-		return SerialTransportLayer.listConnections();
+		return new SerialTransportLayer().listConnections().toArray(new String[0]);
 	}
 
 	private void uploadNow() {
