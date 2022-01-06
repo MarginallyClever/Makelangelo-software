@@ -8,7 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ButtonIcon extends JButton {
-    private static final Logger logger = LoggerFactory.getLogger(ButtonIcon.class);
+	private static final long serialVersionUID = 6329805223648415348L;
+	private static final Logger logger = LoggerFactory.getLogger(ButtonIcon.class);
 
     public ButtonIcon(String translationKey, String iconPath) {
         super();
@@ -24,8 +25,10 @@ public class ButtonIcon extends JButton {
         setIcon(createImageIcon(iconPath));
     }
 
-    /** Returns an ImageIcon, or null if the path was invalid. */
-    protected ImageIcon createImageIcon(String path) {
+    /**
+     * @return an ImageIcon, or null if the path was invalid.
+     */ 
+    private ImageIcon createImageIcon(String path) {
         java.net.URL imgURL = getClass().getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL);

@@ -8,8 +8,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MarlinPlotterInterfaceTest {
