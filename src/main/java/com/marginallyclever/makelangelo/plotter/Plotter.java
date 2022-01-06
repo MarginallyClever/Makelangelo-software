@@ -3,8 +3,11 @@ package com.marginallyclever.makelangelo.plotter;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
+import org.apache.xmlgraphics.image.loader.util.Penalty;
+
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
@@ -41,10 +44,18 @@ public class Plotter implements PreviewListener, Cloneable {
 	
 	private ArrayList<PlotterEventListener> listeners = new ArrayList<PlotterEventListener>();
 
+	/**
+	 * Subscribe to listen to {@link PlotterEvent}s.
+	 * @param listener
+	 */
 	public void addPlotterEventListener(PlotterEventListener listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * unsubscribe from {@link PlotterEvent}s.
+	 * @param listener
+	 */
 	public void removePlotterEventListener(PlotterEventListener listener) {
 		listeners.remove(listener);
 	}
@@ -54,21 +65,41 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 
 	// OBSERVER PATTERN ENDS
-	
+
+	/**
+	 * Lift the pen up.  When the pen is up {@code setPos} will move the pen
+	 * across the {@link Paper} without leaving a mark.
+	 */
 	public void raisePen() {
 		penIsUp=true;
 		firePlotterEvent(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,true));
 	}
 	
+	/**
+	 * Put the pen down.  When the pen is down {@code setPos} will drag the pen
+	 * across the {@link Paper}, producing a visible line in the chosen pen color.
+	 */
 	public void lowerPen() {
 		penIsUp = false;
 		firePlotterEvent(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,false));
+	}
+
+	/**
+	 * @return true if pen is up, false if pen is down.
+	 */
+	public boolean getPenIsUp() {
+		return penIsUp;
 	}
 	
 	private void requestUserChangeTool(int toolNumber) {
 		firePlotterEvent(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
 	}
 	
+	/**
+	 * When the {@link Plotter} first turns on it has no idea where it is.
+	 * This method will instruct it to touch off the limit switches, after which 
+	 * it will be at the home position obtained from {@code getHome()}.
+	 */
 	public void findHome() {
 		raisePen();
 		pos.set(settings.getHome());
@@ -76,17 +107,26 @@ public class Plotter implements PreviewListener, Cloneable {
 		firePlotterEvent(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 	}
 	
+	/**
+	 * @return true if the machine has found home at least once.
+	 */
 	public boolean getDidFindHome() {
 		return didFindHome;
 	}
 
-	// in mm
-	public void moveTo(double x, double y) {
+	/**
+	 * move the {@link Plotter} pen holder to the desired position
+	 * @param x in mm
+	 * @param y in mm
+	 */
+	public void setPos(double x, double y) {
 		pos.set(x,y);
 		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
 	}
 
-	// in mm
+	/**
+	 * @return the current pen holder position.
+	 */
 	public Point2D getPos() {
 		return pos;
 	}
@@ -157,19 +197,19 @@ public class Plotter implements PreviewListener, Cloneable {
 		gl2.glEnd();
 	}
 
-	public boolean getPenIsUp() {
-		return penIsUp;
-	}
-
+	/**
+	 * Instruct the {@link Plotter} to move.
+	 * @param move a {@link TurtleMove} with instructions.
+	 */
 	public void turtleMove(TurtleMove move) {
 		switch(move.type) {
 		case TurtleMove.TRAVEL:
 			if(!penIsUp) raisePen();
-			moveTo(move.x,move.y);
+			setPos(move.x,move.y);
 			break;
 		case TurtleMove.DRAW:
 			if(penIsUp) lowerPen();
-			moveTo(move.x,move.y);
+			setPos(move.x,move.y);
 			break;
 		case TurtleMove.TOOL_CHANGE:
 			requestUserChangeTool((int)move.x);
@@ -177,31 +217,52 @@ public class Plotter implements PreviewListener, Cloneable {
 		}
 	}
 
+	/**
+	 * @return the angle the pen holder servo should be at when the pen is up.
+	 */
 	public double getPenUpAngle() {
 		return settings.getPenUpAngle();
 	}
 
+	/**
+	 * @return the angle the pen holder servo should be at when the pen is down.
+	 */
 	public double getPenDownAngle() {
 		return settings.getPenDownAngle();
 	}
 
+	/**
+	 * @return the time it should take to move the pen lift servo from down position to up position.
+	 */
 	public double getPenLiftTime() {
 		return settings.getPenLiftTime();
 	}
 
+	/**
+	 * @return the top physical limit of the drawing area.
+	 */
+	public double getLimitTop() {
+		return settings.getLimitTop();
+	}
+
+	/**
+	 * @return the bottom physical limit of the drawing area.
+	 */
 	public double getLimitBottom() {
 		return settings.getLimitBottom();
 	}
 
+	/**
+	 * @return the left physical limit of the drawing area.
+	 */
 	public double getLimitLeft() {
 		return settings.getLimitLeft();
 	}
 
+	/**
+	 * @return the right physical limit of the drawing area.
+	 */
 	public double getLimitRight() {
 		return settings.getLimitRight();
-	}
-
-	public double getLimitTop() {
-		return settings.getLimitTop();
 	}
 }

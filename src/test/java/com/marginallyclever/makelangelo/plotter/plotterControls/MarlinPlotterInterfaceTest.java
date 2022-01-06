@@ -20,7 +20,7 @@ public class MarlinPlotterInterfaceTest {
     @Test
     public void onHearM114_OK() {
         Plotter plotter = new Plotter();
-        plotter.moveTo(23,45);
+        plotter.setPos(23,45);
         MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "X:10.00 Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000";
@@ -33,7 +33,7 @@ public class MarlinPlotterInterfaceTest {
     @Test
     public void onHearM114_KO() {
         Plotter plotter = new Plotter();
-        plotter.moveTo(23,45);
+        plotter.setPos(23,45);
         MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "X:inva Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000";

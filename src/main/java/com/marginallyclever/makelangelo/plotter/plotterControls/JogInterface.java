@@ -66,7 +66,7 @@ public class JogInterface extends JPanel {
 	    	Point2D p = plotter.getPos();
 	    	p.x+=x;
 	    	p.y+=y;
-	    	plotter.moveTo(p.x,p.y);
+	    	plotter.setPos(p.x,p.y);
 	    });
 
 		myPlotter.addPlotterEventListener((e)-> {
