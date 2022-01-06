@@ -3,8 +3,6 @@ package com.marginallyclever.makelangelo.plotter;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
-import org.apache.xmlgraphics.image.loader.util.Penalty;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
