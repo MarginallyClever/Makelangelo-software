@@ -19,10 +19,6 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  */
 public class PlotterSettingsManager extends JPanel {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7163572330672713872L;
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManager.class);
 	

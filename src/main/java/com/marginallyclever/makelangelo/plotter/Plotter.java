@@ -1,11 +1,13 @@
 package com.marginallyclever.makelangelo.plotter;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
@@ -104,16 +106,30 @@ public class Plotter implements PreviewListener, Cloneable {
 		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,state));
 	}
 	
+	/**
+	 * @return a reference to the active {@link PlotterSettings} in this {@link Plotter}.
+	 * Modifications will immediately affect the {@link Plotter}.
+	 */
 	public PlotterSettings getSettings() {
 		return settings;
 	}
 	
-	public void setSettings(PlotterSettings s) {
+	/**
+	 * Replace the existing {@link PlotterSettings} inside this {@link Plotter}.
+	 * Does not fire any event notification.
+	 * @param s the new settings.
+	 */
+	public void setSettings(PlotterSettings s) throws InvalidParameterException {
+		if(s==null) throw new InvalidParameterException(PlotterSettings.class.getSimpleName()+" cannot be null.");
 		settings=s;
 	}
 	
+	/**
+	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
+	 * @param gl2 the render context
+	 */
 	@Override
-	public void render(GL2 gl2) {
+	public void render(GL2 gl2) {		
 		float[] lineWidthBuf = new float[1];
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		
@@ -125,9 +141,13 @@ public class Plotter implements PreviewListener, Cloneable {
 		gl2.glLineWidth(lineWidthBuf[0]);
 	}	
 	
+	/**
+	 * Outline the drawing limits
+	 * @param gl2
+	 */
 	private void drawPhysicalLimits(GL2 gl2) {
 		gl2.glLineWidth(1);
-		gl2.glColor3f(0.9f, 0.9f, 0.9f); // #color Machine Hardware Drawing Limits
+		gl2.glColor3f(0.9f, 0.9f, 0.9f); // #color 
 		
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
