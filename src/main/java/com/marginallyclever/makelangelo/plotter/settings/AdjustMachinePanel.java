@@ -11,7 +11,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 
 @Deprecated
-public class PanelAdjustMachine extends SelectPanel {
+public class AdjustMachinePanel extends SelectPanel {
 	/**
 	 * 
 	 */
@@ -31,7 +31,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	protected SelectButton buttonBpos;
 
 
-	public PanelAdjustMachine(Plotter robot) {
+	public AdjustMachinePanel(Plotter robot) {
 		super();
 		
 		this.robot = robot;
@@ -148,9 +148,9 @@ public class PanelAdjustMachine extends SelectPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(PanelAdjustMachine.class.getSimpleName());
+		JFrame frame = new JFrame(AdjustMachinePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PanelAdjustMachine(new Plotter()));
+		frame.add(new AdjustMachinePanel(new Plotter()));
 		frame.pack();
 		frame.setVisible(true);
 	}
