@@ -63,6 +63,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -137,7 +138,7 @@ public final class Makelangelo {
 	private void startRobot() {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addListener((e)-> onPlotterEvent(e));
+		myPlotter.addListener(this::onPlotterEvent);
 		myPlotter.getSettings().addListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
@@ -284,11 +285,11 @@ public final class Makelangelo {
 	}
 
 	private void openPlotterControls() {
-		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle);
-		JDialog dialog = new JDialog(mainFrame,PlotterControls.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
+		dialog.setPreferredSize(new Dimension(850, 220));
+		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
 
 		enableMenuBar(false);
@@ -309,30 +310,22 @@ public final class Makelangelo {
 
 		try {
 			PiCaptureAction pc = new PiCaptureAction();
-			
-			if(pc != null) {
-				JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
-				bCapture.addActionListener((e)->{
-					pc.run(mainFrame,myPaper);
-				});
-		        menu.add(bCapture);
-				menu.addSeparator();
-		    } 
+
+			JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
+			bCapture.addActionListener((e)-> pc.run(mainFrame,myPaper));
+			menu.add(bCapture);
+			menu.addSeparator();
 		} catch (FailedToRunRaspistillException e) {
 			logger.debug("Raspistill unavailable.");
 		}
 
 		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
 		menu.add(fit);
-		fit.addActionListener((e)->{
-			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false));
-		});
+		fit.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false)));
 
 		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
 		menu.add(fill);
-		fill.addActionListener((e)->{
-			setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true));
-		});
+		fill.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true)));
 
 		JMenuItem scale = new JMenuItem(Translator.get("Scale"));
 		menu.add(scale);
@@ -415,9 +408,7 @@ public final class Makelangelo {
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
-		recentFiles.addSubmenuListener((e)->{
-			openLoadFile(((JMenuItem)e.getSource()).getText());	
-		});
+		recentFiles.addSubmenuListener((e)-> openLoadFile(((JMenuItem)e.getSource()).getText()));
 		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
@@ -455,9 +446,7 @@ public final class Makelangelo {
 		logger.debug("Loading file {}...", filename);
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
-			loader.addActionListener((e)->{
-				setTurtle((Turtle)(e).getSource());
-			});
+			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
 			previewPanel.addListener(loader);
 			if(filename!=null && !filename.trim().isEmpty() ) {
 				loader.load(filename);
@@ -519,9 +508,7 @@ public final class Makelangelo {
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
 		buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-		buttonZoomToFit.addActionListener((e) -> {
-			camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
-		});
+		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight()));
 		menu.add(buttonZoomToFit);
 
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
@@ -674,7 +661,7 @@ public final class Makelangelo {
 	}
 	
 	private void setupDropTarget() {
-		logger.debug("  adding drag & drop support...");
+		logger.debug("adding drag & drop support...");
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
@@ -749,6 +736,11 @@ public final class Makelangelo {
 		preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
 		preferences.putInt(KEY_WINDOW_X, location.x);
 		preferences.putInt(KEY_WINDOW_Y, location.y);
+		try {
+			preferences.sync();
+		} catch (BackingStoreException e) {
+			logger.error("Failed to store size of the window", e);
+		}
 	}
 
 	/**
