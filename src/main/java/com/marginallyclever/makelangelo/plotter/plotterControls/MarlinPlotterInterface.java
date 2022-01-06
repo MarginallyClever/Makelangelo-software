@@ -31,7 +31,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 		myPlotter = plotter;
 
-		plotter.addListener(this::onPlotterEvent);
+		plotter.addPlotterEventListener(this::onPlotterEvent);
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {

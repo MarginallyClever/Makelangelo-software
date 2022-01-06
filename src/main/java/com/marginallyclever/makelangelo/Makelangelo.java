@@ -138,8 +138,8 @@ public final class Makelangelo {
 	private void startRobot() {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addListener(this::onPlotterEvent);
-		myPlotter.getSettings().addListener((e)->{
+		myPlotter.addPlotterEventListener(this::onPlotterEvent);
+		myPlotter.getSettings().addPlotterSettingsListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
 		if(previewPanel != null) {

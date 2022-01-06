@@ -69,7 +69,7 @@ public class JogInterface extends JPanel {
 	    	plotter.moveTo(p);
 	    });
 
-		myPlotter.addListener((e)-> {
+		myPlotter.addPlotterEventListener((e)-> {
 			if(e.type == PlotterEvent.MOTORS_ENGAGED
 			|| e.type == PlotterEvent.HOME_FOUND) {
 				updateButtonStatus();

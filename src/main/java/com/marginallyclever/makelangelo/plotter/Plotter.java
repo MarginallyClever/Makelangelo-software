@@ -39,15 +39,15 @@ public class Plotter implements PreviewListener, Cloneable {
 	
 	private ArrayList<PlotterEventListener> listeners = new ArrayList<PlotterEventListener>();
 
-	public void addListener(PlotterEventListener listener) {
+	public void addPlotterEventListener(PlotterEventListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(PlotterEventListener listener) {
+	public void removePlotterEventListener(PlotterEventListener listener) {
 		listeners.remove(listener);
 	}
 	
-	private void notifyListeners(PlotterEvent e) {
+	private void firePlotterEvent(PlotterEvent e) {
 		for (PlotterEventListener listener : listeners) listener.makelangeloRobotEvent(e);
 	}
 
@@ -55,23 +55,23 @@ public class Plotter implements PreviewListener, Cloneable {
 	
 	public void raisePen() {
 		penIsUp=true;
-		notifyListeners(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,true));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,true));
 	}
 	
 	public void lowerPen() {
 		penIsUp = false;
-		notifyListeners(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,false));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.PEN_UPDOWN,this,false));
 	}
 	
 	private void requestUserChangeTool(int toolNumber) {
-		notifyListeners(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
 	}
 	
 	public void findHome() {
 		raisePen();
-		pos.set(settings.getHomeX(),settings.getHomeY());
+		pos.set(settings.getHome());
 		didFindHome = true;
-		notifyListeners(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.HOME_FOUND,this));
 	}
 	
 	public boolean getDidFindHome() {
@@ -81,13 +81,13 @@ public class Plotter implements PreviewListener, Cloneable {
 	// in mm
 	public void setPos(double x,double y) {
 		pos.set(x,y);
-		notifyListeners(new PlotterEvent(PlotterEvent.POSITION,this));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
 	}
 	
 	// in mm
 	public void setPos(Point2D p) {
 		pos.set(p);
-		notifyListeners(new PlotterEvent(PlotterEvent.POSITION,this));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
 	}
 
 	// in mm
@@ -111,12 +111,12 @@ public class Plotter implements PreviewListener, Cloneable {
 		
 	public void disengageMotors() {
 		areMotorsEngaged = false;
-		notifyListeners(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,false));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,false));
 	}
 
 	public void engageMotors() {
 		areMotorsEngaged = true;
-		notifyListeners(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,true));
+		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,true));
 	}
 	
 	public PlotterSettings getSettings() {
