@@ -9,8 +9,8 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
- * {@link Plotter} is a virtual plotter.  Other systems listen and react to it.
- * 
+ * {@link Plotter} is a virtual plotter.  It is directly responsible for the live state of the plotter.
+ * It also contains {@link PlotterSettings}, which constrain the total possible valid live states.
  * @author Dan
  * @since 7.2.10
  */
@@ -79,44 +79,29 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 
 	// in mm
-	public void setPos(double x,double y) {
+	public void moveTo(double x, double y) {
 		pos.set(x,y);
 		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
-	}
-	
-	// in mm
-	public void setPos(Point2D p) {
-		pos.set(p);
-		firePlotterEvent(new PlotterEvent(PlotterEvent.POSITION,this));
-	}
-
-	// in mm
-	public void moveTo(double x, double y) {
-		setPos(x,y);
-	}
-
-	// in mm
-	public void moveTo(Point2D p) {
-		setPos(p);
 	}
 
 	// in mm
 	public Point2D getPos() {
 		return pos;
 	}
-	
-	public boolean getAreMotorsEngaged() {
+
+	/**
+	 * @return true for engaged, false for disengaged.
+	 */
+	public boolean getMotorsEngaged() {
 		return areMotorsEngaged;
 	}
-		
-	public void disengageMotors() {
-		areMotorsEngaged = false;
-		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,false));
-	}
-
-	public void engageMotors() {
-		areMotorsEngaged = true;
-		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,true));
+	
+	/**
+	 * @param state true for engaged, false for disengaged.
+	 */
+	public void setMotorsEngaged(boolean state) {
+		areMotorsEngaged = state;
+		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,state));
 	}
 	
 	public PlotterSettings getSettings() {

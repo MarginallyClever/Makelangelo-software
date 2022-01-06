@@ -13,10 +13,7 @@ import javax.swing.*;
 
 
 @Deprecated
-public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ {
-	/**
-	 * 
-	 */
+public class PenSettingsPanel extends SelectPanel {
 	private static final long serialVersionUID = 1L;
 
 	protected Plotter robot;
@@ -28,8 +25,6 @@ public class PenSettingsPanel extends SelectPanel/* implements ActionListener*/ 
 	protected SelectDouble penDown;
 	protected SelectDouble penZRate;
 
-	//protected SelectButton buttonTestUp;
-	//protected SelectButton buttonTestDown;
 	protected SelectButton buttonSave;
 	protected SelectButton buttonCancel;
 	

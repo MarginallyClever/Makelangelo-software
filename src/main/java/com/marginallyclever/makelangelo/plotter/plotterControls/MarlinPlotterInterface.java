@@ -76,7 +76,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendEngage() {
-		queueAndSendCommand(myPlotter.getAreMotorsEngaged() ? "M17" : "M18");
+		queueAndSendCommand(myPlotter.getMotorsEngaged() ? "M17" : "M18");
 	}
 
 	private void sendGoto() {
@@ -117,7 +117,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 				if (minorParts[0].equalsIgnoreCase("Y")) pos.y = v;
 			}
 
-			myPlotter.setPos(pos);
+			myPlotter.moveTo(pos.x,pos.y);
 		} catch (NumberFormatException e) {
 			logger.error("M114 error: {}", message, e);
 		}

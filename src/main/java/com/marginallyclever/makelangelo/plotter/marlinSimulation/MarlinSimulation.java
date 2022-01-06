@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -610,8 +611,9 @@ public class MarlinSimulation {
 		double zd = settings.getPenDownAngle();
 		boolean isUp=true;
 		
-		double lx=settings.getHomeX();
-		double ly=settings.getHomeY();
+		Point2D home = settings.getHome();
+		double lx=home.x;
+		double ly=home.y;
 		poseNow.set(lx,ly,zu);
 		queue.clear();
 				

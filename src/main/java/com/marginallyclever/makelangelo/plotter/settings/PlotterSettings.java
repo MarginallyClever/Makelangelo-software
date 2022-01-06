@@ -18,13 +18,9 @@ import java.util.prefs.Preferences;
  * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
  * @author Dan Royer 
  */
-public class PlotterSettings implements Serializable {
-
-	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
-	
+public class PlotterSettings implements Serializable {	
 	private static final long serialVersionUID = -4185946661019573192L;
-
-	private String[] configsAvailable;
+	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
 
 	private List<PlotterSettingsListener> listeners;
 
@@ -48,12 +44,8 @@ public class PlotterSettings implements Serializable {
 	private double drawFeedRate;
 	private double maxAcceleration;
 
-	// for a while the robot would sign it's name at the end of a drawing
-	@Deprecated
-	private boolean shouldSignName;
-
 	private ColorRGB paperColor;
-	
+
 	private ColorRGB penDownColorDefault;
 	private ColorRGB penDownColor;
 	private ColorRGB penUpColor;
@@ -94,7 +86,6 @@ public class PlotterSettings implements Serializable {
 		paperColor = new ColorRGB(255, 255, 255);
 
 		listeners = new ArrayList<PlotterSettingsListener>();
-		shouldSignName = false;
 
 		penDownColor = penDownColorDefault = new ColorRGB(0, 0, 0); // BLACK
 		penUpColor = new ColorRGB(0, 255, 0); // blue
@@ -102,132 +93,30 @@ public class PlotterSettings implements Serializable {
 
 		setHardwareVersion("5");
 
-		// which configurations are available?
-		try {
-			Preferences topLevelMachinesPreferenceNode = PreferencesHelper
-					.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
-		} catch (Exception e) {
-			logger.error("Failed to load preferences", e);
-			configsAvailable = new String[1];
-			configsAvailable[0] = "Default";
-		}
-
 		// Load most recent config
 		// loadConfig(last_machine_id);
 	}
 
-	public void addListener(PlotterSettingsListener listener) {
+	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(PlotterSettingsListener listener) {
+	public void removePlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.remove(listener);
 	}
 
-	public void notifyListeners() {
+	protected void notifyListeners() {
 		for (PlotterSettingsListener listener : listeners) {
 			listener.settingsChangedEvent(this);
 		}
-	}
-
-	public void createNewUID(long newUID) {
-		// make sure a topLevelMachinesPreferenceNode node is created
-		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
-				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		topLevelMachinesPreferenceNode.node(Long.toString(newUID));
-
-		// if this is a new robot UID, update the list of available configurations
-		final String[] new_list = new String[configsAvailable.length + 1];
-		System.arraycopy(configsAvailable, 0, new_list, 0, configsAvailable.length);
-		new_list[configsAvailable.length] = Long.toString(newUID);
-		configsAvailable = new_list;
 	}
 
 	public double getMaxAcceleration() {
 		return maxAcceleration;
 	}
 
-	/**
-	 * Get the UID of every machine this computer recognizes INCLUDING machine 0,
-	 * which is only assigned temporarily when a machine is new or before the first
-	 * software connect.
-	 *
-	 * @return an array of strings, each string is a machine UID.
-	 */
-	public String[] getAvailableConfigurations() {
-		return configsAvailable;
-	}
-
 	public Point2D getHome() {
 		return getHardwareProperties().getHome();
-	}
-
-	/**
-	 * @return home X coordinate in mm
-	 */
-	public double getHomeX() {
-		return getHome().x;
-	}
-
-	/**
-	 * @return home Y coordinate in mm
-	 */
-	public double getHomeY() {
-		return getHome().y;
-	}
-
-	@Deprecated
-	public String getAbsoluteMode() {
-		return "G90\n";
-	}
-
-	@Deprecated
-	public String getRelativeMode() {
-		return "G91\n";
-	}
-
-	public int getKnownMachineIndex() {
-		String[] list = getKnownMachineNames();
-		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals("0"))
-				continue;
-			if (list[i].equals(Long.toString(robotUID))) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	boolean isNumeric(String s) {
-		try {
-			Integer.parseInt(s);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Get the UID of every machine this computer recognizes EXCEPT machine 0, which
-	 * is only assigned temporarily when a machine is new or before the first
-	 * software connect.
-	 *
-	 * @return an array of strings, each string is a machine UID.
-	 */
-	public String[] getKnownMachineNames() {
-		List<String> knownMachineList = new LinkedList<String>(Arrays.asList(configsAvailable));
-		List<String> keepList = new LinkedList<String>();
-		for (String a : knownMachineList) {
-			if (a.contentEquals("0"))
-				continue;
-			if (!isNumeric(a))
-				continue;
-			keepList.add(a);
-		}
-
-		return Arrays.copyOf(keepList.toArray(), keepList.size(), String[].class);
 	}
 
 	/**
@@ -258,13 +147,6 @@ public class PlotterSettings implements Serializable {
 		return limitTop;
 	}
 
-	/**
-	 * @return the number of machine configurations that exist on this computer
-	 */
-	public int getMachineCount() {
-		return configsAvailable.length;
-	}
-
 	public long getUID() {
 		return robotUID;
 	}
@@ -274,8 +156,7 @@ public class PlotterSettings implements Serializable {
 	}
 
 	/**
-	 * Load the machine configuration
-	 *
+	 * Load the machine configuration from {@link Preferences}.
 	 * @param uid the unique id of the robot to be loaded
 	 */
 	public void loadConfig(long uid) {
@@ -420,10 +301,6 @@ public class PlotterSettings implements Serializable {
 
 	public void setRegistered(boolean isRegistered) {
 		this.isRegistered = isRegistered;
-	}
-
-	public boolean shouldSignName() {
-		return shouldSignName;
 	}
 
 	public String getHardwareVersion() {
