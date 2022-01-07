@@ -221,5 +221,4 @@ public class ScaleTurtlePanel extends JPanel {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		runAsDialog(frame,new Turtle());
 	}
-
 }
