@@ -36,8 +36,8 @@ public class TranslatorTests {
 	public void changeLanguageTest() {
 		Translator.start();
 		String[] available = Translator.getLanguageList();
-			assertTrue(available.length > 1, "More than one language needed to complete test.");
-			int current = Translator.getCurrentLanguageIndex();
+		assertTrue(available.length > 1, "More than one language needed to complete test.");
+		int current = Translator.getCurrentLanguageIndex();
 		try {
 			int next = (current + 1) % available.length;
 			Translator.setCurrentLanguage(available[next]);
