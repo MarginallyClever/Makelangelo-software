@@ -5,12 +5,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.ScaleTurtlePanel;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
@@ -26,6 +33,7 @@ public class PlotterSettingsManager extends JPanel {
 
 	public PlotterSettingsManager() {
 		super();
+		loadAllConfigurations();
 	}
 	
 	private void loadAllConfigurations() {
@@ -39,5 +47,20 @@ public class PlotterSettingsManager extends JPanel {
 			logger.error("Failed to load preferences", e);
 			configurationNames.add("Default");
 		}
+	}
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		Log.start();
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+
+		JFrame frame = new JFrame(PlotterSettingsManager.class.getSimpleName());
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.add(new PlotterSettingsManager());
+		frame.pack();
+		frame.setVisible(true);
 	}
 }
