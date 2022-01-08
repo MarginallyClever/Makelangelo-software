@@ -59,7 +59,7 @@ public class AdjustMachinePanel extends SelectPanel {
 			totalBeltNeeded.setReadOnly();
 			totalServoNeeded.setReadOnly();
 
-			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
+			if(!robot.getSettings().canChangeMachineSize()) {
 				machineWidth.setReadOnly();
 				machineHeight.setReadOnly();
 			}
@@ -70,7 +70,7 @@ public class AdjustMachinePanel extends SelectPanel {
 		{
 			acceleration = new SelectDouble("acceleration",Translator.get("AdjustAcceleration"),(float)robot.getSettings().getMaxAcceleration());
 
-			if(robot.getSettings().getHardwareProperties().canAccelerate()) {
+			if(robot.getSettings().canAccelerate()) {
 				add(acceleration);
 			}
 		}

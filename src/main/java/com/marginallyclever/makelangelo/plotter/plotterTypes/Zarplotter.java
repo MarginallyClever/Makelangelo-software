@@ -6,11 +6,9 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
 /**
- * Deprecated because it cannot find home.
  * @author Dan Royer
  */
-@Deprecated
-public class Zarplotter extends Polargraph {
+public class Zarplotter implements PlotterType {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
@@ -18,35 +16,9 @@ public class Zarplotter extends Polargraph {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-	
-	@Override
-	public String getVersion() {
-		return "6";
-	}
-
-	@Override
 	public String getName() {
 		return "Zarplotter";
 	}
-
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintMotors(gl2,robot);
@@ -55,8 +27,7 @@ public class Zarplotter extends Polargraph {
 			paintPenHolderToCounterweights(gl2,robot);		
 	}
 
-	@Override
-	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
 		Point2D pos = robot.getPos();
@@ -108,8 +79,7 @@ public class Zarplotter extends Polargraph {
 		gl2.glEnd();
 	}
 
-	@Override
-	protected void paintMotors(GL2 gl2,Plotter robot) {
+	private void paintMotors(GL2 gl2,Plotter robot) {
 		double top = robot.getLimitTop();
 		double bottom = robot.getLimitBottom();
 		double right = robot.getLimitRight();
@@ -122,7 +92,7 @@ public class Zarplotter extends Polargraph {
 		gl2.glPushMatrix();		gl2.glTranslated(left , bottom, 0);		gl2.glRotated(  0, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
 	}
 
-	protected void paintOneMotor(GL2 gl2) {
+	private void paintOneMotor(GL2 gl2) {
 		// frame
 		gl2.glColor3f(1, 0.8f, 0.5f);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
@@ -175,4 +145,79 @@ public class Zarplotter extends Polargraph {
 
 		gl2.glPopMatrix();
 	}
+/*
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+	
+	@Override
+	public String getVersion() {
+		return "6";
+	}
+
+	@Override
+	public boolean canAutoHome() {
+		return false;
+	}
+
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public float getWidth() {
+		return 3 * 12 * 25.4f;  // 3'
+	}
+
+	@Override
+	public float getHeight() {
+		return 3 * 12 * 25.4f;  // 3'
+	}
+
+	@Override
+	public float getFeedrateMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getFeedrateDefault() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getAccelerationMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getPenLiftTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getZAngleOn() {
+		return 0;
+	}
+
+	@Override
+	public float getZAngleOff() {
+		return 90;
+	}*/
 }

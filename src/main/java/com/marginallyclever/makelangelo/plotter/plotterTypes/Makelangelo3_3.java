@@ -4,35 +4,10 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Makelangelo3_3 extends Polargraph {
-	@Override
-	public String getVersion() {
-		return "4";
-	}
-
+public class Makelangelo3_3 implements PlotterType {
 	@Override
 	public String getName() {
 		return "Makelangelo 3.3";
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return true;
 	}
 
 	@Override
@@ -43,6 +18,107 @@ public class Makelangelo3_3 extends Polargraph {
 			paintPenHolderToCounterweights(gl2,robot);		
 	}
 
+	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+		double dx, dy;
+		Point2D pos = robot.getPos();
+		double gx = pos.x;
+		double gy = pos.y;
+
+		double top = robot.getLimitTop();
+		double bottom = robot.getLimitBottom();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+
+		double mw = right - left;
+		double mh = top - bottom;
+		double suggestedLength = Math.sqrt(mw * mw + mh * mh) + 50;
+
+		dx = gx - left;
+		dy = gy - top;
+		double left_a = Math.sqrt(dx * dx + dy * dy);
+		double left_b = (suggestedLength - left_a) / 2;
+
+		dx = gx - right;
+		double right_a = Math.sqrt(dx * dx + dy * dy);
+		double right_b = (suggestedLength - right_a) / 2;
+
+		if (gx < left)
+			return;
+		if (gx > right)
+			return;
+		if (gy > top)
+			return;
+		if (gy < bottom)
+			return;
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glColor3d(0.2, 0.2, 0.2);
+
+		// belt from motor to pen holder left
+		gl2.glVertex2d(left, top);
+		gl2.glVertex2d(gx, gy);
+		// belt from motor to pen holder right
+		gl2.glVertex2d(right, top);
+		gl2.glVertex2d(gx, gy);
+
+		float bottleCenter = 8f + 7.5f;
+
+		// belt from motor to counterweight left
+		gl2.glVertex2d(left - bottleCenter - 2, top);
+		gl2.glVertex2d(left - bottleCenter - 2, top - left_b);
+		gl2.glVertex2d(left - bottleCenter + 2, top);
+		gl2.glVertex2d(left - bottleCenter + 2, top - left_b);
+		// belt from motor to counterweight right
+		gl2.glVertex2d(right + bottleCenter - 2, top);
+		gl2.glVertex2d(right + bottleCenter - 2, top - right_b);
+		gl2.glVertex2d(right + bottleCenter + 2, top);
+		gl2.glVertex2d(right + bottleCenter + 2, top - right_b);
+		gl2.glEnd();
+
+		// gondola
+		Polargraph.drawCircle(gl2,gx,gy,Polargraph.PEN_HOLDER_RADIUS_2,20);
+		if(robot.getPenIsUp()) {
+			Polargraph.drawCircle(gl2,gx,gy,Polargraph.PEN_HOLDER_RADIUS_2+5,20);
+		}
+
+		// counterweight left
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		gl2.glVertex2d(left - bottleCenter - 15, top - left_b);
+		gl2.glVertex2d(left - bottleCenter + 15, top - left_b);
+		gl2.glVertex2d(left - bottleCenter + 15, top - left_b - 150);
+		gl2.glVertex2d(left - bottleCenter - 15, top - left_b - 150);
+		gl2.glEnd();
+
+		// counterweight right
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glColor3f(0, 0, 1);
+		gl2.glVertex2d(right + bottleCenter - 15, top - right_b);
+		gl2.glVertex2d(right + bottleCenter + 15, top - right_b);
+		gl2.glVertex2d(right + bottleCenter + 15, top - right_b - 150);
+		gl2.glVertex2d(right + bottleCenter - 15, top - right_b - 150);
+		gl2.glEnd();
+	}
+
+	protected void paintMotors(GL2 gl2,Plotter robot) {
+		double top = robot.getLimitTop();
+		double right = robot.getLimitRight();
+		double left = robot.getLimitLeft();
+
+		// left motor
+		gl2.glColor3f(0, 0, 0);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left - Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(left + Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(left + Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(left - Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
+		// right motor
+		gl2.glVertex2d(right - Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(right + Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(right + Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
+		gl2.glVertex2d(right - Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
+		gl2.glEnd();
+	}
+	
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
@@ -167,10 +243,30 @@ public class Makelangelo3_3 extends Polargraph {
 		// clean up
 		gl2.glPopMatrix();
 	}
+/*
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+	
+	@Override
+	public boolean canAutoHome() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		return true;
+	}
 
 	@Override
 	public Point2D getHome() {
 		return new Point2D(0,0);
 	}
-	
+	*/
 }

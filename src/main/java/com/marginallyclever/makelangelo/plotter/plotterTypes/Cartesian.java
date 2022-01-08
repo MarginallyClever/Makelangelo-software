@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Cartesian extends Polargraph {
+public class Cartesian implements PlotterType {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
@@ -12,35 +12,9 @@ public class Cartesian extends Polargraph {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-	
-	@Override
-	public String getVersion() {
-		return "1";
-	}
-
-	@Override
 	public String getName() {
 		return "Cartesian";
 	}
-
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintGantryAndHead(gl2,robot);		
@@ -159,5 +133,85 @@ public class Cartesian extends Polargraph {
 
 		gl2.glPopMatrix();
 	}
+/*
 
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+	
+	@Override
+	public String getVersion() {
+		return "1";
+	}
+
+	@Override
+	public boolean canAutoHome() {
+		return false;
+	}
+
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public float getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getFeedrateMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getFeedrateDefault() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getAccelerationMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getPenLiftTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getZAngleOn() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getZAngleOff() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+*/
 }

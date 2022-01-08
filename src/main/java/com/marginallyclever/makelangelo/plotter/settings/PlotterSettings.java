@@ -2,7 +2,8 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5Marlin;
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
+import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 import com.marginallyclever.util.PreferencesHelper;
@@ -91,7 +92,7 @@ public class PlotterSettings implements Serializable {
 		penUpColor = new ColorRGB(0, 255, 0); // blue
 		startingPositionIndex = 4;
 
-		setHardwareVersion("5");
+		setHardwareVersion("Makelangelo 5");
 
 		// Load most recent config
 		// loadConfig(last_machine_id);
@@ -116,7 +117,7 @@ public class PlotterSettings implements Serializable {
 	}
 
 	public Point2D getHome() {
-		return getHardwareProperties().getHome();
+		return new Point2D(0,0);
 	}
 
 	/**
@@ -318,7 +319,7 @@ public class PlotterSettings implements Serializable {
 			Iterator<PlotterType> i = PlotterTypeFactory.iterator();
 			while (i.hasNext()) {
 				PlotterType hw = i.next();
-				if (hw.getVersion().contentEquals(version)) {
+				if (hw.getName().contentEquals(version)) {
 					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
 					newVersion = version;
 					break;
@@ -326,31 +327,72 @@ public class PlotterSettings implements Serializable {
 			}
 		} catch (Exception e) {
 			logger.error("Hardware version instance failed. Defaulting to v5", e);
-			hardwareProperties = new Makelangelo5Marlin();
-			newVersion = hardwareProperties.getVersion();
+			hardwareProperties = new Makelangelo5();
+			newVersion = hardwareProperties.getName();
 		}
 		if (newVersion.equals("")) {
 			logger.error("Unknown hardware version requested. Defaulting to v5");
-			hardwareProperties = new Makelangelo5Marlin();
-			newVersion = hardwareProperties.getVersion();
+			hardwareProperties = new Makelangelo5();
+			newVersion = hardwareProperties.getName();
 		}
 
 		hardwareVersion = newVersion;
-		if (!hardwareProperties.canChangeMachineSize()) {
-			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
+		if (!canChangeMachineSize()) {
+			this.setMachineSize(getWidth(), getHeight());
 		}
 
 		// apply default hardware values
-		travelFeedRate = hardwareProperties.getFeedrateMax();
-		drawFeedRate = hardwareProperties.getFeedrateDefault();
-		maxAcceleration = hardwareProperties.getAccelerationMax();
+		travelFeedRate = getFeedrateTravel();
+		drawFeedRate = getFeedrateDraw();
+		maxAcceleration = getAccelerationMax();
 
-		setPenLiftTime(hardwareProperties.getPenLiftTime());
-		setPenDownAngle(hardwareProperties.getZAngleOn());
-		setPenUpAngle(hardwareProperties.getZAngleOff());
+		setPenLiftTime(getPenLiftTime());
+		setPenDownAngle(getZAngleOn());
+		setPenUpAngle(getZAngleOff());
 
 		// pen
 		setPenDiameter(0.8f);
+	}
+
+	private double getZAngleOff() {
+		// TODO Auto-generated method stub
+		return 40;
+	}
+
+	private double getZAngleOn() {
+		// TODO Auto-generated method stub
+		return 90;
+	}
+
+	private double getAccelerationMax() {
+		// TODO Auto-generated method stub
+		return MarlinSimulation.DEFAULT_ACCELERATION;
+	}
+
+	private double getFeedrateDraw() {
+		// TODO Auto-generated method stub
+		return MarlinSimulation.DEFAULT_FEEDRATE;
+	}
+
+	private double getFeedrateTravel() {
+		// TODO Auto-generated method stub
+		return MarlinSimulation.DEFAULT_FEEDRATE;
+	}
+
+	/**
+	 * @return height of machine's drawing area, in mm.
+	 */
+	private double getHeight() {
+		// TODO Auto-generated method stub
+		return 1000; // mm
+	}
+
+	/**
+	 * @return width of machine's drawing area, in mm.
+	 */
+	private double getWidth() {
+		// TODO Auto-generated method stub
+		return 650; // mm
 	}
 
 	public ColorRGB getPenDownColorDefault() {
@@ -407,5 +449,15 @@ public class PlotterSettings implements Serializable {
 
 	public void setPenLiftTime(double ms) {
 		this.penLiftTime = ms;
+	}
+
+	public boolean canChangeMachineSize() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean canAccelerate() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
