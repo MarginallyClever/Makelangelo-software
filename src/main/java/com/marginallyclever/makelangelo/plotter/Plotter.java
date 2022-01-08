@@ -174,7 +174,7 @@ public class Plotter implements PreviewListener, Cloneable {
 		drawPhysicalLimits(gl2);
 		
 		// hardware features
-		settings.getHardwareProperties().render(gl2, this);
+		settings.render(gl2, this);
 
 		gl2.glLineWidth(lineWidthBuf[0]);
 	}	

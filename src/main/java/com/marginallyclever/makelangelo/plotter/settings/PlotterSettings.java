@@ -1,7 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5;
 import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
@@ -22,8 +24,6 @@ import java.util.prefs.Preferences;
 public class PlotterSettings implements Serializable {	
 	private static final long serialVersionUID = -4185946661019573192L;
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
-
-	private List<PlotterSettingsListener> listeners;
 
 	// Each robot has a global unique identifier
 	private long robotUID;
@@ -86,8 +86,6 @@ public class PlotterSettings implements Serializable {
 
 		paperColor = new ColorRGB(255, 255, 255);
 
-		listeners = new ArrayList<PlotterSettingsListener>();
-
 		penDownColor = penDownColorDefault = new ColorRGB(0, 0, 0); // BLACK
 		penUpColor = new ColorRGB(0, 255, 0); // blue
 		startingPositionIndex = 4;
@@ -97,6 +95,10 @@ public class PlotterSettings implements Serializable {
 		// Load most recent config
 		// loadConfig(last_machine_id);
 	}
+
+	// OBSERVER PATTERN START
+
+	private List<PlotterSettingsListener> listeners = new ArrayList<PlotterSettingsListener>();
 
 	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.add(listener);
@@ -111,6 +113,8 @@ public class PlotterSettings implements Serializable {
 			listener.settingsChangedEvent(this);
 		}
 	}
+
+	// OBSERVER PATTERN END
 
 	public double getMaxAcceleration() {
 		return maxAcceleration;
@@ -199,8 +203,8 @@ public class PlotterSettings implements Serializable {
 		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(getPenUpAngle()))));
 		// tool_number =
 		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		travelFeedRate = Double.valueOf(prefs.get("feed_rate", Double.toString(travelFeedRate)));
-		drawFeedRate = Double.valueOf(prefs.get("feed_rate_current", Double.toString(drawFeedRate)));
+		travelFeedRate = Double.valueOf(prefs.get("feed_rate", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
+		drawFeedRate = Double.valueOf(prefs.get("feed_rate_current", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
 
 		int r, g, b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -340,43 +344,6 @@ public class PlotterSettings implements Serializable {
 		if (!canChangeMachineSize()) {
 			this.setMachineSize(getWidth(), getHeight());
 		}
-
-		// apply default hardware values
-		travelFeedRate = getFeedrateTravel();
-		drawFeedRate = getFeedrateDraw();
-		maxAcceleration = getAccelerationMax();
-
-		setPenLiftTime(getPenLiftTime());
-		setPenDownAngle(getZAngleOn());
-		setPenUpAngle(getZAngleOff());
-
-		// pen
-		setPenDiameter(0.8f);
-	}
-
-	private double getZAngleOff() {
-		// TODO Auto-generated method stub
-		return 40;
-	}
-
-	private double getZAngleOn() {
-		// TODO Auto-generated method stub
-		return 90;
-	}
-
-	private double getAccelerationMax() {
-		// TODO Auto-generated method stub
-		return MarlinSimulation.DEFAULT_ACCELERATION;
-	}
-
-	private double getFeedrateDraw() {
-		// TODO Auto-generated method stub
-		return MarlinSimulation.DEFAULT_FEEDRATE;
-	}
-
-	private double getFeedrateTravel() {
-		// TODO Auto-generated method stub
-		return MarlinSimulation.DEFAULT_FEEDRATE;
 	}
 
 	/**
@@ -459,5 +426,11 @@ public class PlotterSettings implements Serializable {
 	public boolean canAccelerate() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void render(GL2 gl2, Plotter plotter) {
+		if(hardwareProperties!=null) {
+			hardwareProperties.render(gl2, plotter);
+		}
 	}
 }
