@@ -57,14 +57,6 @@ public abstract class Polargraph implements PlotterType {
 		return new Point2D(b1,b2);
 	}
 
-	public float getWidth() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	public float getHeight() {
-		return 4 * 12 * 25.4f;  // 4'
-	}
-
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
 		paintMotors(gl2, robot);
@@ -73,7 +65,7 @@ public abstract class Polargraph implements PlotterType {
 			paintPenHolderToCounterweights(gl2, robot);
 	}
 
-	protected void paintMotors(GL2 gl2,Plotter robot) {
+	static public void paintMotors(GL2 gl2,Plotter robot) {
 		double top = robot.getLimitTop();
 		double right = robot.getLimitRight();
 		double left = robot.getLimitLeft();
@@ -164,7 +156,7 @@ public abstract class Polargraph implements PlotterType {
 		gl2.glPopMatrix();
 	}
 
-	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	static public void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		double dx, dy;
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
@@ -277,55 +269,4 @@ public abstract class Polargraph implements PlotterType {
 		}
 		gl2.glEnd();
 	}
-	/*
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return false;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return false;
-	}
-
-	@Override
-	public float getFeedrateMax() {
-		return 100;
-	}
-
-	@Override
-	public float getFeedrateDefault() {
-		return 60;
-	}
-
-	@Override
-	public float getAccelerationMax() {
-		return 300;
-	}
-
-	@Override
-	public float getPenLiftTime() {
-		return 500;
-	}
-	
-	@Override
-	public float getZAngleOn() {
-		return 160;
-	}
-	
-	@Override
-	public float getZAngleOff() {
-		return 90;
-	}
-	*/
 }

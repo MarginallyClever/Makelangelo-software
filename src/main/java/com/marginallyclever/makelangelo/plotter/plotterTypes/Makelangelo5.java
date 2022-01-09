@@ -48,7 +48,7 @@ public class Makelangelo5 implements PlotterType {
 			paintPenHolderToCounterweights(gl2, robot);
 
 		if (Makelangelo5.texture2 == null) {
-			paintMotors(gl2, robot);
+			Polargraph.paintMotors(gl2, robot);
 		} else {
 			Makelangelo5.texture2.bind(gl2);
 			paintControlBoxFancy(gl2, robot);
@@ -60,51 +60,6 @@ public class Makelangelo5 implements PlotterType {
 			Makelangelo5.texture3.bind(gl2);
 			paintLogoFancy(gl2, robot);
 		}
-	}
-
-	protected void paintMotors(GL2 gl2, Plotter robot) {
-		double top = robot.getLimitTop();
-		double right = robot.getLimitRight();
-		double left = robot.getLimitLeft();
-
-		gl2.glColor3f(1, 0.8f, 0.5f);
-		// left frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(-2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(left - Polargraph.FRAME_SIZE, top + Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(left + Polargraph.FRAME_SIZE, top + Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(left + Polargraph.FRAME_SIZE, top);
-		gl2.glVertex2d(left, top - Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(left - Polargraph.FRAME_SIZE, top - Polargraph.FRAME_SIZE);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// right frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(right + Polargraph.FRAME_SIZE, top + Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(right - Polargraph.FRAME_SIZE, top + Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(right - Polargraph.FRAME_SIZE, top);
-		gl2.glVertex2d(right, top - Polargraph.FRAME_SIZE);
-		gl2.glVertex2d(right + Polargraph.FRAME_SIZE, top - Polargraph.FRAME_SIZE);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// left motor
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left - Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(left + Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(left + Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(left - Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
-		// right motor
-		gl2.glVertex2d(right - Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(right + Polargraph.MOTOR_SIZE, top + Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(right + Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
-		gl2.glVertex2d(right - Polargraph.MOTOR_SIZE, top - Polargraph.MOTOR_SIZE);
-		gl2.glEnd();
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot) {
@@ -280,29 +235,7 @@ public class Makelangelo5 implements PlotterType {
 		gl2.glPopMatrix();
 	}
 
-	// draw left & right motor
-	protected void paintMotors(GL2 gl2, PlotterSettings settings) {
-		double top = settings.getLimitTop();
-		double right = settings.getLimitRight();
-		double left = settings.getLimitLeft();
-
-		// left motor
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left - MOTOR_WIDTH / 2, top + MOTOR_WIDTH / 2);
-		gl2.glVertex2d(left + MOTOR_WIDTH / 2, top + MOTOR_WIDTH / 2);
-		gl2.glVertex2d(left + MOTOR_WIDTH / 2, top - MOTOR_WIDTH / 2);
-		gl2.glVertex2d(left - MOTOR_WIDTH / 2, top - MOTOR_WIDTH / 2);
-
-		// right motor
-		gl2.glVertex2d(right - MOTOR_WIDTH / 2, top + MOTOR_WIDTH / 2);
-		gl2.glVertex2d(right + MOTOR_WIDTH / 2, top + MOTOR_WIDTH / 2);
-		gl2.glVertex2d(right + MOTOR_WIDTH / 2, top - MOTOR_WIDTH / 2);
-		gl2.glVertex2d(right - MOTOR_WIDTH / 2, top - MOTOR_WIDTH / 2);
-		gl2.glEnd();
-	}
-
-	protected void renderLCD(GL2 gl2) {
+	private void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -364,7 +297,7 @@ public class Makelangelo5 implements PlotterType {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double dx, dy;
 		Point2D pos = robot.getPos();
@@ -440,7 +373,7 @@ public class Makelangelo5 implements PlotterType {
 		gl2.glEnd();
 	}
 
-	protected void paintPlotter(GL2 gl2, Plotter robot, float gx, float gy) {
+	private void paintPlotter(GL2 gl2, Plotter robot, float gx, float gy) {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
 		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5);
@@ -449,7 +382,7 @@ public class Makelangelo5 implements PlotterType {
 		}
 	}
 
-	protected void drawCircle(GL2 gl2, float x, float y, float r) {
+	private void drawCircle(GL2 gl2, float x, float y, float r) {
 		gl2.glTranslatef(x, y, 0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		float f;
@@ -460,7 +393,7 @@ public class Makelangelo5 implements PlotterType {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 
-	protected void paintSafeArea(GL2 gl2, Plotter robot) {
+	private void paintSafeArea(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double top = settings.getLimitTop();
 		// double bottom = settings.getLimitBottom();

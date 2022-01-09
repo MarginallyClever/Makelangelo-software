@@ -312,10 +312,6 @@ public class PlotterSettings implements Serializable {
 		return hardwareVersion;
 	}
 
-	public PlotterType getHardwareProperties() {
-		return hardwareProperties;
-	}
-
 	public void setHardwareVersion(String version) {
 		String newVersion = "";
 		try {
