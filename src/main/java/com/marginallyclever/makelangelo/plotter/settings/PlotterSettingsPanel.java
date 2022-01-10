@@ -1,22 +1,16 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.machines.Machines;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRendererFactory;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -31,7 +25,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 	private Plotter robot;
 
 	private JComboBox<String> hardwareVersionChoices;
-	private ArrayList<String> hardwareVersionNames = PlotterRendererFactory.getNames();
+	private List<String> hardwareVersionNames;
 
 	private JTabbedPane panes = new JTabbedPane();
 	private JPanel modelPanel;
@@ -97,8 +91,12 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 
 		d.gridx = 1;
 		d.gridwidth = 2;
-		
-		hardwareVersionChoices = new JComboBox<String>((String[])hardwareVersionNames.toArray());
+
+		hardwareVersionNames = Arrays.stream(Machines.values())
+				.map(machine -> machine.getPlotterRenderer().getName())
+				.collect(Collectors.toList());
+
+		hardwareVersionChoices = new JComboBox<>((String[])hardwareVersionNames.toArray());
 		// set the default
 		String hv = robot.getSettings().getHardwareName();
 		for (int i = 0; i < hardwareVersionNames.size(); ++i) {

@@ -13,6 +13,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
@@ -34,7 +35,6 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
-import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -63,7 +63,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.prefs.BackingStoreException;
@@ -105,7 +105,7 @@ public final class Makelangelo {
 	private boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
-	private PlotterRenderer myPlotterRenderer = PlotterRendererFactory.getByName(null);
+	private PlotterRenderer myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 	
 	// GUI elements
 	private JFrame mainFrame;
@@ -284,18 +284,19 @@ public final class Makelangelo {
 		JMenu menu = new JMenu(Translator.get("RobotMenu.Style"));
 		
 		ButtonGroup group = new ButtonGroup();
-		
-		Iterator<PlotterRenderer> pIter = PlotterRendererFactory.iterator();
-		while(pIter.hasNext()) {
-			PlotterRenderer pr = pIter.next();
-			JRadioButtonMenuItem button = new JRadioButtonMenuItem(pr.getName());
-			if(myPlotterRenderer == pr) button.setSelected(true);
-			button.addActionListener((e)->{
-				myPlotterRenderer = PlotterRendererFactory.getByName(pr.getName());
-			});
-			menu.add(button);
-			group.add(button);
-		}
+
+		Arrays.stream(Machines.values())
+				.forEach(machine -> {
+					PlotterRenderer pr = machine.getPlotterRenderer();
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(pr.getName());
+					if(myPlotterRenderer == pr) button.setSelected(true);
+					button.addActionListener((e)->{
+						logger.debug("Switching to Machine '{}'", pr.getName());
+						myPlotterRenderer = Machines.findByName(pr.getName()).getPlotterRenderer();
+					});
+					menu.add(button);
+					group.add(button);
+				});
 
 		return menu;
 	}
