@@ -95,16 +95,13 @@ public final class RecentFiles extends JMenu {
 	}
 		
 	private void loadFromStorage() {
-		logger.debug("loading recent files:");
-		for(int i=0;i<MAX_FILES;++i) {
+		logger.debug("loading recent files");
+		for (int i=0; i<MAX_FILES; ++i) {
 			String name = getNodeName(i);
 			String value = prefs.get(name, "");
-			if(!value.trim().isEmpty()) {
-				logger.debug("...{}", value);
+			if (!value.trim().isEmpty()) {
+				logger.trace("...{}", value);
 				fileList.add(value);
-			} else {
-				logger.debug("...done");
-				return;
 			}
 		}
 	}
