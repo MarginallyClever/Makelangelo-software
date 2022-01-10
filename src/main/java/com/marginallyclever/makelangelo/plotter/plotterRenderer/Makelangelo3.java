@@ -1,7 +1,6 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 /**
@@ -9,11 +8,7 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
  * @author Dan Royer
  */
 @Deprecated
-public class Makelangelo3 extends Polargraph {
-	@Override
-	public String getVersion() {
-		return "3";
-	}
+public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
 	public String getName() {
@@ -21,83 +16,13 @@ public class Makelangelo3 extends Polargraph {
 	}
 
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return true;
-	}
-
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintControlBox(gl2,robot);
-		paintMotors(gl2,robot);
+		Polargraph.paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(gl2,robot);		
+			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
 	}
 
-	protected void paintMotors(GL2 gl2,Plotter robot) {
-		double top = robot.getLimitTop();
-		double right = robot.getLimitRight();
-		double left = robot.getLimitLeft();
-
-		gl2.glColor3f(1, 0.8f, 0.5f);
-		// left frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(-2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(left + FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(left + FRAME_SIZE, top             );
-		gl2.glVertex2d(left             , top - FRAME_SIZE);
-		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// right frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(2.1f, 2.1f, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right - FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right - FRAME_SIZE, top             );
-		gl2.glVertex2d(right             , top - FRAME_SIZE);
-		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();
-		gl2.glPopMatrix();
-
-		// left motor
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left - MOTOR_SIZE, top + MOTOR_SIZE);
-		gl2.glVertex2d(left + MOTOR_SIZE, top + MOTOR_SIZE);
-		gl2.glVertex2d(left + MOTOR_SIZE, top - MOTOR_SIZE);
-		gl2.glVertex2d(left - MOTOR_SIZE, top - MOTOR_SIZE);
-		// right motor
-		gl2.glVertex2d(right - MOTOR_SIZE, top + MOTOR_SIZE);
-		gl2.glVertex2d(right + MOTOR_SIZE, top + MOTOR_SIZE);
-		gl2.glVertex2d(right + MOTOR_SIZE, top - MOTOR_SIZE);
-		gl2.glVertex2d(right - MOTOR_SIZE, top - MOTOR_SIZE);
-		gl2.glEnd();
-	}
-	
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
@@ -155,7 +80,7 @@ public class Makelangelo3 extends Polargraph {
 		gl2.glPopMatrix();
 	}
 	
-	protected void renderLCD(GL2 gl2) {
+	private void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -222,48 +147,59 @@ public class Makelangelo3 extends Polargraph {
 		// clean up
 		gl2.glPopMatrix();
 	}
+/*
+	@Override
+	public String getVersion() {
+		return "3";
+	}
 
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+	
+	@Override
+	public boolean canAutoHome() {
+		return false;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		return true;
+	}
+	
 	@Override
 	public float getFeedrateMax() {
 		return 400;
 	}
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
+
 	@Override
 	public float getFeedrateDefault() {
 		return 100;
 	}
 	
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s^2 [>0]
-	 */
 	@Override
 	public float getAccelerationMax() {
 		return 50;
 	}
 
-	/**
-	 * @since software 7.22.6
-	 * @return deg/s [>0]
-	 */
 	@Override
 	public float getPenLiftTime() {
 		return 50;
 	}
 	
-	/**
-	 * @since software 7.22.6
-	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
-	 */
 	@Override
 	public float getZAngleOn() {
 		return 40;
-	}
+	}*/
 }

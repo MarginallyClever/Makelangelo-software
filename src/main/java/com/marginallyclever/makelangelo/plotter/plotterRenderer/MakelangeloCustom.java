@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-public class MakelangeloCustom extends Makelangelo3_3 {
+public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -14,41 +14,8 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 	public final static double MOTOR_WIDTH = 42;
 
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-
-	@Override
-	public String getVersion() {
-		return "0";
-	}
-	
-	@Override
 	public String getName() {
 		return "Makelangelo (Custom)";
-	}
-	
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	public float getWidth() { return 3*12*25.4f; }
-	public float getHeight() { return 4*12*25.4f; }
-
-	@Override
-	public boolean canAutoHome() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return false;
 	}
 
 	@Override
@@ -131,7 +98,6 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 		gl2.glPopMatrix();
 	}
 	
-
 	// draw left & right motor
 	protected void paintMotors( GL2 gl2,PlotterSettings settings ) {
 		double top = settings.getLimitTop();
@@ -220,7 +186,6 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 		gl2.glPopMatrix();
 	}
 
-	
 	protected void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
@@ -297,7 +262,6 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
 		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
-		
 	}
 	
 	protected void drawCircle(GL2 gl2,float x,float y,float r) {
@@ -365,48 +329,69 @@ public class MakelangeloCustom extends Makelangelo3_3 {
 		drawArc(gl2, (float)right, (float)top, (float)belt, (float)(Math.PI*1.5-sideang), (float)(Math.PI*1.5-botang));
 		drawArc(gl2, (float)left, (float)top, (float)belt, (float)(Math.PI*1.5+botang), (float)(Math.PI*1.5+sideang));
 	}
+/*
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+
+	@Override
+	public String getVersion() {
+		return "0";
+	}
 	
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+
+	@Override
+	public float getWidth() {
+		return 3*12*25.4f;
+	}
+	
+	@Override
+	public float getHeight() {
+		return 4*12*25.4f;
+	}
+
+	@Override
+	public boolean canAutoHome() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		return false;
+	}
+
 	@Override
 	public float getFeedrateMax() {
 		return 100;
 	}
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
+
 	@Override
 	public float getFeedrateDefault() {
 		return 100;
 	}
-	
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s^2 [>0]
-	 */
+
 	@Override
 	public float getAccelerationMax() {
 		return 150;
 	}
 
-	/**
-	 * @since software 7.22.6
-	 * @return deg/s [>0]
-	 */
 	@Override
 	public float getPenLiftTime() {
 		return 80;
 	}
-	
-	/**
-	 * @since software 7.22.6
-	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
-	 */
+
 	@Override
 	public float getZAngleOn() {
 		return 30;
-	}
+	}*/
 }

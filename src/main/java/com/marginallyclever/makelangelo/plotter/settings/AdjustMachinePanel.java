@@ -11,7 +11,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 
 @Deprecated
-public class PanelAdjustMachine extends SelectPanel {
+public class AdjustMachinePanel extends SelectPanel {
 	/**
 	 * 
 	 */
@@ -31,7 +31,7 @@ public class PanelAdjustMachine extends SelectPanel {
 	protected SelectButton buttonBpos;
 
 
-	public PanelAdjustMachine(Plotter robot) {
+	public AdjustMachinePanel(Plotter robot) {
 		super();
 		
 		this.robot = robot;
@@ -59,7 +59,7 @@ public class PanelAdjustMachine extends SelectPanel {
 			totalBeltNeeded.setReadOnly();
 			totalServoNeeded.setReadOnly();
 
-			if(!robot.getSettings().getHardwareProperties().canChangeMachineSize()) {
+			if(!robot.getSettings().canChangeMachineSize()) {
 				machineWidth.setReadOnly();
 				machineHeight.setReadOnly();
 			}
@@ -70,7 +70,7 @@ public class PanelAdjustMachine extends SelectPanel {
 		{
 			acceleration = new SelectDouble("acceleration",Translator.get("AdjustAcceleration"),(float)robot.getSettings().getMaxAcceleration());
 
-			if(robot.getSettings().getHardwareProperties().canAccelerate()) {
+			if(robot.getSettings().canAccelerate()) {
 				add(acceleration);
 			}
 		}
@@ -148,9 +148,9 @@ public class PanelAdjustMachine extends SelectPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(PanelAdjustMachine.class.getSimpleName());
+		JFrame frame = new JFrame(AdjustMachinePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PanelAdjustMachine(new Plotter()));
+		frame.add(new AdjustMachinePanel(new Plotter()));
 		frame.pack();
 		frame.setVisible(true);
 	}

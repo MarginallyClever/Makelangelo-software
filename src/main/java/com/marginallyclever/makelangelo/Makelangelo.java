@@ -13,6 +13,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
@@ -33,6 +34,7 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -61,6 +63,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.prefs.BackingStoreException;
@@ -102,6 +105,7 @@ public final class Makelangelo {
 	private boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private PlotterRenderer myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 	
 	// GUI elements
 	private JFrame mainFrame;
@@ -138,13 +142,22 @@ public final class Makelangelo {
 	private void startRobot() {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addListener(this::onPlotterEvent);
-		myPlotter.getSettings().addListener((e)->{
+		myPlotter.addPlotterEventListener(this::onPlotterEvent);
+		myPlotter.getSettings().addPlotterSettingsListener((e)->{
 			if(previewPanel != null) previewPanel.repaint();
 		});
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
+			addPlotterRendererToPreviewPanel();
 		}
+	}
+
+	private void addPlotterRendererToPreviewPanel() {
+		previewPanel.addListener((gl2)->{
+			if(myPlotterRenderer!=null) {
+				myPlotterRenderer.render(gl2, myPlotter);
+			}
+		});
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {
@@ -250,7 +263,9 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
-		JMenuItem bEstimate = new JMenuItem(Translator.get("GetTimeEstimate"));
+		menu.add(createStyleMenu());
+		
+		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
@@ -258,9 +273,30 @@ public final class Makelangelo {
 		bSaveToSD.addActionListener((e)-> saveGCode());
 		menu.add(bSaveToSD);
 
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
 		menu.add(bOpenControls);
+
+		return menu;
+	}
+
+	private JMenuItem createStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.Style"));
+		
+		ButtonGroup group = new ButtonGroup();
+
+		Arrays.stream(Machines.values())
+				.forEach(machine -> {
+					PlotterRenderer pr = machine.getPlotterRenderer();
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(pr.getName());
+					if(myPlotterRenderer == pr) button.setSelected(true);
+					button.addActionListener((e)->{
+						logger.debug("Switching to Machine '{}'", pr.getName());
+						myPlotterRenderer = Machines.findByName(pr.getName()).getPlotterRenderer();
+					});
+					menu.add(button);
+					group.add(button);
+				});
 
 		return menu;
 	}
@@ -626,6 +662,7 @@ public final class Makelangelo {
 		previewPanel.addListener(myPaper);
 		previewPanel.addListener(myPlotter);
 		previewPanel.addListener(myTurtleRenderer);
+		addPlotterRendererToPreviewPanel();
 
 		// major layout
 		contentPane.add(previewPanel, BorderLayout.CENTER);

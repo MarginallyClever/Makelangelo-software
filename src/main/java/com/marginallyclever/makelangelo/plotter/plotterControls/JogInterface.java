@@ -66,10 +66,10 @@ public class JogInterface extends JPanel {
 	    	Point2D p = plotter.getPos();
 	    	p.x+=x;
 	    	p.y+=y;
-	    	plotter.moveTo(p);
+	    	plotter.setPos(p.x,p.y);
 	    });
 
-		myPlotter.addListener((e)-> {
+		myPlotter.addPlotterEventListener((e)-> {
 			if(e.type == PlotterEvent.MOTORS_ENGAGED
 			|| e.type == PlotterEvent.HOME_FOUND) {
 				updateButtonStatus();
@@ -107,17 +107,17 @@ public class JogInterface extends JPanel {
 	}
 
 	private void onToggleEngageMotorAction(ActionEvent e) {
-		if (myPlotter.getAreMotorsEngaged()) {
+		if (myPlotter.getMotorsEngaged()) {
 			((ButtonIcon) e.getSource()).replaceIcon("/images/lock.png");
-			myPlotter.disengageMotors();
+			myPlotter.setMotorsEngaged(false);
 		} else {
 			((ButtonIcon) e.getSource()).replaceIcon("/images/lock_open.png");
-			myPlotter.engageMotors();
+			myPlotter.setMotorsEngaged(true);
 		}
 	}
 
 	private void updateButtonStatus() {
-		toggleEngageMotor.setText(Translator.get( myPlotter.getAreMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors" ));
+		toggleEngageMotor.setText(Translator.get( myPlotter.getMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors" ));
 		bCartesian.setEnabled(myPlotter.getDidFindHome());
 	}
 

@@ -31,7 +31,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 		myPlotter = plotter;
 
-		plotter.addListener(this::onPlotterEvent);
+		plotter.addPlotterEventListener(this::onPlotterEvent);
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {
@@ -76,7 +76,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendEngage() {
-		queueAndSendCommand(myPlotter.getAreMotorsEngaged() ? "M17" : "M18");
+		queueAndSendCommand(myPlotter.getMotorsEngaged() ? "M17" : "M18");
 	}
 
 	private void sendGoto() {
@@ -117,7 +117,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 				if (minorParts[0].equalsIgnoreCase("Y")) pos.y = v;
 			}
 
-			myPlotter.setPos(pos);
+			myPlotter.setPos(pos.x,pos.y);
 		} catch (NumberFormatException e) {
 			logger.error("M114 error: {}", message, e);
 		}
