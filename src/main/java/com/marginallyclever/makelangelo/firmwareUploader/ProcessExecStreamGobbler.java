@@ -7,19 +7,10 @@ package com.marginallyclever.makelangelo.firmwareUploader;
 import java.io.*;
 import java.util.Date;
 
-/** StreamGobbler (Threaded), to take care of a stream of a process running.
+/** StreamGobbler (Threaded), to take care of an "output" (for the command point of view) stream of a process running.
  * 
- * TODO revision pour les process interactif qui ne font pas de retour a la
- * ligne ... 
- * 
- * TODO ? ajout timer ou delais depuis dernier event ou info diverse
- * sur flux de sortie vers process ?
- *
- * TODO ? interface class ... StreamGobbler listener ?
- * 
- * @author PPAC37
  */
-public class StreamGobblerReadLineBufferedSpecial extends Thread {
+public class ProcessExecStreamGobbler extends Thread {
 
     private InputStream is;
     private String type;
@@ -32,16 +23,19 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
     int lineCount = 0;
     StringBuilder stringBuilder = null;
     //
+    // ?? usable to identify frozen commands ?
+    private long startedAt;
+    private long lastEventAt;
 
     public String getInBuffer() {
         return stringBuilder.toString();
     }
 
-    public StreamGobblerReadLineBufferedSpecial(InputStream is, String type) {
+    public ProcessExecStreamGobbler(InputStream is, String type) {
         this(is, type, null);
     }
 
-    public StreamGobblerReadLineBufferedSpecial(InputStream is, String type, OutputStream redirect) {
+    public ProcessExecStreamGobbler(InputStream is, String type, OutputStream redirect) {
         this.is = is;
         this.type = type;
         this.os = redirect;
@@ -50,6 +44,7 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
 
     @Override
     public void run() {
+	startedAt = System.currentTimeMillis();
         fireUpdateRunBegin();
         try {
             PrintWriter pw = null;
@@ -61,7 +56,8 @@ public class StreamGobblerReadLineBufferedSpecial extends Thread {
 	    
             int intRead;
             while ((intRead = isr.read()) != -1) {
-                readCount++;
+		lastEventAt = System.currentTimeMillis();
+                readCount++;		
                 // Pour le cas d'une redirection
                 if (pw != null) {
                     pw.write(intRead);

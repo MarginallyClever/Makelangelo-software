@@ -15,7 +15,6 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -40,19 +39,19 @@ import org.slf4j.LoggerFactory;
  * TODO Minimal size ! for window resize.
  *
  * <p>
- * User case :<br/>
+ * User case :<br>
  * ? if no avrdude found ? url to get it / install it ? or to get ArduinoIDE (
  * that embed avrdude) or XLoader ...
- *
+ * <ul>
+ * <li><a href="http://savannah.nongnu.org/projects/avrdude">http://savannah.nongnu.org/projects/avrdude/</a></li>
+ * <li><a href="https://www.arduino.cc/en/software">https://www.arduino.cc/en/software</a></li>
+ * </ul>
  * <p>
- * ? border for fiel with values not ok ... ?<br/>
+ * ? border for fiel with values not ok ... ?<br>
  * jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(5, 5, 5, 5, new
  * java.awt.Color(255, 204, 51)));
  */
-public class FirmwareUploaderPanel extends
-	//
-	SelectPanel //	JPanel 
-{
+public class FirmwareUploaderPanel extends	SelectPanel {
 
     /**
      * a specific logger for this class.
@@ -84,9 +83,9 @@ public class FirmwareUploaderPanel extends
      *
      * Sould be a valid readable file.
      *
-     * TODO ? file size check. As this is a firmware, normaly the size of the
-     * file have to be ??? less or equal to 256Ko or 512Ko or ? depending of the
-     * maximul capacity of the microchip.
+     * TODO ? file size check. As this is a firmware the .hex is not a bit to bit the flash size ( as for a .bin), but normaly the size of the
+     * file have to be ??? less or equal to ?2x 512Ko or ? depending of the
+     * maximum flash capacity of the microchip. ( basicaly if we got a 10 Mb file for a atmega2560 (flash size of ?512KB )  there is something wrong ... )
      */
     private SelectFile sourceHex = new SelectFile("file", Translator.get("*.hex file"), "");
 
@@ -190,6 +189,7 @@ public class FirmwareUploaderPanel extends
 
 	add(sourceHex);
 
+	//TODO put this in one "line" in the GUI ! ( need a new kind of SelectOneOfMany that avec a refresh button ? or simply use a Jpanel to combinat ?)
 	add(port);
 	add(refreshButton);
 
@@ -197,17 +197,6 @@ public class FirmwareUploaderPanel extends
 
 	add(selectTextAreaForAvrdudeExecLog);
 
-//		setLayout(new BorderLayout(0, 0));
-//
-//		SelectPanel top = new SelectPanel();
-//		top.setLayout(new FlowLayout());
-//		top.add(sourceAVRDude);
-//		top.add(sourceHex);
-//		top.add(port);
-//		top.add(refreshButton);
-//		top.add(goButton);		
-//		add(top, BorderLayout.NORTH);
-//		add(selectTextAreaForAvrdudeExecLog, BorderLayout.CENTER);
     }
 
     private void updateCOMPortList() {
@@ -223,7 +212,7 @@ public class FirmwareUploaderPanel extends
      * As this is a long action that can block this as to be done in a thread.
      * and sometimes avrdude do not exit ...
      *
-     * TODO do it better ... / more resiliant.
+     * TODO do it better ... / more resiliant. Not so rude to read.
      */
     private void uploadNow() {
 	// disabling the "start" button to avoid concurent run (a Serial com port can only be used by one application and have to be free/liberated)
@@ -309,7 +298,7 @@ public class FirmwareUploaderPanel extends
     private boolean AVRDudeExists() {
 
 	//  Warning: As this is a command to be executed on the user's system, always beware of user input, you should not initiate a formatting of the disk or delete files because the user has inadvertently copy paste something like "C: / Y format" in an edit control.
-	boolean resExec = FirmwareUploader.execBashCommand(new String[]{"avrdude", "-?"}, null, null, true, true);
+	boolean resExec = ProcessExecCmd.execBashCommand(new String[]{FirmwareUploader.getAvrdudeCommandNameDependingOfTheOs(), "-?"}, null, null, true, true);
 	if (resExec) {
 	    return resExec;
 	}
@@ -321,7 +310,7 @@ public class FirmwareUploaderPanel extends
 	    String msg = "<html><body>" + f.getAbsolutePath() + "<br>"
 		    + "AVRDude not found.<br>"
 		    + " Select a valide avrdude executable file.<br>"
-		    + " (you can get/install avrdude on your system from ??? "
+		    + " (you can get/install avrdude on your system from <a href=\"http://savannah.nongnu.org/projects/avrdude/\">http://savannah.nongnu.org/projects/avrdude/</a> "
 		    // TODO ? url to github wiki how to get / install avrdude.
 		    + "or install ArduinoIDE "
 		    + "<a href=\"https://www.arduino.cc/en/software\">https://www.arduino.cc/en/software<a> "
