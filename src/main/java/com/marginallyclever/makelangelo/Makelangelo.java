@@ -63,6 +63,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.prefs.BackingStoreException;
@@ -147,12 +148,16 @@ public final class Makelangelo {
 		});
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
-			previewPanel.addListener((gl2)->{
-				if(myPlotterRenderer!=null) {
-					myPlotterRenderer.render(gl2, myPlotter);
-				}
-			});
+			addPlotterRendererToPreviewPanel();
 		}
+	}
+
+	private void addPlotterRendererToPreviewPanel() {
+		previewPanel.addListener((gl2)->{
+			if(myPlotterRenderer!=null) {
+				myPlotterRenderer.render(gl2, myPlotter);
+			}
+		});
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {
@@ -258,7 +263,9 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
-		JMenuItem bEstimate = new JMenuItem(Translator.get("GetTimeEstimate"));
+		menu.add(createStyleMenu());
+		
+		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
@@ -266,9 +273,29 @@ public final class Makelangelo {
 		bSaveToSD.addActionListener((e)-> saveGCode());
 		menu.add(bSaveToSD);
 
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenControls"));
+		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
 		menu.add(bOpenControls);
+
+		return menu;
+	}
+
+	private JMenuItem createStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.Style"));
+		
+		ButtonGroup group = new ButtonGroup();
+		
+		Iterator<PlotterRenderer> pIter = PlotterRendererFactory.iterator();
+		while(pIter.hasNext()) {
+			PlotterRenderer pr = pIter.next();
+			JRadioButtonMenuItem button = new JRadioButtonMenuItem(pr.getName());
+			if(myPlotterRenderer == pr) button.setSelected(true);
+			button.addActionListener((e)->{
+				myPlotterRenderer = PlotterRendererFactory.getByName(pr.getName());
+			});
+			menu.add(button);
+			group.add(button);
+		}
 
 		return menu;
 	}
@@ -634,6 +661,7 @@ public final class Makelangelo {
 		previewPanel.addListener(myPaper);
 		previewPanel.addListener(myPlotter);
 		previewPanel.addListener(myTurtleRenderer);
+		addPlotterRendererToPreviewPanel();
 
 		// major layout
 		contentPane.add(previewPanel, BorderLayout.CENTER);
