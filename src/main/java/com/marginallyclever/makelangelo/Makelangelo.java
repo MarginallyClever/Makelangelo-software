@@ -33,6 +33,8 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -102,6 +104,7 @@ public final class Makelangelo {
 	private boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private PlotterRenderer myPlotterRenderer = PlotterRendererFactory.getByName(null);
 	
 	// GUI elements
 	private JFrame mainFrame;
@@ -144,6 +147,11 @@ public final class Makelangelo {
 		});
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
+			previewPanel.addListener((gl2)->{
+				if(myPlotterRenderer!=null) {
+					myPlotterRenderer.render(gl2, myPlotter);
+				}
+			});
 		}
 	}
 
