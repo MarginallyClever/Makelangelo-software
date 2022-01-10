@@ -4,8 +4,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TranslatorTests {
