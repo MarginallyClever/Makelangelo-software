@@ -73,7 +73,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				int notches = e.getWheelRotation();
 				if (notches < 0) {
 					camera.zoomIn();
-				} else {
+				} else if (notches > 0) {
 					camera.zoomOut();
 				}
 				repaint();
