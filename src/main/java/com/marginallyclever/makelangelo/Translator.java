@@ -116,18 +116,17 @@ public final class Translator {
 			int found=0;
 			Stream<Path> walk = getLanguagePaths();
 			Iterator<Path> it = walk.iterator();
-			while( it.hasNext() ) {
+			while (it.hasNext()) {
 				Path p = it.next();
 				String name = p.toString();
 				//if( f.isDirectory() || f.isHidden() ) continue;
-				if( FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
-					if( name.endsWith("pom.xml") ) {
-						logger.debug("pom.xml ignored.");
+				if (FilenameUtils.getExtension(name).equalsIgnoreCase("xml") ) {
+					if (name.endsWith("pom.xml")) {
 						continue;
 					}
 					
 					// found an XML file in the /languages folder.  Good sign!
-					if(attemptToLoadLanguageXML(name)) found++;
+					if (attemptToLoadLanguageXML(name)) found++;
 				}
 			}
 			walk.close();
@@ -156,7 +155,7 @@ public final class Translator {
 
 	private static Stream<Path> getLanguagePaths() throws Exception {
 		URI uri = Translator.class.getClassLoader().getResource(WORKING_DIRECTORY).toURI();
-		logger.debug("Looking for translations in {}", uri.toString());
+		logger.trace("Looking for translations in {}", uri.toString());
 		
 		Path myPath;
 		if (uri.getScheme().equals("jar")) {
@@ -167,8 +166,8 @@ public final class Translator {
 		}
 
 		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
-		logger.debug("rootDir={}", rootPath.toString());
-		
+		logger.trace("rootDir={}", rootPath.toString());
+
 		// we'll look inside the JAR file first, then look in the working directory.
 		// this way new translation files in the working directory will replace the old JAR files.
 		Stream<Path> walk = Stream.concat(
@@ -191,7 +190,7 @@ public final class Translator {
 		}
 		if( stream == null ) return false;
 		
-		logger.debug("Found {}", actualFilename);
+		logger.trace("Found {}", actualFilename);
 		TranslatorLanguage lang = new TranslatorLanguage();
 		try {
 			lang.loadFromInputStream(stream);
