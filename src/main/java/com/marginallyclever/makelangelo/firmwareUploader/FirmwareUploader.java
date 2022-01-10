@@ -122,7 +122,6 @@ public class FirmwareUploader {
 	return name;
     }
 
-//	public void run(String hexPath,String portName) throws Exception {
     /**
      *
      * To run avrdude to do the firmware update with the binary firmware file
@@ -237,15 +236,16 @@ public class FirmwareUploader {
 	the current operation will retain its previous contents.*/
 	commandArryBuilding.add("-D");	
 
-	// the action type ( read/write flash/eeprom/fuse ... ) can be multiple 	
-	boolean actionReadToSaveBeforWriting = false;
-	if ( actionReadToSaveBeforWriting){
-	    // To review is this needed ? 
-	    // To review as the .hex file can be in a non writable path this have to be adapte. to be sure we have a writable file to do the save.
-	 // read the flash from the microcontroleur to a file ... ( but if the chips is protected you do not get a usable file ...)
-	  commandArryBuilding.add("-Uflash:r:" + hexPath + ".save." + System.currentTimeMillis() + ".hex" + ":i");
-	  //todo save the eeprom ? ... so we also need to write it later : TODO
-	}
+	// the action type ( read/write flash/eeprom/fuse ... ) can be multiple 
+	
+//	boolean actionReadToSaveBeforWriting = false;
+//	if ( actionReadToSaveBeforWriting){
+//	    // To review is this needed ? 
+//	    // To review as the .hex file can be in a non writable path this have to be adapte. to be sure we have a writable file to do the save.
+//	 // read the flash from the microcontroleur to a file ... ( but if the chips is protected you do not get a usable file ...)
+//	  commandArryBuilding.add("-Uflash:r:" + hexPath + ".save." + System.currentTimeMillis() + ".hex" + ":i");
+//	  //todo save the eeprom ? ... so we also need to write it later : TODO
+//	}
 	
 	boolean actionWrite = true;	  
 	if (actionWrite) {
@@ -311,12 +311,11 @@ public class FirmwareUploader {
     public static void main(String[] args) throws Exception {
 	FirmwareUploader fu = new FirmwareUploader();
 
-	//fu.run("./firmware.hex", "COM3");
 	try {
 	    //fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );//Windows
 	    fu.run("./firmware.hex", "/dev/ttyACM0", new SelectTextArea("test", "test", ""));//linux 
 	} catch (Exception e) {
-	    e.printStackTrace();
+//	    e.printStackTrace();
 	    logger.error("error: {}", e.getMessage(), e);
 	}
 
