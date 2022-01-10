@@ -4,10 +4,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TranslatorTests {
 	@BeforeAll
@@ -18,33 +15,38 @@ public class TranslatorTests {
 	@Test
 	public void startTranslatorTwiceTest() {
 		Translator.start();
-		System.out.println(Arrays.toString(Translator.getLanguageList()));
+		String[] first = Translator.getLanguageList();
 		Translator.start();
-		System.out.println(Arrays.toString(Translator.getLanguageList()));
+		String[] second = Translator.getLanguageList();
+		assertArrayEquals(first, second);
 	}
 	
 	@Test
 	public void loadLanguageTest() {
 		Translator.start();
 		int current = Translator.getCurrentLanguageIndex();
+		assertNotEquals(0, current);
 		String [] available = Translator.getLanguageList();
-		System.out.println("current language="+available[current]);
+		assertNotNull(available[current]);
 	}
 	
 	@Test
 	public void changeLanguageTest() {
 		Translator.start();
-		String [] available = Translator.getLanguageList();
-		assertTrue(available.length>1,"More than one language needed to complete test.");
+		String[] available = Translator.getLanguageList();
+		assertTrue(available.length > 1, "More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
-		int next = (current+1)%available.length;
-		Translator.setCurrentLanguage(available[next]);
-		Translator.saveConfig();
-		Translator.loadConfig();
-		int read = Translator.getCurrentLanguageIndex();
-		assertEquals(read,next,"Changing language failed.");
-		// return to previous state
-		Translator.setCurrentLanguage(available[current]);
-		Translator.saveConfig();
+		try {
+			int next = (current + 1) % available.length;
+			Translator.setCurrentLanguage(available[next]);
+			Translator.saveConfig();
+			Translator.loadConfig();
+			int read = Translator.getCurrentLanguageIndex();
+			assertEquals(read, next, "Changing language failed.");
+		} finally {
+			// return to previous state
+			Translator.setCurrentLanguage(available[current]);
+			Translator.saveConfig();
+		}
 	}
 }

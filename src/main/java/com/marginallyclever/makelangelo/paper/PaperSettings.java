@@ -76,8 +76,8 @@ public class PaperSettings extends SelectPanel {
 		double rot = myPaper.getRotation();
 		
 		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSize"),commonPaperNames,0));
-		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(float)(right-left)));
-		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(float)(top-bot))); 
+		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(double)(right-left)));
+		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(double)(top-bot))); 
 		add(shiftX = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
 		add(shiftY = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
 		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
@@ -85,7 +85,8 @@ public class PaperSettings extends SelectPanel {
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),this));
 
-		getValuesFromPaper();
+		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
+		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
 		paperSizes.addPropertyChangeListener((e)->onPaperSizeChange(e));
 		pw.addPropertyChangeListener((e)->onPaperDimensionsChange(e));
@@ -124,6 +125,7 @@ public class PaperSettings extends SelectPanel {
 		double h = ph.getValue();
 		pw.setValue(h);
 		ph.setValue(w);
+		setPaperFromPanel();
 		logger.debug("onLandscapeChange() done");
 	}
 
@@ -195,6 +197,7 @@ public class PaperSettings extends SelectPanel {
 		myPaper.setRotation(rot);
 		myPaper.setPaperColor(paperColor.getColor());
 		myPaper.setPaperMargin((100 - paperMargin.getValue()) * 0.01);
+		myPaper.saveConfig();
 	}
 
 	/**
@@ -240,6 +243,7 @@ public class PaperSettings extends SelectPanel {
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
 			myPaper.setPaperMargin(pm);
+			myPaper.saveConfig();
 		}
 	}
 	

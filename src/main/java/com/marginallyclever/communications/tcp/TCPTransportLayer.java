@@ -2,9 +2,10 @@ package com.marginallyclever.communications.tcp;
 
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
-import com.marginallyclever.communications.TransportLayerPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Lists available TCP connections and opens a connection of that type to a robot
@@ -49,7 +50,7 @@ public class TCPTransportLayer implements TransportLayer {
 	}
 
 	@Override
-	public TransportLayerPanel getTransportLayerPanel() {
-		return new TCPTransportLayerPanel(this);
+	public List<String> listConnections() {
+		return List.of("192.168.1.183:9999");
 	}
 }

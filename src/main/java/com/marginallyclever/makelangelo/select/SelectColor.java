@@ -73,6 +73,5 @@ public class SelectColor extends Select {
 	
 	public void setColor(ColorRGB c) {
 		field.setBackground(new Color(c.red,c.green,c.blue));
-		firePropertyChange(null,c);
 	}
 }

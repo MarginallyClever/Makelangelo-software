@@ -1,6 +1,7 @@
 package com.marginallyclever.communications;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created on 4/12/15.
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  * @since v7
  */
 public abstract class NetworkSession {
-	private ArrayList<NetworkSessionListener> listeners = new ArrayList<NetworkSessionListener>();
+
 	private String name = "";
 		
 	public abstract void closeConnection();
@@ -29,6 +30,8 @@ public abstract class NetworkSession {
 	}
 	
 	// OBSERVER PATTERN
+
+	private List<NetworkSessionListener> listeners = new ArrayList<>();
 
 	public void addListener(NetworkSessionListener listener) {
 		listeners.add(listener);

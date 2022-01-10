@@ -204,8 +204,8 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 	port.setNewList(list);
     }
 
-    private String[] getListOfCOMPorts() {
-	return SerialTransportLayer.listConnections();
+  private String[] getListOfCOMPorts() {
+		return new SerialTransportLayer().listConnections().toArray(new String[0]);
     }
 
     /**
@@ -318,6 +318,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 	    JTextComponent createHyperlinkListenableJEditorPane = /*DialogAbout.*/ createHyperlinkListenableJEditorPane(msg);//
 	    JOptionPane.showMessageDialog(this, createHyperlinkListenableJEditorPane, msg_firmware_upload_status, JOptionPane.ERROR_MESSAGE);
 	    //JOptionPane.showMessageDialog(this,"AVRDude not found.",msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);		    
+
 	}
 	return state;
     }

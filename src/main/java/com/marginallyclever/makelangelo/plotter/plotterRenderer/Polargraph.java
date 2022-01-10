@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 /**
  * @author Dan Royer
  */
-public abstract class Polargraph implements PlotterType {
+public abstract class Polargraph implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
@@ -56,34 +56,6 @@ public abstract class Polargraph implements PlotterType {
 		
 		return new Point2D(b1,b2);
 	}
-	
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return false;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return false;
-	}
-
-	public float getWidth() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	public float getHeight() {
-		return 4 * 12 * 25.4f;  // 4'
-	}
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
@@ -93,7 +65,7 @@ public abstract class Polargraph implements PlotterType {
 			paintPenHolderToCounterweights(gl2, robot);
 	}
 
-	protected void paintMotors(GL2 gl2,Plotter robot) {
+	static public void paintMotors(GL2 gl2,Plotter robot) {
 		double top = robot.getLimitTop();
 		double right = robot.getLimitRight();
 		double left = robot.getLimitLeft();
@@ -184,7 +156,7 @@ public abstract class Polargraph implements PlotterType {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	static public void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		double dx, dy;
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
@@ -285,7 +257,7 @@ public abstract class Polargraph implements PlotterType {
 		 */
 	}
 
-	private void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
+	public static void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
 		float f;
@@ -296,59 +268,5 @@ public abstract class Polargraph implements PlotterType {
 					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
 		}
 		gl2.glEnd();
-
-	}
-
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
-	@Override
-	public float getFeedrateMax() {
-		return 100;
-	}
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s [>0]
-	 */
-	@Override
-	public float getFeedrateDefault() {
-		return 60;
-	}
-	
-	/**
-	 * @since software 7.22.6
-	 * @return mm/s^2 [>0]
-	 */
-	@Override
-	public float getAccelerationMax() {
-		return 300;
-	}
-
-	/**
-	 * @since software 7.22.6
-	 * @return deg/s [>0]
-	 */
-	@Override
-	public float getPenLiftTime() {
-		return 500;
-	}
-	
-	/**
-	 * @since software 7.22.6
-	 * @return deg [0...90] largest angle less than 90 when pen is touching drawing.
-	 */
-	@Override
-	public float getZAngleOn() {
-		return 160;
-	}
-	
-	/**
-	 * @since software 7.22.6
-	 * @return 90 deg.  Middle position on servo. 
-	 */
-	@Override
-	public float getZAngleOff() {
-		return 90;
 	}
 }

@@ -2,13 +2,8 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5Marlin;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.util.PreferencesHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -18,25 +13,16 @@ import java.util.prefs.Preferences;
  * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
  * @author Dan Royer 
  */
-public class PlotterSettings implements Serializable {
-
-	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
-	
+public class PlotterSettings implements Serializable {	
 	private static final long serialVersionUID = -4185946661019573192L;
-
-	private String[] configsAvailable;
-
-	private List<PlotterSettingsListener> listeners;
 
 	// Each robot has a global unique identifier
 	private long robotUID;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
 
-	private String hardwareVersion;
-	
-	private PlotterType hardwareProperties;
-	
+	private String hardwareName;
+		
 	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
@@ -48,12 +34,8 @@ public class PlotterSettings implements Serializable {
 	private double drawFeedRate;
 	private double maxAcceleration;
 
-	// for a while the robot would sign it's name at the end of a drawing
-	@Deprecated
-	private boolean shouldSignName;
-
 	private ColorRGB paperColor;
-	
+
 	private ColorRGB penDownColorDefault;
 	private ColorRGB penDownColor;
 	private ColorRGB penUpColor;
@@ -93,141 +75,42 @@ public class PlotterSettings implements Serializable {
 
 		paperColor = new ColorRGB(255, 255, 255);
 
-		listeners = new ArrayList<PlotterSettingsListener>();
-		shouldSignName = false;
-
 		penDownColor = penDownColorDefault = new ColorRGB(0, 0, 0); // BLACK
 		penUpColor = new ColorRGB(0, 255, 0); // blue
 		startingPositionIndex = 4;
 
-		setHardwareVersion("5");
-
-		// which configurations are available?
-		try {
-			Preferences topLevelMachinesPreferenceNode = PreferencesHelper
-					.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-			configsAvailable = topLevelMachinesPreferenceNode.childrenNames();
-		} catch (Exception e) {
-			logger.error("Failed to load preferences", e);
-			configsAvailable = new String[1];
-			configsAvailable[0] = "Default";
-		}
+		setHardwareVersion("Makelangelo 5");
 
 		// Load most recent config
 		// loadConfig(last_machine_id);
 	}
 
-	public void addListener(PlotterSettingsListener listener) {
+	// OBSERVER PATTERN START
+
+	private List<PlotterSettingsListener> listeners = new ArrayList<PlotterSettingsListener>();
+
+	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(PlotterSettingsListener listener) {
+	public void removePlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.remove(listener);
 	}
 
-	public void notifyListeners() {
+	protected void notifyListeners() {
 		for (PlotterSettingsListener listener : listeners) {
 			listener.settingsChangedEvent(this);
 		}
 	}
 
-	public void createNewUID(long newUID) {
-		// make sure a topLevelMachinesPreferenceNode node is created
-		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
-				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		topLevelMachinesPreferenceNode.node(Long.toString(newUID));
-
-		// if this is a new robot UID, update the list of available configurations
-		final String[] new_list = new String[configsAvailable.length + 1];
-		System.arraycopy(configsAvailable, 0, new_list, 0, configsAvailable.length);
-		new_list[configsAvailable.length] = Long.toString(newUID);
-		configsAvailable = new_list;
-	}
+	// OBSERVER PATTERN END
 
 	public double getMaxAcceleration() {
 		return maxAcceleration;
 	}
 
-	/**
-	 * Get the UID of every machine this computer recognizes INCLUDING machine 0,
-	 * which is only assigned temporarily when a machine is new or before the first
-	 * software connect.
-	 *
-	 * @return an array of strings, each string is a machine UID.
-	 */
-	public String[] getAvailableConfigurations() {
-		return configsAvailable;
-	}
-
 	public Point2D getHome() {
-		return getHardwareProperties().getHome();
-	}
-
-	/**
-	 * @return home X coordinate in mm
-	 */
-	public double getHomeX() {
-		return getHome().x;
-	}
-
-	/**
-	 * @return home Y coordinate in mm
-	 */
-	public double getHomeY() {
-		return getHome().y;
-	}
-
-	@Deprecated
-	public String getAbsoluteMode() {
-		return "G90\n";
-	}
-
-	@Deprecated
-	public String getRelativeMode() {
-		return "G91\n";
-	}
-
-	public int getKnownMachineIndex() {
-		String[] list = getKnownMachineNames();
-		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals("0"))
-				continue;
-			if (list[i].equals(Long.toString(robotUID))) {
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-	boolean isNumeric(String s) {
-		try {
-			Integer.parseInt(s);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Get the UID of every machine this computer recognizes EXCEPT machine 0, which
-	 * is only assigned temporarily when a machine is new or before the first
-	 * software connect.
-	 *
-	 * @return an array of strings, each string is a machine UID.
-	 */
-	public String[] getKnownMachineNames() {
-		List<String> knownMachineList = new LinkedList<String>(Arrays.asList(configsAvailable));
-		List<String> keepList = new LinkedList<String>();
-		for (String a : knownMachineList) {
-			if (a.contentEquals("0"))
-				continue;
-			if (!isNumeric(a))
-				continue;
-			keepList.add(a);
-		}
-
-		return Arrays.copyOf(keepList.toArray(), keepList.size(), String[].class);
+		return new Point2D(0,0);
 	}
 
 	/**
@@ -258,13 +141,6 @@ public class PlotterSettings implements Serializable {
 		return limitTop;
 	}
 
-	/**
-	 * @return the number of machine configurations that exist on this computer
-	 */
-	public int getMachineCount() {
-		return configsAvailable.length;
-	}
-
 	public long getUID() {
 		return robotUID;
 	}
@@ -274,8 +150,7 @@ public class PlotterSettings implements Serializable {
 	}
 
 	/**
-	 * Load the machine configuration
-	 *
+	 * Load the machine configuration from {@link Preferences}.
 	 * @param uid the unique id of the robot to be loaded
 	 */
 	public void loadConfig(long uid) {
@@ -306,7 +181,7 @@ public class PlotterSettings implements Serializable {
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered))));
 
 		loadPenConfig(uniqueMachinePreferencesNode);
-		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareVersion));
+		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareName));
 	}
 
 	protected void loadPenConfig(Preferences prefs) {
@@ -317,8 +192,8 @@ public class PlotterSettings implements Serializable {
 		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(getPenUpAngle()))));
 		// tool_number =
 		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		travelFeedRate = Double.valueOf(prefs.get("feed_rate", Double.toString(travelFeedRate)));
-		drawFeedRate = Double.valueOf(prefs.get("feed_rate_current", Double.toString(drawFeedRate)));
+		travelFeedRate = Double.valueOf(prefs.get("feed_rate", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
+		drawFeedRate = Double.valueOf(prefs.get("feed_rate_current", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
 
 		int r, g, b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
@@ -367,7 +242,7 @@ public class PlotterSettings implements Serializable {
 		// Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 
-		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareVersion);
+		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareName);
 
 		savePenConfig(uniqueMachinePreferencesNode);
 		notifyListeners();
@@ -422,58 +297,31 @@ public class PlotterSettings implements Serializable {
 		this.isRegistered = isRegistered;
 	}
 
-	public boolean shouldSignName() {
-		return shouldSignName;
+	public String getHardwareName() {
+		return hardwareName;
 	}
 
-	public String getHardwareVersion() {
-		return hardwareVersion;
+	public void setHardwareVersion(String name) {
+		hardwareName = name;
+		if (!canChangeMachineSize()) {
+			this.setMachineSize(getWidth(), getHeight());
+		}
 	}
 
-	public PlotterType getHardwareProperties() {
-		return hardwareProperties;
+	/**
+	 * @return height of machine's drawing area, in mm.
+	 */
+	private double getHeight() {
+		// TODO Auto-generated method stub
+		return 1000; // mm
 	}
 
-	public void setHardwareVersion(String version) {
-		String newVersion = "";
-		try {
-			// get version numbers
-			Iterator<PlotterType> i = PlotterTypeFactory.iterator();
-			while (i.hasNext()) {
-				PlotterType hw = i.next();
-				if (hw.getVersion().contentEquals(version)) {
-					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
-					newVersion = version;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Hardware version instance failed. Defaulting to v5", e);
-			hardwareProperties = new Makelangelo5Marlin();
-			newVersion = hardwareProperties.getVersion();
-		}
-		if (newVersion.equals("")) {
-			logger.error("Unknown hardware version requested. Defaulting to v5");
-			hardwareProperties = new Makelangelo5Marlin();
-			newVersion = hardwareProperties.getVersion();
-		}
-
-		hardwareVersion = newVersion;
-		if (!hardwareProperties.canChangeMachineSize()) {
-			this.setMachineSize(hardwareProperties.getWidth(), hardwareProperties.getHeight());
-		}
-
-		// apply default hardware values
-		travelFeedRate = hardwareProperties.getFeedrateMax();
-		drawFeedRate = hardwareProperties.getFeedrateDefault();
-		maxAcceleration = hardwareProperties.getAccelerationMax();
-
-		setPenLiftTime(hardwareProperties.getPenLiftTime());
-		setPenDownAngle(hardwareProperties.getZAngleOn());
-		setPenUpAngle(hardwareProperties.getZAngleOff());
-
-		// pen
-		setPenDiameter(0.8f);
+	/**
+	 * @return width of machine's drawing area, in mm.
+	 */
+	private double getWidth() {
+		// TODO Auto-generated method stub
+		return 650; // mm
 	}
 
 	public ColorRGB getPenDownColorDefault() {
@@ -530,5 +378,15 @@ public class PlotterSettings implements Serializable {
 
 	public void setPenLiftTime(double ms) {
 		this.penLiftTime = ms;
+	}
+
+	public boolean canChangeMachineSize() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean canAccelerate() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

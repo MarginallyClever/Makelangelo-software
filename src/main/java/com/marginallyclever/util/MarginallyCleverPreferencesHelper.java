@@ -43,6 +43,7 @@ final class MarginallyCleverPreferencesHelper {
       final boolean wasSaveFileFlagFound = wasSearchKeyFoundInArray(SAVE_FILE_FLAG, args);
       if (wasSaveFileFlagFound) {
         final File preferencesFile = MarginallyCleverPreferencesFileFactory.getXmlPreferencesFile();
+        logger.debug("preferencesFiles: {}", preferencesFile);
         try (final OutputStream fileOutputStream = new FileOutputStream(preferencesFile)) {
           PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT).exportSubtree(fileOutputStream);
         } catch (IOException e) {

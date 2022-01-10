@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -14,13 +13,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * The {@link MarlinInterface} manages communication with a remote device running Marlin firmware.
+ * 
  * In the OSI model of network interfaces this is the Presentation/Syntax layer which
  * "ensures that data is in a usable format and is where data encryption occurs".
- * In our case the "encryption" is checksum and resend-control.
+ * That means checksum verification and resend control.
  * 
  * @author Dan Royer
+ * @since 7.28.0
  */
 public class MarlinInterface extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinInterface.class);
@@ -36,16 +39,17 @@ public class MarlinInterface extends JPanel {
 	private static final String STR_RESEND = "Resend: ";
 	// Marlin sends this event when the robot is ready to receive more.
 	private static final String STR_OK = "ok";
+	// Marlin sends this message when an error happened.
+	private static final String STR_ERROR = "Error:";
+	// Marlin sends this message when a fatal error occured.
+	private static final String STR_PRINTER_HALTED = "Printer halted";
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
+	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
+	public static final String ERROR = "error";
 
-	//private static final String STR_ECHO = "echo:";
-	//private static final String STR_ERROR = "Error:";
-
-	private TextInterfaceToNetworkSession chatInterface = new TextInterfaceToNetworkSession();
-	private ArrayList<MarlinCommand> myHistory = new ArrayList<MarlinCommand>();
-
-	private JButton bESTOP = new JButton("EMERGENCY STOP");
+	private TextInterfaceToNetworkSession chatInterface;
+	private List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
 	private int lineNumberToSend;
@@ -57,25 +61,19 @@ public class MarlinInterface extends JPanel {
 	private Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
 	
-	public MarlinInterface() {
+	public MarlinInterface(ChooseConnection chooseConnection) {
 		super();
 
 		this.setLayout(new BorderLayout());
-		this.add(getToolBar(), BorderLayout.PAGE_START);
+		chatInterface = new TextInterfaceToNetworkSession(chooseConnection);
 		this.add(chatInterface, BorderLayout.CENTER);
 
-		chatInterface.addActionListener((e) -> {
-			switch (e.getID()) {
-			case ChooseConnection.CONNECTION_OPENED:
-				onConnect();
-				notifyListeners(e);
-				break;
-			case ChooseConnection.CONNECTION_CLOSED:
-				onClose();
-				updateButtonAccess();
-				notifyListeners(e);
-				break;
+		chatInterface.addListener((e) -> {
+			switch (e.flag) {
+				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
+				case NetworkSessionEvent.CONNECTION_CLOSED -> onClose();
 			}
+			// TODO notifyListeners(e);
 		});
 	}
 
@@ -89,7 +87,6 @@ public class MarlinInterface extends JPanel {
 		lineNumberToSend=1;
 		lineNumberAdded=0;
 		myHistory.clear();
-		updateButtonAccess();
 		timeoutChecker.start();
 	}
 	
@@ -110,14 +107,17 @@ public class MarlinInterface extends JPanel {
 	
 	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
 	protected void onDataReceived(NetworkSessionEvent evt) {
-		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
-			lastReceivedTime=System.currentTimeMillis();
+		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+			lastReceivedTime = System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
-			//logger.debug("MarlinInterface received '"+message.trim()+"'.");
-			if(message.startsWith(STR_OK)) {
+
+			logger.trace("received '{}'", message.trim());
+			if (message.startsWith(STR_OK)) {
 				onHearOK();
-			} else if(message.contains(STR_RESEND)) {
+			} else if (message.contains(STR_RESEND)) {
 				onHearResend(message);
+			} else if (message.startsWith(STR_ERROR)) {
+				onHearError(message);
 			}
 		}
 	}
@@ -125,8 +125,8 @@ public class MarlinInterface extends JPanel {
 	private void onHearResend(String message) {
 		String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
 		try {
-			int n = Integer.valueOf(numberPart);
-			if(n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
+			int n = Integer.parseInt(numberPart);
+			if (n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
 				// no problem.
 				lineNumberToSend=n;
 			} else {
@@ -148,8 +148,15 @@ public class MarlinInterface extends JPanel {
         });
 	}
 
+	private void onHearError(String message) {
+		logger.error("Error from printer '{}'", message);
+		if (message.contains(STR_PRINTER_HALTED)) {
+			notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
+		}
+	}
+
 	private void fireIdleNotice() {
-		notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED,MarlinInterface.IDLE));
+		notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED, MarlinInterface.IDLE));
 	}
 
 	private void clearOldHistory() {
@@ -165,7 +172,7 @@ public class MarlinInterface extends JPanel {
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		//logger.debug("MarlinInterface queued '"+assembled+"'.  busyCount="+busyCount);
+		//logger.debug("MarlinInterface queued '{}'. busyCount={}", assembled, busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	
@@ -180,7 +187,7 @@ public class MarlinInterface extends JPanel {
 			if(mc.lineNumber == lineNumberToSend) {
 				busyCount--;
 				lineNumberToSend++;
-				//logger.debug("MarlinInterface sending '"+mc.command+"'.");
+				logger.trace("sending '{}'", mc.command);
 				chatInterface.sendCommand(mc.command);
 				return;
 			}
@@ -188,9 +195,11 @@ public class MarlinInterface extends JPanel {
 		
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
-			logger.debug("MarlinInterface did not find {}", lineNumberToSend);
-			for( MarlinCommand mc : myHistory ) {
-				logger.debug("...{}: {}", mc.lineNumber, mc.command);
+			logger.warn("Did not find {}", lineNumberToSend);
+			if (logger.isDebugEnabled()) {
+				for (MarlinCommand mc : myHistory) {
+					logger.debug("...{}: {}", mc.lineNumber, mc.command);
+				}
 			}
 		}
 	}
@@ -208,46 +217,16 @@ public class MarlinInterface extends JPanel {
 		return busyCount<=0;
 	}
 
-	
-	protected JToolBar getToolBar() {
-		JToolBar bar = new JToolBar();
-		bar.setRollover(true);
-
-		bESTOP.setFont(getFont().deriveFont(Font.BOLD));
-		bESTOP.setForeground(Color.RED);
-
-		bESTOP.addActionListener((e) -> sendESTOP() );
-		bar.add(bESTOP);
-		//bar.addSeparator();
-		
-		updateButtonAccess();
-
-		return bar;
-	}
-
-	private void sendESTOP() {
+	public void sendESTOP() {
+		logger.warn("Emergency stop");
 		chatInterface.sendCommand("M112");
 		chatInterface.sendCommand("M112");
 		chatInterface.sendCommand("M112");
 	}
 
-	private void updateButtonAccess() {
-		boolean isConnected = chatInterface.getIsConnected();
-
-		bESTOP.setEnabled(isConnected);
-	}
-
-	public void setNetworkSession(NetworkSession session) {
-		chatInterface.setNetworkSession(session);
-	}
-
-	public void closeConnection() {
-		this.chatInterface.closeConnection();
-	}
-	
 	// OBSERVER PATTERN
 	
-	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+	private List<ActionListener> listeners = new ArrayList<>();
 
 	public void addListener(ActionListener listener) {
 		listeners.add(listener);
@@ -272,7 +251,7 @@ public class MarlinInterface extends JPanel {
 
 		JFrame frame = new JFrame(MarlinInterface.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new MarlinInterface());
+		frame.add(new MarlinInterface(new ChooseConnection()));
 		frame.pack();
 		frame.setVisible(true);
 	}

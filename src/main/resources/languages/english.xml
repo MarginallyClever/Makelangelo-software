@@ -556,11 +556,7 @@
 		<hint>start at dialog</hint>
 	</string>
 
-	<string>
-		<key>PlotterControls.Pause</key>
-		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
+
 
 	<string>
 		<key>Robot</key>
@@ -577,6 +573,32 @@
 		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
+	<string>
+		<key>PlotterControls.Title</key>
+		<value>Robot controls</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.ConnectControls</key>
+		<value>Connect</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DrawControls</key>
+		<value>Draw controls</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.FindHome</key>
+		<value>Find home</value>
+		<hint>manual driving dialog</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Pause</key>
+		<value>Pause</value>
+		<hint>menu or dialog title</hint>
+	</string>
 	<string>
 		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
@@ -586,6 +608,57 @@
 		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Connect</key>
+		<value>Connect</value>
+		<hint>title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.EmergencyStop</key>
+		<value>Emergency Stop</value>
+		<hint>button</hint>
+	</string>
+	<string>
+		<key>PlotterControls.MarlinTab</key>
+		<value>Marlin</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.ProgramTab</key>
+		<value>Program</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.JogTab</key>
+		<value>Robot controls</value>
+		<hint>panel tab title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.AdvancedControls</key>
+		<value>Advanced controls</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.FatalErrorTitle</key>
+		<value>Fatal Error</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.FatalError</key>
+		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
+		<hint>texte</hint>
+	</string>
+
+	<string>
+		<key>ConversationHistory.Clear</key>
+		<value>Clear</value>
+		<hint>button</hint>
+	</string>
+	<string>
+		<key>ConversationHistory.Save</key>
+		<value>Save</value>
+		<hint>button</hint>
 	</string>
 
 	<string>
@@ -614,7 +687,12 @@
 		<value>Right</value>
 		<hint>manual driving dialog</hint>
 	</string>
-	
+
+	<string>
+		<key>JogInterface.FindHome</key>
+		<value>Home</value>
+		<hint>manual driving dialog</hint>
+	</string>
 	<string>
 		<key>JogInterface.PenUp</key>
 		<value>Pen up</value>
@@ -634,11 +712,6 @@
 		<key>JogInterface.EngageMotors</key>
 		<value>Engage</value>
 		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Set</key>

@@ -1,48 +1,22 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Makelangelo3_3 extends Polargraph {
-	@Override
-	public String getVersion() {
-		return "4";
-	}
-
+public class Makelangelo3_3 implements PlotterRenderer {
 	@Override
 	public String getName() {
 		return "Makelangelo 3.3";
 	}
 
 	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return true;
-	}
-
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintControlBox(gl2,robot);
-		paintMotors(gl2,robot);
+		Polargraph.paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(gl2,robot);		
+			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
 	}
-
+	
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
@@ -167,10 +141,30 @@ public class Makelangelo3_3 extends Polargraph {
 		// clean up
 		gl2.glPopMatrix();
 	}
+/*
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+	
+	@Override
+	public boolean canAutoHome() {
+		return true;
+	}
+
+	@Override
+	public boolean canChangeHome() {
+		return true;
+	}
 
 	@Override
 	public Point2D getHome() {
 		return new Point2D(0,0);
 	}
-	
+	*/
 }

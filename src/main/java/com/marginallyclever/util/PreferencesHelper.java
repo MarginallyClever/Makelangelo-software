@@ -16,6 +16,8 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.*;
+
 /**
  * Helper class to be used when accessing preferences.
  * @author Peter Colapietro
@@ -37,55 +39,27 @@ public final class PreferencesHelper {
 	private static final String MAKELANGELO_ROOT_PATH_NAME = PreferencesHelper.class.getPackage().getName();
 
 	/**
-	 * Legacy preference node path.
-	 */
-	@Deprecated
-	private static final String LEGACY_MAKELANGELO_ROOT_PATH_NAME = "DrawBot";
-
-	/**
-	 * Graphics preference node path, used to store things such as {@code "Draw all while running"} used when OpenGL
-	 * renders the application.
-	 */
-	private static final String GRAPHICS_PATH_NAME = "Graphics";
-
-	/**
-	 * Machine preference node path, used to store things such as paper height and width, invert left and right motors,
-	 * etc.
-	 * See com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings
-	 */
-	private static final String MACHINES_PATH_NAME = "Machines";
-	private static final String LANGUAGE_PATH_NAME = "Language";
-	private static final String SOUND_PATH_NAME = "Sound";
-	private static final String METRICS_PATH_NAME = "Metrics";
-	private static final String FILE_PATH_NAME = "File";
-	private static final String PAPER_PATH_NAME = "Paper";
-
-	/**
-	 * Initializes {@link CLASS_TO_PREFERENCE_NODE_MAP}.
+	 * Load saved values
 	 */
 	@SuppressWarnings("unchecked")
 	static public void start() {
-		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<MakelangeloPreferenceKey, Preferences>();
+		Map<MakelangeloPreferenceKey, ? super Preferences> initialMap = new HashMap<>();
 		Preferences userRootPreferencesNode = MarginallyCleverPreferences.userRoot();
-		//FIXME write unit test/tool to view import/export machine configurations.
-		//final Preferences makelangeloPreferenceNode = userRootPreferencesNode.node(MAKELANGELO_ROOT_PATH_NAME);
-		//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(thisPackageName), userRootPreferencesNode.node(thisPackageName).name()); 
-		final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME);//new MarginallyCleverPreferences((AbstractPreferences) userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME), userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT_PATH_NAME).name());
+		final Preferences legacyMakelangeloPreferenceNode = userRootPreferencesNode.node(LEGACY_MAKELANGELO_ROOT.getNodeName());
 		try {
 			legacyMakelangeloPreferenceNode.sync();
 		} catch (BackingStoreException e) {
 			logger.error("Failed to sync pref", e);
 		}
-		//initialMap.put(MAKELANGELO_ROOT, makelangeloPreferenceNode);
-		initialMap.put(MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
-		initialMap.put(MakelangeloPreferenceKey.GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.SOUND, legacyMakelangeloPreferenceNode.node(SOUND_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.METRICS, legacyMakelangeloPreferenceNode.node(METRICS_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.PAPER, legacyMakelangeloPreferenceNode.node(PAPER_PATH_NAME));
-		initialMap.put(MakelangeloPreferenceKey.FILE, legacyMakelangeloPreferenceNode.node(FILE_PATH_NAME));
-		
+		initialMap.put(LEGACY_MAKELANGELO_ROOT, legacyMakelangeloPreferenceNode);
+		initialMap.put(GRAPHICS, legacyMakelangeloPreferenceNode.node(GRAPHICS.getNodeName()));
+		initialMap.put(MACHINES, legacyMakelangeloPreferenceNode.node(MACHINES.getNodeName()));
+		initialMap.put(LANGUAGE, legacyMakelangeloPreferenceNode.node(LANGUAGE.getNodeName()));
+		initialMap.put(SOUND, legacyMakelangeloPreferenceNode.node(SOUND.getNodeName()));
+		initialMap.put(METRICS, legacyMakelangeloPreferenceNode.node(METRICS.getNodeName()));
+		initialMap.put(PAPER, legacyMakelangeloPreferenceNode.node(PAPER.getNodeName()));
+		initialMap.put(FILE, legacyMakelangeloPreferenceNode.node(FILE.getNodeName()));
+
 		Map<? extends MakelangeloPreferenceKey, ? extends Preferences> castedMap = (Map<? extends MakelangeloPreferenceKey, ? extends Preferences>) initialMap;
 		CLASS_TO_PREFERENCE_NODE_MAP = Collections.unmodifiableMap(castedMap);
 	}
@@ -95,16 +69,40 @@ public final class PreferencesHelper {
 	 * See #getPreferenceNode(MakelangeloPreferenceKey)
 	 */
 	public enum MakelangeloPreferenceKey {
-		GRAPHICS,
-		MACHINES,
-		LANGUAGE,
-		SOUND,
-		FILE,
-		METRICS,
-		PAPER,
+
+		/**
+		 * Graphics preference node path, used to store things such as {@code "Draw all while running"} used when OpenGL
+		 * renders the application.
+		 */
+		GRAPHICS("Graphics"),
+
+		/**
+		 * Machine preference node path, used to store things such as paper height and width, invert left and right motors,
+		 * etc.
+		 * See com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings
+		 */
+		MACHINES("Machines"),
+		LANGUAGE("Language"),
+		SOUND("Sound"),
+		FILE("File"),
+		METRICS("Metrics"),
+		PAPER("Paper"),
+
+		/**
+		 * Legacy preference node path.
+		 */
 		@Deprecated
-		LEGACY_MAKELANGELO_ROOT,
-		//MAKELANGELO_ROOT
+		LEGACY_MAKELANGELO_ROOT("DrawBot");
+
+		MakelangeloPreferenceKey(String nodeName) {
+			this.nodeName = nodeName;
+		}
+
+		private String nodeName;
+
+		public String getNodeName() {
+			return nodeName;
+		}
 	}
 
 	/**
@@ -131,15 +129,17 @@ public final class PreferencesHelper {
 	 */
 	public static <P extends Preferences> void logPreferenceNode(P preferenceNode) {
 		try {
-			logger.debug("node name:{}", preferenceNode);
-			logKeyValuesForPreferenceNode(preferenceNode);
-			final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
-			for (String childNodeName : childrenPreferenceNodeNames) {
-				final Preferences childNode = preferenceNode.node(childNodeName);
-				logPreferenceNode(childNode);
+			if (logger.isDebugEnabled()) {
+				logger.debug("node name:{}", preferenceNode);
+				logKeyValuesForPreferenceNode(preferenceNode);
+				final String[] childrenPreferenceNodeNames = preferenceNode.childrenNames();
+				for (String childNodeName : childrenPreferenceNodeNames) {
+					final Preferences childNode = preferenceNode.node(childNodeName);
+					logPreferenceNode(childNode);
+				}
 			}
 		} catch (BackingStoreException e) {
-			logger.error("Failed to load preference", e);
+			logger.error("Failed to log node {}", preferenceNode, e);
 		}
 	}
 

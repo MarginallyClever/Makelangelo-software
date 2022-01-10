@@ -122,7 +122,7 @@ public class DragAndDrive extends JPanel {
 				mouseLastX=x;
 				mouseLastY=y;
 				
-				robot.moveTo(x,y);
+				robot.setPos(x,y);
 				coordinates.setText("X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y));
 			} else {
 				coordinates.setText("");

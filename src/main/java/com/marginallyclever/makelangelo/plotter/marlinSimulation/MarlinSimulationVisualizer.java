@@ -7,10 +7,21 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 
+/**
+ * {@link MarlinSimulationVisualizer} uses OpenGL to render the behavior of a Marlin-based 3D printer as it processes gcode instructions.
+ * It can render in three modes:
+ * 0, Acceleration and Deceleration
+ * 1, minimum segment length highlighting
+ * 2, alternating block colors (aka 'candy cane')
+ * @author Dan Royer
+ * @since 7.24.0
+ *
+ */
 public class MarlinSimulationVisualizer {
 	//private static int limit;
 	
 	private Turtle previousTurtle=null;
+	private int renderMode = 2;
 	
 	private class ColorPoint {
 		public Vector3d c;
@@ -52,7 +63,6 @@ public class MarlinSimulationVisualizer {
 	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, final PlotterSettings settings) {
 		buffer.clear();
 		
-		final int renderMode=2;
 		MarlinSimulation m = new MarlinSimulation(settings);
 		m.historyAction(turtleToRender, (block)->{
 			switch(renderMode) {

@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
@@ -21,8 +20,8 @@ public class MarlinPlotterInterfaceTest {
     @Test
     public void onHearM114_OK() {
         Plotter plotter = new Plotter();
-        plotter.setPos(new Point2D(23,45));
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        plotter.setPos(23,45);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "X:10.00 Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000";
         mpi.onHearM114(message);
@@ -34,8 +33,8 @@ public class MarlinPlotterInterfaceTest {
     @Test
     public void onHearM114_KO() {
         Plotter plotter = new Plotter();
-        plotter.setPos(new Point2D(23,45));
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        plotter.setPos(23,45);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "X:inva Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000";
         mpi.onHearM114(message);
@@ -51,7 +50,7 @@ public class MarlinPlotterInterfaceTest {
         PlotterSettings ps = new PlotterSettings();
         ps.setAcceleration(42);
         plotter.setSettings(ps);
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "echo:  M201 X300.00 Y300.00 Z300.00";
         mpi.onHearAcceleration(message);
@@ -65,7 +64,7 @@ public class MarlinPlotterInterfaceTest {
         PlotterSettings ps = new PlotterSettings();
         ps.setAcceleration(42);
         plotter.setSettings(ps);
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "echo:  M201 X300.00 Yinvalid";
         mpi.onHearAcceleration(message);
@@ -80,7 +79,7 @@ public class MarlinPlotterInterfaceTest {
         PlotterSettings ps = new PlotterSettings();
         ps.setDrawFeedRate(42);
         plotter.setSettings(ps);
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "echo:  M203 X200.00 Y200.00 Z200.00";
         mpi.onHearFeedrate(message);
@@ -94,7 +93,7 @@ public class MarlinPlotterInterfaceTest {
         PlotterSettings ps = new PlotterSettings();
         ps.setDrawFeedRate(42);
         plotter.setSettings(ps);
-        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
 
         String message = "echo:  M203 X200.00 Yinvalid";
         mpi.onHearFeedrate(message);

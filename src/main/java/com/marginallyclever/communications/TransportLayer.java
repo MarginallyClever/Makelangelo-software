@@ -1,5 +1,7 @@
 package com.marginallyclever.communications;
 
+import java.util.List;
+
 /**
  * Lists available connections of a type (serial, ethernet, smoke signals, etc) and opens a connection of that type
  * See also "OSI Layers" (Google it)
@@ -11,17 +13,18 @@ public interface TransportLayer {
 	 * 
 	 * @return english name of this transport layer
 	 */
-  public String getName();
+    public String getName();
   
-  /**
-   * opens a connection
-   * @param connectionName where to connect
-   * @return a connection to the device at address <code>connectionName</code>
-   */
-  public NetworkSession openConnection(String connectionName);
+    /**
+     * opens a connection
+     * @param connectionName where to connect
+     * @return a connection to the device at address <code>connectionName</code>
+     */
+    public NetworkSession openConnection(String connectionName);
 
-  /**
-   * @return a panel with the gui options for this transport layer
-   */
-  public TransportLayerPanel getTransportLayerPanel();
+    /**
+     * List availables connections
+     * @return availables connections
+     */
+    public List<String> listConnections();
 }
