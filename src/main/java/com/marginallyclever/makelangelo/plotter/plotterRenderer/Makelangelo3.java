@@ -1,13 +1,18 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-public class Makelangelo3_3 implements PlotterType {
+/**
+ * Deprecated because it cannot find home.
+ * @author Dan Royer
+ */
+@Deprecated
+public class Makelangelo3 implements PlotterRenderer {
+
 	@Override
 	public String getName() {
-		return "Makelangelo 3.3";
+		return "Makelangelo 3.0-3.2";
 	}
 
 	@Override
@@ -17,7 +22,7 @@ public class Makelangelo3_3 implements PlotterType {
 		if(robot.getDidFindHome()) 
 			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
 	}
-	
+
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
@@ -75,7 +80,7 @@ public class Makelangelo3_3 implements PlotterType {
 		gl2.glPopMatrix();
 	}
 	
-	protected void renderLCD(GL2 gl2) {
+	private void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -144,6 +149,16 @@ public class Makelangelo3_3 implements PlotterType {
 	}
 /*
 	@Override
+	public String getVersion() {
+		return "3";
+	}
+
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+
+	@Override
 	public boolean canChangeMachineSize() {
 		return true;
 	}
@@ -155,17 +170,36 @@ public class Makelangelo3_3 implements PlotterType {
 	
 	@Override
 	public boolean canAutoHome() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean canChangeHome() {
 		return true;
 	}
+	
+	@Override
+	public float getFeedrateMax() {
+		return 400;
+	}
 
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
+	public float getFeedrateDefault() {
+		return 100;
 	}
-	*/
+	
+	@Override
+	public float getAccelerationMax() {
+		return 50;
+	}
+
+	@Override
+	public float getPenLiftTime() {
+		return 50;
+	}
+	
+	@Override
+	public float getZAngleOn() {
+		return 40;
+	}*/
 }

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 /**
  * @author Dan Royer
  */
-public class Zarplotter implements PlotterType {
+public class Zarplotter implements PlotterRenderer {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	final public double ZAR_PLOTTER_SIZE=60; //cm
 	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm

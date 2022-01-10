@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-public class MakelangeloCustom implements PlotterType {
+public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class Makelangelo5 implements PlotterType {
+public class Makelangelo5 implements PlotterRenderer {
 	private static final Logger logger = LoggerFactory.getLogger(Makelangelo5.class);
 
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm

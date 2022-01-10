@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterTypes;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 /**
  * @author Dan Royer
  */
-public abstract class Polargraph implements PlotterType {
+public abstract class Polargraph implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
