@@ -1,17 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.Makelangelo5;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterType;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
 import com.marginallyclever.util.PreferencesHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -23,17 +15,14 @@ import java.util.prefs.Preferences;
  */
 public class PlotterSettings implements Serializable {	
 	private static final long serialVersionUID = -4185946661019573192L;
-	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
 
 	// Each robot has a global unique identifier
 	private long robotUID;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered;
 
-	private String hardwareVersion;
-	
-	private PlotterType hardwareProperties;
-	
+	private String hardwareName;
+		
 	// machine physical limits, in mm
 	private double limitLeft;
 	private double limitRight;
@@ -192,7 +181,7 @@ public class PlotterSettings implements Serializable {
 		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered))));
 
 		loadPenConfig(uniqueMachinePreferencesNode);
-		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareVersion));
+		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareName));
 	}
 
 	protected void loadPenConfig(Preferences prefs) {
@@ -253,7 +242,7 @@ public class PlotterSettings implements Serializable {
 		// Integer.toString(getCurrentToolNumber()));
 		uniqueMachinePreferencesNode.put("isRegistered", Boolean.toString(isRegistered()));
 
-		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareVersion);
+		uniqueMachinePreferencesNode.put("hardwareVersion", hardwareName);
 
 		savePenConfig(uniqueMachinePreferencesNode);
 		notifyListeners();
@@ -308,35 +297,12 @@ public class PlotterSettings implements Serializable {
 		this.isRegistered = isRegistered;
 	}
 
-	public String getHardwareVersion() {
-		return hardwareVersion;
+	public String getHardwareName() {
+		return hardwareName;
 	}
 
-	public void setHardwareVersion(String version) {
-		String newVersion = "";
-		try {
-			// get version numbers
-			Iterator<PlotterType> i = PlotterTypeFactory.iterator();
-			while (i.hasNext()) {
-				PlotterType hw = i.next();
-				if (hw.getName().contentEquals(version)) {
-					hardwareProperties = hw.getClass().getDeclaredConstructor().newInstance();
-					newVersion = version;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Hardware version instance failed. Defaulting to v5", e);
-			hardwareProperties = new Makelangelo5();
-			newVersion = hardwareProperties.getName();
-		}
-		if (newVersion.equals("")) {
-			logger.error("Unknown hardware version requested. Defaulting to v5");
-			hardwareProperties = new Makelangelo5();
-			newVersion = hardwareProperties.getName();
-		}
-
-		hardwareVersion = newVersion;
+	public void setHardwareVersion(String name) {
+		hardwareName = name;
 		if (!canChangeMachineSize()) {
 			this.setMachineSize(getWidth(), getHeight());
 		}
@@ -422,11 +388,5 @@ public class PlotterSettings implements Serializable {
 	public boolean canAccelerate() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public void render(GL2 gl2, Plotter plotter) {
-		if(hardwareProperties!=null) {
-			hardwareProperties.render(gl2, plotter);
-		}
 	}
 }

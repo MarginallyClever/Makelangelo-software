@@ -16,7 +16,7 @@ import javax.swing.JTabbedPane;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.plotterTypes.PlotterTypeFactory;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRendererFactory;
 
 /**
  * Controls related to configuring a Makelangelo machine
@@ -31,8 +31,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 	private Plotter robot;
 
 	private JComboBox<String> hardwareVersionChoices;
-	private ArrayList<String> availableHardwareVersions = PlotterTypeFactory.getHardwareVersions();
-	private ArrayList<String> hardwareVersionNames = PlotterTypeFactory.getNames();
+	private ArrayList<String> hardwareVersionNames = PlotterRendererFactory.getNames();
 
 	private JTabbedPane panes = new JTabbedPane();
 	private JPanel modelPanel;
@@ -101,9 +100,9 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		
 		hardwareVersionChoices = new JComboBox<String>((String[])hardwareVersionNames.toArray());
 		// set the default
-		String hv = robot.getSettings().getHardwareVersion();
-		for (int i = 0; i < availableHardwareVersions.size(); ++i) {
-			if (availableHardwareVersions.get(i).equals(hv)) {
+		String hv = robot.getSettings().getHardwareName();
+		for (int i = 0; i < hardwareVersionNames.size(); ++i) {
+			if (hardwareVersionNames.get(i).equals(hv)) {
 				hardwareVersionChoices.setSelectedIndex(i);
 				break;
 			}
@@ -139,7 +138,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		Object src = e.getSource();
 
 		if (src == hardwareVersionChoices) {
-			String newChoice = availableHardwareVersions.get(hardwareVersionChoices.getSelectedIndex());
+			String newChoice = hardwareVersionNames.get(hardwareVersionChoices.getSelectedIndex());
 			robot.getSettings().setHardwareVersion(newChoice);
 			rebuildTabbedPanes();
 		}
