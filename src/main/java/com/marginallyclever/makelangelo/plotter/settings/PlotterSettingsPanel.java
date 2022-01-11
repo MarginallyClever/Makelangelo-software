@@ -93,7 +93,7 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		d.gridwidth = 2;
 
 		hardwareVersionNames = Arrays.stream(Machines.values())
-				.map(machine -> machine.getPlotterRenderer().getName())
+				.map(Machines::getName)
 				.collect(Collectors.toList());
 
 		hardwareVersionChoices = new JComboBox<>((String[])hardwareVersionNames.toArray());
