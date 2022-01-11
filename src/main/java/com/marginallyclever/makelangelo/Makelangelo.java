@@ -102,7 +102,7 @@ public final class Makelangelo {
 	private Plotter myPlotter;
 	private Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
-	private boolean isMacOS = false;
+	private static boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private PlotterRenderer myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
@@ -120,11 +120,6 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
-		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-		if ((os.contains("mac")) || (os.contains("darwin"))) {
-			isMacOS = true;
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		logger.debug("Starting preferences...");
@@ -179,6 +174,11 @@ public final class Makelangelo {
 	        try {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	        } catch (Exception e) {}
+		}
+		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+		if ((os.contains("mac")) || (os.contains("darwin"))) {
+			isMacOS = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 	}
 
