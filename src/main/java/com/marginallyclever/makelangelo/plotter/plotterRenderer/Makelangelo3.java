@@ -11,11 +11,6 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public String getName() {
-		return "Makelangelo 3.0-3.2";
-	}
-
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintControlBox(gl2,robot);
 		Polargraph.paintMotors(gl2,robot);
