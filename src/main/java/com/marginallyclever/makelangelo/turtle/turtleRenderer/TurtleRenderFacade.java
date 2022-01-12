@@ -19,7 +19,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	//private MakelangeloFirmwareVisualizer viz = new MakelangeloFirmwareVisualizer(); 
 	//viz.render(gl2, turtleToRender, settings);
 
-	private TurtleRenderer tr=defaultRenderer;
+	private TurtleRenderer myRenderer=defaultRenderer;
 	
 	private Turtle myTurtle = new Turtle();
 	
@@ -38,7 +38,7 @@ public class TurtleRenderFacade implements PreviewListener {
 			int showCount = 0;
 			
 			try {
-				tr.start(gl2);
+				myRenderer.start(gl2);
 				showCount++;
 
 				for (TurtleMove m : myTurtle.history) {
@@ -48,21 +48,21 @@ public class TurtleRenderFacade implements PreviewListener {
 					switch (m.type) {
 					case TurtleMove.TRAVEL:
 						if (inShow && previousMove != null) {
-							tr.travel(previousMove, m);
+							myRenderer.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
 					case TurtleMove.DRAW:
 						if (inShow && previousMove != null) {
-							tr.draw(previousMove, m);
+							myRenderer.draw(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
 					case TurtleMove.TOOL_CHANGE:
-						tr.setPenDownColor(m.getColor());
-						tr.setPenDiameter(m.getDiameter());
+						myRenderer.setPenDownColor(m.getColor());
+						myRenderer.setPenDiameter(m.getDiameter());
 						break;
 					}
 				}
@@ -71,7 +71,7 @@ public class TurtleRenderFacade implements PreviewListener {
 				//Log.error(e.getMessage());
 			}
 			finally {
-				tr.end();
+				myRenderer.end();
 			}
 		}
 		catch(Exception e) {
@@ -90,5 +90,9 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public void setTurtle(Turtle turtle) {
 		this.myTurtle = turtle;
+	}
+
+	public void setRenderer(TurtleRenderer render) {
+		this.myRenderer = render;
 	}
 }
