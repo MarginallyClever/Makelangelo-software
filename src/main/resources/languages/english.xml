@@ -231,12 +231,12 @@
 	</string>
 	<string>
 		<key>PaperSettings.ShiftX</key>
-		<value>Shift X</value>
+		<value>Shift left</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
 		<key>PaperSettings.ShiftY</key>
-		<value>Shift Y</value>
+		<value>Shift up</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
