@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 
 import javax.swing.*;
 import java.awt.*;

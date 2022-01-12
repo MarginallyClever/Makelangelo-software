@@ -11,7 +11,6 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
@@ -32,11 +31,12 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
@@ -275,7 +275,8 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
-		menu.add(createStyleMenu());
+		menu.add(createRobotStyleMenu());
+		menu.add(createRenderStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.addActionListener((e)-> estimateTime());
@@ -292,8 +293,27 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	private JMenuItem createStyleMenu() {
-		JMenu menu = new JMenu(Translator.get("RobotMenu.Style"));
+	private JMenuItem createRenderStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.RenderStyle"));
+		
+		ButtonGroup group = new ButtonGroup();
+
+		Arrays.stream(Machines.values())
+				.forEach(it -> {
+					PlotterRenderer pr = it.getPlotterRenderer();
+					String name = it.getName();
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+					if (myPlotterRenderer == pr) button.setSelected(true);
+					button.addActionListener((e)-> onMachineChange(name));
+					menu.add(button);
+					group.add(button);
+				});
+
+		return menu;
+	}
+
+	private JMenuItem createRobotStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.RobotStyle"));
 		
 		ButtonGroup group = new ButtonGroup();
 

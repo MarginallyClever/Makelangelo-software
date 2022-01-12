@@ -1,7 +1,10 @@
-package com.marginallyclever.makelangelo.turtle;
+package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
