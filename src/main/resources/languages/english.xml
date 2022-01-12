@@ -563,8 +563,14 @@
 		<value>Makelangelo</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.Style</key>
+		<value>Style</value>
+		<hint>select style of robot to draw around art</hint>
+	</string>
+	<string>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -1247,7 +1253,7 @@
 	</string>
 
 	<string>
-		<key>GetTimeEstimate</key>
+		<key>RobotMenu.GetTimeEstimate</key>
 		<value>Estimate time</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
