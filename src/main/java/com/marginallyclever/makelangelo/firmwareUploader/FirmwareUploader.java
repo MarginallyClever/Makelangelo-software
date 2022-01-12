@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Maybe needed for troubleshooting guide:
  * <ul>
  * <li>avrdude documentation :
- * http://www.nongnu.org/avrdude/user-manual/avrdude_3.html#Option-Descriptions<br/>
+ * http://www.nongnu.org/avrdude/user-manual/avrdude_3.html#Option-Descriptions<br>
  * <code>
  * -F</code>
  * <p>
@@ -141,6 +141,7 @@ public class FirmwareUploader {
      * @param textAreaThatCanBeNullForPosibleLogs can be null a SelectTextArea
      * to show to the user the output by append if not null of the avrdude
      * run/exec outputs.
+     * @return 
      * @throws Exception
      */
     public boolean run(String hexPath, String portName, SelectTextArea textAreaThatCanBeNullForPosibleLogs) throws Exception {
