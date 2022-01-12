@@ -175,6 +175,10 @@ public final class Makelangelo {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	        } catch (Exception e) {}
 		}
+		setSystemLookAndFeelForMacos();
+	}
+	
+	private static void setSystemLookAndFeelForMacos() {
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 		if ((os.contains("mac")) || (os.contains("darwin"))) {
 			isMacOS = true;
