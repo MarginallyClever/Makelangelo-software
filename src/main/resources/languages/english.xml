@@ -215,15 +215,51 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperSize</key>
+		<value>Paper Size</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.PaperWidth</key>
 		<value>Paper width</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>Paper height</value>
 		<hint>Paper settings panel</hint>
 	</string>
+	<string>
+		<key>PaperSettings.ShiftX</key>
+		<value>Shift X</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.ShiftY</key>
+		<value>Shift Y</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.Rotation</key>
+		<value>Rotation</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.Landscape</key>
+		<value>Landscape</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.PaperMargin</key>
+		<value>Margin (%)</value>
+		<hint>Paper settings panel</hint>
+	</string>
+	<string>
+		<key>PaperSettings.PaperColor</key>
+		<value>Paper color</value>
+		<hint>Paper settings panel</hint>
+	</string>
+
 	<string>
 		<key>isLandscape</key>
 		<value>Is landscape?</value>
@@ -564,13 +600,23 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>SaveGCode</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>Save Gcode to file/SD</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>RobotMenu.Style</key>
+		<value>Machine style</value>
+		<hint>menu or dialog title</hint>
+	</string>
+	<string>
+		<key>RobotMenu.GetTimeEstimate</key>
+		<value>Estimate time</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -1689,12 +1735,6 @@
 	<string>
 		<key>Art Pipeline</key>
 		<value>Tools</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>paper color</key>
-		<value>Paper color</value>
 		<hint></hint>
 	</string>
 

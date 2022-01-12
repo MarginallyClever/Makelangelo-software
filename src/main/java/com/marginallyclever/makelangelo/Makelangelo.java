@@ -281,7 +281,7 @@ public final class Makelangelo {
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
-		JMenuItem bSaveToSD = new JMenuItem(Translator.get("SaveGCode"));
+		JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
 		bSaveToSD.addActionListener((e)-> saveGCode());
 		menu.add(bSaveToSD);
 
