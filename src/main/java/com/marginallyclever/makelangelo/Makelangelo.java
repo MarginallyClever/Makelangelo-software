@@ -37,6 +37,8 @@ import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
@@ -276,7 +278,6 @@ public final class Makelangelo {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
 		menu.add(createRobotStyleMenu());
-		menu.add(createRenderStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.addActionListener((e)-> estimateTime());
@@ -298,18 +299,24 @@ public final class Makelangelo {
 		
 		ButtonGroup group = new ButtonGroup();
 
-		Arrays.stream(Machines.values())
-				.forEach(it -> {
-					PlotterRenderer pr = it.getPlotterRenderer();
-					String name = it.getName();
+		Arrays.stream(TurtleRenderFactory.values())
+				.forEach(iter -> {
+					TurtleRenderer renderer = iter.getTurtleRenderer();
+					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
-					if (myPlotterRenderer == pr) button.setSelected(true);
-					button.addActionListener((e)-> onMachineChange(name));
+					if (myPlotterRenderer == renderer) button.setSelected(true);
+					button.addActionListener((e)-> onTurtleRenderChange(name));
 					menu.add(button);
 					group.add(button);
 				});
 
 		return menu;
+	}
+
+	private void onTurtleRenderChange(String name) {
+		logger.debug("Switching to render style '{}'", name);
+		TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
+		myTurtleRenderer.setRenderer(renderer);
 	}
 
 	private JMenuItem createRobotStyleMenu() {
@@ -318,9 +325,9 @@ public final class Makelangelo {
 		ButtonGroup group = new ButtonGroup();
 
 		Arrays.stream(Machines.values())
-				.forEach(it -> {
-					PlotterRenderer pr = it.getPlotterRenderer();
-					String name = it.getName();
+				.forEach(iter -> {
+					PlotterRenderer pr = iter.getPlotterRenderer();
+					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
 					if (myPlotterRenderer == pr) button.setSelected(true);
 					button.addActionListener((e)-> onMachineChange(name));
@@ -594,6 +601,8 @@ public final class Makelangelo {
 			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
 		});
 		menu.add(checkboxShowPenUpMoves);
+
+		menu.add(createRenderStyleMenu());
 
 		return menu;
 	}

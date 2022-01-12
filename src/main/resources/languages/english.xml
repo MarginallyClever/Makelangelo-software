@@ -571,7 +571,7 @@
 	</string>
 	<string>
 		<key>RobotMenu.RenderStyle</key>
-		<value>Robot style</value>
+		<value>Render style</value>
 		<hint>select style of art</hint>
 	</string>
 	<string>
