@@ -304,7 +304,7 @@ public final class Makelangelo {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
 					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
-					if (myPlotterRenderer == renderer) button.setSelected(true);
+					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));
 					menu.add(button);
 					group.add(button);

@@ -12,7 +12,7 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
-	private TurtleRenderer defaultRenderer = new DefaultTurtleRenderer();
+	private TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
 
 	//private TurtleRenderer barberPole = new BarberPoleTurtleRenderer();
 
@@ -89,10 +89,14 @@ public class TurtleRenderFacade implements PreviewListener {
 	}
 
 	public void setTurtle(Turtle turtle) {
-		this.myTurtle = turtle;
+		myTurtle = turtle;
 	}
 
 	public void setRenderer(TurtleRenderer render) {
-		this.myRenderer = render;
+		myRenderer = render;
+	}
+
+	public TurtleRenderer getRenderer() {
+		return myRenderer;
 	}
 }
