@@ -20,7 +20,6 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterInterface.class);
 
-	private static final double MARLIN_DRAW_FEEDRATE = 7500.0; // mm/min
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
 
@@ -81,8 +80,9 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
-		String msg = myPlotter.getPenIsUp() ? MarlinPlotterInterface.getTravelToString(p.x, p.y)
-				: MarlinPlotterInterface.getDrawToString(p.x, p.y);
+		String msg = myPlotter.getPenIsUp() 
+				? MarlinPlotterInterface.getTravelToString(myPlotter, p.x, p.y)
+				: MarlinPlotterInterface.getDrawToString(myPlotter, p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 
@@ -157,14 +157,14 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getTravelToString(double x, double y) {
-		return "G0" + getPosition(x, y);
+	public static String getTravelToString(Plotter p,double x, double y) {
+		return "G0" + getPosition(x, y) ;//+ " F" + p.getSettings().getTravelFeedRate();
 	}
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getDrawToString(double x, double y) {
-		return "G1" + getPosition(x, y) + " F" + MARLIN_DRAW_FEEDRATE;
+	public static String getDrawToString(Plotter p,double x, double y) {
+		return "G1" + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
 	}
 
 	private static String getPosition(double x, double y) {

@@ -1,8 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
+import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controls related to configuring a Makelangelo machine
+ * {@link PlotterSettingsPanel} is the user interface to adjust {@link PlotterSettings}.
  *
  * @author dan royer
  * @since 7.1.4
@@ -140,5 +142,20 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 			robot.getSettings().setHardwareVersion(newChoice);
 			rebuildTabbedPanes();
 		}
+	}
+	
+	// TEST
+	
+	public static void main(String[] args) {
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+
+		Plotter p = new Plotter();
+		JFrame frame = new JFrame(PlotterSettingsPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PlotterSettingsPanel(p));
+		frame.pack();
+		frame.setVisible(true);	
 	}
 }

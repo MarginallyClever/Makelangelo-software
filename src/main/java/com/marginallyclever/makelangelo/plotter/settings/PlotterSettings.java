@@ -30,9 +30,9 @@ public class PlotterSettings implements Serializable {
 	private double limitTop;
 	
 	// speed control
-	private double travelFeedRate;
-	private double drawFeedRate;
-	private double maxAcceleration;
+	private double travelFeedRate = MarlinSimulation.DEFAULT_FEEDRATE;
+	private double drawFeedRate = MarlinSimulation.DEFAULT_FEEDRATE;
+	private double maxAcceleration = MarlinSimulation.MAX_ACCELERATION;
 
 	private ColorRGB paperColor;
 
@@ -40,10 +40,10 @@ public class PlotterSettings implements Serializable {
 	private ColorRGB penDownColor;
 	private ColorRGB penUpColor;
 
-	private double penDiameter; // mm, >0
-	private double penUpAngle; // servo angle (degrees,0...180)
-	private double penDownAngle; // servo angle (degrees,0...180)
-	private double penLiftTime; // ms
+	private double penDiameter=0.8; // mm, >0
+	private double penUpAngle=90; // servo angle (degrees,0...180)
+	private double penDownAngle=25; // servo angle (degrees,0...180)
+	private double penLiftTime=50; // ms
 
 	/**
 	 * top left, bottom center, etc...
@@ -186,14 +186,13 @@ public class PlotterSettings implements Serializable {
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setPenDiameter(Double.valueOf(prefs.get("diameter", Double.toString(getPenDiameter()))));
-		setPenLiftTime(Double.valueOf(prefs.get("z_rate", Double.toString(getPenLiftTime()))));
-		setPenDownAngle(Double.valueOf(prefs.get("z_on", Double.toString(getPenDownAngle()))));
-		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(getPenUpAngle()))));
-		// tool_number =
-		// Integer.parseInt(prefs.get("tool_number",Integer.toString(tool_number)));
-		travelFeedRate = Double.valueOf(prefs.get("feed_rate", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
-		drawFeedRate = Double.valueOf(prefs.get("feed_rate_current", Double.toString(MarlinSimulation.DEFAULT_FEEDRATE)));
+		setPenDiameter(Double.valueOf(prefs.get("diameter", Double.toString(penDiameter))));
+		setPenLiftTime(Double.valueOf(prefs.get("z_rate", Double.toString(penLiftTime))));
+		setPenDownAngle(Double.valueOf(prefs.get("z_on", Double.toString(penDownAngle))));
+		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(penUpAngle))));
+		setTravelFeedRate(Double.valueOf(prefs.get("feed_rate", Double.toString(travelFeedRate))));
+		setDrawFeedRate(Double.valueOf(prefs.get("feed_rate_current", Double.toString(drawFeedRate))));
+		// tool_number = Integer.valueOf(prefs.get("tool_number",Integer.toString(tool_number)));
 
 		int r, g, b;
 		r = prefs.getInt("penDownColorR", penDownColor.getRed());
