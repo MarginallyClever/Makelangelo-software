@@ -16,10 +16,6 @@ public class Zarplotter implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public String getName() {
-		return "Zarplotter";
-	}
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintMotors(gl2,robot);
 		paintControlBox(gl2,robot);

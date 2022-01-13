@@ -11,9 +11,7 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
  * 
  * @author Dan Royer
  */
-public abstract interface PlotterRenderer {
-	public String getName();
-
+public interface PlotterRenderer {
 	/**
 	 * Custom look and feel for each version
 	 * 

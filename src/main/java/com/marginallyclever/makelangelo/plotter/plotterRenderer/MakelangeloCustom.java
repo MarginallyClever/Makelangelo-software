@@ -14,11 +14,6 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public final static double MOTOR_WIDTH = 42;
 
 	@Override
-	public String getName() {
-		return "Makelangelo (Custom)";
-	}
-
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
