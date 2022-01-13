@@ -5,8 +5,6 @@ package com.marginallyclever.makelangelo;
  * @version 1.00 2012/2/28
  */
 
-// io functions
-
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.StringHelper;
@@ -87,6 +85,7 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_Y = "windowY";
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
+	private static final String KEY_MACHINE_STYLE = "machineStyle";
 
 	private static Logger logger;
 
@@ -102,10 +101,10 @@ public final class Makelangelo {
 	private Plotter myPlotter;
 	private Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
-	private boolean isMacOS = false;
+	private static boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
-	private PlotterRenderer myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+	private PlotterRenderer myPlotterRenderer;
 	
 	// GUI elements
 	private JFrame mainFrame;
@@ -120,16 +119,20 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
-		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-		if ((os.contains("mac")) || (os.contains("darwin"))) {
-			isMacOS = true;
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		}
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-		logger.debug("Starting preferences...");
 		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
 		myPreferencesPanel = new MakelangeloSettingPanel();
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		String machineStyle = preferences.get(KEY_MACHINE_STYLE, Machines.MAKELANGELO_5.getName());
+		logger.debug("machine style: {}", machineStyle);
+
+		try {
+			myPlotterRenderer = Machines.valueOf(machineStyle).getPlotterRenderer();
+		} catch (Exception e) {
+			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+		}
 
 		startRobot();
 
@@ -179,6 +182,15 @@ public final class Makelangelo {
 	        try {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	        } catch (Exception e) {}
+		}
+		setSystemLookAndFeelForMacos();
+	}
+	
+	private static void setSystemLookAndFeelForMacos() {
+		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+		if ((os.contains("mac")) || (os.contains("darwin"))) {
+			isMacOS = true;
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 	}
 
@@ -269,7 +281,7 @@ public final class Makelangelo {
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
-		JMenuItem bSaveToSD = new JMenuItem(Translator.get("SaveGCode"));
+		JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
 		bSaveToSD.addActionListener((e)-> saveGCode());
 		menu.add(bSaveToSD);
 
@@ -286,19 +298,25 @@ public final class Makelangelo {
 		ButtonGroup group = new ButtonGroup();
 
 		Arrays.stream(Machines.values())
-				.forEach(machine -> {
-					PlotterRenderer pr = machine.getPlotterRenderer();
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(pr.getName());
-					if(myPlotterRenderer == pr) button.setSelected(true);
-					button.addActionListener((e)->{
-						logger.debug("Switching to Machine '{}'", pr.getName());
-						myPlotterRenderer = Machines.findByName(pr.getName()).getPlotterRenderer();
-					});
+				.forEach(it -> {
+					PlotterRenderer pr = it.getPlotterRenderer();
+					String name = it.getName();
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+					if (myPlotterRenderer == pr) button.setSelected(true);
+					button.addActionListener((e)-> onMachineChange(name));
 					menu.add(button);
 					group.add(button);
 				});
 
 		return menu;
+	}
+
+	private void onMachineChange(String name) {
+		logger.debug("Switching to Machine '{}'", name);
+		Machines machineStyle = Machines.findByName(name);
+		myPlotterRenderer = machineStyle.getPlotterRenderer();
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		preferences.put(KEY_MACHINE_STYLE, machineStyle.name());
 	}
 
 	private void saveGCode() {

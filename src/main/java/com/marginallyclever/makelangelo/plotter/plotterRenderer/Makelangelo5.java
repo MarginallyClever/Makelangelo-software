@@ -25,11 +25,6 @@ public class Makelangelo5 implements PlotterRenderer {
 	private static Texture texture3;
 
 	@Override
-	public String getName() {
-		return "Makelangelo 5";
-	}
-
-	@Override
 	public void render(GL2 gl2, Plotter robot) {
 		if (Makelangelo5.texture1 == null) Makelangelo5.texture1 = loadTexture(gl2, "/makelangelo5.png");
 		if (Makelangelo5.texture2 == null) Makelangelo5.texture2 = loadTexture(gl2, "/makelangelo5-motors.png");

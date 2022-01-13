@@ -4,10 +4,6 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 public class Makelangelo3_3 implements PlotterRenderer {
-	@Override
-	public String getName() {
-		return "Makelangelo 3.3";
-	}
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {

@@ -12,10 +12,6 @@ public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public String getName() {
-		return "Cartesian";
-	}
-	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintGantryAndHead(gl2,robot);		
 		paintMotors(gl2,robot);
