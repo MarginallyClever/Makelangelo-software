@@ -20,8 +20,9 @@ public class TurtleRenderFacade implements PreviewListener {
 	//viz.render(gl2, turtleToRender, settings);
 
 	private TurtleRenderer myRenderer=defaultRenderer;
-	
 	private Turtle myTurtle = new Turtle();
+	private int first=0;
+	private int last;
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -31,9 +32,6 @@ public class TurtleRenderFacade implements PreviewListener {
 			
 			TurtleMove previousMove = null;
 			
-			// the first and last command to show (in case we want to isolate part of the drawing)
-			int first = 0;
-			int last = myTurtle.history.size();
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
 			
@@ -89,6 +87,17 @@ public class TurtleRenderFacade implements PreviewListener {
 	}
 
 	public void setTurtle(Turtle turtle) {
+		int size=0;
+		if(turtle!=null) size = turtle.history.size();
+
+		if(myTurtle==null) {
+			first=0;
+			last=size;
+		} else {
+			// check first and last bounds
+			if(last>size) last=size;
+			if(first>last) first=last;
+		}
 		myTurtle = turtle;
 	}
 
@@ -98,5 +107,29 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public TurtleRenderer getRenderer() {
 		return myRenderer;
+	}
+	
+	public void setFirst(int arg0) {
+		int size = 0;
+		if(myTurtle!=null) size = myTurtle.history.size();
+
+		first=(int)Math.min(Math.max(arg0, 0),size);
+		if(last<first) setLast(first);
+	}
+	
+	public int getFirst() {
+		return first;
+	}
+	
+	public void setLast(int arg0) {
+		int size = 0;
+		if(myTurtle!=null) size = myTurtle.history.size();
+
+		last = (int)Math.min(Math.max(arg0, 0), size);
+		if(first>last) setFirst(last);
+	}
+
+	public int getLast() {
+		return last;
 	}
 }
