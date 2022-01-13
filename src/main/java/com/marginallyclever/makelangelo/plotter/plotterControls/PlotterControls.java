@@ -78,6 +78,20 @@ public class PlotterControls extends JPanel {
 			}
 			updateProgressBar();
 		});
+		chooseConnection.addListener(e -> {
+			switch (e.flag) {
+				case NetworkSessionEvent.CONNECTION_OPENED -> {
+					myPlotter.reInit();
+					updateButtonStatusOnConnect();
+					jogInterface.onNetworkConnect();
+				}
+				case NetworkSessionEvent.CONNECTION_CLOSED -> {
+					myPlotter.reInit();
+					updateButtonStatusOnDisconnect();
+					jogInterface.onNetworkDisconnect();
+				}
+			}
+		});
 	}
 
 	private JPanel getButtonsPanels() {
@@ -93,12 +107,7 @@ public class PlotterControls extends JPanel {
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
 		panel.setBorder(border);
 		panel.add(chooseConnection);
-		chooseConnection.addListener(e -> {
-			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> updateButtonStatusOnConnect();
-				case NetworkSessionEvent.CONNECTION_CLOSED -> updateButtonStatusOnDisconnect();
-			}
-		});
+
 		return panel;
 	}
 
