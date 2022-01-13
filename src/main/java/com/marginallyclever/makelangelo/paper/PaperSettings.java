@@ -75,15 +75,15 @@ public class PaperSettings extends SelectPanel {
 		double right = myPaper.getPaperRight();
 		double rot = myPaper.getRotation();
 		
-		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSize"),commonPaperNames,0));
-		add(pw = new SelectDouble("width",Translator.get("PaperWidth"),(double)(right-left)));
-		add(ph = new SelectDouble("height",Translator.get("PaperHeight"),(double)(top-bot))); 
-		add(shiftX = new SelectDouble("shiftx","Shift X",(float)(left+right)/2.0f)); 
-		add(shiftY = new SelectDouble("shifty","Shift y",(float)(top+bot)/2.0f)); 
-		add(ang = new SelectDouble("rotation","Rotation",(float)rot));
-		add(isLandscape = new SelectBoolean("landscape","\u21cb",false));
-		add(paperMargin = new SelectSlider("margin",Translator.get("PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
-		add(paperColor = new SelectColor("color",Translator.get("paper color"),myPaper.getPaperColor(),this));
+		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSettings.PaperSize"),commonPaperNames,0));
+		add(pw = new SelectDouble("width",Translator.get("PaperSettings.PaperWidth"),right-left));
+		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),top-bot));
+		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),(float)(left+right)/2.0f));
+		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),(float)(top+bot)/2.0f));
+		add(ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),(float)rot));
+		add(isLandscape = new SelectBoolean("landscape",Translator.get("PaperSettings.Landscape"),false));
+		add(paperMargin = new SelectSlider("margin",Translator.get("PaperSettings.PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
+		add(paperColor = new SelectColor("color",Translator.get("PaperSettings.PaperColor"),myPaper.getPaperColor(),this));
 
 		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
 		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
