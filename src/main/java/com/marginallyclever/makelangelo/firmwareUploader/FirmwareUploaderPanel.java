@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.firmwareUploader;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Translator;
@@ -76,7 +77,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      *
      * Should be automaticaly filed with the return of ...
      */
-    private SelectFile sourceAVRDude = new SelectFile("path", Translator.get("avrDude path"), firmwareUploader.getAvrdudePath());
+    private SelectFile sourceAVRDude = new SelectFile("path", Translator.get("FirmwareUploaderPanel.avrDude path"), firmwareUploader.getAvrdudePath());
 
     /**
      * User interface to select/change the binary firmware file (.hex) to use.
@@ -87,20 +88,21 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      * file have to be ??? less or equal to ?2x 512Ko or ? depending of the
      * maximum flash capacity of the microchip. ( basicaly if we got a 10 Mb file for a atmega2560 (flash size of ?512KB )  there is something wrong ... )
      */
-    private SelectFile sourceHex = new SelectFile("file", Translator.get("*.hex file"), "");
+    private SelectFile sourceHex = new SelectFile("file", Translator.get("FirmwareUploaderPanel.HexFile"), "");
 
     /**
      * User interface to select/change the Serial COM port to use. Can be
      * refresh. Sould be filed with available COM Port.
      */
-    private SelectOneOfMany port = new SelectOneOfMany("port", Translator.get("Port"));
+    private SelectOneOfMany port = new SelectOneOfMany("port", Translator.get("FirmwareUploaderPanel.Port"));
 
     /**
      * User interface to refresh the port aivalable.
      *
      * Sould be groupe with the SelectOneOfMany port in an unique class.
      */
-    private SelectButton refreshButton = new SelectButton("refresh", Translator.get("Refresh"));
+    //private SelectButton refreshButton = new SelectButton("refresh", Translator.get("FirmwareUploaderPanel.Refresh"));
+    private ButtonIcon portRefreshJButtonIcon = new ButtonIcon( "FirmwareUploaderPanel.Refresh", "/images/arrow_refresh.png");
 
     /**
      * User interface to run the firmware update process.
@@ -110,7 +112,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      * All the input should be check ( files exist ( canExecut for
      * sourceAVRDude, canRead for sourceHex), available for port))
      */
-    private SelectButton goButton = new SelectButton("start", Translator.get("Start"));
+    private SelectButton goButton = new SelectButton("upload", Translator.get("FirmwareUploaderPanel.Upload"));
 
     /**
      * A JTextArea in a JScroolPane to have the output of the execution of
@@ -120,7 +122,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      *
      * Should be automatiquely scrool to the last line/char added.
      */
-    private SelectTextArea selectTextAreaForAvrdudeExecLog = new SelectTextArea("avrdude_logs", Translator.get("avrdude.logs"), "");
+    private SelectTextArea selectTextAreaForAvrdudeExecLog = new SelectTextArea("avrdude_logs", Translator.get("FirmwareUploaderPanel.avrdude.logs"), "");
 
     /**
      * The title for all JDialogueMessage to inform the user. of the
@@ -132,7 +134,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      * your machine could make it unusable. Please accept the risks beyond our
      * responsibility and choose your file carefully.
      */
-    final String msg_firmware_upload_status = "Firmware upload status"; // TODO traduction
+    final String msg_firmware_upload_status = Translator.get("FirmwareUploaderPanel.FirmwareUploadStatus");
 
     public FirmwareUploaderPanel() {
 	super();
@@ -141,12 +143,16 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 	refreshLayout();
 	// preparing and populating the avrdude source path
 	sourceAVRDude.setPathOnly();
-	sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"), "hex"));
+	sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("FirmwareUploaderPanel.FileExtFilterDesc.HexFile"), "hex"));
 	sourceHex.setFileHidingEnabled(false);// if this is in my .pio (hidden dir on linux start with a '.') from a VSCode build ...
 	// implementing the port select refresh content
-	refreshButton.addPropertyChangeListener((e) -> {
-	    updateCOMPortList();
-	});
+	//	refreshButton.addPropertyChangeListener((e) -> {
+	//	    updateCOMPortList();
+	//	});
+	portRefreshJButtonIcon.addActionListener(e -> {
+		    updateCOMPortList();
+			});
+
 	// implementing the "start" button to run the avrdude command
 	goButton.addPropertyChangeListener((e) -> {
 	    if (AVRDudeExists()) {
@@ -160,7 +166,7 @@ public class FirmwareUploaderPanel extends	SelectPanel {
     }
 
     /**
-     * To automaticaly popolate the hex source file ... the first of the .hex
+     * To automaticaly populate the hex source file JTextField. ... the first of the .hex
      * files found in the currend PWD/"." dir.
      *
      * TODO user home dir ? download dir ?
@@ -189,9 +195,17 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 
 	add(sourceHex);
 
+	JPanel jpanelGroupPort = new JPanel(new BorderLayout());
+	
 	//TODO put this in one "line" in the GUI ! ( need a new kind of SelectOneOfMany that avec a refresh button ? or simply use a Jpanel to combinat ?)
-	add(port);
-	add(refreshButton);
+	//add(port);
+	////	add(refreshButton);
+	//add(refresh);
+	
+	jpanelGroupPort.add(port,BorderLayout.CENTER);
+	jpanelGroupPort.add(portRefreshJButtonIcon,BorderLayout.EAST);
+	add(jpanelGroupPort);
+	
 
 	add(goButton);
 
@@ -234,15 +248,15 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 			// TODO all checks sould be done in the "functionnals needs" implementation class (FirmwareUploader) ! 
 			// but it may be easyer to do it in here also, to get a more user friendly GUI interface. not bound to the basic "functionnals needs".
 			// 
-			// we only need a way to distinc the inputus paraméter in defaut from the exception thrown to help the user ( border red the field)
+			// we only need a way to distinc the inputs parameters in defaut from the exception thrown to help the user (? border red the field)
 			// TODO traduction TODO simplyfy the message, TODO move that in a location so it can be modifield easyly
 			final String msg_please_selecte_a_Port_ = "Please selecte a port" +/*port.getTexte()+*/ "!";
-			final String msg_please_selecte_a_hex_file_ = "Please selecte an existing redable firmware binary (.hex) file!";
+			final String msg_please_selecte_a_hex_file_ = "Please selecte an existing redable firmware (*.hex) file!";
 			final String msg_finished = "Finished!";
 			final String msg_errors_refer_to_the_avrdudelog_s = "Errors! refer to the avrdude.log s";
 
 			if (port.getSelectedItem() == null || port.getSelectedItem().isBlank()) {
-
+			    //port. // GUI red border ???
 			    JOptionPane.showMessageDialog(selectTextAreaForAvrdudeExecLog, msg_please_selecte_a_Port_, msg_firmware_upload_status, JOptionPane.ERROR_MESSAGE);
 
 			} else if (sourceHex.getText().isBlank() || !new File(sourceHex.getText()).canRead()) {
@@ -348,6 +362,8 @@ public class FirmwareUploaderPanel extends	SelectPanel {
      *
      * TODO do i keep that or do i use the one in DialogAbout (modified as
      * public static), for code factoring ?
+     * 
+     * Or do i remove this message. (lets the user find it by himself with no leads )
      *
      * @param html
      * @return

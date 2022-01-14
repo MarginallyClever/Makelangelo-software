@@ -1820,25 +1820,29 @@
 	</string>
 
 	<string>
-		<key>avrDude path</key>
+		<key>FirmwareUploaderPanel.avrDude path</key>
 		<value>avrDude Pfad</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
 
 	<string>
-		<key>*.hex file</key>
+		<key>FirmwareUploaderPanel.HexFile</key>
 		<value>*.hex Datei</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
-
+        <string>
+		<key>FirmwareUploaderPanel.FileExtFilterDesc.HexFile</key>
+		<value>*.hex Datei</value>
+		<hint>FirmwareUpdate action : FileNameExtensionFilter.Description</hint>
+	</string>
 	<string>
-		<key>Port</key>
+		<key>FirmwareUploaderPanel.Port</key>
 		<value>Port</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
 
 	<string>
-		<key>Refresh</key>
+		<key>FirmwareUploaderPanel.Refresh</key>
 		<value>Aktualisieren</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>

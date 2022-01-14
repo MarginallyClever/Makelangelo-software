@@ -1975,28 +1975,50 @@
 	</string>
 
 	<string>
-		<key>avrDude path</key>
+		<key>FirmwareUploaderPanel.avrDude path</key>
 		<value>avrDude path</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
 
 	<string>
-		<key>*.hex file</key>
+		<key>FirmwareUploaderPanel.HexFile</key>
 		<value>*.hex file</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
+        <string>
+		<key>FirmwareUploaderPanel.FileExtFilterDesc.HexFile</key>
+		<value>*.hex file</value>
+		<hint>FirmwareUpdate action : FileNameExtensionFilter.Description</hint>
+	</string>
+
 
 	<string>
-		<key>Port</key>
+		<key>FirmwareUploaderPanel.Port</key>
 		<value>Port</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
 
 	<string>
-		<key>Refresh</key>
+		<key>FirmwareUploaderPanel.Refresh</key>
 		<value>Refresh</value>
 		<hint>FirmwareUpdate action</hint>
 	</string>
+        <string>
+		<key>FirmwareUploaderPanel.Upload</key>
+		<value>Upload</value>
+		<hint>FirmwareUpdate action</hint>
+	</string>
+        <string>
+		<key>FirmwareUploaderPanel.avrdude.logs</key>
+		<value>avrdude logs</value>
+		<hint>FirmwareUpdate action</hint>
+	</string>
+        <string>
+		<key>FirmwareUploaderPanel.FirmwareUploadStatus</key>
+		<value>Firmware upload status</value>
+		<hint>FirmwareUpdate action : message dialog title</hint>
+	</string>
+	
 	<string>
 		<key>NotConnected</key>
 		<value>Not connected</value>

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.marginallyclever.convenience.ColorRGB;
+import java.awt.Component;
 
 /**
  * A container for all Select elements, to facilitate formatting as a group.
@@ -36,11 +37,25 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		interiorPanel.setLayout(new BoxLayout(interiorPanel, BoxLayout.Y_AXIS));
 	}
 	
-	public void add(Select c) {
-		//gbc.gridy++;
-		//interiorPanel.add(c,gbc);
-		interiorPanel.add(c);
-		c.addPropertyChangeListener(this);
+//	// TO REVIEW 
+//	public void add(Select c) {
+//		//gbc.gridy++;
+//		//interiorPanel.add(c,gbc);
+//		interiorPanel.add(c);
+//		c.addPropertyChangeListener(this);
+//	}
+	
+	/**
+	 * TO REVIEW can i do this to avoid to have to create a new Select object ?.
+	 * to be compatible with non Select component. ( or this is bad and i sould add a specifique methode for my need)
+	 * @param comp
+	 * @return 
+	 */
+	@Override
+	public Component add(Component comp) {
+		interiorPanel.add(comp);
+		comp.addPropertyChangeListener(this);
+		return comp;
 	}
 	
 	// OBSERVER PATTERN	
