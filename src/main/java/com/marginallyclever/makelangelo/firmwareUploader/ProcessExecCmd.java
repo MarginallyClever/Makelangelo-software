@@ -250,7 +250,7 @@ public class ProcessExecCmd {
 
     public static boolean isOSWindows() {
 	String OS = System.getProperty("os.name").toLowerCase();
-	boolean isWindowsOS = OS.contains("win");
+	boolean isWindowsOS = OS.contains("win");//is this suffisant maybe one day you will have a non windows OS with "win" in is name ...
 	return isWindowsOS;
     }
 
@@ -258,9 +258,9 @@ public class ProcessExecCmd {
 	// only if Windows OS.
 	// Communly used variable name for path to programFilesDir on Windows OS.
 	String[] windowsOSVarNameForProgFileDir = {
-	    "PROGRAMFILES" //C:\Program Files
+	    "PROGRAMFILES" //ex : "C:\Program Files"
 	    ,
-	     "PROGRAMFILES(x86)" //C:\Program Files (x86)
+	     "PROGRAMFILES(x86)" //ex : "C:\Program Files (x86)"
 	    ,
 	     "CommunProgramFiles" //
 	    ,
@@ -270,7 +270,7 @@ public class ProcessExecCmd {
     }
 
     //
-    // TODO a test case
+    // TODO some test case TO REVIEW 
     //
     public static void main(String[] args) {
 	String cmdNameLs = "ls";
@@ -287,7 +287,7 @@ public class ProcessExecCmd {
 	}
 	// not a usefull test : assert cmdName != null
 	// ?? do not throw a exception
-	// ?? have correctly math the OS ??
+	// ?? have correctly match the OS ??
 	//
 	ArrayList<String> searchCommandFromEnvPath = searchCommandFromEnvPath(cmdName, true);
 
