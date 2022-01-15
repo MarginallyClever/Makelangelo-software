@@ -51,7 +51,7 @@ public class TurtleRenderFacade implements PreviewListener {
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.DRAW:
+					case TurtleMove.LINE:
 						if (inShow && previousMove != null) {
 							myRenderer.draw(previousMove, m);
 						}
