@@ -619,7 +619,7 @@ public class MarlinSimulation {
 				
 		for(TurtleMove m : t.history) {			
 			switch(m.type) {
-			case TurtleMove.LINE:
+			case TurtleMove.DRAW_LINE:
 				if(isUp) {
 					isUp=false;
 					bufferLine(new Vector3d(lx,ly,isUp?zu:zd),fz,a);

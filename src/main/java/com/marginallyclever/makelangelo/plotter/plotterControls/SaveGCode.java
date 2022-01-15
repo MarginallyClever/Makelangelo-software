@@ -82,7 +82,7 @@ public class SaveGCode {
 						}
 						previousMovement = m;
 					}
-					case TurtleMove.LINE -> {
+					case TurtleMove.DRAW_LINE -> {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
