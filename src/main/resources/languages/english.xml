@@ -693,7 +693,22 @@
 	<string>
 		<key>PlotterControls.FatalError</key>
 		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
-		<hint>texte</hint>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.InfoTitle</key>
+		<value>Information</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.HomeXYFirst</key>
+		<value>Home the printer first.</value>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DidNotFind</key>
+		<value>Error in communicating with the robot.</value>
+		<hint>text</hint>
 	</string>
 
 	<string>

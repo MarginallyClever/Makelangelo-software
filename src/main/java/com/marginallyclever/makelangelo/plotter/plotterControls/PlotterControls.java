@@ -71,10 +71,15 @@ public class PlotterControls extends JPanel {
 		this.add(progress, BorderLayout.SOUTH);
 
 		marlinInterface.addListener(e -> {
-			if (e.getActionCommand().equals(MarlinInterface.IDLE) && isRunning) {
-				step();
-			} else if (e.getActionCommand().equals(MarlinInterface.ERROR)) {
-				JOptionPane.showMessageDialog(this,  Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
+			switch (e.getActionCommand()) {
+				case MarlinInterface.IDLE ->
+						{ if (isRunning) step(); }
+				case MarlinInterface.ERROR ->
+						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"),  JOptionPane.ERROR_MESSAGE);
+				case MarlinInterface.HOME_XY_FIRST ->
+						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("PlotterControls.InfoTitle"), JOptionPane.WARNING_MESSAGE);
+				case MarlinInterface.DID_NOT_FIND ->
+						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			}
 			updateProgressBar();
 		});
