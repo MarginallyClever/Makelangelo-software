@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2022 Marginally Clever Robots, Limited.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+-->
+
+<!-- 
+    TODO define vocabulary identification data //PPAC37 : i begin with DTD, dont know what to use here.
+    PUBLIC ID  : -//vendor//vocabulary//EN
+    SYSTEM ID  : http://server/path/__NAME__
+-->
+
+
+<!-- DTD definition so we can xml validate ( vocabulary/syntax ) a xml file 
+by adding in this header : <!DOCTYPE language SYSTEM "language_v0.dtd">
+or ( not to be depanding of an external file )
+<!DOCTYPE language [<<< The DTD definition that folow >>>]>
+-->
+<!ELEMENT language (meta,string+)>
+
+<!ELEMENT meta (name,author)>
+
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+
+<!ELEMENT string (key,value,hint?)><!-- remove the ? at the and of "hint?" to have validation issue for the <string> that do not containe a <hint>  -->
+
+<!ATTLIST string id ID #IMPLIED><!-- PPAC37: not currently use but could be a way to enforce key unicity -->
+<!ELEMENT key (#PCDATA)> <!-- 
+// TODO to reveiw for key unicity, migrate the elements as and attribut id of the <strnig> elements
+<!ELEMENT string (value,hint?)>
+<!ATTLIST string id ID #REQUIRED> 
+// but have to change the read/write implementation as an element becom an attribut .
+TODO study case code change / xml rework / implication (no back compatibility )
+  -->				
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT hint (#PCDATA)>

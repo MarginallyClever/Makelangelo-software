@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE language>
+<!DOCTYPE language SYSTEM "language_v0.dtd"><!-- ADDED BY PPAC37 : SYSTEM "language_v0.dtd"-->
 <language>
 	<meta>
 		<name>Deutsch</name>
