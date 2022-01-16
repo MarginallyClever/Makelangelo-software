@@ -53,14 +53,12 @@ public class FindAllTraductionGet {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGet.class);
 
-    private static Map<FindAllTraductionResult,Path> mapMatchResultToFilePath = new HashMap<>();
+    private static Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
 
     public static Map<FindAllTraductionResult, Path> getMapMatchResultToFilePath() {
 	return mapMatchResultToFilePath;
     }
-    
-    
-    
+
     /**
      * Try to search a src java project for a specifik pattern ( like
      * Traduction.get(...) )
@@ -70,21 +68,21 @@ public class FindAllTraductionGet {
     public static void main(String[] args) {
 
 	Log.start();
-		// lazy init to be able to purge old files
-		//logger = LoggerFactory.getLogger(Makelangelo.class);
+	// lazy init to be able to purge old files
+	//logger = LoggerFactory.getLogger(Makelangelo.class);
 
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
+	PreferencesHelper.start();
+	CommandLineOptions.setFromMain(args);
+	Translator.start();
 
-		if(Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			LanguagePreferences.chooseLanguage();
-		}
+	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
+	    LanguagePreferences.chooseLanguage();
+	}
 	try {
 	    // TODO arg 0 as dirToSearch 
-	    if ( args != null &&  args.length > 0){
+	    if (args != null && args.length > 0) {
 		//
-		
+
 	    }
 	    String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
 	    System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
@@ -107,20 +105,19 @@ public class FindAllTraductionGet {
 	System.out.printf("totalMatchCountInAllFilesV0    =%d\n", totalMatchCountInAllFilesV0);
 	System.out.printf("mapMatchResultToFilePath.size()=%d\n", mapMatchResultToFilePath.size()
 	);
-	
-	
+
 	JFrame jf = new JFrame();
 	jf.setLayout(new BorderLayout());
 	JTable jtab = new JTable(new FindAllTraductionGetTableModel());
 	jtab.setAutoCreateRowSorter(true);
 	JScrollPane jsp = new JScrollPane();
 	jsp.setViewportView(jtab);
-	jf.getContentPane().add(jsp,BorderLayout.CENTER);
+	jf.getContentPane().add(jsp, BorderLayout.CENTER);
 	jf.setMinimumSize(new Dimension(800, 600));
 	jf.pack();
 	jf.setVisible(true);
 	jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	
+
     }
 
     private static int totalMatchCountInAllFiles = 0;
@@ -173,13 +170,14 @@ public class FindAllTraductionGet {
 //		    System.out.printf("::%d in %s\n", n.size(), x.toAbsolutePath());
 		    for (MatchResult mr : n) {
 			totalMatchCountInAllFilesV0++;
+			// Can we get the line num ? currently in this implementation we have the car pos in the file/strem ...
 //			System.out.printf(" %-50s in %s at sart:%d end:%d\n", mr.group(1), mr.group(), mr.start(), mr.end());
 		    }
 		}
 
 	    }
 
-	    // line by line ( this can miss some ... )
+	    // line by line ( this can miss some like "Traduction.\nget(\n...\n);" )
 	    Scanner scanner = new Scanner(x);
 	    int lineNum = 0;
 	    while (scanner.hasNextLine()) {
@@ -221,7 +219,8 @@ public class FindAllTraductionGet {
      * (filter organisation) and the cumultation/collect ...
      *
      * @param path
-     * @param fileNameEndsWithSuffix use ".java" to get only ... ( this is not a regexp so no '.' despecialisation needed )
+     * @param fileNameEndsWithSuffix use ".java" to get only ... ( this is not a
+     * regexp so no '.' despecialisation needed )
      * @return
      * @throws IOException
      */
@@ -237,11 +236,11 @@ public class FindAllTraductionGet {
 		    .map(File::toPath)
 		    .collect(Collectors.toList());
 	}
-	if (debugPaser || true ){
-	    if ( result == null){
-				System.out.printf("listFiles (%s, \"%s\").size()=null\n", path,fileNameEndsWithSuffix);
-	    }else{
-		System.out.printf("listFiles (%s, \"%s\").size()=%d\n", path,fileNameEndsWithSuffix,result.size());
+	if (debugPaser || true) {
+	    if (result == null) {
+		System.out.printf("listFiles (%s, \"%s\").size()=null\n", path, fileNameEndsWithSuffix);
+	    } else {
+		System.out.printf("listFiles (%s, \"%s\").size()=%d\n", path, fileNameEndsWithSuffix, result.size());
 	    }
 	}
 	return result;

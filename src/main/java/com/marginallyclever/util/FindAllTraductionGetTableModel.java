@@ -90,7 +90,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
     public String getColumnName(int columnIndex) {
 	final String columnKey = getColumnKey(columnIndex);
 //        if (useTraslator) {
-//            return Translator.get(columnKey); //TODO 
+//            return Translator.get(columnKey); //TODO but in this implementation this is dangerous if the traduction do not assert distinct value for the traduction of each key ...
 //        }
 	return columnKey;
     }
@@ -150,6 +150,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	} else {
 	    return null;
 	}
+	
 	final String columnKey = getColumnKey(columnIndex);
 	if (COL_KEY_ROW_NUM.equals(columnKey)) {
 	    return rowIndex + 1;
@@ -164,38 +165,37 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	} else if (COL_KEY_ARGS_TRADUCTED.equals(columnKey)) {
 	    // 
 	    String tmpS = mr.argsMatch;
-	    if ( tmpS.startsWith("\"") && tmpS.endsWith("\"")){
-		return "\""+Translator.get(tmpS.substring(1, tmpS.length()-1))+"\"";
+	    if (tmpS.startsWith("\"") && tmpS.endsWith("\"")) {
+		return "\"" + Translator.get(tmpS.substring(1, tmpS.length() - 1)) + "\"";
 	    }
-	    
+
 	}
-	
+
 	//
 	return null;
     }
 
     /**
      * TODO ... find a way to impact a modification ... dangerous if not well
-     * done ... not implemented.
+     * done ... not implemented yet.
      */
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 	final String columnKey = getColumnKey(columnIndex);
-	System.out.printf("Not supported yet. TODO setValueAt(value=%s,row=%d,col=%d -> %s )\n", aValue, rowIndex, columnIndex, columnKey);
+	System.out.printf("Not implemented yet. TODO setValueAt(value=%s,row=%d,col=%d -> %s )\n", aValue, rowIndex, columnIndex, columnKey);
 	if (COL_KEY_ARGS.equals(columnKey)) {
 	    Object obj = map.keySet().toArray()[rowIndex];
 	    FindAllTraductionResult mr = null;
 	    if (obj != null && obj instanceof FindAllTraductionResult) {
 		mr = (FindAllTraductionResult) obj;
 	    }
-	    if (mr != null){
-		System.out.printf("Not supported yet. TODO safely modifiy %s to change at line %d, %s in %s\n", mr.pSrc, mr.lineInFile, mr.argsMatch, aValue);
-		
+	    if (mr != null) {
+		System.out.printf("Not implemented yet. TODO safely modifiy %s to change at line %d, %s in %s\n", mr.pSrc, mr.lineInFile, mr.argsMatch, aValue);
+
 		// TODO is this posible to "securly" modifiy a .java file with this ...
-	    // TODO but first we need to be sure that this is perfectly well done ...
-	    // TODO and then we may have to change the key/or create a new on in the traductions files ...
+		// TODO but first we need to be sure that this is perfectly well done ...
+		// TODO and then we may have to change the key/or create a new on in the traductions files tha used this key ...
 	    }
-	    
 
 	}
 	//throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -204,17 +204,16 @@ public class FindAllTraductionGetTableModel implements TableModel {
     //
     //
     //
-    
     protected void fireUpdateTableModel() {
-        for (TableModelListener tml : arrayListTableModelListener) {
-            tml.tableChanged(new TableModelEvent(this));
-        }
+	for (TableModelListener tml : arrayListTableModelListener) {
+	    tml.tableChanged(new TableModelEvent(this));
+	}
     }
 
     protected void fireUpdateTableModel(int row) {
-        for (TableModelListener tml : arrayListTableModelListener) {
-            tml.tableChanged(new TableModelEvent(this, row));
-        }
+	for (TableModelListener tml : arrayListTableModelListener) {
+	    tml.tableChanged(new TableModelEvent(this, row));
+	}
     }
     //
     // ? Notifieur / Notifié pattern implementation.
@@ -222,9 +221,12 @@ public class FindAllTraductionGetTableModel implements TableModel {
     private ArrayList<TableModelListener> arrayListTableModelListener = new ArrayList<>();
 
     /**
-     * When a JTable use a TableModel normaly the JTable register a TableModelListener.
-     * This allow later to fireUpdate TableModelChange to the TableModelListener JTable when the table model have change. (so the JTable reload / refresh )
-     * @param l 
+     * When a JTable use a TableModel normaly the JTable register a
+     * TableModelListener. This allow later to fireUpdate TableModelChange to
+     * the TableModelListener JTable when the table model have change. (so the
+     * JTable reload / refresh )
+     *
+     * @param l
      */
     @Override
     public void addTableModelListener(TableModelListener l) {

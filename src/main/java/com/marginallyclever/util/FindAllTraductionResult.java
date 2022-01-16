@@ -20,20 +20,22 @@ package com.marginallyclever.util;
 import java.nio.file.Path;
 
 /**
- *
- * @author q6
+ * As a MatcherResult is kinf of empty if not in this .match context ... 
+ * A way to store some result.
+ * @author PPAC
  */
 public class FindAllTraductionResult {
+
     String argsMatch;
-    int posDebArgMatch=-1;    
+    int posDebArgMatch = -1;
     int lineInFile = -1;
     Path pSrc;
 
-    public FindAllTraductionResult(String argsMatch,int line ,int pos, Path pSrc) {
+    public FindAllTraductionResult(String argsMatch, int line, int pos, Path pSrc) {
 	this.argsMatch = argsMatch;
 	this.posDebArgMatch = pos;
 	this.lineInFile = line;
 	this.pSrc = pSrc;
     }
-    
+
 }
