@@ -15,6 +15,7 @@ import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
 import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
+import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle2;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
@@ -425,6 +426,7 @@ public final class Makelangelo {
 		menu.addSeparator();
 		
 		menu.add(new SimplifyTurtle(this));
+		menu.add(new SimplifyTurtle2(this));
 		menu.add(new ReorderTurtle(this));
 		menu.add(new InfillTurtleAction(this));
 
