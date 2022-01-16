@@ -145,7 +145,7 @@ public final class Translator {
 			URL pathFound = Translator.class.getClassLoader().getResource(path);
 			logger.debug("path found: {}", pathFound);
 			try (InputStream s = pathFound.openStream()) {
-				languageContainer.loadFromInputStream(s);
+				languageContainer.loadFromInputStream(s, pathFound.toString());
 			} catch (IOException ie) {
 				logger.error(ie.getMessage());
 			}
@@ -190,12 +190,14 @@ public final class Translator {
 		}
 		if( stream == null ) return false;
 		
-		logger.trace("Found {}", actualFilename);
+		logger.debug("Found {}", actualFilename); // was a trace set as debug by PPAC37 to review some issues.
 		TranslatorLanguage lang = new TranslatorLanguage();
 		try {
-			lang.loadFromInputStream(stream);
+			lang.loadFromInputStream(stream, actualFilename);
+			logger.debug("Found {} // {} ", actualFilename,lang.getName()); // currenty a english.xml can have a language name value "dutch" ... this is disturbing not to be aware of that.
 		} catch(Exception e) {
 			logger.error("Failed to load {}", actualFilename);
+			e.printStackTrace();
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
@@ -204,6 +206,13 @@ public final class Translator {
 		if( !lang.getName().isEmpty() && 
 			!lang.getAuthor().isEmpty()) {
 			// we loaded a language file that seems pretty legit.
+			if ( languages.containsKey(lang.getName())){
+			    // So ... what ... lets overwirte it ?
+			    // TODO maybe fusion it ? 
+			    // But at least warm the user ?
+			        logger.debug(String.format("SAME language Name \"%s\" ... using last one ...",lang.getName()));
+				
+			}
 			languages.put(lang.getName(), lang);
 			return true;
 		}
@@ -218,6 +227,10 @@ public final class Translator {
 	 */
 	public static String get(String key) {
 		return languages.get(currentLanguage).get(key);
+	}
+	
+	public static void writeMissingKeyXmlFile(){
+	    languages.get(currentLanguage).generatePartialXmlFileWithMissingKey();
 	}
 
 	/**
