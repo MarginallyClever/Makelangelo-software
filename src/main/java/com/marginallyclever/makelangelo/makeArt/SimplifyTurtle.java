@@ -29,7 +29,7 @@ public class SimplifyTurtle extends AbstractAction {
 	
 	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
-		logger.debug("SimplifyTurtle begin @ {}", os);
+		logger.debug("begin @ {}", os);
 		
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
@@ -44,7 +44,7 @@ public class SimplifyTurtle extends AbstractAction {
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines,1.0);
 		int ns = t.history.size();
-		logger.debug("SimplifyTurtle end @ {}", ns);
+		logger.debug("end @ {}", ns);
 		
 		return t;
 	}
