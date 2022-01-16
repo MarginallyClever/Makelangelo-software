@@ -89,10 +89,10 @@ public class TurtleRenderFacade implements PreviewListener {
 	public void setTurtle(Turtle turtle) {
 		int size=0;
 		if(turtle!=null) size = turtle.history.size();
+		myTurtle = turtle;
 
 		setFirst(0);
 		setLast(size);
-		myTurtle = turtle;
 	}
 
 	public void setRenderer(TurtleRenderer render) {
