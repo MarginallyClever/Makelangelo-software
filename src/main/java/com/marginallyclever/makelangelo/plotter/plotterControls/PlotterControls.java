@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
@@ -78,10 +79,17 @@ public class PlotterControls extends JPanel {
 			}
 			updateProgressBar();
 		});
+		
 		chooseConnection.addListener(e -> {
 			switch (e.flag) {
 				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
 				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
+			}
+		});
+		
+		myPlotter.addPlotterEventListener((e)-> {
+			if (e.type == PlotterEvent.HOME_FOUND) {
+				updateButtonStatusConnected();
 			}
 		});
 	}
