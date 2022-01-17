@@ -265,6 +265,7 @@ public class PlotterControls extends JPanel {
 		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
 		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 
 }

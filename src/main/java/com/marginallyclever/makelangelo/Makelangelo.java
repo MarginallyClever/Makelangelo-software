@@ -356,6 +356,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
 
