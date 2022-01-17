@@ -121,7 +121,7 @@ public class TranslatorLanguage {
 
 				// store key/value pairs into a map
 				//logger.debug(language_file +"\t"+key+"\t=\t"+value);// KO language_file no in this scoop
-				logger.debug(src +"\t"+key+"\t=\t"+value);// OK
+				//logger.debug(src +"\t"+key+"\t=\t"+value);// OK
 				
 				if ( strings.containsKey(key)){
 				    // This sould not occure.
