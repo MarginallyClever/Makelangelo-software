@@ -1,8 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -17,11 +20,13 @@ import java.util.ArrayList;
  * @since 7.24.0
  *
  */
-public class MarlinSimulationVisualizer {
-	//private static int limit;
-	
-	private Turtle previousTurtle=null;
-	private int renderMode = 2;
+public class MarlinSimulationVisualizer implements TurtleRenderer {
+	//private Turtle previousTurtle=null;
+	private int renderMode = 0;
+	private GL2 gl2;
+	private Turtle myTurtle = new Turtle();
+
+	private PlotterSettings mySettings;
 	
 	private class ColorPoint {
 		public Vector3d c;
@@ -37,18 +42,9 @@ public class MarlinSimulationVisualizer {
 	
 	public MarlinSimulationVisualizer() {}
 	
-	public void render(GL2 gl2,Turtle turtleToRender,PlotterSettings settings) {
-		if(previousTurtle!=turtleToRender) {
-			recalculateBuffer(gl2,turtleToRender,settings);
-			previousTurtle = turtleToRender;
-		}
-		
-		drawBufferedTurtle(gl2);
-	}
-
 	private void drawBufferedTurtle(GL2 gl2) {
 		gl2.glPushMatrix();
-		gl2.glLineWidth(1);
+		gl2.glLineWidth(3);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 
 		for( ColorPoint a : buffer ) {
@@ -60,7 +56,7 @@ public class MarlinSimulationVisualizer {
 		gl2.glPopMatrix();
 	}
 
-	private void recalculateBuffer(GL2 gl2, Turtle turtleToRender, final PlotterSettings settings) {
+	private void recalculateBuffer(Turtle turtleToRender, final PlotterSettings settings) {
 		buffer.clear();
 		
 		MarlinSimulation m = new MarlinSimulation(settings);
@@ -134,7 +130,7 @@ public class MarlinSimulationVisualizer {
 			buffer.add(new ColorPoint(red,o));
 			buffer.add(new ColorPoint(red,block.start));
 		}
-		boolean showExit=false;
+		boolean showExit=true;
 		if(showExit) {
 			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
 			double f = block.exitSpeed / settings.getDrawFeedRate();
@@ -172,5 +168,47 @@ public class MarlinSimulationVisualizer {
 		Vector3d red = new Vector3d(v,0,0);
 		buffer.add(new ColorPoint(red,pLast));
 		buffer.add(new ColorPoint(red,block.end));
+	}
+
+	
+	@Override
+	public void start(GL2 gl2) {
+		this.gl2 = gl2;
+		myTurtle.history.clear();
+	}
+
+	@Override
+	public void draw(TurtleMove p0, TurtleMove p1) {
+		myTurtle.history.add(p1);
+		
+	}
+
+	@Override
+	public void travel(TurtleMove p0, TurtleMove p1) {
+		myTurtle.history.add(p1);
+	}
+
+	@Override
+	public void end() {
+		//if(previousTurtle!=myTurtle || previousTurtle.history.size() != myTurtle.history.size()) {
+			recalculateBuffer(myTurtle,mySettings);
+			//previousTurtle = myTurtle;
+		//}
+		
+		drawBufferedTurtle(gl2);
+	}
+
+	@Override
+	public void setPenDownColor(ColorRGB color) {
+		myTurtle.history.add(new TurtleMove(color.toInt(),0,TurtleMove.TOOL_CHANGE));
+	}
+
+	@Override
+	public void setPenDiameter(double d) {
+		
+	}
+	
+	public void setSettings(PlotterSettings e) {
+		mySettings = e;
 	}
 }
