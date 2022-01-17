@@ -86,7 +86,7 @@ public class PlotterControls extends JPanel {
 				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
 			}
 		});
-		
+
 		myPlotter.addPlotterEventListener((e)-> {
 			if (e.type == PlotterEvent.HOME_FOUND) {
 				updateButtonStatusConnected();
@@ -272,6 +272,7 @@ public class PlotterControls extends JPanel {
 		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
 		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 
 }
