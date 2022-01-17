@@ -30,8 +30,8 @@ public class PlotterSettings implements Serializable {
 	private double limitTop;
 	
 	// speed control
-	private double travelFeedRate = MarlinSimulation.DEFAULT_FEEDRATE;
-	private double drawFeedRate = MarlinSimulation.DEFAULT_FEEDRATE;
+	private double travelFeedRate = MarlinSimulation.MAX_FEEDRATE;
+	private double drawFeedRate = MarlinSimulation.MAX_FEEDRATE;
 	private double maxAcceleration = MarlinSimulation.MAX_ACCELERATION;
 
 	private ColorRGB paperColor;
