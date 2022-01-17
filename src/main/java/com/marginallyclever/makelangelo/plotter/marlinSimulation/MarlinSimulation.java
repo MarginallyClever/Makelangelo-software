@@ -34,7 +34,7 @@ public class MarlinSimulation {
 	private static final boolean JD_HANDLE_SMALL_SEGMENTS = false;
 
 	// values that can be tweaked in firmware at run time.
-	final double MAX_FEEDRATE = 3000;  // 5400 = 90*60 mm/s
+	public static final double MAX_FEEDRATE = 3000;  // 5400 = 90*60 mm/s
 	public static final double MAX_ACCELERATION = 100;  // 2400=40*60 mm/s/s
 	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
