@@ -139,9 +139,7 @@ public class JogInterface extends JPanel {
 		penUp.setEnabled(isConnected);
 		penDown.setEnabled(isConnected);
 		toggleEngageMotor.setEnabled(isConnected);
-		if (!isConnected) {
-			bCartesian.setEnabled(false);
-		}
+		if(!isConnected) bCartesian.setEnabled(false);
 	}
 
 	public static void main(String[] args) {
