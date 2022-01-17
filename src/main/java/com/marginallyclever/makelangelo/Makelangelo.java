@@ -356,6 +356,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
 
@@ -705,7 +706,7 @@ public final class Makelangelo {
 		
 		mainFrame.setContentPane(createContentPane());
 
-		camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
+		camera.zoomToFit(Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 		
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
