@@ -22,12 +22,16 @@ import java.util.ArrayList;
  */
 public class MarlinSimulationVisualizer implements TurtleRenderer {
 	//private Turtle previousTurtle=null;
-	private int renderMode = 0;
 	private GL2 gl2;
 	private Turtle myTurtle = new Turtle();
-
 	private PlotterSettings mySettings;
 	
+	private int renderMode = 0;
+	private boolean useDistance=true;
+	private boolean showNominal=false;
+	private boolean showEntry=false;
+	private boolean showExit=true;
+
 	private class ColorPoint {
 		public Vector3d c;
 		public Vector3d p;
@@ -44,7 +48,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	
 	private void drawBufferedTurtle(GL2 gl2) {
 		gl2.glPushMatrix();
-		gl2.glLineWidth(3);
+		gl2.glLineWidth(2);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 
 		for( ColorPoint a : buffer ) {
@@ -58,6 +62,10 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	private void recalculateBuffer(Turtle turtleToRender, final PlotterSettings settings) {
 		buffer.clear();
+
+		showNominal=false;
+		showEntry=false;
+		showExit=false;
 		
 		MarlinSimulation m = new MarlinSimulation(settings);
 		m.historyAction(turtleToRender, (block)->{
@@ -91,7 +99,6 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	
 	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
 		double t,a,d;
-		boolean useDistance=true;
 		if(useDistance) {
 			t = block.distance;
 			a = block.accelerateUntilD;
@@ -107,34 +114,37 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		//if(--limit<=0) return;
 		//if(limit<20) block.report();
 		// nominal vs entry speed
+
+		Vector3d ortho = new Vector3d();
+		if(showNominal || showEntry || showExit) {
+			ortho = new Vector3d(-block.normal.y,block.normal.x,0);
+			ortho.scale(150);
+		}
 		
-		boolean showNominal=false;
 		if(showNominal) {
-			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
+			Vector3d o = new Vector3d(ortho);
 			double f = block.nominalSpeed / settings.getDrawFeedRate();
-			o.scale(f*5);
+			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(1-f,f,0);
 			buffer.add(new ColorPoint(black,block.start));
 			buffer.add(new ColorPoint(black,o));
 			buffer.add(new ColorPoint(black,block.start));
 		}
-		boolean showEntry=false;
 		if(showEntry) {
-			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
+			Vector3d o = new Vector3d(ortho);
 			double f = block.entrySpeed / settings.getDrawFeedRate();
-			o.scale(f*5);
+			o.scale(f);
 			o.add(block.start);
 			Vector3d red = new Vector3d(1-f,0,f);
 			buffer.add(new ColorPoint(red,block.start));
 			buffer.add(new ColorPoint(red,o));
 			buffer.add(new ColorPoint(red,block.start));
 		}
-		boolean showExit=true;
 		if(showExit) {
-			Vector3d o = new Vector3d(-block.normal.y,block.normal.x,0);
+			Vector3d o = new Vector3d(ortho);
 			double f = block.exitSpeed / settings.getDrawFeedRate();
-			o.scale(f*-5);
+			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(0,1-f,f);
 			buffer.add(new ColorPoint(black,block.start));
@@ -143,31 +153,33 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 
 		double v = 1;
-		Vector3d pLast = block.start;
 		if(a>0) {
+			v = block.entrySpeed / block.nominalSpeed;
 			// accel part of block
 			Vector3d p0 = new Vector3d(block.delta);
 			p0.scale(a/t);
 			p0.add(block.start);
-			Vector3d green = new Vector3d(0,v,0);
+			Vector3d green = new Vector3d(0,1.0-v,v);
 			buffer.add(new ColorPoint(green,block.start));
 			buffer.add(new ColorPoint(green,p0));
-			pLast=p0;
 		}
 		if(a<d) {
+			v=1;
 			// nominal part of block
 			Vector3d p1 = new Vector3d(block.delta);
 			p1.scale(d/t);
 			p1.add(block.start);
 			Vector3d blue = new Vector3d(0,0,v);
-			buffer.add(new ColorPoint(blue,pLast));
+			//buffer.add(new ColorPoint(blue,pLast));
 			buffer.add(new ColorPoint(blue,p1));
-			pLast=p1;
 		}
-		// decel part of block
-		Vector3d red = new Vector3d(v,0,0);
-		buffer.add(new ColorPoint(red,pLast));
-		buffer.add(new ColorPoint(red,block.end));
+		if(d<t) {
+			// decel part of block
+			v = block.exitSpeed / block.nominalSpeed;
+			Vector3d red = new Vector3d(1.0-v,0,v);
+			//buffer.add(new ColorPoint(red,pLast));
+			buffer.add(new ColorPoint(red,block.end));
+		}
 	}
 
 	
