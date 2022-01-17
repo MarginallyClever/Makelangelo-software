@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import java.util.Arrays;
 
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
+
 /**
  * {@link TurtleRenderFactory} is a Factory pattern for {@link TurtleRenderer} instances, written
  * as an enum so that it does extra checks at compile time.
@@ -10,7 +12,8 @@ import java.util.Arrays;
  */
 public enum TurtleRenderFactory {
 	DEFAULT("Default", new DefaultTurtleRenderer()),
-	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer());
+	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
+	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
 
 	private final TurtleRenderer turtleRenderer;
 

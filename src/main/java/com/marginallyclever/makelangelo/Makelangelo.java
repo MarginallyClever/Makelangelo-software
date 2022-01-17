@@ -30,10 +30,12 @@ import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -149,12 +151,20 @@ public final class Makelangelo {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addPlotterEventListener(this::onPlotterEvent);
-		myPlotter.getSettings().addPlotterSettingsListener((e)->{
-			if(previewPanel != null) previewPanel.repaint();
-		});
+		myPlotter.getSettings().addPlotterSettingsListener((e)->onPlotterSettingsUpdate(e));
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
+		}
+		onPlotterSettingsUpdate(myPlotter.getSettings());
+	}
+
+	private void onPlotterSettingsUpdate(PlotterSettings e) {
+		if(previewPanel != null) previewPanel.repaint();
+		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
+		if(f instanceof MarlinSimulationVisualizer) {
+			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
+			msv.setSettings(e);
 		}
 	}
 

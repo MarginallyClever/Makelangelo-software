@@ -1916,6 +1916,11 @@
 		<hint>Art Pipeline</hint>
 	</string>
 	<string>
+		<key>Simplify2</key>
+		<value>Simplify 2</value>
+		<hint>Art Pipeline</hint>
+	</string>
+	<string>
 		<key>Crop to margins</key>
 		<value>Crop to margins</value>
 		<hint>Art Pipeline</hint>
