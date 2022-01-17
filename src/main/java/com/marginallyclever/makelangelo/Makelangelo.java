@@ -36,6 +36,7 @@ import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -232,7 +233,7 @@ public final class Makelangelo {
 
 		mainMenuBar = new JMenuBar();
 		mainMenuBar.add(createFileMenu());
-		mainMenuBar.add(createPaperSettingsMenu());
+		mainMenuBar.add(createSettingsMenu());
 		mainMenuBar.add(createGenerateMenu());
 		mainMenuBar.add(createToolsMenu());
 		mainMenuBar.add(createViewMenu());
@@ -255,20 +256,24 @@ public final class Makelangelo {
 		}
 	}
 
-	private JMenu createPaperSettingsMenu() {
+	private JMenu createSettingsMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuPaper"));
 		
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenPaperSettings"));
-		bOpenControls.addActionListener((e)-> openPaperSettings());
-		menu.add(bOpenControls);
+		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
+		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
+		menu.add(bOpenPaperSettings);
+		
+		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
+		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
+		menu.add(bOpenPlotterSettings);
 		
 		return menu;
 	}
 
-	private void openPaperSettings() {
-		PaperSettings paperSettings = new PaperSettings(myPaper);
-		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
-		dialog.add(paperSettings);
+	private void openPlotterSettings() {
+		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
+		JDialog dialog = new JDialog(mainFrame,PlotterSettingsPanel.class.getSimpleName());
+		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
@@ -278,7 +283,26 @@ public final class Makelangelo {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				enableMenuBar(true);
-				paperSettings.save();
+			}
+		});
+
+		dialog.setVisible(true);
+	}
+
+	private void openPaperSettings() {
+		PaperSettings settings = new PaperSettings(myPaper);
+		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		dialog.add(settings);
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+
+		enableMenuBar(false);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
+				settings.save();
 			}
 		});
 
