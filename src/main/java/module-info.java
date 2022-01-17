@@ -19,4 +19,5 @@ module com.marginallyclever.makelangelo {
 	exports com.marginallyclever.makelangelo;
 	exports com.marginallyclever.makelangelo.turtle;
 	exports com.marginallyclever.convenience;
+	exports com.marginallyclever.convenience.log;
 }
