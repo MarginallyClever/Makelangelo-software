@@ -197,19 +197,24 @@ public class TranslatorLanguage {
 		return DocumentBuilderFactory.newInstance();
 	}
 
+	/**
+	 * To have a way to remember missing key asked ... to later create a partial missing key .xml file.
+	 */
 	public SortedSet<String> missingKeys = new TreeSet<>();
 	
 	public String get(String key) {
 		if(strings.containsKey(key)) {
 			return strings.get(key);
 		} else {
-			// a sorted set of all the missing key to generat a essay .xml 
+			// a sorted set of all the missing key to eventualy later generat a partial language .xml 
 			missingKeys.add(key);		    
 			return "Missing:"+key;
 		}
 	}
 
 	/**
+	 * PPAC37 : TODO to help adding missing key ...
+	 * 
 	 * https://examples.javacodegeeks.com/core-java/xml/parsers/documentbuilderfactory/create-xml-file-in-java-using-dom-parser-example/
 	 *
 	 * https://mkyong.com/java/how-to-create-xml-file-in-java-dom/
@@ -237,7 +242,7 @@ public class TranslatorLanguage {
 		
 		Element elemLanguageName = doc.createElement(XML_TAG_NAME);
 		elemMeta.appendChild(elemLanguageName);
-		elemLanguageName.setTextContent(name+"_");
+		elemLanguageName.setTextContent(name+"_");// The "_" at the end is to avoid having the same language name. (or this will replace all traduction ... when loaded)
 		
 		Element elemAuthor = doc.createElement(XML_TAG_AUTHOR);
 		elemMeta.appendChild(elemAuthor);
