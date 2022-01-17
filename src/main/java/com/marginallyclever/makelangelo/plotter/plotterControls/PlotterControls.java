@@ -80,16 +80,8 @@ public class PlotterControls extends JPanel {
 		});
 		chooseConnection.addListener(e -> {
 			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> {
-					myPlotter.reInit();
-					updateButtonStatusOnConnect();
-					jogInterface.onNetworkConnect();
-				}
-				case NetworkSessionEvent.CONNECTION_CLOSED -> {
-					myPlotter.reInit();
-					updateButtonStatusOnDisconnect();
-					jogInterface.onNetworkDisconnect();
-				}
+				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
+				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
 			}
 		});
 	}
@@ -143,7 +135,7 @@ public class PlotterControls extends JPanel {
 			chooseConnection.closeConnection();
 		});
 
-		updateButtonStatusOnDisconnect();
+		onDisconnect();
 
 		return panel;
 	}
@@ -216,19 +208,23 @@ public class PlotterControls extends JPanel {
 		bStep.setEnabled(isHomed && !isRunning);
 	}
 
-	private void updateButtonStatusOnConnect() {
+	private void onConnect() {
+		myPlotter.reInit();
 		bFindHome.setEnabled(true);
 		bEmergencyStop.setEnabled(true);
 		updateButtonStatusConnected();
+		jogInterface.onNetworkConnect();
 	}
 
-	private void updateButtonStatusOnDisconnect() {
+	private void onDisconnect() {
+		myPlotter.reInit();
 		bFindHome.setEnabled(false);
 		bEmergencyStop.setEnabled(false);
 		bRewind.setEnabled(false);
 		bStart.setEnabled(false);
 		bPause.setEnabled(false);
 		bStep.setEnabled(false);
+		jogInterface.onNetworkDisconnect();
 	}
 
 	@SuppressWarnings("unused")
