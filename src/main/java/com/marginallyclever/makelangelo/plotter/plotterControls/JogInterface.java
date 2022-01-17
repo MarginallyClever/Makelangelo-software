@@ -29,7 +29,10 @@ public class JogInterface extends JPanel {
 	private Plotter myPlotter;
 	private CartesianButtons bCartesian = new CartesianButtons();
 	private JButton toggleEngageMotor;
-	
+	private JButton findHome;
+	private JButton penUp;
+	private JButton penDown;
+
 	public JogInterface(Plotter plotter) {
 		super();
 		myPlotter=plotter;
@@ -72,23 +75,32 @@ public class JogInterface extends JPanel {
 		myPlotter.addPlotterEventListener((e)-> {
 			if(e.type == PlotterEvent.MOTORS_ENGAGED
 			|| e.type == PlotterEvent.HOME_FOUND) {
-				updateButtonStatus();
+				updateButtonStatusWithPlotter();
 			}
 		});
-		updateButtonStatus();
+		updateButtonStatusWithPlotter();
+		updateButtonsStatus(false);
 	}
 	
 	public void findHome() {
 		myPlotter.findHome();
-		updateButtonStatus();
+		updateButtonStatusWithPlotter();
+	}
+
+	public void onNetworkConnect() {
+		updateButtonsStatus(true);
+	}
+
+	public void onNetworkDisconnect() {
+		updateButtonsStatus(false);
 	}
 	
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
-		JButton findHome    = new ButtonIcon("JogInterface.FindHome", "/images/house.png");
-		JButton penUp    = new ButtonIcon("JogInterface.PenUp", "/images/arrow_up.png");
-		JButton penDown  = new ButtonIcon("JogInterface.PenDown", "/images/arrow_down.png");
+		findHome = new ButtonIcon("JogInterface.FindHome", "/images/house.png");
+		penUp = new ButtonIcon("JogInterface.PenUp", "/images/arrow_up.png");
+		penDown  = new ButtonIcon("JogInterface.PenDown", "/images/arrow_down.png");
 		toggleEngageMotor = new ButtonIcon("JogInterface.DisengageMotors", "/images/lock_open.png");
 
 		bar.add(findHome);
@@ -116,9 +128,18 @@ public class JogInterface extends JPanel {
 		}
 	}
 
-	private void updateButtonStatus() {
-		toggleEngageMotor.setText(Translator.get( myPlotter.getMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors" ));
-		bCartesian.setEnabled(myPlotter.getDidFindHome());
+	private void updateButtonStatusWithPlotter() {
+		toggleEngageMotor.setText(Translator.get(myPlotter.getMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors"));
+		boolean isHomed = myPlotter.getDidFindHome();
+		bCartesian.setEnabled(isHomed);
+	}
+
+	private void updateButtonsStatus(boolean isConnected) {
+		findHome.setEnabled(isConnected);
+		penUp.setEnabled(isConnected);
+		penDown.setEnabled(isConnected);
+		toggleEngageMotor.setEnabled(isConnected);
+		if(!isConnected) bCartesian.setEnabled(false);
 	}
 
 	public static void main(String[] args) {
