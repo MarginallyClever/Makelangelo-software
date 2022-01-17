@@ -32,32 +32,29 @@ jobs:
       run: ./mvnw -B clean package -DskipTests
 
     - name: Prepare package for release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
 
     - name: Upload artifact for release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: actions/upload-artifact@v2
       with:
         name: artifact
         path: target/to-upload.jar
-        retention-days: 1
+        retention-days: 5
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
     runs-on: windows-latest
     needs: build
+    if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact
       uses: actions/download-artifact@v2
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       with:
         name: artifact
 
       # from https://github.com/marketplace/actions/deploy-nightly
     - name: Deploy universal release
       uses: WebFreak001/deploy-nightly@v1.1.0
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
