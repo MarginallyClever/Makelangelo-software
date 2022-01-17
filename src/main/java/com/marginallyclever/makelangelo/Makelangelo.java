@@ -257,7 +257,7 @@ public final class Makelangelo {
 	}
 
 	private JMenu createSettingsMenu() {
-		JMenu menu = new JMenu(Translator.get("MenuPaper"));
+		JMenu menu = new JMenu(Translator.get("MenuSettings"));
 		
 		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
 		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());

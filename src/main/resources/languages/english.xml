@@ -2020,14 +2020,14 @@
 	</string>
 
 	<string>
-		<key>MenuPaper</key>
-		<value>Paper</value>
+		<key>OpenPaperSettings</key>
+		<value>Paper settings</value>
 		<hint></hint>
 	</string>
-
+	
 	<string>
-		<key>OpenPaperSettings</key>
-		<value>Open settings</value>
+		<key>OpenPlotterSettings</key>
+		<value>Plotter settings</value>
 		<hint></hint>
 	</string>
 	
