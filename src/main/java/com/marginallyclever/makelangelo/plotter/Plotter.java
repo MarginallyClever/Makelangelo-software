@@ -143,7 +143,15 @@ public class Plotter implements PreviewListener, Cloneable {
 		areMotorsEngaged = state;
 		firePlotterEvent(new PlotterEvent(PlotterEvent.MOTORS_ENGAGED,this,state));
 	}
-	
+
+	/**
+	 * When a new connection is established, Marlin released the motors and reset the home position
+	 */
+	public void reInit() {
+		areMotorsEngaged = false;
+		didFindHome = false;
+	}
+
 	/**
 	 * @return a reference to the active {@link PlotterSettings} in this {@link Plotter}.
 	 * Modifications will immediately affect the {@link Plotter}.

@@ -294,7 +294,7 @@ public final class Makelangelo {
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
-		JMenuItem bSaveToSD = new JMenuItem(Translator.get("SaveGCode"));
+		JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
 		bSaveToSD.addActionListener((e)-> saveGCode());
 		menu.add(bSaveToSD);
 
@@ -394,6 +394,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
 
@@ -746,7 +747,7 @@ public final class Makelangelo {
 		
 		mainFrame.setContentPane(createContentPane());
 
-		camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
+		camera.zoomToFit(Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 		
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
