@@ -63,10 +63,11 @@ public class TranslatorTests {
 	}
 
 	@Test
-	public void searchSimpleStringMissingKeyUsedAsArgumentForTranslatorGetInTheSrcCode() {
-	    Translator.start();
+	public void searchSimpleStringMissingKeyUsedAsArgumentForTranslatorGetInTheSrcCode() {	    
 	    try {
-		// TODO in the env test is this the way ?
+		//Pre requis
+		Translator.start();
+		
 		String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
 		System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
 		File srcDir = new File(".", baseDirToSearch);
@@ -76,22 +77,20 @@ public class TranslatorTests {
 		    ex.printStackTrace();
 		}
 
-		// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
-		// TODO a lead to explace this regexp will not work if Translation.get is refactoref ( ex : class renamed or methode renamend )
 		Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
 		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
 		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
-		//
-		// output the missing keys
-		//
+		
+		// output the missing keys if any.
 		for (String k : groupIdenticalMissingKey.keySet()) {
 		    System.out.printf("missing traduction key : \"%s\"\n", k);
 		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
 			System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
 		    }
 		}
-		// ???
+		
+		// validate or not the test. (succes if no missing keys found)
 		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?.");
 		
 	    } catch (Exception e) {
