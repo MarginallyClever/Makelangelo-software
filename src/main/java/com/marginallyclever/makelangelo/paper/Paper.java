@@ -12,10 +12,11 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 
 public class Paper implements PreviewListener {
-	private static final Logger logger = LoggerFactory.getLogger(Paper.class);
 
-	private static final int DEFAULT_WIDTH=420; // mm
-	private static final int DEFAULT_HEIGHT=594; // mm
+	public static final int DEFAULT_WIDTH = 420; // mm
+	public static final int DEFAULT_HEIGHT = 594; // mm
+
+	private static final Logger logger = LoggerFactory.getLogger(Paper.class);
 
 	private static final String PREF_KEY_ROTATION = "rotation";
 	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
