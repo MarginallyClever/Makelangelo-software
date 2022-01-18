@@ -45,15 +45,14 @@ import org.slf4j.LoggerFactory;
  * @author PPAC37
  */
 public class FindAllTraductionGetTableModel implements TableModel {
-    
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGetTableModel.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(FindAllTraductionGetTableModel.class);
 
     // KEY definition of the table colum REQUIRED ( Warning should have distinc value ) TODO as enum.
     final static String COL_KEY_ROW_NUM = "*";
     final static String COL_KEY_ARGS = "Traduction.get(...)";
     final static String COL_KEY_ARGS_IS_SIMPLE_STRING = "isS";
-    
+
     final static String COL_KEY_LINE = "Line";
     final static String COL_KEY_FILE_NAME = "FileName";
     final static String COL_KEY_ARGS_TRADUCTED = "Traduction";
@@ -128,17 +127,15 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	final String columnKey = getColumnKey(columnIndex);
 	if (COL_KEY_ROW_NUM.equals(columnKey) || COL_KEY_LINE.equals(columnKey)) {
 	    return Integer.class;
-	}
-//	else if (.equals(columnKey)) {
-//            return Long.class;
-//        } else if (.equals(columnKey)) {
-//            return String.class;
-//        }
+	} //	else if (.equals(columnKey)) {
+	//            return Long.class;
+	//        } else if (.equals(columnKey)) {
+	//            return String.class;
+	//        }
 	else if (COL_KEY_ARGS_IS_SIMPLE_STRING.equals(columnKey)
-		|| COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING.equals(columnKey)
-		) {
-            return Boolean.class;
-        } 
+		|| COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING.equals(columnKey)) {
+	    return Boolean.class;
+	}
 // else if (.equals(columnKey)) {
 //            return JButton.class;
 //        }
@@ -155,7 +152,15 @@ public class FindAllTraductionGetTableModel implements TableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
 	final String columnKey = getColumnKey(columnIndex);
 	if (COL_KEY_ARGS.equals(columnKey)) {
-	    return true;
+	    //return true;
+	    Object obj = map.keySet().toArray()[rowIndex];
+	    FindAllTraductionResult mr = null;
+	    if (obj != null && obj instanceof FindAllTraductionResult) {
+		mr = (FindAllTraductionResult) obj;
+		return mr.isArgsMatchASimpleString();
+	    } else {
+		return false;
+	    }
 	}
 	return false;
     }
@@ -175,7 +180,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	} else {
 	    return null;
 	}
-	
+
 	final String columnKey = getColumnKey(columnIndex);
 	if (COL_KEY_ROW_NUM.equals(columnKey)) {
 	    return rowIndex + 1;
@@ -194,7 +199,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	} else if (COL_KEY_ARGS_TRADUCTED.equals(columnKey)) {
 	    // 
 	    String tmpS = mr.getSimpleStringFromArgs();
-	    if (tmpS!=null) {
+	    if (tmpS != null) {
 		return "\"" + Translator.get(tmpS) + "\"";
 	    }
 
@@ -219,11 +224,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 		mr = (FindAllTraductionResult) obj;
 	    }
 	    if (mr != null) {
-		System.out.printf("Not implemented yet. TODO safely modifiy %s to change at line %d, %s in %s\n", mr.pSrc, mr.lineInFile, mr.argsMatch, aValue);
-
-		// TODO is this posible to "securly" modifiy a .java file with this ...
-		// TODO but first we need to be sure that this is perfectly well done ...
-		// TODO and then we may have to change the key/or create a new on in the traductions files tha used this key ...
+		mr.setValueAtByTableModel((String) aValue);
 	    }
 
 	}
@@ -266,54 +267,33 @@ public class FindAllTraductionGetTableModel implements TableModel {
     public void removeTableModelListener(TableModelListener l) {
 	arrayListTableModelListener.remove(l);
     }
-    
-    //
-    //
-    //
-     public static void main(String[] args) {
 
-	 Log.start();
+    //
+    //
+    //
+    public static void main(String[] args) {
+
+	Log.start();
 	// lazy init to be able to purge old files
 	//logger = LoggerFactory.getLogger(Makelangelo.class);
 
-	PreferencesHelper.start();
-	 CommandLineOptions.setFromMain(args);
-	Translator.start();
-	
+	PreferencesHelper.start();// Needed for Translator ? (why Translator dont start himself PreferencesHelper if needed ? )
+	CommandLineOptions.setFromMain(args);// Not realy needed but we not.
+	Translator.start();// To use the "standard" Translator system implemented.
+
+	// Have i play white other traduction file in case in this env the one define in the pref do not exist
 	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 	    LanguagePreferences.chooseLanguage();
 	}
-	try {
-	    // TODO arg 0 as dirToSearch 
-	    if (args != null && args.length > 0) {
-		//
 
-	    }
-	    String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
-	    System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
-	    File srcDir = new File(".", baseDirToSearch);
-	    try {
-		System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
-	    } catch (IOException ex) {
-		ex.printStackTrace();
-		//Logger.getLogger(FindAllTraductionGetTableModel.class.getName()).log(Level.SEVERE, null, ex);
-	    }
-	    // list all .java files in srcDir.
-
-	    List<Path> paths = FindAllTraductionGet.listFiles(srcDir.toPath(), ".java");
-	    // search in the file ...
-	    paths.forEach(x -> FindAllTraductionGet.searchInAFile(x, srcDir.toPath(), "Translator\\s*\\.\\s*get\\s*\\(([^\\)]*)\\)"));
-	} catch (IOException ex) {
-	    ex.printStackTrace();
-	    //Logger.getLogger(FindAllTraductionGetTableModel.class.getName()).log(Level.SEVERE, null, ex);
-	}
-	
-	 JFrame jf = new JFrame();
+	// Test the TableModel
+	JFrame jf = new JFrame(FindAllTraductionGetTableModel.class.getSimpleName());
 	jf.setLayout(new BorderLayout());
-	 JTable jtab = new JTable(new FindAllTraductionGetTableModel());
-	jtab.setAutoCreateRowSorter(true);
-	 JScrollPane jsp = new JScrollPane();
-	jsp.setViewportView(jtab);
+	JTable jtable = new JTable(new FindAllTraductionGetTableModel());
+	jtable.setAutoCreateRowSorter(true);// So you can sort cols value (but be aware then the col,row selection JTable model will be one SelectionModel away from the TableModel (i.e. row 1 on the JTable can be row 5 in the TableModel due to the sorter...) )
+	jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	JScrollPane jsp = new JScrollPane();
+	jsp.setViewportView(jtable);
 	jf.getContentPane().add(jsp, BorderLayout.CENTER);
 	jf.setMinimumSize(new Dimension(800, 600));
 	jf.pack();

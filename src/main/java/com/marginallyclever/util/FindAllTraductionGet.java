@@ -43,9 +43,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An attempt to find the Tratuction.get(...) arguments in the source code. To
- * deduce if possible (args = simple string value) the keys used and therefore
+ * deduce when possible (args = simple string value) the keys used and therefore
  * missing in the translation file in use.
- *
  *
  * @author PPAC37
  */
@@ -54,28 +53,19 @@ public class FindAllTraductionGet {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGet.class);
 
     //
-    private static boolean debugPaser = false;
+    private static boolean debugPaser = true;
     private static boolean debugListFiles = true;
 
-//    /**
-//     *
-//     * @return
-//     */
-//    public Map<FindAllTraductionResult, Path> getMapMatchResultToFilePath() {
-//	return mapMatchResultToFilePath;
-//    }
     /**
-     * Try to search a src java project for a specifik pattern ( like
-     * Traduction.get(...) )
+     * Try to search a src java project for a specific pattern.
+     * like <code>Traduction.get(...)</code> in all .java file.
      *
      * @param args
      */
     public static void main(String[] args) {
 
 	Log.start();
-	// lazy init to be able to purge old files
-	//logger = LoggerFactory.getLogger(Makelangelo.class);
-
+	
 	PreferencesHelper.start();
 	CommandLineOptions.setFromMain(args);
 	Translator.start();
@@ -86,13 +76,14 @@ public class FindAllTraductionGet {
 	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 	    LanguagePreferences.chooseLanguage();
 	}
-
+	
 	// TODO in the env test is this the way ?
 	String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
-	System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
+	logger.debug(String.format("PDW=%s", new File(".").getAbsolutePath()));
+	
 	File srcDir = new File(".", baseDirToSearch);
 	try {
-	    System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
+	    logger.debug(String.format("srcDir=%s", srcDir.getCanonicalPath()));
 	} catch (IOException ex) {
 	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
 	}
@@ -102,14 +93,14 @@ public class FindAllTraductionGet {
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
 	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
-	System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalKey.size());
+	logger.debug(String.format("groupIdenticalKey.size()=%d", groupIdenticalKey.size()));
 	//
 	// output the missing keys
 	//
 	for (String k : groupIdenticalKey.keySet()) {
-	    System.out.printf("missing traduction key : \"%s\"\n", k);
+	    logger.debug(String.format("missing traduction key : \"%s\"", k));
 	    for (FindAllTraductionResult tr : groupIdenticalKey.get(k)) {
-		System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+		logger.debug(String.format("  used in : \"%s\" line %d", tr.pSrc, tr.lineInFile));
 	    }
 	}
 	//
@@ -127,12 +118,11 @@ public class FindAllTraductionGet {
 	int totalSrcLineWithMissingKey = 0;
 	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalKey = new TreeMap<>();
 	for (FindAllTraductionResult tr : mapMatchResultToFilePath.keySet()) {
+	    // find the key that get a Missing: when traducted
 	    if (tr.isTraductionStartWithMissing()) {
 		totalSrcLineWithMissingKey++;
-		String k = tr.getSimpleStringFromArgs();
-		//System.out.printf("missing traduction key : \"%s\" used in %s : line %d\n",posibleKey,tr.pSrc,tr.lineInFile);
-
-		// group same missing keys.
+		String k = tr.getSimpleStringFromArgs();		
+		// a way to group same missing keys.
 		if (groupIdenticalKey.containsKey(k)) {
 		    groupIdenticalKey.get(k).add(tr);
 		} else {
@@ -142,7 +132,7 @@ public class FindAllTraductionGet {
 		}
 	    }
 	}
-	System.out.printf("totalSrcLineWithMissingKey=%d\n", totalSrcLineWithMissingKey);
+	logger.debug(String.format("totalSrcLineWithMissingKey=%d", totalSrcLineWithMissingKey));
 	return groupIdenticalKey;
     }
 
@@ -184,7 +174,7 @@ public class FindAllTraductionGet {
 	} catch (IOException ex) {
 	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
 	}
-	System.out.printf("mapMatchResultToFilePath.size()=%d\n", mapMatchResultToFilePath.size());
+	logger.debug(String.format("mapMatchResultToFilePath.size()=%d", mapMatchResultToFilePath.size()));
 	return mapMatchResultToFilePath;
     }
 
@@ -199,7 +189,7 @@ public class FindAllTraductionGet {
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
 	try {
 	    if (debugPaser) {
-		System.out.println(x);
+		logger.debug(String.format("searchInAFile %s",x));
 	    }
 
 	    Pattern pattern = Pattern.compile(regexp);
@@ -210,11 +200,13 @@ public class FindAllTraductionGet {
 		List<MatchResult> n = sc.findAll(pattern)
 			.collect(Collectors.toList());
 		if (n.size() > 0) {
-//		    System.out.printf("::%d in %s\n", n.size(), x.toAbsolutePath());
+//		    
+logger.debug(String.format("::%d in %s", n.size(), x.toAbsolutePath()));
 		    for (MatchResult mr : n) {
 			countMatchNotLineByLine++;
 			// Can we get the line num ? currently in this implementation we have the car pos in the file/stream ...
-//			System.out.printf(" %-50s in %s at sart:%d end:%d\n", mr.group(1), mr.group(), mr.start(), mr.end());
+//			
+logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.group(), mr.start(), mr.end()));
 		    }
 		}
 	    }
@@ -230,13 +222,10 @@ public class FindAllTraductionGet {
 
 		while (m.find()) {
 		    if (debugPaser) {
-			System.out.println("#found: " + m.group(0));
-			System.out.flush();
-			System.out.println("#found gp count : " + m.groupCount());
-			System.out.flush();
+			logger.debug(String.format("#found (gp count=%d) : %s ", m.groupCount(), m.group(0)));			
 		    }
-		    if (false) {
-			System.out.printf("%s\n\tat %s(l:%d c:%d)\n", m.group(1), baseDir.relativize(x), lineNum, m.start(1));
+		    if (true) {
+			logger.debug(String.format("%s\n\tat %s(l:%d c:%d)", m.group(1), baseDir.relativize(x), lineNum, m.start(1)));
 		    }
 		    FindAllTraductionResult res = new FindAllTraductionResult(m.group(1), lineNum, m.start(1), x);
 		    mapMatchResultToFilePath.put(res, x);
@@ -275,9 +264,9 @@ public class FindAllTraductionGet {
 	}
 	if (debugListFiles) {
 	    if (result == null) {
-		System.out.printf("listFiles (%s, \"%s\").size()=null\n", path, fileNameEndsWithSuffix);
+		logger.debug(String.format("listFiles (%s, \"%s\").size()=null", path, fileNameEndsWithSuffix));
 	    } else {
-		System.out.printf("listFiles (%s, \"%s\").size()=%d\n", path, fileNameEndsWithSuffix, result.size());
+		logger.debug(String.format("listFiles (%s, \"%s\").size()=%d", path, fileNameEndsWithSuffix, result.size()));
 	    }
 	}
 	return result;

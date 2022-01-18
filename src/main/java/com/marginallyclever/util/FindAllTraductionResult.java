@@ -86,7 +86,7 @@ public class FindAllTraductionResult {
      * Only applicable/valid on a simple string args.
      * As a varaible or exression can be used as argus for Traduction.get and we only get the texte ... hard to resolv expressions.
      * This only return trye for simple String case.
-     * 
+     * TODO : should directly work with the TranslatorLanguage and not go by Translator.get ? 
      * @return 
      */
     public boolean isTraductionStartWithMissing(){
@@ -102,5 +102,20 @@ public class FindAllTraductionResult {
 
     //
     // For possible edition TODO ? history ? ? direct impacte vs later apply/saved ...    
-    // -> a way to refresh all the TableModelConente / a way to appli modification ...
+    // -> a way to refresh all the TableModel contente / a way to apply modification ...
+    
+    public void setValueAtByTableModel(String aValue){
+		System.out.printf("Not implemented yet. TODO safely modifiy %s to change at line %d, %s in %s\n", pSrc, lineInFile,argsMatch, aValue);
+
+		// TODO if i want to cumulate modifications and only apply them when we clic on a "Apply" button ???
+		// have a way to higlight modification not appliyed and activate an "apply bt" ?
+		
+		// TODO if i want to implement undo redo ? if not applyed seem posible but if alredy apply ... this can be complexe ? 
+		
+		// TODO is this posible to "securly" modifiy a .java file with this ...
+		// TODO but first we need to be sure that this is perfectly well done ...
+		// TODO and then we may have to change the key/or create a new on in the traductions files that used this key ...
+		// TODO have some choise to make create a new key or rename an existing key ...
+	   
+    }
 }
