@@ -17,28 +17,47 @@
  */
 package com.marginallyclever.util;
 
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.MatchResult;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author PPAC37
  */
 public class FindAllTraductionGetTableModel implements TableModel {
+    
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGetTableModel.class);
+
 
     // KEY definition of the table colum REQUIRED ( Warning should have distinc value ) TODO as enum.
     final static String COL_KEY_ROW_NUM = "*";
-    final static String COL_KEY_ARGS = "Args";
+    final static String COL_KEY_ARGS = "Traduction.get(...)";
+    final static String COL_KEY_ARGS_IS_SIMPLE_STRING = "isS";
+    
     final static String COL_KEY_LINE = "Line";
     final static String COL_KEY_FILE_NAME = "FileName";
     final static String COL_KEY_ARGS_TRADUCTED = "Traduction";
+    final static String COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING = "Traduction start with MISSING";
     // SPECIAL CASE ( todo to implemente as negative colIndex to hide this to the user but to have a way to get the object used at the row ... )
     final static String SPECIAL_COL_KEY_OBJECT = "...";
     /**
@@ -54,15 +73,17 @@ public class FindAllTraductionGetTableModel implements TableModel {
     protected String columKey[] = {
 	COL_KEY_ROW_NUM,
 	COL_KEY_ARGS,
+	COL_KEY_ARGS_IS_SIMPLE_STRING,
 	COL_KEY_FILE_NAME,
 	COL_KEY_LINE,
+	COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING,
 	COL_KEY_ARGS_TRADUCTED
     };
 
     private Map<FindAllTraductionResult, Path> map = null;
 
     public FindAllTraductionGetTableModel() {
-	map = FindAllTraductionGet.getMapMatchResultToFilePath();
+	map = FindAllTraductionGet.matchTraductionGetInAllSrcJavaFiles(new File("."));
     }
 
     @Override
@@ -112,9 +133,13 @@ public class FindAllTraductionGetTableModel implements TableModel {
 //            return Long.class;
 //        } else if (.equals(columnKey)) {
 //            return String.class;
-//        } else if (.equals(columnKey)) {
-//            return Boolean.class;
-//        } else if (.equals(columnKey)) {
+//        }
+	else if (COL_KEY_ARGS_IS_SIMPLE_STRING.equals(columnKey)
+		|| COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING.equals(columnKey)
+		) {
+            return Boolean.class;
+        } 
+// else if (.equals(columnKey)) {
 //            return JButton.class;
 //        }
 	return Object.class;
@@ -162,11 +187,15 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	    return mr.lineInFile;
 	} else if (SPECIAL_COL_KEY_OBJECT.equals(columnKey)) {
 	    return mr;
+	} else if (COL_KEY_ARGS_IS_SIMPLE_STRING.equals(columnKey)) {
+	    return mr.isArgsMatchASimpleString();
+	} else if (COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING.equals(columnKey)) {
+	    return mr.isTraductionStartWithMissing();
 	} else if (COL_KEY_ARGS_TRADUCTED.equals(columnKey)) {
 	    // 
-	    String tmpS = mr.argsMatch;
-	    if (tmpS.startsWith("\"") && tmpS.endsWith("\"")) {
-		return "\"" + Translator.get(tmpS.substring(1, tmpS.length() - 1)) + "\"";
+	    String tmpS = mr.getSimpleStringFromArgs();
+	    if (tmpS!=null) {
+		return "\"" + Translator.get(tmpS) + "\"";
 	    }
 
 	}
@@ -236,6 +265,61 @@ public class FindAllTraductionGetTableModel implements TableModel {
     @Override
     public void removeTableModelListener(TableModelListener l) {
 	arrayListTableModelListener.remove(l);
+    }
+    
+    //
+    //
+    //
+     public static void main(String[] args) {
+
+	 Log.start();
+	// lazy init to be able to purge old files
+	//logger = LoggerFactory.getLogger(Makelangelo.class);
+
+	PreferencesHelper.start();
+	 CommandLineOptions.setFromMain(args);
+	Translator.start();
+	
+	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
+	    LanguagePreferences.chooseLanguage();
+	}
+	try {
+	    // TODO arg 0 as dirToSearch 
+	    if (args != null && args.length > 0) {
+		//
+
+	    }
+	    String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
+	    System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
+	    File srcDir = new File(".", baseDirToSearch);
+	    try {
+		System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
+	    } catch (IOException ex) {
+		ex.printStackTrace();
+		//Logger.getLogger(FindAllTraductionGetTableModel.class.getName()).log(Level.SEVERE, null, ex);
+	    }
+	    // list all .java files in srcDir.
+
+	    List<Path> paths = FindAllTraductionGet.listFiles(srcDir.toPath(), ".java");
+	    // search in the file ...
+	    paths.forEach(x -> FindAllTraductionGet.searchInAFile(x, srcDir.toPath(), "Translator\\s*\\.\\s*get\\s*\\(([^\\)]*)\\)"));
+	} catch (IOException ex) {
+	    ex.printStackTrace();
+	    //Logger.getLogger(FindAllTraductionGetTableModel.class.getName()).log(Level.SEVERE, null, ex);
+	}
+	
+	 JFrame jf = new JFrame();
+	jf.setLayout(new BorderLayout());
+	 JTable jtab = new JTable(new FindAllTraductionGetTableModel());
+	jtab.setAutoCreateRowSorter(true);
+	 JScrollPane jsp = new JScrollPane();
+	jsp.setViewportView(jtab);
+	jf.getContentPane().add(jsp, BorderLayout.CENTER);
+	jf.setMinimumSize(new Dimension(800, 600));
+	jf.pack();
+	jf.setVisible(true);
+	jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
     }
 
 }

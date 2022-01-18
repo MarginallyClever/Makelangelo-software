@@ -77,6 +77,9 @@ public class TranslatorLanguage {
 				Element el = (Element) nl.item(i);
 				String key = getTextValue(el, "key");
 				String value = getTextValue(el, "value");
+				if ( value.startsWith(PRE_APPENDED_MISSING)){
+				    logger.warn(String.format("A Traduction value start with the reseverd text used to identify Missing Traduction key. key:\"%s\" value:\"%s\".",key,value));
+				}
 
 				// store key/value pairs into a map
 				//logger.debug(language_file +"\t"+key+"\t=\t"+value);
@@ -103,9 +106,16 @@ public class TranslatorLanguage {
 		if(strings.containsKey(key)) {
 			return strings.get(key);
 		} else {
-			return "Missing:"+key;
+			return PRE_APPENDED_MISSING+key;
 		}
 	}
+	
+	/**
+	 * Pre append texte add to the key if no traduction found.
+	 * PPAC37 : Refactored as a public constante for some usage in sone test ( in com.marginallyclever.util.FindAllTraductionResult )
+	 * DONE : to avoid confusion no traduction value sould start with this ...
+	 */
+	public static final String PRE_APPENDED_MISSING = "Missing:";
 
 
 	/**

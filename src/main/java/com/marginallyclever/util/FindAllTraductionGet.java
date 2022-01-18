@@ -21,16 +21,17 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.MatchResult;
@@ -38,13 +39,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Try to find in the source code the Tratuction keys used ...
+ * An attempt to find the Tratuction.get(...) arguments in the source code. To
+ * deduce if possible (args = simple string value) the keys used and therefore
+ * missing in the translation file in use.
  *
  *
  * @author PPAC37
@@ -53,12 +53,17 @@ public class FindAllTraductionGet {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGet.class);
 
-    private static Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
+    //
+    private static boolean debugPaser = false;
+    private static boolean debugListFiles = true;
 
-    public static Map<FindAllTraductionResult, Path> getMapMatchResultToFilePath() {
-	return mapMatchResultToFilePath;
-    }
-
+//    /**
+//     *
+//     * @return
+//     */
+//    public Map<FindAllTraductionResult, Path> getMapMatchResultToFilePath() {
+//	return mapMatchResultToFilePath;
+//    }
     /**
      * Try to search a src java project for a specifik pattern ( like
      * Traduction.get(...) )
@@ -75,122 +80,150 @@ public class FindAllTraductionGet {
 	CommandLineOptions.setFromMain(args);
 	Translator.start();
 
+	// TODO test assert the current languge is from english.xml // ??? 
+	// TODO get ride of any GUI for the continuous integration test :
+	// ??? not need for the test but only in the case the languge set in prefrence do not existe anymore ...
 	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 	    LanguagePreferences.chooseLanguage();
 	}
+
+	// TODO in the env test is this the way ?
+	String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
+	System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
+	File srcDir = new File(".", baseDirToSearch);
 	try {
-	    // TODO arg 0 as dirToSearch 
-	    if (args != null && args.length > 0) {
-		//
-
-	    }
-	    String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
-	    System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
-	    File srcDir = new File(".", baseDirToSearch);
-	    try {
-		System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
-	    } catch (IOException ex) {
-		Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
-	    }
-	    // list all .java files in srcDir.
-
-	    List<Path> paths = listFiles(srcDir.toPath(), ".java");
-	    // search in the file ...
-	    paths.forEach(x -> searchAFile(x, srcDir.toPath()));
+	    System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
 	} catch (IOException ex) {
 	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
 	}
 
-	System.out.printf("totalMatchCountInAllFiles      =%d\n", totalMatchCountInAllFiles);
-	System.out.printf("totalMatchCountInAllFilesV0    =%d\n", totalMatchCountInAllFilesV0);
-	System.out.printf("mapMatchResultToFilePath.size()=%d\n", mapMatchResultToFilePath.size()
-	);
+	// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
+	// TODO a lead to explace this regexp will not work if Translation.get is refactoref ( ex : class renamed or methode renamend )
+	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
-	JFrame jf = new JFrame();
-	jf.setLayout(new BorderLayout());
-	JTable jtab = new JTable(new FindAllTraductionGetTableModel());
-	jtab.setAutoCreateRowSorter(true);
-	JScrollPane jsp = new JScrollPane();
-	jsp.setViewportView(jtab);
-	jf.getContentPane().add(jsp, BorderLayout.CENTER);
-	jf.setMinimumSize(new Dimension(800, 600));
-	jf.pack();
-	jf.setVisible(true);
-	jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	//
+	// group identical missing keys.
+	//
+	int totalSrcLineWithMissingKey = 0;
+	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalKey = new TreeMap<>();
+	for (FindAllTraductionResult tr : mapMatchResultToFilePath.keySet()) {
+	    if (tr.isTraductionStartWithMissing()) {
+		totalSrcLineWithMissingKey++;
+		String k = tr.getSimpleStringFromArgs();
+		//System.out.printf("missing traduction key : \"%s\" used in %s : line %d\n",posibleKey,tr.pSrc,tr.lineInFile);
+
+		// group same missing keys.
+		if (groupIdenticalKey.containsKey(k)) {
+		    groupIdenticalKey.get(k).add(tr);
+		} else {
+		    ArrayList<FindAllTraductionResult> alist = new ArrayList<>();
+		    alist.add(tr);
+		    groupIdenticalKey.put(k, alist);
+		}
+	    }
+	}
+	System.out.printf("totalSrcLineWithMissingKey=%d\n", totalSrcLineWithMissingKey);
+	System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalKey.size());
+	//
+	// output the missing keys
+	//
+	for (String k : groupIdenticalKey.keySet()) {
+	    System.out.printf("missing traduction key : \"%s\"\n", k);
+	    for (FindAllTraductionResult tr : groupIdenticalKey.get(k)) {
+		System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+	    }
+	}
+	//
+	// TODO propose a lead for the resolution if one or more translation keys are missing.
+	// TODO (Done in another PR of mine...) give the name of the .xml translation file where its keys are missing (normally it should be english.xml but to be checked.)
+	// propose to disable the test because it is not a critical failure for the use of the appliation. (but then remember that it's not great / professional to make a version where translations are missing.)
+	// propose to correct the source code to use existing keys or propose a partial .xml model with these new keys to facilitate the creation of its translations in the .xml translation file.
 
     }
 
-    private static int totalMatchCountInAllFiles = 0;
-    private static int totalMatchCountInAllFilesV0 = 0;
-    private static boolean debugPaser = false;
+    public static Map<FindAllTraductionResult, Path> matchTraductionGetInAllSrcJavaFiles(File srcDir) {
+	// "Translator\\s*\\.\\s*get\\s*\\(([^\\)]*)\\)" is a patternt to match and it define a group "(...)". "[^\\)]*" could be interpreted as any char that is not a ')'.
+	// notice the "\" to despecialize some special char in the regexp like '\(' and also tu specify specific char like "\s"
+	// the "\\" is cause we are in a string to finaly have a '\' ... (yes this is confusing ... )
+	// 
+	return matchPatternInAllFilesThatHaveAFilenameThatEndWithInADir(srcDir, ".java", "Translator\\s*\\.\\s*get\\s*\\(([^\\)]*)\\)");
+    }
 
     /**
-     * line by line scanner then token matcher ...TODO if i have a multiline ?
-     *
-     * @param x
-     * @param baseDir only to relativize output path
+     * The patterne is used to match and have to containe a match group in this implementation.
+     * 
+     * N.B. : the pattern have to have 1 group ...
+     * 
+     * // See pattern regexp (fr) https://cyberzoide.developpez.com/tutoriels/java/regex/
+	// normaly '(' and ')' are used to define group in patern matcher so to match a real '(' you have to déspécialise it by adding a trailling '\' ( and as we are in a string you have to add a '\' befor the '\' ... )
+	// '.' in regexp is for any caractére if you whant to match a '.' you have to despecialise it by adding a '\' ...
+	// [^\\).]
+	// \s Un caractère blanc : [ \t\n\x0B\f\r]
+	
+     * @param srcDir
+     * @param fileNameEndWith not a pattern just a string to select filename that end with it.
+     * @param patternToMatchInFiles patterne used to match in files from srcDir, the pattern have to containe a match group e.g. "(...)"in this implementation.
+     * @return 
      */
-    public static int searchAFile(Path x, Path baseDir) {
-	int totalMatchCount = 0;
+    public static Map<FindAllTraductionResult, Path> matchPatternInAllFilesThatHaveAFilenameThatEndWithInADir(File srcDir, String fileNameEndWith, String patternToMatchInFiles) {
+	final Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
+	try {
+
+	    // list all .java files in srcDir.
+	    List<Path> paths = listFiles(srcDir.toPath(), fileNameEndWith);
+
+	    // search in the files ...
+	    paths.forEach(x -> {
+		mapMatchResultToFilePath.putAll(searchInAFile(x, srcDir.toPath(), patternToMatchInFiles));
+	    });
+	} catch (IOException ex) {
+	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+	}
+	System.out.printf("mapMatchResultToFilePath.size()=%d\n", mapMatchResultToFilePath.size());
+	return mapMatchResultToFilePath;
+    }
+
+    /**
+     *
+     * @param x the value of x
+     * @param baseDir the value of baseDir
+     * @param regexp the value of regexp ( see java.​util.​regex.Pattern )
+     * @return the int
+     */
+    public static Map<FindAllTraductionResult, Path> searchInAFile(Path x, Path baseDir, String regexp) {
+	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
 	try {
 	    if (debugPaser) {
 		System.out.println(x);
 	    }
-	    // TODO parse the file
-	    int posVarCombinationsFromController = 0;
 
-	    // See pattern regexp (fr) https://cyberzoide.developpez.com/tutoriels/java/regex/
-	    // normaly '(' and ')' are used to define group in patern matcher so to match a real '(' you have to déspécialise it by adding a trailling '\' ( and as we are in a string you have to add a '\' befor the '\' ... )
-	    // '.' in regexp is for any caractére if you whant to match a '.' you have to despecialise it by adding a '\' ...
-	    // [^\\).]
-	    // \s Un caractère blanc : [ \t\n\x0B\f\r]
-	    String patternString1 = "Translator\\s*\\.\\s*get\\s*\\(([^\\)]*)\\)";
-	    Pattern patternS1 = Pattern.compile(patternString1);
+	    Pattern pattern = Pattern.compile(regexp);
 
-	    // not line by line ... 
-//	    try ( Scanner sc = new Scanner(x)) {
-//		Pattern pat = Pattern.compile(patternString1);
-//		List<String> n = sc.findAll(pat)
-//			.map(MatchResult::group)
-//			.collect(Collectors.toList());
-//		if ( n.size()>0){
-//		    System.out.printf("::%d\n", n.size());
-//		    for ( String s : n){
-//			System.out.printf(" %s\n", s);
-//		    }
-//		}
-//		
-//	    }
+	    // not line by line ... not used ... only to vérifie if we miss some on multilines
+	    int countMatchNotLineByLine = 0;
 	    try ( Scanner sc = new Scanner(x)) {
-		Pattern pat = Pattern.compile(patternString1);
-		List<MatchResult> n = sc.findAll(pat)
-			//.map(MatchResult)
+		List<MatchResult> n = sc.findAll(pattern)
 			.collect(Collectors.toList());
 		if (n.size() > 0) {
 //		    System.out.printf("::%d in %s\n", n.size(), x.toAbsolutePath());
 		    for (MatchResult mr : n) {
-			totalMatchCountInAllFilesV0++;
-			// Can we get the line num ? currently in this implementation we have the car pos in the file/strem ...
+			countMatchNotLineByLine++;
+			// Can we get the line num ? currently in this implementation we have the car pos in the file/stream ...
 //			System.out.printf(" %-50s in %s at sart:%d end:%d\n", mr.group(1), mr.group(), mr.start(), mr.end());
 		    }
 		}
-
 	    }
 
-	    // line by line ( this can miss some like "Traduction.\nget(\n...\n);" )
+	    // line by line ( this can miss some like "Traduction.\nget(\n...\n);" ) but it gave me the line number in the file/stream ...
 	    Scanner scanner = new Scanner(x);
 	    int lineNum = 0;
 	    while (scanner.hasNextLine()) {
 		lineNum++;
 		String nextToken = scanner.nextLine();
 
-		Matcher m = patternS1.matcher(nextToken);
+		Matcher m = pattern.matcher(nextToken);
 
-		int matchCount = 0;
 		while (m.find()) {
-		    totalMatchCountInAllFiles++;
-		    totalMatchCount++;
-		    matchCount++;
 		    if (debugPaser) {
 			System.out.println("#found: " + m.group(0));
 			System.out.flush();
@@ -202,30 +235,29 @@ public class FindAllTraductionGet {
 		    }
 		    FindAllTraductionResult res = new FindAllTraductionResult(m.group(1), lineNum, m.start(1), x);
 		    mapMatchResultToFilePath.put(res, x);
-		    //
 		}
 	    }
 	} catch (IOException ex) {
 	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
 	}
-	return totalMatchCount;
+	return mapMatchResultToFilePath;
     }
 
     /**
-     * List all file in this path. Using <code>Files.walk(path)</code> (so this
-     * take care of recursive path exploration ) And applying filter (
-     * RegularFile and ReadableFile ) and filterring FileName ... TODO : a
-     * better/more efficient way ? ( im not familiare with the usage of walk
-     * (filter organisation) and the cumultation/collect ...
+     * List all files and sub files in this path. Using
+     * <code>Files.walk(path)</code> (so this take care of recursive path
+     * exploration ) And applying filter ( RegularFile and ReadableFile ) and
+     * filtering FileName ...
      *
-     * @param path
+     * @param path where to look.
      * @param fileNameEndsWithSuffix use ".java" to get only ... ( this is not a
-     * regexp so no '.' despecialisation needed )
-     * @return
+     * regexp so no '.' despecialization required ) can be set to
+     * <code>""</code> to get all files.
+     * @return a list of files (may be empty if nothing is found) or null if
+     * something is wrong.
      * @throws IOException
      */
     public static List<Path> listFiles(Path path, String fileNameEndsWithSuffix) throws IOException {
-
 	List<Path> result = null;
 	try ( Stream<Path> walk = Files.walk(path)) {
 	    result = walk
@@ -236,7 +268,7 @@ public class FindAllTraductionGet {
 		    .map(File::toPath)
 		    .collect(Collectors.toList());
 	}
-	if (debugPaser || true) {
+	if (debugListFiles) {
 	    if (result == null) {
 		System.out.printf("listFiles (%s, \"%s\").size()=null\n", path, fileNameEndsWithSuffix);
 	    } else {
@@ -244,7 +276,6 @@ public class FindAllTraductionGet {
 	    }
 	}
 	return result;
-
     }
 
 }
