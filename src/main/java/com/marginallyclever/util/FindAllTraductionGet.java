@@ -53,54 +53,50 @@ public class FindAllTraductionGet {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FindAllTraductionGet.class);
 
     //
-    private static boolean debugPaser = true;
+    private static boolean debugSearchInAFile = false;
     private static boolean debugListFiles = true;
 
     /**
-     * Try to search a src java project for a specific pattern.
-     * like <code>Traduction.get(...)</code> in all .java file.
+     * Try to search a src java project for a specific pattern. like
+     * <code>Traduction.get(...)</code> in all .java file.
      *
      * @param args
      */
     public static void main(String[] args) {
 
 	Log.start();
-	
+
 	PreferencesHelper.start();
 	CommandLineOptions.setFromMain(args);
 	Translator.start();
 
-	// TODO test assert the current languge is from english.xml // ??? 
-	// TODO get ride of any GUI for the continuous integration test :
-	// ??? not need for the test but only in the case the languge set in prefrence do not existe anymore ...
 	if (Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
 	    LanguagePreferences.chooseLanguage();
 	}
-	
-	// TODO in the env test is this the way ?
+
 	String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
 	logger.debug(String.format("PDW=%s", new File(".").getAbsolutePath()));
-	
+
 	File srcDir = new File(".", baseDirToSearch);
 	try {
 	    logger.debug(String.format("srcDir=%s", srcDir.getCanonicalPath()));
 	} catch (IOException ex) {
-	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+	    logger.error("{}",ex.getMessage(), ex);
 	}
 
 	// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
 	// TODO a lead to explace this regexp will not work if Translation.get is refactoref ( ex : class renamed or methode renamend )
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
-	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
-	logger.debug(String.format("groupIdenticalKey.size()=%d", groupIdenticalKey.size()));
+	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
+	logger.debug(String.format("groupIdenticalMissingKey.size()=%d", groupIdenticalMissingKey.size()));
 	//
 	// output the missing keys
 	//
-	for (String k : groupIdenticalKey.keySet()) {
-	    logger.debug(String.format("missing traduction key : \"%s\"", k));
-	    for (FindAllTraductionResult tr : groupIdenticalKey.get(k)) {
-		logger.debug(String.format("  used in : \"%s\" line %d", tr.pSrc, tr.lineInFile));
+	for (String k : groupIdenticalMissingKey.keySet()) {
+	    logger.error(String.format("missing traduction key : \"%s\"", k));
+	    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
+		logger.error(String.format(" used in \"%s\" line %d", tr.pSrc, tr.lineInFile));
 	    }
 	}
 	//
@@ -121,7 +117,7 @@ public class FindAllTraductionGet {
 	    // find the key that get a Missing: when traducted
 	    if (tr.isTraductionStartWithMissing()) {
 		totalSrcLineWithMissingKey++;
-		String k = tr.getSimpleStringFromArgs();		
+		String k = tr.getSimpleStringFromArgs();
 		// a way to group same missing keys.
 		if (groupIdenticalKey.containsKey(k)) {
 		    groupIdenticalKey.get(k).add(tr);
@@ -145,20 +141,26 @@ public class FindAllTraductionGet {
     }
 
     /**
-     * The patterne is used to match and have to containe a match group in this implementation.
-     * 
+     * The patterne is used to match and have to containe a match group in this
+     * implementation.
+     *
      * N.B. : the pattern have to have 1 group ...
-     * 
-     * // See pattern regexp (fr) https://cyberzoide.developpez.com/tutoriels/java/regex/
-	// normaly '(' and ')' are used to define group in patern matcher so to match a real '(' you have to déspécialise it by adding a trailling '\' ( and as we are in a string you have to add a '\' befor the '\' ... )
-	// '.' in regexp is for any caractére if you whant to match a '.' you have to despecialise it by adding a '\' ...
-	// [^\\).]
-	// \s Un caractère blanc : [ \t\n\x0B\f\r]
-	
+     *
+     * // See pattern regexp (fr)
+     * https://cyberzoide.developpez.com/tutoriels/java/regex/ // normaly '('
+     * and ')' are used to define group in patern matcher so to match a real '('
+     * you have to déspécialise it by adding a trailling '\' ( and as we are in
+     * a string you have to add a '\' befor the '\' ... ) // '.' in regexp is
+     * for any caractére if you whant to match a '.' you have to despecialise it
+     * by adding a '\' ... // [^\\).] // \s Un caractère blanc : [ \t\n\x0B\f\r]
+     *
      * @param srcDir
-     * @param fileNameEndWith not a pattern just a string to select filename that end with it.
-     * @param patternToMatchInFiles patterne used to match in files from srcDir, the pattern have to containe a match group e.g. "(...)"in this implementation.
-     * @return 
+     * @param fileNameEndWith not a pattern just a string to select filename
+     * that end with it.
+     * @param patternToMatchInFiles patterne used to match in files from srcDir,
+     * the pattern have to containe a match group e.g. "(...)"in this
+     * implementation.
+     * @return
      */
     public static Map<FindAllTraductionResult, Path> matchPatternInAllFilesThatHaveAFilenameThatEndWithInADir(File srcDir, String fileNameEndWith, String patternToMatchInFiles) {
 	final Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
@@ -166,13 +168,12 @@ public class FindAllTraductionGet {
 
 	    // list all .java files in srcDir.
 	    List<Path> paths = listFiles(srcDir.toPath(), fileNameEndWith);
-
 	    // search in the files ...
 	    paths.forEach(x -> {
 		mapMatchResultToFilePath.putAll(searchInAFile(x, srcDir.toPath(), patternToMatchInFiles));
 	    });
-	} catch (IOException ex) {
-	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+	} catch (Exception ex) {
+	    logger.error("{}",ex.getMessage(), ex);
 	}
 	logger.debug(String.format("mapMatchResultToFilePath.size()=%d", mapMatchResultToFilePath.size()));
 	return mapMatchResultToFilePath;
@@ -188,8 +189,8 @@ public class FindAllTraductionGet {
     public static Map<FindAllTraductionResult, Path> searchInAFile(Path x, Path baseDir, String regexp) {
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
 	try {
-	    if (debugPaser) {
-		logger.debug(String.format("searchInAFile %s",x));
+	    if (debugSearchInAFile) {
+		logger.debug(String.format("searchInAFile(\"%s\", ?, \"%s\")", x, regexp));
 	    }
 
 	    Pattern pattern = Pattern.compile(regexp);
@@ -199,14 +200,11 @@ public class FindAllTraductionGet {
 	    try ( Scanner sc = new Scanner(x)) {
 		List<MatchResult> n = sc.findAll(pattern)
 			.collect(Collectors.toList());
-		if (n.size() > 0) {
-//		    
-logger.debug(String.format("::%d in %s", n.size(), x.toAbsolutePath()));
+		if (!n.isEmpty()) {
 		    for (MatchResult mr : n) {
 			countMatchNotLineByLine++;
 			// Can we get the line num ? currently in this implementation we have the car pos in the file/stream ...
-//			
-logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.group(), mr.start(), mr.end()));
+			//	logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.group(), mr.start(), mr.end()));
 		    }
 		}
 	    }
@@ -217,22 +215,27 @@ logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.gro
 	    while (scanner.hasNextLine()) {
 		lineNum++;
 		String nextToken = scanner.nextLine();
-
 		Matcher m = pattern.matcher(nextToken);
-
 		while (m.find()) {
-		    if (debugPaser) {
-			logger.debug(String.format("#found (gp count=%d) : %s ", m.groupCount(), m.group(0)));			
+		    if (debugSearchInAFile) {
+			logger.debug(String.format(" match (groupCount=%d) : \"%s\" line:%d char:%d", m.groupCount(), m.group(0), lineNum, m.start(0)));
+			logger.debug(String.format(" match group(1) : \"%s\" char:%d", m.group(1), m.start(1)));
+			//logger.debug(String.format("match group(1) : \"%s\" in \"%s\" line:%d char:%d", m.group(1), baseDir.relativize(x), lineNum, m.start(1)));
 		    }
-		    if (true) {
-			logger.debug(String.format("%s\n\tat %s(l:%d c:%d)", m.group(1), baseDir.relativize(x), lineNum, m.start(1)));
+		    if (m.groupCount() >= 1) {
+			FindAllTraductionResult res = new FindAllTraductionResult(m.group(1), lineNum, m.start(1), x);
+			mapMatchResultToFilePath.put(res, x);
+		    } else {
+			// no group found ? bad regexp pattern with no group ? 
 		    }
-		    FindAllTraductionResult res = new FindAllTraductionResult(m.group(1), lineNum, m.start(1), x);
-		    mapMatchResultToFilePath.put(res, x);
 		}
 	    }
+	    // warm if we miss some match by doing line by line ?
+	    if (countMatchNotLineByLine != mapMatchResultToFilePath.size()){
+		logger.error(String.format("Miss %d match in multilines ... ",countMatchNotLineByLine-mapMatchResultToFilePath.size()));
+	    }
 	} catch (IOException ex) {
-	    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+	    logger.error("{}",ex.getMessage(), ex);
 	}
 	return mapMatchResultToFilePath;
     }
@@ -264,9 +267,9 @@ logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.gro
 	}
 	if (debugListFiles) {
 	    if (result == null) {
-		logger.debug(String.format("listFiles (%s, \"%s\").size()=null", path, fileNameEndsWithSuffix));
+		logger.debug(String.format("listFiles(\"%s\",\"%s\")=null", path, fileNameEndsWithSuffix));
 	    } else {
-		logger.debug(String.format("listFiles (%s, \"%s\").size()=%d", path, fileNameEndsWithSuffix, result.size()));
+		logger.debug(String.format("listFiles(\"%s\",\"%s\").size()=%d", path, fileNameEndsWithSuffix, result.size()));
 	    }
 	}
 	return result;

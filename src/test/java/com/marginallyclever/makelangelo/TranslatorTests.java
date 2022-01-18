@@ -73,7 +73,7 @@ public class TranslatorTests {
 		try {
 		    System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
 		} catch (IOException ex) {
-		    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+		    ex.printStackTrace();
 		}
 
 		// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
@@ -81,21 +81,21 @@ public class TranslatorTests {
 		Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
 		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
-		System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalMissingKey.size());
+		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
 		//
 		// output the missing keys
 		//
 		for (String k : groupIdenticalMissingKey.keySet()) {
 		    System.out.printf("missing traduction key : \"%s\"\n", k);
 		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
-			System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+			System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
 		    }
 		}
 		// ???
-		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?...");
+		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?.");
 		
 	    } catch (Exception e) {
-		e.printStackTrace();
+		e.printStackTrace();		
 	    }
 	}
 }
