@@ -101,6 +101,26 @@ public class FindAllTraductionGet {
 	// TODO a lead to explace this regexp will not work if Translation.get is refactoref ( ex : class renamed or methode renamend )
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
+	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
+	System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalKey.size());
+	//
+	// output the missing keys
+	//
+	for (String k : groupIdenticalKey.keySet()) {
+	    System.out.printf("missing traduction key : \"%s\"\n", k);
+	    for (FindAllTraductionResult tr : groupIdenticalKey.get(k)) {
+		System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+	    }
+	}
+	//
+	// TODO propose a lead for the resolution if one or more translation keys are missing.
+	// TODO (Done in another PR of mine...) give the name of the .xml translation file where its keys are missing (normally it should be english.xml but to be checked.)
+	// propose to disable the test because it is not a critical failure for the use of the appliation. (but then remember that it's not great / professional to make a version where translations are missing.)
+	// propose to correct the source code to use existing keys or propose a partial .xml model with these new keys to facilitate the creation of its translations in the .xml translation file.
+
+    }
+
+    public static SortedMap<String, ArrayList<FindAllTraductionResult>> getTraductionGetStringMissingKey(Map<FindAllTraductionResult, Path> mapMatchResultToFilePath) {
 	//
 	// group identical missing keys.
 	//
@@ -123,22 +143,7 @@ public class FindAllTraductionGet {
 	    }
 	}
 	System.out.printf("totalSrcLineWithMissingKey=%d\n", totalSrcLineWithMissingKey);
-	System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalKey.size());
-	//
-	// output the missing keys
-	//
-	for (String k : groupIdenticalKey.keySet()) {
-	    System.out.printf("missing traduction key : \"%s\"\n", k);
-	    for (FindAllTraductionResult tr : groupIdenticalKey.get(k)) {
-		System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
-	    }
-	}
-	//
-	// TODO propose a lead for the resolution if one or more translation keys are missing.
-	// TODO (Done in another PR of mine...) give the name of the .xml translation file where its keys are missing (normally it should be english.xml but to be checked.)
-	// propose to disable the test because it is not a critical failure for the use of the appliation. (but then remember that it's not great / professional to make a version where translations are missing.)
-	// propose to correct the source code to use existing keys or propose a partial .xml model with these new keys to facilitate the creation of its translations in the .xml translation file.
-
+	return groupIdenticalKey;
     }
 
     public static Map<FindAllTraductionResult, Path> matchTraductionGetInAllSrcJavaFiles(File srcDir) {

@@ -31,8 +31,8 @@ public class FindAllTraductionResult {
 
     String argsMatch;
     int posDebArgMatch = -1;
-    int lineInFile = -1;
-    Path pSrc;
+    public int lineInFile = -1;
+    public Path pSrc;
 
     public FindAllTraductionResult(String argsMatch, int line, int pos, Path pSrc) {
 	this.argsMatch = argsMatch;

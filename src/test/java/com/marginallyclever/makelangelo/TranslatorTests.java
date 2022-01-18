@@ -1,6 +1,18 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.util.FindAllTraductionGet;
+import static com.marginallyclever.util.FindAllTraductionGet.getTraductionGetStringMissingKey;
+import static com.marginallyclever.util.FindAllTraductionGet.matchTraductionGetInAllSrcJavaFiles;
+import com.marginallyclever.util.FindAllTraductionResult;
 import com.marginallyclever.util.PreferencesHelper;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -48,5 +60,42 @@ public class TranslatorTests {
 			Translator.setCurrentLanguage(available[current]);
 			Translator.saveConfig();
 		}
+	}
+
+	@Test
+	public void searchSimpleStringMissingKeyUsedAsArgumentForTranslatorGetInTheSrcCode() {
+	    Translator.start();
+	    try {
+		// TODO in the env test is this the way ?
+		String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
+		System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
+		File srcDir = new File(".", baseDirToSearch);
+		try {
+		    System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
+		} catch (IOException ex) {
+		    Logger.getLogger(FindAllTraductionGet.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
+		// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
+		// TODO a lead to explace this regexp will not work if Translation.get is refactoref ( ex : class renamed or methode renamend )
+		Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
+
+		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
+		System.out.printf("groupIdenticalKey.size()=%d\n", groupIdenticalMissingKey.size());
+		//
+		// output the missing keys
+		//
+		for (String k : groupIdenticalMissingKey.keySet()) {
+		    System.out.printf("missing traduction key : \"%s\"\n", k);
+		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
+			System.out.printf("  used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+		    }
+		}
+		// ???
+		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?...");
+		
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
 	}
 }
