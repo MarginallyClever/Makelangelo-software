@@ -1710,7 +1710,7 @@
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>Pulshöhe</value>
 		<hint></hint>
 	</string>

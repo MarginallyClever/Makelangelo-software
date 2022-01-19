@@ -1688,7 +1688,7 @@
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>脉冲高度</value>
 		<hint></hint>
 	</string>
