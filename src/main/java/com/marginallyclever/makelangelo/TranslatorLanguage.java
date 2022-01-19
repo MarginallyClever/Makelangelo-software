@@ -78,7 +78,7 @@ public class TranslatorLanguage {
 				String key = getTextValue(el, "key");
 				String value = getTextValue(el, "value");
 				if ( value.startsWith(PRE_APPENDED_MISSING)){
-				    logger.warn(String.format("A Traduction value start with the reseverd text used to identify Missing Traduction key. key:\"%s\" value:\"%s\".",key,value));
+				    logger.warn("A Traduction value start with the reseverd text used to identify Missing Traduction key. key:\"{}\" value:\"{}\".",key,value);
 				}
 
 				// store key/value pairs into a map
