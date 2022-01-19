@@ -88,15 +88,17 @@ public class FindAllTraductionGet {
 
 	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
 	logger.debug("groupIdenticalMissingKey.size()={}", groupIdenticalMissingKey.size());
-	//
-	// output the missing keys : TODO as xml ...
-	//
-	for (String k : groupIdenticalMissingKey.keySet()) {
-	    logger.error("missing traduction key : \"{}\"", k);
-	    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
-		logger.error(" used in \"{}\" line {}", tr.pSrc, tr.lineInFile);
-	    }
-	}
+//	//
+//	// output the missing keys : TODO as xml ...
+//	//
+//	for (String k : groupIdenticalMissingKey.keySet()) {
+//	    logger.error("missing traduction key : \"{}\"", k);
+//	    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
+//		logger.error(" used in \"{}\" line {}", tr.pSrc, tr.lineInFile);
+//	    }
+//	}
+	
+	FindAllTraductionXMLGenerator.generatePartialXmlFileWithMissingKey(groupIdenticalMissingKey);
 	//
 	// TODO propose a lead for the resolution if one or more translation keys are missing.
 	// TODO (Done in another PR of mine...) give the name of the .xml translation file where its keys are missing (normally it should be english.xml but to be checked.)

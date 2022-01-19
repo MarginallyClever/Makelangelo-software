@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo;
 import static com.marginallyclever.util.FindAllTraductionGet.getTraductionGetStringMissingKey;
 import static com.marginallyclever.util.FindAllTraductionGet.matchTraductionGetInAllSrcJavaFiles;
 import com.marginallyclever.util.FindAllTraductionResult;
+import com.marginallyclever.util.FindAllTraductionXMLGenerator;
 import com.marginallyclever.util.PreferencesHelper;
 import java.io.File;
 import java.io.IOException;
@@ -82,15 +83,16 @@ public class TranslatorTests {
 
 		// find the missing simple "key" found  ...
 		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(matchTraductionGetInAllSrcJavaFiles);
-		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
+//		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
 		
 		// output the missing keys if any.
-		for (String k : groupIdenticalMissingKey.keySet()) {
-		    System.out.printf("missing traduction key : \"%s\"\n", k);
-		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
-			System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
-		    }
-		}
+//		for (String k : groupIdenticalMissingKey.keySet()) {
+//		    System.out.printf("missing traduction key : \"%s\"\n", k);
+//		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
+//			System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+//		    }
+//		}
+		FindAllTraductionXMLGenerator.generatePartialXmlFileWithMissingKey(groupIdenticalMissingKey);
 		
 		// validate or not the test. (succes if no missing keys found)
 		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?.");
