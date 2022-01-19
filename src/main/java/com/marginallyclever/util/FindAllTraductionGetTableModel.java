@@ -293,6 +293,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	JTable jtable = new JTable(new FindAllTraductionGetTableModel());
 	jtable.setAutoCreateRowSorter(true);// So you can sort cols value (but be aware then the col,row selection JTable model will be one SelectionModel away from the TableModel (i.e. row 1 on the JTable can be row 5 in the TableModel due to the sorter...) )
 	jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	jtable.setDragEnabled(true);
 	JScrollPane jsp = new JScrollPane();
 	jsp.setViewportView(jtable);
 	jf.getContentPane().add(jsp, BorderLayout.CENTER);
