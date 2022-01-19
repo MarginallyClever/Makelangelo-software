@@ -334,11 +334,6 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
 		<key>PlotterControls.Rewind</key>
 		<value>Rewind</value>
 		<hint>menu or dialog title</hint>
@@ -566,7 +561,7 @@
 	</string>
 	<string>
 		<key>RobotMenu.SaveGCode</key>
-		<value>Opslaan als...</value>
+		<value>Bewaar Gcode in bestand/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 

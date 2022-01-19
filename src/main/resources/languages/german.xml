@@ -573,11 +573,6 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>SaveGCode</key>
-		<value>Speichere GCode in Datei/SD</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
 		<key>PlotterControls.Rewind</key>
 		<value>Zurückspulen</value>
 		<hint>menu or dialog title</hint>
@@ -860,7 +855,7 @@
 	</string>
 	<string>
 		<key>RobotMenu.SaveGCode</key>
-		<value>In Datei/SD Karte speichern</value>
+		<value>Speichere GCode in Datei/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
