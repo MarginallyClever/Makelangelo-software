@@ -876,7 +876,7 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>保存到文件/ SD卡</value>
 		<hint>menu or dialog title</hint>
 	</string>

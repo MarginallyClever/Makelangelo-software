@@ -565,7 +565,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>Opslaan als...</value>
 		<hint>menu or dialog title</hint>
 	</string>

@@ -859,7 +859,7 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>In Datei/SD Karte speichern</value>
 		<hint>menu or dialog title</hint>
 	</string>

@@ -577,7 +577,7 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>aveSay asyay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
