@@ -568,7 +568,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Öffne Kontrollen</value>
 		<hint>menu or dialog title</hint>
 	</string>
