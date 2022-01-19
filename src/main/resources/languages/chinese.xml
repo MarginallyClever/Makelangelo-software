@@ -1706,7 +1706,7 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>
