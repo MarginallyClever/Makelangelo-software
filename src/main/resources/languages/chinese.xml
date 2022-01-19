@@ -202,7 +202,7 @@
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>绘图纸高度</value>
 		<hint>Paper settings panel</hint>
 	</string>

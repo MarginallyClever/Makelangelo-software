@@ -220,7 +220,7 @@
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>Papierhöhe</value>
 		<hint>Paper settings panel</hint>
 	</string>

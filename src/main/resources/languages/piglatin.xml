@@ -56,7 +56,7 @@
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>aperPay eighthay</value>
 		<hint>machine size control panel</hint>
 	</string>

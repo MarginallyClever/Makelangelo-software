@@ -45,7 +45,7 @@
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>Papier hoogte</value>
 		<hint>machine size control panel</hint>
 	</string>
