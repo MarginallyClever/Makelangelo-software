@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.util.FindAllTraductionGet;
 import static com.marginallyclever.util.FindAllTraductionGet.getTraductionGetStringMissingKey;
 import static com.marginallyclever.util.FindAllTraductionGet.matchTraductionGetInAllSrcJavaFiles;
 import com.marginallyclever.util.FindAllTraductionResult;
@@ -11,8 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -77,9 +74,14 @@ public class TranslatorTests {
 		    ex.printStackTrace();
 		}
 
-		Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
+		
+		Map<FindAllTraductionResult, Path> matchTraductionGetInAllSrcJavaFiles = matchTraductionGetInAllSrcJavaFiles(srcDir);
+		
+		// assert the test test something 
+		assertTrue(!matchTraductionGetInAllSrcJavaFiles.isEmpty(), "Invalide test : No match ... maybe no source files ... or a refactoring that have invalide the pattern used to search ?");
 
-		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
+		// find the missing simple "key" found  ...
+		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(matchTraductionGetInAllSrcJavaFiles);
 		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
 		
 		// output the missing keys if any.

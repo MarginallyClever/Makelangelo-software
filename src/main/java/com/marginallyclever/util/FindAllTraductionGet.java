@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,7 +89,7 @@ public class FindAllTraductionGet {
 	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
 	logger.debug("groupIdenticalMissingKey.size()={}", groupIdenticalMissingKey.size());
 	//
-	// output the missing keys
+	// output the missing keys : TODO as xml ...
 	//
 	for (String k : groupIdenticalMissingKey.keySet()) {
 	    logger.error("missing traduction key : \"{}\"", k);

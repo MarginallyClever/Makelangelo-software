@@ -24,13 +24,9 @@ import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePrefere
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.MatchResult;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
