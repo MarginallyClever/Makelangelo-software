@@ -75,11 +75,11 @@ public class FindAllTraductionGet {
 	}
 
 	String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
-	logger.debug(String.format("PDW=%s", new File(".").getAbsolutePath()));
+	logger.debug("PDW={}", new File(".").getAbsolutePath());
 
 	File srcDir = new File(".", baseDirToSearch);
 	try {
-	    logger.debug(String.format("srcDir=%s", srcDir.getCanonicalPath()));
+	    logger.debug("srcDir={}", srcDir.getCanonicalPath());
 	} catch (IOException ex) {
 	    logger.error("{}",ex.getMessage(), ex);
 	}
@@ -89,14 +89,14 @@ public class FindAllTraductionGet {
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = matchTraductionGetInAllSrcJavaFiles(srcDir);
 
 	SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(mapMatchResultToFilePath);
-	logger.debug(String.format("groupIdenticalMissingKey.size()=%d", groupIdenticalMissingKey.size()));
+	logger.debug("groupIdenticalMissingKey.size()={}", groupIdenticalMissingKey.size());
 	//
 	// output the missing keys
 	//
 	for (String k : groupIdenticalMissingKey.keySet()) {
-	    logger.error(String.format("missing traduction key : \"%s\"", k));
+	    logger.error("missing traduction key : \"{}\"", k);
 	    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
-		logger.error(String.format(" used in \"%s\" line %d", tr.pSrc, tr.lineInFile));
+		logger.error(" used in \"{}\" line {}", tr.pSrc, tr.lineInFile);
 	    }
 	}
 	//
@@ -128,7 +128,7 @@ public class FindAllTraductionGet {
 		}
 	    }
 	}
-	logger.debug(String.format("totalSrcLineWithMissingKey=%d", totalSrcLineWithMissingKey));
+	logger.debug("totalSrcLineWithMissingKey={}", totalSrcLineWithMissingKey);
 	return groupIdenticalKey;
     }
 
@@ -175,7 +175,7 @@ public class FindAllTraductionGet {
 	} catch (Exception ex) {
 	    logger.error("{}",ex.getMessage(), ex);
 	}
-	logger.debug(String.format("mapMatchResultToFilePath.size()=%d", mapMatchResultToFilePath.size()));
+	logger.debug("mapMatchResultToFilePath.size()={}", mapMatchResultToFilePath.size());
 	return mapMatchResultToFilePath;
     }
 
@@ -190,7 +190,7 @@ public class FindAllTraductionGet {
 	Map<FindAllTraductionResult, Path> mapMatchResultToFilePath = new HashMap<>();
 	try {
 	    if (debugSearchInAFile) {
-		logger.debug(String.format("searchInAFile(\"%s\", ?, \"%s\")", x, regexp));
+		logger.debug("searchInAFile(\"{}\", ?, \"{}\")", x, regexp);
 	    }
 
 	    Pattern pattern = Pattern.compile(regexp);
@@ -204,7 +204,7 @@ public class FindAllTraductionGet {
 		    for (MatchResult mr : n) {
 			countMatchNotLineByLine++;
 			// Can we get the line num ? currently in this implementation we have the car pos in the file/stream ...
-			//	logger.debug(String.format(" %-50s in %s at sart:%d end:%d", mr.group(1), mr.group(), mr.start(), mr.end()));
+			//	logger.debug(" %-50s in {} at sart:{} end:{}", mr.group(1), mr.group(), mr.start(), mr.end());
 		    }
 		}
 	    }
@@ -218,9 +218,9 @@ public class FindAllTraductionGet {
 		Matcher m = pattern.matcher(nextToken);
 		while (m.find()) {
 		    if (debugSearchInAFile) {
-			logger.debug(String.format(" match (groupCount=%d) : \"%s\" line:%d char:%d", m.groupCount(), m.group(0), lineNum, m.start(0)));
-			logger.debug(String.format(" match group(1) : \"%s\" char:%d", m.group(1), m.start(1)));
-			//logger.debug(String.format("match group(1) : \"%s\" in \"%s\" line:%d char:%d", m.group(1), baseDir.relativize(x), lineNum, m.start(1)));
+			logger.debug(" match (groupCount={}) : \"{}\" line:{} char:{}", m.groupCount(), m.group(0), lineNum, m.start(0));
+			logger.debug(" match group(1) : \"{}\" char:{}", m.group(1), m.start(1));
+			//logger.debug("match group(1) : \"{}\" in \"{}\" line:{} char:{}", m.group(1), baseDir.relativize(x), lineNum, m.start(1));
 		    }
 		    if (m.groupCount() >= 1) {
 			FindAllTraductionResult res = new FindAllTraductionResult(m.group(1), lineNum, m.start(1), x);
@@ -232,7 +232,7 @@ public class FindAllTraductionGet {
 	    }
 	    // warm if we miss some match by doing line by line ?
 	    if (countMatchNotLineByLine != mapMatchResultToFilePath.size()){
-		logger.error(String.format("Miss %d match in multilines ... ",countMatchNotLineByLine-mapMatchResultToFilePath.size()));
+		logger.error("Miss {} match in multilines ... ",countMatchNotLineByLine-mapMatchResultToFilePath.size());
 	    }
 	} catch (IOException ex) {
 	    logger.error("{}",ex.getMessage(), ex);
@@ -267,9 +267,9 @@ public class FindAllTraductionGet {
 	}
 	if (debugListFiles) {
 	    if (result == null) {
-		logger.debug(String.format("listFiles(\"%s\",\"%s\")=null", path, fileNameEndsWithSuffix));
+		logger.debug("listFiles(\"{}\",\"{}\")=null", path, fileNameEndsWithSuffix);
 	    } else {
-		logger.debug(String.format("listFiles(\"%s\",\"%s\").size()=%d", path, fileNameEndsWithSuffix, result.size()));
+		logger.debug("listFiles(\"{}\",\"{}\").size()={}", path, fileNameEndsWithSuffix, result.size());
 	    }
 	}
 	return result;
