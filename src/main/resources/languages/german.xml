@@ -1058,7 +1058,6 @@
 	</string>
 	<string>
 		<key>BoxGeneratorMaxSizeNote</key>
-		<value>Max size greater than or equal to 1. Cutoff 0...1</value>
 		<value>Max Größe größer oder gleich 1. Grenze 0...1</value>
 		<hint>Boxxy generator</hint>
 	</string>
