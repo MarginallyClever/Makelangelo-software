@@ -40,7 +40,7 @@
 	</string>
 	
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>Papier breedte</value>
 		<hint>machine size control panel</hint>
 	</string>

@@ -197,7 +197,7 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>绘图纸宽度</value>
 		<hint>Paper settings panel</hint>
 	</string>

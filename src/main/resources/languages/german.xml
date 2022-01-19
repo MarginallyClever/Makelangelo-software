@@ -215,7 +215,7 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>Papierbreite</value>
 		<hint>Paper settings panel</hint>
 	</string>

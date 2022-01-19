@@ -51,7 +51,7 @@
 	</string>
 	
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>aperPay idthway</value>
 		<hint>machine size control panel</hint>
 	</string>
