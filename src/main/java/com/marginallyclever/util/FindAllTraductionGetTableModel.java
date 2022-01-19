@@ -47,7 +47,8 @@ public class FindAllTraductionGetTableModel implements TableModel {
     // KEY definition of the table colum REQUIRED ( Warning should have distinc value ) TODO as enum.
     final static String COL_KEY_ROW_NUM = "*";
     final static String COL_KEY_ARGS = "Traduction.get(...)";
-    final static String COL_KEY_ARGS_IS_SIMPLE_STRING = "isS";
+    final static String COL_KEY_ARGS_IS_SIMPLE_STRING = "isSimple";
+    final static String COL_KEY_ARGS_IS_NCName = "isNCName";// non-colonized name https://stackoverflow.com/questions/1631396/what-is-an-xsncname-type-and-when-should-it-be-used
 
     final static String COL_KEY_LINE = "Line";
     final static String COL_KEY_FILE_NAME = "FileName";
@@ -69,6 +70,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	COL_KEY_ROW_NUM,
 	COL_KEY_ARGS,
 	COL_KEY_ARGS_IS_SIMPLE_STRING,
+	COL_KEY_ARGS_IS_NCName,
 	COL_KEY_FILE_NAME,
 	COL_KEY_LINE,
 	COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING,
@@ -129,6 +131,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
 	//            return String.class;
 	//        }
 	else if (COL_KEY_ARGS_IS_SIMPLE_STRING.equals(columnKey)
+		|| COL_KEY_ARGS_IS_NCName.equals(columnKey)
 		|| COL_KEY_ARGS_TRADUCTED_START_WITH_MISSING.equals(columnKey)) {
 	    return Boolean.class;
 	}
@@ -199,6 +202,8 @@ public class FindAllTraductionGetTableModel implements TableModel {
 		return "\"" + Translator.get(tmpS) + "\"";
 	    }
 
+	} else if (COL_KEY_ARGS_IS_NCName.equals(columnKey)) {
+	    return mr.isSimpleKeyAPossibleNCName();
 	}
 
 	//
@@ -212,7 +217,7 @@ public class FindAllTraductionGetTableModel implements TableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 	final String columnKey = getColumnKey(columnIndex);
-	System.out.printf("Not implemented yet. TODO setValueAt(value=%s,row=%d,col=%d -> %s )\n", aValue, rowIndex, columnIndex, columnKey);
+	//logger.info("Not implemented yet. TODO setValueAt(value={},row={},col={} -> {} )", aValue, rowIndex, columnIndex, columnKey);
 	if (COL_KEY_ARGS.equals(columnKey)) {
 	    Object obj = map.keySet().toArray()[rowIndex];
 	    FindAllTraductionResult mr = null;

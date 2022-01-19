@@ -20,6 +20,8 @@ package com.marginallyclever.util;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.TranslatorLanguage;
 import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * As a MatcherResult is kinf of empty if not in this .match context ... A way
@@ -29,6 +31,8 @@ import java.nio.file.Path;
  */
 public class FindAllTraductionResult {
 
+    private static final Logger logger = LoggerFactory.getLogger(FindAllTraductionResult.class);
+    
     String argsMatch;
     int posDebArgMatch = -1;
     public int lineInFile = -1;
@@ -100,12 +104,27 @@ public class FindAllTraductionResult {
 	return false;
     }
 
+    /** NCName as in xml "non-colonized name".
+     * https://stackoverflow.com/questions/1631396/what-is-an-xsncname-type-and-when-should-it-be-used
+     * TODO the real match. or if not easy at least a isNotNCName( have space or other special chars , start with a number, ... ) 
+     * DONE juste no spaces.
+     * @return 
+     */
+    public boolean isSimpleKeyAPossibleNCName(){
+	//"[\i-[:]][\c-[:]]*" as define in https://www.w3.org/TR/xmlschema-2/#dt-ccesN
+	// so ? in java regexp ???
+	String tmpS = getSimpleStringFromArgs();
+	if ( tmpS != null ){
+	     return tmpS.matches("[^ ]*");
+	}
+	return false;
+    }
     //
     // For possible edition TODO ? history ? ? direct impacte vs later apply/saved ...    
     // -> a way to refresh all the TableModel contente / a way to apply modification ...
     
     public void setValueAtByTableModel(String aValue){
-		System.out.printf("Not implemented yet. TODO safely modifiy %s to change at line %d, %s in %s\n", pSrc, lineInFile,argsMatch, aValue);
+		logger.info("Not implemented yet. TODO safely modifiy {} to change at line {}, {} in {}\n", pSrc, lineInFile,argsMatch, aValue);
 
 		// TODO if i want to cumulate modifications and only apply them when we clic on a "Apply" button ???
 		// have a way to higlight modification not appliyed and activate an "apply bt" ?
