@@ -1682,7 +1682,7 @@
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.spacing</key>
 		<value>环间隙</value>
 		<hint></hint>
 	</string>

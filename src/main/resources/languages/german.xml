@@ -1704,7 +1704,7 @@
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.spacing</key>
 		<value>Abstand zwischen Ringen</value>
 		<hint></hint>
 	</string>
