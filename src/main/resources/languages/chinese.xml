@@ -1599,7 +1599,7 @@
 	</string>
 
 	<string>
-		<key>paper color</key>
+		<key>PaperSettings.PaperColor</key>
 		<value>纸张颜色</value>
 		<hint></hint>
 	</string>

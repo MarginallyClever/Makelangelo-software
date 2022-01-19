@@ -1621,7 +1621,7 @@
 	</string>
 
 	<string>
-		<key>paper color</key>
+		<key>PaperSettings.PaperColor</key>
 		<value>Papierfarbe</value>
 		<hint></hint>
 	</string>
