@@ -98,15 +98,14 @@ public class FirmwareUploader {
 
 		for (String varName : windowsOSVarNameForProgFileDir) {
 		    String varValue = System.getenv(varName);
-		    //System.out.println(varName + "=" + varValue);
+		    logger.debug(varName + "=" + varValue);
 		    if (varValue != null && !varValue.isBlank()) {
 			File posibleAvrdudeDir = new File(varValue, partialSubPathFromProgramFileAduinoIdeDirToAvrdudeDir);
 			if (posibleAvrdudeDir.exists() && posibleAvrdudeDir.isDirectory()) {
 			    File posibleAvrdudePath = new File(posibleAvrdudeDir, avrdudeCommandName);
 			    if (posibleAvrdudePath.exists() && posibleAvrdudePath.canExecute()) {
 				avrdudePath = posibleAvrdudePath.getAbsolutePath();
-				logger.debug(avrdudeCommandName + " : \"" + posibleAvrdudePath.getAbsolutePath() + "\"");
-				System.out.println(avrdudeCommandName + " : \"" + posibleAvrdudePath.getAbsolutePath() + "\"");
+				logger.debug(avrdudeCommandName + " : \"" + posibleAvrdudePath.getAbsolutePath() + "\"");				
 			    }
 			}
 		    }
