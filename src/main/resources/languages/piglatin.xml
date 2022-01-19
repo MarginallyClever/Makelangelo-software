@@ -823,25 +823,13 @@ to check yourself.</value>
 		<value>isengageDay</value>
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
-
-	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
-		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
-		the about message dialog using the version string. This is why there is not
-		one big CDATA html blob. -->
+	
 	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
+		<key>AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
-	</h1>
+        <h1>Makelangelo %VERSION%</h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
