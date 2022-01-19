@@ -1698,7 +1698,7 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>Spirale in Ecken</value>
 		<hint></hint>
 	</string>

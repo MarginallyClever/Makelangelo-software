@@ -1676,7 +1676,7 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>螺旋到角落</value>
 		<hint></hint>
 	</string>
