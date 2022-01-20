@@ -7,6 +7,7 @@ package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
@@ -139,6 +140,7 @@ public final class Makelangelo {
 			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 		}
 
+		loadPaths();
 		startRobot();
 		
 		logger.debug("Starting virtual camera...");
@@ -880,6 +882,7 @@ public final class Makelangelo {
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowSizeAndPosition();
 			myPlotter.getSettings().saveConfig();
+			savePaths();
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
@@ -894,6 +897,18 @@ public final class Makelangelo {
 		}
 	}
 	
+	private void savePaths() {
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		preferences.put("savePath", SaveDialog.getLastPath() );
+		preferences.put("loadPath", LoadFilePanel.getLastPath() );
+	}
+	
+	private void loadPaths() {
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		SaveDialog.setLastPath( preferences.get("savePath", FileAccess.getWorkingDirectory() ) );
+		LoadFilePanel.setLastPath( preferences.get("loadPath", FileAccess.getWorkingDirectory() ) );
+	}
+
 	private void saveFile() {
 		logger.debug("Saving vector file...");
 		try {
