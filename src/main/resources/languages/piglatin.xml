@@ -296,16 +296,6 @@
 		<value>equestedRay invalidyay ooltay #</value>
 		<hint>warning message</hint>
 	</string>
-	<string>
-		<key>ChangeToolPrefix</key>
-		<value>easePlay eparepray</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>ChangeToolPostfix</key>
-		<value>andyay ickclay anyyay uttonbay otay ontinuecay.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
-	</string>
 
 	<string>
 		<key>StartAt</key>

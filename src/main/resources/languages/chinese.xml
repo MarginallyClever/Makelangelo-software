@@ -535,12 +535,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>换笔</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>请更换笔以匹配此颜色.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
