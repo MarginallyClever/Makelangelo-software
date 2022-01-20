@@ -11,7 +11,7 @@ import java.util.prefs.Preferences;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlotterSettingsTest {
+public class PlotterSettingsTest {
 
     private static final long ROBOT_UID = 123456;
 
