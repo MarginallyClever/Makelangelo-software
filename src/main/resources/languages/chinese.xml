@@ -197,12 +197,12 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>绘图纸宽度</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>绘图纸高度</value>
 		<hint>Paper settings panel</hint>
 	</string>
@@ -566,13 +566,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -836,7 +831,7 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>保存到文件/ SD卡</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -1564,7 +1559,7 @@
 	</string>
 
 	<string>
-		<key>paper color</key>
+		<key>PaperSettings.PaperColor</key>
 		<value>纸张颜色</value>
 		<hint></hint>
 	</string>
@@ -1594,7 +1589,7 @@
 	</string>
 
 	<string>
-		<key>Sandy Noble Style</key>
+		<key>SandyNoble.title</key>
 		<value>Sandy风格</value>
 		<hint></hint>
 	</string>
@@ -1636,19 +1631,19 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>螺旋到角落</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.spacing</key>
 		<value>环间隙</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>脉冲高度</value>
 		<hint></hint>
 	</string>
@@ -1666,7 +1661,7 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>

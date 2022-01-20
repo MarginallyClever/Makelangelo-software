@@ -51,12 +51,12 @@
 	</string>
 	
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>aperPay idthway</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>aperPay eighthay</value>
 		<hint>machine size control panel</hint>
 	</string>
@@ -320,13 +320,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -546,7 +541,7 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>aveSay asyay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -787,25 +782,23 @@ to check yourself.</value>
 		<hint>time machine will be drawing</hint>
 	</string>
 
+	<string>
+		<key>DisengageMotors</key>
+		<value>isengageDay</value>
+		<hint>Disengage Button on manual driving dialog</hint>
+	</string>
 
 	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
 		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
 		the about message dialog using the version string. This is why there is not
 		one big CDATA html blob. -->
+
 	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
+		<key>AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
-	</h1>
+        <h1>Makelangelo %VERSION%</h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
