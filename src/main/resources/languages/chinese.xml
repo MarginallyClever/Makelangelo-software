@@ -404,33 +404,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>GCODE (ngc)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>图像(jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12(dxf)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch2</key>
-		<value>Scratch 2 (SB2)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch3</key>
-		<value>Scratch 3 (SB3)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeSVG</key>
-		<value>矢量图 (svg)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -560,12 +535,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>换笔</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>请更换笔以匹配此颜色.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
@@ -606,21 +581,6 @@
 		<hint>menu or dialog title</hint>
 	</string>
 
-	<string>
-		<key>SetHome</key>
-		<value>设置起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>移到起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
-		<value>寻找起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
 	<string>
 		<key>GoPaperBorder</key>
 		<value>边界</value>
