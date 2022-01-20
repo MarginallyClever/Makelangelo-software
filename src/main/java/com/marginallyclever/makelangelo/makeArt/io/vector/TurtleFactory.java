@@ -69,7 +69,7 @@ public class TurtleFactory {
 				FileOutputStream out = new FileOutputStream(filename); 
 				saver.save(out,turtle);
 				out.close();
-				break;
+				return;
 			}
 		}
 		throw new Exception("TurtleFactory could not save '"+filename+"'.");
