@@ -2,6 +2,7 @@ package com.marginallyclever.convenience;
 
 
 import java.awt.Color;
+import java.util.Objects;
 
 
 /**
@@ -90,4 +91,17 @@ public class ColorRGB {
   public int getRed() { return red; }
   public int getGreen() { return green; }
   public int getBlue() { return blue; }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ColorRGB colorRGB = (ColorRGB) o;
+    return red == colorRGB.red && green == colorRGB.green && blue == colorRGB.blue;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(red, green, blue);
+  }
 }
