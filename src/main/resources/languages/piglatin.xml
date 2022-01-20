@@ -223,18 +223,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>ODEGCay (ngc)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>Imageyay (jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 (dxf)</value>
 		<hint>file open dialog</hint>
 	</string>
 
