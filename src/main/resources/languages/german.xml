@@ -537,12 +537,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>Stift tauschen</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>Bitte tausche Stift auf diese Farbe.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>

@@ -295,16 +295,6 @@
 		<value>Gekozen tool is incorrect #</value>
 		<hint>warning message</hint>
 	</string>
-	<string>
-		<key>ChangeToolPrefix</key>
-		<value>Gelieve voor te bereiden </value>
-		<hint>tool change prompt. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>ChangeToolPostfix</key>
-		<value> en klik op een knop om door te gaan.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
-	</string>
 
 	<string>
 		<key>StartAt</key>
