@@ -612,21 +612,6 @@
 	</string>
 
 	<string>
-		<key>SetHome</key>
-		<value>设置起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>移到起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
-		<value>寻找起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
 		<key>GoPaperBorder</key>
 		<value>边界</value>
 		<hint>manual driving dialog</hint>

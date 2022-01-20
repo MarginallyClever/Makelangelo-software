@@ -349,18 +349,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 
-	<string>
-		<key>SetHome</key>
-		<value>Set home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>Go home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
+        <string>
 		<key>Top</key>
 		<value>Boven</value>
 		<hint>manual driving dialog</hint>

@@ -361,17 +361,6 @@
 	</string>
 
 	<string>
-		<key>SetHome</key>
-		<value>etSay omehay</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>oGay omehay</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
 		<key>Top</key>
 		<value>opTay</value>
 		<hint>manual driving dialog</hint>
@@ -818,11 +807,6 @@ to check yourself.</value>
 		<hint>time machine will be drawing</hint>
 	</string>
 
-	<string>
-		<key>DisengageMotors</key>
-		<value>isengageDay</value>
-		<hint>Disengage Button on manual driving dialog</hint>
-	</string>
 
 	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
 		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
@@ -953,11 +937,6 @@ to check yourself.</value>
 		<key>PaperSize</key>
 		<value>aperPay izeSay</value>
 		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>DisengageMotors</key>
-		<value>isengageDay</value>
-		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 	
 </language>
