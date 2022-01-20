@@ -897,12 +897,18 @@ public final class Makelangelo {
 		}
 	}
 	
+	/**
+	 * Use Preferences to store the last "save" and "load" dialog paths.
+	 */
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		preferences.put("savePath", SaveDialog.getLastPath() );
 		preferences.put("loadPath", LoadFilePanel.getLastPath() );
 	}
-	
+
+	/**
+	 * Use Preferences to recall the last "save" and "load" dialog paths.
+	 */
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		SaveDialog.setLastPath( preferences.get("savePath", FileAccess.getWorkingDirectory() ) );
