@@ -127,6 +127,8 @@ public class MarlinInterface extends JPanel {
 				onHearError(message);
 			} else if (message.startsWith(STR_HOME_XY_FIRST)) {
 				onHearHomeXYFirst();
+			} else if (message.startsWith(STR_PRINTER_HALTED)) {
+				onHearError(message);
 			}
 		}
 	}
