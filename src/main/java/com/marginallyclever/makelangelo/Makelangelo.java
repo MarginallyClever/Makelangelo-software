@@ -39,6 +39,7 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.rangeSlider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
@@ -110,6 +111,8 @@ public final class Makelangelo {
 	private static boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private RangeSlider rangeSlider;
+	
 	private PlotterRenderer myPlotterRenderer;
 	
 	// GUI elements
@@ -746,9 +749,19 @@ public final class Makelangelo {
 		previewPanel.addListener(myPlotter);
 		previewPanel.addListener(myTurtleRenderer);
 		addPlotterRendererToPreviewPanel();
-
+		
+		logger.debug("  create range slider...");
+		rangeSlider = new RangeSlider();
+		rangeSlider.addChangeListener((e)->{
+            RangeSlider slider = (RangeSlider) e.getSource();
+            int bottom = Integer.valueOf(slider.getValue());
+            int top = Integer.valueOf(slider.getUpperValue());
+            myTurtleRenderer.setFirst(bottom);
+            myTurtleRenderer.setLast(top);
+		});
 		// major layout
 		contentPane.add(previewPanel, BorderLayout.CENTER);
+		contentPane.add(rangeSlider, BorderLayout.SOUTH);
 
 		return contentPane;
 	}
@@ -897,13 +910,15 @@ public final class Makelangelo {
 		}
 	}
 	
+	private static final String PREFERENCE_SAVE_PATH = "savePath";
+	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 	/**
 	 * Use Preferences to store the last "save" and "load" dialog paths.
 	 */
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-		preferences.put("savePath", SaveDialog.getLastPath() );
-		preferences.put("loadPath", LoadFilePanel.getLastPath() );
+		preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
+		preferences.put(PREFERENCE_LOAD_PATH, LoadFilePanel.getLastPath() );
 	}
 
 	/**
@@ -911,8 +926,8 @@ public final class Makelangelo {
 	 */
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-		SaveDialog.setLastPath( preferences.get("savePath", FileAccess.getWorkingDirectory() ) );
-		LoadFilePanel.setLastPath( preferences.get("loadPath", FileAccess.getWorkingDirectory() ) );
+		SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
+		LoadFilePanel.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
 	}
 
 	private void saveFile() {
@@ -928,6 +943,11 @@ public final class Makelangelo {
 	public void setTurtle(Turtle turtle) {
 		myTurtle = turtle;
 		myTurtleRenderer.setTurtle(turtle);
+		int top = turtle.history.size();
+		rangeSlider.setMinimum(0);
+		rangeSlider.setValue(0);
+		rangeSlider.setMaximum(top);
+		rangeSlider.setUpperValue(top);
 	}
 
 	public Turtle getTurtle() {
