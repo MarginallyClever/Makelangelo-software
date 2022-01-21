@@ -140,7 +140,7 @@ public class Turtle implements Cloneable {
 	public void moveTo(double x,double y) {
 		px=x;
 		py=y;
-		history.add( new TurtleMove(x, y, isUp ? TurtleMove.TRAVEL : TurtleMove.DRAW) );
+		history.add( new TurtleMove(x, y, isUp ? TurtleMove.TRAVEL : TurtleMove.DRAW_LINE) );
 	}
 		
 	/**
@@ -249,7 +249,7 @@ public class Turtle implements Cloneable {
 		int hits=0;
 		
 		for( TurtleMove m : history ) {
-			if(m.type == TurtleMove.DRAW) {
+			if(m.type == TurtleMove.DRAW_LINE) {
 				hits++;
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
@@ -279,7 +279,7 @@ public class Turtle implements Cloneable {
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 			case TurtleMove.TRAVEL:
 				m.x*=sx;
 				m.y*=sy;
@@ -298,7 +298,7 @@ public class Turtle implements Cloneable {
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 			case TurtleMove.TRAVEL:
 				m.x+=dx;
 				m.y+=dy;
@@ -318,7 +318,7 @@ public class Turtle implements Cloneable {
 		int first=1;
 		for(i=0;i<history.size();i++) {
 			TurtleMove mov=history.get(i);
-			if (mov.type == TurtleMove.DRAW) {
+			if (mov.type == TurtleMove.DRAW_LINE) {
 				if(first == 1 || mov.x < xmin) xmin=mov.x;
 				if(first == 1 || mov.y < ymin) ymin=mov.y;
 				if(first == 1 || mov.x > xmax) xmax=mov.x;
@@ -339,7 +339,7 @@ public class Turtle implements Cloneable {
 		
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 				if(previousMovement!=null) {
 					LineSegment2D line = new LineSegment2D(
 							new Point2D(previousMovement.x,previousMovement.y),
@@ -366,23 +366,25 @@ public class Turtle implements Cloneable {
 	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize) {
 		if(orderedLines.isEmpty()) return;
 		
-		LineSegment2D first = orderedLines.get(0); 
+		LineSegment2D first = orderedLines.get(0);
 		jumpTo(first.a.x,first.a.y);
 		moveTo(first.b.x,first.b.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
+		double minDrawDistance = 1e-4;
 		
 		for( LineSegment2D line : orderedLines ) {
 			// change color if needed
 			if(line.c!=getColor()) {
 				setColor(line.c);
 			}
-			
-			if(distanceSquared(line.a) > minJumpSquared) {
+
+			double d = distanceSquared(line.a);
+			if(d > minJumpSquared) {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
 				jumpTo(line.a.x,line.a.y);
-			} else {
+			} else if(d>minDrawDistance) {
 				moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
@@ -424,7 +426,7 @@ public class Turtle implements Cloneable {
 	
 	public boolean getHasAnyDrawingMoves() {
 		for( TurtleMove m : history) {
-			if(m.type==TurtleMove.DRAW) return true;
+			if(m.type==TurtleMove.DRAW_LINE) return true;
 		}
 		return false;
 	}

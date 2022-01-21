@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Initialize log file and purge old
+ * Convenience methods for logging.
+ * @author Dan Royer
+ *
  */
 public class Log {
-
 	private static Logger logger;
 
 	// must be consistent with logback.xml
@@ -23,6 +24,9 @@ public class Log {
 	private static final String PROGRAM_START_STRING = "PROGRAM START";
 	private static final String PROGRAM_END_STRING = "PROGRAM END";
 
+	/**
+	 * Initialize log file and purge old
+	 */
 	public static void start() {
 		// lazy init to be able to purge old file
 		logger = LoggerFactory.getLogger(Log.class);

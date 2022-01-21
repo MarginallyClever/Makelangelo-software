@@ -1,40 +1,51 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.select.SelectColor;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Controls related to configuring a Makelangelo machine
+ * {@link PlotterSettingsPanel} is the user interface to adjust {@link PlotterSettings}.
  *
- * @author dan royer
+ * @author Dan Rmaybe oyer
  * @since 7.1.4
  */
-@Deprecated
-public class PlotterSettingsPanel extends JPanel implements ActionListener {
+public class PlotterSettingsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
-	private Plotter robot;
+	private Plotter myPlotter;
+	
+	private SelectPanel interior;
 
-	private JComboBox<String> hardwareVersionChoices;
-	private List<String> hardwareVersionNames;
-
-	private JTabbedPane panes = new JTabbedPane();
-	private JPanel modelPanel;
+	private SelectDouble machineWidth, machineHeight;
+	private SelectDouble totalBeltNeeded;
+	private SelectDouble totalServoNeeded;
+	private SelectDouble totalStepperNeeded;
+	private SelectDouble acceleration;
+	
+	private SelectDouble penDiameter;
+	private SelectDouble travelFeedRate;
+	private SelectDouble drawFeedRate;
+	private SelectDouble penUpAngle;
+	private SelectDouble penDownAngle;
+	private SelectDouble penZRate;
+	
+	private SelectColor selectPenDownColor;
+	private SelectColor selectPenUpColor;
+	
 	private JButton buttonSave;
 	private JButton buttonCancel;
 	
 	public PlotterSettingsPanel(Plotter robot) {
 		super();
-		this.robot = robot;
+		this.myPlotter = robot;
 
 		buttonSave = new JButton(Translator.get("Save"));
 		buttonCancel = new JButton(Translator.get("Cancel"));
@@ -43,14 +54,37 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		bottom.add(buttonSave);
 		bottom.add(buttonCancel);
 
-		buildModelPanel();
+		interior = new SelectPanel();
 
-		// hardware model settings
-		panes.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		// panes.setPreferredSize(new Dimension(450,500));
+		PlotterSettings settings = myPlotter.getSettings();
+		
+		float w = (float)(settings.getLimitRight() - settings.getLimitLeft());
+		float h = (float)(settings.getLimitTop() - settings.getLimitBottom());
+		interior.add(machineWidth = new SelectDouble("width",Translator.get("MachineWidth"),w));
+		interior.add(machineHeight = new SelectDouble("height",Translator.get("MachineHeight"),h));;
+		interior.add(totalStepperNeeded = new SelectDouble("stepperLength",Translator.get("StepperLengthNeeded"),0));
+		interior.add(totalBeltNeeded = new SelectDouble("beltLength",Translator.get("BeltLengthNeeded"),0));
+		interior.add(totalServoNeeded = new SelectDouble("servoLength",Translator.get("ServoLengthNeeded"),0));
 
-		rebuildTabbedPanes();
-
+		interior.add(penDiameter = new SelectDouble("diameter",Translator.get("penToolDiameter"),settings.getPenDiameter()));
+	    interior.add(travelFeedRate = new SelectDouble("feedrate",Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
+	    interior.add(drawFeedRate = new SelectDouble("speed",Translator.get("Speed"),settings.getDrawFeedRate()));
+	    interior.add(acceleration = new SelectDouble("acceleration",Translator.get("AdjustAcceleration"),(float)robot.getSettings().getMaxAcceleration()));
+		interior.add(penZRate = new SelectDouble("liftSpeed",Translator.get("penToolLiftSpeed"),settings.getPenLiftTime()));
+	    interior.add(penUpAngle = new SelectDouble("up",Translator.get("penToolUp"),settings.getPenUpAngle()));
+	    //interior.add(buttonTestUp = new SelectButton("testUp",Translator.get("penToolTest")));
+	    interior.add(penDownAngle = new SelectDouble("down",Translator.get("penToolDown"),settings.getPenDownAngle()));
+	    //interior.add(buttonTestDown = new SelectButton("testDown",Translator.get("penToolTest")));
+	    interior.add(selectPenDownColor = new SelectColor("colorDown",Translator.get("pen down color"),settings.getPenDownColor(),this));
+		interior.add(selectPenUpColor = new SelectColor("colorUp",Translator.get("pen up color"),settings.getPenUpColor(),this));
+		
+		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
+		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
+		totalStepperNeeded.setReadOnly();
+		totalBeltNeeded.setReadOnly();
+		totalServoNeeded.setReadOnly();
+		updateLengthNeeded();
+		
 		// now assemble the dialog
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -58,87 +92,76 @@ public class PlotterSettingsPanel extends JPanel implements ActionListener {
 		gbc.weightx=1;
 		gbc.gridx=0;
 		gbc.gridy=0;
-		this.add(modelPanel,gbc);
-		gbc.gridy++;
 		gbc.weighty=1;
-		this.add(panes,gbc);
+		this.add(interior,gbc);
 		gbc.gridy++;
 		gbc.weighty=0;
 		this.add(bottom,gbc);
 
-		buttonSave.addActionListener((e)->{
-			robot.getSettings().saveConfig();
-			//robot.sendConfig();
-		});
+		buttonSave.addActionListener((e)->save());
 	}
 
-	// hardware model choice
-	private void buildModelPanel() {
-		modelPanel = new JPanel(new GridBagLayout());
-		modelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+	private void save() {
+		PlotterSettings settings = myPlotter.getSettings();
 
-		GridBagConstraints d = new GridBagConstraints();
-		// the panes for the selected machine configuration
-		d.fill = GridBagConstraints.BOTH;
-		d.gridx = 0;
-		d.gridy = 0;
-		d.weightx = 0;
-		d.weighty = 0;
+		double mwf = machineWidth.getValue();
+		double mhf = machineHeight.getValue();
+		double accel = acceleration.getValue();
 
-		JLabel modelLabel = new JLabel(Translator.get("HardwareVersion"));
-		modelLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-		modelPanel.add(modelLabel, d);
-
-		d.gridx = 1;
-		d.gridwidth = 2;
-
-		hardwareVersionNames = Arrays.stream(Machines.values())
-				.map(Machines::getName)
-				.collect(Collectors.toList());
-
-		hardwareVersionChoices = new JComboBox<>((String[])hardwareVersionNames.toArray());
-		// set the default
-		String hv = robot.getSettings().getHardwareName();
-		for (int i = 0; i < hardwareVersionNames.size(); ++i) {
-			if (hardwareVersionNames.get(i).equals(hv)) {
-				hardwareVersionChoices.setSelectedIndex(i);
-				break;
-			}
+		boolean isDataSane = (mwf > 0 && mhf > 0);
+		if(!isDataSane) {
+			// TODO display a notice to the user?
+			return;
 		}
-		modelPanel.add(hardwareVersionChoices, d);
-		hardwareVersionChoices.addActionListener(this);
+		
+		settings.setMachineSize(mwf, mhf);
+		settings.setAcceleration(accel);
+	
+		settings.setPenDiameter(penDiameter.getValue());
+		settings.setTravelFeedRate(travelFeedRate.getValue());
+		settings.setDrawFeedRate(drawFeedRate.getValue());
+		settings.setPenLiftTime(penZRate.getValue());
+		settings.setPenUpAngle(penUpAngle.getValue());
+		settings.setPenDownAngle(penDownAngle.getValue());
+		settings.setPenDownColor(selectPenDownColor.getColor());
+		settings.setPenDownColorDefault(selectPenDownColor.getColor());
+		settings.setPenUpColor(selectPenUpColor.getColor());
+		
+		settings.saveConfig();
 	}
 
-	private void rebuildTabbedPanes() {
-		// returns tab index or -1 if none selected
-		int previouslySelectedTab = panes.getSelectedIndex();
-		panes.removeAll();
+	/**
+	 * Calculate length of belt and cables needed based on machine dimensions.
+	 */
+	private void updateLengthNeeded() {
+		double w = machineWidth.getValue();
+		double h = machineHeight.getValue();
+		double SAFETY_MARGIN=100;
+		
+		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN); // 10cm safety margin
+		double beltNeeded = Math.ceil(mmBeltNeeded*0.001);
+		totalBeltNeeded.setValue((float)beltNeeded);
+		
+		double mmServoNeeded = (Math.sqrt(w*w+h*h)+SAFETY_MARGIN) + w/2.0; // 10cm safety margin
+		double servoNeeded = Math.ceil(mmServoNeeded*0.001);
+		totalServoNeeded.setValue((float)servoNeeded);
 
-		AdjustMachinePanel panelAdjustMachine = new AdjustMachinePanel(robot);
-		panes.addTab(Translator.get("MenuSettingsMachine"), panelAdjustMachine);
-		buttonSave.addActionListener((e)-> panelAdjustMachine.save() );
-
-		//PanelAdjustPaper panelAdjustPaper = new PanelAdjustPaper(myPaper);
-		//panes.addTab(Translator.get("MenuAdjustPaper"), panelAdjustPaper.getPanel());
-		//buttonSave.addActionListener((e)-> panelAdjustPaper.save() );
-
-		PenSettingsPanel panelAdjustPen = new PenSettingsPanel(robot);
-		panes.addTab(Translator.get("MenuAdjustTool"), panelAdjustPen);
-		buttonSave.addActionListener((e)-> panelAdjustPen.save() );
-
-		// if one tab was selected, make sure to reselect it
-		if (previouslySelectedTab != -1) {
-			panes.setSelectedIndex(previouslySelectedTab);
-		}
+		double mmStepperNeeded = w/2.0+SAFETY_MARGIN; // 10cm safety margin
+		double stepperNeeded = Math.ceil(mmStepperNeeded*0.001);
+		totalStepperNeeded.setValue((float)stepperNeeded);
 	}
+	// TEST
+	
+	public static void main(String[] args) {
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
 
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-
-		if (src == hardwareVersionChoices) {
-			String newChoice = hardwareVersionNames.get(hardwareVersionChoices.getSelectedIndex());
-			robot.getSettings().setHardwareVersion(newChoice);
-			rebuildTabbedPanes();
-		}
+		Plotter p = new Plotter();
+		JFrame frame = new JFrame(PlotterSettingsPanel.class.getSimpleName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(new PlotterSettingsPanel(p));
+		frame.pack();
+		frame.setVisible(true);	
 	}
 }

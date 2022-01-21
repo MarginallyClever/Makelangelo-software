@@ -50,7 +50,7 @@ public class SaveSVG implements TurtleSaver {
 				x0=m.x;
 				y0=m.y;
 				break;
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 				if(isUp) isUp=false;
 				else {
 					out.write("  <line");

@@ -13,32 +13,33 @@ import java.util.LinkedList;
 
 
 /**
- * {@link MarlinSimulation} is used to estimate the time to draw a set of gcode commands by a robot running Marlin 3D printer firmware.
- * It is meant to be a 1:1 Java replica of Marlin's 'Planner' and 'Motor' classes.
+ * {@link MarlinSimulation} is meant to be a 1:1 Java replica of Marlin's 'Planner' and 'Motor' classes. 
+ * It is used to estimate the time to draw a set of gcode commands by a robot running Marlin 3D printer firmware.
  * @author Dan Royer
  * @since 7.24.0
  */
 public class MarlinSimulation {
-
 	private static final Logger logger = LoggerFactory.getLogger(MarlinSimulation.class);
 	
+	/**
+	 * TODO move this entire block into {@link PlotterSettings} so it can be tweaked by the user if needed.
+	 * Default values here should match Marlin settings.
+	 */
+	// values that cannot be tweaked in firmware at run time.
 	public static final int BLOCK_BUFFER_SIZE = 16;
-	public static final long DEFAULT_MINSEGMENTTIME = 20000;  // us
+	public static final int SEGMENTS_PER_SECOND = 5;
 	public static final double MIN_SEGMENT_LENGTH_MM = 0.5;
-	public static final double DEFAULT_FEEDRATE = 3000;  // 3000=50*60 mm/s
-	public static final double DEFAULT_ACCELERATION = 3000;  // 3000=50*60 mm/s/s
-	//public static final double DEFAULT_TRAVEL_ACCELERATION = 3000;  // mm/s/s
-	public static final double MAX_FEEDRATE = 5400;  // 5400 = 90*60 mm/s
-	public static final double MAX_ACCELERATION = 2400;  // 2400=40*60 mm/s/s
+	public static final long DEFAULT_MINSEGMENTTIME = 20000;  // us
+	public static final double GRAVITYmag = 9800.0;  // mm/s/s
+	private static final boolean JD_HANDLE_SMALL_SEGMENTS = false;
+
+	// values that can be tweaked in firmware at run time.
+	public static final double MAX_FEEDRATE = 3000;  // 5400 = 90*60 mm/s
+	public static final double MAX_ACCELERATION = 100;  // 2400=40*60 mm/s/s
 	public static final double MIN_ACCELERATION = 0.0;
 	public static final double MINIMUM_PLANNER_SPEED = 0.05;  // mm/s
-	public static final int SEGMENTS_PER_SECOND = 5;
 	public static final double [] MAX_JERK = { 10, 10, 0.3 };
-	public static final double GRAVITYmag = 9800.0;  // mm/s/s
 	
-	private static final boolean JD_HANDLE_SMALL_SEGMENTS = false;
-	
-	// poseNow is the current position.  Roughly equivalent to Sixi2Live.poseReceived.
 	private Vector3d poseNow = new Vector3d();
 	private PlotterSettings settings;
 	private double timeSum;
@@ -73,70 +74,6 @@ public class MarlinSimulation {
 		YMAX=settings.getLimitTop();
 	}
 	
-/*
-	public void update(double dt) {
-		if(queue.isEmpty()) return;
-		
-		MakelangeloFirmwareSimulationSegment seg = queue.getFirst();
-		seg.busy=true;
-		seg.now_s+=dt;
-		double diff = 0;
-		if(seg.now_s > seg.end_s) {
-			diff = seg.now_s-seg.end_s;
-			seg.now_s = seg.end_s;
-		}
-		
-		updatePositions(seg);
-		
-		if(seg.now_s== seg.end_s) {
-			queue.pop();
-			// make sure the remainder isn't lost.
-			if(!queue.isEmpty()) {
-				queue.getFirst().now_s = diff;
-			}
-		}
-		
-		readyForCommands=(queue.size()<BLOCK_BUFFER_SIZE);
-	}
-	
-	protected void updatePositions(MakelangeloFirmwareSimulationSegment seg) {
-		if(poseNow==null) return;
-
-		double dt = (seg.now_s - seg.start_s);
-		
-		// I need to know how much time has been spent accelerating, cruising, and decelerating in this segment.
-		// acceleratingT will be in the range 0....seg.accelerateUntilT
-		double acceleratingT = Math.min(dt,seg.accelerateUntilT);
-		// deceleratingT will be in the range 0....(seg.end_s-seg.decelerateAfterT)
-		double deceleratingT = Math.max(dt,seg.decelerateAfterT) - seg.decelerateAfterT;
-		// nominalT will be in the range 0....(seg.decelerateAfterT-seg.accelerateUntilT)
-		double nominalT = Math.min(Math.max(dt,seg.accelerateUntilT),seg.decelerateAfterT) - seg.accelerateUntilT;
-		
-		// now find the distance moved in each of those sections.
-		double a = (seg.entrySpeed * acceleratingT) + (0.5 * seg.acceleration * acceleratingT*acceleratingT);
-		double n = seg.nominalSpeed * nominalT;
-		double d = (seg.nominalSpeed * deceleratingT) - (0.5 * seg.acceleration * deceleratingT*deceleratingT);
-		double p = a+n+d;
-		
-		// find the fraction of the total distance travelled
-		double fraction = p / seg.distance;
-		fraction = Math.min(Math.max(fraction, 0), 1);
-		
-		boolean verbose=false;
-		if(verbose) {
-			System.out.print(a+" "+n+" "+d+" -> "+p+" / "+seg.distance + " = ");
-			System.out.print(seg.end_s+" / "+seg.now_s+" / "+seg.start_s+" : "+fraction+" = ");
-			System.out.print(seg.start+" ");
-			System.out.print(seg.delta+" ");
-		}
-		
-		// set pos = start + delta * fraction
-		Vector3d temp = new Vector3d();
-		temp.scale(fraction,seg.delta);
-		poseNow.add(temp,seg.start);
-		if(verbose) logger.debug("{} ", poseNow);
-	}*/
-
 	/**
 	 * Add this destination to the queue and attempt to optimize travel between destinations. 
 	 * @param destination destination (mm)
@@ -619,7 +556,7 @@ public class MarlinSimulation {
 				
 		for(TurtleMove m : t.history) {			
 			switch(m.type) {
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 				if(isUp) {
 					isUp=false;
 					bufferLine(new Vector3d(lx,ly,isUp?zu:zd),fz,a);

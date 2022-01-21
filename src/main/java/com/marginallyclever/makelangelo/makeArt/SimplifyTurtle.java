@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeArt;
 
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -8,14 +9,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.vecmath.Vector2d;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+/**
+ * Performs Douglas-Peucker line simplification.
+ * see https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+ * @author Dan Royer
+ *
+ */
 public class SimplifyTurtle extends AbstractAction {
+	private static final long serialVersionUID = 7013596037448318526L;
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtle.class);
-	private static final long serialVersionUID = 2930297421274921735L;
 	private Makelangelo myMakelangelo;
+
+	private static double distanceTolerance = 1.6;
 	
 	public SimplifyTurtle(Makelangelo m) {
 		super(Translator.get("Simplify"));
@@ -29,14 +37,13 @@ public class SimplifyTurtle extends AbstractAction {
 	
 	public static Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
-		logger.debug("SimplifyTurtle begin @ {}", os);
+		logger.debug("begin @ {}", os);
 		
-		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
+		LineCollection originalLines = new LineCollection(turtle.getAsLineSegments());
 		int originalCount = originalLines.size();
 		logger.debug("  Converted to {} lines.", originalCount);
 
-		double minimumStepSize = 1e-3;
-		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines,minimumStepSize); 
+		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
 		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
@@ -44,50 +51,39 @@ public class SimplifyTurtle extends AbstractAction {
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines,1.0);
 		int ns = t.history.size();
-		logger.debug("SimplifyTurtle end @ {}", ns);
+		logger.debug("end @ {}", ns);
 		
 		return t;
 	}
 
-	private static ArrayList<LineSegment2D> removeVeryShortSegments(ArrayList<LineSegment2D> toTest, double minimumLength) {
-		ArrayList<LineSegment2D> toKeep = new ArrayList<LineSegment2D>();
-		int count = toTest.size();
-		if(count==0) return toKeep;
+	/**
+	 * Split the collection by color, then by travel moves to get contiguous blocks in a single color.
+	 * simplify these blocks using Douglas-Peucker method. 
+	 * @param originalLines
+	 * @return
+	 */
+	private static ArrayList<LineSegment2D> removeVeryShortSegments(LineCollection originalLines) {
+		LineCollection result = new LineCollection();
 		
-		toKeep.add(toTest.get(0));
-		LineSegment2D first = toKeep.get(0); 
-
-		for(int i=1;i<count;++i) {
-			LineSegment2D second = toTest.get(i);
-			// sequential with no jump?
-			if(first.b.distanceSquared(second.a)<minimumLength) {
-				// very short?
-				if(second.a.distanceSquared(second.b)<minimumLength) {
-					first.b=second.b;
-					continue;
-				}
-
-				// colinear?
-				Vector2d firstN = makeUnitVectorFromLineSegment(first);
-				Vector2d secondN = makeUnitVectorFromLineSegment(second);
-				if(firstN.dot(secondN)>0.9999) {
-					first.b=second.b;
-					continue;
-				}
-				second.a=first.b;
+		ArrayList<LineCollection> byColor = originalLines.splitByColor();
+		for(LineCollection c : byColor ) {
+			ArrayList<LineCollection> byTravel = c.splitByTravel();
+			for(LineCollection t : byTravel ) {
+				LineCollection after = t.simplify(distanceTolerance);
+				result.addAll(after);
 			}
-			
-			toKeep.add(second);
-			first = second;
 		}
-		return toKeep;
+		
+		return result;
 	}
 
-	private static Vector2d makeUnitVectorFromLineSegment(LineSegment2D line) {
-		Vector2d n = new Vector2d();
-		n.x = line.b.x - line.a.x;
-		n.y = line.b.y - line.a.y;
-		n.normalize();
-		return n;
+	/**
+	 * Sets the distance tolerance for the simplification. All vertices in the
+	 * simplified line will be within this distance of the original line.
+	 *
+	 * @param distanceTolerance the approximation tolerance to use
+	 */
+	public static void setDistanceTolerance(double distanceTolerance) {
+		SimplifyTurtle.distanceTolerance = distanceTolerance;
 	}
 }

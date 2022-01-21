@@ -83,6 +83,13 @@ public class ColorRGB {
     int distanceSquared = rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
     return (float) Math.sqrt(distanceSquared);
   }
+  
+  public boolean isEqualTo(ColorRGB o) {
+	  if(o.red - this.red != 0) return false;
+	  if(o.green - this.green != 0) return false;
+	  if(o.blue - this.blue != 0) return false;
+	  return true;
+  }
 
   public String toString() {
     return "(" + red + "," + green + "," + blue + ")";

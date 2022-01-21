@@ -19,6 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private static final long serialVersionUID = 1L;
 	private Paper myPaper;
 
-	private JFileChooser fc = new JFileChooser();
+	private static JFileChooser fc = new JFileChooser();
 	private JButton bChoose = new JButton(Translator.get("Open"));
 	private JLabel filename = new JLabel();
 
@@ -146,5 +147,13 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		frame.add(new LoadFilePanel(new Paper(),""));
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public static String getLastPath() {
+		return fc.getCurrentDirectory().toString();
+	}
+	
+	public static void setLastPath(String lastPath) {
+		fc.setCurrentDirectory((lastPath==null?null : new File(lastPath)));
 	}
 }
