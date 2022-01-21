@@ -18,7 +18,6 @@
 package com.marginallyclever.util;
 
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
 import java.io.File;
@@ -61,8 +60,6 @@ public class FindAllTraductionGet {
      * @param args
      */
     public static void main(String[] args) {
-
-	Log.start();
 
 	PreferencesHelper.start();
 	CommandLineOptions.setFromMain(args);
