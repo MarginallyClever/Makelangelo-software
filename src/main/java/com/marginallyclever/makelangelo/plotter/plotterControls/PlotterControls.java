@@ -13,6 +13,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -70,19 +71,21 @@ public class PlotterControls extends JPanel {
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
-		marlinInterface.addListener(e -> {
-			switch (e.getActionCommand()) {
-				case MarlinInterface.IDLE ->
-						{ if (isRunning) step(); }
-				case MarlinInterface.ERROR ->
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"),  JOptionPane.ERROR_MESSAGE);
-				case MarlinInterface.HOME_XY_FIRST ->
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("PlotterControls.InfoTitle"), JOptionPane.WARNING_MESSAGE);
-				case MarlinInterface.DID_NOT_FIND ->
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
-			}
-			updateProgressBar();
-		});
+		marlinInterface.addListener(e -> onMarlinEvent(e));
+	}
+	
+	private void onMarlinEvent(ActionEvent e) {
+		switch (e.getActionCommand()) {
+		case MarlinInterface.IDLE ->
+				{ if (isRunning) step(); }
+		case MarlinInterface.ERROR ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"),  JOptionPane.ERROR_MESSAGE);
+		case MarlinInterface.HOME_XY_FIRST ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("PlotterControls.InfoTitle"), JOptionPane.WARNING_MESSAGE);
+		case MarlinInterface.DID_NOT_FIND ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
+		}
+		updateProgressBar();
 	}
 
 	private JPanel getButtonsPanels() {
