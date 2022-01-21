@@ -145,6 +145,10 @@ public class PlotterSettings implements Serializable {
 		return robotUID;
 	}
 
+	protected void setRobotUID(long robotUID) {
+		this.robotUID = robotUID;
+	}
+
 	public boolean isRegistered() {
 		return isRegistered;
 	}
@@ -312,7 +316,6 @@ public class PlotterSettings implements Serializable {
 	 * @return height of machine's drawing area, in mm.
 	 */
 	private double getHeight() {
-		// TODO Auto-generated method stub
 		return 1000; // mm
 	}
 
@@ -320,7 +323,6 @@ public class PlotterSettings implements Serializable {
 	 * @return width of machine's drawing area, in mm.
 	 */
 	private double getWidth() {
-		// TODO Auto-generated method stub
 		return 650; // mm
 	}
 
@@ -332,24 +334,24 @@ public class PlotterSettings implements Serializable {
 		return penDownColor;
 	}
 
-	public void setPenDownColorDefault(ColorRGB arg0) {
-		penDownColorDefault = arg0;
+	public void setPenDownColorDefault(ColorRGB color) {
+		penDownColorDefault = color;
 	}
 
-	public void setPenDownColor(ColorRGB arg0) {
-		penDownColor = arg0;
+	public void setPenDownColor(ColorRGB color) {
+		penDownColor = color;
 	}
 
-	public void setPenUpColor(ColorRGB arg0) {
-		penUpColor = arg0;
+	public void setPenUpColor(ColorRGB color) {
+		penUpColor = color;
 	}
 
 	public ColorRGB getPenUpColor() {
 		return penUpColor;
 	}
 
-	public void setPenDiameter(double d) {
-		penDiameter = d;
+	public void setPenDiameter(double diameter) {
+		penDiameter = diameter;
 	}
 
 	public double getPenDiameter() {
@@ -381,12 +383,18 @@ public class PlotterSettings implements Serializable {
 	}
 
 	public boolean canChangeMachineSize() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public boolean canAccelerate() {
-		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void setStartingPositionIndex(int startingPositionIndex) {
+		this.startingPositionIndex = startingPositionIndex;
+	}
+
+	public int getStartingPositionIndex() {
+		return this.startingPositionIndex;
 	}
 }

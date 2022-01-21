@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
@@ -71,9 +72,15 @@ public class PlotterControls extends JPanel {
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
-		marlinInterface.addListener(e -> onMarlinEvent(e));
+		marlinInterface.addListener(e -> onMarlinEvent(e));	
+
+		myPlotter.addPlotterEventListener((e)-> {
+			if (e.type == PlotterEvent.HOME_FOUND) {
+				updateButtonStatusConnected();
+			}
+		});
 	}
-	
+  
 	private void onMarlinEvent(ActionEvent e) {
 		switch (e.getActionCommand()) {
 		case MarlinInterface.IDLE ->
@@ -103,10 +110,11 @@ public class PlotterControls extends JPanel {
 		panel.add(chooseConnection);
 		chooseConnection.addListener(e -> {
 			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> updateButtonStatusOnConnect();
-				case NetworkSessionEvent.CONNECTION_CLOSED -> updateButtonStatusOnDisconnect();
+				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
+				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
 			}
 		});
+
 		return panel;
 	}
 
@@ -142,7 +150,7 @@ public class PlotterControls extends JPanel {
 			chooseConnection.closeConnection();
 		});
 
-		updateButtonStatusOnDisconnect();
+		onDisconnect();
 
 		return panel;
 	}
@@ -215,19 +223,23 @@ public class PlotterControls extends JPanel {
 		bStep.setEnabled(isHomed && !isRunning);
 	}
 
-	private void updateButtonStatusOnConnect() {
+	private void onConnect() {
+		myPlotter.reInit();
 		bFindHome.setEnabled(true);
 		bEmergencyStop.setEnabled(true);
 		updateButtonStatusConnected();
+		jogInterface.onNetworkConnect();
 	}
 
-	private void updateButtonStatusOnDisconnect() {
+	private void onDisconnect() {
+		myPlotter.reInit();
 		bFindHome.setEnabled(false);
 		bEmergencyStop.setEnabled(false);
 		bRewind.setEnabled(false);
 		bStart.setEnabled(false);
 		bPause.setEnabled(false);
 		bStep.setEnabled(false);
+		jogInterface.onNetworkDisconnect();
 	}
 
 	@SuppressWarnings("unused")
@@ -267,6 +279,7 @@ public class PlotterControls extends JPanel {
 		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
 		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 
 }
