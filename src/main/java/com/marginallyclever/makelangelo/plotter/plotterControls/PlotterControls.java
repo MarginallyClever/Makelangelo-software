@@ -14,6 +14,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -71,27 +72,27 @@ public class PlotterControls extends JPanel {
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
-		marlinInterface.addListener(e -> {
-			if (e.getActionCommand().equals(MarlinInterface.IDLE) && isRunning) {
-				step();
-			} else if (e.getActionCommand().equals(MarlinInterface.ERROR)) {
-				JOptionPane.showMessageDialog(this,  Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
-			}
-			updateProgressBar();
-		});
-		
-		chooseConnection.addListener(e -> {
-			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
-				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
-			}
-		});
+		marlinInterface.addListener(e -> onMarlinEvent(e));	
 
 		myPlotter.addPlotterEventListener((e)-> {
 			if (e.type == PlotterEvent.HOME_FOUND) {
 				updateButtonStatusConnected();
 			}
 		});
+	}
+  
+	private void onMarlinEvent(ActionEvent e) {
+		switch (e.getActionCommand()) {
+		case MarlinInterface.IDLE ->
+				{ if (isRunning) step(); }
+		case MarlinInterface.ERROR ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"),  JOptionPane.ERROR_MESSAGE);
+		case MarlinInterface.HOME_XY_FIRST ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("PlotterControls.InfoTitle"), JOptionPane.WARNING_MESSAGE);
+		case MarlinInterface.DID_NOT_FIND ->
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
+		}
+		updateProgressBar();
 	}
 
 	private JPanel getButtonsPanels() {
@@ -107,6 +108,12 @@ public class PlotterControls extends JPanel {
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.ConnectControls"));
 		panel.setBorder(border);
 		panel.add(chooseConnection);
+		chooseConnection.addListener(e -> {
+			switch (e.flag) {
+				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
+				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
+			}
+		});
 
 		return panel;
 	}
