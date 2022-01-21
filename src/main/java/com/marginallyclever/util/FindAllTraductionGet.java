@@ -77,7 +77,7 @@ public class FindAllTraductionGet {
 	try {
 	    logger.debug("srcDir={}", srcDir.getCanonicalPath());
 	} catch (IOException ex) {
-	    logger.error("{}",ex.getMessage(), ex);
+	    logger.error("{}", ex.getMessage(), ex);
 	}
 
 	// TODO to reveiw this regexp do not get the complet content/args if there is a ")" in it ... like Translation.get(myObject()+"someValue") ...
@@ -95,7 +95,7 @@ public class FindAllTraductionGet {
 //		logger.error(" used in \"{}\" line {}", tr.pSrc, tr.lineInFile);
 //	    }
 //	}
-	
+
 	FindAllTraductionXMLGenerator.generatePartialXmlFileWithMissingKey(groupIdenticalMissingKey);
 	//
 	// TODO propose a lead for the resolution if one or more translation keys are missing.
@@ -171,7 +171,7 @@ public class FindAllTraductionGet {
 		mapMatchResultToFilePath.putAll(searchInAFile(x, srcDir.toPath(), patternToMatchInFiles));
 	    });
 	} catch (Exception ex) {
-	    logger.error("{}",ex.getMessage(), ex);
+	    logger.error("{}", ex.getMessage(), ex);
 	}
 	logger.debug("mapMatchResultToFilePath.size()={}", mapMatchResultToFilePath.size());
 	return mapMatchResultToFilePath;
@@ -229,11 +229,11 @@ public class FindAllTraductionGet {
 		}
 	    }
 	    // warm if we miss some match by doing line by line ?
-	    if (countMatchNotLineByLine != mapMatchResultToFilePath.size()){
-		logger.error("Miss {} match in multilines ... ",countMatchNotLineByLine-mapMatchResultToFilePath.size());
+	    if (countMatchNotLineByLine != mapMatchResultToFilePath.size()) {
+		logger.error("Miss {} match in multilines ... ", countMatchNotLineByLine - mapMatchResultToFilePath.size());
 	    }
 	} catch (IOException ex) {
-	    logger.error("{}",ex.getMessage(), ex);
+	    logger.error("{}", ex.getMessage(), ex);
 	}
 	return mapMatchResultToFilePath;
     }
