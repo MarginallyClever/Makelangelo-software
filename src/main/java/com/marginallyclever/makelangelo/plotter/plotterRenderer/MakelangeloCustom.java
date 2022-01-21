@@ -20,7 +20,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 //		paintCalibrationPoint(gl2,settings);
 		paintControlBox(gl2,settings);
 		paintMotors(gl2,settings);
-		paintSafeArea(gl2,robot);
+		//paintSafeArea(gl2,robot);
 		if(robot.getDidFindHome()) 
 			paintPenHolderToCounterweights(gl2,robot);
 	}
@@ -30,7 +30,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	 * @param gl2
 	 * @param settings
 	 */
-	protected void paintControlBox(GL2 gl2,PlotterSettings settings) {
+	private void paintControlBox(GL2 gl2,PlotterSettings settings) {
 		double cy = settings.getLimitTop();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
@@ -94,7 +94,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	}
 	
 	// draw left & right motor
-	protected void paintMotors( GL2 gl2,PlotterSettings settings ) {
+	private void paintMotors( GL2 gl2,PlotterSettings settings ) {
 		double top = settings.getLimitTop();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
@@ -115,7 +115,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glEnd();
 	}
 	
-	protected void renderLCD(GL2 gl2) {
+	private void renderLCD(GL2 gl2) {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -181,7 +181,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glPopMatrix();
 	}
 
-	protected void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
+	private void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
 		Point2D pos = robot.getPos();
@@ -253,13 +253,13 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	protected void paintPlotter(GL2 gl2,float gx,float gy) {
+	private void paintPlotter(GL2 gl2,float gx,float gy) {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
 		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
 	}
 	
-	protected void drawCircle(GL2 gl2,float x,float y,float r) {
+	private void drawCircle(GL2 gl2,float x,float y,float r) {
 		gl2.glTranslatef(x, y, 0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		float f;
@@ -272,7 +272,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 	
-	protected void drawArc(GL2 gl2,float x,float y,float r, float a1, float a2) {
+	private void drawArc(GL2 gl2,float x,float y,float r, float a1, float a2) {
 		gl2.glTranslatef(x, y, 0);
 		gl2.glBegin(GL2.GL_LINES);
 		float f;
@@ -289,7 +289,8 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glTranslatef(-x, -y, 0);
 	}
 	
-	protected void paintSafeArea(GL2 gl2,Plotter robot) {
+	@SuppressWarnings("unused")
+	private void paintSafeArea(GL2 gl2,Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double topcrit_ang=20*3.14/180.0;
 		double sidecrit_ang=20*3.14/180.0;

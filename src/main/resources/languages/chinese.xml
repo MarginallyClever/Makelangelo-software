@@ -197,12 +197,12 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>绘图纸宽度</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>绘图纸高度</value>
 		<hint>Paper settings panel</hint>
 	</string>
@@ -404,33 +404,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>GCODE (ngc)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>图像(jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12(dxf)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch2</key>
-		<value>Scratch 2 (SB2)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeScratch3</key>
-		<value>Scratch 3 (SB3)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeSVG</key>
-		<value>矢量图 (svg)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -560,12 +535,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>换笔</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>请更换笔以匹配此颜色.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
@@ -591,13 +566,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -611,21 +581,6 @@
 		<hint>menu or dialog title</hint>
 	</string>
 
-	<string>
-		<key>SetHome</key>
-		<value>设置起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>移到起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>FindHome</key>
-		<value>寻找起始点</value>
-		<hint>manual driving dialog</hint>
-	</string>
 	<string>
 		<key>GoPaperBorder</key>
 		<value>边界</value>
@@ -876,7 +831,7 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>保存到文件/ SD卡</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -1604,7 +1559,7 @@
 	</string>
 
 	<string>
-		<key>paper color</key>
+		<key>PaperSettings.PaperColor</key>
 		<value>纸张颜色</value>
 		<hint></hint>
 	</string>
@@ -1634,7 +1589,7 @@
 	</string>
 
 	<string>
-		<key>Sandy Noble Style</key>
+		<key>SandyNoble.title</key>
 		<value>Sandy风格</value>
 		<hint></hint>
 	</string>
@@ -1676,19 +1631,19 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>螺旋到角落</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.spacing</key>
 		<value>环间隙</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>脉冲高度</value>
 		<hint></hint>
 	</string>
@@ -1706,7 +1661,7 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>

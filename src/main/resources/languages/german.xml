@@ -215,12 +215,12 @@
 	</string>
 
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>Papierbreite</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>Papierhöhe</value>
 		<hint>Paper settings panel</hint>
 	</string>
@@ -537,12 +537,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>Stift tauschen</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>Bitte tausche Stift auf diese Farbe.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
@@ -568,13 +568,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Öffne Kontrollen</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Speichere GCode in Datei/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -859,8 +854,8 @@
 		<hint></hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
-		<value>In Datei/SD Karte speichern</value>
+		<key>RobotMenu.SaveGCode</key>
+		<value>Speichere GCode in Datei/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -1058,7 +1053,6 @@
 	</string>
 	<string>
 		<key>BoxGeneratorMaxSizeNote</key>
-		<value>Max size greater than or equal to 1. Cutoff 0...1</value>
 		<value>Max Größe größer oder gleich 1. Grenze 0...1</value>
 		<hint>Boxxy generator</hint>
 	</string>
@@ -1627,7 +1621,7 @@
 	</string>
 
 	<string>
-		<key>paper color</key>
+		<key>PaperSettings.PaperColor</key>
 		<value>Papierfarbe</value>
 		<hint></hint>
 	</string>
@@ -1657,7 +1651,7 @@
 	</string>
 
 	<string>
-		<key>Sandy Noble Style</key>
+		<key>SandyNoble.title</key>
 		<value>Sandy Noble Stil</value>
 		<hint></hint>
 	</string>
@@ -1699,19 +1693,19 @@
 	</string>
 
 	<string>
-		<key>spiralToCorners</key>
+		<key>Spiral.toCorners</key>
 		<value>Spirale in Ecken</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseSpacing</key>
+		<key>SpiralPulse.spacing</key>
 		<value>Abstand zwischen Ringen</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>SpiralPulseHeight</key>
+		<key>SpiralPulse.height</key>
 		<value>Pulshöhe</value>
 		<hint></hint>
 	</string>
@@ -1729,7 +1723,7 @@
 	</string>
 
 	<string>
-		<key>converterWanderCMYK</key>
+		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
 		<hint></hint>
 	</string>

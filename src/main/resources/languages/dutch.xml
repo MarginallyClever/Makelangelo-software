@@ -40,12 +40,12 @@
 	</string>
 	
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>Papier breedte</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>Papier hoogte</value>
 		<hint>machine size control panel</hint>
 	</string>
@@ -212,18 +212,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>GCODE (ngc)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>Afbeelding (jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 (dxf)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -295,16 +285,6 @@
 		<value>Gekozen tool is incorrect #</value>
 		<hint>warning message</hint>
 	</string>
-	<string>
-		<key>ChangeToolPrefix</key>
-		<value>Gelieve voor te bereiden </value>
-		<hint>tool change prompt. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>ChangeToolPostfix</key>
-		<value> en klik op een knop om door te gaan.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
-	</string>
 
 	<string>
 		<key>StartAt</key>
@@ -329,13 +309,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -349,18 +324,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 
-	<string>
-		<key>SetHome</key>
-		<value>Set home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>Go home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
+        <string>
 		<key>Top</key>
 		<value>Boven</value>
 		<hint>manual driving dialog</hint>
@@ -565,8 +529,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
-		<value>Opslaan als...</value>
+		<key>RobotMenu.SaveGCode</key>
+		<value>Bewaar Gcode in bestand/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -811,25 +775,13 @@
 		<value>Motoren uitzetten</value>
 		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
-
-	<!-- Because the version string is declared in Java, AboutHTMLBeforeVersionNumber 
-		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
-		the about message dialog using the version string. This is why there is not
-		one big CDATA html blob. -->
+	
 	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
+		<key>AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
-	</h1>
+        <h1>Makelangelo %VERSION%</h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
