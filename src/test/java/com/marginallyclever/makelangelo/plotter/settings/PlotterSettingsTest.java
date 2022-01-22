@@ -21,7 +21,7 @@ public class PlotterSettingsTest {
     }
 
     @Test
-    void saveLoadConfig() {
+    void saveAndLoadConfig() {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_UID);
@@ -29,7 +29,6 @@ public class PlotterSettingsTest {
         plotterSettings.setLimitBottom(3);
         plotterSettings.setLimitRight(4);
         plotterSettings.setLimitLeft(5);
-        plotterSettings.setAcceleration(300);
         plotterSettings.setStartingPositionIndex(6);
         plotterSettings.setPenDiameter(7);
         plotterSettings.setPenLiftTime(8);
@@ -38,6 +37,10 @@ public class PlotterSettingsTest {
         plotterSettings.setTravelFeedRate(11);
         plotterSettings.setPenDownColorDefault(new ColorRGB(12, 13, 14));
         plotterSettings.setPenUpColor(new ColorRGB(15, 16, 17));
+        plotterSettings.setPaperColor(new ColorRGB(18, 19, 20));
+        plotterSettings.setDrawFeedRate(21);
+        plotterSettings.setAcceleration(22);
+        plotterSettings.setHardwareName("TestRobot");
 
         // when
         plotterSettings.saveConfig();
@@ -45,11 +48,11 @@ public class PlotterSettingsTest {
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
         plotterSettingsRead.loadConfig(ROBOT_UID);
-//        assertEquals(2, plotterSettingsRead.getLimitTop()); // Not yet implemented
-//        assertEquals(3, plotterSettingsRead.getLimitBottom()); // Not yet implemented
-//        assertEquals(4, plotterSettingsRead.getLimitRight()); // Not yet implemented
-//        assertEquals(5, plotterSettingsRead.getLimitLeft()); // Not yet implemented
-//        assertEquals(6, plotterSettingsRead.getMaxAcceleration()); // Not yet implemented
+        assertEquals(2, plotterSettingsRead.getLimitTop());
+        assertEquals(3, plotterSettingsRead.getLimitBottom());
+        assertEquals(4, plotterSettingsRead.getLimitRight());
+        assertEquals(5, plotterSettingsRead.getLimitLeft());
+        assertEquals(6, plotterSettingsRead.getStartingPositionIndex());
         assertEquals(7, plotterSettingsRead.getPenDiameter());
         assertEquals(8, plotterSettingsRead.getPenLiftTime());
         assertEquals(9, plotterSettingsRead.getPenDownAngle());
@@ -57,6 +60,10 @@ public class PlotterSettingsTest {
         assertEquals(11, plotterSettingsRead.getTravelFeedRate());
         assertEquals(new ColorRGB(12, 13, 14), plotterSettingsRead.getPenDownColorDefault());
         assertEquals(new ColorRGB(15, 16, 17), plotterSettingsRead.getPenUpColor());
+        assertEquals(new ColorRGB(18, 19, 20), plotterSettingsRead.getPaperColor());
+        assertEquals(21, plotterSettingsRead.getDrawFeedRate());
+        assertEquals(22, plotterSettingsRead.getMaxAcceleration());
+        assertEquals("TestRobot", plotterSettingsRead.getHardwareName());
     }
 
     @AfterEach
