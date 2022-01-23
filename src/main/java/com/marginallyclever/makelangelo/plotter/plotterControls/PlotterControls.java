@@ -29,7 +29,12 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
-    private static final long serialVersionUID = -1201865024705737250L;
+
+	public static final int DIMENSION_PANEL_WIDTH = 850;
+	public static final int DIMENSION_PANEL_HEIGHT = 220;
+	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
+
+	private static final long serialVersionUID = -1201865024705737250L;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;
@@ -59,12 +64,11 @@ public class PlotterControls extends JPanel {
 		programInterface = new ProgramInterface(plotter, turtle);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		jogInterface.setPreferredSize(new Dimension(780, 300));
 		tabbedPane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
 
-		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), 570);
+		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT);
 		collapsiblePanel.add(tabbedPane);
 
 		this.setLayout(new BorderLayout());
@@ -72,7 +76,7 @@ public class PlotterControls extends JPanel {
 		this.add(getButtonsPanels(), BorderLayout.NORTH);
 		this.add(progress, BorderLayout.SOUTH);
 
-		marlinInterface.addListener(e -> onMarlinEvent(e));	
+		marlinInterface.addListener(this::onMarlinEvent);
 
 		myPlotter.addPlotterEventListener((e)-> {
 			if (e.type == PlotterEvent.HOME_FOUND) {
@@ -274,12 +278,12 @@ public class PlotterControls extends JPanel {
 		Translator.start();
 
 		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
-		frame.setPreferredSize(new Dimension(850, 220));
+		frame.setPreferredSize(new Dimension(DIMENSION_PANEL_WIDTH, DIMENSION_PANEL_HEIGHT));
+		frame.setMinimumSize(new Dimension(DIMENSION_PANEL_WIDTH, DIMENSION_PANEL_HEIGHT));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
 		frame.pack();
 		frame.setVisible(true);
-		frame.setResizable(false);
 	}
 
 }
