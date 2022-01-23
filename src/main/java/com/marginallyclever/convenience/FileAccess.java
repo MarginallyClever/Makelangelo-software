@@ -78,13 +78,13 @@ public class FileAccess {
 	}
 
 	private static void readZipFileIntoTempFile(ZipInputStream zipFile, File f) throws IOException {
-        FileOutputStream fos = new FileOutputStream(f);
-		byte[] buffer = new byte[2048];
-		int len;
-        while ((len = zipFile.read(buffer)) > 0) {
-            fos.write(buffer, 0, len);
-        }
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(f)) {
+			byte[] buffer = new byte[2048];
+			int len;
+			while ((len = zipFile.read(buffer)) > 0) {
+				fos.write(buffer, 0, len);
+			}
+		}
 	}
 
 	/**
