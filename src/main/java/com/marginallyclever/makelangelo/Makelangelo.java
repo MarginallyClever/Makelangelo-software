@@ -404,7 +404,8 @@ public final class Makelangelo {
 
 	private void openPlotterControls() {
 		JDialog dialog = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
-		dialog.setPreferredSize(new Dimension(850, 220));
+		dialog.setPreferredSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
+		dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
@@ -420,7 +421,6 @@ public final class Makelangelo {
 			}
 		});
 
-		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
 
