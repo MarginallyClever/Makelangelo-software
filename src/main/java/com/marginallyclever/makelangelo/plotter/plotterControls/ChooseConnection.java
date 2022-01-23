@@ -29,6 +29,7 @@ public class ChooseConnection extends JPanel {
 	public static final int CONNECTION_CLOSED = 2;
 	
 	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
+	private ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
 	private NetworkSession mySession;
 
@@ -37,7 +38,6 @@ public class ChooseConnection extends JPanel {
 
 		this.add(connectionComboBox);
 
-		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
 		this.add(refresh);
 		addConnectionsItems(connectionComboBox);
@@ -79,6 +79,7 @@ public class ChooseConnection extends JPanel {
 			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED,null));
 		}
 		connectionComboBox.setEnabled(true);
+		refresh.setEnabled(true);
 		bConnect.setText(Translator.get("ButtonConnect"));
 		bConnect.replaceIcon("/images/connect.png");
 		bConnect.setForeground(Color.GREEN);
@@ -94,6 +95,7 @@ public class ChooseConnection extends JPanel {
 			}
 		});
 		connectionComboBox.setEnabled(false);
+		refresh.setEnabled(false);
 		bConnect.setText(Translator.get("ButtonDisconnect"));
 		bConnect.replaceIcon("/images/disconnect.png");
 		bConnect.setForeground(Color.RED);
