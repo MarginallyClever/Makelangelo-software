@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.google.common.collect.EvictingQueue;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -15,7 +16,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.IntStream;
 
 /**
  * {@link ConversationHistory} maintains a history of the dialog between two or more parties.
@@ -25,11 +26,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 7.28.0
  */
 public class ConversationHistory extends JPanel {
+	private static final int HISTORY_SIZE = 5;
+
 	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;
-	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
-	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
-	private ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<ConversationEvent>();
+	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<>();
+	private JList<ConversationEvent> listView = new JList<>(listModel);
+	private final EvictingQueue<ConversationEvent> inBoundQueue = EvictingQueue.create(HISTORY_SIZE);
 	private JFileChooser chooser = new JFileChooser();
 
 	private ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
@@ -65,7 +68,7 @@ public class ConversationHistory extends JPanel {
 	}
 
 	private void createCellRenderingSystem() {
-		listView.setCellRenderer(new ListCellRenderer<ConversationEvent>() {
+		listView.setCellRenderer(new ListCellRenderer<>() {
 			private DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer(); 
 			
 			@Override
@@ -136,7 +139,7 @@ public class ConversationHistory extends JPanel {
 	@Override
 	public void paint(Graphics g) {
 		boolean isLast = (listView.getLastVisibleIndex() == listModel.getSize()-1);
-		
+
 		addQueuedMessages();
 		
 		if(isLast) jumpToEnd();
@@ -145,9 +148,14 @@ public class ConversationHistory extends JPanel {
 	}
 
 	private void addQueuedMessages() {
-		while(!inBoundQueue.isEmpty()) {
+		while (!inBoundQueue.isEmpty()) {
 			ConversationEvent msg = inBoundQueue.poll();
-			if(msg!=null) listModel.addElement(msg);
+			if (msg!=null) {
+				if (listModel.getSize() > HISTORY_SIZE) {
+					listModel.remove(0);
+				}
+				listModel.addElement(msg);
+			}
 		}
 	}
 		
@@ -157,7 +165,7 @@ public class ConversationHistory extends JPanel {
 	
 	// TEST
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
@@ -166,11 +174,14 @@ public class ConversationHistory extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ConversationHistory ch = new ConversationHistory();
 		frame.add(ch);
+		frame.setPreferredSize(new Dimension(850, 400));
 		frame.pack();
 		frame.setVisible(true);
 
 		ch.addElement("You", "N2 G28 XY*48");
 		ch.addElement("/dev/cu.usbserial-1410", "X:0.00 Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000");
 		ch.addElement("/dev/cu.usbserial-1410", "echo:; Advanced (B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate> X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>):");
+
+		IntStream.range(0, 50).forEach(i -> ch.addElement("You", "msg " + i));
 	}
 }
