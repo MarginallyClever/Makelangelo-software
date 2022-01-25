@@ -112,6 +112,8 @@ public final class Makelangelo {
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private RangeSlider rangeSlider;
+	private JLabel labelRangeMin = new JLabel();
+	private JLabel labelRangeMax = new JLabel();
 	
 	private PlotterRenderer myPlotterRenderer;
 	
@@ -750,20 +752,40 @@ public final class Makelangelo {
 		previewPanel.addListener(myTurtleRenderer);
 		addPlotterRendererToPreviewPanel();
 		
-		logger.debug("  create range slider...");
-		rangeSlider = new RangeSlider();
-		rangeSlider.addChangeListener((e)->{
-            RangeSlider slider = (RangeSlider) e.getSource();
-            int bottom = Integer.valueOf(slider.getValue());
-            int top = Integer.valueOf(slider.getUpperValue());
-            myTurtleRenderer.setFirst(bottom);
-            myTurtleRenderer.setLast(top);
-		});
-		// major layout
+		createRangeSlider(contentPane);
+		
 		contentPane.add(previewPanel, BorderLayout.CENTER);
-		contentPane.add(rangeSlider, BorderLayout.SOUTH);
 
 		return contentPane;
+	}
+
+	private void createRangeSlider(JPanel contentPane) {
+		logger.debug("  create range slider...");
+		JPanel bottomPanel = new JPanel(new BorderLayout());
+		rangeSlider = new RangeSlider();
+		rangeSlider.addChangeListener((e)->{
+	        RangeSlider slider = (RangeSlider)e.getSource();
+	        int bottom = Integer.valueOf(slider.getValue());
+	        int top = Integer.valueOf(slider.getUpperValue());
+	        myTurtleRenderer.setFirst(bottom);
+	        myTurtleRenderer.setLast(top);
+	        labelRangeMin.setText(Integer.toString(bottom));
+	        labelRangeMax.setText(Integer.toString(top));
+		});
+		
+		Dimension d = labelRangeMin.getPreferredSize();
+		d.width=50;
+		labelRangeMin.setPreferredSize(d);
+		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		labelRangeMax.setPreferredSize(d);
+		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
+		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		
+		bottomPanel.add(labelRangeMin, BorderLayout.WEST);
+		bottomPanel.add(rangeSlider, BorderLayout.CENTER);
+		bottomPanel.add(labelRangeMax, BorderLayout.EAST);
+		
+		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
