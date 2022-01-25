@@ -158,25 +158,25 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getTravelToString(Plotter p,double x, double y) {
-		return "G0" + getPosition(x, y) ;//+ " F" + p.getSettings().getTravelFeedRate();
+		return "G0 " + getPosition(x, y) ;//+ " F" + p.getSettings().getTravelFeedRate();
 	}
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getDrawToString(Plotter p,double x, double y) {
-		return "G1" + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
+		return "G1 " + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
 	}
 
 	private static String getPosition(double x, double y) {
-		return " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
+		return "X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
 	}
 
 	public static String getPenUpString(Plotter p) {
-		return "M280 P0 S" + (int) p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+		return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S" + (int) p.getPenDownAngle() + " T50";
+		return "M280 P0 S" + (int)p.getPenDownAngle() + " T50";
 	}
 
 	public static String getToolChangeString(int toolNumber) {
