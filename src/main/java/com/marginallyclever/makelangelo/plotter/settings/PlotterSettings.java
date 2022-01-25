@@ -79,10 +79,7 @@ public class PlotterSettings implements Serializable {
 		penUpColor = new ColorRGB(0, 255, 0); // blue
 		startingPositionIndex = 4;
 
-		setHardwareVersion("Makelangelo 5");
-
-		// Load most recent config
-		// loadConfig(last_machine_id);
+		hardwareName = "Makelangelo 5";
 	}
 
 	// OBSERVER PATTERN START
@@ -163,16 +160,15 @@ public class PlotterSettings implements Serializable {
 		Preferences topLevelMachinesPreferenceNode = PreferencesHelper
 				.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(robotUID));
-		limitTop = Double.valueOf(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
-		limitBottom = Double.valueOf(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
-		limitLeft = Double.valueOf(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
-		limitRight = Double.valueOf(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
 
-		maxAcceleration = Float
-				.valueOf(uniqueMachinePreferencesNode.get("acceleration", Double.toString(maxAcceleration)));
+		limitTop = Double.parseDouble(uniqueMachinePreferencesNode.get("limit_top", Double.toString(limitTop)));
+		limitBottom = Double.parseDouble(uniqueMachinePreferencesNode.get("limit_bottom", Double.toString(limitBottom)));
+		limitLeft = Double.parseDouble(uniqueMachinePreferencesNode.get("limit_left", Double.toString(limitLeft)));
+		limitRight = Double.parseDouble(uniqueMachinePreferencesNode.get("limit_right", Double.toString(limitRight)));
 
-		startingPositionIndex = Integer
-				.valueOf(uniqueMachinePreferencesNode.get("startingPosIndex", Integer.toString(startingPositionIndex)));
+		maxAcceleration = Float.parseFloat(uniqueMachinePreferencesNode.get("acceleration", Double.toString(maxAcceleration)));
+
+		startingPositionIndex = Integer.parseInt(uniqueMachinePreferencesNode.get("startingPosIndex", Integer.toString(startingPositionIndex)));
 
 		int r, g, b;
 		r = uniqueMachinePreferencesNode.getInt("paperColorR", paperColor.getRed());
@@ -182,20 +178,20 @@ public class PlotterSettings implements Serializable {
 
 		// setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",
 		// Integer.toString(getCurrentToolNumber()))));
-		setRegistered(Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered))));
+		isRegistered = Boolean.parseBoolean(uniqueMachinePreferencesNode.get("isRegistered", Boolean.toString(isRegistered)));
 
 		loadPenConfig(uniqueMachinePreferencesNode);
-		setHardwareVersion(uniqueMachinePreferencesNode.get("hardwareVersion", hardwareName));
+		hardwareName = uniqueMachinePreferencesNode.get("hardwareVersion", hardwareName);
 	}
 
 	protected void loadPenConfig(Preferences prefs) {
 		prefs = prefs.node("Pen");
-		setPenDiameter(Double.valueOf(prefs.get("diameter", Double.toString(penDiameter))));
-		setPenLiftTime(Double.valueOf(prefs.get("z_rate", Double.toString(penLiftTime))));
-		setPenDownAngle(Double.valueOf(prefs.get("z_on", Double.toString(penDownAngle))));
-		setPenUpAngle(Double.valueOf(prefs.get("z_off", Double.toString(penUpAngle))));
-		setTravelFeedRate(Double.valueOf(prefs.get("feed_rate", Double.toString(travelFeedRate))));
-		setDrawFeedRate(Double.valueOf(prefs.get("feed_rate_current", Double.toString(drawFeedRate))));
+		setPenDiameter(Double.parseDouble(prefs.get("diameter", Double.toString(penDiameter))));
+		setPenLiftTime(Double.parseDouble(prefs.get("z_rate", Double.toString(penLiftTime))));
+		setPenDownAngle(Double.parseDouble(prefs.get("z_on", Double.toString(penDownAngle))));
+		setPenUpAngle(Double.parseDouble(prefs.get("z_off", Double.toString(penUpAngle))));
+		setTravelFeedRate(Double.parseDouble(prefs.get("feed_rate", Double.toString(travelFeedRate))));
+		setDrawFeedRate(Double.parseDouble(prefs.get("feed_rate_current", Double.toString(drawFeedRate))));
 		// tool_number = Integer.valueOf(prefs.get("tool_number",Integer.toString(tool_number)));
 
 		int r, g, b;
@@ -300,15 +296,20 @@ public class PlotterSettings implements Serializable {
 		this.isRegistered = isRegistered;
 	}
 
+	public void setHardwareName(String hardwareName) {
+		this.hardwareName = hardwareName;
+	}
+
 	public String getHardwareName() {
 		return hardwareName;
 	}
 
-	public void setHardwareVersion(String name) {
-		hardwareName = name;
-		if (!canChangeMachineSize()) {
-			this.setMachineSize(getWidth(), getHeight());
-		}
+	public ColorRGB getPaperColor() {
+		return paperColor;
+	}
+
+	public void setPaperColor(ColorRGB paperColor) {
+		this.paperColor = paperColor;
 	}
 
 	/**
