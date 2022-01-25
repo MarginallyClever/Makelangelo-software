@@ -51,12 +51,12 @@
 	</string>
 	
 	<string>
-		<key>PaperWidth</key>
+		<key>PaperSettings.PaperWidth</key>
 		<value>aperPay idthway</value>
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>PaperHeight</key>
+		<key>PaperSettings.PaperHeight</key>
 		<value>aperPay eighthay</value>
 		<hint>machine size control panel</hint>
 	</string>
@@ -223,18 +223,8 @@
 	</string>
 
 	<string>
-		<key>FileTypeGCode</key>
-		<value>ODEGCay (ngc)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
 		<key>FileTypeImage</key>
 		<value>Imageyay (jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>FileTypeDXF</key>
-		<value>DXF R12 (dxf)</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -306,16 +296,6 @@
 		<value>equestedRay invalidyay ooltay #</value>
 		<hint>warning message</hint>
 	</string>
-	<string>
-		<key>ChangeToolPrefix</key>
-		<value>easePlay eparepray</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>ChangeToolPostfix</key>
-		<value>andyay ickclay anyyay uttonbay otay ontinuecay.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
-	</string>
 
 	<string>
 		<key>StartAt</key>
@@ -340,13 +320,8 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>OpenControls</key>
+		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
@@ -358,17 +333,6 @@
 		<key>PlotterControls.Play</key>
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>SetHome</key>
-		<value>etSay omehay</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>GoHome</key>
-		<value>oGay omehay</value>
-		<hint>manual driving dialog</hint>
 	</string>
 
 	<string>
@@ -577,7 +541,7 @@ to check yourself.</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveGCODEAs</key>
+		<key>RobotMenu.SaveGCode</key>
 		<value>aveSay asyay...</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -828,20 +792,13 @@ to check yourself.</value>
 		and AboutHTMLAfterVersionNumber are used to dynamically build the HTML for 
 		the about message dialog using the version string. This is why there is not
 		one big CDATA html blob. -->
+
 	<string>
-		<key>AboutHTMLBeforeVersionNumber</key>
+		<key>AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>AboutHTMLAfterVersionNumber</key>
-		<value><![CDATA[
-	</h1>
+        <h1>Makelangelo %VERSION%</h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
@@ -953,11 +910,6 @@ to check yourself.</value>
 		<key>PaperSize</key>
 		<value>aperPay izeSay</value>
 		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>DisengageMotors</key>
-		<value>isengageDay</value>
-		<hint>Disengage Button on manual driving dialog</hint>
 	</string>
 	
 </language>

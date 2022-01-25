@@ -32,7 +32,7 @@ public class CropTurtle {
 		
 		for( TurtleMove m : oldHistory ) {
 			switch(m.type) {
-			case TurtleMove.DRAW:
+			case TurtleMove.DRAW_LINE:
 			case TurtleMove.TRAVEL:
 				if(prev!=null) {
 					P0.set(prev.x, prev.y);

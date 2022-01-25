@@ -7,11 +7,11 @@ package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.machines.Machines;
 import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
 import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
 import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
@@ -30,13 +30,20 @@ import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
+import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.rangeSlider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
+import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
 import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
@@ -104,13 +111,17 @@ public final class Makelangelo {
 	private static boolean isMacOS = false;
 
 	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private RangeSlider rangeSlider;
+	private JLabel labelRangeMin = new JLabel();
+	private JLabel labelRangeMax = new JLabel();
+	
 	private PlotterRenderer myPlotterRenderer;
 	
 	// GUI elements
 	private JFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
-	private SaveDialog saveDialog;
+	private SaveDialog saveDialog = new SaveDialog();
 	
 	private RecentFiles recentFiles;
 
@@ -134,9 +145,8 @@ public final class Makelangelo {
 			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 		}
 
+		loadPaths();
 		startRobot();
-
-		saveDialog = new SaveDialog();
 		
 		logger.debug("Starting virtual camera...");
 		camera = new Camera();
@@ -146,12 +156,20 @@ public final class Makelangelo {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addPlotterEventListener(this::onPlotterEvent);
-		myPlotter.getSettings().addPlotterSettingsListener((e)->{
-			if(previewPanel != null) previewPanel.repaint();
-		});
+		myPlotter.getSettings().addPlotterSettingsListener((e)->onPlotterSettingsUpdate(e));
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
+		}
+		onPlotterSettingsUpdate(myPlotter.getSettings());
+	}
+
+	private void onPlotterSettingsUpdate(PlotterSettings e) {
+		if(previewPanel != null) previewPanel.repaint();
+		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
+		if(f instanceof MarlinSimulationVisualizer) {
+			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
+			msv.setSettings(e);
 		}
 	}
 
@@ -219,7 +237,7 @@ public final class Makelangelo {
 
 		mainMenuBar = new JMenuBar();
 		mainMenuBar.add(createFileMenu());
-		mainMenuBar.add(createPaperSettingsMenu());
+		mainMenuBar.add(createSettingsMenu());
 		mainMenuBar.add(createGenerateMenu());
 		mainMenuBar.add(createToolsMenu());
 		mainMenuBar.add(createViewMenu());
@@ -242,20 +260,24 @@ public final class Makelangelo {
 		}
 	}
 
-	private JMenu createPaperSettingsMenu() {
-		JMenu menu = new JMenu(Translator.get("MenuPaper"));
+	private JMenu createSettingsMenu() {
+		JMenu menu = new JMenu(Translator.get("MenuSettings"));
 		
-		JMenuItem bOpenControls = new JMenuItem(Translator.get("OpenPaperSettings"));
-		bOpenControls.addActionListener((e)-> openPaperSettings());
-		menu.add(bOpenControls);
+		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
+		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
+		menu.add(bOpenPaperSettings);
+		
+		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
+		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
+		menu.add(bOpenPlotterSettings);
 		
 		return menu;
 	}
 
-	private void openPaperSettings() {
-		PaperSettings paperSettings = new PaperSettings(myPaper);
-		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
-		dialog.add(paperSettings);
+	private void openPlotterSettings() {
+		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
+		JDialog dialog = new JDialog(mainFrame,PlotterSettingsPanel.class.getSimpleName());
+		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
@@ -265,7 +287,26 @@ public final class Makelangelo {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				enableMenuBar(true);
-				paperSettings.save();
+			}
+		});
+
+		dialog.setVisible(true);
+	}
+
+	private void openPaperSettings() {
+		PaperSettings settings = new PaperSettings(myPaper);
+		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		dialog.add(settings);
+		dialog.setLocationRelativeTo(mainFrame);
+		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.pack();
+
+		enableMenuBar(false);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				enableMenuBar(true);
+				settings.save();
 			}
 		});
 
@@ -275,7 +316,7 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 
-		menu.add(createStyleMenu());
+		menu.add(createRobotStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.addActionListener((e)-> estimateTime());
@@ -292,15 +333,40 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	private JMenuItem createStyleMenu() {
-		JMenu menu = new JMenu(Translator.get("RobotMenu.Style"));
+	private JMenuItem createRenderStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.RenderStyle"));
+		
+		ButtonGroup group = new ButtonGroup();
+
+		Arrays.stream(TurtleRenderFactory.values())
+				.forEach(iter -> {
+					TurtleRenderer renderer = iter.getTurtleRenderer();
+					String name = iter.getName();
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
+					button.addActionListener((e)-> onTurtleRenderChange(name));
+					menu.add(button);
+					group.add(button);
+				});
+
+		return menu;
+	}
+
+	private void onTurtleRenderChange(String name) {
+		logger.debug("Switching to render style '{}'", name);
+		TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
+		myTurtleRenderer.setRenderer(renderer);
+	}
+
+	private JMenuItem createRobotStyleMenu() {
+		JMenu menu = new JMenu(Translator.get("RobotMenu.RobotStyle"));
 		
 		ButtonGroup group = new ButtonGroup();
 
 		Arrays.stream(Machines.values())
-				.forEach(it -> {
-					PlotterRenderer pr = it.getPlotterRenderer();
-					String name = it.getName();
+				.forEach(iter -> {
+					PlotterRenderer pr = iter.getPlotterRenderer();
+					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
 					if (myPlotterRenderer == pr) button.setSelected(true);
 					button.addActionListener((e)-> onMachineChange(name));
@@ -340,7 +406,8 @@ public final class Makelangelo {
 
 	private void openPlotterControls() {
 		JDialog dialog = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
-		dialog.setPreferredSize(new Dimension(850, 220));
+		dialog.setPreferredSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
+		dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
 		dialog.setLocationRelativeTo(mainFrame);
@@ -356,7 +423,6 @@ public final class Makelangelo {
 			}
 		});
 
-		dialog.setResizable(false);
 		dialog.setVisible(true);
 	}
 
@@ -398,6 +464,7 @@ public final class Makelangelo {
 
 		menu.addSeparator();
 		
+		menu.add(new SimplifyTurtle(this));
 		menu.add(new SimplifyTurtle(this));
 		menu.add(new ReorderTurtle(this));
 		menu.add(new InfillTurtleAction(this));
@@ -576,6 +643,8 @@ public final class Makelangelo {
 		});
 		menu.add(checkboxShowPenUpMoves);
 
+		menu.add(createRenderStyleMenu());
+
 		return menu;
 	}
 
@@ -659,14 +728,17 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * See
-	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
-	 * java/
+	 * See http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-java/
 	 *//*
-	 * private void downloadUpdate() { String[] run =
-	 * {"java","-jar","updater/update.jar"}; try {
-	 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
-	 * ex.printStackTrace(); } System.exit(0); }
+	 * private void downloadUpdate() {
+	 *   String[] run = {"java","-jar","updater/update.jar"};
+	 *   try {
+	 *     Runtime.getRuntime().exec(run);
+	 *   } catch (Exception ex) {
+	 *     ex.printStackTrace();
+	 *   }
+	 *   System.exit(0);
+	 * }
 	 */
 
 	private Container createContentPane() {
@@ -682,11 +754,47 @@ public final class Makelangelo {
 		previewPanel.addListener(myPlotter);
 		previewPanel.addListener(myTurtleRenderer);
 		addPlotterRendererToPreviewPanel();
-
-		// major layout
+		
+		createRangeSlider(contentPane);
+		
 		contentPane.add(previewPanel, BorderLayout.CENTER);
 
 		return contentPane;
+	}
+
+	/**
+	 * Build and lay out the bottom-most components of the main view: 
+	 * the two-headed range slider and the numbers that show the head
+	 * values.
+	 * @param contentPane where to attach the new elements.
+	 */
+	private void createRangeSlider(JPanel contentPane) {
+		logger.debug("  create range slider...");
+		JPanel bottomPanel = new JPanel(new BorderLayout());
+		rangeSlider = new RangeSlider();
+		rangeSlider.addChangeListener((e)->{
+	        RangeSlider slider = (RangeSlider)e.getSource();
+	        int bottom = Integer.valueOf(slider.getValue());
+	        int top = Integer.valueOf(slider.getUpperValue());
+	        myTurtleRenderer.setFirst(bottom);
+	        myTurtleRenderer.setLast(top);
+	        labelRangeMin.setText(Integer.toString(bottom));
+	        labelRangeMax.setText(Integer.toString(top));
+		});
+		
+		Dimension d = labelRangeMin.getPreferredSize();
+		d.width=50;
+		labelRangeMin.setPreferredSize(d);
+		labelRangeMax.setPreferredSize(d);
+		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
+		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		
+		bottomPanel.add(labelRangeMin, BorderLayout.WEST);
+		bottomPanel.add(rangeSlider, BorderLayout.CENTER);
+		bottomPanel.add(labelRangeMax, BorderLayout.EAST);
+		
+		contentPane.add(bottomPanel, BorderLayout.SOUTH);
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
@@ -818,6 +926,7 @@ public final class Makelangelo {
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			saveWindowSizeAndPosition();
 			myPlotter.getSettings().saveConfig();
+			savePaths();
 
 			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
 			Log.end();
@@ -832,6 +941,26 @@ public final class Makelangelo {
 		}
 	}
 	
+	private static final String PREFERENCE_SAVE_PATH = "savePath";
+	private static final String PREFERENCE_LOAD_PATH = "loadPath";
+	/**
+	 * Use Preferences to store the last "save" and "load" dialog paths.
+	 */
+	private void savePaths() {
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
+		preferences.put(PREFERENCE_LOAD_PATH, LoadFilePanel.getLastPath() );
+	}
+
+	/**
+	 * Use Preferences to recall the last "save" and "load" dialog paths.
+	 */
+	private void loadPaths() {
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
+		LoadFilePanel.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
+	}
+
 	private void saveFile() {
 		logger.debug("Saving vector file...");
 		try {
@@ -845,6 +974,11 @@ public final class Makelangelo {
 	public void setTurtle(Turtle turtle) {
 		myTurtle = turtle;
 		myTurtleRenderer.setTurtle(turtle);
+		int top = turtle.history.size();
+		rangeSlider.setMinimum(0);
+		rangeSlider.setValue(0);
+		rangeSlider.setMaximum(top);
+		rangeSlider.setUpperValue(top);
 	}
 
 	public Turtle getTurtle() {

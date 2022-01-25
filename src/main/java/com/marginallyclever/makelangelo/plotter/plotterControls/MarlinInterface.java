@@ -43,10 +43,17 @@ public class MarlinInterface extends JPanel {
 	private static final String STR_ERROR = "Error:";
 	// Marlin sends this message when a fatal error occured.
 	private static final String STR_PRINTER_HALTED = "Printer halted";
+	// Marlin sends this event when the robot must be homed first
+	private static final String STR_HOME_XY_FIRST = "echo:Home XY First";
+
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
-	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
+	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle an error.
 	public static final String ERROR = "error";
+	// MarlinInterface sends this as an ActionEvent to let listeners know it must home first.
+	public static final String HOME_XY_FIRST = "homexyfirst";
+	// MarlinInterface sends this as an ActionEvent to let listeners know there is an error in the transmission.
+	public static final String DID_NOT_FIND = "didnotfind";
 
 	private TextInterfaceToNetworkSession chatInterface;
 	private List<MarlinCommand> myHistory = new ArrayList<>();
@@ -118,6 +125,10 @@ public class MarlinInterface extends JPanel {
 				onHearResend(message);
 			} else if (message.startsWith(STR_ERROR)) {
 				onHearError(message);
+			} else if (message.startsWith(STR_HOME_XY_FIRST)) {
+				onHearHomeXYFirst();
+			} else if (message.startsWith(STR_PRINTER_HALTED)) {
+				onHearError(message);
 			}
 		}
 	}
@@ -150,13 +161,19 @@ public class MarlinInterface extends JPanel {
 
 	private void onHearError(String message) {
 		logger.error("Error from printer '{}'", message);
-		if (message.contains(STR_PRINTER_HALTED)) {
-			notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
-		}
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
+	}
+
+	private void onHearHomeXYFirst() {
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.HOME_XY_FIRST));
+	}
+
+	private void onDidNotFindCommandInHistory() {
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.DID_NOT_FIND));
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners(new ActionEvent(this,ActionEvent.ACTION_PERFORMED, MarlinInterface.IDLE));
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.IDLE));
 	}
 
 	private void clearOldHistory() {
@@ -196,6 +213,7 @@ public class MarlinInterface extends JPanel {
 		if(smallest>lineNumberToSend) {
 			// history no longer contains the line?!
 			logger.warn("Did not find {}", lineNumberToSend);
+			onDidNotFindCommandInHistory();
 			if (logger.isDebugEnabled()) {
 				for (MarlinCommand mc : myHistory) {
 					logger.debug("...{}: {}", mc.lineNumber, mc.command);

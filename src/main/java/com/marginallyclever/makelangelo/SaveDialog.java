@@ -13,7 +13,7 @@ import java.io.File;
 public class SaveDialog {
 	private static final Logger logger = LoggerFactory.getLogger(SaveDialog.class);
 	
-	private JFileChooser fc = new JFileChooser();
+	private static JFileChooser fc = new JFileChooser();
 	
 	public SaveDialog() {
 		for( FileNameExtensionFilter ff : TurtleFactory.getSaveExtensions() ) {
@@ -21,11 +21,6 @@ public class SaveDialog {
 		}
 		// do not allow wild card (*.*) file extensions
 		fc.setAcceptAllFileFilterUsed(false);
-	}
-	
-	public SaveDialog(String lastDir) {
-		// remember the last path used, if any
-		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 	
 	public void run(Turtle t,JFrame parent) throws Exception {
@@ -43,5 +38,13 @@ public class SaveDialog {
 		}
 		
 		return name + "." + extensions[0];
+	}
+
+	public static String getLastPath() {
+		return fc.getCurrentDirectory().toString();
+	}
+	
+	public static void setLastPath(String lastPath) {
+		fc.setCurrentDirectory((lastPath==null?null : new File(lastPath)));
 	}
 }

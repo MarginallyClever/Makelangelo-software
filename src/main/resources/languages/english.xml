@@ -573,12 +573,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>Change Pen</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>Please change the pen to match this color.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
@@ -598,6 +598,17 @@
 		<key>Robot</key>
 		<value>Makelangelo</value>
 		<hint>menu or dialog title</hint>
+	</string>
+
+	<string>
+		<key>RobotMenu.RobotStyle</key>
+		<value>Robot style</value>
+		<hint>select style of robot to draw around art</hint>
+	</string>
+	<string>
+		<key>RobotMenu.RenderStyle</key>
+		<value>Render style</value>
+		<hint>select style of art</hint>
 	</string>
 	<string>
 		<key>RobotMenu.OpenControls</key>
@@ -693,7 +704,22 @@
 	<string>
 		<key>PlotterControls.FatalError</key>
 		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
-		<hint>texte</hint>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.InfoTitle</key>
+		<value>Information</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterControls.HomeXYFirst</key>
+		<value>Home the printer first.</value>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DidNotFind</key>
+		<value>Error in communicating with the robot.</value>
+		<hint>text</hint>
 	</string>
 
 	<string>
@@ -1293,7 +1319,7 @@
 	</string>
 
 	<string>
-		<key>GetTimeEstimate</key>
+		<key>RobotMenu.GetTimeEstimate</key>
 		<value>Estimate time</value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
@@ -2004,14 +2030,14 @@
 	</string>
 
 	<string>
-		<key>MenuPaper</key>
-		<value>Paper</value>
+		<key>OpenPaperSettings</key>
+		<value>Paper settings</value>
 		<hint></hint>
 	</string>
-
+	
 	<string>
-		<key>OpenPaperSettings</key>
-		<value>Open settings</value>
+		<key>OpenPlotterSettings</key>
+		<value>Plotter settings</value>
 		<hint></hint>
 	</string>
 	

@@ -64,14 +64,15 @@ public class TurtleFactory {
 	public static void save(Turtle turtle,String filename) throws Exception {
 		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
 
-		for( TurtleSaver saver : savers ) {
+		for (TurtleSaver saver : savers) {
 			if(isValidExtension(filename,saver.getFileNameFilter())) {
-				FileOutputStream out = new FileOutputStream(filename); 
-				saver.save(out,turtle);
-				out.close();
-				break;
+				try (FileOutputStream out = new FileOutputStream(filename)) {
+					saver.save(out, turtle);
+				}
+				return;
 			}
 		}
-		throw new Exception("TurtleFactory could not save '"+filename+"'.");
+		String extension = filename.substring(filename.lastIndexOf("."));
+		throw new Exception("TurtleFactory could not save '"+filename+"' : invalid file format '" + extension + "'");
 	}
 }

@@ -82,15 +82,15 @@ public class SaveGCode {
 						}
 						previousMovement = m;
 					}
-					case TurtleMove.DRAW -> {
+					case TurtleMove.DRAW_LINE -> {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
-							out.write(MarlinPlotterInterface.getTravelToString(previousMovement.x, previousMovement.y) + "\n");
+							out.write(MarlinPlotterInterface.getTravelToString(robot,previousMovement.x, previousMovement.y) + "\n");
 							out.write(MarlinPlotterInterface.getPenDownString(robot) + "\n");
 							isUp = false;
 						}
-						out.write(MarlinPlotterInterface.getDrawToString(m.x, m.y) + "\n");
+						out.write(MarlinPlotterInterface.getDrawToString(robot,m.x, m.y) + "\n");
 						previousMovement = m;
 					}
 					case TurtleMove.TOOL_CHANGE -> out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");

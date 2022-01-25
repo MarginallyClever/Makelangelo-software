@@ -215,7 +215,7 @@ public class Generator_Text extends TurtleGenerator {
 				coords2[1] = coords[1];
 				break;
 			case PathIterator.SEG_LINETO:
-				//logger.debug("LINE");
+				//logger.debug("DRAW_LINE");
 				turtle.moveTo(coords[0]-dx, -coords[1]-dy);
 				coords2[0] = coords[0];
 				coords2[1] = coords[1];

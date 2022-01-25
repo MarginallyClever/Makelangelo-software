@@ -1,7 +1,10 @@
-package com.marginallyclever.makelangelo.turtle;
+package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,16 +12,17 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
-	private TurtleRenderer defaultRenderer = new DefaultTurtleRenderer();
+	private TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
 
 	//private TurtleRenderer barberPole = new BarberPoleTurtleRenderer();
 
 	//private MakelangeloFirmwareVisualizer viz = new MakelangeloFirmwareVisualizer(); 
 	//viz.render(gl2, turtleToRender, settings);
 
-	private TurtleRenderer tr=defaultRenderer;
-	
+	private TurtleRenderer myRenderer=defaultRenderer;
 	private Turtle myTurtle = new Turtle();
+	private int first=0;
+	private int last;
 	
 	@Override
 	public void render(GL2 gl2) {
@@ -28,14 +32,11 @@ public class TurtleRenderFacade implements PreviewListener {
 			
 			TurtleMove previousMove = null;
 			
-			// the first and last command to show (in case we want to isolate part of the drawing)
-			int first = 0;
-			int last = myTurtle.history.size();
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
 			
 			try {
-				tr.start(gl2);
+				myRenderer.start(gl2);
 				showCount++;
 
 				for (TurtleMove m : myTurtle.history) {
@@ -45,21 +46,21 @@ public class TurtleRenderFacade implements PreviewListener {
 					switch (m.type) {
 					case TurtleMove.TRAVEL:
 						if (inShow && previousMove != null) {
-							tr.travel(previousMove, m);
+							myRenderer.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.DRAW:
+					case TurtleMove.DRAW_LINE:
 						if (inShow && previousMove != null) {
-							tr.draw(previousMove, m);
+							myRenderer.draw(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
 					case TurtleMove.TOOL_CHANGE:
-						tr.setPenDownColor(m.getColor());
-						tr.setPenDiameter(m.getDiameter());
+						myRenderer.setPenDownColor(m.getColor());
+						myRenderer.setPenDiameter(m.getDiameter());
 						break;
 					}
 				}
@@ -68,7 +69,7 @@ public class TurtleRenderFacade implements PreviewListener {
 				//Log.error(e.getMessage());
 			}
 			finally {
-				tr.end();
+				myRenderer.end();
 			}
 		}
 		catch(Exception e) {
@@ -86,6 +87,45 @@ public class TurtleRenderFacade implements PreviewListener {
 	}
 
 	public void setTurtle(Turtle turtle) {
-		this.myTurtle = turtle;
+		int size=0;
+		if(turtle!=null) size = turtle.history.size();
+		myTurtle = turtle;
+
+		setFirst(0);
+		setLast(size);
+	}
+
+	public void setRenderer(TurtleRenderer render) {
+		myRenderer = render;
+	}
+
+	public TurtleRenderer getRenderer() {
+		return myRenderer;
+	}
+	
+	public void setFirst(int arg0) {
+		int size = 0;
+		if(myTurtle!=null) size = myTurtle.history.size();
+
+		first=(int)Math.min(Math.max(arg0, 0),size);
+		logger.debug("first={}",first);
+		if(last<first) setLast(first);
+	}
+	
+	public int getFirst() {
+		return first;
+	}
+	
+	public void setLast(int arg0) {
+		int size = 0;
+		if(myTurtle!=null) size = myTurtle.history.size();
+
+		last = (int)Math.min(Math.max(arg0, 0), size);
+		logger.debug("last={}",last);
+		if(first>last) setFirst(last);
+	}
+
+	public int getLast() {
+		return last;
 	}
 }

@@ -22,6 +22,7 @@ public class CollapsiblePanel extends JPanel {
     private final Window parentWindow;
     private Dimension previousDimension;
     private int heightCollapsibleComponent;
+    private Dimension initialDimension;
     private boolean collapsedByDefault = false;
 
     public CollapsiblePanel(Window parentWindow, String title, int heightCollapsibleComponent) {
@@ -59,6 +60,11 @@ public class CollapsiblePanel extends JPanel {
         @Override
         public void componentHidden(ComponentEvent e) {
             updateBorderTitle();
+        }
+
+        @Override
+        public void componentResized(ComponentEvent e) {
+            updateComponentSize();
         }
     };
 
@@ -144,14 +150,19 @@ public class CollapsiblePanel extends JPanel {
         }
         updateBorderTitle();
         if (visible) {
-            int height = previousDimension == null? heightCollapsibleComponent: previousDimension.height;
+            // expands all elements
+            int height = previousDimension == null ? heightCollapsibleComponent: previousDimension.height;
             Dimension toggle = new Dimension(parentWindow.getWidth(), height);
             parentWindow.setPreferredSize(toggle);
+            parentWindow.setMinimumSize(new Dimension(initialDimension.width, height));
+            updateComponentSize();
         } else {
+            // collapse all elements
             previousDimension = parentWindow.getSize();
             int height = previousDimension.height - innerPannel.getHeight();
             Dimension toggle = new Dimension(previousDimension.width, height);
             parentWindow.setPreferredSize(toggle);
+            parentWindow.setMinimumSize(initialDimension);
         }
         parentWindow.validate();
         parentWindow.repaint();
@@ -162,9 +173,19 @@ public class CollapsiblePanel extends JPanel {
     private void updateBorderTitle() {
         String arrow = "";
         if (innerPannel.getComponentCount() > 0) {
-            arrow = (hasInvisibleComponent() ? "▾" : "▸");
+            arrow = (hasInvisibleComponent() ? "▼" : "▲");
         }
         border.setTitle(title + " " + arrow + " ");
+    }
+
+    private void updateComponentSize() {
+        if (initialDimension == null) {
+            initialDimension = new Dimension(parentWindow.getSize());
+        }
+        Dimension newDim = new Dimension(parentWindow.getWidth() - 5, parentWindow.getHeight() - initialDimension.height);
+        for (Component c : innerPannel.getComponents()) {
+            c.setPreferredSize(newDim);
+        }
     }
 
     private boolean hasInvisibleComponent() {
