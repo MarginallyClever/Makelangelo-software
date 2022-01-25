@@ -728,14 +728,17 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * See
-	 * http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-
-	 * java/
+	 * See http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-java/
 	 *//*
-	 * private void downloadUpdate() { String[] run =
-	 * {"java","-jar","updater/update.jar"}; try {
-	 * Runtime.getRuntime().exec(run); } catch (Exception ex) {
-	 * ex.printStackTrace(); } System.exit(0); }
+	 * private void downloadUpdate() {
+	 *   String[] run = {"java","-jar","updater/update.jar"};
+	 *   try {
+	 *     Runtime.getRuntime().exec(run);
+	 *   } catch (Exception ex) {
+	 *     ex.printStackTrace();
+	 *   }
+	 *   System.exit(0);
+	 * }
 	 */
 
 	private Container createContentPane() {
@@ -759,6 +762,12 @@ public final class Makelangelo {
 		return contentPane;
 	}
 
+	/**
+	 * Build and lay out the bottom-most components of the main view: 
+	 * the two-headed range slider and the numbers that show the head
+	 * values.
+	 * @param contentPane where to attach the new elements.
+	 */
 	private void createRangeSlider(JPanel contentPane) {
 		logger.debug("  create range slider...");
 		JPanel bottomPanel = new JPanel(new BorderLayout());
@@ -776,9 +785,9 @@ public final class Makelangelo {
 		Dimension d = labelRangeMin.getPreferredSize();
 		d.width=50;
 		labelRangeMin.setPreferredSize(d);
-		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setPreferredSize(d);
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
+		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		
 		bottomPanel.add(labelRangeMin, BorderLayout.WEST);
