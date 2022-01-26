@@ -27,6 +27,8 @@ public class InfillTurtleAction extends AbstractAction {
 		Turtle t = myMakelangelo.getTurtle();
 		try {
 			t.add(infill.run(t));
+			// PPAC : to indirectly update the slider last max limit (or else max limit is not updated and no view update on infill menu item clic)
+			myMakelangelo.setTurtle(t);
 		} catch (Exception ex) {
 			logger.error("Failed to infill", ex);
 		}
