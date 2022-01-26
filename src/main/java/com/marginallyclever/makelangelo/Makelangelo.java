@@ -465,7 +465,6 @@ public final class Makelangelo {
 		menu.addSeparator();
 		
 		menu.add(new SimplifyTurtle(this));
-		menu.add(new SimplifyTurtle(this));
 		menu.add(new ReorderTurtle(this));
 		menu.add(new InfillTurtleAction(this));
 
