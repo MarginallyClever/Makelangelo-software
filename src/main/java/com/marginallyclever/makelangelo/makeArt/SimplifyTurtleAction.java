@@ -2,40 +2,30 @@ package com.marginallyclever.makelangelo.makeArt;
 
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.LineCollection;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 /**
  * Performs Douglas-Peucker line simplification.
  * see https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
  * @author Dan Royer
- *
+ * @since 7.31.0
  */
-public class SimplifyTurtle extends AbstractAction {
+public class SimplifyTurtleAction extends TurtleModifierAction {
 	private static final long serialVersionUID = 7013596037448318526L;
-	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtle.class);
-	private Makelangelo myMakelangelo;
-
+	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
 	private static double distanceTolerance = 1.6;
 	
-	public SimplifyTurtle(Makelangelo m) {
+	public SimplifyTurtleAction() {
 		super(Translator.get("Simplify"));
-		myMakelangelo=m;
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		myMakelangelo.setTurtle(run(myMakelangelo.getTurtle()));
-	}
-	
-	public static Turtle run(Turtle turtle) {
+	public Turtle run(Turtle turtle) {
 		int os = turtle.history.size();
 		logger.debug("begin @ {}", os);
 		
@@ -62,7 +52,7 @@ public class SimplifyTurtle extends AbstractAction {
 	 * @param originalLines
 	 * @return
 	 */
-	private static ArrayList<LineSegment2D> removeVeryShortSegments(LineCollection originalLines) {
+	private ArrayList<LineSegment2D> removeVeryShortSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();
 		
 		ArrayList<LineCollection> byColor = originalLines.splitByColor();
@@ -83,7 +73,7 @@ public class SimplifyTurtle extends AbstractAction {
 	 *
 	 * @param distanceTolerance the approximation tolerance to use
 	 */
-	public static void setDistanceTolerance(double distanceTolerance) {
-		SimplifyTurtle.distanceTolerance = distanceTolerance;
+	public void setDistanceTolerance(double distanceTolerance) {
+		SimplifyTurtleAction.distanceTolerance = distanceTolerance;
 	}
 }
