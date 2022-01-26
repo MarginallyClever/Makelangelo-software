@@ -12,18 +12,12 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeArt.InfillTurtleAction;
-import com.marginallyclever.makelangelo.makeArt.ReorderTurtle;
-import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaper;
-import com.marginallyclever.makelangelo.makeArt.SimplifyTurtle;
+import com.marginallyclever.makelangelo.makeArt.*;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.*;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
@@ -79,7 +73,7 @@ import java.util.prefs.Preferences;
  * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
  * 
  * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (ImageGenerators), or 
- * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA) into vectors (ImageConverters).
+ * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA,PIO) into vectors (ImageConverters).
  * 
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
  * the mark on the paper.  This knowledge helps the app to create better gcode.  
@@ -440,34 +434,30 @@ public final class Makelangelo {
 			logger.debug("Raspistill unavailable.");
 		}
 
-		JMenuItem fit = new JMenuItem(Translator.get("ConvertImagePaperFit"));
-		menu.add(fit);
-		fit.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,false)));
-
-		JMenuItem fill = new JMenuItem(Translator.get("ConvertImagePaperFill"));
-		menu.add(fill);
-		fill.addActionListener((e)-> setTurtle(ResizeTurtleToPaper.run(myTurtle,myPaper,true)));
-
+		TurtleModifierAction a6 = new ResizeTurtleToPaperAction(myPaper,false,Translator.get("ConvertImagePaperFit"));
+		TurtleModifierAction a7 = new ResizeTurtleToPaperAction(myPaper,true,Translator.get("ConvertImagePaperFill"));
+		a6.setSource(this);		a6.addModifierListener((e)->setTurtle(e));		menu.add(a6);
+		a7.setSource(this);		a7.addModifierListener((e)->setTurtle(e));		menu.add(a7);
+		
 		JMenuItem scale = new JMenuItem(Translator.get("Scale"));
 		menu.add(scale);
 		scale.addActionListener((e) -> runScalePanel());
 
 		menu.addSeparator();
 		
-		JMenuItem flipH = new JMenuItem(Translator.get("FlipH"));
-		menu.add(flipH);
-		flipH.addActionListener((e) -> myTurtle.scale(1, -1));
-
-		JMenuItem flipV = new JMenuItem(Translator.get("FlipV"));
-		menu.add(flipV);
-		flipV.addActionListener((e) -> myTurtle.scale(-1, 1));
-
+		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
+		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
+		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
+		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
+		
 		menu.addSeparator();
 		
-		menu.add(new SimplifyTurtle(this));
-		menu.add(new SimplifyTurtle(this));
-		menu.add(new ReorderTurtle(this));
-		menu.add(new InfillTurtleAction(this));
+		TurtleModifierAction a1 = new SimplifyTurtleAction();
+		TurtleModifierAction a2 = new ReorderTurtleAction();
+		TurtleModifierAction a3 = new InfillTurtleAction();
+		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
+		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
+		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
 
 		return menu;
 	}
