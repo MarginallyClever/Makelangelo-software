@@ -19,8 +19,7 @@ public class InfillTurtle {
 	private double penDiameter = 0.8; // TODO adjust me before running infill
 	private double minimumJumpSize = 0.4;
 
-	public InfillTurtle() {
-	}
+	public InfillTurtle() {}
 
 	public Turtle run(Turtle input) throws Exception {
 		logger.debug("InfillTurtle.run()");
