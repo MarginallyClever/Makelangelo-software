@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.util.PreferencesHelper;
 import java.io.Serializable;
 import java.util.*;
@@ -30,10 +29,23 @@ public class PlotterSettings implements Serializable {
 	private double limitTop;
 	
 	// speed control
-	private double travelFeedRate = MarlinSimulation.MAX_FEEDRATE;
-	private double drawFeedRate = MarlinSimulation.MAX_FEEDRATE;
-	private double maxAcceleration = MarlinSimulation.MAX_ACCELERATION;
+	
+	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
+	private int blockBufferSize = 16;
 
+	private int segmentsPerSecond = 5;
+	private double minSegmentLength = 0.5;  // mm
+	private long minSegTime = 20000;  // us
+	private boolean handleSmallSegments = false;
+
+	// values for {@link MarlinSimulation} that can be tweaked in firmware at run time.
+	private double travelFeedRate = 3000;  // 5400 = 90*60 mm/s
+	private double drawFeedRate = 3000;  // 5400 = 90*60 mm/s
+	private double maxAcceleration = 100;  // 2400=40*60 mm/s/s
+	private double minAcceleration = 0.0;  // mm/s/s
+	private double minimumPlannerSpeed = 0.05;  // mm/s
+	private double [] maxJerk = { 10, 10, 0.3 };
+	
 	private ColorRGB paperColor;
 
 	private ColorRGB penDownColorDefault;
@@ -312,20 +324,6 @@ public class PlotterSettings implements Serializable {
 		this.paperColor = paperColor;
 	}
 
-	/**
-	 * @return height of machine's drawing area, in mm.
-	 */
-	private double getHeight() {
-		return 1000; // mm
-	}
-
-	/**
-	 * @return width of machine's drawing area, in mm.
-	 */
-	private double getWidth() {
-		return 650; // mm
-	}
-
 	public ColorRGB getPenDownColorDefault() {
 		return penDownColorDefault;
 	}
@@ -396,5 +394,116 @@ public class PlotterSettings implements Serializable {
 
 	public int getStartingPositionIndex() {
 		return this.startingPositionIndex;
+	}
+	/**
+	 * @return the blockBufferSize
+	 */
+	public int getBlockBufferSize() {
+		return blockBufferSize;
+	}
+
+	/**
+	 * @param blockBufferSize the blockBufferSize to set
+	 */
+	public void setBlockBufferSize(int blockBufferSize) {
+		this.blockBufferSize = blockBufferSize;
+	}
+
+	/**
+	 * @return the segmentsPerSecond
+	 */
+	public int getSegmentsPerSecond() {
+		return segmentsPerSecond;
+	}
+
+	/**
+	 * @param segmentsPerSecond the segmentsPerSecond to set
+	 */
+	public void setSegmentsPerSecond(int segmentsPerSecond) {
+		this.segmentsPerSecond = segmentsPerSecond;
+	}
+
+	/**
+	 * @return the minSegmentLength
+	 */
+	public double getMinSegmentLength() {
+		return minSegmentLength;
+	}
+
+	/**
+	 * @param minSegmentLength the minSegmentLength to set
+	 */
+	public void setMinSegmentLength(double minSegmentLength) {
+		this.minSegmentLength = minSegmentLength;
+	}
+
+	/**
+	 * @return the minSegTime
+	 */
+	public long getMinSegmentTime() {
+		return minSegTime;
+	}
+
+	/**
+	 * @param minSegTime the minSegTime to set
+	 */
+	public void setMinSegTime(long minSegTime) {
+		this.minSegTime = minSegTime;
+	}
+
+	/**
+	 * @return the handleSmallSegments
+	 */
+	public boolean isHandleSmallSegments() {
+		return handleSmallSegments;
+	}
+
+	/**
+	 * @param handleSmallSegments the handleSmallSegments to set
+	 */
+	public void setHandleSmallSegments(boolean handleSmallSegments) {
+		this.handleSmallSegments = handleSmallSegments;
+	}
+
+	/**
+	 * @return the minAcceleration
+	 */
+	public double getMinAcceleration() {
+		return minAcceleration;
+	}
+
+	/**
+	 * @param minAcceleration the minAcceleration to set
+	 */
+	public void setMinAcceleration(double minAcceleration) {
+		this.minAcceleration = minAcceleration;
+	}
+
+	/**
+	 * @return the minimumPlannerSpeed
+	 */
+	public double getMinimumPlannerSpeed() {
+		return minimumPlannerSpeed;
+	}
+
+	/**
+	 * @param minimumPlannerSpeed the minimumPlannerSpeed to set
+	 */
+	public void setMinimumPlannerSpeed(double minimumPlannerSpeed) {
+		this.minimumPlannerSpeed = minimumPlannerSpeed;
+	}
+
+	/**
+	 * @return the maxJerk
+	 */
+	public double[] getMaxJerk() {
+		return maxJerk;
+	}
+
+	/**
+	 * @param maxJerk the maxJerk to set
+	 */
+	public void setMaxJerk(double[] maxJerk) {
+		this.maxJerk = maxJerk;
 	}
 }
