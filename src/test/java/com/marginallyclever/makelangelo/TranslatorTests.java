@@ -61,44 +61,46 @@ public class TranslatorTests {
 	}
 
 	@Test
-	public void searchSimpleStringMissingKeyUsedAsArgumentForTranslatorGetInTheSrcCode() {	    
-	    try {
+	public void searchSimpleStringMissingKeyUsedAsArgumentForTranslatorGetInTheSrcCode() throws IOException {	  
+	    //Removing the try catch and all stack trace to see what append
+	    
+//	    try {
 		//Pre requis
-		Translator.start();
-		
+	    // Bug Introduced commenting : 	
+	    // Translator.start();
+		//Where to look
 		String baseDirToSearch = "src" + File.separator + "main" + File.separator + "java";
 		System.out.printf("PDW=%s\n", new File(".").getAbsolutePath());
 		File srcDir = new File(".", baseDirToSearch);
-		try {
-		    System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
-		} catch (IOException ex) {
-		    ex.printStackTrace();
-		}
+		System.out.printf("srcDir=%s\n", srcDir.getCanonicalPath());
 
-		
 		Map<FindAllTraductionResult, Path> matchTraductionGetInAllSrcJavaFiles = matchTraductionGetInAllSrcJavaFiles(srcDir);
-		
+
 		// assert the test test something 
 		assertTrue(!matchTraductionGetInAllSrcJavaFiles.isEmpty(), "Invalide test : No match ... maybe no source files ... or a refactoring that have invalide the pattern used to search ?");
 
 		// find the missing simple "key" found  ...
 		SortedMap<String, ArrayList<FindAllTraductionResult>> groupIdenticalMissingKey = getTraductionGetStringMissingKey(matchTraductionGetInAllSrcJavaFiles);
-//		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
+		System.out.printf("groupIdenticalMissingKey.size()=%d\n", groupIdenticalMissingKey.size());
 		
 		// output the missing keys if any.
-//		for (String k : groupIdenticalMissingKey.keySet()) {
-//		    System.out.printf("missing traduction key : \"%s\"\n", k);
-//		    for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
-//			System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
-//		    }
-//		}
-		FindAllTraductionXMLGenerator.generatePartialXmlFileWithMissingKey(groupIdenticalMissingKey);
-		
+		boolean basicNotXmlOutput = false;
+		if (basicNotXmlOutput) {
+		    for (String k : groupIdenticalMissingKey.keySet()) {
+			System.out.printf("missing traduction key : \"%s\"\n", k);
+			for (FindAllTraductionResult tr : groupIdenticalMissingKey.get(k)) {
+			    System.out.printf(" used in : \"%s\" line %d\n", tr.pSrc, tr.lineInFile);
+			}
+		    }
+		} else {
+		    FindAllTraductionXMLGenerator.generatePartialXmlFileWithMissingKey(groupIdenticalMissingKey);
+		}
+
 		// validate or not the test. (succes if no missing keys found)
 		assertTrue(groupIdenticalMissingKey.isEmpty(), "Some traduction missing keys !?.");
-		
-	    } catch (Exception e) {
-		e.printStackTrace();		
-	    }
+
+//	    } catch (Exception e) {
+//		e.printStackTrace();
+//	    }
 	}
 }
