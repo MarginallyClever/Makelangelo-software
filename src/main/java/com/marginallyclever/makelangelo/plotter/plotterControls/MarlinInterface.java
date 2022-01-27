@@ -119,16 +119,14 @@ public class MarlinInterface extends JPanel {
 			String message = ((String)evt.data).trim();
 
 			logger.trace("received '{}'", message.trim());
-			if (message.startsWith(STR_OK)) {
+			if(message.startsWith(STR_OK)) {
 				onHearOK();
-			} else if (message.contains(STR_RESEND)) {
+			} else if(message.contains(STR_RESEND)) {
 				onHearResend(message);
-			} else if (message.startsWith(STR_ERROR)) {
+			} else if(message.startsWith(STR_ERROR)) {
 				onHearError(message);
-			} else if (message.startsWith(STR_HOME_XY_FIRST)) {
+			} else if(message.startsWith(STR_HOME_XY_FIRST)) {
 				onHearHomeXYFirst();
-			} else if (message.startsWith(STR_PRINTER_HALTED)) {
-				onHearError(message);
 			}
 		}
 	}
@@ -161,7 +159,11 @@ public class MarlinInterface extends JPanel {
 
 	private void onHearError(String message) {
 		logger.error("Error from printer '{}'", message);
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
+		
+		// only notify listeners of a fatal error (MarlinInterface.ERROR) if the printer halts.
+		if (message.contains(STR_PRINTER_HALTED)) {
+			notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
+		}
 	}
 
 	private void onHearHomeXYFirst() {

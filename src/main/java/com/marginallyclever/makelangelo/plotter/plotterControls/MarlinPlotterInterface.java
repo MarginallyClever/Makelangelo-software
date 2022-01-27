@@ -86,6 +86,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		queueAndSendCommand(msg);
 	}
 
+	@Override
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		super.onDataReceived(evt);
 
