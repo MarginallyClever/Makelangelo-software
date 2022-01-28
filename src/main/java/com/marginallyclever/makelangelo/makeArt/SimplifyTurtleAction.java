@@ -39,7 +39,7 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
 
 		Turtle t = new Turtle();
-		t.addLineSegments(longLines,1.0);
+		t.addLineSegments(longLines);
 		int ns = t.history.size();
 		logger.debug("end @ {}", ns);
 		
