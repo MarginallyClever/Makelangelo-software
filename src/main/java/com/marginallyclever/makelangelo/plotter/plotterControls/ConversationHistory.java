@@ -45,6 +45,7 @@ public class ConversationHistory extends JPanel {
 		
 		listView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listView.setPrototypeCellValue(new ConversationEvent(" "," "));
+		listView.setVisibleRowCount(20);
 
 		this.setBorder(BorderFactory.createTitledBorder(ConversationHistory.class.getSimpleName()));
 		this.setLayout(new BorderLayout());
