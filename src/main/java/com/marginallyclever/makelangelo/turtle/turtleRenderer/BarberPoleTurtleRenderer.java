@@ -76,7 +76,7 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	
 	@Override
 	public void setPenDiameter(double d) {
-		float newDiameter = 2.0f * 5.0f * (float)d / originalLineWidth;
+		float newDiameter = 2.0f * (float)d / originalLineWidth;
 		gl2.glLineWidth(newDiameter);
 	}
 }
