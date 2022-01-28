@@ -85,7 +85,7 @@ public class PlotterSettingsTest {
         assertEquals(b, plotterSettingsRead.getSegmentsPerSecond());
         assertEquals(c, plotterSettingsRead.getMinSegmentLength()); 
         assertEquals(d, plotterSettingsRead.getMinSegmentTime());
-        assertEquals(e, !plotterSettingsRead.isHandleSmallSegments());
+        assertEquals(e, plotterSettingsRead.isHandleSmallSegments());
         assertEquals(f, plotterSettingsRead.getMinAcceleration());
         assertEquals(g, plotterSettingsRead.getMinPlannerSpeed());
     }
