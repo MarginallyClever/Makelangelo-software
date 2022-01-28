@@ -41,6 +41,22 @@ public class PlotterSettingsTest {
         plotterSettings.setDrawFeedRate(21);
         plotterSettings.setAcceleration(22);
         plotterSettings.setHardwareName("TestRobot");
+        
+        int a = plotterSettings.getBlockBufferSize()+1;
+        int b = plotterSettings.getSegmentsPerSecond()+1;
+        double c = plotterSettings.getMinSegmentLength()+1; 
+        long d = plotterSettings.getMinSegmentTime()+1;
+        boolean e = !plotterSettings.isHandleSmallSegments();
+        double f = plotterSettings.getMinAcceleration()+1;
+        double g = plotterSettings.getMinPlannerSpeed()+1;
+        
+		plotterSettings.setBlockBufferSize(a);
+		plotterSettings.setSegmentsPerSecond(b);
+		plotterSettings.setMinSegmentLength(c);
+		plotterSettings.setMinSegmentTime(d);
+		plotterSettings.setHandleSmallSegments(e);
+		plotterSettings.setMinAcceleration(f);
+		plotterSettings.setMinPlannerSpeed(g);
 
         // when
         plotterSettings.saveConfig();
@@ -64,6 +80,14 @@ public class PlotterSettingsTest {
         assertEquals(21, plotterSettingsRead.getDrawFeedRate());
         assertEquals(22, plotterSettingsRead.getMaxAcceleration());
         assertEquals("TestRobot", plotterSettingsRead.getHardwareName());
+        
+        assertEquals(a, plotterSettingsRead.getBlockBufferSize());
+        assertEquals(b, plotterSettingsRead.getSegmentsPerSecond());
+        assertEquals(c, plotterSettingsRead.getMinSegmentLength()); 
+        assertEquals(d, plotterSettingsRead.getMinSegmentTime());
+        assertEquals(e, !plotterSettingsRead.isHandleSmallSegments());
+        assertEquals(f, plotterSettingsRead.getMinAcceleration());
+        assertEquals(g, plotterSettingsRead.getMinPlannerSpeed());
     }
 
     @AfterEach

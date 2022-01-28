@@ -2068,4 +2068,34 @@
 		<key>CopyClipboard</key>
 		<value>Copy to clipboard</value>
 	</string>
+
+	<string>
+		<key>PlotterSettings.blockBufferSize</key>
+		<value>Block Buffer Size</value>
+	</string>
+	<string>
+		<key>PlotterSettings.segmentsPerSecond</key>
+		<value>Segments Per Second</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegmentLength</key>
+		<value>Min Segment Length</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegTime</key>
+		<value>Min Seg Time</value>
+	</string>
+	<string>
+		<key>PlotterSettings.handleSmallSegments</key>
+		<value>Handle Small Segments</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minAcceleration</key>
+		<value>Min Acceleration</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minimumPlannerSpeed</key>
+		<value>Min Planner Speed</value>
+	</string>
+
 </language>

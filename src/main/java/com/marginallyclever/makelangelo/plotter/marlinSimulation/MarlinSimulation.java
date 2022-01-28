@@ -150,7 +150,7 @@ public class MarlinSimulation {
 			default:                  vmax_junction = next.nominalSpeed;  break;
 		}
 		
-		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,settings.getMinimumPlannerSpeed(),next.distance);
+		next.allowableSpeed = maxSpeedAllowed(-next.acceleration,settings.getMinPlannerSpeed(),next.distance);
 		next.entrySpeedMax = vmax_junction;
 		next.entrySpeed = Math.min(vmax_junction, next.allowableSpeed);
 		next.nominalLength = ( next.allowableSpeed >= next.nominalSpeed );
@@ -170,7 +170,7 @@ public class MarlinSimulation {
 	private double dotProductJerk(MarlinSimulationBlock next) { 
 		double vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
 		vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
-		vmax_junction = Math.max(vmax_junction, settings.getMinimumPlannerSpeed());
+		vmax_junction = Math.max(vmax_junction, settings.getMinPlannerSpeed());
 		previousNormal.set(next.normal);
 		
 		return vmax_junction;
@@ -189,7 +189,7 @@ public class MarlinSimulation {
 			// NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
 			if (junction_cos_theta > 0.999999f) {
 				// For a 0 degree acute junction, just set minimum junction speed.
-				vmax_junction = settings.getMinimumPlannerSpeed();
+				vmax_junction = settings.getMinPlannerSpeed();
 			} else {
 				// Check for numerical round-off to avoid divide by zero.
 				junction_cos_theta = Math.max(junction_cos_theta, -0.999999f); 
@@ -395,7 +395,7 @@ public class MarlinSimulation {
 		if(current.entrySpeed != top || (next!=null && next.recalculate)) {
 			double newEntrySpeed = current.nominalLength 
 					? top
-					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getMinimumPlannerSpeed()), current.distance));
+					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getMinPlannerSpeed()), current.distance));
 			current.entrySpeed = newEntrySpeed;
 			current.recalculate = true;
 		}
@@ -445,15 +445,15 @@ public class MarlinSimulation {
 		if(current!=null) {
 			current.recalculate = true;
 			if( !current.busy ) {
-				recalculateTrapezoidForBlock(current, currentEntrySpeed, settings.getMinimumPlannerSpeed());
+				recalculateTrapezoidForBlock(current, currentEntrySpeed, settings.getMinPlannerSpeed());
 			}
 			current.recalculate = false;
 		}
 	}
 	
 	protected void recalculateTrapezoidForBlock(MarlinSimulationBlock block, double entrySpeed, double exitSpeed) {
-		if( entrySpeed < settings.getMinimumPlannerSpeed() ) entrySpeed = settings.getMinimumPlannerSpeed();
-		if( exitSpeed  < settings.getMinimumPlannerSpeed() ) exitSpeed  = settings.getMinimumPlannerSpeed();
+		if( entrySpeed < settings.getMinPlannerSpeed() ) entrySpeed = settings.getMinPlannerSpeed();
+		if( exitSpeed  < settings.getMinPlannerSpeed() ) exitSpeed  = settings.getMinPlannerSpeed();
 		
 		double accel = block.acceleration;
 		double accelerateD = estimateAccelerationDistance(entrySpeed, block.nominalSpeed, accel);

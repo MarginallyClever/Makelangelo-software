@@ -472,7 +472,7 @@ public class PlotterSettings implements Serializable {
 	/**
 	 * @param minSegTime the minSegTime to set
 	 */
-	public void setMinSegTime(long minSegTime) {
+	public void setMinSegmentTime(long minSegTime) {
 		this.minSegTime = minSegTime;
 	}
 
@@ -507,14 +507,14 @@ public class PlotterSettings implements Serializable {
 	/**
 	 * @return the minimumPlannerSpeed
 	 */
-	public double getMinimumPlannerSpeed() {
+	public double getMinPlannerSpeed() {
 		return minimumPlannerSpeed;
 	}
 
 	/**
 	 * @param minimumPlannerSpeed the minimumPlannerSpeed to set
 	 */
-	public void setMinimumPlannerSpeed(double minimumPlannerSpeed) {
+	public void setMinPlannerSpeed(double minimumPlannerSpeed) {
 		this.minimumPlannerSpeed = minimumPlannerSpeed;
 	}
 
