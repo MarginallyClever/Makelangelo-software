@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.google.common.collect.EvictingQueue;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -12,10 +11,7 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.stream.IntStream;
 
 /**
@@ -26,13 +22,12 @@ import java.util.stream.IntStream;
  * @since 7.28.0
  */
 public class ConversationHistory extends JPanel {
-	private static final int HISTORY_SIZE = 5;
+	private static final int HISTORY_SIZE = 5000;
 
 	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<>();
 	private JList<ConversationEvent> listView = new JList<>(listModel);
-	private final EvictingQueue<ConversationEvent> inBoundQueue = EvictingQueue.create(HISTORY_SIZE);
 	private JFileChooser chooser = new JFileChooser();
 
 	private ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
@@ -131,8 +126,11 @@ public class ConversationHistory extends JPanel {
 		return listView.getSelectedValue().toString();
 	}
 
-	public void addElement(String src,String str) { 
-		inBoundQueue.add(new ConversationEvent(src, str));
+	public void addElement(String src,String str) {
+		if (listModel.getSize() > HISTORY_SIZE) {
+			listModel.remove(0);
+		}
+		listModel.addElement(new ConversationEvent(src, str));
 		repaint();
 	}
 	
@@ -140,32 +138,18 @@ public class ConversationHistory extends JPanel {
 	public void paint(Graphics g) {
 		boolean isLast = (listView.getLastVisibleIndex() == listModel.getSize()-1);
 
-		addQueuedMessages();
-		
 		if(isLast) jumpToEnd();
 		
 		super.paint(g);
 	}
 
-	private void addQueuedMessages() {
-		while (!inBoundQueue.isEmpty()) {
-			ConversationEvent msg = inBoundQueue.poll();
-			if (msg!=null) {
-				if (listModel.getSize() > HISTORY_SIZE) {
-					listModel.remove(0);
-				}
-				listModel.addElement(msg);
-			}
-		}
-	}
-		
 	private void jumpToEnd() {
 		listView.ensureIndexIsVisible(listModel.getSize()-1);
 	}
 	
 	// TEST
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws FileNotFoundException {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
@@ -178,10 +162,23 @@ public class ConversationHistory extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 
-		ch.addElement("You", "N2 G28 XY*48");
-		ch.addElement("/dev/cu.usbserial-1410", "X:0.00 Y:-186.00 Z:200.00 Count X:72290 Y:72290 Z:32000");
-		ch.addElement("/dev/cu.usbserial-1410", "echo:; Advanced (B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate> X<max_x_jerk> Y<max_y_jerk> Z<max_z_jerk>):");
+//		int l = 0;
+//		long start = System.currentTimeMillis();
+//		Scanner scanner = new Scanner(new File("de.gcode"));
+//		while (scanner.hasNextLine()) {
+//			ch.addElement("You",scanner.nextLine());
+//			ch.addElement("/dev/cu.usbserial-1410", "ok");
+//			l++;
+//		}
+//		System.out.println("end = " + (System.currentTimeMillis() - start));
+//		System.out.println("l = " + l);
 
-		IntStream.range(0, 50).forEach(i -> ch.addElement("You", "msg " + i));
+		IntStream.range(0, 50).forEach(i -> {
+			ch.addElement("You", "msg " + i);
+			try {
+				Thread.sleep(20);
+			} catch (InterruptedException ignored) {
+			}
+		});
 	}
 }

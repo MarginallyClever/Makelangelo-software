@@ -69,9 +69,9 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendPenUpDown() {
-		String str = myPlotter.getPenIsUp() ? MarlinPlotterInterface.getPenUpString(myPlotter)
-				: MarlinPlotterInterface.getPenDownString(myPlotter);
-		queueAndSendCommand(str);
+//		String str = myPlotter.getPenIsUp() ? MarlinPlotterInterface.getPenUpString(myPlotter)
+//				: MarlinPlotterInterface.getPenDownString(myPlotter);
+//		queueAndSendCommand(str);
 	}
 
 	private void sendEngage() {
