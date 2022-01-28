@@ -363,6 +363,14 @@ public class Turtle implements Cloneable {
 		return lines;
 	}
 
+	/**
+	 * Calls {@code addLineSegments} with a default minimum jump size.
+	 * @param orderedLines
+	 */
+	public void addLineSegments(ArrayList<LineSegment2D> orderedLines) {
+		addLineSegments(orderedLines,0);
+	}
+	
 	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize) {
 		if(orderedLines.isEmpty()) return;
 		
