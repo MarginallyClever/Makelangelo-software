@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.io;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeArt.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.ConvertImagePanel;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
@@ -86,6 +87,10 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				mySubPreviewListener = myConvertImage;
 			} else {
 				Turtle t = TurtleFactory.load(filename);
+				// by popular demand, resize turtle to fit paper
+				ResizeTurtleToPaperAction resize = new ResizeTurtleToPaperAction(myPaper,false,"");
+				t = resize.run(t);
+				
 				notifyListeners(new ActionEvent(t,0,"turtle"));
 			}
 			previousFile = filename;
