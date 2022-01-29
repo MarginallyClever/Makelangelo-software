@@ -84,7 +84,7 @@ public class LoadGCode implements TurtleLoader {
 						break;
 					case 280:
 						// z move
-						double v = Double.valueOf(tokenExists("S",tokens));
+						double v = Double.valueOf(tokenExists("S",tokens).substring(1));
 						nz = isAbsolute ? v : nz+v;
 						if(nz!=oz) {
 							// z change
