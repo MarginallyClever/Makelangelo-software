@@ -24,7 +24,6 @@ public class InfillTurtle {
 	
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 	private double penDiameter = 0.8; // TODO adjust me before running infill
-	private double minimumJumpSize = 0.4;
 
 	public InfillTurtle() {}
 
@@ -38,7 +37,7 @@ public class InfillTurtle {
 		for(Turtle t : list) {
 			ArrayList<LineSegment2D> segments = infillFromTurtle(t);
 			Turtle t2 = new Turtle();
-			t2.addLineSegments(segments, minimumJumpSize);
+			t2.addLineSegments(segments);
 			result.add(t2);
 		}
 
