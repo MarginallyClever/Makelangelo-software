@@ -368,10 +368,10 @@ public class Turtle implements Cloneable {
 	 * @param orderedLines
 	 */
 	public void addLineSegments(ArrayList<LineSegment2D> orderedLines) {
-		addLineSegments(orderedLines,0);
+		addLineSegments(orderedLines,0,1e-6);
 	}
 	
-	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize) {
+	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
 		if(orderedLines.isEmpty()) return;
 		
 		LineSegment2D first = orderedLines.get(0);
@@ -379,7 +379,7 @@ public class Turtle implements Cloneable {
 		moveTo(first.b.x,first.b.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
-		double minDrawDistance = 1e-4;
+		double minDrawSquared = minDrawDistance*minDrawDistance;
 		
 		for( LineSegment2D line : orderedLines ) {
 			// change color if needed
@@ -392,7 +392,7 @@ public class Turtle implements Cloneable {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
 				jumpTo(line.a.x,line.a.y);
-			} else if(d>minDrawDistance) {
+			} else if(d>minDrawSquared) {
 				moveTo(line.a.x,line.a.y);
 			}
 			// Make a pen down move to the end of this line
