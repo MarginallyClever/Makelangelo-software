@@ -61,6 +61,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendToolChange(int toolNumber) {
+		queueAndSendCommand(MarlinPlotterInterface.getPenUpString(myPlotter));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
