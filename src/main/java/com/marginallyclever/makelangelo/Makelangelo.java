@@ -116,12 +116,8 @@ public final class Makelangelo {
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
 	private SaveDialog saveDialog = new SaveDialog();
-	
+	private JDialog dialogPlotterControls;
 	private RecentFiles recentFiles;
-
-	// drag files into the app with {@link DropTarget}
-	@SuppressWarnings("unused")
-	private DropTarget dropTarget;
 
 	public Makelangelo() {
 		logger.debug("Locale={}", Locale.getDefault().toString());
@@ -150,7 +146,7 @@ public final class Makelangelo {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addPlotterEventListener(this::onPlotterEvent);
-		myPlotter.getSettings().addPlotterSettingsListener((e)->onPlotterSettingsUpdate(e));
+		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
@@ -193,7 +189,7 @@ public final class Makelangelo {
 		if(!CommandLineOptions.hasOption("-nolf")) {
 	        try {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	        } catch (Exception e) {}
+	        } catch (Exception ignored) {}
 		}
 		setSystemLookAndFeelForMacos();
 	}
@@ -399,25 +395,27 @@ public final class Makelangelo {
 	}
 
 	private void openPlotterControls() {
-		JDialog dialog = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
-		dialog.setPreferredSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
-		dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
-		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
-		dialog.add(plotterControls);
-		dialog.setLocationRelativeTo(mainFrame);
-		dialog.pack();
+		if (dialogPlotterControls == null) {
+			dialogPlotterControls = new JDialog(mainFrame, Translator.get("PlotterControls.Title"));
+			dialogPlotterControls.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+			dialogPlotterControls.setPreferredSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
+			dialogPlotterControls.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
+			PlotterControls plotterControls = new PlotterControls(myPlotter, myTurtle, dialogPlotterControls);
+			dialogPlotterControls.add(plotterControls);
+			dialogPlotterControls.setLocationRelativeTo(mainFrame);
+			dialogPlotterControls.pack();
 
-		enableMenuBar(false);
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				enableMenuBar(true);
-				// make sure to close the connection when the dialog is closed.
-				plotterControls.closeConnection();
-			}
-		});
-
-		dialog.setVisible(true);
+			enableMenuBar(false);
+			dialogPlotterControls.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					enableMenuBar(true);
+					// make sure to close the connection when the dialog is closed.
+					plotterControls.closeConnection();
+				}
+			});
+		}
+		dialogPlotterControls.setVisible(true);
 	}
 
 	private JMenu createToolsMenu() {
@@ -816,7 +814,7 @@ public final class Makelangelo {
 	
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
+		DropTarget dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
 			    try {
