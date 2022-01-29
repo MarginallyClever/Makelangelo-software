@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
 public enum TurtleRenderFactory {
 	DEFAULT("Default", new DefaultTurtleRenderer()),
 	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
+	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
 	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
 
 	private final TurtleRenderer turtleRenderer;

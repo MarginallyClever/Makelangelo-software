@@ -33,13 +33,13 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 		int originalCount = originalLines.size();
 		logger.debug("  Converted to {} lines.", originalCount);
 
-		ArrayList<LineSegment2D> longLines = removeVeryShortSegments(originalLines); 
+		ArrayList<LineSegment2D> longLines = removeColinearSegments(originalLines); 
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
 		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
 
 		Turtle t = new Turtle();
-		t.addLineSegments(longLines,1.0);
+		t.addLineSegments(longLines);
 		int ns = t.history.size();
 		logger.debug("end @ {}", ns);
 		
@@ -52,7 +52,7 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 	 * @param originalLines
 	 * @return
 	 */
-	private ArrayList<LineSegment2D> removeVeryShortSegments(LineCollection originalLines) {
+	private ArrayList<LineSegment2D> removeColinearSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();
 		
 		ArrayList<LineCollection> byColor = originalLines.splitByColor();

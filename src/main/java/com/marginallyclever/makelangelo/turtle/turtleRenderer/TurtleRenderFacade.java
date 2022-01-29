@@ -9,16 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TurtleRenderFacade implements PreviewListener {
-
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
 	private TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
-
-	//private TurtleRenderer barberPole = new BarberPoleTurtleRenderer();
-
-	//private MakelangeloFirmwareVisualizer viz = new MakelangeloFirmwareVisualizer(); 
-	//viz.render(gl2, turtleToRender, settings);
-
 	private TurtleRenderer myRenderer=defaultRenderer;
 	private Turtle myTurtle = new Turtle();
 	private int first=0;

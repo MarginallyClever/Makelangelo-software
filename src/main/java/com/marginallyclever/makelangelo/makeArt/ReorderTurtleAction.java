@@ -19,9 +19,8 @@ import java.util.ArrayList;
  *
  */
 public class ReorderTurtleAction extends TurtleModifierAction {
-	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtleAction.class);
-	
 	private static final long serialVersionUID = 3473530693924971574L;
+	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtleAction.class);
 	
 	public ReorderTurtleAction() {
 		super(Translator.get("Reorder"));
@@ -59,14 +58,9 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		ColorRGB c = turtle.getFirstColor();
 		logger.debug("  {} converted to {} lines.", c.toString(), originalCount);
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
-		int uniqueCount = uniqueLines.size();
-		int duplicateCount = originalCount - uniqueCount;
-		logger.debug("  - {} duplicates = {} lines.", duplicateCount, uniqueCount);
-
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
+		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
 		Turtle t = new Turtle(c);
-		t.addLineSegments(orderedLines, 1.0);
+		t.addLineSegments(orderedLines);
 		return t;
 	}
 
@@ -114,6 +108,9 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		return orderedLines;
 	}
 
+	
+	// TODO: move this to its own Action?
+	@SuppressWarnings("unused")
 	private ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
 		logger.debug("  removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
