@@ -149,11 +149,6 @@ public class ConversationHistory extends JPanel {
 	private void addQueuedMessages() {
 		listModel.addAll(inBoundQueue);
 		inBoundQueue.clear();
-		/*
-		while(!inBoundQueue.isEmpty()) {
-			ConversationEvent msg = inBoundQueue.poll();
-			if(msg!=null) listModel.addElement(msg);
-		}*/
 	}
 		
 	private void jumpToEnd() {
