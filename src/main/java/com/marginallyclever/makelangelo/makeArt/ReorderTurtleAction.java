@@ -108,6 +108,9 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		return orderedLines;
 	}
 
+	
+	// TODO: move this to its own Action?
+	@SuppressWarnings("unused")
 	private ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
 		logger.debug("  removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
