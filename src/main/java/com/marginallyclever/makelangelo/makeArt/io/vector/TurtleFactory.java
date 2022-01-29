@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import java.util.List;
 
 public class TurtleFactory {
 	private static TurtleLoader [] loaders = {
@@ -45,16 +45,16 @@ public class TurtleFactory {
 		return false;
 	}
 
-	public static ArrayList<FileNameExtensionFilter> getLoadExtensions() {
-		ArrayList<FileNameExtensionFilter> filters = new ArrayList<FileNameExtensionFilter>();
+	public static List<FileNameExtensionFilter> getLoadExtensions() {
+		List<FileNameExtensionFilter> filters = new ArrayList<>();
 		for( TurtleLoader loader : loaders ) {
 			filters.add( loader.getFileNameFilter() );
 		}
 		return filters;
 	}
 
-	public static ArrayList<FileNameExtensionFilter> getSaveExtensions() {
-		ArrayList<FileNameExtensionFilter> filters = new ArrayList<FileNameExtensionFilter>();
+	public static List<FileNameExtensionFilter> getSaveExtensions() {
+		List<FileNameExtensionFilter> filters = new ArrayList<>();
 		for( TurtleSaver saver : savers ) {
 			filters.add( saver.getFileNameFilter() );
 		}

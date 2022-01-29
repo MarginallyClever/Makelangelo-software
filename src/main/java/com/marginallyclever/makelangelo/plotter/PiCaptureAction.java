@@ -292,7 +292,7 @@ public class PiCaptureAction {
 
 		if (useImage) {
 			// process the image
-			makelangeloApp.openLoadFile("/home/pi/Pictures/capture.jpg");
+			makelangeloApp.openFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
 

@@ -16,11 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
@@ -30,13 +28,13 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private static final long serialVersionUID = 1L;
 	private Paper myPaper;
 
-	private static JFileChooser fc = new JFileChooser();
 	private JButton bChoose = new JButton(Translator.get("Open"));
 	private JLabel filename = new JLabel();
 
 	private ConvertImagePanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
 	private JPanel mySubPanel = new JPanel();
+	private FileChooser fc;
 
 	private String previousFile="";
 
@@ -46,6 +44,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		setLayout(new BorderLayout());
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		add(mySubPanel,BorderLayout.CENTER);
+
+		fc = new FileChooser(this);
+		fc.setOpenListener(this::load);
 	}
 	
 	private JPanel getFileSelectionPanel(String previousFile) {
@@ -55,25 +56,11 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		
 		filename.setText(previousFile);
 		
-		bChoose.addActionListener((e)-> chooseFile());
-		
-		setupFilefilters();
+		bChoose.addActionListener((e)-> fc.chooseFile());
 		
 		return panel;
 	}
-	
-	public void chooseFile() {
-		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                        mySubPanel.removeAll();
-                    
-			String selectedFile = fc.getSelectedFile().getAbsolutePath();
-			logger.debug("File selected by user: {}", selectedFile);
-			filename.setText(selectedFile);
-			
-			load(selectedFile);
-		}
-	}
-	
+
 	public void load(String filename) {
 		try {
 			if(ConvertImagePanel.isFilenameForAnImage(filename)) {
@@ -98,20 +85,6 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 			logger.error("Failed to load {}", filename, e);
 			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-	}
-	
-	private void setupFilefilters() {
-		// add vector formats
-		for( FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions() ) {
-			fc.addChoosableFileFilter(ff);
-		}
-		
-		// add image formats
-		FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("FileTypeImage"),ConvertImagePanel.IMAGE_FILE_EXTENSIONS);
-		fc.addChoosableFileFilter(images);
-		
-		// no wild card filter, please.
-		fc.setAcceptAllFileFilterUsed(false);
 	}
 
 	@Override
@@ -152,13 +125,5 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		frame.add(new LoadFilePanel(new Paper(),""));
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public static String getLastPath() {
-		return fc.getCurrentDirectory().toString();
-	}
-	
-	public static void setLastPath(String lastPath) {
-		fc.setCurrentDirectory((lastPath==null?null : new File(lastPath)));
 	}
 }

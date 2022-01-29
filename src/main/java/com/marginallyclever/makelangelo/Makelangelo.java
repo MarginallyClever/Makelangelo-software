@@ -13,6 +13,7 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.*;
+import com.marginallyclever.makelangelo.makeArt.io.FileChooser;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
@@ -118,6 +119,7 @@ public final class Makelangelo {
 	private SaveDialog saveDialog = new SaveDialog();
 	
 	private RecentFiles recentFiles;
+	private FileChooser fc;
 
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
@@ -139,7 +141,6 @@ public final class Makelangelo {
 			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 		}
 
-		loadPaths();
 		startRobot();
 		
 		logger.debug("Starting virtual camera...");
@@ -516,11 +517,11 @@ public final class Makelangelo {
 		menu.add(buttonNewFile);
 
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener((e) -> openLoadFile(""));
+		buttonOpenFile.addActionListener((e) -> openLoadFile());
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
-		recentFiles.addSubmenuListener((e)-> openLoadFile(((JMenuItem)e.getSource()).getText()));
+		recentFiles.addSubmenuListener((e)-> openFile(((JMenuItem)e.getSource()).getText()));
 		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
@@ -554,13 +555,17 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	public void openLoadFile(String filename) {
-		logger.debug("Loading file {}...", filename);
+	public void openLoadFile() {
+		logger.debug("Open file...");
+		fc.chooseFile();
+	}
+
+	public void openFile(String filename) {
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
 			previewPanel.addListener(loader);
-			if(filename!=null && !filename.trim().isEmpty() ) {
+			if (filename!=null && !filename.trim().isEmpty() ) {
 				loader.load(filename);
 			}
 			
@@ -812,6 +817,11 @@ public final class Makelangelo {
 		setWindowSizeAndPosition();
 
 		setupDropTarget();
+
+		fc = new FileChooser(mainFrame);
+		fc.setOpenListener(this::openFile);
+
+		loadPaths();
 	}
 	
 	private void setupDropTarget() {
@@ -832,7 +842,7 @@ public final class Makelangelo {
 			        			if( list.size()>0 ) {
 			        				o = list.get(0);
 			        				if( o instanceof File ) {
-			        					openLoadFile(((File)o).getAbsolutePath());
+			        					openFile(((File)o).getAbsolutePath());
 						        		dtde.dropComplete(true);
 			        					return;
 			        				}
@@ -939,7 +949,7 @@ public final class Makelangelo {
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
-		preferences.put(PREFERENCE_LOAD_PATH, LoadFilePanel.getLastPath() );
+		preferences.put(PREFERENCE_LOAD_PATH, fc.getLastPath() );
 	}
 
 	/**
@@ -948,7 +958,7 @@ public final class Makelangelo {
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
-		LoadFilePanel.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
+		fc.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
 	}
 
 	private void saveFile() {
