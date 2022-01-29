@@ -134,7 +134,7 @@
 
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Zeichnet Gelb, Cyan, Magenta, und dann Schwarz.</html></body>]]></value>
+		<value><![CDATA[Zeichnet Gelb, Cyan, Magenta, und dann Schwarz.]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 

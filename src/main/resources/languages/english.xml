@@ -134,7 +134,7 @@
 
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
+		<value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 
