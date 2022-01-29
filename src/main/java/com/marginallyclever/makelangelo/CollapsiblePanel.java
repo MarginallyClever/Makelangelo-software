@@ -40,7 +40,7 @@ public class CollapsiblePanel extends JPanel {
         setLayout(borderLayout);
         addMouseListener(mouseListener);
         innerPannel = new JPanel();
-        innerPannel.addComponentListener(contentComponentListener);
+        parentWindow.addComponentListener(contentComponentListener);
         super.add(innerPannel);
     }
 
@@ -182,9 +182,9 @@ public class CollapsiblePanel extends JPanel {
         if (initialDimension == null) {
             initialDimension = new Dimension(parentWindow.getSize());
         }
-        Dimension newDim = new Dimension(parentWindow.getWidth() - 5, parentWindow.getHeight() - initialDimension.height);
+        Rectangle rectangle = new Rectangle(0, 5, parentWindow.getWidth() - 12, parentWindow.getHeight() - initialDimension.height);
         for (Component c : innerPannel.getComponents()) {
-            c.setPreferredSize(newDim);
+            c.setBounds(rectangle);
         }
     }
 
