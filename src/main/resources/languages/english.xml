@@ -65,6 +65,15 @@
 	</string>
 
 	<string>
+		<key>ConverterCannyEdgeName</key>
+		<value>Canny Edge Detection</value>
+	</string>
+	<string>
+		<key>ConverterColorFloodFillName</key>
+		<value>Color Flood Fill</value>
+	</string>
+
+	<string>
 		<key>ConverterRandomLinesName</key>
 		<value>Random lines</value>
 		<hint>Random Lines generator</hint>

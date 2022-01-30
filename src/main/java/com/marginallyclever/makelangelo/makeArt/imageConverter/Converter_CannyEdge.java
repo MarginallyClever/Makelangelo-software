@@ -17,7 +17,7 @@ import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_Invert;
 public class Converter_CannyEdge extends ImageConverter {
 	@Override
 	public String getName() {
-		return Translator.get("CannyEdgeConverterName");
+		return Translator.get("ConverterCannyEdgeName");
 	}
 
 	/**
