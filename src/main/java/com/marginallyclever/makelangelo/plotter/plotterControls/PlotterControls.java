@@ -266,8 +266,10 @@ public class PlotterControls extends JPanel {
 		return x;
 	}
 
-	public void closeConnection() {
+	public void onDialogClosing() {
+		// make sure to close the connection when the dialog is closed.
 		chooseConnection.closeConnection();
+		// make sure to unregister listeners
 		marlinInterface.stopListeningToPlotter();
 	}
 
