@@ -149,6 +149,10 @@ public class CollapsiblePanel extends JPanel {
             c.setVisible(visible);
         }
         updateBorderTitle();
+        if (initialDimension == null) {
+            initialDimension = new Dimension(parentWindow.getSize());
+        }
+
         if (visible) {
             // expands all elements
             int height = previousDimension == null ? heightCollapsibleComponent: previousDimension.height;
