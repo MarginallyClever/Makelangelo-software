@@ -654,15 +654,19 @@ public final class Makelangelo {
 			}
 		});
 		menu.add(buttonForums);
-		
-		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener((e) -> {
-			DialogAbout a = new DialogAbout();
-			a.display(mainFrame,VERSION);
-		});
-		menu.add(buttonAbout);
+
+		if (!isMacOS) {
+			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
+			buttonAbout.addActionListener((e) -> onDialogButton());
+			menu.add(buttonAbout);
+		}
 
 		return menu;
+	}
+
+	private void onDialogButton() {
+		DialogAbout a = new DialogAbout();
+		a.display(mainFrame,VERSION);
 	}
 
 	private void runLogPanel() {
@@ -812,6 +816,18 @@ public final class Makelangelo {
 		setWindowSizeAndPosition();
 
 		setupDropTarget();
+
+		if (Desktop.isDesktopSupported()) {
+			Desktop desktop = Desktop.getDesktop();
+			desktop.setQuitHandler((evt, res) -> {
+				if (onClosing()) {
+					res.performQuit();
+				} else {
+					res.cancelQuit();
+				}
+			});
+			desktop.setAboutHandler((e) -> onDialogButton());
+		}
 	}
 	
 	private void setupDropTarget() {
@@ -908,7 +924,7 @@ public final class Makelangelo {
 		});
 	}
 
-	private void onClosing() {
+	private boolean onClosing() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
@@ -928,7 +944,9 @@ public final class Makelangelo {
 				previewPanel.stop();
 				mainFrame.dispose();
 			}).start();
+			return true;
 		}
+		return false;
 	}
 	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
