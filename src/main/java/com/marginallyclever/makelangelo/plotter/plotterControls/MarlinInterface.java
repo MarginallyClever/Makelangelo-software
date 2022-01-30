@@ -135,13 +135,17 @@ public class MarlinInterface extends JPanel {
 		String numberPart = message.substring(message.indexOf(STR_RESEND) + STR_RESEND.length());
 		try {
 			int n = Integer.parseInt(numberPart);
-			if (n>lineNumberAdded-MarlinInterface.HISTORY_BUFFER_LIMIT) {
+			if (n > lineNumberAdded) {
+				logger.warn("Resend line {} asked but never sent", n);
+			}
+			if (n > lineNumberAdded - MarlinInterface.HISTORY_BUFFER_LIMIT) {
 				// no problem.
-				lineNumberToSend=n;
+				lineNumberToSend = n;
 			} else {
 				// line is no longer in the buffer.  should not be possible!
+				logger.warn("Resend line {} asked but no longer in the buffer", n);
 			}
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			logger.debug("Resend request for '{}' failed: {}", message, e.getMessage());
 		}
 	}
@@ -186,12 +190,11 @@ public class MarlinInterface extends JPanel {
 	
 	public void queueAndSendCommand(String str) {
 		if(str.trim().length()==0) return;
-		
+
 		lineNumberAdded++;
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
 		String assembled = withLineNumber + generateChecksum(withLineNumber);
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
-		//logger.debug("MarlinInterface queued '{}'. busyCount={}", assembled, busyCount);
 		if(busyCount>0) sendQueuedCommand();
 	}
 	

@@ -42,7 +42,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return Translator.get("RGBFloodFillName");
+		return Translator.get("ConverterColorFloodFillName");
 	}
 
 
