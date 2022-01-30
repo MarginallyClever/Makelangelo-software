@@ -223,8 +223,13 @@
 	</string>
 
 	<string>
-		<key>FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Imageyay (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string><!-- translation value to review-->
+		<key>OpenFileChooser.AllSupportedFiles</key>
+		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
 

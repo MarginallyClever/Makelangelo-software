@@ -442,12 +442,12 @@
 	</string>
 
 	<string>
-		<key>FileChooser.FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Image (jpg/bmp/png/gif)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string>
-		<key>FileChooser.AllSupportedFiles</key>
+		<key>OpenFileChooser.AllSupportedFiles</key>
 		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
@@ -2045,13 +2045,7 @@
 		<value>Plotter settings</value>
 		<hint></hint>
 	</string>
-	
-	<string>
-		<key>FileTypeImage</key>
-		<value>Image</value>
-		<hint>load file dialog</hint>
-	</string>
-	
+
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>

@@ -100,9 +100,7 @@ public class FileAccess {
 	}
 	
 	public static String getWorkingDirectory() {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		return s;
+		return Paths.get("").toAbsolutePath().toString();
 	}
 
 	/**

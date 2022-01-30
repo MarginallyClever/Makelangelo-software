@@ -34,7 +34,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private ConvertImagePanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
 	private JPanel mySubPanel = new JPanel();
-	private FileChooser fc;
+	private OpenFileChooser openFileChooser;
 
 	private String previousFile="";
 
@@ -45,8 +45,8 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		add(mySubPanel,BorderLayout.CENTER);
 
-		fc = new FileChooser(this);
-		fc.setOpenListener(this::load);
+		openFileChooser = new OpenFileChooser(this);
+		openFileChooser.setOpenListener(this::load);
 	}
 	
 	private JPanel getFileSelectionPanel(String previousFile) {
@@ -56,7 +56,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		
 		filename.setText(previousFile);
 		
-		bChoose.addActionListener((e)-> fc.chooseFile());
+		bChoose.addActionListener((e)-> openFileChooser.chooseFile());
 		
 		return panel;
 	}

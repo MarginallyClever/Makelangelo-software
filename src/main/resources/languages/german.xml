@@ -406,8 +406,13 @@
 	</string>
 
 	<string>
-		<key>FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Bild (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string><!-- translation value to review-->
+		<key>OpenFileChooser.AllSupportedFiles</key>
+		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -1853,13 +1858,7 @@
 		<value>Öffne Einstellungen</value>
 		<hint></hint>
 	</string>
-	
-	<string>
-		<key>FileTypeImage</key>
-		<value>Bild</value>
-		<hint>load file dialog</hint>
-	</string>
-	
+
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>

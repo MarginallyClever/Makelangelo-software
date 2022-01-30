@@ -13,7 +13,7 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.*;
-import com.marginallyclever.makelangelo.makeArt.io.FileChooser;
+import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
@@ -119,7 +119,7 @@ public final class Makelangelo {
 	private SaveDialog saveDialog = new SaveDialog();
 	
 	private RecentFiles recentFiles;
-	private FileChooser fc;
+	private OpenFileChooser openFileChooser;
 
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
@@ -557,7 +557,7 @@ public final class Makelangelo {
 
 	public void openLoadFile() {
 		logger.debug("Open file...");
-		fc.chooseFile();
+		openFileChooser.chooseFile();
 	}
 
 	public void openFile(String filename) {
@@ -818,8 +818,8 @@ public final class Makelangelo {
 
 		setupDropTarget();
 
-		fc = new FileChooser(mainFrame);
-		fc.setOpenListener(this::openFile);
+		openFileChooser = new OpenFileChooser(mainFrame);
+		openFileChooser.setOpenListener(this::openFile);
 
 		loadPaths();
 	}
@@ -949,7 +949,6 @@ public final class Makelangelo {
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
-		preferences.put(PREFERENCE_LOAD_PATH, fc.getLastPath() );
 	}
 
 	/**
@@ -958,7 +957,6 @@ public final class Makelangelo {
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
-		fc.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
 	}
 
 	private void saveFile() {
