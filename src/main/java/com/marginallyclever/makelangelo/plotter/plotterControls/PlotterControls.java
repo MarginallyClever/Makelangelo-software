@@ -266,6 +266,9 @@ public class PlotterControls extends JPanel {
 		return x;
 	}
 
+	/**
+	 * Called from windowAdapter::windowClosing() to clean up resources.
+	 */
 	public void onDialogClosing() {
 		// make sure to close the connection when the dialog is closed.
 		chooseConnection.closeConnection();
