@@ -39,10 +39,7 @@ public class Converter_CMYK extends ImageConverter {
 	 * @param value 
 	 */
 	public void setPasses(int value) {
-		if(value<1) 
-		    passes=1;
-		else 
-		    passes=value;
+		passes = Math.max(1, value);
 	}
 	
 	/**
@@ -72,7 +69,7 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = (double)passes/2.0;
+		double stepSize = passes/2.0;
 
 		// from top to bottom of the margin area...
 		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
