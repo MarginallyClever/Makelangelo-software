@@ -953,7 +953,7 @@
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Anhebegeschwindigkeit</value>
+		<value><!-- needs update -->Anhebegeschwindigkeit</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>

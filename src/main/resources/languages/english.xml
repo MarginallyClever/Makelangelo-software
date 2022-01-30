@@ -1097,7 +1097,7 @@
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift speed</value>
+		<value>Lift delay (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
