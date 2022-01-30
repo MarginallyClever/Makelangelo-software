@@ -10,11 +10,11 @@ public class TranslatorTests {
 	@BeforeAll
 	public static void beforeAll() {
 		PreferencesHelper.start();
+		Translator.start();
 	}
 
 	@Test
 	public void startTranslatorTwiceTest() {
-		Translator.start();
 		String[] first = Translator.getLanguageList();
 		Translator.start();
 		String[] second = Translator.getLanguageList();
@@ -23,7 +23,6 @@ public class TranslatorTests {
 	
 	@Test
 	public void loadLanguageTest() {
-		Translator.start();
 		int current = Translator.getCurrentLanguageIndex();
 		assertNotEquals(0, current);
 		String [] available = Translator.getLanguageList();
@@ -32,7 +31,6 @@ public class TranslatorTests {
 	
 	@Test
 	public void changeLanguageTest() {
-		Translator.start();
 		String[] available = Translator.getLanguageList();
 		assertTrue(available.length > 1, "More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
@@ -48,5 +46,15 @@ public class TranslatorTests {
 			Translator.setCurrentLanguage(available[current]);
 			Translator.saveConfig();
 		}
+	}
+
+	@Test
+	public void getOneValueThatExists() {
+		assertEquals("Makelangelo", Translator.get("Robot"));
+	}
+
+	@Test
+	public void getOneValueThatDoesNotExist() {
+		assertEquals("Missing:DoesNotExist", Translator.get("DoesNotExist"));
 	}
 }
