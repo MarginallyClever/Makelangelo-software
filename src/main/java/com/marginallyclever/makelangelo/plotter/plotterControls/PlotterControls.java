@@ -29,16 +29,16 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
+	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
 	public static final int DIMENSION_PANEL_HEIGHT = 220;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
 
-	private static final long serialVersionUID = -1201865024705737250L;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;
-	private final MarlinInterface marlinInterface;
+	private final MarlinPlotterInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
 
@@ -268,6 +268,7 @@ public class PlotterControls extends JPanel {
 
 	public void closeConnection() {
 		chooseConnection.closeConnection();
+		marlinInterface.stopListeningToPlotter();
 	}
 
 	// TEST
@@ -285,5 +286,4 @@ public class PlotterControls extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 }
