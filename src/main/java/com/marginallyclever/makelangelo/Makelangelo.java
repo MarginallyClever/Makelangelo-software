@@ -819,14 +819,18 @@ public final class Makelangelo {
 
 		if (Desktop.isDesktopSupported()) {
 			Desktop desktop = Desktop.getDesktop();
-			desktop.setQuitHandler((evt, res) -> {
-				if (onClosing()) {
-					res.performQuit();
-				} else {
-					res.cancelQuit();
-				}
-			});
-			desktop.setAboutHandler((e) -> onDialogButton());
+			if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+				desktop.setQuitHandler((evt, res) -> {
+					if (onClosing()) {
+						res.performQuit();
+					} else {
+						res.cancelQuit();
+					}
+				});
+			}
+			if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
+				desktop.setAboutHandler((e) -> onDialogButton());
+			}
 		}
 	}
 	
