@@ -25,7 +25,8 @@ public class MissingTranslationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MissingTranslationTest.class);
 
-    private Pattern pattern = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\"(?<key>[^\\)]*)\"\\)");
+    private Pattern patternComment = Pattern.compile("^\\s*//.*");
+    private Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\"(?<key>[^)]*)\"\\)");
 
     @BeforeAll
     public static void init() {
@@ -54,7 +55,7 @@ public class MissingTranslationTest {
                 logger.info("  {}", result);
             }
         }
-        assertEquals(0, results.size(), "Some translations are missing");
+        assertEquals(0, results.size(), "Some translations are missing, see previous logs for details");
     }
 
     @Test
@@ -82,12 +83,15 @@ public class MissingTranslationTest {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             String line;
             while((line = bufferedReader.readLine()) != null) {
-                Matcher m = pattern.matcher(line);
-                while (m.find()) {
-                    String key = m.group("key");
-                    String trans = Translator.get(key);
-                    if (trans.startsWith(TranslatorLanguage.MISSING)) {
-                        results.add(String.format("%s:%s: %s", file, lineNb, key));
+                Matcher m = patternComment.matcher(line);
+                if (!m.matches()) {
+                    m = patternTranslator.matcher(line);
+                    while (m.find()) {
+                        String key = m.group("key");
+                        String trans = Translator.get(key);
+                        if (trans.startsWith(TranslatorLanguage.MISSING)) {
+                            results.add(String.format("%s:%s: %s", file, lineNb, key));
+                        }
                     }
                 }
                 lineNb++;
@@ -111,7 +115,7 @@ public class MissingTranslationTest {
      * @throws IOException
      */
     public static List<File> listFiles(Path path, String fileNameEndsWithSuffix) throws IOException {
-        List<File> result = null;
+        List<File> result;
         try ( Stream<Path> walk = Files.walk(path)) {
             result = walk
                     .filter(Files::isRegularFile)
@@ -120,11 +124,6 @@ public class MissingTranslationTest {
                     .filter(f -> f.getName().endsWith(fileNameEndsWithSuffix))
                     .collect(Collectors.toList());
         }
-
-        logger.debug("listFiles({},{}).size()={}", path, fileNameEndsWithSuffix, result.size());
-
         return result;
     }
-
-
 }
