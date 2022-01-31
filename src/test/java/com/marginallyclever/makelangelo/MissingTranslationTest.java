@@ -65,7 +65,7 @@ public class MissingTranslationTest {
         // matches.txt contains few entries with translation and one without. The list should not be empty
         searchInAFile(new File("src/test/resources/translator/matches.txt"), results);
 
-        assertEquals(List.of("src/test/resources/translator/matches.txt:4: unknownKey"), results);
+        assertEquals(List.of("src/test/resources/translator/matches.txt:4: unknownKey".replaceAll("/", File.separator)), results);
     }
 
     @Test
