@@ -89,7 +89,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderMinLength(MarlinSimulationBlock block) {
-		double d = block.distance / (MarlinSimulation.MIN_SEGMENT_LENGTH_MM*2.0);
+		double d = block.distance / (mySettings.getMinSegmentLength()*2.0);
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;

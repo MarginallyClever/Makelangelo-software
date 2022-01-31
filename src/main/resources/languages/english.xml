@@ -65,6 +65,15 @@
 	</string>
 
 	<string>
+		<key>ConverterCannyEdgeName</key>
+		<value>Canny Edge Detection</value>
+	</string>
+	<string>
+		<key>ConverterColorFloodFillName</key>
+		<value>Color Flood Fill</value>
+	</string>
+
+	<string>
 		<key>ConverterRandomLinesName</key>
 		<value>Random lines</value>
 		<hint>Random Lines generator</hint>
@@ -134,7 +143,7 @@
 
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
+		<value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 
@@ -1097,7 +1106,7 @@
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift speed</value>
+		<value>Lift delay (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -2068,4 +2077,34 @@
 		<key>CopyClipboard</key>
 		<value>Copy to clipboard</value>
 	</string>
+
+	<string>
+		<key>PlotterSettings.blockBufferSize</key>
+		<value>Block Buffer Size</value>
+	</string>
+	<string>
+		<key>PlotterSettings.segmentsPerSecond</key>
+		<value>Segments Per Second</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegmentLength</key>
+		<value>Min Segment Length</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegTime</key>
+		<value>Min Seg Time</value>
+	</string>
+	<string>
+		<key>PlotterSettings.handleSmallSegments</key>
+		<value>Handle Small Segments</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minAcceleration</key>
+		<value>Min Acceleration</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minimumPlannerSpeed</key>
+		<value>Min Planner Speed</value>
+	</string>
+
 </language>

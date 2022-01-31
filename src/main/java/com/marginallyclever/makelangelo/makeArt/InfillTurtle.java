@@ -12,15 +12,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Take an existing drawing, scan across it horizontally.  Add new lines between every pair of lines found.
+ * It may sometimes make mistakes if it hits the very end of a line.
+ * 
+ * @author Dan Royer
+ * @since 7.31.0
+ */
 public class InfillTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(InfillTurtle.class);
 	
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 	private double penDiameter = 0.8; // TODO adjust me before running infill
-	private double minimumJumpSize = 0.4;
 
-	public InfillTurtle() {
-	}
+	public InfillTurtle() {}
 
 	public Turtle run(Turtle input) throws Exception {
 		logger.debug("InfillTurtle.run()");
@@ -32,7 +37,7 @@ public class InfillTurtle {
 		for(Turtle t : list) {
 			ArrayList<LineSegment2D> segments = infillFromTurtle(t);
 			Turtle t2 = new Turtle();
-			t2.addLineSegments(segments, minimumJumpSize);
+			t2.addLineSegments(segments);
 			result.add(t2);
 		}
 
@@ -44,7 +49,7 @@ public class InfillTurtle {
 		throw new Exception("I cannot confirm this Turtle path is a closed loop.");
 	}
 
-	private ArrayList<LineSegment2D> infillFromTurtle(Turtle input) throws Exception {
+	private ArrayList<LineSegment2D> infillFromTurtle(Turtle input) {
 		logger.debug("  infillFromTurtle()");
 		// make sure line segments don't start on another line, leading to an odd number
 		// of intersections.
@@ -67,7 +72,7 @@ public class InfillTurtle {
 	}
 
 	/**
-	 * Add padding to a {@code Rectangle2D.Double} bounding box.
+	 * Add padding to a {@link Rectangle2D.Double} bounding box.
 	 * 
 	 * @param before
 	 * @return the larger bounds
@@ -76,17 +81,17 @@ public class InfillTurtle {
 		logger.debug("  addPaddingToBounds()");
 		percent*=0.01;
 		Rectangle2D.Double after = new Rectangle2D.Double();
-		after.x = before.x - before.width * percent;
-		after.y = before.y - before.height * percent;
-		after.height = before.height * (1.0 + percent * 2.0);
-		after.width = before.width * (1.0 + percent * 2.0);
+		after.x = before.x - before.width * percent/2.0;
+		after.y = before.y - before.height * percent/2.0;
+		after.height = before.height * (1.0 + percent);
+		after.width = before.width * (1.0 + percent);
 		logger.debug("    before={}", before.toString());
 		logger.debug("    after={}", after.toString());
 		return after;
 	}
 
 	/**
-	 * Trim a {@code LineSegment2D} against a {@code Turtle} path and return a list
+	 * Trim a {@link LineSegment2D} against a {@link Turtle} path and return a list
 	 * of remaining line segments.
 	 * <p>
 	 * If the polygon is convex, there will be two intersection points. These two
@@ -99,12 +104,11 @@ public class InfillTurtle {
 	 * of the line that lie inside the polygon.
 	 * </p>
 	 * 
-	 * @param line  A {@code LineSegment2D} to compare against the {@code Turtle}
-	 * @param input The {@code Turtle}, guaranteed closed loop
-	 * @return a list of remaining {@code LineSegment2D}.
+	 * @param line  A {@link LineSegment2D} to compare against the {@link Turtle}
+	 * @param input The {@link Turtle}, guaranteed closed loop
+	 * @return a list of remaining {@link LineSegment2D}.
 	 */
-	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, ArrayList<LineSegment2D> convertedPath) throws Exception {
-		logger.debug("  trimLineToPath()");
+	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, ArrayList<LineSegment2D> convertedPath) {
 		ArrayList<Point2D> intersections = new ArrayList<Point2D>();
 
 		for (LineSegment2D s : convertedPath) {
@@ -112,17 +116,14 @@ public class InfillTurtle {
 			if (p != null) intersections.add(p);
 		}
 
-		logger.debug("    done testing");
-		int size = intersections.size();
-		if (size % 2 != 0) {
-			throw new Exception("odd number of intersections");
-		}
-
 		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
-		if (size == 2) {
-			results.add(new LineSegment2D(intersections.get(0), intersections.get(1), line.c));
-		} else if (size > 2) {
-			results.addAll(sortIntersectionsIntoSegments(intersections, line.c));
+		int size = intersections.size();
+		if(size%2==0) {
+			if (size == 2) {
+				results.add(new LineSegment2D(intersections.get(0), intersections.get(1), line.c));
+			} else if (size > 2) {
+				results.addAll(sortIntersectionsIntoSegments(intersections, line.c));
+			}
 		}
 
 		return results;
@@ -140,22 +141,18 @@ public class InfillTurtle {
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {
-			logger.debug("    sort by Y");
 			Collections.sort(intersections, new ComparePointsByY());
 		} else {
-			logger.debug("    sort by X");
 			Collections.sort(intersections, new ComparePointsByX());
 		}
 
-		logger.debug("  convert to segments");
 		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
 		int i = 0;
-		while (i < intersections.size()) {
+		while (i < intersections.size()-1) {
 			results.add(new LineSegment2D(intersections.get(i + 0), intersections.get(i + 1), color));
 			i += 2;
 		}
 
-		logger.debug("  done");
 		return results;
 	}
 
@@ -181,7 +178,7 @@ public class InfillTurtle {
 	 * 
 	 * @param alpha
 	 * @param beta
-	 * @return intersection {@code Point2D} or null
+	 * @return intersection {@link Point2D} or null
 	 */
 	private Point2D getIntersection(LineSegment2D alpha, LineSegment2D beta) {
 		double s1_x = alpha.b.x - alpha.a.x;
@@ -190,7 +187,7 @@ public class InfillTurtle {
 		double s2_y = beta.b.y - beta.a.y;
 
 		double s = (-s1_y * (alpha.a.x - beta.a.x) + s1_x * (alpha.a.y - beta.a.y)) / (-s2_x * s1_y + s1_x * s2_y);
-		double t = (s2_x * (alpha.a.y - beta.a.y) - s2_y * (alpha.a.x - beta.a.x)) / (-s2_x * s1_y + s1_x * s2_y);
+		double t = ( s2_x * (alpha.a.y - beta.a.y) - s2_y * (alpha.a.x - beta.a.x)) / (-s2_x * s1_y + s1_x * s2_y);
 
 		if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
 			// hit!

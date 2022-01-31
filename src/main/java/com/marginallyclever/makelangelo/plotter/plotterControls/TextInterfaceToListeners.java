@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
  * @since 7.28.0
  */
 public class TextInterfaceToListeners extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(TextInterfaceToListeners.class);
 	private static final long serialVersionUID = 7996257740483513358L;
 	private JTextField commandLine = new JTextField(60);
 	private JButton send = new JButton("Send");
@@ -50,7 +53,8 @@ public class TextInterfaceToListeners extends JPanel {
 	}
 
 	public void sendNow() {
-		sendCommand(commandLine.getText());
+		logger.debug("User sends '{}' to the robot", getCommand());
+		sendCommand(getCommand());
 		commandLine.setText("");
 	}
 

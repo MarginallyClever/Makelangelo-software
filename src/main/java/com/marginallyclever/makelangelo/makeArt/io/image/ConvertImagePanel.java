@@ -251,7 +251,6 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private void stopWorker() {
 		if(myConverterPanel!=null) {
 			myConverterPanel.getConverter().stopIterating();
-			// TODO removePreviewListener(chosenConverter);
 		}
 		if(imageConverterThread!=null) {
 			logger.debug("Stopping worker");
@@ -276,8 +275,6 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		converter.setProgressMonitor(pm);
 		converter.setPaper(myPaper);
 		converter.setImage(myImage);
-		
-		// TODO addPreviewListener(chosenConverter);
 		
 		imageConverterThread = getNewWorker(converter,workerCount);
 		addWorker(imageConverterThread);
