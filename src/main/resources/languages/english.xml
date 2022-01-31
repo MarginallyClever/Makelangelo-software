@@ -362,13 +362,13 @@
 
 	<string>
 		<key>LoadError</key>
-		<value>File could not be loaded:</value>
+		<value>File could not be loaded: </value>
 		<hint>status message.</hint>
 	</string>
 
 	<string>
 		<key>SaveError</key>
-		<value>File could not be saved:</value>
+		<value>File could not be saved: </value>
 		<hint>status message.</hint>
 	</string>
 

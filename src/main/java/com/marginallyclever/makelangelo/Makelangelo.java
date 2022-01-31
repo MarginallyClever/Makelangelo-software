@@ -386,7 +386,7 @@ public final class Makelangelo {
 			save.run(myTurtle, myPlotter, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("SaveError"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -583,7 +583,7 @@ public final class Makelangelo {
 			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("LoadError"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			recentFiles.removeFilename(filename);
 		}
 	}
@@ -979,7 +979,7 @@ public final class Makelangelo {
 			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while saving the vector file", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("SaveError"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
