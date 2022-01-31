@@ -186,7 +186,7 @@ public class LoadGCode implements TurtleLoader {
 			}
 		}
 		catch(Exception e) {
-			throw new Exception("GCODE parse failure ("+lineNumber+"): "+line);
+			throw new Exception("GCODE parse failure ("+lineNumber+"): "+line, e);
 		}
 		finally {
 			scanner.close();
