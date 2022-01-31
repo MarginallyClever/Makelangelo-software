@@ -411,9 +411,8 @@ public final class Makelangelo {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				plotterControls.onDialogClosing();
 				enableMenuBar(true);
-				// make sure to close the connection when the dialog is closed.
-				plotterControls.closeConnection();
 			}
 		});
 
