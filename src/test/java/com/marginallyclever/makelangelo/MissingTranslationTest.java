@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MissingTranslationTest {
 
@@ -65,7 +65,9 @@ public class MissingTranslationTest {
         // matches.txt contains few entries with translation and one without. The list should not be empty
         searchInAFile(new File("src/test/resources/translator/matches.txt"), results);
 
-        assertEquals(List.of("src/test/resources/translator/matches.txt:4: unknownKey".replaceAll("/", File.separator)), results);
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertTrue(results.get(0).contains("matches.txt:4: unknownKey"));
     }
 
     @Test
@@ -90,7 +92,7 @@ public class MissingTranslationTest {
                         String key = m.group("key");
                         String trans = Translator.get(key);
                         if (trans.startsWith(TranslatorLanguage.MISSING)) {
-                            results.add(String.format("%s:%s: %s", file, lineNb, key));
+                            results.add(String.format("file://%s:%s: %s", file.getCanonicalPath(), lineNb, key));
                         }
                     }
                 }
