@@ -368,7 +368,7 @@ public class Turtle implements Cloneable {
 	 * @param orderedLines
 	 */
 	public void addLineSegments(ArrayList<LineSegment2D> orderedLines) {
-		addLineSegments(orderedLines,0,1e-6);
+		addLineSegments(orderedLines,1e-6,1e-6);
 	}
 	
 	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
