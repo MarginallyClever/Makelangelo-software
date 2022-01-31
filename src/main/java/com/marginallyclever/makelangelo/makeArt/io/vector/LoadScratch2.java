@@ -65,7 +65,7 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		logger.debug("{}...", Translator.get("FileTypeSB2"));
+		logger.debug("Loading...");
 
 		turtle = new Turtle();
 		
