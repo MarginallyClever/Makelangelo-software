@@ -706,19 +706,9 @@
 		<hint>panel title</hint>
 	</string>
 	<string>
-		<key>PlotterControls.FatalErrorTitle</key>
-		<value>Fatal Error</value>
-		<hint>panel title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.FatalError</key>
-		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
+		<key>PlotterControls.Error</key>
+		<value>The printer encountered an error, check the MarlinInterface tab to get details.</value>
 		<hint>text</hint>
-	</string>
-	<string>
-		<key>PlotterControls.InfoTitle</key>
-		<value>Information</value>
-		<hint>panel title</hint>
 	</string>
 	<string>
 		<key>PlotterControls.HomeXYFirst</key>
@@ -1231,6 +1221,11 @@
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
+		<key>penDiameter</key>
+		<value>Pen diameter</value>
+		<hint>Fill page generator</hint>
+	</string>
+	<string>
 		<key>LSystemBranches</key>
 		<value>Branches</value>
 		<hint>LSystem generator</hint>
@@ -1245,6 +1240,32 @@
 		<value>Angle span</value>
 		<hint>LSystem generator</hint>
 	</string>
+	<string>
+		<key>LSystemNoise</key>
+		<value>Noise</value>
+		<hint>LSystem generator</hint>
+	</string>
+	<string>
+		<key>Size</key>
+		<value>Size</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Flap</key>
+		<value>Flap</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Model</key>
+		<value>Model</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Length</key>
+		<value>Length</value>
+		<hint>Package generator</hint>
+	</string>
+
 	<string>
 		<key>MazeName</key>
 		<value>Maze</value>
@@ -2105,6 +2126,22 @@
 	<string>
 		<key>PlotterSettings.minimumPlannerSpeed</key>
 		<value>Min Planner Speed</value>
+	</string>
+
+	<string>
+		<key>QuestionTitle</key>
+		<value>Question</value>
+		<hint>Dialog</hint>
+	</string>
+	<string>
+		<key>InfoTitle</key>
+		<value>Information</value>
+		<hint>Dialog</hint>
+	</string>
+	<string>
+		<key>ErrorTitle</key>
+		<value>Error</value>
+		<hint>Dialog</hint>
 	</string>
 
 </language>

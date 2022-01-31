@@ -386,7 +386,7 @@ public final class Makelangelo {
 			save.run(myTurtle, myPlotter, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("SaveError"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -395,7 +395,7 @@ public final class Makelangelo {
 		int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(myTurtle));
 		String timeAsString = StringHelper.getElapsedTime(estimatedSeconds);
 		String message = Translator.get("EstimatedTimeIs",new String[]{timeAsString});
-		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("RobotMenu.GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void openPlotterControls() {
@@ -583,7 +583,7 @@ public final class Makelangelo {
 			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("LoadError"), JOptionPane.ERROR_MESSAGE);
 			recentFiles.removeFilename(filename);
 		}
 	}
@@ -979,7 +979,7 @@ public final class Makelangelo {
 			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while saving the vector file", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("SaveError"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

@@ -96,7 +96,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 			previousFile = filename;
 		} catch(Exception e) {
 			logger.error("Failed to load {}", filename, e);
-			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
