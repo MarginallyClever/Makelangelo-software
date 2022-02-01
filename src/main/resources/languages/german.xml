@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language>
-	<meta>
+<language>    
+     <!--
+     
+<?xml version="1.0" encoding="UTF-8"?>    
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+
+    -->	
+        <meta>
 		<name>Deutsch</name>
 		<author>Chris Tarantl (chris@tarantl.com)</author>
 	</meta>
@@ -261,17 +267,6 @@
 		<value>Beschleunigung</value>
 		<hint>machine size control panel</hint>
 	</string>
-
-	<string>
-		<key>Left</key>
-		<value>Links</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>Rechts</value>
-		<hint>used in many places</hint>
-	</string>
 	<string>
 		<key>Millimeters</key>
 		<value>mm</value>
@@ -387,13 +382,6 @@
 		<value>Öffne </value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
-
-	<string>
-		<key>Open</key>
-		<value>Datei öffnen </value>
-		<hint></hint>
-	</string>
-
 	<string>
 		<key>UnknownFileType</key>
 		<value>Unbekannter Dateityp</value>
@@ -516,12 +504,6 @@
 		<key>GFXPreferences.showAllWhileDrawing</key>
 		<value>Zeige gesamtes Bild während dem Zeichnen</value>
 		<hint>graphics settings dialog</hint>
-	</string>
-
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>Zurücksetzen</value>
-		<hint>Preferences menu</hint>
 	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
@@ -859,11 +841,6 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSaveFile</key>
-		<value>Speichern</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
 		<key>PlotterControls.Step</key>
 		<value>Schritt</value>
 		<hint>menu or dialog title</hint>
@@ -991,11 +968,6 @@
 	<string>
 		<key>spraypaintToolLiftSpeed</key>
 		<value>Aus/Ein Geschwindigkeit</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolTest</key>
-		<value>Zeichne Punkt</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 
@@ -1313,18 +1285,6 @@
 		<value>Einstellungen zurücksetzen</value>
 		<hint>Preferences menu</hint>
 	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>Protokoll</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>Papiergröße</value>
-		<hint>machine size control panel</hint>
-	</string>
-
 	<string>
 		<key>ServoLengthNeeded</key>
 		<value>Servokabellänge:</value>
@@ -1837,12 +1797,6 @@
 		<hint>FirmwareUpdate action</hint>
 	</string>
 	<string>
-		<key>NotConnected</key>
-		<value>Nicht verbunden</value>
-		<hint>Network session information</hint>
-	</string>
-
-	<string>
 		<key>MenuPaper</key>
 		<value>Papier</value>
 		<hint></hint>
@@ -1852,14 +1806,7 @@
 		<key>OpenPaperSettings</key>
 		<value>Öffne Einstellungen</value>
 		<hint></hint>
-	</string>
-	
-	<string>
-		<key>FileTypeImage</key>
-		<value>Bild</value>
-		<hint>load file dialog</hint>
-	</string>
-	
+	</string>	
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>
