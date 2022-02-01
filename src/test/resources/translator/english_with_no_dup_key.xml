@@ -3,20 +3,20 @@
   SYSTEM "language_v0.dtd">
 <language>
 	<meta>
-		<name>English</name>
-		<author>Dan Royer (dan@marginallyclever.com)</author>
+		<name>English_NO_DUP</name>
+		<author>TEST_SET_NO_DUP_KEY</author>
 	</meta>
 
 	<string>
 		<key>KEY_A</key>
-		<value>Outline paper</value>
-		<hint>Border generator</hint>
+		<value>...</value>
+                <hint></hint>
 	</string>
 
 	<string>
 		<key>KEY_B</key>
-		<value>Outline paper</value>
-		<hint>Border generator</hint>
+		<value>...</value>
+                <hint></hint>
 	</string>
 
 	<string>
