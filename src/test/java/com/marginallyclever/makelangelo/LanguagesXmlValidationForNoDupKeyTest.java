@@ -20,24 +20,12 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-/**
- *
- *
- */
-public class LanguagesXmlValidationForNoDupplicatedKey {
+public class LanguagesXmlValidationForNoDupKeyTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(LanguagesXmlValidationForNoDupplicatedKey.class);
+    private static final Logger logger = LoggerFactory.getLogger(LanguagesXmlValidationForNoDupKeyTest.class);
     
-    /**
-     * A (in ressourcess) path to the xsd schema used to validate the language .xml files.
-     */
     public final static String ressourceStringForXmlShemaFile = "/translator/language_no_dup_key.xsd";
-	
-    
-    /**
-     * 
-     * @throws IOException 
-     */
+	    
     @Test
     public void validateLaguagesXmlFiles() throws IOException {
 
@@ -46,7 +34,7 @@ public class LanguagesXmlValidationForNoDupplicatedKey {
 	
 	// Pre requi	
 //	//URL schemaFile = new File("src/test/resources/translator/language_no_dup_key.xsd").toURI().toURL();
-	URL schemaFile = LanguagesXmlValidationForNoDupplicatedKey.class.getResource(ressourceStringForXmlShemaFile);
+	URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(ressourceStringForXmlShemaFile);
 	
 	//  Pre requi schema xsd file
 	assertNotNull(schemaFile,"The test need a redable schema xsd file ("+ressourceStringForXmlShemaFile+") to validate the language files");

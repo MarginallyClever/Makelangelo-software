@@ -24,12 +24,11 @@
                             <xs:element type="stringNotEmpty" name="value"/>
                             <xs:element type="xs:string" name="hint" minOccurs="0"/>
                         </xs:sequence>
-                        <xs:attribute name="id" type="xs:string" /> <!--default="EN" use="required" -->
                     </xs:complexType>
                    
                 </xs:element>
             </xs:sequence>
-            <xs:attribute name="lang" type="xs:string" default="EN"/> <!-- use="required" -->
+            <xs:attribute name="lang" type="xs:string" /> <!-- todo for a v2 ? default="EN" use="required" -->
         </xs:complexType>
         
         <xs:unique name="string_key_unique">
@@ -42,35 +41,10 @@
     <xs:simpleType name="stringNotEmpty">
         <xs:restriction base="xs:string">
             <xs:pattern value="(\n|.)+" />
-            <!-- 
-           error on CDATA with :
-            <xs:pattern value=".+" />
-             (as CDATA have been converted by the pre xml processor ? ther is non way to identifiy if or not a CDATA but )
-           due to the fact that CDATA can containe \n
-           <xs:pattern value="(\n|.)+" />
-           or add
-            <xs:whiteSpace value="collapse"/>            
-            -->
         </xs:restriction>
     </xs:simpleType>
   
   
-    <!--
-    Restriction 
-    https://www.w3schools.com/xml/schema_facets.asp
-    
-    
-        <xs:whiteSpace value="preserve"/>
-        vs
-        <xs:whiteSpace value="replace"/>
-        vs
-        
-        <xs:whiteSpace value="collapse"/>
-    
-    <xs:simpleType name="httpURI">
-        <xs:restriction base="xs:anyURI">
-            <xs:pattern value="http://.*" />
-        </xs:restriction>
-    </xs:simpleType>
+    <!-- https://www.w3schools.com/xml/schema_facets.asp
     -->
 </xs:schema>
