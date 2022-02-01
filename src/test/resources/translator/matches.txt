@@ -1,0 +1,8 @@
+.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
+JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
+		tabbedPane.addTab(Translator.get("unknownKey"), programInterface);
+
+		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT);
+		collapsiblePanel.add(tabbedPane);
+//		st = Translator.get("unknownKeyInAComment") + " - ";
