@@ -52,13 +52,17 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 	    }
 	});
 
+	StringBuilder sb = new StringBuilder();
 	if (!xmlFilesWithValidationDefect.isEmpty()) {
 	    logger.info("invalide with " + ressourceStringForXmlShemaFile + " :");
 	    for (String result : xmlFilesWithValidationDefect) {
+		sb.append("  ");
+		sb.append(result);
+		sb.append("\n");
 		logger.info("  {}", result);
 	    }
 	}
-	assertEquals(0, xmlFilesWithValidationDefect.size(), "Some language xml file do not validate with language.xsd, see previous logs for details");
+	assertEquals(0, xmlFilesWithValidationDefect.size(), "Some language xml file do not validate with " + ressourceStringForXmlShemaFile + "\n"+sb.toString()+", see previous logs for details");
     }
 
     @Test
