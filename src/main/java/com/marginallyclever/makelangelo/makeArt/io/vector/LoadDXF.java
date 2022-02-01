@@ -125,7 +125,7 @@ public class LoadDXF implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		logger.debug("{}...", Translator.get("FileTypeDXF2"));
+		logger.debug("Loading...");
 
 		// Read in the DXF file
 		parser.parse(in, DXFParser.DEFAULT_ENCODING);

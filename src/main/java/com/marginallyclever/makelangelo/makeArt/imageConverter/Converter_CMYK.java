@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Converter_CMYK extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK.class);
-	static protected int passes=1;
+	static protected int passes=1;// passes value have to be >=1.
 	// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 	// Lift the pen any time the color value is > cutoff
 	
@@ -34,9 +34,12 @@ public class Converter_CMYK extends ImageConverter {
 		return passes;
 	}
 	
+	/**
+	 * Passing a value lower than 1 set passes value to 1.
+	 * @param value 
+	 */
 	public void setPasses(int value) {
-		if(passes<1) passes=1;
-		passes=value;
+		passes = Math.max(1, value);
 	}
 	
 	/**
@@ -66,7 +69,7 @@ public class Converter_CMYK extends ImageConverter {
 		turtle.setColor(newColor);
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = (double)passes/2.0;
+		double stepSize = passes/2.0;
 
 		// from top to bottom of the margin area...
 		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
@@ -107,21 +110,3 @@ public class Converter_CMYK extends ImageConverter {
 		}
 	}
 }
-
-
-/**
- * This file is part of Makelangelo.
- * <p>
- * Makelangelo is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * Makelangelo is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with Makelangelo.  If not, see <http://www.gnu.org/licenses/>.
- */

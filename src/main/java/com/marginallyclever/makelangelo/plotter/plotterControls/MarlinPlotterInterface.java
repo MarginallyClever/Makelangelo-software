@@ -33,6 +33,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		plotter.addPlotterEventListener(this::onPlotterEvent);
 	}
 
+	public void stopListeningToPlotter() {
+		myPlotter.removePlotterEventListener(this::onPlotterEvent);
+	}
+
 	private void onPlotterEvent(PlotterEvent e) {
 		switch (e.type) {
 		case PlotterEvent.HOME_FOUND:
@@ -61,6 +65,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendToolChange(int toolNumber) {
+		queueAndSendCommand(MarlinPlotterInterface.getPenUpString(myPlotter));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 

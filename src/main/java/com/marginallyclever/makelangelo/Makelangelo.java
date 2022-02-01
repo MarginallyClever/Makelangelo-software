@@ -387,7 +387,7 @@ public final class Makelangelo {
 			save.run(myTurtle, myPlotter, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -396,7 +396,7 @@ public final class Makelangelo {
 		int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(myTurtle));
 		String timeAsString = StringHelper.getElapsedTime(estimatedSeconds);
 		String message = Translator.get("EstimatedTimeIs",new String[]{timeAsString});
-		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("RobotMenu.GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void openPlotterControls() {
@@ -412,9 +412,8 @@ public final class Makelangelo {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				plotterControls.onDialogClosing();
 				enableMenuBar(true);
-				// make sure to close the connection when the dialog is closed.
-				plotterControls.closeConnection();
 			}
 		});
 
@@ -588,7 +587,7 @@ public final class Makelangelo {
 			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			recentFiles.removeFilename(filename);
 		}
 	}
@@ -659,15 +658,19 @@ public final class Makelangelo {
 			}
 		});
 		menu.add(buttonForums);
-		
-		JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-		buttonAbout.addActionListener((e) -> {
-			DialogAbout a = new DialogAbout();
-			a.display(mainFrame,VERSION);
-		});
-		menu.add(buttonAbout);
+
+		if (!isMacOS) {
+			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
+			buttonAbout.addActionListener((e) -> onDialogButton());
+			menu.add(buttonAbout);
+		}
 
 		return menu;
+	}
+
+	private void onDialogButton() {
+		DialogAbout a = new DialogAbout();
+		a.display(mainFrame,VERSION);
 	}
 
 	private void runLogPanel() {
@@ -822,6 +825,22 @@ public final class Makelangelo {
 		openFileChooser.setOpenListener(this::openFile);
 
 		loadPaths();
+
+		if (Desktop.isDesktopSupported()) {
+			Desktop desktop = Desktop.getDesktop();
+			if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+				desktop.setQuitHandler((evt, res) -> {
+					if (onClosing()) {
+						res.performQuit();
+					} else {
+						res.cancelQuit();
+					}
+				});
+			}
+			if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
+				desktop.setAboutHandler((e) -> onDialogButton());
+			}
+		}
 	}
 	
 	private void setupDropTarget() {
@@ -918,7 +937,7 @@ public final class Makelangelo {
 		});
 	}
 
-	private void onClosing() {
+	private boolean onClosing() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
@@ -938,7 +957,9 @@ public final class Makelangelo {
 				previewPanel.stop();
 				mainFrame.dispose();
 			}).start();
+			return true;
 		}
+		return false;
 	}
 	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
@@ -965,7 +986,7 @@ public final class Makelangelo {
 			saveDialog.run(myTurtle, mainFrame);
 		} catch(Exception e) {
 			logger.error("Error while saving the vector file", e);
-			JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

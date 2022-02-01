@@ -29,16 +29,16 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
+	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
 	public static final int DIMENSION_PANEL_HEIGHT = 220;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
 
-	private static final long serialVersionUID = -1201865024705737250L;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;
-	private final MarlinInterface marlinInterface;
+	private final MarlinPlotterInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
 
@@ -68,7 +68,7 @@ public class PlotterControls extends JPanel {
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
 
-		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT);
+		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT, true);
 		collapsiblePanel.add(tabbedPane);
 
 		this.setLayout(new BorderLayout());
@@ -90,11 +90,11 @@ public class PlotterControls extends JPanel {
 		case MarlinInterface.IDLE ->
 				{ if (isRunning) step(); }
 		case MarlinInterface.ERROR ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.FatalError"), Translator.get("PlotterControls.FatalErrorTitle"),  JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.Error"), Translator.get("ErrorTitle"),  JOptionPane.ERROR_MESSAGE);
 		case MarlinInterface.HOME_XY_FIRST ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("PlotterControls.InfoTitle"), JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		case MarlinInterface.DID_NOT_FIND ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("PlotterControls.FatalErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 		updateProgressBar();
 	}
@@ -266,8 +266,14 @@ public class PlotterControls extends JPanel {
 		return x;
 	}
 
-	public void closeConnection() {
+	/**
+	 * Called from windowAdapter::windowClosing() to clean up resources.
+	 */
+	public void onDialogClosing() {
+		// make sure to close the connection when the dialog is closed.
 		chooseConnection.closeConnection();
+		// make sure to unregister listeners
+		marlinInterface.stopListeningToPlotter();
 	}
 
 	// TEST
@@ -285,5 +291,4 @@ public class PlotterControls extends JPanel {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 }
