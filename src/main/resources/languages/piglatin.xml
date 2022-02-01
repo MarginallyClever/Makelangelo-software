@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+
+<!--
+    
+<?xml version="1.0" encoding="UTF-8"?>    
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+
+-->
 	<meta>
 		<name>Pig Latin</name>
 		<author>Edmonds Librarian</author>
@@ -346,16 +353,6 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>Left</key>
-		<value>eftLay</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>ightRay</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
 		<key>JogInterface.PenUp</key>
 		<value>enPay upyay</value>
 		<hint>manual driving dialog</hint>
@@ -661,12 +658,6 @@ to check yourself.</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolTest</key>
-		<value>akeMay ayay otday</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-
-	<string>
 		<key>voronoiStipplingName</key>
 		<value>oronoiVay ipplesstay</value>
 		<hint>voronoi stippling generator</hint>
@@ -894,22 +885,6 @@ to check yourself.</value>
 		<key>configureMachine</key>
 		<value>ettingsSay</value>
 		<hint>open machine settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>esetRay eferencesPray</value>
-		<hint>Preferences menu</hint>
-	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>ogLay</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	
-	<string>
-		<key>PaperSize</key>
-		<value>aperPay izeSay</value>
-		<hint>machine size control panel</hint>
 	</string>
 	
 </language>
