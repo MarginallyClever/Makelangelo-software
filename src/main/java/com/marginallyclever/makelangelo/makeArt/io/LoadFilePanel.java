@@ -36,8 +36,6 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private JPanel mySubPanel = new JPanel();
 	private OpenFileChooser openFileChooser;
 
-	private String previousFile="";
-
 	public LoadFilePanel(Paper paper,String filename) {
 		super();
 		myPaper = paper;
@@ -61,9 +59,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		return panel;
 	}
 
-	public void load(String filename) {
+	public boolean load(String filename) {
 		try {
-			if(ConvertImagePanel.isFilenameForAnImage(filename)) {
+			if (ConvertImagePanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
 				myConvertImage = new ConvertImagePanel(myPaper,image);
@@ -72,6 +70,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				
 				mySubPanel.add(myConvertImage);
 				mySubPreviewListener = myConvertImage;
+				return true;
 			} else {
 				Turtle t = TurtleFactory.load(filename);
 				// by popular demand, resize turtle to fit paper
@@ -80,11 +79,11 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				
 				notifyListeners(new ActionEvent(t,0,"turtle"));
 			}
-			previousFile = filename;
 		} catch(Exception e) {
 			logger.error("Failed to load {}", filename, e);
 			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
+		return false;
 	}
 
 	@Override
@@ -107,10 +106,6 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		for( ActionListener a : listeners ) {
 			a.actionPerformed(e);
 		}
-	}
-
-	public String getLastFileIn() {
-		return previousFile;
 	}
 
 	// TEST

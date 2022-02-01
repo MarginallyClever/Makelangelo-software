@@ -63,6 +63,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -563,28 +564,33 @@ public final class Makelangelo {
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
-			previewPanel.addListener(loader);
-			if (filename!=null && !filename.trim().isEmpty() ) {
-				loader.load(filename);
+
+			if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
+
+			if (loader.load(filename)) {
+
+				previewPanel.addListener(loader);
+
+				JDialog dialog = new JDialog(mainFrame, Translator.get("LoadFilePanel.title"));
+				dialog.add(loader);
+				dialog.setLocationRelativeTo(mainFrame);
+				dialog.setMinimumSize(new Dimension(500,500));
+				dialog.pack();
+
+				enableMenuBar(false);
+				dialog.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						enableMenuBar(true);
+						previewPanel.removeListener(loader);
+						recentFiles.addFilename(filename);
+					}
+				});
+
+				dialog.setVisible(true);
+			} else {
+				recentFiles.addFilename(filename);
 			}
-			
-			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
-			dialog.add(loader);
-			dialog.setLocationRelativeTo(mainFrame);
-			dialog.setMinimumSize(new Dimension(500,500));
-			dialog.pack();
-
-			enableMenuBar(false);
-			dialog.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					enableMenuBar(true);
-					previewPanel.removeListener(loader);
-					recentFiles.addFilename(loader.getLastFileIn());
-				}
-			});
-
-			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);

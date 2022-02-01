@@ -34,7 +34,7 @@ public class TurtleFactory {
 				return result;
 			}
 		}
-		throw new Exception("TurtleFactory could not load '"+filename+"'.");
+		throw new IllegalStateException("TurtleFactory could not load '"+filename+"'.");
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {
