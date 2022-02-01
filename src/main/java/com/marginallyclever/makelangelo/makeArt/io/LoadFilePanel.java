@@ -67,7 +67,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				myConvertImage = new ConvertImagePanel(myPaper,image);
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
-				
+				mySubPanel.removeAll();
 				mySubPanel.add(myConvertImage);
 				mySubPreviewListener = myConvertImage;
 				return true;
