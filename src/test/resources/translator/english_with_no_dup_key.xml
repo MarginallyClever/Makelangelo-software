@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language
+  SYSTEM "language_v0.dtd">
+<language>
+	<meta>
+		<name>English</name>
+		<author>Dan Royer (dan@marginallyclever.com)</author>
+	</meta>
+
+	<string>
+		<key>KEY_A</key>
+		<value>Outline paper</value>
+		<hint>Border generator</hint>
+	</string>
+
+	<string>
+		<key>KEY_B</key>
+		<value>Outline paper</value>
+		<hint>Border generator</hint>
+	</string>
+
+	<string>
+		<key>BorderName</key>
+		<value>Outline paper</value>
+		<hint>Border generator</hint>
+	</string>
+
+	<string>
+		<key>LissajousName</key>
+		<value>Lissajous</value>
+		<hint>Lissajous generator</hint>
+	</string>
+</language>
