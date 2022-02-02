@@ -775,10 +775,6 @@ public final class Makelangelo {
 	        labelRangeMax.setText(Integer.toString(top));
 		});
 		
-		Dimension d = labelRangeMin.getPreferredSize();
-		d.width=50;
-		labelRangeMin.setPreferredSize(d);
-		labelRangeMax.setPreferredSize(d);
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
 		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
