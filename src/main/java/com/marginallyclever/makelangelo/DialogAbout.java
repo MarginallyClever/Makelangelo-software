@@ -30,17 +30,6 @@ public class DialogAbout {
 	}
 
 	/**
-	 * <p>
-	 * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
-	 * representing the About Message Dialog's HTML.
-	 * </p>
-	 * <p>
-	 * <p>
-	 * The summation of {@link String#length()} for each of the respective values retrieved with the
-	 * {@code "AboutHTMLBeforeVersionNumber"}, and {@code "AboutHTMLAfterVersionNumber"} {@link Translator} keys,
-	 * in conjunction with {@link Makelangelo#VERSION} is calculated for use with {@link java.lang.StringBuilder#StringBuilder(int)}.
-	 * </p>
-	 *
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString() {

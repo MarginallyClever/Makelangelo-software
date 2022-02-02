@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
@@ -35,6 +36,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private PreviewListener mySubPreviewListener;
 	private JPanel mySubPanel = new JPanel();
 	private OpenFileChooser openFileChooser;
+	private JDialog parent;
 
 	public LoadFilePanel(Paper paper,String filename) {
 		super();
@@ -64,7 +66,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 			if (ConvertImagePanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
-				myConvertImage = new ConvertImagePanel(myPaper,image);
+				myConvertImage = new ConvertImagePanel(myPaper, image);
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
 				mySubPanel.removeAll();
@@ -78,6 +80,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				t = resize.run(t);
 				
 				notifyListeners(new ActionEvent(t,0,"turtle"));
+				if (parent != null) {
+					parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
+				}
 			}
 		} catch(Exception e) {
 			logger.error("Failed to load {}", filename, e);
@@ -120,5 +125,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		frame.add(new LoadFilePanel(new Paper(),""));
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	public void setParent(JDialog parent) {
+		this.parent = parent;
 	}
 }
