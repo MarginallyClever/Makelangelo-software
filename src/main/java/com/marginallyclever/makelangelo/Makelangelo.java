@@ -13,6 +13,7 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.*;
+import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
@@ -62,6 +63,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -118,6 +120,7 @@ public final class Makelangelo {
 	private SaveDialog saveDialog = new SaveDialog();
 	
 	private RecentFiles recentFiles;
+	private OpenFileChooser openFileChooser;
 
 	// drag files into the app with {@link DropTarget}
 	@SuppressWarnings("unused")
@@ -139,7 +142,6 @@ public final class Makelangelo {
 			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
 		}
 
-		loadPaths();
 		startRobot();
 		
 		logger.debug("Starting virtual camera...");
@@ -515,11 +517,11 @@ public final class Makelangelo {
 		menu.add(buttonNewFile);
 
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
-		buttonOpenFile.addActionListener((e) -> openLoadFile(""));
+		buttonOpenFile.addActionListener((e) -> openLoadFile());
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
-		recentFiles.addSubmenuListener((e)-> openLoadFile(((JMenuItem)e.getSource()).getText()));
+		recentFiles.addSubmenuListener((e)-> openFile(((JMenuItem)e.getSource()).getText()));
 		menu.add(recentFiles);		
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
@@ -553,33 +555,42 @@ public final class Makelangelo {
 		return menu;
 	}
 
-	public void openLoadFile(String filename) {
-		logger.debug("Loading file {}...", filename);
+	public void openLoadFile() {
+		logger.debug("Open file...");
+		openFileChooser.chooseFile();
+	}
+
+	public void openFile(String filename) {
 		try {
 			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
-			previewPanel.addListener(loader);
-			if(filename!=null && !filename.trim().isEmpty() ) {
-				loader.load(filename);
+
+			if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
+
+			if (loader.load(filename)) {
+
+				previewPanel.addListener(loader);
+				JDialog dialog = new JDialog(mainFrame, Translator.get("LoadFilePanel.title"));
+				dialog.add(loader);
+				dialog.setLocationRelativeTo(mainFrame);
+				dialog.setMinimumSize(new Dimension(500,500));
+				dialog.pack();
+				loader.setParent(dialog);
+
+				enableMenuBar(false);
+				dialog.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						enableMenuBar(true);
+						previewPanel.removeListener(loader);
+						recentFiles.addFilename(filename);
+					}
+				});
+
+				dialog.setVisible(true);
+			} else {
+				recentFiles.addFilename(filename);
 			}
-			
-			JDialog dialog = new JDialog(mainFrame,LoadFilePanel.class.getSimpleName());
-			dialog.add(loader);
-			dialog.setLocationRelativeTo(mainFrame);
-			dialog.setMinimumSize(new Dimension(500,500));
-			dialog.pack();
-
-			enableMenuBar(false);
-			dialog.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					enableMenuBar(true);
-					previewPanel.removeListener(loader);
-					recentFiles.addFilename(loader.getLastFileIn());
-				}
-			});
-
-			dialog.setVisible(true);
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -812,6 +823,11 @@ public final class Makelangelo {
 
 		setupDropTarget();
 
+		openFileChooser = new OpenFileChooser(mainFrame);
+		openFileChooser.setOpenListener(this::openFile);
+
+		loadPaths();
+
 		if (Desktop.isDesktopSupported()) {
 			Desktop desktop = Desktop.getDesktop();
 			if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
@@ -847,7 +863,7 @@ public final class Makelangelo {
 			        			if( list.size()>0 ) {
 			        				o = list.get(0);
 			        				if( o instanceof File ) {
-			        					openLoadFile(((File)o).getAbsolutePath());
+			        					openFile(((File)o).getAbsolutePath());
 						        		dtde.dropComplete(true);
 			        					return;
 			        				}
@@ -956,7 +972,6 @@ public final class Makelangelo {
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
-		preferences.put(PREFERENCE_LOAD_PATH, LoadFilePanel.getLastPath() );
 	}
 
 	/**
@@ -965,7 +980,6 @@ public final class Makelangelo {
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
-		LoadFilePanel.setLastPath( preferences.get(PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory() ) );
 	}
 
 	private void saveFile() {

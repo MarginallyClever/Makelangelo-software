@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language>    
+<language>
      <!--
-     
-<?xml version="1.0" encoding="UTF-8"?>    
+
+<?xml version="1.0" encoding="UTF-8"?>
 <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
 
-    -->	
+    -->
         <meta>
 		<name>Deutsch</name>
 		<author>Chris Tarantl (chris@tarantl.com)</author>
@@ -394,8 +394,13 @@
 	</string>
 
 	<string>
-		<key>FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Bild (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string><!-- translation value to review-->
+		<key>OpenFileChooser.AllSupportedFiles</key>
+		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -1806,7 +1811,8 @@
 		<key>OpenPaperSettings</key>
 		<value>Öffne Einstellungen</value>
 		<hint></hint>
-	</string>	
+	</string>
+
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>

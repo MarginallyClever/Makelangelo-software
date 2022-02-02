@@ -2,14 +2,14 @@
 <!DOCTYPE language>
 <language>
 
-<!-- 
+<!--
     To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
     please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
         and change the begining of the file with :
-        
+
 <?xml version="1.0" encoding="UTF-8"?>
 <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-        
+
 -->
 	<meta>
 		<name>English</name>
@@ -175,6 +175,11 @@
 		<hint>DXF load option</hint>
 	</string>
 
+	<string>
+		<key>LoadFilePanel.title</key>
+		<value>Load file preview</value>
+		<hint>Load file panel</hint>
+	</string>
 
 	<string>
 		<key>TempFolderLabel</key>
@@ -454,8 +459,13 @@
 	</string>
 
 	<string>
-		<key>FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Image (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>OpenFileChooser.AllSupportedFiles</key>
+		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -2005,6 +2015,7 @@
 		<value>Plotter settings</value>
 		<hint></hint>
 	</string>
+
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>
