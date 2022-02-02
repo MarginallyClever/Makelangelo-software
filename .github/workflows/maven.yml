@@ -28,9 +28,11 @@ jobs:
 
     - name: Prepare package for release
       run: |
-        mkdir target/package &&
-        ls &&
-        mv ./target/Makelangelo-*-with-dependencies.jar ./target/package/to-upload.jar
+        cp -r src/main/package/ target/package &&
+        cp CONTRIBUTING.md LICENSE README.md target/package/ &&
+        mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
+        cd target/package/ &&
+        zip Makelangelo.zip *
 
     - name: Debug
       run: ls target/package
@@ -39,7 +41,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifact
-        path: target/to-upload.jar
+        path: target/Makelangelo.zip
         retention-days: 5
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
