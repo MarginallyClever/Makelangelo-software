@@ -18,9 +18,15 @@ import java.util.ArrayList;
  * Button {@link ActionEvent}s are named for their button. Button are divided
  * into quadrants. In each quadrant, outside zones are lower numbers than inside
  * zones. Quadrants are numbered counter-clockwise, starting with eastern
- * quadrant.  So the zone 1 is the +100 east and zone 11 is the -1 south.
- * The center button is 12.
- * 
+ * quadrant.  So the zone 0 is the +100 east and zone 11 is the -1 south.
+ * The center button is 12. The outside is zone 0.
+ *       3
+ *       4
+ *       5
+ * 6 7 8 12  2 1 0
+ *       11
+ *       10    (-1)
+ *       9
  * @author Dan Royer
  * @since 7.28.0
  */
@@ -54,7 +60,7 @@ public class CartesianButtons extends JComponent {
 			public void mouseMoved(MouseEvent e) {
 				if (!isEnabled())
 					return;
-				// Log.message("moved");
+				// logger.debug("moved");
 				int zone = getZoneUnderPoint(e.getPoint());
 				if (highlightZone != zone) {
 					highlightZone = zone;
@@ -71,17 +77,17 @@ public class CartesianButtons extends JComponent {
 					return;
 				highlightZone = getZoneUnderPoint(e.getPoint());
 				highlightColor = getColorButtonSelect();
-				// Log.message("pressed");
+				// logger.debug("pressed");
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				highlightColor = getColorButtonHighlight();
-				// Log.message("released");
+				// logger.debug("released");
 				int zone = getZoneUnderPoint(e.getPoint());
-				if (highlightZone == zone) {
-					// Log.message("clicked zone "+zone);
+				if(zone!=-1 && highlightZone == zone) {
+					// logger.debug("clicked zone {}",zone);
 					notifyActionListeners(new ActionEvent(this, zone, "clicked"));
 				}
 				highlightZone = -1;
@@ -195,25 +201,25 @@ public class CartesianButtons extends JComponent {
 	 * @param p
 	 * @return The zone under point p. in each quadrant, outside zones are lower
 	 *         numbers than inside zones. Quadrants are numbered counter-clockwise,
-	 *         starting with eastern quadrant.
+	 *         starting with eastern quadrant.  Outer buttons have a lower index than inner buttons.
 	 */
 	private int getZoneUnderPoint(Point p) {
 		Rectangle r = this.getBounds();
 		double dx = p.x - r.width / 2;
 		double dy = -(p.y - r.height / 2);
 		int len = (int) Math.sqrt(dx * dx + dy * dy);
-		if (len < centerRadius)
+		if (len >= centerRadius + buttonWidth*NUM_ZONES_PER_QUADRANT)
+			return -1;  // miss
+		if (len < centerRadius) 
 			return NUM_ZONES_PER_QUADRANT * 4;
 
 		double mouseAngle = (Math.toDegrees(Math.atan2(dy, dx) + Math.PI) + 180) % 360;
 		int quadrant = (int) ((mouseAngle + 45) / 90) % 4;
 		// 0 west 1 north 2 east 3 south
 		int zone = (int) ((len - centerRadius) / buttonWidth);
-		if (zone >= NUM_ZONES_PER_QUADRANT)
-			return -1; // miss
 		zone = NUM_ZONES_PER_QUADRANT - 1 - zone;
 
-		// Log.message(dx+"\t"+dy+"\t"+mouseAngle+"\t"+quadrant+"\t"+len);
+		// logger.debug("{}\t{}\t{}\t{}",dx,dy,mouseAngle,quadrant,len);
 
 		return quadrant * NUM_ZONES_PER_QUADRANT + zone;
 	}
