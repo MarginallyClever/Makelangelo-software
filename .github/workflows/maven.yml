@@ -27,11 +27,15 @@ jobs:
       run: ./mvnw -B clean package -DskipTests
 
     - name: Prepare package for release
+      shell: bash
       run: |
         cp -r src/main/package/ target/package &&
-        cp CONTRIBUTING.md LICENSE README.md target/package/ &&
+        cp CONTRIBUTING.md target/package/ &&
+        cp LICENSE target/package/ &&
+        cp README.md target/package/ &&
         mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
         cd target/package/ &&
+        version=$(sed "/makelangelo.version/s/.*=//" src/main/resources/makelangelo.properties) &&
         zip Makelangelo.zip *
 
     - name: Debug
