@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<language>
+
+<!-- 
+    To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
+    please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
+        and change the begining of the file with :
+        
+    <?xml version="1.0" encoding="UTF-8"?>
+    <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+        
+-->
+	<meta>
+		<name>English_DUP</name>
+		<author>TEST_SET_DUP_KEY</author>
+	</meta>
+
+	<string>
+		<key>BorderName</key>
+		<value>Outline paper</value>
+		<hint>Border generator</hint>
+	</string>
+
+	<string>
+		<key>LissajousName</key>
+		<value>Lissajous</value>
+		<hint>Lissajous generator</hint>
+	</string>
+	<string>
+		<key>KEY_A</key>
+		<value>...</value>
+                <hint></hint>
+	</string>
+	<string>
+		<key>KEY_A</key>
+		<value>...</value>
+                <hint></hint>
+	</string>
+	<string>
+		<key></key>
+		<value>...</value>
+		<hint></hint>
+	</string>
+
+	<string>
+		<key>KEY_B</key>
+		<value>...</value>
+                <hint></hint>
+	</string>
+	<string>
+		<key>KEY_B</key>
+		<value>...</value>
+                <hint></hint>
+	</string>
+	<string>
+		<key>KEY_C_DOUBLED_VALUE</key>
+		<value>...</value>
+		<value>...</value>
+                <hint></hint>
+	</string>
+</language>

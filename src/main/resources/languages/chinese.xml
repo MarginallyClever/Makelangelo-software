@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+
+    <!--
+    
+<?xml version="1.0" encoding="UTF-8"?>    
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+    
+    -->
 	<meta>
-		<name>Chinese</name>
+		<name>Chinese</name> <!-- zh-CN -->
 		<author>Kmimax(kmimax2016@gmail.com)</author>
 	</meta>
 
@@ -515,12 +522,6 @@
 		<value>绘图时显示整个图像</value>
 		<hint>graphics settings dialog</hint>
 	</string>
-
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>重启</value>
-		<hint>Preferences menu</hint>
-	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
 		<value>语言</value>
@@ -595,16 +596,6 @@
 	<string>
 		<key>Bottom</key>
 		<value>底部</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Left</key>
-		<value>左部</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>右部</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
@@ -951,12 +942,6 @@
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolTest</key>
-		<value>做一个点</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-
-	<string>
 		<key>SierpinskiTriangleName</key>
 		<value>Sierpinski三角形形</value>
 		<hint>name of generator</hint>
@@ -1263,18 +1248,6 @@
 		<value>重置首选项</value>
 		<hint>Preferences menu</hint>
 	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>日志</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>绘图纸尺寸</value>
-		<hint>machine size control panel</hint>
-	</string>
-
 	<string>
 		<key>ServoLengthNeeded</key>
 		<value>伺服电机线长:</value>

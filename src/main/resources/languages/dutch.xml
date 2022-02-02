@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language>
+<language>       
+    <!--
+
+<?xml version="1.0" encoding="UTF-8"?>    
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+
+    -->
 	<meta>
 		<name>Nederlands</name>
 		<author>Bart Derks (bderks@zeelandnet.nl)</author>
@@ -84,12 +90,12 @@
 	<string>
 		<key>Left</key>
 		<value>Links</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
 		<value>Rechts</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Millimeters</key>
@@ -332,16 +338,6 @@
 	<string>
 		<key>Bottom</key>
 		<value>Beneden</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Left</key>
-		<value>Links</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>Rechts</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
@@ -649,12 +645,6 @@
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolTest</key>
-		<value>Maak een stip</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-
-	<string>
 		<key>voronoiStipplingName</key>
 		<value>Voronoi stippels</value>
 		<hint>voronoi stippling generator</hint>
@@ -878,20 +868,5 @@
 		<value>Instellingen</value>
 		<hint>open machine settings dialog</hint>
 	</string>
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>Reset Instellingen</value>
-		<hint>Preferences menu</hint>
-	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	
-	<string>
-		<key>PaperSize</key>
-		<value>Papier Grootte</value>
-		<hint>machine size control panel</hint>
-	</string>
+        
 </language>
