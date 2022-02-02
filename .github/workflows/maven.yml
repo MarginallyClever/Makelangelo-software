@@ -27,7 +27,13 @@ jobs:
       run: ./mvnw -B clean package -DskipTests
 
     - name: Prepare package for release
-      run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
+      run: |
+        mkdir target/package &&
+        ls &&
+        mv ./target/Makelangelo-*-with-dependencies.jar ./target/package/to-upload.jar
+
+    - name: Debug
+      run: ls target/package
 
     - name: Upload artifact for release
       uses: actions/upload-artifact@v2
