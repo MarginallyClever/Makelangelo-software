@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+
+<!-- 
+    To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
+    please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
+        and change the begining of the file with :
+        
+<?xml version="1.0" encoding="UTF-8"?>
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+        
+-->
 	<meta>
 		<name>English</name>
 		<author>Dan Royer (dan@marginallyclever.com)</author>
@@ -310,12 +320,12 @@
 	<string>
 		<key>Left</key>
 		<value>Left</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
 		<value>Right</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Millimeters</key>
@@ -432,13 +442,6 @@
 		<value>Opening </value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
-
-	<string>
-		<key>Open</key>
-		<value>Open File dialog </value>
-		<hint></hint>
-	</string>
-
 	<string>
 		<key>UnknownFileType</key>
 		<value>Unknown file type</value>
@@ -562,12 +565,6 @@
 		<value>Show entire image while drawing</value>
 		<hint>graphics settings dialog</hint>
 	</string>
-
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>Reset</value>
-		<hint>Preferences menu</hint>
-	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
 		<value>Language</value>
@@ -637,7 +634,7 @@
 	<string>
 		<key>RobotMenu.GetTimeEstimate</key>
 		<value>Estimate time</value>
-		<hint>menu or dialog title</hint>
+		<hint>menu or dialog title, status message. ?keep the space at the end.</hint>
 	</string>
 
 	<string>
@@ -748,17 +745,6 @@
 		<value>Bottom</value>
 		<hint>manual driving dialog</hint>
 	</string>
-	<string>
-		<key>Left</key>
-		<value>Left</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>Right</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
 	<string>
 		<key>JogInterface.FindHome</key>
 		<value>Home</value>
@@ -995,18 +981,13 @@
 	<string>
 		<key>MenuSaveFile</key>
 		<value>Save File...</value>
-		<hint></hint>
+		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuReopenFile</key>
 		<value>Reopen last file</value>
 		<hint></hint>
-	</string>
-	<string>
-		<key>MenuSaveFile</key>
-		<value>Save</value>
-		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>PlotterControls.Step</key>
@@ -1019,13 +1000,6 @@
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
-
-	<string>
-		<key>NotConnected</key>
-		<value>Not Connected</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
 	<string>
 		<key>Halt</key>
 		<value>Halt</value>
@@ -1105,11 +1079,10 @@
 		<hint>Adjust pen tool</hint>
 	</string>
 
-
 	<string>
 		<key>spraypaintToolTest</key>
 		<value>Spraypaint</value>
-		<hint>Spraypaint tool</hint>
+		<hint>Spraypaint tool Make a dot</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDiameter</key>
@@ -1136,12 +1109,6 @@
 		<value>On/off speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
-	<string>
-		<key>spraypaintToolTest</key>
-		<value>Make a dot</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-
 	<string>
 		<key>SierpinskiTriangleName</key>
 		<value>Sierpinski triangle fractal</value>
@@ -1347,13 +1314,6 @@
 		<value>Estimated draw time: </value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
-
-	<string>
-		<key>RobotMenu.GetTimeEstimate</key>
-		<value>Estimate time</value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	
 	<string>
 		<key>EstimatedTimeIs</key>
 		<value>Estimated time is %1</value>
@@ -1487,18 +1447,6 @@
 		<value>Reset Preferences</value>
 		<hint>Preferences menu</hint>
 	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>Paper Size</value>
-		<hint>machine size control panel</hint>
-	</string>
-
 	<string>
 		<key>ServoLengthNeeded</key>
 		<value>Servo wire length:</value>
@@ -1905,19 +1853,6 @@
 		<value>Draw borders?</value>
 		<hint></hint>
 	</string>
-
-	<string>
-		<key>voronoiStipplingCellCount</key>
-		<value>Number of cells</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>voronoiStipplingDotMin</key>
-		<value>Min dot size</value>
-		<hint></hint>
-	</string>
-
 	<string>
 		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
@@ -2056,7 +1991,7 @@
 	<string>
 		<key>NotConnected</key>
 		<value>Not connected</value>
-		<hint>Network session information</hint>
+		<hint>Network session information, menu or dialog title</hint>
 	</string>
 
 	<string>
@@ -2070,13 +2005,6 @@
 		<value>Plotter settings</value>
 		<hint></hint>
 	</string>
-	
-	<string>
-		<key>FileTypeImage</key>
-		<value>Image</value>
-		<hint>load file dialog</hint>
-	</string>
-	
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>
