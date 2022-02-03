@@ -2,8 +2,8 @@ name: Java CI with Maven
 
 on:
   push:
-#    branches:
-#      - master
+    branches:
+      - master
   pull_request:
 
 jobs:
@@ -19,9 +19,9 @@ jobs:
         cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-#    - name: Build and Test with Maven
-#      timeout-minutes: 15
-#      run: ./mvnw -B test
+    - name: Build and Test with Maven
+      timeout-minutes: 15
+      run: ./mvnw -B test
 
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
@@ -35,10 +35,7 @@ jobs:
         cp README.md target/package/ &&
         mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
         cd target/package/ &&
-        zip Makelangelo.zip *
-
-    - name: Debug
-      run: ls target/package
+        7z a -tzip Makelangelo.zip .
 
     - name: Upload artifact for release
       uses: actions/upload-artifact@v2
