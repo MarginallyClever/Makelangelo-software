@@ -89,6 +89,9 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
+	
+	private static final String PREFERENCE_SAVE_PATH = "savePath";
+	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 
 	private static Logger logger;
 
@@ -964,10 +967,8 @@ public final class Makelangelo {
 		return false;
 	}
 	
-	private static final String PREFERENCE_SAVE_PATH = "savePath";
-	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 	/**
-	 * Use Preferences to store the last "save" and "load" dialog paths.
+	 * Use Preferences to store the last "save" dialog path.
 	 */
 	private void savePaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
@@ -975,7 +976,7 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * Use Preferences to recall the last "save" and "load" dialog paths.
+	 * Use Preferences to recall the last "save" dialog path.
 	 */
 	private void loadPaths() {
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
