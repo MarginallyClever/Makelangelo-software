@@ -374,11 +374,12 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/batik/batik-xml -->
+
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
 		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-all</artifactId>
-			<version>[1.14,)</version>
+		    <groupId>org.apache.xmlgraphics</groupId>
+		    <artifactId>batik-all</artifactId>
+		    <version>1.14</version>
 		</dependency>
 
 		<dependency>
