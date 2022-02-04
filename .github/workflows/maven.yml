@@ -27,13 +27,21 @@ jobs:
       run: ./mvnw -B clean package -DskipTests
 
     - name: Prepare package for release
-      run: mv ./target/Makelangelo-*-with-dependencies.jar ./target/to-upload.jar
+      shell: bash
+      run: |
+        cp -r src/main/package/ target/package &&
+        cp CONTRIBUTING.md target/package/ &&
+        cp LICENSE target/package/ &&
+        cp README.md target/package/ &&
+        mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
+        cd target/package/ &&
+        7z a -tzip Makelangelo.zip .
 
     - name: Upload artifact for release
       uses: actions/upload-artifact@v2
       with:
         name: artifact
-        path: target/to-upload.jar
+        path: target/package/Makelangelo.zip
         retention-days: 5
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
@@ -57,7 +65,7 @@ jobs:
         # in your browser and copy the full "upload_url" value including the {?name,label} part
         upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
         release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
-        asset_path: to-upload.jar # path to archive to upload
-        asset_name: makelangelo-nightly-$$.jar # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_path: Makelangelo.zip # path to archive to upload
+        asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
