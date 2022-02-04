@@ -3,7 +3,7 @@
     <meta>
         <name>Français (fr_FR)</name>
         <author>https://github.com/PPAC37</author>
-        <!-- draft v0.4 04/02/2022 -->
+        <!-- draft v0.4.1 04/02/2022 -->
     </meta>
     <string>
         <key>Left</key>
@@ -116,6 +116,9 @@
         <key>PlotterSettings.minSegTime</key>
         <value>Temps de segment minimum</value>
         <hint></hint>
+        <!--	"PlotterSettings.minSegTime"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 91
+        -->
     </string>
     <string>
         <key>voronoiStipplingName</key>
@@ -159,6 +162,9 @@
         <key>PlotterSettings.minSegmentLength</key>
         <value>Longueur minimale du segment</value>
         <hint></hint>
+        <!--	"PlotterSettings.minSegmentLength"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 90
+        -->
     </string>
     <string>
         <key>MenuAdjustTool</key>
@@ -244,6 +250,9 @@
         <key>MachineHeight</key>
         <value>Hauteur machine</value>
         <hint>[Machine settings]</hint>
+        <!--	"MachineHeight"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 74
+        -->
     </string>
     <string>
         <key>LoadError</key>
@@ -281,6 +290,9 @@
         <key>PlotterSettings.handleSmallSegments</key>
         <value>Gérer les petits segments</value>
         <hint></hint>
+        <!--	"PlotterSettings.handleSmallSegments"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 92
+        -->
     </string>
     <string>
         <key>SierpinskiTriangleName</key>
@@ -299,6 +311,9 @@
         <key>PlotterSettings.minAcceleration</key>
         <value>Accélération minimale</value>
         <hint></hint>
+        <!--	"PlotterSettings.minAcceleration"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 93
+        -->
     </string>
     <string>
         <key>Start</key>
@@ -564,6 +579,9 @@
         <key>Speed</key>
         <value>Vitesse:</value>
         <hint>[manual driving dialog]</hint>
+        <!--	"Speed"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 80
+        -->
     </string>
     <string>
         <key>OpenPlotterSettings</key>
@@ -690,6 +708,9 @@
         <key>penToolDiameter</key>
         <value>Diamètre</value>
         <hint>[Adjust pen tool]</hint>
+        <!--	"penToolDiameter"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 78
+        -->
     </string>
     <string>
         <key>InvertLeft</key>
@@ -801,6 +822,9 @@
         <key>penToolDown</key>
         <value>Bas</value>
         <hint>[Adjust pen tool]</hint>
+        <!--	"penToolDown"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 84
+        -->
     </string>
     <string>
         <key>PaperSettings.ShiftX</key>
@@ -905,6 +929,9 @@
         <key>penToolLiftSpeed</key>
         <value>Vitesse de lever</value>
         <hint>[Adjust pen tool]</hint>
+        <!--	"penToolLiftSpeed"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 82
+        -->
     </string>
     <string>
         <key>MenuGenerate</key>
@@ -1372,6 +1399,9 @@
         <key>PlotterSettings.segmentsPerSecond</key>
         <value>Segments par seconde</value>
         <hint></hint>
+        <!--	"PlotterSettings.segmentsPerSecond"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 89
+        -->
     </string>
     <string>
         <key>MenuPreferences</key>
@@ -1471,6 +1501,9 @@
         <key>pen up color</key>
         <value>Couleur vers le haut</value>
         <hint>[Pen settings]</hint>
+        <!--	"pen up color"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 86
+        -->
     </string>
     <string>
         <key>ChangeToolTitle</key>
@@ -1603,6 +1636,9 @@
         <key>PlotterSettings.blockBufferSize</key>
         <value>Taille du tampon de bloc</value>
         <hint></hint>
+        <!--	"PlotterSettings.blockBufferSize"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 88
+        -->
     </string>
     <string>
         <key>ConverterWanderName</key>
@@ -1695,6 +1731,9 @@
         <key>penToolUp</key>
         <value>Haut</value>
         <hint>[Adjust pen tool]</hint>
+        <!--	"penToolUp"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 83
+        -->
     </string>
     <string>
         <key>horizontal</key>
@@ -2068,6 +2107,9 @@
         <key>ServoLengthNeeded</key>
         <value>Longueur du câble servo :</value>
         <hint>[settings &gt; machine &gt; measurement calculations]</hint>
+        <!--	"ServoLengthNeeded"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 77
+        -->
     </string>
     <string>
         <key>ConversionStyle</key>
@@ -2110,6 +2152,9 @@
         <key>pen down color</key>
         <value>Couleur duvet</value>
         <hint>[Pen settings]</hint>
+        <!--	"pen down color"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 85
+        -->
     </string>
     <string>
         <key>ConvertImagePaperFill</key>
@@ -2150,6 +2195,9 @@
         <key>AdjustAcceleration</key>
         <value>Accélération</value>
         <hint>[machine size control panel]</hint>
+        <!--	"AdjustAcceleration"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 81
+        -->
     </string>
     <string>
         <key>CaptureImageTitle</key>
@@ -2228,6 +2276,9 @@
         <key>MachineWidth</key>
         <value>Largeur machine</value>
         <hint>[Machine settings]</hint>
+        <!--	"MachineWidth"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 73
+        -->
     </string>
     <string>
         <key>spraypaintToolTest</key>
@@ -2349,6 +2400,9 @@
         <key>PlotterSettings.minimumPlannerSpeed</key>
         <value>Vitesse minimale du planificateur</value>
         <hint></hint>
+        <!--	"PlotterSettings.minimumPlannerSpeed"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 94
+        -->
     </string>
     <string>
         <key>MenuConvertImage</key>
@@ -2476,6 +2530,9 @@
         <key>BeltLengthNeeded</key>
         <value>Longueur de la courroie de distribution (chacun):</value>
         <hint>[settings &gt; machine &gt; measurement calculations]</hint>
+        <!--	"BeltLengthNeeded"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 76
+        -->
     </string>
     <string>
         <key>penToolAdjust</key>
@@ -2491,6 +2548,9 @@
         <key>penToolMaxFeedRate</key>
         <value>vitesse maximale</value>
         <hint>[Adjust pen tool]</hint>
+        <!--	"penToolMaxFeedRate"
+                used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/settings/PlotterSettingsPanel.java" line 79
+        -->
     </string>
     <string>
         <key>MenuGCODE</key>
