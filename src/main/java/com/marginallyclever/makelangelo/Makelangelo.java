@@ -456,20 +456,20 @@ public final class Makelangelo {
 		menu.addSeparator();
 		
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
-		//a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift H" //shift should never been an accelerator key
+		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
-		//a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift V" //shift should never been an accelerator key
+		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl L"
 		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
 		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
 		
 		menu.addSeparator();
 		
 		TurtleModifierAction a1 = new SimplifyTurtleAction();
-		//a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift S" //shift should never been an accelerator key
+		a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl Y"
 		TurtleModifierAction a2 = new ReorderTurtleAction();
-		//a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift R" //shift should never been an accelerator key
+		a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl R"
 		TurtleModifierAction a3 = new InfillTurtleAction();
-		//a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift F" //shift should never been an accelerator key
+		a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl I"
 		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
 		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
 		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
@@ -652,7 +652,7 @@ public final class Makelangelo {
 		menu.add(buttonZoomToFit);
 
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
-		//checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift M" // shift should never been an accelerator key 
+		checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl M" 
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
 			GFXPreferences.setShowPenUp(!b);
