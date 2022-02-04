@@ -6,15 +6,14 @@ module com.marginallyclever.makelangelo {
 	requires org.json;
 	requires org.jetbrains.annotations;
 	requires org.slf4j;
+	requires jssc;
 	requires logback.core;
-
-	requires transitive jrpicam;
+	requires jrpicam;
+	requires kabeja;
+	requires vecmath;
+	requires batik.all;
+	requires xml.apis.ext;
 	requires transitive jogamp.fat;
-	requires transitive kabeja;
-	requires transitive jssc;
-	requires transitive vecmath;
-	requires transitive batik.all;
-	requires transitive xml.apis.ext;
 	
 	exports com.marginallyclever.makelangelo;
 	exports com.marginallyclever.makelangelo.turtle;
