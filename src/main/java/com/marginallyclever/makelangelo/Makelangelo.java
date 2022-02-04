@@ -91,7 +91,6 @@ public final class Makelangelo {
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
-	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 
 	private static Logger logger;
 
