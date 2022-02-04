@@ -269,7 +269,7 @@ public final class Makelangelo {
 		
 		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
 		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
-		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
+		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));//"ctrl P"
 		menu.add(bOpenPlotterSettings);
 		
 		return menu;
@@ -320,18 +320,18 @@ public final class Makelangelo {
 		menu.add(createRobotStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
-		bEstimate.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
+		bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));//"ctrl E"
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
 		JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
 		bSaveToSD.addActionListener((e)-> saveGCode());
-		bSaveToSD.setAccelerator(KeyStroke.getKeyStroke("ctrl G"));// or maybe "ctrl alt S"
+		bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));//"ctrl G" or maybe "ctrl alt S"
 		menu.add(bSaveToSD);
 
 		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
-		bOpenControls.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
+		bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));//"ctrl C"
 		menu.add(bOpenControls);
 
 		return menu;
@@ -456,20 +456,20 @@ public final class Makelangelo {
 		menu.addSeparator();
 		
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
-		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift H"));
+		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
-		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift V"));
+		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift V"
 		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
 		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
 		
 		menu.addSeparator();
 		
 		TurtleModifierAction a1 = new SimplifyTurtleAction();
-		a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift S"));
+		a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift S"
 		TurtleModifierAction a2 = new ReorderTurtleAction();
-		a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift R"));
+		a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift R"
 		TurtleModifierAction a3 = new InfillTurtleAction();
-		a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("shift F"));
+		a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift F"
 		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
 		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
 		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
@@ -529,12 +529,12 @@ public final class Makelangelo {
 
 		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener((e) -> newFile());
-		buttonNewFile.setAccelerator(KeyStroke.getKeyStroke("ctrl N"));
+		buttonNewFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));//"ctrl N"
 		menu.add(buttonNewFile);
 
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openLoadFile());
-		buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke("ctrl O"));
+		buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));//"ctrl O"
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
@@ -543,25 +543,19 @@ public final class Makelangelo {
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
-		buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
+		buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));//"ctrl S"
 		menu.add(buttonSaveFile);
 
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
 		buttonAdjustPreferences.addActionListener((e)-> myPreferencesPanel.run(mainFrame));
-		buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke("alt P"));
+		buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));//"alt P"
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
 		buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
 		menu.add(buttonFirmwareUpdate);
-		
-		/* // PPAC37 : moved in Help Menu.
-		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
-		menu.add(buttonCheckForUpdate);
-		*/
 
 		if (!isMacOS) {
 			menu.addSeparator();
@@ -571,7 +565,7 @@ public final class Makelangelo {
 				WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
 			});
-			buttonExit.setAccelerator(KeyStroke.getKeyStroke("ctrl Q"));
+			buttonExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));//"ctrl Q"
 			buttonExit.setMnemonic('q');
 			menu.add(buttonExit);
 		}
@@ -658,7 +652,7 @@ public final class Makelangelo {
 		menu.add(buttonZoomToFit);
 
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
-		checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke("shift M"));
+		checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.SHIFT_DOWN_MASK));//"shift M"
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
 			GFXPreferences.setShowPenUp(!b);
@@ -679,7 +673,7 @@ public final class Makelangelo {
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
 		buttonViewLog.addActionListener((e) -> runLogPanel());		 
-		buttonViewLog.setAccelerator(KeyStroke.getKeyStroke("ctrl L"));
+		buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));//"ctrl L"
 		menu.add(buttonViewLog);
 		
 		JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
