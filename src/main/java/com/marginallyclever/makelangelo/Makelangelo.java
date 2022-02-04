@@ -458,7 +458,7 @@ public final class Makelangelo {
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
 		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
-		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl L"
+		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl F"
 		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
 		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
 		
