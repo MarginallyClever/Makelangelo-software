@@ -571,8 +571,8 @@ public final class Makelangelo {
 				WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
 			});
-			buttonExit.setAccelerator(KeyStroke.getKeyStroke("alt F4"));//"ctrl Q"
-			//buttonExit.setMnemonic('q'); // too easy to hit by mistake
+			buttonExit.setAccelerator(KeyStroke.getKeyStroke("ctrl Q"));
+			buttonExit.setMnemonic('q');
 			menu.add(buttonExit);
 		}
 		return menu;
