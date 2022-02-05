@@ -2102,7 +2102,7 @@
     <string>
         <key>TurtleRenderFactory.BARBER_POLE</key>
         <value>Barber pole</value>
-        <hint></hint>
+        <hint>Barber pole (red white blue, stripes)</hint>
     </string>
     <string>
         <key>TurtleRenderFactory.SEPARATE_LOOP</key>
