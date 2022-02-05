@@ -2768,6 +2768,12 @@
         <value>Paramètres papier</value>
         <hint>Paper settings panel title</hint>
     </string>
+    <string>
+        <key>PlotterSettingsPanel.Title</key>
+        <value>Paramètres du traceur</value>
+        <hint>panel title</hint>
+    </string>
+
     
 <!--
     <string>

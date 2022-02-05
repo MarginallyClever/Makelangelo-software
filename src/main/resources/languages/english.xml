@@ -2087,6 +2087,12 @@
 		<value>Error</value>
 		<hint>Dialog</hint>
 	</string>
+    <string>
+        <key>PlotterSettingsPanel.Title</key>
+		<value>Plotter settings</value>
+        <hint>panel title</hint>
+    </string>
+
 
 
 <!--

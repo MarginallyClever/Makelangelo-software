@@ -275,7 +275,7 @@ public final class Makelangelo {
 
 	private void openPlotterSettings() {
 		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
-		JDialog dialog = new JDialog(mainFrame,PlotterSettingsPanel.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
