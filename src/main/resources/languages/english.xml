@@ -239,6 +239,11 @@
 	</string>
 
 	<string>
+		<key>PaperSettings.Title</key>
+		<value>Paper settings</value>
+		<hint>Paper settings panel title</hint>
+	</string>
+	<string>
 		<key>PaperSettings.PaperSize</key>
 		<value>Paper Size</value>
 		<hint>Paper settings panel</hint>
@@ -2007,7 +2012,7 @@
 	<string>
 		<key>OpenPaperSettings</key>
 		<value>Paper settings</value>
-		<hint></hint>
+		<hint>MenuItem</hint>
 	</string>
 	
 	<string>
@@ -2082,5 +2087,14 @@
 		<value>Error</value>
 		<hint>Dialog</hint>
 	</string>
+
+
+<!--
+    <string>
+        <key></key>
+        <value></value>
+        <hint></hint>
+    </string>
+ -->                
 
 </language>

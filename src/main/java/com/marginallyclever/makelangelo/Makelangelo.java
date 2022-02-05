@@ -294,7 +294,7 @@ public final class Makelangelo {
 
 	private void openPaperSettings() {
 		PaperSettings settings = new PaperSettings(myPaper);
-		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PaperSettings.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));

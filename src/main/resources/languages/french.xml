@@ -2763,4 +2763,18 @@
         <value>Faire un don PayPal</value>
         <hint>About Menu</hint>
     </string>
+    <string>
+        <key>PaperSettings.Title</key>
+        <value>Paramètres papier</value>
+        <hint>Paper settings panel title</hint>
+    </string>
+    
+<!--
+    <string>
+        <key></key>
+        <value></value>
+        <hint></hint>
+    </string>
+ -->
+ 
 </language>
