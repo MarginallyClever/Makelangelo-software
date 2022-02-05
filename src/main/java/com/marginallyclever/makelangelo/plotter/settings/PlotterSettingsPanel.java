@@ -3,11 +3,7 @@ package com.marginallyclever.makelangelo.plotter.settings;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectColor;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -42,6 +38,7 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectColor selectPenDownColor;
 	private SelectColor selectPenUpColor;
 
+	private SelectOneOfMany baudrate;
 	private SelectInteger blockBufferSize;
 	private SelectInteger segmentsPerSecond;
 	private SelectDouble minSegmentLength;
@@ -85,6 +82,9 @@ public class PlotterSettingsPanel extends JPanel {
 	    interior.add(selectPenDownColor = new SelectColor("colorDown",		Translator.get("pen down color"		),settings.getPenDownColor(),this));
 		interior.add(selectPenUpColor 	= new SelectColor("colorUp",		Translator.get("pen up color"		),settings.getPenUpColor(),this));
 
+
+
+		interior.add(baudrate            = new SelectOneOfMany("baudrate",          Translator.get("PlotterSettings.baudrate"            ), new String[]{"250000", "115200", "57600", "38400", "19200"}, 0));
 		interior.add(blockBufferSize     = new SelectInteger("blockBufferSize",     Translator.get("PlotterSettings.blockBufferSize"     ),settings.getBlockBufferSize()));
 		interior.add(segmentsPerSecond   = new SelectInteger("segmentsPerSecond",   Translator.get("PlotterSettings.segmentsPerSecond"   ),settings.getSegmentsPerSecond()));
 		interior.add(minSegmentLength    = new SelectDouble ("minSegmentLength",    Translator.get("PlotterSettings.minSegmentLength"    ),settings.getMinSegmentLength()));

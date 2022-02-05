@@ -29,7 +29,8 @@ public class PlotterSettings implements Serializable {
 	private double limitTop;
 	
 	// speed control
-	
+	private int baudrate = 250000;
+
 	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
 	private int blockBufferSize = 16;
 
@@ -531,4 +532,13 @@ public class PlotterSettings implements Serializable {
 	public void setMaxJerk(double[] maxJerk) {
 		this.maxJerk = maxJerk;
 	}
+
+	public int getBaudrate() {
+		return baudrate;
+	}
+
+	public void setBaudrate(int baudrate) {
+		this.baudrate = baudrate;
+	}
+
 }

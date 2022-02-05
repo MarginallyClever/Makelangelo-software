@@ -1070,12 +1070,12 @@
 	</string>
 	<string>
 		<key>penToolUp</key>
-		<value>Up</value>
+		<value>Pen up angle</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolDown</key>
-		<value>Down</value>
+		<value>Pen down angle</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -2038,6 +2038,10 @@
 		<value>Copy to clipboard</value>
 	</string>
 
+	<string>
+		<key>PlotterSettings.baudrate</key>
+		<value>Transmission speed</value>
+	</string>
 	<string>
 		<key>PlotterSettings.blockBufferSize</key>
 		<value>Block Buffer Size</value>

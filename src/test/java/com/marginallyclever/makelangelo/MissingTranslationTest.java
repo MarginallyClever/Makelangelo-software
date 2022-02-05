@@ -91,7 +91,7 @@ public class MissingTranslationTest {
                     while (m.find()) {
                         String key = m.group("key");
                         String trans = Translator.get(key);
-                        if (trans.startsWith(TranslatorLanguage.MISSING)) {
+                        if (trans.startsWith(Translator.MISSING)) {
                             results.add(String.format("file://%s:%s: %s", file.getCanonicalPath(), lineNb, key));
                         }
                     }

@@ -1633,6 +1633,10 @@
         -->
     </string>
     <string>
+        <key>PlotterSettings.baudrate</key>
+        <value>Vitesse de transmission</value>
+    </string>
+    <string>
         <key>PlotterSettings.blockBufferSize</key>
         <value>Taille du tampon de bloc</value>
         <hint></hint>
