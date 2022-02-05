@@ -341,7 +341,7 @@ public final class Makelangelo {
 				.forEach(iter -> {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
 					String name = iter.getName();					
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTraductedText());
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
 					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));
 					menu.add(button);
