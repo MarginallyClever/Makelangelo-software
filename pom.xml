@@ -380,12 +380,14 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 		    <groupId>org.apache.xmlgraphics</groupId>
 		    <artifactId>batik-all</artifactId>
 		    <version>1.14</version>
-			<exclusions>
-	        	<exclusion>  <!-- declare the exclusion here -->
-				    <groupId>xml-apis</groupId>
-				    <artifactId>xml-apis</artifactId>
-	        	</exclusion>
-	      	</exclusions> 
+		</dependency>
+
+		<!-- maven tricks to have a global exclusion of a jar but it is required for the compilation -->
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
