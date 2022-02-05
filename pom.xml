@@ -377,15 +377,16 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 
 		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
 		<dependency>
-		    <groupId>org.apache.xmlgraphics</groupId>
-		    <artifactId>batik-all</artifactId>
-		    <version>1.14</version>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-all</artifactId>
+			<version>1.14</version>
 			<exclusions>
-	        	<exclusion>  <!-- declare the exclusion here -->
-				    <groupId>xml-apis</groupId>
-				    <artifactId>xml-apis</artifactId>
-	        	</exclusion>
-	      	</exclusions> 
+				<exclusion>
+					<!-- declare the exclusion here -->
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -403,15 +404,15 @@ It pairs really well with Makelangelo-firmware, the code in the brain of the rob
 
 		<!-- qoi image format support -->
 		<dependency>
-		    <groupId>me.saharnooby</groupId>
-		    <artifactId>qoi-java</artifactId>
-		    <version>1.2.0</version>
+			<groupId>me.saharnooby</groupId>
+			<artifactId>qoi-java</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 		<!-- Also add this, if you want to use QOI with ImageIO -->
 		<dependency>
-		    <groupId>me.saharnooby</groupId>
-		    <artifactId>qoi-java-awt</artifactId>
-		    <version>1.2.0</version>
+			<groupId>me.saharnooby</groupId>
+			<artifactId>qoi-java-awt</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 	</dependencies>
 
