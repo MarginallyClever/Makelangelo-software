@@ -2775,6 +2775,27 @@
     </string>
 
     
+    <string>
+        <key>TurtleRenderFactory.DEFAULT</key>
+        <value>Défaut</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.BARBER_POLE</key>
+        <value>Poteau de barbier</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.SEPARATE_LOOP</key>
+        <value>Boucles séparées</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.MARLIN_SIM</key>
+        <value>Simulation vitesses marlin</value>
+        <hint></hint>
+    </string>
+
 <!--
     <string>
         <key></key>

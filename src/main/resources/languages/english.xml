@@ -2094,6 +2094,26 @@
     </string>
 
 
+    <string>
+        <key>TurtleRenderFactory.DEFAULT</key>
+        <value>Default</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.BARBER_POLE</key>
+        <value>Barber pole</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.SEPARATE_LOOP</key>
+        <value>Separate loops</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.MARLIN_SIM</key>
+        <value>Marlin simulation</value>
+        <hint></hint>
+    </string>
 
 <!--
     <string>

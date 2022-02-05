@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
+import com.marginallyclever.makelangelo.Translator;
 import java.util.Arrays;
 
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
@@ -11,18 +12,27 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
  * @author Dan Royer
  */
 public enum TurtleRenderFactory {
-	DEFAULT("Default", new DefaultTurtleRenderer()),
-	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
-	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
-	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
+	DEFAULT("Default", new DefaultTurtleRenderer(),Translator.get("TurtleRenderFactory.DEFAULT")),// not coder friendly but allow latter the CI test not to miss this traduction keys.
+	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer(),Translator.get("TurtleRenderFactory.BARBER_POLE")),
+	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer(),Translator.get("TurtleRenderFactory.SEPARATE_LOOP")),
+	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer(),Translator.get("TurtleRenderFactory.MARLIN_SIM"));
 
 	private final TurtleRenderer turtleRenderer;
 
 	private final String name;
+	
+	private final String traductedText;
 
-	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer) {
+	/**
+	 * 
+	 * @param name
+	 * @param turtleRenderer
+	 * @param traductedText the text (traducted) N.B. : not base on the name (used in findByName) to avoid a bad traduction (that give for two elements the same value) to assert any traduction may not create issues... 
+	 */
+	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer, String traductedText) {
 		this.name = name;
 		this.turtleRenderer = turtleRenderer;
+		this.traductedText = traductedText;
 	}
 
 	public TurtleRenderer getTurtleRenderer() {
@@ -31,6 +41,14 @@ public enum TurtleRenderFactory {
 
 	public String getName() {
 		return name;
+	}
+	
+	/**
+	 * 
+	 * @return The text (traducted) to used as text in the GUI ...
+	 */
+	public String getTraductedText() {
+		return traductedText;
 	}
 
 	public static TurtleRenderFactory findByName(String name) {
