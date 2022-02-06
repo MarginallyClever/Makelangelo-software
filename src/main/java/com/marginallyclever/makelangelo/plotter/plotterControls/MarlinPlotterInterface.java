@@ -5,6 +5,9 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,11 +188,33 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		return "M280 P0 S" + (int)p.getPenDownAngle() + " T50";
 	}
 
+	/**
+	 * N.B. This methode sould not be change if we want the LoadGCode to read back colors ...
+	 * Or we need to define something like <pre>{@code
+	 * static final String sColorChange_NOT_TO_MODIFIE = "M0 Ready %s and click";// Do not modify the "M0 Ready %s" for (back)compatibility with LoadGCode	
+	 * //String.formate(sColorChange_NOT_TO_MODIFIE, getColorName(toolNumber & 0xFFFFFF) ) ; 
+	 * //String pattern = String.formate(sColorChange_NOT_TO_MODIFIE, "(.*)" )
+	 * }</pre>
+	 * @param toolNumber (wrongly named toolNumber) currently use a ColorRGB in int value. 
+	 * @return 
+	 */
 	public static String getToolChangeString(int toolNumber) {
 		String colorName = getColorName(toolNumber & 0xFFFFFF);
-		return "M0 Ready " + colorName + " and click";
+		return "M0 Ready " + colorName + " and click";// TODO as a format ? ( This should be keep and not modified to ensure LoadGCode color identification from the M0 texte.
 	}
 
+	/**
+	 * TODO ? : the contente of this methode should be in the ColorRGB class as
+	 * public static utility methodes. And we need the reverse (a king of map).
+	 * StringColorName to int/ColorRGB ...
+	 * <br>
+	 * ? TODO be conforme to http://www.w3.org/TR/css3-color/
+	 * https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#color
+	 *
+	 * @param toolNumber (wrongly named toolNumber) currently use a ColorRGB in
+	 * int value.
+	 * @return
+	 */
 	private static String getColorName(int toolNumber) {
 		String name = "";
 		switch (toolNumber) {
@@ -197,7 +222,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			name = "red";
 			break;
 		case 0x00ff00:
-			name = "green";
+			name = "green"; //0x00ff00 = "lime" ! TODO be conforme ? as w3c greem = #008000
 			break;
 		case 0x0000ff:
 			name = "blue";
@@ -222,5 +247,85 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			break; // display unknown RGB value as hex
 		}
 		return name;
+	}
+	
+	//
+	//
+	//
+	/**
+	 *  A proposition of replacement for getColorName.
+	 * But this seem bad ... surely a better way. 
+	 * <br>
+	 * N.B. : Have chose not to use a bi-directional map https://github.com/google/guava/wiki/NewCollectionTypesExplained#bimap (only for 1:1 relation)
+	 * as unfortynatly some colorName can have the same intValue (1:n relation). 
+	 * @param colorIntValue
+	 * @return 
+	 */
+	public static String getColorName_Replacement(int colorIntValue) {		
+		TreeMap<String, Integer> mapColorNameToIntVal = getColorMap();
+		if ( mapColorNameToIntVal.containsValue(colorIntValue)){
+			// not a bi directional map so have to iterate all (key,value) and as only one result is needed, return the first key with a value that match ...
+			Iterator<Map.Entry<String, Integer>> iterator = mapColorNameToIntVal.entrySet().iterator();
+			while (iterator.hasNext()){
+				Map.Entry<String, Integer> entry = iterator.next();
+				if ( entry.getValue().equals(colorIntValue)){
+					return entry.getKey();
+				}
+			}			
+		}
+		return "0x" + Integer.toHexString(colorIntValue);		
+	}
+	private static TreeMap<String, Integer> treeMapColorIntValToColorName = null;
+
+	private static TreeMap<String, Integer> getColorMap() {
+		if (treeMapColorIntValToColorName == null) {
+			TreeMap<String, Integer> tm = new TreeMap<>();
+			tm.put("red", 0xff0000);//red		
+			tm.put("green", 0x00ff00);//lime !!! TODO be conforme ? as w3c greem = #008000
+			tm.put("blue", 0x0000ff);//blue
+			tm.put("black", 0x000000);//black
+			tm.put("cyan", 0x00ffff);//cyan
+			tm.put("magenta", 0xff00ff);//magenta		
+			tm.put("yellow", 0xffff00);//yellow
+			tm.put("white", 0xffffff);//white
+			// orange #ffa500
+			// grey #808080 // to avoid ??? this is the background color of the preview ?
+			// ... https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#color 
+			// http://www.w3.org/TR/css3-color/
+			treeMapColorIntValToColorName = tm;
+		}
+		return treeMapColorIntValToColorName;
+	}
+
+	/**
+	 * To convert a String color name or an hexaValue (0xFFFFFF) to this int
+	 * color equivalent.
+	 *
+	 * ?
+	 * https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations#color
+	 * ? http://www.w3.org/TR/css3-color/
+	 *
+	 * @param colorName
+	 * @return the int value of the color or -1 if any exception / parse error.
+	 */
+	public static int getColorValueFromStringName(String colorName) {
+		if (getColorMap().containsKey(colorName)) {
+			return getColorMap().get(colorName);
+		} else {
+			if (colorName == null || colorName.length() != 2 + 6) {
+				// throw exception or else try other format ? -> a masque / transformation on the integer . parse int
+			}
+			try {
+				if (colorName.startsWith("0x")) {
+					//default -> "0x" + Integer.toHexString(toolNumber);		 // display unknown RGB value as hex
+
+					return Integer.parseInt(colorName.substring(2), 16);
+
+				}
+			} catch (Exception e) {
+				// ? throw exception or will return -1;
+			}
+		}
+		return -1; // ? default value
 	}
 }

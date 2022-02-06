@@ -6,11 +6,16 @@ import java.util.Scanner;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.plotter.plotterControls.MarlinPlotterInterface;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoadGCode implements TurtleLoader {
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
 	
+	private static Logger logger = LoggerFactory.getLogger(LoadGCode.class);
+
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
@@ -76,6 +81,25 @@ public class LoadGCode implements TurtleLoader {
 					codeFound=true;
 					int mCode = Integer.parseInt(mCodeToken.substring(1));
 					switch(mCode) {
+					case 0:
+						// Trying to parse the string normaly output for a color change from MarlinPlotterInterface.getToolChangeString(...)
+						// trying to match something like 
+						//String pattern = String.formate("M0 Ready %s and click", "(.*)" )
+					    if ("Ready".equals(tokens[1])) {
+						String cNameOrHexaValue = tokens[2];						
+						logger.debug("READ MO Ready {} ... line {}", cNameOrHexaValue, lineNumber);						
+						int tmpColor = MarlinPlotterInterface.getColorValueFromStringName(cNameOrHexaValue);
+						if (tmpColor != -1) {
+						    ColorRGB colorRGB = new ColorRGB(tmpColor);
+						    logger.debug("SET colorRGB {} line {}", colorRGB.toString(), lineNumber);
+						    turtle.setColor(colorRGB);
+						} else {
+						    logger.debug("M0 Ready : Parse error color \"{}\" line {} in \"{}\"", cNameOrHexaValue, lineNumber, line);
+						}
+					    } else {
+						logger.debug("Not a \"M0 Ready <color>\" line {} in \"{}\"", lineNumber, line);
+					    }
+					    break;
 					case 6:
 						// tool change
 						String color = tokenExists("T",tokens);
