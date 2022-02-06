@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionListener;
+import com.marginallyclever.communications.CommunicationEvent;
+import com.marginallyclever.communications.CommunicationListener;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -55,7 +55,7 @@ public class MarlinInterface extends JPanel {
 	// MarlinInterface sends this as an ActionEvent to let listeners know there is an error in the transmission.
 	public static final String DID_NOT_FIND = "didnotfind";
 
-	private TextInterfaceToNetworkSession chatInterface;
+	private TextInterfaceToCommunication chatInterface;
 	private List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
@@ -72,19 +72,19 @@ public class MarlinInterface extends JPanel {
 		super();
 
 		this.setLayout(new BorderLayout());
-		chatInterface = new TextInterfaceToNetworkSession(chooseConnection);
+		chatInterface = new TextInterfaceToCommunication(chooseConnection);
 		this.add(chatInterface, BorderLayout.CENTER);
 
 		chatInterface.addListener((e) -> {
 			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
-				case NetworkSessionEvent.CONNECTION_CLOSED -> onClose();
+				case CommunicationEvent.CONNECTION_OPENED -> onConnect();
+				case CommunicationEvent.CONNECTION_CLOSED -> onClose();
 			}
 			// TODO notifyListeners(e);
 		});
 	}
 
-	public void addNetworkSessionListener(NetworkSessionListener a) {
+	public void addNetworkSessionListener(CommunicationListener a) {
 		chatInterface.addNetworkSessionListener(a);
 	}
 
@@ -113,8 +113,8 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
-	protected void onDataReceived(NetworkSessionEvent evt) {
-		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+	protected void onDataReceived(CommunicationEvent evt) {
+		if (evt.flag == CommunicationEvent.DATA_RECEIVED) {
 			lastReceivedTime = System.currentTimeMillis();
 			String message = ((String)evt.data).trim();
 

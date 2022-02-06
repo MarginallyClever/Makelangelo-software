@@ -1,6 +1,6 @@
 package com.marginallyclever.communications.serial;
 
-import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.Communication;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author Peter Colapietro
  * @since v7 (4/12/15)
  */
-public final class SerialConnection extends NetworkSession implements SerialPortEventListener {
+public final class SerialConnection extends Communication implements SerialPortEventListener {
 	public static final int BAUD_RATE = 250000;
 	private static final Logger logger = LoggerFactory.getLogger(SerialConnection.class);
 

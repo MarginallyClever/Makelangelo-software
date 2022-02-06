@@ -11,16 +11,16 @@ public class NetworkSessionLog extends DefaultListModel<ConversationEvent> {
 	private static final long serialVersionUID = 4060801871711497751L;
 	private String name;
 
-	public NetworkSessionLog(NetworkSession s) {
-		if(s==null) throw new InvalidParameterException("NetworkSession cannot be null.");
+	public NetworkSessionLog(Communication s) {
+		if(s==null) throw new InvalidParameterException("Communication cannot be null.");
 		
 		name = s.getName();
 		
 		s.addListener((e)->{
-			if(e.flag==NetworkSessionEvent.DATA_RECEIVED) {
+			if(e.flag== CommunicationEvent.DATA_RECEIVED) {
 				String message = (String)e.data;
 				addElement(new ConversationEvent("in",message,System.currentTimeMillis()));
-			} else if(e.flag==NetworkSessionEvent.DATA_SENT) {
+			} else if(e.flag== CommunicationEvent.DATA_SENT) {
 				String message = (String)e.data;
 				addElement(new ConversationEvent("out",message,System.currentTimeMillis()));
 			}

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.CommunicationEvent;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +26,7 @@ public class MarlinInterfaceTest {
 
         mi.addListener(ae::set);
         String message = "echo:Home XY First";
-        mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
+        mi.onDataReceived(new CommunicationEvent(this, CommunicationEvent.DATA_RECEIVED, message));
 
         Assertions.assertNotNull(ae.get());
         Assertions.assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
@@ -41,7 +41,7 @@ public class MarlinInterfaceTest {
 
         mi.addListener(ae::set);
         String message = "Error: Printer halted";
-        mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
+        mi.onDataReceived(new CommunicationEvent(this, CommunicationEvent.DATA_RECEIVED, message));
 
         Assertions.assertNotNull(ae.get());
         Assertions.assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());

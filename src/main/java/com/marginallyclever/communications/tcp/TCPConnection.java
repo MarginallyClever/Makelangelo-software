@@ -6,7 +6,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.Communication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author Peter Colapietro
  * @since v7 (4/12/15)
  */
-public final class TCPConnection extends NetworkSession implements Runnable {
+public final class TCPConnection extends Communication implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(TCPConnection.class);
 
 	public static final int DEFAULT_TCP_PORT = 9999;

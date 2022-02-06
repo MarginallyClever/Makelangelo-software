@@ -20,7 +20,7 @@ public interface TransportLayer {
      * @param connectionName where to connect
      * @return a connection to the device at address <code>connectionName</code>
      */
-    public NetworkSession openConnection(String connectionName);
+    public Communication openConnection(String connectionName);
 
     /**
      * List availables connections

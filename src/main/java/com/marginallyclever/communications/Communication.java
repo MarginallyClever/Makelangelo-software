@@ -9,7 +9,7 @@ import java.util.List;
  * @author Peter Colapietro
  * @since v7
  */
-public abstract class NetworkSession {
+public abstract class Communication {
 
 	private String name = "";
 		
@@ -31,18 +31,18 @@ public abstract class NetworkSession {
 	
 	// OBSERVER PATTERN
 
-	private List<NetworkSessionListener> listeners = new ArrayList<>();
+	private List<CommunicationListener> listeners = new ArrayList<>();
 
-	public void addListener(NetworkSessionListener listener) {
+	public void addListener(CommunicationListener listener) {
 		listeners.add(listener);
 	}
 	
-	public void removeListener(NetworkSessionListener listener) {
+	public void removeListener(CommunicationListener listener) {
 		listeners.remove(listener);
 	}
 	
-	private void notifyListeners(NetworkSessionEvent evt) {
-		for( NetworkSessionListener a : listeners ) {
+	private void notifyListeners(CommunicationEvent evt) {
+		for( CommunicationListener a : listeners ) {
 			a.networkSessionEvent(evt);
 		}
 	}
@@ -51,11 +51,11 @@ public abstract class NetworkSession {
 
 	// tell all listeners data has arrived
 	protected void notifyDataReceived(String line) {
-		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_RECEIVED,line));
+		notifyListeners(new CommunicationEvent(this, CommunicationEvent.DATA_RECEIVED,line));
 	}
 
 	// tell all listeners data has arrived
 	protected void notifyDataSent(String line) {
-		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_SENT,line));
+		notifyListeners(new CommunicationEvent(this, CommunicationEvent.DATA_SENT,line));
 	}
 }

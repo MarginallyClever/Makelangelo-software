@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.CommunicationEvent;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -92,10 +92,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	@Override
-	protected void onDataReceived(NetworkSessionEvent evt) {
+	protected void onDataReceived(CommunicationEvent evt) {
 		super.onDataReceived(evt);
 
-		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+		if(evt.flag == CommunicationEvent.DATA_RECEIVED) {
 			String message = ((String)evt.data).trim();
 			//logger.debug("MarlinPlotterInterface received '"+message.trim()+"'.");
 			if (message.startsWith("X:") && message.contains("Count")) {

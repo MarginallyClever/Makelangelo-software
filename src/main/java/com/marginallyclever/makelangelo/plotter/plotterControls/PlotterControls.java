@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.communications.CommunicationEvent;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
@@ -114,8 +114,8 @@ public class PlotterControls extends JPanel {
 		panel.add(chooseConnection);
 		chooseConnection.addListener(e -> {
 			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
-				case NetworkSessionEvent.CONNECTION_CLOSED -> onDisconnect();
+				case CommunicationEvent.CONNECTION_OPENED -> onConnect();
+				case CommunicationEvent.CONNECTION_CLOSED -> onDisconnect();
 			}
 		});
 

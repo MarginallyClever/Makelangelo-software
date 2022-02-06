@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionListener;
+import com.marginallyclever.communications.Communication;
+import com.marginallyclever.communications.CommunicationEvent;
+import com.marginallyclever.communications.CommunicationListener;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link TextInterfaceToNetworkSession} provides a method to open and close a 
- * {@link NetworkSession} connection through a {@link ChooseConnection}
+ * {@link TextInterfaceToCommunication} provides a method to open and close a
+ * {@link Communication} connection through a {@link ChooseConnection}
  * interface and allow two way communication through a {@link TextInterfaceWithHistory} interface. 
  * @author Dan Royer
  * @since 7.28.0
  */
-public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
+public class TextInterfaceToCommunication extends JPanel implements CommunicationListener {
 	private static final long serialVersionUID = 1032123255711692874L;
 	private TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
-	private NetworkSession mySession;
+	private Communication mySession;
 
-	public TextInterfaceToNetworkSession(ChooseConnection chooseConnection) {
+	public TextInterfaceToCommunication(ChooseConnection chooseConnection) {
 		super();
 
 		setLayout(new BorderLayout());
@@ -46,15 +46,15 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		});
 		chooseConnection.addListener((e)->{
 			switch (e.flag) {
-				case NetworkSessionEvent.CONNECTION_OPENED -> setNetworkSession((NetworkSession) e.data);
-				case NetworkSessionEvent.CONNECTION_CLOSED -> setNetworkSession(null);
+				case CommunicationEvent.CONNECTION_OPENED -> setNetworkSession((Communication) e.data);
+				case CommunicationEvent.CONNECTION_CLOSED -> setNetworkSession(null);
 			}
 
 			notifyListeners(e);
 		});
 	}
 
-	public void setNetworkSession(NetworkSession session) {
+	public void setNetworkSession(Communication session) {
 		if(mySession!=null) mySession.removeListener(this);
 		mySession = session;
 		if(mySession!=null) mySession.addListener(this);
@@ -75,8 +75,8 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	}
 	
 	@Override
-	public void networkSessionEvent(NetworkSessionEvent evt) {
-		if(evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
+	public void networkSessionEvent(CommunicationEvent evt) {
+		if(evt.flag == CommunicationEvent.DATA_RECEIVED) {
 			myInterface.addToHistory(mySession.getName(),((String)evt.data).trim());
 		}
 	}
@@ -93,27 +93,27 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 
 	// OBSERVER PATTERN
 
-	private List<NetworkSessionListener> listeners = new ArrayList<>();
+	private List<CommunicationListener> listeners = new ArrayList<>();
 
-	public void addListener(NetworkSessionListener listener) {
+	public void addListener(CommunicationListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(NetworkSessionListener listener) {
+	public void removeListener(CommunicationListener listener) {
 		listeners.remove(listener);
 	}
 
-	private void notifyListeners(NetworkSessionEvent evt) {
-		for( NetworkSessionListener a : listeners ) {
+	private void notifyListeners(CommunicationEvent evt) {
+		for( CommunicationListener a : listeners ) {
 			a.networkSessionEvent(evt);
 		}
 	}
 
-	public void addNetworkSessionListener(NetworkSessionListener a) {
+	public void addNetworkSessionListener(CommunicationListener a) {
 		mySession.addListener(a);
 	}
 	
-	public void removeNetworkSessionListener(NetworkSessionListener a) {
+	public void removeNetworkSessionListener(CommunicationListener a) {
 		mySession.removeListener(a);
 	}
 
@@ -124,10 +124,10 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
+		JFrame frame = new JFrame(TextInterfaceToCommunication.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new TextInterfaceToNetworkSession(new ChooseConnection()));
+		frame.add(new TextInterfaceToCommunication(new ChooseConnection()));
 		frame.pack();
 		frame.setVisible(true);
 	}

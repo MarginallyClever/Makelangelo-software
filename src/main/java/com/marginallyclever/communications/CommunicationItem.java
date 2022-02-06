@@ -1,11 +1,11 @@
 package com.marginallyclever.communications;
 
-public class NetworkSessionItem {
+public class CommunicationItem {
 
     private final TransportLayer transportLayer;
     private final String connectionName;
 
-    public NetworkSessionItem(TransportLayer transportLayer, String connectionName) {
+    public CommunicationItem(TransportLayer transportLayer, String connectionName) {
         this.transportLayer = transportLayer;
         this.connectionName = connectionName;
     }

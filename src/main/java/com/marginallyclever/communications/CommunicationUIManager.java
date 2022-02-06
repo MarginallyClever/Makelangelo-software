@@ -13,23 +13,23 @@ import java.util.List;
  * @author dan royer
  *
  */
-public class NetworkSessionUIManager {
+public class CommunicationUIManager {
 
-	private static final Logger logger = LoggerFactory.getLogger(NetworkSessionUIManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommunicationUIManager.class);
 	
 	private static List<TransportLayer> transportLayers = new ArrayList<>( Arrays.asList(
 			new SerialTransportLayer()
 			//new TCPTransportLayer()
 			));
 
-	public static List<NetworkSessionItem> getConnectionsItems() {
+	public static List<CommunicationItem> getConnectionsItems() {
 		logger.debug("Fetching connections");
-		List<NetworkSessionItem> items = new ArrayList<>();
+		List<CommunicationItem> items = new ArrayList<>();
 		for (TransportLayer transportLayer : transportLayers) {
 			logger.debug("  {}" ,transportLayer.getName());
 			for (String connection: transportLayer.listConnections()) {
 				logger.debug("    {}", connection);
-				NetworkSessionItem nsi = new NetworkSessionItem(transportLayer, connection);
+				CommunicationItem nsi = new CommunicationItem(transportLayer, connection);
 				items.add(nsi);
 			}
 		}

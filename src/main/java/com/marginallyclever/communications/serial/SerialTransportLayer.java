@@ -1,6 +1,6 @@
 package com.marginallyclever.communications.serial;
 
-import com.marginallyclever.communications.NetworkSession;
+import com.marginallyclever.communications.Communication;
 import com.marginallyclever.communications.TransportLayer;
 
 import java.util.Arrays;
@@ -60,10 +60,10 @@ public class SerialTransportLayer implements TransportLayer {
 	}
 
 	/**
-	 * @return {@code NetworkSession} if connection successful.  return null on failure.
+	 * @return {@code Communication} if connection successful.  return null on failure.
 	 */
 	@Override
-	public NetworkSession openConnection(String connectionName) {
+	public Communication openConnection(String connectionName) {
 		SerialConnection serialConnection = new SerialConnection();
 
 		try {

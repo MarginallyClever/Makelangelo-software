@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * ChooseConnection provides a human interface to open or close a
- * connection to a remote device available through a {@link NetworkSession}.
+ * connection to a remote device available through a {@link Communication}.
  *
  * @author Dan Royer
  * @since 7.28.0
@@ -30,8 +30,8 @@ public class ChooseConnection extends JPanel {
 	
 	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
 	private ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
-	private NetworkSession mySession;
+	private final JComboBox<CommunicationItem> connectionComboBox = new JComboBox<>();
+	private Communication mySession;
 
 	public ChooseConnection() {
 		super();
@@ -49,9 +49,9 @@ public class ChooseConnection extends JPanel {
 		this.add(bConnect);
 	}
 
-	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
+	private void addConnectionsItems(JComboBox<CommunicationItem> comboBox) {
 		comboBox.removeAllItems();
-		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
+		for (CommunicationItem connection: CommunicationUIManager.getConnectionsItems()) {
 			comboBox.addItem(connection);
 		}
 	}
@@ -61,12 +61,12 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			onClose();
 		} else {
-			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			if(networkSessionItem==null) return;  // no connections at all
-			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
-			if (networkSession != null) {
-				onOpen(networkSession);
-				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_OPENED, networkSession));
+			CommunicationItem communicationItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
+			if(communicationItem ==null) return;  // no connections at all
+			Communication communication = communicationItem.getTransportLayer().openConnection(communicationItem.getConnectionName());
+			if (communication != null) {
+				onOpen(communication);
+				notifyListeners(new CommunicationEvent(this, CommunicationEvent.CONNECTION_OPENED, communication));
 			}
 		}
 	}
@@ -76,7 +76,7 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
-			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED,null));
+			notifyListeners(new CommunicationEvent(this, CommunicationEvent.CONNECTION_CLOSED,null));
 		}
 		connectionComboBox.setEnabled(true);
 		refresh.setEnabled(true);
@@ -85,12 +85,12 @@ public class ChooseConnection extends JPanel {
 		bConnect.setForeground(Color.GREEN);
 	}
 
-	private void onOpen(NetworkSession s) {
+	private void onOpen(Communication s) {
 		logger.debug("open to {}", s.getName());
 
 		mySession = s;
 		mySession.addListener((e)->{
-			if (e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
+			if (e.flag == CommunicationEvent.CONNECTION_CLOSED) {
 				onClose(); 
 			}
 		});
@@ -101,11 +101,11 @@ public class ChooseConnection extends JPanel {
 		bConnect.setForeground(Color.RED);
 	}
 
-	public NetworkSession getNetworkSession() {
+	public Communication getNetworkSession() {
 		return mySession;
 	}
 	
-	public void setNetworkSession(NetworkSession s) {
+	public void setNetworkSession(Communication s) {
 		if (s!=null && s!=mySession) {
 			onClose();
 			onOpen(s);
@@ -118,18 +118,18 @@ public class ChooseConnection extends JPanel {
 
 	// OBSERVER PATTERN
 
-	private List<NetworkSessionListener> listeners = new ArrayList<>();
+	private List<CommunicationListener> listeners = new ArrayList<>();
 
-	public void addListener(NetworkSessionListener listener) {
+	public void addListener(CommunicationListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(NetworkSessionListener listener) {
+	public void removeListener(CommunicationListener listener) {
 		listeners.remove(listener);
 	}
 
-	private void notifyListeners(NetworkSessionEvent evt) {
-		for( NetworkSessionListener a : listeners ) {
+	private void notifyListeners(CommunicationEvent evt) {
+		for( CommunicationListener a : listeners ) {
 			a.networkSessionEvent(evt);
 		}
 	}
