@@ -2795,6 +2795,11 @@
         <value>Simulation vitesses marlin</value>
         <hint></hint>
     </string>
+    <string>
+        <key>TurtleGenerators.LearnMore.Link.Text</key>
+        <value>En savoir plus</value>
+        <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
+    </string>
 
 <!--
     <string>

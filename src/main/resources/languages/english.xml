@@ -2114,6 +2114,12 @@
         <value>Marlin simulation</value>
         <hint></hint>
     </string>
+    <string>
+        <key>TurtleGenerators.LearnMore.Link.Text</key>
+        <value>Learn more</value>
+        <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
+    </string>
+
 
 <!--
     <string>
