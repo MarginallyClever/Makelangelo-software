@@ -17,10 +17,10 @@ public class NetworkSessionUIManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(NetworkSessionUIManager.class);
 	
-	private static List<TransportLayer> transportLayers = new ArrayList<>( Arrays.asList(
+	private static List<TransportLayer> transportLayers = Arrays.asList(
 			new SerialTransportLayer()
 			//new TCPTransportLayer()
-			));
+	);
 
 	public static List<NetworkSessionItem> getConnectionsItems() {
 		logger.debug("Fetching connections");

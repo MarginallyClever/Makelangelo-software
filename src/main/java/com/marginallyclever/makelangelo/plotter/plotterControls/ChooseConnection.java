@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 
 import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
+import com.marginallyclever.convenience.ToggleButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,28 +25,28 @@ public class ChooseConnection extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
 	
 	private static final long serialVersionUID = 4773092967249064165L;
-	@Deprecated
-	public static final int CONNECTION_OPENED = 1;
-	@Deprecated
-	public static final int CONNECTION_CLOSED = 2;
-	
-	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
-	private ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
+
+	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
+			Arrays.asList("ButtonConnect", "ButtonDisconnect"),
+			Arrays.asList("/images/connect.png", "/images/disconnect.png"),
+			Arrays.asList(Color.GREEN, Color.RED));
+	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
+	private final JComboBox<Integer> baudRateComboBox = new JComboBox<>();
 	private NetworkSession mySession;
 
 	public ChooseConnection() {
-		super();
-
 		this.add(connectionComboBox);
+		this.add(new JLabel("@"));
+		Arrays.asList(250000, 115200, 57600, 38400, 19200).forEach(baudRateComboBox::addItem);
+		this.add(baudRateComboBox);
 
 		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
 		this.add(refresh);
 		addConnectionsItems(connectionComboBox);
 
-		bConnect.setForeground(Color.GREEN);
 		bConnect.addActionListener((e)-> onConnectAction() );
-		
+
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.add(bConnect);
 	}
@@ -61,8 +63,9 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			onClose();
 		} else {
-			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			if(networkSessionItem==null) return;  // no connections at all
+			int speed = (int) baudRateComboBox.getSelectedItem();
+			NetworkSessionItem networkSessionItem = (NetworkSessionItem) connectionComboBox.getSelectedItem();
+			if (networkSessionItem==null) return;  // no connections at all
 			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
 			if (networkSession != null) {
 				onOpen(networkSession);
@@ -80,9 +83,7 @@ public class ChooseConnection extends JPanel {
 		}
 		connectionComboBox.setEnabled(true);
 		refresh.setEnabled(true);
-		bConnect.setText(Translator.get("ButtonConnect"));
-		bConnect.replaceIcon("/images/connect.png");
-		bConnect.setForeground(Color.GREEN);
+		bConnect.updateButton(0);
 	}
 
 	private void onOpen(NetworkSession s) {
@@ -96,9 +97,7 @@ public class ChooseConnection extends JPanel {
 		});
 		connectionComboBox.setEnabled(false);
 		refresh.setEnabled(false);
-		bConnect.setText(Translator.get("ButtonDisconnect"));
-		bConnect.replaceIcon("/images/disconnect.png");
-		bConnect.setForeground(Color.RED);
+		bConnect.updateButton(1);
 	}
 
 	public NetworkSession getNetworkSession() {
@@ -141,6 +140,7 @@ public class ChooseConnection extends JPanel {
 		Translator.start();
 
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
+		frame.setMinimumSize(new Dimension(600, 70));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChooseConnection());
 		frame.pack();
