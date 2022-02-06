@@ -43,17 +43,17 @@ public class ChooseConnection extends JPanel {
 		addConnectionsItems(connectionComboBox);
 
 		bConnect.setForeground(Color.GREEN);
-		bConnect.addActionListener((e)-> onConnectAction() );
-		
+		bConnect.addActionListener((e)-> onConnectAction());
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.add(bConnect);
 	}
 
 	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
 		comboBox.removeAllItems();
-		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
+		for (NetworkSessionItem connection : NetworkSessionUIManager.getConnectionsItems()) {
 			comboBox.addItem(connection);
 		}
+		bConnect.setEnabled(comboBox.getItemCount() > 0);
 	}
 
 	private void onConnectAction() {
