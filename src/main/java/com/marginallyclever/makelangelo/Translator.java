@@ -27,7 +27,8 @@ import java.util.stream.Stream;
  */
 public final class Translator {
 	private static final Logger logger = LoggerFactory.getLogger(Translator.class);
-	
+
+	public static final String MISSING = "Missing:";
 	// Working directory. This represents the directory where the java executable launched the jar from.
 	public static final String WORKING_DIRECTORY = /*File.separator + */"languages"/*+File.separator*/;
 	// The name of the preferences node containing the user's choice.
@@ -217,7 +218,12 @@ public final class Translator {
 	 * @return the translated value for key, or "missing:key".
 	 */
 	public static String get(String key) {
-		return languages.get(currentLanguage).get(key);
+		String translation = languages.get(currentLanguage).get(key);
+		if (translation == null) {
+			logger.warn("Missing translation '{}' in language '{}'", key, currentLanguage);
+			return MISSING +key;
+		}
+		return translation;
 	}
 
 	/**

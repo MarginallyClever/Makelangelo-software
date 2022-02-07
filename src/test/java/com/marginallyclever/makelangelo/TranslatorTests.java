@@ -55,6 +55,6 @@ public class TranslatorTests {
 
 	@Test
 	public void getOneValueThatDoesNotExist() {
-		assertEquals("Missing:DoesNotExist", Translator.get("DoesNotExist"));
+		assertEquals(Translator.MISSING + "DoesNotExist", Translator.get("DoesNotExist"));
 	}
 }

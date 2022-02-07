@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 public class TranslatorLanguage {
 
 	private static final Logger logger = LoggerFactory.getLogger(TranslatorLanguage.class);
-	public static final String MISSING = "Missing:";
 
 	private String name = "";
 	private String author = "";
@@ -101,11 +100,7 @@ public class TranslatorLanguage {
 	}
 
 	public String get(String key) {
-		if(strings.containsKey(key)) {
-			return strings.get(key);
-		} else {
-			return MISSING +key;
-		}
+		return strings.get(key);
 	}
 
 
