@@ -31,7 +31,7 @@ public class ChooseConnection extends JPanel {
 			Arrays.asList("/images/connect.png", "/images/disconnect.png"),
 			Arrays.asList(Color.GREEN, Color.RED));
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
+	private final JComboBox<Configuration> connectionComboBox = new JComboBox<>();
 	private final JComboBox<Integer> baudRateComboBox = new JComboBox<>();
 	private NetworkSession mySession;
 
@@ -50,32 +50,41 @@ public class ChooseConnection extends JPanel {
 		this.add(bConnect);
 	}
 
-	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
+	private void addConnectionsItems(JComboBox<Configuration> comboBox) {
 		comboBox.removeAllItems();
-		for (NetworkSessionItem connection : NetworkSessionUIManager.getConnectionsItems()) {
-			comboBox.addItem(connection);
+		logger.debug("Fetching connections");
+		List<NetworkSessionItem> items = new ArrayList<>();
+		for (TransportLayer transportLayer : TransportLayers.transportLayers) {
+			logger.debug("  {}" ,transportLayer.getName());
+			for (String connection: transportLayer.listConnections()) {
+				logger.debug("    {}", connection);
+				Configuration configuration = new Configuration(transportLayer, connection);
+				comboBox.addItem(configuration);
+			}
 		}
+
 		bConnect.setEnabled(comboBox.getItemCount() > 0);
 	}
 
 	private void onConnectAction() {
-		logger.debug("onConnectAction()");
 		if (mySession != null) {
 			onClose();
 		} else {
 			int speed = (int) baudRateComboBox.getSelectedItem();
-			NetworkSessionItem networkSessionItem = (NetworkSessionItem) connectionComboBox.getSelectedItem();
-			if (networkSessionItem==null) return;  // no connections at all
-			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
+			Configuration configuration = (Configuration) connectionComboBox.getSelectedItem();
+			if (configuration==null) return;  // no connections at all
+			configuration.addConfiguration("speed", speed);
+			NetworkSession networkSession = configuration.getTransportLayer().openConnection(configuration);
 			if (networkSession != null) {
 				onOpen(networkSession);
 				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_OPENED, networkSession));
+			} else {
+				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_ERROR, null));
 			}
 		}
 	}
 
 	private void onClose() {
-		logger.debug("closed");
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
@@ -87,8 +96,6 @@ public class ChooseConnection extends JPanel {
 	}
 
 	private void onOpen(NetworkSession s) {
-		logger.debug("open to {}", s.getName());
-
 		mySession = s;
 		mySession.addListener((e)->{
 			if (e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {

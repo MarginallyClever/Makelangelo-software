@@ -11,6 +11,8 @@ public class NetworkSessionEvent extends EventObject {
     public static final int CONNECTION_OPENED = 1;
     // connection has closed
     public static final int CONNECTION_CLOSED = 2;
+    // connection cannot be opened
+    public static final int CONNECTION_ERROR = 3;
     // something has arrived.  Data is (String)data.
     public static final int DATA_RECEIVED = 4;
     // something has just been sent.  Data is (String)data.

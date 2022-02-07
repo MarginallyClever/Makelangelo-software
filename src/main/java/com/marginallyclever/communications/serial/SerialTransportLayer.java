@@ -1,5 +1,6 @@
 package com.marginallyclever.communications.serial;
 
+import com.marginallyclever.communications.Configuration;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 
@@ -63,13 +64,18 @@ public class SerialTransportLayer implements TransportLayer {
 	 * @return {@code NetworkSession} if connection successful.  return null on failure.
 	 */
 	@Override
-	public NetworkSession openConnection(String connectionName) {
+	public NetworkSession openConnection(Configuration configuration) {
 		SerialConnection serialConnection = new SerialConnection();
 
 		try {
-			serialConnection.openConnection(connectionName);
+			String connectionName = configuration.getConnectionName();
+			if (configuration.getConfigurations().containsKey("speed")) {
+				serialConnection.openConnection(connectionName, (int) configuration.getConfigurations().get("speed"));
+			} else {
+				serialConnection.openConnection(connectionName);
+			}
 		} catch (Exception e) {
-			logger.error("Failed to open the serial {}; Ignoring", connectionName, e);
+			logger.error("Failed to open the serial {}; Ignoring", configuration.getConnectionName(), e);
 			return null;
 		}
 

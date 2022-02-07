@@ -13,18 +13,18 @@ public interface TransportLayer {
 	 * 
 	 * @return english name of this transport layer
 	 */
-    public String getName();
+    String getName();
   
     /**
      * opens a connection
-     * @param connectionName where to connect
+     * @param configuration where to connect
      * @return a connection to the device at address <code>connectionName</code>
      */
-    public NetworkSession openConnection(String connectionName);
+    NetworkSession openConnection(Configuration configuration);
 
     /**
      * List availables connections
      * @return availables connections
      */
-    public List<String> listConnections();
+    List<String> listConnections();
 }

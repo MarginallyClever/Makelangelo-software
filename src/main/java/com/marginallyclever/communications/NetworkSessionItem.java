@@ -3,22 +3,22 @@ package com.marginallyclever.communications;
 public class NetworkSessionItem {
 
     private final TransportLayer transportLayer;
-    private final String connectionName;
+    private final Configuration connectionConfiguration;
 
-    public NetworkSessionItem(TransportLayer transportLayer, String connectionName) {
+    public NetworkSessionItem(TransportLayer transportLayer, Configuration connectionConfiguration) {
         this.transportLayer = transportLayer;
-        this.connectionName = connectionName;
+        this.connectionConfiguration = connectionConfiguration;
     }
 
     public TransportLayer getTransportLayer() {
         return transportLayer;
     }
 
-    public String getConnectionName() {
-        return connectionName;
+    public Configuration getConnectionConfiguration() {
+        return connectionConfiguration;
     }
 
     public String toString() {
-        return connectionName;
+        return connectionConfiguration.getConnectionName();
     }
 }
