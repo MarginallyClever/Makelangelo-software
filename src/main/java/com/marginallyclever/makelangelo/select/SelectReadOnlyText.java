@@ -9,7 +9,6 @@ import javax.swing.JEditorPane;
 
 import javax.swing.ToolTipManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
