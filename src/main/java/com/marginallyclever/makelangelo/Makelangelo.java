@@ -91,7 +91,6 @@ public final class Makelangelo {
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
-	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 
 	private static Logger logger;
 
@@ -792,6 +791,10 @@ public final class Makelangelo {
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
 		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		Dimension d = labelRangeMin.getPreferredSize();
+		d.width=50;
+		labelRangeMin.setPreferredSize(d);
+		labelRangeMax.setPreferredSize(d);
 		
 		bottomPanel.add(labelRangeMin, BorderLayout.WEST);
 		bottomPanel.add(rangeSlider, BorderLayout.CENTER);
