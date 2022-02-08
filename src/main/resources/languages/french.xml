@@ -2782,8 +2782,8 @@
     </string>
     <string>
         <key>TurtleRenderFactory.BARBER_POLE</key>
-        <value>Enseigne de barbier (rouge, blanc, bleu.)</value>
-        <hint>Barber pole (red white blue, stripes)</hint>
+        <value>Enseigne de barbier (rouge, bleu)</value>
+        <hint>Barber pole (red, blue)</hint>
     </string>
     <string>
         <key>TurtleRenderFactory.SEPARATE_LOOP</key>
