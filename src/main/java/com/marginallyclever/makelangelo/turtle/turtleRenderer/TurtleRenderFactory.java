@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
  * @author Dan Royer
  */
 public enum TurtleRenderFactory {
-	DEFAULT("Default", new DefaultTurtleRenderer(),"TurtleRenderFactory.DEFAULT"),// not coder friendly but allow later the CI test not to miss this translation keys.
+	DEFAULT("Default", new DefaultTurtleRenderer(),"TurtleRenderFactory.DEFAULT"),
 	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer(),"TurtleRenderFactory.BARBER_POLE"),
 	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer(),"TurtleRenderFactory.SEPARATE_LOOP"),
 	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer(),"TurtleRenderFactory.MARLIN_SIM");
