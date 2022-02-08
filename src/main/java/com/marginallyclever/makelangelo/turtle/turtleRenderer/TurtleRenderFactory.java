@@ -25,7 +25,6 @@ public enum TurtleRenderFactory {
 	 * 
 	 * @param name
 	 * @param turtleRenderer
-	 * @param translatedText the text (translated) N.B. : do not rely on the name (used in findByName) to avoid a bad translation (which can give for two elements the same value) to assert any translation may not create issues... 
 	 */
 	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer) {
 		this.name = name;
@@ -39,7 +38,7 @@ public enum TurtleRenderFactory {
 	public String getName() {
 		return name;
 	}
-	
+
 	public static TurtleRenderFactory findByName(String name) {
 		return Arrays.stream(values())
 				.filter(enumValue -> enumValue.getName().contains(name))
