@@ -12,16 +12,14 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
  * @author Dan Royer
  */
 public enum TurtleRenderFactory {
-	DEFAULT("Default", new DefaultTurtleRenderer(),Translator.get("TurtleRenderFactory.DEFAULT")),// not coder friendly but allow later the CI test not to miss this translation keys.
-	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer(),Translator.get("TurtleRenderFactory.BARBER_POLE")),
-	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer(),Translator.get("TurtleRenderFactory.SEPARATE_LOOP")),
-	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer(),Translator.get("TurtleRenderFactory.MARLIN_SIM"));
+	DEFAULT("Default", new DefaultTurtleRenderer()),
+	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
+	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
+	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
 
 	private final TurtleRenderer turtleRenderer;
 
 	private final String name;
-	
-	private final String translatedText;
 
 	/**
 	 * 
@@ -29,10 +27,9 @@ public enum TurtleRenderFactory {
 	 * @param turtleRenderer
 	 * @param translatedText the text (translated) N.B. : do not rely on the name (used in findByName) to avoid a bad translation (which can give for two elements the same value) to assert any translation may not create issues... 
 	 */
-	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer, String translatedText) {
+	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer) {
 		this.name = name;
 		this.turtleRenderer = turtleRenderer;
-		this.translatedText = translatedText;
 	}
 
 	public TurtleRenderer getTurtleRenderer() {
@@ -43,14 +40,6 @@ public enum TurtleRenderFactory {
 		return name;
 	}
 	
-	/**
-	 * 
-	 * @return The text (translated) to used as text in the GUI ...
-	 */
-	public String getTranslatedText() {
-		return translatedText;
-	}
-
 	public static TurtleRenderFactory findByName(String name) {
 		return Arrays.stream(values())
 				.filter(enumValue -> enumValue.getName().contains(name))
