@@ -31,7 +31,7 @@ jobs:
       run: |
         MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
         sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
-        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-windows.cfg" --main-jar "Makelangelo-$MVN_VERSION-with-dependencies.jar" &&
+        jpackage --verbose "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-windows.cfg" --main-jar "Makelangelo-$MVN_VERSION-with-dependencies.jar" &&
         ls
 
     - name: Prepare legacy package
