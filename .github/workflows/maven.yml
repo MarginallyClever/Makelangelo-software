@@ -26,14 +26,6 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
-    - name: Upload artifact for release
-      uses: actions/upload-artifact@v2
-      with:
-        name: jar
-        retention-days: 5
-        path: target/Makelangelo-*-with-dependencies.jar
-
-
 #    - name: Prepare legacy package
 #      shell: bash
 #      run: |
@@ -47,13 +39,21 @@ jobs:
 #        7z a -tzip Makelangelo.zip . &&
 #        mv Makelangelo.zip ../..
 
+    - name: Upload artifact for release
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar
+        retention-days: 5
+        path: target/Makelangelo-*-with-dependencies.jar
+
 
   package:
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+#        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
 
@@ -87,7 +87,7 @@ jobs:
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
     runs-on: windows-latest
-    needs: package
+    needs: build
     if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact
