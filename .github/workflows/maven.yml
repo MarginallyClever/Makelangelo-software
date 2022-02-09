@@ -87,7 +87,7 @@ jobs:
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
     runs-on: windows-latest
-    needs: package-windows
+    needs: package
     if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact
