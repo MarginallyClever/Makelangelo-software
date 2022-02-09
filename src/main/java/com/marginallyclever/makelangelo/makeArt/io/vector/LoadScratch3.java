@@ -132,8 +132,7 @@ public class LoadScratch3 implements TurtleLoader {
 		readScratchInstructions(tree);
 
 		// read the sketch(es)
-		JSONArray children = (JSONArray)tree.get("children");
-		if(children==null) throw new Exception("JSON node 'children' missing.");
+		JSONArray children = (JSONArray)tree.get("children");  // throws exception if missing, which is what I want.
 		//logger.debug("found children");
 		
 		// look for the first child with a script
@@ -141,13 +140,9 @@ public class LoadScratch3 implements TurtleLoader {
 		JSONArray scripts = null;
 		while( childIter.hasNext() ) {
 			JSONObject child = (JSONObject)childIter.next();
-			scripts = (JSONArray)child.get("scripts");
-			if (scripts != null)
-				break;
+			child.get("scripts");  // throws exception if missing, which is what I want.
 		}
 		
-		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
-
 		logger.debug("found {} scripts", scripts.length());
 		logger.debug("finished scripts");
 
