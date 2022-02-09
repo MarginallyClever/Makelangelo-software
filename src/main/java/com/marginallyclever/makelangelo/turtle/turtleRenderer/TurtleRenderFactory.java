@@ -45,7 +45,7 @@ public enum TurtleRenderFactory {
 	
 	/**
 	 * 
-	 * @return The text (translated) to used as text in the GUI ...
+	 * @return The translated text to be used as text in the GUI
 	 */
 	public String getTranslatedText() {
 		return Translator.get(translatKey);
