@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
 import org.json.JSONObject;

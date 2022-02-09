@@ -24,8 +24,6 @@ import java.util.zip.ZipInputStream;
  * @author Dan Royer
  *
  */
-@SuppressWarnings(value = { "unused" }) // TODO until this is finished
-
 public class LoadScratch3 implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadScratch3.class);
 	private final String PROJECT_JSON = "project.json";
@@ -163,6 +161,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchInstructions(JSONObject tree) throws Exception {
+		logger.debug("readScratchInstructions");
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray targets = (JSONArray)tree.get("targets");
 		Iterator<?> targetIter = targets.iterator();
@@ -319,6 +318,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchVariables(JSONObject tree) throws Exception {
+		logger.debug("readScratchVariables");
 		scratchVariables = new LinkedList<ScratchVariable>();
 		JSONArray targets = (JSONArray)tree.get("targets");
 		Iterator<?> targetIter = targets.iterator();
@@ -350,6 +350,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchLists(JSONObject tree) throws Exception {
+		logger.debug("readScratchLists");
 		scratchLists = new LinkedList<ScratchList>();
 		JSONArray targets = (JSONArray)tree.get("targets");
 		Iterator<?> targetIter = targets.iterator();
