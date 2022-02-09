@@ -26,10 +26,19 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
+    - name: Build exe installation
+      shell: bash
+      run: |
+        MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
+        sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
+        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-macos.cfg" --main-jar target/Makelangelo-*-with-dependencies.jar &&
+        ls
+
     - name: Prepare package for release
       shell: bash
       run: |
-        cp -r src/main/package/ target/package &&
+        mkdir -p target/package &&
+        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
         cp CONTRIBUTING.md target/package/ &&
         cp LICENSE target/package/ &&
         cp README.md target/package/ &&
@@ -41,8 +50,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: artifact
-        path: target/package/Makelangelo.zip
         retention-days: 5
+        path: |
+          target/package/Makelangelo.zip
+          Makelangelo*.exe
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
