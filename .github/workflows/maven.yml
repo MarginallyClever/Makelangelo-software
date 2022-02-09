@@ -71,7 +71,7 @@ jobs:
     - name: Build exe installation
       shell: bash
       run: |
-        OS_BUILD=$(echo ${{matrix.TARGET}} | sed "s/-latest//")
+        OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//")
         MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
         sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$MVN_VERSION-with-dependencies.jar" &&
