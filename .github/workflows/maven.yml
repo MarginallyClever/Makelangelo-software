@@ -44,7 +44,8 @@ jobs:
         cp README.md target/package/ &&
         mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
         cd target/package/ &&
-        7z a -tzip Makelangelo.zip .
+        7z a -tzip Makelangelo.zip . &&
+        mv Makelangelo.zip ../..
 
     - name: Upload artifact for release
       uses: actions/upload-artifact@v2
@@ -52,7 +53,7 @@ jobs:
         name: artifact
         retention-days: 5
         path: |
-          target/package/Makelangelo.zip
+          Makelangelo.zip
           Makelangelo*.exe
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
