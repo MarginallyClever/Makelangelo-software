@@ -19,9 +19,9 @@ jobs:
         cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-    - name: Build and Test with Maven
-      timeout-minutes: 15
-      run: ./mvnw -B test
+#    - name: Build and Test with Maven
+#      timeout-minutes: 15
+#      run: ./mvnw -B test
 
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
@@ -31,10 +31,10 @@ jobs:
       run: |
         MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
         sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
-        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-windows.cfg" --main-jar target/Makelangelo-*-with-dependencies.jar &&
+        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-windows.cfg" --main-jar "Makelangelo-$MVN_VERSION-with-dependencies.jar" &&
         ls
 
-    - name: Prepare package for release
+    - name: Prepare legacy package
       shell: bash
       run: |
         mkdir -p target/package &&
