@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class ChooseConnection extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
-	
+
 	private static final long serialVersionUID = 4773092967249064165L;
 
 	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
@@ -32,28 +33,41 @@ public class ChooseConnection extends JPanel {
 			Arrays.asList(Color.GREEN, Color.RED));
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<Configuration> connectionComboBox = new JComboBox<>();
-	private final JComboBox<Integer> baudRateComboBox = new JComboBox<>();
+	private final JPanel configurationPanel = new JPanel();
+	private TransportLayer previousTransportLayer;
+
 	private NetworkSession mySession;
 
 	public ChooseConnection() {
 		this.add(connectionComboBox);
-		this.add(new JLabel("@"));
-		Arrays.asList(250000, 115200, 57600, 38400, 19200).forEach(baudRateComboBox::addItem);
-		this.add(baudRateComboBox);
+		connectionComboBox.addActionListener(this::updateConfigurationPanel);
+		addConnectionsItems(connectionComboBox);
+
+		configurationPanel.setLayout(new BoxLayout(configurationPanel, BoxLayout.LINE_AXIS));
+		this.add(configurationPanel);
 
 		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
 		this.add(refresh);
-		addConnectionsItems(connectionComboBox);
 
-		bConnect.addActionListener((e)-> onConnectAction());
+		bConnect.addActionListener(e-> onConnectAction());
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.add(bConnect);
+	}
+
+	private void updateConfigurationPanel(ActionEvent actionEvent) {
+		Configuration configuration = (Configuration) ((JComboBox )actionEvent.getSource()).getSelectedItem();
+		TransportLayer transportLayer = configuration.getTransportLayer();
+		if (previousTransportLayer != configuration.getTransportLayer()) {
+			configurationPanel.removeAll();
+			configuration.getTransportLayerUI().addToPanel(configurationPanel);
+			configurationPanel.revalidate();
+		}
+		previousTransportLayer = transportLayer;
 	}
 
 	private void addConnectionsItems(JComboBox<Configuration> comboBox) {
 		comboBox.removeAllItems();
 		logger.debug("Fetching connections");
-		List<NetworkSessionItem> items = new ArrayList<>();
 		for (TransportLayer transportLayer : TransportLayers.transportLayers) {
 			logger.debug("  {}" ,transportLayer.getName());
 			for (String connection: transportLayer.listConnections()) {
@@ -70,7 +84,7 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			onClose();
 		} else {
-			int speed = (int) baudRateComboBox.getSelectedItem();
+			int speed = 42; // (int) baudRateComboBox.getSelectedItem();
 			Configuration configuration = (Configuration) connectionComboBox.getSelectedItem();
 			if (configuration==null) return;  // no connections at all
 			configuration.addConfiguration("speed", speed);
@@ -97,25 +111,14 @@ public class ChooseConnection extends JPanel {
 
 	private void onOpen(NetworkSession s) {
 		mySession = s;
-		mySession.addListener((e)->{
+		mySession.addListener(e->{
 			if (e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
-				onClose(); 
+				onClose();
 			}
 		});
 		connectionComboBox.setEnabled(false);
 		refresh.setEnabled(false);
 		bConnect.updateButton(1);
-	}
-
-	public NetworkSession getNetworkSession() {
-		return mySession;
-	}
-	
-	public void setNetworkSession(NetworkSession s) {
-		if (s!=null && s!=mySession) {
-			onClose();
-			onOpen(s);
-		}
 	}
 
 	public void closeConnection() {
@@ -140,14 +143,14 @@ public class ChooseConnection extends JPanel {
 		}
 	}
 
-	// TEST 
-	
+	// TEST
+
 	public static void main(String[] args) {
 		PreferencesHelper.start();
 		Translator.start();
 
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
-		frame.setMinimumSize(new Dimension(600, 70));
+		frame.setMinimumSize(new Dimension(800, 70));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChooseConnection());
 		frame.pack();

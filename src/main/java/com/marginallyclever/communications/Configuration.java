@@ -33,4 +33,5 @@ public class Configuration {
     public String toString() {
         return connectionName;
     }
+
 }
