@@ -26,6 +26,30 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
+    - name: Upload artifact for release
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        retention-days: 5
+        path: target/Makelangelo-*-with-dependencies.jar
+
+  package-windows:
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'maven'
+
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact
+
     - name: Build exe installation
       shell: bash
       run: |
@@ -59,7 +83,7 @@ jobs:
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
     runs-on: windows-latest
-    needs: build
+    needs: package-windows
     if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact
