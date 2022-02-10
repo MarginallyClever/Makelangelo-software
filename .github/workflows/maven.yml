@@ -57,39 +57,30 @@ jobs:
 #        os: [macos-latest, ubuntu-latest, windows-latest]
         os: [ubuntu-latest]
     steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: jar
-
-    - name: Build installation
-      shell: bash
-      run: |
-        ls
-        file jar
-
     - uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
 
+    - uses: actions/download-artifact@v2
+      with:
+        name: jar
+
     - name: Build installation package
       shell: bash
       run: |
-        ls
         set -x
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
-        MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
-        sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
-        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$MVN_VERSION-with-dependencies.jar" &&
+        APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
+        sed -i "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
+        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls
 
-    - name: Upload artifact for release
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2
       with:
         name: artifact
         retention-days: 5
-        path: Makelangelo*
+        path: makelangelo*
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
