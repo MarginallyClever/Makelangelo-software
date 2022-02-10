@@ -26,24 +26,39 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
-#    - name: Prepare legacy package
-#      shell: bash
-#      run: |
-#        mkdir -p target/package &&
-#        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
-#        cp CONTRIBUTING.md target/package/ &&
-#        cp LICENSE target/package/ &&
-#        cp README.md target/package/ &&
-#        mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
-#        cd target/package/ &&
-#        7z a -tzip Makelangelo.zip . &&
-#        mv Makelangelo.zip ../..
+    - name: Prepare legacy package
+      shell: bash
+      run: |
+        mkdir -p target/package &&
+        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
+        cp CONTRIBUTING.md target/package/ &&
+        cp LICENSE target/package/ &&
+        cp README.md target/package/ &&
+        mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
+        cd target/package/ &&
+        7z a -tzip Makelangelo.zip . &&
+        mv Makelangelo.zip ../..
 
-    - name: Upload artifact for release
+    - name: Deploy universal release
+      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+      uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
+        # in your browser and copy the full "upload_url" value including the {?name,label} part
+        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
+        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        asset_path: Makelangelo.zip # path to archive to upload
+        asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_content_type: application/zip # required by GitHub API
+        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+
+    - name: Upload artifact for package
       uses: actions/upload-artifact@v2
       with:
         name: jar
-        retention-days: 5
+        retention-days: 2
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
@@ -75,51 +90,24 @@ jobs:
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
         BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
+        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/")
         echo "$BINARY" &&
         echo "$BINARY_WO_EXT" &&
+        echo "$BINARY_EXT" &&
         echo "BINARY=$BINARY" >> $GITHUB_ENV
         echo "BINARY_WO_EXT=$BINARY_WO_EXT" >> $GITHUB_ENV
+        echo "BINARY_EXT=$BINARY_EXT" >> $GITHUB_ENV
 
-    - name: debug
-      shell: bash
-      run: env | grep BINARY
-
-
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: artifact
-#        retention-days: 5
-#        path: |
-#          makelangelo*
-#          Makelangelo*
-
-  # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
-  deploy-nightly:
-    runs-on: ubuntu-latest
-    needs: package
-#    if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v2
+    - name: Deploy universal release
+      uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
-        name: artifact
-
-    - name: Build installation package
-      shell: bash
-      run: ls
-
-#       from https://github.com/marketplace/actions/deploy-nightly
-#    - name: Deploy universal release
-#      uses: WebFreak001/deploy-nightly@v1.1.0
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-#      with:
-#         find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
-#         in your browser and copy the full "upload_url" value including the {?name,label} part
-#        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-#        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
-#        asset_path: Makelangelo.zip # path to archive to upload
-#        asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
-#        asset_content_type: application/zip # required by GitHub API
-#        max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
-#
+#        find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
+#        in your browser and copy the full "upload_url" value including the {?name,label} part
+        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
+        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        asset_path: ${{ env.BINARY }} # path to archive to upload
+        asset_name: ${{ env.BINARY_WO_EXT }}-nightly-$$.${{ env.BINARY_EXT }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_content_type: application/zip # required by GitHub API
+        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
