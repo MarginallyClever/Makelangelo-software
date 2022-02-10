@@ -221,6 +221,12 @@ public class LoadScratch3 implements TurtleLoader {
 			case "pen_penUp":
 				myTurtle.penUp();
 				break;
+				
+			case "motion_movesteps":		doMovesSteps(currentBlock);		break;
+			case "motion_turnright":		doTurnRight(currentBlock);		break;
+			case "motion_turnleft":			doTurnLeft(currentBlock);		break;
+			case "motion_pointindirection":	doPointInDirection(currentBlock);break;
+			
 			default:
 				logger.debug("Ignored {}", opcode);
 			}
@@ -240,9 +246,70 @@ public class LoadScratch3 implements TurtleLoader {
 		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
 		JSONArray x =(JSONArray)inputs.get("X");
 		JSONArray y =(JSONArray)inputs.get("Y");
-		double px = resolveValue(x.getString(1));
-		double py = resolveValue(y.getString(1));
+		double px = resolveValue(x.get(1));
+		double py = resolveValue(y.get(1));
 		myTurtle.moveTo(px, py);
+	}
+
+	/**
+	 * opcode motion_movesteps.
+	 * <br>N.B. : In scratch it seems that if we try to move out of the
+	 * "screen", we find ourselves "block by"/"returned to" the edge ... (this therefore
+	 * risks creating different renderings because turtle does not have this.)
+	 *
+	 * @param currentBlock
+	 * @throws Exception
+	 */
+	private void doMovesSteps(JSONObject currentBlock) throws Exception {
+		logger.debug("forward steps");
+		JSONObject inputs = (JSONObject) currentBlock.get("inputs");
+		JSONArray steps = (JSONArray) inputs.get("STEPS");
+		double dSteps = resolveValue(steps.get(1));
+		myTurtle.forward(dSteps);
+	}
+
+	/**
+	 * motion_turnright.
+	 * TODO as this is the same as TurnLeft but DEGREES * -1.0 ... a sub fonction to factorise.
+	 * @param currentBlock
+	 * @throws Exception
+	 */
+	private void doTurnRight(JSONObject currentBlock) throws Exception {
+		logger.debug("Turn -DEGREES");
+		JSONObject inputs = (JSONObject) currentBlock.get("inputs");
+		JSONArray degrees = (JSONArray) inputs.get("DEGREES");
+		double dDegrees = resolveValue(degrees.get(1));
+		myTurtle.turn(-dDegrees);
+	}
+
+	/**
+	 * motion_turnleft.
+	 *
+	 * @param currentBlock
+	 * @throws Exception
+	 */
+	private void doTurnLeft(JSONObject currentBlock) throws Exception {
+		logger.debug("Turn +DEGREES");
+		JSONObject inputs = (JSONObject) currentBlock.get("inputs");
+		JSONArray degrees = (JSONArray) inputs.get("DEGREES");
+		double dDegrees = resolveValue(degrees.get(1));
+		myTurtle.turn(dDegrees);
+	}
+
+	/**
+	 * motion_pointindirection.
+	 * <br>
+	 * N.B. : turtel setAngle(0) = scratch motion_pointindirection (-90)
+	 *
+	 * @param currentBlock
+	 * @throws Exception
+	 */
+	private void doPointInDirection(JSONObject currentBlock) throws Exception {
+		logger.debug("pointindirection DIRECTION");
+		JSONObject inputs = (JSONObject) currentBlock.get("inputs");
+		JSONArray degrees = (JSONArray) inputs.get("DIRECTION");
+		double dDegrees = resolveValue(degrees.get(1));
+		myTurtle.setAngle(dDegrees + 90.0);
 	}
 
 	private void doIfElse(JSONObject currentBlock) throws Exception {
@@ -390,7 +457,7 @@ public class LoadScratch3 implements TurtleLoader {
 				String k=(String)keys.next();
 				JSONArray details = (JSONArray)variables.get(k);
 				String name = (String)details.get(0);
-				Number value = (Number)details.get(1);
+				Number value = (Number)Double.parseDouble(details.get(1).toString());
 				try {
 					logger.debug("Variable {} {} {}", k, name, value.floatValue());
 					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
@@ -543,6 +610,8 @@ public class LoadScratch3 implements TurtleLoader {
 			switch(currentArray.getInt(0)) {
 			case 12:  return getScratchVariable(currentArray.getString(2)).value;  // variable
 			case 10:  return Double.parseDouble(currentArray.getString(1));  // constant
+			case 4:  return Double.parseDouble(currentArray.getString(1));  // ??? local block varialbe definition ( repeat n times )
+			case 8:  return Double.parseDouble(currentArray.getString(1));  // ??? constante angle value  ( motion_pointindirection inputs DIRECTION )
 			default: throw new Exception("resolveValue unknown value type "+currentArray.getInt(0));
 			}
 		} else if(currentObject instanceof String) {
