@@ -74,12 +74,15 @@ jobs:
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
+        BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
         echo "$BINARY" &&
+        echo "$BINARY_WO_EXT" &&
         echo "BINARY=$BINARY" >> $GITHUB_ENV
+        echo "BINARY_WO_EXT=$BINARY_WO_EXT" >> $GITHUB_ENV
 
     - name: debug
       shell: bash
-      run: ls
+      run: env | grep BINARY
 
 
 #    - uses: actions/upload-artifact@v2
