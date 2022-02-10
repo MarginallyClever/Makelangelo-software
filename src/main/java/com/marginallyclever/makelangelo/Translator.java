@@ -197,6 +197,7 @@ public final class Translator {
 			lang.loadFromInputStream(stream);
 		} catch(Exception e) {
 			logger.error("Failed to load {}", actualFilename);
+			logger.debug("{}",e);// To log the Exception stack in debug/dev mode.
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
