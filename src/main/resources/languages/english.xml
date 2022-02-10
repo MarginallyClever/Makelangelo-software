@@ -2083,4 +2083,10 @@
 		<hint>Dialog</hint>
 	</string>
 
+	<string>
+		<key>CartesianButtons.buttonCenter</key>
+		<value></value>
+		<hint>jog controls</hint>
+	</string>
+
 </language>
