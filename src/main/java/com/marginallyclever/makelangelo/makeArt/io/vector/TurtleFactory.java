@@ -38,9 +38,10 @@ public class TurtleFactory {
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {
+		filename = filename.toLowerCase();
 		String [] extensions = filter.getExtensions();
 		for( String e : extensions ) {
-			if(filename.endsWith(e)) return true;
+			if(filename.endsWith(e.toLowerCase())) return true;
 		}
 		return false;
 	}

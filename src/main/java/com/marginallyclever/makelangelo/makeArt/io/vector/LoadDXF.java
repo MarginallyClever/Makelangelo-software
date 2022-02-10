@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
