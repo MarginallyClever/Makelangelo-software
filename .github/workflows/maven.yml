@@ -80,7 +80,9 @@ jobs:
       with:
         name: artifact
         retention-days: 5
-        path: makelangelo*
+        path: |
+          makelangelo*
+          Makelangelo*
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
