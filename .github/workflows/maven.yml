@@ -73,8 +73,8 @@ jobs:
         APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
-        BINARY=$(find . -iname 'makelangelo-*' -depth 1)
-        echo "$BINARY"
+        BINARY=$(find . -iname 'makelangelo-*' -depth 1) &&
+        echo "$BINARY" &&
         echo "BINARY=$BINARY" >> $GITHUB_ENV
 
     - name: debug
