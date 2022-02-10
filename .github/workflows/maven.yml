@@ -60,7 +60,6 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
-        cache: 'maven'
 
     - name: Download artifact
       uses: actions/download-artifact@v2
