@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -21,13 +23,16 @@ import java.util.zip.ZipInputStream;
  * We ignore monitors, which are visual displays of variables, booleans, and lists
  * They don't contain any real information we need.
  * 
+ * See https://en.scratch-wiki.info/wiki/Scratch_File_Format
+ * 
  * @author Dan Royer
+ * @since 7.31.0
  */
 public class LoadScratch3 implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadScratch3.class);
 	private final String PROJECT_JSON = "project.json";
 	
-	private class Scratch3Variable {
+	private class Scratch3Variable implements Cloneable {
 		public String name;
 		public String uniqueID;
 		public Object value;
@@ -39,7 +44,8 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 		
 		public String toString() {
-			return uniqueID+" "+name+"="+value;
+			return //uniqueID+" "+
+					name+"="+value;
 		}
 	};
 	
@@ -54,12 +60,20 @@ public class LoadScratch3 implements TurtleLoader {
 	};
 	
 	@SuppressWarnings("serial")
-	private class Scratch3Stack extends LinkedList<Scratch3Variable> {}
+	private class Scratch3Variables extends ArrayList<Scratch3Variable> {
+		public Scratch3Variables deepCopy() {
+			Scratch3Variables copy = new Scratch3Variables();
+			for(Scratch3Variable v : this) {
+				copy.add(new Scratch3Variable(v.name,v.uniqueID,null));
+			}
+			return copy;
+		}
+	}
 
 	private class Scratch3Procedure {
 		public String proccode;  // name of procedure
 		public String uniqueID;
-		public Scratch3Stack parameters = new Scratch3Stack();
+		public Scratch3Variables parameters = new Scratch3Variables();
 		
 		public Scratch3Procedure(String uniqueID,String proccode) {
 			this.uniqueID = uniqueID;
@@ -67,12 +81,16 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 		
 		public String toString() {
-			return uniqueID+" "+proccode+parameters.toString();
+			return //uniqueID+" "+
+					proccode+parameters.toString();
 		}
 	}
 	
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),"SB3");
-	private Scratch3Stack scratchVariables;
+	
+	private Scratch3Variables scratchGlobalVariables;
+	private Stack<Scratch3Variables> myStack = new Stack<>();
+	
 	private List<Scratch3List> scratchLists = new ArrayList<>();
 	private List<Scratch3Procedure> scratchProcedures = new ArrayList<>();
 	private JSONObject blocks;
@@ -93,18 +111,37 @@ public class LoadScratch3 implements TurtleLoader {
 	@Override
 	public Turtle load(InputStream in) throws Exception {
 		logger.debug("Loading...");
-		// reset the turtle object
-		myTurtle = new Turtle();
+		JSONObject tree = getTreeFromInputStream(in);
 		
-		// open zip file
-    	logger.debug("Searching for project.json...");
-    	
+		if(!confirmAtLeastVersion3(tree)) throw new Exception("File must be at least version 3.0.0.");
+		if(!confirmHasPenExtension(tree)) throw new Exception("File must include pen extension.");
+		
+		readScratchVariables(tree);
+		readScratchLists(tree);
+		findBlocks(tree);
+		readScratchProcedures();
+		readScratchInstructions();
+
+		return myTurtle;
+	}
+
+	private JSONObject getTreeFromInputStream(InputStream in) throws FileNotFoundException, IOException {
+		File tempZipFile = extractProjectJSON(in);
+		
+        logger.debug("Parsing JSON file...");
+        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
+        JSONObject tree = new JSONObject(tokener);
+
+		tempZipFile.delete();
+		
+		return tree;
+	}
+
+	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
+		logger.debug("Searching for project.json...");
 		ZipInputStream zipInputStream = new ZipInputStream(in);
-		
-		// locate project.json
 		ZipEntry entry;
 		File tempZipFile=null;
-		boolean found=false;
 		while((entry = zipInputStream.getNextEntry())!=null) {
 	        if( entry.getName().equals(PROJECT_JSON) ) {
 	        	logger.debug("Found project.json...");
@@ -121,38 +158,10 @@ public class LoadScratch3 implements TurtleLoader {
                     fos.write(buffer, 0, len);
                 }
                 fos.close();
-                found=true;
-                break;
+                return tempZipFile;
 	        }
 		}
-
-		if(found==false) {
-			throw new Exception("SB3 missing project.json");
-		}
-		
-		// parse JSON
-        logger.debug("Parsing JSON file...");
-
-        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
-        JSONObject tree = new JSONObject(tokener);
-		// we're done with the tempZipFile now that we have the JSON structure.
-		tempZipFile.delete();
-		
-		
-		if(confirmAtLeastVersion3(tree)==false) {
-			throw new Exception("File must be at least version 3.0.0.");
-		}
-		if(confirmHasPenExtension(tree)==false) {
-			throw new Exception("File must include pen extension.");
-		}
-		
-		readScratchVariables(tree);
-		readScratchLists(tree);
-		findBlocks(tree);
-		readScratchProcedures();
-		readScratchInstructions();
-
-		return myTurtle;
+		throw new FileNotFoundException("SB3 missing project.json");
 	}
 
 	private void findBlocks(JSONObject tree) throws Exception {
@@ -203,7 +212,7 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 	
 	private void parseScratchCode(String currentKey) throws Exception {
-		logger.debug("parseScratchCode {}",currentKey);
+		//logger.debug("parseScratchCode {}",currentKey);
 		JSONObject currentBlock = getBlock(currentKey);
 				
 		while(currentBlock!=null) {
@@ -276,21 +285,49 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 	
 	private void doCall(JSONObject currentBlock) throws Exception {
-		JSONObject inputs = currentBlock.getJSONObject("inputs");
 		String proccode = (String)findMutationInBlock(currentBlock,"proccode");
+		ArrayList<Object> args = resolveArgumentsForProcedure(currentBlock);
+		logger.debug("CALL {}({})",proccode,args.toString());
 		
-		// resolve arguments to pass into procedure
+		Scratch3Procedure p = findProcedureWithProccode(proccode);
+		pushStack(p,args);
+		parseScratchCode(getBlock(p.uniqueID).getString("next"));
+		myStack.pop();
+	}
+	
+	private ArrayList<Object> resolveArgumentsForProcedure(JSONObject currentBlock) throws Exception {
 		ArrayList<Object> args = new ArrayList<>();
+		
+		JSONObject inputs = currentBlock.getJSONObject("inputs");
 		JSONArray argumentids = new JSONArray((String)findMutationInBlock(currentBlock,"argumentids"));
 		Iterator<Object> iter = argumentids.iterator();
 		while(iter.hasNext()) {
 			JSONArray key = (JSONArray)inputs.get((String)iter.next());
 			args.add(resolveValue(key.get(1)));
 		}
-		
-		logger.debug("CALL {}({})",proccode,args.toString());
+
+		return args;
 	}
-	
+
+	// copy the parameters, set the values based on what was passed into the procedure, and then push that onto the stack.
+	private void pushStack(Scratch3Procedure p, ArrayList<Object> args) {
+		Scratch3Variables list = p.parameters.deepCopy();
+		for(int i=0;i<list.size();++i) {
+			list.get(i).value = args.get(i);
+		}
+		
+		myStack.push(list);
+	}
+
+	private Scratch3Procedure findProcedureWithProccode(String proccode) {
+		Iterator<Scratch3Procedure> iter = scratchProcedures.iterator();
+		while(iter.hasNext()) {
+			Scratch3Procedure p = iter.next();
+			if(p.proccode.equals(proccode)) return p;
+		}
+		return null;
+	}
+
 	private void doIf(JSONObject currentBlock) throws Exception {
 		logger.debug("IF");
 		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
@@ -426,14 +463,23 @@ public class LoadScratch3 implements TurtleLoader {
 		return mutation.get(subKey);
 	}
 
+	/**
+	 * Find and return the variable with uniqueID.  Search the top of myStack first, then the globals. 
+	 * @param uniqueID the id to match.
+	 * @return the variable found.
+	 * @throws Exception if variable not found.
+	 */
 	private Scratch3Variable getScratchVariable(String uniqueID) throws Exception {
-		Iterator<Scratch3Variable> svi = scratchVariables.iterator();
-		while(svi.hasNext()) {
-			Scratch3Variable sv = svi.next();
-			if(sv.uniqueID.equals(uniqueID)) {
-				return sv;
+		if(!myStack.isEmpty()) {
+			for(Scratch3Variable sv : myStack.peek()) {
+				if(sv.uniqueID.equals(uniqueID)) return sv;
 			}
 		}
+		
+		for(Scratch3Variable sv : scratchGlobalVariables) {
+			if(sv.uniqueID.equals(uniqueID)) return sv;
+		}
+		
 		throw new Exception("Variable '"+uniqueID+"' not found.");
 	}
 
@@ -471,7 +517,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 */
 	private void readScratchVariables(JSONObject tree) throws Exception {
 		logger.debug("readScratchVariables");
-		scratchVariables = new Scratch3Stack();
+		scratchGlobalVariables = new Scratch3Variables();
 		JSONArray targets = tree.getJSONArray("targets");
 		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
@@ -491,7 +537,7 @@ public class LoadScratch3 implements TurtleLoader {
 				try {
 					double d = value.doubleValue();
 					logger.debug("Variable {} {} {}", k, name, d);
-					scratchVariables.add(new Scratch3Variable(name,k,d));
+					scratchGlobalVariables.add(new Scratch3Variable(name,k,d));
 				} catch (Exception e) {
 					throw new Exception("Variables must be numbers.", e);
 				}
@@ -695,21 +741,23 @@ public class LoadScratch3 implements TurtleLoader {
 			// is equation
 			String opcode = currentBlock.getString("opcode");
 			switch(opcode) {
-			case "operator_add":		return doAdd(currentBlock);
-			case "operator_subtract":	return doSubstract(currentBlock);
-			case "operator_multiply":	return doMultiply(currentBlock);
-			case "operator_divide":		return doDivide(currentBlock);
-			case "operator_random":		return doRandom(currentBlock);
-			case "operator_mathop":		return doMathOp(currentBlock);
-			case "motion_direction":	return doMotionDirection(currentBlock);
-			case "motion_xposition":	return doMotionXPosition(currentBlock);
-			case "motion_yposition":	return doMotionYPosition(currentBlock);
+			case "operator_add":					return doAdd(currentBlock);
+			case "operator_subtract":				return doSubstract(currentBlock);
+			case "operator_multiply":				return doMultiply(currentBlock);
+			case "operator_divide":					return doDivide(currentBlock);
+			case "operator_random":					return doRandom(currentBlock);
+			case "operator_mathop":					return doMathOp(currentBlock);
+			case "motion_direction":				return doMotionDirection(currentBlock);
+			case "motion_xposition":				return doMotionXPosition(currentBlock);
+			case "motion_yposition":				return doMotionYPosition(currentBlock);
+			case "argument_reporter_string_number":	return (double)doReporterStringValue(currentBlock);
+			case "argument_reporter_boolean":		return (double)doReporterStringValue(currentBlock);
 			default: throw new Exception("resolveValue unsupported opcode "+opcode);
 			}
 		}
 		throw new Exception("resolveValue unknown object type "+currentObject.getClass().getSimpleName());
 	}
-	
+
 	private double doAdd(JSONObject currentBlock) throws Exception {
 		JSONObject inputs = currentBlock.getJSONObject("inputs");
 		JSONArray NUM1 = inputs.getJSONArray("NUM1");
@@ -791,6 +839,17 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	private double doMotionYPosition(JSONObject currentBlock) throws Exception {
 		return myTurtle.getY();
+	}
+	
+	private Object doReporterStringValue(JSONObject currentBlock) throws Exception {
+		String name = currentBlock.getJSONObject("fields").getJSONArray("VALUE").getString(0);
+		
+		if(!myStack.isEmpty()) {
+			for(Scratch3Variable sv : myStack.peek()) {
+				if(sv.name.equals(name)) return sv.value;
+			}
+		}
+		throw new Exception("Variable '"+name+"' not found.");
 	}
 
 	private int getListID(Object obj) throws Exception {
