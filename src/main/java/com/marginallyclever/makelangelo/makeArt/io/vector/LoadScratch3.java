@@ -187,42 +187,47 @@ public class LoadScratch3 implements TurtleLoader {
 			String opcode = (String)currentBlock.get("opcode");			
 			switch(opcode) {
 			// control blocks start
-			case "event_whenflagclicked":	doStart(currentBlock);			break;
-			case "control_repeat":			doRepeat(currentBlock);  		break;
-			case "control_repeat_until":	doRepeatUntil(currentBlock);	break;
-			case "control_forever":			doRepeatForever(currentBlock);	break;
-			case "control_if":				doIf(currentBlock);				break;
-			case "control_if_else":			doIfElse(currentBlock);			break;
+			case "event_whenflagclicked":	doStart(currentBlock);					break;
+			case "control_repeat":			doRepeat(currentBlock);  				break;
+			case "control_repeat_until":	doRepeatUntil(currentBlock);			break;
+			case "control_forever":			doRepeatForever(currentBlock);			break;
+			case "control_if":				doIf(currentBlock);						break;
+			case "control_if_else":			doIfElse(currentBlock);					break;
 			case "control_stop":
 				//throw new Exception("control_stop not supported.");
 				return;
+			case "procedures_call":			doCall(currentBlock);					break;
 			// control blocks end
 
 //			case "data_variable":			break;
-			case "data_setvariableto":		setVariableTo(currentBlock);	break;
-			case "data_changevariableby":	changeVariableBy(currentBlock);	break;
-/*			case "data_hidevariable":										break;
-			case "data_showvariable":										break;
-			case "data_listcontents":										break;
-			case "data_addtolist":											break;
-			case "data_deleteoflist":										break;
-			case "data_deletealloflist":									break;
-			case "data_insertatlist":										break;
-			case "data_replaceitemoflist":									break;
-			case "data_itemoflist":											break;
-			case "data_itemnumoflist":										break;
-			case "data_lengthoflist":										break;
-			case "data_listcontainsitem":									break;
+			case "data_setvariableto":		setVariableTo(currentBlock);			break;
+			case "data_changevariableby":	changeVariableBy(currentBlock);			break;
+/*			case "data_hidevariable":												break;
+			case "data_showvariable":												break;
+			case "data_listcontents":												break;
+			case "data_addtolist":													break;
+			case "data_deleteoflist":												break;
+			case "data_deletealloflist":											break;
+			case "data_insertatlist":												break;
+			case "data_replaceitemoflist":											break;
+			case "data_itemoflist":													break;
+			case "data_itemnumoflist":												break;
+			case "data_lengthoflist":												break;
+			case "data_listcontainsitem":											break;
 */
-			case "motion_gotoxy": 			doGotoXY(currentBlock);			break;
-			case "pen_penDown":
-				myTurtle.penDown();
-				break;
-			case "pen_penUp":
-				myTurtle.penUp();
-				break;
-			default:
-				logger.debug("Ignored {}", opcode);
+			case "motion_gotoxy": 			doMotionGotoXY(currentBlock);  			break;
+			case "motion_pointindirection": doMotionPointInDirection(currentBlock);	break;
+			case "motion_turnleft":			doMotionTurnLeft(currentBlock);  		break;
+			case "motion_turnright":		doMotionTurnRight(currentBlock);  		break;
+			case "motion_movesteps":		doMotionMoveSteps(currentBlock);		break;
+			//case "motion_pointtowards": 	doMotionPointTowards(currentBlock);  break;
+			case "motion_changexby": 		doMotionChangeX(currentBlock);  		break;
+			case "motion_changeyby": 		doMotionChangeY(currentBlock);  		break;
+			case "motion_setx": 			doMotionSetX(currentBlock);  			break;
+			case "motion_sety": 			doMotionSetY(currentBlock);  			break;
+			case "pen_penDown":				myTurtle.penDown();						break;
+			case "pen_penUp":				myTurtle.penUp();						break;
+			default: logger.debug("Ignored {}", opcode);
 			}
 
 			currentBlock = findNextBlock(currentBlock);
@@ -235,76 +240,73 @@ public class LoadScratch3 implements TurtleLoader {
 		myTurtle = new Turtle();
 	}
 
-	private void doGotoXY(JSONObject currentBlock) throws Exception {
-		logger.debug("GOTO XY");
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray x =(JSONArray)inputs.get("X");
-		JSONArray y =(JSONArray)inputs.get("Y");
-		double px = resolveValue(x.getString(1));
-		double py = resolveValue(y.getString(1));
-		myTurtle.moveTo(px, py);
-	}
-
 	private void doIfElse(JSONObject currentBlock) throws Exception {
 		logger.debug("IF ELSE");
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray condition =(JSONArray)inputs.get("CONDITION");
-		JSONArray substack = (JSONArray)inputs.get("SUBSTACK");
-		JSONArray substack2 = (JSONArray)inputs.get("SUBSTACK2");
-		if(resolveBoolean(getBlock(condition.getString(1)))) {
-			parseScratchCode(substack.getString(1));
+		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
+		String substack2 = (String)findInputInBlock(currentBlock,"SUBSTACK2");
+		if(resolveBoolean(getBlock(condition))) {
+			parseScratchCode(substack);
 		} else {
-			parseScratchCode(substack2.getString(1));
+			parseScratchCode(substack2);
 		}
+	}
+	
+	private void doCall(JSONObject currentBlock) throws Exception {
+		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
+		JSONObject mutation = (JSONObject)currentBlock.get("mutation");
+		String proccode = mutation.getString("proccode");
+		JSONArray argumentids = new JSONArray((String)mutation.get("argumentids"));
+				
+		ArrayList<Object> args = new ArrayList<>();
+		Iterator<Object> iter = argumentids.iterator();
+		while(iter.hasNext()) {
+			JSONArray key = (JSONArray)inputs.get((String)iter.next());
+			args.add(resolveValue(key.get(1)));
+		}
+		logger.debug("CALL {}({})",proccode,args.toString());
 	}
 
 	private void doIf(JSONObject currentBlock) throws Exception {
 		logger.debug("IF");
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray condition =(JSONArray)inputs.get("CONDITION");
-		JSONArray substack = (JSONArray)inputs.get("SUBSTACK");
-		if(resolveBoolean(getBlock(condition.getString(1)))) {
-			parseScratchCode(substack.getString(1));
+		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
+		if(resolveBoolean(getBlock(condition))) {
+			parseScratchCode(substack);
 		}
 	}
 
 	private void doRepeatForever(JSONObject currentBlock) throws Exception {
-		logger.debug("FOREVER");
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray substack = (JSONArray)inputs.get("SUBSTACK");
+		logger.debug("REPEAT FOREVER");
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		while(true) {
-			parseScratchCode(substack.getString(1));
+			parseScratchCode(substack);
 		}
 	}
 
 	private void doRepeatUntil(JSONObject currentBlock) throws Exception {
 		logger.debug("REPEAT UNTIL");
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray CONDITION = (JSONArray)inputs.get("CONDITION");
-		JSONArray SUBSTACK = (JSONArray)inputs.get("SUBSTACK");
-		JSONObject condition = getBlock(CONDITION.getString(1));
-		String substack = SUBSTACK.getString(1);
+		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		
-		while(!resolveBoolean(condition)) {
+		while(!resolveBoolean(getBlock(condition))) {
 			parseScratchCode(substack);
 		}
 	}
 
 	private void doRepeat(JSONObject currentBlock) throws Exception {
-		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray condition =(JSONArray)inputs.get("TIMES");
-		JSONArray substack = (JSONArray)inputs.get("SUBSTACK");
-		int count = (int)resolveValue(getBlock(condition.getString(1)));
+		int count = (int)resolveValue(findInputInBlock(currentBlock,"TIMES"));
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		logger.debug("REPEAT {}",count);
 		for(int i=0;i<count;++i) {
-			parseScratchCode(substack.getString(1));
+			parseScratchCode(substack);
 		}		
 	}
 
 	// relative change
 	private void changeVariableBy(JSONObject currentBlock) throws Exception {
 		ScratchVariable v = findFieldVariableInBlock(currentBlock);
-		double newValue = findInputValueInBlock(currentBlock);
+		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value += newValue;
 		logger.debug("Set {} to {}", v.name, v.value);
@@ -313,17 +315,73 @@ public class LoadScratch3 implements TurtleLoader {
 	// absolute change
 	private void setVariableTo(JSONObject currentBlock) throws Exception {
 		ScratchVariable v = findFieldVariableInBlock(currentBlock);
-		double newValue = findInputValueInBlock(currentBlock);
+		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = newValue;
 		logger.debug("Set {} to {}", v.name, v.value);
 	}
 
-	private double findInputValueInBlock(JSONObject currentBlock) throws Exception {
+
+	private void doMotionGotoXY(JSONObject currentBlock) throws Exception {
+		double px = resolveValue(findInputInBlock(currentBlock,"X"));
+		double py = resolveValue(findInputInBlock(currentBlock,"Y"));
+		logger.debug("GOTO {} {}",px,py);
+		myTurtle.moveTo(px, py);
+	}
+
+	private void doMotionPointInDirection(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"DIRECTION"));
+		logger.debug("POINT AT {}",v);
+		myTurtle.setAngle(v);
+	}
+	
+	private void doMotionTurnLeft(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"DEGREES"));
+		logger.debug("LEFT {}",v);
+		myTurtle.setAngle(myTurtle.getAngle()+v);
+	}
+	
+	private void doMotionTurnRight(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"DEGREES"));
+		logger.debug("RIGHT {}",v);
+		myTurtle.setAngle(myTurtle.getAngle()-v);
+	}
+
+	private void doMotionMoveSteps(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"STEPS"));
+		logger.debug("MOVE {}",v);
+		myTurtle.forward(v);
+	}
+	
+	private void doMotionChangeX(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"DX"));
+		logger.debug("MOVE X {}",v);
+		myTurtle.moveTo(myTurtle.getX()+v,myTurtle.getY());
+	}
+
+	private void doMotionChangeY(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"DY"));
+		logger.debug("MOVE Y {}",v);
+		myTurtle.moveTo(myTurtle.getX(),myTurtle.getY()+v);
+		
+	}
+
+	private void doMotionSetX(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"X"));
+		logger.debug("SET X {}",v);
+		myTurtle.moveTo(v,myTurtle.getY());
+	}
+
+	private void doMotionSetY(JSONObject currentBlock) throws Exception {
+		double v = resolveValue(findInputInBlock(currentBlock,"Y"));
+		logger.debug("SET Y {}",v);
+		myTurtle.moveTo(myTurtle.getX(),v);
+	}
+		
+	private Object findInputInBlock(JSONObject currentBlock,String subKey) throws Exception {
 		JSONObject inputs = (JSONObject)currentBlock.get("inputs");
-		JSONArray VALUE = (JSONArray)inputs.get("VALUE");
-		JSONArray VALUE1 = (JSONArray)VALUE.get(1);
-		return Double.valueOf(VALUE1.getString(1));
+		JSONArray VALUE = (JSONArray)inputs.get(subKey);
+		return VALUE.get(1);
 	}
 
 	private ScratchVariable findFieldVariableInBlock(JSONObject currentBlock) throws Exception {
@@ -390,7 +448,10 @@ public class LoadScratch3 implements TurtleLoader {
 				String k=(String)keys.next();
 				JSONArray details = (JSONArray)variables.get(k);
 				String name = (String)details.get(0);
-				Number value = (Number)details.get(1);
+				Object valueUnknown = details.get(1);
+				Number value;
+				if(valueUnknown instanceof String) value = Double.parseDouble((String)valueUnknown); 
+				else value = (Number)valueUnknown;
 				try {
 					logger.debug("Variable {} {} {}", k, name, value.floatValue());
 					scratchVariables.add(new ScratchVariable(name,k,value.floatValue()));
@@ -541,8 +602,17 @@ public class LoadScratch3 implements TurtleLoader {
 		if(currentObject instanceof JSONArray) {
 			JSONArray currentArray = (JSONArray)currentObject;
 			switch(currentArray.getInt(0)) {
-			case 12:  return getScratchVariable(currentArray.getString(2)).value;  // variable
-			case 10:  return Double.parseDouble(currentArray.getString(1));  // constant
+			case 4:  // number
+			case 5:  // positive number
+			case 6:  // positive integer
+			case 7:  // integer
+			case 8:  // angle
+			// 9 is color (#rrggbbaa)
+			case 10:  // string, try to parse as number
+				return Double.parseDouble(currentArray.getString(1));  // constant
+			case 12:  // variable
+				return getScratchVariable(currentArray.getString(2)).value;  // variable
+			// 13 is list [name,id,x,y]
 			default: throw new Exception("resolveValue unknown value type "+currentArray.getInt(0));
 			}
 		} else if(currentObject instanceof String) {
@@ -556,6 +626,9 @@ public class LoadScratch3 implements TurtleLoader {
 			case "operator_divide":		return doDivide(currentBlock);
 			case "operator_random":		return doRandom(currentBlock);
 			case "operator_mathop":		return doMathOp(currentBlock);
+			case "motion_direction":	return doMotionDirection(currentBlock);
+			case "motion_xposition":	return doMotionXPosition(currentBlock);
+			case "motion_yposition":	return doMotionYPosition(currentBlock);
 			default: throw new Exception("resolveValue unsupported opcode "+opcode);
 			}
 		}
@@ -633,6 +706,18 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 	}
 
+	private double doMotionDirection(JSONObject currentBlock) throws Exception {
+		return myTurtle.getAngle();
+	}
+	
+	private double doMotionXPosition(JSONObject currentBlock) throws Exception {
+		return myTurtle.getX();
+	}
+	
+	private double doMotionYPosition(JSONObject currentBlock) throws Exception {
+		return myTurtle.getY();
+	}
+
 	private int getListID(Object obj) throws Exception {
 		if(!(obj instanceof String)) throw new Exception("List name not a string.");
 		String listName = obj.toString();
@@ -653,6 +738,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @return the resolved value as an integer.
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unused")
 	private int resolveListIndex(Object o2,Object o3) throws Exception {
 		String index = (String)o2;
 		String listName = (String)o3;
