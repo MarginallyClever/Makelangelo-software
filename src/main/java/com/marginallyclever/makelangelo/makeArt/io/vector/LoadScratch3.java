@@ -24,6 +24,7 @@ import java.util.zip.ZipInputStream;
  * They don't contain any real information we need.
  * 
  * See https://en.scratch-wiki.info/wiki/Scratch_File_Format
+ * See https://github.com/LLK/scratch-blocks/tree/develop/blocks_vertical
  * 
  * @author Dan Royer
  * @since 7.31.0
