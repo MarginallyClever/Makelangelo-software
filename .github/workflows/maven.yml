@@ -44,8 +44,9 @@ jobs:
       with:
         name: jar
         retention-days: 5
-        path: target/Makelangelo-*-with-dependencies.jar
-
+        path: |
+          src/main/package/jpackage*
+          target/Makelangelo-*-with-dependencies.jar
 
   package:
     needs: build
@@ -68,11 +69,11 @@ jobs:
       with:
         name: jar
 
-    - name: Build exe installation
+    - name: Build installation
       shell: bash
       run: |
+        ls
         set -x
-        find . -name '*.jar' &&
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
         MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) &&
         sed -i "s/\(--app-version\).*/\1 $MVN_VERSION/" src/main/package/jpackage.cfg &&
