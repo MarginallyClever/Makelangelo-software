@@ -46,6 +46,7 @@ jobs:
         retention-days: 5
         path: |
           src/main/package/jpackage*
+          pom.xml
           target/Makelangelo-*-with-dependencies.jar
 
   package:
@@ -56,17 +57,23 @@ jobs:
 #        os: [macos-latest, ubuntu-latest, windows-latest]
         os: [ubuntu-latest]
     steps:
-    - uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
     - name: Download artifact
       uses: actions/download-artifact@v2
       with:
         name: jar
 
     - name: Build installation
+      shell: bash
+      run: |
+        ls
+        file jar
+
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build installation package
       shell: bash
       run: |
         ls
