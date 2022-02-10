@@ -46,7 +46,6 @@ jobs:
         retention-days: 5
         path: |
           src/main/package/jpackage*
-          pom.xml
           target/Makelangelo-*-with-dependencies.jar
 
   package:
@@ -54,8 +53,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+#        os: [ubuntu-latest]
     steps:
     - uses: actions/setup-java@v2
       with:
@@ -84,7 +83,7 @@ jobs:
 
   # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
   deploy-nightly:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
     if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
     steps:
