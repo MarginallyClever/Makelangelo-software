@@ -15,7 +15,7 @@ jobs:
     steps:
     - name: "Say Hello Mona it's Monday"
 #      if: ${{ env.DAY_OF_WEEK == 'Monday' }}
-      run: touch hello.txt
+      run: echo toto > hello.txt
 
     - name: Deploy Windows release
       uses: WebFreak001/deploy-nightly@v1.1.0
