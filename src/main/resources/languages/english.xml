@@ -2083,4 +2083,9 @@
 		<hint>Dialog</hint>
 	</string>
 
+	<string>
+		<key>LoadScratch3.foreverNotAllowed</key>
+		<value>Forever loops are forever forbidden.</value>
+	</string>
+
 </language>
