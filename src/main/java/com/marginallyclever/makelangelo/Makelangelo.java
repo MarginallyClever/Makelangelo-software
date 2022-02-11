@@ -276,7 +276,7 @@ public final class Makelangelo {
 
 	private void openPlotterSettings() {
 		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
-		JDialog dialog = new JDialog(mainFrame,PlotterSettingsPanel.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -295,7 +295,7 @@ public final class Makelangelo {
 
 	private void openPaperSettings() {
 		PaperSettings settings = new PaperSettings(myPaper);
-		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PaperSettings.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -341,8 +341,8 @@ public final class Makelangelo {
 		Arrays.stream(TurtleRenderFactory.values())
 				.forEach(iter -> {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
-					String name = iter.getName();
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+					String name = iter.getName();					
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
 					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));
 					menu.add(button);
