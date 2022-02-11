@@ -89,8 +89,13 @@ jobs:
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
         APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
-        jpackage --verbose "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar"
-#        BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
+        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
+        ls &&
+        BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
+        echo "$BINARY" &&
+        echo "binary=$BINARY" >> $GITHUB_ENV &&
+        cat $GITHUB_ENV
+
 #        BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
 #        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
 #        echo "$BINARY" &&
