@@ -1,5 +1,11 @@
 name: Java CI with Maven
 
+env:
+  # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
+  # in your browser and copy the full "upload_url" value including the {?name,label} part
+  UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
+  RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+
 on:
   push:
     branches:
@@ -46,10 +52,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
-        # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
-        # in your browser and copy the full "upload_url" value including the {?name,label} part
-        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        upload_url: ${{ env.UPLOAD_URL }}
+        release_id: ${{ env.RELEASE_ID }}{
         asset_path: Makelangelo.zip # path to archive to upload
         asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
@@ -104,19 +108,19 @@ jobs:
       shell: bash
       run: |
         echo "asset_path ${{ env.BINARY }}"
-        echo "asset_name ${{ env.BINARY_WO_EXT }}-nightly-xx.${{ env.binaryext }}"
+        echo "asset_name ${{ env.BINARY_WO_EXT }}-nightly-xx.${{ env.BINARY_EXT }}"
 
     - name: Deploy universal release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+#      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v1.1.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
 #        find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
 #        in your browser and copy the full "upload_url" value including the {?name,label} part
-        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        upload_url: ${{ env.UPLOAD_URL }}
+        release_id: ${{ env.RELEASE_ID }}
         asset_path: ${{ env.BINARY }} # path to archive to upload
-        asset_name: ${{ env.BINARY_WO_EXT }}-nightly-$$.${{ env.binaryext }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_name: ${{ env.BINARY_WO_EXT }}-nightly-$$.${{ env.BINARY_EXT }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
