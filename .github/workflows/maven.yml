@@ -32,7 +32,7 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
-    - name: Prepare legacy package
+    - name: Prepare universal package
       shell: bash
       run: |
         mkdir -p target/package &&
