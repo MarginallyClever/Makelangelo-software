@@ -45,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -778,21 +780,18 @@ public final class Makelangelo {
 		logger.debug("  create range slider...");
 		JPanel bottomPanel = new JPanel(new BorderLayout());
 		rangeSlider = new RangeSlider();
-		rangeSlider.addChangeListener((e)->{
-	        RangeSlider slider = (RangeSlider)e.getSource();
-	        int bottom = Integer.valueOf(slider.getValue());
-	        int top = Integer.valueOf(slider.getUpperValue());
-	        myTurtleRenderer.setFirst(bottom);
-	        myTurtleRenderer.setLast(top);
-	        labelRangeMin.setText(Integer.toString(bottom));
-	        labelRangeMax.setText(Integer.toString(top));
-		});
+		rangeSlider.addChangeListener((e)->onChangeSlider(e));
 		
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		
+		labelRangeMin.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		labelRangeMax.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		
 		Dimension d = labelRangeMin.getPreferredSize();
-		d.width=50;
+		d.width=60;
 		labelRangeMin.setPreferredSize(d);
 		labelRangeMax.setPreferredSize(d);
 		
@@ -801,6 +800,20 @@ public final class Makelangelo {
 		bottomPanel.add(labelRangeMax, BorderLayout.EAST);
 		
 		contentPane.add(bottomPanel, BorderLayout.SOUTH);
+	}
+	
+	/**
+	 * When the two-headed drawing start/end slider is moved
+	 * @param e {@link ChangeEvent} describing the move.
+	 */
+	private void onChangeSlider(ChangeEvent e) {
+        RangeSlider slider = (RangeSlider)e.getSource();
+        int bottom = Integer.valueOf(slider.getValue());
+        int top = Integer.valueOf(slider.getUpperValue());
+        myTurtleRenderer.setFirst(bottom);
+        myTurtleRenderer.setLast(top);
+        labelRangeMin.setText(Integer.toString(bottom));
+        labelRangeMax.setText(Integer.toString(top));
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
