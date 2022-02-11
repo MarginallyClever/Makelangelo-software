@@ -84,8 +84,9 @@ jobs:
     - name: Build installation package
       shell: bash
       run: |
+        find . &&
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
-        APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
+        APP_VERSION=$(ls -1 Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
