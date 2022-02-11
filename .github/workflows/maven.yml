@@ -115,7 +115,7 @@ jobs:
     - name: Upload artifact for testing purpose
       uses: actions/upload-artifact@v2
       with:
-        name: jar
+        name: installer
         retention-days: 1
         path: |
           Makelangelo-*
