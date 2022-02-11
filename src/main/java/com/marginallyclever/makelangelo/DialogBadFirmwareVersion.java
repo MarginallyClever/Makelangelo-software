@@ -10,7 +10,6 @@ import javax.swing.text.JTextComponent;
 
 @Deprecated
 public class DialogBadFirmwareVersion {
-	private static final Logger logger = LoggerFactory.getLogger(DialogBadFirmwareVersion.class);
 	/**
 	 * <p>
 	 * Uses {@link java.lang.StringBuilder#append(String)} to create an internationalization supported {@code String}
