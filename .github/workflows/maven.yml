@@ -91,7 +91,7 @@ jobs:
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
-        BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
+        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -Ev '.jar$') &&
         echo "$BINARY" &&
         echo "binary=$BINARY" >> $GITHUB_ENV &&
         cat $GITHUB_ENV
