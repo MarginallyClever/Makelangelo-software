@@ -96,8 +96,8 @@ jobs:
         echo "$BINARY" &&
         echo "$BINARY_WO_EXT" &&
         echo "$BINARY_EXT" &&
-        echo "binary=$BINARY" >> $GITHUB_ENV
-        echo "binarywoext=$BINARY_WO_EXT" >> $GITHUB_ENV
+        echo "binary=$BINARY" >> $GITHUB_ENV &&
+        echo "binarywoext=$BINARY_WO_EXT" >> $GITHUB_ENV &&
         echo "binaryext=$BINARY_EXT" >> $GITHUB_ENV
 
     - name: debug
