@@ -74,8 +74,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [macos-latest, ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+#        os: [ubuntu-latest]
     steps:
     - uses: actions/setup-java@v2
       with:
@@ -96,19 +96,10 @@ jobs:
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
-        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -Ev '.jar$' | sed "s,./,," | head -1) &&
-        BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
-        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
+        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(exe$|dmg$|deb$)' | sed "s,./,," | head -1) &&
+        BINARY_NIGHTLY=$(echo $BINARY | sed 's/\(.*\)\.\(.*\)/\1-nightly-$$.\2/') &&
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
-        echo "BINARY_WO_EXT=$BINARY_WO_EXT" | tee -a $GITHUB_ENV &&
-        echo "BINARY_EXT=$BINARY_EXT" | tee -a $GITHUB_ENV &&
-        cat $GITHUB_ENV
-
-    - name: debug
-      shell: bash
-      run: |
-        echo "asset_path ${{ env.BINARY }}"
-        echo "asset_name ${{ env.BINARY_WO_EXT }}-nightly-xx.${{ env.BINARY_EXT }}"
+        echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
     - name: Deploy universal release
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
@@ -121,6 +112,6 @@ jobs:
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
         asset_path: ${{ env.BINARY }} # path to archive to upload
-        asset_name: ${{ env.BINARY_WO_EXT }}-nightly-$$.${{ env.BINARY_EXT }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_name: ${{ env.BINARY_NIGHTLY }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
