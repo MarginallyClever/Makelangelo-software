@@ -95,9 +95,6 @@ jobs:
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -Ev '.jar$' | sed "s,./,," | head -1) &&
         BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
         BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
-        echo "$BINARY" &&
-        echo "$BINARY_WO_EXT" &&
-        echo "$BINARY_EXT" &&
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_WO_EXT=$BINARY_WO_EXT" | tee -a $GITHUB_ENV &&
         echo "BINARY_EXT=$BINARY_EXT" | tee -a $GITHUB_ENV &&
@@ -105,9 +102,12 @@ jobs:
 
     - name: debug
       shell: bash
-      run: env | grep -i binary
+      run: |
+        echo "asset_path ${{ env.BINARY }}"
+        echo "asset_name ${{ env.BINARY_WO_EXT }}-nightly-xx.${{ env.binaryext }}"
 
     - name: Deploy universal release
+      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v1.1.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
