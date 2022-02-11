@@ -86,25 +86,22 @@ jobs:
       shell: bash
       run: |
         set -x
+        set -o pipefail
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
         APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
-        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -Ev '.jar$') &&
+        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -Ev '.jar$' | sed "s,./,," | head -1) &&
+        BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
+        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
         echo "$BINARY" &&
-        echo "binary=$BINARY" >> $GITHUB_ENV &&
+        echo "$BINARY_WO_EXT" &&
+        echo "$BINARY_EXT" &&
+        echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
+        echo "BINARY_WO_EXT=$BINARY_WO_EXT" | tee -a $GITHUB_ENV &&
+        echo "BINARY_EXT=$BINARY_EXT" | tee -a $GITHUB_ENV &&
         cat $GITHUB_ENV
-
-#        BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
-#        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
-#        echo "$BINARY" &&
-#        echo "$BINARY_WO_EXT" &&
-#        echo "$BINARY_EXT" &&
-#        echo "binary=$BINARY" >> $GITHUB_ENV &&
-#        echo "binarywoext=$BINARY_WO_EXT" >> $GITHUB_ENV &&
-#        echo "binaryext=$BINARY_EXT" >> $GITHUB_ENV &&
-#        cat $GITHUB_ENV
 
     - name: debug
       shell: bash
@@ -119,7 +116,7 @@ jobs:
 #        in your browser and copy the full "upload_url" value including the {?name,label} part
         upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
         release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
-        asset_path: ${{ env.binary }} # path to archive to upload
-        asset_name: ${{ env.binarywoext }}-nightly-$$.${{ env.binaryext }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_path: ${{ env.BINARY }} # path to archive to upload
+        asset_name: ${{ env.BINARY_WO_EXT }}-nightly-$$.${{ env.binaryext }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
