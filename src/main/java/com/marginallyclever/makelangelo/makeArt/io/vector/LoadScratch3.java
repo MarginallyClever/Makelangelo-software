@@ -367,7 +367,7 @@ public class LoadScratch3 implements TurtleLoader {
 
 	// relative change
 	private void changeVariableBy(JSONObject currentBlock) throws Exception {
-		Scratch3Variable v = getScratchVariable((String)findInputInBlock(currentBlock,"VARIABLE"));
+		Scratch3Variable v = getScratchVariable((String)findFieldInBlock(currentBlock,"VARIABLE"));
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = (double)v.value + newValue;
@@ -376,7 +376,7 @@ public class LoadScratch3 implements TurtleLoader {
 
 	// absolute change
 	private void setVariableTo(JSONObject currentBlock) throws Exception {
-		Scratch3Variable v = getScratchVariable((String)findInputInBlock(currentBlock,"VARIABLE"));
+		Scratch3Variable v = getScratchVariable((String)findFieldInBlock(currentBlock,"VARIABLE"));
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = newValue;
@@ -437,6 +437,19 @@ public class LoadScratch3 implements TurtleLoader {
 		double v = resolveValue(findInputInBlock(currentBlock,"Y"));
 		logger.debug("SET Y {}",v);
 		myTurtle.moveTo(myTurtle.getX(),v);
+	}
+	
+	/**
+	 * Find and return currentBlock/fields/subKey/(first element). 
+	 * @param currentBlock the block to search.
+	 * @param subKey the key name inside currentBlock.
+	 * @return the first element of currentBlock/inputs/subKey
+	 * @throws Exception if any part of the operation fails, usually because of non-existent key.
+	 */
+	private Object findFieldInBlock(JSONObject currentBlock,String subKey) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("fields");
+		JSONArray subKeyArray = (JSONArray)inputs.get(subKey);
+		return subKeyArray.get(1);
 	}
 	
 	/**
@@ -610,6 +623,9 @@ public class LoadScratch3 implements TurtleLoader {
 		// find the blocks with opcode=procedures_definition.
 		for( String k : blockKeys ) {
 			String uniqueID = k.toString();
+			Object obj = blocks.get(uniqueID);
+			if(!(obj instanceof JSONObject)) continue;
+			
 			JSONObject currentBlock = blocks.getJSONObject(uniqueID);
 			String opcode = currentBlock.getString("opcode");
 			if(opcode.equals("procedures_definition")) {
