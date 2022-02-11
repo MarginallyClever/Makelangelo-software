@@ -24,7 +24,8 @@ jobs:
 #      run: ./mvnw -B test
 
     - name: Package with Maven
-      run: ./mvnw -B clean package -DskipTests
+      run: mkdir -p target; echo qwerty > target/Makelangelo-7.31.0-with-dependencies.jar
+#      run: ./mvnw -B clean package -DskipTests
 
     - name: Prepare legacy package
       shell: bash
@@ -91,7 +92,7 @@ jobs:
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-$OS_BUILD.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo-*') &&
         BINARY_WO_EXT=$(echo $BINARY | sed -e "s,./,," -e "s/\(.*\)\..*/\1/") &&
-        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/")
+        BINARY_EXT=$(echo $BINARY | sed  "s/.*\.\(.*\)/\1/") &&
         echo "$BINARY" &&
         echo "$BINARY_WO_EXT" &&
         echo "$BINARY_EXT" &&
