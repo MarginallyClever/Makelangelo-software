@@ -62,7 +62,7 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
-          target/Makelangelo-*-with-dependencies.jar
+          target/package/Makelangelo-*-with-dependencies.jar
 
   package:
     needs: build
@@ -85,6 +85,7 @@ jobs:
       shell: bash
       run: |
         find . &&
+        mv target/package/Makelangelo-*-with-dependencies.jar .
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
         APP_VERSION=$(ls -1 Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
         sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
