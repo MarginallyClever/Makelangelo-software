@@ -116,6 +116,6 @@ jobs:
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' || github.ref != 'refs/heads/master'
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.BINARY }}
+        name: ${{ env.BINARY }}.zip
         retention-days: 1
         path: ${{ env.BINARY }}
