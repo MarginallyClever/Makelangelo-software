@@ -25,26 +25,25 @@ jobs:
         cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-#    - name: Build and Test with Maven
-#      timeout-minutes: 15
-#      run: ./mvnw -B test
+    - name: Build and Test with Maven
+      timeout-minutes: 15
+      run: ./mvnw -B test
 
     - name: Package with Maven
-      run: mkdir -p target; echo qwerty > target/Makelangelo-7.31.0-with-dependencies.jar
-#      run: ./mvnw -B clean package -DskipTests
+      run: ./mvnw -B clean package -DskipTests
 
-#    - name: Prepare legacy package
-#      shell: bash
-#      run: |
-#        mkdir -p target/package &&
-#        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
-#        cp CONTRIBUTING.md target/package/ &&
-#        cp LICENSE target/package/ &&
-#        cp README.md target/package/ &&
-#        cp target/Makelangelo-*-with-dependencies.jar target/package/ &&
-#        cd target/package/ &&
-#        7z a -tzip Makelangelo.zip . &&
-#        mv Makelangelo.zip ../..
+    - name: Prepare legacy package
+      shell: bash
+      run: |
+        mkdir -p target/package &&
+        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
+        cp CONTRIBUTING.md target/package/ &&
+        cp LICENSE target/package/ &&
+        cp README.md target/package/ &&
+        cp target/Makelangelo-*-with-dependencies.jar target/package/ &&
+        cd target/package/ &&
+        7z a -tzip Makelangelo.zip . &&
+        mv Makelangelo.zip ../..
 
     - name: Deploy universal release
       if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
@@ -63,7 +62,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jar
-        retention-days: 2
+        retention-days: 1
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
@@ -75,7 +74,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-#        os: [ubuntu-latest]
     steps:
     - uses: actions/setup-java@v2
       with:
@@ -107,11 +105,18 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
-#        find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
-#        in your browser and copy the full "upload_url" value including the {?name,label} part
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
         asset_path: ${{ env.BINARY }} # path to archive to upload
         asset_name: ${{ env.BINARY_NIGHTLY }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+
+    - name: Upload artifact for testing purpose
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar
+        retention-days: 1
+        path: |
+          Makelangelo-*
+          makelangelo-*
