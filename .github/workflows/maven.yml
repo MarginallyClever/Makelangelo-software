@@ -27,18 +27,18 @@ jobs:
       run: mkdir -p target; echo qwerty > target/Makelangelo-7.31.0-with-dependencies.jar
 #      run: ./mvnw -B clean package -DskipTests
 
-    - name: Prepare legacy package
-      shell: bash
-      run: |
-        mkdir -p target/package &&
-        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
-        cp CONTRIBUTING.md target/package/ &&
-        cp LICENSE target/package/ &&
-        cp README.md target/package/ &&
-        cp target/Makelangelo-*-with-dependencies.jar target/package/ &&
-        cd target/package/ &&
-        7z a -tzip Makelangelo.zip . &&
-        mv Makelangelo.zip ../..
+#    - name: Prepare legacy package
+#      shell: bash
+#      run: |
+#        mkdir -p target/package &&
+#        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/package &&
+#        cp CONTRIBUTING.md target/package/ &&
+#        cp LICENSE target/package/ &&
+#        cp README.md target/package/ &&
+#        cp target/Makelangelo-*-with-dependencies.jar target/package/ &&
+#        cd target/package/ &&
+#        7z a -tzip Makelangelo.zip . &&
+#        mv Makelangelo.zip ../..
 
     - name: Deploy universal release
       if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
@@ -70,8 +70,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-#        os: [ubuntu-latest]
+#        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
     steps:
     - uses: actions/setup-java@v2
       with:
@@ -85,6 +85,7 @@ jobs:
     - name: Build installation package
       shell: bash
       run: |
+        set -x
         find . &&
         OS_BUILD=$(echo ${{matrix.os}} | sed "s/-latest//") &&
         APP_VERSION=$(ls -1 target/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
@@ -98,7 +99,8 @@ jobs:
         echo "$BINARY_EXT" &&
         echo "binary=$BINARY" >> $GITHUB_ENV &&
         echo "binarywoext=$BINARY_WO_EXT" >> $GITHUB_ENV &&
-        echo "binaryext=$BINARY_EXT" >> $GITHUB_ENV
+        echo "binaryext=$BINARY_EXT" >> $GITHUB_ENV &&
+        cat $GITHUB_ENV
 
     - name: debug
       shell: bash
