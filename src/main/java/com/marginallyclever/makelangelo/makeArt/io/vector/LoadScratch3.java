@@ -771,6 +771,7 @@ public class LoadScratch3 implements TurtleLoader {
 			case "operator_subtract":				return doSubstract(currentBlock);
 			case "operator_multiply":				return doMultiply(currentBlock);
 			case "operator_divide":					return doDivide(currentBlock);
+			case "operator_mod":					return doModulus(currentBlock);
 			case "operator_random":					return doRandom(currentBlock);
 			case "operator_mathop":					return doMathOp(currentBlock);
 			case "motion_direction":				return doMotionDirection(currentBlock);
@@ -829,6 +830,15 @@ public class LoadScratch3 implements TurtleLoader {
 		return a / b;
 	}
 
+	private double doModulus(JSONObject currentBlock) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("inputs");
+		JSONArray NUM1 = inputs.getJSONArray("NUM1");
+		JSONArray NUM2 = inputs.getJSONArray("NUM2");
+		double a = resolveValue(NUM1.get(1));
+		double b = resolveValue(NUM2.get(1));
+		return a % b;
+	}
+	
 	private double doRandom(JSONObject currentBlock) throws Exception {
 		JSONObject inputs = currentBlock.getJSONObject("inputs");
 		JSONArray FROM = inputs.getJSONArray("FROM");
