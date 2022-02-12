@@ -774,6 +774,7 @@ public class LoadScratch3 implements TurtleLoader {
 			case "operator_mod":					return doModulus(currentBlock);
 			case "operator_random":					return doRandom(currentBlock);
 			case "operator_mathop":					return doMathOp(currentBlock);
+			case "operator_round":					return doRound(currentBlock);
 			case "motion_direction":				return doMotionDirection(currentBlock);
 			case "motion_xposition":				return doMotionXPosition(currentBlock);
 			case "motion_yposition":				return doMotionYPosition(currentBlock);
@@ -846,6 +847,13 @@ public class LoadScratch3 implements TurtleLoader {
 		double a = resolveValue(FROM.get(1));
 		double b = resolveValue(TO.get(1));
 		return Math.random() * (b-a) + a;
+	}
+	
+	private double doRound(JSONObject currentBlock) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("inputs");
+		JSONArray NUM = inputs.getJSONArray("NUM");
+		double a = resolveValue(NUM.get(1));
+		return Math.round(a);
 	}
 	
 	private double doMathOp(JSONObject currentBlock) throws Exception {
