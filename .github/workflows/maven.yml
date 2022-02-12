@@ -100,7 +100,7 @@ jobs:
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
-    - name: Deploy universal release
+    - name: Deploy installation release
       if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v1.1.0
       env:

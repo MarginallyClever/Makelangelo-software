@@ -16,16 +16,20 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 
 # Start!
 
-- Setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/commits/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/)
-- Install "Makelangelo Software" on your computer to control the robot 
-  1. Install The latest OpenJDK (java software)
-  2. Grab a [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) and run it directly *or* Install Makelangelo Software App from the source
+- Buy a plotter [Makelangelo 5](https://www.marginallyclever.com/products/makelangelo-5/) or build your own;
+- Setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/commits/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/);
+- Install "Makelangelo Software" on your computer to control the robot. You will find [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) whith installer for the main OS: macOS, Linux and Windows *or* Install Makelangelo Software App from the source as described below;
+- Import a picture, or a vector graphic and watch the robot drawing.
 
-Then you should be able to run the application.
+## Developper instructions
+
+If you want to contribute to the application or just want the blending edge version of the software, follow the instructions below to install a JDK and next to download and run the app after compiling it with eclipse or Maven.
+
+This project is written in Java and uses Swing for the graphical interface. The packaging of the application is done with Maven.
 
 ## 1. Install The latest OpenJDK
 
-Get the [Open Java Development Kit (OpenJDK)](https://openjdk.java.net/). The minimum required version 17.
+Get the [Open Java Development Kit (OpenJDK)](https://openjdk.java.net/). The minimum required version 15.
 
 - **OSX**: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-17.jdk) into your `/Library/Java/JavaVirtualMachines/` folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
 - **Windows**: https://stackoverflow.com/a/52531093 _untested_
@@ -46,12 +50,12 @@ java -jar makelangelo-nightly-XXXXX.jar
 * Download the [zip file](https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip) and extract it *or* clone the repos with Git. Note the folder for later.
 
 2 options are available for building the application:
-- with Eclipse: fully graphical but long
+- with an IDE like Eclipse: fully graphical but long
 - with Maven in a console: fast and reliable
 
 ### Eclipse IDE building
 * Go to Eclipse website: https://www.eclipse.org/downloads/, choose "Eclipse IDE for Java developers" and install the latest version.
-* Launch "Eclipse IDE" when done and go to File > Import > Maven > Existing Maven Projects > Next > (folder from previous step) > Finish
+* Launch "Eclipse IDE" when done and go to File > Import > Maven > Existing Maven Projects > Next > (folder from previous steps) > Finish
 * If you see the "Welcome!" tab, close it.
 * select Run > Debug As > Java Application
 * select "Makelangelo - com.marginallyclever.makelangelo" and click OK. (It should be the top of the list)
@@ -66,7 +70,7 @@ java -jar makelangelo-nightly-XXXXX.jar
   * `./mvnw clean install -DskipTests` on macOS or GNU/Linux
   * `mvnw.cmd clean install -DskipTests` on Windows
 * in the `target/` folder, launch the jar file with a name like : `Makelangelo*-with-dependencies.jar`
-  * double click on it *OR*
+  * double-click on it *OR*
   * in the previously opened console, run `java -jar target/Makelangelo*-with-dependencies.jar`
 
 🎉 Application should now launch.
