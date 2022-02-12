@@ -66,6 +66,7 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
+          LICENSE
           target/Makelangelo-*-with-dependencies.jar
 
   package:
@@ -117,5 +118,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.BINARY }}
-        retention-days: 1
+        retention-days: 4
         path: ${{ env.BINARY }}
