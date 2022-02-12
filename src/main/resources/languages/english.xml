@@ -2039,8 +2039,16 @@
 	</string>
 
 	<string>
-		<key>CopyClipboard</key>
+		<key>LogPanel.CopyClipboard</key>
 		<value>Copy to clipboard</value>
+	</string>
+	<string>
+		<key>LogPanel.LogFiles</key>
+		<value>Log files</value>
+	</string>
+	<string>
+		<key>LogPanel.Title</key>
+		<value>Log</value>
 	</string>
 
 	<string>

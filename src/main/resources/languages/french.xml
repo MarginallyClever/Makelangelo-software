@@ -418,13 +418,18 @@
         -->
     </string>
     <string>
-        <key>CopyClipboard</key>
+        <key>LogPanel.CopyClipboard</key>
         <value>Copier dans le presse-papier</value>
-        <hint></hint>
-        <!--	"CopyClipboard"
-                used in "../Makelangelo-software/src/main/java/com/marginallyclever/convenience/log/LogPanel.java" line 51
-        -->
     </string>
+    <string>
+        <key>LogPanel.LogFiles</key>
+        <value>Fichiers de logs</value>
+    </string>
+    <string>
+        <key>LogPanel.Title</key>
+        <value>Log</value>
+    </string>
+
     <string>
         <key>Failed</key>
         <value>Echec: </value>
