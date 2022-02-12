@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
@@ -261,6 +262,7 @@ public class LoadScratch3 implements TurtleLoader {
 			case "motion_sety": 			doMotionSetY(currentBlock);  			break;
 			case "pen_penDown":				myTurtle.penDown();						break;
 			case "pen_penUp":				myTurtle.penUp();						break;
+			case "pen_setPenColorToColor":	doSetPenColor(currentBlock);			break;
 			default: logger.debug("Ignored {}", opcode);
 			}
 
@@ -444,6 +446,18 @@ public class LoadScratch3 implements TurtleLoader {
 		double v = resolveValue(findInputInBlock(currentBlock,"Y"));
 		logger.debug("SET Y {}",v);
 		myTurtle.moveTo(myTurtle.getX(),v);
+	}
+	
+	private void doSetPenColor(JSONObject currentBlock) throws Exception {
+		String c = (String)findInputInBlock(currentBlock,"COLOR");
+		if(c.startsWith("#")) {
+			c = c.substring(1);
+			int r = Integer.parseInt(c.substring(0,2));
+			int g = Integer.parseInt(c.substring(2,4));
+			int b = Integer.parseInt(c.substring(4));
+			logger.debug("SET COLOR {}",c);
+			myTurtle.setColor(new ColorRGB(r,g,b));
+		}
 	}
 	
 	/**
