@@ -21,4 +21,8 @@ public class TCPUI implements TransportLayerUI {
     public void setSelectedValue(Configuration configuration) {
 
     }
+
+    public void onClose() {}
+
+    public void onOpen() {}
 }

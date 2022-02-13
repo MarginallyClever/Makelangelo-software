@@ -11,4 +11,8 @@ public interface TransportLayerUI {
     TransportLayer getTransportLayer();
 
     void setSelectedValue(Configuration configuration);
+
+    void onClose();
+
+    void onOpen();
 }

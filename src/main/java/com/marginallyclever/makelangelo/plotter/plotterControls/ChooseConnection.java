@@ -104,23 +104,27 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
-			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED,null));
+			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED, null));
 		}
+
 		connectionComboBox.setEnabled(true);
 		refresh.setEnabled(true);
 		bConnect.updateButton(0);
+		availableTransportsUI.forEach(TransportLayerUI::onClose);
 	}
 
 	private void onOpen(NetworkSession s) {
 		mySession = s;
-		mySession.addListener(e->{
+		mySession.addListener(e -> {
 			if (e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
 				onClose();
 			}
 		});
+
 		connectionComboBox.setEnabled(false);
 		refresh.setEnabled(false);
 		bConnect.updateButton(1);
+		availableTransportsUI.forEach(TransportLayerUI::onOpen);
 	}
 
 	public void closeConnection() {

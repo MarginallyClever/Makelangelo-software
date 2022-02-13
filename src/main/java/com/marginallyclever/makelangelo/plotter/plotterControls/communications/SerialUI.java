@@ -25,4 +25,13 @@ public class SerialUI implements TransportLayerUI {
     public void setSelectedValue(Configuration configuration) {
         configuration.addConfiguration("speed", baudRateComboBox.getSelectedItem());
     }
+
+    public void onClose() {
+        baudRateComboBox.setEnabled(true);
+    }
+
+    public void onOpen() {
+        baudRateComboBox.setEnabled(false);
+    }
+
 }
