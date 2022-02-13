@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
@@ -35,6 +36,7 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	private class Scratch3Variable implements Cloneable {
 		public String name;
+		
 		public String uniqueID;
 		public Object value;
 
@@ -140,27 +142,28 @@ public class LoadScratch3 implements TurtleLoader {
 
 	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
 		logger.debug("Searching for project.json...");
-		ZipInputStream zipInputStream = new ZipInputStream(in);
-		ZipEntry entry;
-		File tempZipFile=null;
-		while((entry = zipInputStream.getNextEntry())!=null) {
-	        if( entry.getName().equals(PROJECT_JSON) ) {
-	        	logger.debug("Found project.json...");
-	        	
-		        // read buffered stream into temp file.
-	        	tempZipFile = File.createTempFile("project", "json");
-	        	tempZipFile.setReadable(true);
-	        	tempZipFile.setWritable(true);
-	        	tempZipFile.deleteOnExit();
-		        FileOutputStream fos = new FileOutputStream(tempZipFile);
-	    		byte[] buffer = new byte[2048];
-	    		int len;
-                while ((len = zipInputStream.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-                return tempZipFile;
-	        }
+		try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
+			ZipEntry entry;
+			File tempZipFile = null;
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				if (entry.getName().equals(PROJECT_JSON)) {
+					logger.debug("Found project.json...");
+
+					// read buffered stream into temp file.
+					tempZipFile = File.createTempFile("project", "json");
+					tempZipFile.setReadable(true);
+					tempZipFile.setWritable(true);
+					tempZipFile.deleteOnExit();
+					try (FileOutputStream fos = new FileOutputStream(tempZipFile)) {
+						byte[] buffer = new byte[2048];
+						int len;
+						while ((len = zipInputStream.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+						return tempZipFile;
+					}
+				}
+			}
 		}
 		throw new FileNotFoundException("SB3 missing project.json");
 	}
@@ -206,14 +209,14 @@ public class LoadScratch3 implements TurtleLoader {
 		return blocks.getJSONObject(key);
 	}
 	
-	private JSONObject findNextBlock(JSONObject currentBlock) {
+	private String findNextBlockKey(JSONObject currentBlock) {
 		Object key = currentBlock.opt("next");
 		if(key==null || key == JSONObject.NULL) return null;
-		return getBlock((String)key);
+		return (String)key;
 	}
 	
 	private void parseScratchCode(String currentKey) throws Exception {
-		//logger.debug("parseScratchCode {}",currentKey);
+		logger.debug("parseScratchCode {}",currentKey);
 		JSONObject currentBlock = getBlock(currentKey);
 				
 		while(currentBlock!=null) {
@@ -260,10 +263,15 @@ public class LoadScratch3 implements TurtleLoader {
 			case "motion_sety": 			doMotionSetY(currentBlock);  			break;
 			case "pen_penDown":				myTurtle.penDown();						break;
 			case "pen_penUp":				myTurtle.penUp();						break;
+			case "pen_setPenColorToColor":	doSetPenColor(currentBlock);			break;
 			default: logger.debug("Ignored {}", opcode);
 			}
 
-			currentBlock = findNextBlock(currentBlock);
+			currentKey = findNextBlockKey(currentBlock);
+			if(currentKey==null) break;
+			
+			logger.debug("next block {}",currentKey);
+			currentBlock = getBlock(currentKey);
 		}
 	}
 
@@ -339,11 +347,13 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 
 	private void doRepeatForever(JSONObject currentBlock) throws Exception {
-		logger.debug("REPEAT FOREVER");
-		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
-		while(true) {
-			parseScratchCode(substack);
-		}
+		throw new Exception(Translator.get("LoadScratch3.foreverNotAllowed"));
+		// technically this would work and the program would never end.  It is here for reference.
+		//logger.debug("REPEAT FOREVER");
+		//String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
+		//while(true) {
+		//	parseScratchCode(substack);
+		//}
 	}
 
 	private void doRepeatUntil(JSONObject currentBlock) throws Exception {
@@ -367,7 +377,7 @@ public class LoadScratch3 implements TurtleLoader {
 
 	// relative change
 	private void changeVariableBy(JSONObject currentBlock) throws Exception {
-		Scratch3Variable v = getScratchVariable((String)findInputInBlock(currentBlock,"VARIABLE"));
+		Scratch3Variable v = getScratchVariable((String)findFieldsInBlock(currentBlock,"VARIABLE"));
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = (double)v.value + newValue;
@@ -376,7 +386,7 @@ public class LoadScratch3 implements TurtleLoader {
 
 	// absolute change
 	private void setVariableTo(JSONObject currentBlock) throws Exception {
-		Scratch3Variable v = getScratchVariable((String)findInputInBlock(currentBlock,"VARIABLE"));
+		Scratch3Variable v = getScratchVariable((String)findFieldsInBlock(currentBlock,"VARIABLE"));
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = newValue;
@@ -439,6 +449,25 @@ public class LoadScratch3 implements TurtleLoader {
 		myTurtle.moveTo(myTurtle.getX(),v);
 	}
 	
+	private void doSetPenColor(JSONObject currentBlock) throws Exception {
+		ColorRGB c = new ColorRGB((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));
+		logger.debug("SET COLOR {}",c);
+		myTurtle.setColor(c);
+	}
+	
+	/**
+	 * Find and return currentBlock/fields/subKey/(first element). 
+	 * @param currentBlock the block to search.
+	 * @param subKey the key name inside currentBlock.
+	 * @return the first element of currentBlock/inputs/subKey
+	 * @throws Exception if any part of the operation fails, usually because of non-existent key.
+	 */
+	private Object findFieldsInBlock(JSONObject currentBlock,String subKey) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("fields");
+		JSONArray subKeyArray = (JSONArray)inputs.get(subKey);
+		return subKeyArray.get(1);
+	}
+		
 	/**
 	 * Find and return currentBlock/inputs/subKey/(first element). 
 	 * @param currentBlock the block to search.
@@ -610,6 +639,9 @@ public class LoadScratch3 implements TurtleLoader {
 		// find the blocks with opcode=procedures_definition.
 		for( String k : blockKeys ) {
 			String uniqueID = k.toString();
+			Object obj = blocks.get(uniqueID);
+			if(!(obj instanceof JSONObject)) continue;
+
 			JSONObject currentBlock = blocks.getJSONObject(uniqueID);
 			String opcode = currentBlock.getString("opcode");
 			if(opcode.equals("procedures_definition")) {
@@ -628,12 +660,14 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	private void buildParameterListForProcedure(JSONObject prototypeBlock, Scratch3Procedure p) throws Exception {
 		JSONArray argumentIDs = new JSONArray((String)findMutationInBlock(prototypeBlock,"argumentids"));
+		JSONArray argumentNames = new JSONArray((String)findMutationInBlock(prototypeBlock,"argumentnames"));
+
 		//JSONArray argumentDefaults = new JSONArray((String)findMutationInBlock(prototypeBlock,"argumentdefaults"));
 		for(int i=0;i<argumentIDs.length();++i) {
 			String uniqueID = argumentIDs.getString(i);
 			//String defaultValue = argumentDefaults.getString(i);
-			JSONObject argumentBlock = getBlock((String)findInputInBlock(prototypeBlock, uniqueID));
-			String name = argumentBlock.getJSONObject("fields").getJSONArray("VALUE").getString(0);
+			String name = argumentNames.getString(i);
+
 			p.parameters.add(new Scratch3Variable(name,uniqueID,0/*defaultValue*/));
 			// TODO set defaults?
 		}
@@ -729,9 +763,9 @@ public class LoadScratch3 implements TurtleLoader {
 			case 6:  // positive integer
 			case 7:  // integer
 			case 8:  // angle
-			// 9 is color (#rrggbbaa)
+			case 9:  // color (#rrggbbaa)			
 			case 10:  // string, try to parse as number
-				return Double.parseDouble(currentArray.getString(1));
+				return parseNumber(currentArray.get(1));
 			case 12:  // variable
 				return (double)getScratchVariable(currentArray.getString(2)).value; 
 			// 13 is list [name,id,x,y]
@@ -746,8 +780,10 @@ public class LoadScratch3 implements TurtleLoader {
 			case "operator_subtract":				return doSubstract(currentBlock);
 			case "operator_multiply":				return doMultiply(currentBlock);
 			case "operator_divide":					return doDivide(currentBlock);
+			case "operator_mod":					return doModulus(currentBlock);
 			case "operator_random":					return doRandom(currentBlock);
 			case "operator_mathop":					return doMathOp(currentBlock);
+			case "operator_round":					return doRound(currentBlock);
 			case "motion_direction":				return doMotionDirection(currentBlock);
 			case "motion_xposition":				return doMotionXPosition(currentBlock);
 			case "motion_yposition":				return doMotionYPosition(currentBlock);
@@ -757,6 +793,17 @@ public class LoadScratch3 implements TurtleLoader {
 			}
 		}
 		throw new Exception("resolveValue unknown object type "+currentObject.getClass().getSimpleName());
+	}
+	
+	private double parseNumber(Object object) {
+		if(object instanceof String) {
+			String str = (String)object;
+			if(str.startsWith("#")) return (double)Integer.parseInt(str.substring(1),16);
+			return Double.parseDouble(str);
+		} else if(object instanceof Double) 
+			return (double)object;
+		else //if(object instanceof Integer)
+			return (double)(int)object;
 	}
 
 	private double doAdd(JSONObject currentBlock) throws Exception {
@@ -795,6 +842,15 @@ public class LoadScratch3 implements TurtleLoader {
 		return a / b;
 	}
 
+	private double doModulus(JSONObject currentBlock) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("inputs");
+		JSONArray NUM1 = inputs.getJSONArray("NUM1");
+		JSONArray NUM2 = inputs.getJSONArray("NUM2");
+		double a = resolveValue(NUM1.get(1));
+		double b = resolveValue(NUM2.get(1));
+		return a % b;
+	}
+	
 	private double doRandom(JSONObject currentBlock) throws Exception {
 		JSONObject inputs = currentBlock.getJSONObject("inputs");
 		JSONArray FROM = inputs.getJSONArray("FROM");
@@ -802,6 +858,13 @@ public class LoadScratch3 implements TurtleLoader {
 		double a = resolveValue(FROM.get(1));
 		double b = resolveValue(TO.get(1));
 		return Math.random() * (b-a) + a;
+	}
+	
+	private double doRound(JSONObject currentBlock) throws Exception {
+		JSONObject inputs = currentBlock.getJSONObject("inputs");
+		JSONArray NUM = inputs.getJSONArray("NUM");
+		double a = resolveValue(NUM.get(1));
+		return Math.round(a);
 	}
 	
 	private double doMathOp(JSONObject currentBlock) throws Exception {

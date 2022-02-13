@@ -157,27 +157,28 @@ public class LoadScratch2 implements TurtleLoader {
 	}
 
 	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
-    	logger.debug("Searching for project.json...");
-		ZipInputStream zipInputStream = new ZipInputStream(in);
-		ZipEntry entry;
-		while((entry = zipInputStream.getNextEntry())!=null) {
-	        if(entry.getName().equals(PROJECT_JSON) ) {
-	        	logger.debug("Found.");
-	        	
-		        // read buffered stream into temp file.
-	        	File tempZipFile = File.createTempFile("project", "json");
-	        	tempZipFile.setReadable(true);
-	        	tempZipFile.setWritable(true);
-	        	tempZipFile.deleteOnExit();
-		        FileOutputStream fos = new FileOutputStream(tempZipFile);
-	    		byte[] buffer = new byte[2048];
-	    		int len;
-                while ((len = zipInputStream.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-                return tempZipFile;
-	        }
+		logger.debug("Searching for project.json...");
+		try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
+			ZipEntry entry;
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				if (entry.getName().equals(PROJECT_JSON)) {
+					logger.debug("Found.");
+
+					// read buffered stream into temp file.
+					File tempZipFile = File.createTempFile("project", "json");
+					tempZipFile.setReadable(true);
+					tempZipFile.setWritable(true);
+					tempZipFile.deleteOnExit();
+					try (FileOutputStream fos = new FileOutputStream(tempZipFile)) {
+						byte[] buffer = new byte[2048];
+						int len;
+						while ((len = zipInputStream.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+						return tempZipFile;
+					}
+				}
+			}
 		}
 		throw new FileNotFoundException("SB2 missing project.json");
 	}
