@@ -87,19 +87,19 @@ public class FileAccess {
 	}
 
 	/**
-	 * Return the current directory
+	 * Return the current directory from where the app has been launched
 	 * @return the current directory
 	 */
-	public static String getUserDirectory() {
+	public static String getWorkingDirectory() {
 		return System.getProperty("user.dir");
 	}
-	
-	public static String getTempDirectory() { 
-		return System.getProperty("java.io.tmpdir");
-	}
-	
-	public static String getWorkingDirectory() {
-		return Paths.get("").toAbsolutePath().toString();
+
+	/**
+	 * Return the user home directory
+	 * @return the user home directory
+	 */
+	public static String getHomeDirectory() {
+		return System.getProperty("user.home");
 	}
 
 	/**

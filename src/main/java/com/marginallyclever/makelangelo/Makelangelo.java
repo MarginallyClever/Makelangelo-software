@@ -968,9 +968,6 @@ public final class Makelangelo {
 			myPlotter.getSettings().saveConfig();
 			savePaths();
 
-			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
-			Log.end();
-
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
 			// exiting
@@ -1025,7 +1022,6 @@ public final class Makelangelo {
 
 	public static void main(String[] args) {
 		Log.start();
-		// lazy init to be able to purge old files
 		logger = LoggerFactory.getLogger(Makelangelo.class);
 
 		PreferencesHelper.start();
