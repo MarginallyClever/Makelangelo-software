@@ -2039,8 +2039,16 @@
 	</string>
 
 	<string>
-		<key>CopyClipboard</key>
+		<key>LogPanel.CopyClipboard</key>
 		<value>Copy to clipboard</value>
+	</string>
+	<string>
+		<key>LogPanel.LogFiles</key>
+		<value>Log files</value>
+	</string>
+	<string>
+		<key>LogPanel.Title</key>
+		<value>Log</value>
 	</string>
 
 	<string>
@@ -2087,39 +2095,43 @@
 		<value>Error</value>
 		<hint>Dialog</hint>
 	</string>
-    <string>
-        <key>PlotterSettingsPanel.Title</key>
-		<value>Plotter settings</value>
-        <hint>panel title</hint>
-    </string>
+  
+  <string>
+    <key>MenuItemPayPalDonation</key>
+    <value>PayPal donation</value>
+    <hint>Help Menu, PayPal donation</hint>
+  </string>
+  <string>
+      <key>PlotterSettingsPanel.Title</key>
+      <value>Plotter settings</value>
+      <hint>panel title</hint>
+  </string>
 
-
-    <string>
-        <key>TurtleRenderFactory.DEFAULT</key>
-        <value>Default</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>TurtleRenderFactory.BARBER_POLE</key>
-        <value>Barber pole</value>
-        <hint>Barber pole (red, blue)</hint>
-    </string>
-    <string>
-        <key>TurtleRenderFactory.SEPARATE_LOOP</key>
-        <value>Separate loops</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>TurtleRenderFactory.MARLIN_SIM</key>
-        <value>Marlin simulation</value>
-        <hint></hint>
-    </string>
-    <string>
-        <key>TurtleGenerators.LearnMore.Link.Text</key>
-        <value>Learn more</value>
-        <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
-    </string>
-
+  <string>
+      <key>TurtleRenderFactory.DEFAULT</key>
+      <value>Default</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.BARBER_POLE</key>
+      <value>Barber pole</value>
+      <hint>Barber pole (red, blue)</hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.SEPARATE_LOOP</key>
+      <value>Separate loops</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.MARLIN_SIM</key>
+      <value>Marlin simulation</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleGenerators.LearnMore.Link.Text</key>
+      <value>Learn more</value>
+      <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
+  </string>
 
 <!--
     <string>

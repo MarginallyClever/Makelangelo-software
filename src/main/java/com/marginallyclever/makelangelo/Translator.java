@@ -166,7 +166,7 @@ public final class Translator {
 			myPath = Paths.get(uri);
 		}
 
-		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
+		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getWorkingDirectory());
 		logger.trace("rootDir={}", rootPath.toString());
 
 		// we'll look inside the JAR file first, then look in the working directory.
@@ -197,7 +197,7 @@ public final class Translator {
 			lang.loadFromInputStream(stream);
 		} catch(Exception e) {
 			logger.error("Failed to load {}", actualFilename);
-			logger.debug("{}",e);// To log the Exception stack in debug/dev mode.
+			logger.debug("{}",e.getMessage());// To log the Exception stack in debug/dev mode.
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
