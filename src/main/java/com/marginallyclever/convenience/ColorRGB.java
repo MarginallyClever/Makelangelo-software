@@ -6,7 +6,7 @@ import java.util.Objects;
 
 
 /**
- * RGB color class
+ * RGB color class.  each component is 0...255
  * @author Dan Royer
  *
  */

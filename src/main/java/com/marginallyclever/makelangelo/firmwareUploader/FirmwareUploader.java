@@ -35,7 +35,7 @@ public class FirmwareUploader {
 			return;
 		} 
 		
-		f = new File(FileAccess.getUserDirectory() + File.separator+name);
+		f = new File(FileAccess.getWorkingDirectory() + File.separator+name);
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
 		}
