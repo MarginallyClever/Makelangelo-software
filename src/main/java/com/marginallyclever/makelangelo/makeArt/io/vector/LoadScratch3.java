@@ -142,27 +142,28 @@ public class LoadScratch3 implements TurtleLoader {
 
 	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
 		logger.debug("Searching for project.json...");
-		ZipInputStream zipInputStream = new ZipInputStream(in);
-		ZipEntry entry;
-		File tempZipFile=null;
-		while((entry = zipInputStream.getNextEntry())!=null) {
-	        if( entry.getName().equals(PROJECT_JSON) ) {
-	        	logger.debug("Found project.json...");
-	        	
-		        // read buffered stream into temp file.
-	        	tempZipFile = File.createTempFile("project", "json");
-	        	tempZipFile.setReadable(true);
-	        	tempZipFile.setWritable(true);
-	        	tempZipFile.deleteOnExit();
-		        FileOutputStream fos = new FileOutputStream(tempZipFile);
-	    		byte[] buffer = new byte[2048];
-	    		int len;
-                while ((len = zipInputStream.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-                return tempZipFile;
-	        }
+		try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
+			ZipEntry entry;
+			File tempZipFile = null;
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				if (entry.getName().equals(PROJECT_JSON)) {
+					logger.debug("Found project.json...");
+
+					// read buffered stream into temp file.
+					tempZipFile = File.createTempFile("project", "json");
+					tempZipFile.setReadable(true);
+					tempZipFile.setWritable(true);
+					tempZipFile.deleteOnExit();
+					try (FileOutputStream fos = new FileOutputStream(tempZipFile)) {
+						byte[] buffer = new byte[2048];
+						int len;
+						while ((len = zipInputStream.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+						return tempZipFile;
+					}
+				}
+			}
 		}
 		throw new FileNotFoundException("SB3 missing project.json");
 	}
@@ -451,12 +452,9 @@ public class LoadScratch3 implements TurtleLoader {
 	private void doSetPenColor(JSONObject currentBlock) throws Exception {
 		String c = (String)findInputInBlock(currentBlock,"COLOR");
 		if(c.startsWith("#")) {
-			c = c.substring(1);
-			int r = Integer.parseInt(c.substring(0,2));
-			int g = Integer.parseInt(c.substring(2,4));
-			int b = Integer.parseInt(c.substring(4));
+			int r = Integer.parseInt(c.substring(1));
 			logger.debug("SET COLOR {}",c);
-			myTurtle.setColor(new ColorRGB(r,g,b));
+			myTurtle.setColor(new ColorRGB(r));
 		}
 	}
 	
