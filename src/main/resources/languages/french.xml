@@ -296,7 +296,7 @@
     </string>
     <string>
         <key>SierpinskiTriangleName</key>
-        <value>Fractale du triangle de Sierpinski</value>
+        <value>Triangle de Sierpiński</value>
         <hint>[name of generator]</hint>
         <!--	"SierpinskiTriangleName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_SierpinskiTriangle.java" line 18
@@ -440,7 +440,7 @@
     </string>
     <string>
         <key>FibonacciSpiralName</key>
-        <value>Fractale en spirale de Fibonacci</value>
+        <value>Spirale de Fibonacci</value>
         <hint>[]</hint>
         <!--	"FibonacciSpiralName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_FibonacciSpiral.java" line 26
@@ -789,7 +789,7 @@
     </string>
     <string>
         <key>JogInterface.FindHome</key>
-        <value>Accueil</value>
+        <value>Trouver l'origine ("Home")</value>
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
@@ -1117,7 +1117,7 @@
     </string>
     <string>
         <key>KochTreeName</key>
-        <value>Fractale de la courbe de Koch</value>
+        <value>Courbe de Koch</value>
         <hint>[]</hint>
         <!--	"KochTreeName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_KochCurve.java" line 21
@@ -1278,7 +1278,7 @@
     </string>
     <string>
         <key>DragonName</key>
-        <value>Fractale de dragon</value>
+        <value>Courbe du dragon</value>
         <hint>[]</hint>
         <!--	"DragonName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_Dragon.java" line 21
@@ -1430,7 +1430,7 @@
     </string>
     <string>
         <key>JogInterface.DisengageMotors</key>
-        <value>Dé-engager</value>
+        <value>Dé-engager les moteurs</value>
         <hint>[Manual driving dialog]</hint>
     </string>
     <string>
@@ -1491,7 +1491,7 @@
     </string>
     <string>
         <key>Polyeder</key>
-        <value>Papercraft Polyèdre</value>
+        <value>Paper craft 3D Polyèdre</value>
         <hint>[Generator]</hint>
         <!--	"Polyeder"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_Polyeder.java" line 142
@@ -1705,7 +1705,7 @@
     </string>
     <string>
         <key>LissajousName</key>
-        <value>Lissajous</value>
+        <value>Courbe de Lissajous</value>
         <hint>[Lissajous generator]</hint>
         <!--	"LissajousName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_Lissajous.java" line 23
@@ -2092,7 +2092,7 @@
     </string>
     <string>
         <key>LSystemTreeName</key>
-        <value>Fractale d'arbre système L</value>
+        <value>Arbre L-Système</value>
         <hint>[]</hint>
         <!--	"LSystemTreeName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_LSystemTree.java" line 24
@@ -2167,7 +2167,7 @@
     </string>
     <string>
         <key>HilbertCurveName</key>
-        <value>Fractale de la courbe de Hilbert</value>
+        <value>Courbe de Hilbert</value>
         <hint>[Hilbert Curve generator]</hint>
         <!--	"HilbertCurveName"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/makeArt/turtleGenerator/Generator_HilbertCurve.java" line 19
@@ -2663,7 +2663,7 @@
     </string>
     <string>
         <key>JogInterface.EngageMotors</key>
-        <value>Engager</value>
+        <value>Engager les moteurs</value>
         <hint>[Manual driving dialog]</hint>
     </string>
     <string>
@@ -2809,4 +2809,10 @@
     </string>
  -->
  
+    <string>
+        <key>CartesianButtons.buttonCenter</key>
+        <value></value>
+        <hint>jog controls</hint>
+    </string>
+    
 </language>
