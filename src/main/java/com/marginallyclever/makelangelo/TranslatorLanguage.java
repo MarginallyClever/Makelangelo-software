@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class TranslatorLanguage {
 
 	private static final Logger logger = LoggerFactory.getLogger(TranslatorLanguage.class);
-	public static final String MISSING = "Missing:";
 
 	private String name = "";
 	private String author = "";
@@ -101,11 +101,7 @@ public class TranslatorLanguage {
 	}
 
 	public String get(String key) {
-		if(strings.containsKey(key)) {
-			return strings.get(key);
-		} else {
-			return MISSING +key;
-		}
+		return strings.get(key);
 	}
 
 
@@ -132,7 +128,13 @@ public class TranslatorLanguage {
 		NodeList nl = ele.getElementsByTagName(tagName);
 		if (nl != null && nl.getLength() > 0) {
 			Element el = (Element) nl.item(0);
-			textVal = el.getFirstChild().getNodeValue();
+			// to allow empty value as translation 
+			final Node firstChild = el.getFirstChild();
+			if ( firstChild != null){
+				textVal = firstChild.getNodeValue();
+			}else{				
+				textVal = "";
+			}
 		}
 		textVal = textVal.replace("\\n", "\n");
 		return textVal;

@@ -1,17 +1,14 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class DialogAbout {
 	private static final Logger logger = LoggerFactory.getLogger(DialogAbout.class);
@@ -37,43 +34,13 @@ public class DialogAbout {
 	}
 
 	/**
-	 * @param html String of valid HTML.
-	 * @return a
-	 */
-	private JTextComponent createHyperlinkListenableJEditorPane(String html) {
-		final JEditorPane bottomText = new JEditorPane();
-		bottomText.setContentType("text/html");
-		bottomText.setEditable(false);
-		bottomText.setText(html);
-		bottomText.setOpaque(false);
-		final HyperlinkListener hyperlinkListener = new HyperlinkListener() {
-			public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-				if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					if (Desktop.isDesktopSupported()) {
-						try {
-							URI u = hyperlinkEvent.getURL().toURI();
-							Desktop.getDesktop().browse(u);
-						} catch (IOException | URISyntaxException e) {
-							logger.error("Failed to open the browser to the url", e);
-						}
-					}
-
-				}
-			}
-		};
-		bottomText.addHyperlinkListener(hyperlinkListener);
-		return bottomText;
-	}
-
-
-	/**
 	 * Display the about dialog.
 	 */
 	public void display(Component parent,String versionString) {
 		String aboutHtml = getAboutHtmlFromMultilingualString();
 		aboutHtml = aboutHtml.replace("%VERSION%",versionString);
 		
-		final JTextComponent bottomText = createHyperlinkListenableJEditorPane(aboutHtml);
+		final JTextComponent bottomText = SelectReadOnlyText.createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
 		if (icon == null) {
 			icon = getImageIcon("resources/logo.png");

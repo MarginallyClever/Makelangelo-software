@@ -3,28 +3,17 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class SelectGUITest {
     private SelectPanel panel;
     private int testObservation;
-
-    @BeforeAll
-    public static void beforeAll() {}
-
-    @AfterAll
-    public static void afterAll() {}
 
     @BeforeEach
     public void beforeEach() {
         panel = new SelectPanel();
     }
-
-    @AfterEach
-    public void afterEach() {}
 
     @Test
     public void testBoolean() {

@@ -27,7 +27,8 @@ import java.util.stream.Stream;
  */
 public final class Translator {
 	private static final Logger logger = LoggerFactory.getLogger(Translator.class);
-	
+
+	public static final String MISSING = "Missing:";
 	// Working directory. This represents the directory where the java executable launched the jar from.
 	public static final String WORKING_DIRECTORY = /*File.separator + */"languages"/*+File.separator*/;
 	// The name of the preferences node containing the user's choice.
@@ -165,7 +166,7 @@ public final class Translator {
 			myPath = Paths.get(uri);
 		}
 
-		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getUserDirectory());
+		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getWorkingDirectory());
 		logger.trace("rootDir={}", rootPath.toString());
 
 		// we'll look inside the JAR file first, then look in the working directory.
@@ -196,6 +197,7 @@ public final class Translator {
 			lang.loadFromInputStream(stream);
 		} catch(Exception e) {
 			logger.error("Failed to load {}", actualFilename);
+			logger.debug("{}",e.getMessage());// To log the Exception stack in debug/dev mode.
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
@@ -217,7 +219,12 @@ public final class Translator {
 	 * @return the translated value for key, or "missing:key".
 	 */
 	public static String get(String key) {
-		return languages.get(currentLanguage).get(key);
+		String translation = languages.get(currentLanguage).get(key);
+		if (translation == null) {
+			logger.warn("Missing translation '{}' in language '{}'", key, currentLanguage);
+			return MISSING +key;
+		}
+		return translation;
 	}
 
 	/**

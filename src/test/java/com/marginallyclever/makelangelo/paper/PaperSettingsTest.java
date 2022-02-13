@@ -17,7 +17,6 @@ import static org.assertj.swing.launcher.ApplicationLauncher.application;
  * @author Dan Royer
  *
  */
-//@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 	private FrameFixture window;
 

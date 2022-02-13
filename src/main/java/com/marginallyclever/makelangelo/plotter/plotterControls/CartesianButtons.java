@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marginallyclever.makelangelo.Translator;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -108,7 +110,7 @@ public class CartesianButtons extends JComponent {
 			--v;
 		}
 
-		labels[ZONE_CENTER] = "Home";
+		labels[ZONE_CENTER] = Translator.get( "CartesianButtons.buttonCenter" );
 	}
 
 	@Override

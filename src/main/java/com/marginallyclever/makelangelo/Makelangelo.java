@@ -45,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -91,7 +93,6 @@ public final class Makelangelo {
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
-	private static final String PREFERENCE_LOAD_PATH = "loadPath";
 
 	private static Logger logger;
 
@@ -277,7 +278,7 @@ public final class Makelangelo {
 
 	private void openPlotterSettings() {
 		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
-		JDialog dialog = new JDialog(mainFrame,PlotterSettingsPanel.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -296,7 +297,7 @@ public final class Makelangelo {
 
 	private void openPaperSettings() {
 		PaperSettings settings = new PaperSettings(myPaper);
-		JDialog dialog = new JDialog(mainFrame,PaperSettings.class.getSimpleName());
+		JDialog dialog = new JDialog(mainFrame,Translator.get("PaperSettings.Title"));
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -345,8 +346,8 @@ public final class Makelangelo {
 		Arrays.stream(TurtleRenderFactory.values())
 				.forEach(iter -> {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
-					String name = iter.getName();
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+					String name = iter.getName();					
+					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
 					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));
 					menu.add(button);
@@ -822,25 +823,40 @@ public final class Makelangelo {
 		logger.debug("  create range slider...");
 		JPanel bottomPanel = new JPanel(new BorderLayout());
 		rangeSlider = new RangeSlider();
-		rangeSlider.addChangeListener((e)->{
-	        RangeSlider slider = (RangeSlider)e.getSource();
-	        int bottom = Integer.valueOf(slider.getValue());
-	        int top = Integer.valueOf(slider.getUpperValue());
-	        myTurtleRenderer.setFirst(bottom);
-	        myTurtleRenderer.setLast(top);
-	        labelRangeMin.setText(Integer.toString(bottom));
-	        labelRangeMax.setText(Integer.toString(top));
-		});
+		rangeSlider.addChangeListener((e)->onChangeSlider(e));
 		
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
+		
 		labelRangeMin.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		labelRangeMax.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		
+		labelRangeMin.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		labelRangeMax.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+		
+		Dimension d = labelRangeMin.getPreferredSize();
+		d.width=60;
+		labelRangeMin.setPreferredSize(d);
+		labelRangeMax.setPreferredSize(d);
 		
 		bottomPanel.add(labelRangeMin, BorderLayout.WEST);
 		bottomPanel.add(rangeSlider, BorderLayout.CENTER);
 		bottomPanel.add(labelRangeMax, BorderLayout.EAST);
 		
 		contentPane.add(bottomPanel, BorderLayout.SOUTH);
+	}
+	
+	/**
+	 * When the two-headed drawing start/end slider is moved
+	 * @param e {@link ChangeEvent} describing the move.
+	 */
+	private void onChangeSlider(ChangeEvent e) {
+        RangeSlider slider = (RangeSlider)e.getSource();
+        int bottom = Integer.valueOf(slider.getValue());
+        int top = Integer.valueOf(slider.getUpperValue());
+        myTurtleRenderer.setFirst(bottom);
+        myTurtleRenderer.setLast(top);
+        labelRangeMin.setText(Integer.toString(bottom));
+        labelRangeMax.setText(Integer.toString(top));
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
@@ -995,9 +1011,6 @@ public final class Makelangelo {
 			myPlotter.getSettings().saveConfig();
 			savePaths();
 
-			// Log.end() should be the very last call.  mainFrame.dispose() kills the thread, so this is as close as I can get.
-			Log.end();
-
 			// Run this on another thread than the AWT event queue to
 			// make sure the call to Animator.stop() completes before
 			// exiting
@@ -1052,7 +1065,6 @@ public final class Makelangelo {
 
 	public static void main(String[] args) {
 		Log.start();
-		// lazy init to be able to purge old files
 		logger = LoggerFactory.getLogger(Makelangelo.class);
 
 		PreferencesHelper.start();

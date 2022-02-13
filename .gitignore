@@ -54,5 +54,8 @@ docs/
 ## packaging
 packaging/*
 firmware.hex
+!src/main/package/firmware.hex
 avrdude.conf
+!src/main/package/avrdude.conf
 avrdude.exe
+!src/main/package/avrdude.exe
