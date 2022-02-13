@@ -418,13 +418,18 @@
         -->
     </string>
     <string>
-        <key>CopyClipboard</key>
+        <key>LogPanel.CopyClipboard</key>
         <value>Copier dans le presse-papier</value>
-        <hint></hint>
-        <!--	"CopyClipboard"
-                used in "../Makelangelo-software/src/main/java/com/marginallyclever/convenience/log/LogPanel.java" line 51
-        -->
     </string>
+    <string>
+        <key>LogPanel.LogFiles</key>
+        <value>Fichiers de logs</value>
+    </string>
+    <string>
+        <key>LogPanel.Title</key>
+        <value>Log</value>
+    </string>
+
     <string>
         <key>Failed</key>
         <value>Echec: </value>
@@ -2763,4 +2768,50 @@
         <value>Faire un don PayPal</value>
         <hint>About Menu</hint>
     </string>
+    <string>
+        <key>PaperSettings.Title</key>
+        <value>Paramètres papier</value>
+        <hint>Paper settings panel title</hint>
+    </string>
+    <string>
+        <key>PlotterSettingsPanel.Title</key>
+        <value>Paramètres du traceur</value>
+        <hint>panel title</hint>
+    </string>
+
+    
+    <string>
+        <key>TurtleRenderFactory.DEFAULT</key>
+        <value>Défaut</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.BARBER_POLE</key>
+        <value>Enseigne de barbier (rouge, bleu)</value>
+        <hint>Barber pole (red, blue)</hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.SEPARATE_LOOP</key>
+        <value>Boucles séparées</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleRenderFactory.MARLIN_SIM</key>
+        <value>Simulation vitesses marlin</value>
+        <hint></hint>
+    </string>
+    <string>
+        <key>TurtleGenerators.LearnMore.Link.Text</key>
+        <value>En savoir plus</value>
+        <hint>Utilisé dans différents panels comme texte de lien vers Wikipedia</hint>
+    </string>
+
+<!--
+    <string>
+        <key></key>
+        <value></value>
+        <hint></hint>
+    </string>
+ -->
+ 
 </language>

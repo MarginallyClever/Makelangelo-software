@@ -1,11 +1,13 @@
 package com.marginallyclever.convenience.log;
 
+import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -13,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class LogPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(LogPanel.class);
@@ -20,13 +24,47 @@ public class LogPanel extends JPanel {
 	private static final long serialVersionUID = -2753297349917155256L;
 
 	private final JTextArea logArea = new JTextArea();
+	private final JComboBox<File> filesJComboBox = new JComboBox<>();
 
 	public LogPanel() {
 		this.setLayout(new BorderLayout());
+		JPanel innerPanel = new JPanel(new BorderLayout());
+		this.add(innerPanel);
+
+		Arrays.stream(Log.logDir.listFiles((dir1, name) -> name.matches(Log.LOG_FILE_NAME_PATTERN)))
+				.sorted(Comparator.reverseOrder())
+				.forEach(logFile -> {
+					if (logFile.exists() && logFile.isFile()) {
+						filesJComboBox.addItem(logFile);
+					}
+				});
+		filesJComboBox.addItemListener(e -> displayLog((File) e.getItem()));
+
+		JPanel topPanel = new JPanel(new BorderLayout());
+		JLabel label = new JLabel(Translator.get("LogPanel.LogFiles"));
+		label.setBorder(new EmptyBorder(0,10,0,10));//top,left,bottom,right
+		topPanel.add(label, BorderLayout.LINE_START);
+		topPanel.add(filesJComboBox, BorderLayout.CENTER);
+
+		innerPanel.add(topPanel, BorderLayout.NORTH);
+
 		JScrollPane scrollPane = new JScrollPane(logArea);
-		this.add(scrollPane, BorderLayout.CENTER);
+		innerPanel.add(scrollPane, BorderLayout.CENTER);
 		scrollPane.setPreferredSize(new Dimension(1000, 400));
-		File log = Log.getLogLocation();
+
+		displayLog(Log.getLogLocation());
+
+		ButtonIcon copyClipboardButton = new ButtonIcon("LogPanel.CopyClipboard", "/images/page_copy.png");
+		copyClipboardButton.addActionListener((e)-> {
+			StringSelection stringSelection = new StringSelection(logArea.getText());
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(stringSelection, null);
+		});
+		innerPanel.add(copyClipboardButton ,BorderLayout.SOUTH);
+	}
+
+	private void displayLog(File log) {
+		logArea.setText("");
 		try (BufferedReader br = new BufferedReader(new FileReader(log))) {
 			String b;
 			while ((b = br.readLine()) != null) {
@@ -41,26 +79,12 @@ public class LogPanel extends JPanel {
 		}
 	}
 
-	private String getText() {
-		return logArea.getText();
-	}
-
 	public static void runAsDialog(JFrame frame) {
-		JDialog dialog = new JDialog(frame, Log.getLogLocation().toString(), Dialog.ModalityType.DOCUMENT_MODAL);
-
-		JButton copyClipboardButton = new JButton(Translator.get("CopyClipboard"));
+		JDialog dialog = new JDialog(frame, Translator.get("LogPanel.Title"), Dialog.ModalityType.DOCUMENT_MODAL);
 
 		JPanel outerPanel = new JPanel(new BorderLayout());
 		LogPanel logPanel = new LogPanel();
 		outerPanel.add(logPanel,BorderLayout.CENTER);
-
-		outerPanel.add(copyClipboardButton,BorderLayout.SOUTH);
-
-		copyClipboardButton.addActionListener((e)-> {
-			StringSelection stringSelection = new StringSelection(logPanel.getText());
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			clipboard.setContents(stringSelection, null);
-		});
 
 		dialog.add(outerPanel);
 		dialog.pack();
