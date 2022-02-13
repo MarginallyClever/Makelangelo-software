@@ -450,12 +450,9 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 	
 	private void doSetPenColor(JSONObject currentBlock) throws Exception {
-		String c = (String)findInputInBlock(currentBlock,"COLOR");
-		if(c.startsWith("#")) {
-			int r = Integer.parseInt(c.substring(1));
-			logger.debug("SET COLOR {}",c);
-			myTurtle.setColor(new ColorRGB(r));
-		}
+		ColorRGB c = new ColorRGB((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));
+		logger.debug("SET COLOR {}",c);
+		myTurtle.setColor(c);
 	}
 	
 	/**
@@ -766,7 +763,7 @@ public class LoadScratch3 implements TurtleLoader {
 			case 6:  // positive integer
 			case 7:  // integer
 			case 8:  // angle
-			// 9 is color (#rrggbbaa)
+			case 9:  // color (#rrggbbaa)			
 			case 10:  // string, try to parse as number
 				return parseNumber(currentArray.get(1));
 			case 12:  // variable
@@ -797,11 +794,13 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 		throw new Exception("resolveValue unknown object type "+currentObject.getClass().getSimpleName());
 	}
-
+	
 	private double parseNumber(Object object) {
-		if(object instanceof String)
-			return Double.parseDouble((String)object);
-		else if(object instanceof Double) 
+		if(object instanceof String) {
+			String str = (String)object;
+			if(str.startsWith("#")) return (double)Integer.parseInt(str.substring(1),16);
+			return Double.parseDouble(str);
+		} else if(object instanceof Double) 
 			return (double)object;
 		else //if(object instanceof Integer)
 			return (double)(int)object;
