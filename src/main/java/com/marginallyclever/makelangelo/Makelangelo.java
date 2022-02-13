@@ -262,6 +262,7 @@ public final class Makelangelo {
 
 	private JMenu createSettingsMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuSettings"));
+		menu.setMnemonic('S');
 		
 		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
 		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
@@ -269,6 +270,7 @@ public final class Makelangelo {
 		
 		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
 		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
+		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));//"ctrl P"
 		menu.add(bOpenPlotterSettings);
 		
 		return menu;
@@ -315,19 +317,22 @@ public final class Makelangelo {
 
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
-
+		menu.setMnemonic('k');
 		menu.add(createRobotStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
+		bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));//"ctrl E"
 		bEstimate.addActionListener((e)-> estimateTime());
 		menu.add(bEstimate);
 
 		JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
 		bSaveToSD.addActionListener((e)-> saveGCode());
+		bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));//"ctrl G" or maybe "ctrl alt S"
 		menu.add(bSaveToSD);
 
 		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
+		bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));//"ctrl C"
 		menu.add(bOpenControls);
 
 		return menu;
@@ -427,6 +432,7 @@ public final class Makelangelo {
 
 	private JMenu createToolsMenu() {
 		JMenu menu = new JMenu(Translator.get("Art Pipeline"));
+		menu.setMnemonic('T');
 
 		try {
 			PiCaptureAction pc = new PiCaptureAction();
@@ -451,15 +457,20 @@ public final class Makelangelo {
 		menu.addSeparator();
 		
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
+		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
+		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl F"
 		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
 		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
 		
 		menu.addSeparator();
 		
 		TurtleModifierAction a1 = new SimplifyTurtleAction();
+		a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl Y"
 		TurtleModifierAction a2 = new ReorderTurtleAction();
+		a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl R"
 		TurtleModifierAction a3 = new InfillTurtleAction();
+		a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl I"
 		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
 		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
 		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
@@ -473,7 +484,7 @@ public final class Makelangelo {
 
 	private JMenu createGenerateMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuGenerate"));
-		
+		menu.setMnemonic('A');
 		for( TurtleGenerator ici : TurtleGeneratorFactory.available ) {
 			JMenuItem mi = new JMenuItem(ici.getName());
 			mi.addActionListener((e) -> runGeneratorDialog(ici));
@@ -515,13 +526,16 @@ public final class Makelangelo {
 
 	private JMenu createFileMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
+		menu.setMnemonic('f');
 
 		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener((e) -> newFile());
+		buttonNewFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));//"ctrl N"
 		menu.add(buttonNewFile);
 
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openLoadFile());
+		buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));//"ctrl O"
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
@@ -530,21 +544,19 @@ public final class Makelangelo {
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
+		buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));//"ctrl S"
 		menu.add(buttonSaveFile);
 
 		menu.addSeparator();
 				
 		JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
 		buttonAdjustPreferences.addActionListener((e)-> myPreferencesPanel.run(mainFrame));
+		buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));//"alt P"
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
 		buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
 		menu.add(buttonFirmwareUpdate);
-		
-		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
-		menu.add(buttonCheckForUpdate);
 
 		if (!isMacOS) {
 			menu.addSeparator();
@@ -554,6 +566,8 @@ public final class Makelangelo {
 				WindowEvent windowClosing = new WindowEvent(mainFrame, WindowEvent.WINDOW_CLOSING);
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
 			});
+			buttonExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));//"ctrl Q"
+			buttonExit.setMnemonic('q');
 			menu.add(buttonExit);
 		}
 		return menu;
@@ -621,6 +635,7 @@ public final class Makelangelo {
 
 	private JMenu createViewMenu() {
 		JMenu menu = new JMenu(Translator.get("MenuView"));
+		menu.setMnemonic('V');
 		
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
@@ -638,6 +653,7 @@ public final class Makelangelo {
 		menu.add(buttonZoomToFit);
 
 		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"),GFXPreferences.getShowPenUp());
+		checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.CTRL_DOWN_MASK));//"ctrl M" 
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
 			GFXPreferences.setShowPenUp(!b);
@@ -654,28 +670,55 @@ public final class Makelangelo {
 
 	private JMenu createHelpMenu() {
 		JMenu menu = new JMenu(Translator.get("Help"));
+		menu.setMnemonic('H');//
 		
 		JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-		buttonViewLog.addActionListener((e) -> runLogPanel());
+		buttonViewLog.addActionListener((e) -> runLogPanel());		 
+		buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));//"ctrl L"
 		menu.add(buttonViewLog);
-
-		JMenuItem buttonForums = new JMenuItem(Translator.get("MenuForums"));
-		buttonForums.addActionListener((e) -> {
-			try {
-				java.awt.Desktop.getDesktop().browse(URI.create("https://discord.gg/Q5TZFmB"));
-			} catch (IOException ioe) {
-				logger.error("Can't open the browser to discord", ioe);
-			}
-		});
+		
+		JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
 		menu.add(buttonForums);
 
+		JMenuItem buttonDonation = createMenuItemBrowse(Translator.get("MenuItemPayPalDonation"), "https://www.marginallyclever.com/products/makelangelo-software/");
+		menu.add(buttonDonation);
+		
+		JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
+		buttonCheckForUpdate.addActionListener((e) -> checkForUpdate(false));
+		menu.add(buttonCheckForUpdate);
+
+		menu.addSeparator();
+		
 		if (!isMacOS) {
 			JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
 			buttonAbout.addActionListener((e) -> onDialogButton());
 			menu.add(buttonAbout);
 		}
 
+		
 		return menu;
+	}
+
+	public JMenuItem createMenuItemBrowse(String menuLabelAlreadyTranslated, String urlAsString) {
+		JMenuItem jmi = new JMenuItem(menuLabelAlreadyTranslated);
+		jmi.setToolTipText(urlAsString);
+		jmi.addActionListener((e) -> {
+			try {
+				if (Desktop.isDesktopSupported()) {
+					if (Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+						java.awt.Desktop.getDesktop().browse(URI.create(urlAsString));
+					} else {
+						logger.error("Desktop.Action.BROWSE not supported. Can't open the browser to " + urlAsString);
+					}
+				} else {
+					logger.error("Desktop not supported. Can't open the browser to " + urlAsString);
+				}
+				
+			} catch (IOException ioe) {
+				logger.error("Can't open the browser to "+urlAsString, ioe);
+			}
+		});
+		return jmi;
 	}
 
 	private void onDialogButton() {
