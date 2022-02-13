@@ -25,16 +25,13 @@ public class SerialTransportLayer implements TransportLayer {
 
 	public SerialTransportLayer() {}
 
-	public String getName() {
-		return "USB Serial";
-	}
-	
 	/**
 	 * find all available serial ports.
 	 * @return a list of port names
 	 */
 	public List<String> listConnections() {
-		String [] portsDetected;
+		logger.debug("Listing available serial port");
+		String[] portsDetected;
 
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 		if ((os.contains("mac")) || (os.contains("darwin"))) {
@@ -57,7 +54,13 @@ public class SerialTransportLayer implements TransportLayer {
 			portsDetected = SerialPortList.getPortNames();
 		}
 
-		return Arrays.asList(portsDetected);
+		List<String> connections = Arrays.asList(portsDetected);
+
+		if (logger.isDebugEnabled()) {
+			connections.forEach(connection -> logger.debug("  {}", connection));
+		}
+
+		return connections;
 	}
 
 	/**

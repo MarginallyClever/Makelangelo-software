@@ -4,13 +4,15 @@ import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.ToggleButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.SerialUI;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,15 +34,15 @@ public class ChooseConnection extends JPanel {
 			Arrays.asList("/images/connect.png", "/images/disconnect.png"),
 			Arrays.asList(Color.GREEN, Color.RED));
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-	private final JComboBox<Configuration> connectionComboBox = new JComboBox<>();
+	private final JComboBox<ComboItem> connectionComboBox = new JComboBox<>();
 	private final JPanel configurationPanel = new JPanel();
-	private TransportLayer previousTransportLayer;
-
+	private TransportLayerUI previousTransportLayerUI;
+	private final List<TransportLayerUI> availableTransportsUI = List.of(new SerialUI());
 	private NetworkSession mySession;
 
 	public ChooseConnection() {
 		this.add(connectionComboBox);
-		connectionComboBox.addActionListener(this::updateConfigurationPanel);
+		connectionComboBox.addItemListener(this::updateConfigurationPanel);
 		addConnectionsItems(connectionComboBox);
 
 		configurationPanel.setLayout(new BoxLayout(configurationPanel, BoxLayout.LINE_AXIS));
@@ -54,26 +56,25 @@ public class ChooseConnection extends JPanel {
 		this.add(bConnect);
 	}
 
-	private void updateConfigurationPanel(ActionEvent actionEvent) {
-		Configuration configuration = (Configuration) ((JComboBox )actionEvent.getSource()).getSelectedItem();
-		TransportLayer transportLayer = configuration.getTransportLayer();
-		if (previousTransportLayer != configuration.getTransportLayer()) {
+	private void updateConfigurationPanel(ItemEvent itemEvent) {
+		ComboItem comboItem = (ComboItem) itemEvent.getItem();
+		TransportLayerUI transportLayerUI = comboItem.transportLayerUi;
+		if (previousTransportLayerUI != transportLayerUI) {
 			configurationPanel.removeAll();
-			configuration.getTransportLayerUI().addToPanel(configurationPanel);
+			comboItem.transportLayerUi.addToPanel(configurationPanel);
 			configurationPanel.revalidate();
 		}
-		previousTransportLayer = transportLayer;
+		previousTransportLayerUI = transportLayerUI;
 	}
 
-	private void addConnectionsItems(JComboBox<Configuration> comboBox) {
+	private void addConnectionsItems(JComboBox<ComboItem> comboBox) {
 		comboBox.removeAllItems();
 		logger.debug("Fetching connections");
-		for (TransportLayer transportLayer : TransportLayers.transportLayers) {
-			logger.debug("  {}" ,transportLayer.getName());
+		for (TransportLayerUI transportLayerUi : availableTransportsUI) {
+			TransportLayer transportLayer = transportLayerUi.getTransportLayer();
 			for (String connection: transportLayer.listConnections()) {
-				logger.debug("    {}", connection);
 				Configuration configuration = new Configuration(transportLayer, connection);
-				comboBox.addItem(configuration);
+				comboBox.addItem(new ComboItem(configuration, transportLayerUi));
 			}
 		}
 
@@ -84,10 +85,11 @@ public class ChooseConnection extends JPanel {
 		if (mySession != null) {
 			onClose();
 		} else {
-			int speed = 42; // (int) baudRateComboBox.getSelectedItem();
-			Configuration configuration = (Configuration) connectionComboBox.getSelectedItem();
-			if (configuration==null) return;  // no connections at all
-			configuration.addConfiguration("speed", speed);
+			ComboItem comboItem = (ComboItem) connectionComboBox.getSelectedItem();
+			if (comboItem==null) return;  // no connections selected, can't happened
+
+			Configuration configuration = comboItem.configuration;
+			comboItem.transportLayerUi.setSelectedValue(configuration);
 			NetworkSession networkSession = configuration.getTransportLayer().openConnection(configuration);
 			if (networkSession != null) {
 				onOpen(networkSession);
@@ -123,6 +125,20 @@ public class ChooseConnection extends JPanel {
 
 	public void closeConnection() {
 		onClose();
+	}
+
+	private class ComboItem {
+		private final Configuration configuration;
+		private final TransportLayerUI transportLayerUi;
+
+		private ComboItem(Configuration configuration, TransportLayerUI transportLayerUi) {
+			this.configuration = configuration;
+			this.transportLayerUi = transportLayerUi;
+		}
+
+		public String toString() {
+			return configuration.getConnectionName();
+		}
 	}
 
 	// OBSERVER PATTERN

@@ -19,10 +19,6 @@ public class TCPTransportLayer implements TransportLayer {
 
 	public TCPTransportLayer() {}
 
-	public String getName() {
-		return "TCP/IP";
-	}
-
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
@@ -52,6 +48,7 @@ public class TCPTransportLayer implements TransportLayer {
 
 	@Override
 	public List<String> listConnections() {
+		logger.debug("Listing available tcp connection");
 		return List.of("192.168.1.183:9999");
 	}
 }

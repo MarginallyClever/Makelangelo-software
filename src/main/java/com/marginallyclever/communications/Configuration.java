@@ -3,6 +3,9 @@ package com.marginallyclever.communications;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration of a connection: transport layer, target, optionnal params
+ */
 public class Configuration {
 
     private TransportLayer transportLayer;

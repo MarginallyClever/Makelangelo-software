@@ -9,11 +9,6 @@ import java.util.List;
  * @since v7.1.0.0
  */
 public interface TransportLayer {
-	/**
-	 * 
-	 * @return english name of this transport layer
-	 */
-    String getName();
   
     /**
      * opens a connection
