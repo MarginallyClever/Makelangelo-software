@@ -3,7 +3,7 @@
     <meta>
         <name>Français (fr_FR)</name>
         <author>https://github.com/PPAC37</author>
-        <!-- draft v0.4.1 04/02/2022 -->
+        <!-- draft v0.4.2 13/02/2022 -->
     </meta>
     <string>
         <key>Left</key>
@@ -509,7 +509,7 @@
     </string>
     <string>
         <key>PlotterControls.FindHome</key>
-        <value>Trouver la maison</value>
+        <value>Trouver l'origine ("Home")</value>
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
@@ -1130,7 +1130,7 @@
     </string>
     <string>
         <key>PlotterControls.MarlinTab</key>
-        <value>Marin</value>
+        <value>Marlin</value>
         <hint>[panel tab title]</hint>
         <!--	"PlotterControls.MarlinTab"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/plotterControls/PlotterControls.java" line 68
@@ -1697,7 +1697,7 @@
     </string>
     <string>
         <key>PlotterControls.ConnectControls</key>
-        <value>Relier</value>
+        <value>Connecter</value>
         <hint>[title]</hint>
         <!--	"PlotterControls.ConnectControls"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/plotterControls/PlotterControls.java" line 112
@@ -2022,7 +2022,7 @@
     </string>
     <string>
         <key>ConversationHistory.Clear</key>
-        <value>Dégager</value>
+        <value>Effacer</value>
         <hint>[button]</hint>
     </string>
     <string>
@@ -2261,7 +2261,7 @@
     </string>
     <string>
         <key>PlotterControls.Error</key>
-        <value>L'imprimante a rencontré une erreur, consultez l'onglet MarlinInterface pour obtenir des détails.</value>
+        <value>L'imprimante a rencontré une erreur, consultez l'onglet Marlin pour obtenir des détails.</value>
         <hint>[text]</hint>
         <!--	"PlotterControls.Error"
                 used in "../Makelangelo-software/src/main/java/com/marginallyclever/makelangelo/plotter/plotterControls/PlotterControls.java" line 93
