@@ -20,9 +20,9 @@
     </if>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>makelangelo.log</file>
+        <file>${user.home}/.makelangelo/makelangelo.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>makelangelo.%i.log</fileNamePattern>
+            <fileNamePattern>${user.home}/.makelangelo/makelangelo.%i.log</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>1</maxIndex>
         </rollingPolicy>

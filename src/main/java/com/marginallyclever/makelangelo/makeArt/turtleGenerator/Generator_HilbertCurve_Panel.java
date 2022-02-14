@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 import java.beans.PropertyChangeEvent;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 
 /**
@@ -24,6 +25,7 @@ public class Generator_HilbertCurve_Panel extends TurtleGeneratorPanel {
 		this.generator = generator;
 
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override

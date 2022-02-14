@@ -21,7 +21,7 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element type="stringNotEmpty" name="key"/>
-                            <xs:element type="stringNotEmpty" name="value"/>
+                            <xs:element type="xs:string" name="value"/>
                             <xs:element type="xs:string" name="hint" minOccurs="0"/>
                         </xs:sequence>
                     </xs:complexType>                   

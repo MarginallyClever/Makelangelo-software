@@ -16,22 +16,17 @@ import java.util.Properties;
  *
  */
 public class Log {
-	private static Logger logger;
+	private static final Logger logger = LoggerFactory.getLogger(Log.class);
 
 	// must be consistent with logback.xml
-	private static final String LOG_FILE_NAME_TXT = "makelangelo.log";
-	private static final String LOG_FILE_NAME_PATTERN = "makelangelo\\..*\\.log";
-	private static final String PROGRAM_START_STRING = "PROGRAM START";
-	private static final String PROGRAM_END_STRING = "PROGRAM END";
+	public static final String LOG_FILE_NAME_TXT = "makelangelo.log";
+	public static final String LOG_FILE_NAME_PATTERN = "makelangelo\\..*log";
+	public static final File logDir = new File(FileAccess.getHomeDirectory(), ".makelangelo");
 
 	/**
-	 * Initialize log file and purge old
+	 * Initialize log file
 	 */
 	public static void start() {
-		// lazy init to be able to purge old file
-		logger = LoggerFactory.getLogger(Log.class);
-		// custom logger name to separate a long debug info from useful info
-		logger.info(PROGRAM_START_STRING);
 		logger.info("------------------------------------------------");
 		Properties p = System.getProperties();
 		List<String> names = new ArrayList<>(p.stringPropertyNames());
@@ -40,35 +35,9 @@ public class Log {
 			logger.info("{} = {}", name, p.get(name));
 		}
 		logger.info("------------------------------------------------");
-
-		if (crashReportCheck()) {
-			logger.warn("Crash detected on previous run");
-		}
-	}
-
-	public static void end() {
-		logger.info(PROGRAM_END_STRING);
 	}
 
 	public static File getLogLocation() {
-		return new File(FileAccess.getUserDirectory(), LOG_FILE_NAME_TXT);
+		return new File(logDir, LOG_FILE_NAME_TXT);
 	}
-
-	/**
-	 * check if a previous log does not contain PROGRAM_END_STRING to look for previously crash and delete it
-	 */
-	private static boolean crashReportCheck() {
-		File [] files = new File(FileAccess.getUserDirectory()).listFiles((dir1, name) -> name.matches(LOG_FILE_NAME_PATTERN));
-
-		boolean ending = false;
-
-		for (File oldLogFile : files) {
-			if (oldLogFile.exists() && oldLogFile.isFile()) {
-				ending |= FileAccess.tail(oldLogFile).contains(PROGRAM_END_STRING);
-				oldLogFile.delete();
-			}
-		}
-		return !ending;
-	}
-
 }

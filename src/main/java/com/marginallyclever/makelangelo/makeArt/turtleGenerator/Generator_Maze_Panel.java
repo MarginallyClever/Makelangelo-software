@@ -27,7 +27,7 @@ public class Generator_Maze_Panel extends TurtleGeneratorPanel {
 
 		add(field_rows = new SelectSlider("rows",Translator.get("MazeRows"),100,1,generator.getRows()));
 		add(field_columns = new SelectSlider("columns",Translator.get("MazeColumns"),100,1,generator.getCols()));
-		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>Learn more</a>"));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override

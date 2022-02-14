@@ -35,7 +35,7 @@ public class Generator_Spirograph_Panel extends TurtleGeneratorPanel {
 		add(field_minorRadius = new SelectInteger("MinorRadius",Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
 		add(field_pScale = new SelectDouble("PScale",Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
 		add(field_numSamples = new SelectInteger("NumSamples",Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
-		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Spirograph'>Learn more</a>"));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Spirograph'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override
