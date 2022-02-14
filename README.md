@@ -20,6 +20,7 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
   ![plotter](src/main/resources/splash.png)
 - Setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/commits/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/);
 - Install "Makelangelo Software" on your computer to control the robot. You will find [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) whith installer for the macOS, Linux and Windows *or* Install Makelangelo Software App from the source as described below;
+  > Note: on macOS, when launching the app, you will have an error: "Makelangelo.app is damaged and can't be opened, you should move it to the trash". It can be fixed by opening a console and entering the command `sudo xattr -cr /Applications/Makelangelo.app`. This is due to [this bug](https://bugs.openjdk.java.net/browse/JDK-8276150).
 - Import a picture, or a vector graphic and watch the robot drawing.
 
 ## Developper instructions
@@ -32,7 +33,7 @@ This project is written in Java and uses Swing for the graphical interface. The 
 
 Get the [Open Java Development Kit (OpenJDK)](https://openjdk.java.net/). The minimum required version 15.
 
-- **OSX**: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-17.jdk) into your `/Library/Java/JavaVirtualMachines/` folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
+- **macOS**: Unarchive the OpenJDK tar, and place the resulting folder (i.e. jdk-17.jdk) into your `/Library/Java/JavaVirtualMachines/` folder since this is the standard and expected location of JDK installs. You can also install anywhere you want in reality.
 - **Windows**: https://stackoverflow.com/a/52531093 _untested_
 - **Linux**: https://linuxize.com/post/install-java-on-ubuntu-18-04/ _untested_
 
