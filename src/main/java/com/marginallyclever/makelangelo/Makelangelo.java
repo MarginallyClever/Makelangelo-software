@@ -100,7 +100,8 @@ public final class Makelangelo {
 	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the 
 	 * VERSION based upon pom.xml.  In this way we only define the VERSION once and prevent violating DRY.
 	 */
-	public String VERSION;
+	private final String VERSION;
+	private final String DETAILED_VERSION;
 
 	private MakelangeloSettingPanel myPreferencesPanel;
 	
@@ -133,7 +134,8 @@ public final class Makelangelo {
 	public Makelangelo() {
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-		VERSION = PropertiesFileHelper.getMakelangeloVersionPropertyValue();
+		VERSION = PropertiesFileHelper.getMakelangeloVersion();
+		DETAILED_VERSION = PropertiesFileHelper.getMakelangeloGitVersion();
 		myPreferencesPanel = new MakelangeloSettingPanel();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -723,7 +725,7 @@ public final class Makelangelo {
 
 	private void onDialogButton() {
 		DialogAbout a = new DialogAbout();
-		a.display(mainFrame,VERSION);
+		a.display(mainFrame,VERSION, DETAILED_VERSION);
 	}
 
 	private void runLogPanel() {
@@ -758,7 +760,7 @@ public final class Makelangelo {
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				logger.debug("latest release: {}; this version: {}", line2, VERSION);
+				logger.debug("latest release: {}; this version: {}@{}", line2, VERSION, DETAILED_VERSION);
 				// logger.debug(inputLine.compareTo(VERSION));
 
 				int comp = line2.compareTo(VERSION);
@@ -863,7 +865,7 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		mainFrame = new JFrame(Translator.get("TitlePrefix")+" "+this.VERSION);
+		mainFrame = new JFrame(Translator.get("TitlePrefix") + " " + VERSION);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
