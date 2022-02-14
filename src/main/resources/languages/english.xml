@@ -1336,11 +1336,11 @@
 	</string>
 
 	<string>
-		<key>AboutHTML</key>
+		<key>DialogAbout.AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo %VERSION%</h1>
+        <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
