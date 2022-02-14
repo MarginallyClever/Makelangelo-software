@@ -10,15 +10,16 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 
 ## Where to go from here
 
-**On your own**  [Reading our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.  
+**On your own**  [Reading our friendly manuals](http://mcr.dozuki.com). Pictures and arrows and everything.  
 
 **Together** and [join our Discord group](https://discord.gg/QtvHqAv8yp)
 
 # Start!
 
 - Buy a plotter [Makelangelo 5](https://www.marginallyclever.com/products/makelangelo-5/) or build your own;
+  ![plotter](src/main/resources/splash.png)
 - Setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/commits/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/);
-- Install "Makelangelo Software" on your computer to control the robot. You will find [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) whith installer for the main OS: macOS, Linux and Windows *or* Install Makelangelo Software App from the source as described below;
+- Install "Makelangelo Software" on your computer to control the robot. You will find [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) whith installer for the macOS, Linux and Windows *or* Install Makelangelo Software App from the source as described below;
 - Import a picture, or a vector graphic and watch the robot drawing.
 
 ## Developper instructions
@@ -81,10 +82,10 @@ When launching the application, set the environnement variable `DEV` to `true` i
 
 ## Thank you
 
-Did this program help you?  Like Open Source software?  Want to show support?
+Did this program help you? Like Open Source software? Want to show support?
 Donate what you can to help speed up development at https://www.marginallyclever.com/product/makelangelo-software/
 
-Makelangelo is derived from the work of Paul Fisher.  It is largely inspired by [Hektor](http://hektor.ch/) by Jürg Lehni and Uli Franke.
+Makelangelo is derived from the work of Paul Fisher. It is largely inspired by [Hektor](http://hektor.ch/) by Jürg Lehni and Uli Franke.
 
 ## Credits
 

@@ -164,6 +164,47 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/package</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/package</directory>
+									<includes>
+										<include>avrdude.*</include>
+										<include>firmware.hex</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-fat-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/package</outputDirectory>
+							<resources>
+								<resource>
+									<directory>target</directory>
+									<includes>
+										<include>Makelangelo*-with-dependencies.jar</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-site-plugin</artifactId>
