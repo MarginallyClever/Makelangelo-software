@@ -115,5 +115,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.BINARY }}
-        retention-days: 4
+        retention-days: 2
         path: ${{ env.BINARY }}
