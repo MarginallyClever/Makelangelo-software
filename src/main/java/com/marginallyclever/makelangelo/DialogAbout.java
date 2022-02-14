@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.util.PreferencesHelper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,18 +28,12 @@ public class DialogAbout {
 	}
 
 	/**
-	 * @return An HTML string used for the About Message Dialog.
-	 */
-	private String getAboutHtmlFromMultilingualString() {
-		return Translator.get("AboutHTML");
-	}
-
-	/**
 	 * Display the about dialog.
 	 */
-	public void display(Component parent,String versionString) {
-		String aboutHtml = getAboutHtmlFromMultilingualString();
-		aboutHtml = aboutHtml.replace("%VERSION%",versionString);
+	public void display(Component parent, String versionString, String detailedVersion) {
+		String aboutHtml = Translator.get("DialogAbout.AboutHTML")
+				.replace("%VERSION%", versionString)
+				.replace("%DETAILED_VERSION%", detailedVersion);
 		
 		final JTextComponent bottomText = SelectReadOnlyText.createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse(aboutHtml);
 		ImageIcon icon = getImageIcon("logo.png");
@@ -46,5 +41,14 @@ public class DialogAbout {
 			icon = getImageIcon("resources/logo.png");
 		}
 		JOptionPane.showMessageDialog(parent, bottomText, Translator.get("MenuAbout"), JOptionPane.INFORMATION_MESSAGE, icon);
+	}
+
+	// TEST
+
+	public static void main(String[] args) {
+		PreferencesHelper.start();
+		Translator.start();
+		DialogAbout a = new DialogAbout();
+		a.display(null, "7.31.0", "hash-ee8c91a-dirty ");
 	}
 }

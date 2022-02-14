@@ -1478,8 +1478,8 @@
         <hint>[menu or dialog title]</hint>
     </string>
     <string>
-        <key>AboutHTML</key>
-        <value>    &lt;html&gt; &lt;body&gt; &lt;h1&gt;Makelangelo %VERSION%&lt;/h1&gt; &lt;h3&gt; &lt;a href='http://www.makelangelo.com/'&gt;http://www.makelangelo.com/&lt;/a &gt; &lt;/h3&gt; &lt;p&gt;Pour obtenir la dernière version, veuillez visiter&lt;br&gt; &lt;a href='https://www.marginallyclever.com/product/makelangelo-software/'&gt;https://www.marginallyclever.com /product/makelangelo-software/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;Créé par &lt;a href="mailto:dan@marginallyclever.com"&gt;Dan Royer&lt;/a&gt;.&lt;/p&gt; &lt;p&gt;Logiciel supplémentaire et les contributions matérielles de&lt;br&gt; Joseph Cottam, &lt;a href='https://github.com/virtuoushub'&gt;Peter Colapietro&lt;a/&gt;, Miguel Sánchez&lt;br&gt; Mark Raynsford et &lt;a href='https://ca.linkedin.com/in/kington-chu-219923123'&gt;Kington Chu&lt;/a&gt;.&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</value>
+        <key>DialogAbout.AboutHTML</key>
+        <value>    &lt;html&gt; &lt;body&gt; &lt;h1&gt;Makelangelo %VERSION% &lt;span style="font-size: small; font-weight: normal"&gt;%DETAILED_VERSION%&lt;/span&gt; &lt;/h1&gt; &lt;h3&gt;&lt;a href='http://www.makelangelo.com/'&gt;http://www.makelangelo.com/&lt;/a &gt; &lt;/h3&gt; &lt;p&gt;Pour obtenir la dernière version, veuillez visiter&lt;br&gt; &lt;a href='https://www.marginallyclever.com/product/makelangelo-software/'&gt;https://www.marginallyclever.com /product/makelangelo-software/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;Créé par &lt;a href="mailto:dan@marginallyclever.com"&gt;Dan Royer&lt;/a&gt;.&lt;/p&gt; &lt;p&gt;Logiciel supplémentaire et les contributions matérielles de&lt;br&gt; Joseph Cottam, &lt;a href='https://github.com/virtuoushub'&gt;Peter Colapietro&lt;a/&gt;, Miguel Sánchez&lt;br&gt; Mark Raynsford et &lt;a href='https://ca.linkedin.com/in/kington-chu-219923123'&gt;Kington Chu&lt;/a&gt;.&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</value>
         <hint>[HTML for About Dialog]</hint>
     </string>
     <string>
