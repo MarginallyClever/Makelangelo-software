@@ -49,6 +49,6 @@ public class DialogAbout {
 		PreferencesHelper.start();
 		Translator.start();
 		DialogAbout a = new DialogAbout();
-		a.display(null, "7.31.0", "hash-ee8c91a-dirty ");
+		a.display(null, "7.31.0", "hash-ee8c91a-dirty");
 	}
 }
