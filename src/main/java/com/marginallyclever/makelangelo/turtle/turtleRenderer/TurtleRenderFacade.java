@@ -101,7 +101,6 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(myTurtle!=null) size = myTurtle.history.size();
 
 		first=(int)Math.min(Math.max(arg0, 0),size);
-		logger.debug("first={}",first);
 		if(last<first) setLast(first);
 	}
 	
@@ -114,7 +113,6 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(myTurtle!=null) size = myTurtle.history.size();
 
 		last = (int)Math.min(Math.max(arg0, 0), size);
-		logger.debug("last={}",last);
 		if(first>last) setFirst(last);
 	}
 
