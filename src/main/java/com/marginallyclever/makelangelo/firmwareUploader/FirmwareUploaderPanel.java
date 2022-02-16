@@ -328,7 +328,8 @@ public class FirmwareUploaderPanel extends	SelectPanel {
 		    // TODO ? url to github wiki how to get / install avrdude.
 		    + "or install ArduinoIDE "
 		    + "<a href=\"https://www.arduino.cc/en/software\">https://www.arduino.cc/en/software<a> "
-		    + "or XLoader that embed it)</body></html>";//Translator.get("AboutAvrdude");
+		    + "or XLoader that embed it)</body></html>";
+//Translator.get("AboutAvrdude");
 	    JTextComponent createHyperlinkListenableJEditorPane = /*DialogAbout.*/ createHyperlinkListenableJEditorPane(msg);//
 	    JOptionPane.showMessageDialog(this, createHyperlinkListenableJEditorPane, msg_firmware_upload_status, JOptionPane.ERROR_MESSAGE);
 	    //JOptionPane.showMessageDialog(this,"AVRDude not found.",msg_firmware_upload_status,JOptionPane.ERROR_MESSAGE);		    
