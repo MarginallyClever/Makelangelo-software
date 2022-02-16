@@ -31,7 +31,9 @@ public class Select extends JPanel {
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
 		if ( propertyChangeListeners == null){ 
-			// PPAC37 to avoid "-nolf" : as some linux Look and Feel can run this overrided methode befor the class is fully initialised ...			
+			// PPAC37 to avoid "-nolf" : as some linux Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+			// can run this overrided methode befor the class is fully initialised ...
+			// (But then tooltips color to change TODO.)
 			propertyChangeListeners = new ArrayList<>();
 			logger.debug("need \"-nolf\" due to l&f \"{}\"",UIManager.getLookAndFeel().getClass().getCanonicalName());
 		}
