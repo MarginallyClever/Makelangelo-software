@@ -20,7 +20,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Dan Royer
@@ -33,6 +33,10 @@ public class LoadSVG implements TurtleLoader {
 	
 	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	private Turtle myTurtle;
+
+	private boolean isNewPath;  // for cubic paths
+	private Vector3d pathFirstPoint = new Vector3d();
+	private Vector3d pathPoint = new Vector3d();
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -66,20 +70,13 @@ public class LoadSVG implements TurtleLoader {
 	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
 
-		logger.debug("...parse path");
-		parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		logger.debug("...parse polylines");
-		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		logger.debug("...parse polygons");
-		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		logger.debug("...parse lines");
-		parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		logger.debug("...parse rects");
-		parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		logger.debug("...parse circles");
-		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		logger.debug("...parse ellipses");
-		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
+		logger.debug("...parse path");			parsePathElements(    documentElement.getElementsByTagName( "path"     ));
+		logger.debug("...parse polylines");		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
+		logger.debug("...parse polygons");		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
+		logger.debug("...parse lines");			parseLineElements(    documentElement.getElementsByTagName( "line"     ));
+		logger.debug("...parse rects");			parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
+		logger.debug("...parse circles");		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
+		logger.debug("...parse ellipses");		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
 	}
 	
 	/**
@@ -87,8 +84,6 @@ public class LoadSVG implements TurtleLoader {
 	 * @param pathNodes the source of the elements
 	 */
 	private void parsePolylineElements(NodeList pathNodes) throws Exception {
-		Vector3d v2;
-		
 	    int pathNodeCount = pathNodes.getLength();
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
@@ -102,7 +97,7 @@ public class LoadSVG implements TurtleLoader {
 			//logger.debug("New Node has "+pathObjects+" elements.");
 
 			SVGPoint item = (SVGPoint)pointList.getItem(0);
-			v2 = transform(item.getX(),item.getY(),m);
+			Vector3d v2 = transform(item.getX(),item.getY(),m);
 			myTurtle.jumpTo(v2.x,v2.y);
 			
 			for( int i=1; i<numPoints; ++i ) {
@@ -311,20 +306,15 @@ public class LoadSVG implements TurtleLoader {
 			myTurtle.moveTo(v2.x,v2.y);
 	    }
 	}
-	
+
 	/**
-	 * Parse through all the SVG path elements and raster them to gcode.
+	 * Parse through all the SVG path elements and raster them to {@link Turtle}.
 	 * @param paths the source of the elements
 	 */
 	private void parsePathElements(NodeList paths) throws Exception {
-		double firstX=0;
-		double firstY=0;
-		double px=0;
-		double py=0;
-		
 	    int pathCount = paths.getLength();
 	    for( int iPath = 0; iPath < pathCount; iPath++ ) {
-	    	if(paths.item( iPath ).getClass() == SVGOMPolylineElement.class) {
+	    	if(paths.item( iPath ) instanceof SVGOMPolylineElement) {
 	    		logger.debug("Node is a polyline.");
 	    		parsePolylineElements(paths);
 	    		continue;
@@ -334,115 +324,97 @@ public class LoadSVG implements TurtleLoader {
 				continue;
 			
 			Matrix3d m = getMatrixFromElement(element);
-			Vector3d v;
 
 	    	SVGPathSegList pathList = element.getNormalizedPathSegList();
-	    	//SVGPathSegList pathList = element.getPathSegList();
 	    	int itemCount = pathList.getNumberOfItems();
 	    	logger.debug("Node has {} elements.", itemCount);
-	    	int sinceClosePath=0;
+	    	isNewPath=true;
 	    	
 			for(int i=0; i<itemCount; i++) {
-				++sinceClosePath;
 				SVGPathSeg item = pathList.getItem(i);
-				logger.debug("segType={}", item.getClass().getSimpleName());
 				switch( item.getPathSegType() ) {
-				case SVGPathSeg.PATHSEG_CLOSEPATH:  // Z z
-					{
-						logger.debug("Close path");
-						v = transform(firstX,firstY,m);
-						myTurtle.moveTo(v.x,v.y);
-						sinceClosePath=0;
-					}
-					break;
-				case SVGPathSeg.PATHSEG_MOVETO_ABS:  // M
-					{
-						SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
-						logger.debug("Move Abs x{} y{}", path.getX(), path.getY());
-						px = path.getX();
-						py = path.getY();
-						if(sinceClosePath==1) {
-							firstX = px;
-							firstY = py;
-						}
-						v = transform(px,py,m);
-						myTurtle.jumpTo(v.x,v.y);
-					}
-					break;
-				case SVGPathSeg.PATHSEG_MOVETO_REL:  // m
-					{
-						SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
-						logger.debug("Move Rel x{} y{}", path.getX(), path.getY());
-						px += path.getX();
-						py += path.getY();
-						if(sinceClosePath==1) {
-							firstX = px;
-							firstY = py;
-						}
-						v = transform(px,py,m);
-						myTurtle.jumpTo(v.x,v.y);
-					}
-					break;
-				case SVGPathSeg.PATHSEG_LINETO_ABS:  // L H V
-					{
-						SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
-						logger.debug("Line Abs x{} y{}", path.getX(), path.getY());
-						px = path.getX();
-						py = path.getY();
-						v = transform(px,py,m);
-						myTurtle.moveTo(v.x,v.y);
-					}
-					break;
-				case SVGPathSeg.PATHSEG_LINETO_REL:  // l h v
-					{
-						SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
-						logger.debug("Line Rel x{} y{}", path.getX(), path.getY());
-						px += path.getX();
-						py += path.getY();
-						v = transform(px,py,m);
-						myTurtle.moveTo(v.x,v.y);
-					}
-					break;
-				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS: // C c
-					{
-						SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
-						logger.debug("Curve Cubic Abs x{}  y{}", path.getX(), path.getY());
-						logger.debug("               1x{} 1y{}", path.getX1(), path.getY1());
-						logger.debug("               2x{} 2y{}", path.getX2(), path.getY2());
-
-						// x0,y0 is the first point
-						double x0=px;
-						double y0=py;
-						// x3,y3 is the end point
-						double x3=path.getX();
-						double y3=path.getY();
-						// x1,y1 is the first control point
-						double x1=path.getX1();
-						double y1=path.getY1();
-						// x2,y2 is the second control point
-						double x2=path.getX2();
-						double y2=path.getY2();
-						Bezier b = new Bezier(x0,y0,x1,y1,x2,y2,x3,y3);
-						ArrayList<Point2D> points = b.generateCurvePoints(0.1);
-						for(Point2D p2 : points) {
-							v = transform(p2.x,p2.y,m);
-							myTurtle.moveTo(v.x,v.y);
-						}
-						px=x3;
-						py=y3;
-					}
-					break;
-				default:
-					{
-						String m2="Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString();
-						logger.debug(m2);
-						throw new Exception(m2);
-					}
+				case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m);  	// M
+				case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m);  		// m
+				case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m);  	// L H V
+				case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m);  	// l h v
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m);	// C c
+				case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(m); 			// Z z
+				default -> throw new Exception("Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString());
 				}
 			}
 		}
 	}
     
+	private void doCubicCurveAbs(SVGPathSeg item, Matrix3d m) {
+		SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
+
+		// x0,y0 is the first point
+		Vector3d p0 = pathPoint;
+		// x1,y1 is the first control point
+		Vector3d p1 = transform(path.getX1(),path.getY1(),m);
+		// x2,y2 is the second control point
+		Vector3d p2 = transform(path.getX2(),path.getY2(),m);
+		// x3,y3 is the end point
+		Vector3d p3 = transform(path.getX(),path.getY(),m);
+		
+		logger.debug("Cubic curve {} {} {} {}", p0,p1,p2,p3);
+		
+		Bezier b = new Bezier(
+				p0.x,p0.y,
+				p1.x,p1.y,
+				p2.x,p2.y,
+				p3.x,p3.y);
+		List<Point2D> points = b.generateCurvePoints(0.1);
+		for(Point2D p : points) myTurtle.moveTo(p.x,p.y);
+		pathPoint.set(p3);
+		isNewPath=true;
+	}
+
+	private void doLineToRel(SVGPathSeg item, Matrix3d m) {
+		SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
+		Vector3d p = transform(path.getX(),path.getY(),m);
+		logger.debug("Line Rel {}", p);
+		pathPoint.set(myTurtle.getX(),myTurtle.getY(),0);
+		pathPoint.add(p);
+		myTurtle.moveTo(pathPoint.x,pathPoint.y);
+		isNewPath=false;
+	}
+
+	private void doLineToAbs(SVGPathSeg item, Matrix3d m) {
+		SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
+		Vector3d p = transform(path.getX(),path.getY(),m);
+		logger.debug("Line Abs {}", p);
+		pathPoint.set(p);
+		myTurtle.moveTo(pathPoint.x,pathPoint.y);
+		isNewPath=false;
+	}
+
+	private void doMoveRel(SVGPathSeg item, Matrix3d m) {
+		SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
+		Vector3d p = transform(path.getX(),path.getY(),m);
+		logger.debug("Move Rel {}", p);
+		pathPoint.add(p);
+		if(isNewPath==true) pathFirstPoint.set(pathPoint);
+		myTurtle.jumpTo(p.x,p.y);
+		isNewPath=false;
+	}
+
+	private void doMoveToAbs(SVGPathSeg item, Matrix3d m) {
+		SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
+		Vector3d p = transform(path.getX(),path.getY(),m);
+		logger.debug("Move Abs {}", p);
+		pathPoint.set(p);
+		if(isNewPath==true) pathFirstPoint.set(pathPoint);
+		myTurtle.jumpTo(p.x,p.y);
+		isNewPath=false;
+	}
+
+	private void doClosePath(Matrix3d m) {
+		logger.debug("Close path");
+		myTurtle.moveTo(pathFirstPoint.x,pathFirstPoint.y);
+		isNewPath=true;
+	}
+
 	private Vector3d transform(double x, double y, Matrix3d m) {
 		Vector3d p = new Vector3d(x,y,1);
 		m.transform(p);

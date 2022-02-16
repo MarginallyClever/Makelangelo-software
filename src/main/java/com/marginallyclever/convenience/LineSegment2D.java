@@ -1,7 +1,7 @@
 package com.marginallyclever.convenience;
 
 /** 
- * line segments with color 
+ * {@link LineSegment2D} represents two connected points and line color. 
  * @author Dan Royer
  *
  */

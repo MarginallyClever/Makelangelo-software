@@ -18,6 +18,11 @@ module com.marginallyclever.makelangelo {
 	
 	exports com.marginallyclever.makelangelo;
 	exports com.marginallyclever.makelangelo.turtle;
+	exports com.marginallyclever.makelangelo.plotter;
+	exports com.marginallyclever.makelangelo.plotter.settings;
+	exports com.marginallyclever.makelangelo.paper;
 	exports com.marginallyclever.convenience;
 	exports com.marginallyclever.convenience.log;
+
+	opens com.marginallyclever.makelangelo.plotter.settings;
 }

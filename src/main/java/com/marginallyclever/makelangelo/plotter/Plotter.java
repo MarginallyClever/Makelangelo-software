@@ -210,7 +210,7 @@ public class Plotter implements PreviewListener, Cloneable {
 			if(!penIsUp) raisePen();
 			setPos(move.x,move.y);
 			break;
-		case TurtleMove.DRAW:
+		case TurtleMove.DRAW_LINE:
 			if(penIsUp) lowerPen();
 			setPos(move.x,move.y);
 			break;

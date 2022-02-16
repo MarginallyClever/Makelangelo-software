@@ -7,7 +7,7 @@ import com.marginallyclever.convenience.StringHelper;
 
 public class TurtleMove {
 	public static final int TRAVEL=0;  // move without drawing
-	public static final int DRAW=1;  // move while drawing
+	public static final int DRAW_LINE=1;  // move while drawing
 	public static final int TOOL_CHANGE=2;
 	
 	public int type;
@@ -40,7 +40,7 @@ public class TurtleMove {
 		case TRAVEL:
 			return "TRAVEL X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
 		default:
-			return "DRAW X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
+			return "DRAW_LINE X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -25,21 +26,21 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	private final String PROJECT_JSON = "project.json";
 	
-	private class ScratchVariable {
+	private class Scratch2Variable {
 		public String name;
 		public double value;
 
-		public ScratchVariable(String arg0,float arg1) {
+		public Scratch2Variable(String arg0,float arg1) {
 			name=arg0;
 			value=arg1;
 		}
 	};
 	
-	private class ScratchList {
+	private class Scratch2List {
 		public String name;
 		public ArrayList<Double> contents;
 
-		public ScratchList(String _name) {
+		public Scratch2List(String _name) {
 			name=_name;
 			contents=new ArrayList<Double>();
 		}
@@ -47,8 +48,8 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	private FileNameExtensionFilter filter = new FileNameExtensionFilter("Scratch 2","SB2");
 	private Turtle turtle;
-	private LinkedList<ScratchVariable> scratchVariables;
-	private LinkedList<ScratchList> scratchLists;
+	private LinkedList<Scratch2Variable> scratchVariables;
+	private LinkedList<Scratch2List> scratchLists;
 	private Map<String,JSONArray> subRoutines = new HashMap<String,JSONArray>();
 	private int indent;
 	
@@ -65,79 +66,29 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
-		logger.debug("{}...", Translator.get("FileTypeSB2"));
+		logger.debug("Loading...");
 
 		turtle = new Turtle();
+		indent=0;
 		
-	    indent=0;
-		
-		// open zip file
-    	logger.debug("Searching for project.json...");
-    	
-		ZipInputStream zipInputStream = new ZipInputStream(in);
-		
-		// locate project.json
-		ZipEntry entry;
-		File tempZipFile=null;
-		boolean found=false;
-		while((entry = zipInputStream.getNextEntry())!=null) {
-	        if( entry.getName().equals(PROJECT_JSON) ) {
-	        	logger.debug("Found project.json...");
-	        	
-		        // read buffered stream into temp file.
-	        	tempZipFile = File.createTempFile("project", "json");
-	        	tempZipFile.setReadable(true);
-	        	tempZipFile.setWritable(true);
-	        	tempZipFile.deleteOnExit();
-		        FileOutputStream fos = new FileOutputStream(tempZipFile);
-	    		byte[] buffer = new byte[2048];
-	    		int len;
-                while ((len = zipInputStream.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-                found=true;
-                break;
-	        }
-		}
-
-		if(found==false) {
-			throw new Exception("SB2 missing project.json");
-		}
-		
-		// parse JSON
-        logger.debug("Parsing JSON file...");
-        
-        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
-        JSONObject tree = new JSONObject(tokener);
-		// we're done with the tempZipFile now that we have the JSON structure.
-		tempZipFile.delete();
-		
+		JSONObject tree = getTreeFromInputStream(in);
 		readScratchVariables(tree);
 		readScratchLists(tree);
 
 		// read the sketch(es)
-		JSONArray children = (JSONArray)tree.get("children");
-		if(children==null) throw new Exception("JSON node 'children' missing.");
-		//logger.debug("found children");
-		
 		// look for the first child with a script
+		JSONArray scripts = getScripts(tree);
+		logger.debug("found {} top level event scripts", scripts.length());
 
-		Iterator<?> childIter = children.iterator();
-		JSONArray scripts = null;
-		while( childIter.hasNext() ) {
-			JSONObject child = (JSONObject)childIter.next();
-			scripts = (JSONArray)child.get("scripts");
-			if (scripts != null)
-				break;
-		}
+		readAllSubroutines(scripts);
+		findAndRunFromGreenFlag(scripts);
 		
-		if(scripts==null) throw new Exception("JSON node 'scripts' missing.");
+		logger.debug("finished scripts");
 
-		logger.debug("found  {} top-level event scripts", scripts.length());
-		
-		JSONArray greenFlagScript = null;
-		
+		return turtle;
+	}
+
+	private void findAndRunFromGreenFlag(JSONArray scripts) throws Exception {
 		// extract known elements and convert them to turtle commands.
 		Iterator<?> scriptIter = scripts.iterator();
 		// find the first script with a green flag.
@@ -154,24 +105,82 @@ public class LoadScratch2 implements TurtleLoader {
     			String firstType = (String)scriptHead;
 				if(firstType.equals("whenGreenFlag")) {
 					logger.debug("Found green flag script");
-					if( greenFlagScript != null ) {
-						throw new Exception("More than one green flag script");
-					}
-					greenFlagScript = scripts02;
-				} else if(firstType.equals("whenIReceive")) {
+					parseScratchCode(scripts02);
+				}
+			}
+		}
+	}
+
+	private void readAllSubroutines(JSONArray scripts) {
+		// extract known elements and convert them to turtle commands.
+		Iterator<?> scriptIter = scripts.iterator();
+		
+		while( scriptIter.hasNext() ) {
+			JSONArray scripts0 = (JSONArray)scriptIter.next();
+			if( scripts0==null ) continue;
+			JSONArray scripts02 = (JSONArray)scripts0.get(2);
+			if( scripts02==null || scripts02.length()==0 ) continue;
+			// look inside the script at the first block, which gives the type.
+			Object scriptContents = scripts02.get(0);
+			if( ( scriptContents instanceof JSONArray ) ) {
+				String firstType = ((JSONArray)scriptContents).getString(0);
+				if(firstType.equals("whenIReceive")) {
 	    			String firstName = (String)((JSONArray)scriptContents).get(1);
 					logger.debug("Found subroutine {}", firstName);
 	    			subRoutines.put(firstName, ((JSONArray)scriptContents));
 				}
 			}
 		}
+	}
 
-		// actual code begins here.
-		parseScratchCode(greenFlagScript);
+	private JSONArray getScripts(JSONObject tree) throws Exception {
+		Iterator<?> childIter = tree.getJSONArray("children").iterator();
+		while( childIter.hasNext() ) {
+			JSONObject child = (JSONObject)childIter.next();
+			if(child.has("scripts")) {
+				return (JSONArray)child.get("scripts");
+			}
+		}
+		throw new Exception("JSON node 'scripts' missing.");
+	}
+
+	private JSONObject getTreeFromInputStream(InputStream in) throws FileNotFoundException, IOException {
+		File tempZipFile = extractProjectJSON(in);
 		
-		logger.debug("finished scripts");
+        logger.debug("Parsing JSON file...");
+        JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
+        JSONObject tree = new JSONObject(tokener);
 
-		return turtle;
+		tempZipFile.delete();
+		
+		return tree;
+	}
+
+	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
+		logger.debug("Searching for project.json...");
+		try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
+			ZipEntry entry;
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				if (entry.getName().equals(PROJECT_JSON)) {
+					logger.debug("Found.");
+
+					// read buffered stream into temp file.
+					File tempZipFile = File.createTempFile("project", "json");
+					tempZipFile.setReadable(true);
+					tempZipFile.setWritable(true);
+					tempZipFile.deleteOnExit();
+					try (FileOutputStream fos = new FileOutputStream(tempZipFile)) {
+						byte[] buffer = new byte[2048];
+						int len;
+						while ((len = zipInputStream.read(buffer)) > 0) {
+							fos.write(buffer, 0, len);
+						}
+						return tempZipFile;
+					}
+				}
+			}
+		}
+		throw new FileNotFoundException("SB2 missing project.json");
 	}
 
 	/**
@@ -180,7 +189,7 @@ public class LoadScratch2 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchVariables(JSONObject tree) throws Exception {
-		scratchVariables = new LinkedList<ScratchVariable>();
+		scratchVariables = new LinkedList<Scratch2Variable>();
 		JSONArray variables = (JSONArray)tree.get("variables");
 		// A scratch file without variables would crash before this test
 		if (variables != null) {
@@ -188,17 +197,17 @@ public class LoadScratch2 implements TurtleLoader {
 			while( varIter.hasNext() ) {
 				//logger.debug("var:"+elem.toString());
 				JSONObject elem = (JSONObject)varIter.next();
-				String varName = (String)elem.get("name");
+				String varName = elem.getString("name");
 				Object varValue = elem.get("value");
 				float value;
 				if(varValue instanceof Number) {
 					Number num = (Number)varValue;
 					value = (float)num.doubleValue();
-					scratchVariables.add(new ScratchVariable(varName,value));
+					scratchVariables.add(new Scratch2Variable(varName,value));
 				} else if(varValue instanceof String) {
 					try {
 						value = Float.parseFloat((String)varValue);
-	    				scratchVariables.add(new ScratchVariable(varName,value));
+	    				scratchVariables.add(new Scratch2Variable(varName,value));
 					} catch (Exception e) {
 						throw new Exception("Variables must be numbers.", e);
 					}
@@ -213,7 +222,7 @@ public class LoadScratch2 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchLists(JSONObject tree) throws Exception {
-		scratchLists = new LinkedList<ScratchList>();
+		scratchLists = new LinkedList<Scratch2List>();
 		JSONArray listOfLists = (JSONArray)tree.get("lists");
 		if(listOfLists == null) return;
 		logger.debug("Found {} lists.", listOfLists.length());
@@ -224,7 +233,7 @@ public class LoadScratch2 implements TurtleLoader {
 			String listName = (String)elem.get("listName");
 			logger.debug("  Found list {}", listName);
 			Object contents = elem.get("contents");
-			ScratchList list = new ScratchList(listName);
+			Scratch2List list = new Scratch2List(listName);
 			// fill the list with any given contents
 			if( contents != null && contents instanceof JSONArray ) {
 				JSONArray arr = (JSONArray)contents;
@@ -255,10 +264,10 @@ public class LoadScratch2 implements TurtleLoader {
 	private int getListByID(Object obj) throws Exception {
 		if(!(obj instanceof String)) throw new Exception("List name not a string.");
 		String listName = obj.toString();
-		ListIterator<ScratchList> iter = scratchLists.listIterator();
+		ListIterator<Scratch2List> iter = scratchLists.listIterator();
 		int index=0;
 		while(iter.hasNext()) {
-			ScratchList i = iter.next();
+			Scratch2List i = iter.next();
 			if(i.name.equals(listName)) return index;
 			++index;
 		}
@@ -291,197 +300,225 @@ public class LoadScratch2 implements TurtleLoader {
 				parseScratchCode(arr);
 				continue;
 			}
-			
 			String name = o.toString();
 			//logger.debug(getIndent()+name);
-			
-			if(name.equals("whenGreenFlag")) {
-				continue;
-			} else if(name.equals("whenIReceive")) {
-				// skip the name of the whenIReceive script.
-				scriptIter.next();
-				continue;
-			} else if(name.equals("doBroadcastAndWait")) {
-				Object o2 = scriptIter.next();
-				//logger.debug(getIndent()+"broadcast "+(String)o2);
-				JSONArray arr = subRoutines.get(o2);
-				parseScratchCode(arr);
-			} else if(name.equals("stopScripts")) {
-				//logger.debug(getIndent()+"stop");
-				break;
-			} else if(name.equals("doRepeat")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				int count = (int)resolveValue(o2);
-				//logger.debug(getIndent()+"Repeat "+count+" times:");
-				for(int i=0;i<count;++i) {
-					parseScratchCode((JSONArray)o3);
-				}
-			} else if(name.equals("doUntil")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				//logger.debug(getIndent()+"Do Until");
-				while(!resolveBoolean((JSONArray)o2)) {
-					parseScratchCode((JSONArray)o3);
-				}
-			} else if(name.equals("doIf")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				if(resolveBoolean((JSONArray)o2)) {
-					//logger.debug(getIndent()+"if(true)");
-					parseScratchCode((JSONArray)o3);
-				}
-			} else if(name.equals("doIfElse")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				Object o4 = scriptIter.next();
-				if(resolveBoolean((JSONArray)o2)) {
-					//logger.debug(getIndent()+"if(true)");
-					parseScratchCode((JSONArray)o3);
-				} else {
-					//logger.debug(getIndent()+"if(false)");
-					parseScratchCode((JSONArray)o4);
-				}
-			} else if(name.equals("append:toList:")) {
-				// "append:toList:", new value, list name 
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				double value = resolveValue(o2);
-				scratchLists.get(getListByID(o3)).contents.add(value);
-			} else if(name.equals("deleteLine:ofList:")) {
-				// "deleteLine:ofList:", index, list name 
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				int listIndex = (int)resolveListIndex(o2,o3);
-				scratchLists.get(getListByID(o3)).contents.remove(listIndex);
-			} else if(name.equals("insert:at:ofList:")) {
-				// "insert:at:ofList:", new value, index, list name 
-				Object o4 = scriptIter.next();
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				double newValue = resolveValue(o4);
-				int listIndex = (int)resolveListIndex(o2,o3);
-				scratchLists.get(getListByID(o3)).contents.add(listIndex,newValue);
-			} else if(name.equals("setLine:ofList:to:")) {
-				// "setLine:ofList:to:", index, list name, new value
-				Object o4 = scriptIter.next();
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				double newValue = resolveValue(o4);
-				int listIndex = (int)resolveListIndex(o2,o3);
-				scratchLists.get(getListByID(o3)).contents.set(listIndex,newValue);
-			} else if(name.equals("wait:elapsed:from:")) {
-				// dwell - does nothing.
-				Object o2 = scriptIter.next();
-				double seconds = resolveValue(o2);
-				logger.debug("{} dwell {} seconds.", getIndent(), seconds);
-				continue;
-			} else if(name.equals("putPenUp")) {
-				turtle.penUp();
-				logger.debug("{} pen up", getIndent());
-				continue;
-			} else if(name.equals("putPenDown")) {
-				turtle.penDown();
-				logger.debug("{} pen down", getIndent());
-			} else if(name.equals("gotoX:y:")) {
-				Object o2 = scriptIter.next();
-				double x = resolveValue(o2);
-				Object o3 = scriptIter.next();
-				double y = resolveValue(o3);
-				turtle.moveTo(x,y);
-				logger.debug("{}Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
-			} else if(name.equals("changeXposBy:")) {
-				Object o2 = scriptIter.next();
-				double v = resolveValue(o2);
-				turtle.moveTo(turtle.getX()+v,turtle.getY());
-				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
-			} else if(name.equals("changeYposBy:")) {
-				Object o2 = scriptIter.next();
-				double v = resolveValue(o2);
-				turtle.moveTo(turtle.getX(),turtle.getY()+v);
-				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
-			} else if(name.equals("forward:")) {
-				Object o2 = scriptIter.next();
-				double v = resolveValue(o2);
-				turtle.forward(v);
-				logger.debug("{} Move forward {} mm", getIndent(), v);
-			} else if(name.equals("turnRight:")) {
-				Object o2 = scriptIter.next();
-				double degrees = resolveValue(o2);
-				turtle.turn(-degrees);
-				logger.debug("{} Right {} degrees.", getIndent(), degrees);
-			} else if(name.equals("turnLeft:")) {
-				Object o2 = scriptIter.next();
-				double degrees = resolveValue(o2);
-				turtle.turn(degrees);
-				logger.debug("{} Left {} degrees.", getIndent(), degrees);
-			} else if(name.equals("xpos:")) {
-				Object o2 = scriptIter.next();
-				double v = resolveValue(o2);
-				turtle.moveTo(v,turtle.getY());
-				logger.debug("{} Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
-			} else if(name.equals("ypos:")) {
-				Object o2 = scriptIter.next();
-				double v = resolveValue(o2);
-				turtle.moveTo(turtle.getX(),v);
-				//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");
-			} else if(name.equals("heading:")) {
-				Object o2 = scriptIter.next();
-				double degrees = resolveValue(o2);
-				turtle.setAngle(degrees);
-				//logger.debug(getIndent()+"Turn to "+degrees);
-			} else if(name.equals("setVar:to:")) {
-				// set variable
-				String varName = (String)scriptIter.next();
-				Object o3 = scriptIter.next();
-				float v = (float)resolveValue(o3);
-
-				boolean foundVar=false;
-				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
-				while(svi.hasNext()) {
-					ScratchVariable sv = svi.next();
-					if(sv.name.equals(varName)) {
-						sv.value = v;
-						//logger.debug(getIndent()+"Set "+varName+" to "+v);
-						foundVar=true;
-					}
-				}
-				if(foundVar==false) {
-					throw new Exception("Variable '"+varName+"' not found.");
-				}
-			} else if(name.equals("changeVar:by:")) {
-				// set variable
-				String varName = (String)scriptIter.next();
-				Object o3 = scriptIter.next();
-				float v = (float)resolveValue(o3);
-
-				boolean foundVar=false;
-				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
-				while(svi.hasNext()) {
-					ScratchVariable sv = svi.next();
-					if(sv.name.equals(varName)) {
-						sv.value += v;
-						//logger.debug(getIndent()+"Change "+varName+" by "+v+" to "+sv.value);
-						foundVar=true;
-					}
-				}
-				if(foundVar==false) {
-					throw new Exception("Variable '"+varName+"' not found.");
-				}
-			} else if(name.equals("clearPenTrails")) {
-				// Ignore this Scratch command
-			} else if(name.equals("hide")) {
-				// Ignore this Scratch command
-			} else if(name.equals("show")) {
-				// Ignore this Scratch command
-			} else {
-				throw new Exception("Unsupported Scratch block '"+name+"'");
+			switch(name) {
+			case "whenIReceive"->		scriptIter.next();
+			case "doBroadcastAndWait"-> doBroadcastAndWait(scriptIter);
+			case "doRepeat"-> 			doRepeat(scriptIter);
+			case "doUntil"-> 			doUntil(scriptIter);
+			case "doIf"-> 				doIf(scriptIter);
+			case "doIfElse"-> 			doIfElse(scriptIter);
+			case "append:toList:"-> 	doAppend(scriptIter);
+			case "deleteLine:ofList:"-> doDeleteLine(scriptIter);
+			case "insert:at:ofList:"-> 	doInsertLine(scriptIter);
+			case "setLine:ofList:to:"-> doSetLine(scriptIter);
+			case "wait:elapsed:from:"-> doWait(scriptIter);
+			case "putPenUp"-> 			turtle.penUp();
+			case "putPenDown"-> 		turtle.penDown();
+			case "gotoX:y:"->			doGotoXY(scriptIter);
+			case "changeXposBy:"-> 		doChangeX(scriptIter);
+			case "changeYposBy:"-> 		doChangeY(scriptIter);
+			case "forward:"-> 			doForward(scriptIter);
+			case "turnRight:"-> 		doTurnRight(scriptIter);
+			case "turnLeft:"-> 			doTurnLeft(scriptIter);
+			case "xpos:"-> 				doSetX(scriptIter);
+			case "ypos:"-> 				doSetY(scriptIter);
+			case "heading:"-> 			doSetHeading(scriptIter);
+			case "setVar:to:"-> 		doSetVar(scriptIter);
+			case "changeVar:by:"-> 		doChangeVar(scriptIter);
+			default->					logger.debug("Ignored Scratch block "+name);
 			}
 		}
 		indent--;
 		//logger.debug(getIndent()+"}");
 	}
-	
+
+	// relative change
+	private void doChangeVar(Iterator<?> scriptIter) throws Exception {
+		String varName = (String)scriptIter.next();
+		float v = (float)resolveValue(scriptIter.next());
+
+		for(Scratch2Variable sv : scratchVariables) {
+			if(sv.name.equals(varName)) {
+				sv.value += v;
+				//logger.debug(getIndent()+"Change "+varName+" by "+v+" to "+sv.value);
+			}
+		}
+		throw new Exception("Variable '"+varName+"' not found.");
+	}
+
+	// absolute change
+	private void doSetVar(Iterator<?> scriptIter) throws Exception {
+		String varName = (String)scriptIter.next();
+		float v = (float)resolveValue(scriptIter.next());
+
+		for(Scratch2Variable sv : scratchVariables) {
+			if(sv.name.equals(varName)) {
+				sv.value = v;
+				//logger.debug(getIndent()+"Set "+varName+" to "+v);
+				return;
+			}
+		}
+		throw new Exception("Variable '"+varName+"' not found.");
+	}
+
+	private void doSetHeading(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double degrees = resolveValue(o2);
+		turtle.setAngle(degrees);
+		//logger.debug(getIndent()+"Turn to "+degrees);
+	}
+
+	private void doSetY(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double v = resolveValue(o2);
+		turtle.moveTo(turtle.getX(),v);
+		logger.debug("{} Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
+	}
+
+	private void doSetX(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double v = resolveValue(o2);
+		turtle.moveTo(v,turtle.getY());
+		logger.debug("{} Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
+	}
+
+	private void doTurnLeft(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double degrees = resolveValue(o2);
+		turtle.turn(degrees);
+		logger.debug("{} Left {} degrees.", getIndent(), degrees);
+	}
+
+	private void doTurnRight(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double degrees = resolveValue(o2);
+		turtle.turn(-degrees);
+		logger.debug("{} Right {} degrees.", getIndent(), degrees);
+	}
+
+	private void doForward(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double v = resolveValue(o2);
+		turtle.forward(v);
+		logger.debug("{} Move forward {} mm", getIndent(), v);
+	}
+
+	private void doChangeX(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double v = resolveValue(o2);
+		turtle.moveTo(turtle.getX()+v,turtle.getY());
+		//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");		
+	}
+
+	private void doChangeY(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double v = resolveValue(o2);
+		turtle.moveTo(turtle.getX(),turtle.getY()+v);
+		//logger.debug(getIndent()+"Move to ("+turtle.getX()+","+turtle.getY()+")");		
+	}
+
+	private void doGotoXY(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		double x = resolveValue(o2);
+		Object o3 = scriptIter.next();
+		double y = resolveValue(o3);
+		turtle.moveTo(x,y);
+		logger.debug("{}Move to ({},{})", getIndent(), turtle.getX(), turtle.getY());
+	}
+
+	private void doWait(Iterator<?> scriptIter) throws Exception {
+		// dwell - does nothing.
+		Object o2 = scriptIter.next();
+		double seconds = resolveValue(o2);
+		logger.debug("{} dwell {} seconds.", getIndent(), seconds);
+	}
+
+	private void doSetLine(Iterator<?> scriptIter) throws Exception {
+		// "setLine:ofList:to:", index, list name, new value
+		Object o4 = scriptIter.next();
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		double newValue = resolveValue(o4);
+		int listIndex = (int)resolveListIndex(o2,o3);
+		scratchLists.get(getListByID(o3)).contents.set(listIndex,newValue);
+	}
+
+	private void doInsertLine(Iterator<?> scriptIter) throws Exception {
+		// "insert:at:ofList:", new value, index, list name 
+		Object o4 = scriptIter.next();
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		double newValue = resolveValue(o4);
+		int listIndex = (int)resolveListIndex(o2,o3);
+		scratchLists.get(getListByID(o3)).contents.add(listIndex,newValue);
+	}
+
+	private void doDeleteLine(Iterator<?> scriptIter) throws Exception {
+		// "deleteLine:ofList:", index, list name 
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		int listIndex = (int)resolveListIndex(o2,o3);
+		scratchLists.get(getListByID(o3)).contents.remove(listIndex);
+	}
+
+	private void doAppend(Iterator<?> scriptIter) throws Exception {
+		// "append:toList:", new value, list name 
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		double value = resolveValue(o2);
+		scratchLists.get(getListByID(o3)).contents.add(value);
+	}
+
+	private void doIfElse(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		Object o4 = scriptIter.next();
+		if(resolveBoolean((JSONArray)o2)) {
+			//logger.debug(getIndent()+"if(true)");
+			parseScratchCode((JSONArray)o3);
+		} else {
+			//logger.debug(getIndent()+"if(false)");
+			parseScratchCode((JSONArray)o4);
+		}		
+	}
+
+	private void doIf(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		if(resolveBoolean((JSONArray)o2)) {
+			//logger.debug(getIndent()+"if(true)");
+			parseScratchCode((JSONArray)o3);
+		}		
+	}
+
+	private void doUntil(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		//logger.debug(getIndent()+"Do Until");
+		while(!resolveBoolean((JSONArray)o2)) {
+			parseScratchCode((JSONArray)o3);
+		}
+	}
+
+	private void doRepeat(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		int count = (int)resolveValue(o2);
+		//logger.debug(getIndent()+"Repeat "+count+" times:");
+		for(int i=0;i<count;++i) {
+			parseScratchCode((JSONArray)o3);
+		}		
+	}
+
+	private void doBroadcastAndWait(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		//logger.debug(getIndent()+"broadcast "+(String)o2);
+		JSONArray arr = subRoutines.get(o2);
+		parseScratchCode(arr);
+	}
+
 	/**
 	 * Scratch block contains a boolean or boolean operator
 	 * @param obj a String, Number, or JSONArray of elements to be calculated. 
@@ -545,16 +582,9 @@ public class LoadScratch2 implements TurtleLoader {
 		if(obj instanceof String) {
 			// probably a variable
 			String firstName = obj.toString();
-			
-			if(firstName.equals("xpos")) {
-				return turtle.getX();
-			}
-			if(firstName.equals("ypos")) {
-				return turtle.getY();
-			}
-			if(firstName.equals("heading")) {
-				return turtle.getAngle();
-			}
+			if(firstName.equals("xpos")) return turtle.getX();
+			if(firstName.equals("ypos")) return turtle.getY();
+			if(firstName.equals("heading")) return turtle.getAngle();
 
 			try {
 				float v = Float.parseFloat(firstName);
@@ -577,105 +607,18 @@ public class LoadScratch2 implements TurtleLoader {
 				throw new Exception("Parse error (resolveValue array)");
 			}
 			String firstName = first.toString();
-			if(firstName.equals("/")) {
-				// divide
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
-				return a/b;
-			}
-			if(firstName.equals("*")) {
-				// multiply
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
-				return a*b;
-			}
-			if(firstName.equals("+")) {
-				// add
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
-				return a+b;
-			}
-			if(firstName.equals("-")) {
-				// subtract
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
-				return a-b;
-			}
-			if(firstName.equals("%")) {
-				// modulus
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				float a = (float)resolveValue(o2);
-				float b = (float)resolveValue(o3);
-				return a%b;
-			}
-			if(firstName.equals("randomFrom:to:")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				int a = (int)resolveValue(o2);
-				int b = (int)resolveValue(o3);
-				if(a>b) {
-					int c = b;
-					b=a;
-					a=c;
-				}
-				Random r = new Random();
-				return r.nextInt(b-a)+a;
-			}
-			if(firstName.equals("readVariable")) {
-				String varName = (String)scriptIter.next();
-
-				ListIterator<ScratchVariable> svi = scratchVariables.listIterator();
-				while(svi.hasNext()) {
-					ScratchVariable sv = svi.next();
-					if(sv.name.equals(varName)) {
-						return sv.value;
-					}
-				}
-			}
-			if(firstName.equals("computeFunction:of:")) {
-				String functionName = (String)scriptIter.next();
-				Object o2 = scriptIter.next();
-				
-				float a = (float)resolveValue(o2);
-
-				if(functionName.equals("abs")) return (float)Math.abs(a);
-				if(functionName.equals("floor")) return (float)Math.floor(a);
-				if(functionName.equals("ceiling")) return (float)Math.ceil(a);
-				if(functionName.equals("sqrt")) return (float)Math.sqrt(a);
-				if(functionName.equals("sin")) return (float)Math.sin(Math.toRadians(a));
-				if(functionName.equals("cos")) return (float)Math.cos(Math.toRadians(a));
-				if(functionName.equals("tan")) return (float)Math.tan(Math.toRadians(a));
-
-				if(functionName.equals("asin")) return (float)Math.asin(Math.toRadians(a));
-				if(functionName.equals("acos")) return (float)Math.acos(Math.toRadians(a));
-				if(functionName.equals("atan")) return (float)Math.atan(Math.toRadians(a));
-				if(functionName.equals("ln")) return (float)Math.log(a);
-				if(functionName.equals("log")) return (float)Math.log10(a);
-				if(functionName.equals("e ^")) return (float)Math.pow(Math.E,a);
-				if(functionName.equals("10 ^")) return (float)Math.pow(10,a);
-				throw new Exception("Parse error (resolveValue computeFunction)");
-			}
-			if(firstName.equals("lineCountOfList:")) {
-				String listName = (String)scriptIter.next();
-				return scratchLists.get(getListByID(listName)).contents.size();
-			}
-			if(firstName.equals("getLine:ofList:")) {
-				Object o2 = scriptIter.next();
-				Object o3 = scriptIter.next();
-				int listIndex = resolveListIndex(o2,o3);
-				String listName = (String)o3;
-				ScratchList list = scratchLists.get(getListByID(listName)); 
-
-				return list.contents.get(listIndex);
+			switch(firstName) {
+			case "/" : 						return doDivide(scriptIter);
+			case "*" : 						return doMultiply(scriptIter);
+			case "+" : 						return doAdd(scriptIter);
+			case "-" : 						return doSubtract(scriptIter);
+			case "%" : 						return doModulus(scriptIter);
+			case "randomFrom:to:" : 		return doRandom(scriptIter);
+			case "readVariable" : 			return doReadVariable(scriptIter);
+			case "computeFunction:of:" : 	return doCompute(scriptIter);
+			case "lineCountOfList:" : 		return doCountList(scriptIter);
+			case "getLine:ofList:" : 		return doGetFromList(scriptIter);
+			default :						logger.debug("unknown operation "+firstName);
 			}
 			
 			return resolveValue(first);
@@ -683,7 +626,96 @@ public class LoadScratch2 implements TurtleLoader {
 
 		throw new Exception("Parse error (resolveValue)");
 	}
+
+	private double doGetFromList(Iterator<?> scriptIter) throws Exception {
+		Object o2 = scriptIter.next();
+		Object o3 = scriptIter.next();
+		int listIndex = resolveListIndex(o2,o3);
+		String listName = (String)o3;
+		Scratch2List list = scratchLists.get(getListByID(listName)); 
+
+		return list.contents.get(listIndex);
+	}
+
+	private double doCountList(Iterator<?> scriptIter) throws Exception {
+		String listName = (String)scriptIter.next();
+		return scratchLists.get(getListByID(listName)).contents.size();
+	}
+
+	private double doCompute(Iterator<?> scriptIter) throws Exception {
+		String functionName = (String)scriptIter.next();
+		double a = (float)resolveValue(scriptIter.next());
+
+		switch(functionName) {
+		case "abs" :		return Math.abs(a);
+		case "floor" :		return Math.floor(a);
+		case "ceiling" :	return Math.ceil(a);
+		case "sqrt" :		return Math.sqrt(a);
+		case "sin" :		return Math.sin(Math.toRadians(a));
+		case "cos" :		return Math.cos(Math.toRadians(a));
+		case "tan" :		return Math.tan(Math.toRadians(a));
+		case "asin" :		return Math.asin(Math.toRadians(a));
+		case "acos" :		return Math.acos(Math.toRadians(a));
+		case "atan" :		return Math.atan(Math.toRadians(a));
+		case "ln" :			return Math.log(a);
+		case "log" :		return Math.log10(a);
+		case "e ^" :		return Math.pow(Math.E,a);
+		case "10 ^" :		return Math.pow(10,a);
+		default : 			throw new Exception("doCompute unknown operation "+functionName);
+		}
+	}
+
+	private double doReadVariable(Iterator<?> scriptIter) throws Exception {
+		String varName = (String)scriptIter.next();
+
+		for(Scratch2Variable sv : scratchVariables) {
+			if(sv.name.equals(varName)) return sv.value;
+		}
+		throw new Exception("Failed to find variable "+varName);
+	}
+
+	private double doRandom(Iterator<?> scriptIter) throws Exception {
+		int a = (int)resolveValue(scriptIter.next());
+		int b = (int)resolveValue(scriptIter.next());
+		if(a>b) {
+			int c = b;
+			b=a;
+			a=c;
+		}
+		Random r = new Random();
+		return r.nextInt(b-a)+a;
+	}
 	
+	private double doModulus(Iterator<?> scriptIter) throws Exception {
+		double a = (double)resolveValue(scriptIter.next());
+		double b = (double)resolveValue(scriptIter.next());
+		return a%b;
+	}
+
+	private double doDivide(Iterator<?> scriptIter) throws Exception {
+		double a = (double)resolveValue(scriptIter.next());
+		double b = (double)resolveValue(scriptIter.next());
+		return a/b;
+	}
+	
+	private double doMultiply(Iterator<?> scriptIter) throws Exception {
+		double a = (double)resolveValue(scriptIter.next());
+		double b = (double)resolveValue(scriptIter.next());
+		return a*b;
+	}
+	
+	private double doAdd(Iterator<?> scriptIter) throws Exception {
+		double a = (double)resolveValue(scriptIter.next());
+		double b = (double)resolveValue(scriptIter.next());
+		return a+b;
+	}
+	
+	private double doSubtract(Iterator<?> scriptIter) throws Exception {
+		double a = (double)resolveValue(scriptIter.next());
+		double b = (double)resolveValue(scriptIter.next());
+		return a-b;
+	}
+
 	/**
 	 * Find the requested index in a list.
 	 * @param o2 the index value.  could be "random", "last", or an index number
@@ -697,7 +729,7 @@ public class LoadScratch2 implements TurtleLoader {
 		if(o2 instanceof String) {
 			String index = (String)o2;
 			String listName = (String)o3;
-			ScratchList list = scratchLists.get(getListByID(listName));
+			Scratch2List list = scratchLists.get(getListByID(listName));
 			if(index.equals("last")) {
 				listIndex = list.contents.size()-1;
 			} else if(index.equals("random")) {

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+
+<!--
+    To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
+    please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
+        and change the begining of the file with :
+
+<?xml version="1.0" encoding="UTF-8"?>
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
+
+-->
 	<meta>
 		<name>English</name>
 		<author>Dan Royer (dan@marginallyclever.com)</author>
@@ -62,6 +72,15 @@
 		<key>SpirographEpitrochoid</key>
 		<value>is epitrochoid</value>
 		<hint>Spirograph generator</hint>
+	</string>
+
+	<string>
+		<key>ConverterCannyEdgeName</key>
+		<value>Canny Edge Detection</value>
+	</string>
+	<string>
+		<key>ConverterColorFloodFillName</key>
+		<value>Color Flood Fill</value>
 	</string>
 
 	<string>
@@ -134,7 +153,7 @@
 
 	<string>
 		<key>ConverterCMYKNote</key>
-		<value><![CDATA[<html>Draws Yellow, Cyan, Magenta, and then Black.</html></body>]]></value>
+		<value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value>
 		<hint>CMYK converter hint</hint>
 	</string>
 
@@ -156,6 +175,11 @@
 		<hint>DXF load option</hint>
 	</string>
 
+	<string>
+		<key>LoadFilePanel.title</key>
+		<value>Load file preview</value>
+		<hint>Load file panel</hint>
+	</string>
 
 	<string>
 		<key>TempFolderLabel</key>
@@ -214,6 +238,11 @@
 		<hint>Machine settings</hint>
 	</string>
 
+	<string>
+		<key>PaperSettings.Title</key>
+		<value>Paper settings</value>
+		<hint>Paper settings panel title</hint>
+	</string>
 	<string>
 		<key>PaperSettings.PaperSize</key>
 		<value>Paper Size</value>
@@ -301,12 +330,12 @@
 	<string>
 		<key>Left</key>
 		<value>Left</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Right</key>
 		<value>Right</value>
-		<hint>used in many places</hint>
+		<hint>used in many places like in manual driving dialog</hint>
 	</string>
 	<string>
 		<key>Millimeters</key>
@@ -353,13 +382,13 @@
 
 	<string>
 		<key>LoadError</key>
-		<value>File could not be loaded:</value>
+		<value>File could not be loaded: </value>
 		<hint>status message.</hint>
 	</string>
 
 	<string>
 		<key>SaveError</key>
-		<value>File could not be saved:</value>
+		<value>File could not be saved: </value>
 		<hint>status message.</hint>
 	</string>
 
@@ -423,13 +452,6 @@
 		<value>Opening </value>
 		<hint>status update. keep the space at the end.</hint>
 	</string>
-
-	<string>
-		<key>Open</key>
-		<value>Open File dialog </value>
-		<hint></hint>
-	</string>
-
 	<string>
 		<key>UnknownFileType</key>
 		<value>Unknown file type</value>
@@ -442,8 +464,13 @@
 	</string>
 
 	<string>
-		<key>FileTypeImage</key>
+		<key>OpenFileChooser.FileTypeImage</key>
 		<value>Image (jpg/bmp/png/gif)</value>
+		<hint>file open dialog</hint>
+	</string>
+	<string>
+		<key>OpenFileChooser.AllSupportedFiles</key>
+		<value>All supported files</value>
 		<hint>file open dialog</hint>
 	</string>
 
@@ -553,12 +580,6 @@
 		<value>Show entire image while drawing</value>
 		<hint>graphics settings dialog</hint>
 	</string>
-
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>Reset</value>
-		<hint>Preferences menu</hint>
-	</string>
 	<string>
 		<key>MenuLanguageTitle</key>
 		<value>Language</value>
@@ -573,12 +594,12 @@
 	<string>
 		<key>ChangeToolTitle</key>
 		<value>Change Pen</value>
-		<hint>tool change prompt. keep the space at the end.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 	<string>
 		<key>ChangeToolMessage</key>
 		<value>Please change the pen to match this color.</value>
-		<hint>tool change prompt. keep the space at the start.</hint>
+		<hint>tool change prompt.</hint>
 	</string>
 
 	<string>
@@ -599,6 +620,17 @@
 		<value>Makelangelo</value>
 		<hint>menu or dialog title</hint>
 	</string>
+
+	<string>
+		<key>RobotMenu.RobotStyle</key>
+		<value>Robot style</value>
+		<hint>select style of robot to draw around art</hint>
+	</string>
+	<string>
+		<key>RobotMenu.RenderStyle</key>
+		<value>Render style</value>
+		<hint>select style of art</hint>
+	</string>
 	<string>
 		<key>RobotMenu.OpenControls</key>
 		<value>Open Controls</value>
@@ -617,7 +649,7 @@
 	<string>
 		<key>RobotMenu.GetTimeEstimate</key>
 		<value>Estimate time</value>
-		<hint>menu or dialog title</hint>
+		<hint>menu or dialog title, status message. ?keep the space at the end.</hint>
 	</string>
 
 	<string>
@@ -686,14 +718,19 @@
 		<hint>panel title</hint>
 	</string>
 	<string>
-		<key>PlotterControls.FatalErrorTitle</key>
-		<value>Fatal Error</value>
-		<hint>panel title</hint>
+		<key>PlotterControls.Error</key>
+		<value>The printer encountered an error, check the MarlinInterface tab to get details.</value>
+		<hint>text</hint>
 	</string>
 	<string>
-		<key>PlotterControls.FatalError</key>
-		<value>The printer encountered a fatal error, check the MarlinInterface tab to get details.</value>
-		<hint>texte</hint>
+		<key>PlotterControls.HomeXYFirst</key>
+		<value>Home the printer first.</value>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.DidNotFind</key>
+		<value>Error in communicating with the robot.</value>
+		<hint>text</hint>
 	</string>
 
 	<string>
@@ -723,17 +760,6 @@
 		<value>Bottom</value>
 		<hint>manual driving dialog</hint>
 	</string>
-	<string>
-		<key>Left</key>
-		<value>Left</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>Right</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
 	<string>
 		<key>JogInterface.FindHome</key>
 		<value>Home</value>
@@ -970,18 +996,13 @@
 	<string>
 		<key>MenuSaveFile</key>
 		<value>Save File...</value>
-		<hint></hint>
+		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>MenuReopenFile</key>
 		<value>Reopen last file</value>
 		<hint></hint>
-	</string>
-	<string>
-		<key>MenuSaveFile</key>
-		<value>Save</value>
-		<hint>menu or dialog title</hint>
 	</string>
 	<string>
 		<key>PlotterControls.Step</key>
@@ -994,13 +1015,6 @@
 		<value>Draw</value>
 		<hint>menu or dialog title</hint>
 	</string>
-
-	<string>
-		<key>NotConnected</key>
-		<value>Not Connected</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
 	<string>
 		<key>Halt</key>
 		<value>Halt</value>
@@ -1071,7 +1085,7 @@
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift speed</value>
+		<value>Lift delay (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -1080,11 +1094,10 @@
 		<hint>Adjust pen tool</hint>
 	</string>
 
-
 	<string>
 		<key>spraypaintToolTest</key>
 		<value>Spraypaint</value>
-		<hint>Spraypaint tool</hint>
+		<hint>Spraypaint tool Make a dot</hint>
 	</string>
 	<string>
 		<key>spraypaintToolDiameter</key>
@@ -1111,12 +1124,6 @@
 		<value>On/off speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
-	<string>
-		<key>spraypaintToolTest</key>
-		<value>Make a dot</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-
 	<string>
 		<key>SierpinskiTriangleName</key>
 		<value>Sierpinski triangle fractal</value>
@@ -1196,6 +1203,11 @@
 		<hint>Hilbert Curve generator</hint>
 	</string>
 	<string>
+		<key>penDiameter</key>
+		<value>Pen diameter</value>
+		<hint>Fill page generator</hint>
+	</string>
+	<string>
 		<key>LSystemBranches</key>
 		<value>Branches</value>
 		<hint>LSystem generator</hint>
@@ -1210,6 +1222,32 @@
 		<value>Angle span</value>
 		<hint>LSystem generator</hint>
 	</string>
+	<string>
+		<key>LSystemNoise</key>
+		<value>Noise</value>
+		<hint>LSystem generator</hint>
+	</string>
+	<string>
+		<key>Size</key>
+		<value>Size</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Flap</key>
+		<value>Flap</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Model</key>
+		<value>Model</value>
+		<hint>Polyeder generator</hint>
+	</string>
+	<string>
+		<key>Length</key>
+		<value>Length</value>
+		<hint>Package generator</hint>
+	</string>
+
 	<string>
 		<key>MazeName</key>
 		<value>Maze</value>
@@ -1291,13 +1329,6 @@
 		<value>Estimated draw time: </value>
 		<hint>status message. keep the space at the end.</hint>
 	</string>
-
-	<string>
-		<key>GetTimeEstimate</key>
-		<value>Estimate time</value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	
 	<string>
 		<key>EstimatedTimeIs</key>
 		<value>Estimated time is %1</value>
@@ -1305,11 +1336,11 @@
 	</string>
 
 	<string>
-		<key>AboutHTML</key>
+		<key>DialogAbout.AboutHTML</key>
 		<value><![CDATA[
     <html>
       <body>
-        <h1>Makelangelo %VERSION%</h1>
+        <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
       <h3>
         <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
       </h3>
@@ -1431,18 +1462,6 @@
 		<value>Reset Preferences</value>
 		<hint>Preferences menu</hint>
 	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>Paper Size</value>
-		<hint>machine size control panel</hint>
-	</string>
-
 	<string>
 		<key>ServoLengthNeeded</key>
 		<value>Servo wire length:</value>
@@ -1849,19 +1868,6 @@
 		<value>Draw borders?</value>
 		<hint></hint>
 	</string>
-
-	<string>
-		<key>voronoiStipplingCellCount</key>
-		<value>Number of cells</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>voronoiStipplingDotMin</key>
-		<value>Min dot size</value>
-		<hint></hint>
-	</string>
-
 	<string>
 		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
@@ -2022,27 +2028,21 @@
 	<string>
 		<key>NotConnected</key>
 		<value>Not connected</value>
-		<hint>Network session information</hint>
-	</string>
-
-	<string>
-		<key>MenuPaper</key>
-		<value>Paper</value>
-		<hint></hint>
+		<hint>Network session information, menu or dialog title</hint>
 	</string>
 
 	<string>
 		<key>OpenPaperSettings</key>
-		<value>Open settings</value>
-		<hint></hint>
+		<value>Paper settings</value>
+		<hint>MenuItem</hint>
 	</string>
 	
 	<string>
-		<key>FileTypeImage</key>
-		<value>Image</value>
-		<hint>load file dialog</hint>
+		<key>OpenPlotterSettings</key>
+		<value>Plotter settings</value>
+		<hint></hint>
 	</string>
-	
+
 	<string>
 		<key>FileTypeScratch3</key>
 		<value>Scratch 3</value>
@@ -2061,7 +2061,117 @@
 	</string>
 
 	<string>
-		<key>CopyClipboard</key>
+		<key>LogPanel.CopyClipboard</key>
 		<value>Copy to clipboard</value>
 	</string>
+	<string>
+		<key>LogPanel.LogFiles</key>
+		<value>Log files</value>
+	</string>
+	<string>
+		<key>LogPanel.Title</key>
+		<value>Log</value>
+	</string>
+
+	<string>
+		<key>PlotterSettings.blockBufferSize</key>
+		<value>Block Buffer Size</value>
+	</string>
+	<string>
+		<key>PlotterSettings.segmentsPerSecond</key>
+		<value>Segments Per Second</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegmentLength</key>
+		<value>Min Segment Length</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minSegTime</key>
+		<value>Min Seg Time</value>
+	</string>
+	<string>
+		<key>PlotterSettings.handleSmallSegments</key>
+		<value>Handle Small Segments</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minAcceleration</key>
+		<value>Min Acceleration</value>
+	</string>
+	<string>
+		<key>PlotterSettings.minimumPlannerSpeed</key>
+		<value>Min Planner Speed</value>
+	</string>
+
+	<string>
+		<key>QuestionTitle</key>
+		<value>Question</value>
+		<hint>Dialog</hint>
+	</string>
+	<string>
+		<key>InfoTitle</key>
+		<value>Information</value>
+		<hint>Dialog</hint>
+	</string>
+	<string>
+		<key>ErrorTitle</key>
+		<value>Error</value>
+		<hint>Dialog</hint>
+	</string>
+  
+  <string>
+    <key>MenuItemPayPalDonation</key>
+    <value>PayPal donation</value>
+    <hint>Help Menu, PayPal donation</hint>
+  </string>
+  <string>
+      <key>PlotterSettingsPanel.Title</key>
+      <value>Plotter settings</value>
+      <hint>panel title</hint>
+  </string>
+
+  <string>
+      <key>TurtleRenderFactory.DEFAULT</key>
+      <value>Default</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.BARBER_POLE</key>
+      <value>Barber pole</value>
+      <hint>Barber pole (red, blue)</hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.SEPARATE_LOOP</key>
+      <value>Separate loops</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleRenderFactory.MARLIN_SIM</key>
+      <value>Marlin simulation</value>
+      <hint></hint>
+  </string>
+  <string>
+      <key>TurtleGenerators.LearnMore.Link.Text</key>
+      <value>Learn more</value>
+      <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
+  </string>
+
+<!--
+    <string>
+        <key></key>
+        <value></value>
+        <hint></hint>
+    </string>
+ -->                
+
+	<string>
+		<key>CartesianButtons.buttonCenter</key>
+		<value></value>
+		<hint>jog controls</hint>
+	</string>
+
+	<string>
+		<key>LoadScratch3.foreverNotAllowed</key>
+		<value>Forever loops are forever forbidden.</value>
+	</string>
+
 </language>

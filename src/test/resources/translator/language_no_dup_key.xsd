@@ -1,0 +1,43 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="language">        
+        <xs:complexType>            
+            <xs:sequence>
+                <xs:element name="meta">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="name">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="1"/>
+                                        <xs:maxLength value="100"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element type="xs:string" name="author"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="string" maxOccurs="unbounded" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="stringNotEmpty" name="key"/>
+                            <xs:element type="xs:string" name="value"/>
+                            <xs:element type="xs:string" name="hint" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>                   
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="lang" type="xs:string" /> <!-- todo for a v2 ? default="EN" use="required" -->
+        </xs:complexType>        
+        <xs:key name="string_key_unique">
+            <xs:selector xpath="string" />
+            <xs:field xpath="key" />
+        </xs:key>        
+    </xs:element>    
+    <xs:simpleType name="stringNotEmpty">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(\n|.)+" />
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- https://www.w3schools.com/xml/schema_facets.asp  -->
+</xs:schema>

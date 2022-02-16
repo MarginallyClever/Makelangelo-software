@@ -54,7 +54,7 @@ public abstract class NetworkSession {
 		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_RECEIVED,line));
 	}
 
-	// tell all listeners data has arrived
+	// tell all listeners data was sent
 	protected void notifyDataSent(String line) {
 		notifyListeners(new NetworkSessionEvent(this,NetworkSessionEvent.DATA_SENT,line));
 	}

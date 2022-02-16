@@ -2,14 +2,19 @@ package com.marginallyclever.makelangelo.plotter.plotterControls;
 
 import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
+import com.marginallyclever.convenience.ToggleButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.SerialUI;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,97 +26,123 @@ import java.util.List;
  */
 public class ChooseConnection extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
-	
+
 	private static final long serialVersionUID = 4773092967249064165L;
-	@Deprecated
-	public static final int CONNECTION_OPENED = 1;
-	@Deprecated
-	public static final int CONNECTION_CLOSED = 2;
-	
-	private ButtonIcon bConnect = new ButtonIcon("ButtonConnect", "/images/connect.png");
-	private final JComboBox<NetworkSessionItem> connectionComboBox = new JComboBox<>();
+
+	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
+			Arrays.asList("ButtonConnect", "ButtonDisconnect"),
+			Arrays.asList("/images/connect.png", "/images/disconnect.png"),
+			Arrays.asList(Color.GREEN, Color.RED));
+	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
+	private final JComboBox<ComboItem> connectionComboBox = new JComboBox<>();
+	private final JPanel configurationPanel = new JPanel();
+	private TransportLayerUI previousTransportLayerUI;
+	private final List<TransportLayerUI> availableTransportsUI = List.of(new SerialUI());
 	private NetworkSession mySession;
 
 	public ChooseConnection() {
-		super();
-
 		this.add(connectionComboBox);
-
-		ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
-		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
-		this.add(refresh);
+		connectionComboBox.addItemListener(this::updateConfigurationPanel);
 		addConnectionsItems(connectionComboBox);
 
-		bConnect.setForeground(Color.GREEN);
-		bConnect.addActionListener((e)-> onConnectAction() );
-		
+		configurationPanel.setLayout(new BoxLayout(configurationPanel, BoxLayout.LINE_AXIS));
+		this.add(configurationPanel);
+
+		refresh.addActionListener(e -> addConnectionsItems(connectionComboBox));
+		this.add(refresh);
+
+		bConnect.addActionListener(e-> onConnectAction());
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.add(bConnect);
 	}
 
-	private void addConnectionsItems(JComboBox<NetworkSessionItem> comboBox) {
-		comboBox.removeAllItems();
-		for (NetworkSessionItem connection: NetworkSessionUIManager.getConnectionsItems()) {
-			comboBox.addItem(connection);
+	private void updateConfigurationPanel(ItemEvent itemEvent) {
+		ComboItem comboItem = (ComboItem) itemEvent.getItem();
+		TransportLayerUI transportLayerUI = comboItem.transportLayerUi;
+		if (previousTransportLayerUI != transportLayerUI) {
+			configurationPanel.removeAll();
+			comboItem.transportLayerUi.addToPanel(configurationPanel);
+			configurationPanel.revalidate();
 		}
+		previousTransportLayerUI = transportLayerUI;
+	}
+
+	private void addConnectionsItems(JComboBox<ComboItem> comboBox) {
+		comboBox.removeAllItems();
+		logger.debug("Fetching connections");
+		for (TransportLayerUI transportLayerUi : availableTransportsUI) {
+			TransportLayer transportLayer = transportLayerUi.getTransportLayer();
+			for (String connection: transportLayer.listConnections()) {
+				Configuration configuration = new Configuration(transportLayer, connection);
+				comboBox.addItem(new ComboItem(configuration, transportLayerUi));
+			}
+		}
+
+		bConnect.setEnabled(comboBox.getItemCount() > 0);
 	}
 
 	private void onConnectAction() {
-		logger.debug("onConnectAction()");
 		if (mySession != null) {
 			onClose();
 		} else {
-			NetworkSessionItem networkSessionItem = connectionComboBox.getItemAt(connectionComboBox.getSelectedIndex());
-			if(networkSessionItem==null) return;  // no connections at all
-			NetworkSession networkSession = networkSessionItem.getTransportLayer().openConnection(networkSessionItem.getConnectionName());
+			ComboItem comboItem = (ComboItem) connectionComboBox.getSelectedItem();
+			if (comboItem==null) return;  // no connections selected, can't happened
+
+			Configuration configuration = comboItem.configuration;
+			comboItem.transportLayerUi.setSelectedValue(configuration);
+			NetworkSession networkSession = configuration.getTransportLayer().openConnection(configuration);
 			if (networkSession != null) {
 				onOpen(networkSession);
 				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_OPENED, networkSession));
+			} else {
+				notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_ERROR, null));
 			}
 		}
 	}
 
 	private void onClose() {
-		logger.debug("closed");
 		if (mySession != null) {
 			mySession.closeConnection();
 			mySession = null;
-			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED,null));
+			notifyListeners(new NetworkSessionEvent(this, NetworkSessionEvent.CONNECTION_CLOSED, null));
 		}
+
 		connectionComboBox.setEnabled(true);
-		bConnect.setText(Translator.get("ButtonConnect"));
-		bConnect.replaceIcon("/images/connect.png");
-		bConnect.setForeground(Color.GREEN);
+		refresh.setEnabled(true);
+		bConnect.updateButton(0);
+		availableTransportsUI.forEach(TransportLayerUI::onClose);
 	}
 
 	private void onOpen(NetworkSession s) {
-		logger.debug("open to {}", s.getName());
-
 		mySession = s;
-		mySession.addListener((e)->{
+		mySession.addListener(e -> {
 			if (e.flag == NetworkSessionEvent.CONNECTION_CLOSED) {
-				onClose(); 
+				onClose();
 			}
 		});
-		connectionComboBox.setEnabled(false);
-		bConnect.setText(Translator.get("ButtonDisconnect"));
-		bConnect.replaceIcon("/images/disconnect.png");
-		bConnect.setForeground(Color.RED);
-	}
 
-	public NetworkSession getNetworkSession() {
-		return mySession;
-	}
-	
-	public void setNetworkSession(NetworkSession s) {
-		if (s!=null && s!=mySession) {
-			onClose();
-			onOpen(s);
-		}
+		connectionComboBox.setEnabled(false);
+		refresh.setEnabled(false);
+		bConnect.updateButton(1);
+		availableTransportsUI.forEach(TransportLayerUI::onOpen);
 	}
 
 	public void closeConnection() {
 		onClose();
+	}
+
+	private class ComboItem {
+		private final Configuration configuration;
+		private final TransportLayerUI transportLayerUi;
+
+		private ComboItem(Configuration configuration, TransportLayerUI transportLayerUi) {
+			this.configuration = configuration;
+			this.transportLayerUi = transportLayerUi;
+		}
+
+		public String toString() {
+			return configuration.getConnectionName();
+		}
 	}
 
 	// OBSERVER PATTERN
@@ -132,13 +163,14 @@ public class ChooseConnection extends JPanel {
 		}
 	}
 
-	// TEST 
-	
+	// TEST
+
 	public static void main(String[] args) {
 		PreferencesHelper.start();
 		Translator.start();
 
 		JFrame frame = new JFrame(ChooseConnection.class.getSimpleName());
+		frame.setMinimumSize(new Dimension(800, 70));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new ChooseConnection());
 		frame.pack();

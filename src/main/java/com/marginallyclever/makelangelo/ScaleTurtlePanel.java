@@ -14,12 +14,10 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
 
 public class ScaleTurtlePanel extends JPanel {
-
+	private static final long serialVersionUID = -4566997988723228869L;
 	private static final Logger logger = LoggerFactory.getLogger(ScaleTurtlePanel.class);
 	
-	private static final long serialVersionUID = -4566997988723228869L;
 	private final String [] unitTypes = new String[]{"mm","%"};
-	
 	private final Turtle turtleToChange;
 	private Turtle turtleOriginal;
 	private final JSpinner width;

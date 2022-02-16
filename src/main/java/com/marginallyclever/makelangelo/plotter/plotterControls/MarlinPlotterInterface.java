@@ -20,7 +20,6 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterInterface.class);
 
-	private static final double MARLIN_DRAW_FEEDRATE = 7500.0; // mm/min
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
 
@@ -32,6 +31,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		myPlotter = plotter;
 
 		plotter.addPlotterEventListener(this::onPlotterEvent);
+	}
+
+	public void stopListeningToPlotter() {
+		myPlotter.removePlotterEventListener(this::onPlotterEvent);
 	}
 
 	private void onPlotterEvent(PlotterEvent e) {
@@ -62,6 +65,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendToolChange(int toolNumber) {
+		queueAndSendCommand(MarlinPlotterInterface.getPenUpString(myPlotter));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
@@ -81,11 +85,13 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
-		String msg = myPlotter.getPenIsUp() ? MarlinPlotterInterface.getTravelToString(p.x, p.y)
-				: MarlinPlotterInterface.getDrawToString(p.x, p.y);
+		String msg = myPlotter.getPenIsUp() 
+				? MarlinPlotterInterface.getTravelToString(myPlotter, p.x, p.y)
+				: MarlinPlotterInterface.getDrawToString(myPlotter, p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 
+	@Override
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		super.onDataReceived(evt);
 
@@ -157,26 +163,26 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getTravelToString(double x, double y) {
-		return "G0" + getPosition(x, y);
+	public static String getTravelToString(Plotter p,double x, double y) {
+		return "G0 " + getPosition(x, y) ;//+ " F" + p.getSettings().getTravelFeedRate();
 	}
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getDrawToString(double x, double y) {
-		return "G1" + getPosition(x, y) + " F" + MARLIN_DRAW_FEEDRATE;
+	public static String getDrawToString(Plotter p,double x, double y) {
+		return "G1 " + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
 	}
 
 	private static String getPosition(double x, double y) {
-		return " X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
+		return "X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
 	}
 
 	public static String getPenUpString(Plotter p) {
-		return "M280 P0 S" + (int) p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+		return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S" + (int) p.getPenDownAngle() + " T50";
+		return "M280 P0 S" + (int)p.getPenDownAngle() + " T50";
 	}
 
 	public static String getToolChangeString(int toolNumber) {

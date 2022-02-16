@@ -49,6 +49,7 @@ public class Camera {
 	
 	// scale the picture of the robot to fake a zoom.
 	public void zoomToFit(double w,double h) {
+	//	PPAC37 ??? like "if (width < height) {" was to mutch refactered ?
 		if (w < h) {
 			zoom = (w > h ? w : h);
 		} else {

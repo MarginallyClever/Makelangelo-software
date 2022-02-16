@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -78,32 +77,29 @@ public class FileAccess {
 	}
 
 	private static void readZipFileIntoTempFile(ZipInputStream zipFile, File f) throws IOException {
-        FileOutputStream fos = new FileOutputStream(f);
-		byte[] buffer = new byte[2048];
-		int len;
-        while ((len = zipFile.read(buffer)) > 0) {
-            fos.write(buffer, 0, len);
-        }
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(f)) {
+			byte[] buffer = new byte[2048];
+			int len;
+			while ((len = zipFile.read(buffer)) > 0) {
+				fos.write(buffer, 0, len);
+			}
+		}
 	}
 
 	/**
-	 * Return the current directory.
-	 * from <code>System.getProperty("user.dir");</code>
+	 * Return the current directory from where the app has been launched
 	 * @return the current directory
 	 */
-	public static String getUserDirectory() {
+	public static String getWorkingDirectory() {
 		return System.getProperty("user.dir");
 	}
-	
-	public static String getTempDirectory() { 
-		return System.getProperty("java.io.tmpdir");
-	}
-	
-	public static String getWorkingDirectory() {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		return s;
+
+	/**
+	 * Return the user home directory
+	 * @return the user home directory
+	 */
+	public static String getHomeDirectory() {
+		return System.getProperty("user.home");
 	}
 
 	/**

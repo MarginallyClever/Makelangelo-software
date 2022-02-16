@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import java.util.List;
 
 public class TurtleFactory {
 	private static TurtleLoader [] loaders = {
@@ -34,27 +34,28 @@ public class TurtleFactory {
 				return result;
 			}
 		}
-		throw new Exception("TurtleFactory could not load '"+filename+"'.");
+		throw new IllegalStateException("TurtleFactory could not load '"+filename+"'.");
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {
+		filename = filename.toLowerCase();
 		String [] extensions = filter.getExtensions();
 		for( String e : extensions ) {
-			if(filename.endsWith(e)) return true;
+			if(filename.endsWith(e.toLowerCase())) return true;
 		}
 		return false;
 	}
 
-	public static ArrayList<FileNameExtensionFilter> getLoadExtensions() {
-		ArrayList<FileNameExtensionFilter> filters = new ArrayList<FileNameExtensionFilter>();
+	public static List<FileNameExtensionFilter> getLoadExtensions() {
+		List<FileNameExtensionFilter> filters = new ArrayList<>();
 		for( TurtleLoader loader : loaders ) {
 			filters.add( loader.getFileNameFilter() );
 		}
 		return filters;
 	}
 
-	public static ArrayList<FileNameExtensionFilter> getSaveExtensions() {
-		ArrayList<FileNameExtensionFilter> filters = new ArrayList<FileNameExtensionFilter>();
+	public static List<FileNameExtensionFilter> getSaveExtensions() {
+		List<FileNameExtensionFilter> filters = new ArrayList<>();
 		for( TurtleSaver saver : savers ) {
 			filters.add( saver.getFileNameFilter() );
 		}
@@ -64,14 +65,15 @@ public class TurtleFactory {
 	public static void save(Turtle turtle,String filename) throws Exception {
 		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
 
-		for( TurtleSaver saver : savers ) {
+		for (TurtleSaver saver : savers) {
 			if(isValidExtension(filename,saver.getFileNameFilter())) {
-				FileOutputStream out = new FileOutputStream(filename); 
-				saver.save(out,turtle);
-				out.close();
-				break;
+				try (FileOutputStream out = new FileOutputStream(filename)) {
+					saver.save(out, turtle);
+				}
+				return;
 			}
 		}
-		throw new Exception("TurtleFactory could not save '"+filename+"'.");
+		String extension = filename.substring(filename.lastIndexOf("."));
+		throw new Exception("TurtleFactory could not save '"+filename+"' : invalid file format '" + extension + "'");
 	}
 }

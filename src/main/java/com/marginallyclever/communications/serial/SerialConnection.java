@@ -28,6 +28,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 	@Override
 	public void closeConnection() {
 		if (portOpened) {
+			logger.debug("closed {}", getName());
 			if (serialPort != null) {
 				try {
 					serialPort.removeEventListener();
@@ -40,17 +41,23 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 		}
 	}
 
-	// open a serial connection to a device.  We won't know it's the robot until
 	@Override
 	public void openConnection(String portName) throws Exception {
+		openConnection(portName, BAUD_RATE);
+	}
+
+	// open a serial connection to a device.  We won't know it's the robot until
+	public void openConnection(String portName, int baud) throws Exception {
 		if (portOpened) return;
 
 		closeConnection();
-		
+
+		logger.debug("open {} @ {}", portName, baud);
+
 		// open the port
 		serialPort = new SerialPort(portName);
-		serialPort.openPort();// Open serial port
-		serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		serialPort.openPort(); // Open serial port
+		serialPort.setParams(baud, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 		serialPort.addEventListener(this);
 
 		setName(portName);

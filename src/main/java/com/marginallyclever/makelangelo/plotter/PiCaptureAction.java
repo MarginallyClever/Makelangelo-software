@@ -222,7 +222,7 @@ public class PiCaptureAction {
 				buttonUseCapture.setEnabled(true);
 			} catch (Exception e) {
 				logger.error("PiCaptureAction: ", e);
-				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			}
 		});
 		buttonCaptureImage.setPreferredSize(new Dimension(89, BUTTON_HEIGHT));
@@ -292,7 +292,7 @@ public class PiCaptureAction {
 
 		if (useImage) {
 			// process the image
-			makelangeloApp.openLoadFile("/home/pi/Pictures/capture.jpg");
+			makelangeloApp.openFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
 

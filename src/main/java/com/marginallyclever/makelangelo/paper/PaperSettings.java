@@ -17,10 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PaperSettings extends SelectPanel {
-
-	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
-	
 	private static final long serialVersionUID = 2824594482225714527L;
+	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
 
 	private static PaperSize commonPaperSizes [] = {
 		new PaperSize("4A0",1682,2378),

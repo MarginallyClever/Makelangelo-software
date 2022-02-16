@@ -3,34 +3,30 @@ package com.marginallyclever.makelangelo.makeArt;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
-public class ReorderTurtle extends AbstractAction {
-
-	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtle.class);
-	
+/**
+ * {@link ReorderTurtleAction} tries to reorder the line segments of a {@link Turtle}'s path such that the
+ * the new path will take less time to draw.  
+ * First it attempts to remove any duplicate line segments.
+ * Second it runs a "greedy tour" which does a pretty good job of sorting by draw-first, travel-second behavior. 
+ * @author Dan Royer
+ *
+ */
+public class ReorderTurtleAction extends TurtleModifierAction {
 	private static final long serialVersionUID = 3473530693924971574L;
-	private Makelangelo myMakelangelo;
+	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtleAction.class);
 	
-	public ReorderTurtle(Makelangelo m) {
+	public ReorderTurtleAction() {
 		super(Translator.get("Reorder"));
-		myMakelangelo = m;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		myMakelangelo.setTurtle(run(myMakelangelo.getTurtle()));
 	}
 	
-	public static Turtle run(Turtle turtle) {
+	public Turtle run(Turtle turtle) {
 		if(turtle.history.size()==0) return turtle;
 		
 		logger.debug("reorder() start @ {} instructions.", turtle.history.size());
@@ -56,24 +52,26 @@ public class ReorderTurtle extends AbstractAction {
 	 * 
 	 * @param turtle
 	 */
-	private static Turtle reorderTurtle(Turtle turtle) {
+	private Turtle reorderTurtle(Turtle turtle) {
 		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
 		ColorRGB c = turtle.getFirstColor();
 		logger.debug("  {} converted to {} lines.", c.toString(), originalCount);
 
-		ArrayList<LineSegment2D> uniqueLines = removeDuplicates(originalLines,1e-4);
-		int uniqueCount = uniqueLines.size();
-		int duplicateCount = originalCount - uniqueCount;
-		logger.debug("  - {} duplicates = {} lines.", duplicateCount, uniqueCount);
-
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(uniqueLines);
+		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
 		Turtle t = new Turtle(c);
-		t.addLineSegments(orderedLines, 1.0);
+		t.addLineSegments(orderedLines);
 		return t;
 	}
 
-	private static ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
+	/**
+	 * From the pool of uniqueLines, take one and make it the head.
+	 * looking for the nearest available segment that begins where the head ends.
+	 * The segment found is removed from the available pool and becomes the new head.  Repeat until the avilable pool is empty.
+	 * @param uniqueLines the unsorted list.
+	 * @return the sorted list.
+	 */
+	private ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
 		logger.debug("  greedyReordering()");
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
@@ -110,7 +108,10 @@ public class ReorderTurtle extends AbstractAction {
 		return orderedLines;
 	}
 
-	private static ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
+	
+	// TODO: move this to its own Action?
+	@SuppressWarnings("unused")
+	private ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
 		logger.debug("  removeDuplicates()");
 		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
 
@@ -160,7 +161,7 @@ public class ReorderTurtle extends AbstractAction {
 	}
 
 	// assumes extPoint is a point which lies on the infinite extension of targetLine
- 	private static void extendLine(LineSegment2D targetLine, Point2D extPoint) {
+ 	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
 		double newLengthA = targetLine.a.distanceSquared(extPoint);
 		double newLengthB = targetLine.b.distanceSquared(extPoint);
 		double currentLength = targetLine.lengthSquared();

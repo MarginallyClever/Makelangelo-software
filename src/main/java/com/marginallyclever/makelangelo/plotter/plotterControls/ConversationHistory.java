@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 7.28.0
  */
 public class ConversationHistory extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private static final long serialVersionUID = 6287436679006933618L;
+	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
 	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
 	private ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<ConversationEvent>();
@@ -44,6 +44,8 @@ public class ConversationHistory extends JPanel {
 		scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		listView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listView.setPrototypeCellValue(new ConversationEvent(" "," "));
+		listView.setVisibleRowCount(20);
 
 		this.setBorder(BorderFactory.createTitledBorder(ConversationHistory.class.getSimpleName()));
 		this.setLayout(new BorderLayout());
@@ -145,10 +147,8 @@ public class ConversationHistory extends JPanel {
 	}
 
 	private void addQueuedMessages() {
-		while(!inBoundQueue.isEmpty()) {
-			ConversationEvent msg = inBoundQueue.poll();
-			if(msg!=null) listModel.addElement(msg);
-		}
+		listModel.addAll(inBoundQueue);
+		inBoundQueue.clear();
 	}
 		
 	private void jumpToEnd() {

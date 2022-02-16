@@ -16,21 +16,16 @@ public class CollapsiblePanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 154827706727963515L;
-	private String title = "";
+	private String title;
     private final TitledBorder border;
     private final JPanel innerPannel;
     private final Window parentWindow;
     private Dimension previousDimension;
-    private int heightCollapsibleComponent;
-    private boolean collapsedByDefault = false;
+    private final int heightCollapsibleComponent;
+    private Dimension initialDimension;
+    private final boolean collapsedByDefault;
 
-    public CollapsiblePanel(Window parentWindow, String title, int heightCollapsibleComponent) {
-        this(parentWindow, title);
-        this.heightCollapsibleComponent = heightCollapsibleComponent;
-        collapsedByDefault = true;
-    }
-
-    public CollapsiblePanel(Window parentWindow, String title) {
+    public CollapsiblePanel(Window parentWindow, String title, int heightCollapsibleComponent, boolean collapsedByDefault) {
         this.parentWindow = parentWindow;
         this.title = title;
         border = BorderFactory.createTitledBorder(title);
@@ -38,9 +33,12 @@ public class CollapsiblePanel extends JPanel {
         BorderLayout borderLayout = new BorderLayout();
         setLayout(borderLayout);
         addMouseListener(mouseListener);
-        innerPannel = new JPanel();
-        innerPannel.addComponentListener(contentComponentListener);
+        innerPannel = new JPanel(new GridLayout(1, 1), false);
+        parentWindow.addComponentListener(contentComponentListener);
         super.add(innerPannel);
+        this.heightCollapsibleComponent = heightCollapsibleComponent;
+        this.collapsedByDefault = collapsedByDefault;
+        toggleVisibility(false);
     }
 
     MouseListener mouseListener = new MouseAdapter() {
@@ -135,7 +133,7 @@ public class CollapsiblePanel extends JPanel {
     }
 
     protected void toggleVisibility() {
-        toggleVisibility(hasInvisibleComponent());
+        toggleVisibility(!hasVisibleComponent());
     }
 
     protected void toggleVisibility(boolean visible) {
@@ -143,15 +141,25 @@ public class CollapsiblePanel extends JPanel {
             c.setVisible(visible);
         }
         updateBorderTitle();
+        if (initialDimension == null) {
+            initialDimension = new Dimension(parentWindow.getSize());
+        }
+
         if (visible) {
-            int height = previousDimension == null? heightCollapsibleComponent: previousDimension.height;
+            // expands all elements
+            int height = previousDimension == null ? heightCollapsibleComponent: previousDimension.height;
             Dimension toggle = new Dimension(parentWindow.getWidth(), height);
             parentWindow.setPreferredSize(toggle);
+            parentWindow.setMinimumSize(new Dimension(initialDimension.width, heightCollapsibleComponent));
+            parentWindow.setMaximumSize(null);
         } else {
+            // collapse all elements
             previousDimension = parentWindow.getSize();
             int height = previousDimension.height - innerPannel.getHeight();
             Dimension toggle = new Dimension(previousDimension.width, height);
             parentWindow.setPreferredSize(toggle);
+            parentWindow.setMinimumSize(initialDimension);
+            parentWindow.setMaximumSize(new Dimension(previousDimension.width, initialDimension.height));
         }
         parentWindow.validate();
         parentWindow.repaint();
@@ -162,14 +170,14 @@ public class CollapsiblePanel extends JPanel {
     private void updateBorderTitle() {
         String arrow = "";
         if (innerPannel.getComponentCount() > 0) {
-            arrow = (hasInvisibleComponent() ? "▾" : "▸");
+            arrow = (hasVisibleComponent() ? "-" : "+");
         }
         border.setTitle(title + " " + arrow + " ");
     }
 
-    private boolean hasInvisibleComponent() {
+    private boolean hasVisibleComponent() {
         for (Component c : innerPannel.getComponents()) {
-            if (!c.isVisible()) {
+            if (c.isVisible()) {
                 return true;
             }
         }
@@ -187,7 +195,7 @@ public class CollapsiblePanel extends JPanel {
         SelectBoolean a = new SelectBoolean("A", "AAAAAAAAAAA", false);
         jPanel.add(a, BorderLayout.NORTH);
 
-        CollapsiblePanel cpanel = new CollapsiblePanel(frame, "lot of buttons", 400);
+        CollapsiblePanel cpanel = new CollapsiblePanel(frame, "lot of buttons", 400, true);
         jPanel.add(cpanel, BorderLayout.CENTER);
 
         SelectButton b = new SelectButton("B", "B");

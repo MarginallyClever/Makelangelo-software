@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -20,16 +19,12 @@ import com.marginallyclever.convenience.ColorRGB;
  * @since 7.24.0
  */
 public class SelectColor extends Select {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8898817786685388020L;
+	
 	private JLabel label;
-	private JLabel field;
-	private JButton chooseButton;
+	private BackgroundPaintedButton chooseButton;
 	
 	/**
-	 * 
 	 * @param parentComponent a component (JFrame, JPanel) that owns the color selection dialog
 	 * @param labelValue
 	 * @param defaultValue
@@ -39,27 +34,26 @@ public class SelectColor extends Select {
 		
 		label = new JLabel(labelValue,JLabel.LEADING);
 
-		field = new JLabel("");
-		field.setOpaque(true);
-		field.setMinimumSize(new Dimension(80,20));
-		field.setMaximumSize(field.getMinimumSize());
-		field.setPreferredSize(field.getMinimumSize());
-		field.setSize(field.getMinimumSize());
-		field.setBackground(new Color(defaultValue.toInt()));
-		field.setBorder(new LineBorder(Color.BLACK));
+		chooseButton = new BackgroundPaintedButton("");
+		chooseButton.setOpaque(true);
+		chooseButton.setMinimumSize(new Dimension(80,20));
+		chooseButton.setMaximumSize(chooseButton.getMinimumSize());
+		chooseButton.setPreferredSize(chooseButton.getMinimumSize());
+		chooseButton.setSize(chooseButton.getMinimumSize());
+		chooseButton.setBackground(new Color(defaultValue.toInt()));
+		chooseButton.setBorder(new LineBorder(Color.BLACK));
 
-		chooseButton = new JButton("...");
 		chooseButton.addActionListener(new ActionListener() {
         	@Override
 			public void actionPerformed(ActionEvent e) {
-				Color c = JColorChooser.showDialog(parentComponent, label.getText(), field.getBackground());
-				field.setBackground(c);
+				Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
+				chooseButton.setBackground(c);
 				firePropertyChange(null,c);
 			}
 		});
 
 		JPanel panel2 = new JPanel(new BorderLayout());
-		panel2.add(field,BorderLayout.LINE_END);
+		panel2.add(chooseButton,BorderLayout.LINE_END);
 		
 		this.add(label,BorderLayout.LINE_START);
 		this.add(panel2,BorderLayout.CENTER);
@@ -67,11 +61,11 @@ public class SelectColor extends Select {
 	}
 	
 	public ColorRGB getColor() {
-		Color c = field.getBackground();
+		Color c = chooseButton.getBackground();
 		return new ColorRGB(c.getRed(),c.getGreen(),c.getBlue());
 	}
 	
 	public void setColor(ColorRGB c) {
-		field.setBackground(new Color(c.red,c.green,c.blue));
+		chooseButton.setBackground(new Color(c.red,c.green,c.blue));
 	}
 }
