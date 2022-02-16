@@ -46,7 +46,7 @@ java -jar makelangelo-nightly-XXXXX.jar
 
 🎉 Application should now launch.
 
-## 2 bis. Install Makelangelo Software App from the source
+## 3. Install Makelangelo Software App from the source
 
 * Goto https://github.com/MarginallyClever/Makelangelo-software/
 * Download the [zip file](https://github.com/MarginallyClever/Makelangelo-software/archive/refs/heads/master.zip) and extract it *or* clone the repos with Git. Note the folder for later.
