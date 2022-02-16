@@ -341,7 +341,7 @@ public final class Makelangelo {
 
 		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
-		bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, SHORTCUT_CTRL));//"ctrl C"
+		bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, SHORTCUT_CTRL));//"ctrl C"
 		menu.add(bOpenControls);
 
 		return menu;
