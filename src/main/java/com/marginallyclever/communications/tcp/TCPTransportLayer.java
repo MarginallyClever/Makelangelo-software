@@ -1,5 +1,6 @@
 package com.marginallyclever.communications.tcp;
 
+import com.marginallyclever.communications.Configuration;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
 import org.slf4j.Logger;
@@ -18,14 +19,10 @@ public class TCPTransportLayer implements TransportLayer {
 
 	public TCPTransportLayer() {}
 
-	public String getName() {
-		return "TCP/IP";
-	}
-
 	/**
 	 * @return <code>serialConnection</code> if connection successful.  <code>null</code> on failure.
 	 */
-	public NetworkSession openConnection(String connectionName) {
+	public NetworkSession openConnection(Configuration configuration) {
 		/*
 		// check it
 		Log.message("Validating "+connectionName);
@@ -35,11 +32,11 @@ public class TCPTransportLayer implements TransportLayer {
 			return null;
 		}
 		*/
-		logger.info("Connecting to {}", connectionName);
+		logger.info("Connecting to {}", configuration.getConnectionName());
 		TCPConnection connection = new TCPConnection();
 
 		try {
-			connection.openConnection(connectionName);
+			connection.openConnection(configuration.getConnectionName());
 			logger.info("Connect OK");
 		} catch (Exception e) {
 			logger.error("Connection FAILED to {}", connection, e);
@@ -51,6 +48,7 @@ public class TCPTransportLayer implements TransportLayer {
 
 	@Override
 	public List<String> listConnections() {
+		logger.debug("Listing available tcp connection");
 		return List.of("192.168.1.183:9999");
 	}
 }

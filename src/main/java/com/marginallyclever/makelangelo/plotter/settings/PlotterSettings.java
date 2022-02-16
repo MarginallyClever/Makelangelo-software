@@ -75,8 +75,8 @@ public class PlotterSettings implements Serializable {
 	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
 	public PlotterSettings() {
-		double mh = 835; // mm
-		double mw = 835; // mm
+		double mh = 1000; // mm
+		double mw = 650; // mm
 
 		robotUID = 0;
 		isRegistered = false;
