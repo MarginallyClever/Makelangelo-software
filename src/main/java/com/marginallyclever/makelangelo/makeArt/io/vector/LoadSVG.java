@@ -367,7 +367,7 @@ public class LoadSVG implements TurtleLoader {
 		ArrayList<Point2D> points = b.generateCurvePoints(0.1);
 		for(Point2D p : points) myTurtle.moveTo(p.x,p.y);
 		pathPoint.set(p3);
-		isNewPath=false;
+		isNewPath=true;
 	}
 
 	private void doLineToRel(SVGPathSeg item, Matrix3d m) {
