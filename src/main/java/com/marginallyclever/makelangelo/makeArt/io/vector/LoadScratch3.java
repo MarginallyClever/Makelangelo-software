@@ -403,7 +403,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private void doMotionPointInDirection(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DIRECTION"));
 		logger.debug("POINT AT {}",v);
-		myTurtle.setAngle(v);
+		myTurtle.setAngle(v-90.0);// 0° orientation in turtle = 90° orientation in scratch.
 	}
 	
 	private void doMotionTurnLeft(JSONObject currentBlock) throws Exception {
