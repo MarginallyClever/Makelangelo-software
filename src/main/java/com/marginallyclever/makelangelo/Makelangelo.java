@@ -163,6 +163,7 @@ public final class Makelangelo {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
 		}
+		myPlotter.getSettings().loadConfig(0);
 		onPlotterSettingsUpdate(myPlotter.getSettings());
 	}
 
