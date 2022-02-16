@@ -20,7 +20,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Dan Royer
@@ -364,7 +364,7 @@ public class LoadSVG implements TurtleLoader {
 				p1.x,p1.y,
 				p2.x,p2.y,
 				p3.x,p3.y);
-		ArrayList<Point2D> points = b.generateCurvePoints(0.1);
+		List<Point2D> points = b.generateCurvePoints(0.1);
 		for(Point2D p : points) myTurtle.moveTo(p.x,p.y);
 		pathPoint.set(p3);
 		isNewPath=true;
