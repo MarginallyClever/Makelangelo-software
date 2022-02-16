@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -20,7 +21,7 @@ public class Select extends JPanel {
 	private static final long serialVersionUID = 5289951183273734129L;
 	private static final Logger logger = LoggerFactory.getLogger(Select.class);
 	
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
+	private List<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
 		
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
