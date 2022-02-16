@@ -315,7 +315,6 @@ public class FirmwareUploader {
 			//fu.run("./firmware.hex", "COM3", new SelectTextArea("test","test","") );//Windows
 			fu.run("./firmware.hex", "/dev/ttyACM0", new SelectTextArea("test", "test", ""));//linux 
 		} catch (Exception e) {
-//	    e.printStackTrace();
 			logger.error("error: {}", e.getMessage(), e);
 		}
 
