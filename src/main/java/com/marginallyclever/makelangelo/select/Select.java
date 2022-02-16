@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public class Select extends JPanel {
 	private static final long serialVersionUID = 5289951183273734129L;
 	private static final Logger logger = LoggerFactory.getLogger(Select.class);
+	private static boolean haveLAndFIssueBeenReported = false;
 	
 	private List<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
 		
@@ -36,7 +37,10 @@ public class Select extends JPanel {
 			// can run this overrided methode befor the class is fully initialised ...
 			// (But then tooltips color to change TODO.)
 			propertyChangeListeners = new ArrayList<>();
-			logger.debug("need \"-nolf\" due to l&f \"{}\"",UIManager.getLookAndFeel().getClass().getCanonicalName());
+			if ( !haveLAndFIssueBeenReported ) {
+				haveLAndFIssueBeenReported = true;
+				logger.debug("need \"-nolf\" due to l&f \"{}\"",UIManager.getLookAndFeel().getClass().getCanonicalName());
+			}
 		}
 		propertyChangeListeners.add(p);
 	}
