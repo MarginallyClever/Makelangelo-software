@@ -6,6 +6,9 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all Select.  A Select is a UI panel item the user can control.
@@ -15,7 +18,9 @@ import javax.swing.JPanel;
  */
 public class Select extends JPanel {
 	private static final long serialVersionUID = 5289951183273734129L;
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private static final Logger logger = LoggerFactory.getLogger(Select.class);
+	
+	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
 		
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
@@ -25,6 +30,11 @@ public class Select extends JPanel {
 	// OBSERVER PATTERN
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {
+		if ( propertyChangeListeners == null){ 
+			// PPAC37 to avoid "-nolf" : as some linux Look and Feel can run this overrided methode befor the class is fully initialised ...			
+			propertyChangeListeners = new ArrayList<>();
+			logger.debug("need \"-nolf\" due to l&f \"{}\"",UIManager.getLookAndFeel().getClass().getCanonicalName());
+		}
 		propertyChangeListeners.add(p);
 	}
 	
