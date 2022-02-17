@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
+import com.marginallyclever.convenience.Point2D;
+
 import java.awt.*;
 
 /**
@@ -88,5 +90,13 @@ public class NodeVariable<T> {
 
     public boolean getHasInput() {
         return hasInput;
+    }
+
+    public Point2D getInPosition() {
+        return new Point2D(rectangle.getMinX(), rectangle.y+rectangle.height/2);
+    }
+
+    public Point2D getOutPosition() {
+        return new Point2D(rectangle.getMaxX(), rectangle.y+rectangle.height/2);
     }
 }

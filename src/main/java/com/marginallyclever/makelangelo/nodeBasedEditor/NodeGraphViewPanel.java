@@ -8,7 +8,6 @@ import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
 
 import javax.swing.*;
-import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
@@ -18,7 +17,12 @@ import java.util.List;
  * {@link NodeGraphViewPanel} visualizes the contents of a {@link NodeGraphModel} with Java Swing.
  */
 public class NodeGraphViewPanel extends JPanel {
+    public static final Color DEFAULT_BORDER = Color.BLACK;
+    public static final Color DEFAULT_BORDER_SELECTED = Color.GREEN;
+
     private final NodeGraphModel model;
+
+    private Node lastSelectedNode=null;
 
     public NodeGraphViewPanel(NodeGraphModel model) {
         super();
@@ -56,17 +60,16 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     private void paintNode(Graphics g, Node n) {
+        paintNodeBackground(g,n);
+        paintNodeTitle(g, n);
+        paintVariables(g, n);
+        paintNodeBorder(g, n);
+    }
+
+    private void paintNodeBackground(Graphics g, Node n) {
         Rectangle r = n.getRectangle();
         g.setColor(Color.WHITE);
         g.fillRect(r.x, r.y, r.width, r.height);
-        paintVariables(g, n);
-        paintNodeTitle(g, n);
-        paintBorder(g, r);
-    }
-
-    private void paintBorder(Graphics g,Rectangle r) {
-        g.setColor(Color.BLACK);
-        g.drawRect(r.x, r.y, r.width, r.height);
     }
 
     private void paintNodeTitle(Graphics g,Node n) {
@@ -89,16 +92,26 @@ public class NodeGraphViewPanel extends JPanel {
             paintTextCentered(g,name,box);
             g.setColor(Color.LIGHT_GRAY);
             g.drawRect(box.x,box.y,box.width,box.height);
-            if(v.getHasInput()) {
-                Point2D p = n.getInPosition(i);
-                int radius = 5;
-                g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
-            }
-            if(v.getHasOutput()) {
-                Point2D p = n.getOutPosition(i);
-                int radius = 5;
-                g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
-            }
+            paintVariableConnectionPoints(g,v);
+        }
+    }
+
+    private void paintNodeBorder(Graphics g,Node n) {
+        g.setColor(lastSelectedNode == n ? DEFAULT_BORDER_SELECTED : DEFAULT_BORDER);
+        Rectangle r = n.getRectangle();
+        g.drawRect(r.x, r.y, r.width, r.height);
+    }
+
+    private void paintVariableConnectionPoints(Graphics g, NodeVariable<?> v) {
+        if(v.getHasInput()) {
+            Point2D p = v.getInPosition();
+            int radius = (int)NodeConnection.DEFAULT_RADIUS+2;
+            g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
+        }
+        if(v.getHasOutput()) {
+            Point2D p = v.getOutPosition();
+            int radius = (int)NodeConnection.DEFAULT_RADIUS+2;
+            g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
         }
     }
 
@@ -124,6 +137,19 @@ public class NodeGraphViewPanel extends JPanel {
                 p2.x,p2.y,
                 p3.x,p3.y);
         drawBezier(g,b);
+
+        if(c.isOutputValid()) {
+            Point2D p = c.getOutPosition();
+            int radius = (int) NodeConnection.DEFAULT_RADIUS;
+            g.setColor(NodeConnection.DEFAULT_COLOR);
+            g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
+        }
+        if(c.isInputValid()) {
+            Point2D p = c.getInPosition();
+            int radius = (int) NodeConnection.DEFAULT_RADIUS;
+            g.setColor(NodeConnection.DEFAULT_COLOR);
+            g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
+        }
     }
 
     private void drawBezier(Graphics g, Bezier b) {
@@ -136,7 +162,15 @@ public class NodeGraphViewPanel extends JPanel {
             x[i]=(int)p.x;
             y[i]=(int)p.y;
         }
-        g.setColor(Color.BLUE);
+        g.setColor(NodeConnection.DEFAULT_COLOR);
         g.drawPolyline(x,y,len);
+    }
+
+    public Node getLastSelectedNode() {
+        return lastSelectedNode;
+    }
+
+    public void setLastSelectedNode(Node lastSelectedNode) {
+        this.lastSelectedNode = lastSelectedNode;
     }
 }

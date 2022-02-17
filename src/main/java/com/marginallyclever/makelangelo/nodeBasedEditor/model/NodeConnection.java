@@ -2,7 +2,12 @@ package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
 
+import java.awt.*;
+
 public class NodeConnection extends Indexable {
+    public static final double DEFAULT_RADIUS = 5;
+    public static final Color DEFAULT_COLOR = Color.BLUE;
+
     private Node inNode;
     private int inVariableIndex=-1;
     private Node outNode;
@@ -83,5 +88,9 @@ public class NodeConnection extends Indexable {
      */
     public Point2D getOutPosition() {
         return outNode.getInPosition(outVariableIndex);
+    }
+
+    public boolean isConnectedTo(Node n) {
+        return inNode==n || outNode==n;
     }
 }

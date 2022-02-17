@@ -34,8 +34,12 @@ public abstract class Node extends Indexable {
     public void updateRectangle() {
         int w=0;
         int h=Node.NODE_TITLE_HEIGHT;
+        int y=getRectangle().y;
+        int x=getRectangle().x;
         for(NodeVariable v : variables) {
             Rectangle r = v.getRectangle();
+            r.y=h+y;
+            r.x=x;
             if(w < r.width) w = r.width;
             h += r.height;
         }

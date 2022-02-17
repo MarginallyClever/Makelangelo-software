@@ -23,6 +23,10 @@ public class NodeGraphEditorPanel extends JPanel {
     private final NodeGraphModel model;
     private final NodeGraphViewPanel paintArea;
     private final JToolBar bar = new JToolBar();
+    private final JButton deleteNode = new JButton("Delete");
+    private final JButton editNode = new JButton("Edit");
+
+    private Node nodeBeingDragged=null;
 
     public NodeGraphEditorPanel(NodeGraphModel model) {
         super(new BorderLayout());
@@ -34,23 +38,35 @@ public class NodeGraphEditorPanel extends JPanel {
 
         this.add(bar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
-        this.setPreferredSize(new Dimension(200,200));
+        this.setPreferredSize(new Dimension(600,200));
 
         attachMouseAdapter();
         paintArea.updatePaintAreaBounds();
         paintArea.repaint();
+
+        setLastSelectedNode(null);
     }
 
     private void setupBar() {
-        JButton addConnection = new JButton("Add Node");
+        JButton clearAll = new JButton("New");
+        bar.add(clearAll);
+        clearAll.addActionListener((e)->onClear());
+
+        JButton addConnection = new JButton("Add");
         bar.add(addConnection);
         addConnection.addActionListener((e)->onAdd());
+
+        bar.add(deleteNode);
+        deleteNode.addActionListener((e)->onDelete());
+
+        bar.add(editNode);
+        editNode.addActionListener((e)->onEdit());
 
         JButton toString = new JButton("toString");
         bar.add(toString);
         toString.addActionListener((e)-> System.out.println(model) );
 
-        JButton update = new JButton("update");
+        JButton update = new JButton("Update");
         bar.add(update);
         update.addActionListener((e)-> {
             try {
@@ -62,7 +78,32 @@ public class NodeGraphEditorPanel extends JPanel {
         });
     }
 
-    private Node nodeBeingDragged=null;
+    private void onEdit() {
+        System.out.println("Edit node "+paintArea.getLastSelectedNode().getUniqueName());
+    }
+
+    private void onDelete() {
+        model.removeNode(paintArea.getLastSelectedNode());
+        setLastSelectedNode(null);
+    }
+
+    private void onAdd() {
+        System.out.println("adding node");
+        try {
+            Node n = model.addNode(new Add());
+            model.addNode(n);
+            paintArea.updatePaintAreaBounds();
+            paintArea.repaint();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void onClear() {
+        System.out.println("clear");
+        model.clear();
+        paintArea.repaint();
+    }
 
     private void attachMouseAdapter() {
         System.out.println("Attaching mouse adapter");
@@ -71,7 +112,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
         paintArea.addMouseMotionListener(new MouseAdapter() {
             @Override
-            public void mouseDragged (MouseEvent e){
+            public void mouseDragged(MouseEvent e) {
                 if (nodeBeingDragged != null) {
                     Rectangle r = nodeBeingDragged.getRectangle();
                     r.x += e.getX() - prev.x;
@@ -82,36 +123,49 @@ public class NodeGraphEditorPanel extends JPanel {
             }
 
             @Override
-            public void mouseMoved (MouseEvent e) {}
+            public void mouseMoved(MouseEvent e) {
+                Point2D p = model.getNearestConnection(e.getPoint(),20);
+                if(p!=null) {
+
+                }
+            }
         });
 
         paintArea.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {}
+            public void mouseClicked(MouseEvent e) {
+                setLastSelectedNode(getNodeAt(e.getPoint()));
+            }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 nodeBeingDragged=getNodeAt(e.getPoint());
                 if(nodeBeingDragged!=null) {
-                    //System.out.println("hit "+nodeBeingDragged.getUniqueName());
+                    setLastSelectedNode(nodeBeingDragged);
                     prev.set(e.getX(), e.getY());
                     Rectangle r = nodeBeingDragged.getRectangle();
                     offset.set(e.getX() - r.x, e.getY() - r.y);
+                } else {
+                    // start of selection area
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                //System.out.println("release");
-                nodeBeingDragged=null;
+                if(nodeBeingDragged!=null) {
+                    nodeBeingDragged = null;
+                } else {
+                    // end of selection area
+                }
             }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {}
-
-            @Override
-            public void mouseExited(MouseEvent e) {}
         });
+    }
+
+    private void setLastSelectedNode(Node nodeAt) {
+        paintArea.setLastSelectedNode(nodeAt);
+        deleteNode.setEnabled(nodeAt!=null);
+        editNode.setEnabled(nodeAt!=null);
+        repaint();
     }
 
     private Node getNodeAt(Point point) {
@@ -128,18 +182,6 @@ public class NodeGraphEditorPanel extends JPanel {
         return null;
     }
 
-    private void onAdd() {
-        System.out.println("adding node");
-        try {
-            Node n = model.addNode(new Add());
-            model.addNode(n);
-            paintArea.updatePaintAreaBounds();
-            paintArea.repaint();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     public static void main(String[] args) throws Exception {
         PreferencesHelper.start();
         CommandLineOptions.setFromMain(args);
@@ -153,6 +195,10 @@ public class NodeGraphEditorPanel extends JPanel {
         NodeConnection c0 = model.createNodeConnection();   c0.setInput(constant0,0);   c0.setOutput(add,0);
         NodeConnection c1 = model.createNodeConnection();   c1.setInput(constant1,0);   c1.setOutput(add,1);
         NodeConnection c2 = model.createNodeConnection();   c2.setInput(add,2);         c2.setOutput(report,0);
+
+        constant1.getRectangle().y=50;
+        add.getRectangle().x=200;
+        report.getRectangle().x=400;
 
         NodeGraphEditorPanel panel = new NodeGraphEditorPanel(model);
         JFrame frame = new JFrame("NodeBasedEditorPanel");
