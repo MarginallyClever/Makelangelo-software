@@ -1,14 +1,25 @@
 package com.marginallyclever.makelangelo.nodeBasedEditor;
 
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeConnection;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Add;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeConnection;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TestNodeGraphModel {
+    @Test
+    public void testAdd() {
+        Node add = new Add();
+        add.getVariable(0).setValue(Integer.valueOf(5));
+        add.getVariable(1).setValue(Integer.valueOf(10));
+        add.update();
+        assertEquals( 15.0, add.getVariable(2).getValue() );
+    }
+
     @Test
     public void testAddAndReport() throws Exception {
         NodeGraphModel model = new NodeGraphModel();
