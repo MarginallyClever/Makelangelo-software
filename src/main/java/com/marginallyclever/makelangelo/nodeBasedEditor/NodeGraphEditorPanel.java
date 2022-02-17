@@ -30,13 +30,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
         paintArea = new NodeGraphViewPanel(model);
 
-        JButton addConnection = new JButton("Add Node");
-        bar.add(addConnection);
-        addConnection.addActionListener((e)->onAdd());
-
-        JButton toString = new JButton("toString");
-        bar.add(toString);
-        toString.addActionListener((e)-> System.out.println(model) );
+        setupBar();
 
         this.add(bar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
@@ -45,6 +39,27 @@ public class NodeGraphEditorPanel extends JPanel {
         attachMouseAdapter();
         paintArea.updatePaintAreaBounds();
         paintArea.repaint();
+    }
+
+    private void setupBar() {
+        JButton addConnection = new JButton("Add Node");
+        bar.add(addConnection);
+        addConnection.addActionListener((e)->onAdd());
+
+        JButton toString = new JButton("toString");
+        bar.add(toString);
+        toString.addActionListener((e)-> System.out.println(model) );
+
+        JButton update = new JButton("update");
+        bar.add(update);
+        update.addActionListener((e)-> {
+            try {
+                System.out.println("Update");
+                model.update();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     private Node nodeBeingDragged=null;
@@ -119,12 +134,13 @@ public class NodeGraphEditorPanel extends JPanel {
             Node n = model.addNode(new Add());
             model.addNode(n);
             paintArea.updatePaintAreaBounds();
+            paintArea.repaint();
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         PreferencesHelper.start();
         CommandLineOptions.setFromMain(args);
         Translator.start();
