@@ -4,6 +4,11 @@ public class Point2D {
 	public double x,y;
 	
 	public Point2D() {}
+
+	public Point2D(Point2D b) {
+		this(b.x,b.y);
+	}
+
 	public Point2D(double x0,double y0) {
 		x=x0;
 		y=y0;

@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
+import com.marginallyclever.convenience.Point2D;
+
 import javax.vecmath.Vector2d;
 import java.awt.*;
 
@@ -76,33 +78,15 @@ public class NodeConnection extends Indexable {
                 '}';
     }
 
-    public Vector2d getInPosition() {
-        Vector2d p = new Vector2d(0,0);
-        if(isInputValid()) {
-            p.y = getPointHeight(inVariableIndex);
-        }
-        Rectangle r = inNode.getRectangle();
-        p.x = r.x+r.width;
-        return p;
+    // the in position of this {@link NodeConnection} is the out position of a {@link NodeVariable}
+    public Point2D getInPosition() {
+        return inNode.getOutPosition(inVariableIndex);
     }
 
-    public Vector2d getOutPosition() {
-        Vector2d p = new Vector2d(0,0);
-        if(isInputValid()) {
-            p.y = getPointHeight(outVariableIndex);
-        }
-        Rectangle r = outNode.getRectangle();
-        p.x = r.x;
-        return p;
-    }
-
-    private double getPointHeight(int index) {
-        float y = 0;
-        Rectangle inr = inNode.getRectangle();
-        for(int i=0;i<index;++i) {
-            y += inNode.getVariable(i).getRectangle().height;
-        }
-        y += inNode.getVariable(inVariableIndex).getRectangle().height/2;
-        return y;
+    /**
+     * The out position of this {@link NodeConnection} is the in position of a {@link NodeVariable}
+     */
+    public Point2D getOutPosition() {
+        return outNode.getInPosition(outVariableIndex);
     }
 }

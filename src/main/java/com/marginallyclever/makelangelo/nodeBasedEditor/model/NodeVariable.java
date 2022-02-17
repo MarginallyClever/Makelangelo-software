@@ -6,11 +6,16 @@ import java.awt.*;
  * {@link NodeVariable}
  */
 public class NodeVariable<T> {
+    public final static int DEFAULT_WIDTH = 150;
+    public final static int DEFAULT_HEIGHT = 20;
+
+    private T value;
+
     private String name;
-    private boolean isDirty;
     private boolean hasInput;
     private boolean hasOutput;
-    private T value;
+
+    private boolean isDirty;
     private final Rectangle rectangle = new Rectangle();
 
     public NodeVariable(String _name,T startingValue,boolean _hasInput,boolean _hasOutput) {
@@ -19,11 +24,15 @@ public class NodeVariable<T> {
         this.value = startingValue;
         this.hasInput = _hasInput;
         this.hasOutput = _hasOutput;
-        rectangle.setBounds(0,0,150,50);
+        rectangle.setBounds(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT);
     }
 
     public Rectangle getRectangle() {
         return rectangle;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setValue(T arg0) {

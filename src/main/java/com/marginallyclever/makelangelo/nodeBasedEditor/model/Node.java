@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
+import com.marginallyclever.convenience.Point2D;
+
+import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.List;
  * The operator is defined by extending the {@link Node} class and defining the {@code update()} method.
  */
 public abstract class Node extends Indexable {
+    public static final int NODE_TITLE_HEIGHT = 25;
     private List<NodeVariable<?>> variables = new ArrayList<>();
     private final Rectangle rectangle = new Rectangle();
 
@@ -29,11 +33,11 @@ public abstract class Node extends Indexable {
 
     public void updateRectangle() {
         int w=0;
-        int h=0;
+        int h=Node.NODE_TITLE_HEIGHT;
         for(NodeVariable v : variables) {
             Rectangle r = v.getRectangle();
-            if(w<r.width) w = r.width;
-            h+=r.height;
+            if(w < r.width) w = r.width;
+            h += r.height;
         }
         rectangle.width=w;
         rectangle.height=h;
@@ -76,5 +80,27 @@ public abstract class Node extends Indexable {
                 "uniqueName=" + getUniqueName() +", "+
                 "variables=" + variables +
                 '}';
+    }
+
+    public Point2D getInPosition(int index) {
+        Rectangle r = getRectangle();
+        Point2D p = new Point2D(r.x,r.y+getPointHeight(index));
+        return p;
+    }
+
+    public Point2D getOutPosition(int index) {
+        Rectangle r = getRectangle();
+        Point2D p = new Point2D(r.x+r.width,r.y+getPointHeight(index));
+        return p;
+    }
+
+    private double getPointHeight(int index) {
+        float y = NODE_TITLE_HEIGHT;
+        Rectangle inr = getRectangle();
+        for(int i=0;i<index;++i) {
+            y += getVariable(i).getRectangle().height;
+        }
+        y += getVariable(index).getRectangle().height/2;
+        return y;
     }
 }
