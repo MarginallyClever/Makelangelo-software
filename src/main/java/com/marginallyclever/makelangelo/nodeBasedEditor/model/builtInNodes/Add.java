@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.basicNodes;
+package com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.NodeVariable;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
 
 public class Add extends Node {
     private final NodeVariable<Number> a = new NodeVariable<>("A",0,true,false);

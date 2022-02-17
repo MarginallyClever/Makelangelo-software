@@ -1,19 +1,16 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
+import javax.vecmath.Vector2d;
 import java.awt.*;
 
-public class NodeConnection {
-    private static int uniqueIDSource=0;
-    private int uniqueID;
-
+public class NodeConnection extends Indexable {
     private Node inNode;
     private int inVariableIndex=-1;
     private Node outNode;
     private int outVariableIndex=-1;
 
     public NodeConnection() {
-        super();
-        uniqueID = ++uniqueIDSource;
+        super("Connection");
     }
     /**
      * send the value of upstream variables to downstream variables
@@ -54,7 +51,7 @@ public class NodeConnection {
         return true;
     }
 
-    public void render(Graphics g) {
+    public void paintComponent(Graphics g) {
 
     }
 
@@ -71,11 +68,41 @@ public class NodeConnection {
     @Override
     public String toString() {
         return "NodeConnection{" +
-                "uniqueID=" + uniqueID +
-                ", inNode="+inNode.getUniqueName() +
+                "uniqueName=" + getUniqueName() +
+                ", inNode=" + inNode.getUniqueName() +
                 ", inVariableIndex=" + inVariableIndex +
-                ", outNode=" + outNode +
+                ", outNode=" + outNode.getUniqueName() +
                 ", outVariableIndex=" + outVariableIndex +
                 '}';
+    }
+
+    public Vector2d getInPosition() {
+        Vector2d p = new Vector2d(0,0);
+        if(isInputValid()) {
+            p.y = getPointHeight(inVariableIndex);
+        }
+        Rectangle r = inNode.getRectangle();
+        p.x = r.x+r.width;
+        return p;
+    }
+
+    public Vector2d getOutPosition() {
+        Vector2d p = new Vector2d(0,0);
+        if(isInputValid()) {
+            p.y = getPointHeight(outVariableIndex);
+        }
+        Rectangle r = outNode.getRectangle();
+        p.x = r.x;
+        return p;
+    }
+
+    private double getPointHeight(int index) {
+        float y = 0;
+        Rectangle inr = inNode.getRectangle();
+        for(int i=0;i<index;++i) {
+            y += inNode.getVariable(i).getRectangle().height;
+        }
+        y += inNode.getVariable(inVariableIndex).getRectangle().height/2;
+        return y;
     }
 }

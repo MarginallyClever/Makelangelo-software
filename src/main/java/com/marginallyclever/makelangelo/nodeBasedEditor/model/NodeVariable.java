@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
 import java.awt.*;
 
@@ -11,6 +11,7 @@ public class NodeVariable<T> {
     private boolean hasInput;
     private boolean hasOutput;
     private T value;
+    private final Rectangle rectangle = new Rectangle();
 
     public NodeVariable(String _name,T startingValue,boolean _hasInput,boolean _hasOutput) {
         super();
@@ -18,6 +19,11 @@ public class NodeVariable<T> {
         this.value = startingValue;
         this.hasInput = _hasInput;
         this.hasOutput = _hasOutput;
+        rectangle.setBounds(0,0,150,50);
+    }
+
+    public Rectangle getRectangle() {
+        return rectangle;
     }
 
     public void setValue(T arg0) {

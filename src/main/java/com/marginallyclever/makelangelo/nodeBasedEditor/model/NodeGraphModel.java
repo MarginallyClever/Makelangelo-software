@@ -1,19 +1,17 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.basicNodes.Constant;
-
-import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link NodeBasedEditorModel} contains the {@link Node}s, and {@link NodeConnection}s
+ * {@link NodeGraphModel} contains the {@link Node}s, and {@link NodeConnection}s
  */
-public class NodeBasedEditorModel {
+public class NodeGraphModel {
     private List<Node> nodes = new ArrayList<>();
     private List<NodeConnection> connections = new ArrayList<>();
 
-    public NodeBasedEditorModel() {
+    public NodeGraphModel() {
         super();
     }
 
@@ -35,7 +33,13 @@ public class NodeBasedEditorModel {
         return n;
     }
 
-    public NodeConnection addNodeConnection(NodeConnection c) {
+    public Node createNode(String classType) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Node n = (Node)Class.forName(classType).getDeclaredConstructor().newInstance();
+        return addNode(n);
+    }
+
+    public NodeConnection createNodeConnection() {
+        NodeConnection c = new NodeConnection();
         connections.add(c);
         return c;
     }

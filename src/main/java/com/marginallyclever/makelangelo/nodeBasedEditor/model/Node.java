@@ -1,8 +1,7 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
-
-import com.marginallyclever.convenience.ColorRGB;
+package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,16 +9,17 @@ import java.util.List;
  * {@link Node} is a collection of zero or more inputs and zero or more outputs connected by some operator.
  * The operator is defined by extending the {@link Node} class and defining the {@code update()} method.
  */
-public abstract class Node {
-    private static int uniqueIDSource=0;
-    private int uniqueID;
-    private String name;
+public abstract class Node extends Indexable {
     private List<NodeVariable<?>> variables = new ArrayList<>();
+    private final Rectangle rectangle = new Rectangle();
 
-    public Node(String _name) {
-        super();
-        uniqueID = ++uniqueIDSource;
-        this.name = _name;
+    public Node(String str) {
+        super(str);
+        rectangle.setBounds(0,0,150,50);
+    }
+
+    public Rectangle getRectangle() {
+        return rectangle;
     }
 
     /**
@@ -27,6 +27,17 @@ public abstract class Node {
      */
     public abstract void update();
 
+    public void updateRectangle() {
+        int w=0;
+        int h=0;
+        for(NodeVariable v : variables) {
+            Rectangle r = v.getRectangle();
+            if(w<r.width) w = r.width;
+            h+=r.height;
+        }
+        rectangle.width=w;
+        rectangle.height=h;
+    }
     /**
      * Check if any variables are dirty.
      * @return true if any variables are dirty.
@@ -47,10 +58,6 @@ public abstract class Node {
         }
     }
 
-    public int getUniqueID() {
-        return uniqueID;
-    }
-
     public void addVariable(NodeVariable v) {
         variables.add(v);
     }
@@ -63,19 +70,11 @@ public abstract class Node {
         return variables.get(index);
     }
 
-    public void render(Graphics g) {
-    }
-
     @Override
     public String toString() {
         return "Node{" +
-                "uniqueID=" + uniqueID +
-                ", name='" + name + '\'' +
-                ", variables=" + variables +
+                "uniqueName=" + getUniqueName() +", "+
+                "variables=" + variables +
                 '}';
-    }
-
-    public String getUniqueName() {
-        return uniqueID+"-"+name;
     }
 }
