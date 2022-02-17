@@ -1,0 +1,21 @@
+package com.marginallyclever.makelangelo.nodeBasedEditor.basicNodes;
+
+import com.marginallyclever.makelangelo.nodeBasedEditor.Node;
+import com.marginallyclever.makelangelo.nodeBasedEditor.NodeVariable;
+
+public class ReportToStdOut extends Node {
+    private final NodeVariable<Object> a = new NodeVariable<>("A",null,true,false);
+
+    public ReportToStdOut() {
+        super("Report to StdOut");
+        addVariable(a);
+    }
+
+    @Override
+    public void update() {
+        if(!isDirty()) return;
+        Object var = a.getValue();
+        String output = (var!=null) ? var.toString() : "null";
+        System.out.println(getUniqueID()+": "+output);
+    }
+}

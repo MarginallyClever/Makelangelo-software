@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serial;
+
 /**
  * {@link MarlinPlotterInterface} is a {@link MarlinInterface} with extra
  * instructions for interaction with a plotter robot.
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
  * @since 7.28.0
  */
 public class MarlinPlotterInterface extends MarlinInterface {
+	@Serial
 	private static final long serialVersionUID = -7114823910724405882L;
 
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterInterface.class);
@@ -164,7 +167,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getTravelToString(Plotter p,double x, double y) {
-		return "G0 " + getPosition(x, y) ;//+ " F" + p.getSettings().getTravelFeedRate();
+		return "G0 " + getPosition(x, y) + " F" + p.getSettings().getTravelFeedRate();
 	}
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
@@ -191,36 +194,17 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private static String getColorName(int toolNumber) {
-		String name = "";
-		switch (toolNumber) {
-		case 0xff0000:
-			name = "red";
-			break;
-		case 0x00ff00:
-			name = "green";
-			break;
-		case 0x0000ff:
-			name = "blue";
-			break;
-		case 0x000000:
-			name = "black";
-			break;
-		case 0x00ffff:
-			name = "cyan";
-			break;
-		case 0xff00ff:
-			name = "magenta";
-			break;
-		case 0xffff00:
-			name = "yellow";
-			break;
-		case 0xffffff:
-			name = "white";
-			break;
-		default:
-			name = "0x" + Integer.toHexString(toolNumber);
-			break; // display unknown RGB value as hex
-		}
+		String name = switch (toolNumber) {
+			case 0xff0000 -> "red";
+			case 0x00ff00 -> "green";
+			case 0x0000ff -> "blue";
+			case 0x000000 -> "black";
+			case 0x00ffff -> "cyan";
+			case 0xff00ff -> "magenta";
+			case 0xffff00 -> "yellow";
+			case 0xffffff -> "white";
+			default -> "0x" + Integer.toHexString(toolNumber); // display unknown RGB value as hex
+		};
 		return name;
 	}
 }

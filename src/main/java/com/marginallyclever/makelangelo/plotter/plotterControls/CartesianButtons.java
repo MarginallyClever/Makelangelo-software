@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,18 +331,17 @@ public class CartesianButtons extends JComponent {
 	}
 
 	public static void main(String[] args) {
+		PreferencesHelper.start();
+		Translator.start();
 		JFrame frame = new JFrame("CartesianButtons");
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JPanel p = new JPanel();
-		frame.add(p);
 		CartesianButtons button = new CartesianButtons();
-		p.add(button);
+		frame.add(button);
 		button.addActionListener((e) -> {
 			logger.debug("{} {}", e.getActionCommand(), button.getLabel(e.getID()));
 		});
-
 		frame.pack();
 		frame.setVisible(true);
 	}
