@@ -10,21 +10,29 @@ public class NodeVariable<T> {
     public final static int DEFAULT_HEIGHT = 20;
 
     private T value;
+    private final T defaultValue;
+    private final Class<T> type;
 
-    private String name;
-    private boolean hasInput;
-    private boolean hasOutput;
+    private final String name;
+    private final boolean hasInput;
+    private final boolean hasOutput;
 
     private boolean isDirty;
     private final Rectangle rectangle = new Rectangle();
 
-    public NodeVariable(String _name,T startingValue,boolean _hasInput,boolean _hasOutput) {
+    private NodeVariable(String _name,Class<T> type,T defaultValue,boolean _hasInput,boolean _hasOutput) {
         super();
+        this.type = type;
         this.name = _name;
-        this.value = startingValue;
+        this.defaultValue = defaultValue;
+        this.value = defaultValue;
         this.hasInput = _hasInput;
         this.hasOutput = _hasOutput;
         rectangle.setBounds(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT);
+    }
+
+    public static <T> NodeVariable<T> newInstance(String _name,Class<T> clazz,T defaultValue,boolean _hasInput,boolean _hasOutput) {
+        return new NodeVariable<T>(_name,clazz,defaultValue,_hasInput,_hasOutput);
     }
 
     public Rectangle getRectangle() {
@@ -35,17 +43,24 @@ public class NodeVariable<T> {
         return name;
     }
 
-    public void setValue(T arg0) {
-        value=arg0;
-        isDirty=true;
+    @SuppressWarnings("unchecked")
+    public void setValue(Object arg0) {
+        if(isValidType(arg0)) {
+            value = (T)arg0;
+            isDirty = true;
+        }
+    }
+
+    public String getTypeClass() {
+        return type.getSimpleName();
+    }
+
+    public boolean isValidType(Object arg0) {
+        return type.isInstance(arg0);
     }
 
     public T getValue() {
         return value;
-    }
-
-    public Class getTypeClass() {
-        return value == null ? Object.class : value.getClass();
     }
 
     public void setIsDirty(boolean state) {
@@ -54,9 +69,6 @@ public class NodeVariable<T> {
 
     public boolean getIsDirty() {
         return isDirty;
-    }
-
-    public void render(Graphics g) {
     }
 
     @Override

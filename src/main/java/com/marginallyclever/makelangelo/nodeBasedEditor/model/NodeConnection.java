@@ -2,9 +2,6 @@ package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
 
-import javax.vecmath.Vector2d;
-import java.awt.*;
-
 public class NodeConnection extends Indexable {
     private Node inNode;
     private int inVariableIndex=-1;
@@ -20,20 +17,20 @@ public class NodeConnection extends Indexable {
     public void apply() throws Exception {
         if(!isInputValid() || !isOutputValid()) return;
 
-        NodeVariable in = getInputVariable();
-        NodeVariable out = getOutputVariable();
-        //if( out.getTypeClass().isInstance(in.getValue()) ) {
+        NodeVariable<?> in = getInputVariable();
+        NodeVariable<?> out = getOutputVariable();
+        if( out.isValidType(in.getValue()) ) {
             out.setValue(in.getValue());
-        //} else {
-            //throw new Exception("types do not match "+out.getTypeClass() + " vs " +in.getTypeClass());
-        //}
+        } else {
+            throw new Exception("types do not match "+out.getTypeClass() + " vs " +in.getTypeClass());
+        }
     }
 
-    private NodeVariable getOutputVariable() {
+    private NodeVariable<?> getOutputVariable() {
         return outNode.getVariable(outVariableIndex);
     }
 
-    private NodeVariable getInputVariable() {
+    private NodeVariable<?> getInputVariable() {
         return inNode.getVariable(inVariableIndex);
     }
 
@@ -41,7 +38,7 @@ public class NodeConnection extends Indexable {
         if(inNode==null) return false;
         if(inVariableIndex==-1) return false;
         if(inNode.getNumVariables() <= inVariableIndex) return false;
-        if(inNode.getVariable(inVariableIndex).getHasOutput()==false) return false;
+        if(!inNode.getVariable(inVariableIndex).getHasOutput()) return false;
         return true;
     }
 
@@ -49,22 +46,20 @@ public class NodeConnection extends Indexable {
         if(outNode==null) return false;
         if(outVariableIndex==-1) return false;
         if(outNode.getNumVariables() <= outVariableIndex) return false;
-        if(outNode.getVariable(outVariableIndex).getHasInput()==false) return false;
+        if(!outNode.getVariable(outVariableIndex).getHasInput()) return false;
         return true;
     }
 
-    public void paintComponent(Graphics g) {
-
-    }
-
-    public void setInput(Node n, int i) {
+    public void setInput(Node n, int i) throws Exception {
         inNode = n;
         inVariableIndex = i;
+        apply();
     }
 
-    public void setOutput(Node n, int i) {
+    public void setOutput(Node n, int i) throws Exception {
         outNode = n;
         outVariableIndex = i;
+        apply();
     }
 
     @Override

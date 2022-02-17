@@ -4,9 +4,9 @@ import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
 
 public class Add extends Node {
-    private final NodeVariable<Number> a = new NodeVariable<>("A",0,true,false);
-    private final NodeVariable<Number> b = new NodeVariable<>("B",0,true,false);
-    private final NodeVariable<Number> c = new NodeVariable<>("output",0,false,true);
+    private final NodeVariable<Number> a = NodeVariable.newInstance("A",Number.class,0,true,false);
+    private final NodeVariable<Number> b = NodeVariable.newInstance("B",Number.class,0,true,false);
+    private final NodeVariable<Number> c = NodeVariable.newInstance("output",Number.class,0,false,true);
 
     public Add() {
         super("Add");

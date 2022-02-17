@@ -4,7 +4,7 @@ import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
 
 public class Constant extends Node {
-    private final NodeVariable<Number> v = new NodeVariable<>("value",0,false,true);
+    private final NodeVariable<Number> v = NodeVariable.newInstance("value",Number.class,0,false,true);
 
     public Constant(Number startingValue) {
         super("Constant");
