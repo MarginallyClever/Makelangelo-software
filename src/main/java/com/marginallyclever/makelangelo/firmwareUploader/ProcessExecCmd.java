@@ -222,7 +222,6 @@ public class ProcessExecCmd {
 	public static ArrayList<String> searchCommandFromEnvPath(String commandName, boolean addCurrentPwdFirst) {
 		ArrayList<String> res = new ArrayList<>();
 		try {
-			// if in an applet to avoid security exception ?
 			if (addCurrentPwdFirst) {
 				File f = new File(commandName);
 				if (f.exists() && f.canExecute()) {
@@ -238,7 +237,7 @@ public class ProcessExecCmd {
 					res.add(f.getParent());
 				}
 			}
-		} catch (Exception ignored) {
+		} catch (Exception ignored) {// if in an applet to avoid security exception ?
 			// maybe in an applet or some securitymanager restriction.
 			// therefore certainly not possible Process exec therefore to be ignored. (The result array will then certainly be empty.)
 		}
