@@ -1,9 +1,4 @@
 package com.marginallyclever.makelangelo;
-/**
- * @(#)Makelangelo.java drawbot application with GUI
- * @author Dan Royer (dan@marginallyclever.com)
- * @version 1.00 2012/2/28
- */
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -82,8 +77,8 @@ import java.util.prefs.Preferences;
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
  * the mark on the paper.  This knowledge helps the app to create better gcode.  
  * 
- * @author Dan Royer
- * @since 0.0.1
+ * @author Dan Royer (dan@marginallyclever.com)
+ * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
 	private static final String KEY_WINDOW_X = "windowX";
@@ -91,7 +86,6 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
-	
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
 
 	private static Logger logger;
@@ -103,18 +97,18 @@ public final class Makelangelo {
 	private final String VERSION;
 	private final String DETAILED_VERSION;
 
-	private MakelangeloSettingPanel myPreferencesPanel;
+	private final MakelangeloSettingPanel myPreferencesPanel;
 	
-	private Camera camera;
+	private final Camera camera;
 	private Plotter myPlotter;
-	private Paper myPaper = new Paper();
+	private final Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
 	private static boolean isMacOS = false;
 
-	private TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
+	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private RangeSlider rangeSlider;
-	private JLabel labelRangeMin = new JLabel();
-	private JLabel labelRangeMax = new JLabel();
+	private final JLabel labelRangeMin = new JLabel();
+	private final JLabel labelRangeMax = new JLabel();
 	
 	private PlotterRenderer myPlotterRenderer;
 	
@@ -162,7 +156,7 @@ public final class Makelangelo {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
 		myPlotter.addPlotterEventListener(this::onPlotterEvent);
-		myPlotter.getSettings().addPlotterSettingsListener((e)->onPlotterSettingsUpdate(e));
+		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
@@ -206,7 +200,9 @@ public final class Makelangelo {
 		if(!CommandLineOptions.hasOption("-nolf")) {
 	        try {
 	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	        } catch (Exception e) {}
+	        } catch (Exception e) {
+				logger.debug("failed to set look and feel.");
+			}
 		}
 		setSystemLookAndFeelForMacos();
 	}
@@ -836,7 +832,7 @@ public final class Makelangelo {
 		logger.debug("  create range slider...");
 		JPanel bottomPanel = new JPanel(new BorderLayout());
 		rangeSlider = new RangeSlider();
-		rangeSlider.addChangeListener((e)->onChangeSlider(e));
+		rangeSlider.addChangeListener(this::onChangeSlider);
 		
 		labelRangeMax.setHorizontalAlignment(SwingConstants.RIGHT);
 		
@@ -864,8 +860,8 @@ public final class Makelangelo {
 	 */
 	private void onChangeSlider(ChangeEvent e) {
         RangeSlider slider = (RangeSlider)e.getSource();
-        int bottom = Integer.valueOf(slider.getValue());
-        int top = Integer.valueOf(slider.getUpperValue());
+        int bottom = slider.getValue();
+        int top = slider.getUpperValue();
         myTurtleRenderer.setFirst(bottom);
         myTurtleRenderer.setLast(top);
         labelRangeMin.setText(Integer.toString(bottom));
