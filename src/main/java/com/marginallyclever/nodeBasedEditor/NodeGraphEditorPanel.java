@@ -1,12 +1,13 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.*;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Add;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Constant;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Add;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -218,7 +219,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
         // check that the end node is not the same as the start node.
         if(!connectionBeingCreated.isConnectedTo(lastConnectionPoint.node)) {
-            if (lastConnectionPoint.flags == NodeGraphModel.IN) {
+            if (lastConnectionPoint.flags == NodeVariable.IN) {
                 // the output of a connection goes to the input of a node.
                 connectionBeingCreated.setOutput(lastConnectionPoint.node, lastConnectionPoint.nodeVariableIndex);
             } else {
@@ -240,7 +241,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void highlightNearbyConnectionPoint(Point2D p) {
-        NodeConnectionPointInfo info = model.getNearestConnection(p,15,NodeGraphModel.IN | NodeGraphModel.OUT);
+        NodeConnectionPointInfo info = model.getFirstNearbyConnection(p,15,NodeVariable.IN | NodeVariable.OUT);
         setLastConnectionPoint(info);
     }
 

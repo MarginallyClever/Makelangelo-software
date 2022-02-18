@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model;
+package com.marginallyclever.nodeBasedEditor.model;
 
 /**
  * Utility class

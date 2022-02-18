@@ -1,8 +1,12 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.*;
+import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
+import com.marginallyclever.nodeBasedEditor.model.NodeGraphModel;
+import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
 import javax.swing.*;
 import java.awt.*;

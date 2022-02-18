@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
+import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
 public class Constant extends Node {
     private final NodeVariable<Number> v = NodeVariable.newInstance("value",Number.class,0,false,true);

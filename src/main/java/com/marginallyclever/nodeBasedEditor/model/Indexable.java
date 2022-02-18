@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model;
+package com.marginallyclever.nodeBasedEditor.model;
 
 /**
  * A base class that ensures all nodes and connections have unique ids for easier debugging and reflection.

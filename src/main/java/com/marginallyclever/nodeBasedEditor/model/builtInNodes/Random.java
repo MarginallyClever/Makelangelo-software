@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
+import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
 public class Random extends Node {
     private final NodeVariable<Number> vMax = NodeVariable.newInstance("max",Number.class,0,true,false);

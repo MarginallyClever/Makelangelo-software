@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model;
+package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
 
@@ -8,8 +8,11 @@ import java.awt.*;
  * {@link NodeVariable}
  */
 public class NodeVariable<T> {
-    public final static int DEFAULT_WIDTH = 150;
-    public final static int DEFAULT_HEIGHT = 20;
+    public static final int IN=1;
+    public static final int OUT=2;
+
+    public static final int DEFAULT_WIDTH = 150;
+    public static final int DEFAULT_HEIGHT = 20;
     public static final Color DEFAULT_CONNECTION_POINT_COLOR_SELECTED = Color.RED;
     public static final Color DEFAULT_CONNECTION_POINT_COLOR = Color.LIGHT_GRAY;
 

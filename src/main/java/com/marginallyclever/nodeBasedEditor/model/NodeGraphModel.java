@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model;
+package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
 
@@ -9,6 +9,7 @@ import java.util.List;
  * {@link NodeGraphModel} contains the {@link Node}s, and {@link NodeConnection}s
  */
 public class NodeGraphModel {
+
     private final List<Node> nodes = new ArrayList<>();
     private final List<NodeConnection> connections = new ArrayList<>();
 
@@ -58,7 +59,7 @@ public class NodeGraphModel {
 
     /**
      * Adds a {@link NodeConnection} without checking if it already exists.
-     * @param connection
+     * @param connection the item to add.
      */
     public NodeConnection addConnection(NodeConnection connection) {
         connections.add(connection);
@@ -71,14 +72,12 @@ public class NodeGraphModel {
 
     /**
      *
-     * @param connection
+     * @param connection the item to compare against.
      * @return returns the existing match or null.
      */
     public NodeConnection getMatchingConnection(NodeConnection connection) {
         for(NodeConnection c : connections) {
-            if(c.equals(connection)) {
-                return c;
-            }
+            if(c.equals(connection)) return c;
         }
         return null;
     }
@@ -92,36 +91,33 @@ public class NodeGraphModel {
     }
 
     /**
-     * Remove all nodes and connections
+     * Empty the model.
      */
     public void clear() {
         nodes.clear();
         connections.clear();
     }
 
-    public static final int IN=1;
-    public static final int OUT=2;
-
     /**
      *
      * @param point center of search area
      * @param r radius limit
-     * @param flags NodeGraphModel.IN | NodeGraphModel.OUT for the types you want.
+     * @param flags {@code NodeVariable.IN} or {@code NodeVariable.OUT} for the types you want.
      * @return the a {@link NodeConnectionPointInfo} or null.
      */
-    public NodeConnectionPointInfo getNearestConnection(Point2D point, double r,int flags) {
+    public NodeConnectionPointInfo getFirstNearbyConnection(Point2D point, double r, int flags) {
         double rr=r*r;
-        boolean doIn = (flags & NodeGraphModel.IN) == NodeGraphModel.IN;
-        boolean doOut = (flags & NodeGraphModel.OUT) == NodeGraphModel.OUT;
+        boolean doIn = (flags & NodeVariable.IN) == NodeVariable.IN;
+        boolean doOut = (flags & NodeVariable.OUT) == NodeVariable.OUT;
         if(doIn || doOut) {
             for(Node n : nodes) {
                 for(int i = 0; i < n.getNumVariables(); ++i) {
                     NodeVariable<?> v = n.getVariable(i);
                     if(doIn && v.getInPosition().distanceSquared(point) < rr) {
-                        return new NodeConnectionPointInfo(n,i,NodeGraphModel.IN);
+                        return new NodeConnectionPointInfo(n,i,NodeVariable.IN);
                     }
                     if(doOut && v.getOutPosition().distanceSquared(point) < rr) {
-                        return new NodeConnectionPointInfo(n,i,NodeGraphModel.OUT);
+                        return new NodeConnectionPointInfo(n,i,NodeVariable.OUT);
                     }
                 }
             }

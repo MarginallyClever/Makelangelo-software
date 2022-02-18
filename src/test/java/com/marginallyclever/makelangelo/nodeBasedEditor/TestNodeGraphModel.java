@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.nodeBasedEditor;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeConnection;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Add;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Constant;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
+import com.marginallyclever.nodeBasedEditor.model.NodeGraphModel;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Add;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

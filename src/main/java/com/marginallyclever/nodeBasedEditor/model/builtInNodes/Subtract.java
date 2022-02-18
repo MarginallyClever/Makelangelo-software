@@ -1,15 +1,15 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
 
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
+import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
-public class Add extends Node {
+public class Subtract extends Node {
     private final NodeVariable<Number> a = NodeVariable.newInstance("A",Number.class,0,true,false);
     private final NodeVariable<Number> b = NodeVariable.newInstance("B",Number.class,0,true,false);
     private final NodeVariable<Number> c = NodeVariable.newInstance("output",Number.class,0,false,true);
 
-    public Add() {
-        super("Add");
+    public Subtract() {
+        super("Subtract");
         addVariable(a);
         addVariable(b);
         addVariable(c);
@@ -18,11 +18,9 @@ public class Add extends Node {
     @Override
     public void update() {
         if(!isDirty()) return;
-        Number an = a.getValue();
-        double av = an.doubleValue();
-        Number bn = b.getValue();
-        double bv = bn.doubleValue();
-        c.setValue(av + bv);
+        double av = a.getValue().doubleValue();
+        double bv = b.getValue().doubleValue();
+        c.setValue(av - bv);
         alwaysBeCleaning();
     }
 }
