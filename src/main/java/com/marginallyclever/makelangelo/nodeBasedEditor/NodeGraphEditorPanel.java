@@ -3,10 +3,7 @@ package com.marginallyclever.makelangelo.nodeBasedEditor;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeConnection;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.*;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Add;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
@@ -27,7 +24,8 @@ public class NodeGraphEditorPanel extends JPanel {
     private final JButton deleteNode = new JButton("Delete");
     private final JButton editNode = new JButton("Edit");
 
-    private Node nodeBeingDragged=null;
+    private Node nodeBeingDragged = null;
+    private NodeConnection connectionBeingCreated = new NodeConnection();
 
     public NodeGraphEditorPanel(NodeGraphModel model) {
         super(new BorderLayout());
@@ -149,7 +147,7 @@ public class NodeGraphEditorPanel extends JPanel {
                 if(nodeBeingDragged!=null) {
                     nodeBeingDragged = null;
                 } else if(paintArea.getLastSelectedVariable()!=null) {
-                    paintArea.setLastSelectedVariable(null,null,0);
+                    paintArea.setLastSelectedVariable(null);
                 }
             }
 
@@ -161,51 +159,47 @@ public class NodeGraphEditorPanel extends JPanel {
         });
     }
 
-    private boolean createConnectionStarted=false;
-    private Node createConnectionNode;
-    private NodeVariable<?> createConnectionVariable;
-    private int createConnectionFlags;
-
     private void onClickConnectionPoint() {
-        if(!createConnectionStarted) {
-            // store the start point
-            createConnectionStarted = true;
-            createConnectionVariable = paintArea.getLastSelectedVariable();
-            createConnectionFlags = paintArea.getLastSelectedFlags();
-        } else {
-            // check that the end point is not the same flag as the start point.
-            // check that the end node is not the same as the start node.
-            // check if the user created from end to start instead of start to end.
+        NodeConnectionPointInfo info = paintArea.getLastSelectedVariable();
+        if(info==null) return;
 
+        // check that the end node is not the same as the start node.
+        if(!connectionBeingCreated.isConnectedTo(info.node)) {
+            if (info.flags == NodeGraphModel.IN) {
+                // the output of a connection goes to the input of a node.
+                connectionBeingCreated.setOutput(info.node, info.nodeVariableIndex);
+            } else {
+                //the output of a node goes to the input of a connection.
+                connectionBeingCreated.setInput(info.node, info.nodeVariableIndex);
+            }
+        }
+
+        if(connectionBeingCreated.isInputValid() && connectionBeingCreated.isOutputValid() ) {
+            if(connectionBeingCreated.isValidDataType()) {
+                // a new valid connection has been completed by the user
+                NodeConnection connection = model.createNodeConnection();
+                connection.set(connectionBeingCreated);
+            }
+            // destroy the temp connection, especially if the data type was invalid.
+            connectionBeingCreated.disconnectAll();
         }
     }
 
     private void highlightNearbyConnectionPoint(Point2D p) {
-        NodeVariable<?> v = model.getNearestConnection(p,15,NodeGraphModel.IN | NodeGraphModel.OUT);
-        if(v!=null) {
-            if( v.getInPosition().distanceSquared(p) <
-                    v.getOutPosition().distanceSquared(p) ) {
-                // near the in point
-                System.out.println("in");
-                setLastSelectedVariable(v,v.getInPosition(),NodeGraphModel.IN);
-            } else {
-                // near the out point
-                System.out.println("out");
-                setLastSelectedVariable(v,v.getOutPosition(),NodeGraphModel.OUT);
-            }
+        NodeConnectionPointInfo info = model.getNearestConnection(p,15,NodeGraphModel.IN | NodeGraphModel.OUT);
+        if(info!=null) {
+            setLastSelectedVariable(info);
         } else {
-            setLastSelectedVariable(null,null,0);
+            setLastSelectedVariable(null);
         }
     }
 
     /**
      *
-     * @param v the {@link NodeVariable}
-     * @param p the point
-     * @param flag either {@code NodeGraphModel.IN} or {@code NodeGraphModel.OUT}
+     * @param info the {@link NodeConnectionPointInfo}
      */
-    private void setLastSelectedVariable(NodeVariable<?> v, Point2D p,int flag) {
-        paintArea.setLastSelectedVariable(v,p,flag);
+    private void setLastSelectedVariable(NodeConnectionPointInfo info) {
+        paintArea.setLastSelectedVariable(info);
         repaint();
     }
 

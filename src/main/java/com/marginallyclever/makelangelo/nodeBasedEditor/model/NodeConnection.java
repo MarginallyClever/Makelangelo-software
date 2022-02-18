@@ -16,19 +16,25 @@ public class NodeConnection extends Indexable {
     public NodeConnection() {
         super("Connection");
     }
+
     /**
-     * send the value of upstream variables to downstream variables
+     * Send the value of upstream variables to downstream variables
      */
-    public void apply() throws Exception {
+    public void apply() {
         if(!isInputValid() || !isOutputValid()) return;
+        if( isValidDataType() ) {
+            NodeVariable<?> in = getInputVariable();
+            NodeVariable<?> out = getOutputVariable();
+            out.setValue(in.getValue());
+        }
+    }
+
+    public boolean isValidDataType() {
+        if(!isInputValid() || !isOutputValid()) return false;
 
         NodeVariable<?> in = getInputVariable();
         NodeVariable<?> out = getOutputVariable();
-        if( out.isValidType(in.getValue()) ) {
-            out.setValue(in.getValue());
-        } else {
-            throw new Exception("types do not match "+out.getTypeClass() + " vs " +in.getTypeClass());
-        }
+        return out.isValidType(in.getValue());
     }
 
     private NodeVariable<?> getOutputVariable() {
@@ -55,13 +61,13 @@ public class NodeConnection extends Indexable {
         return true;
     }
 
-    public void setInput(Node n, int i) throws Exception {
+    public void setInput(Node n, int i) {
         inNode = n;
         inVariableIndex = i;
         apply();
     }
 
-    public void setOutput(Node n, int i) throws Exception {
+    public void setOutput(Node n, int i) {
         outNode = n;
         outVariableIndex = i;
         apply();
@@ -92,5 +98,15 @@ public class NodeConnection extends Indexable {
 
     public boolean isConnectedTo(Node n) {
         return inNode==n || outNode==n;
+    }
+
+    public void disconnectAll() {
+        setInput(null,0);
+        setOutput(null,0);
+    }
+
+    public void set(NodeConnection b) {
+        setInput(b.inNode,b.inVariableIndex);
+        setOutput(b.outNode,b.outVariableIndex);
     }
 }
