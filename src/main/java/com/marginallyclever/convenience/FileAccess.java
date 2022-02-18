@@ -31,7 +31,7 @@ public class FileAccess {
 		int index = filename.lastIndexOf(":");
 		int index2 = filename.lastIndexOf(":\\");  // hack for windows file system
 		if(index!=-1 && index!=index2) {
-			return loadFromZip(filename.substring(0, index), filename.substring(index+1,filename.length()));
+			return loadFromZip(filename.substring(0, index), filename.substring(index+1));
 		} else {
 			return new BufferedInputStream(getInputStream(filename));
 		}
@@ -40,7 +40,7 @@ public class FileAccess {
 	private static InputStream getInputStream(String fname) throws IOException {
 		InputStream s = FileAccess.class.getResourceAsStream(fname);
 		if( s==null ) {
-			s = new FileInputStream(new File(fname));
+			s = new FileInputStream(fname);
 		}
 		return s;
 	}

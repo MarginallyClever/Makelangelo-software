@@ -6,8 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.drawCircle;
-import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.loadTexture;
+import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.*;
 
 public class Makelangelo5 implements PlotterRenderer {
 
@@ -29,7 +28,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (Makelangelo5.texture1 == null) {
 			paintControlBoxPlain(gl2, robot);
 		} else {
-			Makelangelo5.texture1.bind(gl2);
 			paintControlBoxFancy(gl2, robot);
 		}
 
@@ -48,7 +46,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (Makelangelo5.texture3 == null) {
 			// paintLogo(gl2,robot);
 		} else {
-			Makelangelo5.texture3.bind(gl2);
 			paintLogoFancy(gl2, robot);
 		}
 	}
@@ -63,21 +60,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final double ox = left - 106 * scale; // 106 taken from offset in texture map
 		final double oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
 
-		gl2.glColor4d(1, 1, 1, 1);
-		gl2.glEnable(GL2.GL_TEXTURE_2D);
-
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glTexCoord2d(0, 0);
-		gl2.glVertex2d(ox, oy);
-		gl2.glTexCoord2d(1, 0);
-		gl2.glVertex2d(ox + TW, oy);
-		gl2.glTexCoord2d(1, 1);
-		gl2.glVertex2d(ox + TW, oy + TH);
-		gl2.glTexCoord2d(0, 1);
-		gl2.glVertex2d(ox, oy + TH);
-		gl2.glEnd();
-
-		gl2.glDisable(GL2.GL_TEXTURE_2D);
+		paintTexture(gl2, texture1, ox, oy, TW, TH);
 	}
 
 	/**
@@ -101,21 +84,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		// coordinates in the main Wooden Base
 		// final float LOGO_Y= 0 + 470;
 
-		gl2.glColor4d(1, 1, 1, 1);
-		gl2.glEnable(GL2.GL_TEXTURE_2D);
-
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glTexCoord2d(0, 0);
-		gl2.glVertex2d(LOGO_X, LOGO_Y);
-		gl2.glTexCoord2d(1, 0);
-		gl2.glVertex2d(LOGO_X + TW, LOGO_Y);
-		gl2.glTexCoord2d(1, 1);
-		gl2.glVertex2d(LOGO_X + TW, LOGO_Y + TH);
-		gl2.glTexCoord2d(0, 1);
-		gl2.glVertex2d(LOGO_X, LOGO_Y + TH);
-		gl2.glEnd();
-
-		gl2.glDisable(GL2.GL_TEXTURE_2D);
+		paintTexture(gl2, texture3, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**
