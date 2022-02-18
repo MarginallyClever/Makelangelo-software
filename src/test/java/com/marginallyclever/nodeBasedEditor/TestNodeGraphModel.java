@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;

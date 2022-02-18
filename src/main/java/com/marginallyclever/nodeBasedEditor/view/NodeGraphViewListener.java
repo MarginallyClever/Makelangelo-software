@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor.view;
 
 import java.awt.*;
 

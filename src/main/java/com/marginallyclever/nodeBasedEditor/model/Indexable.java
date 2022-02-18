@@ -18,6 +18,10 @@ public abstract class Indexable {
         return uniqueID;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getUniqueName() {
         return uniqueID+"-"+name;
     }
@@ -25,8 +29,8 @@ public abstract class Indexable {
     @Override
     public String toString() {
         return "Indexable{" +
-                "uniqueID=" + uniqueID +
-                ", name='" + name + '\'' +
+                "uniqueID=" + uniqueID +", "+
+                "name='" + name + '\'' +
                 '}';
     }
 }

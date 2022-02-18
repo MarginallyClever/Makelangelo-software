@@ -16,6 +16,11 @@ public class Divide extends Node {
     }
 
     @Override
+    public Node create() {
+        return new Divide();
+    }
+
+    @Override
     public void update() {
         if(!isDirty()) return;
         double av = a.getValue().doubleValue();

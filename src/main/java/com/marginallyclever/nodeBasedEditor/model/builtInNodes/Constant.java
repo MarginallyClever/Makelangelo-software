@@ -17,5 +17,10 @@ public class Constant extends Node {
     }
 
     @Override
+    public Node create() {
+        return new Constant();
+    }
+
+    @Override
     public void update() {}
 }

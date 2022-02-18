@@ -12,10 +12,16 @@ public class ReportToStdOut extends Node {
     }
 
     @Override
+    public Node create() {
+        return new ReportToStdOut();
+    }
+
+    @Override
     public void update() {
         if(!isDirty()) return;
         Object var = a.getValue();
         String output = (var!=null) ? var.toString() : "null";
         System.out.println(getUniqueID()+": "+output);
+        alwaysBeCleaning();
     }
 }

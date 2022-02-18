@@ -23,6 +23,10 @@ module com.marginallyclever.makelangelo {
 	exports com.marginallyclever.makelangelo.paper;
 	exports com.marginallyclever.convenience;
 	exports com.marginallyclever.convenience.log;
+	exports com.marginallyclever.nodeBasedEditor;
+	exports com.marginallyclever.nodeBasedEditor.model;
+	exports com.marginallyclever.nodeBasedEditor.model.builtInNodes;
 
 	opens com.marginallyclever.makelangelo.plotter.settings;
+	exports com.marginallyclever.nodeBasedEditor.view;
 }

@@ -22,6 +22,11 @@ public class Random extends Node {
     }
 
     @Override
+    public Node create() {
+        return new Random();
+    }
+
+    @Override
     public void update() {
         if(!isDirty()) return;
         double a = vMin.getValue().doubleValue();

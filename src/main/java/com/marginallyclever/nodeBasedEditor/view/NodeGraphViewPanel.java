@@ -1,8 +1,7 @@
-package com.marginallyclever.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor.view;
 
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraphModel;
@@ -17,11 +16,12 @@ import java.util.List;
 
 /**
  * {@link NodeGraphViewPanel} visualizes the contents of a {@link NodeGraphModel} with Java Swing.
+ * It can call on {@link NodeGraphViewListener}s to add additional flavor.
  */
 public class NodeGraphViewPanel extends JPanel {
     public static final Color DEFAULT_BORDER = Color.BLACK;
-    private static final Color DEFAULT_BACKGROUND = Color.WHITE;
-    private static final Color DEFAULT_FONT = Color.BLACK;
+    public static final Color DEFAULT_BACKGROUND = Color.WHITE;
+    public static final Color DEFAULT_FONT = Color.BLACK;
 
     private final NodeGraphModel model;
 

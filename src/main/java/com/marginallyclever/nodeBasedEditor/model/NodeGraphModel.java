@@ -1,6 +1,8 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.nodeBasedEditor.NodeFactory;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,11 @@ public class NodeGraphModel {
 
     public NodeGraphModel() {
         super();
+        NodeFactory.registerNode(new Add());
+        NodeFactory.registerNode(new Subtract());
+        NodeFactory.registerNode(new Multiply());
+        NodeFactory.registerNode(new Divide());
+        NodeFactory.registerNode(new ReportToStdOut());
     }
 
     public void update() throws Exception {

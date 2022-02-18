@@ -20,6 +20,12 @@ public abstract class Node extends Indexable {
         rectangle.setBounds(0,0,150,50);
     }
 
+    /**
+     *
+     * @return One new instance of this type of {@link Node}.
+     */
+    public abstract Node create();
+
     public Rectangle getRectangle() {
         return rectangle;
     }

@@ -3,11 +3,11 @@ package com.marginallyclever.nodeBasedEditor;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.view.NodeGraphViewPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -137,13 +137,11 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private void onAdd() {
         System.out.println("adding node");
-        try {
-            Node n = model.addNode(new Add());
+        Node n = NodeFactoryPanel.runAsDialog((JFrame)SwingUtilities.getWindowAncestor(this));
+        if(n!=null) {
             model.addNode(n);
             paintArea.updatePaintAreaBounds();
             paintArea.repaint();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 
@@ -275,7 +273,7 @@ public class NodeGraphEditorPanel extends JPanel {
         return null;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         PreferencesHelper.start();
         CommandLineOptions.setFromMain(args);
         Translator.start();

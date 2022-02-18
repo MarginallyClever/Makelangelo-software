@@ -16,6 +16,11 @@ public class Subtract extends Node {
     }
 
     @Override
+    public Node create() {
+        return new Subtract();
+    }
+
+    @Override
     public void update() {
         if(!isDirty()) return;
         double av = a.getValue().doubleValue();
