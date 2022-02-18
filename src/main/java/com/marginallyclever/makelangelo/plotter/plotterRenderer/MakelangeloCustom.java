@@ -6,7 +6,6 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
 public class MakelangeloCustom implements PlotterRenderer {
-	public final static float PEN_HOLDER_RADIUS=6; //cm
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
@@ -38,87 +37,66 @@ public class MakelangeloCustom implements PlotterRenderer {
 		double cx = 0;
 
 		gl2.glPushMatrix();
-		
+
 		// mounting plate for PCB
-		final float SUCTION_CUP_Y=35f;
-		final float SUCTION_CUP_RADIUS = 32.5f; ///mm
 		final float FRAME_SIZE=50f; //mm
 
-		gl2.glColor3f(1,1f,1f);
-		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
-		drawCircle(gl2,(float)left -SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
-		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top-SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
-		drawCircle(gl2,(float)right+SUCTION_CUP_Y,(float)top+SUCTION_CUP_Y,SUCTION_CUP_RADIUS);
-		
 		gl2.glColor3f(1,0.8f,0.5f);
 		// frame
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left-FRAME_SIZE, top+FRAME_SIZE);
-		gl2.glVertex2d(right+FRAME_SIZE, top+FRAME_SIZE);
-		gl2.glVertex2d(right+FRAME_SIZE, top-FRAME_SIZE);
-		gl2.glVertex2d(left-FRAME_SIZE, top-FRAME_SIZE);
-		gl2.glEnd();
+		drawRectangle(gl2, top+FRAME_SIZE, left-FRAME_SIZE, top-FRAME_SIZE, right+FRAME_SIZE);
 
 		gl2.glTranslated(cx, cy, 0);
-		
+
 		// wires to each motor
 		gl2.glBegin(GL2.GL_LINES);
 		final float SPACING=2;
 		float y=SPACING*-1.5f;
-		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
-		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
-		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
-		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
-
-		y=SPACING*-1.5f;
-		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
-		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
-		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
-		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(left, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 1, 0);		gl2.glVertex2d(left, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(0, 0, 1);		gl2.glVertex2d(left, y);	gl2.glVertex2d(right, y);  y+=SPACING;
+		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(left, y);	gl2.glVertex2d(right, y);;
 		gl2.glEnd();
 		
 		// RUMBA in v3 (135mm*75mm)
-		float h = 75f/2;
+		float shiftX = (float) right / 2;
+		if (shiftX < 100) {
+			 shiftX = 85;
+		}
+		gl2.glPushMatrix();
+		gl2.glTranslated(shiftX, 0, 0);
 		float w = 135f/2;
+		float h = 75f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		drawRectangle(gl2, h, w, -h, -w);
+		gl2.glPopMatrix();
 
-		renderLCD(gl2);
+		renderLCD(gl2, left);
 
 		gl2.glPopMatrix();
 	}
-	
+
 	// draw left & right motor
-	private void paintMotors( GL2 gl2,PlotterSettings settings ) {
+	private void paintMotors(GL2 gl2, PlotterSettings settings) {
 		double top = settings.getLimitTop();
 		double right = settings.getLimitRight();
 		double left = settings.getLimitLeft();
 
 		// left motor
 		gl2.glColor3f(0,0,0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left-MOTOR_WIDTH/2, top+MOTOR_WIDTH/2);
-		gl2.glVertex2d(left+MOTOR_WIDTH/2, top+MOTOR_WIDTH/2);
-		gl2.glVertex2d(left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2);
-		gl2.glVertex2d(left-MOTOR_WIDTH/2, top-MOTOR_WIDTH/2);
-		
+		drawRectangle(gl2, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2);
+
 		// right motor
-		gl2.glVertex2d(right-MOTOR_WIDTH/2, top+MOTOR_WIDTH/2);
-		gl2.glVertex2d(right+MOTOR_WIDTH/2, top+MOTOR_WIDTH/2);
-		gl2.glVertex2d(right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2);
-		gl2.glVertex2d(right-MOTOR_WIDTH/2, top-MOTOR_WIDTH/2);
-		gl2.glEnd();
+		drawRectangle(gl2, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2);
 	}
 	
-	private void renderLCD(GL2 gl2) {
+	private void renderLCD(GL2 gl2, double left) {
 		// position
+		float shiftX = (float) left / 2;
+		if (shiftX > -100) {
+			shiftX = -75;
+		}
 		gl2.glPushMatrix();
-		gl2.glTranslated(-180, 0, 0);
+		gl2.glTranslated(shiftX, 0, 0);
 		/*
 		// mounting plate for LCD
 		gl2.glColor3f(1,0.8f,0.5f);
@@ -133,12 +111,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		float w = 150f/2;
 		float h = 56f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		drawRectangle(gl2, h, w, -h, -w);
 
 		// LCD green
 		gl2.glPushMatrix();
@@ -147,33 +120,18 @@ public class MakelangeloCustom implements PlotterRenderer {
 		w = 98f/2;
 		h = 60f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		drawRectangle(gl2, h, w, -h, -w);
 
 		// LCD black
 		h = 40f/2;
 		gl2.glColor3f(0,0,0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		drawRectangle(gl2, h, w, -h, -w);
 
 		// LCD blue
 		h = 25f/2;
 		w = 75f/2;
 		gl2.glColor3f(0,0,0.7f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		drawRectangle(gl2, h, w, -h, -w);
 		
 		gl2.glPopMatrix();
 
@@ -287,6 +245,15 @@ public class MakelangeloCustom implements PlotterRenderer {
 		}
 		gl2.glEnd();
 		gl2.glTranslatef(-x, -y, 0);
+	}
+
+	private void drawRectangle(GL2 gl2, double top, double right, double bottom, double left) {
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left, top);
+		gl2.glVertex2d(right, top);
+		gl2.glVertex2d(right, bottom);
+		gl2.glVertex2d(left, bottom);
+		gl2.glEnd();
 	}
 	
 	@SuppressWarnings("unused")
