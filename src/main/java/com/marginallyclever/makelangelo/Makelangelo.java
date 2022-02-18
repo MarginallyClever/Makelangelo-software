@@ -44,6 +44,7 @@ import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 
@@ -884,7 +885,11 @@ public final class Makelangelo {
 				onClosing();
 			}
 		});
-		
+		try {
+			mainFrame.setIconImage(ImageIO.read(Makelangelo.class.getResource("/logo-icon.png")));
+		} catch (IOException e) {
+			logger.warn("Can't load icon", e);
+		}
 		buildMenuBar();
 		
 		mainFrame.setContentPane(createContentPane());
