@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.Node;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeGraphModel;
+import com.marginallyclever.makelangelo.nodeBasedEditor.model.NodeVariable;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Add;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.makelangelo.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
@@ -107,27 +108,24 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private void attachMouseAdapter() {
         System.out.println("Attaching mouse adapter");
-        final Point2D offset = new Point2D();
-        final Point2D prev = new Point2D();
+        final Point2D mouseDragPreviousPosition = new Point2D();
 
         paintArea.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (nodeBeingDragged != null) {
                     Rectangle r = nodeBeingDragged.getRectangle();
-                    r.x += e.getX() - prev.x;
-                    r.y += e.getY() - prev.y;
-                    prev.set(e.getX(), e.getY());
+                    r.x += e.getX() - mouseDragPreviousPosition.x;
+                    r.y += e.getY() - mouseDragPreviousPosition.y;
+                    mouseDragPreviousPosition.set(e.getX(), e.getY());
                     paintArea.repaint();
                 }
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                Point2D p = model.getNearestConnection(e.getPoint(),20);
-                if(p!=null) {
-
-                }
+                Point p = e.getPoint();
+                highlightNearbyConnectionPoint(new Point2D(p.x,p.y));
             }
         });
 
@@ -141,24 +139,74 @@ public class NodeGraphEditorPanel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 nodeBeingDragged=getNodeAt(e.getPoint());
                 if(nodeBeingDragged!=null) {
-                    setLastSelectedNode(nodeBeingDragged);
-                    prev.set(e.getX(), e.getY());
-                    Rectangle r = nodeBeingDragged.getRectangle();
-                    offset.set(e.getX() - r.x, e.getY() - r.y);
-                } else {
-                    // start of selection area
+                    beginDragNode(e.getPoint());
                 }
+                onClickConnectionPoint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 if(nodeBeingDragged!=null) {
                     nodeBeingDragged = null;
-                } else {
-                    // end of selection area
+                } else if(paintArea.getLastSelectedVariable()!=null) {
+                    paintArea.setLastSelectedVariable(null,null,0);
                 }
             }
+
+            private void beginDragNode(Point e) {
+                setLastSelectedNode(nodeBeingDragged);
+                mouseDragPreviousPosition.set(e.getX(), e.getY());
+                Rectangle r = nodeBeingDragged.getRectangle();
+            }
         });
+    }
+
+    private boolean createConnectionStarted=false;
+    private Node createConnectionNode;
+    private NodeVariable<?> createConnectionVariable;
+    private int createConnectionFlags;
+
+    private void onClickConnectionPoint() {
+        if(!createConnectionStarted) {
+            // store the start point
+            createConnectionStarted = true;
+            createConnectionVariable = paintArea.getLastSelectedVariable();
+            createConnectionFlags = paintArea.getLastSelectedFlags();
+        } else {
+            // check that the end point is not the same flag as the start point.
+            // check that the end node is not the same as the start node.
+            // check if the user created from end to start instead of start to end.
+
+        }
+    }
+
+    private void highlightNearbyConnectionPoint(Point2D p) {
+        NodeVariable<?> v = model.getNearestConnection(p,15,NodeGraphModel.IN | NodeGraphModel.OUT);
+        if(v!=null) {
+            if( v.getInPosition().distanceSquared(p) <
+                    v.getOutPosition().distanceSquared(p) ) {
+                // near the in point
+                System.out.println("in");
+                setLastSelectedVariable(v,v.getInPosition(),NodeGraphModel.IN);
+            } else {
+                // near the out point
+                System.out.println("out");
+                setLastSelectedVariable(v,v.getOutPosition(),NodeGraphModel.OUT);
+            }
+        } else {
+            setLastSelectedVariable(null,null,0);
+        }
+    }
+
+    /**
+     *
+     * @param v the {@link NodeVariable}
+     * @param p the point
+     * @param flag either {@code NodeGraphModel.IN} or {@code NodeGraphModel.OUT}
+     */
+    private void setLastSelectedVariable(NodeVariable<?> v, Point2D p,int flag) {
+        paintArea.setLastSelectedVariable(v,p,flag);
+        repaint();
     }
 
     private void setLastSelectedNode(Node nodeAt) {

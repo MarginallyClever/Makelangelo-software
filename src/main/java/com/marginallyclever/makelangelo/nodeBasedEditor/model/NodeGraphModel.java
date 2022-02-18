@@ -79,15 +79,27 @@ public class NodeGraphModel {
         connections.clear();
     }
 
-    public Point2D getNearestConnection(Point point, double r) {
-        double rr=r*r;
-        Point2D p = new Point2D(point.x,point.y);
+    public static final int IN=1;
+    public static final int OUT=2;
 
-        for(Node n : nodes) {
-            for(int i=0;i<n.getNumVariables();++i) {
-                NodeVariable<?> v = n.getVariable(i);
-                if(v.getInPosition().distanceSquared(p) < rr) return v.getInPosition();
-                if(v.getOutPosition().distanceSquared(p) < rr) return v.getOutPosition();
+    /**
+     *
+     * @param point center of search area
+     * @param r radius limit
+     * @param flags NodeGraphModel.IN | NodeGraphModel.OUT for the types you want.
+     * @return the first {@link NodeVariable} found, if any.
+     */
+    public NodeVariable<?> getNearestConnection(Point2D point, double r,int flags) {
+        double rr=r*r;
+        boolean doIn = (flags & NodeGraphModel.IN) == NodeGraphModel.IN;
+        boolean doOut = (flags & NodeGraphModel.OUT) == NodeGraphModel.OUT;
+        if(doIn || doOut) {
+            for(Node n : nodes) {
+                for(int i = 0; i < n.getNumVariables(); ++i) {
+                    NodeVariable<?> v = n.getVariable(i);
+                    if(doIn && v.getInPosition().distanceSquared(point) < rr) return v;
+                    if(doOut && v.getOutPosition().distanceSquared(point) < rr) return v;
+                }
             }
         }
         return null;

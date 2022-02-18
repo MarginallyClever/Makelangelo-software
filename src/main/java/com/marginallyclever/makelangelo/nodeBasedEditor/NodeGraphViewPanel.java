@@ -23,6 +23,9 @@ public class NodeGraphViewPanel extends JPanel {
     private final NodeGraphModel model;
 
     private Node lastSelectedNode=null;
+    private NodeVariable<?> lastSelectedVariable = null;
+    private final Point2D lastSelectedPoint = new Point2D();
+    private int lastSelectedFlags = 0;
 
     public NodeGraphViewPanel(NodeGraphModel model) {
         super();
@@ -103,6 +106,8 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     private void paintVariableConnectionPoints(Graphics g, NodeVariable<?> v) {
+        g.setColor(lastSelectedVariable==v ? NodeVariable.DEFAULT_CONNECTION_POINT_COLOR_SELECTED : NodeVariable.DEFAULT_CONNECTION_POINT_COLOR);
+
         if(v.getHasInput()) {
             Point2D p = v.getInPosition();
             int radius = (int)NodeConnection.DEFAULT_RADIUS+2;
@@ -172,5 +177,37 @@ public class NodeGraphViewPanel extends JPanel {
 
     public void setLastSelectedNode(Node lastSelectedNode) {
         this.lastSelectedNode = lastSelectedNode;
+    }
+
+    public NodeVariable<?> getLastSelectedVariable() {
+        return lastSelectedVariable;
+    }
+
+    /**
+     *
+     * @return the 2d coordinates of the last selected connection point, relative to the panel's origin
+     */
+    public Point2D getLastSelectedPoint() {
+        return lastSelectedPoint;
+    }
+
+    /**
+     *
+     * @return either {@code NodeGraphModel.IN} or {@code NodeGraphModel.OUT}
+     */
+    public int getLastSelectedFlags() {
+        return lastSelectedFlags;
+    }
+
+    /**
+     *
+     * @param v the {@link NodeVariable}
+     * @param p the point
+     * @param flags either {@code NodeGraphModel.IN} or {@code NodeGraphModel.OUT}
+     */
+    public void setLastSelectedVariable(NodeVariable<?> v, Point2D p,int flags) {
+        lastSelectedVariable = v;
+        if(p!=null) lastSelectedPoint.set(p);
+        lastSelectedFlags = flags;
     }
 }
