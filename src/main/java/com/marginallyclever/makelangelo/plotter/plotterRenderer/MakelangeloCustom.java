@@ -5,6 +5,8 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
+import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.*;
+
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -26,8 +28,8 @@ public class MakelangeloCustom implements PlotterRenderer {
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param gl2
-	 * @param settings
+	 * @param gl2 the render context
+	 * @param settings settings of the robot
 	 */
 	private void paintControlBox(GL2 gl2,PlotterSettings settings) {
 		double cy = settings.getLimitTop();
@@ -215,45 +217,6 @@ public class MakelangeloCustom implements PlotterRenderer {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
 		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
-	}
-	
-	private void drawCircle(GL2 gl2,float x,float y,float r) {
-		gl2.glTranslatef(x, y, 0);
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		float f;
-		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(
-					Math.cos(f)*r,
-					Math.sin(f)*r);
-		}
-		gl2.glEnd();
-		gl2.glTranslatef(-x, -y, 0);
-	}
-	
-	private void drawArc(GL2 gl2,float x,float y,float r, float a1, float a2) {
-		gl2.glTranslatef(x, y, 0);
-		gl2.glBegin(GL2.GL_LINES);
-		float f;
-		int i;
-		int steps=10;
-		float delta=(a2-a1)/(float) steps;
-		f=a1;
-		for(i=0;i<steps;i++) {
-			gl2.glVertex2d(	Math.cos(f)*r,Math.sin(f)*r);
-			gl2.glVertex2d(	Math.cos(f+delta)*r,Math.sin(f+delta)*r);
-			f += delta;
-		}
-		gl2.glEnd();
-		gl2.glTranslatef(-x, -y, 0);
-	}
-
-	private void drawRectangle(GL2 gl2, double top, double right, double bottom, double left) {
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(right, bottom);
-		gl2.glVertex2d(left, bottom);
-		gl2.glEnd();
 	}
 	
 	@SuppressWarnings("unused")

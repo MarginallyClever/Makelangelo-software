@@ -2,18 +2,14 @@ package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.drawCircle;
+import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.loadTexture;
 
 public class Makelangelo5 implements PlotterRenderer {
-	private static final Logger logger = LoggerFactory.getLogger(Makelangelo5.class);
 
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -26,9 +22,9 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (Makelangelo5.texture1 == null) Makelangelo5.texture1 = loadTexture(gl2, "/makelangelo5.png");
-		if (Makelangelo5.texture2 == null) Makelangelo5.texture2 = loadTexture(gl2, "/makelangelo5-motors.png");
-		if (Makelangelo5.texture3 == null) Makelangelo5.texture3 = loadTexture(gl2, "/logo.png");
+		if (Makelangelo5.texture1 == null) Makelangelo5.texture1 = loadTexture("/textures/makelangelo5.png");
+		if (Makelangelo5.texture2 == null) Makelangelo5.texture2 = loadTexture("/textures/makelangelo5-motors.png");
+		if (Makelangelo5.texture3 == null) Makelangelo5.texture3 = loadTexture("/logo.png");
 
 		if (Makelangelo5.texture1 == null) {
 			paintControlBoxPlain(gl2, robot);
@@ -84,21 +80,11 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glDisable(GL2.GL_TEXTURE_2D);
 	}
 
-	private Texture loadTexture(GL2 gl2, String name) {
-		Texture tex = null;
-		try {
-			tex = TextureIO.newTexture(FileAccess.open(name), false, name.substring(name.lastIndexOf('.') + 1));
-		} catch (IOException e) {
-			logger.debug("Can't load {}", name, e);
-		}
-		return tex;
-	}
-
 	/**
 	 * paint the Marginally Clever Logo
-	 * 
-	 * @param gl2
-	 * @param settings
+	 *
+	 * @param gl2   the render context
+	 * @param robot the machine to draw.
 	 */
 	private void paintLogoFancy(GL2 gl2, Plotter robot) {
 		double left = robot.getLimitLeft();
@@ -134,9 +120,9 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	/**
 	 * paint the controller and the LCD panel
-	 * 
-	 * @param gl2
-	 * @param settings
+	 *
+	 * @param gl2   the render context
+	 * @param robot the machine to draw.
 	 */
 	private void paintControlBoxPlain(GL2 gl2, Plotter robot) {
 		double cy = robot.getLimitTop();
@@ -375,17 +361,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (robot.getPenIsUp()) {
 			drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5 + 5);
 		}
-	}
-
-	private void drawCircle(GL2 gl2, float x, float y, float r) {
-		gl2.glTranslatef(x, y, 0);
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		float f;
-		for (f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-			gl2.glVertex2d(Math.cos(f) * r, Math.sin(f) * r);
-		}
-		gl2.glEnd();
-		gl2.glTranslatef(-x, -y, 0);
 	}
 
 	private void paintSafeArea(GL2 gl2, Plotter robot) {
