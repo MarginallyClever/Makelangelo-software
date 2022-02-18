@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,10 +56,31 @@ public class NodeGraphModel {
         connections.addAll(toKeep);
     }
 
-    public NodeConnection createNodeConnection() {
-        NodeConnection c = new NodeConnection();
-        connections.add(c);
-        return c;
+    /**
+     * Adds a {@link NodeConnection} without checking if it already exists.
+     * @param connection
+     */
+    public NodeConnection addConnection(NodeConnection connection) {
+        connections.add(connection);
+        return connection;
+    }
+
+    public void removeConnection(NodeConnection c) {
+        connections.remove(c);
+    }
+
+    /**
+     *
+     * @param connection
+     * @return returns the existing match or null.
+     */
+    public NodeConnection getMatchingConnection(NodeConnection connection) {
+        for(NodeConnection c : connections) {
+            if(c.equals(connection)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,12 +16,10 @@ import java.util.List;
  */
 public class NodeGraphViewPanel extends JPanel {
     public static final Color DEFAULT_BORDER = Color.BLACK;
-    public static final Color DEFAULT_BORDER_SELECTED = Color.GREEN;
+    private static final Color DEFAULT_BACKGROUND = Color.WHITE;
+    private static final Color DEFAULT_FONT = Color.BLACK;
 
     private final NodeGraphModel model;
-
-    private Node lastSelectedNode=null;
-    private NodeConnectionPointInfo lastSelectedVariable = null;
 
     public NodeGraphViewPanel(NodeGraphModel model) {
         super();
@@ -38,7 +37,11 @@ public class NodeGraphViewPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 
         for(Node n : model.getNodes()) paintNode(g,n);
+
+        g.setColor(NodeConnection.DEFAULT_COLOR);
         for(NodeConnection c : model.getConnections()) paintConnection(g,c);
+
+        paintExtras(g);
     }
 
     public void updatePaintAreaBounds() {
@@ -58,15 +61,20 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     public void paintNode(Graphics g, Node n) {
+        g.setColor(DEFAULT_BACKGROUND);
         paintNodeBackground(g,n);
+
+        g.setColor(DEFAULT_FONT);
         paintNodeTitle(g, n);
-        paintVariables(g, n);
+
+        paintAllNodeVariables(g, n);
+
+        g.setColor(DEFAULT_BORDER);
         paintNodeBorder(g, n);
     }
 
     public void paintNodeBackground(Graphics g, Node n) {
         Rectangle r = n.getRectangle();
-        g.setColor(Color.WHITE);
         g.fillRect(r.x, r.y, r.width, r.height);
     }
 
@@ -77,26 +85,29 @@ public class NodeGraphViewPanel extends JPanel {
         paintTextCentered(g,name,box);
     }
 
-    public void paintVariables(Graphics g, Node n) {
-        int x = n.getRectangle().x;
-        int y = n.getRectangle().y+Node.NODE_TITLE_HEIGHT;
+    private void paintAllNodeVariables(Graphics g, Node n) {
         for(int i=0;i<n.getNumVariables();++i) {
             NodeVariable<?> v = n.getVariable(i);
-            String name = v.getName();
-            Rectangle box = new Rectangle(v.getRectangle());
-            box.y=y;
-            box.x=x;
-            y+=box.height;
-            paintTextCentered(g,name,box);
-            g.setColor(Color.LIGHT_GRAY);
-            g.drawRect(box.x,box.y,box.width,box.height);
-            g.setColor(NodeVariable.DEFAULT_CONNECTION_POINT_COLOR);
-            paintVariableConnectionPoints(g,v);
+            paintVariable(g,v);
         }
     }
 
+    public void paintVariable(Graphics g, NodeVariable<?> v) {
+        Rectangle box = v.getRectangle();
+        // label
+        g.setColor(DEFAULT_FONT);
+        paintTextCentered(g,v.getName(),box);
+
+        // internal border
+        g.setColor(Color.LIGHT_GRAY);
+        g.drawRect(box.x,box.y,box.width,box.height);
+
+        // connection points
+        g.setColor(NodeVariable.DEFAULT_CONNECTION_POINT_COLOR);
+        paintVariableConnectionPoints(g,v);
+    }
+
     public void paintNodeBorder(Graphics g,Node n) {
-        g.setColor(lastSelectedNode == n ? DEFAULT_BORDER_SELECTED : DEFAULT_BORDER);
         Rectangle r = n.getRectangle();
         g.drawRect(r.x, r.y, r.width, r.height);
     }
@@ -125,30 +136,38 @@ public class NodeGraphViewPanel extends JPanel {
 
     public void paintConnection(Graphics g, NodeConnection c) {
         Point2D p0 = c.getInPosition();
-        Point2D p1 = new Point2D(p0);
-        p1.x+=50;
         Point2D p3 = c.getOutPosition();
+        paintBezierBetweenTwoPoints(g,p0,p3);
+
+        if(c.isOutputValid()) paintConnectionAtPoint(g,c.getOutPosition());
+        if(c.isInputValid()) paintConnectionAtPoint(g,c.getInPosition());
+    }
+
+    public void paintConnectionAtPoint(Graphics g,Point2D p) {
+        int radius = (int) NodeConnection.DEFAULT_RADIUS;
+        g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
+    }
+
+    /**
+     * Given points p0 and p3,
+     * @param g
+     * @param p0
+     * @param p3
+     */
+    public void paintBezierBetweenTwoPoints(Graphics g,Point2D p0, Point2D p3) {
+        Point2D p1 = new Point2D(p0);
         Point2D p2 = new Point2D(p3);
-        p2.x-=50;
+
+        double d=Math.abs(p3.x-p1.x)/2;
+        p1.x+=d;
+        p2.x-=d;
+
         Bezier b = new Bezier(
                 p0.x,p0.y,
                 p1.x,p1.y,
                 p2.x,p2.y,
                 p3.x,p3.y);
         drawBezier(g,b);
-
-        if(c.isOutputValid()) {
-            Point2D p = c.getOutPosition();
-            int radius = (int) NodeConnection.DEFAULT_RADIUS;
-            g.setColor(NodeConnection.DEFAULT_COLOR);
-            g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
-        }
-        if(c.isInputValid()) {
-            Point2D p = c.getInPosition();
-            int radius = (int) NodeConnection.DEFAULT_RADIUS;
-            g.setColor(NodeConnection.DEFAULT_COLOR);
-            g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
-        }
     }
 
     private void drawBezier(Graphics g, Bezier b) {
@@ -161,27 +180,23 @@ public class NodeGraphViewPanel extends JPanel {
             x[i]=(int)p.x;
             y[i]=(int)p.y;
         }
-        g.setColor(NodeConnection.DEFAULT_COLOR);
         g.drawPolyline(x,y,len);
     }
 
-    public Node getLastSelectedNode() {
-        return lastSelectedNode;
+    // listener pattern for painting
+    private final List<NodeGraphViewListener> listeners = new ArrayList<NodeGraphViewListener>();
+
+    public void addViewListener(NodeGraphViewListener p) {
+        listeners.add(p);
     }
 
-    public void setLastSelectedNode(Node lastSelectedNode) {
-        this.lastSelectedNode = lastSelectedNode;
+    public void removeViewListener(NodeGraphViewListener p) {
+        listeners.remove(p);
     }
 
-    public NodeConnectionPointInfo getLastSelectedVariable() {
-        return lastSelectedVariable;
-    }
-
-    /**
-     *
-     * @param v the {@link NodeConnectionPointInfo}
-     */
-    public void setLastSelectedVariable(NodeConnectionPointInfo info) {
-        lastSelectedVariable = info;
+    private void paintExtras(Graphics g) {
+        for( NodeGraphViewListener p : listeners ) {
+            p.paint(g, this);
+        }
     }
 }

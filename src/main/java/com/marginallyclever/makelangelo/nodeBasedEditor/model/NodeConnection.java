@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.nodeBasedEditor.model;
 import com.marginallyclever.convenience.Point2D;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class NodeConnection extends Indexable {
     public static final double DEFAULT_RADIUS = 5;
@@ -15,6 +16,17 @@ public class NodeConnection extends Indexable {
 
     public NodeConnection() {
         super("Connection");
+    }
+
+    public NodeConnection(Node inNode,int inVariableIndex,Node outNode,int outVariableIndex) {
+        this();
+        setInput(inNode,inVariableIndex);
+        setOutput(outNode,outVariableIndex);
+    }
+
+    public NodeConnection(NodeConnection b) {
+        this();
+        set(b);
     }
 
     /**
@@ -108,5 +120,21 @@ public class NodeConnection extends Indexable {
     public void set(NodeConnection b) {
         setInput(b.inNode,b.inVariableIndex);
         setOutput(b.outNode,b.outVariableIndex);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NodeConnection that = (NodeConnection) o;
+        return inVariableIndex == that.inVariableIndex &&
+                outVariableIndex == that.outVariableIndex &&
+                inNode.equals(that.inNode) &&
+                outNode.equals(that.outNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(inNode, inVariableIndex, outNode, outVariableIndex);
     }
 }

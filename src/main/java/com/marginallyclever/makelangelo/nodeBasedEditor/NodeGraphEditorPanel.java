@@ -25,14 +25,18 @@ public class NodeGraphEditorPanel extends JPanel {
     private final JButton editNode = new JButton("Edit");
 
     private Node nodeBeingDragged = null;
-    private NodeConnection connectionBeingCreated = new NodeConnection();
+    private final NodeConnection connectionBeingCreated = new NodeConnection();
+
+    private Node lastSelectedNode=null;
+    private NodeConnectionPointInfo lastConnectionPoint = null;
+
+    final Point2D mousePreviousPosition = new Point2D();
 
     public NodeGraphEditorPanel(NodeGraphModel model) {
         super(new BorderLayout());
         this.model = model;
 
         paintArea = new NodeGraphViewPanel(model);
-
         setupBar();
 
         this.add(bar,BorderLayout.NORTH);
@@ -40,10 +44,54 @@ public class NodeGraphEditorPanel extends JPanel {
         this.setPreferredSize(new Dimension(600,200));
 
         attachMouseAdapter();
-        paintArea.updatePaintAreaBounds();
-        paintArea.repaint();
+        setupPaintArea();
 
         setLastSelectedNode(null);
+    }
+
+    private void setupPaintArea() {
+        paintArea.addViewListener((g,e)->{
+            // highlight the last selected node
+            if(lastSelectedNode!=null) {
+                g.setColor(Color.GREEN);
+                paintArea.paintNodeBorder(g,lastSelectedNode);
+            }
+
+            // draw a connection as it is being made
+            if(connectionBeingCreated.isInputValid() || connectionBeingCreated.isOutputValid()) {
+                g.setColor(Color.RED);
+                setLineWidth(g,3);
+
+                Point2D a,b;
+                if(connectionBeingCreated.isInputValid()) {
+                    a = connectionBeingCreated.getInPosition();
+                    b = mousePreviousPosition;
+                    paintArea.paintConnectionAtPoint(g,a);
+                } else {
+                    a = mousePreviousPosition;
+                    b = connectionBeingCreated.getOutPosition();
+                    paintArea.paintConnectionAtPoint(g,b);
+                }
+                paintArea.paintBezierBetweenTwoPoints(g,a,b);
+
+                setLineWidth(g,1);
+            }
+
+            // draw the connection point under the cursor
+            if(lastConnectionPoint !=null) {
+                g.setColor(Color.RED);
+                setLineWidth(g,2);
+                paintArea.paintVariableConnectionPoints(g,lastConnectionPoint.getVariable());
+                setLineWidth(g,1);
+            }
+        });
+        paintArea.updatePaintAreaBounds();
+        paintArea.repaint();
+    }
+
+    private void setLineWidth(Graphics g,float r) {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setStroke(new BasicStroke(r));
     }
 
     private void setupBar() {
@@ -78,11 +126,11 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void onEdit() {
-        System.out.println("Edit node "+paintArea.getLastSelectedNode().getUniqueName());
+        System.out.println("Edit node "+lastSelectedNode.getUniqueName());
     }
 
     private void onDelete() {
-        model.removeNode(paintArea.getLastSelectedNode());
+        model.removeNode(lastSelectedNode);
         setLastSelectedNode(null);
     }
 
@@ -105,17 +153,14 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void attachMouseAdapter() {
-        System.out.println("Attaching mouse adapter");
-        final Point2D mouseDragPreviousPosition = new Point2D();
-
         paintArea.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (nodeBeingDragged != null) {
                     Rectangle r = nodeBeingDragged.getRectangle();
-                    r.x += e.getX() - mouseDragPreviousPosition.x;
-                    r.y += e.getY() - mouseDragPreviousPosition.y;
-                    mouseDragPreviousPosition.set(e.getX(), e.getY());
+                    r.x += e.getX() - mousePreviousPosition.x;
+                    r.y += e.getY() - mousePreviousPosition.y;
+                    mousePreviousPosition.set(e.getX(), e.getY());
                     paintArea.repaint();
                 }
             }
@@ -124,89 +169,94 @@ public class NodeGraphEditorPanel extends JPanel {
             public void mouseMoved(MouseEvent e) {
                 Point p = e.getPoint();
                 highlightNearbyConnectionPoint(new Point2D(p.x,p.y));
+                mousePreviousPosition.set(e.getX(), e.getY());
             }
         });
 
         paintArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                setLastSelectedNode(getNodeAt(e.getPoint()));
+                onClickConnectionPoint();
+                if(lastConnectionPoint == null) {
+                    setLastSelectedNode(getNodeAt(e.getPoint()));
+                }
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                nodeBeingDragged=getNodeAt(e.getPoint());
-                if(nodeBeingDragged!=null) {
-                    beginDragNode(e.getPoint());
+                // clicking a connection point takes precedence
+                if(lastConnectionPoint == null) {
+                    // then dragging a node
+                    nodeBeingDragged = getNodeAt(e.getPoint());
+                    if (nodeBeingDragged != null) {
+                        beginDragNode(e.getPoint());
+                    }
                 }
-                onClickConnectionPoint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if(nodeBeingDragged!=null) {
+                if(nodeBeingDragged != null) {
+                    // end drag node
                     nodeBeingDragged = null;
-                } else if(paintArea.getLastSelectedVariable()!=null) {
-                    paintArea.setLastSelectedVariable(null);
                 }
             }
 
             private void beginDragNode(Point e) {
                 setLastSelectedNode(nodeBeingDragged);
-                mouseDragPreviousPosition.set(e.getX(), e.getY());
-                Rectangle r = nodeBeingDragged.getRectangle();
+                mousePreviousPosition.set(e.getX(), e.getY());
             }
         });
     }
 
     private void onClickConnectionPoint() {
-        NodeConnectionPointInfo info = paintArea.getLastSelectedVariable();
-        if(info==null) return;
+        System.out.println("onClickConnectionPoint");
+        if(lastConnectionPoint == null) {
+            connectionBeingCreated.disconnectAll();
+            return;
+        }
 
         // check that the end node is not the same as the start node.
-        if(!connectionBeingCreated.isConnectedTo(info.node)) {
-            if (info.flags == NodeGraphModel.IN) {
+        if(!connectionBeingCreated.isConnectedTo(lastConnectionPoint.node)) {
+            if (lastConnectionPoint.flags == NodeGraphModel.IN) {
                 // the output of a connection goes to the input of a node.
-                connectionBeingCreated.setOutput(info.node, info.nodeVariableIndex);
+                connectionBeingCreated.setOutput(lastConnectionPoint.node, lastConnectionPoint.nodeVariableIndex);
             } else {
                 //the output of a node goes to the input of a connection.
-                connectionBeingCreated.setInput(info.node, info.nodeVariableIndex);
+                connectionBeingCreated.setInput(lastConnectionPoint.node, lastConnectionPoint.nodeVariableIndex);
             }
         }
 
         if(connectionBeingCreated.isInputValid() && connectionBeingCreated.isOutputValid() ) {
             if(connectionBeingCreated.isValidDataType()) {
-                // a new valid connection has been completed by the user
-                NodeConnection connection = model.createNodeConnection();
-                connection.set(connectionBeingCreated);
+                NodeConnection match = model.getMatchingConnection(connectionBeingCreated);
+                if(match!=null) model.removeConnection(match);
+                else model.addConnection(new NodeConnection(connectionBeingCreated));
             }
-            // destroy the temp connection, especially if the data type was invalid.
+            // if any of the tests failed, restart.
             connectionBeingCreated.disconnectAll();
+            repaint();
         }
     }
 
     private void highlightNearbyConnectionPoint(Point2D p) {
         NodeConnectionPointInfo info = model.getNearestConnection(p,15,NodeGraphModel.IN | NodeGraphModel.OUT);
-        if(info!=null) {
-            setLastSelectedVariable(info);
-        } else {
-            setLastSelectedVariable(null);
-        }
+        setLastConnectionPoint(info);
     }
 
     /**
      *
      * @param info the {@link NodeConnectionPointInfo}
      */
-    private void setLastSelectedVariable(NodeConnectionPointInfo info) {
-        paintArea.setLastSelectedVariable(info);
+    private void setLastConnectionPoint(NodeConnectionPointInfo info) {
+        lastConnectionPoint = info;
         repaint();
     }
 
-    private void setLastSelectedNode(Node nodeAt) {
-        paintArea.setLastSelectedNode(nodeAt);
-        deleteNode.setEnabled(nodeAt!=null);
-        editNode.setEnabled(nodeAt!=null);
+    private void setLastSelectedNode(Node node) {
+        lastSelectedNode = node;
+        deleteNode.setEnabled(node!=null);
+        editNode.setEnabled(node!=null);
         repaint();
     }
 
@@ -234,9 +284,9 @@ public class NodeGraphEditorPanel extends JPanel {
         Node constant1 = model.addNode(new Constant(2));
         Node add = model.addNode(new Add());
         Node report = model.addNode(new ReportToStdOut());
-        NodeConnection c0 = model.createNodeConnection();   c0.setInput(constant0,0);   c0.setOutput(add,0);
-        NodeConnection c1 = model.createNodeConnection();   c1.setInput(constant1,0);   c1.setOutput(add,1);
-        NodeConnection c2 = model.createNodeConnection();   c2.setInput(add,2);         c2.setOutput(report,0);
+        NodeConnection c0 = model.addConnection(new NodeConnection(constant0,0,add,0));
+        NodeConnection c1 = model.addConnection(new NodeConnection(constant1,0,add,1));
+        NodeConnection c2 = model.addConnection(new NodeConnection(add,2,report,0));
 
         constant1.getRectangle().y=50;
         add.getRectangle().x=200;

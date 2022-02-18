@@ -20,4 +20,8 @@ public class NodeConnectionPointInfo {
         this.nodeVariableIndex=nodeVariableIndex;
         this.flags=flags;
     }
+
+    public NodeVariable<?> getVariable() {
+        return node.getVariable(nodeVariableIndex);
+    }
 }

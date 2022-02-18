@@ -27,9 +27,9 @@ public class TestNodeGraphModel {
         Node constant1 = model.addNode(new Constant(2));
         Node add = model.addNode(new Add());
         Node report = model.addNode(new ReportToStdOut());
-        NodeConnection c0 = model.createNodeConnection();   c0.setInput(constant0,0);   c0.setOutput(add,0);
-        NodeConnection c1 = model.createNodeConnection();   c1.setInput(constant1,0);   c1.setOutput(add,1);
-        NodeConnection c2 = model.createNodeConnection();   c2.setInput(add,2);         c2.setOutput(report,0);
+        NodeConnection c0 = model.addConnection(new NodeConnection(constant0,0,add,0));
+        NodeConnection c1 = model.addConnection(new NodeConnection(constant1,0,add,1));
+        NodeConnection c2 = model.addConnection(new NodeConnection(add,2,report,0));
 
         for(int i=0;i<3;++i) {
             model.update();
