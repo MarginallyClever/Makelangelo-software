@@ -42,11 +42,11 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	// private boolean mouseIn=false;
 	private int buttonPressed = MouseEvent.NOBUTTON;
 	private int mouseOldX, mouseOldY;
+	private int mouseLastZoomDirection = 0;
 
 	// OpenGL stuff
 	private GLU glu;
 	private FPSAnimator animator;
-
 
 	public PreviewPanel() {
 		super();
@@ -71,10 +71,19 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int notches = e.getWheelRotation();
+				if (notches == 0) {
+					return;
+				}
 				if (notches < 0) {
-					camera.zoomIn();
-				} else if (notches > 0) {
-					camera.zoomOut();
+					if (mouseLastZoomDirection == -1) {
+						camera.zoomIn();
+					}
+					mouseLastZoomDirection = -1;
+				} else {
+					if (mouseLastZoomDirection == 1) {
+						camera.zoomOut();
+					}
+					mouseLastZoomDirection = 1;
 				}
 				repaint();
 			}
