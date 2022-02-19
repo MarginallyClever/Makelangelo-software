@@ -246,30 +246,37 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public float getHeight() {
 		return 4*12*25.4f;
 	}
+
 	@Override
 	public boolean canAutoHome() {
 		return true;
 	}
+
 	@Override
 	public boolean canChangeHome() {
 		return false;
 	}
+
 	@Override
 	public float getFeedrateMax() {
 		return 100;
 	}
+
 	@Override
 	public float getFeedrateDefault() {
 		return 100;
 	}
+
 	@Override
 	public float getAccelerationMax() {
 		return 150;
 	}
+
 	@Override
 	public float getPenLiftTime() {
 		return 80;
 	}
+
 	@Override
 	public float getZAngleOn() {
 		return 30;
