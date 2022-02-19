@@ -1,6 +1,9 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -85,8 +88,10 @@ public abstract class Node extends Indexable {
     @Override
     public String toString() {
         return "Node{" +
-                "uniqueName=" + getUniqueName() +", "+
-                "variables=" + variables +
+                "name=" + getName() +
+                ", uniqueID=" + getUniqueID() +
+                ", variables=" + variables +
+                ", rectangle=" + rectangle +
                 '}';
     }
 
@@ -110,5 +115,43 @@ public abstract class Node extends Indexable {
         }
         y += getVariable(index).getRectangle().height/2;
         return y;
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jo = super.toJSON();
+        jo.put("rectangle",JSONHelper.rectangleToJSON(rectangle));
+        jo.put("variables", getAllVariablesAsJSON());
+        return jo;
+    }
+
+    private JSONArray getAllVariablesAsJSON() {
+        JSONArray vars = new JSONArray();
+        for(NodeVariable<?> v : variables) {
+            vars.put(v.toJSON());
+        }
+        return vars;
+    }
+
+    @Override
+    public void parseJSON(JSONObject jo) throws JSONException {
+        super.parseJSON(jo);
+        rectangle.setBounds(JSONHelper.rectangleFromJSON(jo.getJSONObject("rectangle")));
+        parseAllVariablesFromJSON(jo.getJSONArray("variables"));
+    }
+
+    private void parseAllVariablesFromJSON(JSONArray vars) throws JSONException {
+        guaranteeSameNumberOfVariables(vars);
+        for(int i=0;i<vars.length();++i) {
+            variables.get(i).parseJSON(vars.getJSONObject(i));
+        }
+    }
+
+    private void guaranteeSameNumberOfVariables(JSONArray vars) throws JSONException {
+        if(vars.length() != variables.size()) {
+            int a = variables.size();
+            int b = vars.length();
+            throw new JSONException("JSON bad number of node variables.  Expected "+a+" found "+b);
+        }
     }
 }

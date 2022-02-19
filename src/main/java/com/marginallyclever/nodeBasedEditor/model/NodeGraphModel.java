@@ -3,20 +3,25 @@ package com.marginallyclever.nodeBasedEditor.model;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * {@link NodeGraphModel} contains the {@link Node}s, and {@link NodeConnection}s
  */
 public class NodeGraphModel {
-
     private final List<Node> nodes = new ArrayList<>();
     private final List<NodeConnection> connections = new ArrayList<>();
 
     public NodeGraphModel() {
         super();
+        NodeFactory.registerNode(new Constant());
+        NodeFactory.registerNode(new Random());
         NodeFactory.registerNode(new Add());
         NodeFactory.registerNode(new Subtract());
         NodeFactory.registerNode(new Multiply());
@@ -24,7 +29,7 @@ public class NodeGraphModel {
         NodeFactory.registerNode(new ReportToStdOut());
     }
 
-    public void update() throws Exception {
+    public void update() {
         for(Node n : nodes) n.update();
         for(NodeConnection c : connections) c.apply();
     }
@@ -130,5 +135,97 @@ public class NodeGraphModel {
             }
         }
         return null;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject jo = new JSONObject();
+        jo.put("nodes",getAllNodesAsJSON());
+        jo.put("nodeConnections",getAllNodeConnectionsAsJSON());
+        return jo;
+    }
+
+    public void parseJSON(JSONObject jo) throws JSONException {
+        clear();
+        parseAllNodesFromJSON(jo.getJSONArray("nodes"));
+        parseAllNodeConnectionsFromJSON(jo.getJSONArray("nodeConnections"));
+        bumpUpIndexableID();
+    }
+
+    private void parseAllNodesFromJSON(JSONArray arr) throws JSONException {
+        Iterator<Object> i = arr.iterator();
+        while(i.hasNext()) {
+            JSONObject o = (JSONObject)i.next();
+            Node n = NodeFactory.createNode(o.getString("name"));
+            n.parseJSON(o);
+            addNode(n);
+        }
+    }
+
+    private void parseAllNodeConnectionsFromJSON(JSONArray arr) throws JSONException {
+        Iterator<Object> iter = arr.iterator();
+        while(iter.hasNext()) {
+            NodeConnection c = new NodeConnection();
+            parseOneConnectionFromJSON(c,(JSONObject)iter.next());
+            addConnection(c);
+        }
+    }
+
+    /**
+     * {@link NodeConnection} must be parsed in the {@link NodeGraphModel} because only here can we access the list of
+     * nodes to find the one with a matching {@code getUniqueName()}.
+     * @param c the connection to parse into.
+     * @param jo the JSON to parse.
+     */
+    private void parseOneConnectionFromJSON(NodeConnection c, JSONObject jo) {
+        c.parseJSON(jo);
+        if(jo.has("inNode")) {
+            Node n = findNodeWithUniqueName(jo.getString("inNode"));
+            int i = jo.getInt("inVariableIndex");
+            c.setInput(n,i);
+        }
+        if(jo.has("outNode")) {
+            Node n = findNodeWithUniqueName(jo.getString("outNode"));
+            int i = jo.getInt("outVariableIndex");
+            c.setOutput(n,i);
+        }
+    }
+
+    private Node findNodeWithUniqueName(String name) {
+        for(Node n : nodes) {
+            if(n.getUniqueName().equals(name)) return n;
+        }
+        return null;
+    }
+
+    /**
+     * Every {@link Node} and {@link NodeConnection} has a unique ID.  If the model has just been restored from a file
+     * then the static unique ID will be wrong.  This method bumps the first available unique ID up to the largest value
+     * found.  Then the next attempt to create a unique item will be safe.
+     */
+    private void bumpUpIndexableID() {
+        int id=0;
+        for(Node n : nodes) {
+            id = id > n.getUniqueID() ? id : n.getUniqueID();
+        }
+        for(NodeConnection n : connections) {
+            id = id > n.getUniqueID() ? id : n.getUniqueID();
+        }
+        Indexable.setUniqueIDSource(id);
+    }
+
+    private JSONArray getAllNodesAsJSON() {
+        JSONArray a = new JSONArray();
+        for (Node n : nodes) {
+            a.put(n.toJSON());
+        }
+        return a;
+    }
+
+    private JSONArray getAllNodeConnectionsAsJSON() {
+        JSONArray a = new JSONArray();
+        for (NodeConnection c : connections) {
+            a.put(c.toJSON());
+        }
+        return a;
     }
 }

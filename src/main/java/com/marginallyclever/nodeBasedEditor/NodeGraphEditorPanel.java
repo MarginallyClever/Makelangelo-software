@@ -9,11 +9,14 @@ import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
 import com.marginallyclever.nodeBasedEditor.view.NodeGraphViewPanel;
 import com.marginallyclever.util.PreferencesHelper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.*;
 
 /**
  * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraphModel}.
@@ -38,12 +41,12 @@ public class NodeGraphEditorPanel extends JPanel {
         this.model = model;
 
         paintArea = new NodeGraphViewPanel(model);
-        setupBar();
 
         this.add(bar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
         this.setPreferredSize(new Dimension(600,200));
 
+        setupBar();
         attachMouseAdapter();
         setupPaintArea();
 
@@ -104,15 +107,19 @@ public class NodeGraphEditorPanel extends JPanel {
         bar.add(addConnection);
         addConnection.addActionListener((e)->onAdd());
 
+        JButton saveAll = new JButton("Save");
+        bar.add(saveAll);
+        saveAll.addActionListener((e)->onSave());
+
+        JButton loadAll = new JButton("Load");
+        bar.add(loadAll);
+        loadAll.addActionListener((e)->onLoad());
+
         bar.add(deleteNode);
         deleteNode.addActionListener((e)->onDelete());
 
         bar.add(editNode);
         editNode.addActionListener((e)->onEdit());
-
-        JButton toString = new JButton("toString");
-        bar.add(toString);
-        toString.addActionListener((e)-> System.out.println(model) );
 
         JButton update = new JButton("Update");
         bar.add(update);
@@ -124,6 +131,44 @@ public class NodeGraphEditorPanel extends JPanel {
                 ex.printStackTrace();
             }
         });
+    }
+
+    private void onSave() {
+        JFileChooser fc = new JFileChooser();
+        if (fc.showSaveDialog((JFrame)SwingUtilities.getWindowAncestor(this)) == JFileChooser.APPROVE_OPTION) {
+            saveModelToFile(fc.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void saveModelToFile(String absolutePath) {
+        try(BufferedWriter w = new BufferedWriter(new FileWriter(absolutePath))) {
+            JSONObject modelAsJSON = model.toJSON();
+            w.write(modelAsJSON.toString());
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog((JFrame)SwingUtilities.getWindowAncestor(this),e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void onLoad() {
+        JFileChooser fc = new JFileChooser();
+        if (fc.showOpenDialog((JFrame)SwingUtilities.getWindowAncestor(this)) == JFileChooser.APPROVE_OPTION) {
+            loadModelFromFile(fc.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void loadModelFromFile(String absolutePath) {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(absolutePath)))) {
+            StringBuilder responseStrBuilder = new StringBuilder();
+            String inputStr;
+            while ((inputStr = reader.readLine()) != null)
+                responseStrBuilder.append(inputStr);
+            JSONObject modelAsJSON = new JSONObject(responseStrBuilder.toString());
+            model.parseJSON(modelAsJSON);
+        } catch(IOException e) {
+            JOptionPane.showMessageDialog((JFrame)SwingUtilities.getWindowAncestor(this),e.getLocalizedMessage());
+            e.printStackTrace();
+        }
     }
 
     private void onEdit() {
