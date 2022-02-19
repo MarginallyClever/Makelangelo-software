@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model;
+package com.marginallyclever.nodeBasedEditor;
 
 import org.json.JSONObject;
 

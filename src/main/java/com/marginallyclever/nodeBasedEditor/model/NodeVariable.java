@@ -1,6 +1,7 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.nodeBasedEditor.JSONHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,7 +98,7 @@ public class NodeVariable<T> {
         jo.put("name",name);
         jo.put("hasInput",hasInput);
         jo.put("hasOutput",hasOutput);
-        jo.put("rectangle",JSONHelper.rectangleToJSON(rectangle));
+        jo.put("rectangle", JSONHelper.rectangleToJSON(rectangle));
         jo.put("isDirty",isDirty);
         return jo;
     }
@@ -121,11 +122,12 @@ public class NodeVariable<T> {
         return hasInput;
     }
 
-    public Point2D getInPosition() {
-        return new Point2D(rectangle.getMinX(), rectangle.y+rectangle.height/2);
+    public Point getInPosition() {
+        return new Point((int)rectangle.getMinX(), rectangle.y+rectangle.height/2);
     }
 
-    public Point2D getOutPosition() {
-        return new Point2D(rectangle.getMaxX(), rectangle.y+rectangle.height/2);
+    public Point getOutPosition() {
+        return new Point((int)rectangle.getMaxX(), rectangle.y+rectangle.height/2);
     }
+
 }

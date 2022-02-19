@@ -7,7 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,7 +46,7 @@ public class NodeGraphModel {
         return connections;
     }
 
-    public Node addNode(Node n) {
+    public Node add(Node n) {
         nodes.add(n);
         return n;
     }
@@ -51,7 +55,7 @@ public class NodeGraphModel {
      * Remove a {@link Node} and all associated {@link NodeConnection}s from the model.
      * @param n the subject to be removed.
      */
-    public void removeNode(Node n) {
+    public void remove(Node n) {
         nodes.remove(n);
         removeConnectionsToNode(n);
     }
@@ -73,12 +77,12 @@ public class NodeGraphModel {
      * Adds a {@link NodeConnection} without checking if it already exists.
      * @param connection the item to add.
      */
-    public NodeConnection addConnection(NodeConnection connection) {
+    public NodeConnection add(NodeConnection connection) {
         connections.add(connection);
         return connection;
     }
 
-    public void removeConnection(NodeConnection c) {
+    public void remove(NodeConnection c) {
         connections.remove(c);
     }
 
@@ -117,7 +121,7 @@ public class NodeGraphModel {
      * @param flags {@code NodeVariable.IN} or {@code NodeVariable.OUT} for the types you want.
      * @return the a {@link NodeConnectionPointInfo} or null.
      */
-    public NodeConnectionPointInfo getFirstNearbyConnection(Point2D point, double r, int flags) {
+    public NodeConnectionPointInfo getFirstNearbyConnection(Point point, double r, int flags) {
         double rr=r*r;
         boolean doIn = (flags & NodeVariable.IN) == NodeVariable.IN;
         boolean doOut = (flags & NodeVariable.OUT) == NodeVariable.OUT;
@@ -125,10 +129,10 @@ public class NodeGraphModel {
             for(Node n : nodes) {
                 for(int i = 0; i < n.getNumVariables(); ++i) {
                     NodeVariable<?> v = n.getVariable(i);
-                    if(doIn && v.getInPosition().distanceSquared(point) < rr) {
+                    if(doIn && v.getInPosition().distanceSq(point) < rr) {
                         return new NodeConnectionPointInfo(n,i,NodeVariable.IN);
                     }
-                    if(doOut && v.getOutPosition().distanceSquared(point) < rr) {
+                    if(doOut && v.getOutPosition().distanceSq(point) < rr) {
                         return new NodeConnectionPointInfo(n,i,NodeVariable.OUT);
                     }
                 }
@@ -152,21 +156,19 @@ public class NodeGraphModel {
     }
 
     private void parseAllNodesFromJSON(JSONArray arr) throws JSONException {
-        Iterator<Object> i = arr.iterator();
-        while(i.hasNext()) {
-            JSONObject o = (JSONObject)i.next();
+        for (Object element : arr) {
+            JSONObject o = (JSONObject)element;
             Node n = NodeFactory.createNode(o.getString("name"));
             n.parseJSON(o);
-            addNode(n);
+            add(n);
         }
     }
 
     private void parseAllNodeConnectionsFromJSON(JSONArray arr) throws JSONException {
-        Iterator<Object> iter = arr.iterator();
-        while(iter.hasNext()) {
+        for (Object o : arr) {
             NodeConnection c = new NodeConnection();
-            parseOneConnectionFromJSON(c,(JSONObject)iter.next());
-            addConnection(c);
+            parseOneConnectionFromJSON(c, (JSONObject)o);
+            add(c);
         }
     }
 
@@ -177,7 +179,6 @@ public class NodeGraphModel {
      * @param jo the JSON to parse.
      */
     private void parseOneConnectionFromJSON(NodeConnection c, JSONObject jo) {
-        c.parseJSON(jo);
         if(jo.has("inNode")) {
             Node n = findNodeWithUniqueName(jo.getString("inNode"));
             int i = jo.getInt("inVariableIndex");
@@ -207,10 +208,7 @@ public class NodeGraphModel {
         for(Node n : nodes) {
             id = id > n.getUniqueID() ? id : n.getUniqueID();
         }
-        for(NodeConnection n : connections) {
-            id = id > n.getUniqueID() ? id : n.getUniqueID();
-        }
-        Indexable.setUniqueIDSource(id);
+        Node.setUniqueIDSource(id);
     }
 
     private JSONArray getAllNodesAsJSON() {
@@ -227,5 +225,105 @@ public class NodeGraphModel {
             a.put(c.toJSON());
         }
         return a;
+    }
+
+    /**
+     * Add all {@link Node}s and {@link NodeConnection}s from one model to this model.
+     * @param b the model to add.
+     */
+    public void add(NodeGraphModel b) {
+        assignNewUniqueIDs(0);
+        b.assignNewUniqueIDs(Node.getUniqueIDSource());
+
+        nodes.addAll(b.nodes);
+        connections.addAll(b.connections);
+
+        bumpUpIndexableID();
+    }
+
+    private void assignNewUniqueIDs(int startingIndex) {
+        for(Node n : nodes) n.setUniqueID(++startingIndex);
+    }
+
+    /**
+     * Returns a deep copy of this {@link NodeGraphModel} by using the JSON serialization methods.
+     * <blockquote><pre>newInstance.parseJSON(this.toJSON());</pre></blockquote>
+     * @return a deep copy of this {@link NodeGraphModel}
+     */
+    public NodeGraphModel deepCopy() {
+        NodeGraphModel copy = new NodeGraphModel();
+        copy.parseJSON(toJSON());
+        return copy;
+    }
+
+    /**
+     * Return the index within the list of nodes of the first occurrence of class c.
+     * Comparisons are done using {@code isInstance()} and may return subclasses.
+     * @param c the class to match.
+     * @return the index within the list of nodes of the first occurrence of class c, or -1.
+     */
+    public int indexOfNode(Class<Add> c) {
+        return indexOfNode(c,0);
+    }
+
+    /**
+     * Return the index within the list of nodes of the first occurrence of class c, starting the search at the
+     * specified index.
+     * Comparisons are done using {@code isInstance()} and may return subclasses.
+     * @param c the class to match.
+     * @param fromIndex the index to start the search from.
+     * @return the index within the list of nodes of the first occurrence of class c, or -1.
+     */
+    public int indexOfNode(Class<Add> c, int fromIndex) {
+        for(int i=fromIndex;i<nodes.size();++i) {
+            if(c.isInstance(nodes.get(i))) return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Return the number of instances of class c or its subclasses.
+     * Comparisons are done using {@code isInstance()} and may count subclasses.
+     * @param c the class to match
+     * @return the number of instances of class c or its subclasses.
+     */
+    public int countNodesOfClass(Class<?> c) {
+        int i=0;
+        for(Node n : nodes) {
+            if(c.isInstance(n)) i++;
+        }
+        return i;
+    }
+
+    public Collection<? extends Node> getNodesInRectangle(Rectangle2D selectionArea) {
+        if(selectionArea==null) throw new InvalidParameterException("selectionArea cannot be null.");
+        ArrayList<Node> found = new ArrayList<>();
+        for(Node n : nodes) {
+            Rectangle r = n.getRectangle();
+            if(selectionArea.intersects(r)) found.add(n);
+        }
+        return found;
+    }
+
+    public boolean isEmpty() {
+        return nodes.isEmpty();
+    }
+
+    /**
+     * Returns all {@link NodeConnection}s that are only connected between the given set of nodes.
+     * @param selectedNodes the set of nodes to check
+     * @return all {@link NodeConnection}s that are only connected between the given set of nodes.
+     */
+    public List<NodeConnection> getConnectionsBetweenTheseNodes(List<Node> selectedNodes) {
+        List<NodeConnection> list = new ArrayList<>();
+        if(selectedNodes.size()<2) return list;
+
+        for(NodeConnection c : connections) {
+            if(selectedNodes.contains(c.getOutNode()) &&
+                selectedNodes.contains(c.getInNode())) {
+                list.add(c);
+            }
+        }
+        return list;
     }
 }

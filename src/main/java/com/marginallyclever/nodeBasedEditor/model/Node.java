@@ -1,6 +1,7 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.nodeBasedEditor.JSONHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,28 +14,60 @@ import java.util.List;
  * {@link Node} is a collection of zero or more inputs and zero or more outputs connected by some operator.
  * The operator is defined by extending the {@link Node} class and defining the {@code update()} method.
  */
-public abstract class Node extends Indexable {
+public abstract class Node {
     public static final int NODE_TITLE_HEIGHT = 25;
-    private List<NodeVariable<?>> variables = new ArrayList<>();
+
+    private static int uniqueIDSource=0;
+    private int uniqueID;
+
+    private String name;
+    private String label;
+    private final List<NodeVariable<?>> variables = new ArrayList<>();
     private final Rectangle rectangle = new Rectangle();
 
-    public Node(String str) {
-        super(str);
+    public Node(String name) {
+        super();
+        uniqueID = ++uniqueIDSource;
+        this.name = name;
         rectangle.setBounds(0,0,150,50);
     }
 
     /**
-     *
+     * Return one new instance of this type of {@link Node}.
      * @return One new instance of this type of {@link Node}.
      */
     public abstract Node create();
+
+    public static void setUniqueIDSource(int index) {
+        uniqueIDSource=index;
+    }
+
+    public static int getUniqueIDSource() {
+        return uniqueIDSource;
+    }
+
+    public void setUniqueID(int i) {
+        uniqueID=i;
+    }
+
+    public int getUniqueID() {
+        return uniqueID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUniqueName() {
+        return uniqueID+"-"+name;
+    }
 
     public Rectangle getRectangle() {
         return rectangle;
     }
 
     /**
-     * This method should be overriden to provide the custom behavior of this node.
+     * Override this method to provide the custom behavior of this node.
      */
     public abstract void update();
 
@@ -90,20 +123,21 @@ public abstract class Node extends Indexable {
         return "Node{" +
                 "name=" + getName() +
                 ", uniqueID=" + getUniqueID() +
+                ", label=" + label +
                 ", variables=" + variables +
                 ", rectangle=" + rectangle +
                 '}';
     }
 
-    public Point2D getInPosition(int index) {
+    public Point getInPosition(int index) {
         Rectangle r = getRectangle();
-        Point2D p = new Point2D(r.x,r.y+getPointHeight(index));
+        Point p = new Point(r.x,r.y+(int)getPointHeight(index));
         return p;
     }
 
-    public Point2D getOutPosition(int index) {
+    public Point getOutPosition(int index) {
         Rectangle r = getRectangle();
-        Point2D p = new Point2D(r.x+r.width,r.y+getPointHeight(index));
+        Point p = new Point(r.x+r.width,r.y+(int)getPointHeight(index));
         return p;
     }
 
@@ -117,10 +151,12 @@ public abstract class Node extends Indexable {
         return y;
     }
 
-    @Override
     public JSONObject toJSON() throws JSONException {
-        JSONObject jo = super.toJSON();
-        jo.put("rectangle",JSONHelper.rectangleToJSON(rectangle));
+        JSONObject jo = new JSONObject();
+        jo.put("name",name);
+        jo.put("uniqueID",uniqueID);
+        jo.put("label", label);
+        jo.put("rectangle", JSONHelper.rectangleToJSON(rectangle));
         jo.put("variables", getAllVariablesAsJSON());
         return jo;
     }
@@ -133,9 +169,13 @@ public abstract class Node extends Indexable {
         return vars;
     }
 
-    @Override
     public void parseJSON(JSONObject jo) throws JSONException {
-        super.parseJSON(jo);
+        name = jo.getString("name");
+        uniqueID = jo.getInt("uniqueID");
+        if(jo.has("label")) {
+            String s = jo.getString("label");
+            if(!s.equals("null")) label = s;
+        }
         rectangle.setBounds(JSONHelper.rectangleFromJSON(jo.getJSONObject("rectangle")));
         parseAllVariablesFromJSON(jo.getJSONArray("variables"));
     }
@@ -153,5 +193,13 @@ public abstract class Node extends Indexable {
             int b = vars.length();
             throw new JSONException("JSON bad number of node variables.  Expected "+a+" found "+b);
         }
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String str) {
+        label=str;
     }
 }

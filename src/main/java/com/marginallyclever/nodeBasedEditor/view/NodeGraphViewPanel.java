@@ -10,6 +10,7 @@ import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,12 @@ public class NodeGraphViewPanel extends JPanel {
     public static final Color DEFAULT_BORDER = Color.BLACK;
     public static final Color DEFAULT_BACKGROUND = Color.WHITE;
     public static final Color DEFAULT_FONT = Color.BLACK;
+    public static final int CORNER_RADIUS = 5;
+    public static final int ALIGN_LEFT=0;
+    public static final int ALIGN_RIGHT=1;
+    public static final int ALIGN_CENTER=2;
+    public static final int ALIGN_TOP=0;
+    public static final int ALIGN_BOTTOM=1;
 
     private final NodeGraphModel model;
 
@@ -57,10 +64,10 @@ public class NodeGraphViewPanel extends JPanel {
             r.add(other.getMinX(),other.getMinY());
             r.add(other.getMaxX(),other.getMaxY());
         }
-        this.setBounds(r);
         Dimension d = new Dimension(r.width,r.height);
         this.setMinimumSize(d);
         this.setMaximumSize(d);
+        this.setPreferredSize(d);
         //System.out.println("Bounds="+r.toString());
     }
 
@@ -69,7 +76,7 @@ public class NodeGraphViewPanel extends JPanel {
         paintNodeBackground(g,n);
 
         g.setColor(DEFAULT_FONT);
-        paintNodeTitle(g, n);
+        paintNodeTitleBar(g, n);
 
         paintAllNodeVariables(g, n);
 
@@ -79,14 +86,14 @@ public class NodeGraphViewPanel extends JPanel {
 
     public void paintNodeBackground(Graphics g, Node n) {
         Rectangle r = n.getRectangle();
-        g.fillRect(r.x, r.y, r.width, r.height);
+        g.fillRoundRect(r.x, r.y, r.width, r.height, CORNER_RADIUS, CORNER_RADIUS);
     }
 
-    public void paintNodeTitle(Graphics g,Node n) {
-        String name = n.getUniqueName();
-        Rectangle box = new Rectangle(n.getRectangle());
+    public void paintNodeTitleBar(Graphics g, Node n) {
+        Rectangle box = getNodeInternalBounds(n.getRectangle());
         box.height=Node.NODE_TITLE_HEIGHT;
-        paintTextCentered(g,name,box);
+        paintText(g,n.getLabel(),box,ALIGN_LEFT,ALIGN_CENTER);
+        paintText(g,n.getName(),box,ALIGN_RIGHT,ALIGN_CENTER);
     }
 
     private void paintAllNodeVariables(Graphics g, Node n) {
@@ -98,9 +105,18 @@ public class NodeGraphViewPanel extends JPanel {
 
     public void paintVariable(Graphics g, NodeVariable<?> v) {
         Rectangle box = v.getRectangle();
+        Rectangle insideBox = getNodeInternalBounds(box);
+
         // label
         g.setColor(DEFAULT_FONT);
-        paintTextCentered(g,v.getName(),box);
+        paintText(g,v.getName(),insideBox,ALIGN_LEFT,ALIGN_CENTER);
+
+        // value
+        g.setColor(DEFAULT_FONT);
+        String val = v.getValue().toString();
+        int MAX_CHARS=10;
+        if(val.length()>MAX_CHARS) val = val.substring(0,MAX_CHARS)+"...";
+        paintText(g,val,insideBox,ALIGN_RIGHT,ALIGN_CENTER);
 
         // internal border
         g.setColor(Color.LIGHT_GRAY);
@@ -111,43 +127,71 @@ public class NodeGraphViewPanel extends JPanel {
         paintVariableConnectionPoints(g,v);
     }
 
+    public Rectangle getNodeInternalBounds(Rectangle r) {
+        Rectangle r2 = new Rectangle(r);
+        int padding = (int)NodeConnection.DEFAULT_RADIUS+4;
+        r2.x += padding;
+        r2.width -= padding*2;
+        return r2;
+    }
+
     public void paintNodeBorder(Graphics g,Node n) {
         Rectangle r = n.getRectangle();
-        g.drawRect(r.x, r.y, r.width, r.height);
+        g.drawRoundRect(r.x, r.y, r.width, r.height,CORNER_RADIUS,CORNER_RADIUS);
     }
 
     public void paintVariableConnectionPoints(Graphics g, NodeVariable<?> v) {
         if(v.getHasInput()) {
-            Point2D p = v.getInPosition();
+            Point p = v.getInPosition();
             int radius = (int)NodeConnection.DEFAULT_RADIUS+2;
             g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
         }
         if(v.getHasOutput()) {
-            Point2D p = v.getOutPosition();
+            Point p = v.getOutPosition();
             int radius = (int)NodeConnection.DEFAULT_RADIUS+2;
             g.drawOval((int)p.x-radius,(int)p.y-radius,radius*2,radius*2);
         }
     }
 
-    public void paintTextCentered(Graphics g,String str,Rectangle box) {
+    /**
+     * Use the graphics context to paint text within a box with the provided alignment.
+     * @param g the graphics context
+     * @param str the text to paint
+     * @param box the bounding limits
+     * @param alignH the desired horizontal alignment.  Can be any one of {@link NodeGraphViewPanel#ALIGN_LEFT}, {@link NodeGraphViewPanel#ALIGN_RIGHT}, or {@link NodeGraphViewPanel#ALIGN_CENTER}
+     * @param alignV the desired vertical alignment.  Can be any one of {@link NodeGraphViewPanel#ALIGN_TOP}, {@link NodeGraphViewPanel#ALIGN_BOTTOM}, or {@link NodeGraphViewPanel#ALIGN_CENTER}
+     */
+    public void paintText(Graphics g,String str,Rectangle box,int alignH,int alignV) {
+        if(str==null || str.isEmpty()) return;
+
         FontRenderContext frc = new FontRenderContext(null, false, false);
-        Rectangle2D nameR = g.getFont().getStringBounds(str,frc);
-        g.setColor(Color.DARK_GRAY);
-        g.drawString(str,
-                (int)( box.getX() + (box.getWidth() -nameR.getWidth() )/2),
-                (int)( box.getY() + box.getHeight()/2 + nameR.getHeight()/2) );
+        TextLayout layout = new TextLayout(str,g.getFont(),frc);
+        Rectangle2D nameR = layout.getBounds();
+
+        int x,y;
+        switch(alignH) {
+            default: x = (int)box.getMinX(); break;
+            case ALIGN_RIGHT: x = (int)( box.getMaxX() - nameR.getWidth() ); break;
+            case ALIGN_CENTER: x = (int)( box.getMinX() + (box.getWidth() - nameR.getWidth() )/2); break;
+        }
+        switch(alignV) {
+            default: y = (int)( box.getMinY() + nameR.getHeight() ); break;
+            case ALIGN_BOTTOM: y = (int)( box.getMaxY() ); break;
+            case ALIGN_CENTER: y = (int)( box.getMinY() + (box.getHeight() + nameR.getHeight() )/2); break;
+        }
+        layout.draw((Graphics2D)g,x,y);
     }
 
     public void paintConnection(Graphics g, NodeConnection c) {
-        Point2D p0 = c.getInPosition();
-        Point2D p3 = c.getOutPosition();
+        Point p0 = c.getInPosition();
+        Point p3 = c.getOutPosition();
         paintBezierBetweenTwoPoints(g,p0,p3);
 
         if(c.isOutputValid()) paintConnectionAtPoint(g,c.getOutPosition());
         if(c.isInputValid()) paintConnectionAtPoint(g,c.getInPosition());
     }
 
-    public void paintConnectionAtPoint(Graphics g,Point2D p) {
+    public void paintConnectionAtPoint(Graphics g,Point p) {
         int radius = (int) NodeConnection.DEFAULT_RADIUS;
         g.fillOval((int) p.x - radius, (int) p.y - radius, radius * 2, radius * 2);
     }
@@ -158,9 +202,9 @@ public class NodeGraphViewPanel extends JPanel {
      * @param p0
      * @param p3
      */
-    public void paintBezierBetweenTwoPoints(Graphics g,Point2D p0, Point2D p3) {
-        Point2D p1 = new Point2D(p0);
-        Point2D p2 = new Point2D(p3);
+    public void paintBezierBetweenTwoPoints(Graphics g,Point p0, Point p3) {
+        Point p1 = new Point(p0);
+        Point p2 = new Point(p3);
 
         double d=Math.abs(p3.x-p1.x)/2;
         p1.x+=d;

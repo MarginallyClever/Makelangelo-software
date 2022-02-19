@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.util.Objects;
 
-public class NodeConnection extends Indexable {
+public class NodeConnection {
     public static final double DEFAULT_RADIUS = 5;
     public static final Color DEFAULT_COLOR = Color.BLUE;
 
@@ -17,7 +17,7 @@ public class NodeConnection extends Indexable {
     private int outVariableIndex=-1;
 
     public NodeConnection() {
-        super("Connection");
+        super();
     }
 
     public NodeConnection(Node inNode,int inVariableIndex,Node outNode,int outVariableIndex) {
@@ -49,6 +49,14 @@ public class NodeConnection extends Indexable {
         NodeVariable<?> in = getInputVariable();
         NodeVariable<?> out = getOutputVariable();
         return out.isValidType(in.getValue());
+    }
+
+    public Node getInNode() {
+        return inNode;
+    }
+
+    public Node getOutNode() {
+        return outNode;
     }
 
     private NodeVariable<?> getOutputVariable() {
@@ -90,18 +98,15 @@ public class NodeConnection extends Indexable {
     @Override
     public String toString() {
         return "NodeConnection{" +
-                "name=" + getName() +
-                ", uniqueID=" + getUniqueID() +
-                ", inNode=" + (inNode==null ? "null" : inNode.getUniqueName()) +
+                "inNode=" + (inNode==null ? "null" : inNode.getUniqueName()) +
                 ", inVariableIndex=" + inVariableIndex +
                 ", outNode=" + (outNode==null ? "null" : outNode.getUniqueName()) +
                 ", outVariableIndex=" + outVariableIndex +
                 '}';
     }
 
-    @Override
     public JSONObject toJSON() throws JSONException {
-        JSONObject jo = super.toJSON();
+        JSONObject jo = new JSONObject();
         if(inNode!=null) {
             jo.put("inNode",inNode.getUniqueName());
             jo.put("inVariableIndex",inVariableIndex);
@@ -114,14 +119,14 @@ public class NodeConnection extends Indexable {
     }
 
     // the in position of this {@link NodeConnection} is the out position of a {@link NodeVariable}
-    public Point2D getInPosition() {
+    public Point getInPosition() {
         return inNode.getOutPosition(inVariableIndex);
     }
 
     /**
      * The out position of this {@link NodeConnection} is the in position of a {@link NodeVariable}
      */
-    public Point2D getOutPosition() {
+    public Point getOutPosition() {
         return outNode.getInPosition(outVariableIndex);
     }
 
