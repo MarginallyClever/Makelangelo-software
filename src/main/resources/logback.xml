@@ -13,6 +13,7 @@
             <logger name="com.marginallyclever.convenience.log.Log" level="error" />
             <logger name="com.marginallyclever.makelangelo.Makelangelo" level="info" />
             <logger name="com.marginallyclever.makelangelo.plotter.plotterControls.MarlinInterface" level="trace" />
+            <logger name="com.marginallyclever.makelangelo.makeArt.io.vector.LoadScratch3" level="trace" />
             <root>
                 <appender-ref ref="STDOUT" />
             </root>
