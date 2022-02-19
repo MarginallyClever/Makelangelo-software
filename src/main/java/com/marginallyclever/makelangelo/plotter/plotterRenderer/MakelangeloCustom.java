@@ -224,6 +224,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public Point2D getHome() {
 		return new Point2D(0,0);
 	}
+
 	@Override
 	public String getVersion() {
 		return "0";
@@ -233,10 +234,12 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public boolean canChangeMachineSize() {
 		return true;
 	}
+
 	@Override
 	public boolean canAccelerate() {
 		return true;
 	}
+
 	@Override
 	public float getWidth() {
 		return 3*12*25.4f;
