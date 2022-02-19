@@ -6,7 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.*;
+import static com.marginallyclever.convenience.DrawingHelper.*;
 
 public class Makelangelo5 implements PlotterRenderer {
 

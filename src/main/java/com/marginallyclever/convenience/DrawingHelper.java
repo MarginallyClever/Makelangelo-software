@@ -1,17 +1,16 @@
-package com.marginallyclever.makelangelo.plotter.plotterRenderer;
+package com.marginallyclever.convenience;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
-import com.marginallyclever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 
-public class DrawingAssistant {
-    private static final Logger logger = LoggerFactory.getLogger(DrawingAssistant.class);
+public class DrawingHelper {
+    private static final Logger logger = LoggerFactory.getLogger(DrawingHelper.class);
 
     /**
      * Draw a circle

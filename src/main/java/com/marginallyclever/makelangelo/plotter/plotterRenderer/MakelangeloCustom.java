@@ -6,7 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
-import static com.marginallyclever.makelangelo.plotter.plotterRenderer.DrawingAssistant.*;
+import static com.marginallyclever.convenience.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -218,4 +218,60 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glColor3f(0, 0, 1);
 		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5);
 	}
+
+/*
+	@Override
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+	@Override
+	public String getVersion() {
+		return "0";
+	}
+
+	@Override
+	public boolean canChangeMachineSize() {
+		return true;
+	}
+	@Override
+	public boolean canAccelerate() {
+		return true;
+	}
+	@Override
+	public float getWidth() {
+		return 3*12*25.4f;
+	}
+
+	@Override
+	public float getHeight() {
+		return 4*12*25.4f;
+	}
+	@Override
+	public boolean canAutoHome() {
+		return true;
+	}
+	@Override
+	public boolean canChangeHome() {
+		return false;
+	}
+	@Override
+	public float getFeedrateMax() {
+		return 100;
+	}
+	@Override
+	public float getFeedrateDefault() {
+		return 100;
+	}
+	@Override
+	public float getAccelerationMax() {
+		return 150;
+	}
+	@Override
+	public float getPenLiftTime() {
+		return 80;
+	}
+	@Override
+	public float getZAngleOn() {
+		return 30;
+	}*/
 }
