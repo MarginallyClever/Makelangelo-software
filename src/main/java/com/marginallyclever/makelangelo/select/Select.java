@@ -31,8 +31,8 @@ public class Select extends JPanel {
 	// OBSERVER PATTERN
 	
 	public void addPropertyChangeListener(PropertyChangeListener p) {	
-		if ( propertyChangeListeners == null ){// PPAC37 to avoid "-nolf" : as some linux Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
-			// can run this overrided methode befor the class is fully initialised ...
+		if ( propertyChangeListeners == null ){
+		// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
 			propertyChangeListeners = new ArrayList<>();
 		}
 		propertyChangeListeners.add(p);
