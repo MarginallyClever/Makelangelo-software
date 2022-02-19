@@ -12,11 +12,11 @@ class FileAccessTest {
     @Test
     void open_fileInClasspath() throws IOException {
         // given
-        BufferedInputStream bis = FileAccess.open("/line.svg");
+        BufferedInputStream bis = FileAccess.open("/4laws.txt");
 
         // then
         assertNotNull(bis);
-        assertEquals("<svg", readFirst(bis));
+        assertEquals("0. A robot", readFirst(bis));
     }
 
     @Test
@@ -27,7 +27,7 @@ class FileAccessTest {
 
         // then
         assertNotNull(bis);
-        assertEquals("<?xm", readFirst(bis));
+        assertEquals("<?xml vers", readFirst(bis));
     }
 
     @Test
@@ -37,7 +37,7 @@ class FileAccessTest {
 
         // then
         assertNotNull(bis);
-        assertEquals("insi", readFirst(bis));
+        assertEquals("inside jar", readFirst(bis));
 
     }
 
@@ -48,8 +48,8 @@ class FileAccessTest {
      * @throws IOException
      */
     private String readFirst(BufferedInputStream bis) throws IOException {
-        byte[] barr = new byte[4];
-        bis.read(barr, 0, 4);
+        byte[] barr = new byte[10];
+        bis.read(barr, 0, 10);
         
         return new String(barr);
     }
