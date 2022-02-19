@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all Select.  A Select is a UI panel item the user can control.
@@ -18,9 +15,7 @@ import org.slf4j.LoggerFactory;
  * @since 7.24.0
  */
 public class Select extends JPanel {
-	private static final long serialVersionUID = 5289951183273734129L;
-	private static final Logger logger = LoggerFactory.getLogger(Select.class);
-	
+	private static final long serialVersionUID = 5289951183273734129L;	
 	private List<PropertyChangeListener> propertyChangeListeners = null;
 		
 	protected Select(String name) {
@@ -30,14 +25,16 @@ public class Select extends JPanel {
 	
 	// OBSERVER PATTERN
 	
+	@Override
 	public void addPropertyChangeListener(PropertyChangeListener p) {	
 		if ( propertyChangeListeners == null ){
-		// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
+			// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
 			propertyChangeListeners = new ArrayList<>();
 		}
 		propertyChangeListeners.add(p);
 	}
 	
+	@Override
 	public void removePropertyChangeListener(PropertyChangeListener p) {
 		if ( propertyChangeListeners == null ){
 			propertyChangeListeners = new ArrayList<>();
