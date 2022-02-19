@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 public class Select extends JPanel {
 	private static final long serialVersionUID = 5289951183273734129L;
 	private static final Logger logger = LoggerFactory.getLogger(Select.class);
-	private static boolean haveLAndFIssueBeenReported = false;
 	
-	private List<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
+	private List<PropertyChangeListener> propertyChangeListeners = null;
 		
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
@@ -31,25 +30,25 @@ public class Select extends JPanel {
 	
 	// OBSERVER PATTERN
 	
-	public void addPropertyChangeListener(PropertyChangeListener p) {
-		if ( propertyChangeListeners == null){ 
-			// PPAC37 to avoid "-nolf" : as some linux Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+	public void addPropertyChangeListener(PropertyChangeListener p) {	
+		if ( propertyChangeListeners == null ){// PPAC37 to avoid "-nolf" : as some linux Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
 			// can run this overrided methode befor the class is fully initialised ...
-			// (But then tooltips color to change TODO.)
 			propertyChangeListeners = new ArrayList<>();
-			if ( !haveLAndFIssueBeenReported ) {
-				haveLAndFIssueBeenReported = true;
-				logger.debug("need \"-nolf\" due to l&f \"{}\"",UIManager.getLookAndFeel().getClass().getCanonicalName());
-			}
 		}
 		propertyChangeListeners.add(p);
 	}
 	
 	public void removePropertyChangeListener(PropertyChangeListener p) {
+		if ( propertyChangeListeners == null ){
+			propertyChangeListeners = new ArrayList<>();
+		}
 		propertyChangeListeners.remove(p);
 	}
 	
 	protected void firePropertyChange(Object oldValue,Object newValue) {
+		if ( propertyChangeListeners == null ){
+			propertyChangeListeners = new ArrayList<>();
+		}
 		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);
