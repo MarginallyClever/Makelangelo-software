@@ -1,21 +1,22 @@
-package com.marginallyclever.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor.view;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
-import com.marginallyclever.nodeBasedEditor.view.NodeGraphViewPanel;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,8 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final NodeGraph model;
     private final NodeGraphViewPanel paintArea;
-    private final JPopupMenu bar = new JPopupMenu();
+    private final JPopupMenu popupBar = new JPopupMenu();
+    private final JToolBar toolBar = new JToolBar();
     private final JMenuItem deleteNodes = new JMenuItem("Delete");
     private final JMenuItem copyNodes = new JMenuItem("Copy");
     private final JMenuItem pasteNodes = new JMenuItem("Paste");
@@ -41,10 +43,18 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final NodeGraph copiedNodes = new NodeGraph();
 
-    private final Point mousePreviousPosition = new Point();
-    private final Point selectionAreaStart = new Point();
-    private boolean selectionOn=false;
+    // true while dragging one or more nodes around.
     private boolean dragOn=false;
+    // for tracking relative motion, useful for relative moves like dragging.
+    private final Point mousePreviousPosition = new Point();
+
+    // true while drawing a box to select nodes.
+    private boolean selectionOn=false;
+    // first corner of the bounding area when a user clicks and drags to form a box.
+    private final Point selectionAreaStart = new Point();
+
+    // cursor position when the popup menu happened.
+    private final Point popupPoint = new Point();
 
     public NodeGraphEditorPanel(NodeGraph model) {
         super(new BorderLayout());
@@ -52,10 +62,12 @@ public class NodeGraphEditorPanel extends JPanel {
 
         paintArea = new NodeGraphViewPanel(model);
 
+        this.add(toolBar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
         this.setPreferredSize(new Dimension(600,200));
 
-        setupBar();
+        setupToolBar();
+        setupPopopBar();
         attachMouseAdapter();
         setupPaintArea();
 
@@ -130,46 +142,74 @@ public class NodeGraphEditorPanel extends JPanel {
         g2.setStroke(new BasicStroke(r));
     }
 
-    private void setupBar() {
+    private void setupToolBar() {
         JMenuItem clearAll = new JMenuItem("New");
-        bar.add(clearAll);
+        toolBar.add(clearAll);
         clearAll.addActionListener((e)->onClear());
-
-        JMenuItem addConnection = new JMenuItem("Add");
-        bar.add(addConnection);
-        addConnection.addActionListener((e)->onAdd());
+        clearAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 
         JMenuItem saveAll = new JMenuItem("Save");
-        bar.add(saveAll);
+        toolBar.add(saveAll);
         saveAll.addActionListener((e)->onSave());
         saveAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 
         JMenuItem loadAll = new JMenuItem("Load");
-        bar.add(loadAll);
+        toolBar.add(loadAll);
         loadAll.addActionListener((e)->onLoad());
+        loadAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
 
-        bar.add(deleteNodes);
+        JMenuItem print = new JMenuItem("Print");
+        toolBar.add(print);
+        print.addActionListener((e)-> onPrint());
+        print.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+
+        JMenuItem update = new JMenuItem("Update");
+        toolBar.add(update);
+        update.addActionListener((e)-> onUpdate());
+        update.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
+    }
+
+    private void onPrint() {
+        BufferedImage awtImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics g = awtImage.getGraphics();
+        this.printAll(g);
+        g.translate(popupPoint.x,popupPoint.y);
+        popupBar.printAll(g);
+        g.translate(-popupPoint.x,-popupPoint.y);
+
+        // TODO file selection dialog here
+        File outputfile = new File("saved.png");
+
+        try {
+            ImageIO.write(awtImage, "png", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setupPopopBar() {
+        JMenuItem addConnection = new JMenuItem("Add");
+        popupBar.add(addConnection);
+        addConnection.addActionListener((e)->onAdd());
+
+        popupBar.add(deleteNodes);
         deleteNodes.addActionListener((e)->onDelete());
         deleteNodes.setEnabled(false);
 
-        bar.add(copyNodes);
+        popupBar.add(copyNodes);
         copyNodes.addActionListener((e)->onCopy());
         copyNodes.setEnabled(false);
         copyNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
 
-        bar.add(pasteNodes);
+        popupBar.add(pasteNodes);
         pasteNodes.addActionListener((e)->onPaste());
         pasteNodes.setEnabled(false);
         pasteNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
 
-        bar.add(editNode);
+        popupBar.add(editNode);
         editNode.addActionListener((e)->onEdit());
         editNode.setEnabled(false);
         editNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
-
-        JMenuItem update = new JMenuItem("Update");
-        bar.add(update);
-        update.addActionListener((e)-> onUpdate());
     }
 
     private void onSave() {
@@ -250,6 +290,7 @@ public class NodeGraphEditorPanel extends JPanel {
         System.out.println("adding node");
         Node n = NodeFactoryPanel.runAsDialog((JFrame)SwingUtilities.getWindowAncestor(this));
         if(n!=null) {
+            n.setPosition(popupPoint);
             model.add(n);
             paintArea.updatePaintAreaBounds();
             paintArea.repaint();
@@ -322,7 +363,10 @@ public class NodeGraphEditorPanel extends JPanel {
             }
 
             private void maybeShowPopup(MouseEvent e) {
-                if(e.isPopupTrigger()) bar.show(e.getComponent(),e.getX(),e.getY());
+                if(e.isPopupTrigger()) {
+                    popupPoint.setLocation(e.getPoint());
+                    popupBar.show(e.getComponent(),e.getX(),e.getY());
+                }
             }
         });
     }
@@ -459,7 +503,7 @@ public class NodeGraphEditorPanel extends JPanel {
         Node constant0 = model.add(new Constant(1));
         Node constant1 = model.add(new Constant(2));
         Node add = model.add(new Add());
-        Node report = model.add(new ReportToStdOut());
+        Node report = model.add(new PrintToStdOut());
         model.add(new NodeConnection(constant0,0,add,0));
         model.add(new NodeConnection(constant1,0,add,1));
         model.add(new NodeConnection(add,2,report,0));
