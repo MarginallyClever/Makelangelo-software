@@ -29,7 +29,7 @@ public class NodeGraph {
         NodeFactory.registerNode(new Subtract());
         NodeFactory.registerNode(new Multiply());
         NodeFactory.registerNode(new Divide());
-        NodeFactory.registerNode(new ReportToStdOut());
+        NodeFactory.registerNode(new PrintToStdOut());
         NodeFactory.registerNode(new Cos());
         NodeFactory.registerNode(new Sin());
         NodeFactory.registerNode(new Tan());

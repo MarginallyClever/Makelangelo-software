@@ -6,7 +6,7 @@ import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +52,7 @@ public class TestNodeGraph {
         Node constant0 = model.add(new Constant(1));
         Node constant1 = model.add(new Constant(2));
         Node add = model.add(new Add());
-        Node report = model.add(new ReportToStdOut());
+        Node report = model.add(new PrintToStdOut());
         model.add(new NodeConnection(constant0,0,add,0));
         model.add(new NodeConnection(constant1,0,add,1));
         model.add(new NodeConnection(add,2,report,0));

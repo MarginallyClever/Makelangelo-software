@@ -3,17 +3,17 @@ package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
-public class ReportToStdOut extends Node {
+public class PrintToStdOut extends Node {
     private final NodeVariable<Object> a = NodeVariable.newInstance("A",Object.class,null,true,false);
 
-    public ReportToStdOut() {
+    public PrintToStdOut() {
         super("Report to StdOut");
         addVariable(a);
     }
 
     @Override
     public Node create() {
-        return new ReportToStdOut();
+        return new PrintToStdOut();
     }
 
     @Override
