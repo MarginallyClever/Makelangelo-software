@@ -3,15 +3,16 @@ package com.marginallyclever.nodeBasedEditor;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.model.*;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.ReportToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.view.NodeGraphViewPanel;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -23,18 +24,22 @@ import java.util.List;
  * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraphModel}.
  */
 public class NodeGraphEditorPanel extends JPanel {
+    public static final Color CONNECTION_POINT_COLOR_SELECTED = Color.RED;
+
     private final NodeGraphModel model;
     private final NodeGraphViewPanel paintArea;
-    private final JToolBar bar = new JToolBar();
-    private final JButton deleteNodes = new JButton("Delete");
-    private final JButton copyNodes = new JButton("Copy");
-    private final JButton pasteNodes = new JButton("Paste");
-    private final JButton editNode = new JButton("Edit");
+    private final JPopupMenu bar = new JPopupMenu();
+    private final JMenuItem deleteNodes = new JMenuItem("Delete");
+    private final JMenuItem copyNodes = new JMenuItem("Copy");
+    private final JMenuItem pasteNodes = new JMenuItem("Paste");
+    private final JMenuItem editNode = new JMenuItem("Edit");
 
     private final NodeConnection connectionBeingCreated = new NodeConnection();
 
-    private final List<Node> selectedNodes = new ArrayList<Node>();
+    private final List<Node> selectedNodes = new ArrayList<>();
     private NodeConnectionPointInfo lastConnectionPoint = null;
+
+    private final NodeGraphModel copiedNodes = new NodeGraphModel();
 
     private final Point mousePreviousPosition = new Point();
     private final Point selectionAreaStart = new Point();
@@ -47,7 +52,6 @@ public class NodeGraphEditorPanel extends JPanel {
 
         paintArea = new NodeGraphViewPanel(model);
 
-        this.add(bar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
         this.setPreferredSize(new Dimension(600,200));
 
@@ -104,7 +108,7 @@ public class NodeGraphEditorPanel extends JPanel {
     // draw the connection point under the cursor
     private void HighlightNearbyConnectionPoint(Graphics g) {
         if(lastConnectionPoint !=null) {
-            g.setColor(Color.RED);
+            g.setColor(CONNECTION_POINT_COLOR_SELECTED);
             setLineWidth(g,2);
             paintArea.paintVariableConnectionPoints(g,lastConnectionPoint.getVariable());
             setLineWidth(g,1);
@@ -127,19 +131,20 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void setupBar() {
-        JButton clearAll = new JButton("New");
+        JMenuItem clearAll = new JMenuItem("New");
         bar.add(clearAll);
         clearAll.addActionListener((e)->onClear());
 
-        JButton addConnection = new JButton("Add");
+        JMenuItem addConnection = new JMenuItem("Add");
         bar.add(addConnection);
         addConnection.addActionListener((e)->onAdd());
 
-        JButton saveAll = new JButton("Save");
+        JMenuItem saveAll = new JMenuItem("Save");
         bar.add(saveAll);
         saveAll.addActionListener((e)->onSave());
+        saveAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 
-        JButton loadAll = new JButton("Load");
+        JMenuItem loadAll = new JMenuItem("Load");
         bar.add(loadAll);
         loadAll.addActionListener((e)->onLoad());
 
@@ -150,16 +155,19 @@ public class NodeGraphEditorPanel extends JPanel {
         bar.add(copyNodes);
         copyNodes.addActionListener((e)->onCopy());
         copyNodes.setEnabled(false);
+        copyNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
 
         bar.add(pasteNodes);
         pasteNodes.addActionListener((e)->onPaste());
         pasteNodes.setEnabled(false);
+        pasteNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
 
         bar.add(editNode);
         editNode.addActionListener((e)->onEdit());
         editNode.setEnabled(false);
+        editNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
 
-        JButton update = new JButton("Update");
+        JMenuItem update = new JMenuItem("Update");
         bar.add(update);
         update.addActionListener((e)-> onUpdate());
     }
@@ -221,8 +229,6 @@ public class NodeGraphEditorPanel extends JPanel {
         for(Node n : selectedNodes) model.remove(n);
         setSelectedNodes(null);
     }
-
-    private final NodeGraphModel copiedNodes = new NodeGraphModel();
 
     private void onCopy() {
         copiedNodes.clear();
@@ -287,22 +293,36 @@ public class NodeGraphEditorPanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+
                 // clicking a connection point takes precedence
                 if(lastConnectionPoint == null) {
                     // if user presses down on an already selected item then user is dragging selected nodes
                     Node n = getNodeAt(e.getPoint());
-                    if(selectedNodes.contains(n)) {
-                        beginDragNode(e.getPoint());
+                    if(n!=null) {
+                        if(selectedNodes.contains(n)) {
+                            beginDragNode(e.getPoint());
+                        } else {
+                            setSelectedNodes(n);
+                            beginDragNode(e.getPoint());
+                        }
                     } else {
                         beginSelectionArea(e.getPoint());
                     }
                 }
             }
 
+
+
             @Override
             public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
                 if(dragOn) endDragNodes();
                 else if(selectionOn) endSelectionArea(e.getPoint());
+            }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if(e.isPopupTrigger()) bar.show(e.getComponent(),e.getX(),e.getY());
             }
         });
     }
@@ -344,8 +364,7 @@ public class NodeGraphEditorPanel extends JPanel {
         double x2 = Math.max(point.x, selectionAreaStart.x);
         double y1 = Math.min(point.y, selectionAreaStart.y);
         double y2 = Math.max(point.y, selectionAreaStart.y);
-        Rectangle2D r = new Rectangle2D.Double(x1,y1,x2-x1,y2-y1);
-        return r;
+        return new Rectangle2D.Double(x1,y1,x2-x1,y2-y1);
     }
 
     private void onClickConnectionPoint() {
@@ -379,7 +398,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void selectOneNearbyConnectionPoint(Point p) {
-        NodeConnectionPointInfo info = model.getFirstNearbyConnection(p,15,NodeVariable.IN | NodeVariable.OUT);
+        NodeConnectionPointInfo info = model.getFirstNearbyConnection(p,15);
         setLastConnectionPoint(info);
     }
 
@@ -392,13 +411,15 @@ public class NodeGraphEditorPanel extends JPanel {
         repaint();
     }
 
+    @SuppressWarnings("unchecked")
     private void setSelectedNodes(Object o) {
         selectedNodes.clear();
-        if(o instanceof Node) {
-            Node node = (Node)o;
-            if(node != null) selectedNodes.add(node);
-        } else if(o instanceof List<?>) {
-            selectedNodes.addAll((List<Node>)o);
+        if(o!=null) {
+            if(o instanceof Node) {
+                selectedNodes.add((Node) o);
+            } else if(o instanceof List<?>) {
+                selectedNodes.addAll((List<Node>) o);
+            }
         }
         boolean notEmpty = !selectedNodes.isEmpty();
         deleteNodes.setEnabled(notEmpty);
@@ -407,9 +428,17 @@ public class NodeGraphEditorPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Return the last {@link Node} at the given point, which will be the top-most visible.
+     * @param point the search location.
+     * @return the last {@link Node} at the given point
+     */
     private Node getNodeAt(Point point) {
         //System.out.println("getNodeAt("+point.x+","+point.y+")");
-        for(Node n : model.getNodes()) {
+
+        List<Node> list = model.getNodes();
+        for (int i = list.size(); i-- > 0; ) {
+            Node n = list.get(i);
             Rectangle r = n.getRectangle();
             //System.out.println(n.getUniqueName()+":"+r);
             if(r.getMinX()>point.x) continue;
