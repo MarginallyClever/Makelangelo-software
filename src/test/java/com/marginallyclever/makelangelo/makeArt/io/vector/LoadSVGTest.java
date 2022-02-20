@@ -3,9 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.io.vector;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
-
+import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadSVGTest {
@@ -88,9 +86,5 @@ public class LoadSVGTest {
         assertNotNull(turtle);
         assertNotNull(turtle.history);
         assertEquals(readFile(expectedFile), turtle.history.toString());
-    }
-
-    private String readFile(String filename) {
-        return  new Scanner(LoadSVGTest.class.getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A").next();
     }
 }
