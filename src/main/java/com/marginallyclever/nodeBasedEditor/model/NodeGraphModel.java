@@ -1,8 +1,8 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +12,6 @@ import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,6 +30,10 @@ public class NodeGraphModel {
         NodeFactory.registerNode(new Multiply());
         NodeFactory.registerNode(new Divide());
         NodeFactory.registerNode(new ReportToStdOut());
+        NodeFactory.registerNode(new Cos());
+        NodeFactory.registerNode(new Sin());
+        NodeFactory.registerNode(new Tan());
+        NodeFactory.registerNode(new ATan2());
     }
 
     public void update() {
@@ -115,26 +118,21 @@ public class NodeGraphModel {
     }
 
     /**
-     *
+     * Return the first connection point found within radius of a point
      * @param point center of search area
      * @param r radius limit
-     * @param flags {@code NodeVariable.IN} or {@code NodeVariable.OUT} for the types you want.
-     * @return the a {@link NodeConnectionPointInfo} or null.
+     * @return a {@link NodeConnectionPointInfo} describing the point found or null.
      */
-    public NodeConnectionPointInfo getFirstNearbyConnection(Point point, double r, int flags) {
+    public NodeConnectionPointInfo getFirstNearbyConnection(Point point, double r) {
         double rr=r*r;
-        boolean doIn = (flags & NodeVariable.IN) == NodeVariable.IN;
-        boolean doOut = (flags & NodeVariable.OUT) == NodeVariable.OUT;
-        if(doIn || doOut) {
-            for(Node n : nodes) {
-                for(int i = 0; i < n.getNumVariables(); ++i) {
-                    NodeVariable<?> v = n.getVariable(i);
-                    if(doIn && v.getInPosition().distanceSq(point) < rr) {
-                        return new NodeConnectionPointInfo(n,i,NodeVariable.IN);
-                    }
-                    if(doOut && v.getOutPosition().distanceSq(point) < rr) {
-                        return new NodeConnectionPointInfo(n,i,NodeVariable.OUT);
-                    }
+        for(Node n : nodes) {
+            for(int i = 0; i < n.getNumVariables(); ++i) {
+                NodeVariable<?> v = n.getVariable(i);
+                if(v.getInPosition().distanceSq(point) < rr) {
+                    return new NodeConnectionPointInfo(n,i,NodeVariable.IN);
+                }
+                if(v.getOutPosition().distanceSq(point) < rr) {
+                    return new NodeConnectionPointInfo(n,i,NodeVariable.OUT);
                 }
             }
         }
