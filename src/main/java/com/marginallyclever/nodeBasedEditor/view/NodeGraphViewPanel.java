@@ -4,7 +4,7 @@ import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
-import com.marginallyclever.nodeBasedEditor.model.NodeGraphModel;
+import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link NodeGraphViewPanel} visualizes the contents of a {@link NodeGraphModel} with Java Swing.
+ * {@link NodeGraphViewPanel} visualizes the contents of a {@link NodeGraph} with Java Swing.
  * It can call on {@link NodeGraphViewListener}s to add additional flavor.
  */
 public class NodeGraphViewPanel extends JPanel {
@@ -35,9 +35,9 @@ public class NodeGraphViewPanel extends JPanel {
     public static final int ALIGN_TOP=0;
     public static final int ALIGN_BOTTOM=1;
 
-    private final NodeGraphModel model;
+    private final NodeGraph model;
 
-    public NodeGraphViewPanel(NodeGraphModel model) {
+    public NodeGraphViewPanel(NodeGraph model) {
         super();
         this.model=model;
         this.setBackground(PANEL_COLOR_BACKGROUND);

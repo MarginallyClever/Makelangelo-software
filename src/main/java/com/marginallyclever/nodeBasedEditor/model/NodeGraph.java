@@ -15,13 +15,13 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link NodeGraphModel} contains the {@link Node}s, and {@link NodeConnection}s
+ * {@link NodeGraph} contains the {@link Node}s, and {@link NodeConnection}s
  */
-public class NodeGraphModel {
+public class NodeGraph {
     private final List<Node> nodes = new ArrayList<>();
     private final List<NodeConnection> connections = new ArrayList<>();
 
-    public NodeGraphModel() {
+    public NodeGraph() {
         super();
         NodeFactory.registerNode(new Constant());
         NodeFactory.registerNode(new Random());
@@ -171,7 +171,7 @@ public class NodeGraphModel {
     }
 
     /**
-     * {@link NodeConnection} must be parsed in the {@link NodeGraphModel} because only here can we access the list of
+     * {@link NodeConnection} must be parsed in the {@link NodeGraph} because only here can we access the list of
      * nodes to find the one with a matching {@code getUniqueName()}.
      * @param c the connection to parse into.
      * @param jo the JSON to parse.
@@ -229,7 +229,7 @@ public class NodeGraphModel {
      * Add all {@link Node}s and {@link NodeConnection}s from one model to this model.
      * @param b the model to add.
      */
-    public void add(NodeGraphModel b) {
+    public void add(NodeGraph b) {
         assignNewUniqueIDs(0);
         b.assignNewUniqueIDs(Node.getUniqueIDSource());
 
@@ -244,12 +244,12 @@ public class NodeGraphModel {
     }
 
     /**
-     * Returns a deep copy of this {@link NodeGraphModel} by using the JSON serialization methods.
+     * Returns a deep copy of this {@link NodeGraph} by using the JSON serialization methods.
      * <blockquote><pre>newInstance.parseJSON(this.toJSON());</pre></blockquote>
-     * @return a deep copy of this {@link NodeGraphModel}
+     * @return a deep copy of this {@link NodeGraph}
      */
-    public NodeGraphModel deepCopy() {
-        NodeGraphModel copy = new NodeGraphModel();
+    public NodeGraph deepCopy() {
+        NodeGraph copy = new NodeGraph();
         copy.parseJSON(toJSON());
         return copy;
     }

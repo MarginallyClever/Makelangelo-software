@@ -2,7 +2,7 @@ package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
-import com.marginallyclever.nodeBasedEditor.model.NodeGraphModel;
+import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestNodeGraphModel {
-    private static NodeGraphModel model;
+public class TestNodeGraph {
+    private static NodeGraph model;
 
     @BeforeAll
     static void beforeAll() {
-        model = new NodeGraphModel();
+        model = new NodeGraph();
     }
 
     @BeforeEach
@@ -98,7 +98,7 @@ public class TestNodeGraphModel {
         testAddTwoConstants();
 
         JSONObject a = model.toJSON();
-        NodeGraphModel modelB = new NodeGraphModel();
+        NodeGraph modelB = new NodeGraph();
         modelB.parseJSON(a);
         assertEquals(model.toString(),modelB.toString());
     }
@@ -115,7 +115,7 @@ public class TestNodeGraphModel {
     public void testAddTwoModelsTogether() {
         testAddTwoConstants();
 
-        NodeGraphModel modelB = new NodeGraphModel();
+        NodeGraph modelB = new NodeGraph();
         modelB.add(model);
         modelB.add(model.deepCopy());
 

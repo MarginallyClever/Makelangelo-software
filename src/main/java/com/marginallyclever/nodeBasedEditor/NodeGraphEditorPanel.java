@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraphModel}.
+ * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraph}.
  */
 public class NodeGraphEditorPanel extends JPanel {
     public static final Color CONNECTION_POINT_COLOR_SELECTED = Color.RED;
 
-    private final NodeGraphModel model;
+    private final NodeGraph model;
     private final NodeGraphViewPanel paintArea;
     private final JPopupMenu bar = new JPopupMenu();
     private final JMenuItem deleteNodes = new JMenuItem("Delete");
@@ -39,14 +39,14 @@ public class NodeGraphEditorPanel extends JPanel {
     private final List<Node> selectedNodes = new ArrayList<>();
     private NodeConnectionPointInfo lastConnectionPoint = null;
 
-    private final NodeGraphModel copiedNodes = new NodeGraphModel();
+    private final NodeGraph copiedNodes = new NodeGraph();
 
     private final Point mousePreviousPosition = new Point();
     private final Point selectionAreaStart = new Point();
     private boolean selectionOn=false;
     private boolean dragOn=false;
 
-    public NodeGraphEditorPanel(NodeGraphModel model) {
+    public NodeGraphEditorPanel(NodeGraph model) {
         super(new BorderLayout());
         this.model = model;
 
@@ -195,8 +195,8 @@ public class NodeGraphEditorPanel extends JPanel {
         }
     }
 
-    private NodeGraphModel loadModelFromFile(String absolutePath) {
-        NodeGraphModel newModel = new NodeGraphModel();
+    private NodeGraph loadModelFromFile(String absolutePath) {
+        NodeGraph newModel = new NodeGraph();
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(absolutePath)))) {
             StringBuilder responseStrBuilder = new StringBuilder();
             String inputStr;
@@ -232,7 +232,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private void onCopy() {
         copiedNodes.clear();
-        NodeGraphModel modelB = new NodeGraphModel();
+        NodeGraph modelB = new NodeGraph();
         for(Node n : selectedNodes) modelB.add(n);
         List<NodeConnection> selectedConnections = model.getConnectionsBetweenTheseNodes(selectedNodes);
         for(NodeConnection c : selectedConnections) modelB.add(c);
@@ -241,7 +241,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void onPaste() {
-        NodeGraphModel modelC = copiedNodes.deepCopy();
+        NodeGraph modelC = copiedNodes.deepCopy();
         model.add(modelC);
         setSelectedNodes(modelC.getNodes());
     }
@@ -455,7 +455,7 @@ public class NodeGraphEditorPanel extends JPanel {
         CommandLineOptions.setFromMain(args);
         Translator.start();
 
-        NodeGraphModel model = new NodeGraphModel();
+        NodeGraph model = new NodeGraph();
         Node constant0 = model.add(new Constant(1));
         Node constant1 = model.add(new Constant(2));
         Node add = model.add(new Add());
