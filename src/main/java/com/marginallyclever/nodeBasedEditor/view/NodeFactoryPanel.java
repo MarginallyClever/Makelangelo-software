@@ -1,6 +1,7 @@
-package com.marginallyclever.nodeBasedEditor;
+package com.marginallyclever.nodeBasedEditor.view;
 
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.util.PreferencesHelper;
 
