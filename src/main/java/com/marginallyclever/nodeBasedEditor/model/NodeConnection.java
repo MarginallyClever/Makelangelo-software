@@ -9,7 +9,6 @@ import java.util.Objects;
 
 public class NodeConnection {
     public static final double DEFAULT_RADIUS = 5;
-    public static final Color DEFAULT_COLOR = Color.BLUE;
 
     private Node inNode;
     private int inVariableIndex=-1;

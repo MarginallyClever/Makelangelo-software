@@ -20,9 +20,14 @@ import java.util.List;
  * It can call on {@link NodeGraphViewListener}s to add additional flavor.
  */
 public class NodeGraphViewPanel extends JPanel {
-    public static final Color DEFAULT_BORDER = Color.BLACK;
-    public static final Color DEFAULT_BACKGROUND = Color.WHITE;
-    public static final Color DEFAULT_FONT = Color.BLACK;
+    public static final Color NODE_COLOR_BACKGROUND = Color.WHITE;
+    public static final Color NODE_COLOR_BORDER = Color.BLACK;
+    public static final Color NODE_COLOR_INTERNAL_BORDER = Color.DARK_GRAY;
+    public static final Color PANEL_COLOR_BACKGROUND = Color.LIGHT_GRAY;
+    public static final Color NODE_COLOR_FONT = Color.BLACK;
+    public static final Color CONNECTION_POINT_COLOR = Color.LIGHT_GRAY;
+    public static final Color CONNECTION_COLOR = Color.BLUE;
+
     public static final int CORNER_RADIUS = 5;
     public static final int ALIGN_LEFT=0;
     public static final int ALIGN_RIGHT=1;
@@ -35,6 +40,7 @@ public class NodeGraphViewPanel extends JPanel {
     public NodeGraphViewPanel(NodeGraphModel model) {
         super();
         this.model=model;
+        this.setBackground(PANEL_COLOR_BACKGROUND);
     }
 
     @Override
@@ -49,7 +55,7 @@ public class NodeGraphViewPanel extends JPanel {
 
         for(Node n : model.getNodes()) paintNode(g,n);
 
-        g.setColor(NodeConnection.DEFAULT_COLOR);
+        g.setColor(CONNECTION_COLOR);
         for(NodeConnection c : model.getConnections()) paintConnection(g,c);
 
         paintExtras(g);
@@ -72,15 +78,15 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     public void paintNode(Graphics g, Node n) {
-        g.setColor(DEFAULT_BACKGROUND);
+        g.setColor(NODE_COLOR_BACKGROUND);
         paintNodeBackground(g,n);
 
-        g.setColor(DEFAULT_FONT);
+        g.setColor(NODE_COLOR_FONT);
         paintNodeTitleBar(g, n);
 
         paintAllNodeVariables(g, n);
 
-        g.setColor(DEFAULT_BORDER);
+        g.setColor(NODE_COLOR_BORDER);
         paintNodeBorder(g, n);
     }
 
@@ -108,22 +114,22 @@ public class NodeGraphViewPanel extends JPanel {
         Rectangle insideBox = getNodeInternalBounds(box);
 
         // label
-        g.setColor(DEFAULT_FONT);
+        g.setColor(NODE_COLOR_FONT);
         paintText(g,v.getName(),insideBox,ALIGN_LEFT,ALIGN_CENTER);
 
         // value
-        g.setColor(DEFAULT_FONT);
+        g.setColor(NODE_COLOR_FONT);
         String val = v.getValue().toString();
         int MAX_CHARS=10;
         if(val.length()>MAX_CHARS) val = val.substring(0,MAX_CHARS)+"...";
         paintText(g,val,insideBox,ALIGN_RIGHT,ALIGN_CENTER);
 
         // internal border
-        g.setColor(Color.LIGHT_GRAY);
-        g.drawRect(box.x,box.y,box.width,box.height);
+        g.setColor(NODE_COLOR_INTERNAL_BORDER);
+        g.drawLine((int)box.getMinX(),(int)box.getMinY(),(int)box.getMaxX(),(int)box.getMinY());
 
         // connection points
-        g.setColor(NodeVariable.DEFAULT_CONNECTION_POINT_COLOR);
+        g.setColor(CONNECTION_POINT_COLOR);
         paintVariableConnectionPoints(g,v);
     }
 

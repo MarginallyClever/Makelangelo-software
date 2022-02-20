@@ -15,8 +15,6 @@ public class NodeVariable<T> {
     public static final int OUT=2;
     public static final int DEFAULT_WIDTH = 150;
     public static final int DEFAULT_HEIGHT = 20;
-    public static final Color DEFAULT_CONNECTION_POINT_COLOR_SELECTED = Color.RED;
-    public static final Color DEFAULT_CONNECTION_POINT_COLOR = Color.LIGHT_GRAY;
 
     private T value;
     private T defaultValue;
