@@ -29,4 +29,5 @@ module com.marginallyclever.makelangelo {
 
 	opens com.marginallyclever.makelangelo.plotter.settings;
 	exports com.marginallyclever.nodeBasedEditor.view;
+    exports com.marginallyclever.nodeBasedEditor.model.builtInNodes.math;
 }
