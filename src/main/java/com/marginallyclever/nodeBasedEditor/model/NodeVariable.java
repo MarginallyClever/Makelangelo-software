@@ -17,7 +17,6 @@ public class NodeVariable<T> {
     public static final int DEFAULT_HEIGHT = 20;
 
     private T value;
-    private T defaultValue;
     private final Class<T> type;
 
     private String name;
@@ -31,7 +30,6 @@ public class NodeVariable<T> {
         super();
         this.type = type;
         this.name = _name;
-        this.defaultValue = defaultValue;
         this.value = defaultValue;
         this.hasInput = _hasInput;
         this.hasOutput = _hasOutput;
@@ -92,7 +90,6 @@ public class NodeVariable<T> {
     public JSONObject toJSON() throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("value",value);
-        jo.put("defaultValue",defaultValue);
         jo.put("name",name);
         jo.put("hasInput",hasInput);
         jo.put("hasOutput",hasOutput);
@@ -104,7 +101,6 @@ public class NodeVariable<T> {
     @SuppressWarnings("unchecked")
     public void parseJSON(JSONObject jo) throws JSONException, ClassCastException {
         value = (jo.has("value") ? (T)jo.get("value") : null);
-        defaultValue = (jo.has("defaultValue") ? (T)jo.get("defaultValue") : null);
         name = jo.getString("name");
         hasInput = jo.getBoolean("hasInput");
         hasOutput = jo.getBoolean("hasOutput");
