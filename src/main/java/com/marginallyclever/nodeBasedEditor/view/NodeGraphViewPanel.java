@@ -25,7 +25,12 @@ public class NodeGraphViewPanel extends JPanel {
     public static final Color NODE_COLOR_BORDER = Color.BLACK;
     public static final Color NODE_COLOR_INTERNAL_BORDER = Color.DARK_GRAY;
     public static final Color PANEL_COLOR_BACKGROUND = Color.LIGHT_GRAY;
-    public static final Color NODE_COLOR_FONT = Color.BLACK;
+    public static final Color NODE_COLOR_FONT_CLEAN = Color.BLACK;
+    public static final Color NODE_COLOR_FONT_DIRTY = Color.RED;
+
+    public static final Color NODE_COLOR_TITLE_FONT = Color.WHITE;
+    public static final Color NODE_COLOR_TITLE_BACKGROUND = Color.BLACK;
+
     public static final Color CONNECTION_POINT_COLOR = Color.LIGHT_GRAY;
     public static final Color CONNECTION_COLOR = Color.BLUE;
 
@@ -92,7 +97,6 @@ public class NodeGraphViewPanel extends JPanel {
         g.setColor(NODE_COLOR_BACKGROUND);
         paintNodeBackground(g,n);
 
-        g.setColor(NODE_COLOR_FONT);
         paintNodeTitleBar(g, n);
 
         paintAllNodeVariables(g, n);
@@ -107,8 +111,14 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     public void paintNodeTitleBar(Graphics g, Node n) {
+        Rectangle r = n.getRectangle();
+        g.setColor(NODE_COLOR_TITLE_BACKGROUND);
+        g.fillRoundRect(r.x, r.y, r.width, CORNER_RADIUS*2, CORNER_RADIUS, CORNER_RADIUS);
+        g.fillRect(r.x, r.y+CORNER_RADIUS, r.width, Node.TITLE_HEIGHT -CORNER_RADIUS);
+
         Rectangle box = getNodeInternalBounds(n.getRectangle());
-        box.height=Node.NODE_TITLE_HEIGHT;
+        g.setColor(NODE_COLOR_TITLE_FONT);
+        box.height=Node.TITLE_HEIGHT;
         paintText(g,n.getLabel(),box,ALIGN_LEFT,ALIGN_CENTER);
         paintText(g,n.getName(),box,ALIGN_RIGHT,ALIGN_CENTER);
     }
@@ -125,13 +135,10 @@ public class NodeGraphViewPanel extends JPanel {
         Rectangle insideBox = getNodeInternalBounds(box);
 
         // label
-        g.setColor(NODE_COLOR_FONT);
+        g.setColor(v.getIsDirty()?NODE_COLOR_FONT_DIRTY : NODE_COLOR_FONT_CLEAN);
         paintText(g,v.getName(),insideBox,ALIGN_LEFT,ALIGN_CENTER);
 
         // value
-        g.setColor(NODE_COLOR_FONT);
-
-        g.setColor(NODE_COLOR_FONT);
         Object vObj = v.getValue();
         if(vObj != null) {
             String val = vObj.toString();
