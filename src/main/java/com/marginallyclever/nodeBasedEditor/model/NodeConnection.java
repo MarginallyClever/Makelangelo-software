@@ -34,17 +34,16 @@ public class NodeConnection {
      * Send the value of upstream variables to downstream variables
      */
     public void apply() {
-        if(!isInputValid() || !isOutputValid()) return;
-        if( isValidDataType() ) {
-            NodeVariable<?> in = getInputVariable();
-            NodeVariable<?> out = getOutputVariable();
-            out.setValue(in.getValue());
+        if(!isValidDataType()) return;
+
+        NodeVariable<?> in = getInputVariable();
+        if(in.getIsDirty()) {
+            getOutputVariable().setValue(in.getValue());
         }
     }
 
     public boolean isValidDataType() {
         if(!isInputValid() || !isOutputValid()) return false;
-
         NodeVariable<?> in = getInputVariable();
         NodeVariable<?> out = getOutputVariable();
         return out.isValidType(in.getValue());
@@ -157,5 +156,13 @@ public class NodeConnection {
     @Override
     public int hashCode() {
         return Objects.hash(inNode, inVariableIndex, outNode, outVariableIndex);
+    }
+
+    public NodeVariable<?> getInVariable() {
+        return (inNode==null) ? null : inNode.getVariable(inVariableIndex);
+    }
+
+    public NodeVariable<?> getOutVariable() {
+        return (outNode==null) ? null : outNode.getVariable(outVariableIndex);
     }
 }
