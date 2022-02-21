@@ -24,7 +24,7 @@ public class NodeGraph {
 
     public NodeGraph() {
         super();
-        NodeFactory.registerNode(new Constant());
+        NodeFactory.registerNode(new LoadNumber());
         NodeFactory.registerNode(new Random());
         NodeFactory.registerNode(new Add());
         NodeFactory.registerNode(new Subtract());
@@ -38,6 +38,8 @@ public class NodeGraph {
 
         NodeFactory.registerNode(new LoadImage());
         NodeFactory.registerNode(new PrintImage());
+
+        NodeFactory.registerNode(new LoadString());
     }
 
     public void update() {
@@ -132,10 +134,10 @@ public class NodeGraph {
         for(Node n : nodes) {
             for(int i = 0; i < n.getNumVariables(); ++i) {
                 NodeVariable<?> v = n.getVariable(i);
-                if(v.getInPosition().distanceSq(point) < rr) {
+                if(v.getHasInput() && v.getInPosition().distanceSq(point) < rr) {
                     return new NodeConnectionPointInfo(n,i,NodeVariable.IN);
                 }
-                if(v.getOutPosition().distanceSq(point) < rr) {
+                if(v.getHasOutput() && v.getOutPosition().distanceSq(point) < rr) {
                     return new NodeConnectionPointInfo(n,i,NodeVariable.OUT);
                 }
             }
