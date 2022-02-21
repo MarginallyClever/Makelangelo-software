@@ -38,8 +38,8 @@ public class NodeVariable<T> {
         rectangle.setBounds(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT);
     }
 
-    public static <T> NodeVariable<T> newInstance(String _name,Class<T> clazz,T defaultValue,boolean _hasInput,boolean _hasOutput) {
-        return new NodeVariable<T>(_name,clazz,defaultValue,_hasInput,_hasOutput);
+    public static <T> NodeVariable<T> newInstance(String name,Class<T> clazz,T defaultValue,boolean hasInput,boolean hasOutput) {
+        return new NodeVariable<T>(name,clazz,defaultValue,hasInput,hasOutput);
     }
 
     public Rectangle getRectangle() {
