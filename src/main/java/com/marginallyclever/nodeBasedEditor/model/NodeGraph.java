@@ -2,6 +2,7 @@ package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +35,9 @@ public class NodeGraph {
         NodeFactory.registerNode(new Sin());
         NodeFactory.registerNode(new Tan());
         NodeFactory.registerNode(new ATan2());
+
+        NodeFactory.registerNode(new LoadImage());
+        NodeFactory.registerNode(new PrintImage());
     }
 
     public void update() {

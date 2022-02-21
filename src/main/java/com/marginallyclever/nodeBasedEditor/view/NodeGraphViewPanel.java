@@ -2,6 +2,7 @@ package com.marginallyclever.nodeBasedEditor.view;
 
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.nodeBasedEditor.PrintWithGraphics;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
@@ -48,6 +49,8 @@ public class NodeGraphViewPanel extends JPanel {
         updatePaintAreaBounds();
         super.paintComponent(g);
 
+        paintNodesInBackground(g);
+
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_ON);
@@ -59,6 +62,14 @@ public class NodeGraphViewPanel extends JPanel {
         for(NodeConnection c : model.getConnections()) paintConnection(g,c);
 
         paintExtras(g);
+    }
+
+    private void paintNodesInBackground(Graphics g) {
+        for(Node n : model.getNodes()) {
+            if(n instanceof PrintWithGraphics) {
+                ((PrintWithGraphics) n).print(g);
+            }
+        }
     }
 
     public void updatePaintAreaBounds() {
@@ -119,10 +130,15 @@ public class NodeGraphViewPanel extends JPanel {
 
         // value
         g.setColor(NODE_COLOR_FONT);
-        String val = v.getValue().toString();
-        int MAX_CHARS=10;
-        if(val.length()>MAX_CHARS) val = val.substring(0,MAX_CHARS)+"...";
-        paintText(g,val,insideBox,ALIGN_RIGHT,ALIGN_CENTER);
+
+        g.setColor(NODE_COLOR_FONT);
+        Object vObj = v.getValue();
+        if(vObj != null) {
+            String val = vObj.toString();
+            int MAX_CHARS = 10;
+            if (val.length() > MAX_CHARS) val = val.substring(0, MAX_CHARS) + "...";
+            paintText(g, val, insideBox, ALIGN_RIGHT, ALIGN_CENTER);
+        }
 
         // internal border
         g.setColor(NODE_COLOR_INTERNAL_BORDER);

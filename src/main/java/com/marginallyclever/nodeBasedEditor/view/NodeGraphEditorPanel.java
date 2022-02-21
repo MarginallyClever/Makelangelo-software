@@ -4,6 +4,8 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.util.PreferencesHelper;
@@ -507,10 +509,15 @@ public class NodeGraphEditorPanel extends JPanel {
         model.add(new NodeConnection(constant0,0,add,0));
         model.add(new NodeConnection(constant1,0,add,1));
         model.add(new NodeConnection(add,2,report,0));
+        Node loadImage = model.add(new LoadImage("test.png"));
+        Node printImage = model.add(new PrintImage());
+        model.add(new NodeConnection(loadImage,1,printImage,0));
 
         constant1.getRectangle().y=50;
         add.getRectangle().x=200;
         report.getRectangle().x=400;
+        loadImage.getRectangle().setLocation(20,150);
+        printImage.getRectangle().setLocation(200,150);
 
         NodeGraphEditorPanel panel = new NodeGraphEditorPanel(model);
         JFrame frame = new JFrame("NodeBasedEditorPanel");
