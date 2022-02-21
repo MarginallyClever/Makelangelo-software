@@ -7,10 +7,10 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 
-public class ActionLoad extends AbstractAction {
+public class ActionLoadGraph extends AbstractAction {
     NodeGraphEditorPanel editor;
 
-    public ActionLoad(String name, NodeGraphEditorPanel editor) {
+    public ActionLoadGraph(String name, NodeGraphEditorPanel editor) {
         super(name);
         this.editor = editor;
     }

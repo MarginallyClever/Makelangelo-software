@@ -8,10 +8,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class ActionPrint extends AbstractAction {
+public class ActionPrintGraph extends AbstractAction {
     NodeGraphEditorPanel editor;
 
-    public ActionPrint(String name, NodeGraphEditorPanel editor) {
+    public ActionPrintGraph(String name, NodeGraphEditorPanel editor) {
         super(name);
         this.editor = editor;
     }

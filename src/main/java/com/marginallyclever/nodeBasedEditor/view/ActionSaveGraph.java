@@ -5,10 +5,10 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-public class ActionSave extends AbstractAction {
+public class ActionSaveGraph extends AbstractAction {
     NodeGraphEditorPanel editor;
 
-    public ActionSave(String name,NodeGraphEditorPanel editor) {
+    public ActionSaveGraph(String name, NodeGraphEditorPanel editor) {
         super(name);
         this.editor = editor;
     }
