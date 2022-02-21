@@ -262,7 +262,9 @@ public class Turtle implements Cloneable {
 					if(bottom.y>old.y) bottom.y=old.y;
 				}
 			}
-			old=m;
+			if ( m.type != TurtleMove.TOOL_CHANGE){
+				old=m;
+			}
 		}
 		
 		if(hits==0) {

@@ -9,6 +9,8 @@ java/Makelangelo.jar
 java/saved.png
 # End Makelangelo specific #
 
+src/main/art/
+
 # Start OS generated files #
 */.DS_Store
 .DS_Store
