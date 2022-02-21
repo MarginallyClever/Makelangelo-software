@@ -70,8 +70,8 @@ public abstract class Node {
      */
     public abstract void update();
 
-    public void updateRectangle() {
-        int w=0;
+    public void updateBounds() {
+        int w=(int)rectangle.getWidth();
         int h=Node.TITLE_HEIGHT;
         int y=getRectangle().y;
         int x=getRectangle().x;
@@ -219,5 +219,10 @@ public abstract class Node {
     public void setPosition(Point point) {
         rectangle.x=point.x;
         rectangle.y=point.y;
+    }
+
+    public void moveRelative(int dx, int dy) {
+        rectangle.x += dx;
+        rectangle.y += dy;
     }
 }
