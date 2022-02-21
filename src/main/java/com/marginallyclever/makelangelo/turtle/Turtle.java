@@ -33,6 +33,14 @@ public class Turtle implements Cloneable {
 	private boolean isUp;
 	private ColorRGB color;
 	private double diameter=1;
+	
+	//
+	static private int instanceCpt=0;
+	private int instanceNum=instanceCpt++;
+	
+	// 
+	private String name_base = "Turtle_"+instanceNum;
+	
 
 	public Turtle() {
 		super();
@@ -53,6 +61,7 @@ public class Turtle implements Cloneable {
 		for( TurtleMove m : t.history ) {
 			this.history.add(new TurtleMove(m));
 		}
+		this.name_base = t.name_base;
 	}
 	
 	public Turtle(ColorRGB firstColor) {
@@ -77,7 +86,7 @@ public class Turtle implements Cloneable {
 		py = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<TurtleMove>();
+		history = new ArrayList<>();
 		// default turtle color is black.
 		setColor(c);
 	}
@@ -452,5 +461,13 @@ public class Turtle implements Cloneable {
 		}
 		
 		return new ColorRGB(0,0,0);
+	}
+	
+	public String getName(){
+		return name_base;
+	}
+	
+	public void setName(String name){
+		name_base = name +"_"+instanceNum;
 	}
 }

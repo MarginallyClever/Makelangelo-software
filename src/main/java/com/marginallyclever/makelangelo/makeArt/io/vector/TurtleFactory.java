@@ -28,10 +28,11 @@ public class TurtleFactory {
 
 		for( TurtleLoader loader : loaders ) {
 			if(isValidExtension(filename,loader.getFileNameFilter())) {
-				FileInputStream in = new FileInputStream(filename);
-				Turtle result = loader.load(in);
-				in.close();
-				return result;
+				try (FileInputStream in = new FileInputStream(filename)) {// ? already done by collis ... i maybe on an old revision ...
+					Turtle result = loader.load(in, filename);// todo if not in dev mode not the full filename but only the new File(filename).getFileName() with no extension ?
+					return result;
+				}
+				
 			}
 		}
 		throw new IllegalStateException("TurtleFactory could not load '"+filename+"'.");

@@ -38,8 +38,9 @@ public class LoadGCode implements TurtleLoader {
 	}
 	
 	@Override
-	public Turtle load(InputStream in) throws Exception {
+	public Turtle load(InputStream in, String nameForTurlte) throws Exception {
 		Turtle turtle = new Turtle();
+		turtle.setName(nameForTurlte);
 		ColorRGB penDownColor = turtle.getColor();
 		double scaleXY=1;
 		boolean isAbsolute=true;

@@ -114,7 +114,7 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 	
 	@Override
-	public Turtle load(InputStream in) throws Exception {
+	public Turtle load(InputStream in, String nameForTurlte) throws Exception {
 		logger.debug("Loading...");
 		JSONObject tree = getTreeFromInputStream(in);
 		
@@ -125,7 +125,7 @@ public class LoadScratch3 implements TurtleLoader {
 		readScratchLists(tree);
 		findBlocks(tree);
 		readScratchProcedures();
-		readScratchInstructions();
+		readScratchInstructions(nameForTurlte);
 
 		return myTurtle;
 	}
@@ -193,9 +193,10 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @param tree the JSONObject tree read from the project.json/zip file.
 	 * @throws Exception
 	 */
-	private void readScratchInstructions() throws Exception {
+	private void readScratchInstructions(String nameForTurlte) throws Exception {
 		logger.trace("readScratchInstructions ( and do a flagclicked {} times ) ",nbClicOnTheGreenFlag);
 		myTurtle = new Turtle();// needed to be init here in case multiple "event_whenflagclicked"
+		myTurtle.setName(nameForTurlte);
 		int nbGreenFlagParsed_Total = 0;
 		for (int i = 0; i < nbClicOnTheGreenFlag; i++) {
 			// find the first block with opcode=event_whenflagclicked.

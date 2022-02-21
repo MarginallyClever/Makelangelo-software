@@ -50,13 +50,14 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	@Override
-	public Turtle load(InputStream in) throws Exception {
+	public Turtle load(InputStream in, String nameForTurlte) throws Exception {
 		logger.debug("Loading...");
 		
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 		
 	    myTurtle = new Turtle();
+		myTurtle.setName(nameForTurlte);
 		myTurtle.setColor(new ColorRGB(0,0,0));
 		parseAll(document);
 		

@@ -25,5 +25,5 @@ public interface TurtleLoader {
 	 * @param inputStream source of image
 	 * @return true if load successful.
 	 */
-	public Turtle load(InputStream inputStream) throws Exception;
+	public Turtle load(InputStream inputStream, String nameForTurtle) throws Exception;
 }

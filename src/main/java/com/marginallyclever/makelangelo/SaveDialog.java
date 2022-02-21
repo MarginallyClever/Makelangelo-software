@@ -24,6 +24,7 @@ public class SaveDialog {
 	}
 	
 	public void run(Turtle t,JFrame parent) throws Exception {
+		fc.setSelectedFile(new File(t.getName()));// TODO only get the name to avoid changing the save path if the name start with a path.
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());

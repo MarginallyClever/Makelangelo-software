@@ -123,7 +123,7 @@ public class LoadDXF implements TurtleLoader {
 	}
 	
 	@Override
-	public Turtle load(InputStream in) throws Exception {
+	public Turtle load(InputStream in, String nameForTurlte) throws Exception {
 		logger.debug("Loading...");
 
 		// Read in the DXF file
@@ -135,6 +135,7 @@ public class LoadDXF implements TurtleLoader {
 		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
 
 		myTurtle = new Turtle();
+		myTurtle.setName(nameForTurlte);
 		
 		// convert each entity
 		Iterator<?> layerIter = doc.getDXFLayerIterator();

@@ -130,6 +130,7 @@ public final class Makelangelo {
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
+		currentInstance = this;
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 		VERSION = PropertiesFileHelper.getMakelangeloVersion();
@@ -868,11 +869,17 @@ public final class Makelangelo {
         labelRangeMax.setText(Integer.toString(top));
 	}
 
+	String mainFram_pos_title = "";
 	//  For thread safety this method should be invoked from the event-dispatching thread.
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
+		if ( "true".equalsIgnoreCase(System.getenv("DEV"))){
+			mainFram_pos_title = getFullVersionString();
+		}else{
+			mainFram_pos_title = getLiteVersionString();
+		}
 
-		mainFrame = new JFrame(Translator.get("TitlePrefix") + " " + VERSION);
+		mainFrame = new JFrame(mainFram_pos_title);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -1059,6 +1066,7 @@ public final class Makelangelo {
 	}
 
 	public void setTurtle(Turtle turtle) {
+		mainFrame.setTitle(turtle.getName()+" - "+mainFram_pos_title);
 		myTurtle = turtle;
 		myTurtleRenderer.setTurtle(turtle);
 		int top = turtle.history.size();
@@ -1090,5 +1098,21 @@ public final class Makelangelo {
 			Makelangelo makelangeloProgram = new Makelangelo();
 			makelangeloProgram.run();
 		});
+	}
+	
+	public String getFullVersionString(){
+		return getLiteVersionString()+ " ("+DETAILED_VERSION+")";		
+	}
+	public String getLiteVersionString(){
+		return Translator.get("TitlePrefix") + " " +VERSION;		
+	}
+	
+	private static Makelangelo currentInstance = null;
+	
+	public static String staticgetFullVersionString(){
+		if ( currentInstance != null){
+			return currentInstance.getFullVersionString();
+		}
+		return "";
 	}
 }

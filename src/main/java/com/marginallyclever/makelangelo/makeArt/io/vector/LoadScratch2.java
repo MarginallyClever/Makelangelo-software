@@ -65,10 +65,11 @@ public class LoadScratch2 implements TurtleLoader {
 	}
 	
 	@Override
-	public Turtle load(InputStream in) throws Exception {
+	public Turtle load(InputStream in, String nameForTurlte) throws Exception {
 		logger.debug("Loading...");
 
 		turtle = new Turtle();
+		turtle.setName(nameForTurlte);
 		indent=0;
 		
 		JSONObject tree = getTreeFromInputStream(in);
