@@ -40,6 +40,14 @@ public class NodeVariable<T> {
         return new NodeVariable<T>(name,clazz,defaultValue,hasInput,hasOutput);
     }
 
+    /**
+     * Creates a copy of this {@link NodeVariable}, while flipping hasInput and hasOutput
+     * @return an inverted copy of this {@link NodeVariable}.
+     */
+    public NodeVariable<?> createInverse() {
+        return new NodeVariable<T>(name,type,value,!hasInput,!hasOutput);
+    }
+
     public Rectangle getRectangle() {
         return rectangle;
     }
@@ -123,5 +131,4 @@ public class NodeVariable<T> {
     public Point getOutPosition() {
         return new Point((int)rectangle.getMaxX(), rectangle.y+rectangle.height/2);
     }
-
 }
