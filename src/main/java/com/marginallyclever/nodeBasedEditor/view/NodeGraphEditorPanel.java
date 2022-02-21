@@ -9,19 +9,17 @@ import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.util.PreferencesHelper;
-import org.json.JSONObject;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.swing.Action.ACCELERATOR_KEY;
 
 /**
  * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraph}.
@@ -31,12 +29,15 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final NodeGraph model;
     private final NodeGraphViewPanel paintArea;
-    private final JPopupMenu popupBar = new JPopupMenu();
     private final JToolBar toolBar = new JToolBar();
+
+    private final JPopupMenu popupBar = new JPopupMenu();
     private final JMenuItem deleteNodes = new JMenuItem("Delete");
     private final JMenuItem copyNodes = new JMenuItem("Copy");
     private final JMenuItem pasteNodes = new JMenuItem("Paste");
     private final JMenuItem editNode = new JMenuItem("Edit");
+    private final JMenuItem collapseNodes = new JMenuItem("Collapse");
+    private final JMenuItem expandNodes = new JMenuItem("Expand");
 
     private final NodeConnection connectionBeingCreated = new NodeConnection();
 
@@ -152,51 +153,25 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void setupToolBar() {
-        JMenuItem clearAll = new JMenuItem("New");
-        toolBar.add(clearAll);
-        clearAll.addActionListener((e)->onClear());
-        clearAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        ActionNew clear = new ActionNew("New",this);
+        clear.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        toolBar.add(clear);
 
-        JMenuItem saveAll = new JMenuItem("Save");
+        ActionSave saveAll = new ActionSave("Save",this);
+        saveAll.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
         toolBar.add(saveAll);
-        saveAll.addActionListener((e)->onSave());
-        saveAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 
-        JMenuItem loadAll = new JMenuItem("Load");
+        ActionSave loadAll = new ActionSave("Load",this);
+        loadAll.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
         toolBar.add(loadAll);
-        loadAll.addActionListener((e)->onLoad());
-        loadAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
 
-        JMenuItem print = new JMenuItem("Print");
+        ActionPrint print = new ActionPrint("Print",this);
+        print.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
         toolBar.add(print);
-        print.addActionListener((e)-> onPrint());
-        print.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
 
-        JMenuItem update = new JMenuItem("Update");
+        ActionUpdate update = new ActionUpdate("Update",this);
+        update.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
         toolBar.add(update);
-        update.addActionListener((e)-> onUpdate());
-        update.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
-    }
-
-    private void onPrint() {
-        BufferedImage awtImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics g = awtImage.getGraphics();
-        this.printAll(g);
-
-        if(popupBar.isVisible()) {
-            g.translate(popupPoint.x, popupPoint.y);
-            popupBar.printAll(g);
-            g.translate(-popupPoint.x, -popupPoint.y);
-        }
-
-        // TODO file selection dialog here
-        File outputfile = new File("saved.png");
-
-        try {
-            ImageIO.write(awtImage, "png", outputfile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void setupPopopBar() {
@@ -222,45 +197,23 @@ public class NodeGraphEditorPanel extends JPanel {
         editNode.addActionListener((e)->onEdit());
         editNode.setEnabled(false);
         editNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
+
+        popupBar.add(collapseNodes);
+        collapseNodes.addActionListener((e)->onCollapse());
+        collapseNodes.setEnabled(false);
+        collapseNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
+
+        popupBar.add(expandNodes);
+        expandNodes.addActionListener((e)->onExpand());
+        expandNodes.setEnabled(false);
+        expandNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
+
     }
 
-    private void onSave() {
-        JFileChooser fc = new JFileChooser();
-        if (fc.showSaveDialog(SwingUtilities.getWindowAncestor(this)) == JFileChooser.APPROVE_OPTION) {
-            saveModelToFile(fc.getSelectedFile().getAbsolutePath());
-        }
+    private void onCollapse() {
     }
 
-    private void saveModelToFile(String absolutePath) {
-        try(BufferedWriter w = new BufferedWriter(new FileWriter(absolutePath))) {
-            w.write(model.toJSON().toString());
-        } catch(Exception e) {
-            JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void onLoad() {
-        JFileChooser fc = new JFileChooser();
-        if (fc.showOpenDialog(SwingUtilities.getWindowAncestor(this)) == JFileChooser.APPROVE_OPTION) {
-            model.add(loadModelFromFile(fc.getSelectedFile().getAbsolutePath()));
-        }
-    }
-
-    private NodeGraph loadModelFromFile(String absolutePath) {
-        NodeGraph newModel = new NodeGraph();
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(absolutePath)))) {
-            StringBuilder responseStrBuilder = new StringBuilder();
-            String inputStr;
-            while ((inputStr = reader.readLine()) != null)
-                responseStrBuilder.append(inputStr);
-            JSONObject modelAsJSON = new JSONObject(responseStrBuilder.toString());
-            newModel.parseJSON(modelAsJSON);
-        } catch(IOException e) {
-            JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-        return newModel;
+    private void onExpand() {
     }
 
     private void onEdit() {
@@ -268,7 +221,7 @@ public class NodeGraphEditorPanel extends JPanel {
         throw new RuntimeException("Not implemented");
     }
 
-    private void onUpdate() {
+    public void update() {
         try {
             model.update();
             paintArea.repaint();
@@ -486,6 +439,9 @@ public class NodeGraphEditorPanel extends JPanel {
         deleteNodes.setEnabled(notEmpty);
         editNode.setEnabled(notEmpty);
         copyNodes.setEnabled(notEmpty);
+        collapseNodes.setEnabled(selectedNodes.size()>1);
+        expandNodes.setEnabled();
+
         repaint();
     }
 
@@ -509,6 +465,19 @@ public class NodeGraphEditorPanel extends JPanel {
             return n;
         }
         return null;
+    }
+
+    public NodeGraph getGraph() {
+        return model;
+    }
+
+    /**
+     * Clears the internal graph and resets everything.
+     */
+    public void clear() {
+        model.clear();
+        Node.setUniqueIDSource(0);
+        paintArea.repaint();
     }
 
     public static void main(String[] args) {
