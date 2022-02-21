@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -302,7 +301,7 @@ public class NodeGraph {
         return i;
     }
 
-    public Collection<? extends Node> getNodesInRectangle(Rectangle2D selectionArea) {
+    public List<Node> getNodesInRectangle(Rectangle2D selectionArea) {
         if(selectionArea==null) throw new InvalidParameterException("selectionArea cannot be null.");
         ArrayList<Node> found = new ArrayList<>();
         for(Node n : nodes) {
@@ -332,5 +331,22 @@ public class NodeGraph {
             }
         }
         return list;
+    }
+
+    /**
+     * Calculates and returns the smallest {@link Rectangle} that contains all {@link Node}s.  If there are no Nodes
+     * in this graph then nothing is done.
+     * @return the smallest {@link Rectangle} that contains all {@link Node}s, or null.
+     */
+    public Rectangle getBounds() {
+        if(nodes.size()==0) return null;
+
+        Rectangle r=new Rectangle(nodes.get(0).getRectangle());
+        for(Node n : nodes) {
+            r.union(n.getRectangle());
+            // for very small graphs this is a redundant union with self.
+            // For very large graphs this avoids any 'if' in the loop and saves time.
+        }
+        return r;
     }
 }
