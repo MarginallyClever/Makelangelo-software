@@ -1,6 +1,5 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
-import com.marginallyclever.convenience.Point2D;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,15 +30,25 @@ public class NodeConnection {
     }
 
     /**
-     * Send the value of upstream variables to downstream variables
+     * Send the value of upstream variables to downstream variables if the upstream is dirty.
      */
-    public void apply() {
+    public void applyIfDirty() {
         if(!isValidDataType()) return;
 
         NodeVariable<?> in = getInputVariable();
         if(in.getIsDirty()) {
             getOutputVariable().setValue(in.getValue());
         }
+    }
+
+    /**
+     * Send the value of upstream variables to downstream variables
+     */
+    public void apply() {
+        if(!isValidDataType()) return;
+
+        NodeVariable<?> in = getInputVariable();
+        getOutputVariable().setValue(in.getValue());
     }
 
     public boolean isValidDataType() {
