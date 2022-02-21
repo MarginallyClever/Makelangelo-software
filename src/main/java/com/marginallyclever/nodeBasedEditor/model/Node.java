@@ -105,6 +105,12 @@ public abstract class Node {
         }
     }
 
+    public void cleanAllOutputs() {
+        for(NodeVariable<?> v : variables) {
+            if(v.getHasOutput()) v.setIsDirty(false);
+        }
+    }
+
     public void addVariable(NodeVariable v) {
         variables.add(v);
     }
