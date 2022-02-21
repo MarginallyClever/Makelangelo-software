@@ -3,7 +3,7 @@ package com.marginallyclever.nodeBasedEditor.view;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.model.*;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
@@ -83,9 +83,16 @@ public class NodeGraphEditorPanel extends JPanel {
             HighlightNearbyConnectionPoint(g);
 
             if(selectionOn) paintSelectionArea(g);
+            paintCursor(g);
         });
         paintArea.updatePaintAreaBounds();
         paintArea.repaint();
+    }
+
+    private void paintCursor(Graphics g) {
+        int r=5;
+        g.setColor(Color.YELLOW);
+        g.drawArc(mousePreviousPosition.x-r,mousePreviousPosition.y-r,r*2,r*2,0,360);
     }
 
     private void highlightSelectedNodes(Graphics g) {
@@ -175,9 +182,12 @@ public class NodeGraphEditorPanel extends JPanel {
         BufferedImage awtImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = awtImage.getGraphics();
         this.printAll(g);
-        g.translate(popupPoint.x,popupPoint.y);
-        popupBar.printAll(g);
-        g.translate(-popupPoint.x,-popupPoint.y);
+
+        if(popupBar.isVisible()) {
+            g.translate(popupPoint.x, popupPoint.y);
+            popupBar.printAll(g);
+            g.translate(-popupPoint.x, -popupPoint.y);
+        }
 
         // TODO file selection dialog here
         File outputfile = new File("saved.png");
@@ -414,7 +424,6 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void onClickConnectionPoint() {
-        System.out.println("onClickConnectionPoint");
         if(lastConnectionPoint == null) {
             connectionBeingCreated.disconnectAll();
             return;
@@ -436,6 +445,12 @@ public class NodeGraphEditorPanel extends JPanel {
                 NodeConnection match = model.getMatchingConnection(connectionBeingCreated);
                 if(match!=null) model.remove(match);
                 else model.add(new NodeConnection(connectionBeingCreated));
+            } else {
+                NodeVariable<?> vIn = connectionBeingCreated.getInVariable();
+                NodeVariable<?> vOut = connectionBeingCreated.getOutVariable();
+                String nameIn = (vIn==null) ? "null" : vIn.getTypeClass();
+                String nameOut = (vOut==null) ? "null" : vOut.getTypeClass();
+                System.out.println("Invalid types "+nameOut+", "+nameIn+".");
             }
             // if any of the tests failed, restart.
             connectionBeingCreated.disconnectAll();
@@ -502,8 +517,8 @@ public class NodeGraphEditorPanel extends JPanel {
         Translator.start();
 
         NodeGraph model = new NodeGraph();
-        Node constant0 = model.add(new Constant(1));
-        Node constant1 = model.add(new Constant(2));
+        Node constant0 = model.add(new LoadNumber(1));
+        Node constant1 = model.add(new LoadNumber(2));
         Node add = model.add(new Add());
         Node report = model.add(new PrintToStdOut());
         model.add(new NodeConnection(constant0,0,add,0));
