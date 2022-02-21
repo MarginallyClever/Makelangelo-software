@@ -59,3 +59,4 @@ avrdude.conf
 !src/main/package/avrdude.conf
 avrdude.exe
 !src/main/package/avrdude.exe
+saved.png
