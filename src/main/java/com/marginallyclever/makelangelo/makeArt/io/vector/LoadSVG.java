@@ -290,14 +290,14 @@ public class LoadSVG implements TurtleLoader {
 			double perimeterOfAnEllipseApprox = Math.PI * 2.0 * Math.sqrt((ry*ry + rx*rx)/2.0);
 			double steps = Math.max(3,perimeterOfAnEllipseApprox);
 			steps = Math.min(60,steps);
-			printEllipse(m, cx, cy, rx, ry, perimeterOfAnEllipseApprox);
+			printEllipse(m, cx, cy, rx, ry, steps);
 		}
 	}
 
-	private void printEllipse(Matrix3d m, double cx, double cy, double rx, double ry, double perimeterOfAnEllipseApprox) {
+	private void printEllipse(Matrix3d m, double cx, double cy, double rx, double ry, double steps) {
 		Vector3d v2;
-		for(double i = 1; i<perimeterOfAnEllipseApprox; ++i) {
-			double v = (Math.PI*2.0) * (i/perimeterOfAnEllipseApprox);
+		for(double i = 1; i<steps; ++i) {
+			double v = (Math.PI*2.0) * (i/steps);
 			double s=ry*Math.sin(v);
 			double c=rx*Math.cos(v);
 			v2 = transform(cx+c,cy+s,m);
