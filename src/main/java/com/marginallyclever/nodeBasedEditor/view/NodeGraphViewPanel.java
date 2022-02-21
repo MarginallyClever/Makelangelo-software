@@ -80,7 +80,7 @@ public class NodeGraphViewPanel extends JPanel {
     public void updatePaintAreaBounds() {
         Rectangle r = this.getBounds();
         for(Node n : model.getNodes()) {
-            n.updateRectangle();
+            n.updateBounds();
             Rectangle other = new Rectangle(n.getRectangle());
             //other.grow(100,100);
             r.add(other.getMinX(),other.getMinY());
@@ -226,10 +226,10 @@ public class NodeGraphViewPanel extends JPanel {
     }
 
     /**
-     * Given points p0 and p3,
-     * @param g
-     * @param p0
-     * @param p3
+     * Paint a cubic bezier using {@link Graphics} from p0 to p3.
+     * @param g the {@link Graphics} painting tool.
+     * @param p0 the first point of the cubic bezier spline.
+     * @param p3 the last point of the cubic bezier spline.
      */
     public void paintBezierBetweenTwoPoints(Graphics g,Point p0, Point p3) {
         Point p1 = new Point(p0);
