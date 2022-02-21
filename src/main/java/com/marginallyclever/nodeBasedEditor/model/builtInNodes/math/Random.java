@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes.math;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
