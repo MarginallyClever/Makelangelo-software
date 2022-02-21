@@ -35,6 +35,8 @@ public class NodeGraph {
         NodeFactory.registerNode(new Sin());
         NodeFactory.registerNode(new Tan());
         NodeFactory.registerNode(new ATan2());
+        NodeFactory.registerNode(new Min());
+        NodeFactory.registerNode(new Max());
 
         NodeFactory.registerNode(new LoadImage());
         NodeFactory.registerNode(new PrintImage());
@@ -44,7 +46,8 @@ public class NodeGraph {
 
     public void update() {
         for(Node n : nodes) n.update();
-        for(NodeConnection c : connections) c.apply();
+        for(NodeConnection c : connections) c.applyIfDirty();
+        for(Node n : nodes) n.cleanAllOutputs();
     }
 
     public List<Node> getNodes() {
