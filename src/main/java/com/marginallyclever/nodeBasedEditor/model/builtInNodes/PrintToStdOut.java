@@ -7,7 +7,7 @@ public class PrintToStdOut extends Node {
     private final NodeVariable<Object> a = NodeVariable.newInstance("A",Object.class,null,true,false);
 
     public PrintToStdOut() {
-        super("Report to StdOut");
+        super("PrintToStdOut");
         addVariable(a);
     }
 
