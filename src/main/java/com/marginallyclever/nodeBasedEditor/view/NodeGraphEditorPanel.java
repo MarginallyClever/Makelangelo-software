@@ -29,22 +29,37 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final NodeGraph model;
     private final NodeGraphViewPanel paintArea;
-    private final JToolBar toolBar = new JToolBar();
 
+    /**
+     * The currently selected nodes for group operations
+     */
+    private final List<Node> selectedNodes = new ArrayList<>();
+
+    /**
+     * Store copied nodes in this buffer.  Could be a user-space file instead.
+     */
+    private final NodeGraph copiedGraph = new NodeGraph();
+
+    private final JToolBar toolBar = new JToolBar();
     private final JPopupMenu popupBar = new JPopupMenu();
-    private final JMenuItem deleteNodes = new JMenuItem("Delete");
-    private final JMenuItem copyNodes = new JMenuItem("Copy");
-    private final JMenuItem pasteNodes = new JMenuItem("Paste");
-    private final JMenuItem editNode = new JMenuItem("Edit");
-    private final JMenuItem collapseNodes = new JMenuItem("Collapse");
-    private final JMenuItem expandNodes = new JMenuItem("Expand");
+
+    private final ActionNewGraph actionNewGraph = new ActionNewGraph("New",this);
+    private final ActionSaveGraph actionSaveGraph = new ActionSaveGraph("Save",this);
+    private final ActionSaveGraph actionLoadGraph = new ActionSaveGraph("Load",this);
+    private final ActionPrintGraph actionPrintGraph = new ActionPrintGraph("Print",this);
+    private final ActionUpdateGraph actionUpdateGraph = new ActionUpdateGraph("Update",this);
+    private final ActionCopyGraph actionCopyGraph = new ActionCopyGraph("Copy",this);
+    private final ActionPasteGraph actionPasteGraph = new ActionPasteGraph("Paste",this);
+    private final ActionDeleteGraph actionDeleteGraph = new ActionDeleteGraph("Delete",this);
+    private final ActionCutGraph actionCutGraph = new ActionCutGraph("Cut", actionDeleteGraph, actionCopyGraph);
+
+    private final ActionAddNode actionAddNode = new ActionAddNode("Add",this);
+    private final ActionEditNodes actionEditNodes = new ActionEditNodes("Edit",this);
+    private final ActionFoldGraph actionFoldGraph = new ActionFoldGraph("Fold",this, actionCutGraph);
+    private final ActionUnfoldGraph actionUnfoldGraph = new ActionUnfoldGraph("Unfold",this);
 
     private final NodeConnection connectionBeingCreated = new NodeConnection();
-
-    private final List<Node> selectedNodes = new ArrayList<>();
     private NodeConnectionPointInfo lastConnectionPoint = null;
-
-    private final NodeGraph copiedNodes = new NodeGraph();
 
     // true while dragging one or more nodes around.
     private boolean dragOn=false;
@@ -71,10 +86,13 @@ public class NodeGraphEditorPanel extends JPanel {
 
         setupToolBar();
         setupPopopBar();
+        setupAccelerators();
+
         attachMouseAdapter();
         setupPaintArea();
 
         setSelectedNodes(null);
+        updateActionEnableStatus();
     }
 
     private void setupPaintArea() {
@@ -153,72 +171,43 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void setupToolBar() {
-        ActionNew clear = new ActionNew("New",this);
-        clear.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
-        toolBar.add(clear);
-
-        ActionSave saveAll = new ActionSave("Save",this);
-        saveAll.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
-        toolBar.add(saveAll);
-
-        ActionSave loadAll = new ActionSave("Load",this);
-        loadAll.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
-        toolBar.add(loadAll);
-
-        ActionPrint print = new ActionPrint("Print",this);
-        print.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
-        toolBar.add(print);
-
-        ActionUpdate update = new ActionUpdate("Update",this);
-        update.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
-        toolBar.add(update);
+        toolBar.add(actionNewGraph);
+        toolBar.add(actionSaveGraph);
+        toolBar.add(actionLoadGraph);
+        toolBar.add(actionPrintGraph);
+        toolBar.add(actionUpdateGraph);
     }
 
     private void setupPopopBar() {
-        JMenuItem addConnection = new JMenuItem("Add");
-        popupBar.add(addConnection);
-        addConnection.addActionListener((e)->onAdd());
-
-        popupBar.add(deleteNodes);
-        deleteNodes.addActionListener((e)->onDelete());
-        deleteNodes.setEnabled(false);
-
-        popupBar.add(copyNodes);
-        copyNodes.addActionListener((e)->onCopy());
-        copyNodes.setEnabled(false);
-        copyNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
-
-        popupBar.add(pasteNodes);
-        pasteNodes.addActionListener((e)->onPaste());
-        pasteNodes.setEnabled(false);
-        pasteNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
-
-        popupBar.add(editNode);
-        editNode.addActionListener((e)->onEdit());
-        editNode.setEnabled(false);
-        editNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
-
-        popupBar.add(collapseNodes);
-        collapseNodes.addActionListener((e)->onCollapse());
-        collapseNodes.setEnabled(false);
-        collapseNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
-
-        popupBar.add(expandNodes);
-        expandNodes.addActionListener((e)->onExpand());
-        expandNodes.setEnabled(false);
-        expandNodes.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
-
+        popupBar.add(actionAddNode);
+        popupBar.add(actionEditNodes);
+        popupBar.add(actionFoldGraph);
+        popupBar.add(actionUnfoldGraph);
+        popupBar.addSeparator();
+        popupBar.add(actionCopyGraph);
+        popupBar.add(actionCutGraph);
+        popupBar.add(actionPasteGraph);
+        popupBar.addSeparator();
+        popupBar.add(actionDeleteGraph);
     }
 
-    private void onCollapse() {
-    }
+    private void setupAccelerators() {
+        actionNewGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        actionSaveGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+        actionLoadGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
+        actionPrintGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+        actionUpdateGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
 
-    private void onExpand() {
-    }
+        actionAddNode.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+        actionEditNodes.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
+        actionFoldGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
+        actionUnfoldGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
 
-    private void onEdit() {
-        System.out.println("Edit node(s)");
-        throw new RuntimeException("Not implemented");
+        actionCopyGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
+        actionCutGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK));
+        actionPasteGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+
+        actionDeleteGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
     }
 
     public void update() {
@@ -230,52 +219,20 @@ public class NodeGraphEditorPanel extends JPanel {
         }
     }
 
-    private void onDelete() {
-        for(Node n : selectedNodes) model.remove(n);
-        setSelectedNodes(null);
-    }
-
-    private void onCopy() {
-        copiedNodes.clear();
-        NodeGraph modelB = new NodeGraph();
-        for(Node n : selectedNodes) modelB.add(n);
-        List<NodeConnection> selectedConnections = model.getConnectionsBetweenTheseNodes(selectedNodes);
-        for(NodeConnection c : selectedConnections) modelB.add(c);
-        copiedNodes.add(modelB.deepCopy());
-        pasteNodes.setEnabled(!copiedNodes.isEmpty());
-    }
-
-    private void onPaste() {
-        NodeGraph modelC = copiedNodes.deepCopy();
-        model.add(modelC);
-        setSelectedNodes(modelC.getNodes());
-    }
-
-    private void onAdd() {
-        System.out.println("adding node");
-        Node n = NodeFactoryPanel.runAsDialog((JFrame)SwingUtilities.getWindowAncestor(this));
-        if(n!=null) {
-            n.setPosition(popupPoint);
-            model.add(n);
-            paintArea.updatePaintAreaBounds();
-            paintArea.repaint();
-        }
-    }
-
-    private void onClear() {
-        System.out.println("clear");
-        model.clear();
-        paintArea.repaint();
-    }
-
     private void attachMouseAdapter() {
         paintArea.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                dragSelectedNodes(e);
-                mousePreviousPosition.setLocation(e.getX(), e.getY());
+                if(dragOn) {
+                    int dx = e.getX() - mousePreviousPosition.x;
+                    int dy = e.getY() - mousePreviousPosition.y;
+                    moveSelectedNodes(dx, dy);
+                    paintArea.repaint();
+                }
                 if(selectionOn)
                     paintArea.repaint();
+
+                mousePreviousPosition.setLocation(e.getX(), e.getY());
             }
 
             @Override
@@ -293,7 +250,7 @@ public class NodeGraphEditorPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 onClickConnectionPoint();
                 if(lastConnectionPoint == null) {
-                    setSelectedNodes(getNodeAt(e.getPoint()));
+                    setSelectedNode(getNodeAt(e.getPoint()));
                 }
             }
 
@@ -306,24 +263,21 @@ public class NodeGraphEditorPanel extends JPanel {
                     // if user presses down on an already selected item then user is dragging selected nodes
                     Node n = getNodeAt(e.getPoint());
                     if(n!=null) {
-                        if(selectedNodes.contains(n)) {
-                            beginDragNode(e.getPoint());
-                        } else {
-                            setSelectedNodes(n);
-                            beginDragNode(e.getPoint());
+                        if(!selectedNodes.contains(n)) {
+                            setSelectedNode(n);
                         }
+                        dragOn=true;
                     } else {
+                        // nothing under point, start new selection.
                         beginSelectionArea(e.getPoint());
                     }
                 }
             }
 
-
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
-                if(dragOn) endDragNodes();
+                if(dragOn) dragOn=false;
                 else if(selectionOn) endSelectionArea(e.getPoint());
             }
 
@@ -336,25 +290,10 @@ public class NodeGraphEditorPanel extends JPanel {
         });
     }
 
-    private void beginDragNode(Point e) {
-        dragOn=true;
-        mousePreviousPosition.setLocation(e.getX(), e.getY());
-    }
-
-    private void endDragNodes() {
-        dragOn=false;
-    }
-
-    private void dragSelectedNodes(MouseEvent e) {
-        if(!dragOn) return;
-        int dx=e.getX() - mousePreviousPosition.x;
-        int dy=e.getY() - mousePreviousPosition.y;
+    private void moveSelectedNodes(int dx, int dy) {
         for(Node n : selectedNodes) {
-            Rectangle r = n.getRectangle();
-            r.x += dx;
-            r.y += dy;
+            n.moveRelative(dx,dy);
         }
-        paintArea.repaint();
     }
 
     private void beginSelectionArea(Point point) {
@@ -368,7 +307,7 @@ public class NodeGraphEditorPanel extends JPanel {
         setSelectedNodes(model.getNodesInRectangle(getSelectionArea(point)));
     }
 
-    Rectangle2D getSelectionArea(Point point) {
+    private Rectangle2D getSelectionArea(Point point) {
         double x1 = Math.min(point.x, selectionAreaStart.x);
         double x2 = Math.max(point.x, selectionAreaStart.x);
         double y1 = Math.min(point.y, selectionAreaStart.y);
@@ -417,7 +356,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     /**
-     *
+     * Remembers a connection point as described by a {@link NodeConnectionPointInfo}.
      * @param info the {@link NodeConnectionPointInfo}
      */
     private void setLastConnectionPoint(NodeConnectionPointInfo info) {
@@ -425,24 +364,35 @@ public class NodeGraphEditorPanel extends JPanel {
         repaint();
     }
 
-    @SuppressWarnings("unchecked")
-    private void setSelectedNodes(Object o) {
-        selectedNodes.clear();
-        if(o!=null) {
-            if(o instanceof Node) {
-                selectedNodes.add((Node) o);
-            } else if(o instanceof List<?>) {
-                selectedNodes.addAll((List<Node>) o);
-            }
+    public void setSelectedNode(Node n) {
+        if(n!=null) {
+            ArrayList<Node> nodes = new ArrayList<>();
+            nodes.add(n);
+            setSelectedNodes(nodes);
         }
-        boolean notEmpty = !selectedNodes.isEmpty();
-        deleteNodes.setEnabled(notEmpty);
-        editNode.setEnabled(notEmpty);
-        copyNodes.setEnabled(notEmpty);
-        collapseNodes.setEnabled(selectedNodes.size()>1);
-        expandNodes.setEnabled();
+    }
 
-        repaint();
+    public void setSelectedNodes(List<Node> list) {
+        selectedNodes.clear();
+        if (list != null) selectedNodes.addAll(list);
+        updateActionEnableStatus();
+        paintArea.repaint();
+    }
+
+    public List<Node> getSelectedNodes() {
+        return selectedNodes;
+    }
+
+    private void updateActionEnableStatus() {
+        boolean notEmpty = !selectedNodes.isEmpty();
+
+        // TODO All Actions have the tools to check for themselves if they are active.
+        actionDeleteGraph.setEnabled(notEmpty);
+        actionEditNodes.setEnabled(notEmpty);
+        actionCopyGraph.setEnabled(notEmpty);
+        actionPasteGraph.setEnabled(!copiedGraph.isEmpty());
+        actionFoldGraph.setEnabled(selectedNodes.size()>1);
+        actionUnfoldGraph.setEnabled(notEmpty); // TODO more checks here?
     }
 
     /**
@@ -451,18 +401,13 @@ public class NodeGraphEditorPanel extends JPanel {
      * @return the last {@link Node} at the given point
      */
     private Node getNodeAt(Point point) {
-        //System.out.println("getNodeAt("+point.x+","+point.y+")");
-
         List<Node> list = model.getNodes();
+        // reverse iterator because last node is top-most.
         for (int i = list.size(); i-- > 0; ) {
             Node n = list.get(i);
-            Rectangle r = n.getRectangle();
-            //System.out.println(n.getUniqueName()+":"+r);
-            if(r.getMinX()>point.x) continue;
-            if(r.getMinY()>point.y) continue;
-            if(r.getMaxX()<point.x) continue;
-            if(r.getMaxY()<point.y) continue;
-            return n;
+            if(n.getRectangle().contains(point)) {
+                return n;
+            }
         }
         return null;
     }
@@ -471,13 +416,26 @@ public class NodeGraphEditorPanel extends JPanel {
         return model;
     }
 
+    public Point getPopupPoint() {
+        return popupPoint;
+    }
+
+    public NodeGraph getCopiedGraph() {
+        return copiedGraph;
+    }
+
+    public void setCopiedGraph(NodeGraph graph) {
+        copiedGraph.clear();
+        copiedGraph.add(graph);
+    }
+
     /**
      * Clears the internal graph and resets everything.
      */
     public void clear() {
         model.clear();
         Node.setUniqueIDSource(0);
-        paintArea.repaint();
+        repaint();
     }
 
     public static void main(String[] args) {
