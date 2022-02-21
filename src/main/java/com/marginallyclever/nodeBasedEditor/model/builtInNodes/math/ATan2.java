@@ -26,6 +26,6 @@ public class ATan2 extends Node {
         double x = a.getValue().doubleValue();
         double y = a.getValue().doubleValue();
         c.setValue(Math.atan2(y,x));
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }

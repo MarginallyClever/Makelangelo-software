@@ -1,6 +1,5 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.nodeBasedEditor.JSONHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +14,7 @@ import java.util.List;
  * The operator is defined by extending the {@link Node} class and defining the {@code update()} method.
  */
 public abstract class Node {
-    public static final int NODE_TITLE_HEIGHT = 25;
+    public static final int TITLE_HEIGHT = 25;
 
     private static int uniqueIDSource=0;
     private int uniqueID;
@@ -73,7 +72,7 @@ public abstract class Node {
 
     public void updateRectangle() {
         int w=0;
-        int h=Node.NODE_TITLE_HEIGHT;
+        int h=Node.TITLE_HEIGHT;
         int y=getRectangle().y;
         int x=getRectangle().x;
         for(NodeVariable v : variables) {
@@ -98,11 +97,11 @@ public abstract class Node {
     }
 
     /**
-     * Set all variables to clean (dirty=false).
+     * Makes all input variables not dirty.
      */
-    protected void alwaysBeCleaning() {
+    protected void cleanAllInputs() {
         for(NodeVariable<?> v : variables) {
-            v.setIsDirty(false);
+            if(v.getHasInput()) v.setIsDirty(false);
         }
     }
 
@@ -146,7 +145,7 @@ public abstract class Node {
     }
 
     private double getPointHeight(int index) {
-        float y = NODE_TITLE_HEIGHT;
+        float y = TITLE_HEIGHT;
         Rectangle inr = getRectangle();
         for(int i=0;i<index;++i) {
             y += getVariable(i).getRectangle().height;

@@ -26,6 +26,6 @@ public class Multiply extends Node {
         double av = a.getValue().doubleValue();
         double bv = b.getValue().doubleValue();
         c.setValue(av * bv);
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }

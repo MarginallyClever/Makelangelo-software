@@ -27,13 +27,11 @@ public class PrintImage extends Node implements PrintWithGraphics {
     @Override
     public void update() {
         if(!isDirty()) return;
-        Object var = image.getValue();
-
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 
     @Override
     public void print(Graphics g) {
-        g.drawImage((BufferedImage)image.getValue(),(int)px.getValue(),(int)py.getValue(),null);
+        g.drawImage((BufferedImage)image.getValue(),px.getValue().intValue(),py.getValue().intValue(),null);
     }
 }

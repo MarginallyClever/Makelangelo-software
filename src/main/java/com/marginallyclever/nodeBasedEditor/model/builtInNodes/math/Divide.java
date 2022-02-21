@@ -27,6 +27,6 @@ public class Divide extends Node {
         double bv = b.getValue().doubleValue();
         if(bv==0) c.setValue(0);
         else c.setValue(av / bv);
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }

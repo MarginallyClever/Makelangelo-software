@@ -23,6 +23,6 @@ public class Cos extends Node {
         if(!isDirty()) return;
         double av = a.getValue().doubleValue();
         b.setValue(Math.cos(av));
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }

@@ -23,6 +23,6 @@ public class Tan extends Node {
         if(!isDirty()) return;
         double av = a.getValue().doubleValue();
         b.setValue(Math.tan(av));
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }

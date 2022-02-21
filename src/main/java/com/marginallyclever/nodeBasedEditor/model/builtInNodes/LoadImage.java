@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class LoadImage extends Node {
-    private final NodeVariable<String> filename = NodeVariable.newInstance("filename",String.class,"",true,false);
+    private final NodeVariable<String> filename = NodeVariable.newInstance("filename",String.class,null,true,false);
     private final NodeVariable<BufferedImage> contents = NodeVariable.newInstance("contents", BufferedImage.class, null,false,true);
     private final NodeVariable<Number> width = NodeVariable.newInstance("width",Number.class,0,false,true);
     private final NodeVariable<Number> height = NodeVariable.newInstance("height",Number.class,0,false,true);
@@ -24,7 +24,7 @@ public class LoadImage extends Node {
     }
 
     public LoadImage() {
-        this("");
+        this(null);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class LoadImage extends Node {
             contents.setValue(image);
             width.setValue(image.getWidth());
             height.setValue(image.getHeight());
-            alwaysBeCleaning();
+            cleanAllInputs();
         } catch (IOException e) {
             e.printStackTrace();
         }

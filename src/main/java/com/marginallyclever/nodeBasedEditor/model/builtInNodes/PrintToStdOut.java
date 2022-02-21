@@ -22,6 +22,6 @@ public class PrintToStdOut extends Node {
         Object var = a.getValue();
         String output = (var!=null) ? var.toString() : "null";
         System.out.println(getUniqueID()+": "+output);
-        alwaysBeCleaning();
+        cleanAllInputs();
     }
 }
