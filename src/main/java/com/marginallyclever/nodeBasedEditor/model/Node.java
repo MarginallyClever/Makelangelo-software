@@ -110,6 +110,10 @@ public abstract class Node {
         variables.add(v);
     }
 
+    public void removeVariable(NodeVariable v) {
+        variables.remove(v);
+    }
+
     public int getNumVariables() {
         return variables.size();
     }
@@ -201,5 +205,14 @@ public abstract class Node {
 
     public void setLabel(String str) {
         label=str;
+    }
+
+    /**
+     * Sets the top left corner of the {@link Node}'s rectangle.
+     * @param point the new position of the top left corner.
+     */
+    public void setPosition(Point point) {
+        rectangle.x=point.x;
+        rectangle.y=point.y;
     }
 }
