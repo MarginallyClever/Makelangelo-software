@@ -4,7 +4,7 @@ import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.Constant;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import org.json.JSONObject;
@@ -38,8 +38,8 @@ public class TestNodeGraph {
 
     @Test
     public void testAddTwoConstants() {
-        Node constant0 = model.add(new Constant(1));
-        Node constant1 = model.add(new Constant(2));
+        Node constant0 = model.add(new LoadNumber(1));
+        Node constant1 = model.add(new LoadNumber(2));
         Node add = model.add(new Add());
         model.add(new NodeConnection(constant0,0,add,0));
         model.add(new NodeConnection(constant1,0,add,1));
@@ -49,8 +49,8 @@ public class TestNodeGraph {
 
     @Test
     public void testAddTwoConstantsAndReport() throws Exception {
-        Node constant0 = model.add(new Constant(1));
-        Node constant1 = model.add(new Constant(2));
+        Node constant0 = model.add(new LoadNumber(1));
+        Node constant1 = model.add(new LoadNumber(2));
         Node add = model.add(new Add());
         Node report = model.add(new PrintToStdOut());
         model.add(new NodeConnection(constant0,0,add,0));
@@ -120,7 +120,7 @@ public class TestNodeGraph {
         modelB.add(model.deepCopy());
 
         assertEquals(2,modelB.countNodesOfClass(Add.class));
-        assertEquals(4,modelB.countNodesOfClass(Constant.class));
+        assertEquals(4,modelB.countNodesOfClass(LoadNumber.class));
 
         // connect the Adds with a Multiply, update, and check the results.
         Node m = modelB.add(new Multiply());
