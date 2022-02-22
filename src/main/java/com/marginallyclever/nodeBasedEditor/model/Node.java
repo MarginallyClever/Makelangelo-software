@@ -33,6 +33,7 @@ public abstract class Node {
 
     /**
      * Return one new instance of this type of {@link Node}.
+     * Override this method in derived classes.
      * @return One new instance of this type of {@link Node}.
      */
     public abstract Node create();
