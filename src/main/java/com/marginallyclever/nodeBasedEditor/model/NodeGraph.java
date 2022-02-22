@@ -2,8 +2,10 @@ package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.PrintImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +43,14 @@ public class NodeGraph {
         NodeFactory.registerNode(new PrintImage());
 
         NodeFactory.registerNode(new LoadString());
+
+        NodeFactory.registerNode(new LoadTurtle());
+        NodeFactory.registerNode(new PrintTurtle());
+        NodeFactory.registerNode(new TurtleLine());
+        NodeFactory.registerNode(new TurtleRectangle());
+        NodeFactory.registerNode(new TurtleCircle());
+
+        NodeFactory.registerNode(new TurtlePatternOnPath());
     }
 
     public void update() {
@@ -212,7 +222,7 @@ public class NodeGraph {
     private void bumpUpIndexableID() {
         int id=0;
         for(Node n : nodes) {
-            id = id > n.getUniqueID() ? id : n.getUniqueID();
+            id = Math.max(id, n.getUniqueID());
         }
         Node.setUniqueIDSource(id);
     }
