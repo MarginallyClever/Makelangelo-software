@@ -35,7 +35,7 @@ public class TestNodeGraph {
 
     @Test
     public void testSaveEmptyGraph() {
-        assertEquals("{\"nodes\":[],\"nodeConnections\":[]}",model.toJSON());
+        assertEquals("{\"nodes\":[],\"nodeConnections\":[]}",model.toJSON().toString());
     }
 
     @Test
