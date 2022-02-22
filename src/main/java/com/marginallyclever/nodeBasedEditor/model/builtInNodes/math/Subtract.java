@@ -15,6 +15,12 @@ public class Subtract extends Node {
         addVariable(c);
     }
 
+    public Subtract(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Subtract();

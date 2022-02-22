@@ -15,6 +15,12 @@ public class Add extends Node {
         addVariable(c);
     }
 
+    public Add(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Add();

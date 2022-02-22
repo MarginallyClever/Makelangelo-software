@@ -13,6 +13,11 @@ public class Sin extends Node {
         addVariable(b);
     }
 
+    public Sin(double a,double b) {
+        this();
+        this.a.setValue(a);
+    }
+
     @Override
     public Node create() {
         return new Sin();

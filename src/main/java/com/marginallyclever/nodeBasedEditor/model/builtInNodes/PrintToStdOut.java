@@ -11,6 +11,11 @@ public class PrintToStdOut extends Node {
         addVariable(a);
     }
 
+    public PrintToStdOut(Object obj) {
+        this();
+        this.a.setValue(obj);
+    }
+
     @Override
     public Node create() {
         return new PrintToStdOut();

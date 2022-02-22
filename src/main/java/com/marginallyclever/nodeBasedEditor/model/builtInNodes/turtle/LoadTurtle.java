@@ -1,33 +1,29 @@
 package com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle;
 
-import com.marginallyclever.makelangelo.makeArt.io.vector.LoadDXF;
-import com.marginallyclever.makelangelo.makeArt.io.vector.LoadSVG;
-import com.marginallyclever.makelangelo.makeArt.io.vector.LoadScratch3;
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Locale;
+import java.awt.geom.Rectangle2D;
 
 public class LoadTurtle extends Node {
     private final NodeVariable<String> filename = NodeVariable.newInstance("filename",String.class,null,true,false);
-    private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, null,false,true);
+    private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
+    private final NodeVariable<Number> w = NodeVariable.newInstance("width", Number.class, 0,false,true);
+    private final NodeVariable<Number> h = NodeVariable.newInstance("height", Number.class, 0,false,true);
 
-    public LoadTurtle(String startingValue) {
+    public LoadTurtle() {
         super("LoadTurtle");
         addVariable(filename);
         addVariable(contents);
-        filename.setValue(startingValue);
+        addVariable(w);
+        addVariable(h);
     }
 
-    public LoadTurtle() {
-        this(null);
+    public LoadTurtle(String filename) {
+        this();
+        this.filename.setValue(filename);
     }
 
     @Override
@@ -39,7 +35,11 @@ public class LoadTurtle extends Node {
     public void update() {
         if(!isDirty()) return;
         try {
-            contents.setValue(TurtleFactory.load(filename.getValue()));
+            Turtle t = TurtleFactory.load(filename.getValue());
+            contents.setValue(t);
+            Rectangle2D r = t.getBounds();
+            w.setValue(r.getWidth());
+            h.setValue(r.getHeight());
             cleanAllInputs();
         } catch (Exception e) {
             e.printStackTrace();

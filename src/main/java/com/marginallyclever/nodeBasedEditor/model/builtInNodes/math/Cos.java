@@ -13,6 +13,11 @@ public class Cos extends Node {
         addVariable(b);
     }
 
+    public Cos(double a,double b) {
+        this();
+        this.a.setValue(a);
+    }
+
     @Override
     public Node create() {
         return new Cos();

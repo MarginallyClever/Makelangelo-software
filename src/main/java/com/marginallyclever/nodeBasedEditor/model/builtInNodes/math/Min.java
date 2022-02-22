@@ -15,6 +15,12 @@ public class Min extends Node {
         addVariable(c);
     }
 
+    public Min(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Min();

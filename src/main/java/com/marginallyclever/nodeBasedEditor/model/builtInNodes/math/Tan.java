@@ -13,6 +13,11 @@ public class Tan extends Node {
         addVariable(b);
     }
 
+    public Tan(double a) {
+        this();
+        this.a.setValue(a);
+    }
+
     @Override
     public Node create() {
         return new Tan();

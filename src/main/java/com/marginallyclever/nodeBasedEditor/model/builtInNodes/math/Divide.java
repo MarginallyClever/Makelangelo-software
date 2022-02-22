@@ -15,6 +15,12 @@ public class Divide extends Node {
         addVariable(c);
     }
 
+    public Divide(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Divide();

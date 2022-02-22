@@ -15,6 +15,12 @@ public class ATan2 extends Node {
         addVariable(c);
     }
 
+    public ATan2(double y,double x) {
+        this();
+        this.a.setValue(y);
+        this.b.setValue(x);
+    }
+
     @Override
     public Node create() {
         return new ATan2();
@@ -23,8 +29,8 @@ public class ATan2 extends Node {
     @Override
     public void update() {
         if(!isDirty()) return;
-        double x = a.getValue().doubleValue();
         double y = a.getValue().doubleValue();
+        double x = b.getValue().doubleValue();
         c.setValue(Math.atan2(y,x));
         cleanAllInputs();
     }

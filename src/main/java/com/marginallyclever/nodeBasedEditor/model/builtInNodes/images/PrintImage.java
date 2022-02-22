@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes.images;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
@@ -17,6 +17,13 @@ public class PrintImage extends Node implements PrintWithGraphics {
         addVariable(image);
         addVariable(px);
         addVariable(py);
+    }
+
+    public PrintImage(BufferedImage img,double x,double y) {
+        this();
+        this.image.setValue(img);
+        this.px.setValue(x);
+        this.py.setValue(y);
     }
 
     @Override

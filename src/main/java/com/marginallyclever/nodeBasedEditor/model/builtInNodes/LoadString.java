@@ -7,14 +7,14 @@ import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 public class LoadString extends Node implements SupergraphInput {
     private final NodeVariable<String> v = NodeVariable.newInstance("value",String.class,"",false,true);
 
-    public LoadString(String startingValue) {
+    public LoadString() {
         super("LoadString");
         addVariable(v);
-        v.setValue(startingValue);
     }
 
-    public LoadString() {
-        this("");
+    public LoadString(String startingValue) {
+        this();
+        v.setValue(startingValue);
     }
 
     @Override

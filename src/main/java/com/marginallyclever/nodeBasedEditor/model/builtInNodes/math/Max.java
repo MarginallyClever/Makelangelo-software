@@ -15,6 +15,12 @@ public class Max extends Node {
         addVariable(c);
     }
 
+    public Max(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Max();

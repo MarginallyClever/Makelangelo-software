@@ -15,6 +15,12 @@ public class Multiply extends Node {
         addVariable(c);
     }
 
+    public Multiply(double a,double b) {
+        this();
+        this.a.setValue(a);
+        this.b.setValue(b);
+    }
+
     @Override
     public Node create() {
         return new Multiply();
