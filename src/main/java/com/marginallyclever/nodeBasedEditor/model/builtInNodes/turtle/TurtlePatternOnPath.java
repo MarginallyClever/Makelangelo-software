@@ -8,9 +8,9 @@ import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 import java.awt.*;
 
 public class TurtlePatternOnPath extends Node {
-    private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,true);
-    private final NodeVariable<Turtle> path = NodeVariable.newInstance("path", Turtle.class, new Turtle(),false,true);
-    private final NodeVariable<Number> count = NodeVariable.newInstance("count", Number.class, 10,true,true);
+    private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,false);
+    private final NodeVariable<Turtle> path = NodeVariable.newInstance("path", Turtle.class, new Turtle(),true,false);
+    private final NodeVariable<Number> count = NodeVariable.newInstance("count", Number.class, 10,true,false);
     private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class, new Turtle(),false,true);
 
     public TurtlePatternOnPath() {
@@ -22,6 +22,13 @@ public class TurtlePatternOnPath extends Node {
         pattern.setIsDirty(true);
     }
 
+    public TurtlePatternOnPath(Turtle pattern,Turtle path,int count) {
+        this();
+        this.pattern.setValue(pattern);
+        this.path.setValue(path);
+        this.count.setValue(count);
+    }
+
     @Override
     public Node create() {
         return new TurtlePatternOnPath();
@@ -31,20 +38,25 @@ public class TurtlePatternOnPath extends Node {
     public void update() {
         if(!isDirty()) return;
         try {
-            Turtle t = new Turtle();
-            Turtle p = pattern.getValue();
+            Turtle sum = new Turtle();
+            Turtle myPattern = pattern.getValue();
+            Turtle myPath = path.getValue();
             int c = count.getValue().intValue();
             if(c>0) {
-                double pDistance = p.getDrawDistance();
+                double pDistance = myPath.getDrawDistance();
                 double step = pDistance/(double)c;
-                for(double n=0;n<pDistance;n+=step) {
-                    Point2D i = p.interpolate(n);
-                    Turtle stamp = new Turtle(p);
+                if(pDistance==0) {
+                    pDistance=c;
+                    step=1;
+                }
+                for(double n=0;n<=pDistance;n+=step) {
+                    Point2D i = myPath.interpolate(n);
+                    Turtle stamp = new Turtle(myPattern);
                     stamp.translate(i.x,i.y);
-                    t.add(stamp);
+                    sum.add(stamp);
                 }
             }
-            output.setValue(t);
+            output.setValue(sum);
             cleanAllInputs();
         } catch (Exception e) {
             e.printStackTrace();

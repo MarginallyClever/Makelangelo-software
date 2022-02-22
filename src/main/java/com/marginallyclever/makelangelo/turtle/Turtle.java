@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  */
 public class Turtle implements Cloneable {
-
 	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
 	
 	public List<TurtleMove> history;
@@ -68,7 +68,22 @@ public class Turtle implements Cloneable {
 		}
 		return t;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Turtle{" +
+				"history=" + history +
+				", px=" + px +
+				", py=" + py +
+				", nx=" + nx +
+				", ny=" + ny +
+				", angle=" + angle +
+				", isUp=" + isUp +
+				", color=" + color +
+				", diameter=" + diameter +
+				'}';
+	}
+
 	/**
 	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
 	 */
@@ -444,8 +459,8 @@ public class Turtle implements Cloneable {
 		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
 		for( TurtleMove m : history) {
 			if(m.type == TurtleMove.DRAW_LINE) {
-				double dx = prev.x-m.x;
-				double dy = prev.y-m.y;
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
 				d += Math.sqrt(dx*dx+dy*dy);
 				prev = m;
 			} else if(m.type == TurtleMove.TRAVEL) {
@@ -461,17 +476,21 @@ public class Turtle implements Cloneable {
 	 * @return a point along the drawn lines of this {@link Turtle}
 	 */
 	public Point2D interpolate(double t) {
+		double d=0;
 		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
 		for( TurtleMove m : history) {
 			if(m.type == TurtleMove.DRAW_LINE) {
-				double dx = prev.x-m.x;
-				double dy = prev.y-m.y;
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
 				double change = Math.sqrt(dx*dx+dy*dy);
-				if(change>t) {
-					double v = t/change;
-					return new Point2D(prev.x+dx*v,prev.y+dy*v);
+				if(d+change>=t) {
+					double v = (t-d)/change;
+					v = Math.max(Math.min(v,1),0);
+					return new Point2D(
+							prev.x + dx * v,
+							prev.y + dy * v);
 				}
-				t -= change;
+				d += change;
 				prev = m;
 			} else if(m.type == TurtleMove.TRAVEL) {
 				prev = m;
