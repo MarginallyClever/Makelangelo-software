@@ -66,7 +66,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 			if (ConvertImagePanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
-				myConvertImage = new ConvertImagePanel(myPaper, image);
+				myConvertImage = new ConvertImagePanel(myPaper, image,filename);
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
 				mySubPanel.removeAll();

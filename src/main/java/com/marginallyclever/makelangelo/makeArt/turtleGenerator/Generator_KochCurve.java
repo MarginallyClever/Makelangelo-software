@@ -43,6 +43,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 		yMin = -v;
 
 		Turtle turtle = new Turtle();
+		turtle.setName(getName()+" (order="+getOrder()+")");// TODO (may be better in the extended class ) want a constant name ( whatever the language used) with the paraméters name and value ) 
 		
 		double xx = xMax - xMin;
 		double yy = yMax - yMin;

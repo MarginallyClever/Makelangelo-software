@@ -62,6 +62,11 @@ public class Converter_Boxxy extends ImageConverter {
 		if (steps < 1) steps = 1;
 
 		turtle = new Turtle();
+		turtle.setName(getName()+" ("
+				+ "BSize=" + getBoxMasSize() + " "
+				+ "Coff=" + getCutoff() + " "
+				+ ")");// TODO (may be better in the extended class ) want a constant name ( whatever the language used) with the paraméters name and value ) 
+		
 
 		double lowpass = cutoff/255.0;
 		

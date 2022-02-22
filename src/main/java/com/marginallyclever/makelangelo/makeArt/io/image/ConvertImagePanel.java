@@ -52,7 +52,9 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private int workerCount = 0;
 	private ProgressMonitor pm;
 	
-	public ConvertImagePanel(Paper paper,TransformedImage image) {
+	private String imgNameForTurtle = null;
+	
+	public ConvertImagePanel(Paper paper,TransformedImage image, String imgNameForTurtle) {
 		super();
 		myPaper = paper;
 		myImage = image;
@@ -106,6 +108,8 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
 		changeConverter(ImageConverterFactory.list[first]);
+		
+		this.imgNameForTurtle = imgNameForTurtle;
 	}
 	
 	private JComboBox<String> getStyleSelection() {
@@ -357,7 +361,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
 		JFrame frame = new JFrame(ConvertImagePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ConvertImagePanel(new Paper(),image));
+		frame.add(new ConvertImagePanel(new Paper(),image,"grumpyCat"));
 		frame.pack();
 		frame.setVisible(true);
 	}
