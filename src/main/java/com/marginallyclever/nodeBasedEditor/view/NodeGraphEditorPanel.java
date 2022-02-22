@@ -4,10 +4,12 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadImage;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.PrintImage;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle.LoadTurtle;
+import com.marginallyclever.nodeBasedEditor.view.actions.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -45,7 +47,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final ActionNewGraph actionNewGraph = new ActionNewGraph("New",this);
     private final ActionSaveGraph actionSaveGraph = new ActionSaveGraph("Save",this);
-    private final ActionSaveGraph actionLoadGraph = new ActionSaveGraph("Load",this);
+    private final ActionLoadGraph actionLoadGraph = new ActionLoadGraph("Load",this);
     private final ActionPrintGraph actionPrintGraph = new ActionPrintGraph("Print",this);
     private final ActionUpdateGraph actionUpdateGraph = new ActionUpdateGraph("Update",this);
     private final ActionCopyGraph actionCopyGraph = new ActionCopyGraph("Copy",this);
@@ -82,7 +84,6 @@ public class NodeGraphEditorPanel extends JPanel {
 
         this.add(toolBar,BorderLayout.NORTH);
         this.add(new JScrollPane(paintArea),BorderLayout.CENTER);
-        this.setPreferredSize(new Dimension(600,200));
 
         setupToolBar();
         setupPopopBar();
@@ -451,17 +452,22 @@ public class NodeGraphEditorPanel extends JPanel {
         model.add(new NodeConnection(constant0,0,add,0));
         model.add(new NodeConnection(constant1,0,add,1));
         model.add(new NodeConnection(add,2,report,0));
-        Node loadImage = model.add(new LoadImage("test.png"));
-        Node printImage = model.add(new PrintImage());
-        model.add(new NodeConnection(loadImage,1,printImage,0));
-
         constant1.getRectangle().y=50;
         add.getRectangle().x=200;
         report.getRectangle().x=400;
-        loadImage.getRectangle().setLocation(20,150);
+
+        Node loadImage = model.add(new LoadImage("test.png"));
+        Node printImage = model.add(new PrintImage());
+        model.add(new NodeConnection(loadImage,1,printImage,0));
+        loadImage.getRectangle().setLocation(0,150);
         printImage.getRectangle().setLocation(200,150);
 
+        Node loadTurtle = model.add(new LoadTurtle("./src/test/resources/stanfordBunny.svg"));
+        loadTurtle.getRectangle().setLocation(0,300);
+
         NodeGraphEditorPanel panel = new NodeGraphEditorPanel(model);
+        panel.setPreferredSize(new Dimension(800,800));
+
         JFrame frame = new JFrame("NodeBasedEditorPanel");
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
