@@ -1,11 +1,16 @@
 package com.marginallyclever.nodeBasedEditor.view.actions;
 
 import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
+import java.util.Arrays;
 
 public class ActionSaveGraph extends AbstractAction {
     private final NodeGraphEditorPanel editor;
@@ -20,8 +25,17 @@ public class ActionSaveGraph extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         fc.setFileFilter(NodeGraphEditorPanel.FILE_FILTER);
         if (fc.showSaveDialog(SwingUtilities.getWindowAncestor(editor)) == JFileChooser.APPROVE_OPTION) {
-            saveModelToFile(fc.getSelectedFile().getAbsolutePath());
+            String name = addExtensionIfNeeded(fc.getSelectedFile().getAbsolutePath());
+            saveModelToFile(name);
         }
+    }
+
+    private String addExtensionIfNeeded(String s) {
+        if(FilenameUtils.getExtension(s).isEmpty()) {
+            String[] extensions = NodeGraphEditorPanel.FILE_FILTER.getExtensions();
+            s += "."+extensions[0];
+        }
+        return s;
     }
 
     private void saveModelToFile(String absolutePath) {
