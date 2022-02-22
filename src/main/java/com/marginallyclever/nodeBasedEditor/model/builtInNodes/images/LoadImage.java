@@ -34,7 +34,6 @@ public class LoadImage extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             BufferedImage image = ImageIO.read(new File(filename.getValue()));
             contents.setValue(image);

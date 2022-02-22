@@ -36,7 +36,6 @@ public class TurtlePatternOnPath extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             Turtle sum = new Turtle();
             Turtle myPattern = pattern.getValue();

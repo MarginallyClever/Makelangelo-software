@@ -68,8 +68,18 @@ public abstract class Node {
 
     /**
      * Override this method to provide the custom behavior of this node.
+     * Runs regardless of dirty inputs or outputs.
      */
     public abstract void update();
+
+    /**
+     * Runs {@link Node#update()} only if the node is considered dirty.  It is up to individual nodes to decide
+     * if they are done (no longer dirty)
+     */
+    public void updateIfNotDirty() {
+        if(!isDirty()) return;
+        update();
+    }
 
     public void updateBounds() {
         int w=(int)rectangle.getWidth();

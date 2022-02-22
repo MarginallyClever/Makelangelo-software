@@ -53,8 +53,16 @@ public class NodeGraph {
         NodeFactory.registerNode(new TurtlePatternOnPath());
     }
 
+    /**
+     * <ul>
+     * <li>Updates only dirty nodes.</li>
+     * <li>Transmits dirty node outputs to connected inputs.</li>
+     * <li>Sets all outputs to clean.</li>
+     * </ul>
+     * The method does not analyze the directed graph to run nodes in an "intelligent" way.
+     */
     public void update() {
-        for(Node n : nodes) n.update();
+        for(Node n : nodes) n.updateIfNotDirty();
         for(NodeConnection c : connections) c.applyIfDirty();
         for(Node n : nodes) n.cleanAllOutputs();
     }

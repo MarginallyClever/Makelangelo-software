@@ -33,7 +33,6 @@ public class PrintImage extends Node implements PrintWithGraphics {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         cleanAllInputs();
     }
 

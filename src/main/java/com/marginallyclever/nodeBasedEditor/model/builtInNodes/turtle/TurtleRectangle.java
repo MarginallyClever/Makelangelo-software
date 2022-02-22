@@ -32,7 +32,6 @@ public class TurtleRectangle extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             Turtle t = new Turtle();
             double ww = w.getValue().doubleValue()/2.0;

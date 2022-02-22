@@ -30,7 +30,6 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         cleanAllInputs();
     }
 

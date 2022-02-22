@@ -28,7 +28,6 @@ public class ATan2 extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         double y = a.getValue().doubleValue();
         double x = b.getValue().doubleValue();
         c.setValue(Math.atan2(y,x));

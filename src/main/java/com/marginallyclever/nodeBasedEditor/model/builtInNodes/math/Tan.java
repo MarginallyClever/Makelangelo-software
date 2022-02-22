@@ -25,7 +25,6 @@ public class Tan extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         double av = a.getValue().doubleValue();
         b.setValue(Math.tan(av));
         cleanAllInputs();

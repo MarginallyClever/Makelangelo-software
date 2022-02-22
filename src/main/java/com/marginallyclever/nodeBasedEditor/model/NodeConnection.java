@@ -42,7 +42,7 @@ public class NodeConnection {
     }
 
     /**
-     * Send the value of upstream variables to downstream variables
+     * Send the value of upstream variables to downstream variables, dirty or not.
      */
     public void apply() {
         if(!isValidDataType()) return;

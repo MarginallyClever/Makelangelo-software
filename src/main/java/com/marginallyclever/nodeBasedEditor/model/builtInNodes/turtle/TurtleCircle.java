@@ -26,7 +26,6 @@ public class TurtleCircle extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             Turtle t = new Turtle();
             double r = radius.getValue().doubleValue()/2.0;

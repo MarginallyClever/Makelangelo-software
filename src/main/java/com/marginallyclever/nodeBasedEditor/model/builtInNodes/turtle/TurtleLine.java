@@ -35,7 +35,6 @@ public class TurtleLine extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             Turtle t = new Turtle();
             t.jumpTo(x0.getValue().doubleValue(),y0.getValue().doubleValue());

@@ -33,7 +33,6 @@ public class LoadTurtle extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         try {
             Turtle t = TurtleFactory.load(filename.getValue());
             contents.setValue(t);

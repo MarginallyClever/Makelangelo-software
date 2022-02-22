@@ -28,7 +28,6 @@ public class Min extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         double av = a.getValue().doubleValue();
         double bv = b.getValue().doubleValue();
         c.setValue(Math.min(av,bv));

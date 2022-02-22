@@ -28,10 +28,9 @@ public class Random extends Node {
 
     @Override
     public void update() {
-        if(!isDirty()) return;
         double a = vMin.getValue().doubleValue();
         double b = vMax.getValue().doubleValue();
-        cleanAllInputs();
         v.setValue(Math.random()*(b-a) + a);
+        cleanAllInputs();
     }
 }
