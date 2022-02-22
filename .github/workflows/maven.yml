@@ -1,5 +1,11 @@
 name: Java CI with Maven
 
+env:
+  # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
+  # in your browser and copy the full "upload_url" value including the {?name,label} part
+  UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
+  RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+
 on:
   push:
     branches:
@@ -26,46 +32,88 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
-    - name: Prepare package for release
+    - name: Prepare universal package
       shell: bash
       run: |
-        cp -r src/main/package/ target/package &&
-        cp CONTRIBUTING.md target/package/ &&
-        cp LICENSE target/package/ &&
-        cp README.md target/package/ &&
-        mv target/Makelangelo-*-with-dependencies.jar target/package/ &&
-        cd target/package/ &&
-        7z a -tzip Makelangelo.zip .
+        mkdir -p target/universal-package &&
+        cp src/main/package/avrdude.* src/main/package/firmware.hex src/main/package/*.bat src/main/package/start* src/main/package/thankyou.* target/universal-package/ &&
+        cp CONTRIBUTING.md LICENSE README.md target/universal-package/ &&
+        cp target/Makelangelo-*-with-dependencies.jar target/universal-package/ &&
+        cd target/universal-package/ &&
+        7z a -tzip Makelangelo.zip . &&
+        mv Makelangelo.zip ../..
 
-    - name: Upload artifact for release
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifact
-        path: target/package/Makelangelo.zip
-        retention-days: 5
-
-  # from https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
-  deploy-nightly:
-    runs-on: windows-latest
-    needs: build
-    if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: artifact
-
-      # from https://github.com/marketplace/actions/deploy-nightly
     - name: Deploy universal release
+      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v1.1.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
-        # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
-        # in your browser and copy the full "upload_url" value including the {?name,label} part
-        upload_url: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-        release_id: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
+        upload_url: ${{ env.UPLOAD_URL }}
+        release_id: ${{ env.RELEASE_ID }}{
         asset_path: Makelangelo.zip # path to archive to upload
         asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
-        max_releases: 3 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+
+    - name: Upload artifact for package
+      uses: actions/upload-artifact@v2
+      with:
+        name: jar
+        retention-days: 1
+        path: |
+          src/main/package/jpackage*
+          src/main/package/logo*
+          LICENSE
+          target/package/*
+
+  package:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: jar
+
+    - name: Build installation package
+      shell: bash
+      run: |
+        set -x
+        set -o pipefail
+        APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
+        sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
+        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{matrix.os}}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
+        ls &&
+        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,," | head -1) &&
+        BINARY_NIGHTLY=$(echo $BINARY | sed 's/\(.*\)\.\(.*\)/\1-nightly-$$.\2/') &&
+        echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
+        echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
+
+    - name: Deploy installation release
+      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+      uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        release_id: ${{ env.RELEASE_ID }}
+        asset_path: ${{ env.BINARY }} # path to archive to upload
+        asset_name: ${{ env.BINARY_NIGHTLY }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+        asset_content_type: application/zip # required by GitHub API
+        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+
+    - name: Upload artifact for testing purpose
+#      if: github.repository == 'MarginallyClever/Makelangelo-software' || github.ref != 'refs/heads/master'
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.BINARY }}
+        retention-days: 2
+        path: ${{ env.BINARY }}
