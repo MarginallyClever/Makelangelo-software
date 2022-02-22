@@ -13,6 +13,7 @@ import com.marginallyclever.nodeBasedEditor.view.actions.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -21,13 +22,17 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.swing.Action.ACCELERATOR_KEY;
-
 /**
  * {@link NodeGraphEditorPanel} is a Graphic User Interface to edit a {@link NodeGraph}.
+ * @author Dan Royer
+ * @since 2022-02-01
  */
 public class NodeGraphEditorPanel extends JPanel {
-    public static final Color CONNECTION_POINT_COLOR_SELECTED = Color.RED;
+    // used by save and load actions
+    public static final FileNameExtensionFilter FILE_FILTER = new FileNameExtensionFilter("Node Graph","graph");
+
+    private static final Color CONNECTION_POINT_COLOR_SELECTED = Color.RED;
+    private static final double NEARBY_CONNECTION_DISTANCE_MAX = 20;
 
     private final NodeGraph model;
     private final NodeGraphViewPanel paintArea;
@@ -61,6 +66,7 @@ public class NodeGraphEditorPanel extends JPanel {
     private final ActionUnfoldGraph actionUnfoldGraph = new ActionUnfoldGraph("Unfold",this);
 
     private final NodeConnection connectionBeingCreated = new NodeConnection();
+
     private NodeConnectionPointInfo lastConnectionPoint = null;
 
     // true while dragging one or more nodes around.
@@ -100,7 +106,7 @@ public class NodeGraphEditorPanel extends JPanel {
         paintArea.addViewListener((g,e)->{
             highlightSelectedNodes(g);
             paintConnectionBeingMade(g);
-            HighlightNearbyConnectionPoint(g);
+            highlightNearbyConnectionPoint(g);
 
             if(selectionOn) paintSelectionArea(g);
             paintCursor(g);
@@ -147,7 +153,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     // draw the connection point under the cursor
-    private void HighlightNearbyConnectionPoint(Graphics g) {
+    private void highlightNearbyConnectionPoint(Graphics g) {
         if(lastConnectionPoint !=null) {
             g.setColor(CONNECTION_POINT_COLOR_SELECTED);
             setLineWidth(g,2);
@@ -193,22 +199,22 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void setupAccelerators() {
-        actionNewGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
-        actionSaveGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
-        actionLoadGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
-        actionPrintGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
-        actionUpdateGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
+        actionNewGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        actionSaveGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+        actionLoadGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
+        actionPrintGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+        actionUpdateGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK));
 
-        actionAddNode.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
-        actionEditNodes.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
-        actionFoldGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
-        actionUnfoldGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
+        actionAddNode.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
+        actionEditNodes.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
+        actionFoldGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK));
+        actionUnfoldGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK));
 
-        actionCopyGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
-        actionCutGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK));
-        actionPasteGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+        actionCopyGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
+        actionCutGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK));
+        actionPasteGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
 
-        actionDeleteGraph.putValue(ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
+        actionDeleteGraph.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.CTRL_DOWN_MASK));
     }
 
     public void update() {
@@ -352,7 +358,7 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     private void selectOneNearbyConnectionPoint(Point p) {
-        NodeConnectionPointInfo info = model.getFirstNearbyConnection(p,15);
+        NodeConnectionPointInfo info = model.getFirstNearbyConnection(p,NEARBY_CONNECTION_DISTANCE_MAX);
         setLastConnectionPoint(info);
     }
 
@@ -366,11 +372,9 @@ public class NodeGraphEditorPanel extends JPanel {
     }
 
     public void setSelectedNode(Node n) {
-        if(n!=null) {
-            ArrayList<Node> nodes = new ArrayList<>();
-            nodes.add(n);
-            setSelectedNodes(nodes);
-        }
+        ArrayList<Node> nodes = new ArrayList<>();
+        if(n!=null) nodes.add(n);
+        setSelectedNodes(nodes);
     }
 
     public void setSelectedNodes(List<Node> list) {
@@ -436,6 +440,8 @@ public class NodeGraphEditorPanel extends JPanel {
     public void clear() {
         model.clear();
         Node.setUniqueIDSource(0);
+        connectionBeingCreated.disconnectAll();
+        setSelectedNode(null);
         repaint();
     }
 
