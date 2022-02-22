@@ -179,7 +179,9 @@ public abstract class Node {
     }
 
     public void parseJSON(JSONObject jo) throws JSONException {
-        name = jo.getString("name");
+        String joName = jo.getString("name");
+        if(!name.equals(joName)) throw new JSONException("Node types do not match: "+name+", "+joName);
+
         uniqueID = jo.getInt("uniqueID");
         if(jo.has("label")) {
             String s = jo.getString("label");
