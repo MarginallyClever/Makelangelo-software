@@ -33,7 +33,8 @@ public class NodeVariable<T> {
         this.value = defaultValue;
         this.hasInput = _hasInput;
         this.hasOutput = _hasOutput;
-        rectangle.setBounds(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT);
+        this.isDirty = true;
+        this.rectangle.setBounds(0,0,DEFAULT_WIDTH,DEFAULT_HEIGHT);
     }
 
     public static <T> NodeVariable<T> newInstance(String name,Class<T> clazz,T defaultValue,boolean hasInput,boolean hasOutput) {
