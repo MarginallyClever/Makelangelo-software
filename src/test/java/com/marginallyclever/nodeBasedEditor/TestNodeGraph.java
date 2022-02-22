@@ -1,8 +1,10 @@
 package com.marginallyclever.nodeBasedEditor;
 
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
+import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
@@ -13,6 +15,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -125,7 +129,29 @@ public class TestNodeGraph {
         assertEquals(0,model.getConnections().size());
     }
 
+    private <T> void testNodeVariableToJSONAndBack(Class<T> myClass,T instA,T instB) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        NodeVariable<?> a = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instA,false,false);
+        NodeVariable<?> b = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instB,false,false);
+
+        JSONObject obj = a.toJSON();
+        b.parseJSON(obj);
+        assertEquals(a.toString(),b.toString());
+        assertEquals(a.getValue(),b.getValue());
+    }
+
     @Test
+    public void testNodeVariablesToJSONAndBack() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        testNodeVariableToJSONAndBack(Object.class, new Object(),new Object());
+        testNodeVariableToJSONAndBack(String.class, "hello",new String());
+        testNodeVariableToJSONAndBack(Number.class, 1.0,0.0);
+        testNodeVariableToJSONAndBack(Number.class, 1,0);
+        Turtle t = new Turtle();
+        t.jumpTo(10,20);
+        t.moveTo(30,40);
+        testNodeVariableToJSONAndBack(Turtle.class, t,new Turtle());
+    }
+
+        @Test
     public void testAddTwoModelsTogether() {
         testAddTwoConstants();
 
