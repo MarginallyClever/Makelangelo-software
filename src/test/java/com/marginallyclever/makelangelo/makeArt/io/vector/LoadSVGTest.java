@@ -46,13 +46,8 @@ public class LoadSVGTest {
     }
 
     @Test
-    public void load_multi_shapes1() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes1.svg", "/svg/multi_shapes1_expected.txt");
-    }
-
-    @Test
-    public void load_multi_shapes2() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes2.svg", "/svg/multi_shapes2_expected.txt");
+    public void load_multi_shapes_path_circle_line_rect() throws Exception {
+        verifyLoadSvg("/svg/multi_shapes_path-circle-line-rect.svg", "/svg/multi_shapes_path-circle-line-rect_expected.txt");
     }
 
     @Test
