@@ -34,6 +34,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadScratch3.class);
 	private final String PROJECT_JSON = "project.json";
 	
+	
 	private class Scratch3Variable implements Cloneable {
 		public String name;
 		
@@ -46,6 +47,7 @@ public class LoadScratch3 implements TurtleLoader {
 			this.value=defaultValue;
 		}
 		
+		@Override
 		public String toString() {
 			return //uniqueID+" "+
 					name+"="+value;
@@ -131,7 +133,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private JSONObject getTreeFromInputStream(InputStream in) throws FileNotFoundException, IOException {
 		File tempZipFile = extractProjectJSON(in);
 		
-        logger.debug("Parsing JSON file...");
+        logger.trace("Parsing JSON file...");
         JSONTokener tokener = new JSONTokener(tempZipFile.toURI().toURL().openStream());
         JSONObject tree = new JSONObject(tokener);
 
@@ -141,13 +143,13 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 
 	private File extractProjectJSON(InputStream in) throws FileNotFoundException, IOException {
-		logger.debug("Searching for project.json...");
+		logger.trace("Searching for project.json...");
 		try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
 			ZipEntry entry;
 			File tempZipFile = null;
 			while ((entry = zipInputStream.getNextEntry()) != null) {
 				if (entry.getName().equals(PROJECT_JSON)) {
-					logger.debug("Found project.json...");
+					logger.trace("Found project.json...");
 
 					// read buffered stream into temp file.
 					tempZipFile = File.createTempFile("project", "json");
@@ -185,24 +187,52 @@ public class LoadScratch3 implements TurtleLoader {
 		throw new Exception("targets > blocks missing");
 	}
 	
+	int nbClicOnTheGreenFlag = 1;// Lets be basic one clic for now.
 	/**
 	 * parse blocks in scratch
 	 * @param tree the JSONObject tree read from the project.json/zip file.
 	 * @throws Exception
 	 */
 	private void readScratchInstructions() throws Exception {
-		logger.debug("readScratchInstructions");
+		logger.trace("readScratchInstructions ( and do a flagclicked {} times ) ",nbClicOnTheGreenFlag);
+		myTurtle = new Turtle();// needed to be init here in case multiple "event_whenflagclicked"
+		// TODO some myTurtle init to be like Scratch initial state. ( like initial color... )
 		
-		// find the first block with opcode=event_whenflagclicked.
-		for( String k : blockKeys ) {
-			JSONObject block = blocks.getJSONObject(k.toString());
-			String opcode = block.getString("opcode");
-			if(opcode.equals("event_whenflagclicked")) {
-				parseScratchCode(k);
-				return;
+		int nbGreenFlagParsed_Total = 0;
+		for (int i = 0; i < nbClicOnTheGreenFlag; i++) {
+			// find the first block with opcode=event_whenflagclicked.
+			int block_opcode_event_whenflagclicked__count = 0;
+
+			for (String k : blockKeys) {
+				Object getTmp = blocks.get(k);
+				if (getTmp instanceof JSONObject) {
+					JSONObject block = (JSONObject) getTmp;
+					final String key_scratch_block_opcode = "opcode";
+					if (block.has(key_scratch_block_opcode)) {
+						String opcode = block.getString(key_scratch_block_opcode);
+						if (opcode.equals("event_whenflagclicked")) {
+							parseScratchCode(k);// TODO a stack (LIFO) with k to parseScratchCode(k) later (if multiple event_whenflagclicked this is in the Scratch3 interpretor reverse order ... and for scratch timing (wait, ...) if we want to implement it.)							
+							block_opcode_event_whenflagclicked__count++;
+						}
+					} else {
+						// starge no opcode ... but to be resilient no exception .
+						logger.debug("no {} for block {} : {} // instanceof {}",key_scratch_block_opcode, k, getTmp, getTmp.getClass().toString());
+					}
+				} else {					
+					if ( getTmp != null ){
+						// somethinge is not what expected ... maybe a lost variable in the scratch projet ...
+						logger.debug("not expected for block {} : {} // instanceof {}", k, getTmp, getTmp.getClass().toString());
+					}else{
+						// normaly should not happend but juste to be sure ...
+						logger.debug("not expected for block {} : {} // null", k, getTmp);
+					}
+				}
 			}
+			nbGreenFlagParsed_Total += block_opcode_event_whenflagclicked__count;
 		}
-		throw new Exception("WhenFlagClicked block not found.");
+		if (nbGreenFlagParsed_Total == 0) {
+			throw new Exception("WhenFlagClicked block not found.");
+		}
 	}
 	
 	private JSONObject getBlock(String key) {
@@ -216,7 +246,7 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 	
 	private void parseScratchCode(String currentKey) throws Exception {
-		logger.debug("parseScratchCode {}",currentKey);
+		logger.trace("parseScratchCode {}",currentKey);
 		JSONObject currentBlock = getBlock(currentKey);
 				
 		while(currentBlock!=null) {
@@ -270,19 +300,17 @@ public class LoadScratch3 implements TurtleLoader {
 			currentKey = findNextBlockKey(currentBlock);
 			if(currentKey==null) break;
 			
-			logger.debug("next block {}",currentKey);
+			logger.trace("next block {}",currentKey);
 			currentBlock = getBlock(currentKey);
 		}
 	}
 
 	private void doStart(JSONObject currentBlock) {
-		logger.debug("START");
-		// reset the turtle object
-		myTurtle = new Turtle();
+		logger.trace("START a block opcode event_whenflagclicked ...");
 	}
 
 	private void doIfElse(JSONObject currentBlock) throws Exception {
-		logger.debug("IF ELSE");
+		logger.trace("IF ELSE");
 		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
 		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		String substack2 = (String)findInputInBlock(currentBlock,"SUBSTACK2");
@@ -296,7 +324,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private void doCall(JSONObject currentBlock) throws Exception {
 		String proccode = (String)findMutationInBlock(currentBlock,"proccode");
 		ArrayList<Object> args = resolveArgumentsForProcedure(currentBlock);
-		logger.debug("CALL {}({})",proccode,args.toString());
+		logger.trace("CALL {}({})",proccode,args.toString());
 		
 		Scratch3Procedure p = findProcedureWithProccode(proccode);
 		pushStack(p,args);
@@ -338,7 +366,7 @@ public class LoadScratch3 implements TurtleLoader {
 	}
 
 	private void doIf(JSONObject currentBlock) throws Exception {
-		logger.debug("IF");
+		logger.trace("IF");
 		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
 		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		if(resolveBoolean(getBlock(condition))) {
@@ -346,18 +374,33 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 	}
 
+	int loopNbCountInstadeOfForever = 1;// resiliant : we can draw something, but it maybe incomplet ...
+	boolean foreverThrowAnException = false;// To be resiliant and user friendly this is not an error...
+	/**
+	 * dummy doReapeatForever. N.B. : For the current Makelangelo implementation
+	 * we need to assert the Scratch programme have an end. (is not infinit ...
+	 * This is the easy case.) ReapeatForever have to be altered (loop only n
+	 * time) or seen as an error.
+	 *
+	 *
+	 * @param currentBlock
+	 * @throws Exception
+	 */
 	private void doRepeatForever(JSONObject currentBlock) throws Exception {
-		throw new Exception(Translator.get("LoadScratch3.foreverNotAllowed"));
-		// technically this would work and the program would never end.  It is here for reference.
-		//logger.debug("REPEAT FOREVER");
-		//String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
-		//while(true) {
-		//	parseScratchCode(substack);
-		//}
+		if ( foreverThrowAnException ){
+			throw new Exception(Translator.get("LoadScratch3.foreverNotAllowed"));
+		}		
+		logger.trace("REPEAT FOREVER ( if allowed ({}) will only repeat {} times. )",!foreverThrowAnException,loopNbCountInstadeOfForever);
+		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");		
+		for (int i = 0 ; i < loopNbCountInstadeOfForever ; i++){			
+			//while(true) { // technically this would work and the program would never end.  It is here for reference.
+				parseScratchCode(substack);
+			//}
+		}		
 	}
 
 	private void doRepeatUntil(JSONObject currentBlock) throws Exception {
-		logger.debug("REPEAT UNTIL");
+		logger.trace("REPEAT UNTIL");
 		String condition = (String)findInputInBlock(currentBlock,"CONDITION");
 		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
 		
@@ -369,7 +412,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private void doRepeat(JSONObject currentBlock) throws Exception {
 		int count = (int)resolveValue(findInputInBlock(currentBlock,"TIMES"));
 		String substack = (String)findInputInBlock(currentBlock,"SUBSTACK");
-		logger.debug("REPEAT {}",count);
+		logger.trace("REPEAT {}",count);
 		for(int i=0;i<count;++i) {
 			parseScratchCode(substack);
 		}		
@@ -381,7 +424,7 @@ public class LoadScratch3 implements TurtleLoader {
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = (double)v.value + newValue;
-		logger.debug("Set {} to {}", v.name, v.value);
+		logger.trace("Set {} to {}", v.name, v.value);
 	}
 
 	// absolute change
@@ -390,69 +433,74 @@ public class LoadScratch3 implements TurtleLoader {
 		double newValue = resolveValue(findInputInBlock(currentBlock,"VALUE"));
 		// set and report
 		v.value = newValue;
-		logger.debug("Set {} to {}", v.name, v.value);
+		logger.trace("Set {} to {}", v.name, v.value);
 	}
 
 	private void doMotionGotoXY(JSONObject currentBlock) throws Exception {
 		double px = resolveValue(findInputInBlock(currentBlock,"X"));
 		double py = resolveValue(findInputInBlock(currentBlock,"Y"));
-		logger.debug("GOTO {} {}",px,py);
+		logger.trace("GOTO {} {}",px,py);
 		myTurtle.moveTo(px, py);
 	}
 
 	private void doMotionPointInDirection(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DIRECTION"));
-		logger.debug("POINT AT {}",v);
-		myTurtle.setAngle(v);
+		logger.trace("POINT AT {}",v);
+		myTurtle.setAngle(90.0-v);// axial symmetry of an axis having an angle of 45° see https://github.com/MarginallyClever/Makelangelo-software/issues/564#issuecomment-1046217070
 	}
 	
 	private void doMotionTurnLeft(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DEGREES"));
-		logger.debug("LEFT {}",v);
-		myTurtle.setAngle(myTurtle.getAngle()+v);
+		logger.trace("LEFT {}",v);
+		myTurtle.setAngle(myTurtle.getAngle()+v);//myTurtle.turn(v);
 	}
 	
 	private void doMotionTurnRight(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DEGREES"));
-		logger.debug("RIGHT {}",v);
-		myTurtle.setAngle(myTurtle.getAngle()-v);
+		logger.trace("RIGHT {}",v);
+		myTurtle.setAngle(myTurtle.getAngle()-v);//myTurtle.turn(-v);
 	}
 
 	private void doMotionMoveSteps(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"STEPS"));
-		logger.debug("MOVE {}",v);
+		logger.trace("MOVE {}",v);
 		myTurtle.forward(v);
 	}
 	
 	private void doMotionChangeX(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DX"));
-		logger.debug("MOVE X {}",v);
+		logger.trace("MOVE X {}",v);
 		myTurtle.moveTo(myTurtle.getX()+v,myTurtle.getY());
 	}
 
 	private void doMotionChangeY(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DY"));
-		logger.debug("MOVE Y {}",v);
+		logger.trace("MOVE Y {}",v);
 		myTurtle.moveTo(myTurtle.getX(),myTurtle.getY()+v);
 		
 	}
 
 	private void doMotionSetX(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"X"));
-		logger.debug("SET X {}",v);
+		logger.trace("SET X {}",v);
 		myTurtle.moveTo(v,myTurtle.getY());
 	}
 
 	private void doMotionSetY(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"Y"));
-		logger.debug("SET Y {}",v);
+		logger.trace("SET Y {}",v);
 		myTurtle.moveTo(myTurtle.getX(),v);
 	}
 	
+	boolean ignoreDoSetPenColor = false; // As setColor can bug the Makelangelo Render a quick/bad hack to enable/disable this implementation.
 	private void doSetPenColor(JSONObject currentBlock) throws Exception {
-		ColorRGB c = new ColorRGB((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));
-		logger.debug("SET COLOR {}",c);
-		myTurtle.setColor(c);
+		ColorRGB c = new ColorRGB((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));		
+		if ( !ignoreDoSetPenColor ){
+			logger.trace("SET COLOR {}",c);
+			myTurtle.setColor(c);
+		}else{
+			logger.trace("SET COLOR {} ignored",c);
+		}
 	}
 	
 	/**
@@ -546,7 +594,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchVariables(JSONObject tree) throws Exception {
-		logger.debug("readScratchVariables");
+		logger.trace("readScratchVariables");
 		scratchGlobalVariables = new Scratch3Variables();
 		JSONArray targets = tree.getJSONArray("targets");
 		Iterator<?> targetIter = targets.iterator();
@@ -581,7 +629,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchLists(JSONObject tree) throws Exception {
-		logger.debug("readScratchLists");
+		logger.trace("readScratchLists");
 		JSONArray targets = tree.getJSONArray("targets");
 		Iterator<?> targetIter = targets.iterator();
 		while(targetIter.hasNext()) {
@@ -593,10 +641,10 @@ public class LoadScratch3 implements TurtleLoader {
 			Iterator<?> keyIter = keys.iterator();
 			while( keyIter.hasNext() ) {
 				String key = (String)keyIter.next();
-				logger.debug("list key:{}", key);
+				logger.trace("list key:{}", key);
 				JSONArray elem = listOfLists.getJSONArray(key);
 				String listName = elem.getString(0);
-				logger.debug("  list name:{}", listName);
+				logger.trace("  list name:{}", listName);
 				Object contents = elem.get(1);
 				Scratch3List list = new Scratch3List(listName);
 				// fill the list with any given contents
@@ -610,12 +658,12 @@ public class LoadScratch3 implements TurtleLoader {
 						if(varValue instanceof Number) {
 							Number num = (Number)varValue;
 							value = (float)num.doubleValue();
-							logger.debug("  list float:{}", value);
+							logger.trace("  list float:{}", value);
 							list.contents.add(value);
 						} else if(varValue instanceof String) {
 							try {
 								value = Double.parseDouble((String)varValue);
-								logger.debug("  list string:{}", value);
+								logger.trace("  list string:{}", value);
 								list.contents.add(value);
 							} catch (Exception e) {
 								throw new Exception("List variables must be numbers.", e);
@@ -634,7 +682,7 @@ public class LoadScratch3 implements TurtleLoader {
 	 * @throws Exception
 	 */
 	private void readScratchProcedures() throws Exception {
-		logger.debug("readScratchProcedures");
+		logger.trace("readScratchProcedures");
 
 		// find the blocks with opcode=procedures_definition.
 		for( String k : blockKeys ) {
@@ -653,7 +701,7 @@ public class LoadScratch3 implements TurtleLoader {
 				Scratch3Procedure p = new Scratch3Procedure(uniqueID,proccode);
 				scratchProcedures.add(p);
 				buildParameterListForProcedure(prototypeBlock,p);
-				logger.debug("procedure found: {}",p.toString());
+				logger.trace("procedure found: {}",p.toString());
 			}
 		}
 	}

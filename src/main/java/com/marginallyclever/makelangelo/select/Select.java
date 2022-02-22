@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -14,8 +15,8 @@ import javax.swing.JPanel;
  * @since 7.24.0
  */
 public class Select extends JPanel {
-	private static final long serialVersionUID = 5289951183273734129L;
-	private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	private static final long serialVersionUID = 5289951183273734129L;	
+	private List<PropertyChangeListener> propertyChangeListeners = null;
 		
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
@@ -24,15 +25,27 @@ public class Select extends JPanel {
 	
 	// OBSERVER PATTERN
 	
-	public void addPropertyChangeListener(PropertyChangeListener p) {
+	@Override
+	public void addPropertyChangeListener(PropertyChangeListener p) {	
+		if ( propertyChangeListeners == null ){
+			// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
+			propertyChangeListeners = new ArrayList<>();
+		}
 		propertyChangeListeners.add(p);
 	}
 	
+	@Override
 	public void removePropertyChangeListener(PropertyChangeListener p) {
+		if ( propertyChangeListeners == null ){
+			propertyChangeListeners = new ArrayList<>();
+		}
 		propertyChangeListeners.remove(p);
 	}
 	
 	protected void firePropertyChange(Object oldValue,Object newValue) {
+		if ( propertyChangeListeners == null ){
+			propertyChangeListeners = new ArrayList<>();
+		}
 		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);
