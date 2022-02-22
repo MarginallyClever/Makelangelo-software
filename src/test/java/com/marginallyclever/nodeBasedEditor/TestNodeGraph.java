@@ -7,6 +7,8 @@ import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Subtract;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,11 @@ public class TestNodeGraph {
     @BeforeEach
     public void beforeEach() {
         model.clear();
+    }
+
+    @Test
+    public void testSaveEmptyGraph() {
+        assertEquals("{\"nodes\":[],\"nodeConnections\":[]}",model.toJSON());
     }
 
     @Test
@@ -76,21 +83,28 @@ public class TestNodeGraph {
 
     @Test
     public void testFactoryCreatesAllDefaultTypes() {
-        int count=0;
+        assertNotEquals(0,NodeFactory.getNames().length);
         for(String s : NodeFactory.getNames()) {
             assertNotNull(NodeFactory.createNode(s));
-            ++count;
         }
-        assertNotEquals(0,count);
     }
 
     @Test
-    public void testOneNodeToJSONAndBack() {
+    public void testNodesAreNotEqual() {
         Node nodeA = new Add();
-        JSONObject a = nodeA.toJSON();
-        Node nodeB = new Add();
-        nodeB.parseJSON(a);
-        assertEquals(nodeA.toString(), nodeB.toString());
+        Node nodeB = new Subtract();
+        assertThrows(JSONException.class,()->nodeB.parseJSON(nodeA.toJSON()));
+        assertNotEquals(nodeA.toString(), nodeB.toString());
+    }
+
+    @Test
+    public void testAllNodesToJSONAndBack() {
+        for(String s : NodeFactory.getNames()) {
+            Node a = NodeFactory.createNode(s);
+            Node b = NodeFactory.createNode(s);
+            b.parseJSON(a.toJSON());
+            assertEquals(a.toString(),b.toString());
+        }
     }
 
     @Test
