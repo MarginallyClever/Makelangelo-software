@@ -90,15 +90,15 @@ public class NodeConnection {
         return true;
     }
 
-    public void setInput(Node n, int i) {
+    public void setInput(Node n, int variableIndex) {
         inNode = n;
-        inVariableIndex = i;
+        inVariableIndex = variableIndex;
         apply();
     }
 
-    public void setOutput(Node n, int i) {
+    public void setOutput(Node n, int variableIndex) {
         outNode = n;
-        outVariableIndex = i;
+        outVariableIndex = variableIndex;
         apply();
     }
 
