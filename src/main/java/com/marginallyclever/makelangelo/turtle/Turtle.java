@@ -24,7 +24,7 @@ public class Turtle implements Cloneable {
 	
 	public List<TurtleMove> history;
 
-	private ReentrantLock lock = new ReentrantLock();
+	private final ReentrantLock lock = new ReentrantLock();
 
 	// current state
 	private double px, py;
@@ -77,7 +77,7 @@ public class Turtle implements Cloneable {
 		py = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<TurtleMove>();
+		history = new ArrayList<>();
 		// default turtle color is black.
 		setColor(c);
 	}
@@ -123,8 +123,8 @@ public class Turtle implements Cloneable {
 	
 	/**
 	 * Absolute position change, make sure pen is up before move and put pen down after move.
-	 * @param x  
-	 * @param y 
+	 * @param x absolute x position
+	 * @param y absolute y position
 	 */
 	public void jumpTo(double x,double y) {
 		penUp();
@@ -134,8 +134,8 @@ public class Turtle implements Cloneable {
 	
 	/**
 	 * Absolute position change, do not adjust pen status
-	 * @param x  
-	 * @param y 
+	 * @param x relative x position
+	 * @param y relative y position
 	 */
 	public void moveTo(double x,double y) {
 		px=x;
@@ -176,6 +176,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
+	 * Returns true if pen is up.
 	 * @return true if pen is up
 	 */
 	public boolean isUp() {
@@ -183,8 +184,8 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Relative turn
-	 * @param degrees
+	 * Relative turn in degrees.
+	 * @param degrees relative change in degrees.  Positive is counter clockwise.
 	 */
 	public void turn(double degrees) {
 		setAngle(angle+degrees);
@@ -196,8 +197,8 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Set absolute angle
-	 * @param degrees degrees
+	 * Set absolute angle in degrees.
+	 * @param degrees absolute degrees.
 	 */
 	public void setAngle(double degrees) {
 		angle=degrees;
@@ -208,12 +209,12 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Relative move forward/back
-	 * @param stepSize
+	 * @param distance how far to travel
 	 */
-	public void forward(double stepSize) {
+	public void forward(double distance) {
 		moveTo(
-			px + nx * stepSize,
-			py + ny * stepSize
+			px + nx * distance,
+			py + ny * distance
 		);
 	}
 
@@ -272,20 +273,19 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Scale all draw and move segments by parameters
-	 * @param sx
-	 * @param sy
+	 * Scale all draw and move segments by the given amounts
+	 * @param sx the x axis scale factor.
+	 * @param sy the y axis scale factor.
 	 */
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
-			case TurtleMove.TRAVEL:
-				m.x*=sx;
-				m.y*=sy;
-				break;
-			default:
-				break;
+			switch (m.type) {
+				case TurtleMove.DRAW_LINE, TurtleMove.TRAVEL -> {
+					m.x *= sx;
+					m.y *= sy;
+				}
+				default -> {
+				}
 			}
 		}
 	}
@@ -297,66 +297,43 @@ public class Turtle implements Cloneable {
 	 */
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
-			case TurtleMove.TRAVEL:
-				m.x+=dx;
-				m.y+=dy;
-				break;
-			default:
-				break;
+			switch (m.type) {
+				case TurtleMove.DRAW_LINE, TurtleMove.TRAVEL -> {
+					m.x += dx;
+					m.y += dy;
+				}
+				default -> {
+				}
 			}
 		}
 	}
 
 	/**
-	 * Log smallest bounding rectangle for Turtle path.
-	 */
-	public void showExtent() {
-		int i;
-		double xmin=0,xmax=0,ymin=0,ymax=0;
-		int first=1;
-		for(i=0;i<history.size();i++) {
-			TurtleMove mov=history.get(i);
-			if (mov.type == TurtleMove.DRAW_LINE) {
-				if(first == 1 || mov.x < xmin) xmin=mov.x;
-				if(first == 1 || mov.y < ymin) ymin=mov.y;
-				if(first == 1 || mov.x > xmax) xmax=mov.x;
-				if(first == 1 || mov.y > ymax) ymax=mov.y;
-				first=0;
-			}
-		}
-		logger.debug("extent is ({}/{} {}/{}", xmin, ymin, xmax, ymax);
-	}
-
-	// return a list of all the pen-down lines while remembering their color.
+	 * @return a list of all the pen-down lines while remembering their color.
+ 	 */
 	public ArrayList<LineSegment2D> getAsLineSegments() {
-		ArrayList<LineSegment2D> lines = new ArrayList<LineSegment2D>();
+		ArrayList<LineSegment2D> lines = new ArrayList<>();
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
 		logger.debug("  Found {} instructions.", history.size());
 		
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
-				if(previousMovement!=null) {
-					LineSegment2D line = new LineSegment2D(
-							new Point2D(previousMovement.x,previousMovement.y),
-							new Point2D(m.x,m.y),
-							color);
-					if(line.lengthSquared()>0) {
-						lines.add(line);
+			switch (m.type) {
+				case TurtleMove.DRAW_LINE -> {
+					if (previousMovement != null) {
+						LineSegment2D line = new LineSegment2D(
+								new Point2D(previousMovement.x, previousMovement.y),
+								new Point2D(m.x, m.y),
+								color);
+						if (line.lengthSquared() > 0) {
+							lines.add(line);
+						}
 					}
+					previousMovement = m;
 				}
-				previousMovement = m;
-				break;
-			case TurtleMove.TRAVEL:
-				previousMovement = m;
-				break;
-			case TurtleMove.TOOL_CHANGE:
-				color = m.getColor();
-				break;
+				case TurtleMove.TRAVEL -> previousMovement = m;
+				case TurtleMove.TOOL_CHANGE -> color = m.getColor();
 			}
 		}
 
@@ -365,23 +342,29 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Calls {@code addLineSegments} with a default minimum jump size.
-	 * @param orderedLines
+	 * @param segments the list of line segments to add.
 	 */
-	public void addLineSegments(ArrayList<LineSegment2D> orderedLines) {
-		addLineSegments(orderedLines,1e-6,1e-6);
+	public void addLineSegments(ArrayList<LineSegment2D> segments) {
+		addLineSegments(segments,1e-6,1e-6);
 	}
-	
-	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
-		if(orderedLines.isEmpty()) return;
+
+	/**
+	 * Appends the list of segments to this {@link Turtle}.
+	 * @param segments the ordered list of segments to add.
+	 * @param minimumJumpSize For any {@link LineSegment2D} N being added, the Turtle will jump if N.b and (N+1).a are more than minimumJumpSize apart.
+	 * @param minDrawDistance For any {@link LineSegment2D} N being added, the Turtle will not draw line where N.b-N.a is less than minDrawDistance.
+	 */
+	public void addLineSegments(ArrayList<LineSegment2D> segments, double minimumJumpSize, double minDrawDistance) {
+		if(segments.isEmpty()) return;
 		
-		LineSegment2D first = orderedLines.get(0);
+		LineSegment2D first = segments.get(0);
 		jumpTo(first.a.x,first.a.y);
 		moveTo(first.b.x,first.b.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
 		double minDrawSquared = minDrawDistance*minDrawDistance;
 		
-		for( LineSegment2D line : orderedLines ) {
+		for( LineSegment2D line : segments ) {
 			// change color if needed
 			if(line.c!=getColor()) {
 				setColor(line.c);
@@ -407,7 +390,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	public ArrayList<Turtle> splitByToolChange() {
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
+		ArrayList<Turtle> list = new ArrayList<>();
 		Turtle t = new Turtle();
 		list.add(t);
 		
@@ -421,7 +404,7 @@ public class Turtle implements Cloneable {
 		}
 		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
-		ArrayList<Turtle> notEmptyList = new ArrayList<Turtle>();
+		ArrayList<Turtle> notEmptyList = new ArrayList<>();
 		for( Turtle t2 : list ) {
 			if(t2.getHasAnyDrawingMoves()) {
 				notEmptyList.add(t2);
@@ -450,5 +433,50 @@ public class Turtle implements Cloneable {
 		}
 		
 		return new ColorRGB(0,0,0);
+	}
+
+	/**
+	 * Returns the total distance of all pen-down moves within this {@link Turtle}.
+	 * @return the total distance of all pen-down moves within this {@link Turtle}.
+	 */
+    public double getDrawDistance() {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == TurtleMove.DRAW_LINE) {
+				double dx = prev.x-m.x;
+				double dy = prev.y-m.y;
+				d += Math.sqrt(dx*dx+dy*dy);
+				prev = m;
+			} else if(m.type == TurtleMove.TRAVEL) {
+				prev = m;
+			}
+		}
+		return d;
+    }
+
+	/**
+	 * Returns a point along the drawn lines of this {@link Turtle}
+	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
+	 * @return a point along the drawn lines of this {@link Turtle}
+	 */
+	public Point2D interpolate(double t) {
+		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == TurtleMove.DRAW_LINE) {
+				double dx = prev.x-m.x;
+				double dy = prev.y-m.y;
+				double change = Math.sqrt(dx*dx+dy*dy);
+				if(change>t) {
+					double v = t/change;
+					return new Point2D(prev.x+dx*v,prev.y+dy*v);
+				}
+				t -= change;
+				prev = m;
+			} else if(m.type == TurtleMove.TRAVEL) {
+				prev = m;
+			}
+		}
+		return new Point2D(prev.x,prev.y);
 	}
 }
