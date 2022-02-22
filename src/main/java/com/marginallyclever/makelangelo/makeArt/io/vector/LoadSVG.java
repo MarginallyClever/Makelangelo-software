@@ -52,6 +52,10 @@ public class LoadSVG implements TurtleLoader {
 
 	@Override
 	public Turtle load(InputStream in) throws Exception {
+		if (in == null) {
+			throw new NullPointerException("Input stream is null");
+		}
+
 		logger.debug("Loading...");
 
 		Document document = newDocumentFromInputStream(in);
@@ -85,10 +89,11 @@ public class LoadSVG implements TurtleLoader {
 	 * @param pathNodes the source of the elements
 	 */
 	private void parsePolylineElements(NodeList pathNodes) throws Exception {
-		int pathNodeCount = pathNodes.getLength();
-		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-			SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
-			if(isElementStrokeNone(element))
+	    int pathNodeCount = pathNodes.getLength();
+		logger.debug("{} elements", pathNodeCount);
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
+			if(isElementStrokeNone(element)) 
 				continue;
 
 			Matrix3d m = getMatrixFromElement(element);
@@ -111,9 +116,9 @@ public class LoadSVG implements TurtleLoader {
 
 	private void parseLineElements(NodeList node) throws Exception {
 		Vector3d v2;
-
-		int pathNodeCount = node.getLength();
-		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    int pathNodeCount = node.getLength();
+		logger.debug("{} elements", pathNodeCount);
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element))
 				continue;
@@ -165,8 +170,9 @@ public class LoadSVG implements TurtleLoader {
 	 * @param node
 	 */
 	private void parseRectElements(NodeList node) throws Exception {
-		int pathNodeCount = node.getLength();
-		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    int pathNodeCount = node.getLength();
+		logger.debug("{} elements", pathNodeCount);
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element))
 				continue;
@@ -244,9 +250,9 @@ public class LoadSVG implements TurtleLoader {
 	private void parseCircleElements(NodeList node) throws Exception {
 		Vector3d v2;
 
-		int pathNodeCount = node.getLength();
-		logger.debug("{} circles.", pathNodeCount);
-		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    int pathNodeCount = node.getLength();
+		logger.debug("{} elements", pathNodeCount);
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element))
 				continue;
@@ -270,9 +276,9 @@ public class LoadSVG implements TurtleLoader {
 
 	private void parseEllipseElements(NodeList node) {
 		Vector3d v2;
-
-		int pathNodeCount = node.getLength();
-		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+	    int pathNodeCount = node.getLength();
+		logger.debug("{} elements", pathNodeCount);
+	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
 			if(isElementStrokeNone(element))
 				continue;
@@ -313,6 +319,7 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private void parsePathElements(NodeList paths) throws Exception {
 		int pathCount = paths.getLength();
+		logger.debug("{} elements", pathCount);
 		for( int iPath = 0; iPath < pathCount; iPath++ ) {
 			if(paths.item( iPath ) instanceof SVGOMPolylineElement) {
 				logger.debug("Node is a polyline.");

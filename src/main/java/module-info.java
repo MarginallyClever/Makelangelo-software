@@ -25,4 +25,5 @@ module com.marginallyclever.makelangelo {
 	exports com.marginallyclever.convenience.log;
 
 	opens com.marginallyclever.makelangelo.plotter.settings;
+	opens com.marginallyclever.convenience;
 }

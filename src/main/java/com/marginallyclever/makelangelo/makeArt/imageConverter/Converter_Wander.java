@@ -189,6 +189,8 @@ public class Converter_Wander extends ImageConverter {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
+		turtle = new Turtle();
+		
 		outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0);
 	}
 	
