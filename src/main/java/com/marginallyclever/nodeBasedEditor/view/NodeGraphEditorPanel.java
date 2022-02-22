@@ -65,6 +65,7 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private final ActionAddNode actionAddNode = new ActionAddNode("Add",this);
     private final ActionEditNodes actionEditNodes = new ActionEditNodes("Edit",this);
+    private final ActionForciblyUpdateNodes actionForciblyUpdateNodes = new ActionForciblyUpdateNodes("Force update",this);
     private final ActionFoldGraph actionFoldGraph = new ActionFoldGraph("Fold",this, actionCutGraph);
     private final ActionUnfoldGraph actionUnfoldGraph = new ActionUnfoldGraph("Unfold",this);
 
@@ -193,6 +194,7 @@ public class NodeGraphEditorPanel extends JPanel {
     private void setupPopopBar() {
         popupBar.add(actionAddNode);
         popupBar.add(actionEditNodes);
+        popupBar.add(actionForciblyUpdateNodes);
         popupBar.add(actionFoldGraph);
         popupBar.add(actionUnfoldGraph);
         popupBar.addSeparator();
