@@ -8,7 +8,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 public class ActionSaveGraph extends AbstractAction {
-    NodeGraphEditorPanel editor;
+    private final NodeGraphEditorPanel editor;
+    private final JFileChooser fc = new JFileChooser();
 
     public ActionSaveGraph(String name, NodeGraphEditorPanel editor) {
         super(name);
@@ -17,7 +18,7 @@ public class ActionSaveGraph extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(NodeGraphEditorPanel.FILE_FILTER);
         if (fc.showSaveDialog(SwingUtilities.getWindowAncestor(editor)) == JFileChooser.APPROVE_OPTION) {
             saveModelToFile(fc.getSelectedFile().getAbsolutePath());
         }

@@ -5,11 +5,13 @@ import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.io.*;
 
 public class ActionLoadGraph extends AbstractAction {
-    NodeGraphEditorPanel editor;
+    private final NodeGraphEditorPanel editor;
+    private final JFileChooser fc = new JFileChooser();
 
     public ActionLoadGraph(String name, NodeGraphEditorPanel editor) {
         super(name);
@@ -18,7 +20,7 @@ public class ActionLoadGraph extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(NodeGraphEditorPanel.FILE_FILTER);
         if (fc.showOpenDialog(SwingUtilities.getWindowAncestor(editor)) == JFileChooser.APPROVE_OPTION) {
             editor.getGraph().add(loadModelFromFile(fc.getSelectedFile().getAbsolutePath()));
         }
