@@ -1,8 +1,13 @@
-package com.marginallyclever.nodeBasedEditor.view;
+package com.marginallyclever.nodeBasedEditor.view.actions;
+
+import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Updates all dirty nodes in the graph
+ */
 public class ActionUpdateGraph extends AbstractAction {
     NodeGraphEditorPanel editor;
 

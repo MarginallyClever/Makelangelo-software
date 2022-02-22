@@ -1,7 +1,9 @@
-package com.marginallyclever.nodeBasedEditor.view;
+package com.marginallyclever.nodeBasedEditor.view.actions;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
+import com.marginallyclever.nodeBasedEditor.view.NodeFactoryPanel;
+import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
