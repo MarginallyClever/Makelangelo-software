@@ -2,10 +2,7 @@ package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Maintains a map of {@link Node}s and their names.  Can create nodes on request, by name.
@@ -42,6 +39,7 @@ public class NodeFactory {
      * @return an array containing the unique names of every {@link Node} registered.
      */
     public static String [] getNames() {
-         return nodeRegistry.keySet().toArray(new String[0]);
+        Set<String> list = nodeRegistry.keySet();
+        return list.stream().sorted().toArray(String[]::new);
     }
 }
