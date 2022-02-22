@@ -479,13 +479,13 @@ public class NodeGraphEditorPanel extends JPanel {
         loadTurtle.getRectangle().setLocation(0,300);
 
         NodeGraphEditorPanel panel = new NodeGraphEditorPanel(model);
-        panel.setPreferredSize(new Dimension(800,800));
 
         JFrame frame = new JFrame("NodeBasedEditorPanel");
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(new Dimension(1200,800));
+        frame.setLocationRelativeTo(null);
         frame.add(panel);
-        frame.pack();
         frame.setVisible(true);
     }
 }
