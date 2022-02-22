@@ -53,8 +53,11 @@ public class NodeGraphEditorPanel extends JPanel {
     private final ActionNewGraph actionNewGraph = new ActionNewGraph("New",this);
     private final ActionSaveGraph actionSaveGraph = new ActionSaveGraph("Save",this);
     private final ActionLoadGraph actionLoadGraph = new ActionLoadGraph("Load",this);
-    private final ActionPrintGraph actionPrintGraph = new ActionPrintGraph("Print",this);
     private final ActionUpdateGraph actionUpdateGraph = new ActionUpdateGraph("Update",this);
+
+    private final ActionPrintGraph actionPrintGraph = new ActionPrintGraph("Print",this);
+    private final ActionStraightenGraph actionStraightenGraph = new ActionStraightenGraph("Straighten",this);
+
     private final ActionCopyGraph actionCopyGraph = new ActionCopyGraph("Copy",this);
     private final ActionPasteGraph actionPasteGraph = new ActionPasteGraph("Paste",this);
     private final ActionDeleteGraph actionDeleteGraph = new ActionDeleteGraph("Delete",this);
@@ -179,10 +182,12 @@ public class NodeGraphEditorPanel extends JPanel {
 
     private void setupToolBar() {
         toolBar.add(actionNewGraph);
-        toolBar.add(actionSaveGraph);
         toolBar.add(actionLoadGraph);
-        toolBar.add(actionPrintGraph);
+        toolBar.add(actionSaveGraph);
         toolBar.add(actionUpdateGraph);
+        toolBar.addSeparator();
+        toolBar.add(actionPrintGraph);
+        toolBar.add(actionStraightenGraph);
     }
 
     private void setupPopopBar() {
