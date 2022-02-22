@@ -196,6 +196,8 @@ public class LoadScratch3 implements TurtleLoader {
 	private void readScratchInstructions() throws Exception {
 		logger.trace("readScratchInstructions ( and do a flagclicked {} times ) ",nbClicOnTheGreenFlag);
 		myTurtle = new Turtle();// needed to be init here in case multiple "event_whenflagclicked"
+		// TODO some myTurtle init to be like Scratch initial state. ( like initial color... )
+		
 		int nbGreenFlagParsed_Total = 0;
 		for (int i = 0; i < nbClicOnTheGreenFlag; i++) {
 			// find the first block with opcode=event_whenflagclicked.
@@ -209,8 +211,7 @@ public class LoadScratch3 implements TurtleLoader {
 					if (block.has(key_scratch_block_opcode)) {
 						String opcode = block.getString(key_scratch_block_opcode);
 						if (opcode.equals("event_whenflagclicked")) {
-							parseScratchCode(k);// TODO if multiple event_whenflagclicked this is in the Scratch3 interpretor reverse order ...
-							//return; // nop can have multiple "event_whenflagclicked"
+							parseScratchCode(k);// TODO a stack (LIFO) with k to parseScratchCode(k) later (if multiple event_whenflagclicked this is in the Scratch3 interpretor reverse order ... and for scratch timing (wait, ...) if we want to implement it.)							
 							block_opcode_event_whenflagclicked__count++;
 						}
 					} else {
@@ -445,7 +446,7 @@ public class LoadScratch3 implements TurtleLoader {
 	private void doMotionPointInDirection(JSONObject currentBlock) throws Exception {
 		double v = resolveValue(findInputInBlock(currentBlock,"DIRECTION"));
 		logger.trace("POINT AT {}",v);
-		myTurtle.setAngle(v-90.0);// 0° orientation in turtle = 90° orientation in scratch.
+		myTurtle.setAngle(90.0-v);// axial symmetry of an axis having an angle of 45° see https://github.com/MarginallyClever/Makelangelo-software/issues/564#issuecomment-1046217070
 	}
 	
 	private void doMotionTurnLeft(JSONObject currentBlock) throws Exception {
