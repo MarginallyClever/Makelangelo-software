@@ -1,12 +1,18 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.stream.Stream;
+
+import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.loadAndTestFiles;
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,21 +35,26 @@ public class LoadScratch3Test {
         assertFalse(loader.canLoad("file.txt"));
     }
 
-    @Test
-    public void load_koch_curve() throws Exception {
-        verifyLoadScratch("/scratch3/test_02_koch_curve_03.sb3", "/scratch3/test_02_koch_curve_03_expected.txt");
+    @TestFactory
+    public Stream<DynamicTest> testAllSVG() {
+        return loadAndTestFiles("src/test/resources/scratch3", ".sb3", this::verifyLoadScratch3);
     }
 
-    private void verifyLoadScratch(String svgFile, String expectedFile) throws Exception {
-        // given
-        TurtleLoader loader = new LoadScratch3();
+    private void verifyLoadScratch3(File filenameToTest, File fileExpected) {
+        try {
 
-        // when
-        Turtle turtle = loader.load(LoadSVGTest.class.getResourceAsStream(svgFile));
+            // given
+            TurtleLoader loader = new LoadScratch3();
 
-        // then
-        assertNotNull(turtle);
-        assertNotNull(turtle.history);
-        assertEquals(readFile(expectedFile), turtle.history.toString());
+            // when
+            Turtle turtle = loader.load(new FileInputStream(filenameToTest));
+
+            // then
+            assertNotNull(turtle);
+            assertNotNull(turtle.history);
+            assertEquals(readFile(fileExpected), turtle.history.toString());
+        } catch( Exception e) {
+            fail(e);
+        }
     }
 }
