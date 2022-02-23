@@ -1,6 +1,5 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.nodeBasedEditor.JSONHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,15 +37,15 @@ public class NodeVariable<T> {
     }
 
     public static <T> NodeVariable<T> newInstance(String name,Class<T> clazz,T defaultValue,boolean hasInput,boolean hasOutput) {
-        return new NodeVariable<T>(name,clazz,defaultValue,hasInput,hasOutput);
+        return new NodeVariable<>(name,clazz,defaultValue,hasInput,hasOutput);
     }
 
     /**
      * Creates a copy of this {@link NodeVariable}, while flipping hasInput and hasOutput
      * @return an inverted copy of this {@link NodeVariable}.
      */
-    public NodeVariable<?> createInverse() {
-        return new NodeVariable<T>(name,type,value,!hasInput,!hasOutput);
+    public NodeVariable<T> createInverse() {
+        return new NodeVariable<>(name,type,value,!hasInput,!hasOutput);
     }
 
     public Rectangle getRectangle() {

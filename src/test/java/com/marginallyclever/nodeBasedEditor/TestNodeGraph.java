@@ -26,6 +26,7 @@ public class TestNodeGraph {
     @BeforeAll
     static void beforeAll() {
         model = new NodeGraph();
+        NodeFactory.registerBuiltInNodes();
     }
 
     @BeforeEach
