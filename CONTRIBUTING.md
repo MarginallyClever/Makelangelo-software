@@ -38,7 +38,7 @@ By sending in new code you agree that it will be covered by the existing license
 
 ## Discussing features
 
-Please use the [forums](https://www.marginallyclever.com/learn/forum/forum/makelangelo-polargraph-art-robot/) to discuss future features and direction for the project.
+Please use the [forums](https://www.marginallyclever.com/learn/forum/) to discuss future features and direction for the project.
 
 ## Code of conduct
 
