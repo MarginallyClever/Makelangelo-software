@@ -2,6 +2,7 @@ package com.marginallyclever.nodeBasedEditor.view;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.*;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
@@ -89,6 +90,8 @@ public class NodeGraphEditorPanel extends JPanel {
     public NodeGraphEditorPanel(NodeGraph model) {
         super(new BorderLayout());
         this.model = model;
+
+        NodeFactory.registerBuiltInNodes();
 
         paintArea = new NodeGraphViewPanel(model);
 

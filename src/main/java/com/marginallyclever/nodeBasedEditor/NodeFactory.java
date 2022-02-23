@@ -1,6 +1,14 @@
 package com.marginallyclever.nodeBasedEditor;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadString;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.PrintImage;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Random;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle.*;
 
 import java.util.*;
 
@@ -21,6 +29,36 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Call this once to register all the built-in nodes that are included in the package.
+     */
+    public static void registerBuiltInNodes() {
+        NodeFactory.registerNode(new LoadNumber());
+        NodeFactory.registerNode(new Random());
+        NodeFactory.registerNode(new Add());
+        NodeFactory.registerNode(new Subtract());
+        NodeFactory.registerNode(new Multiply());
+        NodeFactory.registerNode(new Divide());
+        NodeFactory.registerNode(new PrintToStdOut());
+        NodeFactory.registerNode(new Cos());
+        NodeFactory.registerNode(new Sin());
+        NodeFactory.registerNode(new Tan());
+        NodeFactory.registerNode(new ATan2());
+        NodeFactory.registerNode(new Min());
+        NodeFactory.registerNode(new Max());
+
+        NodeFactory.registerNode(new LoadString());
+
+        NodeFactory.registerNode(new LoadImage());
+        NodeFactory.registerNode(new PrintImage());
+
+        NodeFactory.registerNode(new LoadTurtle());
+        NodeFactory.registerNode(new PrintTurtle());
+        NodeFactory.registerNode(new TurtleLine());
+        NodeFactory.registerNode(new TurtleRectangle());
+        NodeFactory.registerNode(new TurtleCircle());
+        NodeFactory.registerNode(new TurtlePatternOnPath());
+    }
     /**
      *
      * @param name The {@link Node} you want.

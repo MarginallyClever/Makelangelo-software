@@ -25,32 +25,6 @@ public class NodeGraph {
 
     public NodeGraph() {
         super();
-        NodeFactory.registerNode(new LoadNumber());
-        NodeFactory.registerNode(new Random());
-        NodeFactory.registerNode(new Add());
-        NodeFactory.registerNode(new Subtract());
-        NodeFactory.registerNode(new Multiply());
-        NodeFactory.registerNode(new Divide());
-        NodeFactory.registerNode(new PrintToStdOut());
-        NodeFactory.registerNode(new Cos());
-        NodeFactory.registerNode(new Sin());
-        NodeFactory.registerNode(new Tan());
-        NodeFactory.registerNode(new ATan2());
-        NodeFactory.registerNode(new Min());
-        NodeFactory.registerNode(new Max());
-
-        NodeFactory.registerNode(new LoadImage());
-        NodeFactory.registerNode(new PrintImage());
-
-        NodeFactory.registerNode(new LoadString());
-
-        NodeFactory.registerNode(new LoadTurtle());
-        NodeFactory.registerNode(new PrintTurtle());
-        NodeFactory.registerNode(new TurtleLine());
-        NodeFactory.registerNode(new TurtleRectangle());
-        NodeFactory.registerNode(new TurtleCircle());
-
-        NodeFactory.registerNode(new TurtlePatternOnPath());
     }
 
     /**
