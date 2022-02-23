@@ -1,21 +1,21 @@
-package com.marginallyclever.nodeBasedEditor.builtInNodes.math;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes.math;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
-public class Divide extends Node {
+public class Subtract extends Node {
     private final NodeVariable<Number> a = NodeVariable.newInstance("A",Number.class,0,true,false);
     private final NodeVariable<Number> b = NodeVariable.newInstance("B",Number.class,0,true,false);
     private final NodeVariable<Number> c = NodeVariable.newInstance("output",Number.class,0,false,true);
 
-    public Divide() {
-        super("Divide");
+    public Subtract() {
+        super("Subtract");
         addVariable(a);
         addVariable(b);
         addVariable(c);
     }
 
-    public Divide(double a,double b) {
+    public Subtract(double a,double b) {
         this();
         this.a.setValue(a);
         this.b.setValue(b);
@@ -23,15 +23,14 @@ public class Divide extends Node {
 
     @Override
     public Node create() {
-        return new Divide();
+        return new Subtract();
     }
 
     @Override
     public void update() {
         double av = a.getValue().doubleValue();
         double bv = b.getValue().doubleValue();
-        if(bv==0) c.setValue(0);
-        else c.setValue(av / bv);
+        c.setValue(av - bv);
         cleanAllInputs();
     }
 }

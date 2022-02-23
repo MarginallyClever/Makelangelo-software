@@ -1,8 +1,7 @@
 package com.marginallyclever.nodeBasedEditor.model;
 
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
-import com.marginallyclever.nodeBasedEditor.builtInNodes.math.Add;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.*;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

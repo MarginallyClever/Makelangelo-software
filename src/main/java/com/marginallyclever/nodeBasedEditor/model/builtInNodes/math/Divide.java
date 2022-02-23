@@ -1,21 +1,21 @@
-package com.marginallyclever.nodeBasedEditor.builtInNodes.math;
+package com.marginallyclever.nodeBasedEditor.model.builtInNodes.math;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
 
-public class Max extends Node {
+public class Divide extends Node {
     private final NodeVariable<Number> a = NodeVariable.newInstance("A",Number.class,0,true,false);
     private final NodeVariable<Number> b = NodeVariable.newInstance("B",Number.class,0,true,false);
     private final NodeVariable<Number> c = NodeVariable.newInstance("output",Number.class,0,false,true);
 
-    public Max() {
-        super("Max");
+    public Divide() {
+        super("Divide");
         addVariable(a);
         addVariable(b);
         addVariable(c);
     }
 
-    public Max(double a,double b) {
+    public Divide(double a,double b) {
         this();
         this.a.setValue(a);
         this.b.setValue(b);
@@ -23,14 +23,15 @@ public class Max extends Node {
 
     @Override
     public Node create() {
-        return new Max();
+        return new Divide();
     }
 
     @Override
     public void update() {
         double av = a.getValue().doubleValue();
         double bv = b.getValue().doubleValue();
-        c.setValue(Math.max(av,bv));
+        if(bv==0) c.setValue(0);
+        else c.setValue(av / bv);
         cleanAllInputs();
     }
 }
