@@ -1,14 +1,13 @@
 package com.marginallyclever.nodeBasedEditor;
 
-import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
 import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
+import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Multiply;
 import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Subtract;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -146,10 +145,6 @@ public class TestNodeGraph {
         testNodeVariableToJSONAndBack(String.class, "hello",new String());
         testNodeVariableToJSONAndBack(Number.class, 1.0,0.0);
         testNodeVariableToJSONAndBack(Number.class, 1,0);
-        Turtle t = new Turtle();
-        t.jumpTo(10,20);
-        t.moveTo(30,40);
-        testNodeVariableToJSONAndBack(Turtle.class, t,new Turtle());
     }
 
         @Test

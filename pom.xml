@@ -463,9 +463,21 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>qoi-java-awt</artifactId>
 			<version>1.2.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.MarginallyClever</groupId>
+			<artifactId>NodeGraphCore</artifactId>
+			<version>main-6d3df70</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
+		<!-- for including projects from github instead of maven central -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+
 		<repository>
 			<id>my-local-repo</id>
 			<url>file://${project.basedir}/java/local-maven-repo</url>

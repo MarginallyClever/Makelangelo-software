@@ -459,7 +459,7 @@ public class NodeGraphEditorPanel extends JPanel {
         Translator.start();
 
         NodeFactory.registerBuiltInNodes();
-        SwingNodeFactory.registerSwingNodes();
+        SwingNodeFactory.registerNodes();
 
         NodeGraph model = new NodeGraph();
         Node constant0 = model.add(new LoadNumber(1));
