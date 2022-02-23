@@ -1,6 +1,6 @@
-package com.marginallyclever.nodeBasedEditor.view.actions;
+package com.marginallyclever.nodeBasedEditor.view.swing.actions;
 
-import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
+import com.marginallyclever.nodeBasedEditor.view.swing.NodeGraphEditorPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

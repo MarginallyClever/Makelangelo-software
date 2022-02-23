@@ -1,13 +1,11 @@
-package com.marginallyclever.nodeBasedEditor.view.actions;
+package com.marginallyclever.nodeBasedEditor.view.swing.actions;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
-import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
-import com.marginallyclever.nodeBasedEditor.view.NodeFactoryPanel;
-import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
+import com.marginallyclever.nodeBasedEditor.view.swing.NodeFactoryPanel;
+import com.marginallyclever.nodeBasedEditor.view.swing.NodeGraphEditorPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.List;
 
 public class ActionAddNode extends AbstractAction {
     private NodeGraphEditorPanel editor;

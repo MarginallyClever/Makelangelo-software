@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes.images;
+package com.marginallyclever.nodeBasedEditor.view.swing.nodes.images;
 
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;

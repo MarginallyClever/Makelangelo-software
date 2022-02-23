@@ -1,14 +1,15 @@
 package com.marginallyclever.nodeBasedEditor;
 
+import com.marginallyclever.nodeBasedEditor.builtInNodes.math.*;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.math.Random;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.turtle.*;
 import com.marginallyclever.nodeBasedEditor.model.Node;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadString;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.PrintImage;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.*;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Random;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle.*;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.LoadNumber;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.LoadString;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.PrintToStdOut;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.LoadImage;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.PrintImage;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle.*;
 
 import java.util.*;
 

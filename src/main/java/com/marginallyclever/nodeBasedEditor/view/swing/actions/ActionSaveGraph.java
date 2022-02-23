@@ -1,16 +1,12 @@
-package com.marginallyclever.nodeBasedEditor.view.actions;
+package com.marginallyclever.nodeBasedEditor.view.swing.actions;
 
-import com.marginallyclever.nodeBasedEditor.view.NodeGraphEditorPanel;
+import com.marginallyclever.nodeBasedEditor.view.swing.NodeGraphEditorPanel;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
-import java.util.Arrays;
 
 public class ActionSaveGraph extends AbstractAction {
     private final NodeGraphEditorPanel editor;

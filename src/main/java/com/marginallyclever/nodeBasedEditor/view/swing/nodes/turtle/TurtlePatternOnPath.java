@@ -1,11 +1,9 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle;
+package com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodeBasedEditor.model.Node;
 import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
-
-import java.awt.*;
 
 public class TurtlePatternOnPath extends Node {
     private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,false);

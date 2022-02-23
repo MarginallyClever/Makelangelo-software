@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle;
+package com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle;
 
 import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;

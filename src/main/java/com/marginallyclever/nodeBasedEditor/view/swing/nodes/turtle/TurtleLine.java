@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle;
+package com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodeBasedEditor.model.Node;

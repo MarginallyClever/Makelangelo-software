@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.view;
+package com.marginallyclever.nodeBasedEditor.view.swing;
 
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.Point2D;

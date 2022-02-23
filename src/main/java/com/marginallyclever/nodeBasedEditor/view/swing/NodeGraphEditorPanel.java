@@ -1,15 +1,16 @@
-package com.marginallyclever.nodeBasedEditor.view;
+package com.marginallyclever.nodeBasedEditor.view.swing;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.nodeBasedEditor.NodeFactory;
 import com.marginallyclever.nodeBasedEditor.model.*;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.LoadImage;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.images.PrintImage;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.turtle.LoadTurtle;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.LoadNumber;
+import com.marginallyclever.nodeBasedEditor.view.swing.actions.*;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.LoadImage;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.PrintImage;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.PrintToStdOut;
+import com.marginallyclever.nodeBasedEditor.builtInNodes.math.Add;
+import com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle.LoadTurtle;
 import com.marginallyclever.nodeBasedEditor.view.actions.*;
 import com.marginallyclever.util.PreferencesHelper;
 

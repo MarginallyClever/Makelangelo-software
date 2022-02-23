@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.view.actions;
+package com.marginallyclever.nodeBasedEditor.view.swing.actions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
