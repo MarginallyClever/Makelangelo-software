@@ -2,16 +2,13 @@ package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import org.junit.jupiter.api.DynamicTest;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class LoadHelper {
@@ -19,33 +16,30 @@ public class LoadHelper {
     /**
      * Load a whole file in a String
      *
-     * @param file path of the file in the classpath
+     * @param filename path of the file in the classpath
      * @return the content of the file
      */
-    public static String readFile(File file) throws FileNotFoundException {
-        return new Scanner(new FileInputStream(file), StandardCharsets.UTF_8).useDelimiter("\\A").next();
+    public static String readFile(String filename) {
+        return new Scanner(LoadHelper.class.getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A").next();
     }
 
     /**
      * Generate a list of test based on the files ending with the specified extension in the given folder
      *
-     * @param folder folder where the file are stored
-     * @param extension extension of file to filter. Must start with a .
-     * @param verify Method that check the expected behavior
+     * @param filenames list of files to verify
+     * @param folder    folder where the file are stored
+     * @param verify    Method that check the expected behavior
      * @return a stream a test to launch for Junit
      */
-    public static Stream<DynamicTest> loadAndTestFiles(String folder, String extension, BiConsumer<File, File> verify) {
-        return Arrays.stream(new File(folder).listFiles())
-                .map(File::getName)
-                .filter(filename -> filename.endsWith(extension))
-                .map(filename -> filename.replaceAll("([^.]*)\\..*", "$1"))
-                .map(basename -> dynamicTest(basename + extension, () -> {
-                    String base = folder + File.separator + basename;
-                    File fileToTest = new File(base + extension);
-                    File fileExpected = new File(base + "_expected.txt");
+    public static Stream<DynamicTest> loadAndTestFiles(List<String> filenames, String folder, BiConsumer<String, String> verify) {
+        return filenames.stream()
+                .map(filename -> dynamicTest(filename, () -> {
+                    String fileToTest = folder + "/" + filename;
+                    String basename = filename.replaceAll("([^.]*)\\..*", "$1");
+                    String fileExpected = folder + "/" + basename + "_expected.txt";
                     System.out.println("fileToTest = " + fileToTest + ", " + "fileExpected = " + fileExpected);
-                    assertTrue(fileToTest.exists(), "file to test does not exists");
-                    assertTrue(fileExpected.exists(), "expected file does not exists");
+                    assertNotNull(LoadHelper.class.getResourceAsStream(fileToTest), "the file '" + fileToTest + "' to test does not exists");
+                    assertNotNull(LoadHelper.class.getResourceAsStream(fileExpected), "the expected file '" + fileExpected + "'does not exists");
                     verify.accept(fileToTest, fileExpected);
                 }));
     }

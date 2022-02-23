@@ -5,12 +5,11 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.stream.Stream;
 
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.loadAndTestFiles;
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadSVGTest {
@@ -38,23 +37,33 @@ public class LoadSVGTest {
 
     @TestFactory
     public Stream<DynamicTest> testAllSVG() {
-        return loadAndTestFiles("src/test/resources/svg", ".svg", this::verifyLoadSvg);
+        return loadAndTestFiles(of("circle.svg",
+                        "ellipse.svg",
+                        "eule.svg",
+                        "line.svg",
+                        "multi_shapes_ignatus1.svg",
+                        "multi_shapes_ignatus2.svg",
+                        "multi_shapes_path-circle-line-rect.svg",
+                        "multi_shapes_ying-yang.svg",
+                        "rect.svg"),
+                "/svg",
+                this::verifyLoadSvg);
     }
 
-    private void verifyLoadSvg(File filenameToTest, File fileExpected) {
+    private void verifyLoadSvg(String filenameToTest, String fileExpected) {
         try {
 
             // given
             TurtleLoader loader = new LoadSVG();
 
             // when
-            Turtle turtle = loader.load(new FileInputStream(filenameToTest));
+            Turtle turtle = loader.load(LoadSVGTest.class.getResourceAsStream(filenameToTest));
 
             // then
             assertNotNull(turtle);
             assertNotNull(turtle.history);
             assertEquals(readFile(fileExpected), turtle.history.toString());
-        } catch( Exception e) {
+        } catch (Exception e) {
             fail(e);
         }
     }

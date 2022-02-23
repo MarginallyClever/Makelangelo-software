@@ -8,12 +8,11 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.stream.Stream;
 
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.loadAndTestFiles;
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadScratch3Test {
@@ -36,18 +35,20 @@ public class LoadScratch3Test {
     }
 
     @TestFactory
-    public Stream<DynamicTest> testAllSVG() {
-        return loadAndTestFiles("src/test/resources/scratch3", ".sb3", this::verifyLoadScratch3);
+    public Stream<DynamicTest> testAllFiles() {
+        return loadAndTestFiles(of("test_02_koch_curve_03.sb3"),
+                "/scratch3",
+                this::verifyLoadScratch3);
     }
 
-    private void verifyLoadScratch3(File filenameToTest, File fileExpected) {
+    private void verifyLoadScratch3(String filenameToTest, String fileExpected) {
         try {
 
             // given
             TurtleLoader loader = new LoadScratch3();
 
             // when
-            Turtle turtle = loader.load(new FileInputStream(filenameToTest));
+            Turtle turtle = loader.load(LoadScratch3Test.class.getResourceAsStream(filenameToTest));
 
             // then
             assertNotNull(turtle);
