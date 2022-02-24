@@ -58,29 +58,13 @@ public class SaveGCode {
 		
 		return name + "." + extensions[0];
 	}
-	
-	boolean detailGCodeHeader = true;
-	
+		
 	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
 			
-			if (detailGCodeHeader) {
-				out.write(";FLAVOR:Marlin-polargraph\n");
-
-				//out.write(";TIME:"+ "\n"); // TODO
-				
-				Rectangle2D.Double bounds = turtle.getBounds();
-				out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
-				out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
-				//out.write(";MINZ:0.000\n");
-				out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
-				out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
-				//out.write(";MAXZ:0.000\n");
-
 				out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
-			}
 			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
@@ -89,8 +73,6 @@ public class SaveGCode {
 			// TODO MarlinPlotterInterface.getFindHomeString()?
 			out.write("G28\n");  // go home
 
-			// TODO user "start gcode"
-			
 			boolean isUp = true;
 
 			TurtleMove previousMovement = null;
@@ -118,16 +100,12 @@ public class SaveGCode {
 						previousMovement = m;
 					}
 					case TurtleMove.TOOL_CHANGE -> {
-						// TODO user "tool change start gcode"
 						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
-						// todo user "tool change end gcode"
 					}
 				}
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
-			
-			//TODO user "end gcode"
 
 			out.write(";End of Gcode\n"); 
 			
