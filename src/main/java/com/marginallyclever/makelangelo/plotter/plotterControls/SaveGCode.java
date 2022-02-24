@@ -1,11 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import java.awt.geom.Rectangle2D;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
