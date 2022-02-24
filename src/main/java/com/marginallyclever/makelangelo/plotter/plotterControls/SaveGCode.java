@@ -1,8 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import java.awt.geom.Rectangle2D;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,17 +59,55 @@ public class SaveGCode {
 		return name + "." + extensions[0];
 	}
 	
+	boolean verboseGCodeHeader = true;
+	
 	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
+			
+			if (verboseGCodeHeader) {
+				out.write(";FLAVOR:Marlin-polargraph\n");
 
+				//out.write(";TIME:"+ "\n"); // TODO
+				
+				Rectangle2D.Double bounds = turtle.getBounds();
+				out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
+				out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
+				//out.write(";MINZ:0.000\n");
+				out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
+				out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
+				//out.write(";MAXZ:0.000\n");
+
+				out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
+			}
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
+			
+			if ( verboseGCodeHeader &&  "true".equalsIgnoreCase(System.getenv("DEV")) ){ // TODO or to Review
+				out.write("; plotter:" + robot.getPlotterSettings().getHardwareName() + "\n");// TODO to review as this is alwayse "Makelangelo 5" currently 
+				// TODO Paper Size , plotter type,  plotter config , ...
+				// TODO origin/base filename (ex like ;MESH:ellipse.svg or scratch_test.sb3, ... )
+
+				out.write("; turtle.history.size():" + turtle.history.size() + "\n");
+				out.write("; turtle.splitByToolChange().size():" + turtle.splitByToolChange().size() + "\n");// todo ssi reordered cf 
+				/*
+	2022-02-24 05:08:10,768 DEBUG c.m.makelangelo.turtle.Turtle - Turtle.splitByToolChange() into 4 sections. 
+	2022-02-24 05:08:10,769 DEBUG c.m.makelangelo.turtle.Turtle - Turtle.splitByToolChange() 2 not-empty sections. 
+				 */
+			}
+			
 			// TODO MarlinPlotterInterface.getFindHomeString()?
 			out.write("G28\n");  // go home
 
+			// TODO user "start gcode"
+			// https://marlinfw.org/docs/gcode/M092.html Set Axis Steps-per-unit
+			// https://marlinfw.org/docs/gcode/M117.html Set LCD Message
+			// https://marlinfw.org/docs/gcode/M220.html Set Feedrate Percentage
+			// ...
+			
 			boolean isUp = true;
 
 			TurtleMove previousMovement = null;
@@ -94,14 +135,22 @@ public class SaveGCode {
 						previousMovement = m;
 					}
 					case TurtleMove.TOOL_CHANGE -> {
+						// TODO ? ";TIME_ELAPSED:"
+						// TODO "tool change start gcode" ( if i want a bip M300 and/or something else like a park position ...)
 						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
+						// todo "tool change end gcode"
 					}
 				}
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
-		}
+			
+			//TODO user "end gcode" ( M300 , park position , disable motors ... )
 
+			out.write(";End of Gcode\n"); 
+			
+			out.flush();
+		}
 		logger.debug("done.");
 	}
 }

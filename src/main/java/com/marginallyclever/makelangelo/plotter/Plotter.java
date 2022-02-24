@@ -268,4 +268,12 @@ public class Plotter implements PreviewListener, Cloneable {
 	public double getLimitRight() {
 		return settings.getLimitRight();
 	}
+	
+	/**
+	 * TODO to review as for the moment it alwayse return "Makelangelo 5".
+	 * @return 
+	 */
+	public PlotterSettings getPlotterSettings(){
+		return settings;
+	}
 }
