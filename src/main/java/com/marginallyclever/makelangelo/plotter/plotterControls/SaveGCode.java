@@ -62,7 +62,7 @@ public class SaveGCode {
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
 			
-				out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
+			out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
 			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
