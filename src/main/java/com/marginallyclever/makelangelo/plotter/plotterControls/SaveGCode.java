@@ -59,14 +59,14 @@ public class SaveGCode {
 		return name + "." + extensions[0];
 	}
 	
-	boolean verboseGCodeHeader = true;
+	boolean detailGCodeHeader = true;
 	
 	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
 			
-			if (verboseGCodeHeader) {
+			if (detailGCodeHeader) {
 				out.write(";FLAVOR:Marlin-polargraph\n");
 
 				//out.write(";TIME:"+ "\n"); // TODO
@@ -86,27 +86,10 @@ public class SaveGCode {
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
 			
-			if ( verboseGCodeHeader &&  "true".equalsIgnoreCase(System.getenv("DEV")) ){ // TODO or to Review
-				out.write("; plotter:" + robot.getPlotterSettings().getHardwareName() + "\n");// TODO to review as this is alwayse "Makelangelo 5" currently 
-				// TODO Paper Size , plotter type,  plotter config , ...
-				// TODO origin/base filename (ex like ;MESH:ellipse.svg or scratch_test.sb3, ... )
-
-				out.write("; turtle.history.size():" + turtle.history.size() + "\n");
-				out.write("; turtle.splitByToolChange().size():" + turtle.splitByToolChange().size() + "\n");// todo ssi reordered cf 
-				/*
-	2022-02-24 05:08:10,768 DEBUG c.m.makelangelo.turtle.Turtle - Turtle.splitByToolChange() into 4 sections. 
-	2022-02-24 05:08:10,769 DEBUG c.m.makelangelo.turtle.Turtle - Turtle.splitByToolChange() 2 not-empty sections. 
-				 */
-			}
-			
 			// TODO MarlinPlotterInterface.getFindHomeString()?
 			out.write("G28\n");  // go home
 
 			// TODO user "start gcode"
-			// https://marlinfw.org/docs/gcode/M092.html Set Axis Steps-per-unit
-			// https://marlinfw.org/docs/gcode/M117.html Set LCD Message
-			// https://marlinfw.org/docs/gcode/M220.html Set Feedrate Percentage
-			// ...
 			
 			boolean isUp = true;
 
@@ -135,17 +118,16 @@ public class SaveGCode {
 						previousMovement = m;
 					}
 					case TurtleMove.TOOL_CHANGE -> {
-						// TODO ? ";TIME_ELAPSED:"
-						// TODO "tool change start gcode" ( if i want a bip M300 and/or something else like a park position ...)
+						// TODO user "tool change start gcode"
 						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
-						// todo "tool change end gcode"
+						// todo user "tool change end gcode"
 					}
 				}
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 			
-			//TODO user "end gcode" ( M300 , park position , disable motors ... )
+			//TODO user "end gcode"
 
 			out.write(";End of Gcode\n"); 
 			
