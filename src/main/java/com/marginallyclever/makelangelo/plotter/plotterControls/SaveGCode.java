@@ -1,8 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import java.awt.geom.Rectangle2D;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,14 @@ public class SaveGCode {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
+			out.write(";FLAVOR:Marlin-polargraph\n");
+			Rectangle2D.Double bounds = turtle.getBounds();
+			out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
+			out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
+			//out.write(";MINZ:0.000\n");
+			out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
+			out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
+			//out.write(";MAXZ:0.000\n");
 
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
