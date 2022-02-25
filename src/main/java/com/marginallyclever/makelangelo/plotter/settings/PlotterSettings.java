@@ -71,8 +71,8 @@ public class PlotterSettings implements Serializable {
 	private int startingPositionIndex;
 
 	private String userGeneralStartGcode = "G28";
-	private String userGeneralEndGcode = "";
-	private String userToolChangeStartGcode ="";
+	private String userGeneralEndGcode = "M300";
+	private String userToolChangeStartGcode ="M300";
 	private String userToolChangeEndGcode = "";
 	/**
 	 * These values should match
