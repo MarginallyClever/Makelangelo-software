@@ -70,10 +70,10 @@ public class PlotterSettings implements Serializable {
 	 */
 	private int startingPositionIndex;
 
-	private String userGeneralStartGcode = "G28";
-	private String userGeneralEndGcode = "M300";
-	private String userToolChangeStartGcode ="M300";
-	private String userToolChangeEndGcode = "";
+	private String userGeneralStartGcode = "G28";// TODO Should containe a G28 or a G28 is added befor any move...
+	private String userGeneralEndGcode = "M300";// TODO Should containe a disble motors or added at the end
+	private String userToolChangeStartGcode ="M300"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
+	private String userToolChangeEndGcode = ""; // a resort position ?
 	/**
 	 * These values should match
 	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
