@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.marginallyclever.util.FunctionSolver;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.util.PreferencesHelper;
