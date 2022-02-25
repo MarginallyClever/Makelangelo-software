@@ -78,7 +78,11 @@ public class SaveGCode {
 			// TODO MarlinPlotterInterface.getFindHomeString()?			
 			out.write("; User General Start-Gcode - BEGIN\n");
 			out.write(robot.getSettings().getUserGeneralStartGcode() +"\n");
+			//resolvePlaceHolder
 			out.write("; User General Start-Gcode - END\n");
+			out.write("; RUser General Start-Gcode - BEGIN\n");
+			out.write(robot.getSettings().resolvePlaceHolder(robot.getSettings().getUserGeneralStartGcode()) +"\n");
+			out.write("; RUser General Start-Gcode - END\n");
 			//out.write("G28\n");  // go home
 
 			boolean isUp = true;

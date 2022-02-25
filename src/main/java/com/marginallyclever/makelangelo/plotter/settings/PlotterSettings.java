@@ -6,6 +6,8 @@ import com.marginallyclever.util.PreferencesHelper;
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
@@ -71,7 +73,7 @@ public class PlotterSettings implements Serializable {
 	private int startingPositionIndex;
 
 	private String userGeneralStartGcode = "G28";// TODO Should containe a G28 or a G28 is added befor any move...
-	private String userGeneralEndGcode = "M300";// TODO Should containe a disble motors or added at the end
+	private String userGeneralEndGcode = "M300";// TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
 	private String userToolChangeStartGcode ="M300"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
 	private String userToolChangeEndGcode = ""; // a resort position ?
 	/**
@@ -577,6 +579,148 @@ public class PlotterSettings implements Serializable {
 	public void setUserToolChangeEndGcode(String userToolChangeEndGcode) {
 		this.userToolChangeEndGcode = userToolChangeEndGcode;
 	}
+
 	
+	/**
+	 * Suppose the prefrence is Uptodate ...
+	 * Expression evaluation Thanks to https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java :: https://stackoverflow.com/users/4244130/vincelomba : https://stackoverflow.com/posts/48251395/revisions
+	 * @param in
+	 * @return 
+	 */
+	public String resolvePlaceHolder(String in){
+		StringBuilder res = new StringBuilder();
+		
+		// build a simple map PlaceHolderName to current value ...
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));	
+
+		System.out.println(""+thisMachineNode);
+		System.out.println(""+thisMachineNode.toString());
+		
+		try{
+			String[] childrenNames = thisMachineNode.childrenNames();
+			if (childrenNames != null ){
+			System.out.println(" childrenNames: "+childrenNames.length);
+			}
+		}catch(Exception e ){
+			e.printStackTrace();
+		}
+		
+		TreeMap<String,String> paramNameToValue = new TreeMap<>();
+		try{
+			String[] keys = thisMachineNode.keys();
+			if (keys != null ){
+			System.out.println(" keys: "+keys.length);
+			for ( int i = 0 ; i < keys.length ; i++){
+				System.out.println("  "+keys[i]+": "+thisMachineNode.get(keys[i], "?"));
+				paramNameToValue.put(keys[i], thisMachineNode.get(keys[i], "?"));
+			}
+			/*
+			
+ childrenNames: 2
+ keys: 22
+  acceleration: 100.0
+  blockBufferSize: 16
+  handleSmallSegments: false
+  hardwareVersion: Makelangelo 5
+  isRegistered: false
+  limit_bottom: -500.0
+  limit_left: -325.0
+  limit_right: 325.0
+  limit_top: 500.0
+  minAcceleration: 0.0
+  minSegTime: 20000
+  minSegmentLength: 0.5
+  minimumPlannerSpeed: 0.05
+  paperColorB: 255
+  paperColorG: 255
+  paperColorR: 255
+  segmentsPerSecond: 5
+  startingPosIndex: 4
+  userGeneralEndGcode: 
+  userGeneralStartGcode: G28;
+G0 X{limit_left+10} Y0.00
+M300;
+  userToolChangeEndGcode: 
+  userToolChangeStartGcode: 
+			*/
+			}
+		}catch(Exception e ){
+			e.printStackTrace();
+		}
+		// TODO a parser like to replace placeHolder with ther value and to performe expression evalutation 
+		//// cf https://github.com/MarginallyClever/Makelangelo-software/issues/552#issuecomment-1041907446 : I think I just parked it 10cm from the left edge and 15cm from the top edge.
+		// like "G0 X{${limit_left}+10} Y{${limit_top}-15} ; note the '+' as normaly left are negalive value." -> G0 X-
+		// with limit_left = -width / 2.0
+		// todo evalutation prioryty cf parentesis ...
+		// TODO what if array [0] ... ?
+		// todo what if conditional ?
+		//
+		// basic way replace ? // do not help for evaluation
+		// ? the lasy way use something like groovy or an existing interprétor to evaluate ... 
+		// Comme il n'y a pas besoin d'un vrai parser (je ne vais pas vérifier que l'ensemble respecte une grammaire) 
+		int readPos = 0;
+		final char toResolvExpressionStartDelimitor = '{';
+		final char toResolvExpressionEndDelimitor = '}';
+		int level = 0;
+		
+		StringBuilder tokenToEvaluateReadBuffer = new StringBuilder();
+		while (readPos < in.length()){
+			char currentCharAtReadPos = in.charAt(readPos);
+			switch (currentCharAtReadPos) {
+				case toResolvExpressionStartDelimitor:
+					level++;
+					break;
+				case toResolvExpressionEndDelimitor:
+					level--;
+//					res.append("<TODO resolve \"");
+//					res.append(tokenToEvaluateReadBuffer);
+//					
+//					res.append("\">");
+					for (String k : paramNameToValue.keySet() ){
+						String tmp = tokenToEvaluateReadBuffer.toString().replaceAll(k, paramNameToValue.get(k));
+						tokenToEvaluateReadBuffer.setLength(0);
+						tokenToEvaluateReadBuffer.append(tmp);
+					}
+					
+//					res.append("<TODO evaluate \"");
+//					res.append(tokenToEvaluateReadBuffer);
+//					
+//					res.append("\">");
+					
+					//https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java
+					try{
+					double resTmp = FunctionSolver.solveNumericExpression(tokenToEvaluateReadBuffer.toString());
+					tokenToEvaluateReadBuffer.setLength(0);
+						tokenToEvaluateReadBuffer.append(resTmp);
+						}catch (Exception e ){
+						e.printStackTrace();
+					}
+//					res.append("<TODO checkIfWellEvaluated \"");
+//					res.append(tokenToEvaluateReadBuffer);
+//					
+//					res.append("\">");
+					res.append(tokenToEvaluateReadBuffer);
+					tokenToEvaluateReadBuffer.setLength(0);
+					break;
+				default:
+					if (level > 0) {
+							tokenToEvaluateReadBuffer.append(currentCharAtReadPos);
+					} else {
+						res.append(currentCharAtReadPos);
+					}
+			}
+			//tokenReadBuffer.a
+			if (level <= 0) {
+
+			} else {
+
+			}
+			readPos++;
+		}
+		
+		
+		return res.toString();
+	}
 	
 }
