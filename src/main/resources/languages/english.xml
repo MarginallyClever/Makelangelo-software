@@ -2151,5 +2151,27 @@
 		<key>LoadScratch3.foreverNotAllowed</key>
 		<value>Forever loops are forever forbidden.</value>
 	</string>
+        
+        
+    <string>
+        <key>PlotterSettings.userGeneralStartGcode</key>
+        <value>StartGcode</value>
+        <hint></hint>
+    </string>    
+    <string>
+        <key>PlotterSettings.userGeneralEndGcode</key>
+        <value>EndGcode</value>
+        <hint></hint>
+    </string>    
+    <string>
+        <key>PlotterSettings.userToolChangeStartGcode</key>
+        <value>ToolChangeStartGcode</value>
+        <hint></hint>
+    </string>    
+    <string>
+        <key>PlotterSettings.userToolChangeEndGcode</key>
+        <value>ToolChangeEndGcode</value>
+        <hint></hint>
+    </string>
 
 </language>
