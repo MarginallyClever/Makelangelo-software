@@ -70,6 +70,10 @@ public class PlotterSettings implements Serializable {
 	 */
 	private int startingPositionIndex;
 
+	private String userGeneralStartGcode = "G28;;";
+	private String userGeneralEndGcode = "";
+	private String userToolChangeStartGcode ="";
+	private String userToolChangeEndGcode = "";
 	/**
 	 * These values should match
 	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
@@ -197,6 +201,11 @@ public class PlotterSettings implements Serializable {
 		minAcceleration			= thisMachineNode.getDouble("minAcceleration", minAcceleration);
 		minimumPlannerSpeed 	= thisMachineNode.getDouble("minimumPlannerSpeed", minimumPlannerSpeed);
 		
+		userGeneralStartGcode 	= thisMachineNode.get("userGeneralStartGcode", userGeneralStartGcode);
+		userGeneralEndGcode 	= thisMachineNode.get("userGeneralEndGcode", userGeneralEndGcode);
+		userToolChangeStartGcode 	= thisMachineNode.get("userToolChangeStartGcode", userToolChangeStartGcode);
+		userToolChangeEndGcode 	= thisMachineNode.get("userToolChangeEndGcode", userToolChangeEndGcode);
+		
 		loadJerkConfig(thisMachineNode);
 		loadPenConfig(thisMachineNode);
 	}
@@ -254,6 +263,11 @@ public class PlotterSettings implements Serializable {
 		thisMachineNode.putBoolean("handleSmallSegments", handleSmallSegments);
 		thisMachineNode.putDouble("minAcceleration", minAcceleration);
 		thisMachineNode.putDouble("minimumPlannerSpeed", minimumPlannerSpeed);
+		
+		thisMachineNode.put("userGeneralStartGcode", userGeneralStartGcode);
+		thisMachineNode.put("userGeneralEndGcode", userGeneralEndGcode);
+		thisMachineNode.put("userToolChangeStartGcode", userToolChangeStartGcode);
+		thisMachineNode.put("userToolChangeEndGcode", userToolChangeEndGcode);
 		
 		saveJerkConfig(thisMachineNode);
 		savePenConfig(thisMachineNode);
@@ -531,4 +545,38 @@ public class PlotterSettings implements Serializable {
 	public void setMaxJerk(double[] maxJerk) {
 		this.maxJerk = maxJerk;
 	}
+
+	public String getUserGeneralStartGcode() {
+		return userGeneralStartGcode;
+	}
+
+	public void setUserGeneralStartGcode(String userGeneralStartGcode) {
+		this.userGeneralStartGcode = userGeneralStartGcode;
+	}
+
+	public String getUserGeneralEndGcode() {
+		return userGeneralEndGcode;
+	}
+
+	public void setUserGeneralEndGcode(String userGeneralEndGcode) {
+		this.userGeneralEndGcode = userGeneralEndGcode;
+	}
+
+	public String getUserToolChangeStartGcode() {
+		return userToolChangeStartGcode;
+	}
+
+	public void setUserToolChangeStartGcode(String userToolChangeStartGcode) {
+		this.userToolChangeStartGcode = userToolChangeStartGcode;
+	}
+
+	public String getUserToolChangeEndGcode() {
+		return userToolChangeEndGcode;
+	}
+
+	public void setUserToolChangeEndGcode(String userToolChangeEndGcode) {
+		this.userToolChangeEndGcode = userToolChangeEndGcode;
+	}
+	
+	
 }

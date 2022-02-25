@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectTextArea;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ import java.awt.*;
 
 /**
  * {@link PlotterSettingsPanel} is the user interface to adjust {@link PlotterSettings}.
- *
+ * PPAC37 : todo review to propose user start/eng gcode (general and at change tool) with posible placeholder ...
  * @author Dan Rmaybe oyer
  * @since 7.1.4
  */
@@ -50,8 +51,13 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectDouble minAcceleration;
 	private SelectDouble minPlannerSpeed;
 	
-	private JButton buttonSave;
-	private JButton buttonCancel;
+	private SelectTextArea userGeneralStartGcode;
+	private SelectTextArea userGeneralEndGcode;
+	private SelectTextArea userToolChangeStartGcode;
+	private SelectTextArea userToolChangeEndGcode;
+	
+	private JButton buttonSave;//TODO event
+	private JButton buttonCancel;// TODO event
 	
 	public PlotterSettingsPanel(Plotter robot) {
 		super();
@@ -92,6 +98,11 @@ public class PlotterSettingsPanel extends JPanel {
 		interior.add(handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.isHandleSmallSegments()));
 		interior.add(minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getMinAcceleration()));
 		interior.add(minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getMinPlannerSpeed()));
+		
+		interior.add(userGeneralStartGcode     = new SelectTextArea ("userGeneralStartGcode",     Translator.get("PlotterSettings.userGeneralStartGcode" ),settings.getUserGeneralStartGcode()));
+		interior.add(userGeneralEndGcode     = new SelectTextArea ("userGeneralEndGcode",     Translator.get("PlotterSettings.userGeneralEndGcode" ),settings.getUserGeneralEndGcode()));
+		interior.add(userToolChangeStartGcode     = new SelectTextArea ("userToolChangeStartGcode",     Translator.get("PlotterSettings.userToolChangeStartGcode" ),settings.getUserToolChangeStartGcode()));
+		interior.add(userToolChangeEndGcode     = new SelectTextArea ("userToolChangeEndGcode",     Translator.get("PlotterSettings.userToolChangeEndGcode" ),settings.getUserToolChangeEndGcode()));
 
 		
 		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
@@ -150,6 +161,11 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setHandleSmallSegments(handleSmallSegments.isSelected());
 		settings.setMinAcceleration(minAcceleration.getValue());
 		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
+		
+		settings.setUserGeneralStartGcode(userGeneralStartGcode.getText());
+		settings.setUserGeneralEndGcode(userGeneralEndGcode.getText());
+		settings.setUserToolChangeStartGcode(userToolChangeStartGcode.getText());
+		settings.setUserToolChangeEndGcode(userToolChangeEndGcode.getText());
 
 		settings.saveConfig();
 	}
