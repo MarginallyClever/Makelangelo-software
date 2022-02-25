@@ -6,8 +6,8 @@ import com.marginallyclever.util.PreferencesHelper;
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
@@ -15,6 +15,7 @@ import javax.script.ScriptEngineManager;
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {	
+	private static final Logger logger = LoggerFactory.getLogger(PlotterSettings.class);
 	private static final long serialVersionUID = -4185946661019573192L;
 
 	// Each robot has a global unique identifier
@@ -102,7 +103,7 @@ public class PlotterSettings implements Serializable {
 
 	// OBSERVER PATTERN START
 
-	private List<PlotterSettingsListener> listeners = new ArrayList<PlotterSettingsListener>();
+	private final List<PlotterSettingsListener> listeners = new ArrayList<>();
 
 	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.add(listener);
@@ -582,90 +583,95 @@ public class PlotterSettings implements Serializable {
 
 	
 	/**
-	 * Suppose the prefrence is Uptodate ...
-	 * Expression evaluation Thanks to https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java :: https://stackoverflow.com/users/4244130/vincelomba : https://stackoverflow.com/posts/48251395/revisions
-	 * @param in
-	 * @return 
+	 * To resolve and evaluate user's personal start/end gcodes.
+	 * <br>
+	 * Assume preferences are up to date ...
+	 * <br>
+	 * <pre>{@code G0 X{limit_left+10} Y{limit_top-20} ; Park position}</pre>
+	 * should be resolved and evaluated in something like
+	 * <pre>{@code G0 X-315.0 Y480.0 ; Park position}</pre>
+	 * <br>
+	 * Expression evaluation thanks to
+	 * https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java
+	 * :: https://stackoverflow.com/users/4244130/vincelomba :
+	 * https://stackoverflow.com/posts/48251395/revisions
+	 *
+	 * @param in the String with expression to resolv and evaluate
+	 * @return the result.
 	 */
-	public String resolvePlaceHolder(String in){
+	public String resolvePlaceHolderAndEvalExpression(String in) {
 		StringBuilder res = new StringBuilder();
-		
+
 		// build a simple map PlaceHolderName to current value ...
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));	
+		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
 
-		System.out.println(""+thisMachineNode);
-		System.out.println(""+thisMachineNode.toString());
-		
-		try{
+		logger.trace("{}", thisMachineNode.toString());
+
+		TreeMap<String, String> paramNameToValue = new TreeMap<>();
+
+		try {
 			String[] childrenNames = thisMachineNode.childrenNames();
-			if (childrenNames != null ){
-			System.out.println(" childrenNames: "+childrenNames.length);
+			if (childrenNames != null) {
+				logger.trace(" childrenNames:{}", childrenNames.length);
+				// TODO if we want to use there sub values  ...
 			}
-		}catch(Exception e ){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.trace("{}", e.getMessage(), e);
 		}
-		
-		TreeMap<String,String> paramNameToValue = new TreeMap<>();
-		try{
+
+		try {
 			String[] keys = thisMachineNode.keys();
-			if (keys != null ){
-			System.out.println(" keys: "+keys.length);
-			for ( int i = 0 ; i < keys.length ; i++){
-				System.out.println("  "+keys[i]+": "+thisMachineNode.get(keys[i], "?"));
-				paramNameToValue.put(keys[i], thisMachineNode.get(keys[i], "?"));
+			if (keys != null) {
+				System.out.println(" keys: " + keys.length);
+				for (String key : keys) {
+					logger.debug("  {}:{}", key, thisMachineNode.get(key, ""));
+					paramNameToValue.put(key, thisMachineNode.get(key, ""));
+				}
+				/* TODO a doc with all the replacement pattern
+				keys: 22
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   acceleration:100.0
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   blockBufferSize:16
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   handleSmallSegments:false
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   hardwareVersion:Makelangelo 5
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   isRegistered:false
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_bottom:-500.0
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_left:-325.0
+				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_right:325.0
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   limit_top:500.0
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minAcceleration:0.0
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minSegTime:20000
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minSegmentLength:0.5
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minimumPlannerSpeed:0.05
+				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorB:255
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorG:255
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorR:255
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   segmentsPerSecond:5
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   startingPosIndex:4
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   userGeneralEndGcode:
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   userGeneralStartGcode:G28;
+				G0 X{limit_left+10} Y{limit_top-20} ; Park position
+				M300;
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   userToolChangeEndGcode:
+				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   userToolChangeStartGcode: 
+				 */
 			}
-			/*
-			
- childrenNames: 2
- keys: 22
-  acceleration: 100.0
-  blockBufferSize: 16
-  handleSmallSegments: false
-  hardwareVersion: Makelangelo 5
-  isRegistered: false
-  limit_bottom: -500.0
-  limit_left: -325.0
-  limit_right: 325.0
-  limit_top: 500.0
-  minAcceleration: 0.0
-  minSegTime: 20000
-  minSegmentLength: 0.5
-  minimumPlannerSpeed: 0.05
-  paperColorB: 255
-  paperColorG: 255
-  paperColorR: 255
-  segmentsPerSecond: 5
-  startingPosIndex: 4
-  userGeneralEndGcode: 
-  userGeneralStartGcode: G28;
-G0 X{limit_left+10} Y0.00
-M300;
-  userToolChangeEndGcode: 
-  userToolChangeStartGcode: 
-			*/
-			}
-		}catch(Exception e ){
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.trace("{}", e.getMessage(), e);
 		}
-		// TODO a parser like to replace placeHolder with ther value and to performe expression evalutation 
-		//// cf https://github.com/MarginallyClever/Makelangelo-software/issues/552#issuecomment-1041907446 : I think I just parked it 10cm from the left edge and 15cm from the top edge.
-		// like "G0 X{${limit_left}+10} Y{${limit_top}-15} ; note the '+' as normaly left are negalive value." -> G0 X-
-		// with limit_left = -width / 2.0
-		// todo evalutation prioryty cf parentesis ...
-		// TODO what if array [0] ... ?
-		// todo what if conditional ?
-		//
-		// basic way replace ? // do not help for evaluation
-		// ? the lasy way use something like groovy or an existing interprétor to evaluate ... 
-		// Comme il n'y a pas besoin d'un vrai parser (je ne vais pas vérifier que l'ensemble respecte une grammaire) 
+		// a parser like to replace placeHolder with ther value and to performe expression evalutation 
+		// https://github.com/MarginallyClever/Makelangelo-software/issues/552#issuecomment-1041907446 : I think I just parked it 10cm from the left edge and 15cm from the top edge.
+
+		// TODO array [0] ... ?
+		// todo conditional ?
+		// As there is no need for a real parser (I'm not going to check that the whole thing respects a grammar)
 		int readPos = 0;
 		final char toResolvExpressionStartDelimitor = '{';
 		final char toResolvExpressionEndDelimitor = '}';
-		int level = 0;
-		
-		StringBuilder tokenToEvaluateReadBuffer = new StringBuilder();
-		while (readPos < in.length()){
+		int level = 0;// To resolve and evaluate only if in a delimited expression.
+
+		StringBuilder cumulTokenToEvaluate = new StringBuilder();
+		while (readPos < in.length()) {
 			char currentCharAtReadPos = in.charAt(readPos);
 			switch (currentCharAtReadPos) {
 				case toResolvExpressionStartDelimitor:
@@ -673,53 +679,32 @@ M300;
 					break;
 				case toResolvExpressionEndDelimitor:
 					level--;
-//					res.append("<TODO resolve \"");
-//					res.append(tokenToEvaluateReadBuffer);
-//					
-//					res.append("\">");
-					for (String k : paramNameToValue.keySet() ){
-						String tmp = tokenToEvaluateReadBuffer.toString().replaceAll(k, paramNameToValue.get(k));
-						tokenToEvaluateReadBuffer.setLength(0);
-						tokenToEvaluateReadBuffer.append(tmp);
+					// TODO ? if nested
+					// TODO a more elegant way to do this ... as the solveNumericExpression can get a map of variable name , value ?
+					for (String k : paramNameToValue.keySet()) {
+						String tmp = cumulTokenToEvaluate.toString().replaceAll(k, paramNameToValue.get(k));
+						cumulTokenToEvaluate.setLength(0);
+						cumulTokenToEvaluate.append(tmp);
 					}
-					
-//					res.append("<TODO evaluate \"");
-//					res.append(tokenToEvaluateReadBuffer);
-//					
-//					res.append("\">");
-					
-					//https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java
-					try{
-					double resTmp = FunctionSolver.solveNumericExpression(tokenToEvaluateReadBuffer.toString());
-					tokenToEvaluateReadBuffer.setLength(0);
-						tokenToEvaluateReadBuffer.append(resTmp);
-						}catch (Exception e ){
-						e.printStackTrace();
+					try {
+						double resTmp = FunctionSolver.solveNumericExpression(cumulTokenToEvaluate.toString());
+						cumulTokenToEvaluate.setLength(0);
+						cumulTokenToEvaluate.append(resTmp);
+					} catch (Exception e) {
+						logger.trace("{}", e.getMessage(), e);
 					}
-//					res.append("<TODO checkIfWellEvaluated \"");
-//					res.append(tokenToEvaluateReadBuffer);
-//					
-//					res.append("\">");
-					res.append(tokenToEvaluateReadBuffer);
-					tokenToEvaluateReadBuffer.setLength(0);
+					res.append(cumulTokenToEvaluate);
+					cumulTokenToEvaluate.setLength(0);
 					break;
 				default:
 					if (level > 0) {
-							tokenToEvaluateReadBuffer.append(currentCharAtReadPos);
+						cumulTokenToEvaluate.append(currentCharAtReadPos);
 					} else {
 						res.append(currentCharAtReadPos);
 					}
 			}
-			//tokenReadBuffer.a
-			if (level <= 0) {
-
-			} else {
-
-			}
 			readPos++;
 		}
-		
-		
 		return res.toString();
 	}
 	
