@@ -1,9 +1,12 @@
 package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+
+import static com.marginallyclever.convenience.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -11,25 +14,24 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
+	private static Texture controlBoard;
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
-//		paintCalibrationPoint(gl2,settings);
 		paintControlBox(gl2,settings);
 		paintMotors(gl2,settings);
-		//paintSafeArea(gl2,robot);
-		if(robot.getDidFindHome()) 
+		if(robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl2,robot);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param gl2
-	 * @param settings
+	 * @param gl2 the render context
+	 * @param settings settings of the robot
 	 */
-	private void paintControlBox(GL2 gl2,PlotterSettings settings) {
+	private void paintControlBox(GL2 gl2, PlotterSettings settings) {
 		double cy = settings.getLimitTop();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
@@ -57,18 +59,27 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glColor3f(1, 1, 0);		gl2.glVertex2d(left, y);	gl2.glVertex2d(right, y);;
 		gl2.glEnd();
 		
-		// RUMBA in v3 (135mm*75mm)
 		float shiftX = (float) right / 2;
-		if (shiftX < 100) {
-			 shiftX = 85;
+		if (controlBoard == null) controlBoard = loadTexture("/textures/rampsv14.png");
+		if (controlBoard != null) {
+			final double scale = 0.1;
+			if (shiftX < 100) {
+				shiftX = 45;
+			}
+			paintTexture(gl2, controlBoard, shiftX, -72, 1024 * scale, 1024 * scale);
+		} else {
+			if (shiftX < 100) {
+				shiftX = 85;
+			}
+			// RUMBA in v3 (135mm*75mm)
+			float w = 135f / 2;
+			float h = 75f / 2;
+			gl2.glPushMatrix();
+			gl2.glColor3d(0.9, 0.9, 0.9);
+			gl2.glTranslated(shiftX, 0, 0);
+			drawRectangle(gl2, h, w, -h, -w);
+			gl2.glPopMatrix();
 		}
-		gl2.glPushMatrix();
-		gl2.glTranslated(shiftX, 0, 0);
-		float w = 135f/2;
-		float h = 75f/2;
-		gl2.glColor3d(0.9,0.9,0.9);
-		drawRectangle(gl2, h, w, -h, -w);
-		gl2.glPopMatrix();
 
 		renderLCD(gl2, left);
 
@@ -82,7 +93,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		double left = settings.getLimitLeft();
 
 		// left motor
-		gl2.glColor3f(0,0,0);
+		gl2.glColor3d(0.3,0.3,0.3);
 		drawRectangle(gl2, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2);
 
 		// right motor
@@ -97,15 +108,6 @@ public class MakelangeloCustom implements PlotterRenderer {
 		}
 		gl2.glPushMatrix();
 		gl2.glTranslated(shiftX, 0, 0);
-		/*
-		// mounting plate for LCD
-		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
-		gl2.glEnd();*/
 
 		// LCD red
 		float w = 150f/2;
@@ -139,7 +141,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glPopMatrix();
 	}
 
-	private void paintPenHolderToCounterweights( GL2 gl2, Plotter robot ) {
+	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
 		Point2D pos = robot.getPos();
@@ -211,87 +213,12 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	private void paintPlotter(GL2 gl2,float gx,float gy) {
+	private void paintPlotter(GL2 gl2, float gx, float gy) {
 		// plotter
 		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2,(float)gx,(float)gy,PEN_HOLDER_RADIUS_5);
-	}
-	
-	private void drawCircle(GL2 gl2,float x,float y,float r) {
-		gl2.glTranslatef(x, y, 0);
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		float f;
-		for(f=0;f<2.0*Math.PI;f+=0.3f) {
-			gl2.glVertex2d(
-					Math.cos(f)*r,
-					Math.sin(f)*r);
-		}
-		gl2.glEnd();
-		gl2.glTranslatef(-x, -y, 0);
-	}
-	
-	private void drawArc(GL2 gl2,float x,float y,float r, float a1, float a2) {
-		gl2.glTranslatef(x, y, 0);
-		gl2.glBegin(GL2.GL_LINES);
-		float f;
-		int i;
-		int steps=10;
-		float delta=(a2-a1)/(float) steps;
-		f=a1;
-		for(i=0;i<steps;i++) {
-			gl2.glVertex2d(	Math.cos(f)*r,Math.sin(f)*r);
-			gl2.glVertex2d(	Math.cos(f+delta)*r,Math.sin(f+delta)*r);
-			f += delta;
-		}
-		gl2.glEnd();
-		gl2.glTranslatef(-x, -y, 0);
+		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5);
 	}
 
-	private void drawRectangle(GL2 gl2, double top, double right, double bottom, double left) {
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(right, bottom);
-		gl2.glVertex2d(left, bottom);
-		gl2.glEnd();
-	}
-	
-	@SuppressWarnings("unused")
-	private void paintSafeArea(GL2 gl2,Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-		double topcrit_ang=20*3.14/180.0;
-		double sidecrit_ang=20*3.14/180.0;
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		double top_crit=top-(right-left)/2.0*Math.tan(topcrit_ang);
-		double side_crit=(top-top_crit)*Math.tan(sidecrit_ang);
-		double belt=Math.sqrt(Math.pow(top-bottom,2)+Math.pow((right-left)/2.0f,2));
-		double bot_crit=top-Math.sqrt(Math.pow(top-bottom,2)-Math.pow(right-left,2)*0.75);
-		double botang=Math.asin((right-left)/(2*belt));
-		double sideang=Math.asin((right-left)/(belt));
-		
-		gl2.glColor4f(1f,0.4f,0.4f,0.75f);
-
-		gl2.glBegin(GL2.GL_LINES);
-
-		gl2.glVertex2d(left+side_crit, bot_crit);
-		gl2.glVertex2d(left, top);
-
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d((right+left)/2, top_crit);
-
-		gl2.glVertex2d((right+left)/2, top_crit);
-		gl2.glVertex2d(right, top);
-
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(right-side_crit, bot_crit);
-
-		gl2.glEnd();
-		drawArc(gl2, (float)right, (float)top, (float)belt, (float)(Math.PI*1.5-sideang), (float)(Math.PI*1.5-botang));
-		drawArc(gl2, (float)left, (float)top, (float)belt, (float)(Math.PI*1.5+botang), (float)(Math.PI*1.5+sideang));
-	}
 /*
 	@Override
 	public Point2D getHome() {
@@ -302,7 +229,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public String getVersion() {
 		return "0";
 	}
-	
+
 	@Override
 	public boolean canChangeMachineSize() {
 		return true;
@@ -317,7 +244,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public float getWidth() {
 		return 3*12*25.4f;
 	}
-	
+
 	@Override
 	public float getHeight() {
 		return 4*12*25.4f;
