@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -71,6 +72,7 @@ public class SaveGCode {
 			out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
 			//out.write(";MAXZ:0.000\n");
 
+			out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
@@ -120,13 +122,15 @@ public class SaveGCode {
 				}
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
-			
+ 
 			out.write("; User General End-Gcode - BEGIN\n");
 			out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGeneralEndGcode()) +"\n");
 			out.write("; User General End-Gcode - END\n");
 			
+			out.write(";End of Gcode\n");
+				
+			out.flush();
 		}
-
 		logger.debug("done.");
 	}
 }
