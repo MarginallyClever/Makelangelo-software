@@ -34,7 +34,6 @@ public class LoadSVGTest {
         }, "Input stream is null");
     }
 
-
     @Test
     public void load_circle() throws Exception {
         verifyLoadSvg("/svg/circle.svg", "/svg/circle_expected.txt");
@@ -43,6 +42,11 @@ public class LoadSVGTest {
     @Test
     public void load_rectangle() throws Exception {
         verifyLoadSvg("/svg/rect.svg", "/svg/rect_expected.txt");
+    }
+
+    @Test
+    public void load_ellipse() throws Exception {
+        verifyLoadSvg("/svg/ellipse.svg", "/svg/ellipse_expected.txt");
     }
 
     @Test

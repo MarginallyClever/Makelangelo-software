@@ -115,6 +115,9 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
+		if (in == null) {
+			throw new NullPointerException("Input stream is null");
+		}
 		logger.debug("Loading...");
 		JSONObject tree = getTreeFromInputStream(in);
 		
@@ -130,7 +133,7 @@ public class LoadScratch3 implements TurtleLoader {
 		return myTurtle;
 	}
 
-	private JSONObject getTreeFromInputStream(InputStream in) throws FileNotFoundException, IOException {
+	private JSONObject getTreeFromInputStream(InputStream in) throws IOException {
 		File tempZipFile = extractProjectJSON(in);
 		
         logger.trace("Parsing JSON file...");
@@ -614,7 +617,7 @@ public class LoadScratch3 implements TurtleLoader {
 				else value = (Number)valueUnknown;
 				try {
 					double d = value.doubleValue();
-					logger.debug("Variable {} {} {}", k, name, d);
+					logger.debug("Variable {} {}", name, d);
 					scratchGlobalVariables.add(new Scratch3Variable(name,k,d));
 				} catch (Exception e) {
 					throw new Exception("Variables must be numbers.", e);
