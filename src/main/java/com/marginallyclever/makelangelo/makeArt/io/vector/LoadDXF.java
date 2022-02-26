@@ -124,6 +124,10 @@ public class LoadDXF implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
+		if (in == null) {
+			throw new NullPointerException("Input stream is null");
+		}
+
 		logger.debug("Loading...");
 
 		// Read in the DXF file
