@@ -32,28 +32,29 @@ public class Camera {
 		offsetY += (float) dy * zoom / height;
 	}
 
-	
+	private void limitCameraZoom() {
+		if(zoom<CAMERA_ZNEAR) zoom=CAMERA_ZNEAR;
+		if(zoom>CAMERA_ZFAR) zoom=CAMERA_ZFAR;
+	}
+
 	// scale the picture of the robot to fake a zoom.
 	public void zoomIn() {
 		zoom *= ZOOM_STEP_SIZE;
-		if(zoom<CAMERA_ZNEAR) zoom=CAMERA_ZNEAR;
+		limitCameraZoom();
 	}
 
-	
+
 	// scale the picture of the robot to fake a zoom.
 	public void zoomOut() {
 		zoom /= ZOOM_STEP_SIZE;
-		if(zoom>CAMERA_ZFAR) zoom=CAMERA_ZFAR;
+		limitCameraZoom();
 	}
 
 	
 	// scale the picture of the robot to fake a zoom.
 	public void zoomToFit(double w,double h) {
-		if (w < h) {
-			zoom = (w > h ? w : h);
-		} else {
-			zoom = (w < h ? w : h);
-		}
+		zoom = (w > h ? w : h)/2.0;
+		limitCameraZoom();
 		
 		offsetX = 0;
 		offsetY = 0;

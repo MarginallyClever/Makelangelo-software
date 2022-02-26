@@ -31,7 +31,7 @@ public class FileAccess {
 		int index = filename.lastIndexOf(":");
 		int index2 = filename.lastIndexOf(":\\");  // hack for windows file system
 		if(index!=-1 && index!=index2) {
-			return loadFromZip(filename.substring(0, index), filename.substring(index+1,filename.length()));
+			return loadFromZip(filename.substring(0, index), filename.substring(index+1));
 		} else {
 			return new BufferedInputStream(getInputStream(filename));
 		}
@@ -40,30 +40,27 @@ public class FileAccess {
 	private static InputStream getInputStream(String fname) throws IOException {
 		InputStream s = FileAccess.class.getResourceAsStream(fname);
 		if( s==null ) {
-			s = new FileInputStream(new File(fname));
+			s = new FileInputStream(fname);
 		}
 		return s;
 	}
 		
 	private static BufferedInputStream loadFromZip(String zipName,String fname) throws IOException {
-		ZipInputStream zipFile=null;
-		ZipEntry entry;
-		
-		zipFile = new ZipInputStream(getInputStream(zipName));
-		
-		String fnameSuffix = fname.substring(fname.lastIndexOf(".")+1);
-		String fnameNoSuffix = fname.substring(0,fname.length()-(fnameSuffix.length()+1));
+		try (ZipInputStream zipFile = new ZipInputStream(getInputStream(zipName))) {
 
-		while((entry = zipFile.getNextEntry())!=null) {
-	        if( entry.getName().equals(fname) ) {
-	        	File f = createTempFile(fnameNoSuffix, fnameSuffix);                
-	        	readZipFileIntoTempFile(zipFile,f);
-		        // return temp file as input stream
-                return new BufferedInputStream(new FileInputStream(f));
-	        }
-	    }
-		    
-	    zipFile.close();
+			String fnameSuffix = fname.substring(fname.lastIndexOf(".") + 1);
+			String fnameNoSuffix = fname.substring(0, fname.length() - (fnameSuffix.length() + 1));
+
+			ZipEntry entry;
+			while ((entry = zipFile.getNextEntry()) != null) {
+				if (entry.getName().equals(fname)) {
+					File f = createTempFile(fnameNoSuffix, fnameSuffix);
+					readZipFileIntoTempFile(zipFile, f);
+					// return temp file as input stream
+					return new BufferedInputStream(new FileInputStream(f));
+				}
+			}
+		}
 
 	    throw new IOException("file not found in zip.");
 	}
