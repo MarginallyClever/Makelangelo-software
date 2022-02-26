@@ -1,8 +1,13 @@
 package com.marginallyclever.nodeBasedEditor.view.makelangelo;
 
-import com.marginallyclever.nodeBasedEditor.NodeFactory;
-import com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle.*;
+import com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes.*;
+import com.marginallyClever.nodeGraphCore.NodeFactory;
 
+/**
+ * Create custom {@link com.marginallyClever.nodeGraphCore.Node}s for Makleangelo.
+ * @author Dan Royer
+ * @since 2022-02-01
+ */
 public class MakelangeloNodeFactory {
     public static void registerNodes() {
         NodeFactory.registerNode(new LoadTurtle());

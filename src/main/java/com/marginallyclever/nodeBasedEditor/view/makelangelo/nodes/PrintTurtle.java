@@ -1,11 +1,11 @@
-package com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle;
+package com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.nodeBasedEditor.PrintWithGraphics;
-import com.marginallyclever.nodeBasedEditor.model.Node;
-import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
+import com.marginallyClever.nodeGraphCore.PrintWithGraphics;
+import com.marginallyClever.nodeGraphCore.Node;
+import com.marginallyClever.nodeGraphCore.NodeVariable;
 
 import java.awt.*;
 

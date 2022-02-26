@@ -1,8 +1,8 @@
-package com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle;
+package com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodeBasedEditor.model.Node;
-import com.marginallyclever.nodeBasedEditor.model.NodeVariable;
+import com.marginallyClever.nodeGraphCore.Node;
+import com.marginallyClever.nodeGraphCore.NodeVariable;
 
 public class TurtleRectangle extends Node {
     private final NodeVariable<Number> w = NodeVariable.newInstance("width", Number.class, 100,true,true);

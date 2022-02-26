@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.marginallyclever</groupId>
@@ -65,6 +67,13 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<url>https://repo.maven.apache.org/maven2/</url>
 		</pluginRepository>
 	</pluginRepositories>
+
+	<repositories>
+		<repository>
+			<id>my-local-repo</id>
+			<url>file://${project.basedir}/java/local-maven-repo</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<!-- See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
@@ -465,24 +474,11 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.MarginallyClever</groupId>
+			<groupId>com.MarginallyClever</groupId>
 			<artifactId>NodeGraphCore</artifactId>
-			<version>main-6d3df70</version>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<!-- for including projects from github instead of maven central -->
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-
-		<repository>
-			<id>my-local-repo</id>
-			<url>file://${project.basedir}/java/local-maven-repo</url>
-		</repository>
-	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

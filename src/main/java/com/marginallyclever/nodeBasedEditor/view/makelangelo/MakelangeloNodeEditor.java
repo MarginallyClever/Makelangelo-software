@@ -1,24 +1,29 @@
 package com.marginallyclever.nodeBasedEditor.view.makelangelo;
 
+import com.marginallyClever.nodeGraphCore.Node;
+import com.marginallyClever.nodeGraphCore.NodeConnection;
+import com.marginallyClever.nodeGraphCore.NodeFactory;
+import com.marginallyClever.nodeGraphCore.NodeGraph;
+import com.marginallyClever.nodeGraphCore.builtInNodes.LoadNumber;
+import com.marginallyClever.nodeGraphCore.builtInNodes.PrintToStdOut;
+import com.marginallyClever.nodeGraphCore.builtInNodes.math.Add;
+import com.marginallyClever.nodeGraphSwing.NodeGraphEditorPanel;
+import com.marginallyClever.nodeGraphSwing.SwingNodeFactory;
+import com.marginallyClever.nodeGraphSwing.nodes.images.LoadImage;
+import com.marginallyClever.nodeGraphSwing.nodes.images.PrintImage;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.nodeBasedEditor.NodeFactory;
-import com.marginallyclever.nodeBasedEditor.model.Node;
-import com.marginallyclever.nodeBasedEditor.model.NodeConnection;
-import com.marginallyclever.nodeBasedEditor.model.NodeGraph;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.LoadNumber;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.PrintToStdOut;
-import com.marginallyclever.nodeBasedEditor.model.builtInNodes.math.Add;
-import com.marginallyclever.nodeBasedEditor.view.swing.NodeGraphEditorPanel;
-import com.marginallyclever.nodeBasedEditor.view.swing.SwingNodeFactory;
-import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.LoadImage;
-import com.marginallyclever.nodeBasedEditor.view.swing.nodes.images.PrintImage;
-import com.marginallyclever.nodeBasedEditor.view.swing.nodes.turtle.LoadTurtle;
+import com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes.LoadTurtle;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Launch {@link NodeGraphEditorPanel} for Makleangelo.
+ * @author Dan Royer
+ * @since 2022-02-01
+ */
 public class MakelangeloNodeEditor {
     public static void main(String[] args) {
         PreferencesHelper.start();
