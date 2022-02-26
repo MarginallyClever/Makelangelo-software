@@ -16,14 +16,17 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 
 # Start!
 
+## 🤖 Hardware 
 - Buy a plotter [Makelangelo 5](https://www.marginallyclever.com/products/makelangelo-5/) or build your own;
   ![plotter](src/main/resources/splash.png)
 - Setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/tree/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/);
+
+## 🖥 Installation
 - Install "Makelangelo Software" on your computer to control the robot. You will find [nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly) whith installer for the macOS, Linux and Windows *or* Install Makelangelo Software App from the source as described below;
   > Note: on macOS, when launching the app, you will have an error: "Makelangelo.app is damaged and can't be opened, you should move it to the trash". It can be fixed by opening a console and entering the command `sudo xattr -cr /Applications/Makelangelo.app`. This is due to [this bug](https://bugs.openjdk.java.net/browse/JDK-8276150).
 - Import a picture, or a vector graphic and watch the robot drawing.
 
-## Developper instructions
+# Developer instructions
 
 If you want to contribute to the application or just want the blending edge version of the software, follow the instructions below to install a JDK and next to download and run the app after compiling it with eclipse or Maven.
 
@@ -77,7 +80,7 @@ java -jar makelangelo-nightly-XXXXX.jar
 
 🎉 Application should now launch.
 
-## Development
+### Development
 
 When launching the application, set the environnement variable `DEV` to `true` in order to get the application log on the stdout.
 
@@ -87,6 +90,13 @@ Did this program help you? Like Open Source software? Want to show support?
 Donate what you can to help speed up development at https://www.marginallyclever.com/product/makelangelo-software/
 
 Makelangelo is derived from the work of Paul Fisher. It is largely inspired by [Hektor](http://hektor.ch/) by Jürg Lehni and Uli Franke.
+
+## Maintainers and contributors
+
+<a href="https://github.com/MarginallyClever/Makelangelo-software/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=MarginallyClever/Makelangelo-software" />
+</a>
+
 
 ## Credits
 
