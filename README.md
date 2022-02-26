@@ -26,7 +26,7 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
   > Note: on macOS, when launching the app, you will have an error: "Makelangelo.app is damaged and can't be opened, you should move it to the trash". It can be fixed by opening a console and entering the command `sudo xattr -cr /Applications/Makelangelo.app`. This is due to [this bug](https://bugs.openjdk.java.net/browse/JDK-8276150).
 - Import a picture, or a vector graphic and watch the robot drawing.
 
-# Developer instructions
+# ⌨️ Developer instructions
 
 If you want to contribute to the application or just want the blending edge version of the software, follow the instructions below to install a JDK and next to download and run the app after compiling it with eclipse or Maven.
 
