@@ -34,6 +34,17 @@ public class LoadScratch3Test {
         assertFalse(loader.canLoad("file.txt"));
     }
 
+    @Test
+    public void throwExceptionWhenStreamIsNull() {
+        // given
+        TurtleLoader loader = new LoadSVG();
+
+        // then
+        assertThrows(NullPointerException.class, () -> {
+            loader.load(LoadScratch3Test.class.getResourceAsStream("/doesNotExist"));
+        }, "Input stream is null");
+    }
+
     @TestFactory
     public Stream<DynamicTest> testAllFiles() {
         return loadAndTestFiles(of("test_02_koch_curve_03.sb3"),
