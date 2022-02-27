@@ -89,8 +89,8 @@ public class Converter_Sandy extends ImageConverter {
 		logger.debug("Sandy started.");
 		//Thread.dumpStack();
 
+		turtle.lock();
 		try {
-			turtle.lock();
 			// make concentric circles that get bigger and bigger.
 			for(r=rMin;r<rMax;r+=rStep) {
 				// go around in a circle
