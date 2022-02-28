@@ -17,6 +17,8 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PlotterControls} brings together three separate panels and wraps all
@@ -30,6 +32,8 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(PlotterControls.class);
+	
 	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
@@ -270,15 +274,13 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void addUserStartGCODE() {
-		//TODO logger.trace addUserStartGCODE //marlinInterface.queueAndSendCommand("GCODE START");
-		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralStartGcode()).split("\n");
-		lineByLineAndCommentsCleanningForUserGCODE(userStartGcode);
+		logger.trace("GCODE START");
+		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGeneralStartGcode());
 	}
 
 	private void addUserEndGCODE() {
-		//TODO logger.trace addUserEndGCODE //marlinInterface.queueAndSendCommand("GCODE END");		
-		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralEndGcode()).split("\n");
-		lineByLineAndCommentsCleanningForUserGCODE(userStartGcode); 		
+		logger.trace("GCODE END");
+		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGeneralEndGcode()); 		
 	}
 
 	/**
@@ -286,8 +288,9 @@ public class PlotterControls extends JPanel {
 	 * Splited line by line and gcode comments removed.
 	 * @param userStartGcode 
 	 */
-	private void lineByLineAndCommentsCleanningForUserGCODE(String[] userStartGcode) {
-		for ( String l : userStartGcode){
+	private void lineByLineAndCommentsCleanningForUserGCODE(String userGcodeNotResolvedOrEvalurated) {
+		String[] userGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedOrEvalurated).split("\n");		
+		for ( String l : userGcode){
 			String[] lPart = l.split(";");// to separate the comments
 			if ( lPart!= null && lPart.length>0 ){
 				if ( lPart[0]!= null && lPart[0].length()>0){
