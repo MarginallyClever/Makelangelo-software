@@ -6,18 +6,15 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 
 public class TurtleMove {
-	public static final int TRAVEL=0;  // move without drawing
-	public static final int DRAW_LINE=1;  // move while drawing
-	public static final int TOOL_CHANGE=2;
-	
-	public int type;
+
+	public MovementType type;
 	public double x,y;  // destination
 	
-	public TurtleMove(double x0,double y0,int type0) {
+	public TurtleMove(double destinationX, double destinationY, MovementType movementType) {
 		super();
-		this.x=x0;
-		this.y=y0;
-		this.type=type0;
+		this.x=destinationX;
+		this.y=destinationY;
+		this.type=movementType;
 	}
 	
 	public TurtleMove(TurtleMove m) {

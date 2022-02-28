@@ -45,12 +45,12 @@ public class SaveSVG implements TurtleSaver {
 
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
-			case TurtleMove.TRAVEL:
+			case TRAVEL:
 				if(!isUp) isUp=true;
 				x0=m.x;
 				y0=m.y;
 				break;
-			case TurtleMove.DRAW_LINE:
+			case DRAW_LINE:
 				if(isUp) isUp=false;
 				else {
 					out.write("  <line");
@@ -64,7 +64,7 @@ public class SaveSVG implements TurtleSaver {
 				y0=m.y;
 				
 				break;
-			case TurtleMove.TOOL_CHANGE:
+			case TOOL_CHANGE:
 				break;
 			}
 		}

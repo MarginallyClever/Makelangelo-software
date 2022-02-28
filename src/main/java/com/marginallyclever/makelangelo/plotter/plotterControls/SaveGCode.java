@@ -90,7 +90,7 @@ public class SaveGCode {
 				TurtleMove m = turtle.history.get(i);
 
 				switch (m.type) {
-					case TurtleMove.TRAVEL -> {
+					case TRAVEL -> {
 						if (!isUp) {
 							// lift pen up
 							out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
@@ -98,7 +98,7 @@ public class SaveGCode {
 						}
 						previousMovement = m;
 					}
-					case TurtleMove.DRAW_LINE -> {
+					case DRAW_LINE -> {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
@@ -109,7 +109,7 @@ public class SaveGCode {
 						out.write(MarlinPlotterInterface.getDrawToString(robot,m.x, m.y) + "\n");
 						previousMovement = m;
 					}
-					case TurtleMove.TOOL_CHANGE -> {
+					case TOOL_CHANGE -> {
 						out.write("; User ToolChange Star-Gcode - BEGIN\n");
 						out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserToolChangeStartGcode()) + "\n");
 						out.write("; User ToolChange Star-Gcode - END\n");

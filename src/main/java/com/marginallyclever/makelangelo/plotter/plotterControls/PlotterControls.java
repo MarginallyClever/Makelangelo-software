@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
@@ -168,6 +169,7 @@ public class PlotterControls extends JPanel {
 		programInterface.step();
 		if (programInterface.getLineNumber() == -1) {
 			// done
+			addUserEndGCODE();
 			pause();
 		}
 	}
@@ -198,6 +200,7 @@ public class PlotterControls extends JPanel {
 		if (!penIsUpBeforePause)
 			myPlotter.lowerPen();
 		rewindIfNoProgramLineSelected();
+		addUserStartGCODE();
 		step();
 	}
 
@@ -258,12 +261,20 @@ public class PlotterControls extends JPanel {
 
 		while (x > 1) {
 			TurtleMove m = history.get(x);
-			if (m.type == TurtleMove.TRAVEL)
+			if (m.type == MovementType.TRAVEL)
 				return x;
 			--x;
 		}
 
 		return x;
+	}
+
+	private void addUserStartGCODE() {
+		marlinInterface.queueAndSendCommand("GCODE START");
+	}
+
+	private void addUserEndGCODE() {
+		marlinInterface.queueAndSendCommand("GCODE END");
 	}
 
 	/**

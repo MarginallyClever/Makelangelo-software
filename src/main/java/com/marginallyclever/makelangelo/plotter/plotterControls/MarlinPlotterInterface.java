@@ -196,7 +196,10 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		case 0xff0000:
 			name = "red";
 			break;
-		case 0x00ff00:
+		case 0x00ff00:// = w3c "lime" https://www.w3.org/TR/css-color-3/#svg-color
+			name = "lime";
+			break;
+		case 0x008000:// = w3c "green" https://www.w3.org/TR/css-color-3/#svg-color
 			name = "green";
 			break;
 		case 0x0000ff:

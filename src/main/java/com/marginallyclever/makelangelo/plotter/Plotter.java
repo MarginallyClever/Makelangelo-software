@@ -206,15 +206,15 @@ public class Plotter implements PreviewListener, Cloneable {
 	 */
 	public void turtleMove(TurtleMove move) {
 		switch(move.type) {
-		case TurtleMove.TRAVEL:
+		case TRAVEL:
 			if(!penIsUp) raisePen();
 			setPos(move.x,move.y);
 			break;
-		case TurtleMove.DRAW_LINE:
+		case DRAW_LINE:
 			if(penIsUp) lowerPen();
 			setPos(move.x,move.y);
 			break;
-		case TurtleMove.TOOL_CHANGE:
+		case TOOL_CHANGE:
 			requestUserChangeTool((int)move.x);
 			break;
 		}
