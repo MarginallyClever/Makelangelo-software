@@ -20,9 +20,8 @@ public class TurtleRenderFacade implements PreviewListener {
 	@Override
 	public void render(GL2 gl2) {
 		if(myTurtle.isLocked()) return;
+		myTurtle.lock();
 		try {
-			myTurtle.lock();
-			
 			TurtleMove previousMove = null;
 			
 			// where we're at in the drawing (to check if we're between first & last)
@@ -37,21 +36,21 @@ public class TurtleRenderFacade implements PreviewListener {
 					
 					boolean inShow = (showCount >= first && showCount < last);
 					switch (m.type) {
-					case TurtleMove.TRAVEL:
+					case TRAVEL:
 						if (inShow && previousMove != null) {
 							myRenderer.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.DRAW_LINE:
+					case DRAW_LINE:
 						if (inShow && previousMove != null) {
 							myRenderer.draw(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.TOOL_CHANGE:
+					case TOOL_CHANGE:
 						myRenderer.setPenDownColor(m.getColor());
 						myRenderer.setPenDiameter(m.getDiameter());
 						break;

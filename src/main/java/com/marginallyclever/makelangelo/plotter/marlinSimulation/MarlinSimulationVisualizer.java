@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
@@ -212,7 +213,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	@Override
 	public void setPenDownColor(ColorRGB color) {
-		myTurtle.history.add(new TurtleMove(color.toInt(),0,TurtleMove.TOOL_CHANGE));
+		myTurtle.history.add(new TurtleMove(color.toInt(),0, MovementType.TOOL_CHANGE));
 	}
 
 	@Override

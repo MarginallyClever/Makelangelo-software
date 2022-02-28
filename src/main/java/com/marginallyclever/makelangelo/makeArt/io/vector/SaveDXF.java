@@ -100,12 +100,12 @@ public class SaveDXF implements TurtleSaver {
 				
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
-			case TurtleMove.TRAVEL:
+			case TRAVEL:
 				isUp=true;
 				x0=m.x;
 				y0=m.y;
 				break;
-			case TurtleMove.DRAW_LINE:
+			case DRAW_LINE:
 				if(isUp) isUp=false;
 				else {
 					out.write("0\nLINE\n");
@@ -119,7 +119,7 @@ public class SaveDXF implements TurtleSaver {
 				y0=m.y;
 				
 				break;
-			case TurtleMove.TOOL_CHANGE:
+			case TOOL_CHANGE:
 				// TODO write out DXF layer using  m.getColor()
 				break;
 			}

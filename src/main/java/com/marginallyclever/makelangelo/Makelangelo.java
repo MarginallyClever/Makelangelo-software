@@ -91,13 +91,6 @@ public final class Makelangelo {
 
 	private static Logger logger;
 
-	/**
-	 * Defined in src/resources/makelangelo.properties and uses Maven's resource filtering to update the 
-	 * VERSION based upon pom.xml.  In this way we only define the VERSION once and prevent violating DRY.
-	 */
-	private final String VERSION;
-	private final String DETAILED_VERSION;
-
 	private final MakelangeloSettingPanel myPreferencesPanel;
 	
 	private final Camera camera;
@@ -133,8 +126,6 @@ public final class Makelangelo {
 	public Makelangelo() {
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-		VERSION = PropertiesFileHelper.getMakelangeloVersion();
-		DETAILED_VERSION = PropertiesFileHelper.getMakelangeloGitVersion();
 		myPreferencesPanel = new MakelangeloSettingPanel();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -227,9 +218,9 @@ public final class Makelangelo {
 		
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		String v = preferences.get(SHARING_CHECK_STRING,"0");
-		int comparison = VERSION.compareTo(v);
+		int comparison = MakelangeloVersion.VERSION.compareTo(v);
 		if(comparison!=0) {
-			preferences.put(SHARING_CHECK_STRING,VERSION);
+			preferences.put(SHARING_CHECK_STRING, MakelangeloVersion.VERSION);
 			int dialogResult = JOptionPane.showConfirmDialog(mainFrame, Translator.get("collectAnonymousMetricsOnUpdate"),"Sharing Is Caring",JOptionPane.YES_NO_OPTION);
 			MetricsPreferences.setAllowedToShare(dialogResult == JOptionPane.YES_OPTION);
 		}
@@ -733,7 +724,7 @@ public final class Makelangelo {
 
 	private void onDialogButton() {
 		DialogAbout a = new DialogAbout();
-		a.display(mainFrame,VERSION, DETAILED_VERSION);
+		a.display(mainFrame,MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
 	}
 
 	private void runLogPanel() {
@@ -768,10 +759,10 @@ public final class Makelangelo {
 				// release tag (which is the VERSION)
 				line2 = line2.substring(line2.lastIndexOf("/") + 1);
 
-				logger.debug("latest release: {}; this version: {}@{}", line2, VERSION, DETAILED_VERSION);
-				// logger.debug(inputLine.compareTo(VERSION));
+				logger.debug("latest release: {}; this version: {}@{}", line2, MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
+				// logger.debug(inputLine.compareTo(MakelangeloVersion.VERSION));
 
-				int comp = line2.compareTo(VERSION);
+				int comp = line2.compareTo(MakelangeloVersion.VERSION);
 				String results;
 				if (comp > 0) results = Translator.get("UpdateNotice");
 				else if (comp < 0) results = "This version is from the future?!";
@@ -873,7 +864,7 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		mainFrame = new JFrame(Translator.get("TitlePrefix") + " " + VERSION);
+		mainFrame = new JFrame(MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue());
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override

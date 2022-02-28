@@ -1,23 +1,21 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import java.awt.Color;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 
+import java.awt.*;
+import java.util.Objects;
+
 public class TurtleMove {
-	public static final int TRAVEL=0;  // move without drawing
-	public static final int DRAW_LINE=1;  // move while drawing
-	public static final int TOOL_CHANGE=2;
-	
-	public int type;
+
+	public MovementType type;
 	public double x,y;  // destination
 	
-	public TurtleMove(double x0,double y0,int type0) {
+	public TurtleMove(double destinationX, double destinationY, MovementType movementType) {
 		super();
-		this.x=x0;
-		this.y=y0;
-		this.type=type0;
+		this.x=destinationX;
+		this.y=destinationY;
+		this.type=movementType;
 	}
 	
 	public TurtleMove(TurtleMove m) {
@@ -42,5 +40,18 @@ public class TurtleMove {
 		default:
 			return "DRAW_LINE X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
 		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		TurtleMove that = (TurtleMove) o;
+		return type == that.type && Double.compare(that.x, x) == 0 && Double.compare(that.y, y) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, x, y);
 	}
 }

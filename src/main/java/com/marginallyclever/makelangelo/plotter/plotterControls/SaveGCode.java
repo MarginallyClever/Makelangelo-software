@@ -1,8 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plotterControls;
 
+import com.marginallyclever.makelangelo.MakelangeloVersion;
+import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import java.awt.geom.Rectangle2D;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,15 +58,24 @@ public class SaveGCode {
 		
 		return name + "." + extensions[0];
 	}
-	
+		
 	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
-		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {
-
+		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {			
+			out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
+			out.write(";FLAVOR:Marlin-polargraph\n");
+			Rectangle2D.Double bounds = turtle.getBounds();
+			out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
+			out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
+			//out.write(";MINZ:0.000\n");
+			out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
+			out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
+			//out.write(";MAXZ:0.000\n");
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
+			
 			// TODO MarlinPlotterInterface.getFindHomeString()?
 			out.write("G28\n");  // go home
 
@@ -74,7 +86,7 @@ public class SaveGCode {
 				TurtleMove m = turtle.history.get(i);
 
 				switch (m.type) {
-					case TurtleMove.TRAVEL -> {
+					case TRAVEL -> {
 						if (!isUp) {
 							// lift pen up
 							out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
@@ -82,7 +94,7 @@ public class SaveGCode {
 						}
 						previousMovement = m;
 					}
-					case TurtleMove.DRAW_LINE -> {
+					case DRAW_LINE -> {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
@@ -93,15 +105,18 @@ public class SaveGCode {
 						out.write(MarlinPlotterInterface.getDrawToString(robot,m.x, m.y) + "\n");
 						previousMovement = m;
 					}
-					case TurtleMove.TOOL_CHANGE -> {
+					case TOOL_CHANGE -> {
 						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
 					}
 				}
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
-		}
 
+			out.write(";End of Gcode\n"); 
+			
+			out.flush();
+		}
 		logger.debug("done.");
 	}
 }

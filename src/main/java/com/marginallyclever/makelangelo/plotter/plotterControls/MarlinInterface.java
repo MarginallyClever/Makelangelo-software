@@ -103,7 +103,8 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void onTimeoutCheck() {
-		if(System.currentTimeMillis()-lastReceivedTime>TIMEOUT_DELAY) {
+		if (System.currentTimeMillis() - lastReceivedTime > TIMEOUT_DELAY) {
+			logger.trace("Heartbeat: M400");
 			chatInterface.sendCommand("M400");
 		}
 	}
