@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -24,7 +25,7 @@ public class Turtle implements Cloneable {
 	
 	public List<TurtleMove> history;
 
-	private ReentrantLock lock = new ReentrantLock();
+	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
 	private double px, py;
@@ -104,7 +105,7 @@ public class Turtle implements Cloneable {
 			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
 		}
 		color = new ColorRGB(c);
-		history.add( new TurtleMove(color.toInt(),diameter,TurtleMove.TOOL_CHANGE) );
+		history.add( new TurtleMove(color.toInt(),diameter,MovementType.TOOL_CHANGE) );
 	}
 	
 	public ColorRGB getColor() {
@@ -114,7 +115,7 @@ public class Turtle implements Cloneable {
 	public void setDiameter(double d) {
 		if(diameter==d) return;
 		diameter=d;
-		history.add( new TurtleMove(color.toInt(),diameter,TurtleMove.TOOL_CHANGE) );
+		history.add( new TurtleMove(color.toInt(),diameter,MovementType.TOOL_CHANGE) );
 	}
 	
 	public double getDiameter() {
@@ -140,7 +141,7 @@ public class Turtle implements Cloneable {
 	public void moveTo(double x,double y) {
 		px=x;
 		py=y;
-		history.add( new TurtleMove(x, y, isUp ? TurtleMove.TRAVEL : TurtleMove.DRAW_LINE) );
+		history.add( new TurtleMove(x, y, isUp ? MovementType.TRAVEL : MovementType.DRAW_LINE) );
 	}
 		
 	/**
@@ -249,7 +250,7 @@ public class Turtle implements Cloneable {
 		int hits=0;
 		
 		for( TurtleMove m : history ) {
-			if(m.type == TurtleMove.DRAW_LINE) {
+			if(m.type == MovementType.DRAW_LINE) {
 				hits++;
 				if(top.x<m.x) top.x=m.x;
 				if(top.y<m.y) top.y=m.y;
@@ -262,7 +263,7 @@ public class Turtle implements Cloneable {
 					if(bottom.y>old.y) bottom.y=old.y;
 				}
 			}
-			if ( m.type != TurtleMove.TOOL_CHANGE){
+			if ( m.type != MovementType.TOOL_CHANGE){
 				old=m;
 			}
 		}
@@ -281,8 +282,8 @@ public class Turtle implements Cloneable {
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
-			case TurtleMove.TRAVEL:
+			case DRAW_LINE:
+			case TRAVEL:
 				m.x*=sx;
 				m.y*=sy;
 				break;
@@ -300,8 +301,8 @@ public class Turtle implements Cloneable {
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
-			case TurtleMove.TRAVEL:
+			case DRAW_LINE:
+			case TRAVEL:
 				m.x+=dx;
 				m.y+=dy;
 				break;
@@ -320,7 +321,7 @@ public class Turtle implements Cloneable {
 		int first=1;
 		for(i=0;i<history.size();i++) {
 			TurtleMove mov=history.get(i);
-			if (mov.type == TurtleMove.DRAW_LINE) {
+			if (mov.type == MovementType.DRAW_LINE) {
 				if(first == 1 || mov.x < xmin) xmin=mov.x;
 				if(first == 1 || mov.y < ymin) ymin=mov.y;
 				if(first == 1 || mov.x > xmax) xmax=mov.x;
@@ -341,7 +342,7 @@ public class Turtle implements Cloneable {
 		
 		for( TurtleMove m : history ) {
 			switch(m.type) {
-			case TurtleMove.DRAW_LINE:
+			case DRAW_LINE:
 				if(previousMovement!=null) {
 					LineSegment2D line = new LineSegment2D(
 							new Point2D(previousMovement.x,previousMovement.y),
@@ -353,10 +354,10 @@ public class Turtle implements Cloneable {
 				}
 				previousMovement = m;
 				break;
-			case TurtleMove.TRAVEL:
+			case TRAVEL:
 				previousMovement = m;
 				break;
-			case TurtleMove.TOOL_CHANGE:
+			case TOOL_CHANGE:
 				color = m.getColor();
 				break;
 			}
@@ -414,7 +415,7 @@ public class Turtle implements Cloneable {
 		list.add(t);
 		
 		for( TurtleMove m : history) {
-			if(m.type==TurtleMove.TOOL_CHANGE) {
+			if(m.type==MovementType.TOOL_CHANGE) {
 				t = new Turtle();
 				t.history.clear();
 				list.add(t);
@@ -436,7 +437,7 @@ public class Turtle implements Cloneable {
 	
 	public boolean getHasAnyDrawingMoves() {
 		for( TurtleMove m : history) {
-			if(m.type==TurtleMove.DRAW_LINE) return true;
+			if(m.type==MovementType.DRAW_LINE) return true;
 		}
 		return false;
 	}
@@ -447,10 +448,80 @@ public class Turtle implements Cloneable {
 
 	public ColorRGB getFirstColor() {
 		for( TurtleMove m : history) {
-			if(m.type==TurtleMove.TOOL_CHANGE)
+			if(m.type==MovementType.TOOL_CHANGE)
 				return m.getColor();
 		}
 		
 		return new ColorRGB(0,0,0);
+	}
+
+	/**
+	 * Returns the total distance of all pen-down moves within this {@link Turtle}.
+	 * @return the total distance of all pen-down moves within this {@link Turtle}.
+	 */
+    public double getDrawDistance() {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				d += Math.sqrt(dx*dx+dy*dy);
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return d;
+    }
+
+	/**
+	 * Returns a point along the drawn lines of this {@link Turtle}
+	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
+	 * @return a point along the drawn lines of this {@link Turtle}
+	 */
+	public Point2D interpolate(double t) {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				double change = Math.sqrt(dx*dx+dy*dy);
+				if(d+change>=t) {
+					double v = (t-d)/change;
+					v = Math.max(Math.min(v,1),0);
+					return new Point2D(
+							prev.x + dx * v,
+							prev.y + dy * v);
+				}
+				d += change;
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return new Point2D(prev.x,prev.y);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Turtle turtle = (Turtle) o;
+		return Double.compare(turtle.px, px) == 0 &&
+				Double.compare(turtle.py, py) == 0 &&
+				Double.compare(turtle.nx, nx) == 0 &&
+				Double.compare(turtle.ny, ny) == 0 &&
+				Double.compare(turtle.angle, angle) == 0 &&
+				isUp == turtle.isUp &&
+				Double.compare(turtle.diameter, diameter) == 0 &&
+				history.equals(turtle.history) &&
+				Objects.equals(color, turtle.color);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
 	}
 }

@@ -4,6 +4,7 @@ import com.marginallyclever.communications.*;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.ToggleButtonIcon;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.DummyUI;
 import com.marginallyclever.makelangelo.plotter.plotterControls.communications.SerialUI;
 import com.marginallyclever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
 import com.marginallyclever.util.PreferencesHelper;
@@ -14,8 +15,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static java.util.Arrays.asList;
 
 /**
  * ChooseConnection provides a human interface to open or close a
@@ -30,17 +32,22 @@ public class ChooseConnection extends JPanel {
 	private static final long serialVersionUID = 4773092967249064165L;
 
 	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
-			Arrays.asList("ButtonConnect", "ButtonDisconnect"),
-			Arrays.asList("/images/connect.png", "/images/disconnect.png"),
-			Arrays.asList(Color.GREEN, Color.RED));
+			asList("ButtonConnect", "ButtonDisconnect"),
+			asList("/images/connect.png", "/images/disconnect.png"),
+			asList(Color.GREEN, Color.RED));
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<ComboItem> connectionComboBox = new JComboBox<>();
 	private final JPanel configurationPanel = new JPanel();
 	private TransportLayerUI previousTransportLayerUI;
-	private final List<TransportLayerUI> availableTransportsUI = List.of(new SerialUI());
+	private final List<TransportLayerUI> availableTransportsUI = new ArrayList<>();
 	private NetworkSession mySession;
 
 	public ChooseConnection() {
+		availableTransportsUI.add(new SerialUI());
+		if ("true".equalsIgnoreCase(System.getenv("DEV"))) {
+			availableTransportsUI.add(new DummyUI());
+		}
+
 		this.add(connectionComboBox);
 		connectionComboBox.addItemListener(this::updateConfigurationPanel);
 		addConnectionsItems(connectionComboBox);
