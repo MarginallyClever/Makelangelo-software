@@ -8,6 +8,8 @@ env:
 
 on:
   push:
+    branches:
+      - master
   pull_request:
 
 jobs:
@@ -20,6 +22,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+        cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
     - name: Build and Test with Maven
