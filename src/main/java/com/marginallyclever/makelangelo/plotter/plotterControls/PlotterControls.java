@@ -270,37 +270,34 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void addUserStartGCODE() {
-		//marlinInterface.queueAndSendCommand("GCODE START");
-		// TODO refactor
-		
+		//TODO logger.trace addUserStartGCODE //marlinInterface.queueAndSendCommand("GCODE START");
 		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralStartGcode()).split("\n");
-		for ( String l : userStartGcode){
-			String[] lPart = l.split(";");// to separate the comments
-			if ( lPart!= null && lPart.length>0 ){
-				if ( lPart[0]!= null && lPart[0].length()>0){
-					marlinInterface.queueAndSendCommand(lPart[0]);
-				}
-			}
-		}
-		
-		
+		lineByLineAndCommentsCleanningForUserGCODE(userStartGcode);
 	}
 
 	private void addUserEndGCODE() {
-		//marlinInterface.queueAndSendCommand("GCODE END");//
-		
+		//TODO logger.trace addUserEndGCODE //marlinInterface.queueAndSendCommand("GCODE END");		
 		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralEndGcode()).split("\n");
+		lineByLineAndCommentsCleanningForUserGCODE(userStartGcode); 		
+	}
+
+	/**
+	 * Utility function to {@code marlinInterface.queueAndSendCommand(...)} User(Start/End)Gcode.
+	 * Splited line by line and gcode comments removed.
+	 * @param userStartGcode 
+	 */
+	private void lineByLineAndCommentsCleanningForUserGCODE(String[] userStartGcode) {
 		for ( String l : userStartGcode){
 			String[] lPart = l.split(";");// to separate the comments
 			if ( lPart!= null && lPart.length>0 ){
 				if ( lPart[0]!= null && lPart[0].length()>0){
+					//only non empty lines ( trim later in queueAndSendCommand )
 					marlinInterface.queueAndSendCommand(lPart[0]);
 				}
 			}
 		}
-		
 	}
-
+	
 	/**
 	 * Called from windowAdapter::windowClosing() to clean up resources.
 	 */
