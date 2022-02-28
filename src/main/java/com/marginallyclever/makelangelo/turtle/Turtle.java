@@ -23,7 +23,7 @@ public class Turtle implements Cloneable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
 	
-	public List<TurtleMove> history;
+	public final List<TurtleMove> history = new ArrayList<>();
 
 	private final transient ReentrantLock lock = new ReentrantLock();
 
@@ -78,7 +78,7 @@ public class Turtle implements Cloneable {
 		py = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<TurtleMove>();
+		history.clear();
 		// default turtle color is black.
 		setColor(c);
 	}
