@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -24,7 +25,7 @@ public class Turtle implements Cloneable {
 	
 	public List<TurtleMove> history;
 
-	private ReentrantLock lock = new ReentrantLock();
+	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
 	private double px, py;
@@ -452,5 +453,75 @@ public class Turtle implements Cloneable {
 		}
 		
 		return new ColorRGB(0,0,0);
+	}
+
+	/**
+	 * Returns the total distance of all pen-down moves within this {@link Turtle}.
+	 * @return the total distance of all pen-down moves within this {@link Turtle}.
+	 */
+    public double getDrawDistance() {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				d += Math.sqrt(dx*dx+dy*dy);
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return d;
+    }
+
+	/**
+	 * Returns a point along the drawn lines of this {@link Turtle}
+	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
+	 * @return a point along the drawn lines of this {@link Turtle}
+	 */
+	public Point2D interpolate(double t) {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				double change = Math.sqrt(dx*dx+dy*dy);
+				if(d+change>=t) {
+					double v = (t-d)/change;
+					v = Math.max(Math.min(v,1),0);
+					return new Point2D(
+							prev.x + dx * v,
+							prev.y + dy * v);
+				}
+				d += change;
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return new Point2D(prev.x,prev.y);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Turtle turtle = (Turtle) o;
+		return Double.compare(turtle.px, px) == 0 &&
+				Double.compare(turtle.py, py) == 0 &&
+				Double.compare(turtle.nx, nx) == 0 &&
+				Double.compare(turtle.ny, ny) == 0 &&
+				Double.compare(turtle.angle, angle) == 0 &&
+				isUp == turtle.isUp &&
+				Double.compare(turtle.diameter, diameter) == 0 &&
+				history.equals(turtle.history) &&
+				Objects.equals(color, turtle.color);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
 	}
 }
