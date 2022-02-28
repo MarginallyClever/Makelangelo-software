@@ -461,14 +461,14 @@ public class Turtle implements Cloneable {
 	 */
     public double getDrawDistance() {
 		double d=0;
-		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
-			if(m.type == TurtleMove.DRAW_LINE) {
+			if(m.type == MovementType.DRAW_LINE) {
 				double dx = m.x-prev.x;
 				double dy = m.y-prev.y;
 				d += Math.sqrt(dx*dx+dy*dy);
 				prev = m;
-			} else if(m.type == TurtleMove.TRAVEL) {
+			} else if(m.type == MovementType.TRAVEL) {
 				prev = m;
 			}
 		}
@@ -482,9 +482,9 @@ public class Turtle implements Cloneable {
 	 */
 	public Point2D interpolate(double t) {
 		double d=0;
-		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
-			if(m.type == TurtleMove.DRAW_LINE) {
+			if(m.type == MovementType.DRAW_LINE) {
 				double dx = m.x-prev.x;
 				double dy = m.y-prev.y;
 				double change = Math.sqrt(dx*dx+dy*dy);
@@ -497,7 +497,7 @@ public class Turtle implements Cloneable {
 				}
 				d += change;
 				prev = m;
-			} else if(m.type == TurtleMove.TRAVEL) {
+			} else if(m.type == MovementType.TRAVEL) {
 				prev = m;
 			}
 		}
@@ -522,7 +522,6 @@ public class Turtle implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		history.hashCode();
 		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
 	}
 }
