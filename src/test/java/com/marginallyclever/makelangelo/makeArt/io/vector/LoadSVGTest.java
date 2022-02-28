@@ -1,9 +1,15 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
+import java.util.stream.Stream;
+
+import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.loadAndTestFiles;
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadSVGTest {
@@ -19,12 +25,7 @@ public class LoadSVGTest {
     }
 
     @Test
-    public void load_line() throws Exception {
-        verifyLoadSvg("/svg/line.svg", "/svg/line_expected.txt");
-    }
-
-    @Test
-    public void throwException() throws Exception {
+    public void throwExceptionWhenStreamIsNull() {
         // given
         TurtleLoader loader = new LoadSVG();
 
@@ -34,56 +35,36 @@ public class LoadSVGTest {
         }, "Input stream is null");
     }
 
-    @Test
-    public void load_circle() throws Exception {
-        verifyLoadSvg("/svg/circle.svg", "/svg/circle_expected.txt");
+    @TestFactory
+    public Stream<DynamicTest> testAllSVG() {
+        return loadAndTestFiles(of("circle.svg",
+                        "ellipse.svg",
+                        "eule.svg",
+                        "line.svg",
+                        "multi_shapes_ignatus1.svg",
+                        "multi_shapes_ignatus2.svg",
+                        "multi_shapes_path-circle-line-rect.svg",
+                        "multi_shapes_ying-yang.svg",
+                        "rect.svg"),
+                "/svg",
+                this::verifyLoadSvg);
     }
 
-    @Test
-    public void load_rectangle() throws Exception {
-        verifyLoadSvg("/svg/rect.svg", "/svg/rect_expected.txt");
-    }
+    private void verifyLoadSvg(String filenameToTest, String fileExpected) {
+        try {
 
-    @Test
-    public void load_ellipse() throws Exception {
-        verifyLoadSvg("/svg/ellipse.svg", "/svg/ellipse_expected.txt");
-    }
+            // given
+            TurtleLoader loader = new LoadSVG();
 
-    @Test
-    public void load_multi_shapes_path_circle_line_rect() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes_path-circle-line-rect.svg", "/svg/multi_shapes_path-circle-line-rect_expected.txt");
-    }
+            // when
+            Turtle turtle = loader.load(LoadSVGTest.class.getResourceAsStream(filenameToTest));
 
-    @Test
-    public void load_multi_shapes3() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes_ignatus1.svg", "/svg/multi_shapes_ignatus1_expected.txt");
-    }
-
-    @Test
-    public void load_multi_shapes4() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes_ignatus2.svg", "/svg/multi_shapes_ignatus2_expected.txt");
-    }
-
-    @Test
-    public void load_multi_shapes5() throws Exception {
-        verifyLoadSvg("/svg/multi_shapes_ying-yang.svg", "/svg/multi_shapes_ying-yang_expected.txt");
-    }
-
-    @Test
-    public void load_bigfile() throws Exception {
-        verifyLoadSvg("/svg/eule.svg", "/svg/eule_expected.txt");
-    }
-
-    private void verifyLoadSvg(String svgFile, String expectedFile) throws Exception {
-        // given
-        TurtleLoader loader = new LoadSVG();
-
-        // when
-        Turtle turtle = loader.load(LoadSVGTest.class.getResourceAsStream(svgFile));
-
-        // then
-        assertNotNull(turtle);
-        assertNotNull(turtle.history);
-        assertEquals(readFile(expectedFile), turtle.history.toString());
+            // then
+            assertNotNull(turtle);
+            assertNotNull(turtle.history);
+            assertEquals(readFile(fileExpected), turtle.history.toString());
+        } catch (Exception e) {
+            fail(e);
+        }
     }
 }
