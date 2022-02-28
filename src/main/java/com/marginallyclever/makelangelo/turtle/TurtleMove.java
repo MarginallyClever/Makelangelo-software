@@ -7,7 +7,6 @@ import java.awt.*;
 import java.util.Objects;
 
 public class TurtleMove {
-
 	public MovementType type;
 	public double x,y;  // destination
 	

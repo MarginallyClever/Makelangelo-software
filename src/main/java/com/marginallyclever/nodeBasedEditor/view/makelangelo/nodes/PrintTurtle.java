@@ -60,7 +60,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
                 boolean inShow = (count >= first && count < last);
                 switch (m.type) {
-                    case TurtleMove.TRAVEL -> {
+                    case TRAVEL -> {
                         if (inShow && previousMove != null) {
                             if (showPenUp) {
                                 g.setColor(upColor);
@@ -70,7 +70,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                         count++;
                         previousMove = m;
                     }
-                    case TurtleMove.DRAW_LINE -> {
+                    case DRAW_LINE -> {
                         if (inShow && previousMove != null) {
                             g.setColor(downColor);
                             g.drawLine((int) previousMove.x, -(int)previousMove.y, (int) m.x, -(int) m.y);
@@ -78,7 +78,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                         count++;
                         previousMove = m;
                     }
-                    case TurtleMove.TOOL_CHANGE -> {
+                    case TOOL_CHANGE -> {
                         ColorRGB c = m.getColor();
                         downColor = new Color(c.red, c.green, c.blue);
                         ((Graphics2D) g).setStroke(new BasicStroke((int) m.getDiameter()));

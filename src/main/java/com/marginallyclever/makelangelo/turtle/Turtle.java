@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,7 +297,7 @@ public class Turtle implements Cloneable {
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
 			switch (m.type) {
-				case TurtleMove.DRAW_LINE, TurtleMove.TRAVEL -> {
+				case DRAW_LINE, TRAVEL -> {
 					m.x *= sx;
 					m.y *= sy;
 				}
@@ -316,7 +315,7 @@ public class Turtle implements Cloneable {
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
 			switch (m.type) {
-				case TurtleMove.DRAW_LINE, TurtleMove.TRAVEL -> {
+				case DRAW_LINE, TRAVEL -> {
 					m.x += dx;
 					m.y += dy;
 				}
@@ -358,7 +357,7 @@ public class Turtle implements Cloneable {
 		
 		for( TurtleMove m : history ) {
 			switch (m.type) {
-				case TurtleMove.DRAW_LINE -> {
+				case DRAW_LINE -> {
 					if (previousMovement != null) {
 						LineSegment2D line = new LineSegment2D(
 								new Point2D(previousMovement.x, previousMovement.y),
@@ -370,8 +369,8 @@ public class Turtle implements Cloneable {
 					}
 					previousMovement = m;
 				}
-				case TurtleMove.TRAVEL -> previousMovement = m;
-				case TurtleMove.TOOL_CHANGE -> color = m.getColor();
+				case TRAVEL -> previousMovement = m;
+				case TOOL_CHANGE -> color = m.getColor();
 			}
 		}
 
@@ -479,14 +478,14 @@ public class Turtle implements Cloneable {
 	 */
     public double getDrawDistance() {
 		double d=0;
-		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
-			if(m.type == TurtleMove.DRAW_LINE) {
+			if(m.type == MovementType.DRAW_LINE) {
 				double dx = m.x-prev.x;
 				double dy = m.y-prev.y;
 				d += Math.sqrt(dx*dx+dy*dy);
 				prev = m;
-			} else if(m.type == TurtleMove.TRAVEL) {
+			} else if(m.type == MovementType.TRAVEL) {
 				prev = m;
 			}
 		}
@@ -500,9 +499,9 @@ public class Turtle implements Cloneable {
 	 */
 	public Point2D interpolate(double t) {
 		double d=0;
-		TurtleMove prev = new TurtleMove(0,0,TurtleMove.TRAVEL);
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
-			if(m.type == TurtleMove.DRAW_LINE) {
+			if(m.type == MovementType.DRAW_LINE) {
 				double dx = m.x-prev.x;
 				double dy = m.y-prev.y;
 				double change = Math.sqrt(dx*dx+dy*dy);
@@ -515,7 +514,7 @@ public class Turtle implements Cloneable {
 				}
 				d += change;
 				prev = m;
-			} else if(m.type == TurtleMove.TRAVEL) {
+			} else if(m.type == MovementType.TRAVEL) {
 				prev = m;
 			}
 		}
