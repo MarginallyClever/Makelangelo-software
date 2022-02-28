@@ -20,9 +20,8 @@ public class TurtleRenderFacade implements PreviewListener {
 	@Override
 	public void render(GL2 gl2) {
 		if(myTurtle.isLocked()) return;
+		myTurtle.lock();
 		try {
-			myTurtle.lock();
-			
 			TurtleMove previousMove = null;
 			
 			// where we're at in the drawing (to check if we're between first & last)
