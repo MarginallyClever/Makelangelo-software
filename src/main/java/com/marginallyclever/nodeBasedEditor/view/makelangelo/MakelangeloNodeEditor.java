@@ -1,14 +1,14 @@
 package com.marginallyclever.nodeBasedEditor.view.makelangelo;
 
+import com.marginallyClever.nodeGraphCore.BuiltInNodeRegistry;
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeConnection;
-import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.builtInNodes.LoadNumber;
 import com.marginallyClever.nodeGraphCore.builtInNodes.PrintToStdOut;
 import com.marginallyClever.nodeGraphCore.builtInNodes.math.Add;
 import com.marginallyClever.nodeGraphSwing.NodeGraphEditorPanel;
-import com.marginallyClever.nodeGraphSwing.SwingNodeFactory;
+import com.marginallyClever.nodeGraphSwing.SwingNodeRegistry;
 import com.marginallyClever.nodeGraphSwing.nodes.images.LoadImage;
 import com.marginallyClever.nodeGraphSwing.nodes.images.PrintImage;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -20,7 +20,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Launch {@link NodeGraphEditorPanel} for Makleangelo.
+ * Launch {@link NodeGraphEditorPanel} for Makelangelo.
  * @author Dan Royer
  * @since 2022-02-01
  */
@@ -30,8 +30,8 @@ public class MakelangeloNodeEditor {
         CommandLineOptions.setFromMain(args);
         Translator.start();
 
-        NodeFactory.registerBuiltInNodes();
-        SwingNodeFactory.registerNodes();
+        BuiltInNodeRegistry.registerNodes();
+        SwingNodeRegistry.registerNodes();
         MakelangeloNodeFactory.registerNodes();
         NodeGraph model = new NodeGraph();
 
@@ -64,7 +64,7 @@ public class MakelangeloNodeEditor {
         add.getRectangle().x=200;
         report.getRectangle().x=400;
 
-        Node loadImage = model.add(new LoadImage("test.png"));
+        Node loadImage = model.add(new LoadImage("src/test/resources/test.png"));
         Node printImage = model.add(new PrintImage());
         model.add(new NodeConnection(loadImage,1,printImage,0));
         loadImage.getRectangle().setLocation(0,150);
