@@ -36,21 +36,21 @@ public class TurtleRenderFacade implements PreviewListener {
 					
 					boolean inShow = (showCount >= first && showCount < last);
 					switch (m.type) {
-					case TurtleMove.TRAVEL:
+					case TRAVEL:
 						if (inShow && previousMove != null) {
 							myRenderer.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.DRAW_LINE:
+					case DRAW_LINE:
 						if (inShow && previousMove != null) {
 							myRenderer.draw(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
-					case TurtleMove.TOOL_CHANGE:
+					case TOOL_CHANGE:
 						myRenderer.setPenDownColor(m.getColor());
 						myRenderer.setPenDiameter(m.getDiameter());
 						break;
