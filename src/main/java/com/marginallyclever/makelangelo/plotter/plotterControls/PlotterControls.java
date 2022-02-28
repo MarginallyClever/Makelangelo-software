@@ -271,7 +271,7 @@ public class PlotterControls extends JPanel {
 
 	private void addUserStartGCODE() {
 		//marlinInterface.queueAndSendCommand("GCODE START");
-		// TODO get the plotter user strat gcode resolved, and send it line by line ( removing the comments ) 
+		// TODO refactor
 		
 		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralStartGcode()).split("\n");
 		for ( String l : userStartGcode){
