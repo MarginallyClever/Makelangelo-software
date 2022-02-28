@@ -285,11 +285,11 @@ public class PlotterControls extends JPanel {
 
 	/**
 	 * Utility function to {@code marlinInterface.queueAndSendCommand(...)} User(Start/End)Gcode.
-	 * Splited line by line and gcode comments removed.
-	 * @param userStartGcode 
+	 * User(Start/End)Gcode, splited line by line and gcode comments removed.
+	 * @param userGcodeNotResolvedAndNotEvaluated 
 	 */
-	private void lineByLineAndCommentsCleanningForUserGCODE(String userGcodeNotResolvedOrEvalurated) {
-		String[] userGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedOrEvalurated).split("\n");		
+	private void lineByLineAndCommentsCleanningForUserGCODE(String userGcodeNotResolvedAndNotEvaluated) {
+		String[] userGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedAndNotEvaluated).split("\n");		
 		for ( String l : userGcode){
 			String[] lPart = l.split(";");// to separate the comments
 			if ( lPart!= null && lPart.length>0 ){
