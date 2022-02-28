@@ -270,11 +270,35 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void addUserStartGCODE() {
-		marlinInterface.queueAndSendCommand("GCODE START");
+		//marlinInterface.queueAndSendCommand("GCODE START");
+		// TODO get the plotter user strat gcode resolved, and send it line by line ( removing the comments ) 
+		
+		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralStartGcode()).split("\n");
+		for ( String l : userStartGcode){
+			String[] lPart = l.split(";");// to separate the comments
+			if ( lPart!= null && lPart.length>0 ){
+				if ( lPart[0]!= null && lPart[0].length()>0){
+					marlinInterface.queueAndSendCommand(lPart[0]);
+				}
+			}
+		}
+		
+		
 	}
 
 	private void addUserEndGCODE() {
-		marlinInterface.queueAndSendCommand("GCODE END");
+		//marlinInterface.queueAndSendCommand("GCODE END");//
+		
+		String[] userStartGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(myPlotter.getSettings().getUserGeneralEndGcode()).split("\n");
+		for ( String l : userStartGcode){
+			String[] lPart = l.split(";");// to separate the comments
+			if ( lPart!= null && lPart.length>0 ){
+				if ( lPart[0]!= null && lPart[0].length()>0){
+					marlinInterface.queueAndSendCommand(lPart[0]);
+				}
+			}
+		}
+		
 	}
 
 	/**
