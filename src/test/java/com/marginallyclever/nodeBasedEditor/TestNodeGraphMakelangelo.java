@@ -1,6 +1,5 @@
 package com.marginallyclever.nodeBasedEditor;
 
-import com.marginallyClever.nodeGraphCore.JSONHelper;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
@@ -35,7 +34,7 @@ public class TestNodeGraphMakelangelo {
         NodeVariable<?> a = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instA,false,false);
         NodeVariable<?> b = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instB,false,false);
 
-        JSONHelper.deserializeNodeVariable(b, JSONHelper.serializeNodeVariable(a));
+        b.parseJSON(a.toJSON());
         assertEquals(a.toString(),b.toString());
         assertEquals(a.getValue(),b.getValue());
     }
