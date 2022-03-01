@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class LoadHelper {
@@ -20,7 +21,9 @@ public class LoadHelper {
      * @return the content of the file
      */
     public static String readFile(String filename) {
-        return new Scanner(LoadHelper.class.getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A").next();
+        Scanner scanner = new Scanner(LoadHelper.class.getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A");
+        assertTrue(scanner.hasNext(), "The file '"+ filename + "' is empty");
+        return scanner.next();
     }
 
     /**

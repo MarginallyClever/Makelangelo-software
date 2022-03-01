@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Turtle implements Cloneable {
 	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
 	
-	public List<TurtleMove> history;
+	public final List<TurtleMove> history = new ArrayList<>();
 
 	private final transient ReentrantLock lock = new ReentrantLock();
 
@@ -92,7 +92,7 @@ public class Turtle implements Cloneable {
 		py = 0;
 		setAngle(0);
 		penUp();
-		history = new ArrayList<>();
+		history.clear();
 		// default turtle color is black.
 		setColor(c);
 	}
@@ -539,7 +539,6 @@ public class Turtle implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		history.hashCode();
 		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
 	}
 }

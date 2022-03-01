@@ -19,9 +19,7 @@ public class CropTurtle {
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
 		logger.debug("crop start @ {}", turtle.history.size());
 
-		List<TurtleMove> oldHistory = turtle.history;
-		turtle.history = new ArrayList<TurtleMove>();
-		
+		List<TurtleMove> newHistory = new ArrayList<>();
 		// limits we will need for rectangle
 		Point2D rMax = new Point2D(rectangle.getMaxX(),rectangle.getMaxY());
 		Point2D rMin = new Point2D(rectangle.getMinX(),rectangle.getMinY());
@@ -31,7 +29,7 @@ public class CropTurtle {
 		
 		TurtleMove prev=null;
 		
-		for( TurtleMove m : oldHistory ) {
+		for (TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case DRAW_LINE:
 			case TRAVEL:
@@ -47,20 +45,20 @@ public class CropTurtle {
 						
 						if(startCropped && endCropped) {
 							// crosses rectangle, both ends out.
-							turtle.history.add(new TurtleMove(P0.x,P0.y, MovementType.TRAVEL));
-							turtle.history.add(m);
+							newHistory.add(new TurtleMove(P0.x,P0.y, MovementType.TRAVEL));
+							newHistory.add(m);
 							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
-							turtle.history.add(m2);
+							newHistory.add(m2);
 						} else if(!startCropped && !endCropped) {
-							turtle.history.add(m);
+							newHistory.add(m);
 						} else if(endCropped) {
 							// end cropped, leaving the rectangle
 							TurtleMove m2=new TurtleMove(P1.x,P1.y,m.type);
-							turtle.history.add(m2);
+							newHistory.add(m2);
 						} else {
 							// start cropped, coming back into rectangle
-							turtle.history.add(new TurtleMove(P0.x,P0.y,MovementType.TRAVEL));
-							turtle.history.add(m);
+							newHistory.add(new TurtleMove(P0.x,P0.y,MovementType.TRAVEL));
+							newHistory.add(m);
 						}
 					}
 				}
@@ -68,10 +66,13 @@ public class CropTurtle {
 				
 				break;
 			default:
-				turtle.history.add(m);
+				newHistory.add(m);
 				break;
 			}
 		}
+
+		turtle.history.clear();
+		turtle.history.addAll(newHistory);
 		
 		// There may be some dumb travel moves left. (several travels in a row.)
 	
