@@ -275,12 +275,12 @@ public class PlotterControls extends JPanel {
 
 	private void addUserStartGCODE() {
 		logger.trace("GCODE START");
-		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGeneralStartGcode());
+		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGcode().getUserGeneralStartGcode());
 	}
 
 	private void addUserEndGCODE() {
 		logger.trace("GCODE END");
-		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGeneralEndGcode()); 		
+		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGcode().getUserGeneralEndGcode()); 		
 	}
 
 	/**
@@ -289,7 +289,7 @@ public class PlotterControls extends JPanel {
 	 * @param userGcodeNotResolvedAndNotEvaluated 
 	 */
 	private void lineByLineAndCommentsCleanningForUserGCODE(String userGcodeNotResolvedAndNotEvaluated) {
-		String[] userGcode = myPlotter.getSettings().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedAndNotEvaluated).split("\n");		
+		String[] userGcode = myPlotter.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedAndNotEvaluated,myPlotter.getSettings()).split("\n");		
 		for ( String l : userGcode){
 			String[] lPart = l.split(";");// to separate the comments
 			if ( lPart!= null && lPart.length>0 ){

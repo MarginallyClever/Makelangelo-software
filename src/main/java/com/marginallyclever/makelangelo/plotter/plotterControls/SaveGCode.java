@@ -79,7 +79,7 @@ public class SaveGCode {
 			
 			// TODO MarlinPlotterInterface.getFindHomeString()?			
 			out.write("; User General Start-Gcode - BEGIN\n");
-			out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGeneralStartGcode()) +"\n");
+			out.write(robot.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGcode().getUserGeneralStartGcode(),robot.getSettings()) +"\n");
 			out.write("; User General Start-Gcode - END\n");
 			//out.write("G28\n");  // go home
 
@@ -111,12 +111,12 @@ public class SaveGCode {
 					}
 					case TOOL_CHANGE -> {
 						out.write("; User ToolChange Star-Gcode - BEGIN\n");
-						out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserToolChangeStartGcode()) + "\n");
+						out.write(robot.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGcode().getUserToolChangeStartGcode(),robot.getSettings()) + "\n");
 						out.write("; User ToolChange Star-Gcode - END\n");
 						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
 						out.write("; User ToolChange End-Gcode - BEGIN\n");
-						out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserToolChangeEndGcode()) + "\n");
+						out.write(robot.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGcode().getUserToolChangeEndGcode(),robot.getSettings()) + "\n");
 						out.write("; User ToolChange End-Gcode - END\n");
 					}
 				}
@@ -124,7 +124,7 @@ public class SaveGCode {
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
  
 			out.write("; User General End-Gcode - BEGIN\n");
-			out.write(robot.getSettings().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGeneralEndGcode()) +"\n");
+			out.write(robot.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGcode().getUserGeneralEndGcode(),robot.getSettings()) +"\n");
 			out.write("; User General End-Gcode - END\n");
 			
 			out.write(";End of Gcode\n");
