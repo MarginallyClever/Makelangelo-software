@@ -2152,26 +2152,36 @@
 		<value>Forever loops are forever forbidden.</value>
 	</string>
         
-        
+    
+    <string>
+        <key>OpenPlotterSettingsUserGcode</key>
+        <value>Plotter Start/End Gcode</value>
+        <hint>Menu item</hint>
+    </string>
+    <string>
+        <key>PlotterSettingsUserGcodePanel.Title</key>
+        <value>Plotter Start/End Gcode</value>
+        <hint>Dialog title</hint>
+    </string>
     <string>
         <key>PlotterSettings.userGeneralStartGcode</key>
-        <value>StartGcode</value>
-        <hint></hint>
+        <value>Start-Gcode</value>
+        <hint>TextArea Label</hint>
     </string>    
     <string>
         <key>PlotterSettings.userGeneralEndGcode</key>
-        <value>EndGcode</value>
-        <hint></hint>
+        <value>End-Gcode</value>
+        <hint>TextArea Label</hint>
     </string>    
     <string>
         <key>PlotterSettings.userToolChangeStartGcode</key>
-        <value>ToolChangeStartGcode</value>
-        <hint></hint>
+        <value>ToolChange-StartGcode</value>
+        <hint>TextArea Label</hint>
     </string>    
     <string>
         <key>PlotterSettings.userToolChangeEndGcode</key>
-        <value>ToolChangeEndGcode</value>
-        <hint></hint>
+        <value>ToolChange-EndGcode</value>
+        <hint>TextArea Label</hint>
     </string>
 
 </language>
