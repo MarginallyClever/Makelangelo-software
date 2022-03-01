@@ -157,11 +157,15 @@ public class PlotterSettingsUserGcode {
 	}
 
 	void saveUserGcode(Preferences thisMachineNode) {
-		thisMachineNode.put("userGeneralStartGcode", userGeneralStartGcode);
-		thisMachineNode.put("userGeneralEndGcode", userGeneralEndGcode);
-		thisMachineNode.put("userToolChangeStartGcode", userToolChangeStartGcode);
-		thisMachineNode.put("userToolChangeEndGcode", userToolChangeEndGcode);
+		thisMachineNode.put(USER_GENERAL_START_GCODE, userGeneralStartGcode);
+		thisMachineNode.put(USER_GENERAL_END_GCODE, userGeneralEndGcode);
+		thisMachineNode.put(USER_TOOL_CHANGE_START_GCODE, userToolChangeStartGcode);
+		thisMachineNode.put(USER_TOOL_CHANGE_END_GCODE, userToolChangeEndGcode);
 	}
+	public static final String USER_TOOL_CHANGE_END_GCODE = "userToolChangeEndGcode";
+	public static final String USER_TOOL_CHANGE_START_GCODE = "userToolChangeStartGcode";
+	public static final String USER_GENERAL_END_GCODE = "userGeneralEndGcode";
+	public static final String USER_GENERAL_START_GCODE = "userGeneralStartGcode";
 
 	public String getUserToolChangeStartGcode() {
 		return userToolChangeStartGcode;
@@ -180,10 +184,10 @@ public class PlotterSettingsUserGcode {
 	}
 
 	void loadUserGcode(Preferences thisMachineNode) {
-		userGeneralStartGcode = thisMachineNode.get("userGeneralStartGcode", userGeneralStartGcode);
-		userGeneralEndGcode = thisMachineNode.get("userGeneralEndGcode", userGeneralEndGcode);
-		userToolChangeStartGcode = thisMachineNode.get("userToolChangeStartGcode", userToolChangeStartGcode);
-		userToolChangeEndGcode = thisMachineNode.get("userToolChangeEndGcode", userToolChangeEndGcode);
+		userGeneralStartGcode = thisMachineNode.get(USER_GENERAL_START_GCODE, userGeneralStartGcode);
+		userGeneralEndGcode = thisMachineNode.get(USER_GENERAL_END_GCODE, userGeneralEndGcode);
+		userToolChangeStartGcode = thisMachineNode.get(USER_TOOL_CHANGE_START_GCODE, userToolChangeStartGcode);
+		userToolChangeEndGcode = thisMachineNode.get(USER_TOOL_CHANGE_END_GCODE, userToolChangeEndGcode);
 	}
 	
 }

@@ -51,11 +51,6 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectDouble minAcceleration;
 	private SelectDouble minPlannerSpeed;
 	
-	private SelectTextArea userGeneralStartGcode;
-	private SelectTextArea userGeneralEndGcode;
-	private SelectTextArea userToolChangeStartGcode;
-	private SelectTextArea userToolChangeEndGcode;
-	
 	private JButton buttonSave;//TODO event
 	private JButton buttonCancel;// TODO event
 	
@@ -98,12 +93,6 @@ public class PlotterSettingsPanel extends JPanel {
 		interior.add(handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.isHandleSmallSegments()));
 		interior.add(minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getMinAcceleration()));
 		interior.add(minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getMinPlannerSpeed()));
-		
-		interior.add(userGeneralStartGcode     = new SelectTextArea ("userGeneralStartGcode",     Translator.get("PlotterSettings.userGeneralStartGcode" ),settings.getUserGcode().getUserGeneralStartGcode()));
-		interior.add(userGeneralEndGcode     = new SelectTextArea ("userGeneralEndGcode",     Translator.get("PlotterSettings.userGeneralEndGcode" ),settings.getUserGcode().getUserGeneralEndGcode()));
-		interior.add(userToolChangeStartGcode     = new SelectTextArea ("userToolChangeStartGcode",     Translator.get("PlotterSettings.userToolChangeStartGcode" ),settings.getUserGcode().getUserToolChangeStartGcode()));
-		interior.add(userToolChangeEndGcode     = new SelectTextArea ("userToolChangeEndGcode",     Translator.get("PlotterSettings.userToolChangeEndGcode" ),settings.getUserGcode().getUserToolChangeEndGcode()));
-
 		
 		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
 		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
@@ -162,11 +151,6 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setMinAcceleration(minAcceleration.getValue());
 		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
 		
-		settings.getUserGcode().setUserGeneralStartGcode(userGeneralStartGcode.getText());
-		settings.getUserGcode().setUserGeneralEndGcode(userGeneralEndGcode.getText());
-		settings.getUserGcode().setUserToolChangeStartGcode(userToolChangeStartGcode.getText());
-		settings.getUserGcode().setUserToolChangeEndGcode(userToolChangeEndGcode.getText());
-
 		settings.saveConfig();
 	}
 
