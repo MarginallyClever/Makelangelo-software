@@ -17,8 +17,8 @@ public class PlotterSettingsUserGcode {
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsUserGcode.class);
 	
 	private String userGeneralStartGcode = "G28 ; Home"; // TODO Should containe a G28 or a G28 is added befor any move...
-	private String userGeneralEndGcode = "G0 X{limit_left+10} Y{limit_top-20} ; Park position\nM300;"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
-	private String userToolChangeStartGcode = "M300"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
+	private String userGeneralEndGcode = "G0 X{limit_left+10} Y{limit_top-20} ; Park position\nM300 ; Bip"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
+	private String userToolChangeStartGcode = "M300 ; Bip"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
 	private String userToolChangeEndGcode = ""; // a resort position ?
 
 	public void setUserGeneralStartGcode(String userGeneralStartGcode) {
