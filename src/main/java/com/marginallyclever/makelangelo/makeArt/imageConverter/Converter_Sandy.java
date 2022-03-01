@@ -86,10 +86,10 @@ public class Converter_Sandy extends ImageConverter {
 		double pulseSize = rStep*0.5 - 0.5;//r_step * 0.6 * scale_z;
 
 		turtle = new Turtle();
-		turtle.lock();
 		logger.debug("Sandy started.");
 		//Thread.dumpStack();
-		
+
+		turtle.lock();
 		try {
 			// make concentric circles that get bigger and bigger.
 			for(r=rMin;r<rMax;r+=rStep) {
