@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 /**
- * Source : https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java : https://stackoverflow.com/posts/48251395/revisions
+ * TODO : To review ( PPAC37 : sloppy way, cut and paste from the internet), currently used to evaluate simple expressions ( eg 123.0 + 15 ). But since it does the job and it's been a long time since I've done an expression evaluator...
+ * Source : https://stackoverflow.com/questions/2605032/is-there-an-eval-function-in-java :: https://stackoverflow.com/users/4244130/vincelomba : https://stackoverflow.com/posts/48251395/revisions
  */
 public abstract class FunctionSolver {
 

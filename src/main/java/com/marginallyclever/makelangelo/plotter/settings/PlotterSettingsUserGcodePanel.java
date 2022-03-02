@@ -22,6 +22,9 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 	private final SelectTextArea userGeneralEndGcode;
 	private final SelectTextArea userToolChangeStartGcode;
 	private final SelectTextArea userToolChangeEndGcode;
+	
+	private final SelectTextArea replacementPatternList;
+	
 
 	public PlotterSettingsUserGcodePanel(Plotter robot) {
 		super();
@@ -57,6 +60,16 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 						settings.getUserGcode().getUserToolChangeEndGcode()
 				)
 		);
+		
+		
+		add(replacementPatternList
+				= new SelectTextArea(
+						"replacementPattern",
+						Translator.get("PlotterSettings.replacementPattern"),
+						settings.getUserGcode().getAllPattern(settings)
+				)
+		);
+
 
 		JPanel bottom = new JPanel(new FlowLayout());
 		buttonSave = new JButton(Translator.get("Save"));

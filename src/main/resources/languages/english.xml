@@ -2183,5 +2183,10 @@
         <value>ToolChange-EndGcode</value>
         <hint>TextArea Label</hint>
     </string>
-
+    <string>
+        <key>PlotterSettings.replacementPattern</key>
+        <value>Replacement patterns</value>
+        <hint></hint>
+    </string>
+    
 </language>
