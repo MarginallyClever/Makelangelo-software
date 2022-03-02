@@ -16,7 +16,7 @@ Please use the Github [Issues](https://github.com/MarginallyClever/Makelangelo-s
 
 ## Contributing new code
 
-Please see the [Getting Started Guide](https://github.com/MarginallyClever/Makelangelo-software/wiki/Getting-Started) to get setup and running.
+Please see the [Getting Started Guide](https://github.com/MarginallyClever/Makelangelo-software/wiki/Getting-Started-For-Developers) to get setup and running.
 
 We use github to host code, to track issues and feature requests, as well as accept pull requests.
 
@@ -38,7 +38,7 @@ By sending in new code you agree that it will be covered by the existing license
 
 ## Discussing features
 
-Please use the [forums](https://www.marginallyclever.com/learn/forum/) to discuss future features and direction for the project.
+Please use [Github discussions](https://github.com/MarginallyClever/Makelangelo-software/discussions) to learn and talk about the future features and direction for the project.
 
 ## Code of conduct
 
