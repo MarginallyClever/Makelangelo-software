@@ -34,10 +34,11 @@ public class FunctionSolverTest {
 		String expression = "A-10 + 10.0";
 		try{
 			FunctionSolver.solveNumericExpression(expression);
-			fail("shoud throw an exception with this expression "+expression);
+			fail("should throw an exception with this expression "+expression);
 		}
 		catch (Exception e ){
 			System.out.println("OK : exception : "+e.getMessage());
+			//OK : exception : The function A-10+10.0 is not a basic function
 		}
 	}
 }
