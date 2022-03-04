@@ -7,9 +7,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoadGCode implements TurtleLoader {
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
+
+	private static final Logger logger = LoggerFactory.getLogger(LoadGCode.class);
+
+	private final FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -39,8 +44,13 @@ public class LoadGCode implements TurtleLoader {
 	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
+		if (in == null) {
+			throw new NullPointerException("Input stream is null");
+		}
+
+		logger.debug("Loading...");
+
 		Turtle turtle = new Turtle();
-		ColorRGB penDownColor = turtle.getColor();
 		double scaleXY=1;
 		boolean isAbsolute=true;
 		
@@ -49,28 +59,27 @@ public class LoadGCode implements TurtleLoader {
 		double oy=turtle.getY();
 		
 		int lineNumber=0;
-		Scanner scanner = new Scanner(in);	
 		String line="";
-		try {
+		try (Scanner scanner = new Scanner(in)) {
 			while (scanner.hasNextLine()) {
 				line = scanner.nextLine();
 				lineNumber++;
-				// lose anything after a ; because it's a comment 
+				// lose anything after a ; because it's a comment
 				String[] pieces = line.split(";");
 				if (pieces.length == 0) continue;
 				// the line isn't empty.
-	
+
 				String[] tokens = pieces[0].split("\\s");
 				if (tokens.length == 0) continue;
-	
+
 				double nx = turtle.getX();
 				double ny = turtle.getY();
 				double nz = oz;
 				double ni = nx;
 				double nj = ny;
-				
+
 				boolean codeFound=false;
-				
+
 				String mCodeToken=tokenExists("M",tokens);
 				if(mCodeToken!=null) {
 					codeFound=true;
@@ -79,12 +88,12 @@ public class LoadGCode implements TurtleLoader {
 					case 6:
 						// tool change
 						String color = tokenExists("T",tokens);
-						penDownColor = new ColorRGB(Integer.parseInt(color.substring(1)));
+						ColorRGB penDownColor = new ColorRGB(Integer.parseInt(color.substring(1)));
 						turtle.setColor(penDownColor);
 						break;
 					case 280:
 						// z move
-						double v = Double.valueOf(tokenExists("S",tokens).substring(1));
+						double v = Double.parseDouble(tokenExists("S",tokens).substring(1));
 						nz = isAbsolute ? v : nz+v;
 						if(nz!=oz) {
 							// z change
@@ -98,7 +107,7 @@ public class LoadGCode implements TurtleLoader {
 						break;
 					}
 				}
-				
+
 				if(!codeFound) {
 					String gCodeToken=tokenExists("G",tokens);
 					if(gCodeToken!=null) {
@@ -111,25 +120,25 @@ public class LoadGCode implements TurtleLoader {
 						default:
 							break;
 						}
-						
+
 						if(tokenExists("X",tokens)!=null) {
-							double v = Float.valueOf(tokenExists("X",tokens).substring(1)) * scaleXY;
+							double v = Float.parseFloat(tokenExists("X",tokens).substring(1)) * scaleXY;
 							nx = isAbsolute ? v : nx+v;
 						}
 						if(tokenExists("Y",tokens)!=null) {
-							double v = Float.valueOf(tokenExists("Y",tokens).substring(1)) * scaleXY;
+							double v = Float.parseFloat(tokenExists("Y",tokens).substring(1)) * scaleXY;
 							ny = isAbsolute ? v : ny+v;
 						}
 						if(tokenExists("Z",tokens)!=null) {
-							double v = Float.valueOf(tokenExists("Z",tokens).substring(1));  // do not scale
+							double v = Float.parseFloat(tokenExists("Z",tokens).substring(1));  // do not scale
 							nz = isAbsolute ? v : nz+v;
 						}
 						if(tokenExists("I",tokens)!=null) {
-							double v = Float.valueOf(tokenExists("I",tokens).substring(1)) * scaleXY;
+							double v = Float.parseFloat(tokenExists("I",tokens).substring(1)) * scaleXY;
 							ni = isAbsolute ? v : ni+v;
 						}
 						if(tokenExists("J",tokens)!=null) {
-							double v = Float.valueOf(tokenExists("J",tokens).substring(1)) * scaleXY;
+							double v = Float.parseFloat(tokenExists("J",tokens).substring(1)) * scaleXY;
 							nj = isAbsolute ? v : nj+v;
 						}
 
@@ -148,24 +157,24 @@ public class LoadGCode implements TurtleLoader {
 						} else if(gCode==2 || gCode==3) {
 							// arc
 							int dir = (gCode==2) ? -1 : 1;
-		
+
 							double dx = ox - ni;
 							double dy = oy - nj;
 							double radius = Math.sqrt(dx * dx + dy * dy);
-		
+
 							// find angle of arc (sweep)
 							double angle1 = atan3(dy, dx);
 							double angle2 = atan3(ny - nj, nx - ni);
 							double theta = angle2 - angle1;
-		
+
 							if (dir > 0 && theta < 0) angle2 += Math.PI * 2.0;
 							else if (dir < 0 && theta > 0) angle1 += Math.PI * 2.0;
-		
+
 							theta = angle2 - angle1;
-		
+
 							double len = Math.abs(theta) * radius;
 							double angle3, scale;
-		
+
 							// TODO turtle support for arcs
 							// Draw the arc from a lot of little line segments.
 							for(double k = 0; k < len; k++) {
@@ -173,7 +182,7 @@ public class LoadGCode implements TurtleLoader {
 								angle3 = theta * scale + angle1;
 								double ix = ni + Math.cos(angle3) * radius;
 								double iy = nj + Math.sin(angle3) * radius;
-		
+
 								turtle.moveTo(ix,iy);
 							}
 							turtle.moveTo(nx,ny);
@@ -187,9 +196,6 @@ public class LoadGCode implements TurtleLoader {
 		}
 		catch(Exception e) {
 			throw new Exception("GCODE parse failure ("+lineNumber+"): "+line, e);
-		}
-		finally {
-			scanner.close();
 		}
 
 		return turtle;
