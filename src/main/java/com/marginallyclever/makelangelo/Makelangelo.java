@@ -610,6 +610,9 @@ public final class Makelangelo {
 			} else {
 				recentFiles.addFilename(filename);
 			}
+
+			setMainTitle(filename);
+
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -864,7 +867,8 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		mainFrame = new JFrame(MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue());
+		mainFrame = new JFrame();
+		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -1052,6 +1056,14 @@ public final class Makelangelo {
 			logger.error("Error while saving the vector file", e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	private void setMainTitle(String filename) {
+		String title = MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
+		if (! "".equals(filename)) {
+			title += " - " + filename;
+		}
+		mainFrame.setTitle(title);
 	}
 
 	public void setTurtle(Turtle turtle) {
