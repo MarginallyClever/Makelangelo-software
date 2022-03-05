@@ -1059,10 +1059,11 @@ public final class Makelangelo {
 	}
 
 	private void setMainTitle(String filename) {
-		String title = MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
+		String title = "";
 		if (! "".equals(filename)) {
-			title += " - " + filename;
+			title += filename.replaceAll(".*/", "") + " - ";
 		}
+		title += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
 		mainFrame.setTitle(title);
 	}
 
