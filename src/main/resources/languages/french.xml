@@ -623,11 +623,6 @@
         <hint>[used in many places]</hint>
     </string>
     <string>
-        <key>Reset</key>
-        <value>Reinitialiser</value>
-        <hint>[used in many places]</hint>
-    </string>
-    <string>
         <key>Spiral.toCorners</key>
         <value>Spirale aux coins</value>
         <hint>[]</hint>
