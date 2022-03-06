@@ -1061,7 +1061,7 @@ public final class Makelangelo {
 	private void setMainTitle(String filename) {
 		String title = "";
 		if (! "".equals(filename)) {
-			title += filename.replaceAll(".*/", "") + " - ";
+			title += new File(filename).getName() + " - ";
 		}
 		title += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
 		mainFrame.setTitle(title);
