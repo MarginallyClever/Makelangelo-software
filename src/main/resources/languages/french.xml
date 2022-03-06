@@ -528,6 +528,11 @@
         <hint>[graphics settings dialog]</hint>
     </string>
     <string>
+        <key>GFXPreferences.dragFactor</key>
+        <value>Vitesse de déplacement de la souris</value>
+        <hint>graphics settings dialog</hint>
+    </string>
+    <string>
         <key>Invert</key>
         <value>Inverser</value>
         <hint>[jog motors dialog]</hint>

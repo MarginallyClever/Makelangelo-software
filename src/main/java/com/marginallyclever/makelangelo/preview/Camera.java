@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.preview;
 
+import com.marginallyclever.util.PreferencesHelper;
+
 /**
  * All information about the position and zoom level of the virtual eye looking through the PreviewPanel at the robot/art
  * @author Dan Royer
@@ -18,18 +20,18 @@ public class Camera {
 	// window size (for aspect ratio?)
 	private double width, height;
 
-
 	public Camera() {}
-	
-	
+
 	/**
 	 * Reposition the camera
 	 * @param dx change horizontally
 	 * @param dy change vertically
 	 */
 	public void moveRelative(int dx, int dy) {
-		offsetX += (float) dx * zoom / width;
-		offsetY += (float) dy * zoom / height;
+		int scale = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS).getInt("dragFactor", 1);
+
+		offsetX += (float) dx * zoom * scale / width;
+		offsetY += (float) dy * zoom * scale / height;
 	}
 
 	private void limitCameraZoom() {
@@ -43,34 +45,29 @@ public class Camera {
 		limitCameraZoom();
 	}
 
-
 	// scale the picture of the robot to fake a zoom.
 	public void zoomOut() {
 		zoom /= ZOOM_STEP_SIZE;
 		limitCameraZoom();
 	}
 
-	
 	// scale the picture of the robot to fake a zoom.
 	public void zoomToFit(double w,double h) {
-		zoom = (w > h ? w : h)/2.0;
+		zoom = (Math.max(w, h))/2.0;
 		limitCameraZoom();
 		
 		offsetX = 0;
 		offsetY = 0;
 	}
 
-
 	public double getX() {
 		return offsetX;
 	}
-	
-	
+
 	public double getY() {
 		return offsetY;
 	}
-	
-	
+
 	public double getZoom() {
 		return zoom;
 	}
@@ -79,16 +76,13 @@ public class Camera {
 		return width;
 	}
 
-
 	public void setWidth(double width) {
 		this.width = width;
 	}
 
-
 	public double getHeight() {
 		return height;
 	}
-
 
 	public void setHeight(double height) {
 		this.height = height;
