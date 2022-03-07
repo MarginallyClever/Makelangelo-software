@@ -24,6 +24,9 @@ public class PlotterSettingsPanel extends JPanel {
 	private final Plotter myPlotter;
 
 	private final SelectDouble machineWidth, machineHeight;
+	private final SelectDouble totalBeltNeeded;
+	private final SelectDouble totalServoNeeded;
+	private final SelectDouble totalStepperNeeded;
 	private final SelectDouble acceleration;
 	
 	private final SelectDouble penDiameter;
@@ -49,7 +52,10 @@ public class PlotterSettingsPanel extends JPanel {
 		this.myPlotter = robot;
 
 		JButton buttonSave = new JButton(Translator.get("Save"));
+		buttonSave.addActionListener((e)->save());
+
 		JButton buttonReset = new JButton(Translator.get("Reset"));
+		buttonReset.addActionListener((e)->reset());
 
 		JPanel bottom = new JPanel(new FlowLayout());
 		bottom.add(buttonSave);
@@ -63,6 +69,9 @@ public class PlotterSettingsPanel extends JPanel {
 		double h = settings.getLimitTop() - settings.getLimitBottom();
 		interior.add(machineWidth 		= new SelectDouble("width",		 Translator.get("MachineWidth"		),w));
 		interior.add(machineHeight 		= new SelectDouble("height",		 Translator.get("MachineHeight"		),h));
+		interior.add(totalStepperNeeded = new SelectDouble("stepperLength", Translator.get("StepperLengthNeeded"),0));
+		interior.add(totalBeltNeeded 	= new SelectDouble("beltLength",	 Translator.get("BeltLengthNeeded"	),0));
+		interior.add(totalServoNeeded 	= new SelectDouble("servoLength",	 Translator.get("ServoLengthNeeded"	),0));
 		interior.add(penDiameter 		= new SelectDouble("diameter",		 Translator.get("penToolDiameter"	),settings.getPenDiameter()));
 	    interior.add(travelFeedRate 	= new SelectDouble("feedrate",		 Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
 	    interior.add(drawFeedRate 		= new SelectDouble("speed",		 Translator.get("Speed"				),settings.getDrawFeedRate()));
@@ -81,6 +90,14 @@ public class PlotterSettingsPanel extends JPanel {
 		interior.add(minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getMinAcceleration()));
 		interior.add(minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getMinPlannerSpeed()));
 		
+
+		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
+		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
+		totalStepperNeeded.setReadOnly();
+		totalBeltNeeded.setReadOnly();
+		totalServoNeeded.setReadOnly();
+		updateLengthNeeded();
+
 		// now assemble the dialog
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -93,9 +110,6 @@ public class PlotterSettingsPanel extends JPanel {
 		gbc.gridy++;
 		gbc.weighty=0;
 		this.add(bottom,gbc);
-
-		buttonSave.addActionListener((e)->save());
-		buttonReset.addActionListener((e)->reset());
 	}
 
 	private void save() {
@@ -158,6 +172,27 @@ public class PlotterSettingsPanel extends JPanel {
 		handleSmallSegments.setSelected(settings.isHandleSmallSegments());
 		minAcceleration.setValue(settings.getMinAcceleration());
 		minPlannerSpeed.setValue(settings.getMinPlannerSpeed());
+	}
+
+	/**
+	 * Calculate length of belt and cables needed based on machine dimensions.
+	 */
+	private void updateLengthNeeded() {
+		double w = machineWidth.getValue();
+		double h = machineHeight.getValue();
+		double SAFETY_MARGIN=100;
+
+		double mmBeltNeeded=(Math.sqrt(w*w+h*h)+SAFETY_MARGIN); // 10cm safety margin
+		double beltNeeded = Math.ceil(mmBeltNeeded*0.001);
+		totalBeltNeeded.setValue((float)beltNeeded);
+
+		double mmServoNeeded = (Math.sqrt(w*w+h*h)+SAFETY_MARGIN) + w/2.0; // 10cm safety margin
+		double servoNeeded = Math.ceil(mmServoNeeded*0.001);
+		totalServoNeeded.setValue((float)servoNeeded);
+
+		double mmStepperNeeded = w/2.0+SAFETY_MARGIN; // 10cm safety margin
+		double stepperNeeded = Math.ceil(mmStepperNeeded*0.001);
+		totalStepperNeeded.setValue((float)stepperNeeded);
 	}
 
 	// TEST
