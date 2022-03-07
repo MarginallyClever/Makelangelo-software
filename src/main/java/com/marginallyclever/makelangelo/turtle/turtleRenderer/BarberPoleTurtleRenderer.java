@@ -14,7 +14,6 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	private GL2 gl2;
 	
 	private ColorRGB colorTravel = new ColorRGB(0,255,0);
-	private ColorRGB colorDraw = new ColorRGB(0,0,0);
 	private boolean showPenUp = false;
 	private float originalLineWidth=1;
 	private int moveCounter;
@@ -70,8 +69,11 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	}
 
 	@Override
-	public void setPenDownColor(ColorRGB color) {
-		colorDraw.set(color);
+	public void setPenDownColor(ColorRGB color) {}
+
+	@Override
+	public void setPenUpColor(ColorRGB color) {
+		colorTravel.set(color);
 	}
 	
 	@Override

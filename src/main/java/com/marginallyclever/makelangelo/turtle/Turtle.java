@@ -15,9 +15,19 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * A simple turtle implementation to make generating pictures and learning programming easier.
- * @author Dan Royer
+ * A {@link Turtle} is a collection of instructions which, combined, form a drawing on a 2D surface.
+ * The name is based on the Commodore 64 turtle from the LOGO programming language, and movement is very similar.
+ * Commands include:
+ * <ul>
+ *     <li>lifting and lowering the turtle's tail</li>
+ *     <li>turning relative or absolute amounts</li>
+ *     <li>moving forward or backward relative amounts</li>
+ *     <li>moving relative or absolute amounts regardless of direction</li>
+ *     <li>changing the tool (color and diameter)</li>
+ * </ul>
  *
+ * @author Dan Royer
+ * @since 7.0?
  */
 public class Turtle implements Cloneable {
 	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
@@ -50,6 +60,7 @@ public class Turtle implements Cloneable {
 		this.color.set(t.color);
 		this.diameter = t.diameter; 
 		// deep copy
+		history.clear();
 		for( TurtleMove m : t.history ) {
 			this.history.add(new TurtleMove(m));
 		}
@@ -85,7 +96,8 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 * Returns this {@link Turtle} to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 * @param c The starting color for this {@link Turtle}.
 	 */
 	private void reset(ColorRGB c) {
 		px = 0;
@@ -93,7 +105,6 @@ public class Turtle implements Cloneable {
 		setAngle(0);
 		penUp();
 		history.clear();
-		// default turtle color is black.
 		setColor(c);
 	}
 	
