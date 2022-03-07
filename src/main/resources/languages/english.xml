@@ -1075,7 +1075,7 @@
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Max speed</value>
+		<value>Travel speed</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
