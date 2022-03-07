@@ -491,13 +491,14 @@ public final class Makelangelo {
 		return menu;
 	}
 	
-	private void runGeneratorDialog(TurtleGenerator ici) {
-		ici.setPaper(myPaper);
-		ici.addListener(this::setTurtle);
-		ici.generate();
-		
-		JDialog dialog = new JDialog(mainFrame,ici.getName());
-		TurtleGeneratorPanel panel = ici.getPanel();
+	private void runGeneratorDialog(TurtleGenerator turtleGenerator) {
+		turtleGenerator.setPaper(myPaper);
+		turtleGenerator.addListener(this::setTurtle);
+		turtleGenerator.generate();
+
+		setMainTitle(turtleGenerator.getName());
+		JDialog dialog = new JDialog(mainFrame, turtleGenerator.getName());
+		TurtleGeneratorPanel panel = turtleGenerator.getPanel();
 		dialog.add(panel);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -510,7 +511,7 @@ public final class Makelangelo {
 			public void windowClosing(WindowEvent e) {
 				enableMenuBar(true);
 				myPaper.setRotationRef(0);
-				logger.debug(Translator.get("Finished"));
+				logger.debug("Generation finished");
 			}
 		});
 
@@ -519,6 +520,7 @@ public final class Makelangelo {
 	
 	private void newFile() {
 		setTurtle(new Turtle());
+		setMainTitle("");
 	}
 
 	private JMenu createFileMenu() {
@@ -611,7 +613,7 @@ public final class Makelangelo {
 				recentFiles.addFilename(filename);
 			}
 
-			setMainTitle(filename);
+			setMainTitle(new File(filename).getName());
 
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
@@ -1058,13 +1060,13 @@ public final class Makelangelo {
 		}
 	}
 
-	private void setMainTitle(String filename) {
-		String title = "";
-		if (! "".equals(filename)) {
-			title += new File(filename).getName() + " - ";
+	private void setMainTitle(String title) {
+		String finalTitle = "";
+		if (! "".equals(title)) {
+			finalTitle += title + " - ";
 		}
-		title += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
-		mainFrame.setTitle(title);
+		finalTitle += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
+		mainFrame.setTitle(finalTitle);
 	}
 
 	public void setTurtle(Turtle turtle) {
