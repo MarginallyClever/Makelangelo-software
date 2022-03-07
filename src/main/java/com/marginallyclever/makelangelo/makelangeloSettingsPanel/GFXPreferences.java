@@ -19,7 +19,7 @@ public class GFXPreferences {
 	static private SelectBoolean antialias;
 	static private SelectBoolean speedOverQuality;
 	static private SelectBoolean showAllWhileDrawing;
-	static private SelectSpinner dragFactor;
+	static private SelectSpinner dragSpeed;
 	static List<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
 
 	static public void addListener(PropertyChangeListener p) {
@@ -48,13 +48,13 @@ public class GFXPreferences {
 		antialias = new SelectBoolean("antialias",Translator.get("GFXPreferences.antialias"),prefs.getBoolean("antialias", true));
 		speedOverQuality = new SelectBoolean("SpeedVSQuality",Translator.get("GFXPreferences.speedVSQuality"),prefs.getBoolean("speed over quality", true));
 		showAllWhileDrawing = new SelectBoolean("drawWhileRunning",Translator.get("GFXPreferences.showAllWhileDrawing"),prefs.getBoolean("Draw all while running", true));
-		dragFactor = new SelectSpinner("dragFactor", Translator.get("GFXPreferences.dragFactor"), 1, 5, prefs.getInt("dragFactor", 1));
+		dragSpeed = new SelectSpinner("dragSpeed", Translator.get("GFXPreferences.dragSpeed"), 1, 5, prefs.getInt("dragSpeed", 1));
 
 		panel.add(showPenUp);
 		panel.add(showAllWhileDrawing);
 		panel.add(antialias);
 		panel.add(speedOverQuality);
-		panel.add(dragFactor);
+		panel.add(dragSpeed);
 
 		GFXPreferences.addListener((e)->{
 			showPenUp.setSelected((boolean)e.getNewValue());
@@ -72,7 +72,7 @@ public class GFXPreferences {
 		prefs.putBoolean("antialias", antialias.isSelected());
 		prefs.putBoolean("speed over quality", speedOverQuality.isSelected());
 		prefs.putBoolean("Draw all while running", showAllWhileDrawing.isSelected());
-		prefs.putInt("dragFactor", dragFactor.getValue());
+		prefs.putInt("dragSpeed", dragSpeed.getValue());
 	}
 	
 	static public void cancel() {}

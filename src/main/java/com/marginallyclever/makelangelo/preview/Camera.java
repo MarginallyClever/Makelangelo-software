@@ -28,7 +28,7 @@ public class Camera {
 	 * @param dy change vertically
 	 */
 	public void moveRelative(int dx, int dy) {
-		int scale = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS).getInt("dragFactor", 1);
+		int scale = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS).getInt("dragSpeed", 1);
 
 		offsetX += (float) dx * zoom * scale / width;
 		offsetY += (float) dy * zoom * scale / height;

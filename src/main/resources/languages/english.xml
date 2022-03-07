@@ -581,8 +581,8 @@
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
-		<key>GFXPreferences.dragFactor</key>
-		<value>Speed of moving while dragging</value>
+		<key>GFXPreferences.dragSpeed</key>
+		<value>camera travel speed</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>

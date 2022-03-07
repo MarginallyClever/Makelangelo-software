@@ -528,7 +528,7 @@
         <hint>[graphics settings dialog]</hint>
     </string>
     <string>
-        <key>GFXPreferences.dragFactor</key>
+        <key>GFXPreferences.dragSpeed</key>
         <value>Vitesse de déplacement de la souris</value>
         <hint>graphics settings dialog</hint>
     </string>
