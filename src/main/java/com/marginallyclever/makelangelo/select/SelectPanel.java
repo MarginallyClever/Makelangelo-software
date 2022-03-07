@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -44,7 +45,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	}
 	
 	// OBSERVER PATTERN	
-	private ArrayList<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
+	private List<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
 
 	public void removeSelectPanelChangeListener(SelectPanelChangeListener ear) {
 		listeners.remove(ear);
@@ -87,6 +88,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		SelectReadOnlyText h = new SelectReadOnlyText("H","H "+ipsum);
 		SelectSlider i = new SelectSlider("I","I",200,0,100);
 		SelectTextArea j = new SelectTextArea("J","J",ipsum);
+		SelectSpinner k = new SelectSpinner("K", "K", 1, 10, 3);
 		
 		panel.add(a);
 		panel.add(b);
@@ -98,7 +100,8 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		panel.add(h);
 		panel.add(i);
 		panel.add(j);
-		
+		panel.add(k);
+
 		// test finish
 		panel.setPreferredSize(new Dimension(400,600));
 		

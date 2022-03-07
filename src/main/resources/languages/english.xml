@@ -581,6 +581,11 @@
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
+		<key>GFXPreferences.dragSpeed</key>
+		<value>camera travel speed</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
 		<key>MenuLanguageTitle</key>
 		<value>Language</value>
 		<hint>menu or dialog title</hint>
