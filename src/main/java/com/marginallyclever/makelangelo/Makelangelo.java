@@ -8,12 +8,15 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.*;
-import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
+import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.*;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
@@ -35,14 +38,12 @@ import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
-import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -164,6 +165,8 @@ public final class Makelangelo {
 			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
 			msv.setSettings(e);
 		}
+		myTurtleRenderer.setUpColor(e.getPenUpColor());
+		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
