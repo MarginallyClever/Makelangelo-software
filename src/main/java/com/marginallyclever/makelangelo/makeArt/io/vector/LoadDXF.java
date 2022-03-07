@@ -22,8 +22,8 @@ import java.util.*;
 public class LoadDXF implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadDXF.class);
 	
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
-	private Parser parser = ParserBuilder.createDefaultParser();
+	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
+	private final Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
 	private double imageCenterX,imageCenterY;
 	private Turtle myTurtle;
@@ -40,88 +40,6 @@ public class LoadDXF implements TurtleLoader {
 		return (ext.equalsIgnoreCase(".dxf"));
 	}
 
-	/**
-	 * Put every entity into a bucket.
-	 * @param doc
-	 * @param grid
-	 * @param groups
-	 */
-	private void sortEntitiesIntoBucketsAndGroups(DXFDocument doc,DXFLayer layer,DXFBucketGrid grid,List<DXFGroup> groups) {
-		//logger.debug("Sorting layer "+layer.getName()+" into buckets...");
-
-		Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
-		while (entityTypeIter.hasNext()) {
-			String entityType = (String)entityTypeIter.next();
-			List<?> entityList = layer.getDXFEntities(entityType);
-			for (Object o : entityList) {
-				DXFEntity e = (DXFEntity) o;
-				DXFBucketEntity be = new DXFBucketEntity(e);
-
-				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-					DXFLine line = (DXFLine) e;
-					grid.addEntity(be, line.getStartPoint());
-					grid.addEntity(be, line.getEndPoint());
-					continue;
-				}
-				if (e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {
-					DXFCircle circle = (DXFCircle) e;
-					double r = circle.getRadius();
-					Point center = circle.getCenterPoint();
-					double cx = center.getX();
-					double cy = center.getY();
-
-					Point a = new Point(cx + r, cy, 0);
-					Point b = new Point();
-					for (double i = 1; i <= 40; ++i) {  // hard coded 40?  gross!
-						double v = (Math.PI * 2.0) * (i / 40.0);
-						double s = r * Math.sin(v);
-						double c = r * Math.cos(v);
-						b.setX(cx + c);
-						b.setY(cy + s);
-						grid.addEntity(be, a);
-						grid.addEntity(be, b);
-						a.setX(b.getX());
-						a.setY(b.getY());
-					}
-					continue;
-				}
-				if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-					e = DXFSplineConverter.toDXFPolyline((DXFSpline) e);
-					// fall through to the next case, polyline.
-				}
-				if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)) {
-					DXFPolyline polyLine = (DXFPolyline) e;
-
-					if (!polyLine.isClosed()) {
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount() - 1).getPoint());
-					} else {
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-					}
-					continue;
-				}
-				if (e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-					DXFLWPolyline polyLine = (DXFLWPolyline) e;
-					if (!polyLine.isClosed()) {
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(polyLine.getVertexCount() - 1).getPoint());
-					} else {
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-						grid.addEntity(be, polyLine.getVertex(0).getPoint());
-					}
-					continue;
-				}
-				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_ARC)) {}
-				//if(e.getType().equals(DXFConstants.ENTITY_TYPE_CIRCLE)) {}
-				// I don't know this entity type.
-				logger.error("Unknown DXF type {}", e.getType());
-			}
-		}
-		
-		//grid.countEntitiesInBuckets();
-	}
-	
 	@Override
 	public Turtle load(InputStream in) throws Exception {
 		if (in == null) {
@@ -149,78 +67,38 @@ public class LoadDXF implements TurtleLoader {
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
-			if (!entityTypeIter.hasNext()) {
-				continue;
-			}
+			if(entityTypeIter.hasNext()) {
+				// ignore the color index, DXF is dumb.
+				myTurtle.setColor(new ColorRGB(0,0,0));
 
-			// ignore the color index, DXF is dumb.
-			myTurtle.setColor(new ColorRGB(0,0,0));
-			
-			// Sort the entities on this layer into the buckets.
-			// Buckets are arranged in an XY grid.
-			// All non-closed entities would appear in two buckets.
-			// One Entity might be in the same bucket twice.
-			Point topLeft = new Point();
-			Point bottomRight = new Point();
-			topLeft.setX(bounds.getMinimumX());
-			topLeft.setY(bounds.getMinimumY());
-			bottomRight.setX(bounds.getMaximumX());
-			bottomRight.setY(bounds.getMaximumY());
-			DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
-			List<DXFGroup> groups = new LinkedList<DXFGroup>();
-
-			// TODO remove this.  Optimizing paths should not happen at this level.  Do not force behavior on users
-			// who might have clever reasons for their DXF being the way it is.
-			sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
-
-			// Use the buckets to narrow the search field and find neighboring entities
-			//grid.sortEntitiesIntoContinguousGroups(groups,0.1);
-			grid.dumpEverythingIntoABucket(groups);
-			removeDuplicates(groups);
-
-			for (DXFGroup g : groups) {
-				for (DXFBucketEntity dxfBucketEntity : g.entities) {
-					parseEntity(dxfBucketEntity.entity);
-				}
+				parseLayer(layer);
 			}
 		}
 
 		return myTurtle;
 	}
 
-	private void parseEntity(DXFEntity e) {
-		if (e.getType().equals(DXFConstants.ENTITY_TYPE_LINE)) {
-			parseDXFLine((DXFLine)e);
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_SPLINE)) {
-			DXFPolyline polyLine = DXFSplineConverter.toDXFPolyline((DXFSpline)e);
-			parseDXFPolyline(polyLine);
-		} else if (e.getType().equals(DXFConstants.ENTITY_TYPE_POLYLINE)
-				|| e.getType().equals(DXFConstants.ENTITY_TYPE_LWPOLYLINE)) {
-			parseDXFPolyline((DXFPolyline)e);
+	private void parseLayer(DXFLayer layer) {
+		logger.debug("Sorting layer "+layer.getName()+" into buckets...");
+
+		Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
+		while (entityTypeIter.hasNext()) {
+			String entityType = (String) entityTypeIter.next();
+			List<?> entityList = layer.getDXFEntities(entityType);
+			for (Object o : entityList) {
+				DXFEntity e = (DXFEntity) o;
+
+				switch(e.getType()) {
+					case DXFConstants.ENTITY_TYPE_LINE -> parseDXFLine((DXFLine)e);
+					case DXFConstants.ENTITY_TYPE_SPLINE -> parseDXFPolyline(DXFSplineConverter.toDXFPolyline((DXFSpline)e));
+					case DXFConstants.ENTITY_TYPE_POLYLINE,
+							DXFConstants.ENTITY_TYPE_LWPOLYLINE -> parseDXFPolyline((DXFPolyline)e);
+					default -> logger.error("Unknown DXF type {}", e.getType());
+				}
+			}
 		}
 	}
-		
-	/**
-	 * http://stackoverflow.com/questions/203984/how-do-i-remove-repeated-elements-from-arraylist
-	 * @param groups
-	 */
-	private void removeDuplicates(List<DXFGroup> groups) {
-		int totalRemoved=0;
-		
-		Iterator<DXFGroup> g = groups.iterator();
-		while(g.hasNext()) {
-			DXFGroup group = g.next();
-			int before = group.entities.size();
-			Set<DXFBucketEntity> hs = new LinkedHashSet<DXFBucketEntity>();
-			hs.addAll(group.entities);
-			group.entities.clear();
-			group.entities.addAll(hs);
-			int after = group.entities.size();
-			totalRemoved += before - after;
-		}
-		if(totalRemoved!=0) logger.debug("{} duplicates removed.", totalRemoved);
-	}
-	
+
 	private double TX(double x) {
 		return (x-imageCenterX);
 	}
