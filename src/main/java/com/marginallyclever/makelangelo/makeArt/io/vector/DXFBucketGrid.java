@@ -81,7 +81,7 @@ public class DXFBucketGrid {
 	}
 	
 	/**
-	 * dumpes everything into one bucket, probably creating duplicates.
+	 * Dumps everything into one bucket, probably creating duplicates.
 	 * @param groups
 	 */
 	protected void dumpEverythingIntoABucket(List<DXFGroup> groups) {

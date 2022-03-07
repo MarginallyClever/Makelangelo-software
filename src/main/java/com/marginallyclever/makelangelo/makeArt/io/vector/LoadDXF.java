@@ -169,6 +169,8 @@ public class LoadDXF implements TurtleLoader {
 			DXFBucketGrid grid = new DXFBucketGrid(15,15,topLeft,bottomRight);
 			List<DXFGroup> groups = new LinkedList<DXFGroup>();
 
+			// TODO remove this.  Optimizing paths should not happen at this level.  Do not force behavior on users
+			// who might have clever reasons for their DXF being the way it is.
 			sortEntitiesIntoBucketsAndGroups(doc,layer,grid,groups);
 
 			// Use the buckets to narrow the search field and find neighboring entities
