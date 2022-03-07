@@ -8,7 +8,6 @@ import com.marginallyclever.makelangelo.select.SelectColor;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectTextArea;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -16,7 +15,6 @@ import java.awt.*;
 
 /**
  * {@link PlotterSettingsPanel} is the user interface to adjust {@link PlotterSettings}.
- * PPAC37 : todo review to propose user start/eng gcode (general and at change tool) with posible placeholder ...
  * @author Dan Rmaybe oyer
  * @since 7.1.4
  */
@@ -51,8 +49,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectDouble minAcceleration;
 	private SelectDouble minPlannerSpeed;
 	
-	private JButton buttonSave;//TODO event
-	private JButton buttonCancel;// TODO event
+	private JButton buttonSave;
+	private JButton buttonCancel;
 	
 	public PlotterSettingsPanel(Plotter robot) {
 		super();
@@ -93,6 +91,7 @@ public class PlotterSettingsPanel extends JPanel {
 		interior.add(handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.isHandleSmallSegments()));
 		interior.add(minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getMinAcceleration()));
 		interior.add(minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getMinPlannerSpeed()));
+		
 		
 		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
 		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
@@ -150,7 +149,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setHandleSmallSegments(handleSmallSegments.isSelected());
 		settings.setMinAcceleration(minAcceleration.getValue());
 		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
-		
+
 		settings.saveConfig();
 	}
 
