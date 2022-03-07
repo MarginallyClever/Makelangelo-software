@@ -165,8 +165,8 @@ public final class Makelangelo {
 			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
 			msv.setSettings(e);
 		}
-		myTurtleRenderer.setDownColor(e.getPenDownColor());
 		myTurtleRenderer.setUpColor(e.getPenUpColor());
+		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
