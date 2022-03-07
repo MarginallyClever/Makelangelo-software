@@ -2,8 +2,10 @@
  */
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.util.FunctionSolver;
 import com.marginallyclever.util.PreferencesHelper;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -19,7 +21,7 @@ public class PlotterSettingsUserGcode {
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsUserGcode.class);
 
 	private String userGeneralStartGcode = "G28 ; Home"; // TODO Should containe a G28 or a G28 is added befor any move...
-	private String userGeneralEndGcode = "G0 X{limit_left+10} Y{limit_top-15} ; Park position\nM300 ; Bip"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
+	private String userGeneralEndGcode = "G0 X{limit_left+100} Y{limit_top-150} ; Park position\nM300 ; Bip"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
 	private String userToolChangeStartGcode = "M300 ; Bip"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
 	private String userToolChangeEndGcode = ""; // a resort position ?
 
@@ -42,6 +44,20 @@ public class PlotterSettingsUserGcode {
 
 	public String getUserGeneralEndGcode() {
 		return userGeneralEndGcode;
+	}
+	
+	public String[] getCommentCleanned(String sUserGcode,PlotterSettings myPlotterSettings){
+		String[] userGcode = resolvePlaceHolderAndEvalExpression(sUserGcode,myPlotterSettings).split("\n");	
+		ArrayList<String> tmp = new ArrayList<>();				
+		for ( String l : userGcode){
+			String[] lPart = l.split(";");// to separate the comments
+			if ( lPart!= null && lPart.length>0 ){
+				if ( lPart[0]!= null && lPart[0].length()>0){					
+					tmp.add(lPart[0]);
+				}
+			}
+		}
+		return tmp.toArray(String[]::new);
 	}
 
 	/**
@@ -152,26 +168,6 @@ public class PlotterSettingsUserGcode {
 						paramNameToValue.put(key, thisMachineNode.get(key, ""));
 					}
 				}
-				/* 
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   acceleration:100.0
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   blockBufferSize:16
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   handleSmallSegments:false
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   hardwareVersion:Makelangelo 5
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   isRegistered:false
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_bottom:-500.0
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_left:-325.0
-				2022-02-25 19:01:38,809 DEBUG c.m.m.p.settings.PlotterSettings -   limit_right:325.0
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   limit_top:500.0
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minAcceleration:0.0
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minSegTime:20000
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minSegmentLength:0.5
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   minimumPlannerSpeed:0.05
-				2022-02-25 19:01:38,810 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorB:255
-				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorG:255
-				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   paperColorR:255
-				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   segmentsPerSecond:5
-				2022-02-25 19:01:38,811 DEBUG c.m.m.p.settings.PlotterSettings -   startingPosIndex:4
-				 */
 			}
 		} catch (Exception e) {
 			logger.trace("{}", e.getMessage(), e);
@@ -209,4 +205,16 @@ public class PlotterSettingsUserGcode {
 		userToolChangeEndGcode = thisMachineNode.get(PREF_KEY_USER_TOOL_CHANGE_END_GCODE, userToolChangeEndGcode);
 	}
 
+	public boolean doUserStartGCodeContaineG28(PlotterSettings plotterSettings){
+		String[] commentCleanned = getCommentCleanned(userGeneralStartGcode, plotterSettings);
+		if ( commentCleanned != null && commentCleanned.length>0){
+			for ( String l : commentCleanned){
+				if ( l.startsWith("G28")){// as normaly no G28x exist ... 
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 }

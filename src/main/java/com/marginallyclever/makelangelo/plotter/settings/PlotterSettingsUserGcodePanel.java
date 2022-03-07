@@ -25,6 +25,8 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 	
 	private final SelectTextArea replacementPatternList;
 	
+	
+    private javax.swing.JTabbedPane jTabbedPane1;
 
 	public PlotterSettingsUserGcodePanel(Plotter robot) {
 		super();
@@ -81,7 +83,11 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 		add(bottom);
 
 	}
+	
+	private void initComponents() {
 
+	}
+	
 	private void save() {
 
 		PlotterSettings settings = myPlotter.getSettings();

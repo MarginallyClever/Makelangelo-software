@@ -275,6 +275,7 @@ public class PlotterControls extends JPanel {
 
 	private void addUserStartGCODE() {
 		logger.trace("GCODE START");
+		//TODO refactor to get directely a String[] ...
 		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGcode().getUserGeneralStartGcode());
 	}
 
@@ -289,13 +290,12 @@ public class PlotterControls extends JPanel {
 	 * @param userGcodeNotResolvedAndNotEvaluated 
 	 */
 	private void lineByLineAndCommentsCleanningForUserGCODE(String userGcodeNotResolvedAndNotEvaluated) {
-		String[] userGcode = myPlotter.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(userGcodeNotResolvedAndNotEvaluated,myPlotter.getSettings()).split("\n");		
-		for ( String l : userGcode){
-			String[] lPart = l.split(";");// to separate the comments
-			if ( lPart!= null && lPart.length>0 ){
-				if ( lPart[0]!= null && lPart[0].length()>0){
+		String[] userGcodeCommentsCleannedResolvedAndEvaluated = myPlotter.getSettings().getUserGcode().getCommentCleanned(userGcodeNotResolvedAndNotEvaluated, myPlotter.getSettings());
+		if (userGcodeCommentsCleannedResolvedAndEvaluated != null) {
+			for (String l : userGcodeCommentsCleannedResolvedAndEvaluated) {
+				if (l != null && l.length() > 0) {
 					//only non empty lines ( trim later in queueAndSendCommand )
-					marlinInterface.queueAndSendCommand(lPart[0]);
+					marlinInterface.queueAndSendCommand(l);
 				}
 			}
 		}
