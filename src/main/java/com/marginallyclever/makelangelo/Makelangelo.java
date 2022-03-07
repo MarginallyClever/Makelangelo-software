@@ -273,9 +273,8 @@ public final class Makelangelo {
 		
 		JMenuItem bOpenPlotterSettingsUserGcode = new JMenuItem(Translator.get("OpenPlotterSettingsUserGcode"));
 		bOpenPlotterSettingsUserGcode.addActionListener((e)-> openPlotterSettingsUserGcode());
-		//bOpenPlotterSettingsUserGcode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
 		menu.add(bOpenPlotterSettingsUserGcode);
-		//
+		
 		return menu;
 	}
 
