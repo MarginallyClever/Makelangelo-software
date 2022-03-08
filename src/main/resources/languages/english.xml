@@ -202,7 +202,6 @@
 		<value>Save</value>
 		<hint>used in many places</hint>
 	</string>
-
 	<string>
 		<key>Load</key>
 		<value>Load</value>
