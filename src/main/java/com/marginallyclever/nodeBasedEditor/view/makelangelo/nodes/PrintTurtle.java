@@ -35,7 +35,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     @Override
     public void print(Graphics g) {
-        Turtle myTurtle = (Turtle) turtle.getValue();
+        Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
         int dx=px.getValue().intValue();
@@ -64,7 +64,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                         if (inShow && previousMove != null) {
                             if (showPenUp) {
                                 g.setColor(upColor);
-                                g.drawLine((int) previousMove.x, -(int)previousMove.y, (int) m.x, -(int) m.y);
+                                g.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
                             }
                         }
                         count++;
@@ -73,7 +73,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                     case DRAW_LINE -> {
                         if (inShow && previousMove != null) {
                             g.setColor(downColor);
-                            g.drawLine((int) previousMove.x, -(int)previousMove.y, (int) m.x, -(int) m.y);
+                            g.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
                         }
                         count++;
                         previousMove = m;

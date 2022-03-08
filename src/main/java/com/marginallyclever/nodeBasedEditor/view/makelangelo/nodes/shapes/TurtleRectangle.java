@@ -1,4 +1,4 @@
-package com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes;
+package com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes.shapes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.Node;

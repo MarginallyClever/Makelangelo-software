@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
-import java.beans.PropertyChangeListener;
-
-import javax.swing.ProgressMonitor;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
@@ -14,6 +10,9 @@ import com.marginallyclever.makelangelo.makeArt.TransformedImage;
 import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import javax.swing.*;
+import java.beans.PropertyChangeListener;
 
 /**
  * Converts a {@link TransformedImage} to {@link Turtle}
@@ -160,7 +159,6 @@ public abstract class ImageConverter implements PropertyChangeListener {
 
 			if(v<channelCutoff) turtle.moveTo(x,y);
 			else turtle.jumpTo(x,y);
-			
 		}
 	}
 	

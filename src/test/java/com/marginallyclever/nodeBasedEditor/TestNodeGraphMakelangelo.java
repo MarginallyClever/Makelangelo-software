@@ -1,10 +1,13 @@
 package com.marginallyclever.nodeBasedEditor;
 
+import com.marginallyClever.nodeGraphCore.BuiltInRegistry;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyClever.nodeGraphSwing.SwingRegistry;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodeBasedEditor.view.makelangelo.MakelangeloNodeFactory;
+import com.marginallyclever.nodeBasedEditor.view.makelangelo.MakelangeloNodeGraphRegistry;
+import com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes.TurtleJSON_DAO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +25,11 @@ public class TestNodeGraphMakelangelo {
     @BeforeAll
     static void beforeAll() {
         model = new NodeGraph();
-        MakelangeloNodeFactory.registerNodes();
+        try {
+            BuiltInRegistry.register();
+            SwingRegistry.register();
+            MakelangeloNodeGraphRegistry.register();
+        } catch (IllegalArgumentException e) {}
     }
 
     @BeforeEach
@@ -54,5 +61,16 @@ public class TestNodeGraphMakelangelo {
             System.out.println(s);
             assertNotNull(NodeFactory.createNode(s));
         }
+    }
+
+    /**
+     * Test {@link Turtle}.
+     */
+    @Test
+    public void testTurtleDAO() {
+        TurtleJSON_DAO dao = new TurtleJSON_DAO();
+        Turtle r1 = new Turtle();
+        Turtle r2=dao.fromJSON(dao.toJSON(r1));
+        assertEquals(r1,r2);
     }
 }

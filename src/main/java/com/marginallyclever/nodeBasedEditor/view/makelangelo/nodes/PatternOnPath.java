@@ -5,13 +5,13 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
 
-public class TurtlePatternOnPath extends Node {
+public class PatternOnPath extends Node {
     private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,false);
     private final NodeVariable<Turtle> path = NodeVariable.newInstance("path", Turtle.class, new Turtle(),true,false);
     private final NodeVariable<Number> count = NodeVariable.newInstance("count", Number.class, 10,true,false);
     private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class, new Turtle(),false,true);
 
-    public TurtlePatternOnPath() {
+    public PatternOnPath() {
         super("PatternOnPath");
         addVariable(pattern);
         addVariable(path);
@@ -20,7 +20,7 @@ public class TurtlePatternOnPath extends Node {
         pattern.setIsDirty(true);
     }
 
-    public TurtlePatternOnPath(Turtle pattern,Turtle path,int count) {
+    public PatternOnPath(Turtle pattern, Turtle path, int count) {
         this();
         this.pattern.setValue(pattern);
         this.path.setValue(path);
@@ -29,7 +29,7 @@ public class TurtlePatternOnPath extends Node {
 
     @Override
     public Node create() {
-        return new TurtlePatternOnPath();
+        return new PatternOnPath();
     }
 
     @Override

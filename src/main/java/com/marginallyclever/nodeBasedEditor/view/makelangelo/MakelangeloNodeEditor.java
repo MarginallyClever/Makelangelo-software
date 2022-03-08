@@ -1,6 +1,6 @@
 package com.marginallyclever.nodeBasedEditor.view.makelangelo;
 
-import com.marginallyClever.nodeGraphCore.BuiltInNodeRegistry;
+import com.marginallyClever.nodeGraphCore.BuiltInRegistry;
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeConnection;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
@@ -8,7 +8,7 @@ import com.marginallyClever.nodeGraphCore.builtInNodes.LoadNumber;
 import com.marginallyClever.nodeGraphCore.builtInNodes.PrintToStdOut;
 import com.marginallyClever.nodeGraphCore.builtInNodes.math.Add;
 import com.marginallyClever.nodeGraphSwing.NodeGraphEditorPanel;
-import com.marginallyClever.nodeGraphSwing.SwingNodeRegistry;
+import com.marginallyClever.nodeGraphSwing.SwingRegistry;
 import com.marginallyClever.nodeGraphSwing.nodes.images.LoadImage;
 import com.marginallyClever.nodeGraphSwing.nodes.images.PrintImage;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -30,9 +30,9 @@ public class MakelangeloNodeEditor {
         CommandLineOptions.setFromMain(args);
         Translator.start();
 
-        BuiltInNodeRegistry.registerNodes();
-        SwingNodeRegistry.registerNodes();
-        MakelangeloNodeFactory.registerNodes();
+        BuiltInRegistry.register();
+        SwingRegistry.register();
+        MakelangeloNodeGraphRegistry.register();
         NodeGraph model = new NodeGraph();
 
         setupAnInitialModel(model);

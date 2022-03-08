@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LineCollection extends ArrayList<LineSegment2D> {
 	private static final long serialVersionUID = 1L;
@@ -10,7 +11,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		super();
 	}
 	
-	public LineCollection(ArrayList<LineSegment2D> list) {
+	public LineCollection(List<LineSegment2D> list) {
 		super();
 		addAll(list);
 	}
@@ -30,7 +31,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			
 			for(int i=1;i<size();++i) {
 				LineSegment2D next = get(i);
-				if(next.c.isEqualTo(head.c)) {
+				if(next.color.isEqualTo(head.color)) {
 					c.add(next);
 				} else {
 					head = next;
@@ -59,7 +60,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			
 			for(int i=1;i<size();++i) {
 				LineSegment2D next = get(i);
-				if(next.b.distanceSquared(head.a)<1e-6) {
+				if(next.end.distanceSquared(head.start)<1e-6) {
 					c.add(next);
 				} else {
 					head = next;
@@ -81,12 +82,12 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		simplifySection(0, size() - 1,distanceTolerance);
 		
 		LineCollection result = new LineCollection();
-		Point2D head = get(0).a;
+		Point2D head = get(0).start;
 		
 		for (int i = 0; i < size(); i++) {
 			if (usePt[i]) {
-				Point2D next = get(i).b;
-				result.add(new LineSegment2D(head,next,get(i).c));
+				Point2D next = get(i).end;
+				result.add(new LineSegment2D(head,next,get(i).color));
 				head=next;
 			}
 		}
@@ -97,13 +98,13 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	private void simplifySection(int i, int j,double distanceTolerance) {
 		if ((i + 1) == j) return;
 		LineSegment2D seg = new LineSegment2D(
-			get(i).a,
-			get(j).b,
-			get(i).c);
+			get(i).start,
+			get(j).end,
+			get(i).color);
 		double maxDistance = -1.0;
 		int maxIndex = i;
 		for (int k = i + 1; k < j; k++) {
-			double distance = seg.ptLineDistSq(get(k).b);
+			double distance = seg.ptLineDistSq(get(k).end);
 			if (distance > maxDistance) {
 				maxDistance = distance;
 				maxIndex = k;

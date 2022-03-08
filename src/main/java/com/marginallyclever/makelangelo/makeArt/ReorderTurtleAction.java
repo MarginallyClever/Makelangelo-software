@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link ReorderTurtleAction} tries to reorder the line segments of a {@link Turtle}'s path such that the
@@ -53,7 +54,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	 * @param turtle
 	 */
 	private Turtle reorderTurtle(Turtle turtle) {
-		ArrayList<LineSegment2D> originalLines = turtle.getAsLineSegments();
+		List<LineSegment2D> originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
 		ColorRGB c = turtle.getFirstColor();
 		logger.debug("  {} converted to {} lines.", c.toString(), originalCount);
@@ -71,12 +72,12 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	 * @param uniqueLines the unsorted list.
 	 * @return the sorted list.
 	 */
-	private ArrayList<LineSegment2D> greedyReordering(ArrayList<LineSegment2D> uniqueLines) {
+	private ArrayList<LineSegment2D> greedyReordering(List<LineSegment2D> uniqueLines) {
 		logger.debug("  greedyReordering()");
 		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
 		if(uniqueLines.isEmpty()) return orderedLines;
 
-		Point2D lastPosition = uniqueLines.get(0).a;
+		Point2D lastPosition = uniqueLines.get(0).start;
 		
 		while(!uniqueLines.isEmpty()) {
 			double bestD = Double.MAX_VALUE;
@@ -85,8 +86,8 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 			
 			for( LineSegment2D line : uniqueLines ) {
 				// is either end of line closer than our best?
-				double dA = lastPosition.distanceSquared(line.a);
-				double dB = lastPosition.distanceSquared(line.b);
+				double dA = lastPosition.distanceSquared(line.start);
+				double dB = lastPosition.distanceSquared(line.end);
 				double nearest = Math.min(dA, dB);
 				if(bestD > nearest) {
 					bestD = nearest;
@@ -102,7 +103,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 			orderedLines.add(bestLine);
 			
 			// Start next iteration where current line ends.
-			lastPosition = bestLine.b;
+			lastPosition = bestLine.end;
 		}
 		
 		return orderedLines;
@@ -121,13 +122,13 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 			// Compare this line to all the lines previously marked as non-duplicate
 			for( LineSegment2D uniqueLine : uniqueLines ) {
 				// Check if lines are colinear
-				if( uniqueLine.ptLineDistSq(candidateLine.a) < EPSILON2 &&
-					uniqueLine.ptLineDistSq(candidateLine.b) < EPSILON2 ) {
+				if( uniqueLine.ptLineDistSq(candidateLine.start) < EPSILON2 &&
+					uniqueLine.ptLineDistSq(candidateLine.end) < EPSILON2 ) {
 					// they are!
 					// if they touch or overlap then I have a candidate.
 					// measure where the points are relative to each other.
-					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.a) < EPSILON2;
-					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.b) < EPSILON2;
+					boolean candidateStartsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.start) < EPSILON2;
+					boolean candidateEndsCloseToUnique = uniqueLine.ptSegDistSq(candidateLine.end) < EPSILON2;
 					
 					if(candidateStartsCloseToUnique) {
 						if(candidateEndsCloseToUnique) {
@@ -135,13 +136,13 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 							// No further action needed.
 						} else {
 							// Partial overlap, extend uniqueLine
-							extendLine(uniqueLine, candidateLine.b);
+							extendLine(uniqueLine, candidateLine.end);
 						}
 						isDuplicate = true;
 						break;
 					} else if(candidateEndsCloseToUnique) {
 						// Partial overlap, extend uniqueLine
-						extendLine(uniqueLine, candidateLine.a);
+						extendLine(uniqueLine, candidateLine.start);
 						isDuplicate = true;
 						break;						
 					} else {
@@ -162,17 +163,17 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 
 	// assumes extPoint is a point which lies on the infinite extension of targetLine
  	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
-		double newLengthA = targetLine.a.distanceSquared(extPoint);
-		double newLengthB = targetLine.b.distanceSquared(extPoint);
+		double newLengthA = targetLine.start.distanceSquared(extPoint);
+		double newLengthB = targetLine.end.distanceSquared(extPoint);
 		double currentLength = targetLine.lengthSquared();
 		
 		// Maximize length of target line by replacing the start or end point with the extPoint		
 		if(newLengthA > currentLength && newLengthA > newLengthB) {
 			// Draw line from targetLine.a to extPoint
-			targetLine.b = extPoint;
+			targetLine.end = extPoint;
 		} else if(newLengthB > currentLength) {
 			// Draw line from extPoint to targetLine.b 
-			targetLine.a = extPoint;
+			targetLine.start = extPoint;
 		}
 	}
 }

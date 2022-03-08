@@ -6,44 +6,43 @@ package com.marginallyclever.convenience;
  *
  */
 public class LineSegment2D {
-	public Point2D a, b;
-	
-	public ColorRGB c;
+	public Point2D start, end;
+	public ColorRGB color;
 	// used while processing line segments.
 	public boolean flag;
 
-	public LineSegment2D(Point2D a, Point2D b, ColorRGB c) {
+	public LineSegment2D(Point2D start, Point2D end, ColorRGB color) {
 		super();
-		this.a = a;
-		this.b = b;
-		this.c = c;
+		this.start = start;
+		this.end = end;
+		this.color = color;
 	}
 	
 	public void flip() {
-		Point2D temp=b;
-		b=a;
-		a=temp;
+		Point2D temp= end;
+		end = start;
+		start =temp;
 	}
 	
 	public String toString() {
-		return "("+a.x+","+a.y+")-("+b.x+","+b.y+")";
+		return "("+ start.x+","+ start.y+")-("+ end.x+","+ end.y+")";
 	}
 	
 	public double lengthSquared() {
-		double dx=a.x-b.x;
-		double dy=a.y-b.y;
+		double dx= start.x- end.x;
+		double dy= start.y- end.y;
 		return dx*dx + dy*dy;
 	}
 
 	// The distance measured is the distance between the specified point,
 	// and the closest point between the start and end points of line a. 
 	public double ptSegDistSq(Point2D point) {
-		return java.awt.geom.Line2D.ptSegDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
+		return java.awt.geom.Line2D.ptSegDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
 
 	// The distance measured is the distance between the specified point
 	// and the closest point on the infinite extension of line a.
 	public double ptLineDistSq(Point2D point) {
-		return java.awt.geom.Line2D.ptLineDistSq(a.x, a.y, b.x, b.y, point.x, point.y);
+		return java.awt.geom.Line2D.ptLineDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
 }

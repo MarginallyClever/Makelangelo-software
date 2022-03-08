@@ -330,8 +330,29 @@ public class Turtle implements Cloneable {
 					m.x += dx;
 					m.y += dy;
 				}
-				default -> {
+				default -> {}
+			}
+		}
+	}
+
+	/**
+	 * Translate all draw and move segments by degrees
+	 * @param degrees relative ccw rotation
+	 */
+	public void rotate(double degrees) {
+		double r = Math.toRadians(degrees);
+		double c = Math.cos(r);
+		double s = Math.sin(r);
+
+		for( TurtleMove m : history ) {
+			switch (m.type) {
+				case DRAW_LINE, TRAVEL -> {
+					double ox=m.x;
+					double oy=m.y;
+					m.x = ox * c + oy * -s;
+					m.y = ox * s + oy *  c;
 				}
+				default -> {}
 			}
 		}
 	}
@@ -359,7 +380,7 @@ public class Turtle implements Cloneable {
 	/**
 	 * @return a list of all the pen-down lines while remembering their color.
  	 */
-	public ArrayList<LineSegment2D> getAsLineSegments() {
+	public List<LineSegment2D> getAsLineSegments() {
 		ArrayList<LineSegment2D> lines = new ArrayList<>();
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
@@ -406,28 +427,28 @@ public class Turtle implements Cloneable {
 		if(segments.isEmpty()) return;
 		
 		LineSegment2D first = segments.get(0);
-		jumpTo(first.a.x,first.a.y);
-		moveTo(first.b.x,first.b.y);
+		jumpTo(first.start.x,first.start.y);
+		moveTo(first.end.x,first.end.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
 		double minDrawSquared = minDrawDistance*minDrawDistance;
 		
 		for( LineSegment2D line : segments ) {
 			// change color if needed
-			if(line.c!=getColor()) {
-				setColor(line.c);
+			if(line.color !=getColor()) {
+				setColor(line.color);
 			}
 
-			double d = distanceSquared(line.a);
+			double d = distanceSquared(line.start);
 			if(d > minJumpSquared) {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
-				jumpTo(line.a.x,line.a.y);
+				jumpTo(line.start.x,line.start.y);
 			} else if(d>minDrawSquared) {
-				moveTo(line.a.x,line.a.y);
+				moveTo(line.start.x,line.start.y);
 			}
 			// Make a pen down move to the end of this line
-			moveTo(line.b.x,line.b.y);
+			moveTo(line.end.x,line.end.y);
 		}
 	}
 

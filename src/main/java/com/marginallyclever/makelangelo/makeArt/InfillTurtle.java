@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Take an existing drawing, scan across it horizontally.  Add new lines between every pair of lines found.
@@ -55,16 +55,16 @@ public class InfillTurtle {
 		// of intersections.
 		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 
-		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
+		ArrayList<LineSegment2D> results = new ArrayList<>();
 
 		// do this once here instead of once per line.
-		ArrayList<LineSegment2D> convertedPath = input.getAsLineSegments();
+		List<LineSegment2D> convertedPath = input.getAsLineSegments();
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2D(), new Point2D(), input.getColor());
 
 		for (double y = bounds.getMinY(); y < bounds.getMaxY(); y += penDiameter) {
-			line.a.set(bounds.getMinX(), y);
-			line.b.set(bounds.getMaxX(), y);
+			line.start.set(bounds.getMinX(), y);
+			line.end.set(bounds.getMaxX(), y);
 			results.addAll(trimLineToPath(line, convertedPath));
 		}
 
@@ -72,9 +72,10 @@ public class InfillTurtle {
 	}
 
 	/**
-	 * Add padding to a {@link Rectangle2D.Double} bounding box.
+	 * Add padding to a {@link Rectangle2D.Double} bounding rectangle.
 	 * 
-	 * @param before
+	 * @param before the original rectangle
+	 * @param percent the added percentage.
 	 * @return the larger bounds
 	 */
 	private Rectangle2D.Double addPaddingToBounds(Rectangle2D.Double before, double percent) {
@@ -85,13 +86,13 @@ public class InfillTurtle {
 		after.y = before.y - before.height * percent/2.0;
 		after.height = before.height * (1.0 + percent);
 		after.width = before.width * (1.0 + percent);
-		logger.debug("    before={}", before.toString());
-		logger.debug("    after={}", after.toString());
+		logger.debug("    before={}", before);
+		logger.debug("    after={}", after);
 		return after;
 	}
 
 	/**
-	 * Trim a {@link LineSegment2D} against a {@link Turtle} path and return a list
+	 * Trim a {@link LineSegment2D} against a path and return a list
 	 * of remaining line segments.
 	 * <p>
 	 * If the polygon is convex, there will be two intersection points. These two
@@ -104,25 +105,25 @@ public class InfillTurtle {
 	 * of the line that lie inside the polygon.
 	 * </p>
 	 * 
-	 * @param line  A {@link LineSegment2D} to compare against the {@link Turtle}
-	 * @param input The {@link Turtle}, guaranteed closed loop
+	 * @param line  A {@link LineSegment2D} to clip
+	 * @param convertedPath The boundary line, which must be a closed loop
 	 * @return a list of remaining {@link LineSegment2D}.
 	 */
-	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, ArrayList<LineSegment2D> convertedPath) {
-		ArrayList<Point2D> intersections = new ArrayList<Point2D>();
+	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, List<LineSegment2D> convertedPath) {
+		ArrayList<Point2D> intersections = new ArrayList<>();
 
 		for (LineSegment2D s : convertedPath) {
 			Point2D p = getIntersection(line, s);
 			if (p != null) intersections.add(p);
 		}
 
-		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
+		ArrayList<LineSegment2D> results = new ArrayList<>();
 		int size = intersections.size();
 		if(size%2==0) {
 			if (size == 2) {
-				results.add(new LineSegment2D(intersections.get(0), intersections.get(1), line.c));
+				results.add(new LineSegment2D(intersections.get(0), intersections.get(1), line.color));
 			} else if (size > 2) {
-				results.addAll(sortIntersectionsIntoSegments(intersections, line.c));
+				results.addAll(sortIntersectionsIntoSegments(intersections, line.color));
 			}
 		}
 
@@ -141,15 +142,15 @@ public class InfillTurtle {
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {
-			Collections.sort(intersections, new ComparePointsByY());
+			intersections.sort(new ComparePointsByY());
 		} else {
-			Collections.sort(intersections, new ComparePointsByX());
+			intersections.sort(new ComparePointsByX());
 		}
 
-		ArrayList<LineSegment2D> results = new ArrayList<LineSegment2D>();
+		ArrayList<LineSegment2D> results = new ArrayList<>();
 		int i = 0;
 		while (i < intersections.size()-1) {
-			results.add(new LineSegment2D(intersections.get(i + 0), intersections.get(i + 1), color));
+			results.add(new LineSegment2D(intersections.get(i), intersections.get(i + 1), color));
 			i += 2;
 		}
 
@@ -171,30 +172,29 @@ public class InfillTurtle {
 	}
 
 	/**
-	 * It is based on an algorithm in Andre LeMothe's "Tricks of the Windows Game
+	 * It is based on an algorithm in Andre LaMothe's "Tricks of the Windows Game
 	 * Programming Gurus". See
 	 * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
 	 * TODO move this to com.marginallyclever.convenience.LineHelper?
 	 * 
-	 * @param alpha
-	 * @param beta
+	 * @param alpha first line segment
+	 * @param beta second line segment
 	 * @return intersection {@link Point2D} or null
 	 */
 	private Point2D getIntersection(LineSegment2D alpha, LineSegment2D beta) {
-		double s1_x = alpha.b.x - alpha.a.x;
-		double s1_y = alpha.b.y - alpha.a.y;
-		double s2_x = beta.b.x - beta.a.x;
-		double s2_y = beta.b.y - beta.a.y;
+		double s1_x = alpha.end.x - alpha.start.x;
+		double s1_y = alpha.end.y - alpha.start.y;
+		double s2_x = beta.end.x - beta.start.x;
+		double s2_y = beta.end.y - beta.start.y;
 
-		double s = (-s1_y * (alpha.a.x - beta.a.x) + s1_x * (alpha.a.y - beta.a.y)) / (-s2_x * s1_y + s1_x * s2_y);
-		double t = ( s2_x * (alpha.a.y - beta.a.y) - s2_y * (alpha.a.x - beta.a.x)) / (-s2_x * s1_y + s1_x * s2_y);
+		double denominator = (-s2_x * s1_y + s1_x * s2_y);
+		double s = (-s1_y * (alpha.start.x - beta.start.x) + s1_x * (alpha.start.y - beta.start.y)) / denominator;
+		double t = ( s2_x * (alpha.start.y - beta.start.y) - s2_y * (alpha.start.x - beta.start.x)) / denominator;
 
 		if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
 			// hit!
-			Point2D p = new Point2D(alpha.a.x + (t * s1_x), alpha.a.y + (t * s1_y));
-			return p;
+			return new Point2D(alpha.start.x + (t * s1_x), alpha.start.y + (t * s1_y));
 		}
-		// no hit
 		return null;
 	}
 
