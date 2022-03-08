@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link ReorderTurtleAction} tries to reorder the line segments of a {@link Turtle}'s path such that the
@@ -35,7 +36,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		output.history.clear();
 		
 		// history is made of changes, travels, and draws
-		ArrayList<Turtle> colors = turtle.splitByToolChange();
+		List<Turtle> colors = turtle.splitByToolChange();
 		logger.debug("reorder() layers: {}", colors.size());
 		for( Turtle t2 : colors ) {
 			output.add(reorderTurtle(t2));

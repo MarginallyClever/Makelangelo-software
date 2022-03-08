@@ -2,6 +2,9 @@ package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import org.junit.jupiter.api.DynamicTest;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
@@ -23,6 +26,18 @@ public class LoadHelper {
     public static String readFile(String filename) {
         Scanner scanner = new Scanner(LoadHelper.class.getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A");
         assertTrue(scanner.hasNext(), "The file '"+ filename + "' is empty");
+        return scanner.next();
+    }
+
+    /**
+     * Load a whole file in a String
+     *
+     * @param file path of the file
+     * @return the content of the file
+     */
+    public static String readFile(File file) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new FileInputStream(file), StandardCharsets.UTF_8).useDelimiter("\\A");
+        assertTrue(scanner.hasNext(), "The file '"+ file + "' is empty");
         return scanner.next();
     }
 
