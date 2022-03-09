@@ -30,18 +30,6 @@ public class LoadHelper {
     }
 
     /**
-     * Load a whole file in a String
-     *
-     * @param file path of the file
-     * @return the content of the file
-     */
-    public static String readFile(File file) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new FileInputStream(file), StandardCharsets.UTF_8).useDelimiter("\\A");
-        assertTrue(scanner.hasNext(), "The file '"+ file + "' is empty");
-        return scanner.next();
-    }
-
-    /**
      * Generate a list of test based on the files ending with the specified extension in the given folder
      *
      * @param filenames list of files to verify

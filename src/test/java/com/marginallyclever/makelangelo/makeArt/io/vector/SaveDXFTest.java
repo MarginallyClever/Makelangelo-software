@@ -9,10 +9,9 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SaveDXFTest {
 
@@ -51,9 +50,7 @@ class SaveDXFTest {
             fileOutputStream.close();
 
             // then
-            String actual = readFile(fileTemp);
-            String expected = readFile("/saved/expected.dxf");
-            assertEquals(expected, actual);
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/saved/expected.dxf").toURI()));
         } finally {
             fileTemp.delete();
         }
