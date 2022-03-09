@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeArt.io.vector;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LoadScratch3Test {
 
-    @BeforeEach
-    public void beforeEach() {
+    @BeforeAll
+    public static void beforeEach() {
         PreferencesHelper.start();
         Translator.start();
     }
