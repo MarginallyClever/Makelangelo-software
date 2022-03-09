@@ -19,8 +19,13 @@ public class PlotterSettingsUserGcode {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsUserGcode.class);
 
-	private String userGeneralStartGcode = "M220 S100 ; Set speed percentage factor to 100%\nG28 ; Auto Home"; // DONE but TODO in PlotterControl Should containe a G28 or a G28 is added befor any move...
-	private String userGeneralEndGcode = "G0 X{limit_left+100} Y{limit_top-150} ; Park position\nM300 ; Play Tone\nM18 ; Disable all steppers immediately"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
+	private String userGeneralStartGcode = """
+										   M220 S100 ; Set speed percentage factor to 100%
+										   G28 ; Auto Home"""; // DONE but TODO in PlotterControl Should containe a G28 or a G28 is added befor any move...
+	private String userGeneralEndGcode = """
+										 G0 X{limit_left+100} Y{limit_top-150} ; Park position
+										 M300 ; Play Tone
+										 M18 ; Disable all steppers immediately"""; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
 	private String userToolChangeStartGcode = "M300 ; Play Tone"; // Should go in relative moves befor and in absolut moves after ??? a save position ?G60 - Save Current Position https://marlinfw.org/docs/gcode/G060.html
 	private String userToolChangeEndGcode = ""; // a resort position ? G61 - Return to Saved Position https://marlinfw.org/docs/gcode/G061.html
 
@@ -134,6 +139,11 @@ public class PlotterSettingsUserGcode {
 		return sb.toString();
 	}
 
+	/**
+	 * TODO to review BUG on the first run (or if you have deleted your prefrence file) this give an empty list ... as this Prefrence node have not been init if the Plotter settings panel have not been load ...
+	 * @param plotterSettings
+	 * @return 
+	 */
 	private Map<String, String> createPatternToValueMap(PlotterSettings plotterSettings) {
 
 		// build a simple map PlaceHolderName to current value ...
