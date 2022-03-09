@@ -14,6 +14,8 @@ public interface TurtleRenderer {
 	void end();
 
 	void setPenDownColor(ColorRGB color);
+
+	void setPenUpColor(ColorRGB color);
 	
 	void setPenDiameter(double d);
 }

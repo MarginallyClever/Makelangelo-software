@@ -8,12 +8,15 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeArt.*;
-import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
+import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.*;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
@@ -36,14 +39,12 @@ import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
-import com.marginallyclever.util.PropertiesFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
-
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -165,6 +166,8 @@ public final class Makelangelo {
 			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
 			msv.setSettings(e);
 		}
+		myTurtleRenderer.setUpColor(e.getPenUpColor());
+		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
@@ -515,13 +518,14 @@ public final class Makelangelo {
 		return menu;
 	}
 	
-	private void runGeneratorDialog(TurtleGenerator ici) {
-		ici.setPaper(myPaper);
-		ici.addListener(this::setTurtle);
-		ici.generate();
-		
-		JDialog dialog = new JDialog(mainFrame,ici.getName());
-		TurtleGeneratorPanel panel = ici.getPanel();
+	private void runGeneratorDialog(TurtleGenerator turtleGenerator) {
+		turtleGenerator.setPaper(myPaper);
+		turtleGenerator.addListener(this::setTurtle);
+		turtleGenerator.generate();
+
+		setMainTitle(turtleGenerator.getName());
+		JDialog dialog = new JDialog(mainFrame, turtleGenerator.getName());
+		TurtleGeneratorPanel panel = turtleGenerator.getPanel();
 		dialog.add(panel);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
@@ -534,7 +538,7 @@ public final class Makelangelo {
 			public void windowClosing(WindowEvent e) {
 				enableMenuBar(true);
 				myPaper.setRotationRef(0);
-				logger.debug(Translator.get("Finished"));
+				logger.debug("Generation finished");
 			}
 		});
 
@@ -543,6 +547,7 @@ public final class Makelangelo {
 	
 	private void newFile() {
 		setTurtle(new Turtle());
+		setMainTitle("");
 	}
 
 	private JMenu createFileMenu() {
@@ -634,6 +639,9 @@ public final class Makelangelo {
 			} else {
 				recentFiles.addFilename(filename);
 			}
+
+			setMainTitle(new File(filename).getName());
+
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -888,7 +896,8 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		mainFrame = new JFrame(MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue());
+		mainFrame = new JFrame();
+		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		mainFrame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -1076,6 +1085,15 @@ public final class Makelangelo {
 			logger.error("Error while saving the vector file", e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	private void setMainTitle(String title) {
+		String finalTitle = "";
+		if (! "".equals(title)) {
+			finalTitle += title + " - ";
+		}
+		finalTitle += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
+		mainFrame.setTitle(finalTitle);
 	}
 
 	public void setTurtle(Turtle turtle) {

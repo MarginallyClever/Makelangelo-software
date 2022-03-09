@@ -20,18 +20,21 @@ public class PlotterSettings implements Serializable {
 	private static final long serialVersionUID = -4185946661019573192L;
 
 	// Each robot has a global unique identifier
-	private long robotUID;
+	private long robotUID = 0;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
-	private boolean isRegistered;
+	private boolean isRegistered = false;
 
-	private String hardwareName;
+	private String hardwareName = "Makelangelo 5";
 		
 	// machine physical limits, in mm
-	private double limitLeft;
-	private double limitRight;
-	private double limitBottom;
-	private double limitTop;
-	
+	private final double machineHeight = 1000; // mm
+	private final double machineWidth = 650; // mm
+
+	private double limitLeft = - machineWidth / 2;
+	private double limitRight = machineWidth / 2;
+	private double limitBottom = - machineHeight / 2;
+	private double limitTop = machineHeight / 2;
+
 	// speed control
 	
 	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
@@ -50,11 +53,11 @@ public class PlotterSettings implements Serializable {
 	private double minimumPlannerSpeed = 0.05;  // mm/s
 	private double [] maxJerk = { 10, 10, 0.3 };
 	
-	private ColorRGB paperColor;
+	private ColorRGB paperColor = new ColorRGB(255, 255, 255);
 
-	private ColorRGB penDownColorDefault;
-	private ColorRGB penDownColor;
-	private ColorRGB penUpColor;
+	private ColorRGB penDownColorDefault = new ColorRGB(0, 0, 0);
+	private ColorRGB penDownColor = new ColorRGB(0, 0, 0);
+	private ColorRGB penUpColor = new ColorRGB(0, 255, 0);
 
 	private double penDiameter=0.8; // mm, >0
 	private double penUpAngle=90; // servo angle (degrees,0...180)
@@ -73,30 +76,13 @@ public class PlotterSettings implements Serializable {
 	 * }
 	 * </pre>
 	 */
-	private int startingPositionIndex;
+	private int startingPositionIndex = 4;
 
 	/**
 	 * These values should match
 	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
 	 */
 	public PlotterSettings() {
-		double mh = 1000; // mm
-		double mw = 650; // mm
-
-		robotUID = 0;
-		isRegistered = false;
-		limitTop = mh / 2;
-		limitBottom = -mh / 2;
-		limitRight = mw / 2;
-		limitLeft = -mw / 2;
-
-		paperColor = new ColorRGB(255, 255, 255);
-
-		penDownColor = penDownColorDefault = new ColorRGB(0, 0, 0); // BLACK
-		penUpColor = new ColorRGB(0, 255, 0); // blue
-		startingPositionIndex = 4;
-
-		hardwareName = "Makelangelo 5";
 	}
 
 	// OBSERVER PATTERN START
@@ -293,6 +279,12 @@ public class PlotterSettings implements Serializable {
 		prefs.putInt("penUpColorR", penUpColor.getRed());
 		prefs.putInt("penUpColorG", penUpColor.getGreen());
 		prefs.putInt("penUpColorB", penUpColor.getBlue());
+	}
+
+	public void reset() {
+		PlotterSettings ps = new PlotterSettings();
+		ps.saveConfig();
+		loadConfig(getUID());
 	}
 
 	public void setAcceleration(double f) {
