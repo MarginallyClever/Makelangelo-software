@@ -19,10 +19,10 @@ public class PlotterSettingsUserGcode {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsUserGcode.class);
 
-	private String userGeneralStartGcode = "G28 ; Home"; // DONE but TODO in PlotterControl Should containe a G28 or a G28 is added befor any move...
-	private String userGeneralEndGcode = "G0 X{limit_left+100} Y{limit_top-150} ; Park position\nM300 ; Bip"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
-	private String userToolChangeStartGcode = "M300 ; Bip"; // Should go in relative moves befor and in absolut moves after ??? a save position ?
-	private String userToolChangeEndGcode = ""; // a resort position ?
+	private String userGeneralStartGcode = "M220 S100 ; Set speed percentage factor to 100%\nG28 ; Auto Home"; // DONE but TODO in PlotterControl Should containe a G28 or a G28 is added befor any move...
+	private String userGeneralEndGcode = "G0 X{limit_left+100} Y{limit_top-150} ; Park position\nM300 ; Play Tone\nM18 ; Disable all steppers immediately"; // TODO Should containe a disble motors or added at the end //  I think I just parked it 10cm from the left edge and 15cm from the top edge.
+	private String userToolChangeStartGcode = "M300 ; Play Tone"; // Should go in relative moves befor and in absolut moves after ??? a save position ?G60 - Save Current Position https://marlinfw.org/docs/gcode/G060.html
+	private String userToolChangeEndGcode = ""; // a resort position ? G61 - Return to Saved Position https://marlinfw.org/docs/gcode/G061.html
 
 	public static final String PREF_KEY_USER_TOOL_CHANGE_END_GCODE = "userToolChangeEndGcode";
 	public static final String PREF_KEY_USER_TOOL_CHANGE_START_GCODE = "userToolChangeStartGcode";
