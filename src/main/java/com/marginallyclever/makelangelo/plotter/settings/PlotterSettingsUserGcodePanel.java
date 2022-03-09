@@ -16,62 +16,84 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 
 	private final Plotter myPlotter;
 
-	private final JButton buttonSave;
+	private JButton buttonSave;
 
-	private final SelectTextArea userGeneralStartGcode;
-	private final SelectTextArea userGeneralEndGcode;
-	private final SelectTextArea userToolChangeStartGcode;
-	private final SelectTextArea userToolChangeEndGcode;
-	
-	private final SelectTextArea replacementPatternList;
-	
-	
-    private javax.swing.JTabbedPane jTabbedPane1;
+	private SelectTextArea userGeneralStartGcode;
+	private SelectTextArea userGeneralEndGcode;
+	private SelectTextArea userToolChangeStartGcode;
+	private SelectTextArea userToolChangeEndGcode;
+
+	private SelectTextArea replacementPatternList;
+
+	private javax.swing.JTabbedPane jTabbedPane1;
 
 	public PlotterSettingsUserGcodePanel(Plotter robot) {
 		super();
+		
+		
 		this.myPlotter = robot;
+		initComponents();
+
+	}
+
+	private void initComponents() {
 
 		PlotterSettings settings = myPlotter.getSettings();
+		setLayout(new java.awt.BorderLayout());
+		jTabbedPane1 = new javax.swing.JTabbedPane();
 
-		add(userGeneralStartGcode
-				= new SelectTextArea(
-						"userGeneralStartGcode",
-						Translator.get("PlotterSettings.userGeneralStartGcode"),
-						settings.getUserGcode().getUserGeneralStartGcode()
-				)
+		userGeneralStartGcode = new SelectTextArea(
+				"userGeneralStartGcode",
+				Translator.get("PlotterSettings.userGeneralStartGcode"),
+				settings.getUserGcode().getUserGeneralStartGcode()
 		);
-		add(userGeneralEndGcode
+		userGeneralStartGcode.setLineWrap(false);
+		//add(userGeneralStartGcode);
+		jTabbedPane1.addTab(Translator.get("PlotterSettings.userGeneralStartGcode"), userGeneralStartGcode);
+		
+		userGeneralEndGcode
 				= new SelectTextArea(
 						"userGeneralEndGcode",
 						Translator.get("PlotterSettings.userGeneralEndGcode"),
 						settings.getUserGcode().getUserGeneralEndGcode()
-				)
-		);
-		add(userToolChangeStartGcode
+				);
+		userGeneralEndGcode.setLineWrap(false);
+		//add(userGeneralEndGcode);
+		jTabbedPane1.addTab(Translator.get("PlotterSettings.userGeneralEndGcode"), userGeneralEndGcode);
+
+		userToolChangeStartGcode
 				= new SelectTextArea(
 						"userToolChangeStartGcode",
 						Translator.get("PlotterSettings.userToolChangeStartGcode"),
 						settings.getUserGcode().getUserToolChangeStartGcode()
-				)
-		);
-		add(userToolChangeEndGcode
+				);
+		userToolChangeStartGcode.setLineWrap(false);
+		//add(userToolChangeStartGcode);
+		jTabbedPane1.addTab(Translator.get("PlotterSettings.userToolChangeStartGcode"), userToolChangeStartGcode);
+		
+		userToolChangeEndGcode
 				= new SelectTextArea(
 						"userToolChangeEndGcode",
 						Translator.get("PlotterSettings.userToolChangeEndGcode"),
 						settings.getUserGcode().getUserToolChangeEndGcode()
-				)
-		);
-		
-		
-		add(replacementPatternList
+				);
+		userToolChangeEndGcode.setLineWrap(false);
+		//add(userToolChangeEndGcode);
+		jTabbedPane1.addTab(Translator.get("PlotterSettings.userToolChangeEndGcode"), userToolChangeEndGcode);
+		//
+		add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+		//
+
+		replacementPatternList
 				= new SelectTextArea(
 						"replacementPattern",
 						Translator.get("PlotterSettings.replacementPattern"),
 						settings.getUserGcode().getAllPattern(settings)
-				)
-		);
-
+				);
+		replacementPatternList.setLineWrap(false);
+		replacementPatternList.setEditable(false);
+		replacementPatternList.setDragEnabled(true);
+		add(replacementPatternList, java.awt.BorderLayout.WEST);
 
 		JPanel bottom = new JPanel(new FlowLayout());
 		buttonSave = new JButton(Translator.get("Save"));
@@ -80,14 +102,11 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 			save();
 		});
 
-		add(bottom);
-
+		
+		
+		add(bottom, java.awt.BorderLayout.SOUTH);
 	}
-	
-	private void initComponents() {
 
-	}
-	
 	private void save() {
 
 		PlotterSettings settings = myPlotter.getSettings();

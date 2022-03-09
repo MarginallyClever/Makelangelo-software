@@ -70,7 +70,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendFindHome() {
-		queueAndSendCommand("G28 XY");
+		queueAndSendCommand("G28 XY");//TODO Only if mandatory for this plotter.
 	}
 
 	private void sendPenUpDown() {
@@ -113,7 +113,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	protected void onHearM114(String message) {
 		try {
 			message = message.substring(0, message.indexOf("Count"));
-			String[] majorParts = message.split("\s");
+			String[] majorParts = message.split("\s");// ??? "\\s" ? A whitespace character: [ \t\n\x0B\f\r]
 			Point2D pos = myPlotter.getPos();
 
 			for (String s : majorParts) {
@@ -190,6 +190,14 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		return "M0 Ready " + colorName + " and click";
 	}
 
+	/**
+	 * TODO To complet with w3c colors
+	 * TODO Should be in a Utility class or in ColorRGB.
+	 * TODO should have the reverse function to get the color from the name.
+	 * TODO review argument name "toolNumber" is in fact a color in int value ... ( or maybe if the plan was to have an intermediate color atribution ... ? )
+	 * @param toolNumber
+	 * @return 
+	 */
 	private static String getColorName(int toolNumber) {
 		String name = "";
 		switch (toolNumber) {
