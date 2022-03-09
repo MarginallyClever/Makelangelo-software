@@ -17,8 +17,6 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-
 /**
  * ChooseConnection provides a human interface to open or close a
  * connection to a remote device available through a {@link NetworkSession}.
@@ -32,9 +30,9 @@ public class ChooseConnection extends JPanel {
 	private static final long serialVersionUID = 4773092967249064165L;
 
 	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
-			asList("ButtonConnect", "ButtonDisconnect"),
-			asList("/images/connect.png", "/images/disconnect.png"),
-			asList(Color.GREEN, Color.RED));
+			new ToggleButtonIcon.Item("ButtonConnect", "/images/connect.png", Color.GREEN),
+			new ToggleButtonIcon.Item("ButtonDisconnect", "/images/disconnect.png", Color.RED)
+		);
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<ComboItem> connectionComboBox = new JComboBox<>();
 	private final JPanel configurationPanel = new JPanel();

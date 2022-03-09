@@ -202,7 +202,6 @@
 		<value>Save</value>
 		<hint>used in many places</hint>
 	</string>
-
 	<string>
 		<key>Load</key>
 		<value>Load</value>
@@ -578,6 +577,11 @@
 	<string>
 		<key>GFXPreferences.showAllWhileDrawing</key>
 		<value>Show entire image while drawing</value>
+		<hint>graphics settings dialog</hint>
+	</string>
+	<string>
+		<key>GFXPreferences.dragSpeed</key>
+		<value>camera travel speed</value>
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
@@ -1070,7 +1074,7 @@
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Max speed</value>
+		<value>Travel speed</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>

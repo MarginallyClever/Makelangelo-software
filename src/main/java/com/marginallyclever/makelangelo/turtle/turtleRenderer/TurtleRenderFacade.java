@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -16,19 +17,22 @@ public class TurtleRenderFacade implements PreviewListener {
 	private Turtle myTurtle = new Turtle();
 	private int first=0;
 	private int last;
-	
+	private final ColorRGB penDownColor = new ColorRGB(0,0,0);
+	private ColorRGB penUpColor = new ColorRGB(0,255,0);
+
 	@Override
 	public void render(GL2 gl2) {
 		if(myTurtle.isLocked()) return;
+		myTurtle.lock();
 		try {
-			myTurtle.lock();
-			
 			TurtleMove previousMove = null;
 			
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
 			
 			try {
+				myRenderer.setPenUpColor(penUpColor);
+				myRenderer.setPenDownColor(penDownColor);
 				myRenderer.start(gl2);
 				showCount++;
 
@@ -118,5 +122,13 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public int getLast() {
 		return last;
+	}
+
+	public void setDownColor(ColorRGB penDownColor) {
+		this.penDownColor.set(penDownColor);
+	}
+
+	public void setUpColor(ColorRGB penUpColor) {
+		this.penUpColor.set(penUpColor);
 	}
 }

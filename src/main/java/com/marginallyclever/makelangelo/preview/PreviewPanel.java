@@ -272,7 +272,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		animator.stop();
 	}
 
-	public void setCamera(Camera camera2) {
-		camera = camera2;
+	public void setCamera(Camera camera) {
+		this.camera = camera;
 	}
 }

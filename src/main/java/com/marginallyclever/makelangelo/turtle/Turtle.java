@@ -10,21 +10,31 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * A simple turtle implementation to make generating pictures and learning programming easier.
- * @author Dan Royer
+ * A {@link Turtle} is a collection of instructions which, combined, form a drawing on a 2D surface.
+ * The name is based on the Commodore 64 turtle from the LOGO programming language, and movement is very similar.
+ * Commands include:
+ * <ul>
+ *     <li>lifting and lowering the turtle's tail</li>
+ *     <li>turning relative or absolute amounts</li>
+ *     <li>moving forward or backward relative amounts</li>
+ *     <li>moving relative or absolute amounts regardless of direction</li>
+ *     <li>changing the tool (color and diameter)</li>
+ * </ul>
  *
+ * @author Dan Royer
+ * @since 7.0?
  */
 public class Turtle implements Cloneable {
-
 	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
 	
 	public final List<TurtleMove> history = new ArrayList<>();
 
-	private final ReentrantLock lock = new ReentrantLock();
+	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
 	private double px, py;
@@ -50,6 +60,7 @@ public class Turtle implements Cloneable {
 		this.color.set(t.color);
 		this.diameter = t.diameter; 
 		// deep copy
+		history.clear();
 		for( TurtleMove m : t.history ) {
 			this.history.add(new TurtleMove(m));
 		}
@@ -70,7 +81,8 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Return this Turtle to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 * Returns this {@link Turtle} to mint condition.  Erases history and resets all parameters.  Called by constructor.
+	 * @param c The starting color for this {@link Turtle}.
 	 */
 	private void reset(ColorRGB c) {
 		px = 0;
@@ -78,7 +90,6 @@ public class Turtle implements Cloneable {
 		setAngle(0);
 		penUp();
 		history.clear();
-		// default turtle color is black.
 		setColor(c);
 	}
 	
@@ -452,5 +463,75 @@ public class Turtle implements Cloneable {
 		}
 		
 		return new ColorRGB(0,0,0);
+	}
+
+	/**
+	 * Returns the total distance of all pen-down moves within this {@link Turtle}.
+	 * @return the total distance of all pen-down moves within this {@link Turtle}.
+	 */
+    public double getDrawDistance() {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				d += Math.sqrt(dx*dx+dy*dy);
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return d;
+    }
+
+	/**
+	 * Returns a point along the drawn lines of this {@link Turtle}
+	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
+	 * @return a point along the drawn lines of this {@link Turtle}
+	 */
+	public Point2D interpolate(double t) {
+		double d=0;
+		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+		for( TurtleMove m : history) {
+			if(m.type == MovementType.DRAW_LINE) {
+				double dx = m.x-prev.x;
+				double dy = m.y-prev.y;
+				double change = Math.sqrt(dx*dx+dy*dy);
+				if(d+change>=t) {
+					double v = (t-d)/change;
+					v = Math.max(Math.min(v,1),0);
+					return new Point2D(
+							prev.x + dx * v,
+							prev.y + dy * v);
+				}
+				d += change;
+				prev = m;
+			} else if(m.type == MovementType.TRAVEL) {
+				prev = m;
+			}
+		}
+		return new Point2D(prev.x,prev.y);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Turtle turtle = (Turtle) o;
+		return Double.compare(turtle.px, px) == 0 &&
+				Double.compare(turtle.py, py) == 0 &&
+				Double.compare(turtle.nx, nx) == 0 &&
+				Double.compare(turtle.ny, ny) == 0 &&
+				Double.compare(turtle.angle, angle) == 0 &&
+				isUp == turtle.isUp &&
+				Double.compare(turtle.diameter, diameter) == 0 &&
+				history.equals(turtle.history) &&
+				Objects.equals(color, turtle.color);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
 	}
 }

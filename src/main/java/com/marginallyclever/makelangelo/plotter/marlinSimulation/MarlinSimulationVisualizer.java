@@ -212,14 +212,13 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	@Override
-	public void setPenDownColor(ColorRGB color) {
-		myTurtle.history.add(new TurtleMove(color.toInt(),0, MovementType.TOOL_CHANGE));
-	}
+	public void setPenDownColor(ColorRGB color) {}
 
 	@Override
-	public void setPenDiameter(double d) {
-		
-	}
+	public void setPenUpColor(ColorRGB color) {}
+
+	@Override
+	public void setPenDiameter(double d) {}
 	
 	public void setSettings(PlotterSettings e) {
 		mySettings = e;
