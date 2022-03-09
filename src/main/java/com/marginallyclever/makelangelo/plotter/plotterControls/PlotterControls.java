@@ -275,7 +275,6 @@ public class PlotterControls extends JPanel {
 
 	private void addUserStartGCODE() {
 		logger.trace("GCODE START");
-		//TODO refactor to get directely a String[] ...
 		lineByLineAndCommentsCleanningForUserGCODE(myPlotter.getSettings().getUserGcode().getUserGeneralStartGcode());
 	}
 

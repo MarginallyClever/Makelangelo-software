@@ -77,11 +77,13 @@ public class SaveGCode {
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
 			
-			// TODO MarlinPlotterInterface.getFindHomeString()?			
+			if ( !robot.getSettings().getUserGcode().doUserStartGCodeContaineG28(robot.getSettings())){
+				out.write("G28\n");  // go home // TODO MarlinPlotterInterface.getFindHomeString()?
+			}						
 			out.write("; User General Start-Gcode - BEGIN\n");
 			out.write(robot.getSettings().getUserGcode().resolvePlaceHolderAndEvalExpression(robot.getSettings().getUserGcode().getUserGeneralStartGcode(),robot.getSettings()) +"\n");
 			out.write("; User General Start-Gcode - END\n");
-			//out.write("G28\n");  // go home
+			//
 
 			boolean isUp = true;
 
