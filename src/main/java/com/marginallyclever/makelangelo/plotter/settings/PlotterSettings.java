@@ -77,6 +77,26 @@ public class PlotterSettings implements Serializable {
 	 */
 	private int startingPositionIndex = 4;
 
+	
+	public static final String PREF_KEY_MINIMUM_PLANNER_SPEED = "minimumPlannerSpeed";
+	public static final String PREF_KEY_MIN_ACCELERATION = "minAcceleration";
+	public static final String PREF_KEY_HANDLE_SMALL_SEGMENTS = "handleSmallSegments";
+	public static final String PREF_KEY_MIN_SEG_TIME = "minSegTime";
+	public static final String PREF_KEY_MIN_SEGMENT_LENGTH = "minSegmentLength";
+	public static final String PREF_KEY_SEGMENTS_PER_SECOND = "segmentsPerSecond";
+	public static final String PREF_KEY_BLOCK_BUFFER_SIZE = "blockBufferSize";
+	public static final String PREF_KEY_STARTING_POS_INDEX = "startingPosIndex";
+	public static final String PREF_KEY_ACCELERATION = "acceleration";
+	public static final String PREF_KEY_LIMIT_RIGHT = "limit_right";
+	public static final String PREF_KEY_LIMIT_LEFT = "limit_left";
+	public static final String PREF_KEY_LIMIT_BOTTOM = "limit_bottom";
+	public static final String PREF_KEY_LIMIT_TOP = "limit_top";
+	public static final String PREF_KEY_HARDWARE_VERSION = "hardwareVersion";
+	public static final String PREF_KEY_IS_REGISTERED = "isRegistered";
+	public static final String PREF_KEY_PAPER_COLOR_B = "paperColorB";
+	public static final String PREF_KEY_PAPER_COLOR_G = "paperColorG";
+	public static final String PREF_KEY_PAPER_COLOR_R = "paperColorR";
+	
 	/**
 	 * These values should match
 	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
@@ -162,30 +182,30 @@ public class PlotterSettings implements Serializable {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
 
-		limitTop 				= thisMachineNode.getDouble("limit_top", limitTop);
-		limitBottom 			= thisMachineNode.getDouble("limit_bottom", limitBottom);
-		limitLeft 				= thisMachineNode.getDouble("limit_left", limitLeft);
-		limitRight 				= thisMachineNode.getDouble("limit_right", limitRight);
-		maxAcceleration 		= thisMachineNode.getDouble("acceleration", maxAcceleration);
-		startingPositionIndex 	= thisMachineNode.getInt("startingPosIndex", startingPositionIndex);
+		limitTop 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_TOP, limitTop);
+		limitBottom 			= thisMachineNode.getDouble(PREF_KEY_LIMIT_BOTTOM, limitBottom);
+		limitLeft 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_LEFT, limitLeft);
+		limitRight 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_RIGHT, limitRight);
+		maxAcceleration 		= thisMachineNode.getDouble(PREF_KEY_ACCELERATION, maxAcceleration);
+		startingPositionIndex 	= thisMachineNode.getInt(PREF_KEY_STARTING_POS_INDEX, startingPositionIndex);
 
-		int r = thisMachineNode.getInt("paperColorR", paperColor.getRed());
-		int g = thisMachineNode.getInt("paperColorG", paperColor.getGreen());
-		int b = thisMachineNode.getInt("paperColorB", paperColor.getBlue());
+		int r = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
+		int g = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
+		int b = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
 		paperColor = new ColorRGB(r, g, b);
 
 		// setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",
 		// Integer.toString(getCurrentToolNumber()))));
-		isRegistered = Boolean.parseBoolean(thisMachineNode.get("isRegistered", Boolean.toString(isRegistered)));
-		hardwareName = thisMachineNode.get("hardwareVersion", hardwareName);
+		isRegistered = Boolean.parseBoolean(thisMachineNode.get(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered)));
+		hardwareName = thisMachineNode.get(PREF_KEY_HARDWARE_VERSION, hardwareName);
 
-		blockBufferSize 		= thisMachineNode.getInt("blockBufferSize", blockBufferSize);
-		segmentsPerSecond 		= thisMachineNode.getInt("segmentsPerSecond", segmentsPerSecond);
-		minSegmentLength 		= thisMachineNode.getDouble("minSegmentLength", minSegmentLength);
-		minSegTime 				= thisMachineNode.getLong("minSegTime", minSegTime);
-		handleSmallSegments 	= thisMachineNode.getBoolean("handleSmallSegments", handleSmallSegments);
-		minAcceleration			= thisMachineNode.getDouble("minAcceleration", minAcceleration);
-		minimumPlannerSpeed 	= thisMachineNode.getDouble("minimumPlannerSpeed", minimumPlannerSpeed);
+		blockBufferSize 		= thisMachineNode.getInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
+		segmentsPerSecond 		= thisMachineNode.getInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
+		minSegmentLength 		= thisMachineNode.getDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
+		minSegTime 				= thisMachineNode.getLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
+		handleSmallSegments 	= thisMachineNode.getBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
+		minAcceleration			= thisMachineNode.getDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
+		minimumPlannerSpeed 	= thisMachineNode.getDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
 		
 		userGcode.loadUserGcode(thisMachineNode);
 		
@@ -226,27 +246,27 @@ public class PlotterSettings implements Serializable {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
 		
-		thisMachineNode.put("limit_top", Double.toString(limitTop));
-		thisMachineNode.put("limit_bottom", Double.toString(limitBottom));
-		thisMachineNode.put("limit_right", Double.toString(limitRight));
-		thisMachineNode.put("limit_left", Double.toString(limitLeft));
-		thisMachineNode.put("acceleration", Double.toString(maxAcceleration));
-		thisMachineNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
+		thisMachineNode.put(PREF_KEY_LIMIT_TOP, Double.toString(limitTop));
+		thisMachineNode.put(PREF_KEY_LIMIT_BOTTOM, Double.toString(limitBottom));
+		thisMachineNode.put(PREF_KEY_LIMIT_RIGHT, Double.toString(limitRight));
+		thisMachineNode.put(PREF_KEY_LIMIT_LEFT, Double.toString(limitLeft));
+		thisMachineNode.put(PREF_KEY_ACCELERATION, Double.toString(maxAcceleration));
+		thisMachineNode.put(PREF_KEY_STARTING_POS_INDEX, Integer.toString(startingPositionIndex));
 
-		thisMachineNode.putInt("paperColorR", paperColor.getRed());
-		thisMachineNode.putInt("paperColorG", paperColor.getGreen());
-		thisMachineNode.putInt("paperColorB", paperColor.getBlue());
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
 
-		thisMachineNode.put("isRegistered", Boolean.toString(isRegistered()));
-		thisMachineNode.put("hardwareVersion", hardwareName);
+		thisMachineNode.put(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered()));
+		thisMachineNode.put(PREF_KEY_HARDWARE_VERSION, hardwareName);
 
-		thisMachineNode.putInt("blockBufferSize", blockBufferSize);
-		thisMachineNode.putInt("segmentsPerSecond", segmentsPerSecond);
-		thisMachineNode.putDouble("minSegmentLength", minSegmentLength);
-		thisMachineNode.putLong("minSegTime", minSegTime);
-		thisMachineNode.putBoolean("handleSmallSegments", handleSmallSegments);
-		thisMachineNode.putDouble("minAcceleration", minAcceleration);
-		thisMachineNode.putDouble("minimumPlannerSpeed", minimumPlannerSpeed);
+		thisMachineNode.putInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
+		thisMachineNode.putInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
+		thisMachineNode.putDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
+		thisMachineNode.putLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
+		thisMachineNode.putBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
+		thisMachineNode.putDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
+		thisMachineNode.putDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
 		
 		userGcode.saveUserGcode(thisMachineNode);
 		

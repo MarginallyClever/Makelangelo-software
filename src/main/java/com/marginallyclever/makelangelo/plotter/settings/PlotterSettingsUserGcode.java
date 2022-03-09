@@ -159,10 +159,28 @@ public class PlotterSettingsUserGcode {
 				logger.trace(" keys count: {}", keys.length);
 				for (String key : keys) {
 					logger.trace("  {}:{}", key, thisMachineNode.get(key, ""));
+					// TODO to review maybe a TreeSet of key to exclude ( or a TreeSet of key to keep )
 					if (!PREF_KEY_USER_GENERAL_END_GCODE.equals(key)
 							&& !PREF_KEY_USER_GENERAL_START_GCODE.equals(key)
 							&& !PREF_KEY_USER_TOOL_CHANGE_START_GCODE.equals(key)
-							&& !PREF_KEY_USER_TOOL_CHANGE_END_GCODE.equals(key) // ? TODO filter non usable prefrences like paperColor*, handleSmallSegments, isRegistered, ...
+							&& !PREF_KEY_USER_TOOL_CHANGE_END_GCODE.equals(key) 
+							
+							&& !PlotterSettings.PREF_KEY_ACCELERATION.equals(key) 
+							&& !PlotterSettings.PREF_KEY_BLOCK_BUFFER_SIZE.equals(key) 
+							&& !PlotterSettings.PREF_KEY_HANDLE_SMALL_SEGMENTS.equals(key) 
+							&& !PlotterSettings.PREF_KEY_IS_REGISTERED.equals(key) 
+														
+							&& !PlotterSettings.PREF_KEY_MIN_ACCELERATION.equals(key) 
+							&& !PlotterSettings.PREF_KEY_MIN_SEG_TIME.equals(key) 
+							&& !PlotterSettings.PREF_KEY_MIN_SEGMENT_LENGTH.equals(key) 
+							&& !PlotterSettings.PREF_KEY_MINIMUM_PLANNER_SPEED.equals(key)
+							
+							&& !PlotterSettings.PREF_KEY_PAPER_COLOR_R.equals(key) 
+							&& !PlotterSettings.PREF_KEY_PAPER_COLOR_G.equals(key) 
+							&& !PlotterSettings.PREF_KEY_PAPER_COLOR_B.equals(key)  
+							
+							&& !PlotterSettings.PREF_KEY_SEGMENTS_PER_SECOND.equals(key) 
+							&& !PlotterSettings.PREF_KEY_STARTING_POS_INDEX.equals(key) 
 							) {
 						paramNameToValue.put(key, thisMachineNode.get(key, ""));
 					}
