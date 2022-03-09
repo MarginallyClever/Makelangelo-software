@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
