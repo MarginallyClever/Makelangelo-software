@@ -2159,12 +2159,12 @@
     
     <string>
         <key>OpenPlotterSettingsUserGcode</key>
-        <value>Plotter Settings - User Start/End GCode</value>
+        <value>Plotter user Start/End GCode</value>
         <hint>Menu item</hint>
     </string>
     <string>
         <key>PlotterSettingsUserGcodePanel.Title</key>
-        <value>Plotter Settings - User Start/End GCode</value>
+        <value>Plotter user Start/End GCode</value>
         <hint>Dialog title</hint>
     </string>
     <string>
@@ -2179,12 +2179,12 @@
     </string>    
     <string>
         <key>PlotterSettings.userToolChangeStartGcode</key>
-        <value>ToolChange Start-GCode</value>
+        <value>Tool Start-GCode</value>
         <hint>TextArea Label</hint>
     </string>    
     <string>
         <key>PlotterSettings.userToolChangeEndGcode</key>
-        <value>ToolChange End-GCode</value>
+        <value>Tool End-GCode</value>
         <hint>TextArea Label</hint>
     </string>
     <string>
