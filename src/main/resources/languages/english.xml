@@ -736,6 +736,11 @@
 		<value>Error in communicating with the robot.</value>
 		<hint>text</hint>
 	</string>
+	<string>
+		<key>PlotterControls.CommunicationFailure</key>
+		<value>No answer from the robot, please check the USB cable.</value>
+		<hint>text</hint>
+	</string>
 
 	<string>
 		<key>ConversationHistory.Clear</key>
