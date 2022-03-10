@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 class SaveSVGTest {
 
     @BeforeAll
-    public static void beforeEach() {
+    public static void beforeAll() {
         PreferencesHelper.start();
         Translator.start();
     }

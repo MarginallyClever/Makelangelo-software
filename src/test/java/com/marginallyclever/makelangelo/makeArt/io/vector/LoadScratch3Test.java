@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoadScratch3Test {
 
     @BeforeAll
-    public static void beforeEach() {
+    public static void beforeAll() {
         PreferencesHelper.start();
         Translator.start();
     }

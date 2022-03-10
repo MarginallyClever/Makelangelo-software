@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 class SaveGCodeTest {
 
     @BeforeAll
-    public static void beforeEach() {
+    public static void beforeAll() {
         PreferencesHelper.start();
         Translator.start();
     }
