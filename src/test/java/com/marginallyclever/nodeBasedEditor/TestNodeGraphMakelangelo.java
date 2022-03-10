@@ -6,8 +6,8 @@ import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
 import com.marginallyClever.nodeGraphSwing.SwingRegistry;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodeBasedEditor.view.makelangelo.MakelangeloNodeGraphRegistry;
-import com.marginallyclever.nodeBasedEditor.view.makelangelo.nodes.TurtleJSON_DAO;
+import com.marginallyclever.donatello.DonatelloRegistry;
+import com.marginallyclever.donatello.nodes.TurtleJSON_DAO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class TestNodeGraphMakelangelo {
         try {
             BuiltInRegistry.register();
             SwingRegistry.register();
-            MakelangeloNodeGraphRegistry.register();
+            DonatelloRegistry.register();
         } catch (IllegalArgumentException e) {}
     }
 
