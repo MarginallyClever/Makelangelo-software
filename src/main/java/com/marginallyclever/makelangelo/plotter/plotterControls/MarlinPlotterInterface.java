@@ -125,7 +125,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 			myPlotter.setPos(pos.x,pos.y);
 		} catch (NumberFormatException e) {
-			logger.warn("M114 error, continuing anyway: {}", message, e);
+			logger.warn("M114 problem, continuing anyway: {}", message, e);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
-			logger.warn("M201 error, continuing anyway:: {}", message, e);
+			logger.warn("M201 problem, continuing anyway: {}", message, e);
 		}
 	}
 
@@ -157,7 +157,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
-			logger.warn("M203 error, continuing anyway:: {}", message, e);
+			logger.warn("M203 problem, continuing anyway: {}", message, e);
 		}
 	}
 
