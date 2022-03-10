@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeArt.io.vector;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -42,6 +43,8 @@ public class SaveSVG implements TurtleSaver {
 		boolean isUp=true;
 		double x0 = turtle.history.get(0).x;
 		double y0 = turtle.history.get(0).y;
+		ColorRGB color = new ColorRGB(0,0,0);
+		boolean hasStarted=false;
 
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
@@ -51,24 +54,32 @@ public class SaveSVG implements TurtleSaver {
 				y0=m.y;
 				break;
 			case DRAW_LINE:
-				if(isUp) isUp=false;
-				else {
-					out.write("  <line");
-					out.write(" x1=\""+StringHelper.formatDouble(x0)+"\"");
-					out.write(" y1=\""+StringHelper.formatDouble(-y0)+"\"");
-					out.write(" x2=\""+StringHelper.formatDouble(m.x)+"\"");
-					out.write(" y2=\""+StringHelper.formatDouble(-m.y)+"\"");
-					out.write(" stroke=\"black\" />\n");
+				if(isUp) {
+					isUp=false;
+					out.write(" M");
+				} else {
+					out.write(" L");
 				}
+
+					out.write(" "+StringHelper.formatDouble(m.x));
+					out.write(" "+StringHelper.formatDouble(-m.y));
 				x0=m.x;
 				y0=m.y;
 				
 				break;
 			case TOOL_CHANGE:
+				if(hasStarted) {
+					out.write("'/>\n");
+				}
+				out.write("  <path fill='none' stroke='"+m.getColor().toHexString()+"' d='");
+				hasStarted=true;
 				break;
 			}
 		}
-		
+		if(hasStarted) {
+			out.write("'/>\n");
+		}
+
 		out.write("</svg>");
 		out.flush();
 		logger.debug("done.");
