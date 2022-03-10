@@ -11,6 +11,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Take an existing drawing, scan across it horizontally.  Add new lines between every pair of lines found.
@@ -33,9 +34,9 @@ public class InfillTurtle {
 
 		Turtle result = new Turtle();
 
-		ArrayList<Turtle> list = input.splitByToolChange();
+		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
-			ArrayList<LineSegment2D> segments = infillFromTurtle(t);
+			List<LineSegment2D> segments = infillFromTurtle(t);
 			Turtle t2 = new Turtle();
 			t2.addLineSegments(segments);
 			result.add(t2);
