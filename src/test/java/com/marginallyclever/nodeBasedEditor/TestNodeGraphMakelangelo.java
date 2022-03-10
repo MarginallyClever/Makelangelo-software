@@ -49,8 +49,8 @@ public class TestNodeGraphMakelangelo {
     @Test
     public void testNodeVariablesToJSONAndBack() throws Exception {
         Turtle t = new Turtle();
-        t.jumpTo(10,20);
-        t.moveTo(30,40);
+        //t.jumpTo(10,20);
+        //t.moveTo(30,40);
         testNodeVariableToJSONAndBack(Turtle.class, t,new Turtle());
     }
 
