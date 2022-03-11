@@ -109,9 +109,9 @@ public class PathImageMask extends Node {
             Point2D b = new Point2D(dx * fraction + P0.x,dy * fraction + P0.y);
             double sampleResult = sampleImageUnderStep(img,a,b);
             if(sampleResult < channelCutoff) {
-                listBelow.add(new LineSegment2D(a,b,new ColorRGB(255,0,0)));
+                listBelow.add(new LineSegment2D(a,b,new ColorRGB(0,0,0)));
             } else {
-                listAbove.add(new LineSegment2D(a,b,new ColorRGB(0,255,0)));
+                listAbove.add(new LineSegment2D(a,b,new ColorRGB(0,0,0)));
             }
             a = b;
         }
@@ -133,16 +133,14 @@ public class PathImageMask extends Node {
         int bottom = (int)Math.floor(Math.min(a.y,b.y));
         int top = (int)Math.ceil(Math.max(a.y,b.y));
         double total = Math.max(1,(right-left) * (top-bottom));
-        double count=0;
         // get the average of the intensities
         double sum = 0;
         for(int y=bottom; y<top; ++y) {
             for(int x=left; x<right; ++x) {
                 sum += intensity(img.getRGB(x,y));
-                ++count;
             }
         }
-        return Math.max(0,Math.min(255, sum / count ));
+        return Math.max(0,Math.min(255, sum / total ));
     }
 
     /**
