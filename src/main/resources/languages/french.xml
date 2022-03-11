@@ -1144,7 +1144,7 @@
     </string>
     <string>
         <key>PlotterControls.CommunicationFailure</key>
-        <value>Pas de réponse du robot, verifier le câble USB cable.</value>
+        <value>Pas de réponse du robot, vérifier le câble USB.</value>
         <hint>text</hint>
     </string>
     <string>
