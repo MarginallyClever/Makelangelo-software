@@ -24,6 +24,8 @@ public class DonatelloRegistry {
         NodeFactory.registerNode(new PatternOnPath());
         NodeFactory.registerNode(new PathImageMask());
         NodeFactory.registerNode(new TransformTurtle());
+        NodeFactory.registerNode(new ColorTurtle());
+        NodeFactory.registerNode(new TurtleToBufferedImage());
 
         JSON_DAO_Factory.registerDAO(Turtle.class,new TurtleJSON_DAO());
     }
