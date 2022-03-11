@@ -282,6 +282,7 @@ public final class Makelangelo {
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.setResizable(false);
 		dialog.pack();
 
 		enableMenuBar(false);
