@@ -21,6 +21,10 @@ public class TurtleMove {
 		this(m.x,m.y,m.type);
 	}
 
+	public void setColor(ColorRGB c) {
+		this.x = c.toInt();
+	}
+
 	public ColorRGB getColor() {
 		return new ColorRGB((int)x);
 	}
@@ -28,7 +32,11 @@ public class TurtleMove {
 	public double getDiameter() {
 		return y;
 	}
-	
+
+	public void setDiameter(double d) {
+		y=d;
+	}
+
 	public String toString() {
 		switch(type) {
 		case TOOL_CHANGE:
