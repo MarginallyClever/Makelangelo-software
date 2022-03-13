@@ -33,42 +33,29 @@ class SaveSVGTest {
     }
 
     @Test
-    void saveTurtle() throws Exception {
-        // given
-        SaveSVG save = new SaveSVG();
-
-        File fileTemp = File.createTempFile("unit", null);
-
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-
-            // when
-            save.save(fileOutputStream, simpleMoves());
-            fileOutputStream.close();
-
-            // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/svg/save_simple_move.svg").toURI()));
-        } finally {
-            fileTemp.delete();
-        }
+    public void saveTurtle() throws Exception {
+        verifySavedFile(simpleMoves(), "/svg/save_simple_move.svg");
     }
 
     @Test
-    void saveMultiColor() throws Exception {
-        // given
-        SaveSVG save = new SaveSVG();
+    public void saveMultiColor() throws Exception {
+        verifySavedFile(multiColorsMoves(), "/svg/save_multi_colors.svg");
+    }
 
+    private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
+        // given
         File fileTemp = File.createTempFile("unit", null);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
 
             // when
-            save.save(fileOutputStream, multiColorsMoves());
+            SaveSVG save = new SaveSVG();
+            save.save(fileOutputStream, turtle);
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/svg/save_multi_colors.svg").toURI()));
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }

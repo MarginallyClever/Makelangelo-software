@@ -16,6 +16,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import static com.marginallyclever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.simpleMoves;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class SaveGCodeTest {
@@ -27,26 +29,30 @@ class SaveGCodeTest {
     }
 
     @Test
-    public void saveGCode() throws Exception {
+    public void saveTurtle() throws Exception {
+        verifySavedFile(simpleMoves(), "/gcode/save_simple_move.gcode");
+    }
+
+    @Test
+    public void saveMultiColor() throws Exception {
+        verifySavedFile(multiColorsMoves(), "/gcode/save_multi_colors.gcode");
+    }
+
+    @Test
+    private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
         // given
         SaveGCode saveGCode = new SaveGCode();
 
         File fileTemp = File.createTempFile("unit", null);
 
         try {
-            Turtle turtle = new Turtle();
-            turtle.jumpTo(-15, -7);
-            turtle.moveTo(3, 4);
-            turtle.moveTo(7, 8);
-            turtle.jumpTo(12, 18);
-
             Plotter plotter = new Plotter();
 
             // when
             saveGCode.save(fileTemp.getAbsolutePath(), turtle, plotter);
 
             // then
-            List<String> expected = splitAndfilterForTest(readFile("/saved/expected.gcode"));
+            List<String> expected = splitAndfilterForTest(readFile(expectedFilename));
             List<String> actual = splitAndfilterForTest(
                     new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
                             .useDelimiter("\\A")
