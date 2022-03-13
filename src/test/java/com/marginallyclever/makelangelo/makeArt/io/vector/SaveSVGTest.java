@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.simpleMoves;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -22,7 +24,7 @@ class SaveSVGTest {
     }
 
     @Test
-    void getFileNameFilter() {
+    public void getFileNameFilter() {
         // given
         SaveSVG save = new SaveSVG();
 
@@ -39,18 +41,34 @@ class SaveSVGTest {
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-            Turtle turtle = new Turtle();
-            turtle.jumpTo(-15, -7);
-            turtle.moveTo(3, 4);
-            turtle.moveTo(7, 8);
-            turtle.jumpTo(12, 18);
 
             // when
-            save.save(fileOutputStream, turtle);
+            save.save(fileOutputStream, simpleMoves());
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/saved/expected.svg").toURI()));
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/svg/save_simple_move.svg").toURI()));
+        } finally {
+            fileTemp.delete();
+        }
+    }
+
+    @Test
+    void saveMultiColor() throws Exception {
+        // given
+        SaveSVG save = new SaveSVG();
+
+        File fileTemp = File.createTempFile("unit", null);
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
+
+            // when
+            save.save(fileOutputStream, multiColorsMoves());
+            fileOutputStream.close();
+
+            // then
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/svg/save_multi_colors.svg").toURI()));
         } finally {
             fileTemp.delete();
         }

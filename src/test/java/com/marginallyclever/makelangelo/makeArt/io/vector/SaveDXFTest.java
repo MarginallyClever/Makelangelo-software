@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.simpleMoves;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -39,14 +40,9 @@ class SaveDXFTest {
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-            Turtle turtle = new Turtle();
-            turtle.jumpTo(-15, -7);
-            turtle.moveTo(3, 4);
-            turtle.moveTo(7, 8);
-            turtle.jumpTo(12, 18);
 
             // when
-            save.save(fileOutputStream, turtle);
+            save.save(fileOutputStream, simpleMoves());
             fileOutputStream.close();
 
             // then
@@ -55,4 +51,6 @@ class SaveDXFTest {
             fileTemp.delete();
         }
     }
+
+
 }
