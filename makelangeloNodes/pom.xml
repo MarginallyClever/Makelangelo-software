@@ -7,28 +7,24 @@
     <parent>
         <groupId>com.marginallyclever</groupId>
         <artifactId>MakelangeloSoftware</artifactId>
-        <version>1.0.0</version>
+        <version>7.33.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>makelangeloNodes</artifactId>
-    <groupId>com.marginallyClever</groupId>
-    <version>0.1.0</version>
-    <packaging>jar</packaging>
 
     <name>makelangeloNodes</name>
     <description>Donatello nodes for manipulating Turtles</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.MarginallyClever</groupId>
-            <artifactId>NodeGraphCore</artifactId>
-            <version>1.0.7</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.MarginallyClever</groupId>-->
+<!--            <artifactId>NodeGraphCore</artifactId>-->
+<!--            <version>1.0.7</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.marginallyclever</groupId>
-            <artifactId>Makelangelo</artifactId>
-            <version>7.32.0</version>
-            <scope>compile</scope>
+            <artifactId>MakelangeloApp</artifactId>
+            <version>7.33.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
