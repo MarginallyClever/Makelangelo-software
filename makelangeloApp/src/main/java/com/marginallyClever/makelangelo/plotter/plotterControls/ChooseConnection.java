@@ -7,7 +7,6 @@ import com.marginallyClever.makelangelo.Translator;
 import com.marginallyClever.makelangelo.plotter.plotterControls.communications.DummyUI;
 import com.marginallyClever.makelangelo.plotter.plotterControls.communications.SerialUI;
 import com.marginallyClever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
-import marginallyClever.communications.*;
 import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
