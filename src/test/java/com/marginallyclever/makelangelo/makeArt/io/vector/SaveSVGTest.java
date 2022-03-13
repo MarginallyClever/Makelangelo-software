@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.simpleMoves;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -22,7 +24,7 @@ class SaveSVGTest {
     }
 
     @Test
-    void getFileNameFilter() {
+    public void getFileNameFilter() {
         // given
         SaveSVG save = new SaveSVG();
 
@@ -31,26 +33,29 @@ class SaveSVGTest {
     }
 
     @Test
-    void saveTurtle() throws Exception {
-        // given
-        SaveSVG save = new SaveSVG();
+    public void saveTurtle() throws Exception {
+        verifySavedFile(simpleMoves(), "/svg/save_simple_move.svg");
+    }
 
+    @Test
+    public void saveMultiColor() throws Exception {
+        verifySavedFile(multiColorsMoves(), "/svg/save_multi_colors.svg");
+    }
+
+    private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
+        // given
         File fileTemp = File.createTempFile("unit", null);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-            Turtle turtle = new Turtle();
-            turtle.jumpTo(-15, -7);
-            turtle.moveTo(3, 4);
-            turtle.moveTo(7, 8);
-            turtle.jumpTo(12, 18);
 
             // when
+            SaveSVG save = new SaveSVG();
             save.save(fileOutputStream, turtle);
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/saved/expected.svg").toURI()));
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeArt.io.vector.SaveHelper.simpleMoves;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -31,26 +33,30 @@ class SaveDXFTest {
     }
 
     @Test
-    void saveTurtle() throws Exception {
-        // given
-        SaveDXF save = new SaveDXF();
+    public void saveTurtle() throws Exception {
+        verifySavedFile(simpleMoves(), "/dxf/save_simple_move.dxf");
+    }
 
+    @Test
+    public void saveMultiColor() throws Exception {
+        verifySavedFile(multiColorsMoves(), "/dxf/save_multi_colors.dxf");
+    }
+
+    @Test
+    private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
+        // given
         File fileTemp = File.createTempFile("unit", null);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-            Turtle turtle = new Turtle();
-            turtle.jumpTo(-15, -7);
-            turtle.moveTo(3, 4);
-            turtle.moveTo(7, 8);
-            turtle.jumpTo(12, 18);
 
             // when
+            SaveDXF save = new SaveDXF();
             save.save(fileOutputStream, turtle);
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource("/saved/expected.dxf").toURI()));
+            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }
