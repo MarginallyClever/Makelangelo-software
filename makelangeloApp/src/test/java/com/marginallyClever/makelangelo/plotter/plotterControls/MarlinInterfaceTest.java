@@ -3,12 +3,13 @@ package com.marginallyClever.makelangelo.plotter.plotterControls;
 import com.marginallyClever.communications.NetworkSessionEvent;
 import com.marginallyClever.makelangelo.Translator;
 import com.marginallyClever.util.PreferencesHelper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.awt.event.ActionEvent;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MarlinInterfaceTest {
 
@@ -28,9 +29,9 @@ public class MarlinInterfaceTest {
         String message = "echo:Home XY First";
         mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
 
-        Assertions.assertNotNull(ae.get());
-        Assertions.assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
-        Assertions.assertEquals(MarlinInterface.HOME_XY_FIRST, ae.get().getActionCommand());
+        assertNotNull(ae.get());
+        assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
+        assertEquals(MarlinInterface.HOME_XY_FIRST, ae.get().getActionCommand());
     }
 
     @Test
@@ -43,9 +44,9 @@ public class MarlinInterfaceTest {
         String message = "Error: Printer halted";
         mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
 
-        Assertions.assertNotNull(ae.get());
-        Assertions.assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
-        Assertions.assertEquals(MarlinInterface.ERROR, ae.get().getActionCommand());
+        assertNotNull(ae.get());
+        assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
+        assertEquals(MarlinInterface.ERROR, ae.get().getActionCommand());
     }
 
     @Test
@@ -56,8 +57,8 @@ public class MarlinInterfaceTest {
 
         mi.queueAndSendCommand("M400");
 
-        Assertions.assertNotNull(ae.get());
-        Assertions.assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
-        Assertions.assertEquals(MarlinInterface.DID_NOT_FIND, ae.get().getActionCommand());
+        assertNotNull(ae.get());
+        assertEquals(ActionEvent.ACTION_PERFORMED, ae.get().getID());
+        assertEquals(MarlinInterface.DID_NOT_FIND, ae.get().getActionCommand());
     }
 }

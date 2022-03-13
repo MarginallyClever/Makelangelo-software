@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class PlotterSettingsTest {
 
     private static final long ROBOT_UID = 123456;
