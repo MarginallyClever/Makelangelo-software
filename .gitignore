@@ -56,11 +56,11 @@ docs/
 ## packaging
 packaging/*
 firmware.hex
-!src/main/package/firmware.hex
+!makelangeloApp/src/main/package/firmware.hex
 avrdude.conf
-!src/main/package/avrdude.conf
+!makelangeloApp/src/main/package/avrdude.conf
 avrdude.exe
-!src/main/package/avrdude.exe
+!makelangeloApp/src/main/package/avrdude.exe
 *.dmg
 *.exe
 *.deb

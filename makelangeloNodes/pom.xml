@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.marginallyclever</groupId>
+        <artifactId>MakelangeloSoftware</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>makelangeloNodes</artifactId>
+    <groupId>com.marginallyClever</groupId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>makelangeloNodes</name>
+    <description>Donatello nodes for manipulating Turtles</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.MarginallyClever</groupId>
+            <artifactId>NodeGraphCore</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.marginallyclever</groupId>
+            <artifactId>Makelangelo</artifactId>
+            <version>7.32.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
+    </properties>
+
+</project>
