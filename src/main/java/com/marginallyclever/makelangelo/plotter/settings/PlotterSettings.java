@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyClever.makelangelo.plotter.settings;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.util.PreferencesHelper;
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;

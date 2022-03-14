@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectDouble;
+import com.marginallyClever.makelangelo.select.SelectInteger;
 
 public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	private static final long serialVersionUID = -5791313991426136610L;

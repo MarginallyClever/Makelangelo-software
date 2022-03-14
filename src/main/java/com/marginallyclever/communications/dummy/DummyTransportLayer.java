@@ -1,8 +1,8 @@
-package com.marginallyclever.communications.dummy;
+package com.marginallyClever.communications.dummy;
 
-import com.marginallyclever.communications.Configuration;
-import com.marginallyclever.communications.NetworkSession;
-import com.marginallyclever.communications.TransportLayer;
+import com.marginallyClever.communications.Configuration;
+import com.marginallyClever.communications.NetworkSession;
+import com.marginallyClever.communications.TransportLayer;
 
 import java.util.List;
 

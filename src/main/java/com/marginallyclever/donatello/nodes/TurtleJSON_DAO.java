@@ -1,7 +1,7 @@
-package com.marginallyclever.donatello.nodes;
+package com.marginallyClever.donatello.nodes;
 
 import com.marginallyClever.nodeGraphCore.JSON_DAO;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.json.JSONException;
 import org.json.JSONObject;
 

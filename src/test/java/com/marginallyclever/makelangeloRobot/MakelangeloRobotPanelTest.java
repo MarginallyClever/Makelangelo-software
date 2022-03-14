@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyClever.makelangeloRobot;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
+import com.marginallyClever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
+import com.marginallyClever.util.PreferencesHelper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

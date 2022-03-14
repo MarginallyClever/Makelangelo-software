@@ -1,6 +1,6 @@
-package com.marginallyclever.convenience.log;
+package com.marginallyClever.convenience.log;
 
-import com.marginallyclever.convenience.FileAccess;
+import com.marginallyClever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,13 +1,11 @@
-package com.marginallyclever.nodeBasedEditor;
+package com.marginallyClever.donatello;
 
-import com.marginallyClever.nodeGraphCore.BuiltInRegistry;
+import com.marginallyClever.donatello.nodes.TurtleJSON_DAO;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.nodeGraphCore.JSON_DAO_Factory;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
-import com.marginallyClever.nodeGraphSwing.SwingRegistry;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.donatello.DonatelloRegistry;
-import com.marginallyclever.donatello.nodes.TurtleJSON_DAO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,16 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2022-02-01
  */
 public class TestNodeGraphMakelangelo {
-    private static NodeGraph model;
+    private static NodeGraph model = new NodeGraph();
 
     @BeforeAll
-    static void beforeAll() {
-        model = new NodeGraph();
-        try {
-            BuiltInRegistry.register();
-            SwingRegistry.register();
-            DonatelloRegistry.register();
-        } catch (IllegalArgumentException e) {}
+    public static void beforeAll() {
+        NodeFactory.loadRegistries();
+        JSON_DAO_Factory.loadRegistries();
+    }
+
+    public static void afterAll() {
+        NodeFactory.clear();
+        JSON_DAO_Factory.clear();
     }
 
     @BeforeEach

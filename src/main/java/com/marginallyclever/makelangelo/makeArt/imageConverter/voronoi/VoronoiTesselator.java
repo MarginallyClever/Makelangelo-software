@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi;
+package com.marginallyClever.makelangelo.makeArt.imageConverter.voronoi;
 
 /*
  * The author of this software is Steven Fortune.  Copyright (c) 1994 by AT&T

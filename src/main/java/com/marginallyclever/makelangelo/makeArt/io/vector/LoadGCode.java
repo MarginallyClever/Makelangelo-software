@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.makeArt.io.vector;
+package com.marginallyClever.makelangelo.makeArt.io.vector;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

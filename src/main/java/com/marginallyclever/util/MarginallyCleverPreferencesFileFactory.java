@@ -1,4 +1,4 @@
-package com.marginallyclever.util;
+package com.marginallyClever.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

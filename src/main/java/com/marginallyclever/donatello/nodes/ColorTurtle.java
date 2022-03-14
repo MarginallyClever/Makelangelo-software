@@ -1,11 +1,11 @@
-package com.marginallyclever.donatello.nodes;
+package com.marginallyClever.donatello.nodes;
 
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.turtle.MovementType;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.turtle.MovementType;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
 
 public class ColorTurtle extends Node {
     private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);

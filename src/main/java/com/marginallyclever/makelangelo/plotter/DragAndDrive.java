@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,8 +12,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyClever.convenience.StringHelper;
+import com.marginallyClever.makelangelo.Translator;
 
 /**
  * Drag cursor to drive plotter control. 

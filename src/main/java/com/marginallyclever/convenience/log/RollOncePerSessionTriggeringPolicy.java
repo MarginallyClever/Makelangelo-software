@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience.log;
+package com.marginallyClever.convenience.log;
 
 import ch.qos.logback.core.rolling.TriggeringPolicyBase;
 

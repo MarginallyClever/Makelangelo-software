@@ -1,6 +1,6 @@
-package com.marginallyclever.communications.serial;
+package com.marginallyClever.communications.serial;
 
-import com.marginallyclever.communications.NetworkSession;
+import com.marginallyClever.communications.NetworkSession;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;

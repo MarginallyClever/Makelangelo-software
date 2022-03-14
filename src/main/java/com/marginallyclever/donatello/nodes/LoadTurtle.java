@@ -1,7 +1,7 @@
-package com.marginallyclever.donatello.nodes;
+package com.marginallyClever.donatello.nodes;
 
-import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
 

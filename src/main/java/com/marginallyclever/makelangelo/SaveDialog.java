@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyClever.makelangelo;
 
-import com.marginallyclever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

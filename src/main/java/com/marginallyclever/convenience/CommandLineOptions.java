@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyClever.convenience;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

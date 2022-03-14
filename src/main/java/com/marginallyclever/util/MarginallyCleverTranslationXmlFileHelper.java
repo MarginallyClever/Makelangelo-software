@@ -1,4 +1,4 @@
-package com.marginallyclever.util;
+package com.marginallyClever.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.marginallyclever.makelangelo.Translator.WORKING_DIRECTORY;
+import static com.marginallyClever.makelangelo.Translator.WORKING_DIRECTORY;
 
 /**
  * Helper utility class to aid in loading of language files.

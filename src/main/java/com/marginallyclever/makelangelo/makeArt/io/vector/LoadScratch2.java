@@ -1,6 +1,6 @@
-package com.marginallyclever.makelangelo.makeArt.io.vector;
+package com.marginallyClever.makelangelo.makeArt.io.vector;
 
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;

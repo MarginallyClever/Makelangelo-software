@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectDouble;
+import com.marginallyClever.makelangelo.select.SelectOneOfMany;
 
 /**
  * GUI for {@link Converter_Moire}

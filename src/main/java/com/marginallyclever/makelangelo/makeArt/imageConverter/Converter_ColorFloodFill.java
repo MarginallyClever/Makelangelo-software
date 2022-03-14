@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
 
-import com.marginallyclever.convenience.ColorPalette;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_GaussianBlur;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorPalette;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_GaussianBlur;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

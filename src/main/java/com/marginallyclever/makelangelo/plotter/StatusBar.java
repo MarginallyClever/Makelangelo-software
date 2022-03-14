@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyClever.convenience.StringHelper;
+import com.marginallyClever.makelangelo.Translator;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,8 +1,8 @@
 /*
  */
-package com.marginallyclever.makelangelo;
+package com.marginallyClever.makelangelo;
 
-import com.marginallyclever.util.PropertiesFileHelper;
+import com.marginallyClever.util.PropertiesFileHelper;
 
 /**
  * Utility functions to retrieve Makelangelo Version and detail version. 

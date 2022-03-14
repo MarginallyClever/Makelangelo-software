@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyClever.makelangelo.plotter.settings;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class PlotterSettingsTest {
     }
 
     @Test
-    void saveAndLoadConfig() {
+    public void saveAndLoadConfig() {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_UID);

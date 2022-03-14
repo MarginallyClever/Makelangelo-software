@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyClever.convenience;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileAccessTest {
 
     @Test
-    void open_fileInClasspath() throws IOException {
+    public void open_fileInClasspath() throws IOException {
         // given
         BufferedInputStream bis = FileAccess.open("/4laws.txt");
 
@@ -20,7 +20,7 @@ class FileAccessTest {
     }
 
     @Test
-    void open_directFile() throws IOException {
+    public void open_directFile() throws IOException {
         // given
 
         BufferedInputStream bis = FileAccess.open("pom.xml");
@@ -31,7 +31,7 @@ class FileAccessTest {
     }
 
     @Test
-    void open_fileInJar() throws IOException {
+    public void open_fileInJar() throws IOException {
         // given
         BufferedInputStream bis = FileAccess.open("/test_jar.jar:folder1/test_in_jar.txt");
 

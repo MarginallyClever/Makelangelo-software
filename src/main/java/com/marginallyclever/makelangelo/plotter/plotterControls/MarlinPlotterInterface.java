@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyClever.communications.NetworkSessionEvent;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.convenience.StringHelper;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.PlotterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,16 +1,16 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.convenience.ButtonIcon;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.CollapsiblePanel;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.PlotterEvent;
-import com.marginallyclever.makelangelo.turtle.MovementType;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.communications.NetworkSessionEvent;
+import com.marginallyClever.convenience.ButtonIcon;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.makelangelo.CollapsiblePanel;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.PlotterEvent;
+import com.marginallyClever.makelangelo.turtle.MovementType;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;

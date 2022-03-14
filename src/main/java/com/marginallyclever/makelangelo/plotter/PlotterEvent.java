@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
 public class PlotterEvent {
 	/*

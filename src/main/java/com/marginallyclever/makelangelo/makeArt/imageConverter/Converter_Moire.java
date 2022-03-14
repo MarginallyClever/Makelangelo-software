@@ -1,16 +1,16 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.marginallyclever.convenience.LineInterpolator;
-import com.marginallyclever.convenience.LineInterpolatorSinCurve;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.LineInterpolator;
+import com.marginallyClever.convenience.LineInterpolatorSinCurve;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class Converter_Moire extends ImageConverter {
 		direction = value;
 	}
 
-	protected void convertLine(TransformedImage img,double spaceBetweenLines,double halfStep,Point2D a,Point2D b) {
+	protected void convertLine(TransformedImage img, double spaceBetweenLines, double halfStep, Point2D a, Point2D b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
 		

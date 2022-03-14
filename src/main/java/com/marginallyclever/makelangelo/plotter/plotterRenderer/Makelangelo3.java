@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.plotter.plotterRenderer;
+package com.marginallyClever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.Plotter;
 
 /**
  * Deprecated because it cannot find home.

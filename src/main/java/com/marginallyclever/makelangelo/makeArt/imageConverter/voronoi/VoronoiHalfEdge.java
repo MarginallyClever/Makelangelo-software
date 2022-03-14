@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi;
+package com.marginallyClever.makelangelo.makeArt.imageConverter.voronoi;
 
 
 public class VoronoiHalfEdge {
