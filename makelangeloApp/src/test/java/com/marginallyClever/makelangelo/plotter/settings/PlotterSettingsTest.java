@@ -21,7 +21,7 @@ public class PlotterSettingsTest {
     }
 
     @Test
-    void saveAndLoadConfig() {
+    public void saveAndLoadConfig() {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_UID);

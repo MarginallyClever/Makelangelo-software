@@ -17,4 +17,7 @@ module com.marginallyClever.makelangelo {
     exports com.marginallyClever.makelangelo.turtle;
     exports com.marginallyClever.convenience;
     exports com.marginallyClever.makelangelo.makeArt.io.vector;
+
+    opens com.marginallyClever.convenience;
+    opens com.marginallyClever.makelangelo.turtle;
 }
