@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration>
+
+    <if condition='property("DEV").equals("true")'>
+        <then>
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d %-5level %logger{35} - %msg %n</pattern>
+                </encoder>
+            </appender>
+
+            <logger name="com.marginallyclever.convenience.log.Log" level="error" />
+            <logger name="com.marginallyclever.makelangelo.Makelangelo" level="info" />
+            <logger name="com.marginallyclever.makelangelo.plotter.plotterControls.MarlinInterface" level="trace" />
+            <root>
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.home}/.makelangelo/makelangelo.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${user.home}/.makelangelo/makelangelo.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="com.marginallyclever.convenience.log.RollOncePerSessionTriggeringPolicy"/>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.marginallyclever" level="debug" />
+
+    <root level="info">
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
