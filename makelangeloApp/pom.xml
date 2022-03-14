@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.marginallyclever</groupId>
-    <artifactId>Makelangelo</artifactId>
+    <groupId>com.marginallyClever</groupId>
+    <artifactId>MakelangeloApp</artifactId>
     <packaging>pom</packaging>
     <version>7.32.0</version>
 
-    <name>Makelangelo</name>
+    <name>MakelangeloApp</name>
     <description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
         It pairs really well with Marlin-polargraph, the code in the brain of the robot that receives instructions and moves the motors.</description>
     <url>http://www.makelangelo.com/</url>
