@@ -13,7 +13,6 @@
     <groupId>com.marginallyClever</groupId>
     <artifactId>MakelangeloApp</artifactId>
     <version>7.32.0</version>
-    <packaging>pom</packaging>
 
     <name>MakelangeloApp</name>
     <description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
