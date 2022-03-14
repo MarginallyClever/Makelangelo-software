@@ -10,8 +10,8 @@
     <version>1.0.0</version>
 
     <modules>
-        <module>makelangeloNodes</module>
-		<module>makelangeloApp</module>
+        <module>MakelangeloNodes</module>
+		<module>MakelangeloApp</module>
 	</modules>
 
     <name>Makelangelo-software</name>
@@ -55,28 +55,8 @@
 		</developer>
 	</developers>
 
-	<dependencies>
-		<dependency>
-			<artifactId>makelangeloNodes</artifactId>
-			<groupId>com.marginallyClever</groupId>
-			<version>0.1.0</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.marginallyClever</groupId>
-			<artifactId>MakelangeloApp</artifactId>
-			<version>7.32.0</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<minimum.maven.version>3.8.1</minimum.maven.version>
 		<minimum.java.version>15</minimum.java.version>
-		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
-		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
-		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
-		<maven.compiler.release>${minimum.java.version}</maven.compiler.release>
 	</properties>
 </project>

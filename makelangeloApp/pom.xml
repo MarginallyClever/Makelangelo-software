@@ -4,10 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.marginallyClever</groupId>
+        <artifactId>MakelangeloSoftware</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <groupId>com.marginallyClever</groupId>
     <artifactId>MakelangeloApp</artifactId>
-    <packaging>pom</packaging>
     <version>7.32.0</version>
+    <packaging>pom</packaging>
 
     <name>MakelangeloApp</name>
     <description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
