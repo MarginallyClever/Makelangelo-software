@@ -2,6 +2,9 @@ package com.marginallyClever.makelangelo.makeArt.io.vector;
 
 import org.junit.jupiter.api.DynamicTest;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;

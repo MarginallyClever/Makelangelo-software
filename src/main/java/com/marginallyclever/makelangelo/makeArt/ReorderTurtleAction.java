@@ -36,7 +36,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		output.history.clear();
 		
 		// history is made of changes, travels, and draws
-		ArrayList<Turtle> colors = turtle.splitByToolChange();
+		List<Turtle> colors = turtle.splitByToolChange();
 		logger.debug("reorder() layers: {}", colors.size());
 		for( Turtle t2 : colors ) {
 			output.add(reorderTurtle(t2));

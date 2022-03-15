@@ -458,8 +458,8 @@ public class Turtle implements Cloneable {
 		return dx*dx + dy*dy; 
 	}
 	
-	public ArrayList<Turtle> splitByToolChange() {
-		ArrayList<Turtle> list = new ArrayList<>();
+	public List<Turtle> splitByToolChange() {
+		List<Turtle> list = new ArrayList<>();
 		Turtle t = new Turtle();
 		list.add(t);
 		
@@ -473,7 +473,7 @@ public class Turtle implements Cloneable {
 		}
 		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
-		ArrayList<Turtle> notEmptyList = new ArrayList<>();
+		List<Turtle> notEmptyList = new ArrayList<>();
 		for( Turtle t2 : list ) {
 			if(t2.getHasAnyDrawingMoves()) {
 				notEmptyList.add(t2);

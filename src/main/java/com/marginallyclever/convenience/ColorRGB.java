@@ -94,6 +94,11 @@ public class ColorRGB {
   public String toString() {
     return "(" + red + "," + green + "," + blue + ")";
   }
+
+  // https://www.codegrepper.com/code-examples/java/rgb+to+hex+java
+  public String toHexString() {
+    return String.format("#%02X%02X%02X", red, green, blue);
+  }
   
   public int getRed() { return red; }
   public int getGreen() { return green; }

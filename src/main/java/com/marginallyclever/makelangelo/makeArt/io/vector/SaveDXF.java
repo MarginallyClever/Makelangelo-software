@@ -13,11 +13,11 @@ import java.io.OutputStreamWriter;
 
 /**
  * @author Dan Royer
- *
+ * see http://paulbourke.net/dataformats/dxf/min3d.html for details
  */
 public class SaveDXF implements TurtleSaver {
 	private static final Logger logger = LoggerFactory.getLogger(SaveDXF.class);
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
+	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 		
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {

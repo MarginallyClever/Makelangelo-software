@@ -115,8 +115,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// trim everything after and including "Count", then read the state data.
 	protected void onHearM114(String message) {
 		try {
-			message = message.substring(0, message.indexOf("Count"));
-			String[] majorParts = message.split("\s");
+			String position = message.substring(0, message.indexOf("Count"));
+			String[] majorParts = position.split("\s");
 			Point2D pos = myPlotter.getPos();
 
 			for (String s : majorParts) {
@@ -128,7 +128,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 			myPlotter.setPos(pos.x,pos.y);
 		} catch (NumberFormatException e) {
-			logger.error("M114 error: {}", message, e);
+			logger.warn("M114 problem, continuing anyway: {}", message, e);
 		}
 	}
 
@@ -136,15 +136,15 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// I only care about the x value when reading.
 	protected void onHearAcceleration(String message) {
 		try {
-			message = message.substring(STR_ACCELERATION.length());
-			String[] parts = message.split("\s");
+			String position = message.substring(STR_ACCELERATION.length());
+			String[] parts = position.split("\s");
 			if (parts.length != 4)
 				throw new Exception("M201 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
 			myPlotter.getSettings().setAcceleration(v);
 		} catch (Exception e) {
-			logger.warn("M201 error: {}", message, e);
+			logger.warn("M201 problem, continuing anyway: {}", message, e);
 		}
 	}
 
@@ -152,15 +152,15 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	// I only care about the x value when reading.
 	protected void onHearFeedrate(String message) {
 		try {
-			message = message.substring(STR_FEEDRATE.length());
-			String[] parts = message.split("\s");
+			String position = message.substring(STR_FEEDRATE.length());
+			String[] parts = position.split("\s");
 			if (parts.length != 4)
 				throw new Exception("M203 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
 			myPlotter.getSettings().setDrawFeedRate(v);
 		} catch (Exception e) {
-			logger.warn("M203 error: {}", message, e);
+			logger.warn("M203 problem, continuing anyway: {}", message, e);
 		}
 	}
 
