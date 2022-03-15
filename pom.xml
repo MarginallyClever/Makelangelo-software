@@ -474,9 +474,9 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</dependency>
 
 		<dependency>
-			<groupId>com.MarginallyClever</groupId>
-			<artifactId>NodeGraphCore</artifactId>
-			<version>1.0.7</version>
+			<groupId>com.marginallyclever</groupId>
+			<artifactId>nodegraphcore</artifactId>
+			<version>1.0.8</version>
 		</dependency>
 	</dependencies>
 
