@@ -49,13 +49,13 @@ public class InfillTurtle {
 		throw new Exception("I cannot confirm this Turtle path is a closed loop.");
 	}
 
-	private ArrayList<LineSegment2D> infillFromTurtle(Turtle input) {
+	private List<LineSegment2D> infillFromTurtle(Turtle input) {
 		logger.debug("  infillFromTurtle()");
 		// make sure line segments don't start on another line, leading to an odd number
 		// of intersections.
 		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 
-		ArrayList<LineSegment2D> results = new ArrayList<>();
+		List<LineSegment2D> results = new ArrayList<>();
 
 		// do this once here instead of once per line.
 		List<LineSegment2D> convertedPath = input.getAsLineSegments();
@@ -109,15 +109,15 @@ public class InfillTurtle {
 	 * @param convertedPath The boundary line, which must be a closed loop
 	 * @return a list of remaining {@link LineSegment2D}.
 	 */
-	private ArrayList<LineSegment2D> trimLineToPath(LineSegment2D line, List<LineSegment2D> convertedPath) {
-		ArrayList<Point2D> intersections = new ArrayList<>();
+	private List<LineSegment2D> trimLineToPath(LineSegment2D line, List<LineSegment2D> convertedPath) {
+		List<Point2D> intersections = new ArrayList<>();
 
 		for (LineSegment2D s : convertedPath) {
 			Point2D p = getIntersection(line, s);
 			if (p != null) intersections.add(p);
 		}
 
-		ArrayList<LineSegment2D> results = new ArrayList<>();
+		List<LineSegment2D> results = new ArrayList<>();
 		int size = intersections.size();
 		if(size%2==0) {
 			if (size == 2) {
@@ -137,7 +137,7 @@ public class InfillTurtle {
 	 * @return return Intersections sorted by ascending x value. If x values match,
 	 *         sort by ascending y value.
 	 */
-	private ArrayList<LineSegment2D> sortIntersectionsIntoSegments(ArrayList<Point2D> intersections, ColorRGB color) {
+	private List<LineSegment2D> sortIntersectionsIntoSegments(List<Point2D> intersections, ColorRGB color) {
 		logger.debug("  sortIntersectionsIntoSegments() {}", intersections.size());
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
@@ -147,7 +147,7 @@ public class InfillTurtle {
 			intersections.sort(new ComparePointsByX());
 		}
 
-		ArrayList<LineSegment2D> results = new ArrayList<>();
+		List<LineSegment2D> results = new ArrayList<>();
 		int i = 0;
 		while (i < intersections.size()-1) {
 			results.add(new LineSegment2D(intersections.get(i), intersections.get(i + 1), color));
