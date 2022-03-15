@@ -1,4 +1,4 @@
-module com.marginallyclever.makelangelo {
+module com.marginallyClever.makelangelo {
     requires com.marginallyClever.NodeGraphCore;
     requires org.slf4j;
     requires jssc;
@@ -16,6 +16,9 @@ module com.marginallyclever.makelangelo {
     requires org.jetbrains.annotations;
 
     opens com.marginallyClever.convenience;
+    opens com.marginallyClever.makelangelo.makeArt.io.vector;
+    opens com.marginallyClever.makelangelo.plotter.plotterControls;
+    opens com.marginallyClever.makelangelo.turtle;
 
 
     uses com.marginallyClever.nodeGraphCore.NodeRegistry;

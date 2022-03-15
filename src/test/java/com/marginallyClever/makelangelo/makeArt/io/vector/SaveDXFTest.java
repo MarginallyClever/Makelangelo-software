@@ -24,7 +24,7 @@ class SaveDXFTest {
     }
 
     @Test
-    void getFileNameFilter() {
+    public void getFileNameFilter() {
         // given
         SaveDXF save = new SaveDXF();
 
