@@ -57,7 +57,6 @@ public class TestNodeGraphMakelangelo {
     public void testFactoryCreatesAllSwingTypes() {
         assertNotEquals(0,NodeFactory.getNames().length);
         for(String s : NodeFactory.getNames()) {
-            System.out.println(s);
             assertNotNull(NodeFactory.createNode(s));
         }
     }
