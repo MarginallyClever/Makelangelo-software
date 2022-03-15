@@ -21,7 +21,7 @@ public class SaveTurtle extends Node {
     }
 
     @Override
-    public void update() {
+    public void update() throws Exception {
         if(filename.getValue().isEmpty()) return;
 
         try {

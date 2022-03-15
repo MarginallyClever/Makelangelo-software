@@ -5,7 +5,7 @@ import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TurtleJSON_DAO implements JSON_DAO<Turtle> {
+public class TurtleDAO4JSON implements JSON_DAO<Turtle> {
     @Override
     public Object toJSON(Object object) throws JSONException {
         JSONObject json = new JSONObject();

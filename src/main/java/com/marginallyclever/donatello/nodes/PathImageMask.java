@@ -45,7 +45,7 @@ public class PathImageMask extends Node {
     }
 
     @Override
-    public void update() {
+    public void update() throws Exception {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
@@ -87,7 +87,7 @@ public class PathImageMask extends Node {
         Point2D P0 = segment.start;
         Point2D P1 = segment.end;
 
-        ArrayList<LineSegment2D> toKeep = new ArrayList<>();
+        List<LineSegment2D> toKeep = new ArrayList<>();
 
         // clip line to image bounds because sampling outside limits causes exception.
         Point2D rMin = new Point2D(0,0);

@@ -29,7 +29,7 @@ public class ColorTurtle extends Node {
     }
 
     @Override
-    public void update() {
+    public void update() throws Exception {
         Turtle input = turtle.getValue();
         int r = red.getValue().intValue();
         int b = blue.getValue().intValue();

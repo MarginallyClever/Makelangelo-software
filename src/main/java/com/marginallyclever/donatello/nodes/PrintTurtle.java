@@ -29,7 +29,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     }
 
     @Override
-    public void update() {
+    public void update() throws Exception {
         cleanAllInputs();
     }
 

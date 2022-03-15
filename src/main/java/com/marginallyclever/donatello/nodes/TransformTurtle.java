@@ -30,7 +30,7 @@ public class TransformTurtle extends Node {
     }
 
     @Override
-    public void update() {
+    public void update() throws Exception {
         Turtle input = turtle.getValue();
         Turtle moved = new Turtle(input);
         moved.scale(sx.getValue().doubleValue(),sy.getValue().doubleValue());

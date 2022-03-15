@@ -1,6 +1,6 @@
 package com.marginallyClever.donatello;
 
-import com.marginallyClever.donatello.nodes.TurtleJSON_DAO;
+import com.marginallyClever.donatello.nodes.TurtleDAO4JSON;
 import com.marginallyClever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.JSON_DAO_Factory;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
@@ -67,7 +67,7 @@ public class TestNodeGraphMakelangelo {
      */
     @Test
     public void testTurtleDAO() {
-        TurtleJSON_DAO dao = new TurtleJSON_DAO();
+        TurtleDAO4JSON dao = new TurtleDAO4JSON();
         Turtle r1 = new Turtle();
         Turtle r2=dao.fromJSON(dao.toJSON(r1));
         assertEquals(r1,r2);

@@ -33,32 +33,28 @@ public class PatternOnPath extends Node {
     }
 
     @Override
-    public void update() {
-        try {
-            Turtle sum = new Turtle();
-            Turtle myPattern = pattern.getValue();
-            Turtle myPath = path.getValue();
-            int c = count.getValue().intValue();
-            if(c>0) {
-                double pDistance = myPath.getDrawDistance();
-                double step = pDistance/(double)c;
-                if(pDistance==0) {
-                    pDistance=c;
-                    step=1;
-                }
-                double n=0;
-                for(int i=0;i<c;++i) {
-                    Point2D p = myPath.interpolate(n);
-                    n+=step;
-                    Turtle stamp = new Turtle(myPattern);
-                    stamp.translate(p.x,p.y);
-                    sum.add(stamp);
-                }
+    public void update() throws Exception {
+        Turtle sum = new Turtle();
+        Turtle myPattern = pattern.getValue();
+        Turtle myPath = path.getValue();
+        int c = count.getValue().intValue();
+        if(c>0) {
+            double pDistance = myPath.getDrawDistance();
+            double step = pDistance/(double)c;
+            if(pDistance==0) {
+                pDistance=c;
+                step=1;
             }
-            output.setValue(sum);
-            cleanAllInputs();
-        } catch (Exception e) {
-            e.printStackTrace();
+            double n=0;
+            for(int i=0;i<c;++i) {
+                Point2D p = myPath.interpolate(n);
+                n+=step;
+                Turtle stamp = new Turtle(myPattern);
+                stamp.translate(p.x,p.y);
+                sum.add(stamp);
+            }
         }
+        output.setValue(sum);
+        cleanAllInputs();
     }
 }

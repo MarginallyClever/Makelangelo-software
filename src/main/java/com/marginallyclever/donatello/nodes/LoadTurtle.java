@@ -32,16 +32,12 @@ public class LoadTurtle extends Node {
     }
 
     @Override
-    public void update() {
-        try {
-            Turtle t = TurtleFactory.load(filename.getValue());
-            contents.setValue(t);
-            Rectangle2D r = t.getBounds();
-            w.setValue(r.getWidth());
-            h.setValue(r.getHeight());
-            cleanAllInputs();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void update() throws Exception {
+        Turtle t = TurtleFactory.load(filename.getValue());
+        contents.setValue(t);
+        Rectangle2D r = t.getBounds();
+        w.setValue(r.getWidth());
+        h.setValue(r.getHeight());
+        cleanAllInputs();
     }
 }
