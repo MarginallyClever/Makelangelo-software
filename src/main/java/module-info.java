@@ -1,5 +1,5 @@
 module com.marginallyClever.makelangelo {
-    requires com.marginallyclever.nodegraphcore;
+    requires com.marginallyClever.nodeGraphCore;
     requires org.slf4j;
     requires jssc;
     requires java.desktop;
