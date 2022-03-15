@@ -98,7 +98,7 @@ public class VoronoiTesselator {
    * @param maxX      The maximum X of the bounding box around the voronoi
    * @param minY      The minimum Y of the bounding box around the voronoi
    * @param maxY      The maximum Y of the bounding box around the voronoi
-   * @return the <code>com.marginallyclever.voronoi.VoronoiGraphEdge</code>s of this VoronoiTesselator.
+   * @return the <code>com.marginallyClever.voronoi.VoronoiGraphEdge</code>s of this VoronoiTesselator.
    */
   public List<VoronoiGraphEdge> generateVoronoi(double[] xValuesIn, double[] yValuesIn,
                                                 double minX, double maxX, double minY, double maxY) {

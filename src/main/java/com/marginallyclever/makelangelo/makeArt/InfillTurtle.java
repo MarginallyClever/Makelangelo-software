@@ -175,7 +175,7 @@ public class InfillTurtle {
 	 * It is based on an algorithm in Andre LaMothe's "Tricks of the Windows Game
 	 * Programming Gurus". See
 	 * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-	 * TODO move this to com.marginallyclever.convenience.LineHelper?
+	 * TODO move this to com.marginallyClever.convenience.LineHelper?
 	 * 
 	 * @param alpha first line segment
 	 * @param beta second line segment

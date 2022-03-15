@@ -79,7 +79,7 @@ import java.util.prefs.Preferences;
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
  * the mark on the paper.  This knowledge helps the app to create better gcode.  
  * 
- * @author Dan Royer (dan@marginallyclever.com)
+ * @author Dan Royer (dan@marginallyClever.com)
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {

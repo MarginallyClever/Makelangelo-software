@@ -117,7 +117,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 							<SplashScreen-Image>splash.png</SplashScreen-Image>
 						</manifestEntries>
 						<manifest>
-							<mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+							<mainClass>com.marginallyClever.makelangelo.Makelangelo</mainClass>
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>

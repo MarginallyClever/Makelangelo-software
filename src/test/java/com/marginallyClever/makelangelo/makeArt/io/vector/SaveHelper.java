@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.makeArt.io.vector;
+package com.marginallyClever.makelangelo.makeArt.io.vector;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 public class SaveHelper {
 

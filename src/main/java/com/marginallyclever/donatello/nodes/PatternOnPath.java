@@ -46,10 +46,12 @@ public class PatternOnPath extends Node {
                     pDistance=c;
                     step=1;
                 }
-                for(double n=0;n<=pDistance;n+=step) {
-                    Point2D i = myPath.interpolate(n);
+                double n=0;
+                for(int i=0;i<c;++i) {
+                    Point2D p = myPath.interpolate(n);
+                    n+=step;
                     Turtle stamp = new Turtle(myPattern);
-                    stamp.translate(i.x,i.y);
+                    stamp.translate(p.x,p.y);
                     sum.add(stamp);
                 }
             }

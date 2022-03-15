@@ -413,7 +413,7 @@ public class Turtle implements Cloneable {
 	 * Calls {@code addLineSegments} with a default minimum jump size.
 	 * @param segments the list of line segments to add.
 	 */
-	public void addLineSegments(ArrayList<LineSegment2D> segments) {
+	public void addLineSegments(List<LineSegment2D> segments) {
 		addLineSegments(segments,1e-6,1e-6);
 	}
 
@@ -423,7 +423,7 @@ public class Turtle implements Cloneable {
 	 * @param minimumJumpSize For any {@link LineSegment2D} N being added, the Turtle will jump if N.b and (N+1).a are more than minimumJumpSize apart.
 	 * @param minDrawDistance For any {@link LineSegment2D} N being added, the Turtle will not draw line where N.b-N.a is less than minDrawDistance.
 	 */
-	public void addLineSegments(ArrayList<LineSegment2D> segments, double minimumJumpSize, double minDrawDistance) {
+	public void addLineSegments(List<LineSegment2D> segments, double minimumJumpSize, double minDrawDistance) {
 		if(segments.isEmpty()) return;
 		
 		LineSegment2D first = segments.get(0);
