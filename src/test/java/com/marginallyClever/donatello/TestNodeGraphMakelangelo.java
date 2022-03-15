@@ -2,7 +2,7 @@ package com.marginallyClever.donatello;
 
 import com.marginallyClever.donatello.nodes.TurtleDAO4JSON;
 import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.JSON_DAO_Factory;
+import com.marginallyClever.nodeGraphCore.DAO4JSONFactory;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeGraph;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
@@ -23,12 +23,12 @@ public class TestNodeGraphMakelangelo {
     @BeforeAll
     public static void beforeAll() {
         NodeFactory.loadRegistries();
-        JSON_DAO_Factory.loadRegistries();
+        DAO4JSONFactory.loadRegistries();
     }
 
     public static void afterAll() {
         NodeFactory.clear();
-        JSON_DAO_Factory.clear();
+        DAO4JSONFactory.clear();
     }
 
     @BeforeEach

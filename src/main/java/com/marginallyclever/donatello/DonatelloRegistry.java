@@ -6,7 +6,7 @@ import com.marginallyClever.donatello.nodes.shapes.TurtleLine;
 import com.marginallyClever.donatello.nodes.shapes.TurtleRectangle;
 import com.marginallyClever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.DAORegistry;
-import com.marginallyClever.nodeGraphCore.JSON_DAO_Factory;
+import com.marginallyClever.nodeGraphCore.DAO4JSONFactory;
 import com.marginallyClever.nodeGraphCore.NodeFactory;
 import com.marginallyClever.nodeGraphCore.NodeRegistry;
 
@@ -18,7 +18,7 @@ import com.marginallyClever.nodeGraphCore.NodeRegistry;
 public class DonatelloRegistry implements DAORegistry, NodeRegistry {
     @Override
     public void registerDAO() {
-        JSON_DAO_Factory.registerDAO(Turtle.class,new TurtleDAO4JSON());
+        DAO4JSONFactory.registerDAO(Turtle.class,new TurtleDAO4JSON());
     }
 
     @Override

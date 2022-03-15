@@ -20,7 +20,6 @@ module com.marginallyClever.makelangelo {
     opens com.marginallyClever.makelangelo.plotter.plotterControls;
     opens com.marginallyClever.makelangelo.turtle;
 
-
     uses com.marginallyClever.nodeGraphCore.NodeRegistry;
     provides com.marginallyClever.nodeGraphCore.NodeRegistry with
             com.marginallyClever.donatello.DonatelloRegistry;

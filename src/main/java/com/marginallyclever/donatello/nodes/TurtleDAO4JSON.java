@@ -1,11 +1,11 @@
 package com.marginallyClever.donatello.nodes;
 
-import com.marginallyClever.nodeGraphCore.JSON_DAO;
 import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.nodeGraphCore.DAO4JSON;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TurtleDAO4JSON implements JSON_DAO<Turtle> {
+public class TurtleDAO4JSON implements DAO4JSON<Turtle> {
     @Override
     public Object toJSON(Object object) throws JSONException {
         JSONObject json = new JSONObject();
