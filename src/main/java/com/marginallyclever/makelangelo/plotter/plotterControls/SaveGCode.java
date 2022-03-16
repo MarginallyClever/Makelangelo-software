@@ -1,23 +1,26 @@
 package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.makelangelo.MakelangeloVersion;
 import com.marginallyClever.convenience.StringHelper;
+import com.marginallyClever.makelangelo.MakelangeloVersion;
+import com.marginallyClever.makelangelo.Translator;
 import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.turtle.MovementType;
 import com.marginallyClever.makelangelo.turtle.Turtle;
 import com.marginallyClever.makelangelo.turtle.TurtleMove;
-import java.awt.geom.Rectangle2D;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Save the {@link ProgramInterface} instruction buffer to a gcode file of the user's choosing.
@@ -42,13 +45,49 @@ public class SaveGCode {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
-	public void run(Turtle turtle, Plotter robot, JFrame parent) throws Exception {
+	public void run(Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", fileWithExtension);
-			save(fileWithExtension,turtle,robot);
+
+			int count = countTurtleToolChanges(turtle);
+			if(count>1) {
+				maybeSaveSeparateFiles(count,fileWithExtension, turtle, plotter,parent);
+			} else {
+				saveOneFile(fileWithExtension, turtle, plotter);
+			}
 		}
+	}
+
+	private void maybeSaveSeparateFiles(int count,String fileWithExtension, Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
+		String title = Translator.get("SaveGCode.splitGCodeTitle");
+		String query = Translator.get("SaveGCode.splitGCode",new String[]{Integer.toString(count)});
+		int n = JOptionPane.showConfirmDialog(parent, query, title, JOptionPane.YES_NO_OPTION);
+		if(n==JOptionPane.NO_OPTION) {
+			saveOneFile(fileWithExtension, turtle, plotter);
+		} else if(n==JOptionPane.YES_OPTION) {
+			// split filename.ext.  New format will be filename-n.ext
+			int last = fileWithExtension.lastIndexOf(".");
+			String ext = fileWithExtension.substring(last);
+			String fileWithoutExtension = fileWithExtension.substring(0,last);
+			// now save each file
+			List<Turtle> list = turtle.splitByToolChange();
+			int i=0;
+			for( Turtle t : list ) {
+				++i;
+				String newFileName = fileWithoutExtension+"-"+Integer.toString(i)+ext;
+				saveOneFile(newFileName,turtle,plotter);
+			}
+		}
+	}
+
+	private int countTurtleToolChanges(Turtle turtle) {
+		int i=0;
+		for( TurtleMove m : turtle.history ) {
+			if(m.type == MovementType.TOOL_CHANGE) ++i;
+		}
+		return i;
 	}
 
 	private String addExtension(String name, String [] extensions) {
@@ -59,7 +98,7 @@ public class SaveGCode {
 		return name + "." + extensions[0];
 	}
 		
-	protected void save(String filename, Turtle turtle, Plotter robot) throws Exception {
+	protected void saveOneFile(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {			

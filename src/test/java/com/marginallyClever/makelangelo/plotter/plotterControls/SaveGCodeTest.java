@@ -49,7 +49,7 @@ class SaveGCodeTest {
             Plotter plotter = new Plotter();
 
             // when
-            saveGCode.save(fileTemp.getAbsolutePath(), turtle, plotter);
+            saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
 
             // then
             List<String> expected = splitAndfilterForTest(readFile(expectedFilename));
