@@ -60,6 +60,15 @@ public class SaveGCode {
 		}
 	}
 
+	/**
+	 * Offer to split the gcode file into one file per tool change, which is probably one per color.
+	 * @param count number of tool changes detected
+	 * @param fileWithExtension the user's desired filename.
+	 * @param turtle the source turtle containing many tool changes.
+	 * @param plotter the plotter that will translate the turtle to gcode.
+	 * @param parent the parent frame for the confirmation dialog.
+	 * @throws Exception if saving the file fails.
+	 */
 	private void maybeSaveSeparateFiles(int count,String fileWithExtension, Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
 		String title = Translator.get("SaveGCode.splitGCodeTitle");
 		String query = Translator.get("SaveGCode.splitGCode",new String[]{Integer.toString(count)});
