@@ -68,11 +68,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</pluginRepository>
 	</pluginRepositories>
 
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository><!--
+	<repositories><!--
 		<repository>
 			<id>github</id>
 			<url>https://maven.pkg.github.com</url>
