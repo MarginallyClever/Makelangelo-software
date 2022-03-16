@@ -397,6 +397,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.10</version>
 		</dependency>
+		<!-- logging -->
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>

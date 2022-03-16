@@ -5,7 +5,7 @@ import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
 
 public class TurtleCircle extends Node {
-    private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 50,true,true);
+    private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 50,true,false);
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
 
     public TurtleCircle() {
