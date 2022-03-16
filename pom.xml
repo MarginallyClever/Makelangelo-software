@@ -70,16 +70,16 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 
 	<repositories>
 		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository><!--
+		<repository>
 			<id>github</id>
 			<url>https://maven.pkg.github.com</url>
-		</repository>
+		</repository>-->
 		<repository>
 			<id>my-local-repo</id>
 			<url>file://${project.basedir}/java/local-maven-repo</url>
-		</repository>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 
