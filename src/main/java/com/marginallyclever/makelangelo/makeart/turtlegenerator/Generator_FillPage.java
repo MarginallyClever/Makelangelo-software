@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;

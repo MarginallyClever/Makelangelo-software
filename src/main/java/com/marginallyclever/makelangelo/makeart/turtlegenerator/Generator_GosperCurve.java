@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import java.awt.geom.Rectangle2D;
 
