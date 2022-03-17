@@ -1,8 +1,8 @@
 package com.marginallyclever.convenience.log;
 
-import com.marginallyClever.convenience.ButtonIcon;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.ButtonIcon;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.marginallyClever.makelangelo.Translator.WORKING_DIRECTORY;
+import static com.marginallyclever.makelangelo.Translator.WORKING_DIRECTORY;
 
 /**
  * Helper utility class to aid in loading of language files.
@@ -204,7 +204,7 @@ public final class MarginallyCleverTranslationXmlFileHelper {
 
   /**
    * @return url object representing the language folder in the user's working directory.
-   * See com.marginallyClever.makelangelo.Translator#WORKING_DIRECTORY
+   * See com.marginallyclever.makelangelo.Translator#WORKING_DIRECTORY
    */
   private static URL getLanguagesFolderUrlFromUserDirectory() {
     URL languageFolderUsingUserDirectoryUrl = null;

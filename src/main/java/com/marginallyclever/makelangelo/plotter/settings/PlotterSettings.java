@@ -1,15 +1,15 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.util.PreferencesHelper;
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
- * {@link com.marginallyClever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
+ * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
  * @author Dan Royer 
  */
 public class PlotterSettings implements Serializable {	
@@ -75,7 +75,7 @@ public class PlotterSettings implements Serializable {
 
 	/**
 	 * These values should match
-	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
+	 * https://github.com.marginallyclever.makelangelo-firmware/firmware_rumba/configure.h
 	 */
 	public PlotterSettings() {
 	}

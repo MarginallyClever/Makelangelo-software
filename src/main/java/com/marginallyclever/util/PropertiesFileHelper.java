@@ -1,6 +1,6 @@
 package com.marginallyclever.util;
 
-import com.marginallyClever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.Makelangelo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

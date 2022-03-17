@@ -27,13 +27,13 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 	private A rootPreferences;
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_XML_FILE =
-			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
+			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE =
-			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
+			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_JSON_FILE =
-			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
+			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
 
 	private static File xmlPreferencesFile;
 

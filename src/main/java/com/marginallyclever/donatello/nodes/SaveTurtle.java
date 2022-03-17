@@ -2,8 +2,8 @@ package com.marginallyclever.donatello.nodes;
 
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
-import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class SaveTurtle extends Node {
     private final NodeVariable<String> filename = NodeVariable.newInstance("filename",String.class,null,true,false);

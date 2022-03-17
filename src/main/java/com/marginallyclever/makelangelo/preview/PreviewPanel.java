@@ -4,8 +4,8 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

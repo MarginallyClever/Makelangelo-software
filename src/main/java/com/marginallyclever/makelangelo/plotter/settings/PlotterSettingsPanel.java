@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.plotter.Plotter;
-import com.marginallyClever.makelangelo.select.SelectBoolean;
-import com.marginallyClever.makelangelo.select.SelectColor;
-import com.marginallyClever.makelangelo.select.SelectDouble;
-import com.marginallyClever.makelangelo.select.SelectInteger;
-import com.marginallyClever.makelangelo.select.SelectPanel;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectColor;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;

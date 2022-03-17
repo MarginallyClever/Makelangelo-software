@@ -1,7 +1,7 @@
 package com.marginallyclever.donatello.nodes;
 
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
 

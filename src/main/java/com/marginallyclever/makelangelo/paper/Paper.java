@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.preview.PreviewListener;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.util.PreferencesHelper;
 
 public class Paper implements PreviewListener {
 

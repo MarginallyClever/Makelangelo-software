@@ -1,6 +1,6 @@
 package com.marginallyclever.convenience;
 
-import com.marginallyClever.makelangelo.makelangeloSettingsPanel.SoundPreferences;
+import com.marginallyclever.makelangelo.makelangelosettingspanel.SoundPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

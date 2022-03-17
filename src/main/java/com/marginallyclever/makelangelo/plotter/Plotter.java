@@ -4,12 +4,12 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.paper.Paper;
-import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyClever.makelangelo.preview.PreviewListener;
-import com.marginallyClever.makelangelo.preview.PreviewPanel;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
  * {@link Plotter} is a virtual plotter.  It is directly responsible for the live state of the plotter.

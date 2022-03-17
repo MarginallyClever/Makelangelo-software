@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.select.*;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.select.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

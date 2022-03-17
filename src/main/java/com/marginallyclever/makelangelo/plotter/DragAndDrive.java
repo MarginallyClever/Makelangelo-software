@@ -12,8 +12,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyClever.convenience.StringHelper;
-import com.marginallyClever.makelangelo.Translator;
+import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Drag cursor to drive plotter control. 

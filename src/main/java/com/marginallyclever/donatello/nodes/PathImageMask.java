@@ -2,11 +2,11 @@ package com.marginallyclever.donatello.nodes;
 
 import com.marginallyClever.nodeGraphCore.Node;
 import com.marginallyClever.nodeGraphCore.NodeVariable;
-import com.marginallyClever.convenience.Clipper2D;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.convenience.LineSegment2D;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

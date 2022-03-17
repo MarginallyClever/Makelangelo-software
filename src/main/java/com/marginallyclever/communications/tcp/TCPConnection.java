@@ -6,7 +6,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import com.marginallyClever.communications.NetworkSession;
+import com.marginallyclever.communications.NetworkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

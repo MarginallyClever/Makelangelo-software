@@ -1,4 +1,4 @@
-module com.marginallyClever.makelangelo {
+module com.marginallyclever.makelangelo {
     requires com.marginallyclever.nodegraphcore;
     requires org.slf4j;
     requires jssc;
@@ -15,16 +15,16 @@ module com.marginallyClever.makelangelo {
     requires jrpicam;
     requires org.jetbrains.annotations;
 
-    opens com.marginallyClever.convenience;
-    opens com.marginallyClever.makelangelo.makeArt.io.vector;
-    opens com.marginallyClever.makelangelo.plotter.plotterControls;
-    opens com.marginallyClever.makelangelo.turtle;
+    opens com.marginallyclever.convenience;
+    opens com.marginallyclever.makelangelo.makeart.io.vector;
+    opens com.marginallyclever.makelangelo.plotter.plotterControls;
+    opens com.marginallyclever.makelangelo.turtle;
 
     uses com.marginallyClever.nodeGraphCore.NodeRegistry;
     provides com.marginallyClever.nodeGraphCore.NodeRegistry with
-            com.marginallyClever.donatello.DonatelloRegistry;
+            com.marginallyclever.donatello.DonatelloRegistry;
 
     uses com.marginallyClever.nodeGraphCore.DAORegistry;
     provides com.marginallyClever.nodeGraphCore.DAORegistry with
-            com.marginallyClever.donatello.DonatelloRegistry;
+            com.marginallyclever.donatello.DonatelloRegistry;
 }
