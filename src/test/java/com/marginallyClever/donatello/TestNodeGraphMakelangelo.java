@@ -26,7 +26,8 @@ public class TestNodeGraphMakelangelo {
             NodeFactory.loadRegistries();
             DAO4JSONFactory.loadRegistries();
         } catch(Exception e) {
-            System.out.println(e);
+            System.out.println("*** Exception found: "+e.getMessage()+"***");
+            e.printStackTrace();
             assert(false);
         }
     }
