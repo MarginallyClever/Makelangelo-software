@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.makeArt;
+package com.marginallyClever.makelangelo.makeArt;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.paper.Paper;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * Scale the input {@link Turtle} to fit the margins of the {@link Paper} provided.

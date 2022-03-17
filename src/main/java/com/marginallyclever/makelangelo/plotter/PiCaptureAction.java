@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -27,9 +27,9 @@ import com.hopding.jrpicam.enums.DRC;
 import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyClever.makelangelo.Makelangelo;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.paper.Paper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

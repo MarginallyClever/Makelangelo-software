@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 
 /**
@@ -48,7 +48,7 @@ public class Converter_Pulse extends ImageConverter {
 		direction = value;
 	}
 	
-	protected void convertLine(TransformedImage img,double zigZagSpacing,double halfStep,Point2D a,Point2D b) {		
+	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2D a, Point2D b) {
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1/len);

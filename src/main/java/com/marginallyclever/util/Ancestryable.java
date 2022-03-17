@@ -1,4 +1,4 @@
-package com.marginallyclever.util;
+package com.marginallyClever.util;
 
 import java.util.Map;
 import java.util.prefs.Preferences;

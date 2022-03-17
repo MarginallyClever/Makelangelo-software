@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeArt;
+package com.marginallyClever.makelangelo.makeArt;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
-import com.marginallyclever.makelangelo.Makelangelo;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.Makelangelo;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * {@link TurtleModifierAction} is the base class for all Actions which modify a {@link Turtle}.

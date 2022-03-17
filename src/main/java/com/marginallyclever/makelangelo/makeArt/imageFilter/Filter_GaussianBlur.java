@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeArt.imageFilter;
+package com.marginallyClever.makelangelo.makeArt.imageFilter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

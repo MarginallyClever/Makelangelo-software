@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.convenience.ButtonIcon;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.PlotterEvent;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.ButtonIcon;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.PlotterEvent;
+import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

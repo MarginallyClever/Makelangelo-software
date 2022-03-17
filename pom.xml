@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.marginallyclever</groupId>
@@ -66,6 +68,17 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</pluginRepository>
 	</pluginRepositories>
 
+	<repositories><!--
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com</url>
+		</repository>-->
+		<repository>
+			<id>my-local-repo</id>
+			<url>file://${project.basedir}/java/local-maven-repo</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<!-- See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
 			and http://stackoverflow.com/a/3697482 -->
@@ -108,7 +121,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 							<SplashScreen-Image>splash.png</SplashScreen-Image>
 						</manifestEntries>
 						<manifest>
-							<mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+							<mainClass>com.marginallyClever.makelangelo.Makelangelo</mainClass>
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
@@ -155,7 +168,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 							<SplashScreen-Image>splash.png</SplashScreen-Image>
 						</manifestEntries>
 						<manifest>
-							<mainClass>com.marginallyclever.makelangelo.Makelangelo</mainClass>
+							<mainClass>com.marginallyClever.makelangelo.Makelangelo</mainClass>
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
@@ -336,20 +349,18 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>commons-io</artifactId>
 			<version>2.8.0</version>
 		</dependency>
-
 		<!-- https://github.com/java-native/jssc/ -->
 		<dependency>
 			<groupId>io.github.java-native</groupId>
 			<artifactId>jssc</artifactId>
 			<version>2.9.4</version>
 		</dependency>
-
+		<!-- opengl graphics -->
 		<dependency>
 			<groupId>org.jogamp.fat</groupId>
 			<artifactId>jogamp-fat</artifactId>
 			<version>2.4.0-rc-20200307</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -368,32 +379,31 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>httpmime</artifactId>
 			<version>4.5.13</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/de.sciss/jrpicam -->
 		<dependency>
 			<groupId>de.sciss</groupId>
 			<artifactId>jrpicam</artifactId>
 			<version>0.2.0</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
 		<dependency>
 			<groupId>org.kabeja</groupId>
 			<artifactId>kabeja</artifactId>
 			<version>0.4</version>
 		</dependency>
-
+		<!-- logging -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.10</version>
 		</dependency>
+		<!-- logging -->
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>3.1.6</version>
 		</dependency>
-
+		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -405,20 +415,18 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>vecmath</artifactId>
 			<version>1.5.2</version>
 		</dependency>
-
+		<!-- test suite -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- used by PreferenceHelper -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20201115</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
@@ -430,14 +438,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-all</artifactId>
 			<version>1.14</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-swing-junit</artifactId>
@@ -450,7 +456,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>4.2.0</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- qoi image format support -->
 		<dependency>
 			<groupId>me.saharnooby</groupId>
@@ -463,14 +468,13 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>qoi-java-awt</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>my-local-repo</id>
-			<url>file://${project.basedir}/java/local-maven-repo</url>
-		</repository>
-	</repositories>
+		<dependency>
+			<groupId>com.marginallyclever</groupId>
+			<artifactId>nodegraphcore</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

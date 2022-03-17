@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.plotter.plotterRenderer;
+package com.marginallyClever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
 
 /**
  * Each {@link PlotterRenderer} renders a {@link Plotter} with custom graphics.

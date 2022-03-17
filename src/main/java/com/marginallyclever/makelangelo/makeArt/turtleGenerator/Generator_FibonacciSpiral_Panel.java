@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyClever.makelangelo.select.SelectSlider;
 
 /**
  * Panel for {@link Generator_FibonacciSpiral}

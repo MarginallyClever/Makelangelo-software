@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyClever.convenience;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
 /**
  * {@link MarlinCommand} is used by {@link MarlinInterface} to buffer outgoing messages.

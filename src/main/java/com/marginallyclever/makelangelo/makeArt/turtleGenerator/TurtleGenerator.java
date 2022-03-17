@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
 import java.util.ArrayList;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.paper.Paper;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * Generators create gcode from user input.  Fractals might be one example.

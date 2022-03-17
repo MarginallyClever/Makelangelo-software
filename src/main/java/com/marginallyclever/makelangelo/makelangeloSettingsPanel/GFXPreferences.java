@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
+package com.marginallyClever.makelangelo.makelangeloSettingsPanel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.*;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.*;
+import com.marginallyClever.util.PreferencesHelper;
 
 /**
  * Graphics settings

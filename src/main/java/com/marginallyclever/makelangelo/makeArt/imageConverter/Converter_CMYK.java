@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class Converter_CMYK extends ImageConverter {
 		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
 	}
 	
-	protected void outputChannel(TransformedImage img,float angle,ColorRGB newColor) {
+	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));

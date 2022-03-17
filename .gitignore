@@ -64,3 +64,5 @@ avrdude.exe
 *.dmg
 *.exe
 *.deb
+
+saved.png

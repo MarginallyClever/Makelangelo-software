@@ -1,6 +1,6 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyClever.makelangelo.select.SelectPanel;
 
 /**
  * All {@link TurtleGenerator} have a {@link TurtleGeneratorPanel}.

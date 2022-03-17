@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve

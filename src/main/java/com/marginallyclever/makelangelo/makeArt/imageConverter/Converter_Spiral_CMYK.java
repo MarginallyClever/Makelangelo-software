@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class Converter_Spiral_CMYK extends ImageConverter {
 		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
 	}
 
-	protected void outputChannel(TransformedImage img,ColorRGB newColor,double cx,double cy) {
+	protected void outputChannel(TransformedImage img, ColorRGB newColor, double cx, double cy) {
 		turtle.setColor(newColor);
 		
 		double maxr;

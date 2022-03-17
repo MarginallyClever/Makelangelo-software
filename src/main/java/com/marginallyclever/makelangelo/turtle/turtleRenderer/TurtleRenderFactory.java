@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.turtle.turtleRenderer;
+package com.marginallyClever.makelangelo.turtle.turtleRenderer;
 
-import com.marginallyclever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.Translator;
 import java.util.Arrays;
 
-import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
+import com.marginallyClever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
 
 /**
  * {@link TurtleRenderFactory} is a Factory pattern for {@link TurtleRenderer} instances, written

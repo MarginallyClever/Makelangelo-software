@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.Clipper2D;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * Completely fills the page with ink.

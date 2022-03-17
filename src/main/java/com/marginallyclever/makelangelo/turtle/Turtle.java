@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.turtle;
+package com.marginallyClever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.convenience.LineSegment2D;
+import com.marginallyClever.convenience.Point2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +79,22 @@ public class Turtle implements Cloneable {
 		}
 		return t;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Turtle{" +
+				"history=" + history +
+				", px=" + px +
+				", py=" + py +
+				", nx=" + nx +
+				", ny=" + ny +
+				", angle=" + angle +
+				", isUp=" + isUp +
+				", color=" + color +
+				", diameter=" + diameter +
+				'}';
+	}
+
 	/**
 	 * Returns this {@link Turtle} to mint condition.  Erases history and resets all parameters.  Called by constructor.
 	 * @param c The starting color for this {@link Turtle}.
@@ -134,8 +149,8 @@ public class Turtle implements Cloneable {
 	
 	/**
 	 * Absolute position change, make sure pen is up before move and put pen down after move.
-	 * @param x  
-	 * @param y 
+	 * @param x absolute x position
+	 * @param y absolute y position
 	 */
 	public void jumpTo(double x,double y) {
 		penUp();
@@ -145,8 +160,8 @@ public class Turtle implements Cloneable {
 	
 	/**
 	 * Absolute position change, do not adjust pen status
-	 * @param x  
-	 * @param y 
+	 * @param x relative x position
+	 * @param y relative y position
 	 */
 	public void moveTo(double x,double y) {
 		px=x;
@@ -187,6 +202,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
+	 * Returns true if pen is up.
 	 * @return true if pen is up
 	 */
 	public boolean isUp() {
@@ -194,8 +210,8 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Relative turn
-	 * @param degrees
+	 * Relative turn in degrees.
+	 * @param degrees relative change in degrees.  Positive is counter clockwise.
 	 */
 	public void turn(double degrees) {
 		setAngle(angle+degrees);
@@ -207,8 +223,8 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Set absolute angle
-	 * @param degrees degrees
+	 * Set absolute angle in degrees.
+	 * @param degrees absolute degrees.
 	 */
 	public void setAngle(double degrees) {
 		angle=degrees;
@@ -219,12 +235,12 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Relative move forward/back
-	 * @param stepSize
+	 * @param distance how far to travel
 	 */
-	public void forward(double stepSize) {
+	public void forward(double distance) {
 		moveTo(
-			px + nx * stepSize,
-			py + ny * stepSize
+			px + nx * distance,
+			py + ny * distance
 		);
 	}
 
@@ -285,20 +301,19 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Scale all draw and move segments by parameters
-	 * @param sx
-	 * @param sy
+	 * Scale all draw and move segments by the given amounts
+	 * @param sx the x axis scale factor.
+	 * @param sy the y axis scale factor.
 	 */
 	public void scale(double sx, double sy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case DRAW_LINE:
-			case TRAVEL:
-				m.x*=sx;
-				m.y*=sy;
-				break;
-			default:
-				break;
+			switch (m.type) {
+				case DRAW_LINE, TRAVEL -> {
+					m.x *= sx;
+					m.y *= sy;
+				}
+				default -> {
+				}
 			}
 		}
 	}
@@ -310,14 +325,34 @@ public class Turtle implements Cloneable {
 	 */
 	public void translate(double dx, double dy) {
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case DRAW_LINE:
-			case TRAVEL:
-				m.x+=dx;
-				m.y+=dy;
-				break;
-			default:
-				break;
+			switch (m.type) {
+				case DRAW_LINE, TRAVEL -> {
+					m.x += dx;
+					m.y += dy;
+				}
+				default -> {}
+			}
+		}
+	}
+
+	/**
+	 * Translate all draw and move segments by degrees
+	 * @param degrees relative ccw rotation
+	 */
+	public void rotate(double degrees) {
+		double r = Math.toRadians(degrees);
+		double c = Math.cos(r);
+		double s = Math.sin(r);
+
+		for( TurtleMove m : history ) {
+			switch (m.type) {
+				case DRAW_LINE, TRAVEL -> {
+					double ox=m.x;
+					double oy=m.y;
+					m.x = ox * c + oy * -s;
+					m.y = ox * s + oy *  c;
+				}
+				default -> {}
 			}
 		}
 	}
@@ -342,8 +377,10 @@ public class Turtle implements Cloneable {
 		logger.debug("extent is ({}/{} {}/{}", xmin, ymin, xmax, ymax);
 	}
 
-	// return a list of all the pen-down lines while remembering their color.
-	public ArrayList<LineSegment2D> getAsLineSegments() {
+	/**
+	 * @return a list of all the pen-down lines while remembering their color.
+ 	 */
+	public List<LineSegment2D> getAsLineSegments() {
 		ArrayList<LineSegment2D> lines = new ArrayList<>();
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
@@ -351,25 +388,21 @@ public class Turtle implements Cloneable {
 		logger.debug("  Found {} instructions.", history.size());
 		
 		for( TurtleMove m : history ) {
-			switch(m.type) {
-			case DRAW_LINE:
-				if(previousMovement!=null) {
-					LineSegment2D line = new LineSegment2D(
-							new Point2D(previousMovement.x,previousMovement.y),
-							new Point2D(m.x,m.y),
-							color);
-					if(line.lengthSquared()>0) {
-						lines.add(line);
+			switch (m.type) {
+				case DRAW_LINE -> {
+					if (previousMovement != null) {
+						LineSegment2D line = new LineSegment2D(
+								new Point2D(previousMovement.x, previousMovement.y),
+								new Point2D(m.x, m.y),
+								color);
+						if (line.lengthSquared() > 0) {
+							lines.add(line);
+						}
 					}
+					previousMovement = m;
 				}
-				previousMovement = m;
-				break;
-			case TRAVEL:
-				previousMovement = m;
-				break;
-			case TOOL_CHANGE:
-				color = m.getColor();
-				break;
+				case TRAVEL -> previousMovement = m;
+				case TOOL_CHANGE -> color = m.getColor();
 			}
 		}
 
@@ -378,38 +411,44 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Calls {@code addLineSegments} with a default minimum jump size.
-	 * @param orderedLines
+	 * @param segments the list of line segments to add.
 	 */
-	public void addLineSegments(List<LineSegment2D> orderedLines) {
-		addLineSegments(orderedLines,1e-6,1e-6);
+	public void addLineSegments(List<LineSegment2D> segments) {
+		addLineSegments(segments,1e-6,1e-6);
 	}
-	
-	public void addLineSegments(List<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
-		if(orderedLines.isEmpty()) return;
+
+	/**
+	 * Appends the list of segments to this {@link Turtle}.
+	 * @param segments the ordered list of segments to add.
+	 * @param minimumJumpSize For any {@link LineSegment2D} N being added, the Turtle will jump if N.b and (N+1).a are more than minimumJumpSize apart.
+	 * @param minDrawDistance For any {@link LineSegment2D} N being added, the Turtle will not draw line where N.b-N.a is less than minDrawDistance.
+	 */
+	public void addLineSegments(List<LineSegment2D> segments, double minimumJumpSize, double minDrawDistance) {
+		if(segments.isEmpty()) return;
 		
-		LineSegment2D first = orderedLines.get(0);
-		jumpTo(first.a.x,first.a.y);
-		moveTo(first.b.x,first.b.y);
+		LineSegment2D first = segments.get(0);
+		jumpTo(first.start.x,first.start.y);
+		moveTo(first.end.x,first.end.y);
 		
 		double minJumpSquared = minimumJumpSize*minimumJumpSize;
 		double minDrawSquared = minDrawDistance*minDrawDistance;
 		
-		for( LineSegment2D line : orderedLines ) {
+		for( LineSegment2D line : segments ) {
 			// change color if needed
-			if(line.c!=getColor()) {
-				setColor(line.c);
+			if(line.color !=getColor()) {
+				setColor(line.color);
 			}
 
-			double d = distanceSquared(line.a);
+			double d = distanceSquared(line.start);
 			if(d > minJumpSquared) {
 				// The previous line ends too far from the start point of this line,
 				// need to make a travel with the pen up to the start point of this line.
-				jumpTo(line.a.x,line.a.y);
+				jumpTo(line.start.x,line.start.y);
 			} else if(d>minDrawSquared) {
-				moveTo(line.a.x,line.a.y);
+				moveTo(line.start.x,line.start.y);
 			}
 			// Make a pen down move to the end of this line
-			moveTo(line.b.x,line.b.y);
+			moveTo(line.end.x,line.end.y);
 		}
 	}
 
