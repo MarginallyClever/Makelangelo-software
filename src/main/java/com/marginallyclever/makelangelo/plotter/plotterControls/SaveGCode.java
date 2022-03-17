@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -76,19 +77,35 @@ public class SaveGCode {
 		if(n==JOptionPane.NO_OPTION) {
 			saveOneFile(fileWithExtension, turtle, plotter);
 		} else if(n==JOptionPane.YES_OPTION) {
-			// split filename.ext.  New format will be filename-n.ext
-			int last = fileWithExtension.lastIndexOf(".");
-			String ext = fileWithExtension.substring(last);
-			String fileWithoutExtension = fileWithExtension.substring(0,last);
-			// now save each file
-			List<Turtle> list = turtle.splitByToolChange();
-			int i=0;
-			for( Turtle t : list ) {
-				++i;
-				String newFileName = fileWithoutExtension+"-"+Integer.toString(i)+ext;
-				saveOneFile(newFileName,turtle,plotter);
-			}
+			saveSeparateFiles(fileWithExtension, turtle, plotter);
 		}
+	}
+
+	/**
+	 * Splits a {@link Turtle} by tool changes and saves to one file per change.  Given a FILE.EXT it will generate
+	 * FILE-1.EXT, FILE-2.EXT, ..., FILE-N.EXT as required.
+	 * @param fileWithExtension the absolute path of the file to save
+	 * @param turtle the turtle to split and save
+	 * @param plotter the plotter reference for generating the gcode.
+	 * @return a list of the names of each file created.
+	 * @throws Exception
+	 */
+	protected List<String> saveSeparateFiles(String fileWithExtension, Turtle turtle, Plotter plotter) throws Exception {
+		// split filename.ext.  New format will be filename-n.ext
+		int last = fileWithExtension.lastIndexOf(".");
+		String ext = fileWithExtension.substring(last);
+		String fileWithoutExtension = fileWithExtension.substring(0,last);
+		// now save each file
+		List<Turtle> list = turtle.splitByToolChange();
+		List<String> filesCreated = new ArrayList<>();
+		int i=0;
+		for( Turtle split : list ) {
+			++i;
+			String newFileName = fileWithoutExtension+"-"+Integer.toString(i)+ext;
+			saveOneFile(newFileName,split,plotter);
+			filesCreated.add(newFileName);
+		}
+		return filesCreated;
 	}
 
 	private int countTurtleToolChanges(Turtle turtle) {

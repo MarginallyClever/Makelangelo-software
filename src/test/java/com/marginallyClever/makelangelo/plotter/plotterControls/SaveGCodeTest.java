@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,7 @@ class SaveGCodeTest {
     }
 
     @Test
-    public void saveMultiColor() throws Exception {
+    public void saveMultiColorOneFile() throws Exception {
         verifySavedFile(multiColorsMoves(), "/gcode/save_multi_colors.gcode");
     }
 
@@ -47,24 +48,53 @@ class SaveGCodeTest {
 
         try {
             Plotter plotter = new Plotter();
-
             // when
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
-
             // then
-            List<String> expected = splitAndfilterForTest(readFile(expectedFilename));
-            List<String> actual = splitAndfilterForTest(
-                    new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
-                            .useDelimiter("\\A")
-                            .next());
-
-            assertIterableEquals(expected, actual);
+            compareExpectedToActual(expectedFilename,fileTemp);
         } finally {
             fileTemp.delete();
         }
     }
 
-    private List<String> splitAndfilterForTest(String fileContent) {
+    private void compareExpectedToActual(String expectedFilename, File fileTemp) throws FileNotFoundException {
+        List<String> expected = splitAndFilterForTest(readFile(expectedFilename));
+        List<String> actual = splitAndFilterForTest(
+                new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
+                        .useDelimiter("\\A")
+                        .next());
+        assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    public void saveMultiColorManyFile() throws Exception {
+        // given
+        Turtle turtle = multiColorsMoves();
+        SaveGCode saveGCode = new SaveGCode();
+
+        List<String> files=null;
+
+        File fileTemp = File.createTempFile("unit", null);
+
+        try {
+            Plotter plotter = new Plotter();
+
+            // when
+            files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
+            // then
+            compareExpectedToActual("/gcode/save_multi_colors-1.gcode",new File(files.get(0)));
+            compareExpectedToActual("/gcode/save_multi_colors-2.gcode",new File(files.get(1)));
+        } finally {
+            fileTemp.delete();
+            if(files!=null) {
+                for(String absolutePath : files) {
+                    (new File(absolutePath)).delete();
+                }
+            }
+        }
+    }
+
+    private List<String> splitAndFilterForTest(String fileContent) {
         return Arrays.stream(fileContent.split("\\r?\\n"))
                 .filter(line -> !line.matches("; 20.* at ..:.*") && !line.matches("Generated with.*"))
                 .collect(Collectors.toList());
