@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 /**
  * {@link ConversationEvent} describes a single entry in a {@link ConversationHistory}.

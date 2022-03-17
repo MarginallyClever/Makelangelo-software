@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;

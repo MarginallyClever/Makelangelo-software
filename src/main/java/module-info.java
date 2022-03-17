@@ -17,7 +17,7 @@ module com.marginallyclever.makelangelo {
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.makeart.io.vector;
-    opens com.marginallyclever.makelangelo.plotter.plotterControls;
+    opens com.marginallyclever.makelangelo.plotter.plottercontrols;
     opens com.marginallyclever.makelangelo.turtle;
 
     uses com.marginallyClever.nodeGraphCore.NodeRegistry;
