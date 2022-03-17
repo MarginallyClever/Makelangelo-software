@@ -7,8 +7,8 @@ import java.io.Writer;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_Invert;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Invert;
 
 /**
  * 

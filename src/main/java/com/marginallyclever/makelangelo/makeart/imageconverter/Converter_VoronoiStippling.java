@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageConverter.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.makeart.imageConverter.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.makelangelo.makeart.imageConverter.voronoi.VoronoiTesselator;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
