@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyClever.makelangelo;
 
-import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.util.MarginallyCleverTranslationXmlFileHelper;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.FileAccess;
+import com.marginallyClever.util.MarginallyCleverTranslationXmlFileHelper;
+import com.marginallyClever.util.PreferencesHelper;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

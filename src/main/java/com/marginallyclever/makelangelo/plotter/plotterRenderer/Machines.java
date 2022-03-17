@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plotterRenderer;
+package com.marginallyClever.makelangelo.plotter.plotterRenderer;
 
 import java.util.Arrays;
 

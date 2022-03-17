@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.rangeSlider;
+package com.marginallyClever.makelangelo.rangeSlider;
 
 import javax.swing.JSlider;
 

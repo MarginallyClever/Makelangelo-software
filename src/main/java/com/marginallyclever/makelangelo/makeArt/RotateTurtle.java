@@ -1,7 +1,7 @@
-package com.marginallyclever.makelangelo.makeArt;
+package com.marginallyClever.makelangelo.makeArt;
 
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
 
 public class RotateTurtle {
 	public static void run(Turtle turtle,double degrees) {

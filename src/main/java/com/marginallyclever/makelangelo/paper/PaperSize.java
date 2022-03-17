@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.paper;
+package com.marginallyClever.makelangelo.paper;
 
 public class PaperSize {
 	public String name;

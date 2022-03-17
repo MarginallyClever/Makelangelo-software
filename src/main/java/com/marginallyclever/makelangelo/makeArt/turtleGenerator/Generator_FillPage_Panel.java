@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectDouble;
 
 /**
  * Panel for {@link Generator_FillPage}

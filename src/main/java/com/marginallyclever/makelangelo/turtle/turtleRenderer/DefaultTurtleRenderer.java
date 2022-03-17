@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.turtle.turtleRenderer;
+package com.marginallyClever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
 
 /**
  * Draws Turtle instructions one line segment at a time.

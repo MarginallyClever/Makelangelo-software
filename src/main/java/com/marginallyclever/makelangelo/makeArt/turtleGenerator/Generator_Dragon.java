@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 
 /**
  * Dragon fractal

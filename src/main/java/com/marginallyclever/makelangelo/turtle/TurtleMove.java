@@ -1,13 +1,12 @@
-package com.marginallyclever.makelangelo.turtle;
+package com.marginallyClever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.convenience.StringHelper;
 
 import java.awt.*;
 import java.util.Objects;
 
 public class TurtleMove {
-
 	public MovementType type;
 	public double x,y;  // destination
 	
@@ -22,6 +21,10 @@ public class TurtleMove {
 		this(m.x,m.y,m.type);
 	}
 
+	public void setColor(ColorRGB c) {
+		this.x = c.toInt();
+	}
+
 	public ColorRGB getColor() {
 		return new ColorRGB((int)x);
 	}
@@ -29,7 +32,11 @@ public class TurtleMove {
 	public double getDiameter() {
 		return y;
 	}
-	
+
+	public void setDiameter(double d) {
+		y=d;
+	}
+
 	public String toString() {
 		switch(type) {
 		case TOOL_CHANGE:

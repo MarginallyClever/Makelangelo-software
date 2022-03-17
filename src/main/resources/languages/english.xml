@@ -2156,4 +2156,15 @@
 		<value>Forever loops are forever forbidden.</value>
 	</string>
 
+	<!-- to update / review -->
+	<string>
+		<key>SaveGCode.splitGCodeTitle</key>
+		<value>Many colors detected</value>
+	</string>
+
+	<!-- to update / review -->
+	<string>
+		<key>SaveGCode.splitGCodeQuestion</key>
+		<value>There are %1 tool changes in this drawing.  Split into separate files?</value>
+	</string>
 </language>

@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectTextArea;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectInteger;
+import com.marginallyClever.makelangelo.select.SelectOneOfMany;
+import com.marginallyClever.makelangelo.select.SelectTextArea;
 
 /**
  * Panel for {@link Generator_Text}

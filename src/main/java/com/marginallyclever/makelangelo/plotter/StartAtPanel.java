@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectInteger;
+import com.marginallyClever.makelangelo.select.SelectOneOfMany;
+import com.marginallyClever.makelangelo.select.SelectPanel;
 
 public class StartAtPanel extends SelectPanel {
 	/**

@@ -1,12 +1,12 @@
-package com.marginallyclever.makelangelo.plotter.plotterRenderer;
+package com.marginallyClever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
 
-import static com.marginallyclever.convenience.DrawingHelper.*;
+import static com.marginallyClever.convenience.DrawingHelper.*;
 
 public class Makelangelo5 implements PlotterRenderer {
 

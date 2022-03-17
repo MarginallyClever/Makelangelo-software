@@ -1,6 +1,6 @@
-package com.marginallyclever.makelangelo.firmwareUploader;
+package com.marginallyClever.makelangelo.firmwareUploader;
 
-import com.marginallyclever.convenience.FileAccess;
+import com.marginallyClever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

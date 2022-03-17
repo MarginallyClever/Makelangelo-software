@@ -1,4 +1,4 @@
-package com.marginallyclever.util;
+package com.marginallyClever.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -27,13 +27,13 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 	private A rootPreferences;
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_XML_FILE =
-			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
+			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.xmlFile";
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_PROPERTIES_FILE =
-			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
+			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.propertiesFile";
 
 	private static final String SYSTEM_PROPERTY_KEY_FOR_JSON_FILE =
-			"com.marginallyclever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
+			"com.marginallyClever.util.MarginallyCleverJsonFilePreferencesFactory.jsonFile";
 
 	private static File xmlPreferencesFile;
 

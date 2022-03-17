@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.paper;
+package com.marginallyClever.makelangelo.paper;
 
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.preview.PreviewListener;
+import com.marginallyClever.util.PreferencesHelper;
 
 public class Paper implements PreviewListener {
 

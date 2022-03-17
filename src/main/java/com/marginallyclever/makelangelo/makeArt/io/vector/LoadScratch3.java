@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.makeArt.io.vector;
+package com.marginallyClever.makelangelo.makeArt.io.vector;
 
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;

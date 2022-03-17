@@ -1,4 +1,4 @@
-package com.marginallyclever.communications;
+package com.marginallyClever.communications;
 
 import java.util.HashMap;
 import java.util.Map;

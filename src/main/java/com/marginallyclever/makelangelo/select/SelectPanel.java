@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.select;
+package com.marginallyClever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyClever.convenience.ColorRGB;
 
 /**
  * A container for all Select elements, to facilitate formatting as a group.

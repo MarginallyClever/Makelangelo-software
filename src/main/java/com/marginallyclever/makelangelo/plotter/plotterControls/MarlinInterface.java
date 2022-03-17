@@ -1,10 +1,10 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionListener;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.communications.NetworkSessionEvent;
+import com.marginallyClever.communications.NetworkSessionListener;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class MarlinInterface extends JPanel {
 	public static final String DID_NOT_FIND = "didnotfind";
 
 	private TextInterfaceToNetworkSession chatInterface;
-	private List<MarlinCommand> myHistory = new ArrayList<>();
+	private final List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
 	private int lineNumberToSend;
@@ -65,7 +65,7 @@ public class MarlinInterface extends JPanel {
 	// don't send more than this many at a time without acknowledgement.
 	private int busyCount=MARLIN_SEND_LIMIT;
 	
-	private Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
+	private final Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
 	
 	public MarlinInterface(ChooseConnection chooseConnection) {
@@ -250,7 +250,7 @@ public class MarlinInterface extends JPanel {
 
 	// OBSERVER PATTERN
 	
-	private List<ActionListener> listeners = new ArrayList<>();
+	private final List<ActionListener> listeners = new ArrayList<>();
 
 	public void addListener(ActionListener listener) {
 		listeners.add(listener);

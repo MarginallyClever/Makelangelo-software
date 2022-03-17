@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.plotter.marlinSimulation;
+package com.marginallyClever.makelangelo.plotter.marlinSimulation;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
+import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;

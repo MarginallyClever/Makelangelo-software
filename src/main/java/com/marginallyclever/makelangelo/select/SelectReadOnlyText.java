@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.select;
+package com.marginallyClever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;

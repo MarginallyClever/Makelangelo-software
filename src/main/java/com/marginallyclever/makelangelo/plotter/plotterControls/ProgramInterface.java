@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyClever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

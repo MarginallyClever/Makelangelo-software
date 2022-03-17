@@ -1,18 +1,18 @@
-package com.marginallyclever.makelangelo.paper;
+package com.marginallyClever.makelangelo.paper;
 
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.JFrame;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectColor;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectSlider;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.select.SelectBoolean;
+import com.marginallyClever.makelangelo.select.SelectColor;
+import com.marginallyClever.makelangelo.select.SelectDouble;
+import com.marginallyClever.makelangelo.select.SelectOneOfMany;
+import com.marginallyClever.makelangelo.select.SelectPanel;
+import com.marginallyClever.makelangelo.select.SelectSlider;
+import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

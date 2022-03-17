@@ -1,19 +1,18 @@
-package com.marginallyclever.makelangelo.makeArt.imageConverter;
-
-import java.beans.PropertyChangeListener;
-
-import javax.swing.ProgressMonitor;
+package com.marginallyClever.makelangelo.makeArt.imageConverter;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.MathHelper;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.io.image.ImageConverterThread;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyClever.convenience.Clipper2D;
+import com.marginallyClever.convenience.MathHelper;
+import com.marginallyClever.convenience.Point2D;
+import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyClever.makelangelo.makeArt.io.image.ImageConverterThread;
+import com.marginallyClever.makelangelo.paper.Paper;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+
+import javax.swing.*;
+import java.beans.PropertyChangeListener;
 
 /**
  * Converts a {@link TransformedImage} to {@link Turtle}
@@ -160,7 +159,6 @@ public abstract class ImageConverter implements PropertyChangeListener {
 
 			if(v<channelCutoff) turtle.moveTo(x,y);
 			else turtle.jumpTo(x,y);
-			
 		}
 	}
 	

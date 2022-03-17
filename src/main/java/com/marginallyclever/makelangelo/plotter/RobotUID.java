@@ -1,6 +1,6 @@
-package com.marginallyclever.makelangelo.plotter;
+package com.marginallyClever.makelangelo.plotter;
 
-import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyClever.convenience.CommandLineOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

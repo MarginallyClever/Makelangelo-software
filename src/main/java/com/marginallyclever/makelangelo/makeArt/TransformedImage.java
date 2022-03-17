@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.makeArt;
+package com.marginallyClever.makelangelo.makeArt;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
-import com.marginallyclever.makelangelo.makeArt.imageFilter.ImageFilter;
+import com.marginallyClever.makelangelo.makeArt.imageFilter.ImageFilter;
 
 /**
  * TransformedImage is a BufferedImage, scaled, rotated, and translated

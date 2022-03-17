@@ -1,23 +1,26 @@
-package com.marginallyclever.makelangelo.plotter.plotterControls;
+package com.marginallyClever.makelangelo.plotter.plotterControls;
 
-import com.marginallyclever.makelangelo.MakelangeloVersion;
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import java.awt.geom.Rectangle2D;
+import com.marginallyClever.convenience.StringHelper;
+import com.marginallyClever.makelangelo.MakelangeloVersion;
+import com.marginallyClever.makelangelo.Translator;
+import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyClever.makelangelo.turtle.MovementType;
+import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyClever.makelangelo.turtle.TurtleMove;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Save the {@link ProgramInterface} instruction buffer to a gcode file of the user's choosing.
@@ -42,7 +45,7 @@ public class SaveGCode {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
-	public void run(Turtle turtle, Plotter robot, JFrame parent) throws Exception {
+	public void run(Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
@@ -93,6 +96,7 @@ public class SaveGCode {
 		for( TurtleMove m : turtle.history ) {
 			if(m.type == MovementType.TOOL_CHANGE) ++i;
 		}
+		return i;
 	}
 
 	private String addExtension(String name, String [] extensions) {
@@ -103,7 +107,7 @@ public class SaveGCode {
 		return name + "." + extensions[0];
 	}
 		
-	protected void save(String filename, Turtle turtle, Plotter robot) throws Exception {
+	protected void saveOneFile(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {			

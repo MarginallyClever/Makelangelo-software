@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyClever.makelangelo;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.util.PreferencesHelper;
+import com.marginallyClever.convenience.CommandLineOptions;
+import com.marginallyClever.convenience.log.Log;
+import com.marginallyClever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
