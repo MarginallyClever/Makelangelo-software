@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience;
+package com.marginallyclever.convenience;
 
 import com.marginallyClever.makelangelo.makelangeloSettingsPanel.SoundPreferences;
 import org.slf4j.Logger;

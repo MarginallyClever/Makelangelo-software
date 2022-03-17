@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyClever.convenience.CommandLineOptions;

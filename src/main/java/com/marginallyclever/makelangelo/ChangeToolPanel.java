@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.marginallyClever.convenience.CommandLineOptions;
 import com.marginallyClever.convenience.log.Log;

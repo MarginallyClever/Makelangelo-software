@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.turtle.turtleRenderer;
+package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.marginallyClever.makelangelo.Translator;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.marginallyClever.donatello.nodes;
+package com.marginallyclever.donatello.nodes;
 
 import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
 import com.marginallyClever.makelangelo.turtle.Turtle;

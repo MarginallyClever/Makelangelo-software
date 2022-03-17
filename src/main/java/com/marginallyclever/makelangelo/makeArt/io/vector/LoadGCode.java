@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import java.io.InputStream;
 import java.util.Scanner;

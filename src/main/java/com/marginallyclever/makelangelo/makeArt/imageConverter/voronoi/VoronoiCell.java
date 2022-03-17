@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter.voronoi;
+package com.marginallyclever.makelangelo.makeArt.imageConverter.voronoi;
 
 import java.awt.geom.Rectangle2D;
 

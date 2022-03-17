@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.imageFilter;
+package com.marginallyclever.makelangelo.makeArt.imageFilter;
 
 import java.awt.Color;
 

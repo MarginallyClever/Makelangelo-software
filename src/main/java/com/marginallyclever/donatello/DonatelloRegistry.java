@@ -1,4 +1,4 @@
-package com.marginallyClever.donatello;
+package com.marginallyclever.donatello;
 
 import com.marginallyClever.donatello.nodes.*;
 import com.marginallyClever.donatello.nodes.shapes.TurtleCircle;

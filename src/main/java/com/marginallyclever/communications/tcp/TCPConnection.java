@@ -1,4 +1,4 @@
-package com.marginallyClever.communications.tcp;
+package com.marginallyclever.communications.tcp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter;
+package com.marginallyclever.makelangelo.plotter;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makelangeloSettingsPanel;
+package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
 import com.marginallyClever.makelangelo.Translator;
 import com.marginallyClever.util.PreferencesHelper;

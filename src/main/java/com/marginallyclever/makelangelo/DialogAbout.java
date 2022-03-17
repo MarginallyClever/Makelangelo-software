@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.marginallyClever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyClever.util.PreferencesHelper;

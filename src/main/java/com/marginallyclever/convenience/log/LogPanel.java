@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience.log;
+package com.marginallyclever.convenience.log;
 
 import com.marginallyClever.convenience.ButtonIcon;
 import com.marginallyClever.makelangelo.Translator;

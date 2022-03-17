@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
 import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;

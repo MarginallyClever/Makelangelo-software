@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.turtle.turtleRenderer;
+package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyClever.convenience.ColorRGB;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.firmwareUploader;
+package com.marginallyclever.makelangelo.firmwareUploader;
 
 import com.marginallyClever.communications.serial.SerialTransportLayer;
 import com.marginallyClever.convenience.CommandLineOptions;

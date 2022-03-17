@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.marginallyClever.util.PreferencesHelper;
 import org.slf4j.Logger;

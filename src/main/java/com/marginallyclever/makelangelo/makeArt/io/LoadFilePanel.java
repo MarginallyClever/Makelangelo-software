@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.io;
+package com.marginallyclever.makelangelo.makeArt.io;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyClever.convenience.CommandLineOptions;

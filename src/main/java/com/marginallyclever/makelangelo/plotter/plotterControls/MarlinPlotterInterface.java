@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
 import com.marginallyClever.communications.NetworkSessionEvent;
 import com.marginallyClever.convenience.Point2D;

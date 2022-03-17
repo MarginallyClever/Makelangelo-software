@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.turtle;
+package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyClever.convenience.ColorRGB;
 import com.marginallyClever.convenience.StringHelper;

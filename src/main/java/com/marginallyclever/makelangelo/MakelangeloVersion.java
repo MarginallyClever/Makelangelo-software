@@ -1,6 +1,6 @@
 /*
  */
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.marginallyClever.util.PropertiesFileHelper;
 

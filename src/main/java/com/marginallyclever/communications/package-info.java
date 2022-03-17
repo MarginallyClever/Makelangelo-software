@@ -6,4 +6,4 @@
  * @version v7
  * @since v7
  */
-package com.marginallyClever.communications;
+package com.marginallyclever.communications;

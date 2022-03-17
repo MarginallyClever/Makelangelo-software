@@ -1,4 +1,4 @@
-package com.marginallyClever.donatello.nodes.shapes;
+package com.marginallyclever.donatello.nodes.shapes;
 
 import com.marginallyClever.makelangelo.turtle.Turtle;
 import com.marginallyClever.nodeGraphCore.Node;

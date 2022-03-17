@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.io;
+package com.marginallyclever.makelangelo.makeArt.io;
 
 import com.marginallyClever.convenience.FileAccess;
 import com.marginallyClever.makelangelo.Translator;

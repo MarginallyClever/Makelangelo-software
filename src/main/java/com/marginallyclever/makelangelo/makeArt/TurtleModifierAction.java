@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeArt;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyClever.convenience.CommandLineOptions;
 import com.marginallyClever.makelangelo.Translator;

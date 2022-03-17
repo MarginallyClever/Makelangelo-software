@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls.communications;
+package com.marginallyclever.makelangelo.plotter.plotterControls.communications;
 
 import com.marginallyClever.communications.Configuration;
 import com.marginallyClever.communications.TransportLayer;

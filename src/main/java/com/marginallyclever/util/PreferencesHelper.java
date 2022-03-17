@@ -1,4 +1,4 @@
-package com.marginallyClever.util;
+package com.marginallyclever.util;
 
 import org.json.JSONObject;
 import org.json.Property;

@@ -1,4 +1,4 @@
-package com.marginallyClever.communications.serial;
+package com.marginallyclever.communications.serial;
 
 import com.marginallyClever.communications.NetworkSession;
 import jssc.SerialPort;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.turtle;
+package com.marginallyclever.makelangelo.turtle;
 
 public enum MovementType {
     TRAVEL, // move without drawing

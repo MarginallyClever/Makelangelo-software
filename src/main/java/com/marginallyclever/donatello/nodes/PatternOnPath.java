@@ -1,4 +1,4 @@
-package com.marginallyClever.donatello.nodes;
+package com.marginallyclever.donatello.nodes;
 
 import com.marginallyClever.convenience.Point2D;
 import com.marginallyClever.makelangelo.turtle.Turtle;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.marlinSimulation;
+package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
 import com.marginallyClever.convenience.StringHelper;
 import org.slf4j.Logger;

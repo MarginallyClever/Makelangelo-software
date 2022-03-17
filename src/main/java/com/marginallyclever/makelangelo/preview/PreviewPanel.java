@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.preview;
+package com.marginallyclever.makelangelo.preview;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;

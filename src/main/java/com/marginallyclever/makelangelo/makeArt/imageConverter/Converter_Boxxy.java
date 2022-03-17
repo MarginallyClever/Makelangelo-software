@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeArt.imageConverter;
 
 
 import java.beans.PropertyChangeEvent;

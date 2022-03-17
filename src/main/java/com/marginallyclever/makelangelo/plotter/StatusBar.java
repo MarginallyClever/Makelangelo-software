@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter;
+package com.marginallyclever.makelangelo.plotter;
 
 import com.marginallyClever.convenience.StringHelper;
 import com.marginallyClever.makelangelo.Translator;

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeArt.io.vector;
 
 import com.marginallyClever.convenience.ColorRGB;
 import com.marginallyClever.makelangelo.turtle.Turtle;

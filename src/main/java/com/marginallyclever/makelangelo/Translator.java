@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import com.marginallyClever.convenience.FileAccess;
 import com.marginallyClever.util.MarginallyCleverTranslationXmlFileHelper;

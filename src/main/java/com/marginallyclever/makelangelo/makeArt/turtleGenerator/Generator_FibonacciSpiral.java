@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeArt.turtleGenerator;
 
 import com.marginallyClever.makelangelo.Translator;
 import com.marginallyClever.makelangelo.turtle.Turtle;

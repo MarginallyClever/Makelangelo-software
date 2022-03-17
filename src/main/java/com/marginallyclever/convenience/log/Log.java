@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience.log;
+package com.marginallyclever.convenience.log;
 
 import com.marginallyClever.convenience.FileAccess;
 import org.slf4j.Logger;

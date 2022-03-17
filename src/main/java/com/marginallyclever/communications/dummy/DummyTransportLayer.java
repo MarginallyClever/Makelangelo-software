@@ -1,4 +1,4 @@
-package com.marginallyClever.communications.dummy;
+package com.marginallyclever.communications.dummy;
 
 import com.marginallyClever.communications.Configuration;
 import com.marginallyClever.communications.NetworkSession;

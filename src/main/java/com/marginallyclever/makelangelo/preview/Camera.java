@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.preview;
+package com.marginallyclever.makelangelo.preview;
 
 import com.marginallyClever.util.PreferencesHelper;
 
