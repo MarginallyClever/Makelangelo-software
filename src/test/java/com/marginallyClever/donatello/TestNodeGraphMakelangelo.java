@@ -22,8 +22,13 @@ public class TestNodeGraphMakelangelo {
 
     @BeforeAll
     public static void beforeAll() {
-        NodeFactory.loadRegistries();
-        DAO4JSONFactory.loadRegistries();
+        try {
+            NodeFactory.loadRegistries();
+            DAO4JSONFactory.loadRegistries();
+        } catch(Exception e) {
+            System.out.println(e);
+            assert(false);
+        }
     }
 
     public static void afterAll() {
