@@ -58,8 +58,8 @@ public class SaveGCode {
 		
 		return name + "." + extensions[0];
 	}
-	
-	private void save(String filename, Turtle turtle, Plotter robot) throws Exception {
+		
+	protected void save(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
 		
 		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {

@@ -344,7 +344,7 @@ public class Turtle implements Cloneable {
 
 	// return a list of all the pen-down lines while remembering their color.
 	public ArrayList<LineSegment2D> getAsLineSegments() {
-		ArrayList<LineSegment2D> lines = new ArrayList<LineSegment2D>();
+		ArrayList<LineSegment2D> lines = new ArrayList<>();
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
@@ -380,11 +380,11 @@ public class Turtle implements Cloneable {
 	 * Calls {@code addLineSegments} with a default minimum jump size.
 	 * @param orderedLines
 	 */
-	public void addLineSegments(ArrayList<LineSegment2D> orderedLines) {
+	public void addLineSegments(List<LineSegment2D> orderedLines) {
 		addLineSegments(orderedLines,1e-6,1e-6);
 	}
 	
-	public void addLineSegments(ArrayList<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
+	public void addLineSegments(List<LineSegment2D> orderedLines, double minimumJumpSize, double minDrawDistance) {
 		if(orderedLines.isEmpty()) return;
 		
 		LineSegment2D first = orderedLines.get(0);
@@ -419,8 +419,8 @@ public class Turtle implements Cloneable {
 		return dx*dx + dy*dy; 
 	}
 	
-	public ArrayList<Turtle> splitByToolChange() {
-		ArrayList<Turtle> list = new ArrayList<Turtle>();
+	public List<Turtle> splitByToolChange() {
+		List<Turtle> list = new ArrayList<>();
 		Turtle t = new Turtle();
 		list.add(t);
 		
@@ -434,7 +434,7 @@ public class Turtle implements Cloneable {
 		}
 		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
-		ArrayList<Turtle> notEmptyList = new ArrayList<Turtle>();
+		List<Turtle> notEmptyList = new ArrayList<>();
 		for( Turtle t2 : list ) {
 			if(t2.getHasAnyDrawingMoves()) {
 				notEmptyList.add(t2);
