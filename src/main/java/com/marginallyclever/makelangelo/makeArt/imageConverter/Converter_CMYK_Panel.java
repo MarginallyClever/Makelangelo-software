@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyClever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 
 public class Converter_CMYK_Panel extends ImageConverterPanel {
 	private static final long serialVersionUID = 1L;

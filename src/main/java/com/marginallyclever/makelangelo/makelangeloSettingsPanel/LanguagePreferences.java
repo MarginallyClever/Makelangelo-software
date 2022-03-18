@@ -1,10 +1,10 @@
-package com.marginallyClever.makelangelo.makelangeloSettingsPanel;
+package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.select.SelectOneOfMany;
-import com.marginallyClever.makelangelo.select.SelectPanel;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

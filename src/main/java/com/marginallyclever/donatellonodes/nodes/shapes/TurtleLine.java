@@ -1,8 +1,8 @@
-package com.marginallyClever.donatello.nodes.shapes;
+package com.marginallyclever.donatellonodes.nodes.shapes;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 
 public class TurtleLine extends Node {
     private final NodeVariable<Number> x0 = NodeVariable.newInstance("x0", Number.class, 0,true,false);

@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

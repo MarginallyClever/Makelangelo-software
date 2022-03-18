@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
-import com.marginallyClever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectPanel;
 
 /**
  * All converters have a panel with options.  This is their shared root.

@@ -1,10 +1,10 @@
-package com.marginallyClever.makelangelo.makeArt.imageFilter;
+package com.marginallyclever.makelangelo.makeart.imageFilter;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyClever.convenience.ColorPalette;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.convenience.ColorPalette;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
 
 /**

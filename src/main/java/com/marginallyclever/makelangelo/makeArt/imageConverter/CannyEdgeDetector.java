@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;

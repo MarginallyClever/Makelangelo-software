@@ -1,11 +1,11 @@
-package com.marginallyClever.makelangelo.makelangeloSettingsPanel;
+package com.marginallyclever.makelangelo.makelangeloSettingsPanel;
 
 import java.util.prefs.Preferences;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.select.SelectFile;
-import com.marginallyClever.makelangelo.select.SelectPanel;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectFile;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.util.PreferencesHelper;
 
 
 /**

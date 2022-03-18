@@ -1,12 +1,12 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.StringHelper;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
-import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_DitherFloydSteinberg;
-import com.marginallyClever.makelangelo.preview.PreviewListener;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_DitherFloydSteinberg;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

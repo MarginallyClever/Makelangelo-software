@@ -1,16 +1,16 @@
-package com.marginallyClever.makelangelo.makeArt.io.image;
+package com.marginallyclever.makelangelo.makeart.io.image;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
-import com.marginallyClever.makelangelo.makeArt.imageConverter.ImageConverter;
-import com.marginallyClever.makelangelo.makeArt.imageConverter.ImageConverterFactory;
-import com.marginallyClever.makelangelo.makeArt.imageConverter.ImageConverterPanel;
-import com.marginallyClever.makelangelo.paper.Paper;
-import com.marginallyClever.makelangelo.preview.PreviewListener;
-import com.marginallyClever.makelangelo.select.SelectPanelChangeListener;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.makeart.imageConverter.ImageConverterFactory;
+import com.marginallyclever.makelangelo.makeart.imageConverter.ImageConverterPanel;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

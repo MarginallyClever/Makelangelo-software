@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls.communications;
+package com.marginallyclever.makelangelo.plotter.plotterControls.communications;
 
-import com.marginallyClever.communications.Configuration;
-import com.marginallyClever.communications.TransportLayer;
-import com.marginallyClever.communications.dummy.DummyTransportLayer;
+import com.marginallyclever.communications.Configuration;
+import com.marginallyclever.communications.TransportLayer;
+import com.marginallyclever.communications.dummy.DummyTransportLayer;
 
 import javax.swing.*;
 

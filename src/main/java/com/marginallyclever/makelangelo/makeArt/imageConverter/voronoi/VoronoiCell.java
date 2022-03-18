@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter.voronoi;
+package com.marginallyclever.makelangelo.makeart.imageConverter.voronoi;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyClever.convenience.Point2D;
+import com.marginallyclever.convenience.Point2D;
 
 
 public class VoronoiCell implements Comparable<VoronoiCell> {

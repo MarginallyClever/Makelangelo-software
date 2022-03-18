@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
 public class TurtleGeneratorFactory {
 	public static TurtleGenerator [] available = {

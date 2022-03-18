@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

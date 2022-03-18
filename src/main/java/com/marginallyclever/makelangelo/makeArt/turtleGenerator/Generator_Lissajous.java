@@ -1,7 +1,7 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)

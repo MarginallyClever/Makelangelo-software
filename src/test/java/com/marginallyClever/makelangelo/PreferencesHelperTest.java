@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

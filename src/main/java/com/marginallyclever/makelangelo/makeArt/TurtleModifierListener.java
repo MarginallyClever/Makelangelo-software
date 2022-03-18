@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * {@link TurtleModifierListener} subscribe to {@link TurtleModifierAction}s in order

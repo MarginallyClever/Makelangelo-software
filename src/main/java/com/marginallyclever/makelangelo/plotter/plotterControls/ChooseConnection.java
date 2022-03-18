@@ -1,13 +1,13 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.communications.*;
-import com.marginallyClever.convenience.ButtonIcon;
-import com.marginallyClever.convenience.ToggleButtonIcon;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.plotter.plotterControls.communications.DummyUI;
-import com.marginallyClever.makelangelo.plotter.plotterControls.communications.SerialUI;
-import com.marginallyClever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.communications.*;
+import com.marginallyclever.convenience.ButtonIcon;
+import com.marginallyclever.convenience.ToggleButtonIcon;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.DummyUI;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.SerialUI;
+import com.marginallyclever.makelangelo.plotter.plotterControls.communications.TransportLayerUI;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

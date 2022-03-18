@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.rangeSlider;
+package com.marginallyclever.makelangelo.rangeSlider;
 
 import java.awt.Color;
 import java.awt.Dimension;

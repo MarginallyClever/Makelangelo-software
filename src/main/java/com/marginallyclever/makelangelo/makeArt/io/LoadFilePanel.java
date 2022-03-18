@@ -1,16 +1,16 @@
-package com.marginallyClever.makelangelo.makeArt.io;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.ResizeTurtleToPaperAction;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
-import com.marginallyClever.makelangelo.makeArt.io.image.ConvertImagePanel;
-import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyClever.makelangelo.paper.Paper;
-import com.marginallyClever.makelangelo.preview.PreviewListener;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.ResizeTurtleToPaperAction;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.io.image.ConvertImagePanel;
+import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

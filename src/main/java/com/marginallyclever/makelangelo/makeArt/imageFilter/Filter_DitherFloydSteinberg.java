@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.makeArt.imageFilter;
+package com.marginallyclever.makelangelo.makeart.imageFilter;
 
 import java.awt.image.BufferedImage;
 
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
 /**
  * Floyd/Steinberg dithering

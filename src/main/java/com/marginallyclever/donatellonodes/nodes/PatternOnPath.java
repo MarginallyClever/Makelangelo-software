@@ -1,9 +1,9 @@
-package com.marginallyClever.donatello.nodes;
+package com.marginallyclever.donatellonodes.nodes;
 
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 
 public class PatternOnPath extends Node {
     private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,false);

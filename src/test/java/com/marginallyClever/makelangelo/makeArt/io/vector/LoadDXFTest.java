@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeart.io.vector;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,8 @@ import org.junit.jupiter.api.TestFactory;
 
 import java.util.stream.Stream;
 
-import static com.marginallyClever.makelangelo.makeArt.io.vector.LoadHelper.loadAndTestFiles;
-import static com.marginallyClever.makelangelo.makeArt.io.vector.LoadHelper.readFile;
+import static com.marginallyclever.makelangelo.makeart.io.vector.LoadHelper.loadAndTestFiles;
+import static com.marginallyclever.makelangelo.makeart.io.vector.LoadHelper.readFile;
 import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.*;
 

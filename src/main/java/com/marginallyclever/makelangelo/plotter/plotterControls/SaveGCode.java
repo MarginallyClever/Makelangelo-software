@@ -1,12 +1,12 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.convenience.StringHelper;
-import com.marginallyClever.makelangelo.MakelangeloVersion;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.plotter.Plotter;
-import com.marginallyClever.makelangelo.turtle.MovementType;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.makelangelo.MakelangeloVersion;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.turtle.MovementType;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

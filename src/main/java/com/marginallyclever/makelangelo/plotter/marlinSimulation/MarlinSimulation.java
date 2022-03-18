@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.plotter.marlinSimulation;
+package com.marginallyclever.makelangelo.plotter.marlinSimulation;
 
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

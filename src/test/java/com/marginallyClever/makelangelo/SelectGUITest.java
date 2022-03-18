@@ -1,7 +1,7 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.select.*;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.select.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,10 +1,10 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyClever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.Translator;
 
 import javax.swing.*;
 import java.awt.*;

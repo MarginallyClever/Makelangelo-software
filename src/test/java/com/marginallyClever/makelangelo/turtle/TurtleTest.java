@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.turtle;
+package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyclever.convenience.ColorRGB;
 import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Rectangle2D;

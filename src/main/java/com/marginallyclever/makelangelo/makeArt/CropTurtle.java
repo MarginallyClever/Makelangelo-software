@@ -1,11 +1,11 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.convenience.Clipper2D;
-import com.marginallyClever.convenience.MathHelper;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.MovementType;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.MovementType;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

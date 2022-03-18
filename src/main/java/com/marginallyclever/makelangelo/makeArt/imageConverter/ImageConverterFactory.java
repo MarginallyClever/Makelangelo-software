@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 public class ImageConverterFactory {
 	// storing this list here so it's easier to find.

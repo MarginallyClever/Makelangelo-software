@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
 import java.awt.geom.Rectangle2D;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Gosper curve fractal.

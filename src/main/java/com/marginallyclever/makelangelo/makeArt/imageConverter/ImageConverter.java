@@ -1,15 +1,15 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
-import com.marginallyClever.convenience.Clipper2D;
-import com.marginallyClever.convenience.MathHelper;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
-import com.marginallyClever.makelangelo.makeArt.io.image.ImageConverterThread;
-import com.marginallyClever.makelangelo.paper.Paper;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.io.image.ImageConverterThread;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;

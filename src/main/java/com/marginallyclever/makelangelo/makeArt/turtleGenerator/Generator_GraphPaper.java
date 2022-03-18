@@ -1,10 +1,10 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
-import com.marginallyClever.convenience.Clipper2D;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * 1cm and 10cm grid lines

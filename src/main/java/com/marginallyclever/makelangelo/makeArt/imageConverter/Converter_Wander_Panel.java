@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.select.SelectBoolean;
-import com.marginallyClever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_Wander_Panel extends ImageConverterPanel {
 	private static final long serialVersionUID = 1L;

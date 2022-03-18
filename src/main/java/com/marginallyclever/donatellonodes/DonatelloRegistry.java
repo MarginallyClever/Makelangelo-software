@@ -1,14 +1,14 @@
-package com.marginallyClever.donatello;
+package com.marginallyclever.donatellonodes;
 
-import com.marginallyClever.donatello.nodes.*;
-import com.marginallyClever.donatello.nodes.shapes.TurtleCircle;
-import com.marginallyClever.donatello.nodes.shapes.TurtleLine;
-import com.marginallyClever.donatello.nodes.shapes.TurtleRectangle;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.DAORegistry;
-import com.marginallyClever.nodeGraphCore.DAO4JSONFactory;
-import com.marginallyClever.nodeGraphCore.NodeFactory;
-import com.marginallyClever.nodeGraphCore.NodeRegistry;
+import com.marginallyclever.donatellonodes.nodes.*;
+import com.marginallyclever.donatellonodes.nodes.shapes.TurtleCircle;
+import com.marginallyclever.donatellonodes.nodes.shapes.TurtleLine;
+import com.marginallyclever.donatellonodes.nodes.shapes.TurtleRectangle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.DAORegistry;
+import com.marginallyclever.nodegraphcore.NodeFactory;
+import com.marginallyclever.nodegraphcore.NodeRegistry;
 
 /**
  * Register custom nodes for {@link Turtle}s.

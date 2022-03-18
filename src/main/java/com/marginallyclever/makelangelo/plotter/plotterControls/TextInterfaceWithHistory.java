@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

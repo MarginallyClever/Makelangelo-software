@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class FlipTurtleAction extends TurtleModifierAction {
 	private static final long serialVersionUID = 3429861670595048893L;

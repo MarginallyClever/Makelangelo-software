@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class ScaleTurtle {
 	public static void run(Turtle turtle,double sx,double sy) {

@@ -1,14 +1,14 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
-import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_BlackAndWhite;
-import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_Invert;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_Invert;
 
 /**
  * 

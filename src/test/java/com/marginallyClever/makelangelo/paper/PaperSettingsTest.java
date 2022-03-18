@@ -1,7 +1,7 @@
-package com.marginallyClever.makelangelo.paper;
+package com.marginallyclever.makelangelo.paper;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.util.PreferencesHelper;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;

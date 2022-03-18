@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.convenience.LineSegment2D;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public class InfillTurtle {
 	 * It is based on an algorithm in Andre LaMothe's "Tricks of the Windows Game
 	 * Programming Gurus". See
 	 * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-	 * TODO move this to com.marginallyClever.convenience.LineHelper?
+	 * TODO move this to com.marginallyclever.convenience.LineHelper?
 	 * 
 	 * @param alpha first line segment
 	 * @param beta second line segment

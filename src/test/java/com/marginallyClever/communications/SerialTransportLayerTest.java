@@ -1,6 +1,6 @@
-package com.marginallyClever.communications;
+package com.marginallyclever.communications;
 
-import com.marginallyClever.communications.serial.SerialTransportLayer;
+import com.marginallyclever.communications.serial.SerialTransportLayer;
 import jssc.SerialPortList;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;

@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.makeArt;
+package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyClever.convenience.LineSegment2D;
-import com.marginallyClever.convenience.LineCollection;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

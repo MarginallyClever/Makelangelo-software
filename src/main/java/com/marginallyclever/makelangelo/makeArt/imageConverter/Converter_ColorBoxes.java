@@ -1,11 +1,11 @@
-package com.marginallyClever.makelangelo.makeArt.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageConverter;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyClever.convenience.ColorPalette;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
+import com.marginallyclever.convenience.ColorPalette;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
 @Deprecated
 public class Converter_ColorBoxes extends ImageConverter {

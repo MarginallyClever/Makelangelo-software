@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.marginallyClever.makelangelo.MissingTranslationTest.listFiles;
+import static com.marginallyclever.makelangelo.MissingTranslationTest.listFiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LanguagesXmlValidationForNoDupKeyTest {

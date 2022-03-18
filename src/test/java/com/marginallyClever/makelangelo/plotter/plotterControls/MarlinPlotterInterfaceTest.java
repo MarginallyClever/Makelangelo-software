@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.plotter.plotterControls;
+package com.marginallyclever.makelangelo.plotter.plotterControls;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.plotter.Plotter;
-import com.marginallyClever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

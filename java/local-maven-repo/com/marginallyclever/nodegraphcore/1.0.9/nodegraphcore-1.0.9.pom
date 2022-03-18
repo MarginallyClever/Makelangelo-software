@@ -143,7 +143,7 @@
                             <SplashScreen-Image>splash.png</SplashScreen-Image>
                         </manifestEntries>
                         <manifest>
-                            <mainClass>com.marginallyClever.nodeGraphSwing.Donatello</mainClass>
+                            <mainClass>com.marginallyclever.nodeGraphSwing.Donatello</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>

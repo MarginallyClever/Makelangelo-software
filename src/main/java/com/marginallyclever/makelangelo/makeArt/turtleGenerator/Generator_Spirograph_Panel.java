@@ -1,12 +1,12 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
 import java.beans.PropertyChangeEvent;
 
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.select.SelectBoolean;
-import com.marginallyClever.makelangelo.select.SelectDouble;
-import com.marginallyClever.makelangelo.select.SelectInteger;
-import com.marginallyClever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 /**
  * Panel for {@link Generator_Spirograph}

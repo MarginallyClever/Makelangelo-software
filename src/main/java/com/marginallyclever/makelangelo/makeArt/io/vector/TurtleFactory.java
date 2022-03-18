@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeart.io.vector;
 
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;

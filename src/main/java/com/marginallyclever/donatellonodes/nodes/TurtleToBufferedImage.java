@@ -1,10 +1,10 @@
-package com.marginallyClever.donatello.nodes;
+package com.marginallyclever.donatellonodes.nodes;
 
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.turtle.Turtle;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

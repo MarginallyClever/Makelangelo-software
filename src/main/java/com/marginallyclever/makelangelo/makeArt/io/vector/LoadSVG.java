@@ -1,9 +1,9 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeart.io.vector;
 
-import com.marginallyClever.convenience.Bezier;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.turtle.Turtle;
+import com.marginallyclever.convenience.Bezier;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SVGItem;

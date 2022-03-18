@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.plotter.plotterRenderer;
+package com.marginallyclever.makelangelo.plotter.plotterRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.Point2D;
-import com.marginallyClever.makelangelo.plotter.Plotter;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 
 /**
  * @author Dan Royer

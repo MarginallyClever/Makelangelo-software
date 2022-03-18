@@ -1,7 +1,7 @@
-package com.marginallyClever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.settings;
 
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

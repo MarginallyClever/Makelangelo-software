@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.io.vector;
+package com.marginallyclever.makelangelo.makeart.io.vector;
 
 import org.junit.jupiter.api.DynamicTest;
 

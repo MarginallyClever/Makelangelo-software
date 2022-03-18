@@ -1,10 +1,10 @@
-package com.marginallyClever.makelangelo.makeArt.io;
+package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyClever.convenience.FileAccess;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.makeArt.io.image.ConvertImagePanel;
-import com.marginallyClever.makelangelo.makeArt.io.vector.TurtleFactory;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.FileAccess;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.io.image.ConvertImagePanel;
+import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

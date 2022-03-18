@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo.turtle.turtleRenderer;
+package com.marginallyclever.makelangelo.turtle.turtleRenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyClever.convenience.ColorRGB;
-import com.marginallyClever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 public interface TurtleRenderer {
 	void start(GL2 gl2);

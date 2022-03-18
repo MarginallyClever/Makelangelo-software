@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.makeArt.turtleGenerator;
+package com.marginallyclever.makelangelo.makeart.turtleGenerator;
 
 /**
  * Blank panel for generators that have no options.

@@ -1,8 +1,8 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.makelangelo.makeArt.TransformedImage;
-import com.marginallyClever.makelangelo.makeArt.imageFilter.Filter_CMYK;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_CMYK;
+import com.marginallyclever.util.PreferencesHelper;
 
 import javax.imageio.ImageIO;
 import java.io.File;
