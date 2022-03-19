@@ -2,8 +2,8 @@ package com.marginallyclever.donatello.nodes;
 
 import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 
 import java.awt.geom.Rectangle2D;
 

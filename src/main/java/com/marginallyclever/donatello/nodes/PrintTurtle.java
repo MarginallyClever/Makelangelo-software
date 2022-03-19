@@ -3,9 +3,9 @@ package com.marginallyclever.donatello.nodes;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyClever.nodeGraphCore.PrintWithGraphics;
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.nodegraphcore.PrintWithGraphics;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 
 import java.awt.*;
 

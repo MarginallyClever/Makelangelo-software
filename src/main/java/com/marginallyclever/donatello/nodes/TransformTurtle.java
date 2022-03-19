@@ -1,7 +1,7 @@
 package com.marginallyclever.donatello.nodes;
 
-import com.marginallyClever.nodeGraphCore.Node;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class TransformTurtle extends Node {

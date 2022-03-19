@@ -1,7 +1,7 @@
 package com.marginallyclever.donatello.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.DAO4JSON;
+import com.marginallyclever.nodegraphcore.DAO4JSON;
 import org.json.JSONException;
 import org.json.JSONObject;
 

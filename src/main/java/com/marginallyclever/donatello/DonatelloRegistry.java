@@ -5,10 +5,10 @@ import com.marginallyclever.donatello.nodes.shapes.TurtleCircle;
 import com.marginallyclever.donatello.nodes.shapes.TurtleLine;
 import com.marginallyclever.donatello.nodes.shapes.TurtleRectangle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.DAORegistry;
-import com.marginallyClever.nodeGraphCore.DAO4JSONFactory;
-import com.marginallyClever.nodeGraphCore.NodeFactory;
-import com.marginallyClever.nodeGraphCore.NodeRegistry;
+import com.marginallyclever.nodegraphcore.DAORegistry;
+import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.NodeFactory;
+import com.marginallyclever.nodegraphcore.NodeRegistry;
 
 /**
  * Register custom nodes for {@link Turtle}s.

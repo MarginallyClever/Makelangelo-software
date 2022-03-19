@@ -1,5 +1,5 @@
 module com.marginallyclever.makelangelo {
-    requires com.marginallyClever.nodeGraphCore;
+    requires com.marginallyclever.nodegraphcore;
     requires org.slf4j;
     requires jssc;
     requires java.desktop;
@@ -20,11 +20,11 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.makelangelo.plotter.plottercontrols;
     opens com.marginallyclever.makelangelo.turtle;
 
-    uses com.marginallyClever.nodeGraphCore.NodeRegistry;
-    provides com.marginallyClever.nodeGraphCore.NodeRegistry with
+    uses com.marginallyclever.nodegraphcore.NodeRegistry;
+    provides com.marginallyclever.nodegraphcore.NodeRegistry with
             com.marginallyclever.donatello.DonatelloRegistry;
 
-    uses com.marginallyClever.nodeGraphCore.DAORegistry;
-    provides com.marginallyClever.nodeGraphCore.DAORegistry with
+    uses com.marginallyclever.nodegraphcore.DAORegistry;
+    provides com.marginallyclever.nodegraphcore.DAORegistry with
             com.marginallyclever.donatello.DonatelloRegistry;
 }

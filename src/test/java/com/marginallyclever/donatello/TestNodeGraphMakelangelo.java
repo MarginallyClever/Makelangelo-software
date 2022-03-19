@@ -2,10 +2,10 @@ package com.marginallyclever.donatello;
 
 import com.marginallyclever.donatello.nodes.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyClever.nodeGraphCore.DAO4JSONFactory;
-import com.marginallyClever.nodeGraphCore.NodeFactory;
-import com.marginallyClever.nodeGraphCore.NodeGraph;
-import com.marginallyClever.nodeGraphCore.NodeVariable;
+import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.NodeFactory;
+import com.marginallyclever.nodegraphcore.NodeGraph;
+import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test custom {@link com.marginallyClever.nodeGraphCore.Node}s for Makelangelo.
+ * Test custom {@link com.marginallyclever.nodegraphcore.Node}s for Makelangelo.
  * @author Dan Royer
  * @since 2022-02-01
  */

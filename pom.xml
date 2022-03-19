@@ -68,14 +68,14 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</pluginRepository>
 	</pluginRepositories>
 
-	<repositories><!--
-		<repository>
-			<id>github</id>
-			<url>https://maven.pkg.github.com</url>
-		</repository>-->
+	<repositories>
 		<repository>
 			<id>my-local-repo</id>
 			<url>file://${project.basedir}/java/local-maven-repo</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 
@@ -470,9 +470,9 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</dependency>
 
 		<dependency>
-			<groupId>com.marginallyclever</groupId>
-			<artifactId>nodegraphcore</artifactId>
-			<version>1.0.9</version>
+			<groupId>com.github.MarginallyClever</groupId>
+			<artifactId>NodeGraphCore</artifactId>
+			<version>1.0.15</version>
 		</dependency>
 	</dependencies>
 
