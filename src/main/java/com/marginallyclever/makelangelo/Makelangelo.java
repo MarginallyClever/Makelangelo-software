@@ -6,17 +6,17 @@ import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.makelangelo.firmwareUploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeArt.*;
-import com.marginallyclever.makelangelo.makeArt.io.LoadFilePanel;
-import com.marginallyclever.makelangelo.makeArt.io.OpenFileChooser;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorFactory;
-import com.marginallyclever.makelangelo.makeArt.turtleGenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.GFXPreferences;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.LanguagePreferences;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MakelangeloSettingPanel;
-import com.marginallyclever.makelangelo.makelangeloSettingsPanel.MetricsPreferences;
+import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.makeart.*;
+import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
+import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
+import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
+import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePreferences;
+import com.marginallyclever.makelangelo.makelangelosettingspanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
@@ -24,8 +24,8 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.plotter.plotterControls.PlotterControls;
-import com.marginallyclever.makelangelo.plotter.plotterControls.SaveGCode;
+import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
+import com.marginallyclever.makelangelo.plotter.plottercontrols.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
@@ -33,11 +33,11 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsUserGcodePanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
-import com.marginallyclever.makelangelo.rangeSlider.RangeSlider;
+import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFacade;
-import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtleRenderer.TurtleRenderer;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ import java.util.prefs.Preferences;
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
  * the mark on the paper.  This knowledge helps the app to create better gcode.  
  * 
- * @author Dan Royer (dan@marginallyclever.com)
+ * @author Dan Royer (dan@marginallyClever.com)
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
@@ -287,6 +287,7 @@ public final class Makelangelo {
 		dialog.add(settings);
 		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.setResizable(false);
 		dialog.pack();
 
 		enableMenuBar(false);
