@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience;
+package com.marginallyclever.convenience;
 
 public class LineInterpolator {
 	static public final double SMALL_VALUE = 1e-5;

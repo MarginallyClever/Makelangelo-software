@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo.preview;
+package com.marginallyclever.makelangelo.preview;
 
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * All information about the position and zoom level of the virtual eye looking through the PreviewPanel at the robot/art

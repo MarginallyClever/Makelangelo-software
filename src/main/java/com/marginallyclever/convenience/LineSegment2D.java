@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience;
+package com.marginallyclever.convenience;
 
 /** 
  * {@link LineSegment2D} represents two connected points and line color. 
