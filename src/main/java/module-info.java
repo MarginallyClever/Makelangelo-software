@@ -1,10 +1,12 @@
+import com.marginallyclever.donatelloimpl.DonatelloRegistry;
+
 module com.marginallyclever.makelangelo {
     requires com.marginallyclever.nodegraphcore;
     requires org.slf4j;
     requires jssc;
     requires java.desktop;
     requires jogamp.fat;
-    requires logback.core;
+    requires ch.qos.logback.core;
     requires org.json;
     requires org.apache.commons.io;
     requires java.prefs;
@@ -22,9 +24,9 @@ module com.marginallyclever.makelangelo {
 
     uses com.marginallyclever.nodegraphcore.NodeRegistry;
     provides com.marginallyclever.nodegraphcore.NodeRegistry with
-            com.marginallyclever.donatello.DonatelloRegistry;
+            DonatelloRegistry;
 
     uses com.marginallyclever.nodegraphcore.DAORegistry;
     provides com.marginallyclever.nodegraphcore.DAORegistry with
-            com.marginallyclever.donatello.DonatelloRegistry;
+            DonatelloRegistry;
 }
