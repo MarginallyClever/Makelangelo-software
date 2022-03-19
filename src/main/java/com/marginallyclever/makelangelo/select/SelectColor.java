@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.select;
+package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import com.marginallyClever.convenience.ColorRGB;
+import com.marginallyclever.convenience.ColorRGB;
 
 /**
  * A color selection dialog

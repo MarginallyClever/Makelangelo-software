@@ -1,4 +1,4 @@
-package com.marginallyClever.util;
+package com.marginallyclever.util;
 
 import org.json.JSONObject;
 import org.json.Property;
@@ -16,7 +16,7 @@ import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import static com.marginallyClever.util.PreferencesHelper.MakelangeloPreferenceKey.*;
+import static com.marginallyclever.util.PreferencesHelper.MakelangeloPreferenceKey.*;
 
 /**
  * Helper class to be used when accessing preferences.
@@ -79,7 +79,7 @@ public final class PreferencesHelper {
 		/**
 		 * Machine preference node path, used to store things such as paper height and width, invert left and right motors,
 		 * etc.
-		 * See com.marginallyClever.makelangeloRobot.settings.MakelangeloRobotSettings
+		 * See com.marginallyclever.makelangeloRobot.settings.MakelangeloRobotSettings
 		 */
 		MACHINES("Machines"),
 		LANGUAGE("Language"),

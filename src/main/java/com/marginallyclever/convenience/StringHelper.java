@@ -1,4 +1,4 @@
-package com.marginallyClever.convenience;
+package com.marginallyclever.convenience;
 
 import java.util.Locale;
 

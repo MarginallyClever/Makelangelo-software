@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.settings;
 
 public interface PlotterSettingsListener {
 	void settingsChangedEvent(PlotterSettings settings);

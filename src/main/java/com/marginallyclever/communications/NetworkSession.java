@@ -1,4 +1,4 @@
-package com.marginallyClever.communications;
+package com.marginallyclever.communications;
 
 import java.util.ArrayList;
 import java.util.List;

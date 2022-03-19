@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
 import java.io.IOException;
 import java.io.InputStream;
