@@ -538,7 +538,7 @@ public class Turtle implements Cloneable {
 				double dy = m.y-prev.y;
 				double change = Math.sqrt(dx*dx+dy*dy);
 				if(d+change>=t) {
-					double v = (t-d)/change;
+					double v = (t-d==0)? 0 : change/(t-d);
 					v = Math.max(Math.min(v,1),0);
 					return new Point2D(
 							prev.x + dx * v,
