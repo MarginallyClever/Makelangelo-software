@@ -91,7 +91,7 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 	}
 	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),"SB3");
+	private FileNameExtensionFilter filter;
 	
 	private Scratch3Variables scratchGlobalVariables;
 	private Stack<Scratch3Variables> myStack = new Stack<>();
@@ -104,6 +104,8 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
+		// prevent get() before start()
+		if(filter==null) filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),"SB3");
 		return filter;
 	}
 
