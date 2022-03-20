@@ -12,6 +12,8 @@ public class LoadTurtle extends Node {
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
     private final NodeVariable<Number> w = NodeVariable.newInstance("width", Number.class, 0,false,true);
     private final NodeVariable<Number> h = NodeVariable.newInstance("height", Number.class, 0,false,true);
+    private final NodeVariable<Number> length = NodeVariable.newInstance("length", Number.class, 0,false,true);
+
 
     public LoadTurtle() {
         super("LoadTurtle");
@@ -38,6 +40,7 @@ public class LoadTurtle extends Node {
         Rectangle2D r = t.getBounds();
         w.setValue(r.getWidth());
         h.setValue(r.getHeight());
+        length.setValue(t.getDrawDistance());
         cleanAllInputs();
     }
 }
