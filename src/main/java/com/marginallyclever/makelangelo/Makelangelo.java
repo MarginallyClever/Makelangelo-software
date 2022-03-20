@@ -26,8 +26,8 @@ import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.SaveGCode;
-import com.marginallyclever.makelangelo.plotter.plotterRenderer.Machines;
-import com.marginallyclever.makelangelo.plotter.plotterRenderer.PlotterRenderer;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
 import com.marginallyclever.makelangelo.preview.Camera;
