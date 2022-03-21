@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.select;
+package com.marginallyclever.makelangelo.select;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import com.marginallyClever.convenience.StringHelper;
+import com.marginallyclever.convenience.StringHelper;
 
 
 /**

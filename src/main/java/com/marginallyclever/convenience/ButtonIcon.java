@@ -1,6 +1,6 @@
-package com.marginallyClever.convenience;
+package com.marginallyclever.convenience;
 
-import com.marginallyClever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter;
+package com.marginallyclever.makelangelo.plotter;
 
 public interface PlotterEventListener {
 	void makelangeloRobotEvent(PlotterEvent e);

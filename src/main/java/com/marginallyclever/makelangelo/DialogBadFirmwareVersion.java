@@ -1,6 +1,6 @@
-package com.marginallyClever.makelangelo;
+package com.marginallyclever.makelangelo;
 
-import com.marginallyClever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;

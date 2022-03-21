@@ -1,4 +1,4 @@
-package com.marginallyClever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,11 +12,11 @@ import javax.swing.WindowConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyClever.convenience.CommandLineOptions;
-import com.marginallyClever.convenience.log.Log;
-import com.marginallyClever.makelangelo.Translator;
-import com.marginallyClever.makelangelo.plotter.Plotter;
-import com.marginallyClever.util.PreferencesHelper;
+import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * {@link PlotterSettingsManager} manages the list of available machine configurations.
