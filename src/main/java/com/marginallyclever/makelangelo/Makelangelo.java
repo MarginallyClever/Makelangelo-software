@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo;
 
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -196,6 +197,7 @@ public final class Makelangelo {
 		if(!CommandLineOptions.hasOption("-nolf")) {
 
 			try {
+				FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
 				UIManager.setLookAndFeel( new FlatLightLaf() );
 			} catch( Exception e ) {
 				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);

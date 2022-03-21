@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
@@ -33,7 +35,7 @@ public class PlotterControls extends JPanel {
 	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
-	public static final int DIMENSION_PANEL_HEIGHT = 220;
+	public static final int DIMENSION_PANEL_HEIGHT = 210;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
 
 	private final Plotter myPlotter;
@@ -41,7 +43,6 @@ public class PlotterControls extends JPanel {
 	private final JogInterface jogInterface;
 	private final MarlinPlotterInterface marlinInterface;
 	private final ProgramInterface programInterface;
-
 
 	private ChooseConnection chooseConnection = new ChooseConnection();
 	private ButtonIcon bFindHome;
@@ -279,10 +280,12 @@ public class PlotterControls extends JPanel {
 
 	// TEST
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedLookAndFeelException {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
+		FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
+		UIManager.setLookAndFeel( new FlatLightLaf() );
 
 		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
 		frame.setPreferredSize(new Dimension(DIMENSION_PANEL_WIDTH, DIMENSION_PANEL_HEIGHT));
