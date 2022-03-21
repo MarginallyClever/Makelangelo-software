@@ -198,13 +198,12 @@ public final class Makelangelo {
 			try {
 				UIManager.setLookAndFeel( new FlatLightLaf() );
 			} catch( Exception e ) {
-				logger.warn("failed to set flat look and feel.", e);
-			}
-
-	        try {
-	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	        } catch (Exception e) {
-				logger.warn("failed to set native look and feel.", e);
+				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Exception ex) {
+					logger.warn("failed to set native look and feel.", ex);
+				}
 			}
 		}
 		setSystemLookAndFeelForMacos();
