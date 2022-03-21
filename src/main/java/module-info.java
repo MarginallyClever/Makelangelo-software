@@ -7,6 +7,7 @@ module com.marginallyclever.makelangelo {
     requires java.desktop;
     requires jogamp.fat;
     requires ch.qos.logback.core;
+    requires ch.qos.logback.classic;
     requires org.json;
     requires org.apache.commons.io;
     requires java.prefs;
