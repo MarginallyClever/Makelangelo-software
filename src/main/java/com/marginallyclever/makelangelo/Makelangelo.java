@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo;
 
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
@@ -193,10 +195,17 @@ public final class Makelangelo {
 
 	private static void setSystemLookAndFeel() {
 		if(!CommandLineOptions.hasOption("-nolf")) {
-	        try {
-	        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	        } catch (Exception e) {
-				logger.debug("failed to set look and feel.");
+
+			try {
+				FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
+				UIManager.setLookAndFeel( new FlatLightLaf() );
+			} catch( Exception e ) {
+				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Exception ex) {
+					logger.warn("failed to set native look and feel.", ex);
+				}
 			}
 		}
 		setSystemLookAndFeelForMacos();

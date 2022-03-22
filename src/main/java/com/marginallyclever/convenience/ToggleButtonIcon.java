@@ -25,8 +25,6 @@ public class ToggleButtonIcon extends JButton {
             icons.add(createImageIcon(item.icon));
             foregroundColors.add(item.foregroundColor);
         }
-        setFont(new Font("Arial", Font.PLAIN, 15));
-        setMargin(new Insets(1, 1, 1, 3));
         updateButton(0);
     }
 
