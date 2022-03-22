@@ -58,6 +58,7 @@ public final class SerialConnection extends NetworkSession implements SerialPort
 		serialPort = new SerialPort(portName);
 		serialPort.openPort(); // Open serial port
 		serialPort.setParams(baud, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+		serialPort.setDTR(false);
 		serialPort.addEventListener(this);
 
 		setName(portName);
