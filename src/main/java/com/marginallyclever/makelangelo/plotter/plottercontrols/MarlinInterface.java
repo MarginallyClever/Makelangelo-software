@@ -57,11 +57,7 @@ public class MarlinInterface extends JPanel {
 	// No news from the robot
 	public static final String COMMUNICATION_FAILURE = "CommunicationFailure";
 
-<<<<<<< HEAD:src/main/java/com/marginallyclever/makelangelo/plotter/plotterControls/MarlinInterface.java
 	private final TextInterfaceToNetworkSession chatInterface;
-=======
-	private TextInterfaceToNetworkSession chatInterface;
->>>>>>> master:src/main/java/com/marginallyclever/makelangelo/plotter/plottercontrols/MarlinInterface.java
 	private final List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
@@ -71,11 +67,7 @@ public class MarlinInterface extends JPanel {
 	// don't send more than this many at a time without acknowledgement.
 	private int busyCount=MARLIN_SEND_LIMIT;
 	
-<<<<<<< HEAD:src/main/java/com/marginallyclever/makelangelo/plotter/plotterControls/MarlinInterface.java
 	private final Timer timeoutChecker = new Timer(TIMEOUT_DELAY,(e)->onTimeoutCheck());
-=======
-	private final Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
->>>>>>> master:src/main/java/com/marginallyclever/makelangelo/plotter/plottercontrols/MarlinInterface.java
 	private long lastReceivedTime;
 	
 	public MarlinInterface(ChooseConnection chooseConnection) {
@@ -90,7 +82,6 @@ public class MarlinInterface extends JPanel {
 				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
 				case NetworkSessionEvent.CONNECTION_CLOSED -> onClose();
 			}
-			// TODO notifyListeners(e);
 		});
 	}
 
