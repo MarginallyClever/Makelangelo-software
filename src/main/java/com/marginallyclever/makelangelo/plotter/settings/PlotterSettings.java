@@ -75,7 +75,7 @@ public class PlotterSettings implements Serializable {
 
 	/**
 	 * These values should match
-	 * https://github.com/marginallyclever/makelangelo-firmware/firmware_rumba/configure.h
+	 * https://github.com.marginallyclever.makelangelo-firmware/firmware_rumba/configure.h
 	 */
 	public PlotterSettings() {
 	}

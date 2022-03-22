@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.makeArt.TransformedImage;
-import com.marginallyclever.makelangelo.makeArt.imageFilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_CMYK;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.imageio.ImageIO;

@@ -4,6 +4,11 @@ public class Point2D {
 	public double x,y;
 	
 	public Point2D() {}
+
+	public Point2D(Point2D b) {
+		this(b.x,b.y);
+	}
+
 	public Point2D(double x0,double y0) {
 		x=x0;
 		y=y0;
@@ -38,5 +43,14 @@ public class Point2D {
 
 	public double distance(Point2D p) {
 		return Math.sqrt(distanceSquared(p));
+	}
+
+	public void normalize() {
+		double len = length();
+		if(len!=0) {
+			double ilen = 1.0/len;
+			x*=ilen;
+			y*=ilen;
+		}
 	}
 }
