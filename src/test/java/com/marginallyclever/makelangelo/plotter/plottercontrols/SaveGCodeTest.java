@@ -96,7 +96,7 @@ class SaveGCodeTest {
 
     private List<String> splitAndFilterForTest(String fileContent) {
         return Arrays.stream(fileContent.split("\\r?\\n"))
-                .filter(line -> !line.matches("; 20.* at ..:.*") && !line.matches("Generated with.*"))
+                .filter(line -> !line.matches("; 20.* at ..:.*") && !line.matches(";Generated with.*"))
                 .collect(Collectors.toList());
     }
 }
