@@ -26,8 +26,8 @@ public class PathImageMask extends Node {
     private final NodeVariable<Turtle> outputAbove = NodeVariable.newInstance("above", Turtle.class,new Turtle(),false,true);
     private final NodeVariable<Turtle> outputBelow = NodeVariable.newInstance("below", Turtle.class,new Turtle(),false,true);
 
-    private final ArrayList<LineSegment2D> listAbove = new ArrayList<>();
-    private final ArrayList<LineSegment2D> listBelow = new ArrayList<>();
+    private final List<LineSegment2D> listAbove = new ArrayList<>();
+    private final List<LineSegment2D> listBelow = new ArrayList<>();
 
     public PathImageMask() {
         super("PathImageMask");

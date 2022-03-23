@@ -56,7 +56,7 @@ public class TurtleToBufferedImage extends Node {
                     case TOOL_CHANGE -> {
                         ColorRGB c = m.getColor();
                         downColor = new Color(c.red, c.green, c.blue);
-                        ((Graphics2D) g).setStroke(new BasicStroke((int) m.getDiameter()));
+                        g.setStroke(new BasicStroke((int) m.getDiameter()));
                     }
                 }
             }
