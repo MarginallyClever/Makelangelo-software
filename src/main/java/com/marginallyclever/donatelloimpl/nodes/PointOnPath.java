@@ -30,17 +30,6 @@ public class PointOnPath extends Node {
         addVariable(ny);
     }
 
-    public PointOnPath(Turtle path, double index) {
-        this();
-        this.path.setValue(path);
-        this.index.setValue(index);
-    }
-
-    @Override
-    public Node create() {
-        return new PointOnPath();
-    }
-
     private static final double EPSILON=0.00001;
 
     @Override

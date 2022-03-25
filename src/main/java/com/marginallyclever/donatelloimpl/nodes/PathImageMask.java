@@ -40,11 +40,6 @@ public class PathImageMask extends Node {
     }
 
     @Override
-    public Node create() {
-        return new PathImageMask();
-    }
-
-    @Override
     public void update() throws Exception {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;

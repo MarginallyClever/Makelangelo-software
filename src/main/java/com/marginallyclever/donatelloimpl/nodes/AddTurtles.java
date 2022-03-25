@@ -16,17 +16,6 @@ public class AddTurtles extends Node {
         addVariable(output);
     }
 
-    public AddTurtles(Turtle turtleA, Turtle turtleB) {
-        this();
-        this.turtleA.setValue(turtleA);
-        this.turtleB.setValue(turtleB);
-    }
-
-    @Override
-    public Node create() {
-        return new AddTurtles();
-    }
-
     @Override
     public void update() throws Exception {
         Turtle a = turtleA.getValue();

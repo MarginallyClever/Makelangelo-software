@@ -20,19 +20,6 @@ public class TurtleLine extends Node {
         addVariable(contents);
     }
 
-    public TurtleLine(double px0,double py0,double px1,double py1) {
-        this();
-        x0.setValue(px0);
-        y0.setValue(py0);
-        x1.setValue(px1);
-        y1.setValue(py1);
-    }
-
-    @Override
-    public Node create() {
-        return new TurtleLine();
-    }
-
     @Override
     public void update() {
         try {

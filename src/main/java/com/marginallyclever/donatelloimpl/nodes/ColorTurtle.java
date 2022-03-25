@@ -24,11 +24,6 @@ public class ColorTurtle extends Node {
     }
 
     @Override
-    public Node create() {
-        return new ColorTurtle();
-    }
-
-    @Override
     public void update() throws Exception {
         Turtle input = turtle.getValue();
         int r = red.getValue().intValue();

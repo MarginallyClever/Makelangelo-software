@@ -25,11 +25,6 @@ public class TransformTurtle extends Node {
     }
 
     @Override
-    public Node create() {
-        return new TransformTurtle();
-    }
-
-    @Override
     public void update() throws Exception {
         Turtle input = turtle.getValue();
         Turtle moved = new Turtle(input);

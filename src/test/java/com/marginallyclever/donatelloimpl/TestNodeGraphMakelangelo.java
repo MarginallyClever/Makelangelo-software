@@ -21,14 +21,14 @@ public class TestNodeGraphMakelangelo {
     private static NodeGraph model = new NodeGraph();
 
     @BeforeAll
-    public static void beforeAll() {
-        try {
-            NodeFactory.loadRegistries();
-            DAO4JSONFactory.loadRegistries();
-        } catch(Exception e) {
-            System.out.println("*** Exception found: "+e.getMessage()+"***");
-            e.printStackTrace();
-            assert(false);
+    public static void beforeAll() throws Exception {
+        NodeFactory.loadRegistries();
+        DAO4JSONFactory.loadRegistries();
+
+        assertNotEquals(0,NodeFactory.getNames().length);
+        System.out.println("NodeFactory.getNames().length="+NodeFactory.getNames().length);
+        for(String s : NodeFactory.getNames()) {
+            System.out.println("NodeFactory.getNames()="+s);
         }
     }
 

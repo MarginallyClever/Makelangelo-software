@@ -20,18 +20,6 @@ public class PatternOnPath extends Node {
         pattern.setIsDirty(true);
     }
 
-    public PatternOnPath(Turtle pattern, Turtle path, int count) {
-        this();
-        this.pattern.setValue(pattern);
-        this.path.setValue(path);
-        this.count.setValue(count);
-    }
-
-    @Override
-    public Node create() {
-        return new PatternOnPath();
-    }
-
     @Override
     public void update() throws Exception {
         Turtle sum = new Turtle();

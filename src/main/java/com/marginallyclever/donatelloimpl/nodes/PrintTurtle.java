@@ -24,11 +24,6 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     }
 
     @Override
-    public Node create() {
-        return new PrintTurtle();
-    }
-
-    @Override
     public void update() throws Exception {
         cleanAllInputs();
     }

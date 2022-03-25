@@ -23,16 +23,6 @@ public class LoadTurtle extends Node {
         addVariable(h);
     }
 
-    public LoadTurtle(String filename) {
-        this();
-        this.filename.setValue(filename);
-    }
-
-    @Override
-    public Node create() {
-        return new LoadTurtle();
-    }
-
     @Override
     public void update() throws Exception {
         Turtle t = TurtleFactory.load(filename.getValue());

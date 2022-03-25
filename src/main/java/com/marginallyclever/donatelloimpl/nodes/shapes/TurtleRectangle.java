@@ -16,17 +16,6 @@ public class TurtleRectangle extends Node {
         addVariable(contents);
     }
 
-    public TurtleRectangle(double width,double height) {
-        this();
-        w.setValue(width);
-        h.setValue(height);
-    }
-
-    @Override
-    public Node create() {
-        return new TurtleRectangle();
-    }
-
     @Override
     public void update() {
         try {

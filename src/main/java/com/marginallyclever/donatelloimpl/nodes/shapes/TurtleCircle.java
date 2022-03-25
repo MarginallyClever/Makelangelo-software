@@ -14,16 +14,6 @@ public class TurtleCircle extends Node {
         addVariable(contents);
     }
 
-    public TurtleCircle(double radius) {
-        this();
-        this.radius.setValue(radius);
-    }
-
-    @Override
-    public Node create() {
-        return new TurtleCircle();
-    }
-
     @Override
     public void update() {
         try {

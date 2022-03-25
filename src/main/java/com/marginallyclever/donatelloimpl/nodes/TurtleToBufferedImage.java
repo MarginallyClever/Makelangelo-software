@@ -21,11 +21,6 @@ public class TurtleToBufferedImage extends Node {
     }
 
     @Override
-    public Node create() {
-        return new TurtleToBufferedImage();
-    }
-
-    @Override
     public void update() throws Exception {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null && !myTurtle.history.isEmpty()) {

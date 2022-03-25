@@ -1,12 +1,9 @@
 package com.marginallyclever.donatelloimpl;
 
-import com.marginallyclever.donatelloimpl.nodes.shapes.TurtleCircle;
-import com.marginallyclever.donatelloimpl.nodes.shapes.TurtleLine;
-import com.marginallyclever.donatelloimpl.nodes.shapes.TurtleRectangle;
-import com.marginallyclever.donatelloimpl.nodes.*;
+import com.marginallyclever.donatelloimpl.nodes.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.DAORegistry;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.DAORegistry;
 import com.marginallyclever.nodegraphcore.NodeFactory;
 import com.marginallyclever.nodegraphcore.NodeRegistry;
 
@@ -23,18 +20,6 @@ public class DonatelloRegistry implements DAORegistry, NodeRegistry {
 
     @Override
     public void registerNodes() {
-        NodeFactory.registerNode(new LoadTurtle());
-        NodeFactory.registerNode(new SaveTurtle());
-        NodeFactory.registerNode(new PrintTurtle());
-        NodeFactory.registerNode(new TurtleLine());
-        NodeFactory.registerNode(new TurtleRectangle());
-        NodeFactory.registerNode(new TurtleCircle());
-        NodeFactory.registerNode(new PatternOnPath());
-        NodeFactory.registerNode(new PathImageMask());
-        NodeFactory.registerNode(new TransformTurtle());
-        NodeFactory.registerNode(new ColorTurtle());
-        NodeFactory.registerNode(new TurtleToBufferedImage());
-        NodeFactory.registerNode(new PointOnPath());
-        NodeFactory.registerNode(new AddTurtles());
+        NodeFactory.registerAllNodesInPackage("com.marginallyclever.donatelloimpl.nodes");
     }
 }
