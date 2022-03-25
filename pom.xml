@@ -470,7 +470,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</dependency>
 
 		<dependency>
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
 			<version>1.0.18</version>
 		</dependency>
