@@ -14,6 +14,7 @@ module com.marginallyclever.makelangelo {
     requires vecmath;
     requires jrpicam;
     requires org.jetbrains.annotations;
+    requires com.formdev.flatlaf;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.makeart.io.vector;

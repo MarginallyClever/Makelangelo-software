@@ -41,11 +41,9 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glPushMatrix();
 
 		// mounting plate for PCB
-		final float FRAME_SIZE=50f; //mm
-
 		gl2.glColor3f(1,0.8f,0.5f);
 		// frame
-		drawRectangle(gl2, top+FRAME_SIZE, left-FRAME_SIZE, top-FRAME_SIZE, right+FRAME_SIZE);
+		drawRectangle(gl2, top+35f, right+30f, top-35f, left-30f);
 
 		gl2.glTranslated(cx, cy, 0);
 
