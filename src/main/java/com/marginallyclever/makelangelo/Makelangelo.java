@@ -405,7 +405,9 @@ public final class Makelangelo {
 
 		SaveGCode save = new SaveGCode();
 		try {
-			save.run(myTurtle, myPlotter, mainFrame);
+			int head = rangeSlider.getUpperValue();
+			int tail = rangeSlider.getValue();
+			save.run(myTurtle, myPlotter, mainFrame, head, tail);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -877,8 +879,6 @@ public final class Makelangelo {
         myTurtleRenderer.setLast(top);
         labelRangeMin.setText(Integer.toString(bottom));
         labelRangeMax.setText(Integer.toString(top));
-		SaveGCode.setTrimHead(bottom);
-		SaveGCode.setTrimTail(top);
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.

@@ -33,8 +33,6 @@ public class SaveGCode {
 	private static final Logger logger = LoggerFactory.getLogger(SaveGCode.class);
 
 	private final JFileChooser fc = new JFileChooser();
-	private static int trimHead = 0;
-	private static int trimTail = 0;
 
 	public SaveGCode() {
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
@@ -48,16 +46,8 @@ public class SaveGCode {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
-	public static void setTrimHead(int trimHead) {
-		SaveGCode.trimHead = trimHead;
-	}
-
-	public static void setTrimTail(int trimTail) {
-		SaveGCode.trimTail = trimTail;
-	}
-
-	public void run(Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
-		Turtle skinnyTurtle = trimTurtle(turtle);
+	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
+		Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
 
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
@@ -80,7 +70,7 @@ public class SaveGCode {
 	 * @param turtle the source turtle.
 	 * @return the {@link Turtle} with the trimmed history.
 	 */
-	private Turtle trimTurtle(Turtle turtle) {
+	private Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
 		Turtle skinny = new Turtle();
 		skinny.history.clear();
 
