@@ -6,13 +6,13 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TurtleCircle extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(TurtleCircle.class);
+public class Circle extends Node {
+    private static final Logger logger = LoggerFactory.getLogger(Circle.class);
 
     private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 50,true,false);
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
 
-    public TurtleCircle() {
+    public Circle() {
         super("Circle");
         addVariable(radius);
         addVariable(contents);

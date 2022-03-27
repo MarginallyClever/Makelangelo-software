@@ -6,8 +6,8 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TurtleLine extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(TurtleLine.class);
+public class Line extends Node {
+    private static final Logger logger = LoggerFactory.getLogger(Line.class);
 
     private final NodeVariable<Number> x0 = NodeVariable.newInstance("x0", Number.class, 0,true,false);
     private final NodeVariable<Number> y0 = NodeVariable.newInstance("y0", Number.class, 0,true,false);
@@ -15,7 +15,7 @@ public class TurtleLine extends Node {
     private final NodeVariable<Number> y1 = NodeVariable.newInstance("y1", Number.class, 0,true,false);
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
 
-    public TurtleLine() {
+    public Line() {
         super("Line");
         addVariable(x0);
         addVariable(y0);

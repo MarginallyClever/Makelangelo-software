@@ -6,14 +6,14 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TurtleRectangle extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(TurtleRectangle.class);
+public class Rectangle extends Node {
+    private static final Logger logger = LoggerFactory.getLogger(Rectangle.class);
 
     private final NodeVariable<Number> w = NodeVariable.newInstance("width", Number.class, 100,true,true);
     private final NodeVariable<Number> h = NodeVariable.newInstance("height", Number.class, 100,true,true);
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
 
-    public TurtleRectangle() {
+    public Rectangle() {
         super("Rectangle");
         addVariable(w);
         addVariable(h);
