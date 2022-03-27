@@ -99,4 +99,22 @@ class SaveGCodeTest {
                 .filter(line -> !line.matches("; 20.* at ..:.*") && !line.matches(";Generated with.*"))
                 .collect(Collectors.toList());
     }
+
+    @Test
+    public void testSaveSubsectionOfFile() throws Exception {
+        // given
+        Turtle turtle = multiColorsMoves();
+
+        SaveGCode saveGCode = new SaveGCode();
+        turtle = saveGCode.trimTurtle(turtle, 10, 20);
+
+        File fileTemp = File.createTempFile("unit", null);
+
+        try {
+            saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
+            compareExpectedToActual("/gcode/save_subsection.gcode",fileTemp);
+        } finally {
+            fileTemp.delete();
+        }
+    }
 }

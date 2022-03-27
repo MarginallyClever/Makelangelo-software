@@ -47,12 +47,12 @@ public class SaveGCode {
 	}
 
 	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
-		Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
-
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", fileWithExtension);
+
+			Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
 
 			int count = countTurtleToolChanges(skinnyTurtle);
 			if(count>1) {
@@ -70,7 +70,7 @@ public class SaveGCode {
 	 * @param turtle the source turtle.
 	 * @return the {@link Turtle} with the trimmed history.
 	 */
-	private Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
+	protected Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
 		Turtle skinny = new Turtle();
 		skinny.history.clear();
 
