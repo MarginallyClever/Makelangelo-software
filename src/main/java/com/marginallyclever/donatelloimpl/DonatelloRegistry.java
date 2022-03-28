@@ -13,6 +13,10 @@ import com.marginallyclever.nodegraphcore.NodeRegistry;
  * @since 2022-02-01
  */
 public class DonatelloRegistry implements DAORegistry, NodeRegistry {
+    public String getName() {
+        return "Makelangelo software";
+    }
+
     @Override
     public void registerDAO() {
         DAO4JSONFactory.registerDAO(Turtle.class,new TurtleDAO4JSON());
