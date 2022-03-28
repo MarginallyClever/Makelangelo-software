@@ -1,4 +1,4 @@
-package com.marginallyclever.donatelloimpl.nodes.shapes;
+package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
@@ -6,15 +6,17 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TurtleCircle extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(TurtleCircle.class);
+public class NGon extends Node {
+    private static final Logger logger = LoggerFactory.getLogger(NGon.class);
 
-    private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 50,true,false);
+    private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 10,true,true);
+    private final NodeVariable<Number> steps = NodeVariable.newInstance("steps", Number.class, 4,true,true);
     private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
 
-    public TurtleCircle() {
-        super("Circle");
+    public NGon() {
+        super("NGon");
         addVariable(radius);
+        addVariable(steps);
         addVariable(contents);
     }
 
@@ -22,14 +24,14 @@ public class TurtleCircle extends Node {
     public void update() {
         try {
             Turtle t = new Turtle();
-            double r = radius.getValue().doubleValue()/2.0;
-            double circumference = Math.ceil(Math.PI*r*2.0);
+            double r = radius.getValue().doubleValue();
+            int s = steps.getValue().intValue();
+
             t.jumpTo(r,0);
-            for(int i=0;i<circumference;++i) {
-                double v = 2.0*Math.PI * (double)i/circumference;
-                t.moveTo(Math.cos(v)*r,Math.sin(v)*r);
+            for(int i=1;i<=s;++i) {
+                double v = ( 2.0*Math.PI*(double)i ) / (double)s;
+                t.moveTo(Math.cos(v), Math.sin(v));
             }
-            t.jumpTo(r,0);
             t.penUp();
             contents.setValue(t);
             cleanAllInputs();
