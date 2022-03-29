@@ -25,7 +25,9 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 		//colorTravel.set(settings.getPenUpColor());
 		//colorDraw.set(settings.getPenDownColorDefault());
 		float penDiameter = 0.8f;
-		
+
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		lineWidth = lineWidthBuf[0];
 
@@ -38,6 +40,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void end() {
 		gl2.glEnd();
 		gl2.glLineWidth(lineWidth);
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	@Override

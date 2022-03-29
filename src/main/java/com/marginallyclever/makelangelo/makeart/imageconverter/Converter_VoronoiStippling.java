@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageConverter;
+package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
