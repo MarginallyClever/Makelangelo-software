@@ -168,6 +168,7 @@ public final class Makelangelo {
 			msv.setSettings(e);
 		}
 		myTurtleRenderer.setUpColor(e.getPenUpColor());
+		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 	}
 

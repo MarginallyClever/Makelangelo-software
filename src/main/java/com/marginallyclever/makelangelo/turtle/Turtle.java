@@ -471,7 +471,7 @@ public class Turtle implements Cloneable {
 			}
 			t.history.add(m);
 		}
-		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
+		//logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
 		List<Turtle> notEmptyList = new ArrayList<>();
 		for( Turtle t2 : list ) {

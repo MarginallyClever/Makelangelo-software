@@ -2167,4 +2167,14 @@
 		<key>SaveGCode.splitGCodeQuestion</key>
 		<value>There are %1 tool changes in this drawing.  Split into separate files?</value>
 	</string>
+
+	<!-- to update / review -->
+	<string>
+		<key>Converter_CMYK_Circles.name</key>
+		<value>CMYK circles</value>
+	</string>
+	<string>
+		<key>Converter_CMYK_Circles.maxCircleSize</key>
+		<value>max circle size</value>
+	</string>
 </language>

@@ -32,13 +32,12 @@ public class InfillTurtle {
 		// confirmTurtleIsClosedLoop(input);
 
 		Turtle result = new Turtle();
+		result.history.clear();
 
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
 			List<LineSegment2D> segments = infillFromTurtle(t);
-			Turtle t2 = new Turtle();
-			t2.addLineSegments(segments);
-			result.add(t2);
+			result.addLineSegments(segments);
 		}
 
 		return result;
