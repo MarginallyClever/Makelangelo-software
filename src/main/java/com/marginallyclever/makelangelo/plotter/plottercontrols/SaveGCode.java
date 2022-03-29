@@ -52,7 +52,9 @@ public class SaveGCode {
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", fileWithExtension);
 
+			logger.debug("turtle.history.size={} trimHead={} trimTail={}", turtle.history.size(), trimHead, trimTail);			
 			Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
+			logger.debug("skinnyTurtle.history.size={} ?=(trimTail-trimHead)={}", skinnyTurtle.history.size(),trimTail-trimHead);
 
 			int count = countTurtleToolChanges(skinnyTurtle);
 			if(count>1) {
