@@ -406,8 +406,8 @@ public final class Makelangelo {
 
 		SaveGCode save = new SaveGCode();
 		try {
-			int head = rangeSlider.getUpperValue();
-			int tail = rangeSlider.getValue();
+			int head = rangeSlider.getValue();
+			int tail = rangeSlider.getUpperValue();
 			save.run(myTurtle, myPlotter, mainFrame, head, tail);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
