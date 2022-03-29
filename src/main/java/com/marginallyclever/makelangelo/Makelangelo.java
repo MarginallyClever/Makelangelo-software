@@ -91,6 +91,8 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
+	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
+	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
 
 	private static Logger logger;
 
@@ -103,9 +105,6 @@ public final class Makelangelo {
 	private static boolean isMacOS = false;
 
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
-	private RangeSlider rangeSlider;
-	private final JLabel labelRangeMin = new JLabel();
-	private final JLabel labelRangeMax = new JLabel();
 	
 	private PlotterRenderer myPlotterRenderer;
 	
@@ -118,8 +117,9 @@ public final class Makelangelo {
 	private RecentFiles recentFiles;
 	private OpenFileChooser openFileChooser;
 
-	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
-	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
+	private RangeSlider rangeSlider;
+	private final JLabel labelRangeMin = new JLabel();
+	private final JLabel labelRangeMax = new JLabel();
 
 	
 	// drag files into the app with {@link DropTarget}
@@ -402,9 +402,12 @@ public final class Makelangelo {
 
 	private void saveGCode() {
 		logger.debug("Saving to gcode...");
+
 		SaveGCode save = new SaveGCode();
 		try {
-			save.run(myTurtle, myPlotter, mainFrame);
+			int head = rangeSlider.getUpperValue();
+			int tail = rangeSlider.getValue();
+			save.run(myTurtle, myPlotter, mainFrame, head, tail);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
