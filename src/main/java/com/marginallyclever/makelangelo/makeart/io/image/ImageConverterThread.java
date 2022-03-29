@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io.image;
 
-import com.marginallyclever.makelangelo.makeart.imageConverter.ImageConverter;
+import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -9,6 +7,8 @@ import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeEvent;
 
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
@@ -61,7 +61,6 @@ public class Converter_CMYK extends ImageConverter {
 	}
 	
 	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {
-		// The picture might be in color.  Smash it to 255 shades of grey.
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
 		double [] channelCutoff = {0,153,51,102,204};

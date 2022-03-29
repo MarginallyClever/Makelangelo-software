@@ -18,8 +18,8 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author Dan
  */
-public class Converter_Spiral_CMYK extends ImageConverter {
-	private static final Logger logger = LoggerFactory.getLogger(Converter_Spiral_CMYK.class);
+public class Converter_CMYK_Spiral extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Spiral.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
 	@Override

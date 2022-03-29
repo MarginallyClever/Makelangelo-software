@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageConverter.voronoi;
+package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
 
 public class VoronoiGraphEdge {
 	public double x1, y1;
