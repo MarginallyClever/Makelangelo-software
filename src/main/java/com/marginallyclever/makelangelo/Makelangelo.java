@@ -290,7 +290,6 @@ public final class Makelangelo {
 		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.setResizable(false);
 		dialog.pack();
@@ -303,6 +302,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
@@ -310,7 +310,6 @@ public final class Makelangelo {
 		PaperSettings settings = new PaperSettings(myPaper);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PaperSettings.Title"));
 		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
 
@@ -323,6 +322,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
@@ -429,7 +429,6 @@ public final class Makelangelo {
 		dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.pack();
 
 		enableMenuBar(false);
@@ -441,6 +440,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
