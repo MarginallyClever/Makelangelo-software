@@ -8,6 +8,7 @@ public class ImageConverterFactory {
 		new Converter_CMYK_Spiral_Panel(new Converter_CMYK_Spiral()),
 		new Converter_CMYK_Circles_Panel(new Converter_CMYK_Circles()),
 		new Converter_Crosshatch_Panel(new Converter_Crosshatch()),
+		new Converter_EdgeDetection_Panel(new Converter_EdgeDetection()),
 		new Converter_Moire_Panel(new Converter_Moire()),
 		new Converter_Multipass_Panel(new Converter_Multipass()),
 		new Converter_Pulse_Panel(new Converter_Pulse()),

@@ -15,20 +15,21 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	
 	private ColorRGB colorTravel = new ColorRGB(0,255,0);
 	private boolean showPenUp = false;
-	private float originalLineWidth=1;
+	private float penDiameter =1;
 	private int moveCounter;
+	private float[] lineWidthBuf = new float[1];
 		
 	@Override
 	public void start(GL2 gl2) {
 		this.gl2=gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
 
-		float[] lineWidthBuf = new float[1];
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		originalLineWidth = lineWidthBuf[0];
+		// Multiply blend mode
+		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);
 
-		float penDiameter = 0.8f;//settings.getPenDiameter();
-		setPenDiameter(penDiameter);
+		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
+		gl2.glLineWidth(penDiameter);
+
 		gl2.glBegin(GL2.GL_LINES);
 		moveCounter=0;
 	}
@@ -36,7 +37,10 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void end() {
 		gl2.glEnd();
-		gl2.glLineWidth(originalLineWidth);
+		// restore pen diameter
+		gl2.glLineWidth(lineWidthBuf[0]);
+		// restore blend mode
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	private void setDrawColor() {
@@ -78,10 +82,9 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	public void setPenUpColor(ColorRGB color) {
 		colorTravel.set(color);
 	}
-	
+
 	@Override
-	public void setPenDiameter(double d) {
-		float newDiameter = (float)d / originalLineWidth;
-		gl2.glLineWidth(newDiameter);
+	public void setPenDiameter(double penDiameter) {
+		this.penDiameter =(float)penDiameter;
 	}
 }
