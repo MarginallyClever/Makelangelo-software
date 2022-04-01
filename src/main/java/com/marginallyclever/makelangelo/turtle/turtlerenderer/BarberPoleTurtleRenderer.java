@@ -15,30 +15,33 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	
 	private ColorRGB colorTravel = new ColorRGB(0,255,0);
 	private boolean showPenUp = false;
-	private float originalLineWidth=1;
+	private float penDiameter =1;
+	private float[] lineWidthBuf = new float[1];
 	private int moveCounter;
 		
 	@Override
 	public void start(GL2 gl2) {
 		this.gl2=gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
-		//colorTravel.set(settings.getPenUpColor());
-		//colorDraw.set(settings.getPenDownColorDefault());
-		float penDiameter = 0.8f;//settings.getPenDiameter();
 
-		float[] lineWidthBuf = new float[1];
+		// Multiply blend mode
+		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);
+		// set pen diameter
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		originalLineWidth = lineWidthBuf[0];
+		gl2.glLineWidth(penDiameter);
 
-		setPenDiameter(penDiameter);
 		gl2.glBegin(GL2.GL_LINES);
 		moveCounter=0;
 	}
 
 	@Override
 	public void end() {
+		// end drawing lines
 		gl2.glEnd();
-		gl2.glLineWidth(originalLineWidth);
+		// restore pen diameter
+		gl2.glLineWidth(lineWidthBuf[0]);
+		// restore blend mode
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	private void setDrawColor() {
@@ -46,7 +49,6 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 		//else if(moveCounter%3==1) gl2.glColor3d(1,0,1);
 		else gl2.glColor3d(0,0,1);
 		moveCounter++;
-		
 	}
 	
 	@Override
@@ -75,10 +77,9 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	public void setPenUpColor(ColorRGB color) {
 		colorTravel.set(color);
 	}
-	
+
 	@Override
-	public void setPenDiameter(double d) {
-		float newDiameter = 2.0f * (float)d / originalLineWidth;
-		gl2.glLineWidth(newDiameter);
+	public void setPenDiameter(double penDiameter) {
+		this.penDiameter =(float)penDiameter;
 	}
 }
