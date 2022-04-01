@@ -169,17 +169,13 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		
 		camera.setWidth(width);
 		camera.setHeight(height);
-		
-		// window_aspect_ratio = window_width / window_height;
 
 		gl2.glMatrixMode(GL2.GL_PROJECTION);
 		gl2.glLoadIdentity();
+		// orthographic projection
 		glu.gluOrtho2D(-width/2, width/2, -height/2, height/2);
-		/*
-		glu.gluPerspective( 90,
-				(float) width / (float) height,
-				Camera.CAMERA_ZNEAR,
-				Camera.CAMERA_ZFAR);*/
+		// perspective projection with 90 degree field of view, for reference.
+		//glu.gluPerspective( 90, (float) width / (float) height, Camera.CAMERA_ZNEAR, Camera.CAMERA_ZFAR);
 	}
 
 	/**
@@ -247,25 +243,28 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			gl2.glPopMatrix();
 		}
 
+		// if you need to display a marker in the scene at the cursor position for debugging, use this.
 		//paintCursor(gl2);
 	}
 
 	private void paintCursor(GL2 gl2) {
 		gl2.glPushMatrix();
-			Rectangle r = this.getBounds();
-			Point2D sp = new Point2D(mouseOldX,mouseOldY);
-			sp.x -= r.getCenterX();
-			sp.y -= r.getCenterY();
 
-			Point2D wp = camera.screenToWorldSpace(sp);
-			gl2.glColor3d(255,0,255);
-			gl2.glTranslated(wp.x,-wp.y,0);
-			gl2.glBegin(GL2.GL_LINES);
-			gl2.glVertex2d(-10,0);
-			gl2.glVertex2d( 10,0);
-			gl2.glVertex2d(0,-10);
-			gl2.glVertex2d(0, 10);
-			gl2.glEnd();
+		Rectangle r = this.getBounds();
+		Point2D sp = new Point2D(mouseOldX,mouseOldY);
+		sp.x -= r.getCenterX();
+		sp.y -= r.getCenterY();
+
+		Point2D wp = camera.screenToWorldSpace(sp);
+		gl2.glColor3d(255,0,255);
+		gl2.glTranslated(wp.x,-wp.y,0);
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glVertex2d(-10,0);
+		gl2.glVertex2d( 10,0);
+		gl2.glVertex2d(0,-10);
+		gl2.glVertex2d(0, 10);
+		gl2.glEnd();
+
 		gl2.glPopMatrix();
 	}
 
