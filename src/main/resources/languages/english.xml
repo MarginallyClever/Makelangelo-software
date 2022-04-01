@@ -2177,4 +2177,21 @@
 		<key>Converter_CMYK_Circles.maxCircleSize</key>
 		<value>max circle size</value>
 	</string>
+
+	<string>
+		<key>Converter_EdgeDetection.name</key>
+		<value>Edge detection</value>
+	</string>
+	<string>
+		<key>Converter_EdgeDetection.passes</key>
+		<value>Passes</value>
+	</string>
+	<string>
+		<key>Converter_EdgeDetection.stepSize</key>
+		<value>Step size</value>
+	</string>
+	<string>
+		<key>Converter_EdgeDetection.sampleSize</key>
+		<value>SampleSize</value>
+	</string>
 </language>
