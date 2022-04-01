@@ -16,7 +16,7 @@ import java.beans.PropertyChangeEvent;
 public class Converter_EdgeDetection extends ImageConverter {
 	private static int passes=5;
 	private static int stepSize=10;
-	private static int sampleSize=10;
+	private static int sampleSize=2;
 
 	private int edge;
 	private TransformedImage img;
