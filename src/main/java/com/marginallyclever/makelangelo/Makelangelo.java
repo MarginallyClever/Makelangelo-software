@@ -662,12 +662,12 @@ public final class Makelangelo {
 		
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-		buttonZoomOut.addActionListener((e) -> camera.zoomOut());
+		buttonZoomOut.addActionListener((e) -> camera.zoom(1));
 		menu.add(buttonZoomOut);
 
 		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-		buttonZoomIn.addActionListener((e) -> camera.zoomIn());
+		buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
 		menu.add(buttonZoomIn);
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
