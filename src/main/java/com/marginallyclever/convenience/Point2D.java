@@ -53,4 +53,8 @@ public class Point2D {
 			y*=ilen;
 		}
 	}
+
+	public boolean equalsEpsilon(Point2D b, double epsilon) {
+		return distance(b) < epsilon;
+	}
 }
