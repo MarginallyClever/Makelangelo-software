@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.marlinSimulation;
+package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
