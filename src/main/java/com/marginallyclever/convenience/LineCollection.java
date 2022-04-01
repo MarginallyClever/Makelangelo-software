@@ -1,7 +1,7 @@
 package com.marginallyclever.convenience;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 public class LineCollection extends ArrayList<LineSegment2D> {
 	private static final long serialVersionUID = 1L;
@@ -11,7 +11,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		super();
 	}
 	
-	public LineCollection(List<LineSegment2D> list) {
+	public LineCollection(LineCollection list) {
 		super();
 		addAll(list);
 	}
@@ -119,4 +119,19 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			simplifySection(maxIndex, j,distanceTolerance);
 		}
 	}
-};
+
+	public Point2D getStart() {
+		return get(0).start;
+	}
+
+	public Point2D getEnd() {
+		return get(size()-1).end;
+	}
+
+	public void flip() {
+		Collections.reverse(this);
+		for( LineSegment2D line : this ) {
+			line.flip();
+		}
+	}
+}

@@ -1,16 +1,11 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.convenience.*;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.NodeVariable;
-import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Use an image to mask a path.  Lay the path over the image and remove all parts of the path where the image is brighter
@@ -26,8 +21,8 @@ public class PathImageMask extends Node {
     private final NodeVariable<Turtle> outputAbove = NodeVariable.newInstance("above", Turtle.class,new Turtle(),false,true);
     private final NodeVariable<Turtle> outputBelow = NodeVariable.newInstance("below", Turtle.class,new Turtle(),false,true);
 
-    private final List<LineSegment2D> listAbove = new ArrayList<>();
-    private final List<LineSegment2D> listBelow = new ArrayList<>();
+    private final LineCollection listAbove = new LineCollection();
+    private final LineCollection listBelow = new LineCollection();
 
     public PathImageMask() {
         super("PathImageMask");
@@ -44,7 +39,7 @@ public class PathImageMask extends Node {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
-        List<LineSegment2D> lines  = myTurtle.getAsLineSegments();
+        LineCollection lines  = myTurtle.getAsLineSegments();
         BufferedImage src = image.getValue();
         
         listAbove.clear();
@@ -82,7 +77,7 @@ public class PathImageMask extends Node {
         Point2D P0 = segment.start;
         Point2D P1 = segment.end;
 
-        List<LineSegment2D> toKeep = new ArrayList<>();
+        LineCollection toKeep = new LineCollection();
 
         // clip line to image bounds because sampling outside limits causes exception.
         Point2D rMin = new Point2D(0,0);
