@@ -69,7 +69,6 @@ public class Camera {
 
 		offsetX -= after.x - before.x;
 		offsetY -= after.y - before.y;
-		//System.out.println("zoom="+zoom+" @ "+cursor.x+","+cursor.y);
 	}
 
 	// scale the picture of the robot to fake a zoom.
