@@ -140,7 +140,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				int y = e.getY();
 				mouseOldX = x;
 				mouseOldY = y;
-				repaint();
 			}
 		});
 		
@@ -165,7 +164,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
 		GL2 gl2 = glautodrawable.getGL().getGL2();
-		// gl2.setSwapInterval(1);
 		
 		camera.setWidth(width);
 		camera.setHeight(height);
@@ -174,8 +172,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		gl2.glLoadIdentity();
 		// orthographic projection
 		glu.gluOrtho2D(-width/2, width/2, -height/2, height/2);
-		// perspective projection with 90 degree field of view, for reference.
-		//glu.gluPerspective( 90, (float) width / (float) height, Camera.CAMERA_ZNEAR, Camera.CAMERA_ZFAR);
 	}
 
 	/**
@@ -242,11 +238,9 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			p.render(gl2);
 			gl2.glPopMatrix();
 		}
-
-		// if you need to display a marker in the scene at the cursor position for debugging, use this.
-		//paintCursor(gl2);
 	}
 
+	// if you need to display a marker in the scene at the cursor position for debugging, use this.
 	private void paintCursor(GL2 gl2) {
 		gl2.glPushMatrix();
 
