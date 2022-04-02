@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
@@ -54,15 +55,102 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	 * @param turtle
 	 */
 	private Turtle reorderTurtle(Turtle turtle) {
-		List<LineSegment2D> originalLines = turtle.getAsLineSegments();
+		LineCollection originalLines = turtle.getAsLineSegments();
 		int originalCount = originalLines.size();
 		ColorRGB c = turtle.getFirstColor();
 		logger.debug("  {} converted to {} lines.", c.toString(), originalCount);
 
-		ArrayList<LineSegment2D> orderedLines = greedyReordering(originalLines);
+		List<LineCollection> firstPass = greedyReordering(originalLines);
+		LineCollection secondPass = sortFirstPass(firstPass);
+
 		Turtle t = new Turtle(c);
-		t.addLineSegments(orderedLines);
+		t.addLineSegments(secondPass);
 		return t;
+	}
+
+	/**
+	 * Search firstPass for elements which are connected in sequence.  Two elments are connected in sequence if
+	 * (A.start == B.start || A.start == B.end).
+	 * @param firstPass a list of {@link LineCollection}s
+	 * @return
+	 */
+	private LineCollection sortFirstPass(List<LineCollection> firstPass) {
+		final double epsilon = 1e-6;
+
+		if(firstPass.isEmpty()) return new LineCollection();
+
+		for(int i=0;i<firstPass.size();++i) {
+		 	LineCollection a = firstPass.get(i);
+			if(a.isEmpty()) continue;
+
+		 	for(int j=i+1;j<firstPass.size();++j) {
+				LineCollection b = firstPass.get(j);
+				if(b.isEmpty()) continue;
+
+				if(a.getEnd().equalsEpsilon(b.getStart(),epsilon)) {
+					a.addAll(b);
+					b.clear();
+				} else if(a.getEnd().equalsEpsilon(b.getEnd(),epsilon)) {
+					b.flip();
+					a.addAll(b);
+					b.clear();
+				} else if(a.getStart().equalsEpsilon(b.getStart(),epsilon)) {
+					a.flip();
+					a.addAll(b);
+					b.clear();
+				} else if(a.getStart().equalsEpsilon(b.getEnd(),epsilon)) {
+					a.flip();
+					b.flip();
+					a.addAll(b);
+					b.clear();
+				}
+			}
+		}
+
+		// remove the empty elements.
+		List<LineCollection> secondPass = new ArrayList<>();
+		for(LineCollection lc : firstPass) {
+			if(!lc.isEmpty()) {
+				secondPass.add(lc);
+			}
+		}
+
+		LineCollection output = new LineCollection();
+
+		if(secondPass.size()==0) {
+			logger.debug("  no reordering.");
+			return output;
+		}
+		if(secondPass.get(0).isEmpty()) {
+			logger.debug("  not possible?!");
+			return output;
+		}
+
+		// another greedy tour.
+		Point2D lastPosition = secondPass.get(0).getEnd();
+		output.addAll(secondPass.remove(0));
+
+		while(!secondPass.isEmpty()) {
+			LineCollection best = null;
+			double distance = Double.MAX_VALUE;
+			boolean flip=false;
+			for(LineCollection lc : secondPass) {
+				double d0 = lc.getStart().distanceSquared(lastPosition);
+				double d1 = lc.getEnd().distanceSquared(lastPosition);
+				double nearest = Math.min(d0, d1);
+				if(distance > nearest) {
+					distance = nearest;
+					best = lc;
+					flip = (d1<d0);
+				}
+			}
+			secondPass.remove(best);
+			if(flip) best.flip();
+			output.addAll(best);
+			lastPosition = best.getEnd();
+		}
+
+		return output;
 	}
 
 	/**
@@ -72,10 +160,12 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	 * @param uniqueLines the unsorted list.
 	 * @return the sorted list.
 	 */
-	private ArrayList<LineSegment2D> greedyReordering(List<LineSegment2D> uniqueLines) {
+	private List<LineCollection> greedyReordering(LineCollection uniqueLines) {
 		logger.debug("  greedyReordering()");
-		ArrayList<LineSegment2D> orderedLines = new ArrayList<LineSegment2D>();
-		if(uniqueLines.isEmpty()) return orderedLines;
+		List<LineCollection> firstPass = new ArrayList<>();
+		if(uniqueLines.isEmpty()) return firstPass;
+
+		LineCollection orderedLines = new LineCollection();
 
 		Point2D lastPosition = uniqueLines.get(0).start;
 		
@@ -86,35 +176,44 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 			
 			for( LineSegment2D line : uniqueLines ) {
 				// is either end of line closer than our best?
-				double dA = lastPosition.distanceSquared(line.start);
-				double dB = lastPosition.distanceSquared(line.end);
-				double nearest = Math.min(dA, dB);
+				double d0 = lastPosition.distanceSquared(line.start);
+				double d1 = lastPosition.distanceSquared(line.end);
+				double nearest = Math.min(d0, d1);
 				if(bestD > nearest) {
 					bestD = nearest;
 					bestLine = line;
-					bestFlip = (dB < dA);
+					bestFlip = (d1 < d0);
 				}
 				if(bestD==0) break;
 			}
 			
 			if(bestFlip) bestLine.flip();
-			
+
+			if(bestD>1e-6) {
+				firstPass.add(orderedLines);
+				orderedLines = new LineCollection();
+			}
+
 			uniqueLines.remove(bestLine);
 			orderedLines.add(bestLine);
 			
 			// Start next iteration where current line ends.
 			lastPosition = bestLine.end;
 		}
+
+		if(!orderedLines.isEmpty()) {
+			firstPass.add(orderedLines);
+		}
 		
-		return orderedLines;
+		return firstPass;
 	}
 
 	
 	// TODO: move this to its own Action?
 	@SuppressWarnings("unused")
-	private ArrayList<LineSegment2D> removeDuplicates(ArrayList<LineSegment2D> originalLines, double EPSILON2) {
+	private LineCollection removeDuplicates(LineCollection originalLines, double EPSILON2) {
 		logger.debug("  removeDuplicates()");
-		ArrayList<LineSegment2D> uniqueLines = new ArrayList<LineSegment2D>();
+		LineCollection uniqueLines = new LineCollection();
 
 		for(LineSegment2D candidateLine : originalLines) {
 			boolean isDuplicate = false;
