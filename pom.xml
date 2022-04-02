@@ -359,7 +359,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.jogamp.fat</groupId>
 			<artifactId>jogamp-fat</artifactId>
-			<version>2.4.0-rc-20200307</version>
+			<version>2.4.0-rc-20210111</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
