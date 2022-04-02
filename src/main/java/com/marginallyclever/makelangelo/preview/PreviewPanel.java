@@ -5,10 +5,13 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -37,11 +40,20 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	
 	// background color, rgb values 0...255
 	public ColorRGB backgroundColor = new ColorRGB(255-67,255-67,255-67);
-	
-	// motion control
-	// private boolean mouseIn=false;
+
+	/**
+	 * button state tracking
+	 */
 	private int buttonPressed = MouseEvent.NOBUTTON;
+
+	/**
+	 * previous mouse position
+	 */
 	private int mouseOldX, mouseOldY;
+
+	/**
+	 * mouseLastZoomDirection is used to prevent reverse zooming on track pads, bug #559.
+	 */
 	private int mouseLastZoomDirection = 0;
 
 	// OpenGL stuff
@@ -65,24 +77,26 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		}
 
 		addGLEventListener(this);
-		
+
+		final JPanel me = this;
+
 		// scroll the mouse wheel to zoom
 		addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				int notches = e.getWheelRotation();
-				if (notches == 0) {
-					return;
-				}
+				if (notches == 0) return;
+
+				Point2D p = new Point2D(e.getPoint().x,e.getPoint().y);
+				Rectangle r = me.getBounds();
+				p.x -= r.getCenterX();
+				p.y -= r.getCenterY();
+
 				if (notches < 0) {
-					if (mouseLastZoomDirection == -1) {
-						camera.zoomIn();
-					}
+					if (mouseLastZoomDirection == -1) camera.zoom(-1,p);
 					mouseLastZoomDirection = -1;
 				} else {
-					if (mouseLastZoomDirection == 1) {
-						camera.zoomOut();
-					}
+					if (mouseLastZoomDirection == 1) camera.zoom(1,p);
 					mouseLastZoomDirection = 1;
 				}
 				repaint();
@@ -120,6 +134,13 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 					repaint();
 				}
 			}
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				mouseOldX = x;
+				mouseOldY = y;
+			}
 		});
 		
 		// start animation system
@@ -143,19 +164,14 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
 		GL2 gl2 = glautodrawable.getGL().getGL2();
-		// gl2.setSwapInterval(1);
 		
 		camera.setWidth(width);
 		camera.setHeight(height);
-		
-		// window_aspect_ratio = window_width / window_height;
 
 		gl2.glMatrixMode(GL2.GL_PROJECTION);
 		gl2.glLoadIdentity();
-		glu.gluPerspective( 90,
-				(float) width / (float) height,
-				Camera.CAMERA_ZNEAR,
-				Camera.CAMERA_ZFAR);
+		// orthographic projection
+		glu.gluOrtho2D(-width/2, width/2, -height/2, height/2);
 	}
 
 	/**
@@ -195,11 +211,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	 */
 	@Override
 	public void display(GLAutoDrawable glautodrawable) {
-		// long now_time = System.currentTimeMillis();
-		// float dt = (now_time - last_time)*0.001f;
-		// last_time = now_time;
-		// logger.debug(dt);
-
 		// draw the world
 		GL2 gl2 = glautodrawable.getGL().getGL2();
 
@@ -221,8 +232,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		
 		paintBackground(gl2);
 		paintCamera(gl2);
-		
-		gl2.glLineWidth((float)camera.getZoom());
 
 		for( PreviewListener p : previewListeners ) {
 			gl2.glPushMatrix();
@@ -230,7 +239,29 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			gl2.glPopMatrix();
 		}
 	}
-	
+
+	// if you need to display a marker in the scene at the cursor position for debugging, use this.
+	private void paintCursor(GL2 gl2) {
+		gl2.glPushMatrix();
+
+		Rectangle r = this.getBounds();
+		Point2D sp = new Point2D(mouseOldX,mouseOldY);
+		sp.x -= r.getCenterX();
+		sp.y -= r.getCenterY();
+
+		Point2D wp = camera.screenToWorldSpace(sp);
+		gl2.glColor3d(255,0,255);
+		gl2.glTranslated(wp.x,-wp.y,0);
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glVertex2d(-10,0);
+		gl2.glVertex2d( 10,0);
+		gl2.glVertex2d(0,-10);
+		gl2.glVertex2d(0, 10);
+		gl2.glEnd();
+
+		gl2.glPopMatrix();
+	}
+
 	/**
 	 * Set up the correct modelview so the robot appears where it should.
 	 *
@@ -239,7 +270,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private void paintCamera(GL2 gl2) {
 		gl2.glMatrixMode(GL2.GL_MODELVIEW);
 		gl2.glLoadIdentity();
-		gl2.glTranslated(-camera.getX(), camera.getY(),-camera.getZoom());
+		gl2.glScaled(camera.getZoom(),camera.getZoom(),1);
+		gl2.glTranslated(-camera.getX(), camera.getY(),0);
 	}
 
 	/**
