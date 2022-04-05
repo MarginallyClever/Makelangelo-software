@@ -31,7 +31,7 @@ public class Generator_FlowField_Panel extends TurtleGeneratorPanel {
 		add(fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),Generator_FlowField.getScaleY()));
 		add(fieldOffsetX = new SelectDouble("offsetX",Translator.get("Generator_FlowField.offsetX"),Generator_FlowField.getOffsetX()));
 		add(fieldOffsetY = new SelectDouble("offsetY",Translator.get("Generator_FlowField.offsetY"),Generator_FlowField.getOffsetY()));
-		add(fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,1,Generator_FlowField.getStepSize()));
+		add(fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,Generator_FlowField.getStepSize()));
 		add(fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),Generator_FlowField.getFromEdge()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}

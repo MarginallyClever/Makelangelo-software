@@ -84,6 +84,7 @@ public class Generator_FlowField extends TurtleGenerator {
 		double yMax = myPaper.getMarginTop()-stepSize;
 		double xMax = myPaper.getMarginRight()-stepSize;
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
+		r.grow(1,1);
 
 		for(double y = yMin; y<yMax; y+=stepSize) {
 			makeLine(turtle, r, xMin, y);
@@ -101,8 +102,8 @@ public class Generator_FlowField extends TurtleGenerator {
 		double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
 		turtle.setAngle(v * 180);
 		Vector2d nextStep = turtle.getHeading();
-		nextStep.x+=x;
-		nextStep.y+=y;
+		nextStep.scale(stepSize);
+		nextStep.add(turtle.getPosition());
 		continueLine(turtle, r,!r.contains(nextStep.x,nextStep.y));
 	}
 
@@ -110,11 +111,12 @@ public class Generator_FlowField extends TurtleGenerator {
 		for(int i=0;i<200;++i) {
 			double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
 			turtle.setAngle(v * 180);
-			turtle.forward(reverse?-stepSize:stepSize);
+			Vector2d nextStep = turtle.getHeading();
+			nextStep.scale(reverse?-stepSize:stepSize);
+			nextStep.add(turtle.getPosition());
 			// stop if we leave the rectangle
-			if(!r.contains(turtle.getX(),turtle.getY())) {
-				break;
-			}
+			if(!r.contains(nextStep.x,nextStep.y)) break;
+			turtle.moveTo(nextStep.x,nextStep.y);
 		}
 	}
 
