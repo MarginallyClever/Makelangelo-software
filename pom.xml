@@ -386,13 +386,13 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>httpmime</artifactId>
 			<version>4.5.13</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/de.sciss/jrpicam -->
+		<!-- raspi camera https://mvnrepository.com/artifact/de.sciss/jrpicam -->
 		<dependency>
 			<groupId>de.sciss</groupId>
 			<artifactId>jrpicam</artifactId>
 			<version>0.2.0</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
+		<!-- dxf format https://mvnrepository.com/artifact/net.sourceforge/kabeja -->
 		<dependency>
 			<groupId>org.kabeja</groupId>
 			<artifactId>kabeja</artifactId>
@@ -445,7 +445,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
+		<!-- replacement for SVG reading from https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
 		<dependency>
 			<groupId>io.sf.carte</groupId>
 			<artifactId>echosvg-all</artifactId>
