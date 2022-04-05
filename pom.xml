@@ -314,6 +314,36 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 					<commitIdGenerationMode>full</commitIdGenerationMode>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<version>1.0.0.RC2</version>
+				<executions>
+					<execution>
+						<id>add-module-infos</id>
+						<phase>package</phase>
+						<configuration>
+							<outputDirectory>${project.build.directory}/modules</outputDirectory>
+							<modules>
+								<module>
+									<artifact>
+										<groupId>xalan</groupId>
+										<artifactId>xalan</artifactId>
+										<version>${xalan.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module xalan.xalan {
+										}
+									</moduleInfoSource>
+								</module>
+							</modules>
+						</configuration>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -495,6 +525,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<minimum.maven.version>3.8.1</minimum.maven.version>
 		<minimum.java.version>15</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
+		<xalan.version>2.7.2</xalan.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
 		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
