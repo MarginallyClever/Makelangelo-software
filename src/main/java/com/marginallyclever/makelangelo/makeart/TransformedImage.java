@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import java.awt.Color;
+import com.marginallyclever.makelangelo.makeart.imageFilter.ImageFilter;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-
-import com.marginallyclever.makelangelo.makeart.imageFilter.ImageFilter;
 
 /**
  * TransformedImage is a BufferedImage, scaled, rotated, and translated
@@ -109,33 +109,28 @@ public class TransformedImage {
 		rotationDegrees += degrees;
 	}
 
+	/**
+	 * Returns the greyscale intensity [0...255]
+	 * @param cx center of the sample area
+	 * @param cy center of the sample area
+	 * @param radius radius of the sample area
+	 * @return the greyscale intensity [0...255]
+	 */
 	public int sample(double cx, double cy, double radius) {
 		return sample(cx-radius,cy-radius,cx+radius,cy+radius);
 	}
 	
 	/**
 	 * Sample the image, taking into account fractions of pixels. left must be less than right, bottom must be less than top.
-	 *
 	 * @param x0 left
 	 * @param y0 top
 	 * @param x1 right
 	 * @param y1 bottom
-	 * @return greyscale intensity in this region. range 0...255 inclusive
+	 * @return greyscale intensity in this region. [0...255]v
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
 		float sampleValue = 0;
 		float weightedSum = 0;
-		
-		if(x1<x0) {
-			double temp = x1;
-			x1=x0;
-			x0=temp;
-		}
-		if(y1<y0) {
-			double temp = y1;
-			y1=y0;
-			y0=temp;
-		}
 
 		int left   = (int)Math.floor(x0);
 		int right  = (int)Math.ceil (x1);
@@ -145,6 +140,13 @@ public class TransformedImage {
 		// calculate the weight matrix
 		int w = right-left;
 		int h = top-bottom;
+		if(w<=1 && h<=1) {
+			if (canSampleAt(left, bottom)) {
+				return sample1x1Unchecked(left, bottom);
+			} else {
+				return 0;
+			}
+		}
 		
 		double [] m = new double[w*h];
 		for(int i=0;i<m.length;++i) {
