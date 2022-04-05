@@ -9,8 +9,7 @@ module com.marginallyclever.makelangelo {
     requires org.apache.commons.io;
     requires java.prefs;
     requires kabeja;
-    requires batik.all;
-    requires xml.apis.ext;
+    requires io.sf.carte.echosvg;
     requires vecmath;
     requires jrpicam;
     requires org.jetbrains.annotations;

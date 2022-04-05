@@ -4,10 +4,10 @@ import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.apache.batik.anim.dom.*;
-import org.apache.batik.bridge.*;
-import org.apache.batik.dom.svg.SVGItem;
-import org.apache.batik.util.XMLResourceDescriptor;
+import io.sf.carte.echosvg.anim.dom.*;
+import io.sf.carte.echosvg.bridge.*;
+import io.sf.carte.echosvg.dom.svg.SVGItem;
+import io.sf.carte.echosvg.dom.util.SAXDocumentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -472,8 +472,7 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-		return (SVGDocument) factory.createDocument("",in);
+		SAXDocumentFactory factory = new SAXSVGDocumentFactory();
+		return (SVGDocument)factory.createDocument(null,in);
 	}
 }

@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
-import org.apache.batik.ext.swing.GridBagConstants;
+import io.sf.carte.echosvg.ext.swing.GridBagConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class ScaleTurtlePanel extends JPanel {
 		c.gridx=0;
 		c.gridy=0;
 		c.weightx=1;
-		c.anchor=GridBagConstants.NORTHWEST;
+		c.anchor= GridBagConstants.NORTHWEST;
 		add(new JLabel(Translator.get("Width")),c);
 		
 		c.gridx=0;

@@ -69,9 +69,16 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	</pluginRepositories>
 
 	<repositories>
+		<!-- for nodegraphcore -->
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
+		</repository>
+		<!-- for echoSVG -->
+		<repository>
+			<id>css4j</id>
+			<name>CSS4J repository</name>
+			<url>https://css4j.github.io/maven/</url>
 		</repository>
 		<repository>
 			<id>my-local-repo</id>
@@ -440,10 +447,11 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-xml -->
 		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-all</artifactId>
-			<version>1.14</version>
+			<groupId>io.sf.carte</groupId>
+			<artifactId>echosvg-all</artifactId>
+			<version>0.1.2</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-swing-junit</artifactId>
