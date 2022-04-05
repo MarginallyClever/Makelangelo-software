@@ -332,7 +332,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 										<version>${xalan.version}</version>
 									</artifact>
 									<moduleInfoSource>
-										module xalan.xalan {
+										module xalan {
 										}
 									</moduleInfoSource>
 								</module>
