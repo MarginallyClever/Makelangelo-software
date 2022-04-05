@@ -18,7 +18,8 @@ public class Generator_FlowField extends TurtleGenerator {
 	private static double offsetX = 0; // controls complexity of curve
 	private static double offsetY = 0; // controls complexity of curve
 	private static int stepSize = 5; // controls complexity of curve
-	private static boolean fromEdge = false;
+	private static boolean fromEdge = false;  // continuous lines
+	private static boolean rightAngle = false;
 
 	public static void setScaleX(double scaleX) {
 		Generator_FlowField.scaleX = scaleX;
@@ -37,6 +38,9 @@ public class Generator_FlowField extends TurtleGenerator {
 	}
 	public static void setFromEdge(boolean fromEdge) {
 		Generator_FlowField.fromEdge = fromEdge;
+	}
+	public static void setRightAngle(boolean rightAngle) {
+		Generator_FlowField.rightAngle = rightAngle;
 	}
 
 	public static double getScaleX() {
@@ -57,6 +61,9 @@ public class Generator_FlowField extends TurtleGenerator {
 	public static boolean getFromEdge() {
 		return fromEdge;
 	}
+	public static boolean getRightAngle() {
+		return rightAngle;
+	}
 
 	@Override
 	public String getName() {
@@ -72,8 +79,16 @@ public class Generator_FlowField extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
-		if (fromEdge) fromEdge(turtle);
-		else asGrid(turtle);
+		if (fromEdge) {
+			fromEdge(turtle);
+			if(rightAngle) {
+				rightAngle=false;
+				fromEdge(turtle);
+				rightAngle=true;
+			}
+		} else {
+			asGrid(turtle);
+		}
 
 		notifyListeners(turtle);
 	}
@@ -100,7 +115,7 @@ public class Generator_FlowField extends TurtleGenerator {
 		turtle.jumpTo(x,y);
 		// if the first step at this position would be outside the rectangle, reverse the direction.
 		double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
-		turtle.setAngle(v * 180);
+		turtle.setAngle(v * 180 + (rightAngle?90:0));
 		Vector2d nextStep = turtle.getHeading();
 		nextStep.scale(stepSize);
 		nextStep.add(turtle.getPosition());
@@ -110,7 +125,7 @@ public class Generator_FlowField extends TurtleGenerator {
 	private void continueLine(Turtle turtle, Rectangle r, boolean reverse) {
 		for(int i=0;i<200;++i) {
 			double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
-			turtle.setAngle(v * 180);
+			turtle.setAngle(v * 180 + (rightAngle?90:0));
 			Vector2d nextStep = turtle.getHeading();
 			nextStep.scale(reverse?-stepSize:stepSize);
 			nextStep.add(turtle.getPosition());

@@ -21,6 +21,7 @@ public class Generator_FlowField_Panel extends TurtleGeneratorPanel {
 	private SelectDouble fieldOffsetY;
 	private SelectSlider fieldStepSize;
 	private SelectBoolean fieldFromEdge;
+	private SelectBoolean fieldRightAngle;
 	private Generator_FlowField generator;
 
 	Generator_FlowField_Panel(Generator_FlowField generator) {
@@ -33,6 +34,7 @@ public class Generator_FlowField_Panel extends TurtleGeneratorPanel {
 		add(fieldOffsetY = new SelectDouble("offsetY",Translator.get("Generator_FlowField.offsetY"),Generator_FlowField.getOffsetY()));
 		add(fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,Generator_FlowField.getStepSize()));
 		add(fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),Generator_FlowField.getFromEdge()));
+		add(fieldRightAngle = new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),Generator_FlowField.getRightAngle()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
@@ -46,19 +48,22 @@ public class Generator_FlowField_Panel extends TurtleGeneratorPanel {
 		double  offsetY  = fieldOffsetY.getValue();
 		int     stepSize = fieldStepSize.getValue();
 		boolean fromEdge = fieldFromEdge.isSelected();
+		boolean rightAngle = fieldRightAngle.isSelected();
 
 		if(scaleX != Generator_FlowField.getScaleX()
 		|| scaleY != Generator_FlowField.getScaleY()
 		|| offsetX != Generator_FlowField.getOffsetX()
 		|| offsetY != Generator_FlowField.getOffsetY()
 		|| stepSize != Generator_FlowField.getStepSize()
-		|| fromEdge != Generator_FlowField.getFromEdge()) {
+		|| fromEdge != Generator_FlowField.getFromEdge()
+		|| rightAngle != Generator_FlowField.getRightAngle()) {
 			Generator_FlowField.setScaleX(scaleX);
 			Generator_FlowField.setScaleY(scaleY);
 			Generator_FlowField.setOffsetX(offsetX);
 			Generator_FlowField.setOffsetY(offsetY);
 			Generator_FlowField.setStepSize(stepSize);
 			Generator_FlowField.setFromEdge(fromEdge);
+			Generator_FlowField.setRightAngle(rightAngle);
 			generator.generate();
 		}
 	}
