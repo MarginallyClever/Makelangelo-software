@@ -8,8 +8,9 @@ import javax.vecmath.Vector2d;
 import java.awt.*;
 
 /**
- * Dragon fractal
+ * Two kinds of flow fields.  Uses Perlin noise to generate the field.
  * @author Dan Royer
+ * @since 2022-04-05
  */
 public class Generator_FlowField extends TurtleGenerator {
 	private static double scaleX = 0.01; // controls complexity of curve
@@ -104,6 +105,7 @@ public class Generator_FlowField extends TurtleGenerator {
 		nextStep.y+=y;
 		continueLine(turtle, r,!r.contains(nextStep.x,nextStep.y));
 	}
+
 	private void continueLine(Turtle turtle, Rectangle r, boolean reverse) {
 		for(int i=0;i<200;++i) {
 			double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
