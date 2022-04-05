@@ -7,6 +7,7 @@ import com.marginallyclever.convenience.Point2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -579,5 +580,13 @@ public class Turtle implements Cloneable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
+	}
+
+	public Vector2d getHeading() {
+		return new Vector2d(nx,ny);
+	}
+
+	public Vector2d getPosition() {
+		return new Vector2d(px,py);
 	}
 }

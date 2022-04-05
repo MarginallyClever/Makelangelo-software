@@ -6,6 +6,7 @@ public class TurtleGeneratorFactory {
 		new Generator_Dragon(),
 		new Generator_FibonacciSpiral(),
 		new Generator_FillPage(),
+		new Generator_FlowField(),
 		new Generator_GosperCurve(),
 		new Generator_GraphPaper(),
 		new Generator_HilbertCurve(),
