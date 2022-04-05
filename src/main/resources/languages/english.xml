@@ -2200,10 +2200,6 @@
 		<value>Flow field</value>
 	</string>
 	<string>
-		<key>Generator_FlowField.name</key>
-		<value>Flow field</value>
-	</string>
-	<string>
 		<key>Generator_FlowField.scaleX</key>
 		<value>X scale</value>
 	</string>
