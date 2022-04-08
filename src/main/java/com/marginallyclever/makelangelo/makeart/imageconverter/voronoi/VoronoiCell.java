@@ -1,13 +1,15 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
 
-import java.awt.geom.Rectangle2D;
-
+import com.marginallyclever.convenience.ConvexHull;
 import com.marginallyclever.convenience.Point2D;
+
+import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 
 
 public class VoronoiCell implements Comparable<VoronoiCell> {
+	public ConvexHull convexHull = new ConvexHull();
 	public Point2D centroid = new Point2D();
-	public Rectangle2D region;
 	public double weight;
 	public double wx, wy;
 	public int hits;
@@ -29,8 +31,8 @@ public class VoronoiCell implements Comparable<VoronoiCell> {
 		return centroid.toString()+",w="+weight;
 	}
 	
-	public void resetRegion() {
-		region = null;
+	public void clear() {
+		convexHull.clear();
 		weight=0;
 		hits=0;
 		wx=0;
@@ -38,10 +40,47 @@ public class VoronoiCell implements Comparable<VoronoiCell> {
 	}
 	
 	public void addPoint(double x,double y) {
-		if(region==null) {
-			region = new Rectangle2D.Double(x,y,0,0);
+		convexHull.add(new Vector2d(x,y));
+	}
+
+	public boolean contains(double x,double y) {
+		return convexHull.contains(new Vector2d(x,y));
+	}
+
+	public Rectangle2D getBounds() {
+		return convexHull.getBounds();
+	}
+
+	public void addWeight(double x,double y,double weight) {
+		this.hits++;
+		this.weight += weight;
+		this.wx += x * weight;
+		this.wy += y * weight;
+	}
+
+	public void scaleByWeight() {
+		if (hits>0 && weight > 0) {
+			wx /= weight;
+			wy /= weight;
+			weight/=hits;
 		} else {
-			region.add(x,y);
+			weight=1;
+			hits=1;
+			wx = centroid.x;
+			wy = centroid.y;
 		}
+	}
+
+	public void setNewCenter() {
+		if(hits<=0) return;
+		double ox = centroid.x;
+		double oy = centroid.y;
+		double dx2 = wx - ox;
+		double dy2 = wy - oy;
+
+		double nx = ox + dx2 * 0.25;// + (Math.random()-0.5) * 0.8e-10;
+		double ny = oy + dy2 * 0.25;// + (Math.random()-0.5) * 0.8e-10;
+
+		centroid.set(nx, ny);
 	}
 }
