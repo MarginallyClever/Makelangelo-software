@@ -48,15 +48,9 @@ public class VoronoiDiagram {
         cells.clear();
         int used;
         for (used=0;used<numCells;++used) {
-            VoronoiCell c = new VoronoiCell();
-
-            double x=0,y=0;
-            for(int i=0;i<30;++i) {
-                x = bounds.getX() + Math.random() * bounds.getWidth();
-                y = bounds.getY() + Math.random() * bounds.getHeight();
-            }
-            c.centroid.set(x,y);
-            cells.add(c);
+            double x = bounds.getMinX() + Math.random() * bounds.getWidth();
+            double y = bounds.getMinY() + Math.random() * bounds.getHeight();
+            cells.add(new VoronoiCell(x,y));
         }
 
         voronoiTesselator.Init(minDistanceBetweenSites);
@@ -89,6 +83,7 @@ public class VoronoiDiagram {
     public List<VoronoiGraphEdge> getGraphEdges() {
         return graphEdges;
     }
+
     /**
      *  I have a set of points.  I want a list of cell borders.
      *  cell borders are halfway between any point and it's nearest neighbors.
@@ -104,7 +99,10 @@ public class VoronoiDiagram {
 
         // scan left to right across the image, building the list of borders as we go.
         graphEdges.clear();
-        graphEdges.addAll(voronoiTesselator.generateVoronoi(xValuesIn, yValuesIn, bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY()));
+        graphEdges.addAll(voronoiTesselator.generateVoronoi(
+                xValuesIn,yValuesIn,
+                bounds.getMinX(),bounds.getMaxX(),
+                bounds.getMinY(),bounds.getMaxY()));
 
         for( VoronoiGraphEdge edge : graphEdges ) {
             VoronoiCell a = cells.get(edge.site1);
@@ -135,13 +133,8 @@ public class VoronoiDiagram {
 
             double ox = c.centroid.x;
             double oy = c.centroid.y;
-            double dx2 = (c.wx - ox) * 0.25;
-            double dy2 = (c.wy - oy) * 0.25;
-
-            totalMagnitude += Math.sqrt(dx2*dx2 + dy2*dy2);
-
-            double nx = ox + dx2;// + (Math.random()-0.5) * w;
-            double ny = oy + dy2;// + (Math.random()-0.5) * w;
+            double nx = ox + (c.wx - ox) * 0.25;// + (Math.random()-0.5) * w;
+            double ny = oy + (c.wy - oy) * 0.25;// + (Math.random()-0.5) * w;
 
             // make sure centroid can't leave image bounds
             if(nx <  bounds.getMinX()) nx = bounds.getMinX();
@@ -150,6 +143,10 @@ public class VoronoiDiagram {
             if(ny >= bounds.getMaxY()) ny = bounds.getMaxY()-1;
 
             c.centroid.set(nx, ny);
+
+            double dx = nx-ox;
+            double dy = ny-oy;
+            totalMagnitude += Math.sqrt(dx*dx + dy*dy);
         }
         return totalMagnitude;
     }
@@ -157,11 +154,16 @@ public class VoronoiDiagram {
     private void updateCellWeights(TransformedImage image) {
         for (VoronoiCell c : cells) {
             Rectangle2D bounds = c.getBounds();
-            for (double y = bounds.getMinY(); y <= bounds.getMaxY(); y++) {
-                for (double x = bounds.getMinX(); x <= bounds.getMaxX(); x++) {
-                    if (c.contains(x, y) && image.canSampleAt(x, y)) {
-                        double weight = 255.0 - image.sample1x1Unchecked( x,y );
-                        c.addWeight(x, y,weight);
+            double stepSize=1;
+            if(bounds.getWidth()<1 || bounds.getHeight()<1) {
+                stepSize = 0.25;
+            }
+
+            for (double y = bounds.getMinY(); y <= bounds.getMaxY(); y+=stepSize) {
+                for (double x = bounds.getMinX(); x <= bounds.getMaxX(); x+=stepSize) {
+                    if (c.contains(x,y) && image.canSampleAt(x,y)) {
+                        double weight = 255.0 - image.sample1x1Unchecked(x,y);
+                        c.addWeight(x,y,weight);
                     }
                 }
             }
