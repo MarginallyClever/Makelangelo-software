@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ConvexHull {
     private static final Logger logger = LoggerFactory.getLogger(ConvexHull.class);
-    private final ArrayList<Vector2d> hull = new ArrayList<Vector2d>();
+    private final ArrayList<Vector2d> points = new ArrayList<Vector2d>();
 
     public ConvexHull() {}
 
@@ -25,8 +25,8 @@ public class ConvexHull {
     }
 
     public void add(Vector2d p) {
-        int s = hull.size();
-        if(s<2) hull.add(p);
+        int s = points.size();
+        if(s<2) points.add(p);
         else if(s<3) addThirdPointClockwise(p);
         else if(!contains(p)) {
             try {
@@ -38,15 +38,15 @@ public class ConvexHull {
     }
 
     public void clear() {
-        hull.clear();
+        points.clear();
     }
 
     public Rectangle2D getBounds() {
         Rectangle2D bounds = new Rectangle2D.Double();
-        if(hull.size()>0) {
-            Vector2d p = hull.get(0);
+        if(points.size()>0) {
+            Vector2d p = points.get(0);
             bounds.setRect(p.x,p.y,0,0);
-            for(Vector2d p2 : hull) {
+            for(Vector2d p2 : points) {
                 bounds.add(p2.x,p2.y);
             }
         }
@@ -54,8 +54,8 @@ public class ConvexHull {
     }
 
     public void set(List<Vector2d> points) {
-        hull.clear();
-        hull.addAll(points);
+        this.points.clear();
+        this.points.addAll(points);
         rebuildHull();
     }
 
@@ -66,11 +66,13 @@ public class ConvexHull {
      * @return true if inside the fan.
      */
     public boolean contains(Vector2d p) {
-        Vector2d a=hull.get(0);
-        int s = hull.size();
+        if(points.size()<3) return false;
+
+        Vector2d a= points.get(0);
+        int s = points.size();
         for(int i=0;i<s;++i) {
             int j=(i+1)%s;
-            Vector2d b=hull.get(j);
+            Vector2d b= points.get(j);
             if(pointIsOnTheLeft(p, a, b)) return false;
             a=b;
         }
@@ -78,10 +80,10 @@ public class ConvexHull {
     }
 
     private void addThirdPointClockwise(Vector2d c) {
-        Vector2d a=hull.get(0);
-        Vector2d b=hull.get(1);
-        if(pointIsOnTheLeft(c,a,b)) hull.add(1, c);	// new order is acb
-        else hull.add( c);	// new order is abc
+        Vector2d a= points.get(0);
+        Vector2d b= points.get(1);
+        if(pointIsOnTheLeft(c,a,b)) points.add(1, c);	// new order is acb
+        else points.add( c);	// new order is abc
     }
 
     private boolean pointIsOnTheLeft(Vector2d c,Vector2d a,Vector2d b) {
@@ -101,22 +103,22 @@ public class ConvexHull {
      * @throws Exception
      */
     private void addPointCarefully(Vector2d p) throws Exception {
-        hull.add(p);
+        points.add(p);
         rebuildHull();
     }
 
     private void rebuildHull() {
-        ArrayList<Vector2d> hull2 = new ArrayList<>();
-        int hullSize=hull.size();
+        ArrayList<Vector2d> toKeep = new ArrayList<>();
+        int hullSize= points.size();
         if(hullSize<=3) return;
 
-        Vector2d pointOnHull = getPointGuaranteedOnEdgeOfHull(hull);
+        Vector2d pointOnHull = getPointGuaranteedOnEdgeOfHull(points);
         Vector2d firstPoint = pointOnHull;
         Vector2d endPoint;
         do {
-            hull2.add(pointOnHull);
-            endPoint = hull.get(0);
-            for( Vector2d b : hull ) {
+            toKeep.add(pointOnHull);
+            endPoint = points.get(0);
+            for( Vector2d b : points) {
                 if(endPoint == pointOnHull || pointIsOnTheLeft(b, pointOnHull, endPoint)) {
                     endPoint = b;
                 }
@@ -125,18 +127,18 @@ public class ConvexHull {
             hullSize--;
         } while(endPoint!=firstPoint && hullSize>=0);
 
-        if(hull2.size()<3) {
+        if(toKeep.size()<3) {
             throw new IndexOutOfBoundsException("Algorithm failed.");
         }
 
-        hull.clear();
-        hull.addAll(hull2);
+        points.clear();
+        points.addAll(toKeep);
     }
 
     private Vector2d getPointGuaranteedOnEdgeOfHull(ArrayList<Vector2d> hull2) {
         // first is left-most point in the set.
-        Vector2d pointOnHull = hull.get(0);
-        for( Vector2d n : hull ) {
+        Vector2d pointOnHull = points.get(0);
+        for( Vector2d n : points) {
             if(pointOnHull.x>n.x) pointOnHull=n;
             else if(pointOnHull.x==n.x) {
                 // two matching x, find the smallest y
@@ -151,8 +153,8 @@ public class ConvexHull {
     public Vector2d getCenterOfHull() {
         Vector2d center = new Vector2d();
 
-        int s = hull.size();
-        for(int i=0;i<s;++i) center.add(hull.get(i));
+        int s = points.size();
+        for(int i=0;i<s;++i) center.add(points.get(i));
         center.scale(1.0/(double)s);
 
         return center;
@@ -174,20 +176,24 @@ public class ConvexHull {
 
     public void renderAsFan(GL2 gl2) {
         gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-        for( Vector2d p : hull ) gl2.glVertex2d(p.x,p.y);
+        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
         gl2.glEnd();
     }
 
     public void renderAsLineLoop(GL2 gl2) {
         gl2.glBegin(GL2.GL_LINE_LOOP);
-        for( Vector2d p : hull ) gl2.glVertex2d(p.x,p.y);
+        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
         gl2.glEnd();
     }
 
     @Override
     public String toString() {
         return "ConvexHull{" +
-                "hull=" + hull +
+                "hull=" + points +
                 '}';
+    }
+
+    public List<Vector2d> getPoints() {
+        return points;
     }
 }
