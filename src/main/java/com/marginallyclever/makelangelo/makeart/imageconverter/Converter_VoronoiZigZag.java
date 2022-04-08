@@ -5,10 +5,10 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiGraphEdge;
 import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiTesselator;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,8 +32,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private ReentrantLock lock = new ReentrantLock();
 
 	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
-	private VoronoiCell[] cells = new VoronoiCell[1];
-	private TransformedImage sourceImage;
+	private List<VoronoiCell> cells = new ArrayList<>();
 	private List<VoronoiGraphEdge> graphEdges = null;
 	private static int numCells = 3000;
 	private static double minDotSize = 1.0f;
@@ -73,7 +73,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	@Override
 	public void setImage(TransformedImage img) {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		sourceImage = bw.filter(img);
+		myImage = bw.filter(img);
 		
 		yBottom = myPaper.getMarginBottom();
 		yTop    = myPaper.getMarginTop();
@@ -99,6 +99,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			optimizeTour();
 		} else {
 			double noiseLevel = evolveCells();
+			System.out.println("noiseLevel="+noiseLevel);
 			if( noiseLevel < 2*numCells ) {
 				lowNoise=true;
 				greedyTour();
@@ -117,45 +118,48 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 	@Override
 	public void render(GL2 gl2) {
-		super.render(gl2);
-
 		while(lock.isLocked());
 		lock.lock();
+		try {
+			if (graphEdges != null) drawGraphEdges(gl2);
+			if (renderMode == 0) drawCellCenters(gl2);
+			if (renderMode == 1 && solution != null) drawTour(gl2);
+		}
+		finally {
+			lock.unlock();
+		}
+	}
 
-		int i;
+	private void drawTour(GL2 gl2) {
+		gl2.glColor3f(0, 0, 0);
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		for (int i = 0; i < solutionContains; ++i) {
+			VoronoiCell c = cells.get(solution[i]);
+			gl2.glVertex2d(c.centroid.x, c.centroid.y);
+		}
+		gl2.glEnd();
+	}
 
-		if (graphEdges != null) {
-			// draw cell edges
-			gl2.glColor3f(0.9f, 0.9f, 0.9f);
-			gl2.glBegin(GL2.GL_LINES);
-			for (VoronoiGraphEdge e : graphEdges) {
-				gl2.glVertex2d( e.x1, e.y1 );
-				gl2.glVertex2d( e.x2, e.y2 );
-			}
-			gl2.glEnd();
+	private void drawCellCenters(GL2 gl2) {
+		gl2.glPointSize(3);
+		gl2.glColor3f(0, 0, 0);
+		gl2.glBegin(GL2.GL_POINTS);
+		for (VoronoiCell c : cells) {
+			Point2D p = c.centroid;
+			gl2.glVertex2d(p.x, p.y);
 		}
-		if (renderMode == 0) {
-			// draw cell centers
-			gl2.glPointSize(3);
-			gl2.glColor3f(0, 0, 0);
-			gl2.glBegin(GL2.GL_POINTS);
-			for (VoronoiCell c : cells) {
-				Point2D p = c.centroid;
-				gl2.glVertex2d(p.x,p.y);
-			}
-			gl2.glEnd();
+		gl2.glEnd();
+	}
+
+	private void drawGraphEdges(GL2 gl2) {
+		// draw cell edges
+		gl2.glColor3f(0.9f, 0.9f, 0.9f);
+		gl2.glBegin(GL2.GL_LINES);
+		for (VoronoiGraphEdge e : graphEdges) {
+			gl2.glVertex2d(e.x1, e.y1);
+			gl2.glVertex2d(e.x2, e.y2);
 		}
-		if (renderMode == 1 && solution != null) {
-			// draw tour
-			gl2.glColor3f(0, 0, 0);
-			gl2.glBegin(GL2.GL_LINE_LOOP);
-			for (i = 0; i < solutionContains; ++i) {
-				VoronoiCell c = cells[solution[i]];
-				gl2.glVertex2d( c.centroid.x, c.centroid.y );
-			}
-			gl2.glEnd();
-		}
-		lock.unlock();
+		gl2.glEnd();
 	}
 
 	private void optimizeTour() {
@@ -207,7 +211,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	 * we have s1,s2...e-1,e.  check if s1,e-1,...s2,e is shorter
 	 * @return true if something was improved.
 	 */
-	// 
 	public boolean flipTests() {
 		boolean once = false;
 		int start, end, j, best_end;
@@ -290,9 +293,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		int besti;
 
 		solutionContains = 0;
-		for (i = 0; i < cells.length; ++i) {
-			VoronoiCell c = cells[i];
-			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+		for( VoronoiCell c : cells ) {
+			float v = 1.0f - (float) myImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
 			if (v * 5 > minDotSize)
 				solutionContains++;
 		}
@@ -302,12 +304,11 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 			// put all the points in the solution in no particular order.
 			j = 0;
-			for (i = 0; i < cells.length; ++i) {
-				VoronoiCell c = cells[i];
-				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
-				if (v * 5 > minDotSize) {
-					solution[j++] = i;
-				}
+			i=0;
+			for( VoronoiCell c : cells ) {
+				float v = 1.0f - (float) myImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+				if (v * 5 > minDotSize) solution[j++] = i;
+				++i;
 			}
 
 			int scount = 0;
@@ -335,10 +336,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	}
 
 	private double calculateWeight(int a, int b) {
-		assert (a >= 0 && a < cells.length);
-		assert (b >= 0 && b < cells.length);
-		double x = cells[a].centroid.x - cells[b].centroid.x;
-		double y = cells[a].centroid.y - cells[b].centroid.y;
+		assert (a >= 0 && a < cells.size());
+		assert (b >= 0 && b < cells.size());
+		double x = cells.get(a).centroid.x - cells.get(b).centroid.x;
+		double y = cells.get(a).centroid.y - cells.get(b).centroid.y;
 		return x * x + y * y;
 	}
 
@@ -346,7 +347,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private void initializeCells(double minDistanceBetweenSites) {
 		logger.debug("Initializing cells");
 
-		cells = new VoronoiCell[numCells];
+		cells.clear();
 		// convert the cells to sites used in the Voronoi class.
 		xValuesIn = new double[numCells];
 		yValuesIn = new double[numCells];
@@ -354,24 +355,19 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		// from top to bottom of the margin area...
 		int used;
 		for (used=0;used<numCells;++used) {
-			cells[used] = new VoronoiCell();
-		}
-		
-		used=0;
-		while(used<numCells) {
 			double x=0,y=0;
 			for(int i=0;i<30;++i) {
 				x = xLeft   + Math.random()*(xRight-xLeft);
 				y = yBottom + Math.random()*(yTop-yBottom);
-				if(sourceImage.canSampleAt((float)x, (float)y)) {
-					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
+				if(myImage.canSampleAt((float)x, (float)y)) {
+					float v = myImage.sample1x1Unchecked((float)x, (float)y);
 					if(Math.random()*255 > v) break;
 				}
 			}
-			cells[used].centroid.set(x,y);
-			++used;
+			VoronoiCell c = new VoronoiCell();
+			c.centroid.set(x,y);
+			cells.add(c);
 		}
-
 
 		voronoiTesselator.Init(minDistanceBetweenSites);
 	}
@@ -380,20 +376,18 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	 * Jiggle the dots until they make a nice picture
 	 */
 	private double evolveCells() {
-		double totalWeight=0;
+		while(lock.isLocked());
+		lock.lock();
 		try {
-			while(lock.isLocked());
-			lock.lock();
 			tessellateVoronoiDiagram();
-			lock.unlock();
-			totalWeight = adjustCentroids();
-		} catch (Exception e) {
-			logger.error("Failed to evolve", e);
-			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
-				lock.unlock();
-			}
 		}
-		return totalWeight;
+		catch (Exception e) {
+			logger.error("Failed to evolve", e);
+		}
+		finally {
+			lock.unlock();
+		}
+		return adjustCentroids();
 	}
 
 	// write cell centroids to a {@link Turtle}.
@@ -407,8 +401,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			double bestw = Float.MAX_VALUE;
 			double x, y, w;
 			for (i = 0; i < solutionContains; ++i) {
-				x = cells[solution[i]].centroid.x;
-				y = cells[solution[i]].centroid.y;
+				x = cells.get(solution[i]).centroid.x;
+				y = cells.get(solution[i]).centroid.y;
 				w = x * x + y * y;
 				if (w < bestw) {
 					bestw = w;
@@ -419,8 +413,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			// write the entire sequence
 			for (i = 0; i <= solutionContains; ++i) {
 				int v = (besti + i) % solutionContains;
-				x = cells[solution[v]].centroid.x;
-				y = cells[solution[v]].centroid.y;
+				x = cells.get(solution[v]).centroid.x;
+				y = cells.get(solution[v]).centroid.y;
 				turtle.moveTo(x, y);
 			}
 		}
@@ -430,11 +424,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	// cell borders are halfway between any point and it's nearest neighbors.
 	private void tessellateVoronoiDiagram() {
 		// convert the cells to sites used in the Voronoi class.
-		int i;
-		for (i = 0; i < numCells; ++i) {
-			xValuesIn[i] = cells[i].centroid.x;
-			yValuesIn[i] = cells[i].centroid.y;
-			cells[i].resetRegion();
+		int i=0;
+		for( VoronoiCell c : cells ) {
+			xValuesIn[i] = c.centroid.x;
+			yValuesIn[i] = c.centroid.y;
+			c.resetRegion();
+			++i;
 		}
 
 		// scan left to right across the image, building the list of borders as we go.
@@ -442,11 +437,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		
 		for (VoronoiGraphEdge e : graphEdges) {
 			try {
-				cells[e.site1].addPoint((float)e.x1, (float)e.y1);
-				cells[e.site1].addPoint((float)e.x2, (float)e.y2);
-				
-				cells[e.site2].addPoint((float)e.x1, (float)e.y1);
-				cells[e.site2].addPoint((float)e.x2, (float)e.y2);
+				VoronoiCell a = cells.get(e.site1);
+				a.addPoint(e.x1, e.y1);
+				a.addPoint(e.x2, e.y2);
+				VoronoiCell b = cells.get(e.site2);
+				b.addPoint(e.x1, e.y1);
+				b.addPoint(e.x2, e.y2);
 			} catch(Exception err) {
 				logger.error("Failed to tessellate", err);
 			}
@@ -466,29 +462,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		float totalMagnitude=0;
 
 		for (VoronoiCell c : cells) {
-			if(c.region==null) { 
-				continue;
-			}
+			if(c.region==null) continue;
 			Rectangle bounds = c.region.getBounds();
-
-			minX = bounds.getMinX();
-			maxX = bounds.getMaxX();
-			double dx=maxX-minX;
-
-			minY = bounds.getMinY();
-			maxY = bounds.getMaxY();
-			double dy=maxY-minY;
+			double dx = bounds.getWidth();
+			double dy = bounds.getHeight();
 
 			stepSize=1.0;
-			if(dx<dy) {
-				if(dx<1) {
-					stepSize = dx/3.0;
-				}
-			} else {
-				if(dy<1) {
-					stepSize = dy/3.0;
-				}
-			}
+			double smaller = Math.min(dx,dy);
+			if(smaller<1) stepSize = smaller/3.0; // ??
 			
 			int hits = 0;
 			totalCellWeight = 0;
@@ -496,16 +477,15 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			wy = 0;
 
 			float sampleWeight;
-			for (y = minY; y <= maxY; y +=stepSize) {
-				for (x = minX; x <= maxX; x +=stepSize) {
-					if (c.region.contains(x,y)) {
-						if(sourceImage.canSampleAt((float)x, (float)y)) 
-						{
+			for (y = bounds.getMinY(); y <= bounds.getMaxY(); y +=stepSize) {
+				for (x = bounds.getMinX(); x <= bounds.getMaxX(); x +=stepSize) {
+					if (c.region.contains(x,y)) { // region is a rectangle! always true!
+						if(myImage.canSampleAt((float)x, (float)y)) {
 							hits++;
-							sampleWeight = 255.0f - (float)sourceImage.sample1x1Unchecked( (float)x, (float)y );
+							sampleWeight = 255.0f - (float)myImage.sample1x1Unchecked( (float)x, (float)y );
 							totalCellWeight += sampleWeight;
-							wx += (x) * sampleWeight;
-							wy += (y) * sampleWeight;
+							wx += x * sampleWeight;
+							wy += y * sampleWeight;
 						}
 					}
 				}
@@ -520,26 +500,13 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			}
 
 			// make sure centroid can't leave image bounds
-			if (wx < xLeft || wx >= xRight || wy < yBottom || wy >= yTop ) {
-				/*
-				// try the geometric centroid
-				for(int j=0;j<c.region.npoints;++j) {
-					wx = c.region.xpoints[j];
-					wy = c.region.ypoints[j];
-				}
-				wx/= c.region.npoints;
-				wy/= c.region.npoints;
-				*/
-				if (wx <  xLeft ) wx = xLeft+1;
-				if (wx >= xRight) wx = xRight-1;
-				
-				if (wy <  yBottom) wy = yBottom+1;
-				if (wy >= yTop   ) wy = yTop-1;
-			}
-			
+			if (wx <  xLeft ) wx = xLeft+1;
+			if (wx >= xRight) wx = xRight-1;
+			if (wy <  yBottom) wy = yBottom+1;
+			if (wy >= yTop   ) wy = yTop-1;
+
 			// use the new center
-			if(hits>0)
-			{
+			if(hits>0) {
 				double ox = c.centroid.x;
 				double oy = c.centroid.y;
 				double dx2 = wx - ox;
