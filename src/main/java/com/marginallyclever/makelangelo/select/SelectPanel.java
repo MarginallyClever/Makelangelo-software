@@ -1,18 +1,14 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.marginallyclever.convenience.ColorRGB;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import com.marginallyclever.convenience.ColorRGB;
 
 /**
  * A container for all Select elements, to facilitate formatting as a group.
@@ -31,15 +27,11 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		super(new BorderLayout());
 		add(interiorPanel,BorderLayout.PAGE_START);
 
-		//interiorPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-		
 		interiorPanel.setBorder(new EmptyBorder(5,5,5,5));
 		interiorPanel.setLayout(new BoxLayout(interiorPanel, BoxLayout.Y_AXIS));
 	}
 	
 	public void add(Select c) {
-		//gbc.gridy++;
-		//interiorPanel.add(c,gbc);
 		interiorPanel.add(c);
 		c.addPropertyChangeListener(this);
 	}
