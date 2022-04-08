@@ -30,10 +30,13 @@ import java.util.prefs.Preferences;
 
 
 public class ConvertImagePanel extends JPanel implements PreviewListener, SelectPanelChangeListener {
-
 	private static final Logger logger = LoggerFactory.getLogger(ConvertImagePanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
-	// Set of image file extensions.
+
+	/**
+	 * Set of image file extensions.
+	 * TODO These should be populated from the ImageIO.getReaderFileSuffixes() method after the image converters are loaded.
+ 	 */
 	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif","qoi"};
 
 	@SuppressWarnings("deprecation")
@@ -56,7 +59,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		super();
 		myPaper = paper;
 		myImage = image;
-		
+
 		cards.setPreferredSize(new Dimension(450,300));
 		
 		fillNames = getFillSelection();
@@ -139,7 +142,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 			Translator.get("ConvertImagePaperFill"),
 			Translator.get("ConvertImagePaperFit")
 		};
-		JComboBox<String> box = new JComboBox<String>(imageFillNames);
+		JComboBox<String> box = new JComboBox<>(imageFillNames);
 		
 		int p=getPreferredFillStyle();
 		if(p>=box.getItemCount()) p=0;
