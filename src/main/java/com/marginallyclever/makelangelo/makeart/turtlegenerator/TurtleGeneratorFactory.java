@@ -18,6 +18,7 @@ public class TurtleGeneratorFactory {
 			new Generator_Polyeder(),
 			new Generator_SierpinskiTriangle(),
 			new Generator_Spirograph(),
-			new Generator_Text()
+			new Generator_Text(),
+			new Generator_Voronoi(),
 	};
 }

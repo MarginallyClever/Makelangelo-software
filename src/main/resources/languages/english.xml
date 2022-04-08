@@ -1144,9 +1144,15 @@
 		<hint>voronoi zigzag generator</hint>
 	</string>
 
+
+	<string>
+		<key>Converter_Voronoi.Name</key>
+		<value>Voronoi diagram</value>
+	</string>
+
 	<string>
 		<key>Converter_VoronoiStippling.CellCount</key>
-		<value>Number of Cells</value>
+		<value>Number of cells</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
