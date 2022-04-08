@@ -10,7 +10,7 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 	public Converter_VoronoiZigZag_Panel(Converter_VoronoiZigZag converter) {
 		super(converter);
 		
-		add(new SelectInteger("count", Translator.get("voronoiStipplingCellCount"),converter.getNumCells()));
-		add(new SelectDouble("min",Translator.get("voronoiStipplingDotMin"),converter.getMinDotSize()));
+		add(new SelectInteger("count", Translator.get("Converter_VoronoiStippling.CellCount"),converter.getNumCells()));
+		add(new SelectDouble("min",Translator.get("Converter_VoronoiStippling.DotMin"),converter.getMinDotSize()));
 	}
 }
