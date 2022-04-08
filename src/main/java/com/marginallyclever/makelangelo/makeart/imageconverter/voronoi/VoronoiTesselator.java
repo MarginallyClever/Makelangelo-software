@@ -50,7 +50,12 @@ import java.util.List;
 
 import java.awt.Point;
 
-
+/**
+ * See https://shaneosullivan.wordpress.com/category/voronoi/
+ * @author Stephan Fortune
+ * @author Shane O'Sullivan
+ * @author Zhenyu Pan
+ */
 public class VoronoiTesselator {
   // ************* Private members ******************
   private double borderMinX, borderMaxX, borderMinY, borderMaxY;

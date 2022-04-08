@@ -1,6 +1,9 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
 
 
+/**
+ * See {@link VoronoiTesselator} for a description of the Voronoi
+ */
 public class VoronoiEdge {
   public double a = 0, b = 0, c = 0;
   public VoronoiSite[] ep;  // JH: End points?

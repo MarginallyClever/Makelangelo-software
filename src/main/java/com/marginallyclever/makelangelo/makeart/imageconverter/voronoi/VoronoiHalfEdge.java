@@ -1,6 +1,9 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
 
 
+/**
+ * See {@link VoronoiTesselator} for a description of the Voronoi
+ */
 public class VoronoiHalfEdge {
   public VoronoiHalfEdge ELleft, ELright;
   public VoronoiEdge ELedge;
