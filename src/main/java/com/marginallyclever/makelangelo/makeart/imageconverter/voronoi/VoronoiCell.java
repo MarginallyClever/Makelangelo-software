@@ -70,17 +70,4 @@ public class VoronoiCell implements Comparable<VoronoiCell> {
 			wy = centroid.y;
 		}
 	}
-
-	public void setNewCenter() {
-		if(hits<=0) return;
-		double ox = centroid.x;
-		double oy = centroid.y;
-		double dx2 = wx - ox;
-		double dy2 = wy - oy;
-
-		double nx = ox + dx2 * 0.25;// + (Math.random()-0.5) * 0.8e-10;
-		double ny = oy + dy2 * 0.25;// + (Math.random()-0.5) * 0.8e-10;
-
-		centroid.set(nx, ny);
-	}
 }
