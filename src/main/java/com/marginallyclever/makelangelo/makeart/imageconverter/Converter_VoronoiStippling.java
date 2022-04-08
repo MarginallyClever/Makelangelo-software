@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -30,7 +31,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	private static double minDotSize = 1.0f;
 	private static double cutoff = 0;
 	
-	private final ReentrantLock lock = new ReentrantLock();
+	private final Lock lock = new ReentrantLock();
 	private final VoronoiDiagram voronoiDiagram = new VoronoiDiagram();
 
 	private int iterations;
@@ -82,8 +83,15 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	@Override
 	public boolean iterate() {
 		iterations++;
-		double noiseLevel = evolveCells();
-		System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
+		lock.lock();
+		try {
+			double noiseLevel = evolveCells();
+			System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
+		}
+		finally {
+			lock.unlock();
+		}
+
 		return keepIterating;
 	}
 
@@ -93,7 +101,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	private double evolveCells() {
 		double change=10000;
 
-		lock.lock();
 		try {
 			voronoiDiagram.tessellate();
 			change = voronoiDiagram.adjustCentroids(myImage);
@@ -101,9 +108,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		catch (Exception e) {
 			logger.error("Failed to evolve", e);
 		}
-		finally {
-			lock.unlock();
-		}
+
 		return change;
 	}
 
@@ -130,12 +135,13 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	@Override
 	public void render(GL2 gl2) {
 		lock.lock();
-		
-		// draw cell edges
-		if(drawVoronoi) voronoiDiagram.renderEdges(gl2);
-		renderDots(gl2);  // dots sized by darkness
-		
-		lock.unlock();
+		try {
+			if (drawVoronoi) voronoiDiagram.renderEdges(gl2);
+			renderDots(gl2);
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 
 	private void renderDots(GL2 gl2) {
@@ -143,10 +149,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		gl2.glColor3f(0, 0, 0);
 
 		for( VoronoiCell c : voronoiDiagram.getCells() ) {
-			double val = c.weight/255.0;
+			double x = c.centroid.x;
+			double y = c.centroid.y;
+			myImage.canSampleAt(x,y);
+			double val = 1.0 - myImage.sample(x,y,3)/255.0;
 			if(val>cutoff) {
-				double x = c.centroid.x;
-				double y = c.centroid.y;
 				double r = val * scale + minDotSize;
 				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 				for(int j = 0; j < 8; ++j) {

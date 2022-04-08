@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -29,7 +30,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private static double minDotSize = 1.0f;
 
 	private final VoronoiDiagram voronoiDiagram = new VoronoiDiagram();
-	private final ReentrantLock lock = new ReentrantLock();
+	private final Lock lock = new ReentrantLock();
 
 	private int[] solution = null;
 	private int solutionContains;
@@ -67,7 +68,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	public void setImage(TransformedImage img) {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		myImage = bw.filter(img);
-		keepIterating=true;
 		restart();
 		renderMode = 0;
 	}
@@ -92,18 +92,24 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	public boolean iterate() {
 		iterations++;
 
-		if(lowNoise==true) {
-			optimizeTour();
-		} else {
-			double noiseLevel = evolveCells();
-			System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
-			if( noiseLevel < 100 ) {
-				System.out.println("done");
-				lowNoise=true;
-				greedyTour();
-				renderMode = 1;
-				logger.debug("Running Lin/Kerighan optimization...");
-			}			
+		lock.lock();
+		try {
+			if(lowNoise==true) {
+				optimizeTour();
+			} else {
+				double noiseLevel = evolveCells();
+				System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
+				if( noiseLevel < 100 ) {
+					System.out.println("done");
+					lowNoise=true;
+					greedyTour();
+					renderMode = 1;
+					logger.debug("Running Lin/Kerighan optimization...");
+				}
+			}
+		}
+		finally {
+			lock.unlock();
 		}
 		return keepIterating;
 	}
@@ -114,7 +120,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private double evolveCells() {
 		double change=10000;
 
-		lock.lock();
 		try {
 			voronoiDiagram.tessellate();
 			change = voronoiDiagram.adjustCentroids(myImage);
@@ -122,9 +127,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		catch (Exception e) {
 			logger.error("Failed to evolve", e);
 		}
-		finally {
-			lock.unlock();
-		}
+
 		return change;
 	}
 
@@ -353,27 +356,12 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 		List<VoronoiCell> cells = voronoiDiagram.getCells();
 
-		// find the tsp point closest to the calibration point
 		int i;
-		int besti = -1;
-		double bestw = Float.MAX_VALUE;
-		double x, y, w;
 		for (i = 0; i < solutionContains; ++i) {
-			x = cells.get(solution[i]).centroid.x;
-			y = cells.get(solution[i]).centroid.y;
-			w = x * x + y * y;
-			if (w < bestw) {
-				bestw = w;
-				besti = i;
-			}
-		}
-
-		// write the entire sequence
-		for (i = 0; i <= solutionContains; ++i) {
-			int v = (besti + i) % solutionContains;
-			x = cells.get(solution[v]).centroid.x;
-			y = cells.get(solution[v]).centroid.y;
-			turtle.moveTo(x, y);
+			double x = cells.get(solution[i]).centroid.x;
+			double y = cells.get(solution[i]).centroid.y;
+			if(i==0) turtle.jumpTo(x, y);
+			else turtle.moveTo(x, y);
 		}
 	}
 

@@ -129,6 +129,8 @@ public class VoronoiDiagram {
         double w = 0.25;//Math.pow(iterations,-0.8);
 
         for (VoronoiCell c : cells) {
+            if(c.hits<=0) continue;
+
             c.scaleByWeight();
 
             double ox = c.centroid.x;
@@ -136,7 +138,7 @@ public class VoronoiDiagram {
             double dx2 = (c.wx - ox) * 0.25;
             double dy2 = (c.wy - oy) * 0.25;
 
-            totalMagnitude += Math.abs(dx2) + Math.abs(dy2);
+            totalMagnitude += Math.sqrt(dx2*dx2 + dy2*dy2);
 
             double nx = ox + dx2;// + (Math.random()-0.5) * w;
             double ny = oy + dy2;// + (Math.random()-0.5) * w;
