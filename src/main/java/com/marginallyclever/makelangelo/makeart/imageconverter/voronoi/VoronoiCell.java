@@ -8,12 +8,17 @@ import java.awt.geom.Rectangle2D;
 
 
 public class VoronoiCell implements Comparable<VoronoiCell> {
-	public ConvexHull convexHull = new ConvexHull();
-	public Point2D centroid = new Point2D();
+	public final ConvexHull convexHull = new ConvexHull();
+	public final Point2D centroid = new Point2D();
 	public double weight;
 	public double wx, wy;
 	public int hits;
-	
+
+	public VoronoiCell(double x,double y) {
+		super();
+		this.centroid.set(x,y);
+	}
+
 	@Override
 	public int compareTo(VoronoiCell arg0) {
 		double y1 = arg0.centroid.y;
