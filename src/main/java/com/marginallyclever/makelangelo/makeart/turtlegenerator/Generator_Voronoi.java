@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiDiagram;
+import com.marginallyclever.convenience.voronoi.VoronoiDiagram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;

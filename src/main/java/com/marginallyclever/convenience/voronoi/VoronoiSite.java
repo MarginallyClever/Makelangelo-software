@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
+package com.marginallyclever.convenience.voronoi;
 
 import java.awt.Point;
 

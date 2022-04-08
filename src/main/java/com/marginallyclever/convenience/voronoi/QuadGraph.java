@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
+package com.marginallyclever.convenience.voronoi;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;

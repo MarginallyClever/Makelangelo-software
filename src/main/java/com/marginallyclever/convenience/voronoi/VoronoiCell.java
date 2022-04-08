@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
+package com.marginallyclever.convenience.voronoi;
 
 import com.marginallyclever.convenience.ConvexHull;
 import com.marginallyclever.convenience.Point2D;
