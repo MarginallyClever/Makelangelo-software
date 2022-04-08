@@ -50,7 +50,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	private ImageConverterThread imageConverterThread; 
 	private ArrayList<ImageConverterThread> workerList = new ArrayList<ImageConverterThread>();
 	private int workerCount = 0;
-	private ProgressMonitor pm;
+	private ProgressMonitor progressMonitor;
 	
 	public ConvertImagePanel(Paper paper,TransformedImage image) {
 		super();
@@ -267,12 +267,12 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		
 		logger.debug("startWorker()");
 		
-		ProgressMonitor pm = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
-		pm.setProgress(0);
-		pm.setMillisToPopup(0);
+		progressMonitor = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
+		progressMonitor.setProgress(0);
+		progressMonitor.setMillisToPopup(0);
 		
 		ImageConverter converter = myConverterPanel.getConverter();
-		converter.setProgressMonitor(pm);
+		converter.setProgressMonitor(progressMonitor);
 		converter.setPaper(myPaper);
 		converter.setImage(myImage);
 		
@@ -288,18 +288,18 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 			String propertyName = evt.getPropertyName(); 
 			if(propertyName.equals("progress")) {
 				int progress = (Integer) evt.getNewValue();
-				pm.setProgress(progress);
+				progressMonitor.setProgress(progress);
 				String message = String.format("%d%%.\n", progress);
-				pm.setNote(message);
+				progressMonitor.setNote(message);
 			}
 			if(propertyName.equals("state")) {
 				if(evt.getNewValue()==StateValue.DONE) {
 					if (imageConverterThread.isDone()) {
 						logger.debug("Finished");
 						notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
-					} else if (imageConverterThread.isCancelled() || pm.isCanceled()) {
+					} else if (imageConverterThread.isCancelled() || progressMonitor.isCanceled()) {
 						logger.debug("Cancelled");
-						if(pm.isCanceled()) imageConverterThread.cancel(true);
+						if(progressMonitor.isCanceled()) imageConverterThread.cancel(true);
 					}
 					removeWorker(thread);
 				}
@@ -325,8 +325,9 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 
 	@Override
 	public void render(GL2 gl2) {
-		if( myConverterPanel instanceof PreviewListener ) { 
-			((PreviewListener)myConverterPanel).render(gl2);
+		ImageConverter converter = myConverterPanel.getConverter();
+		if( converter != null && converter instanceof PreviewListener ) {
+			((PreviewListener)converter).render(gl2);
 		}
 	}
 

@@ -952,7 +952,7 @@
 		<hint>name of generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingName</key>
+		<key>Converter_VoronoiStippling.Name</key>
 		<value>Voronoi点画</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
@@ -963,22 +963,22 @@
 	</string>
 
 	<string>
-		<key>voronoiStipplingCellCount</key>
+		<key>Converter_VoronoiStippling.CellCount</key>
 		<value>单元数</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingGenCount</key>
+		<key>Converter_VoronoiStippling.GenCount</key>
 		<value>叠代数</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingDotMax</key>
+		<key>Converter_VoronoiStippling.DotMax</key>
 		<value>最大点尺寸</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingDotMin</key>
+		<key>Converter_VoronoiStippling.DotMin</key>
 		<value>最小点尺寸</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
@@ -1627,13 +1627,13 @@
 	</string>
 
 	<string>
-		<key>voronoiStipplingCutoff</key>
+		<key>Converter_VoronoiStippling.Cutoff</key>
 		<value>低通截止</value>
 		<hint></hint>
 	</string>
 
 	<string>
-		<key>voronoiStipplingDrawBorders</key>
+		<key>Converter_VoronoiStippling.DrawBorders</key>
 		<value>画边框?</value>
 		<hint></hint>
 	</string>

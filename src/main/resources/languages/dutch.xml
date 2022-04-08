@@ -650,27 +650,27 @@
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingName</key>
+		<key>Converter_VoronoiStippling.Name</key>
 		<value>Voronoi stippels</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingCellCount</key>
+		<key>Converter_VoronoiStippling.CellCount</key>
 		<value>Aantal Cellen</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingGenCount</key>
+		<key>Converter_VoronoiStippling.GenCount</key>
 		<value>Aantal Generaties</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingDotMax</key>
+		<key>Converter_VoronoiStippling.DotMax</key>
 		<value>Max stip grootte</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
 	<string>
-		<key>voronoiStipplingDotMin</key>
+		<key>Converter_VoronoiStippling.DotMin</key>
 		<value>Mininmum stip grootte</value>
 		<hint>voronoi stippling generator</hint>
 	</string>
