@@ -12,6 +12,6 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectDouble("size",Translator.get("HilbertCurveSize"),converter.getScale()));
 		add(new SelectOneOfMany("direction",Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
-		add(new SelectSlider("cutoff",Translator.get("voronoiStipplingCutoff"),255,0,converter.getCutoff()));
+		add(new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,converter.getCutoff()));
 	}
 }
