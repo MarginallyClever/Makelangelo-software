@@ -14,7 +14,6 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 		add(new SelectDouble("max",Translator.get("Converter_VoronoiStippling.DotMax"),converter.getMaxDotSize()));
 		add(new SelectDouble("min",Translator.get("Converter_VoronoiStippling.DotMin"),converter.getMinDotSize()));
 		add(new SelectDouble("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),converter.getCutoff()));
-		add(new SelectBoolean("drawVoronoi",Translator.get("Converter_VoronoiStippling.DrawBordersVoronoi"),converter.getDrawVoronoi()));
-		add(new SelectBoolean("drawQuadTree",Translator.get("Converter_VoronoiStippling.DrawBorders"),converter.getDrawBorders()));
+		add(new SelectBoolean("drawVoronoi",Translator.get("Converter_VoronoiStippling.DrawBorders"),converter.getDrawVoronoi()));
 	}
 }

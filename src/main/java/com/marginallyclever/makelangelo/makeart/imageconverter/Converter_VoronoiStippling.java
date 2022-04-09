@@ -29,7 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Converter_VoronoiStippling extends ImageConverter implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiStippling.class);
-	private static boolean drawBorders = false;
 	private static boolean drawVoronoi = false;
 	private static int numCells = 1000;
 	private static double maxDotSize = 5.0f;
@@ -53,8 +52,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("drawQuadTree")) setDrawBorders((boolean)evt.getNewValue());
-		else if(evt.getPropertyName().equals("drawVoronoi")) setDrawVoronoi((boolean)evt.getNewValue());
+		if(evt.getPropertyName().equals("drawVoronoi")) setDrawVoronoi((boolean)evt.getNewValue());
 		else {
 			boolean isDirty=false;
 			if(evt.getPropertyName().equals("cells")) {
@@ -324,13 +322,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	public void setMaxDotSize(double value) {
 		if(value<=minDotSize) value=minDotSize+1;
 		maxDotSize = value;
-	}
-	
-	public void setDrawBorders(boolean arg0) {
-		drawBorders=arg0;
-	}
-	public boolean getDrawBorders() {
-		return drawBorders;
 	}
 
 	public void setDrawVoronoi(boolean arg0) {
