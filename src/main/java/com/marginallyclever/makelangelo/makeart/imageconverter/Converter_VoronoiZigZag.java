@@ -1,16 +1,22 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,7 +33,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private static int numCells = 3000;
 	private static double minDotSize = 1.0f;
 
-	private final VoronoiDiagram voronoiDiagram = new VoronoiDiagram();
+	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
+	private List<VoronoiCell> cells = new ArrayList<>();
 	private final Lock lock = new ReentrantLock();
 
 	private int[] solution = null;
@@ -78,7 +85,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			lowNoise=false;
 			iterations = 0;
 			keepIterating = true;
-			voronoiDiagram.initializeCells(numCells, myPaper.getMarginRectangle(), 2);
+
+			Rectangle2D bounds = myPaper.getMarginRectangle();
+			cells.clear();
+			for(int i=0;i<numCells;++i) {
+				cells.add(new VoronoiCell(
+						Math.random()*bounds.getWidth()+bounds.getMinX(),
+						Math.random()*bounds.getHeight()+bounds.getMinY()));
+			}
 		}
 		finally {
 			lock.unlock();
@@ -118,8 +132,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		double change=10000;
 
 		try {
-			voronoiDiagram.tessellate();
-			change = voronoiDiagram.adjustCentroids(myImage);
+			tessellateNow();
+			change = adjustCenters(myImage);
 		}
 		catch (Exception e) {
 			logger.error("Failed to evolve", e);
@@ -128,6 +142,56 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		return change;
 	}
 
+	private void tessellateNow() {
+		Point2D[] points = new Point2D[numCells];
+		int i=0;
+		for(VoronoiCell cell : cells) {
+			points[i++] = new Point2D(cell.center.x,cell.center.y);
+		}
+		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
+	}
+	
+	private double adjustCenters(TransformedImage image) {
+		double change=0;
+		GeometryFactory factory = new GeometryFactory();
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			Polygon poly = voronoiDiagram.getHull(i);
+			VoronoiCell cell = cells.get(i);
+
+			// sample every image coordinate inside the voronoi cell and find the weighted center
+			double wx=0,wy=0;
+			double weight=0;
+			int hits=0;
+
+			Point center = poly.getCentroid();
+			cell.center.set(center.getX(),center.getY());
+			Envelope e = poly.getEnvelopeInternal();
+			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
+				for (int x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+					Point c = factory.createPoint(new Coordinate(x,y));
+					if(poly.contains(c) && image.canSampleAt(x,y)) {
+						double sampleWeight = 255.0 - image.sample(x,y,1);
+						weight += sampleWeight;
+						wx += sampleWeight*x;
+						wy += sampleWeight*y;
+						hits++;
+					}
+				}
+			}
+			if(hits>0 && weight>0) {
+				cell.weight = weight / hits;
+				wx /= weight;
+				wy /= weight;
+				double dx = wx - cell.center.x;
+				double dy = wy - cell.center.y;
+				change += Math.sqrt(dx*dx+dy*dy);
+				cell.center.set(wx,wy);
+			}
+		}
+		return change;
+	}
+	
 	@Override
 	public void finish() {
 		keepIterating=false;
@@ -138,8 +202,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	public void render(GL2 gl2) {
 		lock.lock();
 		try {
-			voronoiDiagram.renderEdges(gl2);
-			if (renderMode == 0) voronoiDiagram.renderPoints(gl2);
+			renderEdges(gl2);
+			if (renderMode == 0) renderPoints(gl2);
 			if (renderMode == 1 && solution != null) drawTour(gl2);
 		}
 		finally {
@@ -147,14 +211,36 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		}
 	}
 
-	private void drawTour(GL2 gl2) {
-		List<VoronoiCell> cells = voronoiDiagram.getCells();
+	private void renderPoints(GL2 gl2) {
+		gl2.glColor3f(0, 0, 0);
 
+		gl2.glBegin(GL2.GL_POINTS);
+		for( VoronoiCell c : cells ) {
+			gl2.glVertex2d(c.center.x,c.center.y);
+		}
+		gl2.glEnd();
+	}
+
+	private void renderEdges(GL2 gl2) {
+		gl2.glColor3d(0.9, 0.9, 0.9);
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			boolean first = true;
+			Polygon poly = voronoiDiagram.getHull(i);
+			gl2.glBegin(GL2.GL_LINE_LOOP);
+			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
+				gl2.glVertex2d(p.x, p.y);
+			}
+			gl2.glEnd();
+		}
+	}
+
+	private void drawTour(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 		for (int i = 0; i < solutionContains; ++i) {
 			VoronoiCell c = cells.get(solution[i]);
-			gl2.glVertex2d(c.centroid.x, c.centroid.y);
+			gl2.glVertex2d(c.center.x, c.center.y);
 		}
 		gl2.glEnd();
 	}
@@ -289,8 +375,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		int besti;
 
 		solutionContains = 0;
-		for( VoronoiCell c : voronoiDiagram.getCells() ) {
-			float v = 1.0f - (float) myImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+		for( VoronoiCell c : cells ) {
+			float v = 1.0f - (float) myImage.sample1x1( (int) c.center.x, (int) c.center.y) / 255.0f;
 			if (v * 5 > minDotSize)
 				solutionContains++;
 		}
@@ -301,8 +387,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			// put all the points in the solution in no particular order.
 			j = 0;
 			i=0;
-			for( VoronoiCell c : voronoiDiagram.getCells() ) {
-				float v = 1.0f - (float) myImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
+			for( VoronoiCell c : cells ) {
+				float v = 1.0f - (float) myImage.sample1x1( (int) c.center.x, (int) c.center.y) / 255.0f;
 				if (v * 5 > minDotSize) solution[j++] = i;
 				++i;
 			}
@@ -332,12 +418,10 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	}
 
 	private double calculateLengthSq(int a, int b) {
-		List<VoronoiCell> cells = voronoiDiagram.getCells();
-
 		assert (a >= 0 && a < cells.size());
 		assert (b >= 0 && b < cells.size());
-		double x = cells.get(a).centroid.x - cells.get(b).centroid.x;
-		double y = cells.get(a).centroid.y - cells.get(b).centroid.y;
+		double x = cells.get(a).center.x - cells.get(b).center.x;
+		double y = cells.get(a).center.y - cells.get(b).center.y;
 		return x * x + y * y;
 	}
 
@@ -346,17 +430,15 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	}
 
 	/**
-	 * write cell centroids to a {@link Turtle}.
+	 * write cell centers to a {@link Turtle}.
 	 */
 	private void writeOutCells() {
 		turtle = new Turtle();
 
-		List<VoronoiCell> cells = voronoiDiagram.getCells();
-
 		int i;
 		for (i = 0; i < solutionContains; ++i) {
-			double x = cells.get(solution[i]).centroid.x;
-			double y = cells.get(solution[i]).centroid.y;
+			double x = cells.get(solution[i]).center.x;
+			double y = cells.get(solution[i]).center.y;
 			if(i==0) turtle.jumpTo(x, y);
 			else turtle.moveTo(x, y);
 		}

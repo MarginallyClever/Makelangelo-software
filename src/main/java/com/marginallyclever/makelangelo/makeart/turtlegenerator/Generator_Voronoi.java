@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.VoronoiTesselator2;
+import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.Coordinate;
@@ -47,23 +47,20 @@ public class Generator_Voronoi extends TurtleGenerator {
 					Math.random()*bounds.getHeight()+bounds.getMinY());
 		}
 
-		VoronoiTesselator2 diagram = new VoronoiTesselator2(points,bounds,0.0001);
+		VoronoiTesselator2 diagram = new VoronoiTesselator2();
+		diagram.tessellate(points,bounds,0.0001);
 
 		// draw all the graph edges according to the cells.
-		System.out.println("i="+diagram.getNumHulls());
-		int j=0;
 		for(int i=0;i<diagram.getNumHulls();++i) {
 			boolean first = true;
 			Polygon poly = diagram.getHull(i);
 			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
-				++j;
 				if (first) {
 					turtle.jumpTo(p.x, p.y);
 					first=false;
 				} else turtle.moveTo(p.x, p.y);
 			}
 		}
-		System.out.println("j="+j);
 
 		// draw all the cell centers
 		turtle.setColor(new ColorRGB(0,0,255));

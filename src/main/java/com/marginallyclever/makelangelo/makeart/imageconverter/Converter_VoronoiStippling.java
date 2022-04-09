@@ -1,15 +1,22 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,9 +35,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	private static double maxDotSize = 5.0f;
 	private static double minDotSize = 1.0f;
 	private static double cutoff = 0;
-	
+	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
+	private List<VoronoiCell> cells = new ArrayList<>();
+
 	private final Lock lock = new ReentrantLock();
-	private final VoronoiDiagram voronoiDiagram = new VoronoiDiagram();
 
 	private int iterations;
 	
@@ -85,11 +93,11 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		try {
 			double noiseLevel = evolveCells();
 			System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
+			keepIterating = noiseLevel > numCells/2;
 		}
 		finally {
 			lock.unlock();
 		}
-		keepIterating=false;
 
 		return keepIterating;
 	}
@@ -101,14 +109,64 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		double change=10000;
 
 		try {
-			voronoiDiagram.tessellate();
-			change = voronoiDiagram.adjustCentroids(myImage);
+			tessellateNow();
+			change = adjustCenters(myImage);
 		}
 		catch (Exception e) {
 			logger.error("Failed to evolve", e);
 		}
 
 		return change;
+	}
+
+	private double adjustCenters(TransformedImage image) {
+		double change=0;
+		GeometryFactory factory = new GeometryFactory();
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			Polygon poly = voronoiDiagram.getHull(i);
+			VoronoiCell cell = cells.get(i);
+
+			// sample every image coordinate inside the voronoi cell and find the weighted center
+			double wx=0,wy=0;
+			double weight=0;
+			int hits=0;
+
+			Point centroid = poly.getCentroid();
+			cell.center.set(centroid.getX(),centroid.getY());
+			Envelope e = poly.getEnvelopeInternal();
+			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
+				for (int x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+					Point c = factory.createPoint(new Coordinate(x,y));
+					if(poly.contains(c) && image.canSampleAt(x,y)) {
+						double sampleWeight = 255.0 - image.sample(x,y,1);
+						weight += sampleWeight;
+						wx += sampleWeight*x;
+						wy += sampleWeight*y;
+						hits++;
+					}
+				}
+			}
+			if(hits>0 && weight>0) {
+				cell.weight = weight / hits;
+				wx /= weight;
+				wy /= weight;
+				double dx = wx - cell.center.x;
+				double dy = wy - cell.center.y;
+				change += Math.sqrt(dx*dx+dy*dy);
+				cell.center.set(wx,wy);
+			}
+		}
+		return change;
+	}
+
+	private void tessellateNow() {
+		Point2D [] points = new Point2D[numCells];
+		int i=0;
+		for(VoronoiCell cell : cells) {
+			points[i++] = new Point2D(cell.center.x,cell.center.y);
+		}
+		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
 	}
 
 	private void restart() {		
@@ -118,7 +176,14 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		try {
 			iterations = 0;
 			keepIterating = true;
-			voronoiDiagram.initializeCells(numCells,myPaper.getMarginRectangle(), 2);
+
+			Rectangle2D bounds = myPaper.getMarginRectangle();
+			cells.clear();
+			for(int i=0;i<numCells;++i) {
+				cells.add(new VoronoiCell(
+						Math.random()*bounds.getWidth()+bounds.getMinX(),
+						Math.random()*bounds.getHeight()+bounds.getMinY()));
+			}
 		}
 		finally {
 			lock.unlock();
@@ -135,7 +200,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	public void render(GL2 gl2) {
 		lock.lock();
 		try {
-			if (drawVoronoi) voronoiDiagram.renderEdges(gl2);
+			if (drawVoronoi) renderEdges(gl2);
 			renderDots(gl2);
 		}
 		finally {
@@ -143,13 +208,27 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		}
 	}
 
+	private void renderEdges(GL2 gl2) {
+		gl2.glColor3d(0.9, 0.9, 0.9);
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			boolean first = true;
+			Polygon poly = voronoiDiagram.getHull(i);
+			gl2.glBegin(GL2.GL_LINE_LOOP);
+			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
+				gl2.glVertex2d(p.x, p.y);
+			}
+			gl2.glEnd();
+		}
+	}
+
 	private void renderDots(GL2 gl2) {
 		double scale = maxDotSize - minDotSize;
 		gl2.glColor3f(0, 0, 0);
 
-		for( VoronoiCell c : voronoiDiagram.getCells() ) {
-			double x = c.centroid.x;
-			double y = c.centroid.y;
+		for( VoronoiCell c : cells ) {
+			double x = c.center.x;
+			double y = c.center.y;
 			myImage.canSampleAt(x,y);
 			double val = 1.0 - myImage.sample(x,y,3)/255.0;
 			if(val>cutoff) {
@@ -166,16 +245,16 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	}
 
 	/**
-	 * write cell centroids to gcode.
+	 * write cell centers to gcode.
 	 */
 	private void writeOutCells() {
 		turtle = new Turtle();
 
 		double toolDiameter = 1;
 
-		for( VoronoiCell c : voronoiDiagram.getCells() ) {
-			double x = c.centroid.x;
-			double y = c.centroid.y;
+		for( VoronoiCell c : cells ) {
+			double x = c.center.x;
+			double y = c.center.y;
 			double val = c.weight/255.0f;
 			if(val<cutoff) continue;
 
