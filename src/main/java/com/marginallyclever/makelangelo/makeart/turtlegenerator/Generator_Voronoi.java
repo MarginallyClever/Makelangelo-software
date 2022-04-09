@@ -1,18 +1,20 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.convenience.voronoi.VoronoiDiagram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
 
-import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 
 /**
  * 1cm and 10cm grid lines
  * @author Dan Royer
  */
 public class Generator_Voronoi extends TurtleGenerator {
-	private final VoronoiDiagram diagram = new VoronoiDiagram();
 	private static int numCells = 500;
 
 	@Override
@@ -36,29 +38,37 @@ public class Generator_Voronoi extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
-		diagram.initializeCells(numCells,myPaper.getMarginRectangle(),0.0001);
-		diagram.tessellate();
+		Rectangle2D bounds = myPaper.getMarginRectangle();
+
+		Point2D [] points = new Point2D[numCells];
+		for(int i=0;i<numCells;++i) {
+			points[i] = new Point2D(
+					Math.random()*bounds.getWidth()+bounds.getMinX(),
+					Math.random()*bounds.getHeight()+bounds.getMinY());
+		}
+
+		VoronoiTesselator2 diagram = new VoronoiTesselator2(points,bounds,0.0001);
 
 		// draw all the graph edges according to the cells.
-		diagram.getCells().forEach(cell -> {
-			boolean first=true;
-			for(Vector2d p : cell.convexHull.getPoints()) {
-				if(first) turtle.jumpTo(p.x,p.y);
-				else turtle.moveTo(p.x,p.y);
+		System.out.println("i="+diagram.getNumHulls());
+		int j=0;
+		for(int i=0;i<diagram.getNumHulls();++i) {
+			boolean first = true;
+			Polygon poly = diagram.getHull(i);
+			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
+				++j;
+				if (first) {
+					turtle.jumpTo(p.x, p.y);
+					first=false;
+				} else turtle.moveTo(p.x, p.y);
 			}
-		});
-
-		// draw all the graph edges
-		turtle.setColor(new ColorRGB(255,0,0));
-		diagram.getGraphEdges().forEach(edge -> {
-			turtle.jumpTo(edge.x1,edge.y1);
-			turtle.moveTo(edge.x2,edge.y2);
-		});
+		}
+		System.out.println("j="+j);
 
 		// draw all the cell centers
 		turtle.setColor(new ColorRGB(0,0,255));
-		diagram.getCells().forEach(cell -> {
-			turtle.jumpTo(cell.centroid.x,cell.centroid.y);
+		for( Point2D p : points ) {
+			turtle.jumpTo(p.x,p.y);
 			turtle.forward(1);
 			turtle.turn(90);
 			turtle.forward(1);
@@ -66,7 +76,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 			turtle.forward(1);
 			turtle.turn(90);
 			turtle.forward(1);
-		});
+		}
 
 		turtle.penUp();
 

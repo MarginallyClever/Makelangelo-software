@@ -480,6 +480,14 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>flatlaf</artifactId>
 			<version>2.1</version>
 		</dependency>
+
+		<!-- for voronoi -->
+		<!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts -->
+		<dependency>
+			<groupId>org.locationtech.jts</groupId>
+			<artifactId>jts-core</artifactId>
+			<version>1.18.2</version>
+		</dependency>
 	</dependencies>
 
 	<properties>

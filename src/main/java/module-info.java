@@ -17,6 +17,8 @@ module com.marginallyclever.makelangelo {
     requires com.formdev.flatlaf;
     requires org.reflections;
 
+    requires org.locationtech.jts;            // jts-core
+
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.makeart.io.vector;
     opens com.marginallyclever.makelangelo.plotter.plottercontrols;

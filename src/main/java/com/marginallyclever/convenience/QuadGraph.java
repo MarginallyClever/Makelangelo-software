@@ -1,16 +1,18 @@
-package com.marginallyclever.convenience.voronoi;
+package com.marginallyclever.convenience;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A quadtree is a data structure that can be used to quickly find all the objects that are within a given area.
+ */
 public class QuadGraph {
     private static final int MAX_POINTS = 5;
     public final Rectangle2D bounds = new Rectangle2D.Double();
-    public final List<VoronoiCell> sites = new ArrayList<>();
+    public final List<Point2D> sites = new ArrayList<>();
     public QuadGraph[] children = null;
 
     /**
@@ -42,14 +44,14 @@ public class QuadGraph {
 
     private void moveSitesIntoChildren() {
         // put all sites into the new children
-        for(VoronoiCell c : sites) {
+        for(Point2D c : sites) {
             addCellToOneQuadrant(c);
         }
         sites.clear();
     }
 
-    public boolean insert(VoronoiCell e) {
-        if(bounds.contains(e.centroid.x,e.centroid.y)) {
+    public boolean insert(Point2D e) {
+        if(bounds.contains(e.x,e.y)) {
             if(sites.size()<MAX_POINTS && children == null) {
                 sites.add(e);
                 return true;
@@ -61,7 +63,7 @@ public class QuadGraph {
         return false;
     }
 
-    private boolean addCellToOneQuadrant(VoronoiCell e) {
+    private boolean addCellToOneQuadrant(Point2D e) {
         for(int i=0;i<4;++i) {
             if(children[i].insert(e)) return true;
         }
@@ -69,16 +71,16 @@ public class QuadGraph {
     }
 
     // locate the cell under point x,y
-    public VoronoiCell search(Point2D p) {
+    public Point2D search(Point2D p) {
         if(!bounds.contains(p.x,p.y)) return null;
 
-        VoronoiCell bestFound = null;
+        Point2D bestFound = null;
         double bestD = Double.MAX_VALUE;
 
         if (!sites.isEmpty()) {
             // search me
-            for(VoronoiCell c : sites) {
-                double d = p.distanceSquared(c.centroid);
+            for(Point2D c : sites) {
+                double d = p.distanceSquared(c);
                 if(bestD > d) {
                     bestD = d;
                     bestFound = c;
@@ -89,9 +91,9 @@ public class QuadGraph {
         if(children != null) {
             for (int i = 0; i < 4; ++i) {
                 // look into the children
-                VoronoiCell bestChildFound = children[i].search(p);
+                Point2D bestChildFound = children[i].search(p);
                 if (bestChildFound != null && bestFound == null) {
-                    double d = p.distanceSquared(bestChildFound.centroid);
+                    double d = p.distanceSquared(bestChildFound);
                     if(bestD > d) {
                         bestFound = bestChildFound;
                     }

@@ -4,8 +4,6 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.convenience.voronoi.VoronoiCell;
-import com.marginallyclever.convenience.voronoi.VoronoiDiagram;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
