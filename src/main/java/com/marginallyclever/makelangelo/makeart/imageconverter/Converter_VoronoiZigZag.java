@@ -5,8 +5,8 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiCell;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiDiagram;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.convenience.voronoi.VoronoiDiagram;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -80,7 +80,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			lowNoise=false;
 			iterations = 0;
 			keepIterating = true;
-			voronoiDiagram.initializeCells(numCells, myPaper.getMarginRectangle(), 0.5);
+			voronoiDiagram.initializeCells(numCells, myPaper.getMarginRectangle(), 2);
 		}
 		finally {
 			lock.unlock();
@@ -98,9 +98,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 				optimizeTour();
 			} else {
 				double noiseLevel = evolveCells();
-				System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
-				if( noiseLevel < 100 ) {
-					System.out.println("done");
+				System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
+				if( noiseLevel < numCells*0.1 ) {
 					lowNoise=true;
 					greedyTour();
 					renderMode = 1;

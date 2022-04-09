@@ -6,7 +6,9 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,16 +46,31 @@ public class VoronoiDiagram {
         xValuesIn = new double[numCells];
         yValuesIn = new double[numCells];
 
+        // use a mask to ensure that the cells are not too close to each other.
+        BufferedImage mask = new BufferedImage(
+                (int)Math.ceil(bounds.getWidth()),
+                (int)Math.ceil(bounds.getHeight()),
+                BufferedImage.TYPE_BYTE_GRAY);
+        Graphics g = mask.getGraphics();
+
         // from top to bottom of the margin area...
         cells.clear();
         int used;
+        int m = Math.max(1,(int)Math.ceil(minDistanceBetweenSites));
+        double x=0,y=0;
         for (used=0;used<numCells;++used) {
-            double x = bounds.getMinX() + Math.random() * bounds.getWidth();
-            double y = bounds.getMinY() + Math.random() * bounds.getHeight();
-            cells.add(new VoronoiCell(x,y));
+            for(int i=0;i<130;++i) {
+                x = Math.random() * bounds.getWidth();
+                y = Math.random() * bounds.getHeight();
+                // check the mask
+                if(mask.getRGB((int)x, (int)y) == 0) break;
+            }
+            // fill in the mask
+            g.fillOval((int)(x-m), (int)(y-m), 2*m, 2*m);
+            cells.add(new VoronoiCell(bounds.getMinX() + x,bounds.getMinY() + y));
         }
 
-        voronoiTesselator.Init(minDistanceBetweenSites);
+        voronoiTesselator.init(minDistanceBetweenSites);
     }
 
     public void renderPoints(GL2 gl2) {
@@ -91,7 +108,15 @@ public class VoronoiDiagram {
     public void tessellate() {
         int i=0;
         for( VoronoiCell c : cells ) {
-            xValuesIn[i] = c.centroid.x;
+            // check if two centroids are within epsilon of each other.
+            double x = c.centroid.x;
+
+            for(int j=0;j<i;++j) {
+                if((x-xValuesIn[j])<1e-6) {
+                    x+=1e-6;
+                }
+            }
+            xValuesIn[i] = x;
             yValuesIn[i] = c.centroid.y;
             c.clear();
             ++i;

@@ -42,13 +42,9 @@ package com.marginallyclever.convenience.voronoi;
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-
-import java.awt.Point;
 
 /**
  * See https://shaneosullivan.wordpress.com/category/voronoi/
@@ -57,7 +53,6 @@ import java.awt.Point;
  * @author Zhenyu Pan
  */
 public class VoronoiTesselator {
-  // ************* Private members ******************
   private double borderMinX, borderMaxX, borderMinY, borderMaxY;
   private int siteidx;
   private double xmin, xmax, ymin, ymax, deltax, deltay;
@@ -73,26 +68,21 @@ public class VoronoiTesselator {
   private int PQhashsize;
   private VoronoiHalfEdge[] PQhash;
 
-  private final static int LE = 0;
-  private final static int RE = 1;
+  private final static int leftEdge = 0;
+  private final static int rightEdge = 1;
 
   private int ELhashsize;
   private VoronoiHalfEdge ELhash[];
   private VoronoiHalfEdge ELleftend, ELrightend;
-  private List<VoronoiGraphEdge> allEdges;
+  private final List<VoronoiGraphEdge> allEdges = new LinkedList<>();
 
 
-  /*********************************************************
-   * Public methods
-   ********************************************************/
+  public VoronoiTesselator() {}
 
-  public VoronoiTesselator() {
-  }
-
-  public void Init(double minDistanceBetweenSites) {
+  public void init(double minDistanceBetweenSites) {
     siteidx = 0;
     this.sites = null;
-    this.allEdges = null;
+    this.allEdges.clear();
     this.minDistanceBetweenSites = minDistanceBetweenSites;
   }
 
@@ -109,22 +99,11 @@ public class VoronoiTesselator {
                                                 double minX, double maxX, double minY, double maxY) {
     sort(xValuesIn, yValuesIn, xValuesIn.length);
 
-    // Check bounding box inputs - if mins are bigger than maxes, swap them
-    double temp = 0;
-    if (minX > maxX) {
-      temp = minX;
-      minX = maxX;
-      maxX = temp;
-    }
-    if (minY > maxY) {
-      temp = minY;
-      minY = maxY;
-      maxY = temp;
-    }
-    borderMinX = minX;
-    borderMinY = minY;
-    borderMaxX = maxX;
-    borderMaxY = maxY;
+    // make sure the bounds are not backwards.
+    borderMinX = Math.min(minX,maxX);
+    borderMinY = Math.min(minY,maxY);
+    borderMaxX = Math.max(minX,maxX);
+    borderMaxY = Math.max(minY,maxY);
 
     siteidx = 0;
     voronoi_bd();
@@ -132,60 +111,17 @@ public class VoronoiTesselator {
     return allEdges;
   }
 
-
-  /*********************************************************
-   * Private methods - implementation details
-   ********************************************************/
-
   private void sort(double[] xValuesIn, double[] yValuesIn, int count) {
     sites = null;
-    allEdges = new LinkedList<VoronoiGraphEdge>();
-
+    allEdges.clear();
     nsites = count;
     nvertices = 0;
     nedges = 0;
 
-    double sn = (double) nsites + 4;
-    sqrt_nsites = (int) Math.sqrt(sn);
+    double sn = nsites + 4;
+    sqrt_nsites = (int)Math.sqrt(sn);
 
-    // Copy the inputs so we don't modify the originals
-    double[] xValues = new double[count];
-    double[] yValues = new double[count];
-    for (int i = 0; i < count; i++) {
-      xValues[i] = xValuesIn[i];
-      yValues[i] = yValuesIn[i];
-    }
-    sortNode(xValues, yValues, count);
-  }
-
-  private void qsort(VoronoiSite[] sites) {
-    List<VoronoiSite> listSites = new ArrayList<VoronoiSite>(sites.length);
-    Collections.addAll(listSites, sites);
-
-    Collections.sort(listSites, new Comparator<VoronoiSite>() {
-      @Override
-      public final int compare(VoronoiSite p1, VoronoiSite p2) {
-        Point s1 = p1.coord, s2 = p2.coord;
-        if (s1.y < s2.y) {
-          return (-1);
-        }
-        if (s1.y > s2.y) {
-          return (1);
-        }
-        if (s1.getX() < s2.getX()) {
-          return (-1);
-        }
-        if (s1.getX() > s2.getX()) {
-          return (1);
-        }
-        return (0);
-      }
-    });
-
-    // Copy back into the array
-    for (int i = 0; i < sites.length; i++) {
-      sites[i] = listSites.get(i);
-    }
+    sortNode(xValuesIn, yValuesIn, count);
   }
 
   private void sortNode(double xValues[], double yValues[], int numPoints) {
@@ -218,12 +154,20 @@ public class VoronoiTesselator {
     deltax = xmax - xmin;
   }
 
+  private void qsort(VoronoiSite[] sites) {
+    Arrays.sort(sites, (p1, p2)-> {
+      Point s1 = p1.coord, s2 = p2.coord;
+      if(s1.y != s2.y) return s1.y - s2.y;
+      return s1.x - s2.x;
+    });
+  }
+
   /* return a single in-storage site */
   private VoronoiSite nextone() {
     VoronoiSite s;
     if (siteidx < nsites) {
       s = sites[siteidx];
-      siteidx += 1;
+      siteidx++;
       return (s);
     } else {
       return (null);
@@ -231,26 +175,22 @@ public class VoronoiTesselator {
   }
 
   private VoronoiEdge bisect(VoronoiSite s1, VoronoiSite s2) {
-    double dx, dy, adx, ady;
-    VoronoiEdge newedge;
-
-    newedge = new VoronoiEdge();
+    VoronoiEdge newedge = new VoronoiEdge();
 
     // store the sites that this edge is bisecting
     newedge.reg[0] = s1;
     newedge.reg[1] = s2;
-    // to begin with, there are no endpoints on the bisector - it goes to
-    // infinity
+    // to begin with there are no endpoints on the bisector - it goes to infinity
     newedge.ep[0] = null;
     newedge.ep[1] = null;
 
     // get the difference in x dist between the sites
-    dx = s2.coord.getX() - s1.coord.getX();
-    dy = s2.coord.y - s1.coord.y;
+    double dx = s2.coord.x - s1.coord.x;
+    double dy = s2.coord.y - s1.coord.y;
     // make sure that the difference in positive
-    adx = dx > 0 ? dx : -dx;
-    ady = dy > 0 ? dy : -dy;
-    newedge.c = (double) (s1.coord.getX() * dx + s1.coord.y * dy + (dx * dx + dy
+    double adx = dx > 0 ? dx : -dx;
+    double ady = dy > 0 ? dy : -dy;
+    newedge.c = (double) (s1.coord.x * dx + s1.coord.y * dy + (dx * dx + dy
         * dy) * 0.5);// get the slope of the line
 
     if (adx > ady) {
@@ -265,13 +205,13 @@ public class VoronoiTesselator {
 
     newedge.edgenbr = nedges;
 
-    nedges += 1;
-    return (newedge);
+    nedges++;
+    return newedge;
   }
 
   private void makevertex(VoronoiSite v) {
     v.sitenbr = nvertices;
-    nvertices += 1;
+    nvertices++;
   }
 
   private boolean PQinitialize() {
@@ -286,20 +226,12 @@ public class VoronoiTesselator {
     return true;
   }
 
-  private int PQbucket(VoronoiHalfEdge he) {
-    int bucket;
-
-    bucket = (int) ((he.ystar - ymin) / deltay * PQhashsize);
-    if (bucket < 0) {
-      bucket = 0;
-    }
-    if (bucket >= PQhashsize) {
-      bucket = PQhashsize - 1;
-    }
-    if (bucket < PQmin) {
-      PQmin = bucket;
-    }
-    return (bucket);
+  private int getPQBucketIndex(VoronoiHalfEdge he) {
+    int bucket = (int) ((he.ystar - ymin) / deltay * PQhashsize);
+    if (bucket < 0) bucket = 0;
+    if (bucket >= PQhashsize) bucket = PQhashsize - 1;
+    if (bucket < PQmin) PQmin = bucket;
+    return bucket;
   }
 
   // push the HalfEdge into the ordered linked list of vertices
@@ -308,14 +240,14 @@ public class VoronoiTesselator {
 
     he.vertex = v;
     he.ystar = (double) (v.coord.y + offset);
-    last = PQhash[PQbucket(he)];
+    last = PQhash[getPQBucketIndex(he)];
     while ((next = last.PQnext) != null
-        && (he.ystar > next.ystar || (he.ystar == next.ystar && v.coord.getX() > next.vertex.coord.getX()))) {
+        && (he.ystar > next.ystar || (he.ystar == next.ystar && v.coord.x > next.vertex.coord.x))) {
       last = next;
     }
     he.PQnext = last.PQnext;
     last.PQnext = he;
-    PQcount += 1;
+    PQcount++;
   }
 
   // remove the HalfEdge from the list of vertices
@@ -323,7 +255,7 @@ public class VoronoiTesselator {
     VoronoiHalfEdge last;
 
     if (he.vertex != null) {
-      last = PQhash[PQbucket(he)];
+      last = PQhash[getPQBucketIndex(he)];
       while (last.PQnext != he) {
         last = last.PQnext;
       }
@@ -334,25 +266,22 @@ public class VoronoiTesselator {
     }
   }
 
-  private boolean PQempty() {
-    return (PQcount == 0);
+  private boolean isPQempty() {
+    return PQcount == 0;
   }
 
   private Point PQ_min() {
-    Point answer = new Point();
-
     while (PQhash[PQmin].PQnext == null) {
-      PQmin += 1;
+      PQmin++;
     }
+    Point answer = new Point();
     answer.setLocation( PQhash[PQmin].PQnext.vertex.coord.x, 
     					PQhash[PQmin].PQnext.ystar );
-    return (answer);
+    return answer;
   }
 
   private VoronoiHalfEdge PQextractmin() {
-    VoronoiHalfEdge curr;
-
-    curr = PQhash[PQmin].PQnext;
+    VoronoiHalfEdge curr = PQhash[PQmin].PQnext;
     PQhash[PQmin].PQnext = curr.PQnext;
     PQcount -= 1;
     return (curr);
@@ -388,19 +317,9 @@ public class VoronoiTesselator {
     return true;
   }
 
-  private VoronoiHalfEdge ELright(VoronoiHalfEdge he) {
-    return (he.ELright);
-  }
-
-  private VoronoiHalfEdge ELleft(VoronoiHalfEdge he) {
-    return (he.ELleft);
-  }
-
   private VoronoiSite leftreg(VoronoiHalfEdge he) {
-    if (he.ELedge == null) {
-      return (bottomsite);
-    }
-    return (he.ELpm == LE ? he.ELedge.reg[LE] : he.ELedge.reg[RE]);
+    if (he.ELedge == null) return bottomsite;
+    return (he.ELpm == leftEdge ? he.ELedge.reg[leftEdge] : he.ELedge.reg[rightEdge]);
   }
 
   private void ELinsert(VoronoiHalfEdge lb, VoronoiHalfEdge newHe) {
@@ -444,7 +363,7 @@ public class VoronoiTesselator {
         /* Use hash table to get close to desired halfedge */
     // use the hash function to find the place in the hash map that this
     // HalfEdge should be
-    bucket = (int) ((p.getX() - xmin) / deltax * ELhashsize);
+    bucket = (int) ((p.x - xmin) / deltax * ELhashsize);
 
     // make sure that the bucket position in within the range of the hash
     // array
@@ -510,8 +429,8 @@ public class VoronoiTesselator {
     VoronoiSite s1, s2;
     double x1 = 0, x2 = 0, y1 = 0, y2 = 0;
 
-    x1 = e.reg[0].coord.getX();
-    x2 = e.reg[1].coord.getX();
+    x1 = e.reg[0].coord.x;
+    x2 = e.reg[1].coord.x;
     y1 = e.reg[0].coord.y;
     y2 = e.reg[1].coord.y;
 
@@ -572,16 +491,16 @@ public class VoronoiTesselator {
       }
     } else {
       x1 = pxmin;
-      if (s1 != null && s1.coord.getX() > pxmin) {
-        x1 = s1.coord.getX();
+      if (s1 != null && s1.coord.x > pxmin) {
+        x1 = s1.coord.x;
       }
       if (x1 > pxmax) {
         x1 = pxmax;
       }
       y1 = e.c - e.a * x1;
       x2 = pxmax;
-      if (s2 != null && s2.coord.getX() < pxmax) {
-        x2 = s2.coord.getX();
+      if (s2 != null && s2.coord.x < pxmax) {
+        x2 = s2.coord.x;
       }
       if (x2 < pxmin) {
         x2 = pxmin;
@@ -613,7 +532,7 @@ public class VoronoiTesselator {
 
   private void endpoint(VoronoiEdge e, int lr, VoronoiSite s) {
     e.ep[lr] = s;
-    if (e.ep[RE - lr] == null) {
+    if (e.ep[rightEdge - lr] == null) {
       return;
     }
     clip_line(e);
@@ -629,27 +548,27 @@ public class VoronoiTesselator {
 
     e = el.ELedge;
     topsite = e.reg[1];
-    if (p.getX() > topsite.coord.getX()) {
+    if (p.x > topsite.coord.x) {
       right_of_site = true;
     } else {
       right_of_site = false;
     }
-    if (right_of_site && el.ELpm == LE) {
+    if (right_of_site && el.ELpm == leftEdge) {
       return (true);
     }
-    if (!right_of_site && el.ELpm == RE) {
+    if (!right_of_site && el.ELpm == rightEdge) {
       return (false);
     }
 
     if (e.a == 1.0) {
       dyp = p.y - topsite.coord.y;
-      dxp = p.getX() - topsite.coord.getX();
+      dxp = p.x - topsite.coord.x;
       fast = false;
       if ((!right_of_site & (e.b < 0.0)) | (right_of_site & (e.b >= 0.0))) {
         above = dyp >= e.b * dxp;
         fast = above;
       } else {
-        above = p.getX() + p.y * e.b > e.c;
+        above = p.x + p.y * e.b > e.c;
         if (e.b < 0.0) {
           above = !above;
         }
@@ -658,7 +577,7 @@ public class VoronoiTesselator {
         }
       }
       if (!fast) {
-        dxs = topsite.coord.getX() - (e.reg[0]).coord.getX();
+        dxs = topsite.coord.x - (e.reg[0]).coord.x;
         above = e.b * (dxp * dxp - dyp * dyp) < dxs * dyp
             * (1.0 + 2.0 * dxp / dxs + e.b * e.b);
         if (e.b < 0.0) {
@@ -668,13 +587,13 @@ public class VoronoiTesselator {
     } else /* e.b==1.0 */
 
     {
-      yl = e.c - e.a * p.getX();
+      yl = e.c - e.a * p.x;
       t1 = p.y - yl;
-      t2 = p.getX() - topsite.coord.getX();
+      t2 = p.x - topsite.coord.x;
       t3 = yl - topsite.coord.y;
       above = t1 * t1 > t2 * t2 + t3 * t3;
     }
-    return (el.ELpm == LE ? above : !above);
+    return (el.ELpm == leftEdge ? above : !above);
   }
 
   private VoronoiSite rightreg(VoronoiHalfEdge he) {
@@ -687,12 +606,12 @@ public class VoronoiTesselator {
 
     // if the ELpm field is zero, return the site 0 that this edge bisects,
     // otherwise return site number 1
-    return (he.ELpm == LE ? he.ELedge.reg[RE] : he.ELedge.reg[LE]);
+    return (he.ELpm == leftEdge ? he.ELedge.reg[rightEdge] : he.ELedge.reg[leftEdge]);
   }
 
   private double dist(VoronoiSite s, VoronoiSite t) {
     double dx, dy;
-    dx = s.coord.getX() - t.coord.getX();
+    dx = s.coord.x - t.coord.x;
     dy = s.coord.y - t.coord.y;
     return (double) (Math.sqrt(dx * dx + dy * dy));
   }
@@ -726,7 +645,7 @@ public class VoronoiTesselator {
     yint = (e2.c * e1.a - e1.c * e2.a) / d;
 
     if ((e1.reg[1].coord.y < e2.reg[1].coord.y)
-        || (e1.reg[1].coord.y == e2.reg[1].coord.y && e1.reg[1].coord.getX() < e2.reg[1].coord.getX())) {
+        || (e1.reg[1].coord.y == e2.reg[1].coord.y && e1.reg[1].coord.x < e2.reg[1].coord.x)) {
       el = el1;
       e = e1;
     } else {
@@ -734,9 +653,9 @@ public class VoronoiTesselator {
       e = e2;
     }
 
-    right_of_site = xint >= e.reg[1].coord.getX();
-    if ((right_of_site && el.ELpm == LE)
-        || (!right_of_site && el.ELpm == RE)) {
+    right_of_site = xint >= e.reg[1].coord.x;
+    if ((right_of_site && el.ELpm == leftEdge)
+        || (!right_of_site && el.ELpm == rightEdge)) {
       return null;
     }
 
@@ -766,7 +685,7 @@ public class VoronoiTesselator {
     bottomsite = nextone();
     newsite = nextone();
     while (true) {
-      if (!PQempty()) {
+      if (!isPQempty()) {
         newintstar = PQ_min();
       }
       // if the lowest site has a smaller y value than the lowest vector
@@ -774,12 +693,12 @@ public class VoronoiTesselator {
       // process the site otherwise process the vector intersection
 
       if (newsite != null
-          && (PQempty() || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.getX() < newintstar.getX()))) {
+          && (isPQempty() || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.x < newintstar.x))) {
                 /* new site is smallest -this is a site event */
         // get the first HalfEdge to the LEFT of the new site
         lbnd = ELleftbnd((newsite.coord));
         // get the first HalfEdge to the RIGHT of the new site
-        rbnd = ELright(lbnd);
+        rbnd = lbnd.ELright;
         // if this halfedge has no edge,bot =bottom site (whatever that
         // is)
         bot = rightreg(lbnd);
@@ -787,7 +706,7 @@ public class VoronoiTesselator {
         e = bisect(bot, newsite);
 
         // create a new HalfEdge, setting its ELpm field to 0
-        bisector = HEcreate(e, LE);
+        bisector = HEcreate(e, leftEdge);
         // insert this new bisector edge between the left and right
         // vectors in a linked list
         ELinsert(lbnd, bisector);
@@ -800,7 +719,7 @@ public class VoronoiTesselator {
         }
         lbnd = bisector;
         // create a new HalfEdge, setting its ELpm field to 1
-        bisector = HEcreate(e, RE);
+        bisector = HEcreate(e, rightEdge);
         // insert the new HE to the right of the original bisector
         // earlier in the IF stmt
         ELinsert(lbnd, bisector);
@@ -811,18 +730,18 @@ public class VoronoiTesselator {
           PQinsert(bisector, p, dist(p, newsite));
         }
         newsite = nextone();
-      } else if (!PQempty())
+      } else if (!isPQempty())
             /* intersection is smallest - this is a vector event */ {
         // pop the HalfEdge with the lowest vector off the ordered list
         // of vectors
         lbnd = PQextractmin();
         // get the HalfEdge to the left of the above HE
-        llbnd = ELleft(lbnd);
+        llbnd = lbnd.ELleft;
         // get the HalfEdge to the right of the above HE
-        rbnd = ELright(lbnd);
+        rbnd = lbnd.ELright;
         // get the HalfEdge to the right of the HE to the right of the
         // lowest HE
-        rrbnd = ELright(rbnd);
+        rrbnd = rbnd.ELright;
         // get the Site to the left of the left HE which it bisects
         bot = leftreg(lbnd);
         // get the Site to the right of the right HE which it bisects
@@ -845,7 +764,7 @@ public class VoronoiTesselator {
         ELdelete(rbnd); // mark the right HE for
         // deletion - can't delete yet because there might be pointers
         // to it in Hash Map
-        pm = LE; // set the pm variable to zero
+        pm = leftEdge; // set the pm variable to zero
 
         if (bot.coord.y > top.coord.y)
         // if the site to the left of the event is higher than the
@@ -855,7 +774,7 @@ public class VoronoiTesselator {
           temp = bot;
           bot = top;
           top = temp;
-          pm = RE;
+          pm = rightEdge;
         }
         e = bisect(bot, top); // create an Edge (or line)
         // that is between the two Sites. This creates the formula of
@@ -865,7 +784,7 @@ public class VoronoiTesselator {
         // with its ELedge field
         ELinsert(llbnd, bisector); // insert the new bisector to the
         // right of the left HE
-        endpoint(e, RE - pm, v); // set one endpoint to the new edge
+        endpoint(e, rightEdge - pm, v); // set one endpoint to the new edge
         // to be the vector point 'v'.
         // If the site to the left of this bisector is higher than the
         // right Site, then this endpoint
@@ -888,7 +807,7 @@ public class VoronoiTesselator {
       }
     }
 
-    for (lbnd = ELright(ELleftend); lbnd != ELrightend; lbnd = ELright(lbnd)) {
+    for (lbnd = ELleftend.ELright; lbnd != ELrightend; lbnd = lbnd.ELright) {
       e = lbnd.ELedge;
       clip_line(e);
     }

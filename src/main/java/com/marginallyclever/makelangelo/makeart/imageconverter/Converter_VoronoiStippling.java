@@ -4,8 +4,8 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiCell;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiDiagram;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.convenience.voronoi.VoronoiDiagram;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -86,11 +86,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		lock.lock();
 		try {
 			double noiseLevel = evolveCells();
-			System.out.println(iterations+": "+noiseLevel+"\t"+numCells+"\t"+(noiseLevel/(float)numCells));
+			System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
 		}
 		finally {
 			lock.unlock();
 		}
+		keepIterating=false;
 
 		return keepIterating;
 	}
@@ -119,7 +120,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		try {
 			iterations = 0;
 			keepIterating = true;
-			voronoiDiagram.initializeCells(numCells,myPaper.getMarginRectangle(), 0.5);
+			voronoiDiagram.initializeCells(numCells,myPaper.getMarginRectangle(), 2);
 		}
 		finally {
 			lock.unlock();

@@ -36,7 +36,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
-		diagram.initializeCells(numCells,myPaper.getMarginRectangle(),2);
+		diagram.initializeCells(numCells,myPaper.getMarginRectangle(),0.0001);
 		diagram.tessellate();
 
 		// draw all the graph edges according to the cells.
