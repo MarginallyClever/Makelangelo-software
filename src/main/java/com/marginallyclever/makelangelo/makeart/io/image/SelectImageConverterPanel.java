@@ -9,7 +9,6 @@ import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverterFac
 import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.select.SelectPanelChangeListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 
-public class ConvertImagePanel extends JPanel implements PreviewListener, SelectPanelChangeListener {
-	private static final Logger logger = LoggerFactory.getLogger(ConvertImagePanel.class);
+public class SelectImageConverterPanel extends JPanel implements PreviewListener, PropertyChangeListener {
+	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
 
 	/**
@@ -45,17 +45,19 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	
 	private Paper myPaper;
 	private TransformedImage myImage;
+
 	private static JComboBox<String> styleNames;
 	private static JComboBox<String> fillNames;
-	private JPanel cards = new JPanel(new CardLayout());
-	
+
+	private final JPanel cards = new JPanel(new CardLayout());
+	private final ArrayList<ImageConverterThread> workerList = new ArrayList<>();
+
 	private ImageConverterPanel myConverterPanel;
 	private ImageConverterThread imageConverterThread; 
-	private ArrayList<ImageConverterThread> workerList = new ArrayList<ImageConverterThread>();
 	private int workerCount = 0;
 	private ProgressMonitor progressMonitor;
 	
-	public ConvertImagePanel(Paper paper,TransformedImage image) {
+	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
 		super();
 		myPaper = paper;
 		myImage = image;
@@ -112,13 +114,13 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	}
 	
 	private JComboBox<String> getStyleSelection() {
-		ArrayList<String> imageConverterNames = new ArrayList<String>();
+		ArrayList<String> imageConverterNames = new ArrayList<>();
 		for( ImageConverterPanel i : ImageConverterFactory.list ) {
 			imageConverterNames.add(i.getConverter().getName());
 			cards.add(i,i.getConverter().getName());
 		}
 		
-		JComboBox<String> box = new JComboBox<String>((String[])imageConverterNames.toArray(new String[0]));
+		JComboBox<String> box = new JComboBox<>(imageConverterNames.toArray(new String[0]));
 		box.addItemListener((e) -> onConverterChanged(e));
 		box.setSelectedIndex(getPreferredDrawStyle());
 
@@ -230,10 +232,10 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		stopConversion();
 
 		if(myConverterPanel!=null) {
-			myConverterPanel.removeSelectPanelChangeListener(this);
+			myConverterPanel.removePropertyChangeListener(this);
 		}
 		if(chosenPanel!=null) {
-			chosenPanel.addSelectPanelChangeListener(this);
+			chosenPanel.addPropertyChangeListener(this);
 		}
 		myConverterPanel = chosenPanel;
 		
@@ -241,7 +243,7 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 	}
 
 	@Override
-	public void selectPanelPropertyChange(PropertyChangeEvent evt) {
+	public void propertyChange(PropertyChangeEvent evt) {
 		reconvert();
 	}
 	
@@ -359,9 +361,9 @@ public class ConvertImagePanel extends JPanel implements PreviewListener, Select
 		Translator.start();
 
 		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
-		JFrame frame = new JFrame(ConvertImagePanel.class.getSimpleName());
+		JFrame frame = new JFrame(SelectImageConverterPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ConvertImagePanel(new Paper(),image));
+		frame.add(new SelectImageConverterPanel(new Paper(),image));
 		frame.pack();
 		frame.setVisible(true);
 	}
