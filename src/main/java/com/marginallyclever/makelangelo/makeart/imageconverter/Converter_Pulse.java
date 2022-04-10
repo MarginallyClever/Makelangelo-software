@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.beans.PropertyChangeEvent;
 
 
 /**
@@ -16,8 +16,9 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Pulse extends ImageConverter {
 	private static double blockScale = 6.0f;
 	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
-	
+	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
+	private int cutOff = 16;
+
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
@@ -27,6 +28,7 @@ public class Converter_Pulse extends ImageConverter {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
 		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
+		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
 	}
 	
 	public double getScale() {
@@ -64,16 +66,16 @@ public class Converter_Pulse extends ImageConverter {
 			double x = a.x + dir.x * p; 
 			double y = a.y + dir.y * p; 
 			// read a block of the image and find the average intensity in this block
-			double z = img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
+			double z = 255.0f - img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
 			// scale the intensity value
-			double scale_z = (255.0f - z) / 255.0f;
+			double scale_z = (z) / 255.0f;
 			//scale_z *= scale_z;  // quadratic curve
 			double pulseSize = halfStep * scale_z;
-			
-			turtle.moveTo(
-				x + ortho.x*pulseSize*n,
-				y + ortho.y*pulseSize*n
-			);
+
+			double px=x + ortho.x * pulseSize * n;
+			double py=y + ortho.y * pulseSize * n;
+			if(z>cutOff) turtle.moveTo(px,py);
+			else turtle.jumpTo(px,py);
 			n = -n;
 		}
 	}
@@ -137,5 +139,13 @@ public class Converter_Pulse extends ImageConverter {
 				}
 			}
 		}
+	}
+
+    public int getCutoff() {
+		return cutOff;
+    }
+
+	public void setCutoff(int value) {
+		cutOff=value;
 	}
 }

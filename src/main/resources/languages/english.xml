@@ -2199,4 +2199,37 @@
 		<key>Converter_EdgeDetection.sampleSize</key>
 		<value>SampleSize</value>
 	</string>
+
+	<string>
+		<key>Generator_FlowField.name</key>
+		<value>Flow field</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.scaleX</key>
+		<value>X scale</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.scaleY</key>
+		<value>Y scale</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.offsetX</key>
+		<value>X offset</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.offsetY</key>
+		<value>Y offset</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.stepSize</key>
+		<value>Step size</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.fromEdge</key>
+		<value>Continuous</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.rightAngle</key>
+		<value>Add orthogonal lines</value>
+	</string>
 </language>
