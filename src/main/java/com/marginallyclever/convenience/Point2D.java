@@ -57,4 +57,9 @@ public class Point2D {
 	public boolean equalsEpsilon(Point2D b, double epsilon) {
 		return distance(b) < epsilon;
 	}
+
+	public void add(Point2D b){
+		x += b.x;
+		y += b.y;
+	}
 }
