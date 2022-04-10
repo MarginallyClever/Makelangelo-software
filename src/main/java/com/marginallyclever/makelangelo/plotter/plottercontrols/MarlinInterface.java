@@ -110,6 +110,7 @@ public class MarlinInterface extends JPanel {
 			if (delay > TIMEOUT_DELAY * 5) {
 				logger.error("No answer from the robot");
 				notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, COMMUNICATION_FAILURE));
+				chatInterface.displayError("No answer from the robot, retrying...");
 			} else {
 				logger.trace("Heartbeat: M400");
 				chatInterface.sendCommand("M400");

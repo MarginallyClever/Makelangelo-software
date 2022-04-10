@@ -78,7 +78,9 @@ public class ConversationHistory extends JPanel {
 				if(c instanceof JLabel) {
 					JLabel jc = (JLabel)c;
 					jc.setText(value.toString());
-					if(!value.whoSpoke.contentEquals("You")) {
+					if (value.whoSpoke.contentEquals("Error")) {
+						jc.setForeground(Color.RED);
+					} else if (!value.whoSpoke.contentEquals("You")) {
 						jc.setForeground(Color.BLUE);
 					}
 				}

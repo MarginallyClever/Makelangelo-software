@@ -65,6 +65,10 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 	public void sendCommand(String str) {
 		myInterface.sendCommand(str);
 	}
+
+	public void displayError(String str) {
+		myInterface.addToHistory("Error", str);
+	}
 	
 	public String getCommand() {
 		return myInterface.getCommand();
