@@ -1,12 +1,9 @@
-package com.marginallyclever.makelangelo.makeart.io.image;
+package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverter;
-import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverterFactory;
-import com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
@@ -53,7 +50,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private final ArrayList<ImageConverterThread> workerList = new ArrayList<>();
 
 	private ImageConverterPanel myConverterPanel;
-	private ImageConverterThread imageConverterThread; 
+	private ImageConverterThread imageConverterThread;
 	private int workerCount = 0;
 	private ProgressMonitor progressMonitor;
 	
