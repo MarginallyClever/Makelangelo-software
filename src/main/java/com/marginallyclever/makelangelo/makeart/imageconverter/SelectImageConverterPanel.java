@@ -17,8 +17,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +24,7 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 
-public class SelectImageConverterPanel extends JPanel implements PreviewListener, PropertyChangeListener {
+public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterPanelListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
 
@@ -227,23 +225,18 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		if( chosenPanel == myConverterPanel ) return;
 		logger.debug("changeConverter() {}", chosenPanel.getName());
 		stopConversion();
-
-		if(myConverterPanel!=null) {
-			myConverterPanel.removePropertyChangeListener(this);
-		}
-		if(chosenPanel!=null) {
-			chosenPanel.addPropertyChangeListener(this);
-		}
+		if(myConverterPanel != null) myConverterPanel.removeImageConverterPanelListener(this);
 		myConverterPanel = chosenPanel;
-		
+		myConverterPanel.addImageConverterPanelListener(this);
 		startConversion();
 	}
 
+
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void reconvert(ImageConverterPanel panel) {
 		reconvert();
 	}
-	
+
 	private void reconvert() {
 		logger.debug("reconvert()");
 		stopConversion();

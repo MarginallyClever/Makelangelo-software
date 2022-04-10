@@ -8,7 +8,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,16 +31,6 @@ public class Converter_FlowField extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("Generator_FlowField.name");
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("scaleX")) setScaleX((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("scaleY")) setScaleY((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("offsetX")) setOffsetX((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("offsetY")) setOffsetY((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("stepSize")) setStepSize((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("rightAngle")) setRightAngle((boolean)evt.getNewValue());
 	}
 
 	public static void setScaleX(double scaleX) {

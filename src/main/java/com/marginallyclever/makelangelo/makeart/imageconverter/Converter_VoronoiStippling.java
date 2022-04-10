@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -50,30 +49,6 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		return Translator.get("Converter_VoronoiStippling.Name");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("drawVoronoi")) setDrawVoronoi((boolean)evt.getNewValue());
-		else {
-			boolean isDirty=false;
-			if(evt.getPropertyName().equals("cells")) {
-				isDirty=true;
-				setNumCells((int)evt.getNewValue());
-			}
-			if(evt.getPropertyName().equals("max")) {
-				isDirty=true;
-				setMinDotSize((double)evt.getNewValue());
-			}
-			if(evt.getPropertyName().equals("min")) {
-				isDirty=true;
-				setMaxDotSize((double)evt.getNewValue());
-			}
-			if(evt.getPropertyName().equals("cutoff")) {
-				isDirty=true;
-				setCutoff((double)evt.getNewValue());
-			}
-			if(isDirty) restart();
-		}
-	}
 
 	@Override
 	public void setImage(TransformedImage img) {
@@ -167,7 +142,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
 	}
 
-	private void restart() {		
+	public void restart() {
 		if(myImage==null) return;
 
 		lock.lock();

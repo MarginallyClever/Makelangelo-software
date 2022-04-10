@@ -15,5 +15,29 @@ public class Converter_VoronoiStippling_Panel extends ImageConverterPanel {
 		add(new SelectDouble("min",Translator.get("Converter_VoronoiStippling.DotMin"),converter.getMinDotSize()));
 		add(new SelectDouble("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),converter.getCutoff()));
 		add(new SelectBoolean("drawVoronoi",Translator.get("Converter_VoronoiStippling.DrawBorders"),converter.getDrawVoronoi()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("drawVoronoi")) converter.setDrawVoronoi((boolean)evt.getNewValue());
+			else {
+				boolean isDirty=false;
+				if(evt.getPropertyName().equals("cells")) {
+					isDirty=true;
+					converter.setNumCells((int)evt.getNewValue());
+				}
+				if(evt.getPropertyName().equals("max")) {
+					isDirty=true;
+					converter.setMinDotSize((double)evt.getNewValue());
+				}
+				if(evt.getPropertyName().equals("min")) {
+					isDirty=true;
+					converter.setMaxDotSize((double)evt.getNewValue());
+				}
+				if(evt.getPropertyName().equals("cutoff")) {
+					isDirty=true;
+					converter.setCutoff((double)evt.getNewValue());
+				}
+				if(isDirty) fireRestartConversion();
+			}
+		});
 	}
 }

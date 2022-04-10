@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
@@ -158,7 +156,4 @@ public class Converter_ColorBoxes extends ImageConverter {
 		scan(2, myImage, "Green",new ColorRGB(  0,255,  0));  // green
 		scan(3, myImage, "Blue" ,new ColorRGB(  0,  0,255));  // blue
 	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {}
 }

@@ -6,11 +6,9 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.beans.PropertyChangeEvent;
-
 
 /**
- * 
+ * straight lines pulsing like a heartbeat.  height and density of pulse vary with image intensity.
  * @author Dan Royer
  */
 public class Converter_Pulse extends ImageConverter {
@@ -24,13 +22,6 @@ public class Converter_Pulse extends ImageConverter {
 		return Translator.get("PulseLineName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
-	}
-	
 	public double getScale() {
 		return blockScale;
 	}

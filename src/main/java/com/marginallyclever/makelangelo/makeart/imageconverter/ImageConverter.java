@@ -11,13 +11,12 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.*;
-import java.beans.PropertyChangeListener;
 
 /**
  * Converts a {@link TransformedImage} to {@link Turtle}
  * @author Dan Royer
  */
-public abstract class ImageConverter implements PropertyChangeListener {
+public abstract class ImageConverter {
 	protected TransformedImage myImage;
 	protected Paper myPaper;
 	public Turtle turtle = new Turtle();

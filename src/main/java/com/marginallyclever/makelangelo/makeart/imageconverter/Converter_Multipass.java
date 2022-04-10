@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
@@ -21,12 +19,6 @@ public class Converter_Multipass extends ImageConverter {
 		return Translator.get("ConverterMultipassName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("angle")) setAngle((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("levels")) setPasses((int)evt.getNewValue());		
-	}
-	
 	public double getAngle() {
 		return angle;
 	}

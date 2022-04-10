@@ -8,8 +8,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
@@ -23,11 +21,6 @@ public class Converter_CMYK extends ImageConverter {
 		return Translator.get("ConverterCMYKName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("passes")) setPasses((int)evt.getNewValue());
-	}
-	
 	public int getPasses() {
 		return passes;
 	}

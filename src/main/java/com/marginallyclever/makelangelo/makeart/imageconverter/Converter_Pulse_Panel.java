@@ -13,5 +13,12 @@ public class Converter_Pulse_Panel extends ImageConverterPanel {
 		add(new SelectDouble("size",Translator.get("HilbertCurveSize"),converter.getScale()));
 		add(new SelectOneOfMany("direction",Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
 		add(new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,converter.getCutoff()));
+
+		addPropertyChangeListener((evt)	-> {
+			if (evt.getPropertyName().equals("size")) converter.setScale((double) evt.getNewValue());
+			if (evt.getPropertyName().equals("direction")) converter.setDirectionIndex((int) evt.getNewValue());
+			if (evt.getPropertyName().equals("cutoff")) converter.setCutoff((int) evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

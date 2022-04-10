@@ -18,5 +18,16 @@ public class Converter_FlowField_Panel extends ImageConverterPanel {
 		add(new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,Converter_FlowField.getStepSize()));
 		add(new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),Converter_FlowField.getRightAngle()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("scaleX")) converter.setScaleX((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("scaleY")) converter.setScaleY((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("offsetX")) converter.setOffsetX((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("offsetY")) converter.setOffsetY((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("stepSize")) converter.setStepSize((int)evt.getNewValue());
+			if(evt.getPropertyName().equals("rightAngle")) converter.setRightAngle((boolean)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

@@ -7,8 +7,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-
 
 /**
  * 
@@ -33,12 +31,6 @@ public class Converter_Sandy extends ImageConverter {
 		return Translator.get("SandyNoble.title");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("rings")) setScale((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("direction")) setDirection((int)evt.getNewValue());
-	}
-	
 	@Override
 	public void finish() {
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);

@@ -11,5 +11,10 @@ public class Converter_CMYK_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectSlider("passes", Translator.get("ConverterCMYKPasses"), 5, 1, converter.getPasses()));
 		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("passes")) converter.setPasses((int)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

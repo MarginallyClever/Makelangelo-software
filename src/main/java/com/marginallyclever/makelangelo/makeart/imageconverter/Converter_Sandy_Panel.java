@@ -11,5 +11,11 @@ public class Converter_Sandy_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectSlider("rings",Translator.get("SandyNoble.rings"),300,10,converter.getScale()));
 		add(new SelectOneOfMany("direction",Translator.get("SandyNoble.center"),converter.getDirections(),converter.getDirectionIndex()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("rings")) converter.setScale((int)evt.getNewValue());
+			if(evt.getPropertyName().equals("direction")) converter.setDirection((int)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

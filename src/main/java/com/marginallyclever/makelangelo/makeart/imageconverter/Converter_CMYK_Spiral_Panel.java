@@ -9,5 +9,10 @@ public class Converter_CMYK_Spiral_Panel extends ImageConverterPanel {
 	public Converter_CMYK_Spiral_Panel(Converter_CMYK_Spiral converter) {
 		super(converter);
 		add(new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),converter.getToCorners()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("toCorners")) converter.setToCorners((boolean)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

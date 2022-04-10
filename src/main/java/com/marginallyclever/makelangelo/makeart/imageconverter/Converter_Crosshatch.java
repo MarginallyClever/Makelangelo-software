@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
@@ -19,17 +17,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("intensity")) {
-			setIntensity((float)((int)evt.getNewValue())/10.0f);
-		}
-		if(evt.getPropertyName().equals("pass90")) pass90=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass75")) pass75=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass15")) pass15=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass45")) pass45=(int)evt.getNewValue();
-		
-	}
 
 	public void setIntensity(double arg0) {
 		intensity=arg0;
@@ -113,5 +100,21 @@ public class Converter_Crosshatch extends ImageConverter {
 			}
 			++i;
 		}
+	}
+
+	public void setPass90(int newValue) {
+		Converter_Crosshatch.pass90 = newValue;
+	}
+
+	public void setPass75(int newValue) {
+		Converter_Crosshatch.pass75 = newValue;
+	}
+
+	public void setPass15(int newValue) {
+		Converter_Crosshatch.pass15 = newValue;
+	}
+
+	public void setPass45(int newValue) {
+		Converter_Crosshatch.pass45 = newValue;
 	}
 }

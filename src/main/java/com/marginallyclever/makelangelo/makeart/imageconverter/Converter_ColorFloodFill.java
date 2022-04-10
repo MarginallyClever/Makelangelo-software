@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;
 
 /**
@@ -248,6 +247,4 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		turtle.penUp();
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {}
 }

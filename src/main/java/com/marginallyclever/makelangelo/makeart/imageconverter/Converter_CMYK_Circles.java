@@ -11,8 +11,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
  * @author Dan Royer
@@ -26,11 +24,6 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		return Translator.get("Converter_CMYK_Circles.name");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("maxCircleSize")) setMaxCircleSize((int)evt.getNewValue());
-	}
-	
 	public int getMaxCircleSize() {
 		return maxCircleRadius;
 	}

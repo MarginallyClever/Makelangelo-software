@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;
 
 
@@ -44,12 +43,6 @@ public class Converter_Wander extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("ConverterWanderName");
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("count")) setLineCount((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("cmyk")) setCMYK((boolean)evt.getNewValue());
 	}
 
 	@Override

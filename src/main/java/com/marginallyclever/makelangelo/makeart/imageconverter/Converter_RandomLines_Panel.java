@@ -8,5 +8,10 @@ public class Converter_RandomLines_Panel extends ImageConverterPanel {
 	public Converter_RandomLines_Panel(Converter_RandomLines converter) {
 		super(converter);
 		add(new SelectInteger("total",Translator.get("ConverterRandomLinesCount"),converter.getLineCount()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("total")) converter.setLineCount((int)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

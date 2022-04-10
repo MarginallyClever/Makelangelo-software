@@ -12,5 +12,18 @@ public class Converter_VoronoiZigZag_Panel extends ImageConverterPanel {
 		
 		add(new SelectInteger("count", Translator.get("Converter_VoronoiStippling.CellCount"),converter.getNumCells()));
 		add(new SelectDouble("min",Translator.get("Converter_VoronoiStippling.DotMin"),converter.getMinDotSize()));
+
+		addPropertyChangeListener((evt)->{
+			boolean isDirty=false;
+			if(evt.getPropertyName().equals("count")) {
+				isDirty=true;
+				converter.setNumCells((int)evt.getNewValue());
+			}
+			if(evt.getPropertyName().equals("min")) {
+				isDirty=true;
+				converter.setMinDotSize((double)evt.getNewValue());
+			}
+			if(isDirty) fireRestartConversion();
+		});
 	}
 }

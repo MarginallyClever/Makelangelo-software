@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -53,20 +52,6 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	@Override
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		boolean isDirty=false;
-		if(evt.getPropertyName().equals("count")) {
-			isDirty=true;
-			setNumCells((int)evt.getNewValue());
-		}
-		if(evt.getPropertyName().equals("min")) {
-			isDirty=true;
-			setMinDotSize((double)evt.getNewValue());
-		}
-		if(isDirty) restart();
 	}
 	
 	@Override

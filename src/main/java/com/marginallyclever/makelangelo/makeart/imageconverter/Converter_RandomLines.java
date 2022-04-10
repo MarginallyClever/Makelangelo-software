@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
@@ -20,11 +18,6 @@ public class Converter_RandomLines extends ImageConverter {
 		return Translator.get("ConverterRandomLinesName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("total")) setLineCount((int)evt.getNewValue());
-	}
-	
 	@Override
 	public void finish() {
 		// The picture might be in color.  Smash it to 255 shades of grey.

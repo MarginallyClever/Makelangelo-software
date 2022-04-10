@@ -9,6 +9,10 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Factory for creating {@link Turtle} objects from vector files and writing them to vector files.
+ * @author Dan Royer
+ */
 public class TurtleFactory {
 	private static TurtleLoader [] loaders = {
 		new LoadDXF(),

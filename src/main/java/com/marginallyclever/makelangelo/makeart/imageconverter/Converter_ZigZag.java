@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -312,11 +311,5 @@ public class Converter_ZigZag extends ImageConverter implements PreviewListener 
 		connectTheDots();
 		// Shorten the line that connects the dots
 		generateTSP();
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		// TODO Auto-generated method stub
-		
 	}
 }

@@ -7,8 +7,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
@@ -25,13 +23,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("SpiralPulseName");
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("intensity")) setIntensity((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("spacing")) setSpacing((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("height")) setHeight((double)evt.getNewValue());
 	}
 
 	/**

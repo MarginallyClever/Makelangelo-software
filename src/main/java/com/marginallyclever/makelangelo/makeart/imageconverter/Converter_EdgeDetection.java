@@ -6,8 +6,6 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.beans.PropertyChangeEvent;
-
 /**
  * Uses <a href='http://en.wikipedia.org/wiki/Marching_squares'>marching squares</a> to detect edges.
  * @author Dan Royer
@@ -24,13 +22,6 @@ public class Converter_EdgeDetection extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("Converter_EdgeDetection.name");
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("passes")) passes = (int)evt.getNewValue();
-		if(evt.getPropertyName().equals("stepSize")) stepSize=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("sampleSize")) sampleSize=(int)evt.getNewValue();
 	}
 
 	public int getPasses() {
@@ -186,5 +177,17 @@ public class Converter_EdgeDetection extends ImageConverter {
 		Point2D a = lerpEdge(x0,y1,x0,y0);
 		Point2D b = lerpEdge(x0,y1,x1,y1);
 		line(a,b);
+	}
+
+	public static void setPasses(int newValue) {
+		Converter_EdgeDetection.passes=newValue;
+	}
+
+	public static void setSampleSize(int sampleSize) {
+		Converter_EdgeDetection.sampleSize = sampleSize;
+	}
+
+	public static void setStepSize(int stepSize) {
+		Converter_EdgeDetection.stepSize = stepSize;
 	}
 }

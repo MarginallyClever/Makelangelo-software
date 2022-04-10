@@ -1,8 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
@@ -20,12 +18,6 @@ public class Converter_Boxxy extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("BoxGeneratorName");
-	}
-	
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("size")) setBoxMaxSize((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
 	}
 
 	public void setBoxMaxSize(int arg0) {

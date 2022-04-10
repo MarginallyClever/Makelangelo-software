@@ -11,5 +11,12 @@ public class Converter_SpiralPulse_Panel extends ImageConverterPanel {
 		add(new SelectDouble("intensity", Translator.get("SpiralPulse.intensity"),converter.getIntensity()));
 		add(new SelectDouble("spacing",Translator.get("SpiralPulse.spacing"),converter.getSpacing()));
 		add(new SelectDouble("height",Translator.get("SpiralPulse.height"),converter.getHeight()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("intensity")) converter.setIntensity((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("spacing")) converter.setSpacing((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("height")) converter.setHeight((double)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

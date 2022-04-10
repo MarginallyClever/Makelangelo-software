@@ -31,12 +31,6 @@ public class Converter_Moire extends ImageConverter {
 		return Translator.get("MoireName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
-	}
-	
 	public double getScale() {
 		return blockScale;
 	}

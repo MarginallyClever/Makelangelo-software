@@ -6,9 +6,16 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
 
 public class Converter_Multipass_Panel extends ImageConverterPanel {
 	private static final long serialVersionUID = 1L;
+
 	public Converter_Multipass_Panel(Converter_Multipass converter) {
 		super(converter);
 		add(new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),converter.getAngle()));
 		add(new SelectInteger("level",Translator.get("ConverterMultipassLevels"),converter.getPasses()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("angle")) converter.setAngle((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("levels")) converter.setPasses((int)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }

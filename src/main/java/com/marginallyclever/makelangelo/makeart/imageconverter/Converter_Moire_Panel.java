@@ -16,5 +16,11 @@ public class Converter_Moire_Panel extends ImageConverterPanel {
 		super(converter);
 		add(new SelectDouble("size",Translator.get("HilbertCurveSize"),converter.getScale()));
 		add(new SelectOneOfMany("direction",Translator.get("Direction"),converter.getDirections(),converter.getDirectionIndex()));
+
+		addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("size")) converter.setScale((double)evt.getNewValue());
+			if(evt.getPropertyName().equals("direction")) converter.setDirectionIndex((int)evt.getNewValue());
+			fireRestartConversion();
+		});
 	}
 }
