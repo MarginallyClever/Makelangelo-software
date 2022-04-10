@@ -30,7 +30,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private Paper myPaper;
 
 	private JButton bChoose = new JButton(Translator.get("Open"));
-	private JLabel filename = new JLabel();
+	private JTextArea jtaFilename = new JTextArea();
 
 	private ConvertImagePanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
@@ -45,6 +45,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		add(mySubPanel,BorderLayout.CENTER);
 
+		this.jtaFilename.setEditable(false);
+		this.jtaFilename.setLineWrap(true);
+		
 		openFileChooser = new OpenFileChooser(this);
 		openFileChooser.setOpenListener(this::load);
 	}
@@ -52,9 +55,9 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private JPanel getFileSelectionPanel(String previousFile) {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(bChoose,BorderLayout.WEST);
-		panel.add(filename,BorderLayout.CENTER);
+		panel.add(jtaFilename,BorderLayout.CENTER);
 		
-		filename.setText(previousFile);
+		jtaFilename.setText(previousFile);
 		
 		bChoose.addActionListener((e)-> openFileChooser.chooseFile());
 		

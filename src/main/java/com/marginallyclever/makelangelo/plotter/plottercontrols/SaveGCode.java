@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SaveGCode {
 	private static final Logger logger = LoggerFactory.getLogger(SaveGCode.class);
-	
+
 	private final JFileChooser fc = new JFileChooser();
 
 	public SaveGCode() {
@@ -46,20 +46,60 @@ public class SaveGCode {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
-	public void run(Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
+	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", fileWithExtension);
 
-			int count = countTurtleToolChanges(turtle);
+			logger.debug("turtle.history.size={} trimHead={} trimTail={}", turtle.history.size(), trimHead, trimTail);			
+			Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
+			logger.debug("skinnyTurtle.history.size={} ?=(trimTail-trimHead)={}", skinnyTurtle.history.size(),trimTail-trimHead);
+
+			int count = countTurtleToolChanges(skinnyTurtle);
 			if(count>1) {
-				maybeSaveSeparateFiles(count,fileWithExtension, turtle, plotter,parent);
+				maybeSaveSeparateFiles(count,fileWithExtension, skinnyTurtle, plotter,parent);
 			} else {
-				saveOneFile(fileWithExtension, turtle, plotter);
+				saveOneFile(fileWithExtension, skinnyTurtle, plotter);
 			}
 		}
 	}
+
+	/**
+	 * remove trimHead commands from the start of the turtle history.
+	 * remove trimTail commands from the end of the turtle history.
+	 * Returns the {@link Turtle} with the trimmed history.
+	 * @param turtle the source turtle.
+	 * @return the {@link Turtle} with the trimmed history.
+	 */
+	protected Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
+		Turtle skinny = new Turtle();
+		skinny.history.clear();
+
+		TurtleMove lastTC = null;
+
+		int i=0;
+		for( TurtleMove m : turtle.history ) {
+			if(i<trimHead && m.type == MovementType.TOOL_CHANGE) {
+				// watch for the last tool change
+				lastTC = m;
+			}
+			if(i==trimHead && m.type != MovementType.TOOL_CHANGE) {
+				// we've reached the trimHead point, so start adding commands, starting with the last tool change.
+				skinny.history.add(lastTC);
+			}
+			if(i>=trimHead && i<trimTail) {
+				// between trimHead and trimTail, add all commands.
+				skinny.history.add(m);
+			}
+			++i;
+		}
+		// insurance?
+		skinny.penUp();
+
+		return skinny;
+	}
+
 
 	/**
 	 * Offer to split the gcode file into one file per tool change, which is probably one per color.

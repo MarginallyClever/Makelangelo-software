@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import org.slf4j.Logger;
@@ -380,12 +381,12 @@ public class Turtle implements Cloneable {
 	/**
 	 * @return a list of all the pen-down lines while remembering their color.
  	 */
-	public List<LineSegment2D> getAsLineSegments() {
-		ArrayList<LineSegment2D> lines = new ArrayList<>();
+	public LineCollection getAsLineSegments() {
+		LineCollection lines = new LineCollection();
 		TurtleMove previousMovement=null;
 		ColorRGB color = new ColorRGB(0,0,0);
 
-		logger.debug("  Found {} instructions.", history.size());
+		//logger.debug("  Found {} instructions.", history.size());
 		
 		for( TurtleMove m : history ) {
 			switch (m.type) {
@@ -413,7 +414,7 @@ public class Turtle implements Cloneable {
 	 * Calls {@code addLineSegments} with a default minimum jump size.
 	 * @param segments the list of line segments to add.
 	 */
-	public void addLineSegments(List<LineSegment2D> segments) {
+	public void addLineSegments(LineCollection segments) {
 		addLineSegments(segments,1e-6,1e-6);
 	}
 
@@ -423,7 +424,7 @@ public class Turtle implements Cloneable {
 	 * @param minimumJumpSize For any {@link LineSegment2D} N being added, the Turtle will jump if N.b and (N+1).a are more than minimumJumpSize apart.
 	 * @param minDrawDistance For any {@link LineSegment2D} N being added, the Turtle will not draw line where N.b-N.a is less than minDrawDistance.
 	 */
-	public void addLineSegments(List<LineSegment2D> segments, double minimumJumpSize, double minDrawDistance) {
+	public void addLineSegments(LineCollection segments, double minimumJumpSize, double minDrawDistance) {
 		if(segments.isEmpty()) return;
 		
 		LineSegment2D first = segments.get(0);
@@ -462,16 +463,22 @@ public class Turtle implements Cloneable {
 		List<Turtle> list = new ArrayList<>();
 		Turtle t = new Turtle();
 		list.add(t);
+		TurtleMove lastToolChange = null;
 		
 		for( TurtleMove m : history) {
 			if(m.type==MovementType.TOOL_CHANGE) {
-				t = new Turtle();
-				t.history.clear();
-				list.add(t);
+				if(lastToolChange==null
+						|| !lastToolChange.getColor().equals(m.getColor())
+						|| lastToolChange.getDiameter() != m.getDiameter() ) {
+					t = new Turtle();
+					t.history.clear();
+					list.add(t);
+					lastToolChange = m;
+				}
 			}
 			t.history.add(m);
 		}
-		logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
+		//logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
 
 		List<Turtle> notEmptyList = new ArrayList<>();
 		for( Turtle t2 : list ) {
@@ -479,7 +486,7 @@ public class Turtle implements Cloneable {
 				notEmptyList.add(t2);
 			}
 		}
-		logger.debug("Turtle.splitByToolChange() {} not-empty sections.", notEmptyList.size());
+		//logger.debug("Turtle.splitByToolChange() {} not-empty sections.", notEmptyList.size());
 		
 		return notEmptyList;
 	}

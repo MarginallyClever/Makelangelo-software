@@ -1,6 +1,6 @@
 package com.marginallyclever.donatelloimpl;
 
-import com.marginallyclever.donatelloimpl.nodes.TurtleDAO4JSON;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
 import com.marginallyclever.nodegraphcore.NodeFactory;
@@ -9,6 +9,8 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,17 +20,19 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2022-02-01
  */
 public class TestNodeGraphMakelangelo {
+    private static final Logger logger = LoggerFactory.getLogger(TestNodeGraphMakelangelo.class);
+
     private static NodeGraph model = new NodeGraph();
 
     @BeforeAll
-    public static void beforeAll() {
-        try {
-            NodeFactory.loadRegistries();
-            DAO4JSONFactory.loadRegistries();
-        } catch(Exception e) {
-            System.out.println("*** Exception found: "+e.getMessage()+"***");
-            e.printStackTrace();
-            assert(false);
+    public static void beforeAll() throws Exception {
+        NodeFactory.loadRegistries();
+        DAO4JSONFactory.loadRegistries();
+
+        assertNotEquals(0,NodeFactory.getNames().length);
+        logger.info("NodeFactory.getNames().length="+NodeFactory.getNames().length);
+        for(String s : NodeFactory.getNames()) {
+            logger.info("  found="+s);
         }
     }
 

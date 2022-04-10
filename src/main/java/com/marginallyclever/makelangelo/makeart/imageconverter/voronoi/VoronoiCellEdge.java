@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageConverter.voronoi;
+package com.marginallyclever.makelangelo.makeart.imageconverter.voronoi;
 
 public class VoronoiCellEdge {
 	public double px, py;

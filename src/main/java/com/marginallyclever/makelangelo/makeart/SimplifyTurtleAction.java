@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -33,7 +32,7 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 		int originalCount = originalLines.size();
 		logger.debug("  Converted to {} lines.", originalCount);
 
-		ArrayList<LineSegment2D> longLines = removeColinearSegments(originalLines); 
+		LineCollection longLines = removeColinearSegments(originalLines);
 		int longCount = longLines.size();
 		int shortCount = originalCount - longCount;
 		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
@@ -52,9 +51,9 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 	 * @param originalLines
 	 * @return
 	 */
-	private ArrayList<LineSegment2D> removeColinearSegments(LineCollection originalLines) {
+	private LineCollection removeColinearSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();
-		
+
 		ArrayList<LineCollection> byColor = originalLines.splitByColor();
 		for(LineCollection c : byColor ) {
 			ArrayList<LineCollection> byTravel = c.splitByTravel();

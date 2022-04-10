@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.marlinSimulation;
+package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;

@@ -24,8 +24,8 @@ import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
-import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulation;
-import com.marginallyclever.makelangelo.plotter.marlinSimulation.MarlinSimulationVisualizer;
+import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
+import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
@@ -91,6 +91,8 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
+	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
+	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
 
 	private static Logger logger;
 
@@ -103,9 +105,6 @@ public final class Makelangelo {
 	private static boolean isMacOS = false;
 
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
-	private RangeSlider rangeSlider;
-	private final JLabel labelRangeMin = new JLabel();
-	private final JLabel labelRangeMax = new JLabel();
 	
 	private PlotterRenderer myPlotterRenderer;
 	
@@ -118,8 +117,9 @@ public final class Makelangelo {
 	private RecentFiles recentFiles;
 	private OpenFileChooser openFileChooser;
 
-	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
-	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
+	private RangeSlider rangeSlider;
+	private final JLabel labelRangeMin = new JLabel();
+	private final JLabel labelRangeMax = new JLabel();
 
 	
 	// drag files into the app with {@link DropTarget}
@@ -168,6 +168,7 @@ public final class Makelangelo {
 			msv.setSettings(e);
 		}
 		myTurtleRenderer.setUpColor(e.getPenUpColor());
+		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 	}
 
@@ -289,7 +290,6 @@ public final class Makelangelo {
 		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.setResizable(false);
 		dialog.pack();
@@ -302,6 +302,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
@@ -309,7 +310,6 @@ public final class Makelangelo {
 		PaperSettings settings = new PaperSettings(myPaper);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PaperSettings.Title"));
 		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setMinimumSize(new Dimension(300,300));
 		dialog.pack();
 
@@ -322,6 +322,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
@@ -402,9 +403,12 @@ public final class Makelangelo {
 
 	private void saveGCode() {
 		logger.debug("Saving to gcode...");
+
 		SaveGCode save = new SaveGCode();
 		try {
-			save.run(myTurtle, myPlotter, mainFrame);
+			int head = rangeSlider.getValue();
+			int tail = rangeSlider.getUpperValue();
+			save.run(myTurtle, myPlotter, mainFrame, head, tail);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -425,7 +429,6 @@ public final class Makelangelo {
 		dialog.setMinimumSize(new Dimension(PlotterControls.DIMENSION_PANEL_WIDTH, PlotterControls.DIMENSION_PANEL_HEIGHT));
 		PlotterControls plotterControls = new PlotterControls(myPlotter,myTurtle, dialog);
 		dialog.add(plotterControls);
-		dialog.setLocationRelativeTo(mainFrame);
 		dialog.pack();
 
 		enableMenuBar(false);
@@ -437,6 +440,7 @@ public final class Makelangelo {
 			}
 		});
 
+		dialog.setLocationRelativeTo(mainFrame);
 		dialog.setVisible(true);
 	}
 
@@ -658,12 +662,12 @@ public final class Makelangelo {
 		
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-		buttonZoomOut.addActionListener((e) -> camera.zoomOut());
+		buttonZoomOut.addActionListener((e) -> camera.zoom(1));
 		menu.add(buttonZoomOut);
 
 		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-		buttonZoomIn.addActionListener((e) -> camera.zoomIn());
+		buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
 		menu.add(buttonZoomIn);
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);

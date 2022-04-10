@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -28,17 +29,15 @@ public class InfillTurtle {
 	public InfillTurtle() {}
 
 	public Turtle run(Turtle input) throws Exception {
-		logger.debug("InfillTurtle.run()");
 		// confirmTurtleIsClosedLoop(input);
 
 		Turtle result = new Turtle();
+		result.history.clear();
 
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
-			List<LineSegment2D> segments = infillFromTurtle(t);
-			Turtle t2 = new Turtle();
-			t2.addLineSegments(segments);
-			result.add(t2);
+			LineCollection segments = infillFromTurtle(t);
+			result.addLineSegments(segments);
 		}
 
 		return result;
@@ -49,16 +48,15 @@ public class InfillTurtle {
 		throw new Exception("I cannot confirm this Turtle path is a closed loop.");
 	}
 
-	private List<LineSegment2D> infillFromTurtle(Turtle input) {
-		logger.debug("  infillFromTurtle()");
+	private LineCollection infillFromTurtle(Turtle input) {
 		// make sure line segments don't start on another line, leading to an odd number
 		// of intersections.
 		Rectangle2D.Double bounds = addPaddingToBounds(input.getBounds(), 2.0);
 
-		List<LineSegment2D> results = new ArrayList<>();
+		LineCollection results = new LineCollection();
 
 		// do this once here instead of once per line.
-		List<LineSegment2D> convertedPath = input.getAsLineSegments();
+		LineCollection convertedPath = input.getAsLineSegments();
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2D(), new Point2D(), input.getColor());
 
@@ -79,15 +77,12 @@ public class InfillTurtle {
 	 * @return the larger bounds
 	 */
 	private Rectangle2D.Double addPaddingToBounds(Rectangle2D.Double before, double percent) {
-		logger.debug("  addPaddingToBounds()");
 		percent*=0.01;
 		Rectangle2D.Double after = new Rectangle2D.Double();
 		after.x = before.x - before.width * percent/2.0;
 		after.y = before.y - before.height * percent/2.0;
 		after.height = before.height * (1.0 + percent);
 		after.width = before.width * (1.0 + percent);
-		logger.debug("    before={}", before);
-		logger.debug("    after={}", after);
 		return after;
 	}
 
@@ -109,7 +104,7 @@ public class InfillTurtle {
 	 * @param convertedPath The boundary line, which must be a closed loop
 	 * @return a list of remaining {@link LineSegment2D}.
 	 */
-	private List<LineSegment2D> trimLineToPath(LineSegment2D line, List<LineSegment2D> convertedPath) {
+	private LineCollection trimLineToPath(LineSegment2D line, LineCollection convertedPath) {
 		List<Point2D> intersections = new ArrayList<>();
 
 		for (LineSegment2D s : convertedPath) {
@@ -117,7 +112,7 @@ public class InfillTurtle {
 			if (p != null) intersections.add(p);
 		}
 
-		List<LineSegment2D> results = new ArrayList<>();
+		LineCollection results = new LineCollection();
 		int size = intersections.size();
 		if(size%2==0) {
 			if (size == 2) {
@@ -137,7 +132,7 @@ public class InfillTurtle {
 	 * @return return Intersections sorted by ascending x value. If x values match,
 	 *         sort by ascending y value.
 	 */
-	private List<LineSegment2D> sortIntersectionsIntoSegments(List<Point2D> intersections, ColorRGB color) {
+	private LineCollection sortIntersectionsIntoSegments(List<Point2D> intersections, ColorRGB color) {
 		logger.debug("  sortIntersectionsIntoSegments() {}", intersections.size());
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
@@ -147,7 +142,7 @@ public class InfillTurtle {
 			intersections.sort(new ComparePointsByX());
 		}
 
-		List<LineSegment2D> results = new ArrayList<>();
+		LineCollection results = new LineCollection();
 		int i = 0;
 		while (i < intersections.size()-1) {
 			results.add(new LineSegment2D(intersections.get(i), intersections.get(i + 1), color));
