@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.makeart.imageFilter;
-
-import java.awt.Color;
+package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+
+import java.awt.*;
 
 /**
  * Filters modify a BufferedImage.

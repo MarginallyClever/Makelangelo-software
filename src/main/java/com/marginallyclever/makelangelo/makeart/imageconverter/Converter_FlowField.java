@@ -148,7 +148,7 @@ public class Converter_FlowField extends ImageConverter {
 	 */
 	@Override
 	public void finish() {
-		com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite bw = new com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite(255);
+		com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite bw = new com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 
 		// get all the flow lines.

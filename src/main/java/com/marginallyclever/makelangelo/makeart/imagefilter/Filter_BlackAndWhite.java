@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.imageFilter;
+package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import org.slf4j.Logger;

@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_GaussianBlur;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_GaussianBlur;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class Converter_ColorFloodFill extends ImageConverter {
 		for (float y = y0; y < y1; ++y) {
 			for (float x = x0; x < x1; ++x) {
 				if(imgMask.canSampleAt(x, y)) {
-					imgMask.getSourceImage().setRGB(imgMask.getTransformedX(x), imgMask.getTransformedY(y), c);
+					imgMask.setRGB(x,y,c);
 				}
 			}
 		}
