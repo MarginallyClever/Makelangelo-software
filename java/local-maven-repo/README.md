@@ -1,6 +1,7 @@
 # How to add or update a lib in this folder ?
 
-Here the procedure to update the jar of [jogamp](https://jogamp.org/): download the fat jar from https://jogamp.org/deployment/archive/rc/ and put it the root of the Makelangelo-software folder and run the following command :
+Here the procedure to update the jar of [jogamp](https://jogamp.org/): 
+- Download the fat jar and the associate sources zip from https://jogamp.org/deployment/archive/rc/, put them in the root of the Makelangelo-software folder
 
 - Cleanup previous lib: 
 ```shell
