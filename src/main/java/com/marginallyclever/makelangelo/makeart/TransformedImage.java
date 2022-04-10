@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyclever.makelangelo.makeart.imageFilter.ImageFilter;
+import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -20,7 +20,6 @@ public class TransformedImage {
 	private BufferedImage sourceImage;
 	private float scaleX, scaleY;
 	private float translateX, translateY;
-	private float rotationDegrees;
 	private int colorChannel;
 
 	public TransformedImage(BufferedImage src) {
@@ -29,7 +28,6 @@ public class TransformedImage {
 		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
 		scaleY = -1;
-		rotationDegrees = 0;
 		colorChannel = 0;
 	}
 
@@ -47,7 +45,6 @@ public class TransformedImage {
 		translateY = copy.translateY;
 		scaleX = copy.scaleX;
 		scaleY = copy.scaleY;
-		rotationDegrees = copy.rotationDegrees;
 		colorChannel = copy.colorChannel;
 	}
 
@@ -65,12 +62,7 @@ public class TransformedImage {
 		scaleY = other.scaleY;
 		translateX = other.translateX;
 		translateY = other.translateY;
-		rotationDegrees = other.rotationDegrees;
 		colorChannel = other.colorChannel;
-	}
-
-	public float getRotationDegrees() {
-		return rotationDegrees;
 	}
 
 	public float getScaleX() {
@@ -80,33 +72,17 @@ public class TransformedImage {
 	public float getScaleY() {
 		return scaleY;
 	}
-
-	public float getTranslateX() {
-		return translateX;
-	}
-
-	public float getTranslateY() {
-		return translateY;
-	}
 	
 	public BufferedImage getSourceImage() {
 		return sourceImage;
 	}
 
-	public int getTransformedX(double x) {
+	private int getTransformedX(double x) {
 		return (int) ((x / scaleX) - translateX);
 	}
 
 	public int getTransformedY(double y) {
 		return (int) ((y / scaleY) - translateY);
-	}
-	
-	public void rotateAbsolute(float degrees) {
-		rotationDegrees = degrees;
-	}
-
-	public void rotateRelative(float degrees) {
-		rotationDegrees += degrees;
 	}
 
 	/**
@@ -273,14 +249,8 @@ public class TransformedImage {
 		scaleX = x;
 		scaleY = y;
 	}
-	
-	@Deprecated
-	public void translateX(float x) {
-		translateX = x;
-	}
 
-	@Deprecated
-	public void translateY(float y) {
-		translateY += y;
+	public void setRGB(float x, float y, int c) {
+		sourceImage.setRGB(getTransformedX(x), getTransformedY(y), c);
 	}
 }
