@@ -8,13 +8,9 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 /**
- * TransformedImage is a BufferedImage, scaled, rotated, and translated
- * somewhere on the drawing area (aka paper space). All sampling interactions
- * with TransformedImage are done in paper space coordinates, and
- * TransformedImage takes care of the rest.
- * 
- * @author droyer
- *
+ * TransformedImage is a {@link BufferedImage}, scaled and translated somewhere on the drawing area (aka paper space).
+ * All sampling interactions are done in paper space coordinates and TransformedImage takes care of the rest.
+ * @author Dan Royer
  */
 public class TransformedImage {
 	private BufferedImage sourceImage;
