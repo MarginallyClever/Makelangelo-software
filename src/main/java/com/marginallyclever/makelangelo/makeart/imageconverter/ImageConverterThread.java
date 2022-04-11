@@ -11,10 +11,10 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private ImageConverter chosenConverter;
 	private String name;
 
-	public ImageConverterThread(ImageConverter converter,String name) {
+	public ImageConverterThread(ImageConverter converter) {
 		super();
 		chosenConverter = converter;
-		this.name = name;
+		this.name = converter.getName();
 		
 		chosenConverter.setThread(this);
 	}
@@ -43,15 +43,9 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	
 	@Override
 	public void done() {
-		String state;
+		if(!isCancelled()) chosenConverter.finish();
 
-		if(isCancelled()) {
-			state = "cancelled";
-		} else {
-			chosenConverter.finish();
-			state = "finished";
-		}
-		
+		String state = isCancelled() ? "cancelled" : "finished";
 		logger.debug("{} thread {}", state, name);
 	}
 }

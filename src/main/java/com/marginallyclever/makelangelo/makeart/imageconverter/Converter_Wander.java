@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +23,11 @@ import java.util.LinkedList;
 public class Converter_Wander extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_Wander.class);
 	
-	static protected int numLines = 9000;
-	static protected boolean isCMYK = false;
+	static private int numLines = 9000;
+	static private boolean isCMYK = false;
+	static private double stepSize = 5.0;
 	
-	class Bucket {
+	private class Bucket {
 		public Point2D a,b;
 		public LinkedList<Point2D> unsortedPoints;
 		public LinkedList<Point2D> sortedPoints;
@@ -32,13 +35,27 @@ public class Converter_Wander extends ImageConverter {
 		public Bucket() {
 			a = new Point2D.Double();
 			b = new Point2D.Double();
-			unsortedPoints = new LinkedList<Point2D>();
-			sortedPoints = new LinkedList<Point2D>();
+			unsortedPoints = new LinkedList<>();
+			sortedPoints = new LinkedList<>();
 		}
-	};
+	}
 
-	private LinkedList<Bucket> buckets;
-	
+
+	public Converter_Wander() {
+		super();
+		SelectInteger selectCount = new SelectInteger("count",Translator.get("ConverterWanderLineCount"),getLineCount());
+		add(selectCount);
+		selectCount.addPropertyChangeListener(evt->{
+			setLineCount((int)evt.getNewValue());
+			fireRestart();
+		});
+		SelectBoolean selectCmyk = new SelectBoolean("cmyk",Translator.get("ConverterWanderCMYK"),isCMYK());
+		add(selectCmyk);
+		selectCmyk.addPropertyChangeListener(evt->{
+			setCMYK((boolean)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {
@@ -54,9 +71,8 @@ public class Converter_Wander extends ImageConverter {
 		}
 	}
 
-	protected int outputChannel(TransformedImage img, ColorRGB newColor, int pointsPerChannel, double cutoff) {
-		double stepSize = 5.0;
-		if (stepSize < 1) stepSize = 1;
+	protected void outputChannel(TransformedImage img, ColorRGB newColor, int pointsPerChannel, double cutoff) {
+		stepSize = Math.max(1,stepSize);
 		double halfStep = stepSize/2;
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
@@ -71,10 +87,9 @@ public class Converter_Wander extends ImageConverter {
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;
 		double width = xRight - xLeft-1;
-		Point2D a = null;
 		
 		//logger.debug("Creating buckets in a Z pattern...");
-		buckets = new LinkedList<Bucket>();
+		LinkedList<Bucket> buckets = new LinkedList<>();
 		int actualPoints=0;
 		double wMod = width/5.0;
 		double hMod = height/10.0;
@@ -110,7 +125,7 @@ public class Converter_Wander extends ImageConverter {
 			if(tries==1000) break;  // ran out of points to try?
 
 			int j;
-			for(j=0;j<buckets.size();++j) {
+			for(j=0; j< buckets.size(); ++j) {
 				Bucket b = buckets.get(j);
 				if( b.a.getX()<=endPX && b.b.getX()>endPX && 
 				    b.a.getY()<=endPY && b.b.getY()>endPY ) {
@@ -123,26 +138,25 @@ public class Converter_Wander extends ImageConverter {
 
 		// sort the points by nearest neighbor first.
 		logger.debug("Sorting {} points...", actualPoints);
-		for(int j=0;j<buckets.size();++j) {
+		for (Bucket bucket : buckets) {
 			//logger.debug(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
-			a = new Point2D.Double(0,0);
-			
-			Bucket b = buckets.get(j);
-			if(!b.unsortedPoints.isEmpty()) {
-				while(!b.unsortedPoints.isEmpty()) {
+			Point2D a = new Point2D.Double(0, 0);
+
+			if (!bucket.unsortedPoints.isEmpty()) {
+				while (!bucket.unsortedPoints.isEmpty()) {
 					double bestLen = Double.MAX_VALUE;
-					int bestI=0;
-					for(int i=0;i<b.unsortedPoints.size();++i) {
-						double len = a.distanceSq(b.unsortedPoints.get(i));
-						if(bestLen > len) {
+					int bestI = 0;
+					for (int i = 0; i < bucket.unsortedPoints.size(); ++i) {
+						double len = a.distanceSq(bucket.unsortedPoints.get(i));
+						if (bestLen > len) {
 							bestLen = len;
 							bestI = i;
 						}
 					}
-					a = b.unsortedPoints.remove(bestI);
-					b.sortedPoints.addLast(a);
+					a = bucket.unsortedPoints.remove(bestI);
+					bucket.sortedPoints.addLast(a);
 				}
 			}
 		}
@@ -151,17 +165,14 @@ public class Converter_Wander extends ImageConverter {
 		// draw the sorted list of points.
 		logger.debug("Drawing points...");	
 		turtle.setColor(newColor);
-	
-		for(int j=0;j<buckets.size();++j) {
-			Bucket b = buckets.get(j);
-			while(!b.sortedPoints.isEmpty()) {
-				a = b.sortedPoints.pop();
-				turtle.moveTo(a.getX(),a.getY());
+
+		for (Bucket bucket : buckets) {
+			while (!bucket.sortedPoints.isEmpty()) {
+				Point2D a = bucket.sortedPoints.pop();
+				turtle.moveTo(a.getX(), a.getY());
 				turtle.penDown();
 			}
 		}
-		
-		return actualPoints;
 	}
 	
 	protected void finishCMYK() {
@@ -171,7 +182,7 @@ public class Converter_Wander extends ImageConverter {
 		turtle = new Turtle();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines,255.0*3.0/4.0);
-		logger.debug("Cyan...");			outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines,128.0);
+		logger.debug("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines,128.0);
 		logger.debug("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines,128.0);
 		logger.debug("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines,128.0);
 		logger.debug("Finishing...");

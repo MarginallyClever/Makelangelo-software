@@ -5,9 +5,13 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
@@ -26,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Dan
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends ImageConverter implements PreviewListener {
+public class Converter_VoronoiStippling extends IterativeImageConverter implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiStippling.class);
 	private static boolean drawVoronoi = false;
 	private static int numCells = 1000;
@@ -39,9 +43,45 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	private final Lock lock = new ReentrantLock();
 
 	private int iterations;
-	
+
 	public Converter_VoronoiStippling() {
 		super();
+
+		SelectInteger selectCells = new SelectInteger("cells", Translator.get("Converter_VoronoiStippling.CellCount"), getNumCells());
+		SelectDouble selectMax = new SelectDouble("max", Translator.get("Converter_VoronoiStippling.DotMax"), getMaxDotSize());
+		SelectDouble selectMin = new SelectDouble("min", Translator.get("Converter_VoronoiStippling.DotMin"), getMinDotSize());
+		SelectDouble selectCutoff = new SelectDouble("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), getCutoff());
+		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
+		SelectBoolean selectKeepGoing = new SelectBoolean("keepGoing", Translator.get("Converter_VoronoiStippling.keepGoing"), getKeepGoing());
+
+		add(selectCells);
+		add(selectMax);
+		add(selectMin);
+		add(selectCutoff);
+		add(selectDrawVoronoi);
+		add(selectKeepGoing);
+
+		selectCells.addPropertyChangeListener(evt -> {
+			setNumCells((int) evt.getNewValue());
+			selectKeepGoing.setSelected(true);
+			fireRestart();
+		});
+		selectMax.addPropertyChangeListener(evt -> {
+			setMaxDotSize((double) evt.getNewValue());
+		});
+		selectMin.addPropertyChangeListener(evt -> {
+			setMinDotSize((double) evt.getNewValue());
+
+		});
+		selectCutoff.addPropertyChangeListener(evt -> {
+			setCutoff((double) evt.getNewValue());
+		});
+		selectDrawVoronoi.addPropertyChangeListener(evt -> {
+			setDrawVoronoi((boolean) evt.getNewValue());
+		});
+		selectKeepGoing.addPropertyChangeListener(evt -> {
+			setKeepGoing((boolean) evt.getNewValue());
+		});
 	}
 	
 	@Override
@@ -55,7 +95,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		myImage = bw.filter(img);
-		keepIterating=true;
+		setKeepGoing(true);
 		restart();
 	}
 
@@ -66,13 +106,12 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		try {
 			double noiseLevel = evolveCells();
 			System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
-			keepIterating = noiseLevel > numCells/2;
 		}
 		finally {
 			lock.unlock();
 		}
 
-		return keepIterating;
+		return getKeepGoing();
 	}
 
 	/**
@@ -128,6 +167,8 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 				double dy = wy - cell.center.y;
 				change += Math.sqrt(dx*dx+dy*dy);
 				cell.center.set(wx,wy);
+			} else {
+				cell.weight=0;
 			}
 		}
 		return change;
@@ -147,8 +188,10 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 
 		lock.lock();
 		try {
-			iterations = 0;
-			keepIterating = true;
+			turtle = new Turtle();
+
+			iterations=0;
+			setKeepGoing(true);
 
 			Rectangle2D bounds = myPaper.getMarginRectangle();
 			cells.clear();
@@ -165,12 +208,14 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 
 	@Override
 	public void finish() {
-		keepIterating=false;
+		setKeepGoing(false);
 		writeOutCells();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
+		if(!getKeepGoing()) return;
+
 		lock.lock();
 		try {
 			if (drawVoronoi) renderEdges(gl2);
@@ -202,73 +247,74 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		for( VoronoiCell c : cells ) {
 			double x = c.center.x;
 			double y = c.center.y;
-			myImage.canSampleAt(x,y);
-			double val = 1.0 - myImage.sample(x,y,3)/255.0;
-			if(val>cutoff) {
-				double r = val * scale + minDotSize;
-				gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-				for(int j = 0; j < 8; ++j) {
-					double d = j * 2.0 * Math.PI / 8.0;
-					gl2.glVertex2d(x + Math.cos(d) * r,
-								   y + Math.sin(d) * r);
-				}
-				gl2.glEnd();
-			}
+
+			double val = c.weight/255.0;
+			if(val<cutoff) continue;
+
+			double r = val * scale + minDotSize;
+			drawCircle(gl2,x,y,r);
 		}
+	}
+
+	private void drawCircle(GL2 gl2,double x, double y, double r) {
+		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		for(int j = 0; j < 8; ++j) {
+			double d = j * 2.0 * Math.PI / 8.0;
+			gl2.glVertex2d(x + Math.cos(d) * r,
+					y + Math.sin(d) * r);
+		}
+		gl2.glEnd();
 	}
 
 	/**
 	 * write cell centers to gcode.
 	 */
 	private void writeOutCells() {
-		turtle = new Turtle();
-
-		double toolDiameter = 1;
+		double scale = maxDotSize - minDotSize;
 
 		for( VoronoiCell c : cells ) {
 			double x = c.center.x;
 			double y = c.center.y;
-			double val = c.weight/255.0f;
+			double val = c.weight/255.0;
 			if(val<cutoff) continue;
 
-			double r = val * (maxDotSize-minDotSize);
+			double r = val * scale + minDotSize;
 
-			double newX=0,newY=0;
-			boolean first=true;
-			// filled circles
-			while (r > 0) {
-				float detail = (float)Math.ceil(Math.PI * r*2 / (toolDiameter*4));
-				if (detail < 4) detail = 4;
-				if (detail > 20) detail = 20;
-				for (float j = 0; j <= detail; ++j) {
-					double v = Math.PI * 2.0f * j / detail;
-					newX = x + r * Math.cos(v);
-					newY = y + r * Math.sin(v);
-					if(first) {
-						if(isInsidePaperMargins(newX,newY)) {
-							turtle.jumpTo(newX, newY);
-							first=false;
-						}
-					} else {
-						turtle.moveTo(newX, newY);
-					}
-				}
-				r -= toolDiameter;
-			}
-			if(first==false) {
-				turtle.penUp();
-			}
+			turtleCircle(x,y,r);
 		}
 	}
 
-	public void setNumCells(int value) {
-		if(value<1) value=1;
-		if(numCells!=value) {
-			numCells = value;
-			if(keepIterating) {
-				restart();
+	// filled circles
+	private void turtleCircle(double x, double y, double r) {
+		double toolDiameter = 1;
+
+		Turtle circle = new Turtle();
+
+		float detail = (float)Math.ceil(r * Math.PI * 2.0);
+		detail = Math.max(4, Math.min(20,detail));
+		boolean first = true;
+
+		for (float j = 0; j <= detail; ++j) {
+			double v = Math.PI * 2.0f * j / detail;
+			double newX = x + r * Math.cos(v);
+			double newY = y + r * Math.sin(v);
+			if(first) {
+				circle.jumpTo(newX, newY);
+				first=false;
+			} else {
+				circle.moveTo(newX, newY);
 			}
 		}
+		InfillTurtle filler = new InfillTurtle();
+		try {
+			turtle.add(circle);
+			turtle.add(filler.run(circle));
+		} catch(Exception e) {}
+	}
+
+	public void setNumCells(int value) {
+		value = Math.max(1,value);
+		if(numCells!=value) numCells = value;
 	}
 	
 	public int getNumCells() {
@@ -276,16 +322,14 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 	}
 	
 	public void setMinDotSize(double value) {
-		if(value<0.001) value=0.001f;
-		minDotSize = value;
+		minDotSize = Math.max(0.001,value);
 	}
 	public double getMinDotSize() {
 		return minDotSize;
 	}
 	
 	public void setCutoff(double value) {
-		if(value<0f) value=0f;
-		cutoff = value;
+		cutoff = Math.max(0,Math.min(255,value));
 	}
 	public double getCutoff() {
 		return cutoff;
@@ -295,7 +339,7 @@ public class Converter_VoronoiStippling extends ImageConverter implements Previe
 		return maxDotSize;
 	}
 	public void setMaxDotSize(double value) {
-		if(value<=minDotSize) value=minDotSize+1;
+		value = Math.max(value,minDotSize+1);
 		maxDotSize = value;
 	}
 

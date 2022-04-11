@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,17 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Spiral.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
+	public Converter_CMYK_Spiral() {
+		super();
+
+		SelectBoolean toCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"), getToCorners());
+		toCorners.addPropertyChangeListener(evt->{
+			setToCorners((boolean)evt.getNewValue());
+			fireRestart();
+		});
+		add(toCorners);
+	}
+	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralCMYKName");
@@ -101,9 +113,8 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 				double r1 = r - toolDiameter * p;
 				fx = cx + Math.cos(f) * r1;
 				fy = cy + Math.sin(f) * r1;
-				
-				boolean isInside = isInsidePaperMargins(fx, fy);
-				if(isInside) {
+
+				if(myPaper.isInsidePaperMargins(fx, fy)) {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {

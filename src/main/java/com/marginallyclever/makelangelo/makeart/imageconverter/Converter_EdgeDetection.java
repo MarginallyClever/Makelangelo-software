@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -18,6 +19,25 @@ public class Converter_EdgeDetection extends ImageConverter {
 
 	private int edge;
 	private TransformedImage img;
+
+	public Converter_EdgeDetection() {
+		super();
+		SelectSlider selectPasses     = new SelectSlider("passes", Translator.get("Converter_EdgeDetection.passes"), 20, 1, (int) (getPasses()));
+		SelectSlider selectStepSize   = new SelectSlider("stepSize", Translator.get("Converter_EdgeDetection.stepSize"), 25, 2, (int) getStepSize());
+		SelectSlider selectSampleSize = new SelectSlider("sampleSize", Translator.get("Converter_EdgeDetection.sampleSize"), 5, 1, (int) getSampleSize());
+		selectPasses.addPropertyChangeListener(evt->{
+			setPasses((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectStepSize.addPropertyChangeListener(evt->{
+			setStepSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectSampleSize.addPropertyChangeListener(evt->{
+			setSampleSize((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
 
 	@Override
 	public String getName() {

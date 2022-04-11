@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.SwingWorker.StateValue;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 
-public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterPanelListener {
+public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 	private static final long serialVersionUID = 5574250944369730761L;
 
@@ -47,10 +46,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private final JPanel cards = new JPanel(new CardLayout());
 	private final ArrayList<ImageConverterThread> workerList = new ArrayList<>();
 
-	private ImageConverterPanel myConverterPanel;
+	private ImageConverter myConverter;
 	private ImageConverterThread imageConverterThread;
-	private int workerCount = 0;
-	private ProgressMonitor progressMonitor;
 	
 	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
 		super();
@@ -105,14 +102,14 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		this.add(cards,c);
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
-		changeConverter(ImageConverterFactory.list[first]);
+		changeConverter(ImageConverterFactory.getList()[first]);
 	}
 	
 	private JComboBox<String> getStyleSelection() {
 		ArrayList<String> imageConverterNames = new ArrayList<>();
-		for( ImageConverterPanel i : ImageConverterFactory.list ) {
-			imageConverterNames.add(i.getConverter().getName());
-			cards.add(i,i.getConverter().getName());
+		for( ImageConverter i : ImageConverterFactory.getList() ) {
+			imageConverterNames.add(i.getName());
+			cards.add(new ImageConverterPanel(i), i.getName());
 		}
 		
 		JComboBox<String> box = new JComboBox<>(imageConverterNames.toArray(new String[0]));
@@ -131,7 +128,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
 		setPreferredDrawStyle(first);
-		changeConverter(ImageConverterFactory.list[first]);
+		changeConverter(ImageConverterFactory.getList()[first]);
 	}
 
 	private JComboBox<String> getFillSelection() {
@@ -153,38 +150,24 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	private void scaleLoader(int mode) {
+		double width  = myPaper.getMarginWidth();
+		double height = myPaper.getMarginHeight();
+
+		boolean test;
 		switch(mode) {
-			case 0:  scaleToFillPaper();  break;
-			case 1:  scaleToFitPaper();  break;
-			default: break;
+			case 0 :  test = width > height;  break; // fill paper
+			default:  test = width < height;  break; // fit paper
 		}
-		reconvert();
-	}
-
-	private void scaleToFillPaper() {
-		double width  = myPaper.getMarginWidth();
-		double height = myPaper.getMarginHeight();
 
 		float f;
-		if( width > height ) {
+		if( test ) {
 			f = (float)( width / (double)myImage.getSourceImage().getWidth() );
 		} else {
 			f = (float)( height / (double)myImage.getSourceImage().getHeight() );
 		}
 		myImage.setScale(f,-f);
-	}
-	
-	private void scaleToFitPaper() {
-		double width  = myPaper.getMarginWidth();
-		double height = myPaper.getMarginHeight();
-		
-		float f;
-		if( width < height ) {
-			f = (float)( width / (double)myImage.getSourceImage().getWidth() );
-		} else {
-			f = (float)( height / (double)myImage.getSourceImage().getHeight() );
-		}
-		myImage.setScale(f,-f);
+
+		restart();
 	}
 
 	private void setPreferredDrawStyle(int style) {
@@ -211,44 +194,15 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	private void stopConversion() {
 		logger.debug("Stop conversion");
-		if(imageConverterThread!=null) imageConverterThread.cancel(true);
-		stopWorker();
-	}
-	
-	private void startConversion() {
-		if(myConverterPanel==null || myImage==null) return;
-		logger.debug("startConversion() {}", myConverterPanel.getName());
-		startWorker();
-	}
-	
-	private void changeConverter(ImageConverterPanel chosenPanel) {
-		if( chosenPanel == myConverterPanel ) return;
-		logger.debug("changeConverter() {}", chosenPanel.getName());
-		stopConversion();
-		if(myConverterPanel != null) myConverterPanel.removeImageConverterPanelListener(this);
-		myConverterPanel = chosenPanel;
-		myConverterPanel.addImageConverterPanelListener(this);
-		startConversion();
-	}
 
-
-	@Override
-	public void reconvert(ImageConverterPanel panel) {
-		reconvert();
-	}
-
-	private void reconvert() {
-		logger.debug("reconvert()");
-		stopConversion();
-		startConversion();
-	}
-	
-	private void stopWorker() {
-		if(myConverterPanel!=null) {
-			myConverterPanel.getConverter().stopIterating();
+		if(myConverter != null) {
+			if(myConverter instanceof IterativeImageConverter) {
+				((IterativeImageConverter)myConverter).stopIterating();
+			}
+			myConverter.removeImageConverterListener(this);
 		}
+
 		if(imageConverterThread!=null) {
-			logger.debug("Stopping worker");
 			if(imageConverterThread.cancel(true)) {
 				logger.debug("stop OK");
 			} else {
@@ -256,63 +210,43 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 			}
 		}
 	}
+	
+	private void startConversion() {
+		if(myConverter==null || myImage==null || myPaper==null) return;
 
-	private void startWorker() {
-		if(myImage==null || myPaper==null) return;
-		
-		logger.debug("startWorker()");
-		
-		progressMonitor = new ProgressMonitor(null, Translator.get("Converting"), "", 0, 100);
-		progressMonitor.setProgress(0);
-		progressMonitor.setMillisToPopup(0);
-		
-		ImageConverter converter = myConverterPanel.getConverter();
-		converter.setProgressMonitor(progressMonitor);
-		converter.setPaper(myPaper);
-		converter.setImage(myImage);
-		
-		imageConverterThread = getNewWorker(converter,workerCount);
+		logger.debug("startConversion() {}", myConverter.getName());
+
+		myConverter.setPaper(myPaper);
+		myConverter.setImage(myImage);
+		myConverter.addImageConverterListener(this);
+
+		imageConverterThread = new ImageConverterThread(myConverter);
 		addWorker(imageConverterThread);
 		imageConverterThread.execute();
 	}
 	
-	private ImageConverterThread getNewWorker(ImageConverter converter, int workerCount2) {
-		ImageConverterThread thread = new ImageConverterThread(converter,Integer.toString(workerCount2));
-		
-		thread.addPropertyChangeListener((evt) -> {
-			String propertyName = evt.getPropertyName(); 
-			if(propertyName.equals("progress")) {
-				int progress = (Integer) evt.getNewValue();
-				progressMonitor.setProgress(progress);
-				String message = String.format("%d%%.\n", progress);
-				progressMonitor.setNote(message);
-			}
-			if(propertyName.equals("state")) {
-				if(evt.getNewValue()==StateValue.DONE) {
-					if (imageConverterThread.isDone()) {
-						logger.debug("Finished");
-						notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
-					} else if (imageConverterThread.isCancelled() || progressMonitor.isCanceled()) {
-						logger.debug("Cancelled");
-						if(progressMonitor.isCanceled()) imageConverterThread.cancel(true);
-					}
-					removeWorker(thread);
-				}
-			}
-		});
+	private void changeConverter(ImageConverter converter) {
+		if( converter == myConverter ) return;
+		logger.debug("changeConverter() {}", converter.getName());
 
-		return thread;
+		stopConversion();
+		myConverter = converter;
+		startConversion();
 	}
-	
+
+	private void restart() {
+		logger.debug("restart()");
+		stopConversion();
+		startConversion();
+	}
+
 	private void addWorker(ImageConverterThread thread) {
 		workerList.add(thread);
-		workerCount++;
 		logger.debug("Added worker. {} workers now.", workerList.size());
 	}
 	
 	private void removeWorker(ImageConverterThread thread) {
 		workerList.remove(thread);
-		workerCount--;
 		logger.debug("Removed worker. {} workers now.", workerList.size());
 		if(imageConverterThread==thread)
 			imageConverterThread=null;
@@ -320,15 +254,24 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	@Override
 	public void render(GL2 gl2) {
-		ImageConverter converter = myConverterPanel.getConverter();
-		if( converter != null && converter instanceof PreviewListener ) {
-			((PreviewListener)converter).render(gl2);
+		if( myConverter != null && myConverter instanceof PreviewListener ) {
+			((PreviewListener)myConverter).render(gl2);
 		}
+	}
+
+	@Override
+	public void onRestart(ImageConverter converter) {
+		restart();
+	}
+
+	@Override
+	public void onConvertFinished(ImageConverter converter) {
+		notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
 	}
 
 	// OBSERVER PATTERN
 
-	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+	private ArrayList<ActionListener> listeners = new ArrayList<>();
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);
 	}
@@ -342,7 +285,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 			a.actionPerformed(e);
 		}
 	}
-	
+
 	// TEST
 	
 	public static void main(String[] args) throws Exception {

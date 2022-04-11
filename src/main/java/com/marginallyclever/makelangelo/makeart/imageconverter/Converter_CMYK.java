@@ -4,6 +4,8 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,20 @@ import org.slf4j.LoggerFactory;
 public class Converter_CMYK extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK.class);
 	static protected int passes=1;// passes value have to be >=1.
-	
+
+	public Converter_CMYK() {
+		super();
+
+		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("ConverterCMYKPasses"), 5, 1, getPasses());
+		selectPasses.addPropertyChangeListener(evt->{
+			setPasses((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPasses);
+
+		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("ConverterCMYKName");

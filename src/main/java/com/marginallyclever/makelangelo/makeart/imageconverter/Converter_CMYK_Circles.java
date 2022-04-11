@@ -7,6 +7,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,20 @@ import org.slf4j.LoggerFactory;
 public class Converter_CMYK_Circles extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Circles.class);
 	static protected int maxCircleRadius =5;
-	
+
+	public Converter_CMYK_Circles() {
+		super();
+
+		SelectSlider maxCircleSize = new SelectSlider("maxCircleSize", Translator.get("Converter_CMYK_Circles.maxCircleSize"), 10, 1, getMaxCircleSize());
+		maxCircleSize.addPropertyChangeListener((evt)->{
+			setMaxCircleSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(maxCircleSize);
+
+		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("Converter_CMYK_Circles.name");

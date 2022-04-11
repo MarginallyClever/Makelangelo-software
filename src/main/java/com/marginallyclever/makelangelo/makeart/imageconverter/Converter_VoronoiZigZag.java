@@ -9,6 +9,9 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
@@ -27,13 +30,13 @@ import java.util.concurrent.locks.ReentrantLock;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends ImageConverter implements PreviewListener {
+public class Converter_VoronoiZigZag extends IterativeImageConverter implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiZigZag.class);
 	private static int numCells = 3000;
-	private static double minDotSize = 1.0f;
+	private static double lowpassCutoff = 1.0f;
 
 	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
-	private List<VoronoiCell> cells = new ArrayList<>();
+	private final List<VoronoiCell> cells = new ArrayList<>();
 	private final Lock lock = new ReentrantLock();
 
 	private int[] solution = null;
@@ -48,7 +51,31 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	private long time_limit = 10 * 60 * 1000; // 10 minutes
 
 	private int iterations;
-	
+
+	public Converter_VoronoiZigZag() {
+		super();
+
+		SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
+		add(selectCells);
+		SelectDouble selectCutoff = new SelectDouble("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),getLowpassCutoff());
+		add(selectCutoff);
+		SelectBoolean selectKeepGoing = new SelectBoolean("keepGoing",Translator.get("Converter_VoronoiStippling.keepGoing"),getKeepGoing());
+		add(selectKeepGoing);
+
+		selectCells.addPropertyChangeListener(evt->{
+			setNumCells((int)evt.getNewValue());
+			selectKeepGoing.setSelected(true);
+			fireRestart();
+		});
+		selectCutoff.addPropertyChangeListener(evt->{
+			setLowpassCutoff((double)evt.getNewValue());
+
+		});
+		selectKeepGoing.addPropertyChangeListener(evt->{
+			setKeepGoing((boolean)evt.getNewValue());
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
@@ -69,7 +96,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		try {
 			lowNoise=false;
 			iterations = 0;
-			keepIterating = true;
+			setKeepGoing(true);
 
 			Rectangle2D bounds = myPaper.getMarginRectangle();
 			cells.clear();
@@ -107,7 +134,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		finally {
 			lock.unlock();
 		}
-		return keepIterating;
+		return getKeepGoing();
 	}
 
 	/**
@@ -179,12 +206,14 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	
 	@Override
 	public void finish() {
-		keepIterating=false;
+		setKeepGoing(false);
 		writeOutCells();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
+		if(!getKeepGoing()) return;
+
 		lock.lock();
 		try {
 			renderEdges(gl2);
@@ -238,7 +267,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 		// once|=transposeForwardTest();
 		// once|=transposeBackwardTest();
 
-		keepIterating = flipTests();
+		setKeepGoing(flipTests());
 	}
 
 	public String formatTime(long millis) {
@@ -361,8 +390,8 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 
 		solutionContains = 0;
 		for( VoronoiCell c : cells ) {
-			float v = 1.0f - (float) myImage.sample1x1( (int) c.center.x, (int) c.center.y) / 255.0f;
-			if (v * 5 > minDotSize)
+			double v = 255.0f - myImage.sample1x1( (int) c.center.x, (int) c.center.y);
+			if (v > lowpassCutoff)
 				solutionContains++;
 		}
 
@@ -374,7 +403,7 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 			i=0;
 			for( VoronoiCell c : cells ) {
 				float v = 1.0f - (float) myImage.sample1x1( (int) c.center.x, (int) c.center.y) / 255.0f;
-				if (v * 5 > minDotSize) solution[j++] = i;
+				if (v * 5 > lowpassCutoff) solution[j++] = i;
 				++i;
 			}
 
@@ -430,20 +459,18 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	}
 
 	public void setNumCells(int value) {
-		if(value<1) value=1;
-		numCells = value;
+		numCells = Math.max(1,value);
 	}
 	
 	public int getNumCells() {
 		return numCells;
 	}
 	
-	public void setMinDotSize(double value) {
-		if(value<0.001) value=0.001f;
-		minDotSize = value;
+	public void setLowpassCutoff(double value) {
+		lowpassCutoff = Math.max(0.001,value);
 	}
 	
-	public double getMinDotSize() {
-		return minDotSize;
+	public double getLowpassCutoff() {
+		return lowpassCutoff;
 	}
 }

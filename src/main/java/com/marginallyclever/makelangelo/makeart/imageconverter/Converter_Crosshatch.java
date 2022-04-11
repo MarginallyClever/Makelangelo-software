@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class Converter_Crosshatch extends ImageConverter {
@@ -11,7 +12,45 @@ public class Converter_Crosshatch extends ImageConverter {
 	private static double pass75=16.0f;
 	private static double pass15=64.0f;
 	private static double pass45=128.0f;
-	
+
+	public Converter_Crosshatch() {
+		super();
+		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 100, 1, (int) (getIntensity() * 10.0));
+		selectIntesity.addPropertyChangeListener(evt->{
+			setIntensity((float)((int)evt.getNewValue())/10.0f);
+			fireRestart();
+		});
+		add(selectIntesity);
+
+		SelectSlider selectPass90 = new SelectSlider("pass90", Translator.get("pass90"), 256, 0, (int) getPass90());
+		selectPass90.addPropertyChangeListener((evt)-> {
+			setPass90((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass90);
+
+		SelectSlider selectPass75 = new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)getPass75());
+		selectPass75.addPropertyChangeListener((evt)-> {
+			setPass75((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass75);
+
+		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
+		selectPass15.addPropertyChangeListener((evt)-> {
+			setPass15((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass15);
+
+		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
+		selectPass45.addPropertyChangeListener((evt)-> {
+			setPass45((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass45);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("Crosshatch");

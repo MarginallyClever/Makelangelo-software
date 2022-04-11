@@ -4,6 +4,10 @@ import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
@@ -27,6 +31,50 @@ public class Converter_FlowField extends ImageConverter {
 	private static int     stepSize = 10; // the distance between lines at the edge of the paper, in mm.
 	private static boolean rightAngle = false;
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
+
+	public Converter_FlowField() {
+		super();
+		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
+		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
+		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
+		SelectDouble selectOffsetY = new SelectDouble("offsetY", Translator.get("Generator_FlowField.offsetY"), getOffsetY());
+		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 3, getStepSize());
+		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
+
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+
+		add(selectScaleX);
+		add(selectScaleY);
+		add(selectOffsetX);
+		add(selectOffsetY);
+		add(selectStepSize);
+		add(selectRightAngle);
+
+		selectScaleX.addPropertyChangeListener((evt)->{
+			setScaleX((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectScaleY.addPropertyChangeListener((evt)->{
+			setScaleY((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectOffsetX.addPropertyChangeListener((evt)->{
+			setOffsetX((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectOffsetY.addPropertyChangeListener((evt)->{
+			setOffsetY((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectStepSize.addPropertyChangeListener((evt)->{
+			setStepSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectRightAngle.addPropertyChangeListener((evt)->{
+			setRightAngle((boolean)evt.getNewValue());
+			fireRestart();
+		});
+	}
 
 	@Override
 	public String getName() {

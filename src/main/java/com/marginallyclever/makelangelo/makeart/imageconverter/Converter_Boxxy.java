@@ -4,6 +4,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -14,7 +15,25 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Boxxy extends ImageConverter {
 	public static int boxMaxSize=4; // 0.8*5
 	public static int cutoff=127;
-	
+
+	public Converter_Boxxy() {
+		super();
+
+		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,1,getBoxMasSize());
+		size.addPropertyChangeListener((evt)->{
+			setBoxMaxSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(size);
+
+		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,getCutoff());
+		cutoff.addPropertyChangeListener((evt)->{
+			setCutoff((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(cutoff);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("BoxGeneratorName");

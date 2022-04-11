@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +25,22 @@ public class Converter_Sandy extends ImageConverter {
 		Translator.get("bottom right"), 
 		Translator.get("center")
 	};
-	
-	public Converter_Sandy() {}
+
+	public Converter_Sandy() {
+		super();
+		SelectSlider selectRings = new SelectSlider("rings",Translator.get("SandyNoble.rings"),300,10,getScale());
+		add(selectRings);
+		selectRings.addPropertyChangeListener(evt->{
+			setScale((int)evt.getNewValue());
+			fireRestart();
+		});
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("SandyNoble.center"),getDirections(),getDirectionIndex());
+		add(selectDirection);
+		selectDirection.addPropertyChangeListener(evt->{
+			setDirection((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {
@@ -95,7 +111,7 @@ public class Converter_Sandy extends ImageConverter {
 					dy = Math.sin(t_dir *t);
 					x = cx + dx * r;
 					y = cy + dy * r;
-					if(!isInsidePaperMargins(x,y)) {
+					if(!myPaper.isInsidePaperMargins(x,y)) {
 						if(wasDrawing) {
 							turtle.jumpTo(last_x,last_y);
 							wasDrawing=false;

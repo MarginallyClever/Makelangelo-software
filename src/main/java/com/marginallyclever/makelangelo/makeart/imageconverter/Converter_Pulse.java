@@ -4,6 +4,9 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
@@ -16,6 +19,31 @@ public class Converter_Pulse extends ImageConverter {
 	private static int direction = 0;
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
+
+	public Converter_Pulse() {
+		super();
+
+		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
+		SelectSlider    selectCutoff = new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getCutoff());
+
+		add(selectSize);
+		add(selectDirection);
+		add(selectCutoff);
+
+		selectSize.addPropertyChangeListener(evt->{
+			setScale((double) evt.getNewValue());
+			fireRestart();
+		});
+		selectDirection.addPropertyChangeListener(evt->{
+			setDirectionIndex((int) evt.getNewValue());
+			fireRestart();
+		});
+		selectCutoff.addPropertyChangeListener(evt->{
+			setCutoff((int) evt.getNewValue());
+			fireRestart();
+		});
+	}
 
 	@Override
 	public String getName() {

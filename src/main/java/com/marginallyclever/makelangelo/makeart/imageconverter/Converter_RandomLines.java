@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
@@ -12,7 +13,18 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Converter_RandomLines extends ImageConverter {
 	static protected int numLines = 2500;
-	
+
+	public Converter_RandomLines() {
+		super();
+		SelectInteger selectTotal = new SelectInteger("total",Translator.get("ConverterRandomLinesCount"),getLineCount());
+		add(selectTotal);
+
+		selectTotal.addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("total")) setLineCount((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("ConverterRandomLinesName");

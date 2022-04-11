@@ -1,18 +1,19 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.ListIterator;
-
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.ListIterator;
 
 
 /**
@@ -23,8 +24,26 @@ public class Converter_Moire extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_Moire.class);
 	private static double blockScale = 4.0f;
 	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") }; 
-	
+	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
+
+	public Converter_Moire() {
+		super();
+
+		SelectDouble selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
+
+		add(selectSize);
+		add(selectDirection);
+
+		selectSize.addPropertyChangeListener(evt->{
+			setScale((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectDirection.addPropertyChangeListener(evt->{
+			setDirectionIndex((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {

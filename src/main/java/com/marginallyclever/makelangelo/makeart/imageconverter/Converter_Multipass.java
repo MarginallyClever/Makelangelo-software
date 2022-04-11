@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
@@ -13,6 +15,26 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Multipass extends ImageConverter {
 	static private double angle=0;
 	static private int passes=4;
+
+	public Converter_Multipass() {
+		super();
+
+		SelectDouble  selectAngle = new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),getAngle());
+		SelectInteger selectLevel = new SelectInteger("level",Translator.get("ConverterMultipassLevels"),getPasses());
+
+		add(selectAngle);
+		add(selectLevel);
+
+		selectAngle.addPropertyChangeListener(evt->{
+			setAngle((double)evt.getNewValue());
+			fireRestart();
+		});
+
+		selectLevel.addPropertyChangeListener(evt->{
+			setPasses((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {

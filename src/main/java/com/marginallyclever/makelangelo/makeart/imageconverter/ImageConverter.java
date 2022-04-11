@@ -8,9 +8,11 @@ import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Converts a {@link TransformedImage} to {@link Turtle}
@@ -23,10 +25,8 @@ public abstract class ImageConverter {
 
 	// for previewing the image
 	private Texture texture = null;
-	
-	protected boolean keepIterating=false;
-	private ProgressMonitor pm;
-	private ImageConverterThread thread;
+
+	private List<Select> panelElements = new ArrayList<>();
 
 	/**
 	 * @return the translated name.
@@ -35,25 +35,6 @@ public abstract class ImageConverter {
 
 	public void setPaper(Paper p) {
 		myPaper = p;
-	}
-	
-	public void setThread(ImageConverterThread p) {
-		thread = p;
-	}
-
-	public void setProgressMonitor(ProgressMonitor p) {
-		pm = p;
-	}
-	
-	public void setProgress(int d) {
-		if(pm==null) return;
-		pm.setProgress(d);
-	}
-
-	public boolean isThreadCancelled() {
-		if(thread!=null && thread.isCancelled()) return true;
-		if(pm!=null && !pm.isCanceled()) return true;
-		return false;
 	}
 		
 	/**
@@ -64,18 +45,6 @@ public abstract class ImageConverter {
 		myImage = img;
 		texture = null;
 	}
-	
-	/**
-	 * run one "step" of an iterative image conversion process.
-	 * @return true if conversion should iterate again.
-	 */
-	public boolean iterate() {
-		return false;
-	}
-
-	public void stopIterating() {
-		keepIterating=false;
-	}
 
 	abstract public void finish();
 	
@@ -84,10 +53,8 @@ public abstract class ImageConverter {
 	 * draw the results as the calculation is being performed.
 	 */
 	protected void render(GL2 gl2) {
-		if( texture==null ) {
-			if( myImage!=null) {
-				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
-			}
+		if( texture==null && myImage!=null) {
+			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
 		}
 		if(texture!=null) {
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
@@ -191,7 +158,7 @@ public abstract class ImageConverter {
 			n = b / distance;
 			x = dx * n + x0;
 			y = dy * n + y0;
-			isInside=isInsidePaperMargins(x, y);
+			isInside = myPaper.isInsidePaperMargins(x,y);
 			if(isInside) {
 				oldPixel = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
 				int b2 = (int)Math.min(b, error0.length-2);
@@ -218,7 +185,29 @@ public abstract class ImageConverter {
 		turtle.penUp();
 	}
 
-	protected boolean isInsidePaperMargins(double x,double y) {
-		return myPaper.isInsidePaperMargins(x,y);
+	// Observer pattern notified when a converter has finished a job.
+	private List<ImageConverterListener> listeners = new ArrayList<>();
+
+	public void addImageConverterListener(ImageConverterListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeImageConverterListener(ImageConverterListener listener) {
+		listeners.remove(listener);
+	}
+
+	protected void fireRestart() {
+		for(ImageConverterListener listener:listeners) listener.onRestart(this);
+	}
+
+	protected void fireConversionFinished() {
+		for(ImageConverterListener listener : listeners) listener.onConvertFinished(this);
+	}
+
+	public void add(Select element) {
+		panelElements.add(element);
+	}
+	public List<Select> getPanelElements() {
+		return panelElements;
 	}
 }
