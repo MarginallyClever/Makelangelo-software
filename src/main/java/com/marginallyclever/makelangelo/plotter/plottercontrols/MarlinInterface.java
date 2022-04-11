@@ -35,6 +35,8 @@ public class MarlinInterface extends JPanel {
 	private static final int MARLIN_SEND_LIMIT = 20;
 	// If nothing is heard for this many ms then send a ping to check if the connection is still live. 
 	private static final int TIMEOUT_DELAY = 5000;
+	// Max duration before alerting the user something is wrong
+	private static final int FATAL_TIMEOUT_DELAY = TIMEOUT_DELAY * 5;
 	// Marlin says this when a resend is needed, followed by the last well-received line number.
 	private static final String STR_RESEND = "Resend: ";
 	// Marlin sends this event when the robot is ready to receive more.
@@ -107,7 +109,7 @@ public class MarlinInterface extends JPanel {
 	private void onTimeoutCheck() {
 		long delay = System.currentTimeMillis() - lastReceivedTime;
 		if (delay > TIMEOUT_DELAY) {
-			if (delay > TIMEOUT_DELAY * 5) {
+			if (delay > FATAL_TIMEOUT_DELAY) {
 				logger.error("No answer from the robot");
 				notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, COMMUNICATION_FAILURE));
 				chatInterface.displayError("No answer from the robot, retrying...");
