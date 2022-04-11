@@ -738,7 +738,7 @@
 	</string>
 	<string>
 		<key>PlotterControls.CommunicationFailure</key>
-		<value>No answer from the robot, please check the USB cable, speed settings...</value>
+		<value>No answer from the robot, please check the USB cable, speed settings.</value>
 		<hint>text</hint>
 	</string>
 
