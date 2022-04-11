@@ -42,12 +42,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	private static JComboBox<String> styleNames;
 	private static JComboBox<String> fillNames;
-
 	private final JPanel cards = new JPanel(new CardLayout());
-	private final ArrayList<ImageConverterThread> workerList = new ArrayList<>();
 
 	private ImageConverter myConverter;
-	private ImageConverterThread imageConverterThread;
 	
 	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
 		super();
@@ -75,7 +72,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		c.gridx = 1;
 		c.ipadx=0;
 		this.add(fillNames, c);
-		c.gridy = y;
 		
 		y++;
 		c.anchor = GridBagConstraints.EAST;
@@ -113,7 +109,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		}
 		
 		JComboBox<String> box = new JComboBox<>(imageConverterNames.toArray(new String[0]));
-		box.addItemListener((e) -> onConverterChanged(e));
+		box.addItemListener(e -> onConverterChanged(e));
 		box.setSelectedIndex(getPreferredDrawStyle());
 
 		return box;
@@ -196,18 +192,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("Stop conversion");
 
 		if(myConverter != null) {
-			if(myConverter instanceof IterativeImageConverter) {
-				((IterativeImageConverter)myConverter).stopIterating();
-			}
+			myConverter.stop();
 			myConverter.removeImageConverterListener(this);
-		}
-
-		if(imageConverterThread!=null) {
-			if(imageConverterThread.cancel(true)) {
-				logger.debug("stop OK");
-			} else {
-				logger.debug("stop FAILED");
-			}
 		}
 	}
 	
@@ -216,13 +202,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		logger.debug("startConversion() {}", myConverter.getName());
 
-		myConverter.setPaper(myPaper);
-		myConverter.setImage(myImage);
 		myConverter.addImageConverterListener(this);
-
-		imageConverterThread = new ImageConverterThread(myConverter);
-		addWorker(imageConverterThread);
-		imageConverterThread.execute();
+		myConverter.start(myPaper,myImage);
 	}
 	
 	private void changeConverter(ImageConverter converter) {
@@ -238,18 +219,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("restart()");
 		stopConversion();
 		startConversion();
-	}
-
-	private void addWorker(ImageConverterThread thread) {
-		workerList.add(thread);
-		logger.debug("Added worker. {} workers now.", workerList.size());
-	}
-	
-	private void removeWorker(ImageConverterThread thread) {
-		workerList.remove(thread);
-		logger.debug("Removed worker. {} workers now.", workerList.size());
-		if(imageConverterThread==thread)
-			imageConverterThread=null;
 	}
 
 	@Override

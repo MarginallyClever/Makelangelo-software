@@ -33,15 +33,13 @@ public abstract class ImageConverter {
 	 */
 	abstract public String getName();
 
-	public void setPaper(Paper p) {
-		myPaper = p;
-	}
-		
 	/**
-	 * set the image to be transformed.
+	 * Start the conversion process.
+	 * @param paper the bounds of the final output.
 	 * @param img the {@code TransformedImage} this filter is using as source material.
 	 */
-	public void setImage(TransformedImage img) {
+	public void start(Paper paper,TransformedImage img) {
+		myPaper = paper;
 		myImage = img;
 		texture = null;
 	}
@@ -210,4 +208,6 @@ public abstract class ImageConverter {
 	public List<Select> getPanelElements() {
 		return panelElements;
 	}
+
+	public void stop() {}
 }
