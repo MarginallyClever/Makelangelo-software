@@ -72,7 +72,6 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	
 	@Override
 	public void done() {
-		String state = isCancelled() ? "cancelled" : "finished";
-		logger.debug("{} thread {}", state, name);
+		logger.debug("{} thread {}", isCancelled() ? "cancelled" : "finished", name);
 	}
 }
