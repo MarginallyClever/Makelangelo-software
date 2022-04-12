@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
@@ -10,8 +9,8 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,24 +33,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Converter_VoronoiZigZag extends IterativeImageConverter implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiZigZag.class);
-	private static int numCells = 3000;
-	private static double lowpassCutoff = 1.0f;
+	private static int numCells = 9000;
+	private static int lowpassCutoff = 128;
 
 	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
 	private final List<VoronoiCell> cells = new ArrayList<>();
 	private final Lock lock = new ReentrantLock();
 
-	private int[] solution = null;
-	private int solutionContains;
+	private final List<VoronoiCell> solution = new ArrayList<>();
 	private int renderMode;
 	private boolean lowNoise;
-
-	// processing tools
-	private long t_elapsed, t_start;
-	private double progress;
-	private double old_len, len;
-	private long time_limit = 10 * 60 * 1000; // 10 minutes
-
 	private int iterations;
 
 	public Converter_VoronoiZigZag() {
@@ -71,17 +63,14 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		});
 		SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
 		add(selectCells);
-		SelectDouble selectCutoff = new SelectDouble("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),getLowpassCutoff());
+		SelectSlider selectCutoff = new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getLowpassCutoff());
 		add(selectCutoff);
 
 		selectCells.addPropertyChangeListener(evt->{
 			setNumCells((int)evt.getNewValue());
 			fireRestart();
 		});
-		selectCutoff.addPropertyChangeListener(evt->{
-			setLowpassCutoff((double)evt.getNewValue());
-
-		});
+		selectCutoff.addPropertyChangeListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
 	}
 
 	@Override
@@ -111,7 +100,6 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		finally {
 			lock.unlock();
 		}
-		t_start = System.currentTimeMillis();
 	}
 	
 	@Override
@@ -120,7 +108,7 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 
 		lock.lock();
 		try {
-			if(lowNoise==true) {
+			if(lowNoise) {
 				optimizeTour();
 			} else {
 				double noiseLevel = evolveCells();
@@ -186,9 +174,10 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 			cell.center.set(center.getX(),center.getY());
 			Envelope e = poly.getEnvelopeInternal();
 			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
-				for (int x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
-					Point c = factory.createPoint(new Coordinate(x,y));
-					if(poly.contains(c) && image.canSampleAt(x,y)) {
+				int x0 = findLeftEdge(poly,e,y,factory);
+				int x1 = findRightEdge(poly,e,y,factory);
+				for (int x = x0; x <=x1; ++x) {
+					if(image.canSampleAt(x,y)) {
 						double sampleWeight = 255.0 - image.sample(x,y,1);
 						weight += sampleWeight;
 						wx += sampleWeight*x;
@@ -209,11 +198,35 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		}
 		return change;
 	}
+
+	private int findLeftEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int x;
+		for(x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
+
+	private int findRightEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int x;
+		for(x = (int) e.getMaxX(); x > (int) e.getMinX(); --x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
 	
 	@Override
 	public void stop() {
-		writeOutCells();
-
+		super.stop();
+		lock.lock();
+		try {
+			writeOutCells();
+		}
+		finally {
+			lock.unlock();
+		}
 		fireConversionFinished();
 	}
 
@@ -237,7 +250,9 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 
 		gl2.glBegin(GL2.GL_POINTS);
 		for( VoronoiCell c : cells ) {
-			gl2.glVertex2d(c.center.x,c.center.y);
+			if (c.weight > lowpassCutoff) {
+				gl2.glVertex2d(c.center.x, c.center.y);
+			}
 		}
 		gl2.glEnd();
 	}
@@ -246,7 +261,6 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		gl2.glColor3d(0.9, 0.9, 0.9);
 
 		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
-			boolean first = true;
 			Polygon poly = voronoiDiagram.getHull(i);
 			gl2.glBegin(GL2.GL_LINE_LOOP);
 			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
@@ -259,17 +273,13 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	private void drawTour(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
-		for (int i = 0; i < solutionContains; ++i) {
-			VoronoiCell c = cells.get(solution[i]);
+		for( VoronoiCell c : solution ) {
 			gl2.glVertex2d(c.center.x, c.center.y);
 		}
 		gl2.glEnd();
 	}
 
 	private void optimizeTour() {
-		old_len = getTourLength(solution);
-		updateProgress(old_len, 2);
-
 		// @TODO: make these optional for the very thorough people
 		// once|=transposeForwardTest();
 		// once|=transposeBackwardTest();
@@ -277,111 +287,79 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		flipTests();
 	}
 
-	public String formatTime(long millis) {
-		String elapsed = "";
-		long s = millis / 1000;
-		long m = s / 60;
-		long h = m / 60;
-		m %= 60;
-		s %= 60;
-		if (h > 0)
-			elapsed += h + "h";
-		if (h > 0 || m > 0)
-			elapsed += m + "m";
-		elapsed += s + "s ";
-		return elapsed;
-	}
-
-	public void updateProgress(double len, int color) {
-		t_elapsed = System.currentTimeMillis() - t_start;
-		double new_progress = 100.0 * (double) t_elapsed / (double) time_limit;
-		if (new_progress > progress + 0.1) {
-			// find the new tour length
-			len = getTourLength(solution);
-			if (old_len > len) {
-				old_len = len;
-				logger.debug("{}: {}mm", formatTime(t_elapsed), StringHelper.formatDouble(len));
-			}
-			progress = new_progress;
-			setProgress((int) progress);
-		}
-	}
-
 	private int ti(int x) {
+		int solutionContains = solution.size();
 		return (x + solutionContains) % solutionContains;
 	}
 
 	/**
-	 * we have s1,s2...e-1,e.  check if s1,e-1,...s2,e is shorter
+	 * we have s1,s2...e-1,e.  check if s1,e-1..(flip everything)...s2,e is shorter
 	 * @return true if something was improved.
 	 */
 	public boolean flipTests() {
 		boolean once = false;
-		int start, end, j, best_end;
-		double a, b, c, d, temp_diff, best_diff;
+		int start, end, j, bestIndex;
+		double bestDiff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !isThreadCancelled(); ++start) {
-			a = calculateLengthSq(solution[ti(start)], solution[ti(start + 1)]);
-			best_end = -1;
-			best_diff = 0;
+		int solutionContains = solution.size();
 
-			for (end = start + 2; end < start + solutionContains && !isThreadCancelled(); ++end) {
-				// before
-				b = calculateLengthSq(solution[ti(end)], solution[ti(end - 1)]);
-				// after
-				c = calculateLengthSq(solution[ti(start)], solution[ti(end - 1)]);
-				d = calculateLengthSq(solution[ti(end)], solution[ti(start + 1)]);
+		for (start = 0; start < solutionContains - 2 && !isThreadCancelled(); ++start) {
+			VoronoiCell p0 = solution.get(ti(start));
+			VoronoiCell p1 = solution.get(ti(start+1));
 
-				temp_diff = (a + b) - (c + d);
-				if (best_diff < temp_diff) {
-					best_diff = temp_diff;
-					best_end = end;
+			double a = calculateLengthSq(p0,p1);
+			bestIndex = -1;
+			bestDiff = 0;
+
+			for (end = start + 2; end < solutionContains && !isThreadCancelled(); ++end) {
+				VoronoiCell p2 = solution.get(ti(end-1));
+				VoronoiCell p3 = solution.get(ti(end));
+
+				double b = a + calculateLengthSq(p2, p3);
+				double c = calculateLengthSq(p0, p2) + calculateLengthSq(p1, p3);
+				// the existing model is distance b.  the new possibility is c.
+				double diff = b - c;
+				if (bestDiff < diff) {
+					bestDiff = diff;
+					bestIndex = end;
 				}
 			}
 
-			if (best_end != -1 && !isThreadCancelled()) {
+			if (bestIndex != -1 && !isThreadCancelled()) {
 				once = true;
 				// do the flip
 				int begin = start + 1;
-				int finish = best_end;
-				if (best_end < begin)
-					finish += solutionContains;
+				int finish = bestIndex;
+				if (bestIndex < begin) finish += solutionContains;
 				int half = (finish - begin) / 2;
-				int temp;
 
-				lock.lock();
-				try {
-					// Makelangelo.getSingleton().Log("<font color='red'>flipping
-					// "+(finish-begin));
-					for (j = 0; j < half; ++j) {
-						temp = solution[ti(begin + j)];
-						solution[ti(begin + j)] = solution[ti(finish - 1 - j)];
-						solution[ti(finish - 1 - j)] = temp;
-					}
+				logger.debug("flipping {} {}",finish,begin);
+				for (j = 0; j < half; ++j) {
+					int a1 = ti(begin + j);
+					int b1 = ti(finish-1 - j);
+					swapSolution(a1,b1);
 				}
-				finally {
-					lock.unlock();
-				}
-				updateProgress(len, 1);
 			}
 		}
 		return once;
 	}
 
 	/**
-	 * Get the length of a tour segment
-	 * 
-	 * @param list
-	 *            an array of indexes into the point list. the order forms the
-	 *            tour sequence.
-	 * @return the length of the tour
+	 * Returns the travel distance of the solution path.
+	 * @return the travel distance of the solution path.
 	 */
-	private double getTourLength(int[] list) {
-		double w = 0;
-		for (int i = 0; i < solutionContains - 1; ++i) {
-			w += calculateLength(list[i], list[i + 1]);
+	private double getTourLength() {
+		if(solution.size()<2) return 0;
+
+		double sum = 0;
+		Iterator<VoronoiCell> iter = solution.iterator();
+		VoronoiCell p0 = iter.next();
+		while(iter.hasNext()) {
+			VoronoiCell p1 = iter.next();
+			sum += calculateLength(p0,p1);
+			p0=p1;
 		}
-		return w;
+		return sum;
 	}
 
 	/**
@@ -389,64 +367,57 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	 * points have been "found".
 	 */
 	private void greedyTour() {
-		logger.debug("Finding greedy tour solution...");
+		logger.debug("greedy tour started...");
 
-		int i, j;
-		double w, bestw;
-		int besti;
-
-		solutionContains = 0;
-		for( VoronoiCell c : cells ) {
-			double v = 255.0f - myImage.sample1x1( (int) c.center.x, (int) c.center.y);
-			if (v > lowpassCutoff)
-				solutionContains++;
-		}
-
+		lock.lock();
 		try {
-			solution = new int[solutionContains];
-
-			// put all the points in the solution in no particular order.
-			j = 0;
-			i=0;
-			for( VoronoiCell c : cells ) {
-				float v = 1.0f - (float) myImage.sample1x1( (int) c.center.x, (int) c.center.y) / 255.0f;
-				if (v * 5 > lowpassCutoff) solution[j++] = i;
-				++i;
+			// collect all cells above the cutoff value.
+			solution.clear();
+			for (VoronoiCell c : cells) {
+				if (c.weight > lowpassCutoff) {
+					solution.add(c);
+				}
 			}
 
-			int scount = 0;
-
-			do {
-				// Find the nearest point not already in the line.
-				// Any solution[n] where n>scount is not in the line.
-				bestw = calculateLengthSq(solution[scount], solution[scount + 1]);
-				besti = scount + 1;
-				for (i = scount + 2; i < solutionContains; ++i) {
-					w = calculateLengthSq(solution[scount], solution[i]);
-					if (w < bestw) {
-						bestw = w;
-						besti = i;
+			// do a greedy sort
+			int size = solution.size();
+			for (int i = 0; i < size - 1; ++i) {
+				VoronoiCell p0 = solution.get(i);
+				double bestDistance = Double.MAX_VALUE;
+				int bestIndex = i + 1;
+				for (int j = i + 1; j < size; ++j) {
+					// Find the nearest point not already in the line.
+					VoronoiCell p1 = solution.get(j);
+					double d = calculateLengthSq(p0, p1);
+					if (bestDistance > d) {
+						bestDistance = d;
+						bestIndex = j;
 					}
 				}
-				i = solution[scount + 1];
-				solution[scount + 1] = solution[besti];
-				solution[besti] = i;
-				scount++;
-			} while (scount < solutionContains - 2);
-		} catch (Exception e) {
-			logger.error("Failed to find a greedy tour solution", e);
+				if (i + 1 != bestIndex) {
+					swapSolution(i + 1, bestIndex);
+				}
+			}
 		}
+		finally {
+			lock.unlock();
+		}
+		logger.debug("greedy tour done.");
 	}
 
-	private double calculateLengthSq(int a, int b) {
-		assert (a >= 0 && a < cells.size());
-		assert (b >= 0 && b < cells.size());
-		double x = cells.get(a).center.x - cells.get(b).center.x;
-		double y = cells.get(a).center.y - cells.get(b).center.y;
+	private void swapSolution(int a,int b) {
+		VoronoiCell temp = solution.get(a);
+		solution.set(a,solution.get(b));
+		solution.set(b,temp);
+	}
+
+	private double calculateLengthSq(VoronoiCell a, VoronoiCell b) {
+		double x = a.center.x - b.center.x;
+		double y = a.center.y - b.center.y;
 		return x * x + y * y;
 	}
 
-	private double calculateLength(int a, int b) {
+	private double calculateLength(VoronoiCell a, VoronoiCell b) {
 		return Math.sqrt(calculateLengthSq(a, b));
 	}
 
@@ -456,12 +427,14 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	private void writeOutCells() {
 		turtle = new Turtle();
 
-		int i;
-		for (i = 0; i < solutionContains; ++i) {
-			double x = cells.get(solution[i]).center.x;
-			double y = cells.get(solution[i]).center.y;
-			if(i==0) turtle.jumpTo(x, y);
-			else turtle.moveTo(x, y);
+		boolean first=true;
+		for( VoronoiCell c : solution ) {
+			double x = c.center.x;
+			double y = c.center.y;
+			if(first) {
+				turtle.jumpTo(x, y);
+				first=false;
+			} else turtle.moveTo(x, y);
 		}
 	}
 
@@ -473,11 +446,11 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		return numCells;
 	}
 	
-	public void setLowpassCutoff(double value) {
-		lowpassCutoff = Math.max(0.001,value);
+	public void setLowpassCutoff(int value) {
+		lowpassCutoff = Math.max(1,Math.min(255,value));
 	}
 	
-	public double getLowpassCutoff() {
+	public int getLowpassCutoff() {
 		return lowpassCutoff;
 	}
 }

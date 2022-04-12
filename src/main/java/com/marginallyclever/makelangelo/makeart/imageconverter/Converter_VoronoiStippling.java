@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 	private static int numCells = 1000;
 	private static double maxDotSize = 5.0f;
 	private static double minDotSize = 1.0f;
-	private static double cutoff = 0;
+	private static int cutoff = 128;
 	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
 	private List<VoronoiCell> cells = new ArrayList<>();
 
@@ -51,7 +52,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		SelectInteger selectCells = new SelectInteger("cells", Translator.get("Converter_VoronoiStippling.CellCount"), getNumCells());
 		SelectDouble selectMax = new SelectDouble("max", Translator.get("Converter_VoronoiStippling.DotMax"), getMaxDotSize());
 		SelectDouble selectMin = new SelectDouble("min", Translator.get("Converter_VoronoiStippling.DotMin"), getMinDotSize());
-		SelectDouble selectCutoff = new SelectDouble("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), getCutoff());
+		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255,0, getCutoff());
 		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
 
 		add(selectCells);
@@ -66,7 +67,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		});
 		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((double) evt.getNewValue()));
 		selectMin.addPropertyChangeListener(evt -> setMinDotSize((double) evt.getNewValue()));
-		selectCutoff.addPropertyChangeListener(evt -> setCutoff((double) evt.getNewValue()));
+		selectCutoff.addPropertyChangeListener(evt -> setCutoff((int) evt.getNewValue()));
 		selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 	}
 	
@@ -161,9 +162,10 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 			cell.center.set(centroid.getX(),centroid.getY());
 			Envelope e = poly.getEnvelopeInternal();
 			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
-				for (int x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
-					Point c = factory.createPoint(new Coordinate(x,y));
-					if(poly.contains(c) && image.canSampleAt(x,y)) {
+				int x0 = findLeftEdge(poly,e,y,factory);
+				int x1 = findRightEdge(poly,e,y,factory);
+				for (int x = x0; x <= x1; ++x) {
+					if(image.canSampleAt(x,y)) {
 						double sampleWeight = 255.0 - image.sample(x,y,1);
 						weight += sampleWeight;
 						wx += sampleWeight*x;
@@ -187,6 +189,24 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		return change;
 	}
 
+	private int findLeftEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int x;
+		for(x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
+
+	private int findRightEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int x;
+		for(x = (int) e.getMaxX(); x > (int) e.getMinX(); --x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
+
 	private void tessellateNow() {
 		Point2D [] points = new Point2D[numCells];
 		int i=0;
@@ -198,13 +218,21 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 
 	@Override
 	public void stop() {
-		writeOutCells();
-
+		super.stop();
+		lock.lock();
+		try {
+			writeOutCells();
+		}
+		finally {
+			lock.unlock();
+		}
 		fireConversionFinished();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
+		if(getThread().getPaused()) return;
+
 		lock.lock();
 		try {
 			if (drawVoronoi) renderEdges(gl2);
@@ -237,20 +265,23 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 			double x = c.center.x;
 			double y = c.center.y;
 
-			double val = c.weight/255.0;
+			double val = c.weight;
 			if(val<cutoff) continue;
 
-			double r = val * scale + minDotSize;
+			double r = ((val-cutoff)/255.0) * scale + minDotSize;
 			drawCircle(gl2,x,y,r);
 		}
 	}
 
 	private void drawCircle(GL2 gl2,double x, double y, double r) {
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		for(int j = 0; j < 8; ++j) {
-			double d = j * 2.0 * Math.PI / 8.0;
-			gl2.glVertex2d(x + Math.cos(d) * r,
-					y + Math.sin(d) * r);
+		float detail = (float)Math.ceil(r * Math.PI * 2.0);
+		detail = Math.max(4, Math.min(20,detail));
+		for (float j = 0; j <= detail; ++j) {
+			double v = j * 2.0 * Math.PI / detail;
+			gl2.glVertex2d(
+					x + r * Math.cos(v),
+					y + r * Math.sin(v) );
 		}
 		gl2.glEnd();
 	}
@@ -265,10 +296,10 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		for( VoronoiCell c : cells ) {
 			double x = c.center.x;
 			double y = c.center.y;
-			double val = c.weight/255.0;
+			double val = c.weight;
 			if(val<cutoff) continue;
 
-			double r = val * scale + minDotSize;
+			double r = ((val-cutoff)/255.0) * scale + minDotSize;
 
 			turtleCircle(x,y,r);
 		}
@@ -285,7 +316,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		boolean first = true;
 
 		for (float j = 0; j <= detail; ++j) {
-			double v = Math.PI * 2.0f * j / detail;
+			double v = j * 2.0 * Math.PI / detail;
 			double newX = x + r * Math.cos(v);
 			double newY = y + r * Math.sin(v);
 			if(first) {
@@ -307,25 +338,25 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		value = Math.max(1,value);
 		if(numCells!=value) numCells = value;
 	}
-	
+
 	public int getNumCells() {
 		return numCells;
 	}
-	
+
 	public void setMinDotSize(double value) {
 		minDotSize = Math.max(0.001,value);
 	}
 	public double getMinDotSize() {
 		return minDotSize;
 	}
-	
-	public void setCutoff(double value) {
+
+	public void setCutoff(int value) {
 		cutoff = Math.max(0,Math.min(255,value));
 	}
-	public double getCutoff() {
+	public int getCutoff() {
 		return cutoff;
 	}
-	
+
 	public double getMaxDotSize() {
 		return maxDotSize;
 	}
