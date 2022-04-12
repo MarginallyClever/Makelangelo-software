@@ -21,6 +21,7 @@ public abstract class ImageConverterIterative extends ImageConverter {
 
         pauseButton = new SelectToggleButton("pauseButton",Translator.get("PlotterControls.Pause"));
         add(pauseButton);
+
         pauseButton.addPropertyChangeListener((evt) -> {
             imageConverterThread.setPaused(pauseButton.isSelected());
         });
