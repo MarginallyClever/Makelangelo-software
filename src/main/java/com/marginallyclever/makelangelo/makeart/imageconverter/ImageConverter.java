@@ -10,6 +10,8 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
  * @author Dan Royer
  */
 public abstract class ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(ImageConverter.class);
 	protected TransformedImage myImage;
 	protected Paper myPaper;
 	public Turtle turtle = new Turtle();
@@ -206,7 +209,10 @@ public abstract class ImageConverter {
 	 * Called when the converter has successfully finished a job.
 	 */
 	protected void fireConversionFinished() {
-		for(ImageConverterListener listener : listeners) listener.onConvertFinished(turtle);
+		logger.debug("fire conversion finished");
+		for(ImageConverterListener listener : listeners) {
+			listener.onConvertFinished(turtle);
+		}
 	}
 
 	public void add(Select element) {
