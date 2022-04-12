@@ -15,7 +15,7 @@ public interface ImageConverterListener {
     void onRestart(ImageConverter panel);
 
     /**
-     * Called when the converter has successfully finished a job.
+     * Called when the converter wants to offer a new turtle.
      * @param turtle
      */
     void onConvertFinished(Turtle turtle);
