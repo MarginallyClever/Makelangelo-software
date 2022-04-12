@@ -65,6 +65,10 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	}
 
 	public boolean load(String filename) {
+		if(myConvertImage!=null) {
+			myConvertImage.loadingFinished();
+		}
+
 		try {
 			if (SelectImageConverterPanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
