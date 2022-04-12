@@ -11,6 +11,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private IterativeImageConverter myConverter;
 	private String name;
 	private boolean paused=false;
+	private boolean enough=false;
 	private int iterations=0;
 
 	public ImageConverterThread(IterativeImageConverter converter) {
@@ -29,16 +30,24 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	public boolean getPaused() {
 		return paused;
 	}
-	
+
+	/**
+	 * Will cause the thread to end gracefully at the start of the next iteration.
+	 */
+	public void endThreadGracefully() {
+		logger.debug("endThreadGracefully()");
+		this.enough = true;
+	}
+
 	@Override
 	protected Turtle doInBackground() throws Exception {
-		logger.debug("Starting {}", name);
+		logger.debug("doInBackground() start {}", name);
 		
 		Turtle turtle = new Turtle();
 
 		iterations=0;
 		int pauseCount=-1;
-		while(!isCancelled()) {
+		while(!enough && !isCancelled()) {
 			if(!paused) {
 				if(pauseCount==iterations) {
 					myConverter.resume();
@@ -56,7 +65,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 			} catch (InterruptedException e) {}
 		}
 
-		logger.debug("Ending {} after {} loop(s).", name, iterations);
+		logger.debug("doInBackground() ending {} after {} loop(s).", name, iterations);
 		
 		return turtle;
 	}

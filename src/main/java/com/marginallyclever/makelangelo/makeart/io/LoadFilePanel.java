@@ -47,7 +47,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 		this.jtaFilename.setEditable(false);
 		this.jtaFilename.setLineWrap(true);
-		
+
 		openFileChooser = new OpenFileChooser(this);
 		openFileChooser.setOpenListener(this::load);
 	}
@@ -70,10 +70,12 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
 				myConvertImage = new SelectImageConverterPanel(myPaper, image);
+				// TODO replace this border with something more appropriate
 				myConvertImage.setBorder(BorderFactory.createTitledBorder(SelectImageConverterPanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
 				mySubPanel.removeAll();
 				mySubPanel.add(myConvertImage);
+				myConvertImage.run();
 				mySubPreviewListener = myConvertImage;
 				return true;
 			} else {
@@ -97,6 +99,17 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	@Override
 	public void render(GL2 gl2) {
 		if(mySubPreviewListener!=null) mySubPreviewListener.render(gl2);
+	}
+
+	public void setParent(JDialog parent) {
+		this.parent = parent;
+	}
+
+	public void loadingFinished() {
+		logger.debug("loadingFinished()");
+		if(myConvertImage!=null) {
+			myConvertImage.loadingFinished();
+		}
 	}
 
 	// OBSERVER PATTERN
@@ -130,9 +143,5 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		frame.setPreferredSize(new Dimension(800,600));
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public void setParent(JDialog parent) {
-		this.parent = parent;
 	}
 }

@@ -606,7 +606,6 @@ public final class Makelangelo {
 			if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
 			if (loader.load(filename)) {
-
 				previewPanel.addListener(loader);
 				JDialog dialog = new JDialog(mainFrame, Translator.get("LoadFilePanel.title"));
 				dialog.add(loader);
@@ -619,6 +618,7 @@ public final class Makelangelo {
 				dialog.addWindowListener(new WindowAdapter() {
 					@Override
 					public void windowClosing(WindowEvent e) {
+						loader.loadingFinished();
 						enableMenuBar(true);
 						previewPanel.removeListener(loader);
 						recentFiles.addFilename(filename);

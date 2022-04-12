@@ -52,8 +52,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		myPaper = paper;
 		myImage = image;
 
-		cards.setPreferredSize(new Dimension(450,300));
-		
+		cards.setPreferredSize(new Dimension(450, 300));
+
 		fillNames = getFillSelection();
 		styleNames = getStyleSelection();
 
@@ -66,41 +66,47 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
-		c.ipadx=5;
+		c.ipadx = 5;
 		this.add(new JLabel(Translator.get("ConversionFill")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
-		c.ipadx=0;
+		c.ipadx = 0;
 		this.add(fillNames, c);
-		
+
 		y++;
 		c.anchor = GridBagConstraints.EAST;
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = y;
-		c.ipadx=5;
+		c.ipadx = 5;
 		this.add(new JLabel(Translator.get("ConversionStyle")), c);
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 3;
 		c.gridx = 1;
-		c.ipadx=0;
+		c.ipadx = 0;
 		this.add(styleNames, c);
-	
-		y++;
-		c.anchor=GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth=4;
-		c.gridx=0;
-		c.gridy=y;
-		c.insets = new Insets(10, 0, 0, 0);
-		cards.setPreferredSize(new Dimension(449,325));
-		cards.setBorder(BorderFactory.createLoweredBevelBorder());
-		this.add(cards,c);
 
-		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
+		y++;
+		c.anchor = GridBagConstraints.NORTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 4;
+		c.gridx = 0;
+		c.gridy = y;
+		c.insets = new Insets(10, 0, 0, 0);
+		cards.setPreferredSize(new Dimension(449, 325));
+		cards.setBorder(BorderFactory.createLoweredBevelBorder());
+		this.add(cards, c);
+
+	}
+
+	/**
+	 * Start the image conversion process.
+	 */
+	public void run() {
+		scaleImage(fillNames.getSelectedIndex());
+		int first = (styleNames != null ? styleNames.getSelectedIndex() : 0);
 		changeConverter(ImageConverterFactory.getList()[first]);
-		scaleLoader(fillNames.getSelectedIndex());
 	}
 	
 	private JComboBox<String> getStyleSelection() {
@@ -127,8 +133,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		int p = getPreferredFillStyle();
 		if(p>=box.getItemCount()) p=0;
 		box.addItemListener((e) ->{
-			scaleLoader(box.getSelectedIndex());
+			scaleImage(box.getSelectedIndex());
 			setPreferredFillStyle(box.getSelectedIndex());
+			restart();
 		});
 		box.setSelectedIndex(p);
 
@@ -137,7 +144,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	private void onConverterChanged(ItemEvent e) {
 		logger.debug("onConverterChanged");
-				
+
 	    CardLayout cl = (CardLayout)(cards.getLayout());
 	    cl.show(cards, (String)e.getItem());
 
@@ -146,7 +153,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		changeConverter(ImageConverterFactory.getList()[first]);
 	}
 
-	private void scaleLoader(int mode) {
+	private void scaleImage(int mode) {
 		double width  = myPaper.getMarginWidth();
 		double height = myPaper.getMarginHeight();
 
@@ -163,8 +170,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 			f = (float)( height / (double)myImage.getSourceImage().getHeight() );
 		}
 		myImage.setScale(f,-f);
-
-		restart();
 	}
 
 	private void setPreferredDrawStyle(int style) {
@@ -209,17 +214,24 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("changeConverter() {}", converter.getName());
 
 		stopConversion();
+		eraseOldTurtle();
+
 		if(myConverter != null) myConverter.removeImageConverterListener(this);
 		myConverter = converter;
 		myConverter.addImageConverterListener(this);
+
 		startConversion();
 	}
 
 	private void restart() {
 		logger.debug("restart()");
 		stopConversion();
-		onConvertFinished(new Turtle());
+		eraseOldTurtle();
 		startConversion();
+	}
+
+	private void eraseOldTurtle() {
+		onConvertFinished(new Turtle());
 	}
 
 	@Override
@@ -237,6 +249,11 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	@Override
 	public void onConvertFinished(Turtle turtle) {
 		notifyListeners(new ActionEvent(turtle,0,"turtle"));
+	}
+
+	public void loadingFinished() {
+		logger.debug("loadingFinished()");
+		if(myConverter != null) myConverter.stop();
 	}
 
 	// OBSERVER PATTERN
