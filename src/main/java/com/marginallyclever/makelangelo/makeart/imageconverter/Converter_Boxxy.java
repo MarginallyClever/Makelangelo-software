@@ -20,7 +20,7 @@ public class Converter_Boxxy extends ImageConverter {
 	public Converter_Boxxy() {
 		super();
 
-		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,1,getBoxMasSize());
+		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,2,getBoxMasSize());
 		size.addPropertyChangeListener((evt)->{
 			setBoxMaxSize((int)evt.getNewValue());
 			fireRestart();
