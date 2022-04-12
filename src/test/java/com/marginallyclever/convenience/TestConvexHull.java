@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Dan Royer
@@ -38,9 +39,9 @@ public class TestConvexHull {
         hull.add(new Vector2d(12, 10));
         assertEquals("ConvexHull{hull=[(-9.0, -3.0), (-3.0, -9.0), (19.0, -8.0), (17.0, 5.0), (12.0, 17.0), (5.0, 19.0), (-3.0, 15.0)]}", hull.toString());
         Vector2d center = hull.getCenterOfHull();
-        assert(hull.contains(center));
-        assert(hull.contains(new Vector2d(-9,-3)));
-        assert(!hull.contains(new Vector2d(-10000,-10000)));
+        assertTrue(hull.contains(center));
+        assertTrue(hull.contains(new Vector2d(-9,-3)));
+        assertTrue(!hull.contains(new Vector2d(-10000,-10000)));
     }
 
     @Test
@@ -72,8 +73,8 @@ public class TestConvexHull {
 
         assertEquals("ConvexHull{hull=[(-9.0, -3.0), (-3.0, -9.0), (19.0, -8.0), (17.0, 5.0), (12.0, 17.0), (5.0, 19.0), (-3.0, 15.0)]}", hull.toString());
         Vector2d center = hull.getCenterOfHull();
-        assert(hull.contains(center));
-        assert(hull.contains(new Vector2d(-9,-3)));
-        assert(!hull.contains(new Vector2d(-10000,-10000)));
+        assertTrue(hull.contains(center));
+        assertTrue(hull.contains(new Vector2d(-9,-3)));
+        assertTrue(!hull.contains(new Vector2d(-10000,-10000)));
     }
 }
