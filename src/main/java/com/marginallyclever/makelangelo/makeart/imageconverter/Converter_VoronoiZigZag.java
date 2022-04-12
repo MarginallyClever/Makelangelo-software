@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
@@ -138,7 +137,7 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 		double change=10000;
 
 		try {
-			tessellateNow();
+			voronoiDiagram.tessellate(cells,myPaper.getMarginRectangle(),1e-6);
 			change = adjustCenters(myImage);
 		}
 		catch (Exception e) {
@@ -148,15 +147,6 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 		return change;
 	}
 
-	private void tessellateNow() {
-		Point2D[] points = new Point2D[numCells];
-		int i=0;
-		for(VoronoiCell cell : cells) {
-			points[i++] = new Point2D(cell.center.x,cell.center.y);
-		}
-		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
-	}
-	
 	private double adjustCenters(TransformedImage image) {
 		double change=0;
 		GeometryFactory factory = new GeometryFactory();
@@ -173,7 +163,9 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 			Point center = poly.getCentroid();
 			cell.center.set(center.getX(),center.getY());
 			Envelope e = poly.getEnvelopeInternal();
-			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
+			int miny = (int) Math.floor(e.getMinY());
+			int maxy = (int) Math.ceil(e.getMaxY());
+			for(int y=miny;y<maxy;++y) {
 				int x0 = findLeftEdge(poly,e,y,factory);
 				int x1 = findRightEdge(poly,e,y,factory);
 				for (int x = x0; x <=x1; ++x) {
@@ -200,8 +192,10 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 	}
 
 	private int findLeftEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
 		int x;
-		for(x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+		for(x = minx; x < maxx; ++x) {
 			Point c = factory.createPoint(new Coordinate(x,y));
 			if(poly.contains(c)) break;
 		}
@@ -209,8 +203,10 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 	}
 
 	private int findRightEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
 		int x;
-		for(x = (int) e.getMaxX(); x > (int) e.getMinX(); --x) {
+		for(x = maxx; x > minx; --x) {
 			Point c = factory.createPoint(new Coordinate(x,y));
 			if(poly.contains(c)) break;
 		}
@@ -250,9 +246,8 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 
 		gl2.glBegin(GL2.GL_POINTS);
 		for( VoronoiCell c : cells ) {
-			if (c.weight > lowpassCutoff) {
-				gl2.glVertex2d(c.center.x, c.center.y);
-			}
+			if (c.weight < lowpassCutoff) continue;
+			gl2.glVertex2d(c.center.x, c.center.y);
 		}
 		gl2.glEnd();
 	}

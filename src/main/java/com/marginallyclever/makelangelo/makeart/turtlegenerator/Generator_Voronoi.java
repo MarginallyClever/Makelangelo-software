@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -9,6 +9,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 1cm and 10cm grid lines
@@ -40,11 +42,11 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 		Rectangle2D bounds = myPaper.getMarginRectangle();
 
-		Point2D [] points = new Point2D[numCells];
+		List<VoronoiCell> points = new ArrayList<>();
 		for(int i=0;i<numCells;++i) {
-			points[i] = new Point2D(
-					Math.random()*bounds.getWidth()+bounds.getMinX(),
-					Math.random()*bounds.getHeight()+bounds.getMinY());
+			points.add(new VoronoiCell(
+					Math.random()*bounds.getWidth() +bounds.getMinX(),
+					Math.random()*bounds.getHeight()+bounds.getMinY()));
 		}
 
 		VoronoiTesselator2 diagram = new VoronoiTesselator2();
@@ -64,8 +66,8 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 		// draw all the cell centers
 		turtle.setColor(new ColorRGB(0,0,255));
-		for( Point2D p : points ) {
-			turtle.jumpTo(p.x,p.y);
+		for( VoronoiCell p : points ) {
+			turtle.jumpTo(p.center.x,p.center.y);
 			turtle.forward(1);
 			turtle.turn(90);
 			turtle.forward(1);

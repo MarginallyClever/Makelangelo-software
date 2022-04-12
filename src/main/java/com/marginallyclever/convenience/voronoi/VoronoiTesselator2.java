@@ -1,10 +1,10 @@
 package com.marginallyclever.convenience.voronoi;
 
-import com.marginallyclever.convenience.Point2D;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 /**
  * VoronoiTesselator2 uses the locationtech.jts library to generate a voronoi diagram.
@@ -14,10 +14,11 @@ import java.awt.geom.Rectangle2D;
 public class VoronoiTesselator2 {
     private Geometry diagram;
 
-    public void tessellate(Point2D[] points, Rectangle2D bounds, double tolerance) {
-        Coordinate[] coordinates = new Coordinate[points.length];
-        for (int i = 0; i < points.length; i++) {
-            coordinates[i] = new Coordinate(points[i].x,points[i].y);
+    public void tessellate(List<VoronoiCell> points, Rectangle2D bounds, double tolerance) {
+        Coordinate[] coordinates = new Coordinate[points.size()];
+        int i=0;
+        for(VoronoiCell cell : points) {
+            coordinates[i++] = new Coordinate(cell.center.x,cell.center.y);
         }
         GeometryFactory geometryFactory = new GeometryFactory();
         MultiPoint multiPoint = geometryFactory.createMultiPointFromCoords(coordinates);

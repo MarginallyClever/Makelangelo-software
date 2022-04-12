@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
@@ -35,10 +34,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Converter_VoronoiStippling extends ImageConverterIterative implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiStippling.class);
 	private static boolean drawVoronoi = false;
-	private static int numCells = 1000;
-	private static double maxDotSize = 5.0f;
-	private static double minDotSize = 1.0f;
-	private static int cutoff = 128;
+	private static int numCells = 9000;
+	private static double maxDotSize = 3.5;
+	private static double minDotSize = 0.5;
+	private static int lowpassCutoff = 128;
 	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
 	private List<VoronoiCell> cells = new ArrayList<>();
 
@@ -135,7 +134,7 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		double change=10000;
 
 		try {
-			tessellateNow();
+			voronoiDiagram.tessellate(cells,myPaper.getMarginRectangle(),1e-6);
 			change = adjustCenters(myImage);
 		}
 		catch (Exception e) {
@@ -213,15 +212,6 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		return x;
 	}
 
-	private void tessellateNow() {
-		Point2D [] points = new Point2D[numCells];
-		int i=0;
-		for(VoronoiCell cell : cells) {
-			points[i++] = new Point2D(cell.center.x,cell.center.y);
-		}
-		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
-	}
-
 	@Override
 	public void stop() {
 		super.stop();
@@ -268,13 +258,12 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		gl2.glColor3f(0, 0, 0);
 
 		for( VoronoiCell c : cells ) {
+			double val = c.weight;
+			if(val < lowpassCutoff) continue;
+
 			double x = c.center.x;
 			double y = c.center.y;
-
-			double val = c.weight;
-			if(val<cutoff) continue;
-
-			double r = ((val-cutoff)/255.0) * scale + minDotSize;
+			double r = ((val- lowpassCutoff)/255.0) * scale + minDotSize;
 			drawCircle(gl2,x,y,r);
 		}
 	}
@@ -297,40 +286,36 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	 */
 	private void writeOutCells() {
 		double scale = maxDotSize - minDotSize;
-		turtle = new Turtle();
 
 		for( VoronoiCell c : cells ) {
+			double val = c.weight;
+			if(val< lowpassCutoff) continue;
+
 			double x = c.center.x;
 			double y = c.center.y;
-			double val = c.weight;
-			if(val<cutoff) continue;
-
-			double r = ((val-cutoff)/255.0) * scale + minDotSize;
-
-			turtleCircle(x,y,r);
+			double r = ((val- lowpassCutoff)/255.0) * scale + minDotSize;
+			turtleCircle(x, y, r);
 		}
 	}
 
 	// filled circles
 	private void turtleCircle(double x, double y, double r) {
+		if(r<1) return;
+
 		double toolDiameter = 1;
 
+		int detail = (int)Math.max(4, Math.min(20,Math.ceil((r) * Math.PI * 2.0)));
+		Coordinate [] coordinates = new Coordinate[detail+1];
+
+		double r2 = r-0.5;
+
 		Turtle circle = new Turtle();
-
-		float detail = (float)Math.ceil(r * Math.PI * 2.0);
-		detail = Math.max(4, Math.min(20,detail));
-		boolean first = true;
-
-		for (float j = 0; j <= detail; ++j) {
-			double v = j * 2.0 * Math.PI / detail;
-			double newX = x + r * Math.cos(v);
-			double newY = y + r * Math.sin(v);
-			if(first) {
-				circle.jumpTo(newX, newY);
-				first=false;
-			} else {
-				circle.moveTo(newX, newY);
-			}
+		for(int j = 0; j <= detail; ++j) {
+			double v = (double)j * 2.0 * Math.PI / (double)detail;
+			double newX = x + r2 * Math.cos(v);
+			double newY = y + r2 * Math.sin(v);
+			if(j==0) circle.jumpTo(newX,newY);
+			else circle.moveTo(newX,newY);
 		}
 
 		InfillTurtle filler = new InfillTurtle();
@@ -357,10 +342,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	}
 
 	public void setCutoff(int value) {
-		cutoff = Math.max(0,Math.min(255,value));
+		lowpassCutoff = Math.max(0,Math.min(255,value));
 	}
 	public int getCutoff() {
-		return cutoff;
+		return lowpassCutoff;
 	}
 
 	public double getMaxDotSize() {
