@@ -4,6 +4,8 @@ import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
@@ -184,8 +186,10 @@ public class Converter_FlowField extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void finish() {
-		com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite bw = new com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite(255);
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 
 		// get all the flow lines.
@@ -201,6 +205,8 @@ public class Converter_FlowField extends ImageConverter {
 		for(Turtle t : list) {
 			convertLine(img,t);
 		}
+
+		fireConversionFinished();
 	}
 
 	private List<Turtle> fromEdge() {

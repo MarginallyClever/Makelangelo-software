@@ -26,7 +26,7 @@ public abstract class ImageConverter {
 	// for previewing the image
 	private Texture texture = null;
 
-	private List<Select> panelElements = new ArrayList<>();
+	private final List<Select> panelElements = new ArrayList<>();
 
 	/**
 	 * @return the translated name.
@@ -44,8 +44,12 @@ public abstract class ImageConverter {
 		texture = null;
 	}
 
-	abstract public void finish();
-	
+	/**
+	 * Stop the conversion process.  Called by the GUI when the user cancels the conversion, either by changing the
+	 * style or halting altogether.  In both cases the conversion should be aborted.
+	 */
+	public void stop() {}
+
 	/**
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
@@ -198,8 +202,11 @@ public abstract class ImageConverter {
 		for(ImageConverterListener listener:listeners) listener.onRestart(this);
 	}
 
+	/**
+	 * Called when the converter has successfully finished a job.
+	 */
 	protected void fireConversionFinished() {
-		for(ImageConverterListener listener : listeners) listener.onConvertFinished(this);
+		for(ImageConverterListener listener : listeners) listener.onConvertFinished(turtle);
 	}
 
 	public void add(Select element) {
@@ -208,6 +215,4 @@ public abstract class ImageConverter {
 	public List<Select> getPanelElements() {
 		return panelElements;
 	}
-
-	public void stop() {}
 }

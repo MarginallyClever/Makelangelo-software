@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -40,7 +41,6 @@ public class Converter_Wander extends ImageConverter {
 		}
 	}
 
-
 	public Converter_Wander() {
 		super();
 		SelectInteger selectCount = new SelectInteger("count",Translator.get("ConverterWanderLineCount"),getLineCount());
@@ -63,12 +63,15 @@ public class Converter_Wander extends ImageConverter {
 	}
 
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
 		if(isCMYK) {
 			finishCMYK();
 		} else {
 			finishBlackAndWhite();
 		}
+
+		fireConversionFinished();
 	}
 
 	protected void outputChannel(TransformedImage img, ColorRGB newColor, int pointsPerChannel, double cutoff) {

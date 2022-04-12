@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -52,7 +53,9 @@ public class Converter_SpiralPulse extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
@@ -131,6 +134,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		}
 
 		logger.debug("{} rings.", numRings);
+
+		fireConversionFinished();
 	}
 
 	public void setIntensity(double v) {

@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +100,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
 		changeConverter(ImageConverterFactory.getList()[first]);
+		scaleLoader(fillNames.getSelectedIndex());
 	}
 	
 	private JComboBox<String> getStyleSelection() {
@@ -115,26 +117,14 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		return box;
 	}
 
-	private void onConverterChanged(ItemEvent e) {
-		logger.debug("onConverterChanged");
-				
-	    CardLayout cl = (CardLayout)(cards.getLayout());
-	    cl.show(cards, (String)e.getItem());
-	    scaleLoader(fillNames.getSelectedIndex());
-
-		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
-		setPreferredDrawStyle(first);
-		changeConverter(ImageConverterFactory.getList()[first]);
-	}
-
 	private JComboBox<String> getFillSelection() {
 		String[] imageFillNames = {
-			Translator.get("ConvertImagePaperFill"),
-			Translator.get("ConvertImagePaperFit")
+				Translator.get("ConvertImagePaperFill"),
+				Translator.get("ConvertImagePaperFit")
 		};
 		JComboBox<String> box = new JComboBox<>(imageFillNames);
-		
-		int p=getPreferredFillStyle();
+
+		int p = getPreferredFillStyle();
 		if(p>=box.getItemCount()) p=0;
 		box.addItemListener((e) ->{
 			scaleLoader(box.getSelectedIndex());
@@ -145,14 +135,25 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		return box;
 	}
 
+	private void onConverterChanged(ItemEvent e) {
+		logger.debug("onConverterChanged");
+				
+	    CardLayout cl = (CardLayout)(cards.getLayout());
+	    cl.show(cards, (String)e.getItem());
+
+		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
+		setPreferredDrawStyle(first);
+		changeConverter(ImageConverterFactory.getList()[first]);
+	}
+
 	private void scaleLoader(int mode) {
 		double width  = myPaper.getMarginWidth();
 		double height = myPaper.getMarginHeight();
 
 		boolean test;
 		switch(mode) {
-			case 0 :  test = width > height;  break; // fill paper
-			default:  test = width < height;  break; // fit paper
+			case 0 :  test = width < height;  break; // fill paper
+			default:  test = width > height;  break; // fit paper
 		}
 
 		float f;
@@ -189,11 +190,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	private void stopConversion() {
-		logger.debug("Stop conversion");
-
 		if(myConverter != null) {
+			logger.debug("Stop conversion");
 			myConverter.stop();
-			myConverter.removeImageConverterListener(this);
 		}
 	}
 	
@@ -202,7 +201,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		logger.debug("startConversion() {}", myConverter.getName());
 
-		myConverter.addImageConverterListener(this);
 		myConverter.start(myPaper,myImage);
 	}
 	
@@ -211,13 +209,16 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("changeConverter() {}", converter.getName());
 
 		stopConversion();
+		if(myConverter != null) myConverter.removeImageConverterListener(this);
 		myConverter = converter;
+		myConverter.addImageConverterListener(this);
 		startConversion();
 	}
 
 	private void restart() {
 		logger.debug("restart()");
 		stopConversion();
+		onConvertFinished(new Turtle());
 		startConversion();
 	}
 
@@ -234,8 +235,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	@Override
-	public void onConvertFinished(ImageConverter converter) {
-		notifyListeners(new ActionEvent(converter.turtle,0,"turtle"));
+	public void onConvertFinished(Turtle turtle) {
+		notifyListeners(new ActionEvent(turtle,0,"turtle"));
 	}
 
 	// OBSERVER PATTERN

@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -56,7 +57,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
-
 	public void setIntensity(double arg0) {
 		intensity=arg0;
 	}
@@ -82,7 +82,9 @@ public class Converter_Crosshatch extends ImageConverter {
 	} 
 	
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
@@ -91,6 +93,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		finishPass(new int[]{(int)pass75},15,img);
 		finishPass(new int[]{(int)pass15},75,img);
 		finishPass(new int[]{(int)pass45},45,img);
+
+		fireConversionFinished();
 	}
 	
 	private void finishPass(int [] passes,double angleDeg,TransformedImage img) {

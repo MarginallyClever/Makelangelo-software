@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -49,7 +50,9 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(myImage);
 
@@ -62,17 +65,17 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 		// remove extra change color at the start of the turtle
 		turtle.history.clear();
 		
-		logger.debug("Yellow...");
-		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),Math.cos(Math.toRadians(45    ))*separation,Math.sin(Math.toRadians(45    ))*separation);
-		logger.debug("Cyan...");
-		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),Math.cos(Math.toRadians(45+ 90))*separation,Math.sin(Math.toRadians(45+ 90))*separation);
-		logger.debug("Magenta...");
-		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),Math.cos(Math.toRadians(45+180))*separation,Math.sin(Math.toRadians(45+180))*separation);
-		logger.debug("Black...");
-		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),Math.cos(Math.toRadians(45+270))*separation,Math.sin(Math.toRadians(45+270))*separation);
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),45    ,separation);
+		logger.debug("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),45+ 90,separation);
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),45+180,separation);
+		logger.debug("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),45+270,separation);
+
+		fireConversionFinished();
 	}
 
-	protected void outputChannel(TransformedImage img, ColorRGB newColor, double cx, double cy) {
+	protected void outputChannel(TransformedImage img, ColorRGB newColor, double angle, double separation) {
+		double cx = Math.cos(Math.toRadians(angle))*separation;
+		double cy = Math.sin(Math.toRadians(angle))*separation;
 		turtle.setColor(newColor);
 		
 		double maxr;

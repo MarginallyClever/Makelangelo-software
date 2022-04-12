@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -47,12 +48,14 @@ public class Converter_CMYK extends ImageConverter {
 	public void setPasses(int value) {
 		passes = Math.max(1, value);
 	}
-	
+
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(myImage);
 		
@@ -64,6 +67,8 @@ public class Converter_CMYK extends ImageConverter {
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
 		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
 		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+
+		fireConversionFinished();
 	}
 	
 	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {

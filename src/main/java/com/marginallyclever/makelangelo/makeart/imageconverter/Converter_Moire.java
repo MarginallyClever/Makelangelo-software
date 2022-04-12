@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -191,7 +192,9 @@ public class Converter_Moire extends ImageConverter {
 	}
 
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
@@ -212,8 +215,7 @@ public class Converter_Moire extends ImageConverter {
 		Point2D b = new Point2D();
 		
 		turtle = new Turtle();
-		
-		logger.debug("Moire start");
+
 		if (direction == 0) {
 			// horizontal
 			yBottom -= h;
@@ -233,7 +235,8 @@ public class Converter_Moire extends ImageConverter {
 				convertLine(img,spaceBetweenLines,halfStep,a,b);
 			}
 		}
-		logger.debug("Moire end");
+
+		fireConversionFinished();
 	}
 
 }

@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
@@ -52,36 +53,21 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		SelectDouble selectMin = new SelectDouble("min", Translator.get("Converter_VoronoiStippling.DotMin"), getMinDotSize());
 		SelectDouble selectCutoff = new SelectDouble("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), getCutoff());
 		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
-		SelectBoolean selectKeepGoing = new SelectBoolean("keepGoing", Translator.get("Converter_VoronoiStippling.keepGoing"), getKeepGoing());
 
 		add(selectCells);
 		add(selectMax);
 		add(selectMin);
 		add(selectCutoff);
 		add(selectDrawVoronoi);
-		add(selectKeepGoing);
 
 		selectCells.addPropertyChangeListener(evt -> {
 			setNumCells((int) evt.getNewValue());
-			selectKeepGoing.setSelected(true);
 			fireRestart();
 		});
-		selectMax.addPropertyChangeListener(evt -> {
-			setMaxDotSize((double) evt.getNewValue());
-		});
-		selectMin.addPropertyChangeListener(evt -> {
-			setMinDotSize((double) evt.getNewValue());
-
-		});
-		selectCutoff.addPropertyChangeListener(evt -> {
-			setCutoff((double) evt.getNewValue());
-		});
-		selectDrawVoronoi.addPropertyChangeListener(evt -> {
-			setDrawVoronoi((boolean) evt.getNewValue());
-		});
-		selectKeepGoing.addPropertyChangeListener(evt -> {
-			setKeepGoing((boolean) evt.getNewValue());
-		});
+		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((double) evt.getNewValue()));
+		selectMin.addPropertyChangeListener(evt -> setMinDotSize((double) evt.getNewValue()));
+		selectCutoff.addPropertyChangeListener(evt -> setCutoff((double) evt.getNewValue()));
+		selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 	}
 	
 	@Override
@@ -89,14 +75,35 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		return Translator.get("Converter_VoronoiStippling.Name");
 	}
 
-
 	@Override
-	public void setImage(TransformedImage img) {
+	public void start(Paper paper, TransformedImage image) {
 		// make black & white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		myImage = bw.filter(img);
-		setKeepGoing(true);
-		restart();
+		super.start(paper, bw.filter(image));
+
+		lock.lock();
+		try {
+			turtle = new Turtle();
+
+			iterations=0;
+
+			Rectangle2D bounds = myPaper.getMarginRectangle();
+			cells.clear();
+			for(int i=0;i<numCells;++i) {
+				cells.add(new VoronoiCell(
+						Math.random()*bounds.getWidth()+bounds.getMinX(),
+						Math.random()*bounds.getHeight()+bounds.getMinY()));
+			}
+		}
+		finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void resume() {
+		turtle = new Turtle();
+		fireConversionFinished();
 	}
 
 	@Override
@@ -110,8 +117,14 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		finally {
 			lock.unlock();
 		}
+		return true;
+	}
 
-		return getKeepGoing();
+	@Override
+	public void generateOutput() {
+		writeOutCells();
+
+		fireConversionFinished();
 	}
 
 	/**
@@ -183,39 +196,15 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 		voronoiDiagram.tessellate(points,myPaper.getMarginRectangle(),1e-6);
 	}
 
-	public void restart() {
-		if(myImage==null) return;
-
-		lock.lock();
-		try {
-			turtle = new Turtle();
-
-			iterations=0;
-			setKeepGoing(true);
-
-			Rectangle2D bounds = myPaper.getMarginRectangle();
-			cells.clear();
-			for(int i=0;i<numCells;++i) {
-				cells.add(new VoronoiCell(
-						Math.random()*bounds.getWidth()+bounds.getMinX(),
-						Math.random()*bounds.getHeight()+bounds.getMinY()));
-			}
-		}
-		finally {
-			lock.unlock();
-		}
-	}
-
 	@Override
-	public void finish() {
-		setKeepGoing(false);
+	public void stop() {
 		writeOutCells();
+
+		fireConversionFinished();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
-		if(!getKeepGoing()) return;
-
 		lock.lock();
 		try {
 			if (drawVoronoi) renderEdges(gl2);
@@ -271,6 +260,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 	 */
 	private void writeOutCells() {
 		double scale = maxDotSize - minDotSize;
+		turtle = new Turtle();
 
 		for( VoronoiCell c : cells ) {
 			double x = c.center.x;
@@ -305,6 +295,7 @@ public class Converter_VoronoiStippling extends IterativeImageConverter implemen
 				circle.moveTo(newX, newY);
 			}
 		}
+
 		InfillTurtle filler = new InfillTurtle();
 		try {
 			turtle.add(circle);

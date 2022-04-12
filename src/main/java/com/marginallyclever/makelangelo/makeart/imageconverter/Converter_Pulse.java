@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -103,7 +104,9 @@ public class Converter_Pulse extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
@@ -158,6 +161,8 @@ public class Converter_Pulse extends ImageConverter {
 				}
 			}
 		}
+
+		fireConversionFinished();
 	}
 
     public int getCutoff() {

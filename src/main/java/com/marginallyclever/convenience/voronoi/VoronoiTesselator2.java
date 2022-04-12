@@ -31,7 +31,7 @@ public class VoronoiTesselator2 {
     }
 
     public int getNumHulls() {
-        return diagram.getNumGeometries();
+        return (diagram==null) ? 0 : diagram.getNumGeometries();
     }
 
     public Polygon getHull(int i) {

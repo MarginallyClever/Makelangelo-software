@@ -8,10 +8,11 @@ import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
@@ -55,24 +56,31 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	public Converter_VoronoiZigZag() {
 		super();
 
+		SelectToggleButton selectOptimizePath = new SelectToggleButton("optimizePath",Translator.get("VoronoiZigZag.optimizePath"));
+		add(selectOptimizePath);
+		selectOptimizePath.addPropertyChangeListener(evt -> {
+			lowNoise = selectOptimizePath.isSelected();
+			if(lowNoise) {
+				logger.debug("Running Lin/Kerighan optimization...");
+				renderMode = 1;
+				greedyTour();
+			} else {
+				logger.debug("Evolving...");
+				renderMode = 0;
+			}
+		});
 		SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
 		add(selectCells);
 		SelectDouble selectCutoff = new SelectDouble("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),getLowpassCutoff());
 		add(selectCutoff);
-		SelectBoolean selectKeepGoing = new SelectBoolean("keepGoing",Translator.get("Converter_VoronoiStippling.keepGoing"),getKeepGoing());
-		add(selectKeepGoing);
 
 		selectCells.addPropertyChangeListener(evt->{
 			setNumCells((int)evt.getNewValue());
-			selectKeepGoing.setSelected(true);
 			fireRestart();
 		});
 		selectCutoff.addPropertyChangeListener(evt->{
 			setLowpassCutoff((double)evt.getNewValue());
 
-		});
-		selectKeepGoing.addPropertyChangeListener(evt->{
-			setKeepGoing((boolean)evt.getNewValue());
 		});
 	}
 
@@ -80,23 +88,17 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
 	}
-	
-	@Override
-	public void setImage(TransformedImage img) {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		myImage = bw.filter(img);
-		restart();
-		renderMode = 0;
-	}
 
-	public void restart() {
-		if(myImage==null) return;
+	@Override
+	public void start(Paper paper, TransformedImage image) {
+		renderMode = 0;
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		super.start(paper, bw.filter(image));
 
 		lock.lock();
 		try {
 			lowNoise=false;
 			iterations = 0;
-			setKeepGoing(true);
 
 			Rectangle2D bounds = myPaper.getMarginRectangle();
 			cells.clear();
@@ -123,19 +125,23 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 			} else {
 				double noiseLevel = evolveCells();
 				System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
-				if( noiseLevel < numCells*0.1 ) {
-					lowNoise=true;
-					greedyTour();
-					renderMode = 1;
-					logger.debug("Running Lin/Kerighan optimization...");
-				}
 			}
 		}
 		finally {
 			lock.unlock();
 		}
-		return getKeepGoing();
+		return true;
 	}
+
+	@Override
+	public void generateOutput() {
+		writeOutCells();
+
+		fireConversionFinished();
+	}
+
+	@Override
+	public void resume() {}
 
 	/**
 	 * Jiggle the dots until they make a nice picture
@@ -205,14 +211,15 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 	}
 	
 	@Override
-	public void finish() {
-		setKeepGoing(false);
+	public void stop() {
 		writeOutCells();
+
+		fireConversionFinished();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
-		if(!getKeepGoing()) return;
+		if(getThread().getPaused()) return;
 
 		lock.lock();
 		try {
@@ -267,7 +274,7 @@ public class Converter_VoronoiZigZag extends IterativeImageConverter implements 
 		// once|=transposeForwardTest();
 		// once|=transposeBackwardTest();
 
-		setKeepGoing(flipTests());
+		flipTests();
 	}
 
 	public String formatTime(long millis) {

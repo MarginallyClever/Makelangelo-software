@@ -1296,7 +1296,7 @@
 	</string>
 	<string>
 		<key>SpiralCMYKName</key>
-		<value>Spiral CMYK</value>
+		<value>CMYK Spiral</value>
 		<hint>Spiral generator</hint>
 	</string>
 
@@ -2232,5 +2232,10 @@
 	<string>
 		<key>Generator_FlowField.rightAngle</key>
 		<value>Add orthogonal lines</value>
+	</string>
+
+	<string>
+		<key>VoronoiZigZag.optimizePath</key>
+		<value>Optimize path</value>
 	</string>
 </language>

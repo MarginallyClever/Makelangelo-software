@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -31,7 +32,9 @@ public class Converter_RandomLines extends ImageConverter {
 	}
 
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
@@ -69,8 +72,9 @@ public class Converter_RandomLines extends ImageConverter {
 			startPX = endPX;
 			startPY = endPY;
 		}
+
+		fireConversionFinished();
 	}
-	
 
 	public int getLineCount() {
 		return numLines;
