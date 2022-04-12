@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Dan
  * @since 7.0.0?
  */
-public class Converter_VoronoiStippling extends IterativeImageConverter implements PreviewListener {
+public class Converter_VoronoiStippling extends ImageConverterIterative implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiStippling.class);
 	private static boolean drawVoronoi = false;
 	private static int numCells = 1000;

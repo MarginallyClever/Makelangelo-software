@@ -8,13 +8,13 @@ import javax.swing.*;
 
 public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private static final Logger logger = LoggerFactory.getLogger(ImageConverterThread.class);
-	private IterativeImageConverter myConverter;
+	private ImageConverterIterative myConverter;
 	private String name;
 	private boolean paused=false;
 	private boolean enough=false;
 	private int iterations=0;
 
-	public ImageConverterThread(IterativeImageConverter converter) {
+	public ImageConverterThread(ImageConverterIterative converter) {
 		super();
 		this.myConverter = converter;
 		this.name = converter.getName();

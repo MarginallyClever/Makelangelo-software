@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends IterativeImageConverter implements PreviewListener {
+public class Converter_VoronoiZigZag extends ImageConverterIterative implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiZigZag.class);
 	private static int numCells = 9000;
 	private static int lowpassCutoff = 128;

@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
  * Image converter that runs an evolving, iterative process until it converges on some goal or the user pauses it.
  * @author Dan Royer
  */
-public abstract class IterativeImageConverter extends ImageConverter {
-    private static final Logger logger = LoggerFactory.getLogger(IterativeImageConverter.class);
+public abstract class ImageConverterIterative extends ImageConverter {
+    private static final Logger logger = LoggerFactory.getLogger(ImageConverterIterative.class);
     private ImageConverterThread imageConverterThread;
     private final SelectToggleButton pauseButton;
 
-    public IterativeImageConverter() {
+    public ImageConverterIterative() {
         super();
 
         pauseButton = new SelectToggleButton("pauseButton",Translator.get("PlotterControls.Pause"));
