@@ -161,7 +161,9 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 			Point centroid = poly.getCentroid();
 			cell.center.set(centroid.getX(),centroid.getY());
 			Envelope e = poly.getEnvelopeInternal();
-			for(int y=(int)e.getMinY();y<(int)e.getMaxY();++y) {
+			int miny = (int) Math.floor(e.getMinY());
+			int maxy = (int) Math.ceil(e.getMaxY());
+			for(int y=miny;y<maxy;++y) {
 				int x0 = findLeftEdge(poly,e,y,factory);
 				int x1 = findRightEdge(poly,e,y,factory);
 				for (int x = x0; x <= x1; ++x) {
@@ -190,8 +192,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	}
 
 	private int findLeftEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
 		int x;
-		for(x = (int) e.getMinX(); x < (int) e.getMaxX(); ++x) {
+		for(x = minx; x < maxx; ++x) {
 			Point c = factory.createPoint(new Coordinate(x,y));
 			if(poly.contains(c)) break;
 		}
@@ -199,8 +203,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	}
 
 	private int findRightEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
 		int x;
-		for(x = (int) e.getMaxX(); x > (int) e.getMinX(); --x) {
+		for(x = maxx; x > minx; --x) {
 			Point c = factory.createPoint(new Coordinate(x,y));
 			if(poly.contains(c)) break;
 		}
