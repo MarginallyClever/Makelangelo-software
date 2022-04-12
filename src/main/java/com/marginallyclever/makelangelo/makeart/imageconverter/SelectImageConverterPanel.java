@@ -105,7 +105,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	 */
 	public void run() {
 		scaleImage(fillNames.getSelectedIndex());
-		int first = (styleNames != null ? styleNames.getSelectedIndex() : 0);
+		showCard((String) styleNames.getSelectedItem());
+		int first = styleNames.getSelectedIndex();
 		changeConverter(ImageConverterFactory.getList()[first]);
 	}
 	
@@ -117,8 +118,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		}
 		
 		JComboBox<String> box = new JComboBox<>(imageConverterNames.toArray(new String[0]));
-		box.addItemListener(e -> onConverterChanged(e));
 		box.setSelectedIndex(getPreferredDrawStyle());
+		box.addItemListener(e -> onConverterChanged(e));
 
 		return box;
 	}
@@ -132,12 +133,12 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		int p = getPreferredFillStyle();
 		if(p>=box.getItemCount()) p=0;
+		box.setSelectedIndex(p);
 		box.addItemListener((e) ->{
 			scaleImage(box.getSelectedIndex());
 			setPreferredFillStyle(box.getSelectedIndex());
 			restart();
 		});
-		box.setSelectedIndex(p);
 
 		return box;
 	}
@@ -145,12 +146,16 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private void onConverterChanged(ItemEvent e) {
 		logger.debug("onConverterChanged");
 
-	    CardLayout cl = (CardLayout)(cards.getLayout());
-	    cl.show(cards, (String)e.getItem());
+		showCard((String)e.getItem());
 
 		int first = (styleNames!=null ? styleNames.getSelectedIndex() : 0);
 		setPreferredDrawStyle(first);
 		changeConverter(ImageConverterFactory.getList()[first]);
+	}
+
+	private void showCard(String cardName) {
+		CardLayout cl = (CardLayout)(cards.getLayout());
+		cl.show(cards, cardName);
 	}
 
 	private void scaleImage(int mode) {
@@ -210,7 +215,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 	
 	private void changeConverter(ImageConverter converter) {
-		if( converter == myConverter ) return;
 		logger.debug("changeConverter() {}", converter.getName());
 
 		stopConversion();
