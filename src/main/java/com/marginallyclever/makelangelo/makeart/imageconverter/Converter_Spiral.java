@@ -99,7 +99,7 @@ public class Converter_Spiral extends ImageConverter {
 
 				if(myPaper.isInsidePaperMargins(fx, fy)) {
 					try {
-						z = img.sample3x3(fx, fy);
+						z = img.sample(fx, fy,1);
 					} catch(Exception e) {
 						logger.error("Failed to sample", e);
 					}

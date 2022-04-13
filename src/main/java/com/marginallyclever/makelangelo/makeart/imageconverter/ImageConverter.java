@@ -125,7 +125,7 @@ public abstract class ImageConverter {
 			x = dx * n + P0.x;
 			y = dy * n + P0.y;
 			
-			v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+			v = img.sample( x, y , halfStep);
 
 			if(v<channelCutoff) turtle.moveTo(x,y);
 			else turtle.jumpTo(x,y);
@@ -165,7 +165,7 @@ public abstract class ImageConverter {
 			y = dy * n + y0;
 			isInside = myPaper.isInsidePaperMargins(x,y);
 			if(isInside) {
-				oldPixel = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+				oldPixel = img.sample( x, y, halfStep);
 				int b2 = (int)Math.min(b, error0.length-2);
 				oldPixel += error0[b2];
 				newPixel = oldPixel>=channelCutoff? 255:0;

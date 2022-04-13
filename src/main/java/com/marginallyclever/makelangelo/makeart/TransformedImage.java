@@ -196,10 +196,6 @@ public class TransformedImage {
 		return c2;
 	}
 
-	public int sample3x3(double x, double y) {
-		return sample(x,y,1);
-	}
-
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
 	public int sampleArea(int x0, int y0, int x1, int y1) {
 		int value = 0;
