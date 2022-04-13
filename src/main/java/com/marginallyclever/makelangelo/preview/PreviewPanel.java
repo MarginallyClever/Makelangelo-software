@@ -25,16 +25,15 @@ import java.util.prefs.Preferences;
  *
  */
 public class PreviewPanel extends GLJPanel implements GLEventListener {
+	static final long serialVersionUID = 2;
 
 	private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
 	
-	static final long serialVersionUID = 2;
-
 	// Use debug pipeline?
 	private static final boolean DEBUG_GL_ON = false;
 	private static final boolean TRACE_GL_ON = false;
 
-	private List<PreviewListener> previewListeners = new ArrayList<>();
+	private final List<PreviewListener> previewListeners = new ArrayList<>();
 	
 	private Camera camera;
 	
@@ -134,6 +133,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 					repaint();
 				}
 			}
+
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				int x = e.getX();
@@ -171,7 +171,9 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		gl2.glMatrixMode(GL2.GL_PROJECTION);
 		gl2.glLoadIdentity();
 		// orthographic projection
-		glu.gluOrtho2D(-width/2, width/2, -height/2, height/2);
+		float w2 = width/2.0f;
+		float h2 = height/2.0f;
+		glu.gluOrtho2D(-w2, w2, -h2, h2);
 	}
 
 	/**
@@ -238,28 +240,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 			p.render(gl2);
 			gl2.glPopMatrix();
 		}
-	}
-
-	// if you need to display a marker in the scene at the cursor position for debugging, use this.
-	private void paintCursor(GL2 gl2) {
-		gl2.glPushMatrix();
-
-		Rectangle r = this.getBounds();
-		Point2D sp = new Point2D(mouseOldX,mouseOldY);
-		sp.x -= r.getCenterX();
-		sp.y -= r.getCenterY();
-
-		Point2D wp = camera.screenToWorldSpace(sp);
-		gl2.glColor3d(255,0,255);
-		gl2.glTranslated(wp.x,-wp.y,0);
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2d(-10,0);
-		gl2.glVertex2d( 10,0);
-		gl2.glVertex2d(0,-10);
-		gl2.glVertex2d(0, 10);
-		gl2.glEnd();
-
-		gl2.glPopMatrix();
 	}
 
 	/**
