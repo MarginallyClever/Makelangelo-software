@@ -2,6 +2,10 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
@@ -21,48 +25,64 @@ public class Generator_FlowField extends TurtleGenerator {
 	private static boolean fromEdge = false;  // continuous lines
 	private static boolean rightAngle = false;
 
-	public static void setScaleX(double scaleX) {
-		Generator_FlowField.scaleX = scaleX;
-	}
-	public static void setScaleY(double scaleY) {
-		Generator_FlowField.scaleY = scaleY;
-	}
-	public static void setOffsetX(double offsetX) {
-		Generator_FlowField.offsetX = offsetX;
-	}
-	public static void setOffsetY(double offsetY) {
-		Generator_FlowField.offsetY = offsetY;
-	}
 	public static void setStepSize(int stepSize) {
 		Generator_FlowField.stepSize = stepSize;
-	}
-	public static void setFromEdge(boolean fromEdge) {
-		Generator_FlowField.fromEdge = fromEdge;
-	}
-	public static void setRightAngle(boolean rightAngle) {
-		Generator_FlowField.rightAngle = rightAngle;
-	}
-
-	public static double getScaleX() {
-		return scaleX;
-	}
-	public static double getScaleY() {
-		return scaleY;
-	}
-	public static double getOffsetX() {
-		return offsetX;
-	}
-	public static double getOffsetY() {
-		return offsetY;
 	}
 	public static int getStepSize() {
 		return stepSize;
 	}
-	public static boolean getFromEdge() {
-		return fromEdge;
-	}
-	public static boolean getRightAngle() {
-		return rightAngle;
+
+	public Generator_FlowField() {
+		super();
+		SelectDouble fieldScaleX = new SelectDouble("scaleX",Translator.get("Generator_FlowField.scaleX"),scaleX);
+		SelectDouble fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),scaleY);
+		SelectDouble fieldOffsetX = new SelectDouble("offsetX",Translator.get("Generator_FlowField.offsetX"),offsetX);
+		SelectDouble fieldOffsetY = new SelectDouble("offsetY",Translator.get("Generator_FlowField.offsetY"),offsetY);
+		SelectSlider fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,stepSize);
+		SelectBoolean fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),fromEdge);
+		SelectBoolean fieldRightAngle = new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),rightAngle);
+
+		add(fieldScaleX);
+		fieldScaleX.addPropertyChangeListener(evt->{
+			scaleX = (fieldScaleX.getValue());
+			generate();
+
+		});
+		add(fieldScaleY);
+		fieldScaleY.addPropertyChangeListener(evt->{
+			scaleY = (fieldScaleY.getValue());
+			generate();
+
+		});
+		add(fieldOffsetX);
+		fieldOffsetX.addPropertyChangeListener(evt->{
+			offsetX = (fieldOffsetX.getValue());
+			generate();
+
+		});
+		add(fieldOffsetY);
+		fieldOffsetY.addPropertyChangeListener(evt->{
+			offsetY =(fieldOffsetY.getValue());
+			generate();
+
+		});
+		add(fieldStepSize);
+		fieldStepSize.addPropertyChangeListener(evt->{
+			stepSize = (fieldStepSize.getValue());
+			generate();
+
+		});
+		add(fieldFromEdge);
+		fieldFromEdge.addPropertyChangeListener(evt->{
+			fromEdge = (fieldFromEdge.isSelected());
+			generate();
+		});
+		add(fieldRightAngle);
+		fieldRightAngle.addPropertyChangeListener(evt->{
+			rightAngle = (fieldRightAngle.isSelected());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override
@@ -70,11 +90,6 @@ public class Generator_FlowField extends TurtleGenerator {
 		return Translator.get("Generator_FlowField.name");
 	}
 
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_FlowField_Panel(this);
-	}
-		
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();

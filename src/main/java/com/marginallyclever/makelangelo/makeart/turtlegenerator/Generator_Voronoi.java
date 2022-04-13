@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
@@ -19,6 +20,17 @@ import java.util.List;
 public class Generator_Voronoi extends TurtleGenerator {
 	private static int numCells = 500;
 
+	public Generator_Voronoi() {
+		super();
+
+		SelectInteger cells;
+		add(cells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells()));
+		cells.addPropertyChangeListener(evt->{
+			setNumCells(Math.max(1,cells.getValue()));
+			generate();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("Converter_Voronoi.Name");
@@ -30,12 +42,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 	static public void setNumCells(int value) {
 		numCells = value;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Voronoi_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();

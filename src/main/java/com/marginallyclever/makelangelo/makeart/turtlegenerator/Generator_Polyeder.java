@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,14 +110,13 @@ public class Generator_Polyeder extends TurtleGenerator {
 	// selected model
 	protected int modelid=0;
 	// list of all available model shapes
-	protected ArrayList<Model> models=null;
+	protected final ArrayList<Model> models = new ArrayList<>();
 
 	public int instructionPtr;
 
 	public Generator_Polyeder() {
 		super();
-		
-		models=new ArrayList<Model>();
+
 		addModel("Cube",new int[] {4,4,1,1,1,4,0,1,0,4,1,1,1,4,0,4,0,0,0,0});
 		addModel("Tetrahedron", new int [] {3,3,1,0,3,1,0,3,1,0});
 		addModel("Octahedron",new int[] {3,3,0,3,0,1,3,0,1,3,3,1,3,1,1,3,0,1});
@@ -135,6 +136,27 @@ public class Generator_Polyeder extends TurtleGenerator {
 		addModel("Icosidodecahedron",new int[] {5,3,5,1,3,0,5,1,3,0,0,1,1,3,0,0,3,5,1,3,0,5,1,1,1,1,3,0,0,1,0,5,1,3,0,5,1,3,0,0,1,1,3,0,0,1,3,0,5,1,3,0,5,1,3,0,0,1,1,3,0,0,1,3,0,5,1,3,0,5,1,1,1,1,3,0,0,1,3,0,5,1,3,0,0,1,1,3,0,0});
 		addModel("Truncated Octahedron",new int[] {4,6,1,1,6,4,0,0,0,0,1,1,4,0,0,0,1,1,6,0,1,6,1,0,1,1,1,1,0,6,1,1,6,4,0,0,0,0,4,0,0,0,1,4,0,0,0,1,1,6,0,1,6,1,0,1,1,1,1,0});
 		addModel("Rhombicuboctahedron",new int[] {4,4,3,0,0,4,4,1,1,1,4,3,0,0,1,3,0,0,4,1,1,1,3,0,0,4,1,4,0,0,0,1,4,3,0,0,4,4,1,1,1,4,3,0,0,4,4,1,1,1,1,4,1,1,1,3,0,0,4,1,1,1,3,0,0,4,1,4,0,0,0,1});
+
+		SelectInteger selectSize;
+		SelectInteger selectFlap;
+		SelectOneOfMany selectModel;
+		String [] models=getModelNames();
+
+		add(selectSize = new SelectInteger("size",Translator.get("Size"),getLastSize()));
+		selectSize.addPropertyChangeListener(evt->{
+			setSize(((Number)selectSize.getValue()).intValue());
+			generate();
+		});
+		add(selectFlap = new SelectInteger("flap",Translator.get("Flap"),getLastFlap()));
+		selectFlap.addPropertyChangeListener(evt->{
+			setFlap(((Number)selectFlap.getValue()).intValue());
+			generate();
+		});
+		add(selectModel = new SelectOneOfMany("model",Translator.get("Model"),models,getLastModel()));
+		selectModel.addPropertyChangeListener(evt->{
+			setModel(selectModel.getSelectedIndex());
+			generate();
+		});
 	}
 	
 	@Override
@@ -142,8 +164,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 		return Translator.get("Polyeder");
 	}
 
-	void addModel(String name,int [] instructions)
-	{
+	void addModel(String name,int [] instructions) {
 		Model m = new Model();
 		m.name=name;
 		m.instructions=instructions;
@@ -159,13 +180,6 @@ public class Generator_Polyeder extends TurtleGenerator {
 		}
 		return result;
 
-	}
-
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		// rebuild the list of models here if you want to dynamically add more.
-		
-		return new Generator_Polyeder_Panel(this);
 	}
 
 	private void geneneratePolygonStep(Turtle turtle,Transform t) {

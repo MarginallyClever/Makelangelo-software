@@ -1,9 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import java.security.SecureRandom;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.security.SecureRandom;
 
 /**
  * L System fractal
@@ -17,18 +19,54 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	private static double orderScale = 0.76f;
 	private SecureRandom random;
 	float maxSize;
-	
+
+	public Generator_LSystemTree() {
+		super();
+
+		SelectSlider field_order;
+		SelectSlider field_branches;
+		SelectSlider field_orderScale;
+		SelectSlider field_angle;
+		SelectSlider field_noise;
+
+		add(field_order      = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,getOrder()));
+		field_order.addPropertyChangeListener(evt->{
+			setOrder(field_order.getValue());
+			generate();
+		});
+
+		add(field_branches   = new SelectSlider("branches",Translator.get("LSystemBranches"),8,1,getBranches()));
+		field_branches.addPropertyChangeListener(evt->{
+			setBranches(field_branches.getValue());
+			generate();
+		});
+
+		add(field_orderScale = new SelectSlider("scale",Translator.get("LSystemOrderScale"),100,1,(int)(getScale()*100)));
+		field_orderScale.addPropertyChangeListener(evt->{
+			setScale(field_orderScale.getValue()/100.0f);
+			generate();
+		});
+
+		add(field_angle      = new SelectSlider("angle",Translator.get("LSystemAngle"),360,1,(int)getAngle()));
+		field_angle.addPropertyChangeListener(evt->{
+			setAngle(field_angle.getValue());
+			generate();
+		});
+
+		add(field_noise      = new SelectSlider("noise",Translator.get("LSystemNoise"),100,0,(int)getNoise()));
+		field_noise.addPropertyChangeListener(evt->{
+			setNoise(field_noise.getValue());
+			generate();
+		});
+
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/L-system'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 
 	@Override
 	public String getName() {
 		return Translator.get("LSystemTreeName");
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_LSystemTree_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();

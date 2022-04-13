@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,29 +21,27 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	private float yMax = 70;
 	private static int order = 7; // controls complexity of curve
 
-	private Stack<Integer> fibonacciSequence;
+	private Stack<Integer> fibonacciSequence = new Stack<>();
+
+	public Generator_FibonacciSpiral() {
+		super();
+
+		SelectSlider fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder());
+		add(fieldOrder);
+		fieldOrder.addPropertyChangeListener(evt->{
+			order = Math.max(1,fieldOrder.getValue());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Fibonacci_number'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("FibonacciSpiralName");
 	}
 
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_FibonacciSpiral_Panel(this);
-	}
-
-	static public int getOrder() {
-		return order;
-	}
-	static public void setOrder(int order) {
-		if(order<3) order=1;
-		Generator_FibonacciSpiral.order = order;
-	}
-
-
 	private void buildFibonacciSequence(int order) {
-		fibonacciSequence = new Stack<Integer>();
+		fibonacciSequence.clear();
 		fibonacciSequence.add(1);
 		fibonacciSequence.add(1);
 		int a = 1;

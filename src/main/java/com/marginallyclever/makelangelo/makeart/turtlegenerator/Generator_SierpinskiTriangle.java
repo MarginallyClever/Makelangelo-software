@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -12,12 +14,24 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	private double xMax, xMin, yMax, yMin;
 	private double maxSize;
 	private static int order = 4; // controls complexity of curve
-	
+
+	public Generator_SierpinskiTriangle() {
+		super();
+
+		SelectSlider field_order;
+
+		add(field_order = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,Generator_SierpinskiTriangle.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+		field_order.addPropertyChangeListener(evt-> {
+			Generator_SierpinskiTriangle.setOrder(Math.max(1, field_order.getValue()));
+			generate();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("SierpinskiTriangleName");
 	}
-
 
 	static public int getOrder() {
 		return order;
@@ -26,12 +40,7 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 		if(order<1) order=1;
 		Generator_SierpinskiTriangle.order = order;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_SierpinskiTriangle_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		xMax = myPaper.getMarginWidth()/2.0f;

@@ -1,9 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import java.awt.geom.Rectangle2D;
-
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Gosper curve fractal.
@@ -11,6 +13,21 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_GosperCurve extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
+
+	public Generator_GosperCurve() {
+		super();
+
+		SelectSlider fieldOrder;
+		add(fieldOrder = new SelectSlider("order",
+				Translator.get("HilbertCurveOrder")// As this is the same concept and translation value but this translation key is confusing as we are in GosperCurve_Panle ...
+				,6,1,Generator_GosperCurve.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Gosper_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+
+		fieldOrder.addPropertyChangeListener(evt-> {
+			order = Math.max(1, fieldOrder.getValue());
+			generate();
+		});
+	}
 	
 	@Override
 	public String getName() {
@@ -24,12 +41,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 		if(order<1) order=1;
 		Generator_GosperCurve.order = order;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_GosperCurve_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());

@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -26,6 +28,25 @@ public class Generator_Maze extends TurtleGenerator {
 	protected double xMax, xMin, yMax, yMin;
 	protected MazeCell[] cells;
 	protected MazeWall[] walls;
+
+	public Generator_Maze() {
+		super();
+
+		SelectSlider field_rows;
+		SelectSlider field_columns;
+
+		add(field_rows = new SelectSlider("rows",Translator.get("MazeRows"),100,1,getRows()));
+		field_rows.addPropertyChangeListener(evt->{
+			setRows(field_rows.getValue());
+			generate();
+		});
+		add(field_columns = new SelectSlider("columns",Translator.get("MazeColumns"),100,1,getCols()));
+		field_columns.addPropertyChangeListener(evt->{
+			setCols(field_columns.getValue());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 	
 	@Override
 	public String getName() {
@@ -45,11 +66,6 @@ public class Generator_Maze extends TurtleGenerator {
 	public void setCols(int arg0) {
 		if(arg0<1) arg0=1;
 		columns=arg0;
-	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Maze_Panel(this);
 	}
 
 	/**
