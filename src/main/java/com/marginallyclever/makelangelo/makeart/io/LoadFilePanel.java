@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.io.image.ConvertImagePanel;
+import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
@@ -30,11 +30,11 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private Paper myPaper;
 
 	private JButton bChoose = new JButton(Translator.get("Open"));
-	private JTextArea jtaFilename = new JTextArea();
+	private final JTextArea jtaFilename = new JTextArea();
 
-	private ConvertImagePanel myConvertImage;
+	private SelectImageConverterPanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
-	private JPanel mySubPanel = new JPanel();
+	private final JPanel mySubPanel = new JPanel();
 	private OpenFileChooser openFileChooser;
 	private JDialog parent;
 
@@ -47,7 +47,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 		this.jtaFilename.setEditable(false);
 		this.jtaFilename.setLineWrap(true);
-		
+
 		openFileChooser = new OpenFileChooser(this);
 		openFileChooser.setOpenListener(this::load);
 	}
@@ -65,15 +65,21 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	}
 
 	public boolean load(String filename) {
+		if(myConvertImage!=null) {
+			myConvertImage.loadingFinished();
+		}
+
 		try {
-			if (ConvertImagePanel.isFilenameForAnImage(filename)) {
+			if (SelectImageConverterPanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
 
-				myConvertImage = new ConvertImagePanel(myPaper, image);
-				myConvertImage.setBorder(BorderFactory.createTitledBorder(ConvertImagePanel.class.getSimpleName()));
+				myConvertImage = new SelectImageConverterPanel(myPaper, image);
+				// TODO replace this border with something more appropriate
+				myConvertImage.setBorder(BorderFactory.createTitledBorder(SelectImageConverterPanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
 				mySubPanel.removeAll();
 				mySubPanel.add(myConvertImage);
+				myConvertImage.run();
 				mySubPreviewListener = myConvertImage;
 				return true;
 			} else {
@@ -99,9 +105,21 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		if(mySubPreviewListener!=null) mySubPreviewListener.render(gl2);
 	}
 
+	public void setParent(JDialog parent) {
+		this.parent = parent;
+	}
+
+	public void loadingFinished() {
+		logger.debug("loadingFinished()");
+		if(myConvertImage!=null) {
+			myConvertImage.loadingFinished();
+		}
+	}
+
 	// OBSERVER PATTERN
 
-	private ArrayList<ActionListener> listeners = new ArrayList<ActionListener>();
+	private ArrayList<ActionListener> listeners = new ArrayList<>();
+
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);
 	}
@@ -126,11 +144,8 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		JFrame frame = new JFrame(LoadFilePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(new LoadFilePanel(new Paper(),""));
+		frame.setPreferredSize(new Dimension(800,600));
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public void setParent(JDialog parent) {
-		this.parent = parent;
 	}
 }

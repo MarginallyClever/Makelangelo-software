@@ -1,22 +1,26 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiCell;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiGraphEdge;
-import com.marginallyclever.makelangelo.makeart.imageconverter.voronoi.VoronoiTesselator;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -26,256 +30,331 @@ import java.util.concurrent.locks.ReentrantLock;
  *         http://skynet.ie/~sos/mapviewer/voronoi.php
  * @since 7.0.0?
  */
-public class Converter_VoronoiZigZag extends ImageConverter implements PreviewListener {
+public class Converter_VoronoiZigZag extends ImageConverterIterative implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_VoronoiZigZag.class);
-	private ReentrantLock lock = new ReentrantLock();
+	private static int numCells = 9000;
+	private static int lowpassCutoff = 128;
 
-	private VoronoiTesselator voronoiTesselator = new VoronoiTesselator();
-	private VoronoiCell[] cells = new VoronoiCell[1];
-	private TransformedImage sourceImage;
-	private List<VoronoiGraphEdge> graphEdges = null;
-	private static int numCells = 3000;
-	private static double minDotSize = 1.0f;
-	private double[] xValuesIn = null;
-	private double[] yValuesIn = null;
-	private int[] solution = null;
-	private int solutionContains;
+	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
+	private final List<VoronoiCell> cells = new ArrayList<>();
+	private final Lock lock = new ReentrantLock();
+
+	private final List<VoronoiCell> solution = new ArrayList<>();
 	private int renderMode;
 	private boolean lowNoise;
+	private int iterations;
 
-	// processing tools
-	private long t_elapsed, t_start;
-	private double progress;
-	private double old_len, len;
-	private long time_limit = 10 * 60 * 1000; // 10 minutes
+	public Converter_VoronoiZigZag() {
+		super();
 
-	private double yBottom, yTop, xLeft, xRight;
-	
+		SelectToggleButton selectOptimizePath = new SelectToggleButton("optimizePath",Translator.get("VoronoiZigZag.optimizePath"));
+		add(selectOptimizePath);
+		selectOptimizePath.addPropertyChangeListener(evt -> {
+			lowNoise = selectOptimizePath.isSelected();
+			if(lowNoise) {
+				logger.debug("Running Lin/Kerighan optimization...");
+				renderMode = 1;
+				greedyTour();
+			} else {
+				logger.debug("Evolving...");
+				renderMode = 0;
+			}
+		});
+		SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
+		add(selectCells);
+		SelectSlider selectCutoff = new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getLowpassCutoff());
+		add(selectCutoff);
+
+		selectCells.addPropertyChangeListener(evt->{
+			setNumCells((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectCutoff.addPropertyChangeListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("VoronoiZigZagName");
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		boolean isDirty=false;
-		if(evt.getPropertyName().equals("count")) {
-			isDirty=true;
-			setNumCells((int)evt.getNewValue());
-		}
-		if(evt.getPropertyName().equals("min")) {
-			isDirty=true;
-			setMinDotSize((double)evt.getNewValue());
-		}
-		if(isDirty) restart();
-	}
-	
-	@Override
-	public void setImage(TransformedImage img) {
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
-		sourceImage = bw.filter(img);
-		
-		yBottom = myPaper.getMarginBottom();
-		yTop    = myPaper.getMarginTop();
-		xLeft   = myPaper.getMarginLeft();
-		xRight  = myPaper.getMarginRight();
-		
-		keepIterating=true;
-		restart();
+	public void start(Paper paper, TransformedImage image) {
 		renderMode = 0;
-	}
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		super.start(paper, bw.filter(image));
 
-	public void restart() {
-		if(myImage==null) return;
-		
-		lowNoise=false;
-		keepIterating=true;
-		initializeCells(0.5);
+		lock.lock();
+		try {
+			lowNoise=false;
+			iterations = 0;
+
+			Rectangle2D bounds = myPaper.getMarginRectangle();
+			cells.clear();
+			for(int i=0;i<numCells;++i) {
+				cells.add(new VoronoiCell(
+						Math.random()*bounds.getWidth()+bounds.getMinX(),
+						Math.random()*bounds.getHeight()+bounds.getMinY()));
+			}
+		}
+		finally {
+			lock.unlock();
+		}
 	}
 	
 	@Override
 	public boolean iterate() {
-		if(lowNoise==true) {
-			optimizeTour();
-		} else {
-			double noiseLevel = evolveCells();
-			if( noiseLevel < 2*numCells ) {
-				lowNoise=true;
-				greedyTour();
-				renderMode = 1;
-				logger.debug("Running Lin/Kerighan optimization...");
-			}			
+		iterations++;
+
+		lock.lock();
+		try {
+			if(lowNoise) {
+				optimizeTour();
+			} else {
+				double noiseLevel = evolveCells();
+				System.out.println(iterations+": "+noiseLevel+" "+(noiseLevel/(float)numCells));
+			}
 		}
-		return keepIterating;
+		finally {
+			lock.unlock();
+		}
+		return true;
 	}
 
 	@Override
-	public void finish() {
-		keepIterating=false;
+	public void generateOutput() {
 		writeOutCells();
+
+		fireConversionFinished();
+	}
+
+	@Override
+	public void resume() {}
+
+	/**
+	 * Jiggle the dots until they make a nice picture
+	 */
+	private double evolveCells() {
+		double change=10000;
+
+		try {
+			voronoiDiagram.tessellate(cells,myPaper.getMarginRectangle(),1e-6);
+			change = adjustCenters(myImage);
+		}
+		catch (Exception e) {
+			logger.error("Failed to evolve", e);
+		}
+
+		return change;
+	}
+
+	private double adjustCenters(TransformedImage image) {
+		double change=0;
+		GeometryFactory factory = new GeometryFactory();
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			Polygon poly = voronoiDiagram.getHull(i);
+			VoronoiCell cell = cells.get(i);
+
+			// sample every image coordinate inside the voronoi cell and find the weighted center
+			double wx=0,wy=0;
+			double weight=0;
+			int hits=0;
+
+			Point center = poly.getCentroid();
+			cell.center.set(center.getX(),center.getY());
+			Envelope e = poly.getEnvelopeInternal();
+			int miny = (int) Math.floor(e.getMinY());
+			int maxy = (int) Math.ceil(e.getMaxY());
+			for(int y=miny;y<maxy;++y) {
+				int x0 = findLeftEdge(poly,e,y,factory);
+				int x1 = findRightEdge(poly,e,y,factory);
+				for (int x = x0; x <=x1; ++x) {
+					if(image.canSampleAt(x,y)) {
+						double sampleWeight = 255.0 - image.sample(x,y,1);
+						weight += sampleWeight;
+						wx += sampleWeight*x;
+						wy += sampleWeight*y;
+						hits++;
+					}
+				}
+			}
+			if(hits>0 && weight>0) {
+				cell.weight = weight / hits;
+				wx /= weight;
+				wy /= weight;
+				double dx = wx - cell.center.x;
+				double dy = wy - cell.center.y;
+				change += Math.sqrt(dx*dx+dy*dy);
+				cell.center.set(wx,wy);
+			}
+		}
+		return change;
+	}
+
+	private int findLeftEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
+		int x;
+		for(x = minx; x < maxx; ++x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
+
+	private int findRightEdge(Polygon poly, Envelope e,int y,GeometryFactory factory) {
+		int minx = (int) Math.floor(e.getMinX());
+		int maxx = (int) Math.ceil(e.getMaxX());
+		int x;
+		for(x = maxx; x > minx; --x) {
+			Point c = factory.createPoint(new Coordinate(x,y));
+			if(poly.contains(c)) break;
+		}
+		return x;
+	}
+	
+	@Override
+	public void stop() {
+		super.stop();
+		lock.lock();
+		try {
+			writeOutCells();
+		}
+		finally {
+			lock.unlock();
+		}
+		fireConversionFinished();
 	}
 
 	@Override
 	public void render(GL2 gl2) {
-		super.render(gl2);
+		if(getThread().getPaused()) return;
 
-		while(lock.isLocked());
 		lock.lock();
-
-		int i;
-
-		if (graphEdges != null) {
-			// draw cell edges
-			gl2.glColor3f(0.9f, 0.9f, 0.9f);
-			gl2.glBegin(GL2.GL_LINES);
-			for (VoronoiGraphEdge e : graphEdges) {
-				gl2.glVertex2d( e.x1, e.y1 );
-				gl2.glVertex2d( e.x2, e.y2 );
-			}
-			gl2.glEnd();
+		try {
+			renderEdges(gl2);
+			if (renderMode == 0) renderPoints(gl2);
+			if (renderMode == 1 && solution != null) drawTour(gl2);
 		}
-		if (renderMode == 0) {
-			// draw cell centers
-			gl2.glPointSize(3);
-			gl2.glColor3f(0, 0, 0);
-			gl2.glBegin(GL2.GL_POINTS);
-			for (VoronoiCell c : cells) {
-				Point2D p = c.centroid;
-				gl2.glVertex2d(p.x,p.y);
-			}
-			gl2.glEnd();
+		finally {
+			lock.unlock();
 		}
-		if (renderMode == 1 && solution != null) {
-			// draw tour
-			gl2.glColor3f(0, 0, 0);
+	}
+
+	private void renderPoints(GL2 gl2) {
+		gl2.glColor3f(0, 0, 0);
+
+		gl2.glBegin(GL2.GL_POINTS);
+		for( VoronoiCell c : cells ) {
+			if (c.weight < lowpassCutoff) continue;
+			gl2.glVertex2d(c.center.x, c.center.y);
+		}
+		gl2.glEnd();
+	}
+
+	private void renderEdges(GL2 gl2) {
+		gl2.glColor3d(0.9, 0.9, 0.9);
+
+		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+			Polygon poly = voronoiDiagram.getHull(i);
 			gl2.glBegin(GL2.GL_LINE_LOOP);
-			for (i = 0; i < solutionContains; ++i) {
-				VoronoiCell c = cells[solution[i]];
-				gl2.glVertex2d( c.centroid.x, c.centroid.y );
+			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
+				gl2.glVertex2d(p.x, p.y);
 			}
 			gl2.glEnd();
 		}
-		lock.unlock();
+	}
+
+	private void drawTour(GL2 gl2) {
+		gl2.glColor3f(0, 0, 0);
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		for( VoronoiCell c : solution ) {
+			gl2.glVertex2d(c.center.x, c.center.y);
+		}
+		gl2.glEnd();
 	}
 
 	private void optimizeTour() {
-		old_len = getTourLength(solution);
-		updateProgress(old_len, 2);
-
 		// @TODO: make these optional for the very thorough people
 		// once|=transposeForwardTest();
 		// once|=transposeBackwardTest();
 
-		keepIterating = flipTests();
-	}
-
-	public String formatTime(long millis) {
-		String elapsed = "";
-		long s = millis / 1000;
-		long m = s / 60;
-		long h = m / 60;
-		m %= 60;
-		s %= 60;
-		if (h > 0)
-			elapsed += h + "h";
-		if (h > 0 || m > 0)
-			elapsed += m + "m";
-		elapsed += s + "s ";
-		return elapsed;
-	}
-
-	public void updateProgress(double len, int color) {
-		t_elapsed = System.currentTimeMillis() - t_start;
-		double new_progress = 100.0 * (double) t_elapsed / (double) time_limit;
-		if (new_progress > progress + 0.1) {
-			// find the new tour length
-			len = getTourLength(solution);
-			if (old_len > len) {
-				old_len = len;
-				logger.debug("{}: {}mm", formatTime(t_elapsed), StringHelper.formatDouble(len));
-			}
-			progress = new_progress;
-			setProgress((int) progress);
-		}
+		flipTests();
 	}
 
 	private int ti(int x) {
+		int solutionContains = solution.size();
 		return (x + solutionContains) % solutionContains;
 	}
 
 	/**
-	 * we have s1,s2...e-1,e.  check if s1,e-1,...s2,e is shorter
+	 * we have s1,s2...e-1,e.  check if s1,e-1..(flip everything)...s2,e is shorter
 	 * @return true if something was improved.
 	 */
-	// 
 	public boolean flipTests() {
 		boolean once = false;
-		int start, end, j, best_end;
-		double a, b, c, d, temp_diff, best_diff;
+		int start, end, j, bestIndex;
+		double bestDiff;
 
-		for (start = 0; start < solutionContains * 2 - 2 && !isThreadCancelled(); ++start) {
-			a = calculateWeight(solution[ti(start)], solution[ti(start + 1)]);
-			best_end = -1;
-			best_diff = 0;
+		int solutionContains = solution.size();
 
-			for (end = start + 2; end < start + solutionContains && !isThreadCancelled(); ++end) {
-				// before
-				b = calculateWeight(solution[ti(end)], solution[ti(end - 1)]);
-				// after
-				c = calculateWeight(solution[ti(start)], solution[ti(end - 1)]);
-				d = calculateWeight(solution[ti(end)], solution[ti(start + 1)]);
+		for (start = 0; start < solutionContains - 2 && !isThreadCancelled(); ++start) {
+			VoronoiCell p0 = solution.get(ti(start));
+			VoronoiCell p1 = solution.get(ti(start+1));
 
-				temp_diff = (a + b) - (c + d);
-				if (best_diff < temp_diff) {
-					best_diff = temp_diff;
-					best_end = end;
+			double a = calculateLengthSq(p0,p1);
+			bestIndex = -1;
+			bestDiff = 0;
+
+			for (end = start + 2; end < solutionContains && !isThreadCancelled(); ++end) {
+				VoronoiCell p2 = solution.get(ti(end-1));
+				VoronoiCell p3 = solution.get(ti(end));
+
+				double b = a + calculateLengthSq(p2, p3);
+				double c = calculateLengthSq(p0, p2) + calculateLengthSq(p1, p3);
+				// the existing model is distance b.  the new possibility is c.
+				double diff = b - c;
+				if (bestDiff < diff) {
+					bestDiff = diff;
+					bestIndex = end;
 				}
 			}
 
-			if (best_end != -1 && !isThreadCancelled()) {
+			if (bestIndex != -1 && !isThreadCancelled()) {
 				once = true;
 				// do the flip
 				int begin = start + 1;
-				int finish = best_end;
-				if (best_end < begin)
-					finish += solutionContains;
+				int finish = bestIndex;
+				if (bestIndex < begin) finish += solutionContains;
 				int half = (finish - begin) / 2;
-				int temp;
-				while (lock.isLocked());
 
-				lock.lock();
-				// Makelangelo.getSingleton().Log("<font color='red'>flipping
-				// "+(finish-begin));
+				logger.debug("flipping {} {}",finish,begin);
 				for (j = 0; j < half; ++j) {
-					temp = solution[ti(begin + j)];
-					solution[ti(begin + j)] = solution[ti(finish - 1 - j)];
-					solution[ti(finish - 1 - j)] = temp;
+					int a1 = ti(begin + j);
+					int b1 = ti(finish-1 - j);
+					swapSolution(a1,b1);
 				}
-				lock.unlock();
-				updateProgress(len, 1);
 			}
 		}
 		return once;
 	}
 
-	private double calculateLength(int a, int b) {
-		return Math.sqrt(calculateWeight(a, b));
-	}
-
 	/**
-	 * Get the length of a tour segment
-	 * 
-	 * @param list
-	 *            an array of indexes into the point list. the order forms the
-	 *            tour sequence.
-	 * @return the length of the tour
+	 * Returns the travel distance of the solution path.
+	 * @return the travel distance of the solution path.
 	 */
-	private double getTourLength(int[] list) {
-		double w = 0;
-		for (int i = 0; i < solutionContains - 1; ++i) {
-			w += calculateLength(list[i], list[i + 1]);
+	private double getTourLength() {
+		if(solution.size()<2) return 0;
+
+		double sum = 0;
+		Iterator<VoronoiCell> iter = solution.iterator();
+		VoronoiCell p0 = iter.next();
+		while(iter.hasNext()) {
+			VoronoiCell p1 = iter.next();
+			sum += calculateLength(p0,p1);
+			p0=p1;
 		}
-		return w;
+		return sum;
 	}
 
 	/**
@@ -283,294 +362,90 @@ public class Converter_VoronoiZigZag extends ImageConverter implements PreviewLi
 	 * points have been "found".
 	 */
 	private void greedyTour() {
-		logger.debug("Finding greedy tour solution...");
+		logger.debug("greedy tour started...");
 
-		int i, j;
-		double w, bestw;
-		int besti;
-
-		solutionContains = 0;
-		for (i = 0; i < cells.length; ++i) {
-			VoronoiCell c = cells[i];
-			float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
-			if (v * 5 > minDotSize)
-				solutionContains++;
-		}
-
+		lock.lock();
 		try {
-			solution = new int[solutionContains];
-
-			// put all the points in the solution in no particular order.
-			j = 0;
-			for (i = 0; i < cells.length; ++i) {
-				VoronoiCell c = cells[i];
-				float v = 1.0f - (float) sourceImage.sample1x1( (int) c.centroid.x, (int) c.centroid.y) / 255.0f;
-				if (v * 5 > minDotSize) {
-					solution[j++] = i;
+			// collect all cells above the cutoff value.
+			solution.clear();
+			for (VoronoiCell c : cells) {
+				if (c.weight > lowpassCutoff) {
+					solution.add(c);
 				}
 			}
 
-			int scount = 0;
-
-			do {
-				// Find the nearest point not already in the line.
-				// Any solution[n] where n>scount is not in the line.
-				bestw = calculateWeight(solution[scount], solution[scount + 1]);
-				besti = scount + 1;
-				for (i = scount + 2; i < solutionContains; ++i) {
-					w = calculateWeight(solution[scount], solution[i]);
-					if (w < bestw) {
-						bestw = w;
-						besti = i;
+			// do a greedy sort
+			int size = solution.size();
+			for (int i = 0; i < size - 1; ++i) {
+				VoronoiCell p0 = solution.get(i);
+				double bestDistance = Double.MAX_VALUE;
+				int bestIndex = i + 1;
+				for (int j = i + 1; j < size; ++j) {
+					// Find the nearest point not already in the line.
+					VoronoiCell p1 = solution.get(j);
+					double d = calculateLengthSq(p0, p1);
+					if (bestDistance > d) {
+						bestDistance = d;
+						bestIndex = j;
 					}
 				}
-				i = solution[scount + 1];
-				solution[scount + 1] = solution[besti];
-				solution[besti] = i;
-				scount++;
-			} while (scount < solutionContains - 2);
-		} catch (Exception e) {
-			logger.error("Failed to find a greedy tour solution", e);
+				if (i + 1 != bestIndex) {
+					swapSolution(i + 1, bestIndex);
+				}
+			}
 		}
+		finally {
+			lock.unlock();
+		}
+		logger.debug("greedy tour done.");
 	}
 
-	private double calculateWeight(int a, int b) {
-		assert (a >= 0 && a < cells.length);
-		assert (b >= 0 && b < cells.length);
-		double x = cells[a].centroid.x - cells[b].centroid.x;
-		double y = cells[a].centroid.y - cells[b].centroid.y;
+	private void swapSolution(int a,int b) {
+		VoronoiCell temp = solution.get(a);
+		solution.set(a,solution.get(b));
+		solution.set(b,temp);
+	}
+
+	private double calculateLengthSq(VoronoiCell a, VoronoiCell b) {
+		double x = a.center.x - b.center.x;
+		double y = a.center.y - b.center.y;
 		return x * x + y * y;
 	}
 
-	// set some starting points in a grid
-	private void initializeCells(double minDistanceBetweenSites) {
-		logger.debug("Initializing cells");
-
-		cells = new VoronoiCell[numCells];
-		// convert the cells to sites used in the Voronoi class.
-		xValuesIn = new double[numCells];
-		yValuesIn = new double[numCells];
-
-		// from top to bottom of the margin area...
-		int used;
-		for (used=0;used<numCells;++used) {
-			cells[used] = new VoronoiCell();
-		}
-		
-		used=0;
-		while(used<numCells) {
-			double x=0,y=0;
-			for(int i=0;i<30;++i) {
-				x = xLeft   + Math.random()*(xRight-xLeft);
-				y = yBottom + Math.random()*(yTop-yBottom);
-				if(sourceImage.canSampleAt((float)x, (float)y)) {
-					float v = sourceImage.sample1x1Unchecked((float)x, (float)y);
-					if(Math.random()*255 > v) break;
-				}
-			}
-			cells[used].centroid.set(x,y);
-			++used;
-		}
-
-
-		voronoiTesselator.Init(minDistanceBetweenSites);
+	private double calculateLength(VoronoiCell a, VoronoiCell b) {
+		return Math.sqrt(calculateLengthSq(a, b));
 	}
 
 	/**
-	 * Jiggle the dots until they make a nice picture
+	 * write cell centers to a {@link Turtle}.
 	 */
-	private double evolveCells() {
-		double totalWeight=0;
-		try {
-			while(lock.isLocked());
-			lock.lock();
-			tessellateVoronoiDiagram();
-			lock.unlock();
-			totalWeight = adjustCentroids();
-		} catch (Exception e) {
-			logger.error("Failed to evolve", e);
-			if(lock.isHeldByCurrentThread() && lock.isLocked()) {
-				lock.unlock();
-			}
-		}
-		return totalWeight;
-	}
-
-	// write cell centroids to a {@link Turtle}.
 	private void writeOutCells() {
 		turtle = new Turtle();
-		
-		if (graphEdges != null) {
-			// find the tsp point closest to the calibration point
-			int i;
-			int besti = -1;
-			double bestw = Float.MAX_VALUE;
-			double x, y, w;
-			for (i = 0; i < solutionContains; ++i) {
-				x = cells[solution[i]].centroid.x;
-				y = cells[solution[i]].centroid.y;
-				w = x * x + y * y;
-				if (w < bestw) {
-					bestw = w;
-					besti = i;
-				}
-			}
 
-			// write the entire sequence
-			for (i = 0; i <= solutionContains; ++i) {
-				int v = (besti + i) % solutionContains;
-				x = cells[solution[v]].centroid.x;
-				y = cells[solution[v]].centroid.y;
-				turtle.moveTo(x, y);
-			}
+		boolean first=true;
+		for( VoronoiCell c : solution ) {
+			double x = c.center.x;
+			double y = c.center.y;
+			if(first) {
+				turtle.jumpTo(x, y);
+				first=false;
+			} else turtle.moveTo(x, y);
 		}
 	}
 
-	// I have a set of points. I want a list of cell borders.
-	// cell borders are halfway between any point and it's nearest neighbors.
-	private void tessellateVoronoiDiagram() {
-		// convert the cells to sites used in the Voronoi class.
-		int i;
-		for (i = 0; i < numCells; ++i) {
-			xValuesIn[i] = cells[i].centroid.x;
-			yValuesIn[i] = cells[i].centroid.y;
-			cells[i].resetRegion();
-		}
-
-		// scan left to right across the image, building the list of borders as we go.
-		graphEdges = voronoiTesselator.generateVoronoi(xValuesIn, yValuesIn, xLeft, xRight, yBottom, yTop);
-		
-		for (VoronoiGraphEdge e : graphEdges) {
-			try {
-				cells[e.site1].addPoint((float)e.x1, (float)e.y1);
-				cells[e.site1].addPoint((float)e.x2, (float)e.y2);
-				
-				cells[e.site2].addPoint((float)e.x1, (float)e.y1);
-				cells[e.site2].addPoint((float)e.x2, (float)e.y2);
-			} catch(Exception err) {
-				logger.error("Failed to tessellate", err);
-			}
-		}
-	}
-
-	/**
-	 * Find the weighted center of each cell.
-	 * weight is based on the intensity of the color of each pixel inside the cell
-	 * the center of the pixel must be inside the cell to be counted.
-	 * @return the total magnitude movement of all centers
-	 */
-	private float adjustCentroids() {
-		double totalCellWeight, wx, wy, x, y;
-		double stepSize;
-		double minX,maxX,minY,maxY;
-		float totalMagnitude=0;
-
-		for (VoronoiCell c : cells) {
-			if(c.region==null) { 
-				continue;
-			}
-			Rectangle bounds = c.region.getBounds();
-
-			minX = bounds.getMinX();
-			maxX = bounds.getMaxX();
-			double dx=maxX-minX;
-
-			minY = bounds.getMinY();
-			maxY = bounds.getMaxY();
-			double dy=maxY-minY;
-
-			stepSize=1.0;
-			if(dx<dy) {
-				if(dx<1) {
-					stepSize = dx/3.0;
-				}
-			} else {
-				if(dy<1) {
-					stepSize = dy/3.0;
-				}
-			}
-			
-			int hits = 0;
-			totalCellWeight = 0;
-			wx = 0;
-			wy = 0;
-
-			float sampleWeight;
-			for (y = minY; y <= maxY; y +=stepSize) {
-				for (x = minX; x <= maxX; x +=stepSize) {
-					if (c.region.contains(x,y)) {
-						if(sourceImage.canSampleAt((float)x, (float)y)) 
-						{
-							hits++;
-							sampleWeight = 255.0f - (float)sourceImage.sample1x1Unchecked( (float)x, (float)y );
-							totalCellWeight += sampleWeight;
-							wx += (x) * sampleWeight;
-							wy += (y) * sampleWeight;
-						}
-					}
-				}
-			}
-
-			if (totalCellWeight > 0) {
-				wx /= totalCellWeight;
-				wy /= totalCellWeight;
-				totalMagnitude+=totalCellWeight;
-			} else {
-				continue;
-			}
-
-			// make sure centroid can't leave image bounds
-			if (wx < xLeft || wx >= xRight || wy < yBottom || wy >= yTop ) {
-				/*
-				// try the geometric centroid
-				for(int j=0;j<c.region.npoints;++j) {
-					wx = c.region.xpoints[j];
-					wy = c.region.ypoints[j];
-				}
-				wx/= c.region.npoints;
-				wy/= c.region.npoints;
-				*/
-				if (wx <  xLeft ) wx = xLeft+1;
-				if (wx >= xRight) wx = xRight-1;
-				
-				if (wy <  yBottom) wy = yBottom+1;
-				if (wy >= yTop   ) wy = yTop-1;
-			}
-			
-			// use the new center
-			if(hits>0)
-			{
-				double ox = c.centroid.x;
-				double oy = c.centroid.y;
-				double dx2 = wx - ox;
-				double dy2 = wy - oy;
-
-				c.weight = totalCellWeight/(double)hits;
-				
-				double nx = ox + dx2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
-				double ny = oy + dy2 * 0.25 + (Math.random()-0.5) * 0.8e-10;
-				
-				c.centroid.set(nx, ny);
-			}
-		}
-		return totalMagnitude;
-	}
-	
 	public void setNumCells(int value) {
-		if(value<1) value=1;
-		numCells = value;
+		numCells = Math.max(1,value);
 	}
 	
 	public int getNumCells() {
 		return numCells;
 	}
 	
-	public void setMinDotSize(double value) {
-		if(value<0.001) value=0.001f;
-		minDotSize = value;
+	public void setLowpassCutoff(int value) {
+		lowpassCutoff = Math.max(1,Math.min(255,value));
 	}
 	
-	public double getMinDotSize() {
-		return minDotSize;
+	public int getLowpassCutoff() {
+		return lowpassCutoff;
 	}
 }

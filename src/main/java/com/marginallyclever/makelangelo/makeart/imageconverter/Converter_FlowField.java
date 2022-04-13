@@ -4,11 +4,16 @@ import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,19 +34,53 @@ public class Converter_FlowField extends ImageConverter {
 	private static boolean rightAngle = false;
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
 
-	@Override
-	public String getName() {
-		return Translator.get("Generator_FlowField.name");
+	public Converter_FlowField() {
+		super();
+		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
+		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
+		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
+		SelectDouble selectOffsetY = new SelectDouble("offsetY", Translator.get("Generator_FlowField.offsetY"), getOffsetY());
+		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 3, getStepSize());
+		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
+
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+
+		add(selectScaleX);
+		add(selectScaleY);
+		add(selectOffsetX);
+		add(selectOffsetY);
+		add(selectStepSize);
+		add(selectRightAngle);
+
+		selectScaleX.addPropertyChangeListener((evt)->{
+			setScaleX((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectScaleY.addPropertyChangeListener((evt)->{
+			setScaleY((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectOffsetX.addPropertyChangeListener((evt)->{
+			setOffsetX((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectOffsetY.addPropertyChangeListener((evt)->{
+			setOffsetY((double)evt.getNewValue());
+			fireRestart();
+		});
+		selectStepSize.addPropertyChangeListener((evt)->{
+			setStepSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectRightAngle.addPropertyChangeListener((evt)->{
+			setRightAngle((boolean)evt.getNewValue());
+			fireRestart();
+		});
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("scaleX")) setScaleX((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("scaleY")) setScaleY((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("offsetX")) setOffsetX((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("offsetY")) setOffsetY((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("stepSize")) setStepSize((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("rightAngle")) setRightAngle((boolean)evt.getNewValue());
+	public String getName() {
+		return Translator.get("Generator_FlowField.name");
 	}
 
 	public static void setScaleX(double scaleX) {
@@ -147,8 +186,10 @@ public class Converter_FlowField extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void finish() {
-		com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite bw = new com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite(255);
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
+		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 
 		// get all the flow lines.
@@ -164,6 +205,8 @@ public class Converter_FlowField extends ImageConverter {
 		for(Turtle t : list) {
 			convertLine(img,t);
 		}
+
+		fireConversionFinished();
 	}
 
 	private List<Turtle> fromEdge() {

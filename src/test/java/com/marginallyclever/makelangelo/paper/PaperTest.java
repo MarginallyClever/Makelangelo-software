@@ -1,6 +1,5 @@
-package com.marginallyclever.makelangeloRobot;
+package com.marginallyclever.makelangelo.paper;
 
-import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

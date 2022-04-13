@@ -1,9 +1,14 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectTextArea;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
@@ -15,11 +20,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.StringTokenizer;
-
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Your message here.  understands font families, styles, sizes, and alignment
@@ -68,6 +68,26 @@ public class Generator_Text extends TurtleGenerator {
 		for(Font f : fontList) {
 			fontNames[i++] = f.getFontName(locale);
 		}
+
+		SelectOneOfMany fontChoices;
+		SelectInteger size;
+		SelectTextArea text;
+
+		add(fontChoices = new SelectOneOfMany("face",Translator.get("FontFace"),getFontNames(),getLastFont()));
+		fontChoices.addPropertyChangeListener(evt->{
+			setFont(fontChoices.getSelectedIndex());
+			generate();
+		});
+		add(size = new SelectInteger("size",Translator.get("TextSize"),getLastSize()));
+		size.addPropertyChangeListener(evt->{
+			setSize(((Number)size.getValue()).intValue());
+			generate();
+		});
+		add(text = new SelectTextArea("message",Translator.get("TextMessage"),getLastMessage()));
+		text.addPropertyChangeListener(evt->{
+			setMessage(text.getText());
+			generate();
+		});
 	}
 	
 	public String [] getFontNames() {
@@ -102,12 +122,7 @@ public class Generator_Text extends TurtleGenerator {
 	public String getName() {
 		return Translator.get("YourMsgHereName");
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Text_Panel(this);
-	}
-	
+
 	protected void setupTransform() {
 		double imageHeight = myPaper.getMarginHeight();
 		double imageWidth = myPaper.getMarginWidth();

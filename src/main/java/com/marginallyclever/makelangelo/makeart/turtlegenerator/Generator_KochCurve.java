@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -15,6 +17,20 @@ public class Generator_KochCurve extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
 
 	private double maxSize;
+
+	public Generator_KochCurve() {
+		super();
+
+		SelectSlider fieldOrder;
+
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Koch_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+
+		fieldOrder.addPropertyChangeListener(evt->{
+			setOrder(fieldOrder.getValue());
+			generate();
+		});
+	}
 	
 	@Override
 	public String getName() {
@@ -28,12 +44,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 		if(order<1) order=1;
 		Generator_KochCurve.order = order;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_KochCurve_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());

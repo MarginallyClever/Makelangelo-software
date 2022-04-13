@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -17,6 +19,36 @@ public class Generator_Lissajous extends TurtleGenerator {
 	private static int a = 11;
 	private static int b = 8; // controls complexity of curve
 	private static int numSamples = 2000;
+
+	public Generator_Lissajous() {
+		super();
+		SelectSlider field_a;
+		SelectSlider field_b;
+		SelectSlider field_numSamples;
+		SelectSlider field_delta;
+
+		add(field_a = new SelectSlider("a",Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
+		field_a.addPropertyChangeListener(evt->{
+			setA(field_a.getValue());
+			generate();
+		});
+		add(field_b = new SelectSlider("b",Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
+		field_b.addPropertyChangeListener(evt->{
+			setB(field_b.getValue());
+			generate();
+		});
+		add(field_delta = new SelectSlider("delta",Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
+		field_delta.addPropertyChangeListener(evt->{
+			setDelta(field_delta.getValue());
+			generate();
+		});
+		add(field_numSamples = new SelectSlider("samples",Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
+		field_numSamples.addPropertyChangeListener(evt->{
+			setNumSamples(field_numSamples.getValue());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Lissajous_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 	
 	@Override
 	public String getName() {
@@ -55,12 +87,7 @@ public class Generator_Lissajous extends TurtleGenerator {
 		if(numSamples<1) numSamples=1;
 		numSamples = arg0;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Lissajous_Panel(this);
-	}
-		
+
 	@Override
 	public void generate() {		
 		// scale the step size so the curve fits on the paper

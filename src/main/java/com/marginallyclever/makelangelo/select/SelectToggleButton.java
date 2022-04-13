@@ -4,26 +4,26 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * A button that does nothing until you attach an observer.
+ * A toggle button that does nothing until you attach an observer.
  * @author Dan Royer
  * @since 7.24.0
  */
-public class SelectButton extends Select {
+public class SelectToggleButton extends Select {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7096181261934634708L;
-	private final JButton button;
+	private final JToggleButton button;
 
-	public SelectButton(String internalName,AbstractAction action) {
+	public SelectToggleButton(String internalName, AbstractAction action) {
 		super(internalName);
-		button = new JButton(action);
+		button = new JToggleButton(action);
 	}
-	
-	public SelectButton(String internalName,String labelText) {
+
+	public SelectToggleButton(String internalName, String labelText) {
 		super(internalName);
 		
-		button = new JButton(labelText);
+		button = new JToggleButton(labelText);
 		button.addActionListener((e) -> {
 			firePropertyChange(null,null);
 		});
@@ -45,5 +45,9 @@ public class SelectButton extends Select {
 
 	public void setForeground(Color fg) {
 		if(button!=null) button.setForeground(fg);
+	}
+
+	public boolean isSelected() {
+		return button.isSelected();
 	}
 }

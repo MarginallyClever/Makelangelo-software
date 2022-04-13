@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -16,16 +16,28 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Boxxy extends ImageConverter {
 	public static int boxMaxSize=4; // 0.8*5
 	public static int cutoff=127;
-	
+
+	public Converter_Boxxy() {
+		super();
+
+		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,2,getBoxMasSize());
+		size.addPropertyChangeListener((evt)->{
+			setBoxMaxSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(size);
+
+		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,getCutoff());
+		cutoff.addPropertyChangeListener((evt)->{
+			setCutoff((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(cutoff);
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("BoxGeneratorName");
-	}
-	
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("size")) setBoxMaxSize((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
 	}
 
 	public void setBoxMaxSize(int arg0) {
@@ -42,9 +54,11 @@ public class Converter_Boxxy extends ImageConverter {
 	public int getCutoff() {
 		return cutoff;
 	}
-	
+
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 
@@ -96,6 +110,8 @@ public class Converter_Boxxy extends ImageConverter {
 				}
 			}
 		}
+
+		fireConversionFinished();
 	}
 
 	private void drawBox(double x,double y,double ratio,double halfStep) {

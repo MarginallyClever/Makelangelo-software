@@ -11,8 +11,11 @@ public class TurtleGeneratorPanel extends SelectPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-		
-	protected TurtleGeneratorPanel() {
+	private final TurtleGenerator generator;
+
+	public TurtleGeneratorPanel(TurtleGenerator generator) {
 		super();
+		this.generator = generator;
+		generator.getPanelElements().forEach(this::add);
 	}
 }

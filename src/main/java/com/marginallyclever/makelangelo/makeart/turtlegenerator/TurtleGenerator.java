@@ -1,10 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import java.util.ArrayList;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generators create gcode from user input.  Fractals might be one example.
@@ -12,6 +14,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public abstract class TurtleGenerator {
 	protected Paper myPaper;
+
+	private final List<Select> panelElements = new ArrayList<>();
 	
 	abstract public String getName();
 	
@@ -19,14 +23,19 @@ public abstract class TurtleGenerator {
 	 * generate
 	 */
 	abstract public void generate();
-	
-	/**
-	 * @return the gui panel with options for this manipulator
-	 */
-	public TurtleGeneratorPanel getPanel() {
-		return null;
+
+	public void setPaper(Paper paper) {
+		myPaper = paper;
 	}
-	
+
+	public void add(Select element) {
+		panelElements.add(element);
+	}
+
+	public List<Select> getPanelElements() {
+		return panelElements;
+	}
+
 	/**
 	 * live preview as the system is generating.
 	 * draw the results as the calculation is being performed.
@@ -48,7 +57,4 @@ public abstract class TurtleGenerator {
 		for( TurtleGeneratorListener a : listeners ) a.turtleReady(turtle);
 	}
 
-	public void setPaper(Paper paper) {
-		myPaper = paper;
-	}
 }

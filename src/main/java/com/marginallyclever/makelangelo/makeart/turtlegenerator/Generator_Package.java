@@ -2,27 +2,45 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
- * Draws a border around the paper.  Uses current paper settings.
+ * Draws a paper cutting pattern for a box.
  * @author Dan Royer
- *
  */
 public class Generator_Package extends TurtleGenerator {
-	
 	int width=200;
 	int length=200;
 	int height=100;
+
+	public Generator_Package() {
+		super();
+
+		SelectInteger width;
+		SelectInteger length;
+		SelectInteger height;
+
+		add(width = new SelectInteger("width",Translator.get("Width"),getLastWidth()));
+		width.addPropertyChangeListener(evt->{
+			setWidth(((Number)width.getValue()).intValue());
+			generate();
+		});
+		add(height = new SelectInteger("height",Translator.get("Height"),getLastHeight()));
+		height.addPropertyChangeListener(evt->{
+			setHeight(((Number)height.getValue()).intValue());
+			generate();
+		});
+		add(length = new SelectInteger("length",Translator.get("Length"),getLastLength()));
+		length.addPropertyChangeListener(evt->{
+			setLength(((Number)length.getValue()).intValue());
+			generate();
+		});
+	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("Package");
-	}
-
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Package_Panel(this);
 	}
 
 	void drawRect(Turtle turtle,int x1,int y1,int x2,int y2) {
@@ -40,7 +58,6 @@ public class Generator_Package extends TurtleGenerator {
 		turtle.penDown();
 		turtle.moveTo(x2,y2);
 		turtle.penUp();
-
 	}
 
 	@Override

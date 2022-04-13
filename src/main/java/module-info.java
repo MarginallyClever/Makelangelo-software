@@ -17,6 +17,8 @@ module com.marginallyclever.makelangelo {
     requires com.formdev.flatlaf;
     requires org.reflections;
 
+    requires org.locationtech.jts;            // jts-core
+
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.makeart.io.vector;
     opens com.marginallyclever.makelangelo.plotter.plottercontrols;
@@ -27,6 +29,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes to com.marginallyclever.nodegraphcore;
+    opens com.marginallyclever.convenience.voronoi;
 
     provides com.marginallyclever.nodegraphcore.NodeRegistry with
             com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;

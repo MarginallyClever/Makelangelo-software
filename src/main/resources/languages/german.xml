@@ -173,7 +173,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>voronoiStipplingName</key>
+        <key>Converter_VoronoiStippling.Name</key>
         <value>Voronoi Punkte</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -243,7 +243,7 @@
         <hint>[load file dialog]</hint>
     </string>
     <string>
-        <key>voronoiStipplingDotMin</key>
+        <key>Converter_VoronoiStippling.DotMin</key>
         <value>Min Punktgröße</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -618,7 +618,7 @@
         <hint>[What is the hardware model of this robot?]</hint>
     </string>
     <string>
-        <key>voronoiStipplingCellCount</key>
+        <key>Converter_VoronoiStippling.CellCount</key>
         <value>Zellenanzahl</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -1198,7 +1198,7 @@
         <hint>[Generator]</hint>
     </string>
     <string>
-        <key>voronoiStipplingGenCount</key>
+        <key>Converter_VoronoiStippling.GenCount</key>
         <value>Generationenanzahl</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -1338,12 +1338,12 @@
         <hint>[context sensitive menu]</hint>
     </string>
     <string>
-        <key>voronoiStipplingDrawBorders</key>
+        <key>Converter_VoronoiStippling.DrawBorders</key>
         <value>Rand zeichnen?</value>
         <hint>[]</hint>
     </string>
     <string>
-        <key>voronoiStipplingCutoff</key>
+        <key>Converter_VoronoiStippling.Cutoff</key>
         <value>Tiefpassgrenze</value>
         <hint>[]</hint>
     </string>
@@ -1398,7 +1398,7 @@
         <hint>[Border generator]</hint>
     </string>
     <string>
-        <key>voronoiStipplingDotMax</key>
+        <key>Converter_VoronoiStippling.DotMax</key>
         <value>Max Punktgröße</value>
         <hint>[voronoi stippling generator]</hint>
     </string>

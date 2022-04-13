@@ -2,12 +2,12 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.beans.PropertyChangeEvent;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -19,15 +19,22 @@ public class Converter_Spiral extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_Spiral.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 
+	public Converter_Spiral() {
+		super();
+		SelectBoolean selectToCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),getToCorners());
+		add(selectToCorners);
+
+		selectToCorners.addPropertyChangeListener((evt) -> {
+			setToCorners((boolean)evt.getNewValue());
+			fireRestart();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("SpiralName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("toCorners")) setToCorners((boolean)evt.getNewValue());
-	}
 
 	public boolean getToCorners() {
 		return convertToCorners;
@@ -41,7 +48,9 @@ public class Converter_Spiral extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		turtle = new Turtle();
 
 		// black and white
@@ -87,9 +96,8 @@ public class Converter_Spiral extends ImageConverter {
 				double r1 = r - toolDiameter * p;
 				fx = Math.cos(f) * r1;
 				fy = Math.sin(f) * r1;
-				
-				boolean isInside = isInsidePaperMargins(fx, fy);
-				if(isInside) {
+
+				if(myPaper.isInsidePaperMargins(fx, fy)) {
 					try {
 						z = img.sample3x3(fx, fy);
 					} catch(Exception e) {
@@ -107,5 +115,7 @@ public class Converter_Spiral extends ImageConverter {
 		}
 
 		logger.debug("{} rings.", numRings);
+
+		fireConversionFinished();
 	}
 }

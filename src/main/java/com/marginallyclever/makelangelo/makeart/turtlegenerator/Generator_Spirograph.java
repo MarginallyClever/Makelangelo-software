@@ -1,6 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -16,6 +20,43 @@ public class Generator_Spirograph extends TurtleGenerator {
 	private static int majorRadius = 100; // controls complexity of curve
 	private static int numSamples = 2000;
 	private static boolean isEpitrochoid = false;
+
+	public Generator_Spirograph() {
+		super();
+
+		SelectBoolean field_isEpitrochoid;
+		SelectInteger field_majorRadius;
+		SelectInteger field_minorRadius;
+		SelectDouble field_pScale;
+		SelectInteger field_numSamples;
+
+		add(field_isEpitrochoid = new SelectBoolean("Epitrochoid",Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
+		field_isEpitrochoid.addPropertyChangeListener(evt->{
+			Generator_Spirograph.setEpitrochoid(field_isEpitrochoid.isSelected());
+			generate();
+		});
+		add(field_majorRadius = new SelectInteger("MajorRadius",Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
+		field_majorRadius.addPropertyChangeListener(evt->{
+			Generator_Spirograph.setMajorRadius(field_majorRadius.getValue());
+			generate();
+		});
+		add(field_minorRadius = new SelectInteger("MinorRadius",Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
+		field_minorRadius.addPropertyChangeListener(evt->{
+			Generator_Spirograph.setMinorRadius(field_minorRadius.getValue());
+			generate();
+		});
+		add(field_pScale = new SelectDouble("PScale",Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
+		field_pScale.addPropertyChangeListener(evt->{
+			Generator_Spirograph.setPScale(field_pScale.getValue());
+			generate();
+		});
+		add(field_numSamples = new SelectInteger("NumSamples",Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
+		field_numSamples.addPropertyChangeListener(evt->{
+			Generator_Spirograph.setNumSamples(field_numSamples.getValue());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Spirograph'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 	
 	@Override
 	public String getName() {
@@ -62,12 +103,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 		if(numSamples<1) numSamples=1;
 		numSamples = arg0;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Spirograph_Panel(this);
-	}
-		
+
 	@Override
 	public void generate() {
 		Turtle turtle = drawSpirograph();

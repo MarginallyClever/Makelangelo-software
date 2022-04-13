@@ -16,11 +16,6 @@ public class Generator_Border extends TurtleGenerator {
 	}
 
 	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Empty_Panel(this);
-	}
-
-	@Override
 	public void generate() {
 		double yMin = myPaper.getMarginBottom();
 		double yMax = myPaper.getMarginTop();

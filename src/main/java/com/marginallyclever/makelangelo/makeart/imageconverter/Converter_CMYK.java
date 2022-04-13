@@ -3,12 +3,13 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.beans.PropertyChangeEvent;
 
 /**
  * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
@@ -17,17 +18,25 @@ import java.beans.PropertyChangeEvent;
 public class Converter_CMYK extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK.class);
 	static protected int passes=1;// passes value have to be >=1.
-	
+
+	public Converter_CMYK() {
+		super();
+
+		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("ConverterCMYKPasses"), 5, 1, getPasses());
+		selectPasses.addPropertyChangeListener(evt->{
+			setPasses((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPasses);
+
+		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("ConverterCMYKName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("passes")) setPasses((int)evt.getNewValue());
-	}
-	
 	public int getPasses() {
 		return passes;
 	}
@@ -39,12 +48,14 @@ public class Converter_CMYK extends ImageConverter {
 	public void setPasses(int value) {
 		passes = Math.max(1, value);
 	}
-	
+
 	/**
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_CMYK cmyk = new Filter_CMYK();
 		cmyk.filter(myImage);
 		
@@ -56,6 +67,8 @@ public class Converter_CMYK extends ImageConverter {
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
 		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
 		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+
+		fireConversionFinished();
 	}
 	
 	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {
