@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import com.marginallyclever.makelangelo.makeart.imageFilter.ImageFilter;
+import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -20,8 +20,6 @@ public class TransformedImage {
 	private BufferedImage sourceImage;
 	private float scaleX, scaleY;
 	private float translateX, translateY;
-	private float rotationDegrees;
-	private int colorChannel;
 
 	public TransformedImage(BufferedImage src) {
 		sourceImage = src;
@@ -29,8 +27,6 @@ public class TransformedImage {
 		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
 		scaleY = -1;
-		rotationDegrees = 0;
-		colorChannel = 0;
 	}
 
 	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
@@ -47,8 +43,6 @@ public class TransformedImage {
 		translateY = copy.translateY;
 		scaleX = copy.scaleX;
 		scaleY = copy.scaleY;
-		rotationDegrees = copy.rotationDegrees;
-		colorChannel = copy.colorChannel;
 	}
 
 	public boolean canSampleAt(double x, double y) {
@@ -65,12 +59,6 @@ public class TransformedImage {
 		scaleY = other.scaleY;
 		translateX = other.translateX;
 		translateY = other.translateY;
-		rotationDegrees = other.rotationDegrees;
-		colorChannel = other.colorChannel;
-	}
-
-	public float getRotationDegrees() {
-		return rotationDegrees;
 	}
 
 	public float getScaleX() {
@@ -81,14 +69,6 @@ public class TransformedImage {
 		return scaleY;
 	}
 
-	public float getTranslateX() {
-		return translateX;
-	}
-
-	public float getTranslateY() {
-		return translateY;
-	}
-	
 	public BufferedImage getSourceImage() {
 		return sourceImage;
 	}
@@ -101,14 +81,6 @@ public class TransformedImage {
 		return (int) ((y / scaleY) - translateY);
 	}
 	
-	public void rotateAbsolute(float degrees) {
-		rotationDegrees = degrees;
-	}
-
-	public void rotateRelative(float degrees) {
-		rotationDegrees += degrees;
-	}
-
 	/**
 	 * Returns the greyscale intensity [0...255]
 	 * @param cx center of the sample area
@@ -224,19 +196,7 @@ public class TransformedImage {
 		int sampleY = getTransformedY(y);
 
 		Color c = new Color(sourceImage.getRGB(sampleX, sampleY));
-		int colorToBlend=0;
-		
-		switch (colorChannel) {
-		case 1: colorToBlend=c.getRed();  break;
-		case 2: colorToBlend=c.getGreen();  break;
-		case 3: colorToBlend=c.getBlue();  break;
-		default: return ImageFilter.decodeColor(c);
-		}
-		
-		double a = 255.0-c.getAlpha();
-		int c2 = (int)(  (255.0 - (double)colorToBlend) * (a / 255.0) + (double)colorToBlend);
-		if(c2>255) c2=255;
-		else if(c2<0) c2=0;
+		int c2 = ImageFilter.decodeColor(c) & 0xFF;  // clamp to 0..255
 		return c2;
 	}
 
@@ -246,7 +206,6 @@ public class TransformedImage {
 
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
 	public int sampleArea(int x0, int y0, int x1, int y1) {
-		// point sampling
 		int value = 0;
 		int sum = 0;
 
@@ -265,22 +224,8 @@ public class TransformedImage {
 		return value / sum;
 	}	
 
-	public void setColorChannel(int channel) {
-		colorChannel = channel;
-	}
-
 	public void setScale(float x,float y) {
 		scaleX = x;
 		scaleY = y;
-	}
-	
-	@Deprecated
-	public void translateX(float x) {
-		translateX = x;
-	}
-
-	@Deprecated
-	public void translateY(float y) {
-		translateY += y;
 	}
 }
