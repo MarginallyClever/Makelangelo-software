@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo.makeart.imageFilter;
-
-import java.awt.Color;
+package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+
+import java.awt.*;
 
 /**
  * Filters modify a BufferedImage.
@@ -11,28 +11,27 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
  */
 public class ImageFilter {
 	public static int decode32bit(int pixel) {
-		double a = 255-((pixel>>24) & 0xff);
+		double a = 255.0 - (double)((pixel>>24) & 0xff) / 255.0;
 		int r = ((pixel >> 16) & 0xff);
 		int g = ((pixel >> 8) & 0xff);
 		int b = ((pixel) & 0xff);
 
-		int r2 = (int)((255 - r) * (a / 255.0) + r);
-		int g2 = (int)((255 - g) * (a / 255.0) + g);
-		int b2 = (int)((255 - b) * (a / 255.0) + b);
+		int r2 = (int)( (255.0 - r) * a + r);
+		int g2 = (int)( (255.0 - g) * a + g);
+		int b2 = (int)( (255.0 - b) * a + b);
 		
 		return (r2 + g2 + b2) / 3;
 	}
 
 	public static int decodeColor(Color c) {
-		int r = c.getRed();
-		int g = c.getGreen();
-		int b = c.getBlue();
-		double a = 255-c.getAlpha();
+		double r = c.getRed();
+		double g = c.getGreen();
+		double b = c.getBlue();
+		double a = 1.0 - (double)c.getAlpha() / 255.0;
 
-		
-		int r2 = (int)((255.0 - (double)r) * (a / 255.0) + r);
-		int g2 = (int)((255.0 - (double)g) * (a / 255.0) + g);
-		int b2 = (int)((255.0 - (double)b) * (a / 255.0) + b);
+		int r2 = (int)( (255.0 - r) * a + r);
+		int g2 = (int)( (255.0 - g) * a + g);
+		int b2 = (int)( (255.0 - b) * a + b);
 		
 		return (r2 + g2 + b2) / 3;
 	}
