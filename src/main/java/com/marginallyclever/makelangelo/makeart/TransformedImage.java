@@ -8,13 +8,9 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 /**
- * TransformedImage is a BufferedImage, scaled, rotated, and translated
- * somewhere on the drawing area (aka paper space). All sampling interactions
- * with TransformedImage are done in paper space coordinates, and
- * TransformedImage takes care of the rest.
- * 
- * @author droyer
- *
+ * TransformedImage is a {@link BufferedImage}, scaled and translated somewhere on the drawing area (aka paper space).
+ * All sampling interactions are done in paper space coordinates and TransformedImage takes care of the rest.
+ * @author Dan Royer
  */
 public class TransformedImage {
 	private BufferedImage sourceImage;
@@ -73,14 +69,14 @@ public class TransformedImage {
 		return sourceImage;
 	}
 
-	public int getTransformedX(double x) {
+	private int getTransformedX(double x) {
 		return (int) ((x / scaleX) - translateX);
 	}
 
 	public int getTransformedY(double y) {
 		return (int) ((y / scaleY) - translateY);
 	}
-	
+
 	/**
 	 * Returns the greyscale intensity [0...255]
 	 * @param cx center of the sample area
@@ -227,5 +223,10 @@ public class TransformedImage {
 	public void setScale(float x,float y) {
 		scaleX = x;
 		scaleY = y;
+	}
+
+
+	public void setRGB(float x, float y, int c) {
+		sourceImage.setRGB(getTransformedX(x), getTransformedY(y), c);
 	}
 }

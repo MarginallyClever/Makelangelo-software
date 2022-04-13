@@ -2,12 +2,13 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.beans.PropertyChangeEvent;
 
 
 /**
@@ -25,8 +26,22 @@ public class Converter_Sandy extends ImageConverter {
 		Translator.get("bottom right"), 
 		Translator.get("center")
 	};
-	
-	public Converter_Sandy() {}
+
+	public Converter_Sandy() {
+		super();
+		SelectSlider selectRings = new SelectSlider("rings",Translator.get("SandyNoble.rings"),300,10,getScale());
+		add(selectRings);
+		selectRings.addPropertyChangeListener(evt->{
+			setScale((int)evt.getNewValue());
+			fireRestart();
+		});
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("SandyNoble.center"),getDirections(),getDirectionIndex());
+		add(selectDirection);
+		selectDirection.addPropertyChangeListener(evt->{
+			setDirection((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {
@@ -34,13 +49,9 @@ public class Converter_Sandy extends ImageConverter {
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("rings")) setScale((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("direction")) setDirection((int)evt.getNewValue());
-	}
-	
-	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 
@@ -103,7 +114,7 @@ public class Converter_Sandy extends ImageConverter {
 					dy = Math.sin(t_dir *t);
 					x = cx + dx * r;
 					y = cy + dy * r;
-					if(!isInsidePaperMargins(x,y)) {
+					if(!myPaper.isInsidePaperMargins(x,y)) {
 						if(wasDrawing) {
 							turtle.jumpTo(last_x,last_y);
 							wasDrawing=false;
@@ -144,6 +155,8 @@ public class Converter_Sandy extends ImageConverter {
 			turtle.unlock();
 			logger.debug("Sandy finished.");
 		}
+
+		fireConversionFinished();
 	}
 
 	public int getScale() {

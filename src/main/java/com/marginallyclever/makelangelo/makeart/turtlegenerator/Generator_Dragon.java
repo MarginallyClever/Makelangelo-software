@@ -1,11 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Dragon fractal
@@ -13,8 +15,20 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_Dragon extends TurtleGenerator {
 	private static int order = 12; // controls complexity of curve
+	private SelectSlider fieldOrder;
 
-	private List<Integer> sequence;
+	private final List<Integer> sequence = new ArrayList<>();
+
+	Generator_Dragon() {
+		super();
+
+		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
+		fieldOrder.addPropertyChangeListener(evt->{
+			order = Math.max(1,fieldOrder.getValue());
+			generate();
+		});
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Dragon_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+	}
 
 	@Override
 	public String getName() {
@@ -28,20 +42,15 @@ public class Generator_Dragon extends TurtleGenerator {
 		if(value<1) value=1;
 		order = value;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_Dragon_Panel(this);
-	}
-		
+
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();
 
 		// create the sequence of moves
-        sequence = new ArrayList<Integer>();
+        sequence.clear();
         for (int i = 0; i < order; i++) {
-            List<Integer> copy = new ArrayList<Integer>(sequence);
+            List<Integer> copy = new ArrayList<>(sequence);
             Collections.reverse(copy);
             sequence.add(1);
             for (Integer turn : copy) {

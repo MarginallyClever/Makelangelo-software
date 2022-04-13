@@ -1,9 +1,9 @@
-package com.marginallyclever.makelangelo.makeart.imageFilter;
-
-import java.awt.image.BufferedImage;
+package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+
+import java.awt.image.BufferedImage;
 
 
 /**

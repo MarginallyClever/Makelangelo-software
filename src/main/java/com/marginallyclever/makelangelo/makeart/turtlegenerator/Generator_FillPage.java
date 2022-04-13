@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -12,6 +13,23 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Generator_FillPage extends TurtleGenerator {
 	private static double angle = 0;
 	private static double penDiameter = 0.8;// must be greater than zero ! (or else infinit loop)
+
+	public Generator_FillPage() {
+		super();
+		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle());
+		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),Generator_FillPage.getPenDiameter());
+		add(selectAngle);
+		add(selectPenDiameter);
+		selectAngle.addPropertyChangeListener(evt->{
+			Generator_FillPage.setAngle(selectAngle.getValue());
+			generate();
+		});
+		selectPenDiameter.addPropertyChangeListener(evt->{
+			Generator_FillPage.setPenDiameter(selectPenDiameter.getValue());
+			generate();
+
+		});
+	}
 
 	@Override
 	public String getName() {
@@ -33,11 +51,6 @@ public class Generator_FillPage extends TurtleGenerator {
 		Generator_FillPage.penDiameter = penDiameter;
 	}
 
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_FillPage_Panel(this);
-	}
-	
 	@Override
 	public void generate() {
 		double majorX = Math.cos(Math.toRadians(angle));

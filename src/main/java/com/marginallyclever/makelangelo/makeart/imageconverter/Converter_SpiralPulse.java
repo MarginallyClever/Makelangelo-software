@@ -2,12 +2,12 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.beans.PropertyChangeEvent;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -21,24 +21,41 @@ public class Converter_SpiralPulse extends ImageConverter {
 	private static double zigDensity = 1.2f;  // increase to tighten zigzags
 	private static double spacing = 2.5f;
 	private static double height = 4.0f;
+
+	public Converter_SpiralPulse() {
+		super();
+		SelectDouble selectIntensity = new SelectDouble("intensity", Translator.get("SpiralPulse.intensity"),getIntensity());
+		add(selectIntensity);
+		selectIntensity.addPropertyChangeListener(evt->{
+			setIntensity((double)evt.getNewValue());
+			fireRestart();
+		});
+		SelectDouble selectSpacing = new SelectDouble("spacing",Translator.get("SpiralPulse.spacing"),getSpacing());
+		add(selectSpacing);
+		selectSpacing.addPropertyChangeListener(evt->{
+			setSpacing((double)evt.getNewValue());
+			fireRestart();
+		});
+		SelectDouble selectHeight = new SelectDouble("height",Translator.get("SpiralPulse.height"),getHeight());
+		add(selectHeight);
+		selectHeight.addPropertyChangeListener(evt->{
+			setHeight((double)evt.getNewValue());
+			fireRestart();
+		});
+	}
 	
 	@Override
 	public String getName() {
 		return Translator.get("SpiralPulseName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("intensity")) setIntensity((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("spacing")) setSpacing((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("height")) setHeight((double)evt.getNewValue());
-	}
-
 	/**
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		// black and white
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
@@ -88,8 +105,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 				fx = Math.cos(f) * r2;
 				fy = Math.sin(f) * r2;
 				// clip to paper boundaries
-				if( isInsidePaperMargins(fx, fy) )
-				{
+				if( myPaper.isInsidePaperMargins(fx, fy) ) {
 					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
 					scale_z = (255.0f - z) / 255.0f;
 					pulse_size = halfStep * scale_z;
@@ -118,6 +134,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		}
 
 		logger.debug("{} rings.", numRings);
+
+		fireConversionFinished();
 	}
 
 	public void setIntensity(double v) {

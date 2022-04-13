@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 
@@ -14,19 +14,27 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Converter_RandomLines extends ImageConverter {
 	static protected int numLines = 2500;
-	
+
+	public Converter_RandomLines() {
+		super();
+		SelectInteger selectTotal = new SelectInteger("total",Translator.get("ConverterRandomLinesCount"),getLineCount());
+		add(selectTotal);
+
+		selectTotal.addPropertyChangeListener((evt)->{
+			if(evt.getPropertyName().equals("total")) setLineCount((int)evt.getNewValue());
+			fireRestart();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("ConverterRandomLinesName");
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("total")) setLineCount((int)evt.getNewValue());
-	}
-	
-	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
@@ -64,8 +72,9 @@ public class Converter_RandomLines extends ImageConverter {
 			startPX = endPX;
 			startPY = endPY;
 		}
+
+		fireConversionFinished();
 	}
-	
 
 	public int getLineCount() {
 		return numLines;

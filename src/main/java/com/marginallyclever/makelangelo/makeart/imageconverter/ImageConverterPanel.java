@@ -6,14 +6,15 @@ import com.marginallyclever.makelangelo.select.SelectPanel;
  * All converters have a panel with options.  This is their shared root.
  * @author Dan Royer
  */
-public abstract class ImageConverterPanel extends SelectPanel {
+public class ImageConverterPanel extends SelectPanel {
 	private static final long serialVersionUID = 1L;
-	private ImageConverter myConverter;
+	private final ImageConverter myConverter;
 	
-	protected ImageConverterPanel(ImageConverter converter) {
+	public ImageConverterPanel(ImageConverter converter) {
 		super();
 		myConverter=converter;
-		addPropertyChangeListener(myConverter);
+
+		myConverter.getPanelElements().forEach(this::add);
 	}
 	
 	public ImageConverter getConverter() {

@@ -7,89 +7,59 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.io.image.ImageConverterThread;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Converts a {@link TransformedImage} to {@link Turtle}
  * @author Dan Royer
  */
-public abstract class ImageConverter implements PropertyChangeListener {
+public abstract class ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(ImageConverter.class);
 	protected TransformedImage myImage;
 	protected Paper myPaper;
 	public Turtle turtle = new Turtle();
 
 	// for previewing the image
 	private Texture texture = null;
-	
-	protected boolean keepIterating=false;
-	private ProgressMonitor pm;
-	private ImageConverterThread thread;
+
+	private final List<Select> panelElements = new ArrayList<>();
 
 	/**
 	 * @return the translated name.
 	 */
 	abstract public String getName();
 
-	public void setPaper(Paper p) {
-		myPaper = p;
-	}
-	
-	public void setThread(ImageConverterThread p) {
-		thread = p;
-	}
-
-	public void setProgressMonitor(ProgressMonitor p) {
-		pm = p;
-	}
-	
-	public void setProgress(int d) {
-		if(pm==null) return;
-		pm.setProgress(d);
-	}
-
-	public boolean isThreadCancelled() {
-		if(thread!=null && thread.isCancelled()) return true;
-		if(pm!=null && !pm.isCanceled()) return true;
-		return false;
-	}
-		
 	/**
-	 * set the image to be transformed.
+	 * Start the conversion process.
+	 * @param paper the bounds of the final output.
 	 * @param img the {@code TransformedImage} this filter is using as source material.
 	 */
-	public void setImage(TransformedImage img) {
+	public void start(Paper paper,TransformedImage img) {
+		myPaper = paper;
 		myImage = img;
 		texture = null;
 	}
-	
+
 	/**
-	 * run one "step" of an iterative image conversion process.
-	 * @return true if conversion should iterate again.
+	 * Stop the conversion process.  Called by the GUI when the user cancels the conversion, either by changing the
+	 * style or halting altogether.  In both cases the conversion should be aborted.
 	 */
-	public boolean iterate() {
-		return false;
-	}
+	public void stop() {}
 
-	public void stopIterating() {
-		keepIterating=false;
-	}
-
-	abstract public void finish();
-	
 	/**
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
 	protected void render(GL2 gl2) {
-		if( texture==null ) {
-			if( myImage!=null) {
-				texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
-			}
+		if( texture==null && myImage!=null) {
+			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
 		}
 		if(texture!=null) {
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
@@ -193,7 +163,7 @@ public abstract class ImageConverter implements PropertyChangeListener {
 			n = b / distance;
 			x = dx * n + x0;
 			y = dy * n + y0;
-			isInside=isInsidePaperMargins(x, y);
+			isInside = myPaper.isInsidePaperMargins(x,y);
 			if(isInside) {
 				oldPixel = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
 				int b2 = (int)Math.min(b, error0.length-2);
@@ -220,7 +190,35 @@ public abstract class ImageConverter implements PropertyChangeListener {
 		turtle.penUp();
 	}
 
-	protected boolean isInsidePaperMargins(double x,double y) {
-		return myPaper.isInsidePaperMargins(x,y);
+	// Observer pattern notified when a converter has finished a job.
+	private List<ImageConverterListener> listeners = new ArrayList<>();
+
+	public void addImageConverterListener(ImageConverterListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeImageConverterListener(ImageConverterListener listener) {
+		listeners.remove(listener);
+	}
+
+	protected void fireRestart() {
+		for(ImageConverterListener listener:listeners) listener.onRestart(this);
+	}
+
+	/**
+	 * Called when the converter has successfully finished a job.
+	 */
+	protected void fireConversionFinished() {
+		logger.debug("fire conversion finished");
+		for(ImageConverterListener listener : listeners) {
+			listener.onConvertFinished(turtle);
+		}
+	}
+
+	public void add(Select element) {
+		panelElements.add(element);
+	}
+	public List<Select> getPanelElements() {
+		return panelElements;
 	}
 }

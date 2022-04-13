@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
@@ -12,6 +13,19 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_GraphPaper extends TurtleGenerator {
 	private static double angle = 0;
+
+	public Generator_GraphPaper() {
+		super();
+
+		SelectDouble angle;
+
+		add(angle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_GraphPaper.getAngle()));
+
+		angle.addPropertyChangeListener(evt->{
+			setAngle(angle.getValue());
+			generate();
+		});
+	}
 
 	@Override
 	public String getName() {
@@ -24,12 +38,7 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	static public void setAngle(double value) {
 		angle = value;
 	}
-	
-	@Override
-	public TurtleGeneratorPanel getPanel() {
-		return new Generator_GraphPaper_Panel(this);
-	}
-	
+
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();

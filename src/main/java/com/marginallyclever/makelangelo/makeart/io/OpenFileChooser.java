@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.io.image.ConvertImagePanel;
+import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class OpenFileChooser {
                         .map(FileNameExtensionFilter::getExtensions)
                         .flatMap(Stream::of)
                 ,
-                Arrays.stream(ConvertImagePanel.IMAGE_FILE_EXTENSIONS.clone())
+                Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS.clone())
         ).toArray(String[]::new);
 
         jFileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), extensions));
@@ -46,7 +46,7 @@ public class OpenFileChooser {
         }
 
         // add image formats
-        FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage"), ConvertImagePanel.IMAGE_FILE_EXTENSIONS);
+        FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage"), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         jFileChooser.addChoosableFileFilter(images);
 
         // no wild card filter, please.

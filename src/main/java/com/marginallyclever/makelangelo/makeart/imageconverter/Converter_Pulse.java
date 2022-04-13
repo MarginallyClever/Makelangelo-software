@@ -3,14 +3,16 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-
-import java.beans.PropertyChangeEvent;
 
 
 /**
- * 
+ * straight lines pulsing like a heartbeat.  height and density of pulse vary with image intensity.
  * @author Dan Royer
  */
 public class Converter_Pulse extends ImageConverter {
@@ -19,18 +21,36 @@ public class Converter_Pulse extends ImageConverter {
 	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
 
+	public Converter_Pulse() {
+		super();
+
+		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
+		SelectSlider    selectCutoff = new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getCutoff());
+
+		add(selectSize);
+		add(selectDirection);
+		add(selectCutoff);
+
+		selectSize.addPropertyChangeListener(evt->{
+			setScale((double) evt.getNewValue());
+			fireRestart();
+		});
+		selectDirection.addPropertyChangeListener(evt->{
+			setDirectionIndex((int) evt.getNewValue());
+			fireRestart();
+		});
+		selectCutoff.addPropertyChangeListener(evt->{
+			setCutoff((int) evt.getNewValue());
+			fireRestart();
+		});
+	}
+
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("size")) setScale((double)evt.getNewValue());
-		if(evt.getPropertyName().equals("direction")) setDirectionIndex((int)evt.getNewValue());
-		if(evt.getPropertyName().equals("cutoff")) setCutoff((int)evt.getNewValue());
-	}
-	
 	public double getScale() {
 		return blockScale;
 	}
@@ -84,7 +104,9 @@ public class Converter_Pulse extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
@@ -139,6 +161,8 @@ public class Converter_Pulse extends ImageConverter {
 				}
 			}
 		}
+
+		fireConversionFinished();
 	}
 
     public int getCutoff() {

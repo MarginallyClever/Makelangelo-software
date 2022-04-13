@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import java.beans.PropertyChangeEvent;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imageFilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class Converter_Crosshatch extends ImageConverter {
@@ -13,22 +13,48 @@ public class Converter_Crosshatch extends ImageConverter {
 	private static double pass75=16.0f;
 	private static double pass15=64.0f;
 	private static double pass45=128.0f;
-	
-	@Override
-	public String getName() {
-		return Translator.get("Crosshatch");
+
+	public Converter_Crosshatch() {
+		super();
+		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 100, 1, (int) (getIntensity() * 10.0));
+		selectIntesity.addPropertyChangeListener(evt->{
+			setIntensity((float)((int)evt.getNewValue())/10.0f);
+			fireRestart();
+		});
+		add(selectIntesity);
+
+		SelectSlider selectPass90 = new SelectSlider("pass90", Translator.get("pass90"), 256, 0, (int) getPass90());
+		selectPass90.addPropertyChangeListener((evt)-> {
+			setPass90((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass90);
+
+		SelectSlider selectPass75 = new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)getPass75());
+		selectPass75.addPropertyChangeListener((evt)-> {
+			setPass75((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass75);
+
+		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
+		selectPass15.addPropertyChangeListener((evt)-> {
+			setPass15((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass15);
+
+		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
+		selectPass45.addPropertyChangeListener((evt)-> {
+			setPass45((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass45);
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if(evt.getPropertyName().equals("intensity")) {
-			setIntensity((float)((int)evt.getNewValue())/10.0f);
-		}
-		if(evt.getPropertyName().equals("pass90")) pass90=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass75")) pass75=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass15")) pass15=(int)evt.getNewValue();
-		if(evt.getPropertyName().equals("pass45")) pass45=(int)evt.getNewValue();
-		
+	public String getName() {
+		return Translator.get("Crosshatch");
 	}
 
 	public void setIntensity(double arg0) {
@@ -56,7 +82,9 @@ public class Converter_Crosshatch extends ImageConverter {
 	} 
 	
 	@Override
-	public void finish() {
+	public void start(Paper paper, TransformedImage image) {
+		super.start(paper, image);
+
 		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
 		TransformedImage img = bw.filter(myImage);
 		
@@ -65,6 +93,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		finishPass(new int[]{(int)pass75},15,img);
 		finishPass(new int[]{(int)pass15},75,img);
 		finishPass(new int[]{(int)pass45},45,img);
+
+		fireConversionFinished();
 	}
 	
 	private void finishPass(int [] passes,double angleDeg,TransformedImage img) {
@@ -113,5 +143,21 @@ public class Converter_Crosshatch extends ImageConverter {
 			}
 			++i;
 		}
+	}
+
+	public void setPass90(int newValue) {
+		Converter_Crosshatch.pass90 = newValue;
+	}
+
+	public void setPass75(int newValue) {
+		Converter_Crosshatch.pass75 = newValue;
+	}
+
+	public void setPass15(int newValue) {
+		Converter_Crosshatch.pass15 = newValue;
+	}
+
+	public void setPass45(int newValue) {
+		Converter_Crosshatch.pass45 = newValue;
 	}
 }

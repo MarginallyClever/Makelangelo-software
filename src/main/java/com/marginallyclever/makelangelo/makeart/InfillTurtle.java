@@ -5,8 +5,6 @@ import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -21,8 +19,6 @@ import java.util.List;
  * @since 7.31.0
  */
 public class InfillTurtle {
-	private static final Logger logger = LoggerFactory.getLogger(InfillTurtle.class);
-	
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
 	private double penDiameter = 0.8; // TODO adjust me before running infill
 
@@ -133,7 +129,6 @@ public class InfillTurtle {
 	 *         sort by ascending y value.
 	 */
 	private LineCollection sortIntersectionsIntoSegments(List<Point2D> intersections, ColorRGB color) {
-		logger.debug("  sortIntersectionsIntoSegments() {}", intersections.size());
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {

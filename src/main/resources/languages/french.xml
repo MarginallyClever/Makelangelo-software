@@ -90,7 +90,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>voronoiStipplingName</key>
+        <key>Converter_VoronoiStippling.Name</key>
         <value>Pointillés de Voronoï</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -140,7 +140,7 @@
         <hint>[Spiral generator]</hint>
     </string>
     <string>
-        <key>voronoiStipplingDotMin</key>
+        <key>Converter_VoronoiStippling.DotMin</key>
         <value>Taille de point minimale</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -328,7 +328,7 @@
         <hint>[Art Pipeline]</hint>
     </string>
     <string>
-        <key>voronoiStipplingCellCount</key>
+        <key>Converter_VoronoiStippling.CellCount</key>
         <value>Nombre de cellules</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -723,7 +723,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>voronoiStipplingDotMax</key>
+        <key>Converter_VoronoiStippling.DotMax</key>
         <value>Taille maximale des points</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -1603,7 +1603,7 @@
         <hint>[Generator]</hint>
     </string>
     <string>
-        <key>voronoiStipplingGenCount</key>
+        <key>Converter_VoronoiStippling.GenCount</key>
         <value>Nombre de générations</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -1658,12 +1658,12 @@
         <hint>[]</hint>
     </string>
     <string>
-        <key>voronoiStipplingDrawBorders</key>
+        <key>Converter_VoronoiStippling.DrawBorders</key>
         <value>Dessiner des frontières ?</value>
         <hint>[]</hint>
     </string>
     <string>
-        <key>voronoiStipplingCutoff</key>
+        <key>Converter_VoronoiStippling.Cutoff</key>
         <value>Coupure passe-bas</value>
         <hint>[]</hint>
     </string>
