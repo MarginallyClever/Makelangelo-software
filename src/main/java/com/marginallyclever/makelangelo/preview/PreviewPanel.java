@@ -245,7 +245,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	/**
 	 * Set up the correct modelview so the robot appears where it should.
 	 *
-	 * @param gl2
+	 * @param gl2 OpenGL context
 	 */
 	private void paintCamera(GL2 gl2) {
 		gl2.glMatrixMode(GL2.GL_MODELVIEW);
@@ -257,7 +257,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	/**
 	 * Clear the panel
 	 *
-	 * @param gl2
+	 * @param gl2 OpenGL context
 	 */
 	private void paintBackground(GL2 gl2) {
 		int b=70;
