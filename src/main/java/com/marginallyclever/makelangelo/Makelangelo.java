@@ -39,6 +39,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
+import com.marginallyclever.util.ImageCaptureJComponant;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -488,6 +490,25 @@ public final class Makelangelo {
 		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
 		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
 		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
+		
+		AbstractAction absActionScreenShotSaveAsImgFileAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Try to do a screenshot ...");
+				try{
+					ImageCaptureJComponant.doACapture(previewPanel, new File("."), "screenshot_"+System.currentTimeMillis()+".png", false);
+				}catch(Exception ex ){					
+					ex.printStackTrace();
+				}
+				//throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+			}
+		};
+		
+		// NOP in some linux desktop env this is already used so this can or not override the default (sys env)  : 
+		absActionScreenShotSaveAsImgFileAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PRINTSCREEN, SHORTCUT_CTRL));
+		
+		absActionScreenShotSaveAsImgFileAction.putValue(Action.NAME, "Take a scerenshot of the preview panel");
+		menu.add(absActionScreenShotSaveAsImgFileAction);
 
 		return menu;
 	}
