@@ -1143,6 +1143,11 @@
         <hint>[text]</hint>
     </string>
     <string>
+        <key>PlotterControls.CommunicationFailure</key>
+        <value>Pas de réponse du robot, vérifier le câble USB ou la vitesse de communication.</value>
+        <hint>text</hint>
+    </string>
+    <string>
         <key>PlotterSettings.blockBufferSize</key>
         <value>Taille du tampon de bloc</value>
         <hint></hint>

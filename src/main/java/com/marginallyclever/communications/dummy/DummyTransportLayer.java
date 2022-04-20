@@ -3,6 +3,8 @@ package com.marginallyclever.communications.dummy;
 import com.marginallyclever.communications.Configuration;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,18 +13,18 @@ import java.util.List;
  * Always reply ok to sent messages
  */
 public class DummyTransportLayer implements TransportLayer {
-
+    private static final Logger logger = LoggerFactory.getLogger(DummyTransportLayer.class);
     @Override
     public NetworkSession openConnection(Configuration configuration) {
         return new NetworkSession() {
             @Override
             public void closeConnection() {
-
+                logger.debug("Closed");
             }
 
             @Override
             public void openConnection(String connectionName) throws Exception {
-
+                logger.debug("Open");
             }
 
             @Override

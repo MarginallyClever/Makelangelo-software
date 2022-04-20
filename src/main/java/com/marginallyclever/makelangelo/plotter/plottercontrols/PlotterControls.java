@@ -55,6 +55,7 @@ public class PlotterControls extends JPanel {
 
 	private boolean isRunning = false;
 	private boolean penIsUpBeforePause = false;
+	private boolean isErrorAlreadyDisplayed = false;
 
 	public PlotterControls(Plotter plotter, Turtle turtle, Window parentWindow) {
 		super();
@@ -91,12 +92,16 @@ public class PlotterControls extends JPanel {
 		switch (e.getActionCommand()) {
 		case MarlinInterface.IDLE ->
 				{ if (isRunning) step(); }
-		case MarlinInterface.ERROR ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.Error"), Translator.get("ErrorTitle"),  JOptionPane.ERROR_MESSAGE);
+		case MarlinInterface.ERROR,
+			 MarlinInterface.DID_NOT_FIND,
+			 MarlinInterface.COMMUNICATION_FAILURE -> {
+			if (!isErrorAlreadyDisplayed) {
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+				isErrorAlreadyDisplayed = true;
+			}
+		}
 		case MarlinInterface.HOME_XY_FIRST ->
 				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
-		case MarlinInterface.DID_NOT_FIND ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.DidNotFind"), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 		}
 		updateProgressBar();
 	}
@@ -235,6 +240,7 @@ public class PlotterControls extends JPanel {
 		bEmergencyStop.setEnabled(true);
 		updateButtonStatusConnected();
 		jogInterface.onNetworkConnect();
+		isErrorAlreadyDisplayed = false;
 	}
 
 	private void onDisconnect() {

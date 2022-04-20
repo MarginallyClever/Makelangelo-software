@@ -34,7 +34,9 @@ public class MarlinInterface extends JPanel {
 	// Marlin can buffer this many commands from serial, before processing.
 	private static final int MARLIN_SEND_LIMIT = 20;
 	// If nothing is heard for this many ms then send a ping to check if the connection is still live. 
-	private static final int TIMEOUT_DELAY = 2000;
+	private static final int TIMEOUT_DELAY = 5000;
+	// Max duration before alerting the user something is wrong
+	private static final int FATAL_TIMEOUT_DELAY = TIMEOUT_DELAY * 5;
 	// Marlin says this when a resend is needed, followed by the last well-received line number.
 	private static final String STR_RESEND = "Resend: ";
 	// Marlin sends this event when the robot is ready to receive more.
@@ -49,13 +51,15 @@ public class MarlinInterface extends JPanel {
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
 	public static final String IDLE = "idle";
 	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle an error.
-	public static final String ERROR = "error";
+	public static final String ERROR = "Error";
 	// MarlinInterface sends this as an ActionEvent to let listeners know it must home first.
-	public static final String HOME_XY_FIRST = "homexyfirst";
+	public static final String HOME_XY_FIRST = "HomeXYFirst";
 	// MarlinInterface sends this as an ActionEvent to let listeners know there is an error in the transmission.
-	public static final String DID_NOT_FIND = "didnotfind";
+	public static final String DID_NOT_FIND = "DidNotFind";
+	// No news from the robot
+	public static final String COMMUNICATION_FAILURE = "CommunicationFailure";
 
-	private TextInterfaceToNetworkSession chatInterface;
+	private final TextInterfaceToNetworkSession chatInterface;
 	private final List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
@@ -65,7 +69,7 @@ public class MarlinInterface extends JPanel {
 	// don't send more than this many at a time without acknowledgement.
 	private int busyCount=MARLIN_SEND_LIMIT;
 	
-	private final Timer timeoutChecker = new Timer(10000,(e)->onTimeoutCheck());
+	private final Timer timeoutChecker = new Timer(TIMEOUT_DELAY,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
 	
 	public MarlinInterface(ChooseConnection chooseConnection) {
@@ -80,7 +84,6 @@ public class MarlinInterface extends JPanel {
 				case NetworkSessionEvent.CONNECTION_OPENED -> onConnect();
 				case NetworkSessionEvent.CONNECTION_CLOSED -> onClose();
 			}
-			// TODO notifyListeners(e);
 		});
 	}
 
@@ -95,6 +98,7 @@ public class MarlinInterface extends JPanel {
 		lineNumberAdded=0;
 		myHistory.clear();
 		timeoutChecker.start();
+		lastReceivedTime = System.currentTimeMillis();
 	}
 	
 	private void onClose() {
@@ -103,14 +107,21 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	private void onTimeoutCheck() {
-		if (System.currentTimeMillis() - lastReceivedTime > TIMEOUT_DELAY) {
-			logger.trace("Heartbeat: M400");
-			chatInterface.sendCommand("M400");
+		long delay = System.currentTimeMillis() - lastReceivedTime;
+		if (delay > TIMEOUT_DELAY) {
+			if (delay > FATAL_TIMEOUT_DELAY) {
+				logger.error("No answer from the robot");
+				notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, COMMUNICATION_FAILURE));
+				chatInterface.displayError("No answer from the robot, retrying...");
+			} else {
+				logger.trace("Heartbeat: M400");
+				chatInterface.sendCommand("M400");
+			}
 		}
 	}
 
 	private void setupNetworkListener() {
-		chatInterface.addNetworkSessionListener((evt) -> onDataReceived(evt));
+		chatInterface.addNetworkSessionListener(this::onDataReceived);
 	}
 	
 	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
@@ -167,20 +178,21 @@ public class MarlinInterface extends JPanel {
 		
 		// only notify listeners of a fatal error (MarlinInterface.ERROR) if the printer halts.
 		if (message.contains(STR_PRINTER_HALTED)) {
-			notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.ERROR));
+			notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ERROR));
 		}
 	}
 
 	private void onHearHomeXYFirst() {
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.HOME_XY_FIRST));
+		logger.warn("Home XY First");
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, HOME_XY_FIRST));
 	}
 
 	private void onDidNotFindCommandInHistory() {
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.DID_NOT_FIND));
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DID_NOT_FIND));
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MarlinInterface.IDLE));
+		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, IDLE));
 	}
 
 	private void clearOldHistory() {
