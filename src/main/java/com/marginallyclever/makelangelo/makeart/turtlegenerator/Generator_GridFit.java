@@ -88,16 +88,16 @@ public class Generator_GridFit extends TurtleGenerator {
 		double halfWidth = (w * length)/2;
 		double halfHeight = (h * length)/2;
 
-		for(int y=0;y<h;++y) {
-			double y2 = -halfHeight+y*length;
-			for(int x=0;x<w;++x) {
-				double x2 = -halfWidth+x*length;
-				turtle.jumpTo(x2,y2);
-				turtle.moveTo(x2+length,y2);
-				turtle.moveTo(x2+length,y2+length);
-				turtle.moveTo(x2,y2+length);
-				turtle.moveTo(x2,y2);
-			}
+		for(int y=0;y<=h;++y) {
+			double y2 = -halfHeight + y * length;
+			turtle.jumpTo(-halfWidth,y2);
+			turtle.moveTo( halfWidth,y2);
+		}
+
+		for(int x=0;x<=w;++x) {
+			double x2 = -halfWidth+x*length;
+			turtle.jumpTo(x2,-halfHeight);
+			turtle.moveTo(x2, halfHeight);
 		}
 
 		notifyListeners(turtle);
