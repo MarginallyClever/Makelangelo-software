@@ -2243,4 +2243,21 @@
 		<key>VoronoiZigZag.optimizePath</key>
 		<value>Optimize path</value>
 	</string>
+
+	<string>
+		<key>Generator_GridFit.Name</key>
+		<value>Grid fit</value>
+	</string>
+	<string>
+		<key>Generator_GridFit.margin</key>
+		<value>Minimum margin each side (mm)</value>
+	</string>
+	<string>
+		<key>Generator_GridFit.cellsWide</key>
+		<value>Cells horizontal</value>
+	</string>
+	<string>
+		<key>Generator_GridFit.cellsHigh</key>
+		<value>Cells vertical</value>
+	</string>
 </language>

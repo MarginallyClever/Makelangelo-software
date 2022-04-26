@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Rectangle2D;
@@ -269,4 +270,18 @@ class TurtleTest {
         assertNotEquals(turtle, turtle2);
     }
 
+
+    @Test
+    public void testInterpolate() {
+        final double EPSILON = 1e-6;
+
+        Turtle turtle = new Turtle();
+        turtle.penDown();
+        turtle.forward(1000);
+        double d = turtle.getDrawDistance();
+        assertEquals(1000,d);
+        for(int i=0;i<=10;++i) {
+            assertTrue(new Point2D(i * 100, 0).distance(turtle.interpolate(d*(double)i/10.0)) < EPSILON);
+        }
+    }
 }

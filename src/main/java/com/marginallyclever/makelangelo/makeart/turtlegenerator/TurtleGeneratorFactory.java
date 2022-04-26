@@ -9,6 +9,7 @@ public class TurtleGeneratorFactory {
 			new Generator_FlowField(),
 			new Generator_GosperCurve(),
 			new Generator_GraphPaper(),
+			new Generator_GridFit(),
 			new Generator_HilbertCurve(),
 			new Generator_KochCurve(),
 			new Generator_Lissajous(),
