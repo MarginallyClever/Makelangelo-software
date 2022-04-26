@@ -8,8 +8,10 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
 /**
- * TransformedImage is a {@link BufferedImage}, scaled and translated somewhere on the drawing area (aka paper space).
+ * TransformedImage is a {@link BufferedImage}, with a transformation matrix on top.
  * All sampling interactions are done in paper space coordinates and TransformedImage takes care of the rest.
+ * The original {@link BufferedImage} is not modified so there is no data loss.  This also means one matrix transform
+ * per pixel sample, which is slow.
  * @author Dan Royer
  */
 public class TransformedImage {

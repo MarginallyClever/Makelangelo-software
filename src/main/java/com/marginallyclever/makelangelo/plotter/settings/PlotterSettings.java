@@ -10,10 +10,43 @@ import java.util.prefs.Preferences;
 /**
  * {@link PlotterSettings} stores the customized settings for a single plotter robot.
  * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
- * @author Dan Royer 
+ * @author Dan Royer
  */
-public class PlotterSettings implements Serializable {	
+public class PlotterSettings implements Serializable {
 	private static final long serialVersionUID = -4185946661019573192L;
+
+	private static final String PREF_KEY_ACCELERATION = "acceleration";
+	private static final String PREF_KEY_BLOCK_BUFFER_SIZE = "blockBufferSize";
+	private static final String PREF_KEY_DIAMETER = "diameter";
+	private static final String PREF_KEY_FEED_RATE = "feed_rate";
+	private static final String PREF_KEY_FEED_RATE_CURRENT = "feed_rate_current";
+	private static final String PREF_KEY_HANDLE_SMALL_SEGMENTS = "handleSmallSegments";
+	private static final String PREF_KEY_HARDWARE_VERSION = "hardwareVersion";
+	private static final String PREF_KEY_IS_REGISTERED = "isRegistered";
+	private static final String PREF_KEY_LIMIT_BOTTOM = "limit_bottom";
+	private static final String PREF_KEY_LIMIT_LEFT = "limit_left";
+	private static final String PREF_KEY_LIMIT_RIGHT = "limit_right";
+	private static final String PREF_KEY_LIMIT_TOP = "limit_top";
+	private static final String PREF_KEY_MAX_JERK = "maxJerk";
+	private static final String PREF_KEY_MINIMUM_PLANNER_SPEED = "minimumPlannerSpeed";
+	private static final String PREF_KEY_MIN_ACCELERATION = "minAcceleration";
+	private static final String PREF_KEY_MIN_SEGMENT_LENGTH = "minSegmentLength";
+	private static final String PREF_KEY_MIN_SEG_TIME = "minSegTime";
+	private static final String PREF_KEY_PAPER_COLOR_B = "paperColorB";
+	private static final String PREF_KEY_PAPER_COLOR_G = "paperColorG";
+	private static final String PREF_KEY_PAPER_COLOR_R = "paperColorR";
+	private static final String PREF_KEY_PEN = "Pen";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_B = "penDownColorB";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_G = "penDownColorG";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_R = "penDownColorR";
+	private static final String PREF_KEY_PEN_UP_COLOR_B = "penUpColorB";
+	private static final String PREF_KEY_PEN_UP_COLOR_G = "penUpColorG";
+	private static final String PREF_KEY_PEN_UP_COLOR_R = "penUpColorR";
+	private static final String PREF_KEY_SEGMENTS_PER_SECOND = "segmentsPerSecond";
+	private static final String PREF_KEY_STARTING_POS_INDEX = "startingPosIndex";
+	private static final String PREF_KEY_Z_OFF = "z_off";
+	private static final String PREF_KEY_Z_ON = "z_on";
+	private static final String PREF_KEY_Z_RATE = "z_rate";
 
 	// Each robot has a global unique identifier
 	private long robotUID = 0;
@@ -21,7 +54,7 @@ public class PlotterSettings implements Serializable {
 	private boolean isRegistered = false;
 
 	private String hardwareName = "Makelangelo 5";
-		
+
 	// machine physical limits, in mm
 	private final double machineHeight = 1000; // mm
 	private final double machineWidth = 650; // mm
@@ -32,7 +65,7 @@ public class PlotterSettings implements Serializable {
 	private double limitTop = machineHeight / 2;
 
 	// speed control
-	
+
 	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
 	private int blockBufferSize = 16;
 
@@ -48,7 +81,7 @@ public class PlotterSettings implements Serializable {
 	private double minAcceleration = 0.0;  // mm/s/s
 	private double minimumPlannerSpeed = 0.05;  // mm/s
 	private double [] maxJerk = { 10, 10, 0.3 };
-	
+
 	private ColorRGB paperColor = new ColorRGB(255, 255, 255);
 
 	private ColorRGB penDownColorDefault = new ColorRGB(0, 0, 0);
@@ -73,16 +106,12 @@ public class PlotterSettings implements Serializable {
 	 */
 	private int startingPositionIndex = 4;
 
-	/**
-	 * These values should match
-	 * https://github.com.marginallyclever.makelangelo-firmware/firmware_rumba/configure.h
-	 */
 	public PlotterSettings() {
 	}
 
 	// OBSERVER PATTERN START
 
-	private List<PlotterSettingsListener> listeners = new ArrayList<PlotterSettingsListener>();
+	private final List<PlotterSettingsListener> listeners = new ArrayList<>();
 
 	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
 		listeners.add(listener);
@@ -158,116 +187,115 @@ public class PlotterSettings implements Serializable {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
 
-		limitTop 				= thisMachineNode.getDouble("limit_top", limitTop);
-		limitBottom 			= thisMachineNode.getDouble("limit_bottom", limitBottom);
-		limitLeft 				= thisMachineNode.getDouble("limit_left", limitLeft);
-		limitRight 				= thisMachineNode.getDouble("limit_right", limitRight);
-		maxAcceleration 		= thisMachineNode.getDouble("acceleration", maxAcceleration);
-		startingPositionIndex 	= thisMachineNode.getInt("startingPosIndex", startingPositionIndex);
+		limitTop 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_TOP, limitTop);
+		limitBottom 			= thisMachineNode.getDouble(PREF_KEY_LIMIT_BOTTOM, limitBottom);
+		limitLeft 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_LEFT, limitLeft);
+		limitRight 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_RIGHT, limitRight);
+		maxAcceleration 		= thisMachineNode.getDouble(PREF_KEY_ACCELERATION, maxAcceleration);
+		startingPositionIndex 	= thisMachineNode.getInt(PREF_KEY_STARTING_POS_INDEX, startingPositionIndex);
 
-		int r = thisMachineNode.getInt("paperColorR", paperColor.getRed());
-		int g = thisMachineNode.getInt("paperColorG", paperColor.getGreen());
-		int b = thisMachineNode.getInt("paperColorB", paperColor.getBlue());
+		int r = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
+		int g = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
+		int b = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
 		paperColor = new ColorRGB(r, g, b);
 
 		// setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",
 		// Integer.toString(getCurrentToolNumber()))));
-		isRegistered = Boolean.parseBoolean(thisMachineNode.get("isRegistered", Boolean.toString(isRegistered)));
-		hardwareName = thisMachineNode.get("hardwareVersion", hardwareName);
+		isRegistered = Boolean.parseBoolean(thisMachineNode.get(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered)));
+		hardwareName = thisMachineNode.get(PREF_KEY_HARDWARE_VERSION, hardwareName);
 
-		blockBufferSize 		= thisMachineNode.getInt("blockBufferSize", blockBufferSize);
-		segmentsPerSecond 		= thisMachineNode.getInt("segmentsPerSecond", segmentsPerSecond);
-		minSegmentLength 		= thisMachineNode.getDouble("minSegmentLength", minSegmentLength);
-		minSegTime 				= thisMachineNode.getLong("minSegTime", minSegTime);
-		handleSmallSegments 	= thisMachineNode.getBoolean("handleSmallSegments", handleSmallSegments);
-		minAcceleration			= thisMachineNode.getDouble("minAcceleration", minAcceleration);
-		minimumPlannerSpeed 	= thisMachineNode.getDouble("minimumPlannerSpeed", minimumPlannerSpeed);
-		
+		blockBufferSize 		= thisMachineNode.getInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
+		segmentsPerSecond 		= thisMachineNode.getInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
+		minSegmentLength 		= thisMachineNode.getDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
+		minSegTime 				= thisMachineNode.getLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
+		handleSmallSegments 	= thisMachineNode.getBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
+		minAcceleration			= thisMachineNode.getDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
+		minimumPlannerSpeed 	= thisMachineNode.getDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
+
 		loadJerkConfig(thisMachineNode);
 		loadPenConfig(thisMachineNode);
 	}
-	
+
 	private void loadJerkConfig(Preferences thisMachineNode) {
-		Preferences jerkNode = thisMachineNode.node("maxJerk");
+		Preferences jerkNode = thisMachineNode.node(PREF_KEY_MAX_JERK);
 		for(int i=0;i<maxJerk.length;i++) {
-			maxJerk[i] = jerkNode.getDouble(Integer.toString(i), maxJerk[i] );
+			maxJerk[i] = jerkNode.getDouble(Integer.toString(i), maxJerk[i]);
 		}
 	}
 
 	private void loadPenConfig(Preferences prefs) {
-		prefs = prefs.node("Pen");
-		setPenDiameter(		prefs.getDouble("diameter"			, penDiameter	));
-		setPenLiftTime(		prefs.getDouble("z_rate"			, penLiftTime	));
-		setPenDownAngle(	prefs.getDouble("z_on"				, penDownAngle	));
-		setPenUpAngle(		prefs.getDouble("z_off"				, penUpAngle	));
-		setTravelFeedRate(	prefs.getDouble("feed_rate"			, travelFeedRate));
-		setDrawFeedRate(	prefs.getDouble("feed_rate_current"	, drawFeedRate	));
+		prefs = prefs.node(PREF_KEY_PEN);
+		setPenDiameter(		prefs.getDouble(PREF_KEY_DIAMETER, penDiameter	));
+		setPenLiftTime(		prefs.getDouble(PREF_KEY_Z_RATE, penLiftTime	));
+		setPenDownAngle(	prefs.getDouble(PREF_KEY_Z_ON, penDownAngle	));
+		setPenUpAngle(		prefs.getDouble(PREF_KEY_Z_OFF, penUpAngle	));
+		setTravelFeedRate(	prefs.getDouble(PREF_KEY_FEED_RATE, travelFeedRate));
+		setDrawFeedRate(	prefs.getDouble(PREF_KEY_FEED_RATE_CURRENT, drawFeedRate	));
 		// tool_number = Integer.valueOf(prefs.get("tool_number",Integer.toString(tool_number)));
 
 		int r, g, b;
-		r = prefs.getInt("penDownColorR", penDownColor.getRed());
-		g = prefs.getInt("penDownColorG", penDownColor.getGreen());
-		b = prefs.getInt("penDownColorB", penDownColor.getBlue());
+		r = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColor.getRed());
+		g = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColor.getGreen());
+		b = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColor.getBlue());
 		penDownColor = penDownColorDefault = new ColorRGB(r, g, b);
-		r = prefs.getInt("penUpColorR", penUpColor.getRed());
-		g = prefs.getInt("penUpColorG", penUpColor.getGreen());
-		b = prefs.getInt("penUpColorB", penUpColor.getBlue());
+		r = prefs.getInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
+		g = prefs.getInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
+		b = prefs.getInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
 		penUpColor = new ColorRGB(r, g, b);
 	}
 
 	public void saveConfig() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
-		
-		thisMachineNode.put("limit_top", Double.toString(limitTop));
-		thisMachineNode.put("limit_bottom", Double.toString(limitBottom));
-		thisMachineNode.put("limit_right", Double.toString(limitRight));
-		thisMachineNode.put("limit_left", Double.toString(limitLeft));
-		thisMachineNode.put("acceleration", Double.toString(maxAcceleration));
-		thisMachineNode.put("startingPosIndex", Integer.toString(startingPositionIndex));
 
-		thisMachineNode.putInt("paperColorR", paperColor.getRed());
-		thisMachineNode.putInt("paperColorG", paperColor.getGreen());
-		thisMachineNode.putInt("paperColorB", paperColor.getBlue());
+		thisMachineNode.put(PREF_KEY_LIMIT_TOP, Double.toString(limitTop));
+		thisMachineNode.put(PREF_KEY_LIMIT_BOTTOM, Double.toString(limitBottom));
+		thisMachineNode.put(PREF_KEY_LIMIT_RIGHT, Double.toString(limitRight));
+		thisMachineNode.put(PREF_KEY_LIMIT_LEFT, Double.toString(limitLeft));
+		thisMachineNode.put(PREF_KEY_ACCELERATION, Double.toString(maxAcceleration));
+		thisMachineNode.put(PREF_KEY_STARTING_POS_INDEX, Integer.toString(startingPositionIndex));
 
-		thisMachineNode.put("isRegistered", Boolean.toString(isRegistered()));
-		thisMachineNode.put("hardwareVersion", hardwareName);
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
+		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
 
-		thisMachineNode.putInt("blockBufferSize", blockBufferSize);
-		thisMachineNode.putInt("segmentsPerSecond", segmentsPerSecond);
-		thisMachineNode.putDouble("minSegmentLength", minSegmentLength);
-		thisMachineNode.putLong("minSegTime", minSegTime);
-		thisMachineNode.putBoolean("handleSmallSegments", handleSmallSegments);
-		thisMachineNode.putDouble("minAcceleration", minAcceleration);
-		thisMachineNode.putDouble("minimumPlannerSpeed", minimumPlannerSpeed);
-		
+		thisMachineNode.put(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered()));
+		thisMachineNode.put(PREF_KEY_HARDWARE_VERSION, hardwareName);
+
+		thisMachineNode.putInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
+		thisMachineNode.putInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
+		thisMachineNode.putDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
+		thisMachineNode.putLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
+		thisMachineNode.putBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
+		thisMachineNode.putDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
+		thisMachineNode.putDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
+
 		saveJerkConfig(thisMachineNode);
 		savePenConfig(thisMachineNode);
 		notifyListeners();
 	}
 
 	private void saveJerkConfig(Preferences thisMachineNode) {
-		Preferences jerkNode = thisMachineNode.node("maxJerk");
+		Preferences jerkNode = thisMachineNode.node(PREF_KEY_MAX_JERK);
 		for(int i=0;i<maxJerk.length;i++) {
 			jerkNode.putDouble(Integer.toString(i), maxJerk[i] );
 		}
 	}
 
 	private void savePenConfig(Preferences prefs) {
-		prefs = prefs.node("Pen");
-		prefs.put("diameter", Double.toString(getPenDiameter()));
-		prefs.put("z_rate", Double.toString(getPenLiftTime()));
-		prefs.put("z_on", Double.toString(getPenDownAngle()));
-		prefs.put("z_off", Double.toString(getPenUpAngle()));
-		// prefs.put("tool_number", Integer.toString(toolNumber));
-		prefs.put("feed_rate", Double.toString(travelFeedRate));
-		prefs.put("feed_rate_current", Double.toString(drawFeedRate));
-		prefs.putInt("penDownColorR", penDownColorDefault.getRed());
-		prefs.putInt("penDownColorG", penDownColorDefault.getGreen());
-		prefs.putInt("penDownColorB", penDownColorDefault.getBlue());
-		prefs.putInt("penUpColorR", penUpColor.getRed());
-		prefs.putInt("penUpColorG", penUpColor.getGreen());
-		prefs.putInt("penUpColorB", penUpColor.getBlue());
+		prefs = prefs.node(PREF_KEY_PEN);
+		prefs.put(PREF_KEY_DIAMETER, Double.toString(getPenDiameter()));
+		prefs.put(PREF_KEY_Z_RATE, Double.toString(getPenLiftTime()));
+		prefs.put(PREF_KEY_Z_ON, Double.toString(getPenDownAngle()));
+		prefs.put(PREF_KEY_Z_OFF, Double.toString(getPenUpAngle()));
+		prefs.put(PREF_KEY_FEED_RATE, Double.toString(travelFeedRate));
+		prefs.put(PREF_KEY_FEED_RATE_CURRENT, Double.toString(drawFeedRate));
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColorDefault.getRed());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColorDefault.getGreen());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColorDefault.getBlue());
+		prefs.putInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
+		prefs.putInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
+		prefs.putInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
 	}
 
 	public void reset() {
