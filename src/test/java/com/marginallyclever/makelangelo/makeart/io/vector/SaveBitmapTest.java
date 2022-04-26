@@ -96,7 +96,7 @@ public class SaveBitmapTest {
             // then
             assertEquals(-1,
                     Files.mismatch(fileTemp.toPath(),
-                        Paths.get(SaveBitmap.class.getResource(expectedFilename).toURI())
+                        Paths.get(SaveBitmapTest.class.getResource(expectedFilename).toURI())
                     )
             );
         } finally {
