@@ -69,7 +69,16 @@ public class LoadSVG implements TurtleLoader {
 		myTurtle.translate(-r.width/2,-r.height/2);
 		myTurtle.scale(1, -1);
 
-		return myTurtle;
+		Turtle t2 = new Turtle();
+		t2.history.clear();
+
+		// remove tool changes for zero-length moves.
+		List<Turtle> list = myTurtle.splitByToolChange();
+		for(Turtle t : list) {
+			if(t.getDrawDistance()>0)
+				t2.add(t);
+		}
+		return t2;
 	}
 
 	private void parseAll(Document document) throws Exception {
@@ -120,7 +129,7 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private boolean setStrokeToElementColorBecomesNone(Element element) {
 		ColorRGB color = getStroke(element);
-		if(color==null) return true;  // none
+		if(color==null) return false;  // none
 		if(color.isEqualTo(new ColorRGB(255,255,255))) return true;  // white
 
 		if(!color.isEqualTo(myTurtle.getColor())) {
@@ -451,7 +460,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		logger.debug("Move Rel {}", p);
 		pathPoint.add(p);
-		if(isNewPath==true) pathFirstPoint.set(pathPoint);
+		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
 		isNewPath=false;
 	}
