@@ -130,9 +130,9 @@ public class LoadSVG implements TurtleLoader {
 	private boolean setStrokeToElementColorBecomesNone(Element element) {
 		ColorRGB color = getStroke(element);
 		if(color==null) return false;  // none
-		if(color.isEqualTo(new ColorRGB(255,255,255))) return true;  // white
+		if(color.equals(new ColorRGB(255,255,255))) return true;  // white
 
-		if(!color.isEqualTo(myTurtle.getColor())) {
+		if(!color.equals(myTurtle.getColor())) {
 			logger.debug("Setting stroke color to {}",color);
 			myTurtle.setColor(color);
 		}

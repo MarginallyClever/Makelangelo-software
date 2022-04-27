@@ -31,7 +31,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			
 			for(int i=1;i<size();++i) {
 				LineSegment2D next = get(i);
-				if(next.color.isEqualTo(head.color)) {
+				if(next.color.equals(head.color)) {
 					c.add(next);
 				} else {
 					head = next;
