@@ -177,7 +177,7 @@ public class W3CColorNames {
     public static String get(ColorRGB match) {
         for(String key: map.keySet()) {
             ColorRGB c = map.get(key);
-            if(c.isEqualTo(match)) return key;
+            if(c.equals(match)) return key;
         }
         return null;
     }
