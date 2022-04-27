@@ -40,4 +40,20 @@ public class StringHelper {
 	    long hours = seconds % 24;
 	    return String.format("%02d:%02d:%02d", hours, minutes, seconds);
 	}
+
+	/**
+	 * @param number the number to convert to hex
+	 * @return the hex number returned is 6 characters long and does not include the '0x' at the start.
+	 *  	   If needed it will pad the left end with zeros.
+	 */
+	public static String paddedHex(int number) {
+		String shortHex = Integer.toHexString(number);
+		if(shortHex.length()==6) return shortHex;
+		StringBuilder builder = new StringBuilder();
+		for(int i=0;i<6-shortHex.length();++i) {
+			builder.append("0");
+		}
+		builder.append(shortHex);
+		return builder.toString();
+	}
 }

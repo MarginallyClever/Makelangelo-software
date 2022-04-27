@@ -203,23 +203,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			case 0xff00ff -> "magenta";
 			case 0xffff00 -> "yellow";
 			case 0xffffff -> "white";
-			default -> "0x" + paddedHex(toolNumber); // display unknown RGB value as hex
+			default -> "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
 		};
 		return name;
-	}
-
-	/**
-	 * @param number the number to convert to hex
-	 * @return the hex number returned is 6 characters long.  May pad the left end with zeros.
-	 */
-	private static String paddedHex(int number) {
-		String shortHex = Integer.toHexString(number);
-		if(shortHex.length()==6) return shortHex;
-		StringBuilder builder = new StringBuilder();
-		for(int i=0;i<6-shortHex.length();++i) {
-			builder.append("0");
-		}
-		builder.append(shortHex);
-		return builder.toString();
 	}
 }
