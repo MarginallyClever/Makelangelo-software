@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.io.vector;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import java.io.OutputStream;
 

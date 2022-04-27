@@ -1,10 +1,7 @@
-package com.marginallyclever.makelangelo.makeart.io.vector;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import org.junit.jupiter.api.DynamicTest;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;

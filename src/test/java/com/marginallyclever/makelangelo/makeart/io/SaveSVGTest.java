@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.io.vector;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import static com.marginallyclever.makelangelo.makeart.io.vector.SaveHelper.multiColorsMoves;
-import static com.marginallyclever.makelangelo.makeart.io.vector.SaveHelper.simpleMoves;
+import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

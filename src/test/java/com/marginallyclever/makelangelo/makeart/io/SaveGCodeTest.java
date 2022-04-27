@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.plottercontrols;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import static com.marginallyclever.makelangelo.makeart.io.vector.LoadHelper.readFile;
-import static com.marginallyclever.makelangelo.makeart.io.vector.SaveHelper.multiColorsMoves;
-import static com.marginallyclever.makelangelo.makeart.io.vector.SaveHelper.simpleMoves;
+import static com.marginallyclever.makelangelo.makeart.io.LoadHelper.readFile;
+import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
+import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class SaveGCodeTest {

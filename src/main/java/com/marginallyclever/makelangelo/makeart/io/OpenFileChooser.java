@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
-import com.marginallyclever.makelangelo.makeart.io.vector.TurtleFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

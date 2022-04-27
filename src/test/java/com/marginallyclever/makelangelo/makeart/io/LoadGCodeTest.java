@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.io.vector;
+package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -10,12 +10,12 @@ import org.junit.jupiter.api.TestFactory;
 
 import java.util.stream.Stream;
 
-import static com.marginallyclever.makelangelo.makeart.io.vector.LoadHelper.loadAndTestFiles;
-import static com.marginallyclever.makelangelo.makeart.io.vector.LoadHelper.readFile;
+import static com.marginallyclever.makelangelo.makeart.io.LoadHelper.loadAndTestFiles;
+import static com.marginallyclever.makelangelo.makeart.io.LoadHelper.readFile;
 import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LoadScratch3Test {
+public class LoadGCodeTest {
 
     @BeforeAll
     public static void beforeAll() {
@@ -26,40 +26,41 @@ public class LoadScratch3Test {
     @Test
     public void canLoad() {
         // given
-        TurtleLoader loader = new LoadScratch3();
+        TurtleLoader loader = new LoadGCode();
 
         // then
-        assertTrue(loader.canLoad("file.sb3"));
-        assertTrue(loader.canLoad("file.Sb3"));
+        assertTrue(loader.canLoad("file.gcode"));
+        assertTrue(loader.canLoad("file.GCode"));
         assertFalse(loader.canLoad("file.txt"));
     }
 
     @Test
     public void throwExceptionWhenStreamIsNull() {
         // given
-        TurtleLoader loader = new LoadSVG();
+        TurtleLoader loader = new LoadGCode();
 
         // then
         assertThrows(NullPointerException.class, () -> {
-            loader.load(LoadScratch3Test.class.getResourceAsStream("/doesNotExist"));
+            loader.load(LoadGCodeTest.class.getResourceAsStream("/doesNotExist"));
         }, "Input stream is null");
     }
 
     @TestFactory
     public Stream<DynamicTest> testAllFiles() {
-        return loadAndTestFiles(of("test_02_koch_curve_03.sb3"),
-                "/scratch3",
-                this::verifyLoadScratch3);
+        return loadAndTestFiles(of("multi_shapes_ignatus2.gcode",
+                "multi_shapes_path-circle-line-rect.gcode"),
+                "/gcode",
+                this::verifyLoadGCode);
     }
 
-    private void verifyLoadScratch3(String filenameToTest, String fileExpected) {
+    private void verifyLoadGCode(String filenameToTest, String fileExpected) {
         try {
 
             // given
-            TurtleLoader loader = new LoadScratch3();
+            TurtleLoader loader = new LoadGCode();
 
             // when
-            Turtle turtle = loader.load(LoadScratch3Test.class.getResourceAsStream(filenameToTest));
+            Turtle turtle = loader.load(LoadGCodeTest.class.getResourceAsStream(filenameToTest));
 
             // then
             assertNotNull(turtle);
