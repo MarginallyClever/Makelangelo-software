@@ -20,7 +20,7 @@ public final class RecentFiles extends JMenu {
 	private Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	private ArrayList<String> fileList = new ArrayList<String>();
+	private ArrayList<String> fileList = new ArrayList<>();
 	private ActionListener submenuListener;
 
 	// Load recent files from prefs
