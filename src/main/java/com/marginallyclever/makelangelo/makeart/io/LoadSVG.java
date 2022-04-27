@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.SVGColorNames;
+import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
@@ -213,7 +213,7 @@ public class LoadSVG implements TurtleLoader {
 				return new ColorRGB(r,g,b);
 			}
 		} else {
-			return SVGColorNames.get(strokeName);
+			return W3CColorNames.get(strokeName);
 		}
 		return null;
 	}
