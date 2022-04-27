@@ -1,8 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import org.slf4j.Logger;
@@ -194,17 +196,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private static String getColorName(int toolNumber) {
-		String name = switch (toolNumber) {
-			case 0xff0000 -> "red";
-			case 0x00ff00 -> "green";
-			case 0x0000ff -> "blue";
-			case 0x000000 -> "black";
-			case 0x00ffff -> "cyan";
-			case 0xff00ff -> "magenta";
-			case 0xffff00 -> "yellow";
-			case 0xffffff -> "white";
-			default -> "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
-		};
+		String name = W3CColorNames.get(new ColorRGB(toolNumber));
+		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
 		return name;
 	}
 }

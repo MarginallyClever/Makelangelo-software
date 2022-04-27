@@ -3,8 +3,13 @@ package com.marginallyclever.convenience;
 import java.util.HashMap;
 import java.util.Map;
 
-// obtained from https://www.w3schools.com/colors/colors_names.asp
-public class SVGColorNames {
+/**
+ * W3C web colors, basic and extended.
+ * obtained from many places like https://www.w3.org/TR/css-color-3/, https://www.w3.org/wiki/CSS/Properties/color/keywords
+ * @author Dan Royer
+ * @since 2022-04-25
+ */
+public class W3CColorNames {
     private static final Map<String,ColorRGB> map = new HashMap<>();
     static {
         map.put("aliceblue",new ColorRGB(0xF0,0xF8,0xFF));
@@ -163,5 +168,17 @@ public class SVGColorNames {
      */
     public static ColorRGB get(String name) {
         return map.get(name);
+    }
+
+    /**
+     * @param match the color to matcch
+     * @return the name matching the given color, or null if no match.
+     */
+    public static String get(ColorRGB match) {
+        for(String key: map.keySet()) {
+            ColorRGB c = map.get(key);
+            if(c.equals(match)) return key;
+        }
+        return null;
     }
 }

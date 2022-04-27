@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.SVGColorNames;
+import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
@@ -130,9 +130,9 @@ public class LoadSVG implements TurtleLoader {
 	private boolean setStrokeToElementColorBecomesNone(Element element) {
 		ColorRGB color = getStroke(element);
 		if(color==null) return false;  // none
-		if(color.isEqualTo(new ColorRGB(255,255,255))) return true;  // white
+		if(color.equals(new ColorRGB(255,255,255))) return true;  // white
 
-		if(!color.isEqualTo(myTurtle.getColor())) {
+		if(!color.equals(myTurtle.getColor())) {
 			logger.debug("Setting stroke color to {}",color);
 			myTurtle.setColor(color);
 		}
@@ -213,7 +213,7 @@ public class LoadSVG implements TurtleLoader {
 				return new ColorRGB(r,g,b);
 			}
 		} else {
-			return SVGColorNames.get(strokeName);
+			return W3CColorNames.get(strokeName);
 		}
 		return null;
 	}
