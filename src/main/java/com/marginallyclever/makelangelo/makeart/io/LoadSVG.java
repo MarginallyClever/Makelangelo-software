@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.Bezier;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.SVGColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
@@ -68,7 +69,16 @@ public class LoadSVG implements TurtleLoader {
 		myTurtle.translate(-r.width/2,-r.height/2);
 		myTurtle.scale(1, -1);
 
-		return myTurtle;
+		Turtle t2 = new Turtle();
+		t2.history.clear();
+
+		// remove tool changes for zero-length moves.
+		List<Turtle> list = myTurtle.splitByToolChange();
+		for(Turtle t : list) {
+			if(t.getDrawDistance()>0)
+				t2.add(t);
+		}
+		return t2;
 	}
 
 	private void parseAll(Document document) throws Exception {
@@ -92,8 +102,7 @@ public class LoadSVG implements TurtleLoader {
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
-			if(isElementStrokeNone(element)) 
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -101,16 +110,33 @@ public class LoadSVG implements TurtleLoader {
 			int numPoints = pointList.getNumberOfItems();
 			//logger.debug("New Node has "+pathObjects+" elements.");
 
-			SVGPoint item = (SVGPoint)pointList.getItem(0);
+			SVGPoint item = pointList.getItem(0);
 			Vector3d v2 = transform(item.getX(),item.getY(),m);
 			myTurtle.jumpTo(v2.x,v2.y);
 
 			for( int i=1; i<numPoints; ++i ) {
-				item = (SVGPoint)pointList.getItem(i);
+				item = pointList.getItem(i);
 				v2 = transform(item.getX(),item.getY(),m);
 				myTurtle.moveTo(v2.x,v2.y);
 			}
 		}
+	}
+
+	/**
+	 * Read and apply the element stroke color.
+	 * @param element source of the stroke color.
+	 * @return true if the stroke color is 'none' or white (assumed to be the paper color)
+	 */
+	private boolean setStrokeToElementColorBecomesNone(Element element) {
+		ColorRGB color = getStroke(element);
+		if(color==null) return false;  // none
+		if(color.isEqualTo(new ColorRGB(255,255,255))) return true;  // white
+
+		if(!color.isEqualTo(myTurtle.getColor())) {
+			logger.debug("Setting stroke color to {}",color);
+			myTurtle.setColor(color);
+		}
+		return false;
 	}
 
 	private void parseLineElements(NodeList node) throws Exception {
@@ -119,8 +145,7 @@ public class LoadSVG implements TurtleLoader {
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
-			if(isElementStrokeNone(element))
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -138,21 +163,59 @@ public class LoadSVG implements TurtleLoader {
 		}
 	}
 
-	private boolean isElementStrokeNone(Element element) {
+	private ColorRGB getStroke(Element element) {
 		if(element.hasAttribute("style")) {
 			String style = element.getAttribute("style").toLowerCase().replace("\s","");
-			if(style.contains(LABEL_STROKE)) {
-				int k = style.indexOf(LABEL_STROKE);
-				String strokeStyleName = style.substring(k+LABEL_STROKE.length());
-				if(strokeStyleName.contentEquals("none") || strokeStyleName.contentEquals("white") )
-					// it is!  bail.
-					return true;
-			} else {
+			if(!style.contains(LABEL_STROKE)) {
 				// default SVG stroke is "none", which isn't even transparent - it's nothing!
-				return false;
+				return null;
+			} else {
+				int k = style.indexOf(LABEL_STROKE);
+				String strokeStyleName = style.substring(k + LABEL_STROKE.length());
+				return stringToColor(strokeStyleName);
 			}
 		}
-		return false;
+		if(element.hasAttribute("stroke")) {
+			String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\s","");
+			return stringToColor(strokeStyleName);
+		}
+		return null;
+	}
+
+	private ColorRGB stringToColor(String strokeName) {
+		if(strokeName.startsWith("#")) {
+			strokeName = strokeName.substring(1);
+			if(strokeName.length()==3) {
+				int r = Integer.parseInt(strokeName.substring(0,1),16);
+				int g = Integer.parseInt(strokeName.substring(1,2),16);
+				int b = Integer.parseInt(strokeName.substring(2,3),16);
+				return new ColorRGB(r,g,b);
+			} else if(strokeName.length()==6) {
+				int r = Integer.parseInt(strokeName.substring(0,2),16);
+				int g = Integer.parseInt(strokeName.substring(2,4),16);
+				int b = Integer.parseInt(strokeName.substring(4,6),16);
+				return new ColorRGB(r,g,b);
+			}
+		} else if(strokeName.startsWith("rgb(")) {
+			strokeName.substring(4,strokeName.length()-1);
+			if(strokeName.contains("%")) {
+				strokeName = strokeName.replace("%","");
+				String [] parts = strokeName.split(",");
+				int r = (int)(Integer.parseInt(parts[0])*255.0/100.0);
+				int g = (int)(Integer.parseInt(parts[1])*255.0/100.0);
+				int b = (int)(Integer.parseInt(parts[2])*255.0/100.0);
+				return new ColorRGB(r,g,b);
+			} else {
+				String [] parts = strokeName.split(",");
+				int r = Integer.parseInt(parts[0]);
+				int g = Integer.parseInt(parts[1]);
+				int b = Integer.parseInt(parts[2]);
+				return new ColorRGB(r,g,b);
+			}
+		} else {
+			return SVGColorNames.get(strokeName);
+		}
+		return null;
 	}
 
 	/**
@@ -173,8 +236,7 @@ public class LoadSVG implements TurtleLoader {
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
-			if(isElementStrokeNone(element))
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -253,8 +315,7 @@ public class LoadSVG implements TurtleLoader {
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
-			if(isElementStrokeNone(element))
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -279,8 +340,7 @@ public class LoadSVG implements TurtleLoader {
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
 			Element element = (Element)node.item( iPathNode );
-			if(isElementStrokeNone(element))
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -326,8 +386,8 @@ public class LoadSVG implements TurtleLoader {
 				continue;
 			}
 			SVGOMPathElement element = ((SVGOMPathElement)paths.item( iPath ));
-			if(isElementStrokeNone(element))
-				continue;
+			if(setStrokeToElementColorBecomesNone(element)) continue;
+
 
 			Matrix3d m = getMatrixFromElement(element);
 
@@ -400,7 +460,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		logger.debug("Move Rel {}", p);
 		pathPoint.add(p);
-		if(isNewPath==true) pathFirstPoint.set(pathPoint);
+		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
 		isNewPath=false;
 	}

@@ -276,23 +276,21 @@ public class Turtle implements Cloneable {
 		TurtleMove old=null;
 		
 		int hits=0;
-		
+
 		for( TurtleMove m : history ) {
-			if(m.type == MovementType.DRAW_LINE) {
-				hits++;
-				if(top.x<m.x) top.x=m.x;
-				if(top.y<m.y) top.y=m.y;
-				if(bottom.x>m.x) bottom.x=m.x;
-				if(bottom.y>m.y) bottom.y=m.y;
-				if(old != null) {
-					if(top.x<old.x) top.x=old.x;
-					if(top.y<old.y) top.y=old.y;
-					if(bottom.x>old.x) bottom.x=old.x;
-					if(bottom.y>old.y) bottom.y=old.y;
+			switch(m.type) {
+				case TRAVEL -> {
+					old = m;
 				}
-			}
-			if ( m.type != MovementType.TOOL_CHANGE){
-				old=m;
+				case DRAW_LINE -> {
+					if (old != null) {
+						hits++;
+						getBoundsInternal(top,bottom,old);
+						old=null;
+					}
+					hits++;
+					getBoundsInternal(top,bottom,m);
+				}
 			}
 		}
 		
@@ -300,6 +298,13 @@ public class Turtle implements Cloneable {
 			bottom.set(0,0);
 			top.set(0,0);
 		}
+	}
+
+	private void getBoundsInternal(Point2D top,Point2D bottom,TurtleMove m) {
+		if (top.x < m.x) top.x = m.x;
+		if (top.y < m.y) top.y = m.y;
+		if (bottom.x > m.x) bottom.x = m.x;
+		if (bottom.y > m.y) bottom.y = m.y;
 	}
 
 	/**

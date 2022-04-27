@@ -203,7 +203,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 			case 0xff00ff -> "magenta";
 			case 0xffff00 -> "yellow";
 			case 0xffffff -> "white";
-			default -> "0x" + Integer.toHexString(toolNumber); // display unknown RGB value as hex
+			default -> "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
 		};
 		return name;
 	}

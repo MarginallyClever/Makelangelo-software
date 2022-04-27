@@ -15,17 +15,22 @@ import java.util.List;
  */
 public class TurtleFactory {
 	private static TurtleLoader [] loaders = {
-		new LoadDXF(),
-		new LoadGCode(),
-		new LoadScratch2(),
-		new LoadScratch3(),
-		new LoadSVG(),
+			new LoadDXF(),
+			new LoadGCode(),
+			new LoadScratch2(),
+			new LoadScratch3(),
+			new LoadSVG(),
 	};
 	
 	private static TurtleSaver [] savers = {
-		new SaveDXF(),
-		new SaveSVG(),
-		// TODO no SaveGCode?
+			new SaveDXF(),
+			new SaveSVG(),
+			new SaveBitmap("BMP",false),
+			new SaveBitmap("GIF",false),
+			new SaveBitmap("JPG",false),
+			new SaveBitmap("PIO",false),
+			new SaveBitmap("PNG",true),
+			// TODO no SaveGCode?
 	};
 	
 	public static Turtle load(String filename) throws Exception {
