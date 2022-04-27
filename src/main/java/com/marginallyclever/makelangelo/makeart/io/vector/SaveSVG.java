@@ -38,31 +38,30 @@ public class SaveSVG implements TurtleSaver {
 		// header
 		out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
 		out.write("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
-		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+dim.getX()+" "+dim.getY()+" "+dim.getWidth()+" "+dim.getHeight()+"\">\n");
+		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+dim.getMinX()+" "+(-dim.getMaxY())+" "+dim.getWidth()+" "+dim.getHeight()+"\">\n");
 
 		boolean isUp=true;
 		double x0 = turtle.history.get(0).x;
 		double y0 = turtle.history.get(0).y;
 		ColorRGB color = new ColorRGB(0,0,0);
 		boolean hasStarted=false;
-
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case TRAVEL:
-				if(!isUp) isUp=true;
+				isUp=true;
 				x0=m.x;
 				y0=m.y;
 				break;
 			case DRAW_LINE:
 				if(isUp) {
 					isUp=false;
-					out.write(" M");
-				} else {
-					out.write(" L");
+					out.write("M ");
+					out.write(StringHelper.formatDouble(x0)+" ");
+					out.write(StringHelper.formatDouble(-y0)+" ");
+					out.write("L ");
 				}
-
-					out.write(" "+StringHelper.formatDouble(m.x));
-					out.write(" "+StringHelper.formatDouble(-m.y));
+				out.write(StringHelper.formatDouble(m.x)+" ");
+				out.write(StringHelper.formatDouble(-m.y)+" ");
 				x0=m.x;
 				y0=m.y;
 				
@@ -72,6 +71,7 @@ public class SaveSVG implements TurtleSaver {
 					out.write("'/>\n");
 				}
 				out.write("  <path fill='none' stroke='"+m.getColor().toHexString()+"' d='");
+				isUp=true;
 				hasStarted=true;
 				break;
 			}

@@ -15,7 +15,7 @@ public class SaveHelper {
     }
 
     public static Turtle multiColorsMoves() {
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new ColorRGB(0xff,0x99,0x00));
         turtle.jumpTo(-15, -7);
         turtle.moveTo(3, 4);
         turtle.jumpTo(12, 18);
@@ -23,11 +23,11 @@ public class SaveHelper {
         turtle.jumpTo(5, 2);
         turtle.moveTo(6, 10);
 
-        turtle.setColor(new ColorRGB(4, 5, 6));
-        turtle.moveTo(20, 30);
+        turtle.setColor(new ColorRGB(0x00, 0x44, 0xff));
         turtle.jumpTo(-15, -7);
-        turtle.moveTo(10, 15);
+        turtle.moveTo(20, 30);
         turtle.jumpTo(-4, -8);
+        turtle.moveTo(10, 15);
         return turtle;
     }
 }
