@@ -25,11 +25,11 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
         setLayout(new BorderLayout());
 
         JTabbedPane jTabbedPane = new JTabbedPane();
-        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getUserGeneralStartGcode()        );
+        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getUserGeneralStartGcode());
         userGeneralStartGcode.setLineWrap(false);
         jTabbedPane.addTab(Translator.get("PlotterSettings.userGeneralStartGcode"), userGeneralStartGcode);
         //
-        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getUserGeneralEndGcode()        );
+        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getUserGeneralEndGcode());
         userGeneralEndGcode.setLineWrap(false);
         jTabbedPane.addTab(Translator.get("PlotterSettings.userGeneralEndGcode"), userGeneralEndGcode);
         //
@@ -38,7 +38,9 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
         JPanel bottom = new JPanel(new FlowLayout());
         JButton buttonSave = new JButton(Translator.get("Save"));
         bottom.add(buttonSave);
-        buttonSave.addActionListener((e) -> { save(); });
+        buttonSave.addActionListener((e) -> {
+            save();
+        });
         add(bottom, BorderLayout.SOUTH);
         //
         setMinimumSize(new Dimension(640, 400));
