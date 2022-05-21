@@ -1,10 +1,11 @@
-;Generated with Makelangelo 7.32.0
 ;FLAVOR:Marlin-polargraph
 ;MINX:-15.000
 ;MINY:-7.000
 ;MAXX:12.000
 ;MAXY:18.000
-; 2022-04-26 at 13:46:29 PDT
+;Start of user gcode
+
+;End of user gcode
 G28
 M280 P0 S90 T50
 M0 Ready 0xff9900 and click
@@ -20,4 +21,7 @@ G0 X5.000 Y2.000 F3000.0
 M280 P0 S25 T50
 G1 X6.000 Y10.000 F3000.0
 M280 P0 S90 T50
+;Start of user gcode
+
+;End of user gcode
 ;End of Gcode
