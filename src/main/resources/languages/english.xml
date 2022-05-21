@@ -2260,4 +2260,36 @@
 		<key>Generator_GridFit.cellsHigh</key>
 		<value>Cells vertical</value>
 	</string>
+
+	<string>
+		<key>OpenPlotterSettingsUserGcode</key>
+		<value>Plotter user Start/End GCode</value>
+		<hint>Menu item</hint>
+	</string>
+	<string>
+		<key>PlotterSettingsUserGcodePanel.Title</key>
+		<value>Plotter user Start/End GCode</value>
+		<hint>Dialog title</hint>
+	</string>
+	<string>
+		<key>PlotterSettings.userGeneralStartGcode</key>
+		<value>Start-GCode</value>
+		<hint>TextArea Label</hint>
+	</string>
+	<string>
+		<key>PlotterSettings.userGeneralEndGcode</key>
+		<value>End-GCode</value>
+		<hint>TextArea Label</hint>
+	</string>
+	<string>
+		<key>PlotterSettings.userToolChangeStartGcode</key>
+		<value>Tool Start-GCode</value>
+		<hint>TextArea Label</hint>
+	</string>
+	<string>
+		<key>PlotterSettings.userToolChangeEndGcode</key>
+		<value>Tool End-GCode</value>
+		<hint>TextArea Label</hint>
+	</string>
+
 </language>

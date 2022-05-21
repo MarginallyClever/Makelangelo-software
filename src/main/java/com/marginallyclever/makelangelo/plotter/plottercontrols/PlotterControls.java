@@ -175,6 +175,7 @@ public class PlotterControls extends JPanel {
 		programInterface.step();
 		if (programInterface.getLineNumber() == -1) {
 			// done
+			addUserEndGCODE();
 			pause();
 		}
 	}
@@ -205,6 +206,7 @@ public class PlotterControls extends JPanel {
 		if (!penIsUpBeforePause)
 			myPlotter.lowerPen();
 		rewindIfNoProgramLineSelected();
+		addUserStartGCODE();
 		step();
 	}
 
@@ -272,6 +274,14 @@ public class PlotterControls extends JPanel {
 		}
 
 		return x;
+	}
+
+	private void addUserStartGCODE() {
+		myPlotter.getSettings().getUserGeneralStartGcodeList().forEach(marlinInterface::queueAndSendCommand);
+	}
+
+	private void addUserEndGCODE() {
+		myPlotter.getSettings().getUserGeneralEndGcodeList().forEach(marlinInterface::queueAndSendCommand);
 	}
 
 	/**

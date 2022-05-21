@@ -2003,5 +2003,36 @@
         <value></value>
         <hint>jog controls</hint>
     </string>
-    
+
+    <string>
+        <key>OpenPlotterSettingsUserGcode</key>
+        <value>Paramètres du traceur - GCode début/fin</value>
+        <hint>Menu item</hint>
+    </string>
+    <string>
+        <key>PlotterSettingsUserGcodePanel.Title</key>
+        <value>Paramètres du traceur - GCode début/fin</value>
+        <hint>Dialog title</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.userGeneralStartGcode</key>
+        <value>GCode début</value>
+        <hint>TextArea Label</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.userGeneralEndGcode</key>
+        <value>GCode fin</value>
+        <hint>TextArea Label</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.userToolChangeStartGcode</key>
+        <value>outil GCode début</value>
+        <hint>TextArea Label</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.userToolChangeEndGcode</key>
+        <value>outil GCode fin</value>
+        <hint>TextArea Label</hint>
+    </string>
+
 </language>

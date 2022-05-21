@@ -182,8 +182,9 @@ public class SaveGCode {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
-			
-			// TODO MarlinPlotterInterface.getFindHomeString()?
+
+			out.write(robot.getSettings().getUserGeneralStartGcode());
+			out.write("\n");
 			out.write("G28\n");  // go home
 
 			boolean isUp = true;
@@ -220,8 +221,10 @@ public class SaveGCode {
 			}
 			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
 
-			out.write(";End of Gcode\n"); 
-			
+			out.write("\n");
+			out.write(robot.getSettings().getUserGeneralEndGcode());
+			out.write("\n");
+			out.write(";End of Gcode\n");
 			out.flush();
 		}
 		logger.debug("done.");
