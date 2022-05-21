@@ -250,7 +250,7 @@ public class PlotterSettings implements Serializable {
 		penUpColor = new ColorRGB(r, g, b);
 	}
 
-	void loadUserGcode(Preferences thisMachineNode) {
+	private void loadUserGcode(Preferences thisMachineNode) {
 		userGeneralStartGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
 		userGeneralEndGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
@@ -310,12 +310,10 @@ public class PlotterSettings implements Serializable {
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
 	}
 
-
-	void saveUserGcode(Preferences thisMachineNode) {
+	private void saveUserGcode(Preferences thisMachineNode) {
 		thisMachineNode.put(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
 		thisMachineNode.put(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
-
 
 	public void reset() {
 		PlotterSettings ps = new PlotterSettings();
