@@ -18,6 +18,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
+	@Serial
 	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
@@ -44,7 +46,7 @@ public class PlotterControls extends JPanel {
 	private final MarlinPlotterInterface marlinInterface;
 	private final ProgramInterface programInterface;
 
-	private ChooseConnection chooseConnection = new ChooseConnection();
+	private final ChooseConnection chooseConnection = new ChooseConnection();
 	private ButtonIcon bFindHome;
 	private ButtonIcon bRewind;
 	private ButtonIcon bStart;
@@ -130,7 +132,6 @@ public class PlotterControls extends JPanel {
 	}
 
 	private JPanel getDrawPanel() {
-
 		JPanel panel = new JPanel();
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
 		panel.setBorder(border);

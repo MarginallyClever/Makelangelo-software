@@ -447,7 +447,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-swing-junit</artifactId>
-			<version>3.9.2</version>
+			<version>3.17.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 import java.util.ArrayList;
 
 /**
@@ -22,9 +23,10 @@ import java.util.ArrayList;
  */
 public class TextInterfaceToListeners extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(TextInterfaceToListeners.class);
+	@Serial
 	private static final long serialVersionUID = 7996257740483513358L;
-	private JTextField commandLine = new JTextField(60);
-	private JButton send = new JButton("Send");
+	private final JTextField commandLine = new JTextField(60);
+	private final JButton send = new JButton("Send");
 
 	public TextInterfaceToListeners() {
 		super();

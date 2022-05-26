@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import java.util.List;
 public class MarlinInterface extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinInterface.class);
 	
+	@Serial
 	private static final long serialVersionUID = 979851120390943303L;
 	// number of commands we'll hold on to in case there's a resend.
 	private static final int HISTORY_BUFFER_LIMIT = 250;
