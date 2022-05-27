@@ -36,6 +36,10 @@ public class DummyTransportLayer implements TransportLayer {
             public void sendMessage(String msg) throws Exception {
                 notifyDataReceived("ok"); // Marlin answer, lower case
             }
+
+            public String getName() {
+                return "dummy";
+            }
         };
     }
 

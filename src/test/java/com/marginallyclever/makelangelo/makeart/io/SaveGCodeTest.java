@@ -48,10 +48,13 @@ class SaveGCodeTest {
 
         try {
             Plotter plotter = new Plotter();
+            plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
+            plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
+
             // when
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
-            compareExpectedToActual(expectedFilename,fileTemp);
+            compareExpectedToActual(expectedFilename, fileTemp);
         } finally {
             fileTemp.delete();
         }
@@ -63,6 +66,7 @@ class SaveGCodeTest {
                 new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
                         .useDelimiter("\\A")
                         .next());
+        actual.forEach(System.out::println);
         assertIterableEquals(expected, actual);
     }
 
@@ -72,7 +76,7 @@ class SaveGCodeTest {
         Turtle turtle = multiColorsMoves();
         SaveGCode saveGCode = new SaveGCode();
 
-        List<String> files=null;
+        List<String> files = null;
 
         File fileTemp = File.createTempFile("unit", null);
 
@@ -82,12 +86,12 @@ class SaveGCodeTest {
             // when
             files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
-            compareExpectedToActual("/gcode/save_multi_colors-1.gcode",new File(files.get(0)));
-            compareExpectedToActual("/gcode/save_multi_colors-2.gcode",new File(files.get(1)));
+            compareExpectedToActual("/gcode/save_multi_colors-1.gcode", new File(files.get(0)));
+            compareExpectedToActual("/gcode/save_multi_colors-2.gcode", new File(files.get(1)));
         } finally {
             fileTemp.delete();
-            if(files!=null) {
-                for(String absolutePath : files) {
+            if (files != null) {
+                for (String absolutePath : files) {
                     (new File(absolutePath)).delete();
                 }
             }
@@ -112,7 +116,7 @@ class SaveGCodeTest {
 
         try {
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
-            compareExpectedToActual("/gcode/save_subsection.gcode",fileTemp);
+            compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
         } finally {
             fileTemp.delete();
         }

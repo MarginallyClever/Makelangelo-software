@@ -68,4 +68,28 @@ public class SelectTextArea extends Select {
 	public void setText(String str) {
 		field.setText(str);
 	}
+
+	public void setLineWrap(boolean wrap) {
+		field.setLineWrap(wrap);
+	}
+
+	public boolean getLineWrap() {
+		return field.getLineWrap();
+	}
+
+	public boolean isEditable() {
+		return field.isEditable();
+	}
+
+	public void setEditable(boolean b) {
+		field.setEditable(b);
+	}
+
+	public boolean getDragEnabled() {
+		return field.getDragEnabled();
+	}
+
+	public void setDragEnabled(boolean b) {
+		field.setDragEnabled(b);
+	}
 }

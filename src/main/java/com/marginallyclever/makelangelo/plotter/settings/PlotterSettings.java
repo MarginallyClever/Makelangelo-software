@@ -47,6 +47,8 @@ public class PlotterSettings implements Serializable {
 	private static final String PREF_KEY_Z_OFF = "z_off";
 	private static final String PREF_KEY_Z_ON = "z_on";
 	private static final String PREF_KEY_Z_RATE = "z_rate";
+	private static final String PREF_KEY_USER_GENERAL_END_GCODE = "userGeneralEndGcode";
+	private static final String PREF_KEY_USER_GENERAL_START_GCODE = "userGeneralStartGcode";
 
 	// Each robot has a global unique identifier
 	private long robotUID = 0;
@@ -105,6 +107,9 @@ public class PlotterSettings implements Serializable {
 	 * </pre>
 	 */
 	private int startingPositionIndex = 4;
+
+	private String userGeneralStartGcode = "";
+	private String userGeneralEndGcode = "";
 
 	public PlotterSettings() {
 	}
@@ -212,6 +217,7 @@ public class PlotterSettings implements Serializable {
 		minAcceleration			= thisMachineNode.getDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
 		minimumPlannerSpeed 	= thisMachineNode.getDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
 
+		loadUserGcode(thisMachineNode);
 		loadJerkConfig(thisMachineNode);
 		loadPenConfig(thisMachineNode);
 	}
@@ -244,6 +250,11 @@ public class PlotterSettings implements Serializable {
 		penUpColor = new ColorRGB(r, g, b);
 	}
 
+	private void loadUserGcode(Preferences thisMachineNode) {
+		userGeneralStartGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
+		userGeneralEndGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
+	}
+
 	public void saveConfig() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
@@ -270,6 +281,7 @@ public class PlotterSettings implements Serializable {
 		thisMachineNode.putDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
 		thisMachineNode.putDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
 
+		saveUserGcode(thisMachineNode);
 		saveJerkConfig(thisMachineNode);
 		savePenConfig(thisMachineNode);
 		notifyListeners();
@@ -296,6 +308,11 @@ public class PlotterSettings implements Serializable {
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
+	}
+
+	private void saveUserGcode(Preferences thisMachineNode) {
+		thisMachineNode.put(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
+		thisMachineNode.put(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
 
 	public void reset() {
@@ -551,4 +568,29 @@ public class PlotterSettings implements Serializable {
 	public void setMaxJerk(double[] maxJerk) {
 		this.maxJerk = maxJerk;
 	}
+
+	public String getUserGeneralStartGcode() {
+		return userGeneralStartGcode;
+	}
+
+	public List<String> getUserGeneralStartGcodeList() {
+		return Arrays.asList(userGeneralStartGcode.split(System.getProperty("line.separator")).clone());
+	}
+
+	public void setUserGeneralStartGcode(String userGeneralStartGcode) {
+		this.userGeneralStartGcode = userGeneralStartGcode;
+	}
+
+	public String getUserGeneralEndGcode() {
+		return userGeneralEndGcode;
+	}
+
+	public List<String> getUserGeneralEndGcodeList() {
+		return Arrays.asList(userGeneralEndGcode.split(System.getProperty("line.separator")).clone());
+	}
+
+	public void setUserGeneralEndGcode(String userGeneralEndGcode) {
+		this.userGeneralEndGcode = userGeneralEndGcode;
+	}
+
 }
