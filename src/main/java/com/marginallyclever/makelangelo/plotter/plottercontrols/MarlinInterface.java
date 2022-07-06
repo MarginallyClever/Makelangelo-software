@@ -204,7 +204,8 @@ public class MarlinInterface extends JPanel {
 	}
 	
 	public void queueAndSendCommand(String str) {
-		if(str.trim().length()==0) return;
+		str = removeComment(str);
+		if(str.length()==0) return;
 
 		lineNumberAdded++;
 		String withLineNumber = "N"+lineNumberAdded+" "+str;
@@ -212,7 +213,15 @@ public class MarlinInterface extends JPanel {
 		myHistory.add(new MarlinCommand(lineNumberAdded,assembled));
 		if(busyCount>0) sendQueuedCommand();
 	}
-	
+
+	public String removeComment(String str) {
+		int first = str.indexOf(';');
+		if(first>-1) {
+			str = str.substring(0,first);
+		}
+		return str.trim();
+	}
+
 	private void sendQueuedCommand() {
 		clearOldHistory();
 		

@@ -101,4 +101,18 @@ public class MarlinPlotterInterfaceTest {
         // original values
         assertEquals(42, plotter.getSettings().getDrawFeedRate());
     }
+
+    @Test
+    public void removeComment() {
+        Plotter plotter = new Plotter();
+        PlotterSettings ps = new PlotterSettings();
+        ps.setDrawFeedRate(42);
+        plotter.setSettings(ps);
+        MarlinPlotterInterface mpi = new MarlinPlotterInterface(plotter, new ChooseConnection());
+
+        assertEquals("G0 X20 Y30",mpi.removeComment("G0 X20 Y30 ; this is a comment"));
+        assertEquals("G0 X40 Y50",mpi.removeComment("G0 X40 Y50"));
+        assertEquals("G0 Y60",mpi.removeComment(" G0 Y60"));
+        assertEquals("G0 F600",mpi.removeComment(" G0 F600 ; ;;;"));
+    }
 }
