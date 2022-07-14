@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public class SerialTransportLayer implements TransportLayer {
 
 	private static final Logger logger = LoggerFactory.getLogger(SerialTransportLayer.class);
+	public static final String CU_USBSERIAL = "cu.usbserial";
 
 	public SerialTransportLayer() {}
 
@@ -34,24 +35,21 @@ public class SerialTransportLayer implements TransportLayer {
 		String[] portsDetected;
 
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+		portsDetected = SerialPortList.getPortNames();
 		if ((os.contains("mac")) || (os.contains("darwin"))) {
 			// Also list Bluetooth serial connections
-			portsDetected = SerialPortList.getPortNames(Pattern.compile("cu"));
-
 			Arrays.sort(portsDetected, (o1, o2) -> {
 				// cu.usbserial* are most used, so put it on the top of the list
-				if (o1.contains("cu.usbserial") && o2.contains("cu.usbserial")) {
+				if (o1.contains(CU_USBSERIAL) && o2.contains(CU_USBSERIAL)) {
 					return o1.compareTo(o2);
 				}
-				if (o2.contains("cu.usbserial")) {
+				if (o2.contains(CU_USBSERIAL)) {
 					return 1;
-				} else if (o1.contains("cu.usbserial")) {
+				} else if (o1.contains(CU_USBSERIAL)) {
 					return -1;
 				}
 				return o1.compareTo(o2);
 			});
-		} else {
-			portsDetected = SerialPortList.getPortNames();
 		}
 
 		List<String> connections = Arrays.asList(portsDetected);
