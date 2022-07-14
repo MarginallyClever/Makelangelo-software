@@ -35,8 +35,10 @@ public class SerialTransportLayer implements TransportLayer {
 		String[] portsDetected;
 
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-		portsDetected = SerialPortList.getPortNames();
+
 		if ((os.contains("mac")) || (os.contains("darwin"))) {
+			portsDetected = SerialPortList.getPortNames(Pattern.compile("(ttys[0-9]{1,3}|tty\\..*|cu\\..*)"));
+
 			// Also list Bluetooth serial connections
 			Arrays.sort(portsDetected, (o1, o2) -> {
 				// cu.usbserial* are most used, so put it on the top of the list
@@ -50,6 +52,8 @@ public class SerialTransportLayer implements TransportLayer {
 				}
 				return o1.compareTo(o2);
 			});
+		} else  {
+			portsDetected = SerialPortList.getPortNames();
 		}
 
 		List<String> connections = Arrays.asList(portsDetected);
