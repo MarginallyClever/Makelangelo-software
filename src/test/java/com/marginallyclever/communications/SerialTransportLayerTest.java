@@ -23,7 +23,7 @@ public class SerialTransportLayerTest {
             System.setProperty("os.name", "mac");
 
             serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenAnswer(invocation ->
-                    Stream.of("/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.usbserial-1444140", "/dev/cu.robot-SerialPort", "/dev/cu.usbserial-1410", "/dev/ttyt3", "/dev/ttys001", "/dev/tty.1")
+                    Stream.of("/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.usbserial-1444140", "/dev/cu.robot-SerialPort", "/dev/cu.usbserial-1410", "/dev/ttyt3", "/dev/ttys001", "/dev/tty.1", "/dev/ttys1")
                             .filter(filename -> ((Pattern) invocation.getArgument(0)).matcher(filename).find())
                             .toArray(String[]::new)
             );
