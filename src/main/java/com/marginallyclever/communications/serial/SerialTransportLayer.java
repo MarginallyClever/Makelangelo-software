@@ -37,7 +37,7 @@ public class SerialTransportLayer implements TransportLayer {
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 
 		if ((os.contains("mac")) || (os.contains("darwin"))) {
-			portsDetected = SerialPortList.getPortNames(Pattern.compile("(ttys[0-9]{3}|tty\\..*|cu\\..*)"));
+			portsDetected = SerialPortList.getPortNames(Pattern.compile("(ttys[0-9]{3}|cu\\..*)"));
 
 			// Also list Bluetooth serial connections
 			Arrays.sort(portsDetected, (o1, o2) -> {

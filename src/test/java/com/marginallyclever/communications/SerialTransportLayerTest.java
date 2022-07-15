@@ -28,7 +28,7 @@ public class SerialTransportLayerTest {
                             .toArray(String[]::new)
             );
             List<String> connectionNames = new SerialTransportLayer().listConnections();
-            assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.robot-SerialPort", "/dev/tty.1", "/dev/ttys001"), connectionNames);
+            assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/cu.robot-SerialPort", "/dev/ttys001"), connectionNames);
 
             // alternate order
             serialPortListMocked.when(() -> SerialPortList.getPortNames(any(Pattern.class))).thenAnswer(invocation ->
@@ -37,7 +37,7 @@ public class SerialTransportLayerTest {
                             .toArray(String[]::new)
             );
             connectionNames = new SerialTransportLayer().listConnections();
-            assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/tty.1", "/dev/ttys001"), connectionNames);
+            assertEquals(List.of("/dev/cu.usbserial-1410", "/dev/cu.usbserial-1444140", "/dev/cu.Bluetooth-Incoming-Port", "/dev/cu.SRS-XB33", "/dev/ttys001"), connectionNames);
         } finally {
             System.setProperty("os.name", osName);
         }
