@@ -79,7 +79,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendPenUpDown() {
-		String str = myPlotter.getPenIsUp() ? MarlinPlotterInterface.getPenUpString(myPlotter)
+		String str = myPlotter.getPenIsUp()
+				? MarlinPlotterInterface.getPenUpString(myPlotter)
 				: MarlinPlotterInterface.getPenDownString(myPlotter);
 		queueAndSendCommand(str);
 	}
@@ -90,10 +91,39 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
-		String msg = myPlotter.getPenIsUp() 
+		String msg = myPlotter.getPenIsUp()
 				? MarlinPlotterInterface.getTravelToString(myPlotter, p.x, p.y)
 				: MarlinPlotterInterface.getDrawToString(myPlotter, p.x, p.y);
 		queueAndSendCommand(msg);
+	}
+
+	/**
+	 * M665: Set POLARGRAPH settings
+	 * Parameters:
+	 *   S[segments]  - Segments-per-second
+	 *   L[left]      - Work area minimum X
+	 *   R[right]     - Work area maximum X
+	 *   T[top]       - Work area maximum Y
+	 *   B[bottom]    - Work area minimum Y
+	 *   H[length]    - Maximum belt length
+	 */
+	private void sendSizeUpdate() {
+		var settings = myPlotter.getSettings();
+		var top = settings.getLimitTop();
+		var bottom = settings.getLimitBottom();
+		var left = settings.getLimitLeft();
+		var right = settings.getLimitRight();
+		var width = right-left;
+		var height = top-bottom;
+		var maxLen = Math.sqrt(width*width + height*height);
+
+		queueAndSendCommand("M665"
+				+" T"+StringHelper.formatDouble(top)
+				+" B"+StringHelper.formatDouble(bottom)
+				+" L"+StringHelper.formatDouble(left)
+				+" R"+StringHelper.formatDouble(right)
+				+" S"+ settings.getSegmentsPerSecond()
+				+" H"+StringHelper.formatDouble(maxLen));
 	}
 
 	@Override
