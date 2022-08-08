@@ -92,14 +92,15 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		turtle.forward(distance);
 		if(n>1) {
 			double angleStep = angleSpan / (float)(numBranches-1);
-
 			double oldAngle = turtle.getAngle();
 			double len = distance*orderScale;
+			double noiseUnit = noise/100.0;
+
 			turtle.turn(-(angleSpan/2.0f));
 			for(int i=0;i<numBranches;++i) {
-				lSystemTree(turtle,n-1,len - len*random.nextDouble()*(noise/100.0f) );
+				lSystemTree(turtle,n-1,len - len * noiseUnit * random.nextDouble() );
 				if(noise>0) {
-					turtle.turn(angleStep + (random.nextDouble()-0.5)*(noise/100.0f)*angleStep);
+					turtle.turn(angleStep + angleStep * (random.nextDouble()-0.5)*noiseUnit);
 				} else {
 					turtle.turn(angleStep);
 				}

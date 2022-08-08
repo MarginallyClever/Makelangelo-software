@@ -15,7 +15,7 @@ import java.awt.image.WritableRaster;
  * @author Dan Royer
  */
 public class TransformedImage {
-	private BufferedImage sourceImage;
+	private final BufferedImage sourceImage;
 	private float scaleX, scaleY;
 	private float translateX, translateY;
 

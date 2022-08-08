@@ -28,7 +28,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
 
-	private Plotter myPlotter;
+	private final Plotter myPlotter;
 
 	public MarlinPlotterInterface(Plotter plotter, ChooseConnection chooseConnection) {
 		super(chooseConnection);
