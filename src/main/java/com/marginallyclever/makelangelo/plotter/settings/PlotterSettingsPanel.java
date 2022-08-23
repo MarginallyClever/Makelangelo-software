@@ -34,7 +34,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private final SelectDouble drawFeedRate;
 	private final SelectDouble penUpAngle;
 	private final SelectDouble penDownAngle;
-	private final SelectDouble penZRate;
+	private final SelectDouble penRaiseRate;
+	private final SelectDouble penLowerRate;
 	
 	private final SelectColor selectPenDownColor;
 	private final SelectColor selectPenUpColor;
@@ -76,7 +77,8 @@ public class PlotterSettingsPanel extends JPanel {
 	    interior.add(travelFeedRate 	= new SelectDouble("feedrate",		 Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
 	    interior.add(drawFeedRate 		= new SelectDouble("speed",		 Translator.get("Speed"				),settings.getDrawFeedRate()));
 	    interior.add(acceleration 		= new SelectDouble("acceleration",	 Translator.get("AdjustAcceleration"),settings.getMaxAcceleration()));
-		interior.add(penZRate 			= new SelectDouble("liftSpeed",	 Translator.get("penToolLiftSpeed"	),settings.getPenLiftTime()));
+		interior.add(penRaiseRate       = new SelectDouble("liftSpeed",	 Translator.get("penToolLiftSpeed"	),settings.getPenLiftTime()));
+		interior.add(penLowerRate       = new SelectDouble("lowerSpeed",	 Translator.get("penToolLowerSpeed"	),settings.getPenLowerTime()));
 	    interior.add(penUpAngle 		= new SelectDouble("up",			 Translator.get("penToolUp"			),settings.getPenUpAngle()));
 	    interior.add(penDownAngle 		= new SelectDouble("down",			 Translator.get("penToolDown"		),settings.getPenDownAngle()));
 	    interior.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("pen down color"	),settings.getPenDownColor(),this));
@@ -131,7 +133,8 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setPenDiameter(penDiameter.getValue());
 		settings.setTravelFeedRate(travelFeedRate.getValue());
 		settings.setDrawFeedRate(drawFeedRate.getValue());
-		settings.setPenLiftTime(penZRate.getValue());
+		settings.setPenLiftTime(penRaiseRate.getValue());
+		settings.setPenLowerTime(penLowerRate.getValue());
 		settings.setPenUpAngle(penUpAngle.getValue());
 		settings.setPenDownAngle(penDownAngle.getValue());
 		settings.setPenDownColor(selectPenDownColor.getColor());
@@ -161,7 +164,8 @@ public class PlotterSettingsPanel extends JPanel {
 		travelFeedRate.setValue(settings.getTravelFeedRate());
 		drawFeedRate.setValue(settings.getDrawFeedRate());
 		acceleration.setValue(settings.getMaxAcceleration());
-		penZRate.setValue(settings.getPenLiftTime());
+		penRaiseRate.setValue(settings.getPenLiftTime());
+		penLowerRate.setValue(settings.getPenLowerTime());
 		penUpAngle.setValue(settings.getPenUpAngle());
 		penDownAngle.setValue(settings.getPenDownAngle());
 

@@ -47,6 +47,7 @@ public class PlotterSettings implements Serializable {
 	private static final String PREF_KEY_Z_OFF = "z_off";
 	private static final String PREF_KEY_Z_ON = "z_on";
 	private static final String PREF_KEY_Z_RATE = "z_rate";
+	private static final String PREF_KEY_Z_RATE_UP = "z_rate_up";
 	private static final String PREF_KEY_USER_GENERAL_END_GCODE = "userGeneralEndGcode";
 	private static final String PREF_KEY_USER_GENERAL_START_GCODE = "userGeneralStartGcode";
 
@@ -93,7 +94,18 @@ public class PlotterSettings implements Serializable {
 	private double penDiameter=0.8; // mm, >0
 	private double penUpAngle=90; // servo angle (degrees,0...180)
 	private double penDownAngle=25; // servo angle (degrees,0...180)
-	private double penLiftTime=50; // ms
+
+	/**
+	 * The milliseconds delay to raise the pen.  Marlin firmware will send intermediate values to the servo
+	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 */
+	private double penLiftTime=50;
+
+	/**
+	 * The milliseconds delay to lower the pen.  Marlin firmware will send intermediate values to the servo
+	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 */
+	private double penLowerTime=50;
 
 	/**
 	 * top left, bottom center, etc...
@@ -233,6 +245,7 @@ public class PlotterSettings implements Serializable {
 		prefs = prefs.node(PREF_KEY_PEN);
 		setPenDiameter(		prefs.getDouble(PREF_KEY_DIAMETER, penDiameter	));
 		setPenLiftTime(		prefs.getDouble(PREF_KEY_Z_RATE, penLiftTime	));
+		setPenLowerTime(    prefs.getDouble(PREF_KEY_Z_RATE_UP,penLowerTime ));
 		setPenDownAngle(	prefs.getDouble(PREF_KEY_Z_ON, penDownAngle	));
 		setPenUpAngle(		prefs.getDouble(PREF_KEY_Z_OFF, penUpAngle	));
 		setTravelFeedRate(	prefs.getDouble(PREF_KEY_FEED_RATE, travelFeedRate));
@@ -298,6 +311,7 @@ public class PlotterSettings implements Serializable {
 		prefs = prefs.node(PREF_KEY_PEN);
 		prefs.put(PREF_KEY_DIAMETER, Double.toString(getPenDiameter()));
 		prefs.put(PREF_KEY_Z_RATE, Double.toString(getPenLiftTime()));
+		prefs.put(PREF_KEY_Z_RATE_UP, Double.toString(getPenLowerTime()));
 		prefs.put(PREF_KEY_Z_ON, Double.toString(getPenDownAngle()));
 		prefs.put(PREF_KEY_Z_OFF, Double.toString(getPenUpAngle()));
 		prefs.put(PREF_KEY_FEED_RATE, Double.toString(travelFeedRate));
@@ -438,8 +452,16 @@ public class PlotterSettings implements Serializable {
 		return penLiftTime;
 	}
 
+	public double getPenLowerTime() {
+		return penLowerTime;
+	}
+
 	public void setPenLiftTime(double ms) {
 		this.penLiftTime = ms;
+	}
+
+	public void setPenLowerTime(double ms) {
+		this.penLowerTime = ms;
 	}
 
 	public boolean canChangeMachineSize() {

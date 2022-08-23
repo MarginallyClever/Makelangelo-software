@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -10,6 +7,9 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
 
 /**
  * {@link Plotter} is a virtual plotter.  It is directly responsible for the live state of the plotter.
@@ -239,6 +239,13 @@ public class Plotter implements PreviewListener, Cloneable {
 	 */
 	public double getPenLiftTime() {
 		return settings.getPenLiftTime();
+	}
+
+	/**
+	 * @return the time it should take to move the pen lift servo from down position to up position.
+	 */
+	public double getPenLowerTime() {
+		return settings.getPenLowerTime();
 	}
 
 	/**

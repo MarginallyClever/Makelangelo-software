@@ -1098,6 +1098,11 @@
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
+		<key>penToolLowerSpeed</key>
+		<value>Lower delay (ms)</value>
+		<hint>Adjust pen tool</hint>
+	</string>
+	<string>
 		<key>penToolTest</key>
 		<value>Test</value>
 		<hint>Adjust pen tool</hint>
