@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Lindenmayer System (L System) processor.  Supply the axiom, the rules, and then `getResult(depth)`
  * See also <a href='https://en.wikipedia.org/wiki/L-system#Examples_of_L-systems'>Procedural L Systems</a>.
+ * Does not understand context sensitive grammars, stochastic grammars, parametric grammars, or bi-directional grammars.
  * @author Dan Royer
  * @since 2022-08-03
  */

@@ -48,6 +48,7 @@ public class PlotterSettingsTest {
 		plotterSettings.setHandleSmallSegments(false);
 		plotterSettings.setMinAcceleration(27);
 		plotterSettings.setMinPlannerSpeed(28);
+        plotterSettings.setPenLowerTime(29);
 
         // when
         plotterSettings.saveConfig();
@@ -79,6 +80,7 @@ public class PlotterSettingsTest {
         assertFalse(plotterSettingsRead.isHandleSmallSegments());
         assertEquals(27, plotterSettingsRead.getMinAcceleration());
         assertEquals(28, plotterSettingsRead.getMinPlannerSpeed());
+        assertEquals(29,plotterSettingsRead.getPenLowerTime());
     }
 
     @AfterEach

@@ -1,18 +1,20 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import java.awt.geom.Rectangle2D;
-
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
+import java.io.Serial;
 
 /**
  * Scale the input {@link Turtle} to fit the margins of the {@link Paper} provided.
  * @author Dan Royer
  */
 public class ResizeTurtleToPaperAction extends TurtleModifierAction {
+	@Serial
 	private static final long serialVersionUID = -2481567507951197219L;
-	private Paper myPaper;
-	private boolean fillPage;
+	private final Paper myPaper;
+	private final boolean fillPage;
 	
 	public ResizeTurtleToPaperAction(Paper paper,boolean fillPage,String name) {
 		super(name);

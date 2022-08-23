@@ -1,13 +1,11 @@
 package com.marginallyclever.makelangelo.makeart;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-
-import javax.swing.AbstractAction;
-import javax.swing.Icon;
-
 import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 /**
  * {@link TurtleModifierAction} is the base class for all Actions which modify a {@link Turtle}.
@@ -17,7 +15,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 @SuppressWarnings("serial") // Same-version serialization only
 public abstract class TurtleModifierAction extends AbstractAction {
-	private ArrayList<TurtleModifierListener> listeners = new ArrayList<TurtleModifierListener>();
+	private final ArrayList<TurtleModifierListener> listeners = new ArrayList<TurtleModifierListener>();
 	private Makelangelo myMakelangelo;
 	
 	public TurtleModifierAction() {}
