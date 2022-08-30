@@ -2116,16 +2116,26 @@
 		<hint>Dialog</hint>
 	</string>
   
-  <string>
-    <key>MenuItemPayPalDonation</key>
-    <value>PayPal donation</value>
-    <hint>Help Menu, PayPal donation</hint>
-  </string>
-  <string>
-      <key>PlotterSettingsPanel.Title</key>
-      <value>Plotter settings</value>
-      <hint>panel title</hint>
-  </string>
+	<string>
+		<key>MenuItemPayPalDonation</key>
+		<value>PayPal donation</value>
+		<hint>Help Menu, PayPal donation</hint>
+	</string>
+	<string>
+		<key>PlotterSettingsPanel.Title</key>
+		<value>Plotter settings</value>
+		<hint>panel title</hint>
+	</string>
+	<string>
+		<key>PlotterSettingsPanel.TabEssential</key>
+		<value>Essential</value>
+		<hint>plotter shape and size</hint>
+	</string>
+	<string>
+		<key>PlotterSettingsPanel.TabSimulation</key>
+		<value>Simulation</value>
+		<hint>plotter simulation for time estimates</hint>
+	</string>
 
   <string>
       <key>TurtleRenderFactory.DEFAULT</key>
