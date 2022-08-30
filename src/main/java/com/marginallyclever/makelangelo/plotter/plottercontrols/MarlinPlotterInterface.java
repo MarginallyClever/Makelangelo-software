@@ -217,7 +217,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S" + (int)p.getPenDownAngle() + " T50";
+		return "M280 P0 S" + (int)p.getPenDownAngle() + " T"+(int)p.getPenLowerTime();
 	}
 
 	public static String getToolChangeString(int toolNumber) {
