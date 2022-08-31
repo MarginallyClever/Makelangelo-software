@@ -21,7 +21,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	private float yMax = 70;
 	private static int order = 7; // controls complexity of curve
 
-	private Stack<Integer> fibonacciSequence = new Stack<>();
+	private final Stack<Integer> fibonacciSequence = new Stack<>();
 
 	public Generator_FibonacciSpiral() {
 		super();

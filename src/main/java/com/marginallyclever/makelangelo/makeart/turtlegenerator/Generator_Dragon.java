@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Generator_Dragon extends TurtleGenerator {
 	private static int order = 12; // controls complexity of curve
-	private SelectSlider fieldOrder;
+	private final SelectSlider fieldOrder;
 
 	private final List<Integer> sequence = new ArrayList<>();
 
