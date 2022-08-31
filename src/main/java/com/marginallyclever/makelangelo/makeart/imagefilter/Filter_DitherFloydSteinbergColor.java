@@ -9,9 +9,8 @@ import java.awt.image.BufferedImage;
 
 /**
  * Floyd/Steinberg dithering
- *
- * @author Dan
  * See <a href="http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering">http://stackoverflow.com/questions/5940188/how-to-convert-a-24-bit-png-to-3-bit-png-using-floyd-steinberg-dithering</a>
+ * @author Dan Royer
  */
 public class Filter_DitherFloydSteinbergColor extends ImageFilter {
   public ColorPalette palette;
@@ -55,13 +54,13 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
       // pixel[x-1][y+1] += 3/16 * quant_error
       // pixel[x  ][y+1] += 5/16 * quant_error
       // pixel[x+1][y+1] += 1/16 * quant_error
-      nexterror[x].add(quant_error.mul(5.0 / 16.0));
+      nexterror[x].set(nexterror[x].add(quant_error.mul(5.0 / 16.0)));
       if (x + direction >= 0 && x + direction < w) {
-        error[x + direction].add(quant_error.mul(7.0 / 16.0));
-        nexterror[x + direction].add(quant_error.mul(1.0 / 16.0));
+        error[x + direction].set(error[x + direction].add(quant_error.mul(7.0 / 16.0)));
+        nexterror[x + direction].set(nexterror[x + direction].add(quant_error.mul(1.0 / 16.0)));
       }
       if (x - direction >= 0 && x - direction < w) {
-        nexterror[x - direction].add(quant_error.mul(3.0 / 16.0));
+        nexterror[x - direction].set(nexterror[x - direction].add(quant_error.mul(3.0 / 16.0)));
       }
     }
   }
