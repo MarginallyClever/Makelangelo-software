@@ -1,21 +1,15 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -40,12 +34,13 @@ public class SelectInteger extends Select {
 		
 		label = new JLabel(labelKey,JLabel.LEADING);
 		field = new JFormattedTextField();
-		field.setColumns(5);
 		createAndAttachFormatter(locale);
+
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
+
 		field.setValue((Integer)defaultValue);
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.getDocument().addDocumentListener(new DocumentListener() {

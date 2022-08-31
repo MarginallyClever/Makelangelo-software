@@ -1,18 +1,14 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import com.marginallyclever.convenience.StringHelper;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import com.marginallyclever.convenience.StringHelper;
 
 
 /**
@@ -44,6 +40,7 @@ public class SelectDouble extends Select {
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
+
 		field.setText(StringHelper.formatDouble(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.getDocument().addDocumentListener(new DocumentListener() {
