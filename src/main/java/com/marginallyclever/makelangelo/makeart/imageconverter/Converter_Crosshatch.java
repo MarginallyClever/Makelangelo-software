@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -85,7 +85,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_Greyscale bw = new Filter_Greyscale(255);
 		TransformedImage img = bw.filter(myImage);
 		
 		turtle = new Turtle();

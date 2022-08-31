@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -67,7 +67,7 @@ public class Converter_Multipass extends ImageConverter {
 		super.start(paper, image);
 
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_Greyscale bw = new Filter_Greyscale(255);
 		TransformedImage img = bw.filter(myImage);
 		
 		double dx = Math.cos(Math.toRadians(angle));

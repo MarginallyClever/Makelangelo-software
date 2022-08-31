@@ -4,7 +4,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -193,7 +193,7 @@ public class Converter_Wander extends ImageConverter {
 	
 	protected void finishBlackAndWhite() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_Greyscale bw = new Filter_Greyscale(255);
 		TransformedImage img = bw.filter(myImage);
 		
 		turtle = new Turtle();

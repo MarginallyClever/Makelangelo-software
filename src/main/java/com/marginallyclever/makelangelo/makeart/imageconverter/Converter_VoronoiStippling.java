@@ -6,7 +6,7 @@ import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_BlackAndWhite;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
@@ -78,7 +78,7 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		// make black & white
-		Filter_BlackAndWhite bw = new Filter_BlackAndWhite(255);
+		Filter_Greyscale bw = new Filter_Greyscale(255);
 		super.start(paper, bw.filter(image));
 
 		lock.lock();

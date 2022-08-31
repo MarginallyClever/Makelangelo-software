@@ -49,13 +49,13 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
       // pixel[x-1][y+1] += 3/16 * quant_error
       // pixel[x  ][y+1] += 5/16 * quant_error
       // pixel[x+1][y+1] += 1/16 * quant_error
-      nexterror[x] += 5.0 / 16.0 * quant_error;
+      nexterror[x] += (5.0 / 16.0) * quant_error;
       if (x + direction >= 0 && x + direction < w) {
-        error[x + direction] += 7.0 / 16.0 * quant_error;
-        nexterror[x + direction] += 1.0 / 16.0 * quant_error;
+        error[x + direction] += (7.0 / 16.0) * quant_error;
+        nexterror[x + direction] += (1.0 / 16.0) * quant_error;
       }
       if (x - direction >= 0 && x - direction < w) {
-        nexterror[x - direction] += 3.0 / 16.0 * quant_error;
+        nexterror[x - direction] += (3.0 / 16.0) * quant_error;
       }
     }
   }
@@ -80,7 +80,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
       }
     }
 
-    tone /= (w * h);
+    tone /= ((long) w * h);
 
 
     TransformedImage after = new TransformedImage(img);
