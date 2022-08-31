@@ -8,24 +8,28 @@ import java.util.Objects;
 /**
  * RGB color class.  each component is 0...255
  * @author Dan Royer
- *
  */
 public class ColorRGB {
   public int red = 0;
   public int green = 0;
   public int blue = 0;
 
-  public ColorRGB(int r, int g, int b) {
-    red = r;
-    green = g;
-    blue = b;
+  public ColorRGB(int red, int green, int blue) {
+    super();
+    set(red,green,blue);
   }
 
   public ColorRGB(ColorRGB x) {
+    super();
     set(x);
   }
 
   public ColorRGB(int pixel) {
+    super();
+    set(pixel);
+  }
+
+  public void set(int pixel) {
     int r = ((pixel >> 16) & 0xff);
     int g = ((pixel >> 8) & 0xff);
     int b = ((pixel) & 0xff);
@@ -43,45 +47,50 @@ public class ColorRGB {
   }
 
   public ColorRGB set(ColorRGB x) {
-    red = x.red;
-    green = x.green;
-    blue = x.blue;
+    set(x.red,x.green,x.blue);
     return this;
   }
 
-  public void set(int r, int g, int b) {
-    red = r;
-    green = g;
-    blue = b;
+  public void set(int red, int green, int blue) {
+    this.red = Math.max(0,Math.min(255,red));
+    this.green = Math.max(0,Math.min(255,green));
+    this.blue = Math.max(0,Math.min(255,blue));
+  }
+
+  public void set(ColorHSB hsb) {
+    set(Color.HSBtoRGB(hsb.hue,hsb.saturation,hsb.brightness));
   }
 
   public ColorRGB sub(ColorRGB x) {
-    red -= x.red;
-    green -= x.green;
-    blue -= x.blue;
-    return this;
+    return new ColorRGB(
+      this.red - x.red,
+      this.green - x.green,
+      this.blue - x.blue);
   }
 
   public ColorRGB add(ColorRGB x) {
-    red += x.red;
-    green += x.green;
-    blue += x.blue;
-    return this;
+    return new ColorRGB(
+            this.red + x.red,
+            this.green + x.green,
+            this.blue + x.blue);
   }
 
   public ColorRGB mul(double f) {
-    red *= f;
-    green *= f;
-    blue *= f;
-    return this;
+    return new ColorRGB(
+            (int)(this.red * f),
+            (int)(this.green * f),
+            (int)(this.blue * f));
   }
 
-  public float diff(ColorRGB o) {
-    int rDiff = o.red - this.red;
-    int gDiff = o.green - this.green;
-    int bDiff = o.blue - this.blue;
-    int distanceSquared = rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
-    return (float) Math.sqrt(distanceSquared);
+  public float diffSquared(ColorRGB other) {
+    int r = other.red - this.red;
+    int g = other.green - this.green;
+    int b = other.blue - this.blue;
+    return r*r + g*g + b*b;
+  }
+
+  public float diff(ColorRGB other) {
+    return (float) Math.sqrt(diffSquared(other));
   }
 
   public String toString() {
@@ -92,7 +101,7 @@ public class ColorRGB {
   public String toHexString() {
     return String.format("#%02X%02X%02X", red, green, blue);
   }
-  
+
   public int getRed() { return red; }
   public int getGreen() { return green; }
   public int getBlue() { return blue; }
@@ -102,11 +111,14 @@ public class ColorRGB {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ColorRGB colorRGB = (ColorRGB) o;
-    return red == colorRGB.red && green == colorRGB.green && blue == colorRGB.blue;
+    return red == colorRGB.red
+            && green == colorRGB.green
+            && blue == colorRGB.blue;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(red, green, blue);
   }
+
 }

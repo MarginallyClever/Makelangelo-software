@@ -18,9 +18,9 @@ public class ColorHSB {
     }
 
     public void set(float hue,float saturation,float brightness) {
-        this.hue=hue;
-        this.saturation=saturation;
-        this.brightness=brightness;
+        this.hue = Math.max(0.0f,Math.min(1.0f,hue));
+        this.saturation = Math.max(0.0f,Math.min(1.0f,saturation));
+        this.brightness = Math.max(0.0f,Math.min(1.0f,brightness));
     }
 
     public void set(ColorRGB rgb) {
