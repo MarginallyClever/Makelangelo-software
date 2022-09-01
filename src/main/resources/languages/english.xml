@@ -228,12 +228,12 @@
 
 	<string>
 		<key>MachineWidth</key>
-		<value>Machine width</value>
+		<value>Machine width (mm)</value>
 		<hint>Machine settings</hint>
 	</string>
 	<string>
 		<key>MachineHeight</key>
-		<value>Machine height</value>
+		<value>Machine height (mm)</value>
 		<hint>Machine settings</hint>
 	</string>
 
@@ -249,12 +249,12 @@
 	</string>
 	<string>
 		<key>PaperSettings.PaperWidth</key>
-		<value>Paper width</value>
+		<value>Paper width (mm)</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
 		<key>PaperSettings.PaperHeight</key>
-		<value>Paper height</value>
+		<value>Paper height (mm)</value>
 		<hint>Paper settings panel</hint>
 	</string>
 	<string>
@@ -322,7 +322,7 @@
 	</string>
 	<string>
 		<key>AdjustAcceleration</key>
-		<value>Acceleration</value>
+		<value>Acceleration (mm/s²)</value>
 		<hint>machine size control panel</hint>
 	</string>
 
@@ -801,7 +801,7 @@
 	</string>
 	<string>
 		<key>Speed</key>
-		<value>Draw speed</value>
+		<value>Draw speed (mm/min)</value>
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
@@ -1074,32 +1074,32 @@
 	</string>
 	<string>
 		<key>penToolDiameter</key>
-		<value>Diameter</value>
+		<value>Diameter (mm)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolMaxFeedRate</key>
-		<value>Travel speed</value>
+		<value>Travel speed (mm/min)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolUp</key>
-		<value>Up</value>
+		<value>Up angle (degrees)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolDown</key>
-		<value>Down</value>
+		<value>Down angle (degrees)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolLiftSpeed</key>
-		<value>Lift delay (ms)</value>
+		<value>Pen lift time (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
 		<key>penToolLowerSpeed</key>
-		<value>Lower delay (ms)</value>
+		<value>Pen lower time (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
@@ -1484,17 +1484,17 @@
 	</string>
 	<string>
 		<key>ServoLengthNeeded</key>
-		<value>Servo wire length:</value>
+		<value>Servo wire length (m)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	<string>
 		<key>StepperLengthNeeded</key>
-		<value>Stepper wire length (each):</value>
+		<value>Stepper wire length (m,each)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	<string>
 		<key>BeltLengthNeeded</key>
-		<value>Timing belt length (each):</value>
+		<value>Timing belt length (m,each)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	<string>
@@ -2081,11 +2081,11 @@
 	</string>
 	<string>
 		<key>PlotterSettings.minSegmentLength</key>
-		<value>Min Segment Length</value>
+		<value>Min Segment Length (mm)</value>
 	</string>
 	<string>
 		<key>PlotterSettings.minSegTime</key>
-		<value>Min Seg Time</value>
+		<value>Min Seg Time (ns)</value>
 	</string>
 	<string>
 		<key>PlotterSettings.handleSmallSegments</key>
@@ -2093,11 +2093,11 @@
 	</string>
 	<string>
 		<key>PlotterSettings.minAcceleration</key>
-		<value>Min Acceleration</value>
+		<value>Min Acceleration (mm/s²)</value>
 	</string>
 	<string>
 		<key>PlotterSettings.minimumPlannerSpeed</key>
-		<value>Min Planner Speed</value>
+		<value>Min Planner Speed (mm/s)</value>
 	</string>
 
 	<string>

@@ -79,8 +79,8 @@ public class PlotterSettingsPanel extends JPanel {
 		interior0.add(penLowerRate       = new SelectDouble("lowerSpeed",	 Translator.get("penToolLowerSpeed"	),settings.getPenLowerTime()));
 	    interior0.add(penUpAngle 		 = new SelectDouble("up",			 Translator.get("penToolUp"			),settings.getPenUpAngle()));
 	    interior0.add(penDownAngle 		 = new SelectDouble("down",			 Translator.get("penToolDown"		),settings.getPenDownAngle()));
-	    interior0.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("pen down color"	),settings.getPenDownColor(),this));
 		interior0.add(selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("pen up color"		),settings.getPenUpColor(),this));
+		interior0.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("pen down color"	),settings.getPenDownColor(),this));
 
 		interior1.add(blockBufferSize     = new SelectInteger("blockBufferSize",     Translator.get("PlotterSettings.blockBufferSize"     ),settings.getBlockBufferSize()));
 		interior1.add(segmentsPerSecond   = new SelectInteger("segmentsPerSecond",   Translator.get("PlotterSettings.segmentsPerSecond"   ),settings.getSegmentsPerSecond()));
