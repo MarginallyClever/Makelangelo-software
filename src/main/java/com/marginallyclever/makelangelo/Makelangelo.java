@@ -12,6 +12,7 @@ import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.*;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
+import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
@@ -27,7 +28,6 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
-import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
@@ -54,10 +54,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +66,6 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
@@ -919,6 +915,18 @@ public final class Makelangelo {
 				onClosing();
 			}
 		});
+		mainFrame.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				saveWindowSizeAndPosition();
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				saveWindowSizeAndPosition();
+			}
+		});
+
 		try {
 			mainFrame.setIconImage(ImageIO.read(Makelangelo.class.getResource("/logo-icon.png")));
 		} catch (IOException e) {
@@ -996,49 +1004,39 @@ public final class Makelangelo {
 	}
 
 	private void setWindowSizeAndPosition() {
-		logger.debug("adjust window size...");
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
 		// Get default screen size
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 		// window size
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		int width = preferences.getInt(KEY_WINDOW_WIDTH, -1);
-		int height = preferences.getInt(KEY_WINDOW_HEIGHT, -1);
-    	int windowX = preferences.getInt(KEY_WINDOW_X, -1);
-    	int windowY = preferences.getInt(KEY_WINDOW_Y, -1);
+		int width = preferences.getInt(KEY_WINDOW_WIDTH, Math.min(screenSize.width,1200));
+		int height = preferences.getInt(KEY_WINDOW_HEIGHT, Math.min(screenSize.height,1020));
+    	int windowX = preferences.getInt(KEY_WINDOW_X, (screenSize.width - width)/2);
+    	int windowY = preferences.getInt(KEY_WINDOW_Y, (screenSize.height - height)/2);
+		mainFrame.setBounds( windowX, windowY, width, height);
 
-		if(width==-1 || height==-1) {
-    		logger.debug("...default size");
-			width = Math.min(screenSize.width,1200);
-			height = Math.min(screenSize.height,1020);
+		boolean isFullscreen = preferences.getBoolean("isFullscreen",false);
+		if(isFullscreen) {
+			mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		}
-        if(windowX==-1 || windowY==-1) {
-    		logger.debug("...default position");
-        	// centered
-        	windowX = (screenSize.width - width)/2;
-        	windowY = (screenSize.height - height)/2;
-        }
-        
-		mainFrame.setSize(width, height);
-		mainFrame.setLocation(windowX, windowY);
 	}
 
 	// save window position and size
 	private void saveWindowSizeAndPosition() {
-		Dimension size = this.mainFrame.getSize();
-		Point location = this.mainFrame.getLocation();
-
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 
-		preferences.putInt(KEY_WINDOW_WIDTH, size.width);
-		preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
-		preferences.putInt(KEY_WINDOW_X, location.x);
-		preferences.putInt(KEY_WINDOW_Y, location.y);
-		try {
-			preferences.sync();
-		} catch (BackingStoreException e) {
-			logger.error("Failed to store size of the window", e);
+		int state = mainFrame.getExtendedState();
+		boolean isFullscreen = ((state & JFrame.MAXIMIZED_BOTH)!=0);
+		preferences.putBoolean("isFullscreen", isFullscreen);
+		if(!isFullscreen) {
+			Dimension size = this.mainFrame.getSize();
+			preferences.putInt(KEY_WINDOW_WIDTH, size.width);
+			preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
+
+			Point location = this.mainFrame.getLocation();
+			preferences.putInt(KEY_WINDOW_X, location.x);
+			preferences.putInt(KEY_WINDOW_Y, location.y);
 		}
 	}
 
@@ -1059,7 +1057,6 @@ public final class Makelangelo {
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			saveWindowSizeAndPosition();
 			myPlotter.getSettings().saveConfig();
 			savePaths();
 
