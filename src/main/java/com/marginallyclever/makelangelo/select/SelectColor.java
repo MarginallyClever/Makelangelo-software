@@ -1,17 +1,11 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JColorChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
-
 import com.marginallyclever.convenience.ColorRGB;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.io.Serial;
 
 /**
  * A color selection dialog
@@ -19,10 +13,11 @@ import com.marginallyclever.convenience.ColorRGB;
  * @since 7.24.0
  */
 public class SelectColor extends Select {
+	@Serial
 	private static final long serialVersionUID = 8898817786685388020L;
 	
-	private JLabel label;
-	private BackgroundPaintedButton chooseButton;
+	private final JLabel label;
+	private final BackgroundPaintedButton chooseButton;
 	
 	/**
 	 * @param parentComponent a component (JFrame, JPanel) that owns the color selection dialog
@@ -43,14 +38,11 @@ public class SelectColor extends Select {
 		chooseButton.setBackground(new Color(defaultValue.toInt()));
 		chooseButton.setBorder(new LineBorder(Color.BLACK));
 
-		chooseButton.addActionListener(new ActionListener() {
-        	@Override
-			public void actionPerformed(ActionEvent e) {
-				Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
-				if ( c != null ){
-					chooseButton.setBackground(c);
-					firePropertyChange(null,c);
-				}
+		chooseButton.addActionListener(e -> {
+			Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
+			if ( c != null ){
+				chooseButton.setBackground(c);
+				firePropertyChange(null,c);
 			}
 		});
 
