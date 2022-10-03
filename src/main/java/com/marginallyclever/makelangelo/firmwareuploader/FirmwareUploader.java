@@ -43,7 +43,7 @@ public class FirmwareUploader {
 
 	private File attempt(int i,String filename) {
 		Path p = Path.of(avrdudePath);
-		logger.debug("Trying {}", p.resolve(filename));
+		logger.debug("Trying {} {}",i, p.resolve(filename));
 		return p.resolve(filename).toFile();
 	}
 	

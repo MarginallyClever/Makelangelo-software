@@ -26,15 +26,28 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
 	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
+
+	private static String lastPath = "";
+	private static String lastHexFile = "";
 	
 	public FirmwareUploaderPanel() {
 		super();
 		
 		updateCOMPortList();
 		refreshLayout();
-		
+
 		sourceAVRDude.setPathOnly();
+		sourceAVRDude.setText(lastPath);
+		sourceAVRDude.addPropertyChangeListener((e)->{
+			lastPath = sourceAVRDude.getText();
+		});
+
 		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
+		sourceHex.setText(lastHexFile);
+		sourceHex.addPropertyChangeListener((e)->{
+			lastHexFile = sourceHex.getText();
+		});
+
 		refreshButton.addPropertyChangeListener((e)->{
 			updateCOMPortList();
 		});
