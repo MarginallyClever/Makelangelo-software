@@ -5,10 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
+import java.io.Serial;
 
 public class ButtonIcon extends JButton {
-	private static final long serialVersionUID = 6329805223648415348L;
+	@Serial
+    private static final long serialVersionUID = 6329805223648415348L;
 	private static final Logger logger = LoggerFactory.getLogger(ButtonIcon.class);
 
     public ButtonIcon(String translationKey, String iconPath) {

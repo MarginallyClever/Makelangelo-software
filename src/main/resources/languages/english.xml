@@ -752,6 +752,11 @@
 		<value>Save</value>
 		<hint>button</hint>
 	</string>
+	<string>
+		<key>ConversationHistory.Copy</key>
+		<value>Copy</value>
+		<hint>button</hint>
+	</string>
 
 	<string>
 		<key>GoPaperBorder</key>

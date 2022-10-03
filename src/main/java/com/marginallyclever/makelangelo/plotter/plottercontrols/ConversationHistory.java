@@ -11,10 +11,9 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -25,15 +24,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 7.28.0
  */
 public class ConversationHistory extends JPanel {
+	@Serial
 	private static final long serialVersionUID = 6287436679006933618L;
 	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
-	private DefaultListModel<ConversationEvent> listModel = new DefaultListModel<ConversationEvent>();
-	private JList<ConversationEvent> listView = new JList<ConversationEvent>(listModel);
-	private ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<ConversationEvent>();
-	private JFileChooser chooser = new JFileChooser();
+	private final DefaultListModel<ConversationEvent> listModel = new DefaultListModel<>();
+	private final JList<ConversationEvent> listView = new JList<>(listModel);
+	private final ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<>();
+	private final JFileChooser chooser = new JFileChooser();
 
-	private ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
-	private ButtonIcon bSave = new ButtonIcon("ConversationHistory.Save", "/images/disk.png");
+	private final ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
+	private final ButtonIcon bSave = new ButtonIcon("ConversationHistory.Save", "/images/disk.png");
+	private final ButtonIcon bCopy = new ButtonIcon("ConversationHistory.Copy", "/images/copy2clipboard.png");
 
 	
 	public ConversationHistory() {
@@ -57,13 +58,28 @@ public class ConversationHistory extends JPanel {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
 
+		bar.add(bCopy);
 		bar.add(bSave);
 		bar.add(bClear);
 
+		bCopy.addActionListener(e -> copyToClipboard());
 		bClear.addActionListener( (e) -> runNewAction() );
 		bSave.addActionListener( (e) -> runSaveAction() );
 		
 		return bar;
+	}
+
+	private void copyToClipboard() {
+		StringBuilder sb = new StringBuilder();
+
+		int size=listModel.getSize();
+		for(int i=0;i<size;++i) {
+			String str = listModel.get(i).toString();
+			sb.append(str).append("\n");
+		}
+
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(new StringSelection(sb.toString()), null);
 	}
 
 	private void createCellRenderingSystem() {

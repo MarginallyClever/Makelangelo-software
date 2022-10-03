@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 
 /**
  * {@link TextInterfaceWithHistory} provides a log of the two way communication
@@ -18,9 +19,10 @@ import java.awt.event.ActionListener;
  * @since 7.28.0
  */
 public class TextInterfaceWithHistory extends JPanel {
+	@Serial
 	private static final long serialVersionUID = 5542831703742185676L;
-	private TextInterfaceToListeners myInterface = new TextInterfaceToListeners();
-	private ConversationHistory myHistory = new ConversationHistory();
+	private final TextInterfaceToListeners myInterface = new TextInterfaceToListeners();
+	private final ConversationHistory myHistory = new ConversationHistory();
 
 	public TextInterfaceWithHistory() {
 		super();
