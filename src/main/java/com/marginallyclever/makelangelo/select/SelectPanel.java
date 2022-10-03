@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +20,10 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	/**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = 2141566275423257798L;
 
-	private JPanel interiorPanel = new JPanel();
+	private final JPanel interiorPanel = new JPanel();
 	
 	public SelectPanel() {
 		super(new BorderLayout());
@@ -37,7 +39,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 	}
 	
 	// OBSERVER PATTERN	
-	private List<SelectPanelChangeListener> listeners = new ArrayList<SelectPanelChangeListener>();
+	private final List<SelectPanelChangeListener> listeners = new ArrayList<>();
 
 	public void removeSelectPanelChangeListener(SelectPanelChangeListener ear) {
 		listeners.remove(ear);

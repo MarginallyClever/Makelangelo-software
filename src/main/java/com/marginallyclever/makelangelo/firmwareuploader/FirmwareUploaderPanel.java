@@ -15,18 +15,17 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
+import java.io.Serial;
 
 public class FirmwareUploaderPanel extends SelectPanel {
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = 7101530052729740681L;
-	private FirmwareUploader firmwareUploader = new FirmwareUploader();
-	private SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
-	private SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
-	private SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
-	private SelectButton refreshButton = new SelectButton("refresh",Translator.get("Refresh"));
-	private SelectButton goButton = new SelectButton("start",Translator.get("Start")); 
+	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
+	private final SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
+	private final SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
+	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
+	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
+	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
 	
 	public FirmwareUploaderPanel() {
 		super();
@@ -60,12 +59,30 @@ public class FirmwareUploaderPanel extends SelectPanel {
 	}
 
 	private void refreshLayout() {
-		setLayout(new FlowLayout());
-		add(sourceAVRDude);
-		add(sourceHex);
-		add(port);
-		add(refreshButton);
-		add(goButton);
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(port,BorderLayout.CENTER);
+		panel.add(refreshButton,BorderLayout.EAST);
+
+		setLayout(new GridBagLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx=0;
+		c.gridy=0;
+		c.weightx=1;
+		c.weighty=0;
+
+		add(sourceAVRDude,c);
+		c.gridy++;
+		add(sourceHex,c);
+		c.gridy++;
+		add(panel,c);
+		c.gridy++;
+		c.weightx=1;
+		c.weighty=1;
+		c.anchor = GridBagConstraints.PAGE_END;
+		add(goButton,c);
 	}
 
 	private void updateCOMPortList() {
