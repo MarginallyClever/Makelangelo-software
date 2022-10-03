@@ -40,19 +40,21 @@ public class FirmwareUploader {
 			avrdudePath = f.getAbsolutePath();
 		}
 	}
+
+	private File attempt(int i,String filename) {
+		Path p = Path.of(avrdudePath);
+		logger.debug("Trying {}", p.resolve(filename));
+		return p.resolve(filename).toFile();
+	}
 	
 	public void run(String hexPath,String portName) throws Exception {
 		logger.debug("update started");
 		
-		Path p = Path.of(avrdudePath);
-		logger.debug("Trying {}", (p.resolve("../avrdude.conf").toString()));
-		File f = p.resolve("../avrdude.conf").toFile();
+		File f = attempt(1, "../avrdude.conf");
+		if(!f.exists()) f = attempt(2, "../../etc/avrdude.conf");
+		if(!f.exists()) f = attempt(3, "../etc/avrdude.conf");
 		if(!f.exists()) {
-			logger.debug("Trying 2 {}", (p.resolve("../../etc/avrdude.conf").toString()));
-			f = p.resolve("../../etc/avrdude.conf").toFile();
-			if(!f.exists()) {
-				throw new Exception("Cannot find nearby avrdude.conf");
-			}
+			throw new Exception("Cannot find nearby avrdude.conf");
 		}
 		
 		String confPath = f.getAbsolutePath();
