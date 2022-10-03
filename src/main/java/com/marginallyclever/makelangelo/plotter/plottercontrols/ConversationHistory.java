@@ -31,7 +31,6 @@ public class ConversationHistory extends JPanel {
 	private final JList<ConversationEvent> listView = new JList<>(listModel);
 	private final ConcurrentLinkedQueue<ConversationEvent> inBoundQueue = new ConcurrentLinkedQueue<>();
 	private final JFileChooser chooser = new JFileChooser();
-
 	private final ButtonIcon bClear = new ButtonIcon("ConversationHistory.Clear", "/images/application.png");
 	private final ButtonIcon bSave = new ButtonIcon("ConversationHistory.Save", "/images/disk.png");
 	private final ButtonIcon bCopy = new ButtonIcon("ConversationHistory.Copy", "/images/copy2clipboard.png");
