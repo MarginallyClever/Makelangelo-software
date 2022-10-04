@@ -1,10 +1,11 @@
-package com.marginallyclever.makelangelo.makeart;
+package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

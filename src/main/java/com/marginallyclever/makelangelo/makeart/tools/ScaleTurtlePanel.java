@@ -1,5 +1,6 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.makeart.tools;
 
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
@@ -12,14 +13,16 @@ import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.Serial;
 
 public class ScaleTurtlePanel extends JPanel {
+	@Serial
 	private static final long serialVersionUID = -4566997988723228869L;
 	private static final Logger logger = LoggerFactory.getLogger(ScaleTurtlePanel.class);
 	
 	private final String [] unitTypes = new String[]{"mm","%"};
 	private final Turtle turtleToChange;
-	private Turtle turtleOriginal;
+	private final Turtle turtleOriginal;
 	private final JSpinner width;
 	private final JSpinner height;
 	private final JComboBox<String> units = new JComboBox<String>(unitTypes); 

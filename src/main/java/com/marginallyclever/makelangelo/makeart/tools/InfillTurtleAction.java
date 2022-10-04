@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangelo.makeart;
+package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

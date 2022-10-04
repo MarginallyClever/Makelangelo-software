@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.makeart.*;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
+import com.marginallyclever.makelangelo.makeart.tools.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
@@ -488,6 +489,9 @@ public final class Makelangelo {
 		menu.add(scale);
 		scale.addActionListener((e) -> runScalePanel());
 
+		JMenuItem rotate = new JMenuItem(Translator.get("Rotate"));
+		menu.add(rotate);
+		rotate.addActionListener((e) -> runRotatePanel());
 		menu.addSeparator();
 		
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
@@ -512,6 +516,9 @@ public final class Makelangelo {
 		return menu;
 	}
 
+	private void runRotatePanel() {
+		RotateTurtlePanel.runAsDialog(mainFrame, myTurtle);
+	}
 	private void runScalePanel() {
 		ScaleTurtlePanel.runAsDialog(mainFrame, myTurtle);
 	}

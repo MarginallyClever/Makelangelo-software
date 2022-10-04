@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart;
+package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.MathHelper;

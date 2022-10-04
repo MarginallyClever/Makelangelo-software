@@ -218,6 +218,10 @@
 		<value>Scale</value>
 	</string>
 	<string>
+		<key>Rotate</key>
+		<value>Rotate</value>
+	</string>
+	<string>
 		<key>Width</key>
 		<value>Width</value>
 	</string>

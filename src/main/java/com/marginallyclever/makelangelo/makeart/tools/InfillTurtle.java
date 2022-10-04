@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart;
+package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineCollection;
