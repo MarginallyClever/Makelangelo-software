@@ -283,8 +283,6 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	 * @param gl2 OpenGL context
 	 */
 	private void paintBackground(GL2 gl2) {
-		int b=70;
-		backgroundColor = new ColorRGB(255-b,255-b,255-b);
 		// Clear The Screen And The Depth Buffer
 		gl2.glClearColor(
 				(float)backgroundColor.getRed()/255.0f,
