@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -25,8 +26,6 @@ import java.util.prefs.Preferences;
  *
  */
 public class PreviewPanel extends GLJPanel implements GLEventListener {
-	static final long serialVersionUID = 2;
-
 	private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
 	
 	// Use debug pipeline?
@@ -49,6 +48,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	 * previous mouse position
 	 */
 	private int mouseOldX, mouseOldY;
+	private int mouseX,mouseY;
 
 	/**
 	 * mouseLastZoomDirection is used to prevent reverse zooming on track pads, bug #559.
@@ -104,6 +104,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		
 		// remember button states for when we need them.
 		addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				buttonPressed = e.getButton();
@@ -122,9 +123,13 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				int x = e.getX();
+				int y = e.getY();
+				mouseX = x;
+				mouseY = y;
+				setTipXY();
+
 				if (buttonPressed == MouseEvent.BUTTON1) {
-					int x = e.getX();
-					int y = e.getY();
 					int dx = x - mouseOldX;
 					int dy = y - mouseOldY;
 					mouseOldX = x;
@@ -140,6 +145,9 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				int y = e.getY();
 				mouseOldX = x;
 				mouseOldY = y;
+				mouseX = x;
+				mouseY = y;
+				setTipXY();
 			}
 		});
 		
@@ -174,6 +182,21 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		float w2 = width/2.0f;
 		float h2 = height/2.0f;
 		glu.gluOrtho2D(-w2, w2, -h2, h2);
+	}
+
+	public Vector2d getMousePositionInWorld() {
+		double w2 = camera.getWidth()/2.0;
+		double h2 = camera.getHeight()/2.0;
+		double z = camera.getZoom();
+		Vector2d cursorInSpace = new Vector2d(mouseX-w2, mouseY-h2);
+		cursorInSpace.scale(1.0/z);
+		return new Vector2d(camera.getX()+cursorInSpace.x,
+							-(camera.getY()+cursorInSpace.y));
+	}
+
+	private void setTipXY() {
+		Vector2d p = getMousePositionInWorld();
+		this.setToolTipText((int)p.x + ", " + (int)p.y);
 	}
 
 	/**
