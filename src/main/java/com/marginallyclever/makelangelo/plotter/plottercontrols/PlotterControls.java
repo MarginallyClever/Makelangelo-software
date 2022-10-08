@@ -17,7 +17,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.Serial;
 import java.util.List;
 
@@ -90,19 +89,19 @@ public class PlotterControls extends JPanel {
 		});
 	}
   
-	private void onMarlinEvent(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case MarlinInterface.IDLE ->
+	private void onMarlinEvent(MarlinInterfaceEvent e) {
+		switch (e.getID()) {
+		case MarlinInterfaceEvent.IDLE ->
 				{ if (isRunning) step(); }
-		case MarlinInterface.ERROR,
-			 MarlinInterface.DID_NOT_FIND,
-			 MarlinInterface.COMMUNICATION_FAILURE -> {
-			if (!isErrorAlreadyDisplayed) {
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-				isErrorAlreadyDisplayed = true;
-			}
-		}
-		case MarlinInterface.HOME_XY_FIRST ->
+		case MarlinInterfaceEvent.ERROR,
+				MarlinInterfaceEvent.DID_NOT_FIND,
+				MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
+					if (!isErrorAlreadyDisplayed) {
+						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+						isErrorAlreadyDisplayed = true;
+					}
+				}
+		case MarlinInterfaceEvent.HOME_XY_FIRST ->
 				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
