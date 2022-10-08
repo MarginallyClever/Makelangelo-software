@@ -70,19 +70,12 @@ public class Makelangelo5 implements PlotterRenderer {
 	 * @param robot the machine to draw.
 	 */
 	private void paintLogoFancy(GL2 gl2, Plotter robot) {
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
-
 		final double scale = 0.5;
 		final double TW = 128 * scale;
 		final double TH = 128 * scale;
 
-		final float LOGO_X = ((float) left - (float) right) / 2 - 65; // bottom left corner of safe Area
-		final float LOGO_Y = 0 - 490;
-
-		// final float LOGO_X= 0 - ((float)left - (float)right)/2 - 160; // different
-		// coordinates in the main Wooden Base
-		// final float LOGO_Y= 0 + 470;
+		final float LOGO_X = (float)robot.getLimitLeft() - 65; // bottom left corner of safe Area
+		final float LOGO_Y = (float)robot.getLimitBottom()+10;
 
 		paintTexture(gl2, texture3, LOGO_X, LOGO_Y, TW, TH);
 	}
