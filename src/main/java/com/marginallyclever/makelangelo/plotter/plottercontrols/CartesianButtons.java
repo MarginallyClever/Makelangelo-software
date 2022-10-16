@@ -334,7 +334,7 @@ public class CartesianButtons extends JComponent {
 		PreferencesHelper.start();
 		Translator.start();
 		JFrame frame = new JFrame("CartesianButtons");
-		frame.setLocationRelativeTo(null);
+		frame.setLocationByPlatform(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		CartesianButtons button = new CartesianButtons();
