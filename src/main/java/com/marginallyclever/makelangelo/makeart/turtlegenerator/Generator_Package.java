@@ -10,9 +10,9 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Generator_Package extends TurtleGenerator {
-	int width=200;
-	int length=200;
-	int height=100;
+	private int width=200;
+	private int length=200;
+	private int height=100;
 
 	public Generator_Package() {
 		super();

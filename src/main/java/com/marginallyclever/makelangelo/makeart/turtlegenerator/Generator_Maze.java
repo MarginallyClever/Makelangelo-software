@@ -12,14 +12,14 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_Maze extends TurtleGenerator {
 	// MazeCells are the rooms separted by MazeWalls
-	protected class MazeCell {
+	protected static class MazeCell {
 		int x, y;
 		boolean visited;
 		boolean onStack;
 	}
 
 	// MazeWalls separate MazeCells
-	protected class MazeWall {
+	protected static class MazeWall {
 		int cellA, cellB;
 		boolean removed;
 	}

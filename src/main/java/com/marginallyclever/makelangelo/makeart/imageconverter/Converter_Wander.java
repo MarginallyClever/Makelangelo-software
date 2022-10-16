@@ -28,7 +28,7 @@ public class Converter_Wander extends ImageConverter {
 	static private boolean isCMYK = false;
 	static private double stepSize = 5.0;
 	
-	private class Bucket {
+	private static class Bucket {
 		public Point2D a,b;
 		public LinkedList<Point2D> unsortedPoints;
 		public LinkedList<Point2D> sortedPoints;

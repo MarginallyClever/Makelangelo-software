@@ -10,13 +10,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @author Dan Royer
  */
 public class Generator_KochCurve extends TurtleGenerator {
-	private double xMax = 7;
-	private double xMin = -7;
-	private double yMax = 7;
-	private double yMin = -7;
 	private static int order = 4; // controls complexity of curve
-
-	private double maxSize;
 
 	public Generator_KochCurve() {
 		super();
@@ -48,22 +42,20 @@ public class Generator_KochCurve extends TurtleGenerator {
 	@Override
 	public void generate() {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
-		xMax = v;
-		yMax = v;
-		xMin = -v;
-		yMin = -v;
+		double xMin = -v;
+		double yMin = -v;
 
 		Turtle turtle = new Turtle();
 		
-		double xx = xMax - xMin;
-		double yy = yMax - yMin;
-		maxSize = xx > yy ? xx : yy;
+		double xx = v - xMin;
+		double yy = v - yMin;
+		double maxSize = Math.max(xx, yy);
 		
 		// move to starting position
 		if(myPaper.getPaperWidth() > myPaper.getPaperHeight()) {
-			turtle.moveTo(-xMax,0);
+			turtle.moveTo(-v,0);
 		} else {
-			turtle.moveTo(0,-yMax);
+			turtle.moveTo(0,-v);
 			turtle.turn(90);
 		}
 		

@@ -10,8 +10,6 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -22,10 +20,9 @@ import java.util.ListIterator;
  * @author Dan Royer
  */
 public class Converter_Moire extends ImageConverter {
-	private static final Logger logger = LoggerFactory.getLogger(Converter_Moire.class);
 	private static double blockScale = 4.0f;
 	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
+	private final String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 
 	public Converter_Moire() {
 		super();

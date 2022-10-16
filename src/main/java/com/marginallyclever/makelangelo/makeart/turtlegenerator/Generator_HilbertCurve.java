@@ -11,9 +11,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  */
 public class Generator_HilbertCurve extends TurtleGenerator {
 	private float turtleStep = 10.0f;
-	private double xMax = 7;
-	private double xMin = -7;
-	private double yMax = 7;
 	private static int order = 4; // controls complexity of curve
 
 	public Generator_HilbertCurve() {
@@ -44,17 +41,15 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 	@Override
 	public void generate() {
 		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
-		xMax = v;
-		yMax = v;
-		xMin = -v;
+		double xMin = -v;
 
 		Turtle turtle = new Turtle();
-		turtleStep = (float) ((xMax - xMin) / (Math.pow(2, order)));
+		turtleStep = (float) ((v - xMin) / (Math.pow(2, order)));
 
 		// move to starting position
 		turtle.moveTo(
-				-xMax + turtleStep / 2,
-				-yMax + turtleStep / 2);
+				-v + turtleStep / 2,
+				-v + turtleStep / 2);
 		turtle.penDown();
 		hilbert(turtle,order);
 

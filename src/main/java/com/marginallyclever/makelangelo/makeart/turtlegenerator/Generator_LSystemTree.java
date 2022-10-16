@@ -18,7 +18,6 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	private static int noise = 0;
 	private static double orderScale = 0.76f;
 	private SecureRandom random;
-	float maxSize;
 
 	public Generator_LSystemTree() {
 		super();

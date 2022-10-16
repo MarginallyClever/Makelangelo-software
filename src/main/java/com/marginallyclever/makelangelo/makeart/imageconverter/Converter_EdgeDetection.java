@@ -9,7 +9,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
- * Uses <a href='http://en.wikipedia.org/wiki/Marching_squares'>marching squares</a> to detect edges.
+ * Uses <a href="http://en.wikipedia.org/wiki/Marching_squares">marching squares</a> to detect edges.
  * @author Dan Royer
  * @since 2022-03-31
  */

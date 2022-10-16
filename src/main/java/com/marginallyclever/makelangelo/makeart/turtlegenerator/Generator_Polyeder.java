@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -12,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- * Draws a papercraft Achimedean Solid (https://en.wikipedia.org/wiki/Archimedean_solid).  Cut, crease, fold, and glue to assemble.
+ * Draws a papercraft <a href="https://en.wikipedia.org/wiki/Archimedean_solid">Achimedean Solid</a>.  Cut, crease, fold, and glue to assemble.
  * Model descriptions are recursive path instructions.  for example, {3,3,1,0,3,1,0,3,1,0}.  The first '3' means draw a triangle.  
  * then for each side of that triangle, {3,1,0}, or draw another triangle and add a flap on the first side and nothing on the second.
  * this recursively creates the shapes needed.
@@ -29,7 +28,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 	 * @author Guenther Sohler
 	 * @since 7.24.0
 	 */
-	public class Model {
+	public static class Model {
 		public String name;
 		public int []instructions;
 	}
@@ -39,9 +38,9 @@ public class Generator_Polyeder extends TurtleGenerator {
 	 * @author Guenther Sohler
 	 * @since 7.24.0
 	 */
-	public class Transform {
+	public static class Transform {
 		public Point2D org;
-		public double xabs,yabs,x_x,x_y,y_x,y_y;
+		public double x_x,x_y,y_x,y_y;
 		
 		public Transform()
 		{
@@ -62,7 +61,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 
 		public Transform dup()
 		{
-			Transform t1=new Transform();
+			Transform t1= new Transform();
 			t1.org.x=org.x;
 			t1.org.y=org.y;
 			t1.x_x=x_x;
@@ -171,8 +170,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 		models.add(m);
 	}
 
-	public String [] getModelNames()
-	{
+	public String [] getModelNames() {
 		String [] result = new String[models.size()];
 		for(int i=0;i<models.size();i++)
 		{
@@ -184,7 +182,6 @@ public class Generator_Polyeder extends TurtleGenerator {
 
 	private void geneneratePolygonStep(Turtle turtle,Transform t) {
 		int i;
-		if(models == null) return;
 		if(modelid < 0 || modelid >= models.size()) return;
 		if(instructionPtr >= models.get(modelid).instructions.length) return;
 		int code=models.get(modelid).instructions[instructionPtr++];
@@ -196,14 +193,14 @@ public class Generator_Polyeder extends TurtleGenerator {
 			Point2D abspos;
 
 			pos.x=0;
-			pos.y=size/2;
+			pos.y=size/2f;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
 
 			turtle.penDown();
 
 			pos.x=-flap;
-			pos.y=size/2-flap;
+			pos.y=size/2f-flap;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
 
@@ -212,7 +209,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 			turtle.moveTo(abspos.x,abspos.y);
 
 			pos.x=0;
-			pos.y=-size/2;
+			pos.y=-size/2f;
 			abspos=t.trans(pos);
 			turtle.moveTo(abspos.x,abspos.y);
 

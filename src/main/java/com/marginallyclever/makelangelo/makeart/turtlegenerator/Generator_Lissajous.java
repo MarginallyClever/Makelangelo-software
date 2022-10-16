@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
- * See https://linuxgazette.net/133/luana.html
+ * See <a href="https://linuxgazette.net/133/luana.html">...</a>
  * @author Dan Royer
  *
  */
@@ -84,8 +84,7 @@ public class Generator_Lissajous extends TurtleGenerator {
 	}
 	
 	static public void setNumSamples(int arg0) {
-		if(numSamples<1) numSamples=1;
-		numSamples = arg0;
+		numSamples = Math.max(1,arg0);
 	}
 
 	@Override
@@ -94,14 +93,16 @@ public class Generator_Lissajous extends TurtleGenerator {
 		WIDTH = myPaper.getMarginWidth()/2.0;
 		HEIGHT = myPaper.getMarginHeight()/2.0;
 
-		Turtle turtle = drawLissajous(true);
+		Turtle turtle = drawLissajous();
 
 		notifyListeners(turtle);
 	}
-	
-	// see https://www.openprocessing.org/sketch/26608/
-	// based on code by Javier Romero (http://www.fjromero.com/processing/lissajous/)
-	protected Turtle drawLissajous(boolean write) {
+
+	/**
+	 * see <a href="https://www.openprocessing.org/sketch/26608/">...</a>
+	 * based on <a href="http://www.fjromero.com/processing/lissajous/">code by Javier Romero</a>
+	 */
+	protected Turtle drawLissajous() {
 		double x,y,t;
 
 		//x = AX*sin(a*t + delta) + screen_width/2;

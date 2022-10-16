@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
+ * See also <a href="http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html">...</a>
  * @author Dan Royer
  */
 public class Converter_CMYK_Circles extends ImageConverter {
@@ -45,8 +45,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	}
 	
 	/**
-	 * Passing a value lower than 1 set passes value to 1.
-	 * @param value 
+	 * @param value Must be >=1.
 	 */
 	public void setMaxCircleSize(int value) {
 		maxCircleRadius = Math.max(1, value);
@@ -114,9 +113,6 @@ public class Converter_CMYK_Circles extends ImageConverter {
 			// entire line clipped
 			return;
 		}
-
-		double ox=turtle.getX()-P0.x;
-		double oy=turtle.getY()-P0.y;
 
 		double dx=P1.x-P0.x;
 		double dy=P1.y-P0.y;

@@ -30,11 +30,11 @@ public class Generator_Text extends TurtleGenerator {
 	private static final Logger logger = LoggerFactory.getLogger(Generator_Text.class);
 	
 	// text properties
-	private float kerning = 5.0f;
-	private float letterWidth = 10.0f;
-	private float letterHeight = 20.0f;
-	private float lineSpacing = 5.0f;
-	private float padding = 5.0f;
+	private static float kerning = 5.0f;
+	private static float letterWidth = 10.0f;
+	private static float letterHeight = 20.0f;
+	private static float lineSpacing = 5.0f;
+	private static float padding = 5.0f;
 	static final String ALPHABET_FOLDER = "ALPHABET/";
 	private int charsPerLine = 25;
 	private boolean draw_bounding_box = false;
@@ -54,13 +54,12 @@ public class Generator_Text extends TurtleGenerator {
 	private static String lastMessage = "";
 	private static int lastFont = 0;
 	private static int lastSize = 20;
-	private static Font [] fontList;
 	private static String [] fontNames;
 	
 	public Generator_Text() {		
 		// build list of fonts
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		fontList = ge.getAllFonts();
+		Font[] fontList = ge.getAllFonts();
 		fontNames = new String[fontList.length];
 		
 		Locale locale = Locale.getDefault();
@@ -124,31 +123,23 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	protected void setupTransform() {
-		double imageHeight = myPaper.getMarginHeight();
-		double imageWidth = myPaper.getMarginWidth();
-		setupTransform(imageHeight,imageWidth);
+		setupTransform(myPaper.getMarginHeight(),myPaper.getMarginWidth());
 	}
 
 
 	protected void setupTransform(double width, double height) {
-		double imageHeight = height;
-		double imageWidth = width;
-
-		double newWidth = imageWidth;
-		double newHeight = imageHeight;
-
-		if (imageWidth > myPaper.getMarginWidth()) {
-			float resize = (float) myPaper.getMarginWidth() / (float) imageWidth;
-			newHeight *= resize;
-			newWidth = myPaper.getMarginWidth();
+		if (width > myPaper.getMarginWidth()) {
+			float resize = (float) myPaper.getMarginWidth() / (float) width;
+			height *= resize;
+			width = myPaper.getMarginWidth();
 		}
-		if (newHeight > myPaper.getMarginHeight()) {
-			float resize = (float) myPaper.getMarginHeight() / (float) newHeight;
-			newWidth *= resize;
-			newHeight = myPaper.getMarginHeight();
+		if (height > myPaper.getMarginHeight()) {
+			float resize = (float) myPaper.getMarginHeight() / (float) height;
+			width *= resize;
+			//height = myPaper.getMarginHeight();
 		}
 
-		textFindCharsPerLine(newWidth);
+		textFindCharsPerLine(width);
 
 		posx = 0;
 		posy = 0;
@@ -219,74 +210,74 @@ public class Generator_Text extends TurtleGenerator {
 		float n,i;
 		n = 5;
 		
-		while(pi.isDone() == false ) {
+		while(!pi.isDone()) {
 			int type = pi.currentSegment(coords);
-			switch(type) {
-			case PathIterator.SEG_CLOSE:
-				//logger.debug("CLOSE");
-				turtle.moveTo(start[0]-dx, -start[1]-dy);
-				turtle.penUp();
-				coords2[0] = coords[0];
-				coords2[1] = coords[1];
-				break;
-			case PathIterator.SEG_LINETO:
-				//logger.debug("DRAW_LINE");
-				turtle.moveTo(coords[0]-dx, -coords[1]-dy);
-				coords2[0] = coords[0];
-				coords2[1] = coords[1];
-				break;
-			case PathIterator.SEG_MOVETO:
-				//logger.debug("MOVE");
-				// move without drawing
-				start[0] = coords2[0] = coords[0];
-				start[1] = coords2[1] = coords[1];
-				turtle.jumpTo(start[0]-dx, -start[1]-dy);
-				break;
-			case PathIterator.SEG_CUBICTO:
-				//P(t) = B(3,0)*CP + B(3,1)*P1 + B(3,2)*P2 + B(3,3)*P3
-				//0 <= t <= 1
-				//B(n,m) = mth coefficient of nth degree Bernstein polynomial
-	            //   = C(n,m) * t^(m) * (1 - t)^(n-m)
-				//C(n,m) = Combinations of n things, taken m at a time
-	            //   = n! / (m! * (n-m)!)
-				
-				// B(3,0) = (1 - t)^3
-				// B(3,1) = 3 * t * (1 - t)^2
-				// B(3,2) = 3 * t^2 * (1 - t)
-				// B(3,3) = t^3
-				//logger.debug("CUBIC");
-				for(i=0;i<n;++i) {
-					float t = i/n;
-					float t1 = (1.0f-t);
-					float a = t1*t1*t1;
-					float b = 3*t*t1*t1;
-					float c = 3*t*t*t1;
-					float d = t*t*t;
-					float x = coords2[0]*a + coords[0]*b + coords[2]*c + coords[4]*d;
-					float y = coords2[1]*a + coords[1]*b + coords[3]*c + coords[5]*d;
-					turtle.moveTo(x-dx,-y-dy);
+			switch (type) {
+				case PathIterator.SEG_CLOSE -> {
+					//logger.debug("CLOSE");
+					turtle.moveTo(start[0] - dx, -start[1] - dy);
+					turtle.penUp();
+					coords2[0] = coords[0];
+					coords2[1] = coords[1];
 				}
-				turtle.moveTo(coords[4]-dx,-coords[5]-dy);
-				coords2[0] = coords[4];
-				coords2[1] = coords[5];
-				break;
-			case PathIterator.SEG_QUADTO:
-				//logger.debug("QUAD");
-				for(i=0;i<n;++i) {
-					float t = i/n;
-					//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
-					float u = (1.0f-t);
-					float tt=u*u;
-					float ttt=2.0f*t*u;
-					float tttt=t*t;
-					float x = coords2[0]*tt + (coords[0]*ttt) + (coords[2]*tttt);
-					float y = coords2[1]*tt + (coords[1]*ttt) + (coords[3]*tttt);
-					turtle.moveTo(x-dx,-y-dy);
+				case PathIterator.SEG_LINETO -> {
+					//logger.debug("DRAW_LINE");
+					turtle.moveTo(coords[0] - dx, -coords[1] - dy);
+					coords2[0] = coords[0];
+					coords2[1] = coords[1];
 				}
-				turtle.moveTo(coords[2]-dx,-coords[3]-dy);
-				coords2[0] = coords[2];
-				coords2[1] = coords[3];
-				break;
+				case PathIterator.SEG_MOVETO -> {
+					//logger.debug("MOVE");
+					// move without drawing
+					start[0] = coords2[0] = coords[0];
+					start[1] = coords2[1] = coords[1];
+					turtle.jumpTo(start[0] - dx, -start[1] - dy);
+				}
+				case PathIterator.SEG_CUBICTO -> {
+					//P(t) = B(3,0)*CP + B(3,1)*P1 + B(3,2)*P2 + B(3,3)*P3
+					//0 <= t <= 1
+					//B(n,m) = mth coefficient of nth degree Bernstein polynomial
+					//   = C(n,m) * t^(m) * (1 - t)^(n-m)
+					//C(n,m) = Combinations of n things, taken m at a time
+					//   = n! / (m! * (n-m)!)
+
+					// B(3,0) = (1 - t)^3
+					// B(3,1) = 3 * t * (1 - t)^2
+					// B(3,2) = 3 * t^2 * (1 - t)
+					// B(3,3) = t^3
+					//logger.debug("CUBIC");
+					for (i = 0; i < n; ++i) {
+						float t = i / n;
+						float t1 = (1.0f - t);
+						float a = t1 * t1 * t1;
+						float b = 3 * t * t1 * t1;
+						float c = 3 * t * t * t1;
+						float d = t * t * t;
+						float x = coords2[0] * a + coords[0] * b + coords[2] * c + coords[4] * d;
+						float y = coords2[1] * a + coords[1] * b + coords[3] * c + coords[5] * d;
+						turtle.moveTo(x - dx, -y - dy);
+					}
+					turtle.moveTo(coords[4] - dx, -coords[5] - dy);
+					coords2[0] = coords[4];
+					coords2[1] = coords[5];
+				}
+				case PathIterator.SEG_QUADTO -> {
+					//logger.debug("QUAD");
+					for (i = 0; i < n; ++i) {
+						float t = i / n;
+						//(1-t)²*P0 + 2t*(1-t)*P1 + t²*P2
+						float u = (1.0f - t);
+						float tt = u * u;
+						float ttt = 2.0f * t * u;
+						float tttt = t * t;
+						float x = coords2[0] * tt + (coords[0] * ttt) + (coords[2] * tttt);
+						float y = coords2[1] * tt + (coords[1] * ttt) + (coords[3] * tttt);
+						turtle.moveTo(x - dx, -y - dy);
+					}
+					turtle.moveTo(coords[2] - dx, -coords[3] - dy);
+					coords2[0] = coords[2];
+					coords2[1] = coords[3];
+				}
 			}
 			pi.next();
 		}
@@ -315,8 +306,8 @@ public class Generator_Text extends TurtleGenerator {
 		align_horizontal = x;
 	}
 
-	public void textSetVAlign(VAlign x) {
-		align_vertical = x;
+	public void textSetVAlign(VAlign y) {
+		align_vertical = y;
 	}
 
 
@@ -347,33 +338,33 @@ public class Generator_Text extends TurtleGenerator {
 		float xmax = 0, xmin = 0, ymax = 0, ymin = 0;
 
 		switch (align_horizontal) {
-		case LEFT:
-			xmax = posx + w;
-			xmin = posx;
-			break;
-		case CENTER:
-			xmax = posx + w / 2;
-			xmin = posx - w / 2;
-			break;
-		case RIGHT:
-			xmax = posx;
-			xmin = posx - w;
-			break;
+			case LEFT -> {
+				xmax = posx + w;
+				xmin = posx;
+			}
+			case CENTER -> {
+				xmax = posx + w / 2;
+				xmin = posx - w / 2;
+			}
+			case RIGHT -> {
+				xmax = posx;
+				xmin = posx - w;
+			}
 		}
 
 		switch (align_vertical) {
-		case BOTTOM:
-			ymax = posy + h;
-			ymin = posy;
-			break;
-		case MIDDLE:
-			ymax = posy + h / 2;
-			ymin = posy - h / 2;
-			break;
-		case TOP:
-			ymax = posy;
-			ymin = posy - h;
-			break;
+			case BOTTOM -> {
+				ymax = posy + h;
+				ymin = posy;
+			}
+			case MIDDLE -> {
+				ymax = posy + h / 2;
+				ymin = posy - h / 2;
+			}
+			case TOP -> {
+				ymax = posy;
+				ymin = posy - h;
+			}
 		}
 		/*
 	    logger.debug("{} lines", num_lines);
@@ -471,8 +462,6 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	private void textDrawLine(Turtle turtle,String a1) {
-		String ud = ALPHABET_FOLDER;
-
 		logger.debug("{} ({})", a1, a1.length());
 		
 		int i = 0;
@@ -487,47 +476,45 @@ public class Generator_Text extends TurtleGenerator {
 			if ('a' <= letter && letter <= 'z') {
 				name = "SMALL_" + Character.toUpperCase(letter);
 			} else {
-				switch (letter) {
-				case ' ':					name = "SPACE";					break;
-				case '!':					name = "EXCLAMATION";			break;
-				case '"':					name = "DOUBLEQ";				break;
-				case '$':					name = "DOLLAR";				break;
-				case '#':					name = "POUND";					break;
-				case '%':					name = "PERCENT";				break;
-				case '&':					name = "AMPERSAND";				break;
-				case '\'':					name = "SINGLEQ";				break;
-				case '(':					name = "B1OPEN";				break;
-				case ')':					name = "B1CLOSE";				break;
-				case '*':					name = "ASTERIX";				break;
-				case '+':					name = "PLUS";					break;
-				case ',':					name = "COMMA";					break;
-				case '-':					name = "HYPHEN";				break;
-				case '.':					name = "PERIOD";				break;
-				case '/':					name = "FSLASH";				break;
-				case ':':					name = "COLON";					break;
-				case ';':					name = "SEMICOLON";				break;
-				case '<':					name = "GREATERTHAN";			break;
-				case '=':					name = "EQUAL";					break;
-				case '>':					name = "LESSTHAN";				break;
-				case '?':					name = "QUESTION";				break;
-				case '@':					name = "AT";					break;
-				case '[':					name = "B2OPEN";				break;
-				case ']':					name = "B2CLOSE";				break;
-				case '^':					name = "CARET";					break;
-				case '_':					name = "UNDERSCORE";			break;
-				case '`':					name = "GRAVE";					break;
-				case '{':					name = "B3OPEN";				break;
-				case '|':					name = "BAR";					break;
-				case '}':					name = "B3CLOSE";				break;
-				case '~':					name = "TILDE";					break;
-				case '\\':					name = "BSLASH";				break;
-				case '…':					name = "SPACE";					break;
-				default:
-					name = Character.toString(letter);
-					break;
-				}
+				name = switch (letter) {
+					case ' ' -> "SPACE";
+					case '!' -> "EXCLAMATION";
+					case '"' -> "DOUBLEQ";
+					case '$' -> "DOLLAR";
+					case '#' -> "POUND";
+					case '%' -> "PERCENT";
+					case '&' -> "AMPERSAND";
+					case '\'' -> "SINGLEQ";
+					case '(' -> "B1OPEN";
+					case ')' -> "B1CLOSE";
+					case '*' -> "ASTERIX";
+					case '+' -> "PLUS";
+					case ',' -> "COMMA";
+					case '-' -> "HYPHEN";
+					case '.' -> "PERIOD";
+					case '/' -> "FSLASH";
+					case ':' -> "COLON";
+					case ';' -> "SEMICOLON";
+					case '<' -> "GREATERTHAN";
+					case '=' -> "EQUAL";
+					case '>' -> "LESSTHAN";
+					case '?' -> "QUESTION";
+					case '@' -> "AT";
+					case '[' -> "B2OPEN";
+					case ']' -> "B2CLOSE";
+					case '^' -> "CARET";
+					case '_' -> "UNDERSCORE";
+					case '`' -> "GRAVE";
+					case '{' -> "B3OPEN";
+					case '|' -> "BAR";
+					case '}' -> "B3CLOSE";
+					case '~' -> "TILDE";
+					case '\\' -> "BSLASH";
+					case '…' -> "SPACE";
+					default -> Character.toString(letter);
+				};
 			}
-			String fn = ud + name + ".NGC";
+			String fn = ALPHABET_FOLDER + name + ".NGC";
 			final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fn);
 			if (inputStream != null) {
 				if (i > 0 && kerning != 0) {
@@ -541,27 +528,23 @@ public class Generator_Text extends TurtleGenerator {
 						if (b.trim().length() == 0)
 							continue;
 						switch (b) {
-						case "UP":
-							turtle.penUp();
-							break;
-						case "DOWN":
-							turtle.penDown();
-							break;
-						default:
-							StringTokenizer st = new StringTokenizer(b);
-							while (st.hasMoreTokens()) {
-								String c = st.nextToken();
-								if (c.startsWith("X")) {
-									// translate coordinates
-									final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									turtle.moveTo(turtle.getX()+x, turtle.getY());
-								} else if (c.startsWith("Y")) {
-									// translate coordinates
-									final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
-									turtle.moveTo(turtle.getX(), turtle.getY()+y);
+							case "UP" -> turtle.penUp();
+							case "DOWN" -> turtle.penDown();
+							default -> {
+								StringTokenizer st = new StringTokenizer(b);
+								while (st.hasMoreTokens()) {
+									String c = st.nextToken();
+									if (c.startsWith("X")) {
+										// translate coordinates
+										final float x = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+										turtle.moveTo(turtle.getX() + x, turtle.getY());
+									} else if (c.startsWith("Y")) {
+										// translate coordinates
+										final float y = Float.parseFloat(c.substring(1)) * 10; // cm to mm
+										turtle.moveTo(turtle.getX(), turtle.getY() + y);
+									}
 								}
 							}
-							break;
 						}
 					}
 				}

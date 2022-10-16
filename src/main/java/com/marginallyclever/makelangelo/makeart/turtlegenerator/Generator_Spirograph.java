@@ -10,7 +10,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
- * See https://linuxgazette.net/133/luana.html
+ * See <a href="https://linuxgazette.net/133/luana.html">Plotting the spirograph equations with 'gnuplot'</a>
  * @author Dan Royer
  *
  */
@@ -138,8 +138,8 @@ public class Generator_Spirograph extends TurtleGenerator {
 
 		// https://www.reddit.com/r/math/comments/27nz3l/how_do_i_calculate_the_periodicity_of_a/
 		// https://stackoverflow.com/questions/4201860/how-to-find-gcd-lcm-on-a-set-of-numbers
-		double period = lcm(majorRadius,minorRadius)/majorRadius;
-		double periodRadians = Math.PI*2.0*(double)period/(double)numSamples;
+		long period = lcm(majorRadius,minorRadius) / majorRadius;
+		double periodRadians = Math.PI*2.0*(double)period / (double)numSamples;
 		
 		for(float t1 = 0; t1<=numSamples;++t1) {
 			t = (float)( t1 * periodRadians );
@@ -153,10 +153,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	}
 	
 	/**
-	 * greatest common divider
-	 * @param a
-	 * @param b
-	 * @return greatest common divider
+	 * @return greatest common divider of 'a' and 'b'
 	 */
 	private static long gcd(long a, long b) {
 		long temp;
@@ -169,10 +166,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	}
 	
 	/**
-	 * least common multiplier
-	 * @param a
-	 * @param b
-	 * @return least common multiplier
+	 * @return least common multiplier of 'a' and 'b'
 	 */
 	private static long lcm(long a, long b) {
 	    return a * (b / gcd(a, b));

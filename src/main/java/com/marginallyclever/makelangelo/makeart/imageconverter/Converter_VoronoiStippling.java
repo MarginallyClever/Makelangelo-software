@@ -26,8 +26,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Voronoi graph based stippling.
- * See http://en.wikipedia.org/wiki/Fortune%27s_algorithm
- * See http://skynet.ie/~sos/mapviewer/voronoi.php
+ * See <a href="http://en.wikipedia.org/wiki/Fortune%27s_algorithm">...</a>
+ * See <a href="http://skynet.ie/~sos/mapviewer/voronoi.php">...</a>
  * @author Dan
  * @since 7.0.0?
  */
@@ -39,7 +39,7 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	private static double minDotSize = 0.5;
 	private static int lowpassCutoff = 128;
 	private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
-	private List<VoronoiCell> cells = new ArrayList<>();
+	private final List<VoronoiCell> cells = new ArrayList<>();
 
 	private final Lock lock = new ReentrantLock();
 
@@ -243,7 +243,6 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		gl2.glColor3d(0.9, 0.9, 0.9);
 
 		for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
-			boolean first = true;
 			Polygon poly = voronoiDiagram.getHull(i);
 			gl2.glBegin(GL2.GL_LINE_LOOP);
 			for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
@@ -302,10 +301,7 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 	private void turtleCircle(double x, double y, double r) {
 		if(r<1) return;
 
-		double toolDiameter = 1;
-
 		int detail = (int)Math.max(4, Math.min(20,Math.ceil((r) * Math.PI * 2.0)));
-		Coordinate [] coordinates = new Coordinate[detail+1];
 
 		double r2 = r-0.5;
 
@@ -322,7 +318,7 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		try {
 			turtle.add(circle);
 			turtle.add(filler.run(circle));
-		} catch(Exception e) {}
+		} catch(Exception ignored) {}
 	}
 
 	public void setNumCells(int value) {

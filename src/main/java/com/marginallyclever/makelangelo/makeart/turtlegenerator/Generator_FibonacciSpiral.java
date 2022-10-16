@@ -17,8 +17,6 @@ import java.util.Stack;
 public class Generator_FibonacciSpiral extends TurtleGenerator {
 	private static final Logger logger = LoggerFactory.getLogger(Generator_FibonacciSpiral.class);
 
-	private float xMax = 70;
-	private float yMax = 70;
 	private static int order = 7; // controls complexity of curve
 
 	private final Stack<Integer> fibonacciSequence = new Stack<>();
@@ -59,8 +57,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		xMax = (float)(myPaper.getMarginWidth () /2.0f);
-		yMax = (float)(myPaper.getMarginHeight() /2.0f);
+		float xMax = (float) (myPaper.getMarginWidth() / 2.0f);
+		float yMax = (float) (myPaper.getMarginHeight() / 2.0f);
 		logger.debug("xMax={}", xMax);
 		logger.debug("yMax={}", yMax);
 		
@@ -84,10 +82,10 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		// move to starting position
 		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
 		logger.debug("shortSide={}", shortSide);
-		if( xMax < yMax ) {
+		if( xMax < yMax) {
 			logger.debug("tall thin");
 			// tall thin paper, top left corner
-			turtle.moveTo(shortSide,yMax);
+			turtle.moveTo(shortSide, yMax);
 			turtle.turn(180);
 		} else {
 			logger.debug("short wide");
