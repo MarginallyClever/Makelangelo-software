@@ -7,8 +7,10 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.io.Serial;
 
 public class ChangeToolPanel extends JPanel {
+	@Serial
 	private static final long serialVersionUID = 2253826545484233479L;
 
 	public ChangeToolPanel(int toolNumber) {
