@@ -38,12 +38,6 @@ public class PlotterControls extends JPanel {
 	public static final int DIMENSION_PANEL_WIDTH = 850;
 	public static final int DIMENSION_PANEL_HEIGHT = 210;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
-
-	public static final String PROMPT_BEGIN = "prompt_begin";
-	public static final String PROMPT_CHOICE = "prompt_choice";
-	public static final String PROMPT_BUTTON = "prompt_button";
-	public static final String PROMPT_SHOW = "prompt_show";
-	public static final String PROMPT_END = "prompt_end";
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;
@@ -62,10 +56,6 @@ public class PlotterControls extends JPanel {
 	private boolean isRunning = false;
 	private boolean penIsUpBeforePause = false;
 	private boolean isErrorAlreadyDisplayed = false;
-
-	private boolean waitingForGodot = false;
-
-	private final ActionCommandDialog promptDialog = new ActionCommandDialog();
 
 	public PlotterControls(Plotter plotter, Turtle turtle, Window parentWindow) {
 		super();
@@ -92,62 +82,30 @@ public class PlotterControls extends JPanel {
 		marlinInterface.addListener(this::onMarlinEvent);
 
 		myPlotter.addPlotterEventListener((e)-> {
-			switch(e.type) {
-				case PlotterEvent.HOME_FOUND:
-					updateButtonStatusConnected();
-					break;
-				case PlotterEvent.TOOL_CHANGE:
-					waitingForGodot = true;
-					break;
-				default:
-					break;
+			switch (e.type) {
+				case PlotterEvent.HOME_FOUND -> updateButtonStatusConnected();
+				default -> {}
 			}
 		});
 	}
   
 	private void onMarlinEvent(MarlinInterfaceEvent e) {
 		switch (e.getID()) {
-		case MarlinInterfaceEvent.IDLE -> {
-				if (isRunning && !waitingForGodot) step();
-			}
-		case MarlinInterfaceEvent.ERROR,
-				MarlinInterfaceEvent.DID_NOT_FIND,
-				MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
-					if (!isErrorAlreadyDisplayed) {
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-						isErrorAlreadyDisplayed = true;
-					}
+			case MarlinInterfaceEvent.IDLE -> {
+					if (isRunning) step();
 				}
-		case MarlinInterfaceEvent.HOME_XY_FIRST ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
-		case MarlinInterfaceEvent.ACTION_COMMAND ->
-				processActionCommand(e.getActionCommand());
+			case MarlinInterfaceEvent.ERROR,
+					MarlinInterfaceEvent.DID_NOT_FIND,
+					MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
+						if (!isErrorAlreadyDisplayed) {
+							JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+							isErrorAlreadyDisplayed = true;
+						}
+					}
+			case MarlinInterfaceEvent.HOME_XY_FIRST ->
+					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
-	}
-
-
-	private void processActionCommand(String actionCommand) {
-		if(actionCommand.startsWith(PROMPT_BEGIN)) {
-			promptDialog.setPromptMessage(actionCommand.substring(PROMPT_BEGIN.length()));
-			promptDialog.clearPrompts();
-		} else if(actionCommand.startsWith(PROMPT_CHOICE))
-			promptDialog.addOption(actionCommand.substring(PROMPT_CHOICE.length()).trim());
-		else if(actionCommand.startsWith(PROMPT_BUTTON)) {
-			promptDialog.addOption(actionCommand.substring(PROMPT_BUTTON.length()).trim());
-		} else if(actionCommand.startsWith(PROMPT_SHOW)) {
-			promptDialog.run(this, Translator.get("PlotterControls.InfoTitle"),(result)-> {
-				marlinInterface.queueAndSendCommand("M876 S" + Math.max(0,result));
-				waitingForGodot = false;
-			});
-		} else if(actionCommand.startsWith(PROMPT_END)) {
-			if(promptDialog.isOpen()) {
-				// close the dialog because user clicked dial on robot LCD.
-				promptDialog.close();
-				waitingForGodot = false;
-				if (isRunning) step();
-			}
-		}
 	}
 
 	private JPanel getButtonsPanels() {
