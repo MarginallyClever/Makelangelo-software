@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.tools;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+@Deprecated
 public class RotateTurtle {
 	public static void run(Turtle turtle,double degrees) {
 		double r=Math.toRadians(degrees);

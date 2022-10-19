@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
 	

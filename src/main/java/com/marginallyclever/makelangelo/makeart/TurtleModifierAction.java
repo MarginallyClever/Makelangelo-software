@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * @author Dan Royer
  * @since 7.31.0
  */
-@SuppressWarnings("serial") // Same-version serialization only
 public abstract class TurtleModifierAction extends AbstractAction {
 	private final ArrayList<TurtleModifierListener> listeners = new ArrayList<TurtleModifierListener>();
 	private Makelangelo myMakelangelo;
