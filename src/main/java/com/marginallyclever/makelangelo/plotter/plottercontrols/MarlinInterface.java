@@ -293,7 +293,7 @@ public class MarlinInterface extends JPanel {
 		else if(actionCommand.startsWith(PROMPT_BUTTON)) {
 			promptDialog.addOption(actionCommand.substring(PROMPT_BUTTON.length()).trim());
 		} else if(actionCommand.startsWith(PROMPT_SHOW)) {
-			promptDialog.run(this, Translator.get("PlotterControls.InfoTitle"),(result)-> {
+			promptDialog.run(this, Translator.get("InfoTitle"),(result)-> {
 				queueAndSendCommand("M876 S" + Math.max(0,result));
 				waitingForResponse = false;
 				fireIdleNotice();
