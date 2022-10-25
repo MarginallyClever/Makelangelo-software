@@ -73,9 +73,7 @@ public class Generator_GridFit extends TurtleGenerator {
 	@Override
 	public void generate() {
 		double myMargin = margin.getValue();
-		double yMin = myPaper.getPaperBottom()+myMargin;
 		double xMin = myPaper.getPaperLeft()+myMargin;
-		double yMax = myPaper.getPaperTop()-myMargin;
 		double xMax = myPaper.getPaperRight()-myMargin;
 
 		Turtle turtle = new Turtle();

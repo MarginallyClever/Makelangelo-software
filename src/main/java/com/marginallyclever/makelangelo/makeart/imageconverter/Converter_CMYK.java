@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * See also http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html
+ * See also <a href="http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html">...</a>
  * @author Dan Royer
  */
 public class Converter_CMYK extends ImageConverter {
@@ -42,8 +42,7 @@ public class Converter_CMYK extends ImageConverter {
 	}
 	
 	/**
-	 * Passing a value lower than 1 set passes value to 1.
-	 * @param value 
+	 * @param value number of passes to make.  Must be >=1.
 	 */
 	public void setPasses(int value) {
 		passes = Math.max(1, value);

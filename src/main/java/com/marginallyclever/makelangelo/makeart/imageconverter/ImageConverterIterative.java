@@ -45,8 +45,7 @@ public abstract class ImageConverterIterative extends ImageConverter {
     }
 
     public boolean isThreadCancelled() {
-        if(imageConverterThread!=null && imageConverterThread.isCancelled()) return true;
-        return false;
+        return imageConverterThread != null && imageConverterThread.isCancelled();
     }
 
     public void setThread(ImageConverterThread p) {

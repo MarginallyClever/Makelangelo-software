@@ -73,7 +73,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 			// do the largest circle that still fits in the margin.
 			float w = (float)(myPaper.getMarginWidth())/2.0f;
 			float h = (float)(myPaper.getMarginHeight())/2.0f;
-			maxr = (float)( h < w ? h : w );
+			maxr = Math.min(h, w);
 		}
 		
 		double r = maxr - toolDiameter*5.0f, f;

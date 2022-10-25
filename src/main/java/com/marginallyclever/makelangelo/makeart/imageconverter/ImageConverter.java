@@ -191,7 +191,7 @@ public abstract class ImageConverter {
 	}
 
 	// Observer pattern notified when a converter has finished a job.
-	private List<ImageConverterListener> listeners = new ArrayList<>();
+	private final List<ImageConverterListener> listeners = new ArrayList<>();
 
 	public void addImageConverterListener(ImageConverterListener listener) {
 		listeners.add(listener);

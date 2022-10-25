@@ -11,8 +11,8 @@ import java.io.Serial;
 import java.util.ArrayList;
 
 /**
- * Performs Douglas-Peucker line simplification.
- * see https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+ * Performs <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Douglas-Peucker
+ * line simplification</a>.
  * @author Dan Royer
  * @since 7.31.0
  */
@@ -51,8 +51,8 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 	/**
 	 * Split the collection by color, then by travel moves to get contiguous blocks in a single color.
 	 * simplify these blocks using Douglas-Peucker method. 
-	 * @param originalLines
-	 * @return
+	 * @param originalLines the lines to simplify
+	 * @return the simplified lines
 	 */
 	private LineCollection removeColinearSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();

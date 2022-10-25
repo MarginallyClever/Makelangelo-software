@@ -25,9 +25,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Dithering using a particle system
- * 
- * @author Dan http://en.wikipedia.org/wiki/Fortune%27s_algorithm
- *         http://skynet.ie/~sos/mapviewer/voronoi.php
+ * See <a href="http://en.wikipedia.org/wiki/Fortune%27s_algorithm">...</a>
+ * See <a href="http://skynet.ie/~sos/mapviewer/voronoi.php">...</a>
+ * @author Dan
  * @since 7.0.0?
  */
 public class Converter_VoronoiZigZag extends ImageConverterIterative implements PreviewListener {
@@ -289,10 +289,8 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 
 	/**
 	 * we have s1,s2...e-1,e.  check if s1,e-1..(flip everything)...s2,e is shorter
-	 * @return true if something was improved.
 	 */
-	public boolean flipTests() {
-		boolean once = false;
+	public void flipTests() {
 		int start, end, j, bestIndex;
 		double bestDiff;
 
@@ -321,7 +319,6 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 			}
 
 			if (bestIndex != -1 && !isThreadCancelled()) {
-				once = true;
 				// do the flip
 				int begin = start + 1;
 				int finish = bestIndex;
@@ -336,13 +333,13 @@ public class Converter_VoronoiZigZag extends ImageConverterIterative implements 
 				}
 			}
 		}
-		return once;
 	}
 
 	/**
 	 * Returns the travel distance of the solution path.
 	 * @return the travel distance of the solution path.
 	 */
+	@Deprecated
 	private double getTourLength() {
 		if(solution.size()<2) return 0;
 

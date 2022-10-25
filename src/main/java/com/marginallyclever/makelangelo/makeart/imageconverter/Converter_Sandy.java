@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 
+ * based on polagraph style by Sandy Noble.
  * @author Dan Royer
  */
 public class Converter_Sandy extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_Sandy.class);
 	private static int blockScale=150;
 	private static int direction=0;
-	private String [] directionChoices = new String[] { 
+	private final String [] directionChoices = new String[] {
 		Translator.get("top right"),
 		Translator.get("top left"), 
 		Translator.get("bottom left"), 
@@ -72,13 +72,38 @@ public class Converter_Sandy extends ImageConverter {
 		double last_x=0,last_y=0;
 
 		boolean wasDrawing=false;
-		
-		switch(direction) {
-		case 0:		cx = xRight;	cy = yTop;		last_x = pRight; 	last_y = pTop;		break;
-		case 1:		cx = xLeft;		cy = yTop;		last_x = pLeft; 	last_y = pTop;		break;
-		case 2:		cx = xLeft;		cy = yBottom;	last_x = pLeft; 	last_y = pBottom;	break;
-		case 3:		cx = xRight;	cy = yBottom;	last_x = pRight; 	last_y = pBottom;	break;
-		default:	cx = 0;			cy = 0;			last_x = 0;      	last_y = 0;			break;
+
+		switch (direction) {
+			case 0 -> {
+				cx = xRight;
+				cy = yTop;
+				last_x = pRight;
+				last_y = pTop;
+			}
+			case 1 -> {
+				cx = xLeft;
+				cy = yTop;
+				last_x = pLeft;
+				last_y = pTop;
+			}
+			case 2 -> {
+				cx = xLeft;
+				cy = yBottom;
+				last_x = pLeft;
+				last_y = pBottom;
+			}
+			case 3 -> {
+				cx = xRight;
+				cy = yBottom;
+				last_x = pRight;
+				last_y = pBottom;
+			}
+			default -> {
+				cx = 0;
+				cy = 0;
+				last_x = 0;
+				last_y = 0;
+			}
 		}
 
 		double x, y, z, scaleZ;
@@ -131,7 +156,7 @@ public class Converter_Sandy extends ImageConverter {
 					if(z>255) z=255;
 					scaleZ = (255.0 -  z) / 255.0;
 	
-					if(wasDrawing == false) {
+					if(!wasDrawing) {
 						turtle.jumpTo(last_x,last_y);
 						wasDrawing=true;
 					}

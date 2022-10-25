@@ -56,7 +56,6 @@ public class Generator_FillPage extends TurtleGenerator {
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
-
 		// from top to bottom of the margin area...
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop()   ;
@@ -76,29 +75,28 @@ public class Generator_FillPage extends TurtleGenerator {
 		
 		int i=0;
 		if ( penDiameter > 0 ){
-                    for(double a = -radius;a<radius;a+=penDiameter) {
-                            double majorPX = majorX * a;
-                            double majorPY = majorY * a;
-                            P0.set( majorPX - majorY * radius,
-                                            majorPY + majorX * radius);
-                            P1.set( majorPX + majorY * radius,
-                                            majorPY - majorX * radius);
-                            if(Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
-                                    if ((i % 2) == 0) 	{
-                                            turtle.moveTo(P0.x,P0.y);
-                                            turtle.penDown();
-                                            turtle.moveTo(P1.x,P1.y);
-                                    } else {
-                                            turtle.moveTo(P1.x,P1.y);
-                                            turtle.penDown();
-                                            turtle.moveTo(P0.x,P0.y);
-                                    }
-                            }
-                            ++i;
-                    }
-                }else{
-                    // TODO throw error message "penDiameter must be greater than zero."
-                }
+			for(double a = -radius;a<radius;a+=penDiameter) {
+				double majorPX = majorX * a;
+				double majorPY = majorY * a;
+				P0.set( majorPX - majorY * radius,
+								majorPY + majorX * radius);
+				P1.set( majorPX + majorY * radius,
+								majorPY - majorX * radius);
+				if(Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
+					if ((i % 2) == 0) 	{
+						turtle.moveTo(P0.x,P0.y);
+						turtle.penDown();
+						turtle.moveTo(P1.x,P1.y);
+					} else {
+						turtle.moveTo(P1.x,P1.y);
+						turtle.penDown();
+						turtle.moveTo(P0.x,P0.y);
+					}
+				}
+				++i;
+			}
+		}
+		// else throw error message "penDiameter must be greater than zero."
 
 		notifyListeners(turtle);
 	}

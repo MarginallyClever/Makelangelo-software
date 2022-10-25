@@ -22,5 +22,4 @@ public class FlipTurtleAction extends TurtleModifierAction {
 		out.scale(scaleX, scaleY);
 		return out;
 	}
-
 }

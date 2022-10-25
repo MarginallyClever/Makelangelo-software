@@ -17,7 +17,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.Serial;
 import java.util.List;
 
@@ -39,7 +38,6 @@ public class PlotterControls extends JPanel {
 	public static final int DIMENSION_PANEL_WIDTH = 850;
 	public static final int DIMENSION_PANEL_HEIGHT = 210;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
-
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
 	private final JogInterface jogInterface;
@@ -84,26 +82,28 @@ public class PlotterControls extends JPanel {
 		marlinInterface.addListener(this::onMarlinEvent);
 
 		myPlotter.addPlotterEventListener((e)-> {
-			if (e.type == PlotterEvent.HOME_FOUND) {
-				updateButtonStatusConnected();
+			switch (e.type) {
+				case PlotterEvent.HOME_FOUND -> updateButtonStatusConnected();
+				default -> {}
 			}
 		});
 	}
   
-	private void onMarlinEvent(ActionEvent e) {
-		switch (e.getActionCommand()) {
-		case MarlinInterface.IDLE ->
-				{ if (isRunning) step(); }
-		case MarlinInterface.ERROR,
-			 MarlinInterface.DID_NOT_FIND,
-			 MarlinInterface.COMMUNICATION_FAILURE -> {
-			if (!isErrorAlreadyDisplayed) {
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-				isErrorAlreadyDisplayed = true;
-			}
-		}
-		case MarlinInterface.HOME_XY_FIRST ->
-				JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
+	private void onMarlinEvent(MarlinInterfaceEvent e) {
+		switch (e.getID()) {
+			case MarlinInterfaceEvent.IDLE -> {
+					if (isRunning) step();
+				}
+			case MarlinInterfaceEvent.ERROR,
+					MarlinInterfaceEvent.DID_NOT_FIND,
+					MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
+						if (!isErrorAlreadyDisplayed) {
+							JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+							isErrorAlreadyDisplayed = true;
+						}
+					}
+			case MarlinInterfaceEvent.HOME_XY_FIRST ->
+					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
 	}

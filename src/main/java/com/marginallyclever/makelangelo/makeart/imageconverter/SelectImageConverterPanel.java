@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.FileInputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.prefs.Preferences;
 
 public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
+	@Serial
 	private static final long serialVersionUID = 5574250944369730761L;
 
 	/**
@@ -35,11 +37,11 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif","qoi"};
 
 	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper
+	private final Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 	
-	private Paper myPaper;
-	private TransformedImage myImage;
+	private final Paper myPaper;
+	private final TransformedImage myImage;
 
 	private static JComboBox<String> styleNames;
 	private static JComboBox<String> fillNames;
@@ -119,7 +121,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		
 		JComboBox<String> box = new JComboBox<>(imageConverterNames.toArray(new String[0]));
 		box.setSelectedIndex(getPreferredDrawStyle());
-		box.addItemListener(e -> onConverterChanged(e));
+		box.addItemListener(this::onConverterChanged);
 
 		return box;
 	}
@@ -163,9 +165,10 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		double height = myPaper.getMarginHeight();
 
 		boolean test;
-		switch(mode) {
-			case 0 :  test = width < height;  break; // fill paper
-			default:  test = width > height;  break; // fit paper
+		if (mode == 0) {
+			test = width < height;  // fill paper
+		} else {
+			test = width > height;  // fit paper
 		}
 
 		float f;
@@ -262,11 +265,12 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	// OBSERVER PATTERN
 
-	private ArrayList<ActionListener> listeners = new ArrayList<>();
+	private final ArrayList<ActionListener> listeners = new ArrayList<>();
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);
 	}
-	
+
+	@SuppressWarnings("unused")
 	public void removeActionListener(ActionListener a) {
 		listeners.remove(a);
 	}

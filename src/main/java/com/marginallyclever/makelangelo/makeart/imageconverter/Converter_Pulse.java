@@ -18,7 +18,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 public class Converter_Pulse extends ImageConverter {
 	private static double blockScale = 6.0f;
 	private static int direction = 0;
-	private String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
+	private final String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
 
 	public Converter_Pulse() {
@@ -119,7 +119,6 @@ public class Converter_Pulse extends ImageConverter {
 		double stepSize = blockScale;
 		double halfStep = stepSize / 2.0f;
 		double zigZagSpacing = 1;
-		double spaceBetweenLines = stepSize;
 
 		// from top to bottom of the image...
 		double x, y = 0;
@@ -132,7 +131,7 @@ public class Converter_Pulse extends ImageConverter {
 		
 		if (direction == 0) {
 			// horizontal
-			for (y = yBottom; y < yTop; y += spaceBetweenLines) {
+			for (y = yBottom; y < yTop; y += stepSize) {
 				++i;
 
 				if ((i % 2) == 0) {
@@ -147,7 +146,7 @@ public class Converter_Pulse extends ImageConverter {
 			}
 		} else {
 			// vertical
-			for (x = xLeft; x < xRight; x += spaceBetweenLines) {
+			for (x = xLeft; x < xRight; x += stepSize) {
 				++i;
 
 				if ((i % 2) == 0) {

@@ -10,15 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The {@link MarlinInterface} manages communication with a remote device running Marlin firmware.
- * 
  * In the OSI model of network interfaces this is the Presentation/Syntax layer which
  * "ensures that data is in a usable format and is where data encryption occurs".
  * That means checksum verification and resend control.
@@ -50,18 +47,19 @@ public class MarlinInterface extends JPanel {
 	// Marlin sends this event when the robot must be homed first
 	private static final String STR_HOME_XY_FIRST = "echo:Home XY First";
 
-	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle more input.
-	public static final String IDLE = "idle";
-	// MarlinInterface sends this as an ActionEvent to let listeners know it can handle an error.
-	public static final String ERROR = "Error";
-	// MarlinInterface sends this as an ActionEvent to let listeners know it must home first.
-	public static final String HOME_XY_FIRST = "HomeXYFirst";
-	// MarlinInterface sends this as an ActionEvent to let listeners know there is an error in the transmission.
-	public static final String DID_NOT_FIND = "DidNotFind";
-	// No news from the robot
-	public static final String COMMUNICATION_FAILURE = "CommunicationFailure";
+	// Marlin sends this message when the robot is sending an action command to the host (us)
+	private static final String STR_ACTION_COMMAND = "//action:";
+	// This host is prepared to process action commands and reply with M876.
+
+	public static final String PROMPT_BEGIN = "prompt_begin";
+	public static final String PROMPT_CHOICE = "prompt_choice";
+	public static final String PROMPT_BUTTON = "prompt_button";
+	public static final String PROMPT_SHOW = "prompt_show";
+	public static final String PROMPT_END = "prompt_end";
+	public static final String STR_I_HANDLE_DIALOGS = "M876 P1";
 
 	private final TextInterfaceToNetworkSession chatInterface;
+
 	private final List<MarlinCommand> myHistory = new ArrayList<>();
 
 	// the next line number I should send.  Marlin may say "please resend previous line x", which would change this.
@@ -69,10 +67,13 @@ public class MarlinInterface extends JPanel {
 	// the last line number added to the queue.
 	private int lineNumberAdded;
 	// don't send more than this many at a time without acknowledgement.
-	private int busyCount=MARLIN_SEND_LIMIT;
+	private int busyCount = MARLIN_SEND_LIMIT;
 	
 	private final Timer timeoutChecker = new Timer(TIMEOUT_DELAY,(e)->onTimeoutCheck());
 	private long lastReceivedTime;
+
+	private final ActionCommandDialog promptDialog = new ActionCommandDialog();
+	private boolean waitingForResponse = false;
 	
 	public MarlinInterface(ChooseConnection chooseConnection) {
 		super();
@@ -101,6 +102,7 @@ public class MarlinInterface extends JPanel {
 		myHistory.clear();
 		timeoutChecker.start();
 		lastReceivedTime = System.currentTimeMillis();
+		queueAndSendCommand(STR_I_HANDLE_DIALOGS);
 	}
 	
 	private void onClose() {
@@ -113,7 +115,7 @@ public class MarlinInterface extends JPanel {
 		if (delay > TIMEOUT_DELAY) {
 			if (delay > FATAL_TIMEOUT_DELAY) {
 				logger.error("No answer from the robot");
-				notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, COMMUNICATION_FAILURE));
+				notifyListeners( MarlinInterfaceEvent.COMMUNICATION_FAILURE );
 				chatInterface.displayError("No answer from the robot, retrying...");
 			} else {
 				logger.trace("Heartbeat: M400");
@@ -138,9 +140,11 @@ public class MarlinInterface extends JPanel {
 			} else if(message.contains(STR_RESEND)) {
 				onHearResend(message);
 			} else if(message.startsWith(STR_ERROR)) {
-				onHearError(message);
+				onHearError(message.substring(STR_ERROR.length()).trim());
 			} else if(message.startsWith(STR_HOME_XY_FIRST)) {
 				onHearHomeXYFirst();
+			} else if(message.startsWith(STR_ACTION_COMMAND)) {
+				onHearActionCommand(message.substring(STR_ACTION_COMMAND.length()).trim());
 			}
 		}
 	}
@@ -169,7 +173,7 @@ public class MarlinInterface extends JPanel {
     		busyCount++;
     		sendQueuedCommand();
         	clearOldHistory();
-    		if(lineNumberToSend>=lineNumberAdded) {
+    		if(lineNumberToSend>=lineNumberAdded && !waitingForResponse) {
     			fireIdleNotice();
     		}
         });
@@ -180,21 +184,29 @@ public class MarlinInterface extends JPanel {
 		
 		// only notify listeners of a fatal error (MarlinInterface.ERROR) if the printer halts.
 		if (message.contains(STR_PRINTER_HALTED)) {
-			notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ERROR));
+			notifyListeners( MarlinInterfaceEvent.ERROR, STR_PRINTER_HALTED );
 		}
 	}
 
 	private void onHearHomeXYFirst() {
 		logger.warn("Home XY First");
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, HOME_XY_FIRST));
+		notifyListeners( MarlinInterfaceEvent.HOME_XY_FIRST );
+	}
+
+	private void onHearActionCommand(String command) {
+		logger.debug("Action command {}", command);
+
+		processActionCommand(command);
+
+		notifyListeners( MarlinInterfaceEvent.ACTION_COMMAND, command );
 	}
 
 	private void onDidNotFindCommandInHistory() {
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, DID_NOT_FIND));
+		notifyListeners( MarlinInterfaceEvent.DID_NOT_FIND );
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, IDLE));
+		notifyListeners( MarlinInterfaceEvent.IDLE );
 	}
 
 	private void clearOldHistory() {
@@ -271,20 +283,49 @@ public class MarlinInterface extends JPanel {
 		chatInterface.sendCommand("M112");
 	}
 
+
+	private void processActionCommand(String actionCommand) {
+		if(actionCommand.startsWith(PROMPT_BEGIN)) {
+			promptDialog.setPromptMessage(actionCommand.substring(PROMPT_BEGIN.length()));
+			promptDialog.clearPrompts();
+		} else if(actionCommand.startsWith(PROMPT_CHOICE))
+			promptDialog.addOption(actionCommand.substring(PROMPT_CHOICE.length()).trim());
+		else if(actionCommand.startsWith(PROMPT_BUTTON)) {
+			promptDialog.addOption(actionCommand.substring(PROMPT_BUTTON.length()).trim());
+		} else if(actionCommand.startsWith(PROMPT_SHOW)) {
+			promptDialog.run(this, Translator.get("InfoTitle"),(result)-> {
+				queueAndSendCommand("M876 S" + Math.max(0,result));
+				waitingForResponse = false;
+				fireIdleNotice();
+			});
+		} else if(actionCommand.startsWith(PROMPT_END)) {
+			if(promptDialog.isOpen()) {
+				// close the dialog because user clicked dial on robot LCD.
+				promptDialog.close();
+				waitingForResponse = false;
+				fireIdleNotice();
+			}
+		}
+	}
+
 	// OBSERVER PATTERN
 	
-	private final List<ActionListener> listeners = new ArrayList<>();
+	private final List<MarlinInterfaceListener> listeners = new ArrayList<>();
 
-	public void addListener(ActionListener listener) {
+	public void addListener(MarlinInterfaceListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(ActionListener listener) {
+	public void removeListener(MarlinInterfaceListener listener) {
 		listeners.remove(listener);
 	}
-	
-	private void notifyListeners(ActionEvent e) {
-		for (ActionListener listener : listeners) listener.actionPerformed(e);
+
+	private void notifyListeners(int id) {
+		notifyListeners(id, null);
+	}
+	private void notifyListeners(int id,String command) {
+		MarlinInterfaceEvent event = new MarlinInterfaceEvent(this,id,command);
+		for (MarlinInterfaceListener listener : listeners) listener.actionPerformed(event);
 	}
 
 	// OBSERVER PATTERN ENDS

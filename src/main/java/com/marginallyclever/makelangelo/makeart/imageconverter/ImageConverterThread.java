@@ -8,11 +8,10 @@ import javax.swing.*;
 
 public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private static final Logger logger = LoggerFactory.getLogger(ImageConverterThread.class);
-	private ImageConverterIterative myConverter;
-	private String name;
+	private final ImageConverterIterative myConverter;
+	private final String name;
 	private boolean paused=false;
 	private boolean enough=false;
-	private int iterations=0;
 
 	public ImageConverterThread(ImageConverterIterative converter) {
 		super();
@@ -45,24 +44,24 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 		
 		Turtle turtle = new Turtle();
 
-		iterations=0;
+		int iterations = 0;
 		int pauseCount=-1;
 		while(!enough && !isCancelled()) {
 			if(!paused) {
-				if(pauseCount==iterations) {
+				if(pauseCount== iterations) {
 					myConverter.resume();
 				}
 				myConverter.iterate();
 				iterations++;
 			} else {
-				if(pauseCount!=iterations) {
-					pauseCount=iterations;
+				if(pauseCount!= iterations) {
+					pauseCount= iterations;
 					myConverter.generateOutput();
 				}
 			}
 			try {
 				Thread.sleep(5);
-			} catch (InterruptedException e) {}
+			} catch (Exception ignored) {}
 		}
 
 		logger.debug("doInBackground() ending {} after {} loop(s).", name, iterations);

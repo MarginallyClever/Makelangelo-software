@@ -121,7 +121,7 @@ public class Converter_FlowField extends ImageConverter {
 		return rightAngle;
 	}
 
-	private class SampleAt {
+	private static class SampleAt {
 		public Point2D p;
 		public Point2D n;
 		public double value;

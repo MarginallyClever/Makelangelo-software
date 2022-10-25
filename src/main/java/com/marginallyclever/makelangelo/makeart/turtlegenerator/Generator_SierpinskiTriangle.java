@@ -6,13 +6,11 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
- * see https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve
- * @author Dan Royer 2016-12-12
- *
+ * See <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve">Wikipedia</a>
+ * @author Dan Royer
+ * @since 2016-12-12
  */
 public class Generator_SierpinskiTriangle extends TurtleGenerator {
-	private double xMax, xMin, yMax, yMin;
-	private double maxSize;
 	private static int order = 4; // controls complexity of curve
 
 	public Generator_SierpinskiTriangle() {
@@ -43,21 +41,21 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		xMax = myPaper.getMarginWidth()/2.0f;
-		yMax = myPaper.getMarginHeight()/2.0f;
-		xMin = -xMax;
-		yMin = -yMax;
+		double xMax = myPaper.getMarginWidth() / 2.0f;
+		double yMax = myPaper.getMarginHeight() / 2.0f;
+		double xMin = -xMax;
+		double yMin = -yMax;
 
 		Turtle turtle = new Turtle();
 		
 		double xx = xMax - xMin;
 		double yy = yMax - yMin;
-		maxSize = Math.tan(Math.toRadians(30))*(xx < yy ? xx : yy)*2;
-		double jj = Math.asin(Math.toRadians(30))*(xx < yy ? xx : yy);
+		double maxSize = Math.tan(Math.toRadians(30)) * (Math.min(xx, yy)) * 2;
+		double jj = Math.asin(Math.toRadians(30)) * (Math.min(xx, yy));
 
 		// move to starting position
-		if(xMax>yMax) {
-			turtle.moveTo(-jj,yMin);
+		if(xMax > yMax) {
+			turtle.moveTo(-jj, yMin);
 		} else {
 			turtle.moveTo(xMax,-jj);
 			turtle.turn(90);

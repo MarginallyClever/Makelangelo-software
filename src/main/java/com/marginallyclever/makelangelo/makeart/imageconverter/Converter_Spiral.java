@@ -67,7 +67,7 @@ public class Converter_Spiral extends ImageConverter {
 			// do the largest circle that still fits in the image.
 			double w = myPaper.getMarginWidth()/2.0f;
 			double h = myPaper.getMarginHeight()/2.0f;
-			maxr = h < w ? h : w;
+			maxr = Math.min(h, w);
 		}
 
 		double toolDiameter = 1;

@@ -5,39 +5,57 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import java.awt.*;
 
 /**
- * Filters modify a BufferedImage.
- * @author danroyer
- *
+ * Filters modify a {@link TransformedImage}.
+ * @author dan Royer
  */
 public class ImageFilter {
-	public static int decode32bit(int pixel) {
-		int r = ((pixel >> 16) & 0xff);
-		int g = ((pixel >> 8) & 0xff);
-		int b = ((pixel) & 0xff);
-		double a = (double) ((pixel >> 24) & 0xff) / 255.0;
+	/**
+	 * @param color RGBA
+	 * @return grayscale value
+	 */
+	public static int decode32bit(int color) {
+		int r = ((color >> 16) & 0xff);
+		int g = ((color >> 8) & 0xff);
+		int b = ((color) & 0xff);
+		double a = (double) ((color >> 24) & 0xff) / 255.0;
 
 		return average(r, g, b, a);
 	}
 
-	public static int decodeColor(Color c) {
-		int r = c.getRed();
-		int g = c.getGreen();
-		int b = c.getBlue();
-		double a = (double)c.getAlpha() / 255.0;
+	/**
+	 * @param greyscale 0-255
+	 * @return RGB fully opaque
+	 */
+	public static int encode32bit(int greyscale) {
+		greyscale &= 0xff;
+		return (0xff << 24) | (greyscale << 16) | (greyscale << 8) | greyscale;
+	}
+
+	/**
+	 * @param color RGBA
+	 * @return grayscale value
+	 */
+	public static int decodeColor(Color color) {
+		int r = color.getRed();
+		int g = color.getGreen();
+		int b = color.getBlue();
+		double a = (double)color.getAlpha() / 255.0;
 		return average(r, g, b, a);
 	}
 
+	/**
+	 * @param r red
+	 * @param g green
+	 * @param b blue
+	 * @param a alpha
+	 * @return grayscale value
+	 */
 	private static int average(int r, int g, int b, double a) {
 		int r2 = (int)(r * a);
 		int g2 = (int)(g * a);
 		int b2 = (int)(b * a);
 
 		return (r2 + g2 + b2) / 3;
-	}
-
-	public static int encode32bit(int i) {
-		i &= 0xff;
-		return (0xff << 24) | (i << 16) | (i << 8) | i;
 	}
 	
 	/**

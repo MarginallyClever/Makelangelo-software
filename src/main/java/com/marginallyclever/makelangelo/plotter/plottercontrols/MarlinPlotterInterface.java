@@ -44,28 +44,23 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private void onPlotterEvent(PlotterEvent e) {
 		switch (e.type) {
-		case PlotterEvent.HOME_FOUND:
-			// logger.debug("MarlinPlotterInterface heard plotter home.");
-			sendFindHome();
-			break;
-		case PlotterEvent.POSITION:
-			// logger.debug("MarlinPlotterInterface heard plotter move.");
-			sendGoto();
-			break;
-		case PlotterEvent.PEN_UPDOWN:
-			// logger.debug("MarlinPlotterInterface heard plotter up/down.");
-			sendPenUpDown();
-			break;
-		case PlotterEvent.MOTORS_ENGAGED:
-			// logger.debug("MarlinPlotterInterface heard plotter engage.");
-			sendEngage();
-			break;
-		case PlotterEvent.TOOL_CHANGE:
-			// logger.debug("MarlinPlotterInterface heard plotter tool change.");
-			sendToolChange((int) e.extra);
-			break;
-		default:
-			break;
+			case PlotterEvent.HOME_FOUND ->
+				// logger.debug("MarlinPlotterInterface heard plotter home.");
+					sendFindHome();
+			case PlotterEvent.POSITION ->
+				// logger.debug("MarlinPlotterInterface heard plotter move.");
+					sendGoto();
+			case PlotterEvent.PEN_UPDOWN ->
+				// logger.debug("MarlinPlotterInterface heard plotter up/down.");
+					sendPenUpDown();
+			case PlotterEvent.MOTORS_ENGAGED ->
+				// logger.debug("MarlinPlotterInterface heard plotter engage.");
+					sendEngage();
+			case PlotterEvent.TOOL_CHANGE ->
+				// logger.debug("MarlinPlotterInterface heard plotter tool change.");
+					sendToolChange((int) e.extra);
+			default -> {
+			}
 		}
 	}
 

@@ -16,7 +16,7 @@ public interface ImageConverterListener {
 
     /**
      * Called when the converter wants to offer a new turtle.
-     * @param turtle
+     * @param turtle the new turtle
      */
     void onConvertFinished(Turtle turtle);
 }

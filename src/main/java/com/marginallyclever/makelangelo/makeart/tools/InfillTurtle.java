@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Take an existing drawing, scan across it horizontally.  Add new lines between every pair of lines found.
  * It may sometimes make mistakes if it hits the very end of a line.
- * 
  * @author Dan Royer
  * @since 7.31.0
  */
@@ -147,14 +146,14 @@ public class InfillTurtle {
 		return results;
 	}
 
-	class ComparePointsByY implements Comparator<Point2D> {
+	static class ComparePointsByY implements Comparator<Point2D> {
 		@Override
 		public int compare(Point2D o1, Point2D o2) {
 			return Double.compare(o1.y, o2.y);
 		}
 	}
 
-	class ComparePointsByX implements Comparator<Point2D> {
+	static class ComparePointsByX implements Comparator<Point2D> {
 		@Override
 		public int compare(Point2D o1, Point2D o2) {
 			return Double.compare(o1.x, o2.x);
@@ -162,11 +161,9 @@ public class InfillTurtle {
 	}
 
 	/**
-	 * It is based on an algorithm in Andre LaMothe's "Tricks of the Windows Game
-	 * Programming Gurus". See
+	 * It is based on an algorithm in Andre LaMothe's "Tricks of the Windows Game Programming Gurus". See
 	 * <a href="https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect">Stackoverflow</a>
 	 * TODO move this to com.marginallyclever.convenience.LineHelper?
-	 *
 	 * @param alpha first line segment
 	 * @param beta second line segment
 	 * @return intersection {@link Point2D} or null

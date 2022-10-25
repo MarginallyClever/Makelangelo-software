@@ -9,7 +9,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeart.*;
+import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
@@ -25,7 +25,6 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.paper.PaperSettings;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
@@ -67,18 +66,19 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 /**
  * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
- * into instructions in GCODE format, as described in https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description.
- * 
+ * into instructions in GCODE format, as described in <a href="https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description">the wiki</a>.
+ *
  * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (ImageGenerators), or 
  * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA,PIO) into vectors (ImageConverters).
- * 
+ *
  * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
  * the mark on the paper.  This knowledge helps the app to create better gcode.  
- * 
+ *
  * @author Dan Royer (dan@marginallyClever.com)
  * @since 1.00 2012/2/28
  */
@@ -110,7 +110,7 @@ public final class Makelangelo {
 	private JFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
-	private SaveDialog saveDialog = new SaveDialog();
+	private final SaveDialog saveDialog = new SaveDialog();
 	
 	private RecentFiles recentFiles;
 	private OpenFileChooser openFileChooser;
@@ -121,7 +121,6 @@ public final class Makelangelo {
 
 	
 	// drag files into the app with {@link DropTarget}
-	@SuppressWarnings("unused")
 	private DropTarget dropTarget;
 
 	public Makelangelo() {
@@ -148,7 +147,6 @@ public final class Makelangelo {
 	private void startRobot() {
 		logger.debug("Starting robot...");
 		myPlotter = new Plotter();
-		myPlotter.addPlotterEventListener(this::onPlotterEvent);
 		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
@@ -176,12 +174,6 @@ public final class Makelangelo {
 				myPlotterRenderer.render(gl2, myPlotter);
 			}
 		});
-	}
-
-	private void onPlotterEvent(PlotterEvent e) {
-		if(e.type==PlotterEvent.TOOL_CHANGE) {
-			requestUserChangeTool((int)e.extra);
-		}
 	}
 
 	public void run() {
@@ -482,8 +474,8 @@ public final class Makelangelo {
 
 		TurtleModifierAction a6 = new ResizeTurtleToPaperAction(myPaper,false,Translator.get("ConvertImagePaperFit"));
 		TurtleModifierAction a7 = new ResizeTurtleToPaperAction(myPaper,true,Translator.get("ConvertImagePaperFill"));
-		a6.setSource(this);		a6.addModifierListener((e)->setTurtle(e));		menu.add(a6);
-		a7.setSource(this);		a7.addModifierListener((e)->setTurtle(e));		menu.add(a7);
+		a6.setSource(this);		a6.addModifierListener(this::setTurtle);		menu.add(a6);
+		a7.setSource(this);		a7.addModifierListener(this::setTurtle);		menu.add(a7);
 		
 		JMenuItem scale = new JMenuItem(Translator.get("Scale"));
 		menu.add(scale);
@@ -498,8 +490,8 @@ public final class Makelangelo {
 		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
 		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, SHORTCUT_CTRL));//"ctrl F"
-		a4.setSource(this);		a4.addModifierListener((e)->setTurtle(e));		menu.add(a4);
-		a5.setSource(this);		a5.addModifierListener((e)->setTurtle(e));		menu.add(a5);
+		a4.setSource(this);		a4.addModifierListener(this::setTurtle);		menu.add(a4);
+		a5.setSource(this);		a5.addModifierListener(this::setTurtle);		menu.add(a5);
 		
 		menu.addSeparator();
 		
@@ -509,9 +501,9 @@ public final class Makelangelo {
 		a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
 		TurtleModifierAction a3 = new InfillTurtleAction();
 		a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
-		a1.setSource(this);		a1.addModifierListener((e)->setTurtle(e));		menu.add(a1);
-		a2.setSource(this);		a2.addModifierListener((e)->setTurtle(e));		menu.add(a2);
-		a3.setSource(this);		a3.addModifierListener((e)->setTurtle(e));		menu.add(a3);
+		a1.setSource(this);		a1.addModifierListener(this::setTurtle);		menu.add(a1);
+		a2.setSource(this);		a2.addModifierListener(this::setTurtle);		menu.add(a2);
+		a3.setSource(this);		a3.addModifierListener(this::setTurtle);		menu.add(a3);
 
 		return menu;
 	}
@@ -539,6 +531,10 @@ public final class Makelangelo {
 		turtleGenerator.setPaper(myPaper);
 		turtleGenerator.addListener(this::setTurtle);
 		turtleGenerator.generate();
+
+		if(turtleGenerator.getPanelElements().isEmpty()) {
+			return;
+		}
 
 		setMainTitle(turtleGenerator.getName());
 		JDialog dialog = new JDialog(mainFrame, turtleGenerator.getName());
@@ -781,7 +777,7 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * Parse https://github.com/MarginallyClever/Makelangelo/releases/latest
+	 * Parse <a href="https://github.com/MarginallyClever/Makelangelo/releases/latest">https://github.com/MarginallyClever/Makelangelo/releases/latest</a>
 	 * redirect notice to find the latest release tag.
 	 */
 	private void checkForUpdate(boolean announceIfFailure) {
@@ -829,7 +825,7 @@ public final class Makelangelo {
 	}
 
 	/**
-	 * See http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-java/
+	 * See <a href="http://www.dreamincode.net/forums/topic/190944-creating-an-updater-in-java/">creating an updater in java</a>
 	 *//*
 	 * private void downloadUpdate() {
 	 *   String[] run = {"java","-jar","updater/update.jar"};
@@ -935,7 +931,7 @@ public final class Makelangelo {
 		});
 
 		try {
-			mainFrame.setIconImage(ImageIO.read(Makelangelo.class.getResource("/logo-icon.png")));
+			mainFrame.setIconImage(ImageIO.read(Objects.requireNonNull(Makelangelo.class.getResource("/logo-icon.png"))));
 		} catch (IOException e) {
 			logger.warn("Can't load icon", e);
 		}
@@ -943,7 +939,7 @@ public final class Makelangelo {
 		
 		mainFrame.setContentPane(createContentPane());
 
-		camera.zoomToFit(Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
+		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 		
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
@@ -979,33 +975,33 @@ public final class Makelangelo {
 		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
-			    try {
-			        Transferable tr = dtde.getTransferable();
-			        DataFlavor[] flavors = tr.getTransferDataFlavors();
-			        for (int i = 0; i < flavors.length; i++) {
-			        	logger.debug("Possible flavor: {}", flavors[i].getMimeType());
-			        	if (flavors[i].isFlavorJavaFileListType()) {
-			        		dtde.acceptDrop(DnDConstants.ACTION_COPY);
-			        		Object o = tr.getTransferData(flavors[i]);
-			        		if(o instanceof List<?>) {
-			        			List<?> list = (List<?>)o;
-			        			if( list.size()>0 ) {
-			        				o = list.get(0);
-			        				if( o instanceof File ) {
-			        					openFile(((File)o).getAbsolutePath());
-						        		dtde.dropComplete(true);
-			        					return;
-			        				}
-			        			}
-			        		}
-			        	}
-			        }
-			        logger.debug("Drop failed: {}", dtde);
-			        dtde.rejectDrop();
-			    } catch (Exception e) {
-					logger.error("Drop error", e);
-			        dtde.rejectDrop();
-			    }
+			try {
+				Transferable tr = dtde.getTransferable();
+				DataFlavor[] flavors = tr.getTransferDataFlavors();
+				for (DataFlavor flavor : flavors) {
+					logger.debug("Possible flavor: {}", flavor.getMimeType());
+					if (flavor.isFlavorJavaFileListType()) {
+						dtde.acceptDrop(DnDConstants.ACTION_COPY);
+						Object o = tr.getTransferData(flavor);
+						if (o instanceof List<?>) {
+							List<?> list = (List<?>) o;
+							if (list.size() > 0) {
+								o = list.get(0);
+								if (o instanceof File) {
+									openFile(((File) o).getAbsolutePath());
+									dtde.dropComplete(true);
+									return;
+								}
+							}
+						}
+					}
+				}
+				logger.debug("Drop failed: {}", dtde);
+				dtde.rejectDrop();
+			} catch (Exception e) {
+				logger.error("Drop error", e);
+				dtde.rejectDrop();
+			}
 			}
 		});
 	}
@@ -1045,17 +1041,6 @@ public final class Makelangelo {
 			preferences.putInt(KEY_WINDOW_X, location.x);
 			preferences.putInt(KEY_WINDOW_Y, location.y);
 		}
-	}
-
-	/**
-	 * Display a dialog asking the user to change the pen
-	 * @param toolNumber a 24 bit RGB color of the new pen.
-	 */
-	private void requestUserChangeTool(int toolNumber) {
-		SwingUtilities.invokeLater(()->{
-			ChangeToolPanel panel = new ChangeToolPanel(toolNumber);
-			panel.run(mainFrame);
-		});
 	}
 
 	private boolean onClosing() {
