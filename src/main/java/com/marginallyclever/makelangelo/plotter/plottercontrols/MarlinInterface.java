@@ -288,9 +288,9 @@ public class MarlinInterface extends JPanel {
 		if(actionCommand.startsWith(PROMPT_BEGIN)) {
 			promptDialog.setPromptMessage(actionCommand.substring(PROMPT_BEGIN.length()));
 			promptDialog.clearPrompts();
-		} else if(actionCommand.startsWith(PROMPT_CHOICE))
+		} else if(actionCommand.startsWith(PROMPT_CHOICE)) {
 			promptDialog.addOption(actionCommand.substring(PROMPT_CHOICE.length()).trim());
-		else if(actionCommand.startsWith(PROMPT_BUTTON)) {
+		} else if(actionCommand.startsWith(PROMPT_BUTTON)) {
 			promptDialog.addOption(actionCommand.substring(PROMPT_BUTTON.length()).trim());
 		} else if(actionCommand.startsWith(PROMPT_SHOW)) {
 			promptDialog.run(this, Translator.get("InfoTitle"),(result)-> {
