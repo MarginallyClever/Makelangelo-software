@@ -7,6 +7,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,11 +209,19 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	public static String getPenUpString(Plotter p) {
-		return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+		} else {
+			return "G0 Z" + (int)p.getPenUpAngle();
+		}
 	}
 
 	public static String getPenDownString(Plotter p) {
-		return "M280 P0 S" + (int)p.getPenDownAngle() + " T"+(int)p.getPenLowerTime();
+		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0 S" + (int)p.getPenDownAngle() + " T"+(int)p.getPenLowerTime();
+		} else {
+			return "G1 Z" + (int)p.getPenDownAngle();
+		}
 	}
 
 	public static String getToolChangeString(int toolNumber) {

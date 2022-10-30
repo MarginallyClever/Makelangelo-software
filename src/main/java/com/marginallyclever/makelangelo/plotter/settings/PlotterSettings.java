@@ -51,6 +51,8 @@ public class PlotterSettings implements Serializable {
 	private static final String PREF_KEY_USER_GENERAL_END_GCODE = "userGeneralEndGcode";
 	private static final String PREF_KEY_USER_GENERAL_START_GCODE = "userGeneralStartGcode";
 
+	private static final String PREF_KEY_Z_MOTOR_TYPE = "zMotorType";
+
 	// Each robot has a global unique identifier
 	private long robotUID = 0;
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
@@ -122,6 +124,10 @@ public class PlotterSettings implements Serializable {
 
 	private String userGeneralStartGcode = "";
 	private String userGeneralEndGcode = "";
+
+	public static final int Z_MOTOR_TYPE_SERVO = 1;
+	public static final int Z_MOTOR_TYPE_STEPPER = 2;
+	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
 	public PlotterSettings() {
 	}
@@ -232,6 +238,8 @@ public class PlotterSettings implements Serializable {
 		loadUserGcode(thisMachineNode);
 		loadJerkConfig(thisMachineNode);
 		loadPenConfig(thisMachineNode);
+
+		zMotorType = thisMachineNode.getInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
 	}
 
 	private void loadJerkConfig(Preferences thisMachineNode) {
@@ -297,6 +305,9 @@ public class PlotterSettings implements Serializable {
 		saveUserGcode(thisMachineNode);
 		saveJerkConfig(thisMachineNode);
 		savePenConfig(thisMachineNode);
+
+		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
+
 		notifyListeners();
 	}
 
@@ -615,4 +626,11 @@ public class PlotterSettings implements Serializable {
 		this.userGeneralEndGcode = userGeneralEndGcode;
 	}
 
+    public int getZMotorType() {
+		return this.zMotorType;
+    }
+
+	public void setZMotorType(int i) {
+		zMotorType=i;
+	}
 }

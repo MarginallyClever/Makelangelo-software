@@ -2108,6 +2108,18 @@
 		<key>PlotterSettings.minimumPlannerSpeed</key>
 		<value>Min Planner Speed (mm/s)</value>
 	</string>
+	<string>
+		<key>PlotterSettings.zMotorType</key>
+		<value>Z axis type</value>
+	</string>
+	<string>
+		<key>PlotterSettings.zMotorType.servo</key>
+		<value>Servo</value>
+	</string>
+	<string>
+		<key>PlotterSettings.zMotorType.stepper</key>
+		<value>Stepper</value>
+	</string>
 
 	<string>
 		<key>QuestionTitle</key>

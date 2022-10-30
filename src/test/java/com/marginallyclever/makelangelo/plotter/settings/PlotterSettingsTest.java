@@ -1,8 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -83,6 +85,26 @@ public class PlotterSettingsTest {
         assertEquals(29,plotterSettingsRead.getPenLowerTime());
     }
 
+    @Test
+    public void saveAndLoadZAxis() {
+        saveAndLoadZAxis(PlotterSettings.Z_MOTOR_TYPE_SERVO);
+        saveAndLoadZAxis(PlotterSettings.Z_MOTOR_TYPE_STEPPER);
+    }
+
+    public void saveAndLoadZAxis(int type) {
+        // given
+        PlotterSettings plotterSettings = new PlotterSettings();
+        plotterSettings.setRobotUID(ROBOT_UID);
+        plotterSettings.setZMotorType(PlotterSettings.Z_MOTOR_TYPE_SERVO);
+
+        plotterSettings.saveConfig();
+
+        // then
+        PlotterSettings plotterSettingsRead = new PlotterSettings();
+        plotterSettingsRead.loadConfig(ROBOT_UID);
+        Assertions.assertEquals(plotterSettings.getZMotorType(),plotterSettingsRead.getZMotorType());
+
+    }
     @AfterEach
     public void clean() {
         Preferences topLevelMachinesPreferenceNode = PreferencesHelper

@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 import com.marginallyclever.util.PreferencesHelper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -114,5 +115,22 @@ public class MarlinPlotterInterfaceTest {
         assertEquals("G0 X40 Y50",mpi.removeComment("G0 X40 Y50"));
         assertEquals("G0 Y60",mpi.removeComment(" G0 Y60"));
         assertEquals("G0 F600",mpi.removeComment(" G0 F600 ; ;;;"));
+    }
+    @Test
+    public void testZAxisGcode() {
+        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T50");
+        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_STEPPER,"G1 Z45","G0 Z90");
+    }
+
+    private void testZAxisGcode(int type,String matchDown,String matchUp) {
+        Plotter plotter = new Plotter();
+        PlotterSettings ps = new PlotterSettings();
+        ps.setZMotorType(type);
+        ps.setPenDownAngle(45);
+        ps.setPenUpAngle(90);
+        ps.setPenLowerTime(50);
+        plotter.setSettings(ps);
+        Assertions.assertEquals(matchDown,MarlinPlotterInterface.getPenDownString(plotter));
+        Assertions.assertEquals(matchUp,MarlinPlotterInterface.getPenUpString(plotter));
     }
 }
