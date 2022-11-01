@@ -7,7 +7,7 @@
 M300
 M200
 ;End of user gcode
-G28
+G28 X Y
 M280 P0 S90 T50
 M0 Ready black and click
 G0 X-15.000 Y-7.000 F3000.0
