@@ -3,11 +3,7 @@ package com.marginallyclever.makelangelo.plotter.settings;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectColor;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
@@ -47,7 +43,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private final SelectBoolean handleSmallSegments;
 	private final SelectDouble minAcceleration;
 	private final SelectDouble minPlannerSpeed;
-	
+	private final SelectOneOfMany zMotorType;
+
 	public PlotterSettingsPanel(Plotter robot) {
 		super();
 		this.myPlotter = robot;
@@ -82,6 +79,11 @@ public class PlotterSettingsPanel extends JPanel {
 		interior0.add(selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("pen up color"		),settings.getPenUpColor(),this));
 		interior0.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("pen down color"	),settings.getPenDownColor(),this));
 
+		interior0.add(zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
+				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
+				Translator.get("PlotterSettings.zMotorType.stepper"),  // PlotterSettings.Z_MOTOR_TYPE_STEPPER = 2
+		},settings.getZMotorType()-1));
+
 		interior1.add(blockBufferSize     = new SelectInteger("blockBufferSize",     Translator.get("PlotterSettings.blockBufferSize"     ),settings.getBlockBufferSize()));
 		interior1.add(segmentsPerSecond   = new SelectInteger("segmentsPerSecond",   Translator.get("PlotterSettings.segmentsPerSecond"   ),settings.getSegmentsPerSecond()));
 		interior1.add(minSegmentLength    = new SelectDouble ("minSegmentLength",    Translator.get("PlotterSettings.minSegmentLength"    ),settings.getMinSegmentLength()));
@@ -89,7 +91,6 @@ public class PlotterSettingsPanel extends JPanel {
 		interior1.add(handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.isHandleSmallSegments()));
 		interior1.add(minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getMinAcceleration()));
 		interior1.add(minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getMinPlannerSpeed()));
-		
 
 		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
 		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
@@ -150,6 +151,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setHandleSmallSegments(handleSmallSegments.isSelected());
 		settings.setMinAcceleration(minAcceleration.getValue());
 		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
+		settings.setZMotorType(zMotorType.getSelectedIndex()+1);
 
 		settings.saveConfig();
 	}
@@ -178,6 +180,7 @@ public class PlotterSettingsPanel extends JPanel {
 		handleSmallSegments.setSelected(settings.isHandleSmallSegments());
 		minAcceleration.setValue(settings.getMinAcceleration());
 		minPlannerSpeed.setValue(settings.getMinPlannerSpeed());
+		zMotorType.setSelectedIndex(settings.getZMotorType()-1);
 	}
 
 	/**
