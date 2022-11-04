@@ -185,7 +185,7 @@ public class SaveGCode {
 			out.write(";Start of user gcode\n");
 			out.write(robot.getSettings().getUserGeneralStartGcode());
 			out.write("\n;End of user gcode\n");
-			out.write("G28\n");  // go home
+			out.write(MarlinPlotterInterface.getFindHomeString()+"\n");  // go home
 
 			boolean isUp = true;
 

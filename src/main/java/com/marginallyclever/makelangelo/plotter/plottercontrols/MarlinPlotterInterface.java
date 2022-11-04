@@ -71,7 +71,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendFindHome() {
-		queueAndSendCommand("G28 XY");
+		queueAndSendCommand(getFindHomeString());
 	}
 
 	private void sendPenUpDown() {
@@ -233,5 +233,9 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		String name = W3CColorNames.get(new ColorRGB(toolNumber));
 		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
 		return name;
+	}
+
+	public static String getFindHomeString() {
+		return "G28 X Y";
 	}
 }
