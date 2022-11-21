@@ -357,6 +357,7 @@ public final class Makelangelo {
 		JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
 		bOpenControls.addActionListener((e)-> openPlotterControls());
 		bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, SHORTCUT_CTRL));//"ctrl C"
+		bOpenControls.setIcon(new UnicodeIcon("\uD83D\uDD79"));
 		menu.add(bOpenControls);
 
 		return menu;
@@ -466,6 +467,7 @@ public final class Makelangelo {
 
 			JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
 			bCapture.addActionListener((e)-> pc.run(mainFrame,myPaper));
+			bCapture.setIcon(new UnicodeIcon("📷"));
 			menu.add(bCapture);
 			menu.addSeparator();
 		} catch (FailedToRunRaspistillException e) {
@@ -482,13 +484,16 @@ public final class Makelangelo {
 		scale.addActionListener((e) -> runScalePanel());
 
 		JMenuItem rotate = new JMenuItem(Translator.get("Rotate"));
+		rotate.setIcon(new UnicodeIcon("↻"));
 		menu.add(rotate);
 		rotate.addActionListener((e) -> runRotatePanel());
 		menu.addSeparator();
 		
 		TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
+		a4.putValue(Action.SMALL_ICON, new UnicodeIcon("↕"));
 		a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
 		TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
+		a5.putValue(Action.SMALL_ICON, new UnicodeIcon("↔"));
 		a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, SHORTCUT_CTRL));//"ctrl F"
 		a4.setSource(this);		a4.addModifierListener(this::setTurtle);		menu.add(a4);
 		a5.setSource(this);		a5.addModifierListener(this::setTurtle);		menu.add(a5);
@@ -570,20 +575,23 @@ public final class Makelangelo {
 		JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
 		buttonNewFile.addActionListener((e) -> newFile());
 		buttonNewFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, SHORTCUT_CTRL));//"ctrl N"
+		buttonNewFile.setIcon(new UnicodeIcon("\uD83C\uDF31"));
 		menu.add(buttonNewFile);
 
 		JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
 		buttonOpenFile.addActionListener((e) -> openLoadFile());
 		buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, SHORTCUT_CTRL));//"ctrl O"
+		buttonOpenFile.setIcon(new UnicodeIcon("\uD83D\uDDC1"));
 		menu.add(buttonOpenFile);
 		
 		recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
 		recentFiles.addSubmenuListener((e)-> openFile(((JMenuItem)e.getSource()).getText()));
-		menu.add(recentFiles);		
+		menu.add(recentFiles);
 		
 		JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
 		buttonSaveFile.addActionListener((e) -> saveFile());
 		buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, SHORTCUT_CTRL));//"ctrl S"
+		buttonSaveFile.setIcon(new UnicodeIcon("\uD83D\uDCBE"));
 		menu.add(buttonSaveFile);
 
 		menu.addSeparator();
@@ -595,10 +603,12 @@ public final class Makelangelo {
 		} else {
 			buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_ALT));//"alt P"
 		}
+		buttonAdjustPreferences.setIcon(new UnicodeIcon("⚙"));
 		menu.add(buttonAdjustPreferences);
 
 		JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
 		buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
+		buttonFirmwareUpdate.setIcon(new UnicodeIcon("⬆"));
 		menu.add(buttonFirmwareUpdate);
 
 		if (!isMacOS) {
@@ -686,11 +696,13 @@ public final class Makelangelo {
 		JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
 		buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
 		buttonZoomOut.addActionListener((e) -> camera.zoom(1));
+		buttonZoomOut.setIcon(new UnicodeIcon("\uD83D\uDD0D-"));
 		menu.add(buttonZoomOut);
 
 		JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
 		buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
 		buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
+		buttonZoomIn.setIcon(new UnicodeIcon("\uD83D\uDD0D+"));
 		menu.add(buttonZoomIn);
 		
 		JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
@@ -707,6 +719,7 @@ public final class Makelangelo {
 		GFXPreferences.addListener((e)->{
 			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
 		});
+		checkboxShowPenUpMoves.setIcon(new UnicodeIcon("\uD83D\uDC41"));
 		menu.add(checkboxShowPenUpMoves);
 
 		menu.add(createRenderStyleMenu());
