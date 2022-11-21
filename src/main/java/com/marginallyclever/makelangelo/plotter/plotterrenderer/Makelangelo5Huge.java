@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
 import static com.marginallyclever.convenience.DrawingHelper.*;
 
-public class Makelangelo5 implements PlotterRenderer {
+public class Makelangelo5Huge implements PlotterRenderer {
 
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
@@ -21,7 +21,7 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (texture1 == null) texture1 = loadTexture("/textures/makelangelo5.png");
+		if (texture1 == null) texture1 = loadTexture("/textures/makelangelo5huge.png");
 		if (texture2 == null) texture2 = loadTexture("/textures/makelangelo5-motors.png");
 		if (texture3 == null) texture3 = loadTexture("/logo.png");
 
@@ -36,7 +36,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl2, robot);
 
-		if (texture1 == null || texture2 == null) {
+		if (texture1==null || texture2 == null) {
 			Polargraph.paintMotors(gl2, robot);
 		} else {
 			paintControlBoxFancy(gl2, robot,texture2);
@@ -167,6 +167,12 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
+		/*
+		 * border around RUMBA gl2.glLineWidth(1); gl2.glColor3f(0,0,0);
+		 * gl2.glBegin(GL2.GL_LINE_LOOP); gl2.glVertex2d(-w-1, h+1);
+		 * gl2.glVertex2d(+w+1, h+1); gl2.glVertex2d(+w+1, -h-1); gl2.glVertex2d(-w-1,
+		 * -h-1); gl2.glEnd();
+		 */
 		renderLCD(gl2);
 		gl2.glPopMatrix();
 	}
@@ -175,6 +181,11 @@ public class Makelangelo5 implements PlotterRenderer {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
+		/*
+		 * // mounting plate for LCD gl2.glColor3f(1,0.8f,0.5f);
+		 * gl2.glBegin(GL2.GL_QUADS); gl2.glVertex2d(-8, 5); gl2.glVertex2d(+8, 5);
+		 * gl2.glVertex2d(+8, -5); gl2.glVertex2d(-8, -5); gl2.glEnd();
+		 */
 
 		// LCD red
 		float w = 150f / 2;
@@ -329,5 +340,12 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glVertex2d(right + 70f, top - 1000);
 		gl2.glVertex2d(left - 70f, top - 1000);
 		gl2.glEnd();
+
+		/*
+		 * filled rectangle for safe area gl2.glColor3d(0.9,0.9,0.9); // #color Safe
+		 * area gl2.glBegin(GL2.GL_QUADS); gl2.glVertex2d(left-70f, top+70f);
+		 * gl2.glVertex2d(right+70f, top+70f); gl2.glVertex2d(right+70f, top-1000);
+		 * gl2.glVertex2d(left-70f, top-1000); gl2.glEnd();
+		 */
 	}
 }
