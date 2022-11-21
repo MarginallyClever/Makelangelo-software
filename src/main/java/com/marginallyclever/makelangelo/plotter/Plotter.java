@@ -12,8 +12,8 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 /**
- * {@link Plotter} is a virtual plotter.  It is directly responsible for the live state of the plotter.
- * It also contains {@link PlotterSettings}, which constrain the total possible valid live states.
+ * {@link Plotter} is a virtual plotter.  It is directly responsible for the live state of the drawing robot.
+ * It contains the current position of the pen and the current state of the machine.
  * @author Dan
  * @since 7.2.10
  */

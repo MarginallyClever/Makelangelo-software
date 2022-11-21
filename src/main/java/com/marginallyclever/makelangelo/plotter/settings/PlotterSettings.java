@@ -3,18 +3,18 @@ package com.marginallyclever.makelangelo.plotter.settings;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.util.PreferencesHelper;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
- * {@link PlotterSettings} stores the customized settings for a single plotter robot.
- * {@link com.marginallyclever.makelangelo.plotter.Plotter} stores the rapidly changing state information (while drawing).
+ * {@link PlotterSettings} stores the physical settings for a single plotter robot.  That is to say it stores the
+ * properties that are consistent across all instances of one type of plotter.
  * @author Dan Royer
  */
-public class PlotterSettings implements Serializable {
-	private static final long serialVersionUID = -4185946661019573192L;
-
+public class PlotterSettings {
 	private static final String PREF_KEY_ACCELERATION = "acceleration";
 	private static final String PREF_KEY_BLOCK_BUFFER_SIZE = "blockBufferSize";
 	private static final String PREF_KEY_DIAMETER = "diameter";
@@ -55,18 +55,19 @@ public class PlotterSettings implements Serializable {
 
 	// Each robot has a global unique identifier
 	private long robotUID = 0;
+
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered = false;
 
 	private String hardwareName = "Makelangelo 5";
 
-	// machine physical limits, in mm
+	// physical limits
 	private final double machineHeight = 1000; // mm
 	private final double machineWidth = 650; // mm
 
-	private double limitLeft = - machineWidth / 2;
+	private double limitLeft = -machineWidth / 2;
 	private double limitRight = machineWidth / 2;
-	private double limitBottom = - machineHeight / 2;
+	private double limitBottom = -machineHeight / 2;
 	private double limitTop = machineHeight / 2;
 
 	// speed control
@@ -130,6 +131,7 @@ public class PlotterSettings implements Serializable {
 	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
 	public PlotterSettings() {
+		super();
 	}
 
 	// OBSERVER PATTERN START

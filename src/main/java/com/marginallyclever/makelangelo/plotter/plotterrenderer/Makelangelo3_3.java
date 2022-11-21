@@ -98,30 +98,4 @@ public class Makelangelo3_3 implements PlotterRenderer {
 		// clean up
 		gl2.glPopMatrix();
 	}
-/*
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return true;
-	}
-
-	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-	*/
 }
