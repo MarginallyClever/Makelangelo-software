@@ -16,7 +16,6 @@ import java.awt.*;
  * @since 7.1.4
  */
 public class PlotterSettingsPanel extends JPanel {
-
 	private final Plotter myPlotter;
 
 	private final SelectDouble machineWidth, machineHeight;
