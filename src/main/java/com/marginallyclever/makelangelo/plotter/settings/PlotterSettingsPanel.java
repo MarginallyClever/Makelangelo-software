@@ -2,10 +2,12 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,6 +22,7 @@ public class PlotterSettingsPanel extends JPanel {
 
 	private final PlotterSettingsUserGcodePanel userGcodePanel;
 
+	private final SelectOneOfMany style;
 	private final SelectDouble machineWidth, machineHeight;
 	private final SelectDouble totalBeltNeeded;
 	private final SelectDouble totalServoNeeded;
@@ -52,7 +55,6 @@ public class PlotterSettingsPanel extends JPanel {
 
 		userGcodePanel = new PlotterSettingsUserGcodePanel(settings);
 
-
 		JButton buttonSave = new JButton(Translator.get("Save"));
 		buttonSave.addActionListener((e)->save());
 
@@ -67,22 +69,26 @@ public class PlotterSettingsPanel extends JPanel {
 		SelectPanel interior1 = new SelectPanel();
 		SelectPanel interior2 = new SelectPanel();
 
-		interior0.add(machineWidth 		 = new SelectDouble("width",		 	 Translator.get("MachineWidth"		),settings.getLimitRight() - settings.getLimitLeft()));
-		interior0.add(machineHeight 	 = new SelectDouble("height",		 Translator.get("MachineHeight"		),settings.getLimitTop() - settings.getLimitBottom()));
-		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength",  Translator.get("StepperLengthNeeded"),0));
-		interior0.add(totalBeltNeeded 	 = new SelectDouble("beltLength",	 Translator.get("BeltLengthNeeded"	),0));
-		interior0.add(totalServoNeeded 	 = new SelectDouble("servoLength",	 Translator.get("ServoLengthNeeded"	),0));
+		List<String> machineStyles = getMachineStyleNames();
+		int index = machineStyles.indexOf(settings.getStyle());
 
-		interior1.add(penDiameter 		 = new SelectDouble("diameter",		 Translator.get("penToolDiameter"	),settings.getPenDiameter()));
-	    interior1.add(travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("penToolMaxFeedRate"),settings.getTravelFeedRate()));
-	    interior1.add(drawFeedRate 		 = new SelectDouble("speed",		 	 Translator.get("Speed"				),settings.getDrawFeedRate()));
-	    interior1.add(acceleration 		 = new SelectDouble("acceleration",	 Translator.get("AdjustAcceleration"),settings.getMaxAcceleration()));
-		interior1.add(penRaiseRate       = new SelectDouble("liftSpeed",	 	 Translator.get("penToolLiftSpeed"	),settings.getPenLiftTime()));
-		interior1.add(penLowerRate       = new SelectDouble("lowerSpeed",	 Translator.get("penToolLowerSpeed"	),settings.getPenLowerTime()));
-	    interior1.add(penUpAngle 		 = new SelectDouble("up",			 Translator.get("penToolUp"			),settings.getPenUpAngle()));
-	    interior1.add(penDownAngle 		 = new SelectDouble("down",			 Translator.get("penToolDown"		),settings.getPenDownAngle()));
-		interior1.add(selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("pen up color"		),settings.getPenUpColor(),this));
-		interior1.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("pen down color"	),settings.getPenDownColor(),this));
+		interior0.add(style              = new SelectOneOfMany("style",       Translator.get("PlotterSettingsPanel.Style"				), machineStyles.toArray(new String[0]), index));
+		interior0.add(machineWidth 		 = new SelectDouble("width",		 	 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));
+		interior0.add(machineHeight 	 = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getLimitTop() - settings.getLimitBottom()));
+		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength",  Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
+		interior0.add(totalBeltNeeded 	 = new SelectDouble("beltLength",	 Translator.get("PlotterSettingsPanel.BeltLengthNeeded"		),0));
+		interior0.add(totalServoNeeded 	 = new SelectDouble("servoLength",	 Translator.get("PlotterSettingsPanel.ServoLengthNeeded"	),0));
+
+		interior1.add(penDiameter 		 = new SelectDouble("diameter",		 Translator.get("PlotterSettingsPanel.penToolDiameter"		),settings.getPenDiameter()));
+	    interior1.add(travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	),settings.getTravelFeedRate()));
+	    interior1.add(drawFeedRate 		 = new SelectDouble("speed",		 	 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDrawFeedRate()));
+	    interior1.add(acceleration 		 = new SelectDouble("acceleration",	 Translator.get("PlotterSettingsPanel.AdjustAcceleration"	),settings.getMaxAcceleration()));
+		interior1.add(penRaiseRate       = new SelectDouble("liftSpeed",	 	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getPenLiftTime()));
+		interior1.add(penLowerRate       = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getPenLowerTime()));
+	    interior1.add(penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getPenUpAngle()));
+	    interior1.add(penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getPenDownAngle()));
+		interior1.add(selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getPenUpColor(),this));
+		interior1.add(selectPenDownColor = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getPenDownColor(),this));
 
 		interior1.add(zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
 				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
@@ -152,7 +158,18 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
 		settings.setZMotorType(zMotorType.getSelectedIndex()+1);
 
+		List<String> machineStyles = getMachineStyleNames();
+		settings.setStyle(machineStyles.get(style.getSelectedIndex()));
+
 		settings.saveConfig();
+	}
+
+	private List<String> getMachineStyleNames() {
+		List<String> machineStyleNames = new ArrayList<>();
+		for(Machines m : Machines.values()) {
+			machineStyleNames.add(m.name());
+		}
+		return machineStyleNames;
 	}
 
 	private void reset() {

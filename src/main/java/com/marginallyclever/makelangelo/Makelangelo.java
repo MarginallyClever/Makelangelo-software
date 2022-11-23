@@ -142,13 +142,7 @@ public final class Makelangelo {
 
 		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
 
-		// TODO is this required any more?
-		try {
-			myPlotterRenderer = Machines.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
-		} catch (Exception e) {
-			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
-			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
-		}
+		updatePlotterRenderer();
 
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
@@ -156,6 +150,15 @@ public final class Makelangelo {
 		}
 
 		onPlotterSettingsUpdate(myPlotter.getSettings());
+	}
+
+	private void updatePlotterRenderer() {
+		try {
+			myPlotterRenderer = Machines.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+		} catch (Exception e) {
+			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
+			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+		}
 	}
 
 	private void onPlotterSettingsUpdate(PlotterSettings e) {
@@ -168,6 +171,7 @@ public final class Makelangelo {
 		myTurtleRenderer.setUpColor(e.getPenUpColor());
 		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
+		updatePlotterRenderer();
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
