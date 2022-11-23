@@ -2153,6 +2153,11 @@
 		<hint>plotter shape and size</hint>
 	</string>
 	<string>
+		<key>PlotterSettingsPanel.TabPen</key>
+		<value>Pen</value>
+		<hint>pen shape, color, and speed</hint>
+	</string>
+	<string>
 		<key>PlotterSettingsPanel.TabSimulation</key>
 		<value>Simulation</value>
 		<hint>plotter simulation for time estimates</hint>

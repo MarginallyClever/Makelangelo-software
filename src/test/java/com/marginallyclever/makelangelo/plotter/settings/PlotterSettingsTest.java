@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PlotterSettingsTest {
 
-    private static final long ROBOT_UID = 123456;
+    private static final String ROBOT_TEST_UID = "123456";
 
     @BeforeAll
     public static void beforeAll() {
@@ -26,7 +26,7 @@ public class PlotterSettingsTest {
     public void saveAndLoadConfig() {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.setRobotUID(ROBOT_UID);
+        plotterSettings.setRobotUID(ROBOT_TEST_UID);
         plotterSettings.setLimitTop(2);
         plotterSettings.setLimitBottom(3);
         plotterSettings.setLimitRight(4);
@@ -52,12 +52,17 @@ public class PlotterSettingsTest {
 		plotterSettings.setMinPlannerSpeed(28);
         plotterSettings.setPenLowerTime(29);
 
+        Machines [] allMachines = Machines.values();
+        int index = (int)(Math.random()*allMachines.length);
+        String styleName = allMachines[index].getName();
+        plotterSettings.setStyle(styleName);
+
         // when
         plotterSettings.saveConfig();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_UID);
+        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
         assertEquals(2, plotterSettingsRead.getLimitTop());
         assertEquals(3, plotterSettingsRead.getLimitBottom());
         assertEquals(4, plotterSettingsRead.getLimitRight());
@@ -83,6 +88,8 @@ public class PlotterSettingsTest {
         assertEquals(27, plotterSettingsRead.getMinAcceleration());
         assertEquals(28, plotterSettingsRead.getMinPlannerSpeed());
         assertEquals(29,plotterSettingsRead.getPenLowerTime());
+
+        assertEquals(styleName, plotterSettingsRead.getStyle());
     }
 
     @Test
@@ -94,28 +101,27 @@ public class PlotterSettingsTest {
     public void saveAndLoadZAxis(int type) {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.setRobotUID(ROBOT_UID);
-        plotterSettings.setZMotorType(PlotterSettings.Z_MOTOR_TYPE_SERVO);
+        plotterSettings.setRobotUID(ROBOT_TEST_UID);
+        plotterSettings.setZMotorType(type);
 
         plotterSettings.saveConfig();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_UID);
+        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
         Assertions.assertEquals(plotterSettings.getZMotorType(),plotterSettingsRead.getZMotorType());
 
     }
+
     @AfterEach
     public void clean() {
         Preferences topLevelMachinesPreferenceNode = PreferencesHelper
                 .getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-        Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(Long.toString(ROBOT_UID));
+        Preferences uniqueMachinePreferencesNode = topLevelMachinesPreferenceNode.node(ROBOT_TEST_UID);
         if (uniqueMachinePreferencesNode != null) {
             try {
                 uniqueMachinePreferencesNode.removeNode();
-            } catch (BackingStoreException e) {
-                // Nothing to do
-            }
+            } catch (BackingStoreException ignored) {}
         }
     }
 }

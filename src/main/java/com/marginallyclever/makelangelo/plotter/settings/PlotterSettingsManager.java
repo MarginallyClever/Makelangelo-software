@@ -1,64 +1,70 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.prefs.Preferences;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.WindowConstants;
-
+import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.util.PreferencesHelper;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
- * {@link PlotterSettingsManager} manages the list of available machine configurations.
- * A single machine configuration must be loaded into the active {@link Plotter} at any given time. 
+ * Manages the list of available machine configurations, both default and custom.
  * @author Dan Royer
+ * @since 7.33.2
  */
-public class PlotterSettingsManager extends JPanel {
-	private static final long serialVersionUID = 7163572330672713872L;
-	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManager.class);
-	
-	private List<String> configurationNames = new ArrayList<>();
+public class PlotterSettingsManager {
+    private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManager.class);
+    public static final String KEY_MACHINE_STYLE = "machineStyle";
+    public static final String KEY_MACHINE_LAST_SELECTED = "lastLoadedMachine";
+    private final List<String> configurationNames = new ArrayList<>();
+    private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
-	public PlotterSettingsManager() {
-		super();
-		loadAllConfigurations();
-	}
-	
-	private void loadAllConfigurations() {
-		configurationNames.clear();
-		
-		try {
-			Preferences topLevelMachinesPreferenceNode = PreferencesHelper
-					.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-			configurationNames = Arrays.asList( topLevelMachinesPreferenceNode.childrenNames() );
-		} catch (Exception e) {
-			logger.error("Failed to load preferences", e);
-			configurationNames.add("Default");
-		}
-	}
-	
-	// TEST
-	
-	public static void main(String[] args) {
-		Log.start();
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
+    public PlotterSettingsManager() {
+        super();
 
-		JFrame frame = new JFrame(PlotterSettingsManager.class.getSimpleName());
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.add(new PlotterSettingsManager());
-		frame.pack();
-		frame.setVisible(true);
-	}
+        loadAllConfigurations();
+    }
+
+    public void loadAllConfigurations() {
+        configurationNames.clear();
+
+        try {
+            configurationNames.addAll( List.of( topLevelMachinesPreferenceNode.childrenNames() ) );
+        } catch (Exception e) {
+            logger.error("Failed to load preferences", e);
+            configurationNames.add("Default");
+        }
+    }
+
+    public Collection<String> getProfileNames() {
+        return configurationNames;
+    }
+
+    public PlotterSettings loadProfile(String name) {
+        PlotterSettings plotterSettings = new PlotterSettings();
+        plotterSettings.loadConfig(name);
+        return plotterSettings;
+    }
+
+    /**
+     *
+     * @return a new instance of the last selected {@link PlotterSettings}.
+     */
+    public PlotterSettings getLastSelectedProfile() {
+        String uid = topLevelMachinesPreferenceNode.get(KEY_MACHINE_LAST_SELECTED, "0");
+        return loadProfile(uid);
+    }
+
+    public void setLastSelectedProfile(String robotUID) {
+        topLevelMachinesPreferenceNode.put(KEY_MACHINE_LAST_SELECTED, robotUID);
+    }
+
+    public void deleteProfile(String robotUID) throws BackingStoreException {
+        Preferences thisMachineNode = topLevelMachinesPreferenceNode.node(robotUID);
+
+        thisMachineNode.removeNode();
+    }
 }

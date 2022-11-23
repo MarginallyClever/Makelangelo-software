@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.io.Serial;
@@ -52,9 +53,10 @@ public class PlotterSettings {
 	private static final String PREF_KEY_USER_GENERAL_START_GCODE = "userGeneralStartGcode";
 
 	private static final String PREF_KEY_Z_MOTOR_TYPE = "zMotorType";
+	private static final String PREF_KEY_STYLE = "style";
 
 	// Each robot has a global unique identifier
-	private long robotUID = 0;
+	private String robotUID = "0";
 
 	// if we wanted to test for Marginally Clever brand Makelangelo robots
 	private boolean isRegistered = false;
@@ -130,6 +132,8 @@ public class PlotterSettings {
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
 	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
+	private String style = Machines.MAKELANGELO_5.getName();
+
 	public PlotterSettings() {
 		super();
 	}
@@ -190,11 +194,11 @@ public class PlotterSettings {
 		return limitTop;
 	}
 
-	public long getUID() {
+	public String getUID() {
 		return robotUID;
 	}
 
-	protected void setRobotUID(long robotUID) {
+	protected void setRobotUID(String robotUID) {
 		this.robotUID = robotUID;
 	}
 
@@ -206,11 +210,11 @@ public class PlotterSettings {
 	 * Load the machine configuration from {@link Preferences}.
 	 * @param uid the unique id of the robot to be loaded
 	 */
-	public void loadConfig(long uid) {
+	public void loadConfig(String uid) {
 		robotUID = uid;
 
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 
 		limitTop 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_TOP, limitTop);
 		limitBottom 			= thisMachineNode.getDouble(PREF_KEY_LIMIT_BOTTOM, limitBottom);
@@ -242,6 +246,7 @@ public class PlotterSettings {
 		loadPenConfig(thisMachineNode);
 
 		zMotorType = thisMachineNode.getInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
+		style = thisMachineNode.get(PREF_KEY_STYLE, style);
 	}
 
 	private void loadJerkConfig(Preferences thisMachineNode) {
@@ -280,7 +285,7 @@ public class PlotterSettings {
 
 	public void saveConfig() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(Long.toString(robotUID));
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 
 		thisMachineNode.put(PREF_KEY_LIMIT_TOP, Double.toString(limitTop));
 		thisMachineNode.put(PREF_KEY_LIMIT_BOTTOM, Double.toString(limitBottom));
@@ -309,6 +314,7 @@ public class PlotterSettings {
 		savePenConfig(thisMachineNode);
 
 		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
+		thisMachineNode.put(PREF_KEY_STYLE, style);
 
 		notifyListeners();
 	}
@@ -634,5 +640,13 @@ public class PlotterSettings {
 
 	public void setZMotorType(int i) {
 		zMotorType=i;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
 	}
 }
