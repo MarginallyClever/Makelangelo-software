@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.settings;
 
+import com.jogamp.common.util.ArrayHashSet;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,28 +20,47 @@ public class PlotterSettingsManager {
     private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManager.class);
     public static final String KEY_MACHINE_STYLE = "machineStyle";
     public static final String KEY_MACHINE_LAST_SELECTED = "lastLoadedMachine";
-    private final List<String> configurationNames = new ArrayList<>();
+    private final List<String> profileNames = new ArrayList<>();
     private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 
     public PlotterSettingsManager() {
         super();
+        writeMakelangelo5Profile();
+        writeMakelangeloHugeProfile();
 
-        loadAllConfigurations();
+        loadAllProfiles();
     }
 
-    public void loadAllConfigurations() {
-        configurationNames.clear();
+    private void writeMakelangelo5Profile() {
+        PlotterSettings profile = new PlotterSettings();
+        profile.setRobotUID("Makelangelo 5");
+        profile.setMachineSize(650,1000);
+        profile.saveConfig();
+    }
+
+    private void writeMakelangeloHugeProfile() {
+        PlotterSettings profile = new PlotterSettings();
+        profile.setRobotUID("Makelangelo Huge");
+        profile.setMachineSize(1336,2000);
+        profile.saveConfig();
+    }
+
+    /**
+     * Load all profiles from the preferences tree.  Subsequent calls will reload the list.
+     */
+    public void loadAllProfiles() {
+        profileNames.clear();
 
         try {
-            configurationNames.addAll( List.of( topLevelMachinesPreferenceNode.childrenNames() ) );
+            profileNames.addAll( List.of( topLevelMachinesPreferenceNode.childrenNames() ) );
         } catch (Exception e) {
             logger.error("Failed to load preferences", e);
-            configurationNames.add("Default");
+            profileNames.add("Default");
         }
     }
 
     public Collection<String> getProfileNames() {
-        return configurationNames;
+        return profileNames;
     }
 
     public PlotterSettings loadProfile(String name) {
@@ -62,9 +82,22 @@ public class PlotterSettingsManager {
         topLevelMachinesPreferenceNode.put(KEY_MACHINE_LAST_SELECTED, robotUID);
     }
 
-    public void deleteProfile(String robotUID) throws BackingStoreException {
-        Preferences thisMachineNode = topLevelMachinesPreferenceNode.node(robotUID);
-
-        thisMachineNode.removeNode();
+    /**
+     *
+     * @param robotUID
+     * @return true if there was a problem deleting the profile.
+     */
+    public boolean deleteProfile(String robotUID) {
+        if(robotUID == null) return true;
+        try {
+            Preferences thisMachineNode = topLevelMachinesPreferenceNode.node(robotUID);
+            thisMachineNode.removeNode();
+        }
+        catch (BackingStoreException e) {
+            logger.error("Failed to delete profile {}. {}", robotUID, e);
+            return true;
+        }
+        return false;
     }
+
 }
