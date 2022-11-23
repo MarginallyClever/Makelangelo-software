@@ -275,10 +275,6 @@ public final class Makelangelo {
 		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
 		menu.add(bOpenPlotterSettings);
 
-		JMenuItem bOpenPlotterSettingsUserGcode = new JMenuItem(Translator.get("OpenPlotterSettingsUserGcode"));
-		bOpenPlotterSettingsUserGcode.addActionListener((e)-> openPlotterSettingsUserGcode());
-		menu.add(bOpenPlotterSettingsUserGcode);
-		
 		return menu;
 	}
 
@@ -286,7 +282,7 @@ public final class Makelangelo {
 		PlotterSettingsManagerPanel plotterSettingsPanel = new PlotterSettingsManagerPanel(plotterSettingsManager);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
 		dialog.add(plotterSettingsPanel);
-		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.setMinimumSize(new Dimension(350,300));
 		dialog.setResizable(false);
 		dialog.pack();
 
@@ -300,25 +296,6 @@ public final class Makelangelo {
 		});
 
 		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setVisible(true);
-	}
-
-	private void openPlotterSettingsUserGcode() {
-		PlotterSettingsUserGcodePanel settings = new PlotterSettingsUserGcodePanel(myPlotter);
-		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsUserGcodePanel.Title"));
-		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setMinimumSize(new Dimension(300,300));
-		dialog.pack();
-
-		enableMenuBar(false);
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				enableMenuBar(true);
-			}
-		});
-
 		dialog.setVisible(true);
 	}
 

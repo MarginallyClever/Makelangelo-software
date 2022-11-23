@@ -18,6 +18,8 @@ import java.awt.*;
 public class PlotterSettingsPanel extends JPanel {
 	private final PlotterSettings settings;
 
+	private final PlotterSettingsUserGcodePanel userGcodePanel;
+
 	private final SelectDouble machineWidth, machineHeight;
 	private final SelectDouble totalBeltNeeded;
 	private final SelectDouble totalServoNeeded;
@@ -47,6 +49,9 @@ public class PlotterSettingsPanel extends JPanel {
 	public PlotterSettingsPanel(PlotterSettings settings) {
 		super();
 		this.settings = settings;
+
+		userGcodePanel = new PlotterSettingsUserGcodePanel(settings);
+
 
 		JButton buttonSave = new JButton(Translator.get("Save"));
 		buttonSave.addActionListener((e)->save());
@@ -103,19 +108,12 @@ public class PlotterSettingsPanel extends JPanel {
 		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabEssential"),interior0);
 		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabPen"),interior1);
 		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabSimulation"),interior2);
+		tabbedPane.addTab(Translator.get("PlotterSettingsUserGcodePanel.Title"),userGcodePanel);
 
 		// now assemble the dialog
-		this.setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.weighty=0;
-		gbc.weightx=1;
-		gbc.gridx=0;
-		gbc.gridy=0;
-		gbc.weighty=1;
-		this.add(tabbedPane,gbc);
-		gbc.gridy++;
-		gbc.weighty=0;
-		this.add(bottom,gbc);
+		this.setLayout(new BorderLayout());
+		this.add(tabbedPane,BorderLayout.CENTER);
+		this.add(bottom,BorderLayout.SOUTH);
 	}
 
 	private void save() {
@@ -128,6 +126,8 @@ public class PlotterSettingsPanel extends JPanel {
 			// TODO display a notice to the user?
 			return;
 		}
+
+		userGcodePanel.save();
 		
 		settings.setMachineSize(mwf, mhf);
 		settings.setAcceleration(accel);
@@ -159,6 +159,8 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.reset();
 		double w = settings.getLimitRight() - settings.getLimitLeft();
 		double h = settings.getLimitTop() - settings.getLimitBottom();
+
+		userGcodePanel.reset();
 
 		machineWidth.setValue(w);
 		machineHeight.setValue(h);

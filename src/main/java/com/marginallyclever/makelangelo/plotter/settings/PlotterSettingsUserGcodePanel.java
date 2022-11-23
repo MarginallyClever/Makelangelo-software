@@ -8,48 +8,46 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PlotterSettingsUserGcodePanel extends JPanel {
+    private final PlotterSettings settings;
 
-    private final Plotter myPlotter;
+    private final SelectTextArea userGeneralStartGcode;
+    private final SelectTextArea userGeneralEndGcode;
 
-    private SelectTextArea userGeneralStartGcode;
-    private SelectTextArea userGeneralEndGcode;
-
-    public PlotterSettingsUserGcodePanel(Plotter robot) {
+    public PlotterSettingsUserGcodePanel(PlotterSettings settings) {
         super();
-        this.myPlotter = robot;
-        initComponents();
-    }
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-    private void initComponents() {
-        PlotterSettings settings = myPlotter.getSettings();
-        setLayout(new BorderLayout());
+        this.settings = settings;
 
-        JTabbedPane jTabbedPane = new JTabbedPane();
         userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getUserGeneralStartGcode());
         userGeneralStartGcode.setLineWrap(false);
-        jTabbedPane.addTab(Translator.get("PlotterSettings.userGeneralStartGcode"), userGeneralStartGcode);
-        //
+        userGeneralStartGcode.setAlignmentX(0);
+        JLabel label0 = new JLabel(Translator.get("PlotterSettings.userGeneralStartGcode"));
+        label0.setAlignmentX(0);
+        label0.setHorizontalAlignment(SwingConstants.LEADING);
+        this.add(label0);
+        this.add(userGeneralStartGcode);
+
         userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getUserGeneralEndGcode());
         userGeneralEndGcode.setLineWrap(false);
-        jTabbedPane.addTab(Translator.get("PlotterSettings.userGeneralEndGcode"), userGeneralEndGcode);
-        //
-        add(jTabbedPane, BorderLayout.CENTER);
-        //
-        JPanel bottom = new JPanel(new FlowLayout());
-        JButton buttonSave = new JButton(Translator.get("Save"));
-        bottom.add(buttonSave);
-        buttonSave.addActionListener((e) -> {
-            save();
-        });
-        add(bottom, BorderLayout.SOUTH);
-        //
-        setMinimumSize(new Dimension(640, 400));
-        setPreferredSize(new Dimension(640, 400));
+        userGeneralEndGcode.setAlignmentX(0);
+        label0 = new JLabel(Translator.get("PlotterSettings.userGeneralEndGcode"));
+        label0.setAlignmentX(0);
+        label0.setHorizontalAlignment(SwingConstants.LEADING);
+        this.add(label0);
+        this.add(userGeneralEndGcode);
+
+        //userGeneralStartGcode.setMinimumSize(new Dimension(300, 200));
+        //userGeneralEndGcode.setMinimumSize(new Dimension(300, 200));
     }
 
-    private void save() {
-        PlotterSettings settings = myPlotter.getSettings();
+    public void save() {
         settings.setUserGeneralStartGcode(userGeneralStartGcode.getText());
         settings.setUserGeneralEndGcode(userGeneralEndGcode.getText());
+    }
+
+    public void reset() {
+        userGeneralStartGcode.setText(settings.getUserGeneralStartGcode());
+        userGeneralEndGcode.setText(settings.getUserGeneralEndGcode());
     }
 }
