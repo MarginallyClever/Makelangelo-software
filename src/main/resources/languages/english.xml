@@ -2309,7 +2309,7 @@
 	</string>
 	<string>
 		<key>PlotterSettingsUserGcodePanel.Title</key>
-		<value>Plotter user Start/End GCode</value>
+		<value>Custom GCode</value>
 		<hint>Dialog title</hint>
 	</string>
 	<string>
@@ -2332,5 +2332,31 @@
 		<value>Tool End-GCode</value>
 		<hint>TextArea Label</hint>
 	</string>
+
+	<string>
+		<key>PlotterSettingsManagerPanel.RemoveProfile</key>
+		<value>-</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.AddProfile</key>
+		<value>+</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileName</key>
+		<value>New unique name:</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameSameAsOld</key>
+		<value>Name unchanged.  Try again!</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key>
+		<value>Name already in use.  Try again!</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key>
+		<value>Name cannot be blank.  Try again!</value>
+	</string>
+
 
 </language>
