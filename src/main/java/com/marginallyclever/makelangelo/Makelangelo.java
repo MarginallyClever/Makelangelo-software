@@ -326,7 +326,6 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 		menu.setMnemonic('k');
-		menu.add(createRobotStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));//"ctrl E"
@@ -370,33 +369,6 @@ public final class Makelangelo {
 		logger.debug("Switching to render style '{}'", name);
 		TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
 		myTurtleRenderer.setRenderer(renderer);
-	}
-
-	private JMenuItem createRobotStyleMenu() {
-		JMenu menu = new JMenu(Translator.get("RobotMenu.RobotStyle"));
-		
-		ButtonGroup group = new ButtonGroup();
-
-		Arrays.stream(Machines.values())
-				.forEach(iter -> {
-					PlotterRenderer pr = iter.getPlotterRenderer();
-					String name = iter.getName();
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
-					if (myPlotterRenderer == pr) button.setSelected(true);
-					button.addActionListener((e)-> onMachineChange(name));
-					menu.add(button);
-					group.add(button);
-				});
-
-		return menu;
-	}
-
-	private void onMachineChange(String name) {
-		logger.debug("Switching to Machine '{}'", name);
-		Machines machineStyle = Machines.findByName(name);
-		myPlotterRenderer = machineStyle.getPlotterRenderer();
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		preferences.put(PlotterSettingsManager.KEY_MACHINE_STYLE, machineStyle.name());
 	}
 
 	private void saveGCode() {

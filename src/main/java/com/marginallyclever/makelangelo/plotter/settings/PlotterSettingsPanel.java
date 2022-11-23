@@ -72,7 +72,7 @@ public class PlotterSettingsPanel extends JPanel {
 		List<String> machineStyles = getMachineStyleNames();
 		int index = machineStyles.indexOf(settings.getStyle());
 
-		interior0.add(style              = new SelectOneOfMany("style",       Translator.get("PlotterSettingsPanel.Style"				), machineStyles.toArray(new String[0]), index));
+		interior0.add(style              = new SelectOneOfMany("style",       Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
 		interior0.add(machineWidth 		 = new SelectDouble("width",		 	 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));
 		interior0.add(machineHeight 	 = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getLimitTop() - settings.getLimitBottom()));
 		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength",  Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
