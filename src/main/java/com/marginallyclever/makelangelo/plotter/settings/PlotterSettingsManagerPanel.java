@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.plotter.settings;
 
 import java.awt.*;
 import java.io.Serial;
+import java.util.Collection;
 import java.util.prefs.BackingStoreException;
 
-import javax.print.attribute.standard.JobMessageFromOperator;
 import javax.swing.*;
 
 import org.slf4j.Logger;
@@ -52,47 +52,80 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private Component createTopButtons() {
 		JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topButtons.add(configurationList);
-		topButtons.add(new JButton(new AbstractAction("+") {
+		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
 			@Serial
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				PlotterSettings ps = new PlotterSettings();
-				String newUID = JOptionPane.showInputDialog(this, Translator.get("PlotterSettingsManagerPanel.NewProfileName"));
-				if(!newUID.contentEquals(ps.getUID())) {
-					ps.setRobotUID(newUID);
-					ps.saveConfig();
-					model.addElement(newUID);
-				}
+				// copy the current profile and rename the new instance.
+				runRenameProfileDialog((String)model.getSelectedItem());
 			}
 		}));
-		topButtons.add(new JButton(new AbstractAction("-") {
+		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.RemoveProfile")) {
 			@Serial
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				String uid = (String)model.getSelectedItem();
-				if(!testForDefaultProfile(uid)) {
-					removeProfile(uid);
-				}
+				removeProfile((String)model.getSelectedItem());
 			}
 		}));
 		return topButtons;
 	}
 
-	private boolean testForDefaultProfile(String uid) {
-		// TODO make this more sophisticated later
+	private void runRenameProfileDialog(String uid) {
+		boolean goAgain;
+
+		do {
+			String newUID = JOptionPane.showInputDialog(this, Translator.get("PlotterSettingsManagerPanel.NewProfileName"), uid);
+			if( newUID.isEmpty() || newUID.isBlank() ) {
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank"));
+				goAgain = true;
+			}
+			if( nameIsTaken(newUID) ) {
+				JOptionPane.showMessageDialog(this, Translator.get("PlotterSettingsManagerPanel.NewProfileNameAlreadyExists"));
+				goAgain = true;
+			} else {
+				// found a unique name.  try to update the backing store.
+				goAgain = renameProfile(uid,newUID);
+			}
+		} while(goAgain);
+	}
+
+	/**
+	 * Creates a copy of the current profile, changes the RobotUID, and saves it as a new instance.  Does not change the
+	 * old profile.
+	 * TODO needs a unit test
+	 * @param oldUID
+	 * @param newUID
+	 * @return true if there was a problem.
+	 */
+	private boolean renameProfile(String oldUID,String newUID) {
+		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
+		ps.setRobotUID(newUID);
+		try {
+			ps.saveConfig();
+		} catch(Exception e) {
+			logger.error("failed to rename {} to {}. {}",oldUID,newUID,e);
+			return true;
+		}
+
+		// in with the new
+		plotterSettingsManager.loadAllProfiles();
+		model.addElement(newUID);
 		return false;
 	}
 
+	// TODO could use a unit test
+	private boolean nameIsTaken(String newUID) {
+		Collection<String> list = plotterSettingsManager.getProfileNames();
+		return list.contains(newUID);
+	}
+
 	private void removeProfile(String uid) {
-		model.removeElement(uid);
-		try {
-			plotterSettingsManager.deleteProfile(uid);
-		} catch (BackingStoreException ex) {
-			logger.error("Failed to delete profile", ex);
+		if(plotterSettingsManager.deleteProfile(uid)) {
+			model.removeElement(uid);
 		}
 	}
 
@@ -121,6 +154,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		JFrame frame = new JFrame(PlotterSettingsManagerPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.add(new PlotterSettingsManagerPanel(new PlotterSettingsManager()));
+		frame.setMinimumSize(new Dimension(350,300));
 		frame.pack();
 		frame.setVisible(true);
 	}
