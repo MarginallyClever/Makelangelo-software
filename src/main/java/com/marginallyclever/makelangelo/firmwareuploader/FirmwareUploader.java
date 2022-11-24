@@ -49,10 +49,12 @@ public class FirmwareUploader {
 	
 	public void run(String hexPath,String portName) throws Exception {
 		logger.debug("update started");
-		
-		File f = attempt(1, "../avrdude.conf");
-		if(!f.exists()) f = attempt(2, "../../etc/avrdude.conf");
-		if(!f.exists()) f = attempt(3, "../etc/avrdude.conf");
+
+		int i=0;
+		File f = attempt(i++, "avrdude.conf");
+		if(!f.exists()) f = attempt(i++, "../avrdude.conf");
+		if(!f.exists()) f = attempt(i++, "../../etc/avrdude.conf");
+		if(!f.exists()) f = attempt(i++, "../etc/avrdude.conf");
 		if(!f.exists()) {
 			throw new Exception("Cannot find nearby avrdude.conf");
 		}

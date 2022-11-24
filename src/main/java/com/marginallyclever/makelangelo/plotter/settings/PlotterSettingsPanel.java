@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +71,14 @@ public class PlotterSettingsPanel extends JPanel {
 		SelectPanel interior2 = new SelectPanel();
 
 		List<String> machineStyles = getMachineStyleNames();
-		int index = machineStyles.indexOf(settings.getStyle());
+		String myStyle = settings.getStyle();
+		int index;
+		for(index=0;index< machineStyles.size();++index) {
+			if(machineStyles.get(index).contentEquals(myStyle)) {
+				break;
+			}
+		}
+		if(index<0 || index >= machineStyles.size()) index=0;
 
 		interior0.add(style              = new SelectOneOfMany("style",       Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
 		interior0.add(machineWidth 		 = new SelectDouble("width",		 	 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));

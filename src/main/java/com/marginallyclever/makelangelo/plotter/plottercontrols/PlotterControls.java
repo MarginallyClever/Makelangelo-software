@@ -98,6 +98,9 @@ public class PlotterControls extends JPanel {
 					MarlinInterfaceEvent.DID_NOT_FIND,
 					MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
 						if (!isErrorAlreadyDisplayed) {
+							/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
+							 * robot being turned off while COM port is connected.
+							 */
 							JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 							isErrorAlreadyDisplayed = true;
 						}
