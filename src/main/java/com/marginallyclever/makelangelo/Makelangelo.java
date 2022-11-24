@@ -140,8 +140,6 @@ public final class Makelangelo {
 
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
 
-		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
-
 		updatePlotterRenderer();
 
 		if(previewPanel != null) {
@@ -162,6 +160,7 @@ public final class Makelangelo {
 	}
 
 	private void onPlotterSettingsUpdate(PlotterSettings e) {
+		myPlotter.setSettings(e);
 		if(previewPanel != null) previewPanel.repaint();
 		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
 		if(f instanceof MarlinSimulationVisualizer) {
@@ -294,7 +293,7 @@ public final class Makelangelo {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
+				onPlotterSettingsUpdate(plotterSettingsManager.getLastSelectedProfile());
 				enableMenuBar(true);
 			}
 		});
@@ -348,13 +347,13 @@ public final class Makelangelo {
 
 	private JMenuItem createRenderStyleMenu() {
 		JMenu menu = new JMenu(Translator.get("RobotMenu.RenderStyle"));
-		
+
 		ButtonGroup group = new ButtonGroup();
 
 		Arrays.stream(TurtleRenderFactory.values())
 				.forEach(iter -> {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
-					String name = iter.getName();					
+					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
 					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));

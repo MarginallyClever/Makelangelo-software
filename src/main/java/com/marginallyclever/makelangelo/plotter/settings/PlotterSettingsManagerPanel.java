@@ -124,7 +124,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	}
 
 	private void removeProfile(String uid) {
-		if(plotterSettingsManager.deleteProfile(uid)) {
+		if(!plotterSettingsManager.deleteProfile(uid)) {
 			model.removeElement(uid);
 		}
 	}
@@ -136,6 +136,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 			if(plotterSettingsPanel!=null) {
 				this.remove(plotterSettingsPanel);
 			}
+			plotterSettingsManager.setLastSelectedProfile(name);
 			PlotterSettings plotterSettings = plotterSettingsManager.loadProfile(name);
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
 			this.add(plotterSettingsPanel,BorderLayout.CENTER);

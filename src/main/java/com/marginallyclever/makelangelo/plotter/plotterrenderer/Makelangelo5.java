@@ -316,7 +316,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	private void paintSafeArea(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double top = settings.getLimitTop();
-		// double bottom = settings.getLimitBottom();
+		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
 
@@ -326,8 +326,8 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(left - 70f, top + 70f);
 		gl2.glVertex2d(right + 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, top - 1000);
-		gl2.glVertex2d(left - 70f, top - 1000);
+		gl2.glVertex2d(right + 70f, bottom);
+		gl2.glVertex2d(left - 70f, bottom);
 		gl2.glEnd();
 	}
 }
