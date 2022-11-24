@@ -92,8 +92,9 @@ public class PlotterSettingsManager {
         try {
             Preferences thisMachineNode = topLevelMachinesPreferenceNode.node(robotUID);
             thisMachineNode.removeNode();
+            profileNames.remove(robotUID);
         }
-        catch (BackingStoreException e) {
+        catch (Exception e) {
             logger.error("Failed to delete profile {}. {}", robotUID, e);
             return true;
         }
