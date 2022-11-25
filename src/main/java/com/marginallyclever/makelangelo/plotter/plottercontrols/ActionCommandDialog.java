@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * {@link ActionCommandDialog} is a dialog that allows the user to enter a question and a list of choice responses.
+ * It was written to be used by Marlin Action Commands.  See {@link MarlinInterface} for more information.
+ */
 public class ActionCommandDialog {
     private String promptMessage = "";
     private final List<String> options = new ArrayList<>();
@@ -14,14 +18,12 @@ public class ActionCommandDialog {
     public ActionCommandDialog() {}
 
     public void run(JComponent parentComponent, String title, Consumer<Integer> consumer) {
-        String[] choices = new String[options.size()];
-        choices = options.toArray(choices);
-        String[] finalChoices = choices;
+        String[] choices = options.toArray(new String[0]);
 
-        JOptionPane pane = new JOptionPane(promptMessage, JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, finalChoices, choices[0]);
+        JOptionPane pane = new JOptionPane(promptMessage, JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, choices, choices[0]);
         dialog = pane.createDialog(parentComponent, title);
         dialog.setVisible(true);
-        result = saveResult(pane, finalChoices);
+        result = saveResult(pane, choices);
         consumer.accept(result);
         dialog.dispose();
         dialog=null;
