@@ -25,7 +25,6 @@ public class LoadDXF implements TurtleLoader {
 	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 	private final Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
-	private double imageCenterX,imageCenterY;
 	private Turtle myTurtle;
 	
 	
@@ -52,22 +51,19 @@ public class LoadDXF implements TurtleLoader {
 		parser.parse(in, DXFParser.DEFAULT_ENCODING);
 		
 		DXFDocument doc = parser.getDocument();
-		Bounds bounds = doc.getBounds();
-		imageCenterX = (bounds.getMaximumX() + bounds.getMinimumX()) / 2.0;
-		imageCenterY = (bounds.getMaximumY() + bounds.getMinimumY()) / 2.0;
 
 		myTurtle = new Turtle();
 		
 		// convert each entity
-		Iterator<?> layerIter = doc.getDXFLayerIterator();
-		while (layerIter.hasNext()) {
-			DXFLayer layer = (DXFLayer)layerIter.next();
+		Iterator<?> layerItr = doc.getDXFLayerIterator();
+		while (layerItr.hasNext()) {
+			DXFLayer layer = (DXFLayer)layerItr.next();
 			int color = layer.getColor();
 			logger.debug("Found layer {}(color index={})", layer.getName(), color);
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
-			Iterator<?> entityTypeIter = layer.getDXFEntityTypeIterator();
-			if(entityTypeIter.hasNext()) {
+			Iterator<?> entityTypeItr = layer.getDXFEntityTypeIterator();
+			if(entityTypeItr.hasNext()) {
 				// ignore the color index, DXF is dumb.
 				myTurtle.setColor(new ColorRGB(0,0,0));
 
@@ -100,11 +96,11 @@ public class LoadDXF implements TurtleLoader {
 	}
 
 	private double TX(double x) {
-		return (x-imageCenterX);
+		return x;
 	}
 	
 	private double TY(double y) {
-		return (y-imageCenterY);
+		return y;
 	}
 	
 	private void parseDXFLine(DXFLine entity) {
