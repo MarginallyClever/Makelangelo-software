@@ -140,8 +140,6 @@ public final class Makelangelo {
 
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
 
-		updatePlotterRenderer();
-
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
@@ -272,7 +270,7 @@ public final class Makelangelo {
 		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
 		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
 		menu.add(bOpenPaperSettings);
-		
+
 		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
 		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
 		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
