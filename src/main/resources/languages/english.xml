@@ -231,12 +231,12 @@
 	</string>
 
 	<string>
-		<key>MachineWidth</key>
+		<key>PlotterSettingsPanel.MachineWidth</key>
 		<value>Machine width (mm)</value>
 		<hint>Machine settings</hint>
 	</string>
 	<string>
-		<key>MachineHeight</key>
+		<key>PlotterSettingsPanel.MachineHeight</key>
 		<value>Machine height (mm)</value>
 		<hint>Machine settings</hint>
 	</string>
@@ -325,7 +325,7 @@
 		<hint>machine size control panel</hint>
 	</string>
 	<string>
-		<key>AdjustAcceleration</key>
+		<key>PlotterSettingsPanel.AdjustAcceleration</key>
 		<value>Acceleration (mm/s²)</value>
 		<hint>machine size control panel</hint>
 	</string>
@@ -478,12 +478,12 @@
 	</string>
 
 	<string>
-		<key>pen up color</key>
+		<key>PlotterSettingsPanel.pen up color</key>
 		<value>Up color</value>
 		<hint>Pen settings</hint>
 	</string>
 	<string>
-		<key>pen down color</key>
+		<key>PlotterSettingsPanel.pen down color</key>
 		<value>Down color</value>
 		<hint>Pen settings</hint>
 	</string>
@@ -809,7 +809,7 @@
 		<hint>manual driving dialog</hint>
 	</string>
 	<string>
-		<key>Speed</key>
+		<key>PlotterSettingsPanel.Speed</key>
 		<value>Draw speed (mm/min)</value>
 		<hint>manual driving dialog</hint>
 	</string>
@@ -1077,73 +1077,73 @@
 	</string>
 
 	<string>
-		<key>penToolAdjust</key>
+		<key>PlotterSettingsPanel.penToolAdjust</key>
 		<value>Pen</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolDiameter</key>
+		<key>PlotterSettingsPanel.penToolDiameter</key>
 		<value>Diameter (mm)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolMaxFeedRate</key>
+		<key>PlotterSettingsPanel.penToolMaxFeedRate</key>
 		<value>Travel speed (mm/min)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolUp</key>
+		<key>PlotterSettingsPanel.penToolUp</key>
 		<value>Up angle (degrees)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolDown</key>
+		<key>PlotterSettingsPanel.penToolDown</key>
 		<value>Down angle (degrees)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolLiftSpeed</key>
+		<key>PlotterSettingsPanel.penToolLiftSpeed</key>
 		<value>Pen lift time (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolLowerSpeed</key>
+		<key>PlotterSettingsPanel.penToolLowerSpeed</key>
 		<value>Pen lower time (ms)</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 	<string>
-		<key>penToolTest</key>
+		<key>PlotterSettingsPanel.penToolTest</key>
 		<value>Test</value>
 		<hint>Adjust pen tool</hint>
 	</string>
 
 	<string>
-		<key>spraypaintToolTest</key>
+		<key>PlotterSettingsPanel.spraypaintToolTest</key>
 		<value>Spraypaint</value>
 		<hint>Spraypaint tool Make a dot</hint>
 	</string>
 	<string>
-		<key>spraypaintToolDiameter</key>
+		<key>PlotterSettingsPanel.spraypaintToolDiameter</key>
 		<value>Dot size</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolMaxFeedRate</key>
+		<key>PlotterSettingsPanel.spraypaintToolMaxFeedRate</key>
 		<value>max speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolUp</key>
+		<key>PlotterSettingsPanel.spraypaintToolUp</key>
 		<value>Off</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolDown</key>
+		<key>PlotterSettingsPanel.spraypaintToolDown</key>
 		<value>On</value>
 		<hint>Spraypaint tool</hint>
 	</string>
 	<string>
-		<key>spraypaintToolLiftSpeed</key>
+		<key>PlotterSettingsPanel.spraypaintToolLiftSpeed</key>
 		<value>On/off speed</value>
 		<hint>Spraypaint tool</hint>
 	</string>
@@ -1492,17 +1492,17 @@
 		<hint>Preferences menu</hint>
 	</string>
 	<string>
-		<key>ServoLengthNeeded</key>
+		<key>PlotterSettingsPanel.ServoLengthNeeded</key>
 		<value>Servo wire length (m)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	<string>
-		<key>StepperLengthNeeded</key>
+		<key>PlotterSettingsPanel.StepperLengthNeeded</key>
 		<value>Stepper wire length (m,each)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
 	<string>
-		<key>BeltLengthNeeded</key>
+		<key>PlotterSettingsPanel.BeltLengthNeeded</key>
 		<value>Timing belt length (m,each)</value>
 		<hint>settings > machine > measurement calculations</hint>
 	</string>
@@ -2153,6 +2153,11 @@
 		<hint>plotter shape and size</hint>
 	</string>
 	<string>
+		<key>PlotterSettingsPanel.TabPen</key>
+		<value>Pen</value>
+		<hint>pen shape, color, and speed</hint>
+	</string>
+	<string>
 		<key>PlotterSettingsPanel.TabSimulation</key>
 		<value>Simulation</value>
 		<hint>plotter simulation for time estimates</hint>
@@ -2304,17 +2309,17 @@
 	</string>
 	<string>
 		<key>PlotterSettingsUserGcodePanel.Title</key>
-		<value>Plotter user Start/End GCode</value>
+		<value>Custom GCode</value>
 		<hint>Dialog title</hint>
 	</string>
 	<string>
 		<key>PlotterSettings.userGeneralStartGcode</key>
-		<value>Start-GCode</value>
+		<value>Start GCode</value>
 		<hint>TextArea Label</hint>
 	</string>
 	<string>
 		<key>PlotterSettings.userGeneralEndGcode</key>
-		<value>End-GCode</value>
+		<value>End GCode</value>
 		<hint>TextArea Label</hint>
 	</string>
 	<string>
@@ -2328,4 +2333,32 @@
 		<hint>TextArea Label</hint>
 	</string>
 
+	<string>
+		<key>PlotterSettingsManagerPanel.RemoveProfile</key>
+		<value>-</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.AddProfile</key>
+		<value>+</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileName</key>
+		<value>New unique name:</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameSameAsOld</key>
+		<value>Name unchanged.  Try again!</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key>
+		<value>Name already in use.  Try again!</value>
+	</string>
+	<string>
+		<key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key>
+		<value>Name cannot be blank.  Try again!</value>
+	</string>
+	<string>
+		<key>PlotterSettingsPanel.Style</key>
+		<value>Looks like a...</value>
+	</string>
 </language>

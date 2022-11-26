@@ -47,10 +47,8 @@ public class MarlinInterface extends JPanel {
 	// Marlin sends this event when the robot must be homed first
 	private static final String STR_HOME_XY_FIRST = "echo:Home XY First";
 
-	// Marlin sends this message when the robot is sending an action command to the host (us)
+	// Marlin sends this message when the robot is sending an Action Command.
 	private static final String STR_ACTION_COMMAND = "//action:";
-	// This host is prepared to process action commands and reply with M876.
-
 	public static final String PROMPT_BEGIN = "prompt_begin";
 	public static final String PROMPT_CHOICE = "prompt_choice";
 	public static final String PROMPT_BUTTON = "prompt_button";

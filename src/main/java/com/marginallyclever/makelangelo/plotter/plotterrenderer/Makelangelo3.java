@@ -21,7 +21,7 @@ public class Makelangelo3 implements PlotterRenderer {
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
-	 * @param settings
+	 * @param robot
 	 */
 	private void paintControlBox(GL2 gl2,Plotter robot) {
 		double cy = robot.getLimitTop();
@@ -142,59 +142,4 @@ public class Makelangelo3 implements PlotterRenderer {
 		// clean up
 		gl2.glPopMatrix();
 	}
-/*
-	@Override
-	public String getVersion() {
-		return "3";
-	}
-
-	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-	
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return true;
-	}
-	
-	@Override
-	public float getFeedrateMax() {
-		return 400;
-	}
-
-	@Override
-	public float getFeedrateDefault() {
-		return 100;
-	}
-	
-	@Override
-	public float getAccelerationMax() {
-		return 50;
-	}
-
-	@Override
-	public float getPenLiftTime() {
-		return 50;
-	}
-	
-	@Override
-	public float getZAngleOn() {
-		return 40;
-	}*/
 }

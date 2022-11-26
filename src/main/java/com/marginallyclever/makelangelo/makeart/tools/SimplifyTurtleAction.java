@@ -32,19 +32,20 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 		logger.debug("begin @ {}", os);
 		
 		LineCollection originalLines = new LineCollection(turtle.getAsLineSegments());
-		int originalCount = originalLines.size();
-		logger.debug("  Converted to {} lines.", originalCount);
+		int beforeCount = originalLines.size();
+		logger.debug("  Converted to {} lines.", beforeCount);
 
 		LineCollection longLines = removeColinearSegments(originalLines);
-		int longCount = longLines.size();
-		int shortCount = originalCount - longCount;
-		logger.debug("  - {} shorts = {} lines.", shortCount, longCount);
-
+		int afterCount = longLines.size();
+		int change = beforeCount - afterCount;
+		logger.debug("  - {} shorts = {} lines.", change, afterCount);
+		if(change<=0) {
+			return turtle;
+		}
 		Turtle t = new Turtle();
 		t.addLineSegments(longLines);
 		int ns = t.history.size();
 		logger.debug("end @ {}", ns);
-		
 		return t;
 	}
 

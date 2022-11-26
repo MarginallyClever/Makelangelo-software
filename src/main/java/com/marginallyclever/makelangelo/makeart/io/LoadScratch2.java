@@ -26,7 +26,7 @@ public class LoadScratch2 implements TurtleLoader {
 	
 	private final String PROJECT_JSON = "project.json";
 	
-	private class Scratch2Variable {
+	private static class Scratch2Variable {
 		public String name;
 		public double value;
 
@@ -36,7 +36,7 @@ public class LoadScratch2 implements TurtleLoader {
 		}
 	};
 	
-	private class Scratch2List {
+	private static class Scratch2List {
 		public String name;
 		public ArrayList<Double> contents;
 
@@ -203,11 +203,11 @@ public class LoadScratch2 implements TurtleLoader {
 				if(varValue instanceof Number) {
 					Number num = (Number)varValue;
 					value = (float)num.doubleValue();
-					scratchVariables.add(new Scratch2Variable(varName,value));
+					scratchVariables.add(new Scratch2Variable(varName, value));
 				} else if(varValue instanceof String) {
 					try {
 						value = Float.parseFloat((String)varValue);
-	    				scratchVariables.add(new Scratch2Variable(varName,value));
+	    				scratchVariables.add(new Scratch2Variable(varName, value));
 					} catch (Exception e) {
 						throw new Exception("Variables must be numbers.", e);
 					}

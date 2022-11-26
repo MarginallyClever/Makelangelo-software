@@ -32,12 +32,12 @@ public class LoadSVG implements TurtleLoader {
 
 	private static final String LABEL_STROKE="stroke:";
 
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
+	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	private Turtle myTurtle;
 
 	private boolean isNewPath;  // for cubic paths
-	private Vector3d pathFirstPoint = new Vector3d();
-	private Vector3d pathPoint = new Vector3d();
+	private final Vector3d pathFirstPoint = new Vector3d();
+	private final Vector3d pathPoint = new Vector3d();
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -65,8 +65,7 @@ public class LoadSVG implements TurtleLoader {
 		myTurtle.setColor(new ColorRGB(0,0,0));
 		parseAll(document);
 
-		Rectangle2D.Double r = myTurtle.getBounds();
-		myTurtle.translate(-r.width/2,-r.height/2);
+		// plotter coordinates are inverted in Y so flip the image.
 		myTurtle.scale(1, -1);
 
 		Turtle t2 = new Turtle();

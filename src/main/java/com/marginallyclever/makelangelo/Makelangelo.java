@@ -31,7 +31,8 @@ import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsPanel;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsManager;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsUserGcodePanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
@@ -87,17 +88,18 @@ public final class Makelangelo {
 	private static final String KEY_WINDOW_Y = "windowY";
 	private static final String KEY_WINDOW_WIDTH = "windowWidth";
 	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
-	private static final String KEY_MACHINE_STYLE = "machineStyle";
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
 	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
 	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
 
 	private static Logger logger;
 
-	private final MakelangeloSettingPanel myPreferencesPanel;
+	private final MakelangeloSettingPanel myPreferencesPanel = new MakelangeloSettingPanel();
 	
 	private final Camera camera;
-	private Plotter myPlotter;
+
+	private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
+	private final Plotter myPlotter = new Plotter();
 	private final Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
 	private static boolean isMacOS = false;
@@ -126,17 +128,6 @@ public final class Makelangelo {
 	public Makelangelo() {
 		logger.debug("Locale={}", Locale.getDefault().toString());
 		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-		myPreferencesPanel = new MakelangeloSettingPanel();
-
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		String machineStyle = preferences.get(KEY_MACHINE_STYLE, Machines.MAKELANGELO_5.getName());
-		logger.debug("machine style: {}", machineStyle);
-
-		try {
-			myPlotterRenderer = Machines.valueOf(machineStyle).getPlotterRenderer();
-		} catch (Exception e) {
-			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
-		}
 
 		startRobot();
 		
@@ -146,17 +137,28 @@ public final class Makelangelo {
 	
 	private void startRobot() {
 		logger.debug("Starting robot...");
-		myPlotter = new Plotter();
-		myPlotter.getSettings().addPlotterSettingsListener(this::onPlotterSettingsUpdate);
+
+		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
+
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
 		}
-		myPlotter.getSettings().loadConfig(0);
+
 		onPlotterSettingsUpdate(myPlotter.getSettings());
 	}
 
+	private void updatePlotterRenderer() {
+		try {
+			myPlotterRenderer = Machines.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+		} catch (Exception e) {
+			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
+			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+		}
+	}
+
 	private void onPlotterSettingsUpdate(PlotterSettings e) {
+		myPlotter.setSettings(e);
 		if(previewPanel != null) previewPanel.repaint();
 		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
 		if(f instanceof MarlinSimulationVisualizer) {
@@ -166,6 +168,7 @@ public final class Makelangelo {
 		myTurtleRenderer.setUpColor(e.getPenUpColor());
 		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
+		updatePlotterRenderer();
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
@@ -267,24 +270,20 @@ public final class Makelangelo {
 		JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
 		bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
 		menu.add(bOpenPaperSettings);
-		
+
 		JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
 		bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
 		bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
 		menu.add(bOpenPlotterSettings);
 
-		JMenuItem bOpenPlotterSettingsUserGcode = new JMenuItem(Translator.get("OpenPlotterSettingsUserGcode"));
-		bOpenPlotterSettingsUserGcode.addActionListener((e)-> openPlotterSettingsUserGcode());
-		menu.add(bOpenPlotterSettingsUserGcode);
-		
 		return menu;
 	}
 
 	private void openPlotterSettings() {
-		PlotterSettingsPanel settings = new PlotterSettingsPanel(myPlotter);
+		PlotterSettingsManagerPanel plotterSettingsPanel = new PlotterSettingsManagerPanel(plotterSettingsManager);
 		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsPanel.Title"));
-		dialog.add(settings);
-		dialog.setMinimumSize(new Dimension(300,300));
+		dialog.add(plotterSettingsPanel);
+		dialog.setMinimumSize(new Dimension(350,300));
 		dialog.setResizable(false);
 		dialog.pack();
 
@@ -292,30 +291,12 @@ public final class Makelangelo {
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
+				onPlotterSettingsUpdate(plotterSettingsManager.getLastSelectedProfile());
 				enableMenuBar(true);
 			}
 		});
 
 		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setVisible(true);
-	}
-
-	private void openPlotterSettingsUserGcode() {
-		PlotterSettingsUserGcodePanel settings = new PlotterSettingsUserGcodePanel(myPlotter);
-		JDialog dialog = new JDialog(mainFrame,Translator.get("PlotterSettingsUserGcodePanel.Title"));
-		dialog.add(settings);
-		dialog.setLocationRelativeTo(mainFrame);
-		dialog.setMinimumSize(new Dimension(300,300));
-		dialog.pack();
-
-		enableMenuBar(false);
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				enableMenuBar(true);
-			}
-		});
-
 		dialog.setVisible(true);
 	}
 
@@ -342,7 +323,6 @@ public final class Makelangelo {
 	private JMenu createRobotMenu() {
 		JMenu menu = new JMenu(Translator.get("Robot"));
 		menu.setMnemonic('k');
-		menu.add(createRobotStyleMenu());
 		
 		JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
 		bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));//"ctrl E"
@@ -365,13 +345,13 @@ public final class Makelangelo {
 
 	private JMenuItem createRenderStyleMenu() {
 		JMenu menu = new JMenu(Translator.get("RobotMenu.RenderStyle"));
-		
+
 		ButtonGroup group = new ButtonGroup();
 
 		Arrays.stream(TurtleRenderFactory.values())
 				.forEach(iter -> {
 					TurtleRenderer renderer = iter.getTurtleRenderer();
-					String name = iter.getName();					
+					String name = iter.getName();
 					JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
 					if (myTurtleRenderer.getRenderer() == renderer) button.setSelected(true);
 					button.addActionListener((e)-> onTurtleRenderChange(name));
@@ -386,33 +366,6 @@ public final class Makelangelo {
 		logger.debug("Switching to render style '{}'", name);
 		TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
 		myTurtleRenderer.setRenderer(renderer);
-	}
-
-	private JMenuItem createRobotStyleMenu() {
-		JMenu menu = new JMenu(Translator.get("RobotMenu.RobotStyle"));
-		
-		ButtonGroup group = new ButtonGroup();
-
-		Arrays.stream(Machines.values())
-				.forEach(iter -> {
-					PlotterRenderer pr = iter.getPlotterRenderer();
-					String name = iter.getName();
-					JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
-					if (myPlotterRenderer == pr) button.setSelected(true);
-					button.addActionListener((e)-> onMachineChange(name));
-					menu.add(button);
-					group.add(button);
-				});
-
-		return menu;
-	}
-
-	private void onMachineChange(String name) {
-		logger.debug("Switching to Machine '{}'", name);
-		Machines machineStyle = Machines.findByName(name);
-		myPlotterRenderer = machineStyle.getPlotterRenderer();
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		preferences.put(KEY_MACHINE_STYLE, machineStyle.name());
 	}
 
 	private void saveGCode() {
@@ -1063,6 +1016,7 @@ public final class Makelangelo {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myPlotter.getSettings().saveConfig();
+			plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
 			savePaths();
 
 			// Run this on another thread than the AWT event queue to

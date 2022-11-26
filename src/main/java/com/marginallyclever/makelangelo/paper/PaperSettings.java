@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.paper;
 
 import java.beans.PropertyChangeEvent;
+import java.io.Serial;
 
 import javax.swing.JFrame;
 
@@ -17,10 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PaperSettings extends SelectPanel {
+	@Serial
 	private static final long serialVersionUID = 2824594482225714527L;
 	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
 
-	private static PaperSize commonPaperSizes [] = {
+	private static final PaperSize[] commonPaperSizes = {
 		new PaperSize("4A0",1682,2378),
 		new PaperSize("2A0",1189,1682),
 		new PaperSize("A0",841,1189),
@@ -49,12 +51,12 @@ public class PaperSettings extends SelectPanel {
 		new PaperSize("Arch E1",762,1067)
 	};
 
-	private Paper myPaper;
-	private SelectOneOfMany paperSizes;
-	private SelectDouble pw, ph, shiftX, shiftY, ang;
-	private SelectBoolean isLandscape;
-	private SelectSlider paperMargin;
-	private SelectColor paperColor;
+	private final Paper myPaper;
+	private final SelectOneOfMany paperSizes;
+	private final SelectDouble pw, ph, shiftX, shiftY, ang;
+	private final SelectBoolean isLandscape;
+	private final SelectSlider paperMargin;
+	private final SelectColor paperColor;
 	
 	public PaperSettings(Paper paper) {
 		this.myPaper = paper;
@@ -86,13 +88,13 @@ public class PaperSettings extends SelectPanel {
 		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
 		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
-		paperSizes.addPropertyChangeListener((e)->onPaperSizeChange(e));
-		pw.addPropertyChangeListener((e)->onPaperDimensionsChange(e));
-		ph.addPropertyChangeListener((e)->onPaperDimensionsChange(e));
+		paperSizes.addPropertyChangeListener(this::onPaperSizeChange);
+		pw.addPropertyChangeListener(this::onPaperDimensionsChange);
+		ph.addPropertyChangeListener(this::onPaperDimensionsChange);
 		shiftX.addPropertyChangeListener((e)->setPaperFromPanel());
 		shiftY.addPropertyChangeListener((e)->setPaperFromPanel());
 		ang.addPropertyChangeListener((e)->setPaperFromPanel());
-		isLandscape.addPropertyChangeListener((e)->onLandscapeChange(e));
+		isLandscape.addPropertyChangeListener(this::onLandscapeChange);
 		paperMargin.addPropertyChangeListener((e)->setPaperFromPanel());
 		paperColor.addPropertyChangeListener((e)->setPaperFromPanel());
 	}
