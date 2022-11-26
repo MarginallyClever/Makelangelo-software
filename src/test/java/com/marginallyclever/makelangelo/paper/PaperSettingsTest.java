@@ -28,7 +28,7 @@ public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 		
 		final String title = PaperSettings.class.getSimpleName();
 		
-		window = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+		window = findFrame(new GenericTypeMatcher<>(Frame.class) {
 		  protected boolean isMatching(Frame frame) {
 		    return title.equals(frame.getTitle()) && frame.isShowing();
 		  }
@@ -43,8 +43,8 @@ public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 		assert(window.textBox("height.field").equals("2378"));
 		window.comboBox("size").selectItem(1);
 		window.checkBox("landscape").click();
-		assert(window.textBox("height.field").equals("1682"));
 		assert(window.textBox("width.field").equals("2378"));
+		assert(window.textBox("height.field").equals("1682"));
 		window.close();
 	}
 }

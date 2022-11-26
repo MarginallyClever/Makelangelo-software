@@ -21,14 +21,14 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (Makelangelo5.texture1 == null) Makelangelo5.texture1 = loadTexture("/textures/makelangelo5.png");
-		if (Makelangelo5.texture2 == null) Makelangelo5.texture2 = loadTexture("/textures/makelangelo5-motors.png");
-		if (Makelangelo5.texture3 == null) Makelangelo5.texture3 = loadTexture("/logo.png");
+		if (texture1 == null) texture1 = loadTexture("/textures/makelangelo5.png");
+		if (texture2 == null) texture2 = loadTexture("/textures/makelangelo5-motors.png");
+		if (texture3 == null) texture3 = loadTexture("/logo.png");
 
-		if (Makelangelo5.texture1 == null) {
+		if (texture1 == null) {
 			paintControlBoxPlain(gl2, robot);
 		} else {
-			paintControlBoxFancy(gl2, robot);
+			paintControlBoxFancy(gl2, robot,texture1);
 		}
 
 		paintSafeArea(gl2, robot);
@@ -36,21 +36,20 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl2, robot);
 
-		if (Makelangelo5.texture2 == null) {
+		if (texture1 == null || texture2 == null) {
 			Polargraph.paintMotors(gl2, robot);
 		} else {
-			Makelangelo5.texture2.bind(gl2);
-			paintControlBoxFancy(gl2, robot);
+			paintControlBoxFancy(gl2, robot,texture2);
 		}
 
-		if (Makelangelo5.texture3 == null) {
+		if (texture3 == null) {
 			// paintLogo(gl2,robot);
 		} else {
 			paintLogoFancy(gl2, robot);
 		}
 	}
 
-	private void paintControlBoxFancy(GL2 gl2, Plotter robot) {
+	private void paintControlBoxFancy(GL2 gl2, Plotter robot,Texture texture) {
 		double left = robot.getLimitLeft();
 		// double top = robot.getLimitTop();
 
@@ -60,7 +59,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final double ox = left - 106 * scale; // 106 taken from offset in texture map
 		final double oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
 
-		paintTexture(gl2, texture1, ox, oy, TW, TH);
+		paintTexture(gl2, texture, ox, oy, TW, TH);
 	}
 
 	/**
@@ -168,12 +167,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glVertex2d(-w, -h);
 		gl2.glEnd();
 
-		/*
-		 * border around RUMBA gl2.glLineWidth(1); gl2.glColor3f(0,0,0);
-		 * gl2.glBegin(GL2.GL_LINE_LOOP); gl2.glVertex2d(-w-1, h+1);
-		 * gl2.glVertex2d(+w+1, h+1); gl2.glVertex2d(+w+1, -h-1); gl2.glVertex2d(-w-1,
-		 * -h-1); gl2.glEnd();
-		 */
 		renderLCD(gl2);
 		gl2.glPopMatrix();
 	}
@@ -182,11 +175,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
-		/*
-		 * // mounting plate for LCD gl2.glColor3f(1,0.8f,0.5f);
-		 * gl2.glBegin(GL2.GL_QUADS); gl2.glVertex2d(-8, 5); gl2.glVertex2d(+8, 5);
-		 * gl2.glVertex2d(+8, -5); gl2.glVertex2d(-8, -5); gl2.glEnd();
-		 */
 
 		// LCD red
 		float w = 150f / 2;
@@ -328,7 +316,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	private void paintSafeArea(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double top = settings.getLimitTop();
-		// double bottom = settings.getLimitBottom();
+		double bottom = settings.getLimitBottom();
 		double left = settings.getLimitLeft();
 		double right = settings.getLimitRight();
 
@@ -338,79 +326,8 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glVertex2d(left - 70f, top + 70f);
 		gl2.glVertex2d(right + 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, top - 1000);
-		gl2.glVertex2d(left - 70f, top - 1000);
+		gl2.glVertex2d(right + 70f, bottom);
+		gl2.glVertex2d(left - 70f, bottom);
 		gl2.glEnd();
-
-		/*
-		 * filled rectangle for safe area gl2.glColor3d(0.9,0.9,0.9); // #color Safe
-		 * area gl2.glBegin(GL2.GL_QUADS); gl2.glVertex2d(left-70f, top+70f);
-		 * gl2.glVertex2d(right+70f, top+70f); gl2.glVertex2d(right+70f, top-1000);
-		 * gl2.glVertex2d(left-70f, top-1000); gl2.glEnd();
-		 */
 	}
-/*
-	@Override
-	public Point2D getHome() {
-		return new Point2D(0, -482.65); // assumes 1m belts on 650x1000 machine.
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return false;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-
-	@Override
-	public float getWidth() {
-		return 650;
-	}
-
-	@Override
-	public float getHeight() {
-		return 1000;
-	}
-
-	@Override
-	public boolean canAutoHome() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		return false;
-	}
-
-	@Override
-	public float getFeedrateMax() {
-		return 12000;
-	}
-
-	@Override
-	public float getFeedrateDefault() {
-		return 9000;
-	}
-
-	@Override
-	public float getAccelerationMax() {
-		return 2000;
-	}
-
-	@Override
-	public float getPenLiftTime() {
-		return 300;
-	}
-
-	@Override
-	public float getZAngleOn() {
-		return 30;
-	}
-
-	public String getGCodeConfig(PlotterSettings settings) {
-		return "";
-	}*/
 }

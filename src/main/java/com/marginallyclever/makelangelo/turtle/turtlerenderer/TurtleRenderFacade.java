@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 public class TurtleRenderFacade implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
-	private TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
-	private TurtleRenderer myRenderer=defaultRenderer;
+	private final TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
+	private TurtleRenderer myRenderer = defaultRenderer;
 	private Turtle myTurtle = new Turtle();
 	private int first=0;
 	private int last;
 	private final ColorRGB penDownColor = new ColorRGB(0,0,0);
-	private ColorRGB penUpColor = new ColorRGB(0,255,0);
+	private final ColorRGB penUpColor = new ColorRGB(0,255,0);
 	private double penDiameter=0.8;
 
 	@Override

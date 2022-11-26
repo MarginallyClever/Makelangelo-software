@@ -20,7 +20,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @return cartesian coordinate 
 	 */
 	public Point2D FK(Plotter plotter,double beltL, double beltR) {
-		double limit_ymax = plotter.getLimitTop();
+		double top = plotter.getLimitTop();
 		double right = plotter.getLimitRight();
 		double left = plotter.getLimitLeft();
 
@@ -32,15 +32,16 @@ public abstract class Polargraph implements PlotterRenderer {
 		double theta = (a*a + b*b - c*c) / (2.0*a*b);
 
 		double x = theta * a - b/2;
-		double y = limit_ymax - Math.sqrt(1.0 - theta * theta) * a;
+		double y = top - Math.sqrt(1.0 - theta * theta) * a;
 
 		return new Point2D(x, y);
 	}
 		
 	/**
 	 * convert from cartesian space to belt lengths.
-	 * @param x
-	 * @param y
+	 * @param plotter the plotter
+	 * @param x cartesian x
+	 * @param y cartesian y
 	 * @return Point2D with x=belt left and y=belt right.
 	 */
 	public Point2D IK(Plotter plotter,double x,double y) {
@@ -69,31 +70,6 @@ public abstract class Polargraph implements PlotterRenderer {
 		double top = robot.getLimitTop();
 		double right = robot.getLimitRight();
 		double left = robot.getLimitLeft();
-
-		gl2.glColor3f(1, 0.8f, 0.5f);
-		// left frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(-2.1f, 2.1f, 0);
-		/*gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(left + FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(left + FRAME_SIZE, top             );
-		gl2.glVertex2d(left             , top - FRAME_SIZE);
-		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();*/
-		gl2.glPopMatrix();
-
-		// right frame
-		gl2.glPushMatrix();
-		// gl2.glTranslatef(2.1f, 2.1f, 0);
-		/*gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right - FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right - FRAME_SIZE, top             );
-		gl2.glVertex2d(right             , top - FRAME_SIZE);
-		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();*/
-		gl2.glPopMatrix();
 
 		// left motor
 		gl2.glColor3f(0, 0, 0);
@@ -237,23 +213,34 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();
 
 		/*
-		 * // bottom clearance arcs // right gl2.glColor3d(0.6, 0.6, 0.6);
-		 * gl2.glBegin(GL2.GL_LINE_STRIP); double w =
-		 * machine.getSettings().getLimitRight() -
-		 * machine.getSettings().getLimitLeft()+2.1; double h =
-		 * machine.getSettings().getLimitTop() -
-		 * machine.getSettings().getLimitBottom() + 2.1; r=(float)Math.sqrt(h*h
-		 * + w*w); // circle radius gx = machine.getSettings().getLimitLeft() -
-		 * 2.1; gy = machine.getSettings().getLimitTop() + 2.1; double start =
-		 * (float)1.5*(float)Math.PI; double end = (2*Math.PI-Math.atan(h/w));
-		 * double v; for(v=0;v<=1.0;v+=0.1) { double vi = (end-start)*v + start;
-		 * gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r); } gl2.glEnd();
-		 * 
-		 * // left gl2.glBegin(GL2.GL_LINE_STRIP); gx =
-		 * machine.getSettings().getLimitRight() + 2.1; start =
-		 * (float)(1*Math.PI+Math.atan(h/w)); end = (float)1.5*(float)Math.PI;
-		 * for(v=0;v<=1.0;v+=0.1) { double vi = (end-start)*v + start;
-		 * gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r); } gl2.glEnd();
+		 * // bottom clearance arcs
+		 * // right
+		 * double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft()+2.1;
+		 * double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
+		 * r=(float)Math.sqrt(h*h + w*w); // circle radius
+		 * gx = machine.getSettings().getLimitLeft() - 2.1;
+		 * gy = machine.getSettings().getLimitTop() + 2.1;
+		 * double start = (float)1.5*(float)Math.PI;
+		 * double end = (2*Math.PI-Math.atan(h/w));
+		 * double v;
+		 * gl2.glColor3d(0.6, 0.6, 0.6);
+		 * gl2.glBegin(GL2.GL_LINE_STRIP);
+		 * for(v=0;v<=1.0;v+=0.1) {
+		 *   double vi = (end-start)*v + start;
+		 *   gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		 * }
+		 * gl2.glEnd();
+		 *
+		 * // left
+		 * gx = machine.getSettings().getLimitRight() + 2.1;
+		 * start = (float)(1*Math.PI+Math.atan(h/w));
+		 * end = (float)1.5*(float)Math.PI;
+		 * gl2.glBegin(GL2.GL_LINE_STRIP);
+		 * for(v=0;v<=1.0;v+=0.1) {
+		 *   double vi = (end-start)*v + start;
+		 *   gl2.glVertex2d(gx+Math.cos(vi)*r, gy+Math.sin(vi)*r);
+		 * }
+		 * gl2.glEnd();
 		 */
 	}
 

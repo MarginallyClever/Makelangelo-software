@@ -62,7 +62,6 @@ public class OpenFileChooser {
         jFileChooser.setCurrentDirectory(new File(lastPath));
 
         if (jFileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-
             String filename = jFileChooser.getSelectedFile().getAbsolutePath();
             preferences.put(KEY_PREFERENCE_LOAD_PATH, jFileChooser.getCurrentDirectory().toString());
             logger.debug("File selected by user: {}", filename);

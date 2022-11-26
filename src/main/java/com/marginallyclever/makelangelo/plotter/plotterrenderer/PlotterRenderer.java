@@ -5,7 +5,8 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
 /**
- * Each {@link PlotterRenderer} renders a {@link Plotter} with custom graphics.
+ * Each {@link PlotterRenderer} renders a {@link Plotter} with custom graphics.  That is to say it draws the machine,
+ * not the drawing made by the machine.
  * {@link PlotterRenderer}s do not store any state data.  They must rely on {@link Plotter} and {@link PlotterSettings}.
  * {@code render()} method.
  * 
@@ -18,5 +19,5 @@ public interface PlotterRenderer {
 	 * @param gl2   the render context
 	 * @param robot the machine to draw.
 	 */
-	public void render(GL2 gl2, Plotter robot);
+	void render(GL2 gl2, Plotter robot);
 }
