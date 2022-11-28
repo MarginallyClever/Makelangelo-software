@@ -269,11 +269,11 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		dx = gx - left;
 		dy = gy - top;
 		double left_a = Math.sqrt(dx * dx + dy * dy);
-		double left_b = (suggestedLength - left_a) / 2;
+		double left_b = (suggestedLength - left_a) / 2 -55;
 
 		dx = gx - right;
 		double right_a = Math.sqrt(dx * dx + dy * dy);
-		double right_b = (suggestedLength - right_a) / 2;
+		double right_b = (suggestedLength - right_a) / 2 -55;
 
 		paintPlotter(gl2, robot, (float) gx, (float) gy);
 
