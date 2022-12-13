@@ -31,10 +31,10 @@ public class Makelangelo5 implements PlotterRenderer {
 			paintControlBoxFancy(gl2, robot,texture1);
 		}
 
-		paintSafeArea(gl2, robot);
+		Polargraph.paintSafeArea(gl2, robot);
 
 		if (robot.getDidFindHome())
-			paintPenHolderToCounterweights(gl2, robot);
+			Polargraph.paintPenHolderToCounterweights(gl2, robot);
 
 		if (texture1 == null || texture2 == null) {
 			Polargraph.paintMotors(gl2, robot);
@@ -226,108 +226,5 @@ public class Makelangelo5 implements PlotterRenderer {
 
 		// clean up
 		gl2.glPopMatrix();
-	}
-
-	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-		double dx, dy;
-		Point2D pos = robot.getPos();
-		double gx = pos.x;
-		double gy = pos.y;
-
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-
-		if (gx < left)
-			return;
-		if (gx > right)
-			return;
-		if (gy > top)
-			return;
-		if (gy < bottom)
-			return;
-
-		float bottleCenter = 8f + 7.5f;
-
-		double mw = right - left;
-		double mh = top - settings.getLimitBottom();
-		double suggestedLength = Math.sqrt(mw * mw + mh * mh) + 50;
-
-		dx = gx - left;
-		dy = gy - top;
-		double left_a = Math.sqrt(dx * dx + dy * dy);
-		double left_b = (suggestedLength - left_a) / 2 -55;
-
-		dx = gx - right;
-		double right_a = Math.sqrt(dx * dx + dy * dy);
-		double right_b = (suggestedLength - right_a) / 2 -55;
-
-		paintPlotter(gl2, robot, (float) gx, (float) gy);
-
-		// belts
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3d(0.2, 0.2, 0.2);
-
-		// belt from motor to pen holder left
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(gx, gy);
-		// belt from motor to pen holder right
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(gx, gy);
-
-		// belt from motor to counterweight left
-		gl2.glVertex2d(left - bottleCenter - PULLEY_RADIUS, top - MOTOR_WIDTH / 2);
-		gl2.glVertex2d(left - bottleCenter - PULLEY_RADIUS, top - left_b);
-		// belt from motor to counterweight right
-		gl2.glVertex2d(right + bottleCenter + PULLEY_RADIUS, top - MOTOR_WIDTH / 2);
-		gl2.glVertex2d(right + bottleCenter + PULLEY_RADIUS, top - right_b);
-		gl2.glEnd();
-
-		// counterweight left
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(left - PULLEY_RADIUS - bottleCenter - COUNTERWEIGHT_W / 2, top - left_b);
-		gl2.glVertex2d(left - PULLEY_RADIUS - bottleCenter + COUNTERWEIGHT_W / 2, top - left_b);
-		gl2.glVertex2d(left - PULLEY_RADIUS - bottleCenter + COUNTERWEIGHT_W / 2, top - left_b - COUNTERWEIGHT_H);
-		gl2.glVertex2d(left - PULLEY_RADIUS - bottleCenter - COUNTERWEIGHT_W / 2, top - left_b - COUNTERWEIGHT_H);
-		gl2.glEnd();
-
-		// counterweight right
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(right + PULLEY_RADIUS + bottleCenter - COUNTERWEIGHT_W / 2, top - right_b);
-		gl2.glVertex2d(right + PULLEY_RADIUS + bottleCenter + COUNTERWEIGHT_W / 2, top - right_b);
-		gl2.glVertex2d(right + PULLEY_RADIUS + bottleCenter + COUNTERWEIGHT_W / 2, top - right_b - COUNTERWEIGHT_H);
-		gl2.glVertex2d(right + PULLEY_RADIUS + bottleCenter - COUNTERWEIGHT_W / 2, top - right_b - COUNTERWEIGHT_H);
-		gl2.glEnd();
-	}
-
-	private void paintPlotter(GL2 gl2, Plotter robot, float gx, float gy) {
-		// plotter
-		gl2.glColor3f(0, 0, 1);
-		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5);
-		if (robot.getPenIsUp()) {
-			drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5 + 5);
-		}
-	}
-
-	private void paintSafeArea(GL2 gl2, Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-
-		// gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
-		gl2.glColor4f(1, 1, 1, 1); // #color Safe area
-
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(left - 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, top + 70f);
-		gl2.glVertex2d(right + 70f, bottom);
-		gl2.glVertex2d(left - 70f, bottom);
-		gl2.glEnd();
 	}
 }

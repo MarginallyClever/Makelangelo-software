@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
 
 /**
  * @author Dan Royer
@@ -12,6 +13,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	public final static float MOTOR_SIZE= 21f; // cm
 	public final static float PLOTTER_SIZE= 21f; // cm
 	public final static float FRAME_SIZE= 50f; // cm
+	public final static float BOTTLE_CENTER = 8f + 7.5f;
 	
 	/**
 	 * convert from belt length mm to cartesian position.
@@ -62,8 +64,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	public void render(GL2 gl2, Plotter robot) {
 		paintMotors(gl2, robot);
 		paintControlBox(gl2, robot);
-		if(robot.getDidFindHome()) 
+		if(robot.getDidFindHome()) {
 			paintPenHolderToCounterweights(gl2, robot);
+		}
 	}
 
 	static public void paintMotors(GL2 gl2,Plotter robot) {
@@ -133,7 +136,6 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	static public void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
-		double dx, dy;
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -143,27 +145,22 @@ public abstract class Polargraph implements PlotterRenderer {
 		double left = robot.getLimitLeft();
 		double right = robot.getLimitRight();
 
+		if (gx < left || gx > right) return;
+		if (gy > top || gy < bottom) return;
+
 		double mw = right - left;
 		double mh = top - bottom;
-		double suggestedLength = Math.sqrt(mw * mw + mh * mh) + 50;
+		double beltLength = Math.sqrt(mw * mw + mh * mh) + 50;  // TODO replace with robot.getBeltLength()
 
-		dx = gx - left;
-		dy = gy - top;
+		double dx = gx - left;
+		double dy = gy - top;
 		double left_a = Math.sqrt(dx * dx + dy * dy);
-		double left_b = (suggestedLength - left_a) / 2 - 55;
+		double left_b = (beltLength - left_a) / 2 - 55;
 
 		dx = gx - right;
 		double right_a = Math.sqrt(dx * dx + dy * dy);
-		double right_b = (suggestedLength - right_a) / 2 + 55;
+		double right_b = (beltLength - right_a) / 2 + 55;
 
-		if (gx < left)
-			return;
-		if (gx > right)
-			return;
-		if (gy > top)
-			return;
-		if (gy < bottom)
-			return;
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glColor3d(0.2, 0.2, 0.2);
 
@@ -174,74 +171,75 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glVertex2d(right, top);
 		gl2.glVertex2d(gx, gy);
 
-		float bottleCenter = 8f + 7.5f;
-
 		// belt from motor to counterweight left
-		gl2.glVertex2d(left - bottleCenter - 2, top);
-		gl2.glVertex2d(left - bottleCenter - 2, top - left_b);
-		gl2.glVertex2d(left - bottleCenter + 2, top);
-		gl2.glVertex2d(left - bottleCenter + 2, top - left_b);
+		paintBeltSide(gl2,left,top,left_b);
 		// belt from motor to counterweight right
-		gl2.glVertex2d(right + bottleCenter - 2, top);
-		gl2.glVertex2d(right + bottleCenter - 2, top - right_b);
-		gl2.glVertex2d(right + bottleCenter + 2, top);
-		gl2.glVertex2d(right + bottleCenter + 2, top - right_b);
-		gl2.glEnd();
+		paintBeltSide(gl2,right,top,right_b);
 
-		// gondola
-		drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_2,20);
-		if(robot.getPenIsUp()) {
-			drawCircle(gl2,gx,gy,PEN_HOLDER_RADIUS_2+5,20);
+		paintGondola(gl2,gx,gy,robot);
+
+		// left
+		paintCounterweight(gl2,left,top-left_b);
+		// right
+		paintCounterweight(gl2,right,top-right_b);
+	}
+
+	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
+		gl2.glVertex2d(x - BOTTLE_CENTER - 2, y);
+		gl2.glVertex2d(x - BOTTLE_CENTER - 2, y - length);
+		gl2.glVertex2d(x - BOTTLE_CENTER + 2, y);
+		gl2.glVertex2d(x - BOTTLE_CENTER + 2, y - length);
+	}
+
+	private static void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2, 20);
+		if (robot.getPenIsUp()) {
+			drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2 + 5, 20);
 		}
+	}
 
-		// counterweight left
+	static public void paintCounterweight(GL2 gl2,double x,double y) {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(left - bottleCenter - 15, top - left_b);
-		gl2.glVertex2d(left - bottleCenter + 15, top - left_b);
-		gl2.glVertex2d(left - bottleCenter + 15, top - left_b - 150);
-		gl2.glVertex2d(left - bottleCenter - 15, top - left_b - 150);
+		gl2.glVertex2d(x + BOTTLE_CENTER - 15, y);
+		gl2.glVertex2d(x + BOTTLE_CENTER + 15, y);
+		gl2.glVertex2d(x + BOTTLE_CENTER + 15, y - 150);
+		gl2.glVertex2d(x + BOTTLE_CENTER - 15, y - 150);
+		gl2.glEnd();
+	}
+
+	static public void paintBottomClearanceArea(GL2 gl2, Plotter machine) {
+
+		// bottom clearance arcs
+		// right
+		double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft() + 2.1;
+		double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
+		float r=(float)Math.sqrt(h*h + w*w); // circle radius
+		double gy = machine.getSettings().getLimitTop() + 2.1;
+		double v;
+		gl2.glColor3d(0.6, 0.6, 0.6);
+
+		double gx = machine.getSettings().getLimitLeft() - 2.1;
+		double start = (float)1.5*(float)Math.PI;
+		double end = (2*Math.PI-Math.atan(h/w));
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		for(v=0;v<=1.0;v+=0.1) {
+		  double vi = (end-start)*v + start;
+		  gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
+		}
 		gl2.glEnd();
 
-		// counterweight right
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(right + bottleCenter - 15, top - right_b);
-		gl2.glVertex2d(right + bottleCenter + 15, top - right_b);
-		gl2.glVertex2d(right + bottleCenter + 15, top - right_b - 150);
-		gl2.glVertex2d(right + bottleCenter - 15, top - right_b - 150);
+		// left
+		gx = machine.getSettings().getLimitRight() + 2.1;
+		start = (float)(1*Math.PI+Math.atan(h/w));
+		end = (float)1.5*(float)Math.PI;
+		gl2.glBegin(GL2.GL_LINE_STRIP);
+		for(v=0;v<=1.0;v+=0.1) {
+		  double vi = (end-start)*v + start;
+		  gl2.glVertex2d(gx+Math.cos(vi)*r, gy+Math.sin(vi)*r);
+		}
 		gl2.glEnd();
 
-		/*
-		 * // bottom clearance arcs
-		 * // right
-		 * double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft()+2.1;
-		 * double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
-		 * r=(float)Math.sqrt(h*h + w*w); // circle radius
-		 * gx = machine.getSettings().getLimitLeft() - 2.1;
-		 * gy = machine.getSettings().getLimitTop() + 2.1;
-		 * double start = (float)1.5*(float)Math.PI;
-		 * double end = (2*Math.PI-Math.atan(h/w));
-		 * double v;
-		 * gl2.glColor3d(0.6, 0.6, 0.6);
-		 * gl2.glBegin(GL2.GL_LINE_STRIP);
-		 * for(v=0;v<=1.0;v+=0.1) {
-		 *   double vi = (end-start)*v + start;
-		 *   gl2.glVertex2d(gx+Math.cos(vi)*r,gy+Math.sin(vi)*r);
-		 * }
-		 * gl2.glEnd();
-		 *
-		 * // left
-		 * gx = machine.getSettings().getLimitRight() + 2.1;
-		 * start = (float)(1*Math.PI+Math.atan(h/w));
-		 * end = (float)1.5*(float)Math.PI;
-		 * gl2.glBegin(GL2.GL_LINE_STRIP);
-		 * for(v=0;v<=1.0;v+=0.1) {
-		 *   double vi = (end-start)*v + start;
-		 *   gl2.glVertex2d(gx+Math.cos(vi)*r, gy+Math.sin(vi)*r);
-		 * }
-		 * gl2.glEnd();
-		 */
 	}
 
 	public static void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
@@ -254,6 +252,24 @@ public abstract class Polargraph implements PlotterRenderer {
 					gx + Math.cos(f2) * PEN_HOLDER_RADIUS_2, 
 					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
 		}
+		gl2.glEnd();
+	}
+
+	public static void paintSafeArea(GL2 gl2, Plotter robot) {
+		PlotterSettings settings = robot.getSettings();
+		double top = settings.getLimitTop();
+		double bottom = settings.getLimitBottom();
+		double left = settings.getLimitLeft();
+		double right = settings.getLimitRight();
+
+		// gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
+		gl2.glColor4f(1, 1, 1, 1); // #color Safe area
+
+		gl2.glBegin(GL2.GL_LINE_LOOP);
+		gl2.glVertex2d(left - 70f, top + 70f);
+		gl2.glVertex2d(right + 70f, top + 70f);
+		gl2.glVertex2d(right + 70f, bottom);
+		gl2.glVertex2d(left - 70f, bottom);
 		gl2.glEnd();
 	}
 }
