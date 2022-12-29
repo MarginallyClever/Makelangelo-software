@@ -5,7 +5,7 @@
 Makelangelo Software is a Java program that prepares art for CNC plotters.  It was originally designed for the
 [Makelangelo Art Robot](http://www.makelangelo.com/).  It runs in Windows, OSX, and several flavors of linux.
 
-It pairs really well with [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/tree/polargraph-2.0.x), the code in the brain of the robot that receives instructions and moves the motors.  
+It pairs really well with [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/tree/2.1.x-polargraph), the code in the brain of the robot that receives instructions and moves the motors.  
 
 ![screenshot](screenshot.jpg)
 
@@ -16,7 +16,7 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 - [Join our Discord community](https://discord.gg/QtvHqAv8yp).  Share your creations, make new friends!  The best place to get support.
 - Buy a [Makelangelo 5](https://www.marginallyclever.com/products/makelangelo-5/) hanging plotter.
 - Read more of [our friendly manuals](http://mcr.dozuki.com).  Pictures and arrows and everything.
-- Build your own plotter and setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/tree/polargraph-2.0.x) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/).
+- Build your own plotter and setup [Marlin 3D printer firmware](https://github.com/MarginallyClever/Marlin-polargraph/tree/2.1.x-polargraph) with the help of the [documentation](https://www.marginallyclever.com/2021/10/friday-facts-4-how-to-marlin-polargraph/).
 
 ## Developers
 
