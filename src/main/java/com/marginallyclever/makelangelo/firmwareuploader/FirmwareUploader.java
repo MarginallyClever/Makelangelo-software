@@ -12,30 +12,30 @@ import java.nio.file.Path;
 
 
 public class FirmwareUploader {
-
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
 
+	private final String AVRDUDE_EXE;
 	private String avrdudePath = "";
 
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
-		String name = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
+		AVRDUDE_EXE = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
 		
 		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
-		File f = new File(name);
+		File f = new File(AVRDUDE_EXE);
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
 			return;
 		}
 		
 		// arduinoPath
-		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+name);
+		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+AVRDUDE_EXE);
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
 			return;
 		} 
 		
-		f = new File(FileAccess.getWorkingDirectory() + File.separator+name);
+		f = new File(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_EXE);
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
 		}
@@ -62,7 +62,7 @@ public class FirmwareUploader {
 		String confPath = f.getAbsolutePath();
 		
 		String [] options = new String[]{
-				avrdudePath,
+				avrdudePath+AVRDUDE_EXE,
 	    		"-C"+confPath,
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
