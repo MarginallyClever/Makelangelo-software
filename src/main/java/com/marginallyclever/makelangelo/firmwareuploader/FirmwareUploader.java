@@ -52,17 +52,19 @@ public class FirmwareUploader {
 
 		int i=0;
 		File f = attempt(i++, "avrdude.conf");
-		if(!f.exists()) f = attempt(i++, "../avrdude.conf");
-		if(!f.exists()) f = attempt(i++, "../../etc/avrdude.conf");
-		if(!f.exists()) f = attempt(i++, "../etc/avrdude.conf");
+		if(!f.exists()) f = attempt(i++, ".."+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attempt(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attempt(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
 		if(!f.exists()) {
 			throw new Exception("Cannot find nearby avrdude.conf");
 		}
 		
 		String confPath = f.getAbsolutePath();
+		String path = avrdudePath;
+		if(!path.endsWith(File.separator)) path+=File.separator;
 		
 		String [] options = new String[]{
-				avrdudePath+AVRDUDE_EXE,
+				path+AVRDUDE_EXE,
 	    		"-C"+confPath,
 	    		//"-v","-v","-v","-v",
 	    		"-patmega2560",
