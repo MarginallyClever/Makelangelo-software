@@ -13,7 +13,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
 public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
 	
@@ -36,9 +35,7 @@ public class CropTurtle {
 					if (prev != null) {
 						P0.set(prev.x, prev.y);
 						P1.set(m.x, m.y);
-						boolean result = Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin);
-						// !result means full crop, do nothing.
-						if (result) {
+						if (Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 							// partial crop.  Which end(s)?
 							boolean startCropped = MathHelper.lengthSquared(P0.x - prev.x, P0.y - prev.y) > 1e-8;
 							boolean endCropped = MathHelper.lengthSquared(P1.x - m.x, P1.y - m.y) > 1e-8;
@@ -74,6 +71,5 @@ public class CropTurtle {
 		// There may be some dumb travel moves left. (several travels in a row.)
 	
 		logger.debug("crop end @ {}", turtle.history.size());
-
 	}
 }
