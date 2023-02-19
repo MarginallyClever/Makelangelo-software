@@ -20,6 +20,7 @@ public class TurtleGeneratorFactory {
 			new Generator_SierpinskiTriangle(),
 			new Generator_Spirograph(),
 			new Generator_Text(),
+			new Generator_TruchetTiles(),
 			new Generator_Voronoi(),
 	};
 }

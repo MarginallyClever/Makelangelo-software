@@ -23,6 +23,22 @@
 	</string>
 
 	<string>
+		<key>Generator_TruchetTiles.Name</key>
+		<value>Truchet Tiles</value>
+		<hint>Truchet Tiles generator</hint>
+	</string>
+	<string>
+		<key>Generator_TruchetTiles.LineSpacing</key>
+		<value>Space between lines (mm)</value>
+		<hint>Truchet Tiles generator</hint>
+	</string>
+	<string>
+		<key>Generator_TruchetTiles.LinesPerTile</key>
+		<value>Lines per tile</value>
+		<hint>Truchet Tiles generator</hint>
+	</string>
+
+	<string>
 		<key>LissajousName</key>
 		<value>Lissajous</value>
 		<hint>Lissajous generator</hint>
