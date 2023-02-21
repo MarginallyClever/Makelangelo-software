@@ -1,7 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.noise.Noise;
+import com.marginallyclever.convenience.noise.PerlinNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
@@ -33,6 +34,8 @@ public class Converter_FlowField extends ImageConverter {
 	private static int     stepSize = 10; // the distance between lines at the edge of the paper, in mm.
 	private static boolean rightAngle = false;
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
+
+	private Noise noiseMaker = new PerlinNoise();
 
 	public Converter_FlowField() {
 		super();
@@ -234,7 +237,7 @@ public class Converter_FlowField extends ImageConverter {
 		Turtle line = new Turtle();
 		line.jumpTo(x,y);
 		// if the first step at this position would be outside the rectangle, reverse the direction.
-		double v = PerlinNoise.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
+		double v = noiseMaker.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
 		line.setAngle(v * 180 + (rightAngle?90:0));
 		Vector2d nextStep = line.getHeading();
 		nextStep.scale(samplingRate);
@@ -245,7 +248,7 @@ public class Converter_FlowField extends ImageConverter {
 
 	private void continueLine(Turtle line, Rectangle r, boolean reverse) {
 		for(int i=0;i<200;++i) {
-			double v = PerlinNoise.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
+			double v = noiseMaker.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
 			line.setAngle(v * 180 + (rightAngle?90:0));
 			Vector2d nextStep = line.getHeading();
 			nextStep.scale(reverse?-samplingRate : samplingRate);

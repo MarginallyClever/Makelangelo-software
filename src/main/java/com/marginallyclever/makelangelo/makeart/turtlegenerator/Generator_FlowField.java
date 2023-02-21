@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.marginallyclever.convenience.PerlinNoise;
+import com.marginallyclever.convenience.noise.Noise;
+import com.marginallyclever.convenience.noise.PerlinNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
@@ -24,6 +25,7 @@ public class Generator_FlowField extends TurtleGenerator {
 	private static int stepSize = 5; // controls complexity of curve
 	private static boolean fromEdge = false;  // continuous lines
 	private static boolean rightAngle = false;
+	private Noise noiseMaker = new PerlinNoise();
 
 	public static void setStepSize(int stepSize) {
 		Generator_FlowField.stepSize = stepSize;
@@ -129,7 +131,7 @@ public class Generator_FlowField extends TurtleGenerator {
 	private void makeLine(Turtle turtle, Rectangle r, double x, double y) {
 		turtle.jumpTo(x,y);
 		// if the first step at this position would be outside the rectangle, reverse the direction.
-		double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
+		double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
 		turtle.setAngle(v * 180 + (rightAngle?90:0));
 		Vector2d nextStep = turtle.getHeading();
 		nextStep.scale(stepSize);
@@ -139,7 +141,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	private void continueLine(Turtle turtle, Rectangle r, boolean reverse) {
 		for(int i=0;i<200;++i) {
-			double v = PerlinNoise.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
+			double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
 			turtle.setAngle(v * 180 + (rightAngle?90:0));
 			Vector2d nextStep = turtle.getHeading();
 			nextStep.scale(reverse?-stepSize:stepSize);
@@ -158,7 +160,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 		for(double y = yMin; y<yMax; y+=stepSize) {
 			for(double x = xMin; x<xMax; x+=stepSize) {
-				double v = PerlinNoise.noise(x*scaleX + offsetX,y*scaleY+offsetY,0);
+				double v = noiseMaker.noise(x*scaleX + offsetX,y*scaleY+offsetY,0);
 				turtle.jumpTo(x,y);
 				turtle.setAngle(v*180);
 				turtle.forward(stepSize);
