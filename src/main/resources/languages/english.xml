@@ -2295,6 +2295,10 @@
 		<key>Generator_FlowField.rightAngle</key>
 		<value>Add orthogonal lines</value>
 	</string>
+	<string>
+		<key>Generator_FlowField.noiseType</key>
+		<value>Noise type</value>
+	</string>
 
 	<string>
 		<key>VoronoiZigZag.optimizePath</key>
