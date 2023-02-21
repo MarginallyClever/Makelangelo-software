@@ -1,15 +1,14 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.PerlinNoise;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.noise.Noise;
+import com.marginallyclever.convenience.noise.NoiseFactory;
+import com.marginallyclever.convenience.noise.PerlinNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
@@ -34,8 +33,11 @@ public class Converter_FlowField extends ImageConverter {
 	private static boolean rightAngle = false;
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
 
+	private Noise noiseMaker = new PerlinNoise();
+
 	public Converter_FlowField() {
 		super();
+		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
 		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
@@ -43,7 +45,11 @@ public class Converter_FlowField extends ImageConverter {
 		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 3, getStepSize());
 		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
 
-		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+		add(fieldNoise);
+		fieldNoise.addPropertyChangeListener(evt->{
+			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
+			fireRestart();
+		});
 
 		add(selectScaleX);
 		add(selectScaleY);
@@ -76,6 +82,8 @@ public class Converter_FlowField extends ImageConverter {
 			setRightAngle((boolean)evt.getNewValue());
 			fireRestart();
 		});
+
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override
@@ -234,7 +242,7 @@ public class Converter_FlowField extends ImageConverter {
 		Turtle line = new Turtle();
 		line.jumpTo(x,y);
 		// if the first step at this position would be outside the rectangle, reverse the direction.
-		double v = PerlinNoise.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
+		double v = noiseMaker.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
 		line.setAngle(v * 180 + (rightAngle?90:0));
 		Vector2d nextStep = line.getHeading();
 		nextStep.scale(samplingRate);
@@ -245,7 +253,7 @@ public class Converter_FlowField extends ImageConverter {
 
 	private void continueLine(Turtle line, Rectangle r, boolean reverse) {
 		for(int i=0;i<200;++i) {
-			double v = PerlinNoise.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
+			double v = noiseMaker.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);
 			line.setAngle(v * 180 + (rightAngle?90:0));
 			Vector2d nextStep = line.getHeading();
 			nextStep.scale(reverse?-samplingRate : samplingRate);

@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -24,37 +23,38 @@ public class CropTurtle {
 		Point2D rMax = new Point2D(rectangle.getMaxX(),rectangle.getMaxY());
 		Point2D rMin = new Point2D(rectangle.getMinX(),rectangle.getMinY());
 		// working space for clipping
-		Point2D P0 = new Point2D(); 
-		Point2D P1 = new Point2D(); 
-		
+		Point2D p0 = new Point2D();
+		Point2D p1 = new Point2D();
+		Point2D p0before = new Point2D();
+		Point2D p1before = new Point2D();
+
 		TurtleMove prev=null;
 		
 		for (TurtleMove m : turtle.history ) {
 			switch (m.type) {
 				case DRAW_LINE, TRAVEL -> {
-					if (prev != null) {
-						P0.set(prev.x, prev.y);
-						P1.set(m.x, m.y);
-						if (Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
+					if(prev==null) {
+						newHistory.add(m);
+					} else {
+						p0.set(prev.x, prev.y);
+						p1.set(m.x, m.y);
+						p0before.set(p0);
+						p1before.set(p1);
+						if (Clipper2D.clipLineToRectangle(p0, p1, rMax, rMin)) {
 							// partial crop.  Which end(s)?
-							boolean startCropped = MathHelper.lengthSquared(P0.x - prev.x, P0.y - prev.y) > 1e-8;
-							boolean endCropped = MathHelper.lengthSquared(P1.x - m.x, P1.y - m.y) > 1e-8;
+							boolean startCropped = !p0before.equalsEpsilon(p0, 1e-8);
+							boolean endCropped = !p1before.equalsEpsilon(p1, 1e-8);
 
-							if (startCropped && endCropped) {
-								// crosses rectangle, both ends out.
-								newHistory.add(new TurtleMove(P0.x, P0.y, MovementType.TRAVEL));
-								newHistory.add(m);
-								TurtleMove m2 = new TurtleMove(P1.x, P1.y, m.type);
-								newHistory.add(m2);
-							} else if (!startCropped && !endCropped) {
-								newHistory.add(m);
-							} else if (endCropped) {
-								// end cropped, leaving the rectangle
-								TurtleMove m2 = new TurtleMove(P1.x, P1.y, m.type);
-								newHistory.add(m2);
+							if (startCropped) {
+								// make a jump to the crop start
+								newHistory.add(new TurtleMove(p0.x, p0.y, MovementType.TRAVEL));
+							}
+
+							if(endCropped) {
+								// draw to the crop end
+								newHistory.add(new TurtleMove(p1.x, p1.y, m.type));
 							} else {
-								// start cropped, coming back into rectangle
-								newHistory.add(new TurtleMove(P0.x, P0.y, MovementType.TRAVEL));
+								// draw to the original end
 								newHistory.add(m);
 							}
 						}

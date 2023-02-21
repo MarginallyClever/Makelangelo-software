@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
@@ -96,7 +97,7 @@ public class SaveBitmapTest {
             // then
             assertEquals(-1,
                     Files.mismatch(fileTemp.toPath(),
-                        Paths.get(SaveBitmapTest.class.getResource(expectedFilename).toURI())
+                        Paths.get(Objects.requireNonNull(SaveBitmapTest.class.getResource(expectedFilename)).toURI())
                     )
             );
         } finally {
