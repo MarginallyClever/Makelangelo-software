@@ -2,11 +2,9 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.PerlinNoise;
+import com.marginallyclever.convenience.noise.SimplexNoise;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
@@ -36,6 +34,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	public Generator_FlowField() {
 		super();
+		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"),new String[]{"Perlin","Simplex"/*,"Cellular","Worley"*/},0);
 		SelectDouble fieldScaleX = new SelectDouble("scaleX",Translator.get("Generator_FlowField.scaleX"),scaleX);
 		SelectDouble fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),scaleY);
 		SelectDouble fieldOffsetX = new SelectDouble("offsetX",Translator.get("Generator_FlowField.offsetX"),offsetX);
@@ -43,6 +42,17 @@ public class Generator_FlowField extends TurtleGenerator {
 		SelectSlider fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,stepSize);
 		SelectBoolean fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),fromEdge);
 		SelectBoolean fieldRightAngle = new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),rightAngle);
+
+		add(fieldNoise);
+		fieldNoise.addPropertyChangeListener(evt->{
+			switch (fieldNoise.getSelectedIndex()) {
+				case 0 -> noiseMaker = new PerlinNoise();
+				case 1 -> noiseMaker = new SimplexNoise();
+				//case 2: noiseMaker = new CellularNoise(); break;
+				//case 3: noiseMaker = new WorleyNoise(); break;
+			}
+			generate();
+		});
 
 		add(fieldScaleX);
 		fieldScaleX.addPropertyChangeListener(evt->{

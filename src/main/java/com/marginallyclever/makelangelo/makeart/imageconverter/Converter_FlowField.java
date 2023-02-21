@@ -3,14 +3,12 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.PerlinNoise;
+import com.marginallyclever.convenience.noise.SimplexNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
@@ -39,6 +37,7 @@ public class Converter_FlowField extends ImageConverter {
 
 	public Converter_FlowField() {
 		super();
+		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"),new String[]{"Perlin","Simplex"/*,"Cellular","Worley"*/},0);
 		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
 		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
@@ -46,7 +45,16 @@ public class Converter_FlowField extends ImageConverter {
 		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 3, getStepSize());
 		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
 
-		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
+		add(fieldNoise);
+		fieldNoise.addPropertyChangeListener(evt->{
+			switch (fieldNoise.getSelectedIndex()) {
+				case 0 -> noiseMaker = new PerlinNoise();
+				case 1 -> noiseMaker = new SimplexNoise();
+				//case 2: noiseMaker = new CellularNoise(); break;
+				//case 3: noiseMaker = new WorleyNoise(); break;
+			}
+			fireRestart();
+		});
 
 		add(selectScaleX);
 		add(selectScaleY);
@@ -79,6 +87,8 @@ public class Converter_FlowField extends ImageConverter {
 			setRightAngle((boolean)evt.getNewValue());
 			fireRestart();
 		});
+
+		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Perlin_noise'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 
 	@Override
