@@ -22,7 +22,7 @@ public class TestCropTurtle {
     @Test
     public void testCropEntireTurtle() {
         Turtle turtle = testCropAB(200,200,200,0);
-        Assertions.assertEquals("Turtle{history=[TOOL R0 G0 B0 D1.000, TRAVEL X200.000 Y200.000], px=200.0, py=0.0, nx=1.0, ny=0.0, angle=0.0, isUp=false, color=(0,0,0), diameter=1.0}",turtle.toString());
+       Assertions.assertEquals("Turtle{history=[TOOL R0 G0 B0 D1.000, TRAVEL X200.000 Y200.000], px=200.0, py=0.0, nx=1.0, ny=0.0, angle=0.0, isUp=false, color=(0,0,0), diameter=1.0}",turtle.toString());
     }
 
     @Test
