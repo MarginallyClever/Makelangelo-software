@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.noise.Noise;
+import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.convenience.noise.PerlinNoise;
-import com.marginallyclever.convenience.noise.SimplexNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -34,7 +34,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	public Generator_FlowField() {
 		super();
-		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"),new String[]{"Perlin","Simplex"/*,"Cellular","Worley"*/},0);
+		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble fieldScaleX = new SelectDouble("scaleX",Translator.get("Generator_FlowField.scaleX"),scaleX);
 		SelectDouble fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),scaleY);
 		SelectDouble fieldOffsetX = new SelectDouble("offsetX",Translator.get("Generator_FlowField.offsetX"),offsetX);
@@ -45,12 +45,7 @@ public class Generator_FlowField extends TurtleGenerator {
 
 		add(fieldNoise);
 		fieldNoise.addPropertyChangeListener(evt->{
-			switch (fieldNoise.getSelectedIndex()) {
-				case 0 -> noiseMaker = new PerlinNoise();
-				case 1 -> noiseMaker = new SimplexNoise();
-				//case 2: noiseMaker = new CellularNoise(); break;
-				//case 3: noiseMaker = new WorleyNoise(); break;
-			}
+			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
 			generate();
 		});
 

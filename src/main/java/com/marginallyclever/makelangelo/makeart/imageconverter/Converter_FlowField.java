@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.noise.Noise;
+import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.convenience.noise.PerlinNoise;
-import com.marginallyclever.convenience.noise.SimplexNoise;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
@@ -37,7 +37,7 @@ public class Converter_FlowField extends ImageConverter {
 
 	public Converter_FlowField() {
 		super();
-		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"),new String[]{"Perlin","Simplex"/*,"Cellular","Worley"*/},0);
+		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
 		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
@@ -47,12 +47,7 @@ public class Converter_FlowField extends ImageConverter {
 
 		add(fieldNoise);
 		fieldNoise.addPropertyChangeListener(evt->{
-			switch (fieldNoise.getSelectedIndex()) {
-				case 0 -> noiseMaker = new PerlinNoise();
-				case 1 -> noiseMaker = new SimplexNoise();
-				//case 2: noiseMaker = new CellularNoise(); break;
-				//case 3: noiseMaker = new WorleyNoise(); break;
-			}
+			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
 			fireRestart();
 		});
 
