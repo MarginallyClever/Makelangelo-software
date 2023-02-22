@@ -12,13 +12,9 @@ import java.awt.event.*;
  * The user-triggered collapsable panel containing the component (trigger) in the titled border
  */
 public class CollapsiblePanel extends JPanel {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 154827706727963515L;
 	private String title;
     private final TitledBorder border;
-    private final JPanel innerPannel;
+    private final JPanel innerPanel;
     private final Window parentWindow;
     private Dimension previousDimension;
     private final int heightCollapsibleComponent;
@@ -33,9 +29,9 @@ public class CollapsiblePanel extends JPanel {
         BorderLayout borderLayout = new BorderLayout();
         setLayout(borderLayout);
         addMouseListener(mouseListener);
-        innerPannel = new JPanel(new GridLayout(1, 1), false);
+        innerPanel = new JPanel(new GridLayout(1, 1), false);
         parentWindow.addComponentListener(contentComponentListener);
-        super.add(innerPannel);
+        super.add(innerPanel);
         this.heightCollapsibleComponent = heightCollapsibleComponent;
         this.collapsedByDefault = collapsedByDefault;
         toggleVisibility(false);
@@ -72,7 +68,7 @@ public class CollapsiblePanel extends JPanel {
     public Component add(Component comp) {
         comp.addComponentListener(contentComponentListener);
         comp.setVisible(!collapsedByDefault);
-        Component r = innerPannel.add(comp);
+        Component r = innerPanel.add(comp);
         updateBorderTitle();
         return r;
     }
@@ -81,7 +77,7 @@ public class CollapsiblePanel extends JPanel {
     public Component add(String name, Component comp) {
         comp.addComponentListener(contentComponentListener);
         comp.setVisible(!collapsedByDefault);
-        Component r = innerPannel.add(name, comp);
+        Component r = innerPanel.add(name, comp);
         updateBorderTitle();
         return r;
     }
@@ -90,7 +86,7 @@ public class CollapsiblePanel extends JPanel {
     public Component add(Component comp, int index) {
         comp.addComponentListener(contentComponentListener);
         comp.setVisible(!collapsedByDefault);
-        Component r = innerPannel.add(comp, index);
+        Component r = innerPanel.add(comp, index);
         updateBorderTitle();
         return r;
     }
@@ -99,7 +95,7 @@ public class CollapsiblePanel extends JPanel {
     public void add(Component comp, Object constraints) {
         comp.addComponentListener(contentComponentListener);
         comp.setVisible(!collapsedByDefault);
-        innerPannel.add(comp, constraints);
+        innerPanel.add(comp, constraints);
         updateBorderTitle();
     }
 
@@ -107,21 +103,21 @@ public class CollapsiblePanel extends JPanel {
     public void add(Component comp, Object constraints, int index) {
         comp.addComponentListener(contentComponentListener);
         comp.setVisible(!collapsedByDefault);
-        innerPannel.add(comp, constraints, index);
+        innerPanel.add(comp, constraints, index);
         updateBorderTitle();
     }
 
     @Override
     public void remove(int index) {
-        Component comp = innerPannel.getComponent(index);
+        Component comp = innerPanel.getComponent(index);
         comp.removeComponentListener(contentComponentListener);
-        innerPannel.remove(index);
+        innerPanel.remove(index);
     }
 
     @Override
     public void remove(Component comp) {
         comp.removeComponentListener(contentComponentListener);
-        innerPannel.remove(comp);
+        innerPanel.remove(comp);
     }
 
     @Override
@@ -129,7 +125,7 @@ public class CollapsiblePanel extends JPanel {
         for (Component c : getComponents()) {
             c.removeComponentListener(contentComponentListener);
         }
-        innerPannel.removeAll();
+        innerPanel.removeAll();
     }
 
     protected void toggleVisibility() {
@@ -137,7 +133,7 @@ public class CollapsiblePanel extends JPanel {
     }
 
     protected void toggleVisibility(boolean visible) {
-        for (Component c : innerPannel.getComponents()) {
+        for (Component c : innerPanel.getComponents()) {
             c.setVisible(visible);
         }
         updateBorderTitle();
@@ -155,7 +151,7 @@ public class CollapsiblePanel extends JPanel {
         } else {
             // collapse all elements
             previousDimension = parentWindow.getSize();
-            int height = previousDimension.height - innerPannel.getHeight();
+            int height = previousDimension.height - innerPanel.getHeight();
             Dimension toggle = new Dimension(previousDimension.width, height);
             parentWindow.setPreferredSize(toggle);
             parentWindow.setMinimumSize(initialDimension);
@@ -169,14 +165,14 @@ public class CollapsiblePanel extends JPanel {
 
     private void updateBorderTitle() {
         String arrow = "";
-        if (innerPannel.getComponentCount() > 0) {
+        if (innerPanel.getComponentCount() > 0) {
             arrow = (hasVisibleComponent() ? "-" : "+");
         }
         border.setTitle(title + " " + arrow + " ");
     }
 
     private boolean hasVisibleComponent() {
-        for (Component c : innerPannel.getComponents()) {
+        for (Component c : innerPanel.getComponents()) {
             if (c.isVisible()) {
                 return true;
             }

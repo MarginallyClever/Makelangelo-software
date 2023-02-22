@@ -36,7 +36,7 @@ public class PlotterControls extends JPanel {
 	private static final long serialVersionUID = -1201865024705737250L;
 
 	public static final int DIMENSION_PANEL_WIDTH = 850;
-	public static final int DIMENSION_PANEL_HEIGHT = 210;
+	public static final int DIMENSION_PANEL_HEIGHT = 510;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
@@ -71,7 +71,7 @@ public class PlotterControls extends JPanel {
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
 		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
 
-		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT, true);
+		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT, false);
 		collapsiblePanel.add(tabbedPane);
 
 		this.setLayout(new BorderLayout());
@@ -82,9 +82,8 @@ public class PlotterControls extends JPanel {
 		marlinInterface.addListener(this::onMarlinEvent);
 
 		myPlotter.addPlotterEventListener((e)-> {
-			switch (e.type) {
-				case PlotterEvent.HOME_FOUND -> updateButtonStatusConnected();
-				default -> {}
+			if (e.type == PlotterEvent.HOME_FOUND) {
+				updateButtonStatusConnected();
 			}
 		});
 	}
