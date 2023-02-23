@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;

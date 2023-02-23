@@ -22,8 +22,8 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void start(GL2 gl2) {
 		this.gl2=gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
-		//colorTravel.set(settings.getPenUpColor());
-		//colorDraw.set(settings.getPenDownColorDefault());
+		//colorTravel.set(plottersettings.getPenUpColor());
+		//colorDraw.set(plottersettings.getPenDownColorDefault());
 
 		// Multiply blend mode
 		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);

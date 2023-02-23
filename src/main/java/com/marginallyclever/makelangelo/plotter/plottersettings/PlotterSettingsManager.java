@@ -1,6 +1,5 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.jogamp.common.util.ArrayHashSet;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**

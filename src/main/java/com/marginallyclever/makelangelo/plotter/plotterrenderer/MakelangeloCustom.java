@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import static com.marginallyclever.convenience.DrawingHelper.*;
 
@@ -29,7 +29,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2 the render context
-	 * @param settings settings of the robot
+	 * @param settings plottersettings of the robot
 	 */
 	private void paintControlBox(GL2 gl2, PlotterSettings settings) {
 		double cy = settings.getLimitTop();

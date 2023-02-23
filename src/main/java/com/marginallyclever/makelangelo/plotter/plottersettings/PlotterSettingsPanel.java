@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
@@ -7,7 +7,6 @@ import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;

@@ -1,6 +1,9 @@
 package com.marginallyclever.convenience;
 
 
+/**
+ * Given a line segment as the X axis and an amplitude, this class will generate a sin curve along the line.
+ */
 public class LineInterpolatorSinCurve extends LineInterpolator {
 	double amplitude=1;
 	double scale=1;
@@ -19,16 +22,16 @@ public class LineInterpolatorSinCurve extends LineInterpolator {
 		Point2D bigTan = new Point2D();
 		Point2D bigNorm = new Point2D();
 		
-		bigTan.x = b.x-a.x;
-		bigTan.y = b.y-a.y;
+		bigTan.x = end.x- start.x;
+		bigTan.y = end.y- start.y;
 		bigNorm.y = -bigTan.x/2;
 		bigNorm.x = bigTan.y/2;
 		
 		// now we have overall tangent and normal, we can calculate the position on the sin curve.
 		double s = Math.sin(t*Math.PI*2.0*scale) * amplitude;
 		
-		c.x = a.x + bigTan.x * t + bigNorm.x * s;
-		c.y = a.y + bigTan.y * t + bigNorm.y * s;
+		c.x = start.x + bigTan.x * t + bigNorm.x * s;
+		c.y = start.y + bigTan.y * t + bigNorm.y * s;
 	}
 
 	public double getAmplitude() {

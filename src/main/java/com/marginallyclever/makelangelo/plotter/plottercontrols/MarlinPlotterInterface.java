@@ -7,7 +7,7 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +94,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	/**
-	 * M665: Set POLARGRAPH settings
+	 * M665: Set POLARGRAPH plottersettings
 	 * Parameters:
 	 *   S[segments]  - Segments-per-second
 	 *   L[left]      - Work area minimum X

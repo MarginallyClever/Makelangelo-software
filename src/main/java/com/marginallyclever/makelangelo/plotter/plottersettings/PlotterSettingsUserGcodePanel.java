@@ -1,11 +1,9 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.select.SelectTextArea;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class PlotterSettingsUserGcodePanel extends JPanel {
     private final PlotterSettings settings;

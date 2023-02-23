@@ -1,9 +1,8 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import java.awt.*;
 import java.io.Serial;
 import java.util.Collection;
-import java.util.prefs.BackingStoreException;
 
 import javax.swing.*;
 

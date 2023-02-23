@@ -1,17 +1,15 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.util.PreferencesHelper;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
- * {@link PlotterSettings} stores the physical settings for a single plotter robot.  That is to say it stores the
+ * {@link PlotterSettings} stores the physical plottersettings for a single plotter robot.  That is to say it stores the
  * properties that are consistent across all instances of one type of plotter.
  * @author Dan Royer
  */
