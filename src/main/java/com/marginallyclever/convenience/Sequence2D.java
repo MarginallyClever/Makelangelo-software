@@ -1,8 +1,5 @@
 package com.marginallyclever.convenience;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A sequence of 2D lines forming a polyline.
  * The end of lines.get(n).b should match lines.get(n+1).a.
@@ -12,7 +9,6 @@ import org.slf4j.LoggerFactory;
  */
 @Deprecated(since="7.30.0")
 public class Sequence2D {
-	private static final Logger logger = LoggerFactory.getLogger(Sequence2D.class);
 	public LineCollection lines = new LineCollection();
 	public boolean isClosed=false;
 	

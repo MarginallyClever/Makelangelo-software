@@ -2,6 +2,11 @@ package com.marginallyclever.convenience;
 
 import java.util.Locale;
 
+/**
+ * Convenience functions for working with Strings.
+ * @author Dan Royer
+ * @since 7.0.0
+ */
 public class StringHelper {
 	
 	/**

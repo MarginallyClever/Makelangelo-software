@@ -5,8 +5,8 @@ import java.util.List;
 
 /**
  * 4 point bezier splines
- * Based on https://github.com/pelson/antigrain/blob/master/agg-2.4/src/agg_curves.cpp
- * and https://github.com/mattdesl/adaptive-bezier-curve
+ * Based on <a href="https://github.com/pelson/antigrain/blob/master/agg-2.4/src/agg_curves.cpp">1</a>
+ * and <a href="https://github.com/mattdesl/adaptive-bezier-curve">2</a>
  * @author Dan Royer
  *
  */
