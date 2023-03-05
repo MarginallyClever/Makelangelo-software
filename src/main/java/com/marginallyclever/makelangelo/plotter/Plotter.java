@@ -59,7 +59,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 	
 	private void firePlotterEvent(PlotterEvent e) {
-		for (PlotterEventListener listener : listeners) listener.makelangeloRobotEvent(e);
+		for (PlotterEventListener listener : listeners) listener.plotterEvent(e);
 	}
 
 	// OBSERVER PATTERN ENDS
