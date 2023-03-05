@@ -4,9 +4,10 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
+import com.marginallyclever.makelangelo.makeart.tools.RemoveExtraColorChangesFromTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -70,7 +71,16 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
 		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
 
+		RemoveExtraColorChangesFromTurtle.run(turtle);
 		fireConversionFinished();
+	}
+
+	/**
+	 * Remove any color changes that are not needed.
+	 * TODO could be used on every Turtle generated.
+	 * @param turtle the turtle to clean up
+	 */
+	private void removeRedundantColorChanges(Turtle turtle) {
 	}
 	
 	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {
