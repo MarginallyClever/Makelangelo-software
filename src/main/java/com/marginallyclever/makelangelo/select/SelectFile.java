@@ -1,18 +1,13 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * A file selection dialog
@@ -20,20 +15,14 @@ import javax.swing.filechooser.FileFilter;
  * @since 7.24.0
  */
 public class SelectFile extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1731350044217921795L;
-	private JLabel label;
-	private JTextField field;
-	private JButton chooseButton;
+	private final JTextField field;
 	private FileFilter filter = null;
-	private JFileChooser choose = new JFileChooser();
+	private final JFileChooser choose = new JFileChooser();
 	
 	public SelectFile(String internalName,String labelValue,String defaultValue) {
 		super(internalName);
-		
-		label = new JLabel(labelValue,JLabel.LEADING);
+
+		JLabel label = new JLabel(labelValue, JLabel.LEADING);
 
 		field = new JTextField(defaultValue, 16);
 		field.getDocument().addDocumentListener(new DocumentListener() {
@@ -58,7 +47,7 @@ public class SelectFile extends Select {
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));
 
-		chooseButton = new JButton("...");
+		JButton chooseButton = new JButton("...");
 		chooseButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

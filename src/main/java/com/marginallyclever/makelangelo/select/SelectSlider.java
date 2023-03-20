@@ -1,27 +1,18 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JSlider;
+import javax.swing.*;
+import java.awt.*;
 
 public class SelectSlider extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6440245611041406805L;
-	private JLabel label;
-	private JSlider field;
-	private JLabel value;
+	private final JSlider field = new JSlider();
 	
 	public SelectSlider(String internalName,String labelText,int top,int bottom,int defaultValue) {
 		super(internalName);
 
-		label = new JLabel(labelText,JLabel.LEADING);
-		value = new JLabel("0",JLabel.TRAILING);
-		
-		field = new JSlider();
+		JLabel label = new JLabel(labelText, JLabel.LEADING);
+
+		JLabel value = new JLabel("0",JLabel.TRAILING);
+
 		field.setMaximum(top);
 		field.setMinimum(bottom);
 		field.setMinorTickSpacing(1);

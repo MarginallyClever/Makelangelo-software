@@ -1,10 +1,8 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
 
 /**
  * A JCheckBox that sets itself up to format true/false. 
@@ -12,19 +10,13 @@ import javax.swing.border.EmptyBorder;
  * @since 7.24.0
  */
 public class SelectBoolean extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 598928132833398652L;
-	private JLabel label;
-	private JCheckBox field;
+	private final JCheckBox field = new JCheckBox();
 	
 	public SelectBoolean(String internalName,String labelKey,boolean arg0) {
 		super(internalName);
-		
-		label = new JLabel(labelKey,JLabel.LEADING);
-		
-		field = new JCheckBox();
+
+		JLabel label = new JLabel(labelKey, JLabel.LEADING);
+
 		field.setSelected(arg0);
 		field.setBorder(new EmptyBorder(0,0,0,0));
 		field.addItemListener((e)-> {

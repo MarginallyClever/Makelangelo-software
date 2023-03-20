@@ -5,7 +5,6 @@ import com.marginallyclever.convenience.ColorRGB;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.io.Serial;
 
 /**
  * A color selection dialog
@@ -13,10 +12,6 @@ import java.io.Serial;
  * @since 7.24.0
  */
 public class SelectColor extends Select {
-	@Serial
-	private static final long serialVersionUID = 8898817786685388020L;
-	
-	private final JLabel label;
 	private final BackgroundPaintedButton chooseButton;
 	
 	/**
@@ -26,8 +21,8 @@ public class SelectColor extends Select {
 	 */
 	public SelectColor(String internalName,String labelValue,ColorRGB defaultValue,final Component parentComponent) {
 		super(internalName);
-		
-		label = new JLabel(labelValue,JLabel.LEADING);
+
+		JLabel label = new JLabel(labelValue,JLabel.LEADING);
 
 		chooseButton = new BackgroundPaintedButton("");
 		chooseButton.setOpaque(true);
