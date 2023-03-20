@@ -359,7 +359,6 @@
 	<string>
 		<key>Millimeters</key>
 		<value>mm</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -396,7 +395,6 @@
 	<string>
 		<key>Centimeters</key>
 		<value>cm</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -1024,7 +1022,6 @@
 	<string>
 		<key>MenuOpenFile</key>
 		<value>Open File...</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -1036,7 +1033,6 @@
 	<string>
 		<key>MenuReopenFile</key>
 		<value>Reopen last file</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>PlotterControls.Step</key>
@@ -1447,49 +1443,41 @@
 	<string>
 		<key>MenuGenerate</key>
 		<value>Generate art</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>MenuNewFile</key>
 		<value>New</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>MenuCaptureImage</key>
 		<value>Capture From Camera</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>LSystemTreeName</key>
 		<value>L System Tree Fractal</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>LimitTestName</key>
 		<value>Limit Test</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>KochTreeName</key>
 		<value>Koch Curve Fractal</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>FibonacciSpiralName</key>
 		<value>Fibonacci Spiral Fractal</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>DragonName</key>
 		<value>Dragon Fractal</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -1648,293 +1636,240 @@
 	<string>
 		<key>Off</key>
 		<value>Off</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Auto</key>
 		<value>Auto</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Sun</key>
 		<value>Sun</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Cloud</key>
 		<value>Cloud</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Shade</key>
 		<value>Shade</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Tungsten</key>
 		<value>Tungsten</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Fluorescent</key>
 		<value>Fluorescent</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Incandescent</key>
 		<value>Incandescent</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Flash</key>
 		<value>Flash</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Horizon</key>
 		<value>Horizon</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>High</key>
 		<value>High</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Medium</key>
 		<value>Medium</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Low</key>
 		<value>Low</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Antishake</key>
 		<value>Antishake</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Backlight</key>
 		<value>Backlight</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Beach</key>
 		<value>Beach</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Fireworks</key>
 		<value>Fireworks</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>FixedFPS</key>
 		<value>FixedFPS</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Night</key>
 		<value>Night</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>NightPreview</key>
 		<value>NightPreview</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Snow</key>
 		<value>Snow</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Sports</key>
 		<value>Sports</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Spotlight</key>
 		<value>Spotlight</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>Verylong</key>
 		<value>Verylong</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Choose</key>
 		<value>Choose</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Import</key>
 		<value>Import</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Export</key>
 		<value>Export</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Reset</key>
 		<value>Reset</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Help</key>
 		<value>Help</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Art Pipeline</key>
 		<value>Tools</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Crosshatch</key>
 		<value>Crosshatch</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>MoireName</key>
 		<value>Moire</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>horizontal</key>
 		<value>Horizontal</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>vertical</key>
 		<value>Vertical</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>SandyNoble.title</key>
 		<value>Sandy Noble Style</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>SandyNoble.rings</key>
 		<value>Rings</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>SandyNoble.center</key>
 		<value>Center</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>ConverterIntensity</key>
 		<value>Intensity</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>top right</key>
 		<value>Top right</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>top left</key>
 		<value>Top left</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>bottom right</key>
 		<value>Bottom right</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>bottom left</key>
 		<value>Bottom left</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>center</key>
 		<value>Center</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Spiral.toCorners</key>
 		<value>Spiral to corners</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>SpiralPulse.intensity</key>
 		<value>Intensity</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>SpiralPulse.spacing</key>
 		<value>Space between rings</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>SpiralPulse.height</key>
 		<value>Pulse height</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Converter_VoronoiStippling.Cutoff</key>
 		<value>Low-pass cutoff</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>Converter_VoronoiStippling.DrawBorders</key>
 		<value>Draw borders?</value>
-		<hint></hint>
 	</string>
 	<string>
 		<key>ConverterWanderCMYK</key>
 		<value>CMYK?</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>FillPageName</key>
 		<value>Fill page</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>GosperCurveName</key>
 		<value>Gosper curve</value>
-		<hint></hint>
 	</string>
 
 	<string>
 		<key>GosperCurveOrder</key>
 		<value>Order</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -2063,7 +1998,6 @@
 	<string>
 		<key>OpenPlotterSettings</key>
 		<value>Plotter settings</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -2080,7 +2014,6 @@
 	<string>
 		<key>InfillTurtleAction.title</key>
 		<value>Fill in closed loops</value>
-		<hint></hint>
 	</string>
 
 	<string>
@@ -2182,7 +2115,6 @@
   <string>
       <key>TurtleRenderFactory.DEFAULT</key>
       <value>Default</value>
-      <hint></hint>
   </string>
   <string>
       <key>TurtleRenderFactory.BARBER_POLE</key>
@@ -2192,12 +2124,10 @@
   <string>
       <key>TurtleRenderFactory.SEPARATE_LOOP</key>
       <value>Separate loops</value>
-      <hint></hint>
   </string>
   <string>
       <key>TurtleRenderFactory.MARLIN_SIM</key>
       <value>Marlin simulation</value>
-      <hint></hint>
   </string>
   <string>
       <key>TurtleGenerators.LearnMore.Link.Text</key>
@@ -2209,7 +2139,7 @@
     <string>
         <key></key>
         <value></value>
-        <hint></hint>
+
     </string>
  -->                
 
@@ -2380,5 +2310,18 @@
 	<string>
 		<key>PlotterSettingsPanel.Style</key>
 		<value>Looks like a...</value>
+	</string>
+
+	<string>
+		<key>Generator_OpenAI.APIKey</key>
+		<value>Your API key</value>
+	</string>
+	<string>
+		<key>Generator_OpenAI.prompt</key>
+		<value>English prompt</value>
+	</string>
+	<string>
+		<key>Generator_OpenAI.generate</key>
+		<value>Generate</value>
 	</string>
 </language>
