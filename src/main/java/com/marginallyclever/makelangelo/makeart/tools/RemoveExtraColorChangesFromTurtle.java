@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link RemoveExtraColorChangesFromTurtle} removes any color changes that are not needed.
+ */
 public class RemoveExtraColorChangesFromTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(RemoveExtraColorChangesFromTurtle.class);
 	
