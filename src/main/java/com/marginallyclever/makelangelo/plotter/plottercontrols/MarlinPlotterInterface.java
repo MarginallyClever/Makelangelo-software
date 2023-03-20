@@ -28,6 +28,9 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
+	private static final String MOTOR_ENGAGE = "M17";
+	private static final String MOTOR_DISENGAGE = "M18";
+	private static final String M665 = "M665";
 
 	private final Plotter myPlotter;
 
@@ -82,7 +85,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendEngage() {
-		queueAndSendCommand(myPlotter.getMotorsEngaged() ? "M17" : "M18");
+		queueAndSendCommand(myPlotter.getMotorsEngaged() ? MOTOR_ENGAGE : MOTOR_DISENGAGE);
 	}
 
 	private void sendGoto() {
@@ -113,7 +116,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 		var height = top-bottom;
 		var maxLen = Math.sqrt(width*width + height*height);
 
-		queueAndSendCommand("M665"
+		queueAndSendCommand(M665
 				+" T"+StringHelper.formatDouble(top)
 				+" B"+StringHelper.formatDouble(bottom)
 				+" L"+StringHelper.formatDouble(left)
