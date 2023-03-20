@@ -7,12 +7,6 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import static com.marginallyclever.convenience.DrawingHelper.*;
 
 public class Makelangelo5 implements PlotterRenderer {
-
-	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
-	public final static double COUNTERWEIGHT_W = 30;
-	public final static double COUNTERWEIGHT_H = 60;
-	public final static double PULLEY_RADIUS = 1.27;
-	public final static double MOTOR_WIDTH = 42;
 	private static Texture texture1;
 	private static Texture texture2;
 	private static Texture texture3;
@@ -92,28 +86,33 @@ public class Makelangelo5 implements PlotterRenderer {
 
 		gl2.glPushMatrix();
 
-		// mounting plate for PCB
-		final float SUCTION_CUP_Y = 35f;
-		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
-		final float FRAME_SIZE = 50f; // mm
-
-		gl2.glColor3f(1, 1f, 1f); // #color of suction cups
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-
-		gl2.glColor3d(1, 0.8f, 0.5f);
-		// frame
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
-		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl2.glEnd();
-
+		drawSuctionCups(gl2,left,right,top);
+		drawFrame(gl2,left,right,top);
 		gl2.glTranslated(cx, cy, 0);
+		drawWires(gl2,left,right);
+		drawRUMBA(gl2,left,right);
+		renderLCD(gl2,left,right);
+		gl2.glPopMatrix();
+	}
 
+	// RUMBA in v3 (135mm*75mm)
+	private void drawRUMBA(GL2 gl2, double left, double right) {
+		float h = 75f / 2;
+		float w = 135f / 2;
+		gl2.glPushMatrix();
+		gl2.glTranslated(right-650.0/2.0,0,0);
+
+		gl2.glColor3d(0.9, 0.9, 0.9);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(-w, h);
+		gl2.glVertex2d(+w, h);
+		gl2.glVertex2d(+w, -h);
+		gl2.glVertex2d(-w, -h);
+		gl2.glEnd();
+		gl2.glPopMatrix();
+	}
+
+	private void drawWires(GL2 gl2, double left, double right) {
 		// wires to each motor
 		gl2.glBegin(GL2.GL_LINES);
 		final float SPACING = 2;
@@ -153,26 +152,33 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glVertex2d(right, y);
 		y += SPACING;
 		gl2.glEnd();
-
-		// RUMBA in v3 (135mm*75mm)
-		float h = 75f / 2;
-		float w = 135f / 2;
-		gl2.glColor3d(0.9, 0.9, 0.9); // background #color RUMBA
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
-
-		renderLCD(gl2);
-		gl2.glPopMatrix();
 	}
 
-	private void renderLCD(GL2 gl2) {
+	private void drawFrame(GL2 gl2, double left, double right, double top) {
+		final float FRAME_SIZE = 50f; // mm
+		gl2.glColor3d(1, 0.8f, 0.5f);
+		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
+		gl2.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
+		gl2.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
+		gl2.glEnd();
+	}
+
+	private void drawSuctionCups(GL2 gl2,double left,double right,double top) {
+		final float SUCTION_CUP_Y = 35f;
+		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
+		gl2.glColor3f(1, 1f, 1f); // #color of suction cups
+		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+	}
+
+	private void renderLCD(GL2 gl2, double left, double right) {
 		// position
 		gl2.glPushMatrix();
-		gl2.glTranslated(-180, 0, 0);
+		gl2.glTranslated(right-(650.0/2.0)-180,0,0);
 
 		// LCD red
 		float w = 150f / 2;
