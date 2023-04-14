@@ -425,7 +425,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20220320</version>
+			<version>20230227</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains</groupId>
