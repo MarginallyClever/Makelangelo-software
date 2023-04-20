@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.plotter;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -59,7 +59,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 	
 	private void firePlotterEvent(PlotterEvent e) {
-		for (PlotterEventListener listener : listeners) listener.makelangeloRobotEvent(e);
+		for (PlotterEventListener listener : listeners) listener.plotterEvent(e);
 	}
 
 	// OBSERVER PATTERN ENDS
@@ -163,7 +163,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	/**
 	 * Replace the existing {@link PlotterSettings} inside this {@link Plotter}.
 	 * Does not fire any event notification.
-	 * @param s the new settings.
+	 * @param s the new plottersettings.
 	 */
 	public void setSettings(PlotterSettings s) throws InvalidParameterException {
 		if(s==null) throw new InvalidParameterException(PlotterSettings.class.getSimpleName()+" cannot be null.");

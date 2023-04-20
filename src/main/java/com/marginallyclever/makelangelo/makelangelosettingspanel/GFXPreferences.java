@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 
 /**
- * Graphics settings
+ * Graphics plottersettings
  * @author Dan Royer
  */
 public class GFXPreferences {

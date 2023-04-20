@@ -60,7 +60,7 @@ public class RobotUID {
 			logger.debug("Server says: '{}'", line);
 			newUID = Long.parseLong(line);
 			if (newUID != 0) {
-				//settings.createNewUID(newUID);
+				//plottersettings.createNewUID(newUID);
 			}
 			
 		} catch (Exception e) {

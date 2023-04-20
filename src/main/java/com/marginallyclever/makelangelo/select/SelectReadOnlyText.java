@@ -1,16 +1,14 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.swing.JEditorPane;
-
-import javax.swing.ToolTipManager;
-import javax.swing.event.HyperlinkEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Read only JEditorPane with an HyperlinkListener for text/html, contening or not, multiple html link.
@@ -20,18 +18,12 @@ import org.slf4j.LoggerFactory;
  * @since 7.24.0
  */
 public class SelectReadOnlyText extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8918068053490064344L;
 	
 	private static final Logger logger = LoggerFactory.getLogger(SelectReadOnlyText.class);
-		
-	private JEditorPane jEdPane;
-	
+
 	public SelectReadOnlyText(String internalName,String labelKey) {
-		super(internalName);		
-		jEdPane = createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse("<html>"+ labelKey+"</html>");
+		super(internalName);
+		JEditorPane jEdPane = createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse("<html>" + labelKey + "</html>");
 		this.add(jEdPane,BorderLayout.CENTER);
 	}
 	

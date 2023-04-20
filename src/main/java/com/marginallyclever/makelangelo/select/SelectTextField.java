@@ -6,23 +6,26 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 /**
- * A text input dialog with some limited formatting options.
+ * A short text input.
  * @author Dan Royer
  * @since 7.24.0
  */
-public class SelectTextArea extends Select {
-	private final JTextArea field;
+public class SelectTextField extends Select {
+	private final JTextField field;
 
-	public SelectTextArea(String internalName,String labelKey,String defaultText) {
+	public SelectTextField(String internalName, String labelKey, String defaultText) {
 		super(internalName);
 		//this.setBorder(BorderFactory.createLineBorder(Color.RED));
 
 		JLabel label = new JLabel(labelKey, JLabel.LEADING);
 		
-		field = new JTextArea(defaultText,4,20);
-		field.setLineWrap(true);
-		field.setWrapStyleWord(true);
-		field.setBorder(BorderFactory.createLoweredBevelBorder());
+		field = new JTextField(defaultText);
+
+		Dimension d = field.getPreferredSize();
+		d.width = 100;
+		field.setPreferredSize(d);
+		field.setMinimumSize(d);
+
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -44,11 +47,8 @@ public class SelectTextArea extends Select {
 			}
 		});
 
-		JScrollPane pane = new JScrollPane(field);
-		pane.setPreferredSize(new Dimension(200, 150));
-		
-		this.add(label,BorderLayout.PAGE_START);
-		this.add(pane,BorderLayout.CENTER);
+		this.add(label,BorderLayout.LINE_START);
+		this.add(field,BorderLayout.LINE_END);
 	}
 
 	public String getText() {
@@ -57,14 +57,6 @@ public class SelectTextArea extends Select {
 	
 	public void setText(String str) {
 		field.setText(str);
-	}
-
-	public void setLineWrap(boolean wrap) {
-		field.setLineWrap(wrap);
-	}
-
-	public boolean getLineWrap() {
-		return field.getLineWrap();
 	}
 
 	public boolean isEditable() {

@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 /**
  * @author Dan Royer

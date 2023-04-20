@@ -9,10 +9,6 @@ import java.awt.*;
  * @since 7.24.0
  */
 public class SelectToggleButton extends Select {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 7096181261934634708L;
 	private final JToggleButton button;
 
 	public SelectToggleButton(String internalName, AbstractAction action) {

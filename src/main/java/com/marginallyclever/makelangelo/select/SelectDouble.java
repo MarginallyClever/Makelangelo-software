@@ -17,12 +17,7 @@ import java.util.TimerTask;
  * @since 7.24.0
  */
 public class SelectDouble extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7904178922597267242L;
-	private JLabel label;
-	private JTextField field;
+	private final JTextField field = new JTextField();
 	private double value;
 	private Timer timer;
 
@@ -30,10 +25,10 @@ public class SelectDouble extends Select {
 		super(internalName);
 
 		value = defaultValue;
-		
-		label = new JLabel(labelKey, JLabel.LEADING);
+
+		JLabel label = new JLabel(labelKey, JLabel.LEADING);
 		label.setName(internalName+".label");
-		field = new JTextField();
+
 		field.setName(internalName+".field");
 		
 		Dimension d = field.getPreferredSize();

@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelectSpinner extends Select {
+    private final JSpinner field;
 
-    private JLabel label;
-    private JSpinner field;
+    public SelectSpinner(String internalName, String labelText, int min, int max, int value) {
+        super(internalName);
 
-    public SelectSpinner(String name, String labelText, int min, int max, int value) {
-        super(name);
-
-        label = new JLabel(labelText,JLabel.LEADING);
+        JLabel label = new JLabel(labelText, JLabel.LEADING);
 
         List<Integer> list = new ArrayList<>();
         for (int i = min; i<= max; i++) {

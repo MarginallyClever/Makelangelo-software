@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A quadtree is a data structure that can be used to quickly find all the objects that are within a given area.
+ * A quadtree is a data structure that can be used to quickly find all the objects that are within a given 2D area.
  */
 public class QuadGraph {
     private static final int MAX_POINTS = 5;

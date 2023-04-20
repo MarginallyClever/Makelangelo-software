@@ -13,7 +13,7 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 /**
- * Application settings
+ * Application plottersettings
  * @author Dan Royer
  *
  */

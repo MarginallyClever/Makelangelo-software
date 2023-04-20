@@ -1,30 +1,22 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
-import java.util.Arrays;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.util.Arrays;
 
 /**
  * @author Dan Royer
  * @since 7.24.0
  */
 public class SelectOneOfMany extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8598766351908283067L;
-	private JLabel label;
-	private JComboBox<String> field = new JComboBox<String>();
-	private DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>)field.getModel();
+	private final JComboBox<String> field = new JComboBox<>();
+	private final DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>)field.getModel();
 	
 	public SelectOneOfMany(String internalName,String labelKey) {
 		super(internalName);
-		
-		label = new JLabel(labelKey,JLabel.LEADING);
+
+		JLabel label = new JLabel(labelKey, JLabel.LEADING);
 
 		field.addActionListener((e)-> firePropertyChange(null, field.getSelectedIndex()) );
 

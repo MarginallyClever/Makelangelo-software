@@ -18,11 +18,6 @@ import java.util.TimerTask;
  * @since 7.24.0
  */
 public class SelectInteger extends Select {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3071134838779161675L;
-	private JLabel label;
 	private JFormattedTextField field;
 	private int value;
 	private Timer timer=null;
@@ -31,8 +26,9 @@ public class SelectInteger extends Select {
 		super(internalName);
 		
 		value = defaultValue;
-		
-		label = new JLabel(labelKey,JLabel.LEADING);
+
+		JLabel label = new JLabel(labelKey, JLabel.LEADING);
+
 		field = new JFormattedTextField();
 		createAndAttachFormatter(locale);
 
@@ -41,7 +37,7 @@ public class SelectInteger extends Select {
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
 
-		field.setValue((Integer)defaultValue);
+		field.setValue(defaultValue);
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override

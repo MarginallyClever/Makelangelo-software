@@ -30,10 +30,9 @@ import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsManager;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsManagerPanel;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettingsUserGcodePanel;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;

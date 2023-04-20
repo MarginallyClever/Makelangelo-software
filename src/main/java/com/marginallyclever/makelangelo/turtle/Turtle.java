@@ -273,20 +273,20 @@ public class Turtle implements Cloneable {
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
 		top.y=-Float.MAX_VALUE;
-		TurtleMove old=null;
+		TurtleMove lastTravelMove=null;
 		
 		int hits=0;
 
 		for( TurtleMove m : history ) {
 			switch(m.type) {
 				case TRAVEL -> {
-					old = m;
+					lastTravelMove = m;
 				}
 				case DRAW_LINE -> {
-					if (old != null) {
+					if (lastTravelMove != null) {
 						hits++;
-						getBoundsInternal(top,bottom,old);
-						old=null;
+						getBoundsInternal(top,bottom,lastTravelMove);
+						lastTravelMove = null;
 					}
 					hits++;
 					getBoundsInternal(top,bottom,m);

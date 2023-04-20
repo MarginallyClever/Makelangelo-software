@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.plotter.settings;
+package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;

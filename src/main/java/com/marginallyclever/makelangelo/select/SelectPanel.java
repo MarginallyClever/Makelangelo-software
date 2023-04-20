@@ -83,7 +83,8 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		SelectSlider i = new SelectSlider("I","I",200,0,100);
 		SelectTextArea j = new SelectTextArea("J","J",ipsum);
 		SelectSpinner k = new SelectSpinner("K", "K", 1, 10, 3);
-		
+		SelectTextField m = new SelectTextField("M", "M", "M");
+
 		panel.add(a);
 		panel.add(b);
 		panel.add(c);
@@ -95,6 +96,7 @@ public class SelectPanel extends JPanel implements PropertyChangeListener {
 		panel.add(i);
 		panel.add(j);
 		panel.add(k);
+		panel.add(m);
 
 		// test finish
 		panel.setPreferredSize(new Dimension(400,600));

@@ -500,7 +500,7 @@
 	</string>
 	<string>
 		<key>PlotterSettingsPanel.pen down color</key>
-		<value>Down color</value>
+		<value>Default down color</value>
 		<hint>Pen settings</hint>
 	</string>
 

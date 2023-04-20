@@ -1,5 +1,10 @@
 package com.marginallyclever.convenience;
 
+/**
+ * A 2D point class with some useful methods.
+ * @author Dan Royer
+ * @since 7.0.0
+ */
 public class Point2D {
 	public double x,y;
 	
@@ -18,10 +23,12 @@ public class Point2D {
 		x=x0;
 		y=y0;
 	}
+
 	public void set(Point2D p) {
 		x=p.x;
 		y=p.y;
 	}
+
 	public double lengthSquared() {
 		return x*x+y*y;
 	}

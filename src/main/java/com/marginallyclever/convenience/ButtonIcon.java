@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.Serial;
 
+/**
+ * A button with an icon and a translation key.
+ * @author Dan Royer
+ */
 public class ButtonIcon extends JButton {
 	@Serial
     private static final long serialVersionUID = 6329805223648415348L;

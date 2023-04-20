@@ -1,10 +1,15 @@
 package com.marginallyclever.convenience;
 
+import com.jogamp.opengl.GL2;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import com.jogamp.opengl.GL2;
-
+/**
+ * A collection of static functions to help with OpenGL.
+ * @author Dan Royer
+ * @since 7.30.0
+ */
 public class OpenGLHelper {
 	static public int drawAtopEverythingStart(GL2 gl2) {
 		IntBuffer depthFunc = IntBuffer.allocate(1);

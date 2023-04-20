@@ -13,11 +13,11 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	private GL2 gl2;
 	
-	private ColorRGB colorTravel = new ColorRGB(0,255,0);
+	private final ColorRGB colorTravel = new ColorRGB(0,255,0);
+	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter =1;
 	private int moveCounter;
-	private float[] lineWidthBuf = new float[1];
 		
 	@Override
 	public void start(GL2 gl2) {

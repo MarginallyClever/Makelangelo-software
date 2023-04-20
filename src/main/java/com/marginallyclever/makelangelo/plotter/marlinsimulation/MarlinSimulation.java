@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.settings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
