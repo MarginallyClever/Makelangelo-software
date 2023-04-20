@@ -14,17 +14,17 @@ import org.slf4j.LoggerFactory;
 import java.io.Serial;
 
 /**
- * {@link MarlinPlotterInterface} is a {@link MarlinInterface} with extra
+ * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
  * instructions for interaction with a plotter robot.
  * 
  * @author Dan Royer
  * @since 7.28.0
  */
-public class MarlinPlotterInterface extends MarlinInterface {
+public class MarlinPlotterPanel extends MarlinPanel {
 	@Serial
 	private static final long serialVersionUID = -7114823910724405882L;
 
-	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterInterface.class);
+	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterPanel.class);
 
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
@@ -34,7 +34,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private final Plotter myPlotter;
 
-	public MarlinPlotterInterface(Plotter plotter, ChooseConnection chooseConnection) {
+	public MarlinPlotterPanel(Plotter plotter, ChooseConnection chooseConnection) {
 		super(chooseConnection);
 
 		myPlotter = plotter;
@@ -69,7 +69,7 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	}
 
 	private void sendToolChange(int toolNumber) {
-		queueAndSendCommand(MarlinPlotterInterface.getPenUpString(myPlotter));
+		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
@@ -79,8 +79,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 
 	private void sendPenUpDown() {
 		String str = myPlotter.getPenIsUp()
-				? MarlinPlotterInterface.getPenUpString(myPlotter)
-				: MarlinPlotterInterface.getPenDownString(myPlotter);
+				? MarlinPlotterPanel.getPenUpString(myPlotter)
+				: MarlinPlotterPanel.getPenDownString(myPlotter);
 		queueAndSendCommand(str);
 	}
 
@@ -91,8 +91,8 @@ public class MarlinPlotterInterface extends MarlinInterface {
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
 		String msg = myPlotter.getPenIsUp()
-				? MarlinPlotterInterface.getTravelToString(myPlotter, p.x, p.y)
-				: MarlinPlotterInterface.getDrawToString(myPlotter, p.x, p.y);
+				? MarlinPlotterPanel.getTravelToString(myPlotter, p.x, p.y)
+				: MarlinPlotterPanel.getDrawToString(myPlotter, p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 

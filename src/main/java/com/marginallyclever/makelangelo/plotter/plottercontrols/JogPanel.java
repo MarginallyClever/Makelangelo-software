@@ -15,15 +15,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * {@link JogInterface} provides cartesian driving controls for a {@link Plotter}.
+ * {@link JogPanel} provides cartesian driving controls for a {@link Plotter}.
  * It also includes buttons to engage/disengage the motors; find home; and raise/lower the pen.
  * Cartesian driving is disabled until the "find home" action has completed.
  *
  * @author Dan Royer
  * @since 7.28.0
  */
-public class JogInterface extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(JogInterface.class);
+public class JogPanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(JogPanel.class);
 	
 	private static final long serialVersionUID = -7408469373702327861L;
 	private Plotter myPlotter;
@@ -33,7 +33,7 @@ public class JogInterface extends JPanel {
 	private JButton penUp;
 	private JButton penDown;
 
-	public JogInterface(Plotter plotter) {
+	public JogPanel(Plotter plotter) {
 		super();
 		myPlotter=plotter;
 		
@@ -144,9 +144,9 @@ public class JogInterface extends JPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(JogInterface.class.getSimpleName());
+		JFrame frame = new JFrame(JogPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new JogInterface(new Plotter()));
+		frame.add(new JogPanel(new Plotter()));
 		frame.pack();
 		frame.setVisible(true);
 	}

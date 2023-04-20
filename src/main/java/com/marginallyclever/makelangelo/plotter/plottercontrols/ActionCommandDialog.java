@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 /**
  * {@link ActionCommandDialog} is a dialog that allows the user to enter a question and a list of choice responses.
- * It was written to be used by Marlin Action Commands.  See {@link MarlinInterface} for more information.
+ * It was written to be used by Marlin Action Commands.  See {@link MarlinPanel} for more information.
  */
 public class ActionCommandDialog {
     private String promptMessage = "";
