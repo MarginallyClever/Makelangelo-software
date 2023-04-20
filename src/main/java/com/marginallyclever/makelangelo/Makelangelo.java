@@ -120,9 +120,6 @@ public final class Makelangelo {
 	private final JLabel labelRangeMin = new JLabel();
 	private final JLabel labelRangeMax = new JLabel();
 
-	
-	// drag files into the app with {@link DropTarget}
-	private DropTarget dropTarget;
 
 	public Makelangelo() {
 		logger.debug("Locale={}", Locale.getDefault().toString());
@@ -133,7 +130,7 @@ public final class Makelangelo {
 		logger.debug("Starting virtual camera...");
 		camera = new Camera();
 	}
-	
+
 	private void startRobot() {
 		logger.debug("Starting robot...");
 
@@ -937,36 +934,37 @@ public final class Makelangelo {
 	
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		dropTarget = new DropTarget(mainFrame,new DropTargetAdapter() {
+		// drag files into the app with {@link DropTarget}
+		DropTarget dropTarget = new DropTarget(mainFrame, new DropTargetAdapter() {
 			@Override
 			public void drop(DropTargetDropEvent dtde) {
-			try {
-				Transferable tr = dtde.getTransferable();
-				DataFlavor[] flavors = tr.getTransferDataFlavors();
-				for (DataFlavor flavor : flavors) {
-					logger.debug("Possible flavor: {}", flavor.getMimeType());
-					if (flavor.isFlavorJavaFileListType()) {
-						dtde.acceptDrop(DnDConstants.ACTION_COPY);
-						Object o = tr.getTransferData(flavor);
-						if (o instanceof List<?>) {
-							List<?> list = (List<?>) o;
-							if (list.size() > 0) {
-								o = list.get(0);
-								if (o instanceof File) {
-									openFile(((File) o).getAbsolutePath());
-									dtde.dropComplete(true);
-									return;
+				try {
+					Transferable tr = dtde.getTransferable();
+					DataFlavor[] flavors = tr.getTransferDataFlavors();
+					for (DataFlavor flavor : flavors) {
+						logger.debug("Possible flavor: {}", flavor.getMimeType());
+						if (flavor.isFlavorJavaFileListType()) {
+							dtde.acceptDrop(DnDConstants.ACTION_COPY);
+							Object o = tr.getTransferData(flavor);
+							if (o instanceof List<?>) {
+								List<?> list = (List<?>) o;
+								if (list.size() > 0) {
+									o = list.get(0);
+									if (o instanceof File) {
+										openFile(((File) o).getAbsolutePath());
+										dtde.dropComplete(true);
+										return;
+									}
 								}
 							}
 						}
 					}
+					logger.debug("Drop failed: {}", dtde);
+					dtde.rejectDrop();
+				} catch (Exception e) {
+					logger.error("Drop error", e);
+					dtde.rejectDrop();
 				}
-				logger.debug("Drop failed: {}", dtde);
-				dtde.rejectDrop();
-			} catch (Exception e) {
-				logger.error("Drop error", e);
-				dtde.rejectDrop();
-			}
 			}
 		});
 	}
