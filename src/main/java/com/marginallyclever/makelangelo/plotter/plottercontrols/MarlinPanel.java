@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The {@link MarlinInterface} manages communication with a remote device running Marlin firmware.
+ * The {@link MarlinPanel} manages communication with a remote device running Marlin firmware.
  * In the OSI model of network interfaces this is the Presentation/Syntax layer which
  * "ensures that data is in a usable format and is where data encryption occurs".
  * That means checksum verification and resend control.
@@ -23,8 +23,8 @@ import java.util.List;
  * @author Dan Royer
  * @since 7.28.0
  */
-public class MarlinInterface extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(MarlinInterface.class);
+public class MarlinPanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(MarlinPanel.class);
 	
 	@Serial
 	private static final long serialVersionUID = 979851120390943303L;
@@ -73,7 +73,7 @@ public class MarlinInterface extends JPanel {
 	private final ActionCommandDialog promptDialog = new ActionCommandDialog();
 	private boolean waitingForResponse = false;
 	
-	public MarlinInterface(ChooseConnection chooseConnection) {
+	public MarlinPanel(ChooseConnection chooseConnection) {
 		super();
 
 		this.setLayout(new BorderLayout());
@@ -113,7 +113,7 @@ public class MarlinInterface extends JPanel {
 		if (delay > TIMEOUT_DELAY) {
 			if (delay > FATAL_TIMEOUT_DELAY) {
 				logger.error("No answer from the robot");
-				notifyListeners( MarlinInterfaceEvent.COMMUNICATION_FAILURE );
+				notifyListeners( MarlinPanelEvent.COMMUNICATION_FAILURE );
 				chatInterface.displayError("No answer from the robot, retrying...");
 			} else {
 				logger.trace("Heartbeat: M400");
@@ -154,7 +154,7 @@ public class MarlinInterface extends JPanel {
 			if (n > lineNumberAdded) {
 				logger.warn("Resend line {} asked but never sent", n);
 			}
-			if (n > lineNumberAdded - MarlinInterface.HISTORY_BUFFER_LIMIT) {
+			if (n > lineNumberAdded - MarlinPanel.HISTORY_BUFFER_LIMIT) {
 				// no problem.
 				lineNumberToSend = n;
 			} else {
@@ -182,13 +182,13 @@ public class MarlinInterface extends JPanel {
 		
 		// only notify listeners of a fatal error (MarlinInterface.ERROR) if the printer halts.
 		if (message.contains(STR_PRINTER_HALTED)) {
-			notifyListeners( MarlinInterfaceEvent.ERROR, STR_PRINTER_HALTED );
+			notifyListeners( MarlinPanelEvent.ERROR, STR_PRINTER_HALTED );
 		}
 	}
 
 	private void onHearHomeXYFirst() {
 		logger.warn("Home XY First");
-		notifyListeners( MarlinInterfaceEvent.HOME_XY_FIRST );
+		notifyListeners( MarlinPanelEvent.HOME_XY_FIRST );
 	}
 
 	private void onHearActionCommand(String command) {
@@ -196,15 +196,15 @@ public class MarlinInterface extends JPanel {
 
 		processActionCommand(command);
 
-		notifyListeners( MarlinInterfaceEvent.ACTION_COMMAND, command );
+		notifyListeners( MarlinPanelEvent.ACTION_COMMAND, command );
 	}
 
 	private void onDidNotFindCommandInHistory() {
-		notifyListeners( MarlinInterfaceEvent.DID_NOT_FIND );
+		notifyListeners( MarlinPanelEvent.DID_NOT_FIND );
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners( MarlinInterfaceEvent.IDLE );
+		notifyListeners( MarlinPanelEvent.IDLE );
 	}
 
 	private void clearOldHistory() {
@@ -308,13 +308,13 @@ public class MarlinInterface extends JPanel {
 
 	// OBSERVER PATTERN
 	
-	private final List<MarlinInterfaceListener> listeners = new ArrayList<>();
+	private final List<MarlinPanelListener> listeners = new ArrayList<>();
 
-	public void addListener(MarlinInterfaceListener listener) {
+	public void addListener(MarlinPanelListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeListener(MarlinInterfaceListener listener) {
+	public void removeListener(MarlinPanelListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -322,8 +322,8 @@ public class MarlinInterface extends JPanel {
 		notifyListeners(id, null);
 	}
 	private void notifyListeners(int id,String command) {
-		MarlinInterfaceEvent event = new MarlinInterfaceEvent(this,id,command);
-		for (MarlinInterfaceListener listener : listeners) listener.actionPerformed(event);
+		MarlinPanelEvent event = new MarlinPanelEvent(this,id,command);
+		for (MarlinPanelListener listener : listeners) listener.actionPerformed(event);
 	}
 
 	// OBSERVER PATTERN ENDS
@@ -335,9 +335,9 @@ public class MarlinInterface extends JPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		JFrame frame = new JFrame(MarlinInterface.class.getSimpleName());
+		JFrame frame = new JFrame(MarlinPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new MarlinInterface(new ChooseConnection()));
+		frame.add(new MarlinPanel(new ChooseConnection()));
 		frame.pack();
 		frame.setVisible(true);
 	}

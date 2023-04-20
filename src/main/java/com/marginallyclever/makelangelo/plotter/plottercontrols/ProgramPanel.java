@@ -12,21 +12,21 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 
 /**
- * {@link ProgramInterface} maintains a buffer of commands to be sent to a
+ * {@link ProgramPanel} maintains a buffer of commands to be sent to a
  * {@link Plotter}. The currently selected element in the {@link JList} is the
  * "play head" of the recording.
  * 
  * @author Dan Royer
  * @since 7.28.0
  */
-public class ProgramInterface extends JPanel {
+public class ProgramPanel extends JPanel {
 	private static final long serialVersionUID = -7719350277524271664L;
 	private Plotter myPlotter;
 	private Turtle myTurtle;
 	private DefaultListModel<TurtleMove> listModel = new DefaultListModel<TurtleMove>();
 	private JList<TurtleMove> listView = new JList<TurtleMove>(listModel);
 
-	public ProgramInterface(Plotter plotter, Turtle turtle) {
+	public ProgramPanel(Plotter plotter, Turtle turtle) {
 		super();
 		myPlotter = plotter;
 		myTurtle = turtle;
@@ -134,9 +134,9 @@ public class ProgramInterface extends JPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		JFrame frame = new JFrame(ProgramInterface.class.getSimpleName());
+		JFrame frame = new JFrame(ProgramPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ProgramInterface(new Plotter(), new Turtle()));
+		frame.add(new ProgramPanel(new Plotter(), new Turtle()));
 		frame.pack();
 		frame.setVisible(true);
 	}

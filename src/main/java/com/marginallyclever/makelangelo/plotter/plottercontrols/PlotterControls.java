@@ -23,9 +23,9 @@ import java.util.List;
 /**
  * {@link PlotterControls} brings together three separate panels and wraps all
  * the lower level features in a human friendly, intuitive interface. - The
- * {@link MarlinInterface}, which manages the two way network connection to a
- * robot running Marlin firmware. - The {@link JogInterface}, which is a
- * human-friendly way to drive a {@link Plotter} - The {@link ProgramInterface},
+ * {@link MarlinPanel}, which manages the two way network connection to a
+ * robot running Marlin firmware. - The {@link JogPanel}, which is a
+ * human-friendly way to drive a {@link Plotter} - The {@link ProgramPanel},
  * which is a buffer for queueing commands to a {@link Plotter}
  *
  * @author Dan Royer
@@ -40,9 +40,9 @@ public class PlotterControls extends JPanel {
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
-	private final JogInterface jogInterface;
-	private final MarlinPlotterInterface marlinInterface;
-	private final ProgramInterface programInterface;
+	private final JogPanel jogPanel;
+	private final MarlinPlotterPanel marlinInterface;
+	private final ProgramPanel programPanel;
 
 	private final ChooseConnection chooseConnection = new ChooseConnection();
 	private ButtonIcon bFindHome;
@@ -62,14 +62,14 @@ public class PlotterControls extends JPanel {
 		myPlotter = plotter;
 		myTurtle = turtle;
 
-		jogInterface = new JogInterface(plotter);
-		marlinInterface = new MarlinPlotterInterface(plotter, chooseConnection);
-		programInterface = new ProgramInterface(plotter, turtle);
+		jogPanel = new JogPanel(plotter);
+		marlinInterface = new MarlinPlotterPanel(plotter, chooseConnection);
+		programPanel = new ProgramPanel(plotter, turtle);
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab(Translator.get("PlotterControls.JogTab"), jogInterface);
+		tabbedPane.addTab(Translator.get("PlotterControls.JogTab"), jogPanel);
 		tabbedPane.addTab(Translator.get("PlotterControls.MarlinTab"), marlinInterface);
-		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programInterface);
+		tabbedPane.addTab(Translator.get("PlotterControls.ProgramTab"), programPanel);
 
 		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT, false);
 		collapsiblePanel.add(tabbedPane);
@@ -88,14 +88,14 @@ public class PlotterControls extends JPanel {
 		});
 	}
   
-	private void onMarlinEvent(MarlinInterfaceEvent e) {
+	private void onMarlinEvent(MarlinPanelEvent e) {
 		switch (e.getID()) {
-			case MarlinInterfaceEvent.IDLE -> {
+			case MarlinPanelEvent.IDLE -> {
 					if (isRunning) step();
 				}
-			case MarlinInterfaceEvent.ERROR,
-					MarlinInterfaceEvent.DID_NOT_FIND,
-					MarlinInterfaceEvent.COMMUNICATION_FAILURE -> {
+			case MarlinPanelEvent.ERROR,
+					MarlinPanelEvent.DID_NOT_FIND,
+					MarlinPanelEvent.COMMUNICATION_FAILURE -> {
 						if (!isErrorAlreadyDisplayed) {
 							/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
 							 * robot being turned off while COM port is connected.
@@ -104,7 +104,7 @@ public class PlotterControls extends JPanel {
 							isErrorAlreadyDisplayed = true;
 						}
 					}
-			case MarlinInterfaceEvent.HOME_XY_FIRST ->
+			case MarlinPanelEvent.HOME_XY_FIRST ->
 					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
@@ -170,13 +170,13 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void findHome() {
-		jogInterface.findHome();
+		jogPanel.findHome();
 		updateButtonStatusConnected();
 	}
 
 	private void step() {
-		programInterface.step();
-		if (programInterface.getLineNumber() == -1) {
+		programPanel.step();
+		if (programPanel.getLineNumber() == -1) {
 			// done
 			addUserEndGCODE();
 			pause();
@@ -184,22 +184,22 @@ public class PlotterControls extends JPanel {
 	}
 
 	public void startAt(int lineNumber) {
-		int count = programInterface.getMoveCount();
+		int count = programPanel.getMoveCount();
 		if (lineNumber >= count)
 			lineNumber = count;
 		if (lineNumber < 0)
 			lineNumber = 0;
 
-		programInterface.setLineNumber(lineNumber);
+		programPanel.setLineNumber(lineNumber);
 		play();
 	}
 
 	private void updateProgressBar() {
-		progress.setValue((int) (100.0 * programInterface.getLineNumber() / programInterface.getMoveCount()));
+		progress.setValue((int) (100.0 * programPanel.getLineNumber() / programPanel.getMoveCount()));
 	}
 
 	private void rewind() {
-		programInterface.rewind();
+		programPanel.rewind();
 		progress.setValue(0);
 	}
 
@@ -214,8 +214,8 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void rewindIfNoProgramLineSelected() {
-		if (programInterface.getLineNumber() == -1) {
-			programInterface.rewind();
+		if (programPanel.getLineNumber() == -1) {
+			programPanel.rewind();
 		}
 	}
 
@@ -244,7 +244,7 @@ public class PlotterControls extends JPanel {
 		bFindHome.setEnabled(true);
 		bEmergencyStop.setEnabled(true);
 		updateButtonStatusConnected();
-		jogInterface.onNetworkConnect();
+		jogPanel.onNetworkConnect();
 		isErrorAlreadyDisplayed = false;
 	}
 
@@ -256,7 +256,7 @@ public class PlotterControls extends JPanel {
 		bStart.setEnabled(false);
 		bPause.setEnabled(false);
 		bStep.setEnabled(false);
-		jogInterface.onNetworkDisconnect();
+		jogPanel.onNetworkDisconnect();
 	}
 
 	@SuppressWarnings("unused")

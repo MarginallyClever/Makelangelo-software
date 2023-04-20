@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 /**
  * MarlinInterface sends this to let listeners know about important events.
  */
-public class MarlinInterfaceEvent {
+public class MarlinPanelEvent {
     /**
      * MarlinInterface sends this to let listeners know it is ready to receive more commands.
      */
@@ -39,7 +39,7 @@ public class MarlinInterfaceEvent {
     private final int id;
     private final String command;
 
-    public MarlinInterfaceEvent(Object source, int id, String command) {
+    public MarlinPanelEvent(Object source, int id, String command) {
         this.source = source;
         this.id = id;
         this.command = command;

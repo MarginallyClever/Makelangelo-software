@@ -4,8 +4,8 @@ import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterInterface;
-import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramInterface;
+import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterPanel;
+import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramPanel;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -26,8 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Save the {@link ProgramInterface} instruction buffer to a gcode file of the user's choosing.
- * Relies on {@link MarlinPlotterInterface} to translate the instructions into gcode.
+ * Save the {@link ProgramPanel} instruction buffer to a gcode file of the user's choosing.
+ * Relies on {@link MarlinPlotterPanel} to translate the instructions into gcode.
  * @author Dan Royer
  * @since 7.28.0
  */
@@ -185,7 +185,7 @@ public class SaveGCode {
 			out.write(";Start of user gcode\n");
 			out.write(robot.getSettings().getUserGeneralStartGcode());
 			out.write("\n;End of user gcode\n");
-			out.write(MarlinPlotterInterface.getFindHomeString()+"\n");  // go home
+			out.write(MarlinPlotterPanel.getFindHomeString()+"\n");  // go home
 
 			boolean isUp = true;
 
@@ -197,7 +197,7 @@ public class SaveGCode {
 					case TRAVEL -> {
 						if (!isUp) {
 							// lift pen up
-							out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
+							out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
 							isUp = true;
 						}
 						previousMovement = m;
@@ -206,20 +206,20 @@ public class SaveGCode {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
-							out.write(MarlinPlotterInterface.getTravelToString(robot,previousMovement.x, previousMovement.y) + "\n");
-							out.write(MarlinPlotterInterface.getPenDownString(robot) + "\n");
+							out.write(MarlinPlotterPanel.getTravelToString(robot,previousMovement.x, previousMovement.y) + "\n");
+							out.write(MarlinPlotterPanel.getPenDownString(robot) + "\n");
 							isUp = false;
 						}
-						out.write(MarlinPlotterInterface.getDrawToString(robot,m.x, m.y) + "\n");
+						out.write(MarlinPlotterPanel.getDrawToString(robot,m.x, m.y) + "\n");
 						previousMovement = m;
 					}
 					case TOOL_CHANGE -> {
-						out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
-						out.write(MarlinPlotterInterface.getToolChangeString(m.getColor().toInt()) + "\n");
+						out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
+						out.write(MarlinPlotterPanel.getToolChangeString(m.getColor().toInt()) + "\n");
 					}
 				}
 			}
-			if (!isUp) out.write(MarlinPlotterInterface.getPenUpString(robot) + "\n");
+			if (!isUp) out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
 			out.write(";Start of user gcode\n");
 			out.write(robot.getSettings().getUserGeneralEndGcode());
 			out.write("\n;End of user gcode\n");
