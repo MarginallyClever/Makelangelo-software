@@ -140,11 +140,15 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin><!--
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.3.1</version>
-			</plugin>
+				<configuration>
+					<source>8</source>
+					<destDir>${project.basedir}/docs</destDir>
+				</configuration>
+			</plugin> -->
 
 			<!-- Beginning of plugins defined originally only in Super POM -->
 			<plugin>
@@ -336,7 +340,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<dependency>
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
-				<version>5.8.1</version>
+				<version>5.9.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
