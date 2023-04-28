@@ -96,7 +96,6 @@ public class Generator_OpenAI extends TurtleGenerator {
         String output = new BufferedReader(new InputStreamReader(con.getInputStream())).lines()
                 .reduce((a, b) -> a + b).get();
 
-        String result = new JSONObject(output).getJSONArray("choices").getJSONObject(0).getString("text");
-        return result;
+        return new JSONObject(output).getJSONArray("choices").getJSONObject(0).getString("text");
     }
 }
