@@ -26,7 +26,7 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(LanguagesXmlValidationForNoDupKeyTest.class);
 
-	public final static String ressourceStringForXmlShemaFile = "/translator/language_no_dup_key.xsd";
+	public final static String resourceStringForXmlSchemaFile = "/translator/language_no_dup_key.xsd";
 
 	@Test
 	public void validateLaguagesXmlFiles() throws IOException {
@@ -36,10 +36,10 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 
 		// Pre requi	
 //	//URL schemaFile = new File("src/test/resources/translator/language_no_dup_key.xsd").toURI().toURL();
-		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(ressourceStringForXmlShemaFile);
+		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(resourceStringForXmlSchemaFile);
 
 		//  Pre requi schema xsd file
-		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + ressourceStringForXmlShemaFile + ") to validate the language files");
+		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + resourceStringForXmlSchemaFile + ") to validate the language files");
 
 		//  Pre requi some language xml file to test
 		List<File> files = listFiles(srcDir.toPath(), ".xml");
@@ -56,7 +56,7 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 
 		StringBuilder sb = new StringBuilder();
 		if (!xmlFilesWithValidationDefect.isEmpty()) {
-			logger.info("invalide with " + ressourceStringForXmlShemaFile + " :");
+			logger.info("invalide with " + resourceStringForXmlSchemaFile + " :");
 			for (String result : xmlFilesWithValidationDefect) {
 				sb.append("  ");
 				sb.append(result);
@@ -64,14 +64,14 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 				logger.info("  {}", result);
 			}
 		}
-		assertEquals(0, xmlFilesWithValidationDefect.size(), "Some language xml file do not validate with " + ressourceStringForXmlShemaFile + "\n" + sb.toString() + ", see previous logs for details");
+		assertEquals(0, xmlFilesWithValidationDefect.size(), "Some language xml file do not validate with " + resourceStringForXmlSchemaFile + "\n" + sb.toString() + ", see previous logs for details");
 	}
 
 	@Test
 	public void verifyThatValidationWorks_notvalide() throws IOException {
 
-		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(ressourceStringForXmlShemaFile);
-		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + ressourceStringForXmlShemaFile + ") to validate the language files");
+		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(resourceStringForXmlSchemaFile);
+		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + resourceStringForXmlSchemaFile + ") to validate the language files");
 
 		String myTestFileWithWithDupKeyInRessources = "/translator/english_with_dup_key.xml";
 		URL resource = LanguagesXmlValidationForNoDupKeyTest.class.getResource(myTestFileWithWithDupKeyInRessources);
@@ -86,8 +86,8 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 	@Test
 	public void verifyThatValidationWorks_valide() throws IOException {
 
-		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(ressourceStringForXmlShemaFile);
-		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + ressourceStringForXmlShemaFile + ") to validate the language files");
+		URL schemaFile = LanguagesXmlValidationForNoDupKeyTest.class.getResource(resourceStringForXmlSchemaFile);
+		assertNotNull(schemaFile, "The test need a redable schema xsd file (" + resourceStringForXmlSchemaFile + ") to validate the language files");
 
 		String myTestFileWithNoDupKeyInRessources = "/translator/english_with_no_dup_key.xml";
 		URL resource = LanguagesXmlValidationForNoDupKeyTest.class.getResource(myTestFileWithNoDupKeyInRessources);

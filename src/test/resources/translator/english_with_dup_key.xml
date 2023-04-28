@@ -30,12 +30,12 @@
 	<string>
 		<key>KEY_A</key>
 		<value>...</value>
-                <hint></hint>
+		<hint></hint>
 	</string>
 	<string>
 		<key>KEY_A</key>
 		<value>...</value>
-                <hint></hint>
+        <hint></hint>
 	</string>
 	<string>
 		<key></key>
@@ -46,17 +46,17 @@
 	<string>
 		<key>KEY_B</key>
 		<value>...</value>
-                <hint></hint>
+        <hint></hint>
 	</string>
 	<string>
 		<key>KEY_B</key>
 		<value>...</value>
-                <hint></hint>
+        <hint></hint>
 	</string>
 	<string>
 		<key>KEY_C_DOUBLED_VALUE</key>
 		<value>...</value>
 		<value>...</value>
-                <hint></hint>
+        <hint></hint>
 	</string>
 </language>
