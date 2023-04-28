@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
-import java.awt.Component;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 
 @Deprecated
 public class DialogBadFirmwareVersion {
@@ -23,7 +23,7 @@ public class DialogBadFirmwareVersion {
 	 * @return An HTML string used for the About Message Dialog.
 	 */
 	private String getAboutHtmlFromMultilingualString(String version) {
-		return Translator.get("firmwareVersionBadMessage", new String[]{version});
+		return Translator.get("firmwareVersionBadMessage", version);
 	}
 
 	public void display(Component parent,String version) {

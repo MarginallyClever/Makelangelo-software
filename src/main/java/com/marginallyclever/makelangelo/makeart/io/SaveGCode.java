@@ -114,7 +114,7 @@ public class SaveGCode {
 	 */
 	private void maybeSaveSeparateFiles(int count,String fileWithExtension, Turtle turtle, Plotter plotter, JFrame parent) throws Exception {
 		String title = Translator.get("SaveGCode.splitGCodeTitle");
-		String query = Translator.get("SaveGCode.splitGCodeQuestion",new String[]{Integer.toString(count)});
+		String query = Translator.get("SaveGCode.splitGCodeQuestion",Integer.toString(count));
 		int n = JOptionPane.showConfirmDialog(parent, query, title, JOptionPane.YES_NO_OPTION);
 		if(n==JOptionPane.NO_OPTION) {
 			saveOneFile(fileWithExtension, turtle, plotter);

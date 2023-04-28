@@ -234,7 +234,7 @@ public final class Translator {
 	 * @param params 
 	 * @return the translated value for key, or "missing:key".
 	 */
-	public static String get(String key,String [] params) {
+	public static String get(String key,String ... params) {
 		String modified = get(key);
 		int n=1;
 		for(String p : params) {

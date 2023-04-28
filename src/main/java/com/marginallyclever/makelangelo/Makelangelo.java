@@ -382,7 +382,7 @@ public final class Makelangelo {
 		MarlinSimulation ms = new MarlinSimulation(myPlotter.getSettings());
 		int estimatedSeconds = (int)Math.ceil(ms.getTimeEstimate(myTurtle));
 		String timeAsString = StringHelper.getElapsedTime(estimatedSeconds);
-		String message = Translator.get("EstimatedTimeIs",new String[]{timeAsString});
+		String message = Translator.get("EstimatedTimeIs",timeAsString);
 		JOptionPane.showMessageDialog(mainFrame, message, Translator.get("RobotMenu.GetTimeEstimate"), JOptionPane.INFORMATION_MESSAGE);
 	}
 
