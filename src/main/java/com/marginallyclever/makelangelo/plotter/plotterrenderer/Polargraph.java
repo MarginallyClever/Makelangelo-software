@@ -9,11 +9,10 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
  * @author Dan Royer
  */
 public abstract class Polargraph implements PlotterRenderer {
-	public final static float PEN_HOLDER_RADIUS_2= 60f; // cm
-	public final static float MOTOR_SIZE= 21f; // cm
-	public final static float PLOTTER_SIZE= 21f; // cm
-	public final static float FRAME_SIZE= 50f; // cm
-	public final static float BOTTLE_CENTER = 8f + 7.5f;
+	public static final float PEN_HOLDER_RADIUS_2= 60f; // cm
+	public static final float MOTOR_SIZE= 21f; // cm
+	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
+	public static final float COUNTERWEIGHT_HEIGHT = 100;
 	
 	/**
 	 * convert from belt length mm to cartesian position.
@@ -170,12 +169,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		// belt from motor to pen holder right
 		gl2.glVertex2d(right, top);
 		gl2.glVertex2d(gx, gy);
-
+/*
 		// belt from motor to counterweight left
 		paintBeltSide(gl2,left,top,left_b);
 		// belt from motor to counterweight right
 		paintBeltSide(gl2,right,top,right_b);
-
+*/
 		paintGondola(gl2,gx,gy,robot);
 
 		// left
@@ -185,10 +184,10 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
-		gl2.glVertex2d(x - BOTTLE_CENTER - 2, y);
-		gl2.glVertex2d(x - BOTTLE_CENTER - 2, y - length);
-		gl2.glVertex2d(x - BOTTLE_CENTER + 2, y);
-		gl2.glVertex2d(x - BOTTLE_CENTER + 2, y - length);
+		gl2.glVertex2d(x - 2, y);
+		gl2.glVertex2d(x - 2, y - length);
+		gl2.glVertex2d(x + 2, y);
+		gl2.glVertex2d(x + 2, y - length);
 	}
 
 	private static void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
@@ -201,10 +200,10 @@ public abstract class Polargraph implements PlotterRenderer {
 	static public void paintCounterweight(GL2 gl2,double x,double y) {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
-		gl2.glVertex2d(x + BOTTLE_CENTER - 15, y);
-		gl2.glVertex2d(x + BOTTLE_CENTER + 15, y);
-		gl2.glVertex2d(x + BOTTLE_CENTER + 15, y - 150);
-		gl2.glVertex2d(x + BOTTLE_CENTER - 15, y - 150);
+		gl2.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y);
+		gl2.glVertex2d(x + COUNTERWEIGHT_HALF_WIDTH, y);
+		gl2.glVertex2d(x + COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
+		gl2.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
 		gl2.glEnd();
 	}
 

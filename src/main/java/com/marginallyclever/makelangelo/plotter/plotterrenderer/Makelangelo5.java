@@ -7,20 +7,20 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import static com.marginallyclever.convenience.DrawingHelper.*;
 
 public class Makelangelo5 implements PlotterRenderer {
-	private static Texture texture1;
-	private static Texture texture2;
-	private static Texture texture3;
+	private static Texture textureMainBody;
+	private static Texture textureMotors;
+	private static Texture textureLogo;
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (texture1 == null) texture1 = loadTexture("/textures/makelangelo5.png");
-		if (texture2 == null) texture2 = loadTexture("/textures/makelangelo5-motors.png");
-		if (texture3 == null) texture3 = loadTexture("/logo.png");
+		if (textureMainBody == null) textureMainBody = loadTexture("/textures/makelangelo5.png");
+		if (textureMotors == null) textureMotors = loadTexture("/textures/makelangelo5-motors.png");
+		if (textureLogo == null) textureLogo = loadTexture("/logo.png");
 
-		if (texture1 == null) {
+		if (textureMainBody == null) {
 			paintControlBoxPlain(gl2, robot);
 		} else {
-			paintControlBoxFancy(gl2, robot,texture1);
+			paintControlBoxFancy(gl2, robot, textureMainBody);
 		}
 
 		Polargraph.paintSafeArea(gl2, robot);
@@ -28,13 +28,13 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (robot.getDidFindHome())
 			Polargraph.paintPenHolderToCounterweights(gl2, robot);
 
-		if (texture1 == null || texture2 == null) {
+		if (textureMainBody == null || textureMotors == null) {
 			Polargraph.paintMotors(gl2, robot);
 		} else {
-			paintControlBoxFancy(gl2, robot,texture2);
+			paintControlBoxFancy(gl2, robot, textureMotors);
 		}
 
-		if (texture3 == null) {
+		if (textureLogo == null) {
 			// paintLogo(gl2,robot);
 		} else {
 			paintLogoFancy(gl2, robot);
@@ -68,7 +68,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final float LOGO_X = (float)robot.getLimitLeft() - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)robot.getLimitBottom()+10;
 
-		paintTexture(gl2, texture3, LOGO_X, LOGO_Y, TW, TH);
+		paintTexture(gl2, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**
