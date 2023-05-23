@@ -70,6 +70,7 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
+          src/main/package/firmware*.hex
           LICENSE
           target/package/*
 
