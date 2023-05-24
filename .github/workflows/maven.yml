@@ -91,7 +91,7 @@ jobs:
         name: jar
         
     - name: Check files
-      run: ls -l 
+      run: ls -l ./
 
     - name: Build installation package
       shell: bash
