@@ -59,8 +59,10 @@ jobs:
         cp LICENSE target/package/ &&
         cp README.md target/package/ &&
 
-    - name: Check files 2
+    - name: Check files 2a
       run: ls -l target/universal-package/
+
+    - name: Check files 2b
       run: ls -l target/package/
 
     - name: Deploy universal release
