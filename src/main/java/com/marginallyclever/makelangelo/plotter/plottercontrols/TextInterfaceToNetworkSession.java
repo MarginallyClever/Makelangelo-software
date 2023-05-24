@@ -9,7 +9,6 @@ import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,6 @@ import java.util.List;
  * @since 7.28.0
  */
 public class TextInterfaceToNetworkSession extends JPanel implements NetworkSessionListener {
-	@Serial
-	private static final long serialVersionUID = 1032123255711692874L;
 	private final TextInterfaceWithHistory myInterface = new TextInterfaceWithHistory();
 	private NetworkSession mySession;
 
@@ -99,7 +96,7 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 
 	// OBSERVER PATTERN
 
-	private List<NetworkSessionListener> listeners = new ArrayList<>();
+	private final List<NetworkSessionListener> listeners = new ArrayList<>();
 
 	public void addListener(NetworkSessionListener listener) {
 		listeners.add(listener);

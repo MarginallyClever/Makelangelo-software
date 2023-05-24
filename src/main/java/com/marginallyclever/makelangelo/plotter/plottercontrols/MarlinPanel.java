@@ -74,9 +74,8 @@ public class MarlinPanel extends JPanel {
 	private boolean waitingForResponse = false;
 	
 	public MarlinPanel(ChooseConnection chooseConnection) {
-		super();
+		super(new BorderLayout());
 
-		this.setLayout(new BorderLayout());
 		chatInterface = new TextInterfaceToNetworkSession(chooseConnection);
 		this.add(chatInterface, BorderLayout.CENTER);
 
