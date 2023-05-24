@@ -39,6 +39,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p target/universal-package &&
+        mkdir -p target/universal-package &&
         cp src/main/package/avrdude.* target/universal-package/ &&
         cp src/main/package/firmware*.hex target/universal-package/ &&
         cp src/main/package/*.bat target/universal-package/ &&
@@ -80,6 +81,9 @@ jobs:
           LICENSE
           target/package/*
 
+    - name: Check files 3
+      run: ls -l target/package/
+
   package:
     needs: build
     runs-on: ${{ matrix.os }}
@@ -96,7 +100,7 @@ jobs:
       with:
         name: jar
         
-    - name: Check files 3
+    - name: Check files 4
       run: ls -l target/package/
 
     - name: Build installation package
