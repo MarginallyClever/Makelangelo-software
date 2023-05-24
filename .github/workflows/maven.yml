@@ -89,6 +89,10 @@ jobs:
     - uses: actions/download-artifact@v3.0.2
       with:
         name: jar
+        path: target/package/
+        
+    - name: Check files
+      run: ls -l target/package/
 
     - name: Build installation package
       shell: bash
