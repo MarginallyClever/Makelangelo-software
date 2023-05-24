@@ -35,6 +35,7 @@ jobs:
     - name: Prepare universal package
       shell: bash
       run: |
+        ls src/main/package/ &&
         mkdir -p target/universal-package &&
         cp src/main/package/avrdude.* target/universal-package/ &&
         cp src/main/package/firmware*.hex target/universal-package/ &&
@@ -46,6 +47,7 @@ jobs:
         cp README.md target/universal-package/ &&
         cp target/Makelangelo-*-with-dependencies.jar target/universal-package/ &&
         cd target/universal-package/ &&
+        ls target/universal-package/ &&
         7z a -tzip Makelangelo.zip . &&
         mv Makelangelo.zip ../..
 
