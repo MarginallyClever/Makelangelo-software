@@ -17,7 +17,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -32,9 +31,6 @@ import java.util.List;
  * @since 7.28.0
  */
 public class PlotterControls extends JPanel {
-	@Serial
-	private static final long serialVersionUID = -1201865024705737250L;
-
 	public static final int DIMENSION_PANEL_WIDTH = 850;
 	public static final int DIMENSION_PANEL_HEIGHT = 510;
 	private static final int DIMENSION_COLLAPSIBLE_HEIGHT = 570;
@@ -94,16 +90,16 @@ public class PlotterControls extends JPanel {
 					if (isRunning) step();
 				}
 			case MarlinPanelEvent.ERROR,
-					MarlinPanelEvent.DID_NOT_FIND,
-					MarlinPanelEvent.COMMUNICATION_FAILURE -> {
-						if (!isErrorAlreadyDisplayed) {
-							/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
-							 * robot being turned off while COM port is connected.
-							 */
-							JOptionPane.showMessageDialog(this, Translator.get("PlotterControls." + e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-							isErrorAlreadyDisplayed = true;
-						}
+				MarlinPanelEvent.DID_NOT_FIND,
+				MarlinPanelEvent.COMMUNICATION_FAILURE -> {
+					if (!isErrorAlreadyDisplayed) {
+						/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
+						 * robot being turned off while COM port is connected.
+						 */
+						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls."+e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+						isErrorAlreadyDisplayed = true;
 					}
+				}
 			case MarlinPanelEvent.HOME_XY_FIRST ->
 					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
