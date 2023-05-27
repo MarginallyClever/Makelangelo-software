@@ -19,26 +19,33 @@ public class FirmwareUploader {
 
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
-		AVRDUDE_EXE = (OS.indexOf("win") >= 0) ? "avrdude.exe": "avrdude";
-		
+		AVRDUDE_EXE = (OS.indexOf("win") >= 0) ? "avrdude.exe" : "avrdude";
+
+		findAVRDude();
+	}
+
+	private void findAVRDude() {
 		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
-		File f = new File(AVRDUDE_EXE);
-		if(f.exists()) {
-			avrdudePath = f.getAbsolutePath();
-			return;
+		if(attemptFindAVRDude(AVRDUDE_EXE)) return;
+
+		String OS = System.getProperty("os.name").toLowerCase();
+		if(OS.indexOf("win") >= 0) {
+			// arduinoPath
+			if(attemptFindAVRDude("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\" + AVRDUDE_EXE)) return;
 		}
-		
-		// arduinoPath
-		f = new File("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+AVRDUDE_EXE);
+
+		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_EXE)) return;
+		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator + AVRDUDE_EXE)) return;
+	}
+
+	private boolean attemptFindAVRDude(String path) {
+		File f = new File(path);
+		logger.debug("searching for avrdude in {}",f.getAbsolutePath());
 		if(f.exists()) {
 			avrdudePath = f.getAbsolutePath();
-			return;
-		} 
-		
-		f = new File(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_EXE);
-		if(f.exists()) {
-			avrdudePath = f.getAbsolutePath();
+			return true;
 		}
+		return false;
 	}
 
 	private File attempt(int i,String filename) {

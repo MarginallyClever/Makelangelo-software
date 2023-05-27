@@ -7,7 +7,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +16,6 @@ import java.util.List;
  * @since 7.24.0
  */
 public class SelectPanel extends JPanel implements PropertyChangeListener {
-	/**
-	 * 
-	 */
-	@Serial
-	private static final long serialVersionUID = 2141566275423257798L;
-
 	private final JPanel interiorPanel = new JPanel();
 	
 	public SelectPanel() {
