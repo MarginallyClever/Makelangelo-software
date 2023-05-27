@@ -38,12 +38,12 @@ public class MarlinPanelTest {
         AtomicReference<MarlinPanelEvent> ae = new AtomicReference<>();
 
         mi.addListener(ae::set);
-        String message = "//action:notification Ready black and click";
+        String message = MarlinPanel.STR_ACTION_COMMAND+MarlinPanel.PROMPT_BEGIN+" Ready black and click";
         mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
 
         Assertions.assertNotNull(ae.get());
         Assertions.assertEquals(MarlinPanelEvent.ACTION_COMMAND, ae.get().getID());
-        Assertions.assertEquals("notification Ready black and click", ae.get().getActionCommand());
+        Assertions.assertEquals(MarlinPanel.PROMPT_BEGIN+" Ready black and click", ae.get().getActionCommand());
     }
 
     @Test
@@ -53,12 +53,12 @@ public class MarlinPanelTest {
         AtomicReference<MarlinPanelEvent> ae = new AtomicReference<>();
 
         mi.addListener(ae::set);
-        String message = "Error: Printer halted";
+        String message = MarlinPanel.STR_ERROR +" "+MarlinPanel.STR_PRINTER_HALTED;
         mi.onDataReceived(new NetworkSessionEvent(this, NetworkSessionEvent.DATA_RECEIVED, message));
 
         Assertions.assertNotNull(ae.get());
         Assertions.assertEquals(MarlinPanelEvent.ERROR, ae.get().getID());
-        Assertions.assertEquals("Printer halted", ae.get().getActionCommand());
+        Assertions.assertEquals(MarlinPanel.STR_PRINTER_HALTED, ae.get().getActionCommand());
     }
 
     @Test

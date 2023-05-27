@@ -762,7 +762,7 @@
 		<hint>text</hint>
 	</string>
 	<string>
-		<key>PlotterControls.printedHalted</key>
+		<key>PlotterControls.Printed halted</key>
 		<value>Printer halted!</value>
 		<hint>text</hint>
 	</string>

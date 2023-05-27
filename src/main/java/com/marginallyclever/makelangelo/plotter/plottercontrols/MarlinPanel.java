@@ -41,14 +41,14 @@ public class MarlinPanel extends JPanel {
 	// Marlin sends this event when the robot is ready to receive more.
 	private static final String STR_OK = "ok";
 	// Marlin sends this message when an error happened.
-	private static final String STR_ERROR = "Error:";
+	public static final String STR_ERROR = "Error:";
 	// Marlin sends this message when a fatal error occured.
-	private static final String STR_PRINTER_HALTED = "printerHalted";
+	public static final String STR_PRINTER_HALTED = "Printer halted";
 	// Marlin sends this event when the robot must be homed first
 	private static final String STR_HOME_XY_FIRST = "echo:Home XY First";
 
 	// Marlin sends this message when the robot is sending an Action Command.
-	private static final String STR_ACTION_COMMAND = "//action:";
+	public static final String STR_ACTION_COMMAND = "//action:";
 	public static final String PROMPT_BEGIN = "prompt_begin";
 	public static final String PROMPT_CHOICE = "prompt_choice";
 	public static final String PROMPT_BUTTON = "prompt_button";

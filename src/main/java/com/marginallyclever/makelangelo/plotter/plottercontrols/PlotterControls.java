@@ -101,7 +101,7 @@ public class PlotterControls extends JPanel {
 					}
 				}
 			case MarlinPanelEvent.HOME_XY_FIRST ->
-					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.HomeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.homeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
 	}
