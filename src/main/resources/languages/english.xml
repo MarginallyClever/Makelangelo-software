@@ -747,18 +747,23 @@
 		<hint>text</hint>
 	</string>
 	<string>
-		<key>PlotterControls.HomeXYFirst</key>
+		<key>PlotterControls.homeXYFirst</key>
 		<value>Home the printer first.</value>
 		<hint>text</hint>
 	</string>
 	<string>
-		<key>PlotterControls.DidNotFind</key>
+		<key>PlotterControls.didNotFind</key>
 		<value>Error in communicating with the robot.</value>
 		<hint>text</hint>
 	</string>
 	<string>
-		<key>PlotterControls.CommunicationFailure</key>
+		<key>PlotterControls.communicationFailure</key>
 		<value>No answer from the robot, please check the USB cable or speed settings.</value>
+		<hint>text</hint>
+	</string>
+	<string>
+		<key>PlotterControls.Printed halted</key>
+		<value>Printer halted!</value>
 		<hint>text</hint>
 	</string>
 
