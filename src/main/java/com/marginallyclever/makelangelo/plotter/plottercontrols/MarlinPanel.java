@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +24,7 @@ import java.util.List;
  */
 public class MarlinPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPanel.class);
-	
-	@Serial
-	private static final long serialVersionUID = 979851120390943303L;
+
 	// number of commands we'll hold on to in case there's a resend.
 	private static final int HISTORY_BUFFER_LIMIT = 250;
 	// Marlin can buffer this many commands from serial, before processing.
