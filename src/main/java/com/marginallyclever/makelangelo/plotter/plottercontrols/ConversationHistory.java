@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 7.28.0
  */
 public class ConversationHistory extends JPanel {
-	@Serial
-	private static final long serialVersionUID = 6287436679006933618L;
 	private static final Logger logger = LoggerFactory.getLogger(ConversationHistory.class);
 	private final DefaultListModel<ConversationEvent> listModel = new DefaultListModel<>();
 	private final JList<ConversationEvent> listView = new JList<>(listModel);
@@ -37,7 +35,7 @@ public class ConversationHistory extends JPanel {
 
 	
 	public ConversationHistory() {
-		super();
+		super(new BorderLayout());
 		createCellRenderingSystem();
 
 		JScrollPane scrollPane = new JScrollPane(listView);
@@ -48,7 +46,6 @@ public class ConversationHistory extends JPanel {
 		listView.setVisibleRowCount(20);
 
 		this.setBorder(BorderFactory.createTitledBorder(ConversationHistory.class.getSimpleName()));
-		this.setLayout(new BorderLayout());
 		this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(scrollPane, BorderLayout.CENTER);
 	}

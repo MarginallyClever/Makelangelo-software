@@ -7,7 +7,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.commons.io.FilenameUtils;
 
@@ -15,14 +14,17 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
-import java.io.Serial;
 
-public class FirmwareUploaderPanel extends SelectPanel {
-	@Serial
-	private static final long serialVersionUID = 7101530052729740681L;
+/**
+ * A panel for uploading firmware to the robot.
+ *
+ * @since 7.32.0?
+ * @author Dan Royer
+ */
+public class FirmwareUploaderPanel extends JPanel {
 	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
 	private final SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
-	private final SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),"");
+	private final SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),firmwareUploader.getAvrdudePath());
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
 	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
@@ -35,6 +37,13 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		
 		updateCOMPortList();
 		refreshLayout();
+
+		if(lastPath==null || lastPath.trim().isEmpty()) {
+			lastPath = firmwareUploader.getAvrdudePath();
+		}
+		if(lastHexFile==null || lastHexFile.trim().isEmpty()) {
+			lastHexFile = firmwareUploader.getAvrdudePath();
+		}
 
 		sourceAVRDude.setPathOnly();
 		sourceAVRDude.setText(lastPath);
@@ -143,8 +152,9 @@ public class FirmwareUploaderPanel extends SelectPanel {
 		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new FirmwareUploaderPanel());
+		frame.setContentPane(new FirmwareUploaderPanel());
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 }

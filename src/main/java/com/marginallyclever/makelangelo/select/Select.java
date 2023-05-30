@@ -1,12 +1,11 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JPanel;
 
 /**
  * Base class for all Select.  A Select is a UI panel item the user can control.
@@ -15,7 +14,6 @@ import javax.swing.JPanel;
  * @since 7.24.0
  */
 public class Select extends JPanel {
-	private static final long serialVersionUID = 5289951183273734129L;	
 	private List<PropertyChangeListener> propertyChangeListeners = null;
 		
 	protected Select(String name) {

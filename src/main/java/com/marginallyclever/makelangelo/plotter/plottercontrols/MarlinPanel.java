@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +24,7 @@ import java.util.List;
  */
 public class MarlinPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPanel.class);
-	
-	@Serial
-	private static final long serialVersionUID = 979851120390943303L;
+
 	// number of commands we'll hold on to in case there's a resend.
 	private static final int HISTORY_BUFFER_LIMIT = 250;
 	// Marlin can buffer this many commands from serial, before processing.
@@ -41,14 +38,14 @@ public class MarlinPanel extends JPanel {
 	// Marlin sends this event when the robot is ready to receive more.
 	private static final String STR_OK = "ok";
 	// Marlin sends this message when an error happened.
-	private static final String STR_ERROR = "Error:";
+	public static final String STR_ERROR = "Error:";
 	// Marlin sends this message when a fatal error occured.
-	private static final String STR_PRINTER_HALTED = "Printer halted";
+	public static final String STR_PRINTER_HALTED = "Printer halted";
 	// Marlin sends this event when the robot must be homed first
 	private static final String STR_HOME_XY_FIRST = "echo:Home XY First";
 
 	// Marlin sends this message when the robot is sending an Action Command.
-	private static final String STR_ACTION_COMMAND = "//action:";
+	public static final String STR_ACTION_COMMAND = "//action:";
 	public static final String PROMPT_BEGIN = "prompt_begin";
 	public static final String PROMPT_CHOICE = "prompt_choice";
 	public static final String PROMPT_BUTTON = "prompt_button";
@@ -74,9 +71,8 @@ public class MarlinPanel extends JPanel {
 	private boolean waitingForResponse = false;
 	
 	public MarlinPanel(ChooseConnection chooseConnection) {
-		super();
+		super(new BorderLayout());
 
-		this.setLayout(new BorderLayout());
 		chatInterface = new TextInterfaceToNetworkSession(chooseConnection);
 		this.add(chatInterface, BorderLayout.CENTER);
 
@@ -98,9 +94,11 @@ public class MarlinPanel extends JPanel {
 		lineNumberToSend=1;
 		lineNumberAdded=0;
 		myHistory.clear();
-		timeoutChecker.start();
 		lastReceivedTime = System.currentTimeMillis();
 		queueAndSendCommand(STR_I_HANDLE_DIALOGS);
+		// timeoutChecker uses lastReceivedTime to check if the connection is still live.
+		// so start it after setting the lastReceived time or the first check will fail.
+		timeoutChecker.start();
 	}
 	
 	private void onClose() {
@@ -113,7 +111,7 @@ public class MarlinPanel extends JPanel {
 		if (delay > TIMEOUT_DELAY) {
 			if (delay > FATAL_TIMEOUT_DELAY) {
 				logger.error("No answer from the robot");
-				notifyListeners( MarlinPanelEvent.COMMUNICATION_FAILURE );
+				notifyListeners( MarlinPanelEvent.COMMUNICATION_FAILURE, "communicationFailure");
 				chatInterface.displayError("No answer from the robot, retrying...");
 			} else {
 				logger.trace("Heartbeat: M400");
@@ -188,7 +186,7 @@ public class MarlinPanel extends JPanel {
 
 	private void onHearHomeXYFirst() {
 		logger.warn("Home XY First");
-		notifyListeners( MarlinPanelEvent.HOME_XY_FIRST );
+		notifyListeners( MarlinPanelEvent.HOME_XY_FIRST,"homeXYFirst" );
 	}
 
 	private void onHearActionCommand(String command) {
@@ -200,11 +198,11 @@ public class MarlinPanel extends JPanel {
 	}
 
 	private void onDidNotFindCommandInHistory() {
-		notifyListeners( MarlinPanelEvent.DID_NOT_FIND );
+		notifyListeners( MarlinPanelEvent.DID_NOT_FIND, "didNotFind" );
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners( MarlinPanelEvent.IDLE );
+		notifyListeners( MarlinPanelEvent.IDLE, "idle" );
 	}
 
 	private void clearOldHistory() {
@@ -318,9 +316,6 @@ public class MarlinPanel extends JPanel {
 		listeners.remove(listener);
 	}
 
-	private void notifyListeners(int id) {
-		notifyListeners(id, null);
-	}
 	private void notifyListeners(int id,String command) {
 		MarlinPanelEvent event = new MarlinPanelEvent(this,id,command);
 		for (MarlinPanelListener listener : listeners) listener.actionPerformed(event);

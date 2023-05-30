@@ -420,7 +420,7 @@ public final class Makelangelo {
 			menu.add(bCapture);
 			menu.addSeparator();
 		} catch (FailedToRunRaspistillException e) {
-			logger.debug("Raspistill unavailable.");
+			logger.debug("PiCaptureAction unavailable.");
 		}
 
 		TurtleModifierAction a6 = new ResizeTurtleToPaperAction(myPaper,false,Translator.get("ConvertImagePaperFit"));
