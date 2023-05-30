@@ -239,6 +239,7 @@ public class PlotterControls extends JPanel {
 		myPlotter.reInit();
 		bFindHome.setEnabled(true);
 		bEmergencyStop.setEnabled(true);
+		isRunning = false;
 		updateButtonStatusConnected();
 		jogPanel.onNetworkConnect();
 		isErrorAlreadyDisplayed = false;

@@ -20,14 +20,13 @@ import java.awt.*;
  * @since 7.28.0
  */
 public class ProgramPanel extends JPanel {
-	private static final long serialVersionUID = -7719350277524271664L;
-	private Plotter myPlotter;
-	private Turtle myTurtle;
-	private DefaultListModel<TurtleMove> listModel = new DefaultListModel<TurtleMove>();
-	private JList<TurtleMove> listView = new JList<TurtleMove>(listModel);
+	private final Plotter myPlotter;
+	private final Turtle myTurtle;
+	private final DefaultListModel<TurtleMove> listModel = new DefaultListModel<TurtleMove>();
+	private final JList<TurtleMove> listView = new JList<>(listModel);
 
 	public ProgramPanel(Plotter plotter, Turtle turtle) {
-		super();
+		super(new BorderLayout());
 		myPlotter = plotter;
 		myTurtle = turtle;
 
@@ -39,7 +38,6 @@ public class ProgramPanel extends JPanel {
 		listView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listView.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 
-		this.setLayout(new BorderLayout());
 		// this.add(getToolBar(), BorderLayout.PAGE_START);
 		this.add(scrollPane, BorderLayout.CENTER);
 
