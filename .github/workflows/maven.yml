@@ -40,6 +40,7 @@ jobs:
       run: |
         mkdir -p target/universal-package &&
         cp src/main/package/avrdude.* target/universal-package/ &&
+        cp src/main/package/*.dll target/universal-package/ &&
         cp src/main/package/firmware*.hex target/universal-package/ &&
         cp src/main/package/*.bat target/universal-package/ &&
         cp src/main/package/start* target/universal-package/ &&
