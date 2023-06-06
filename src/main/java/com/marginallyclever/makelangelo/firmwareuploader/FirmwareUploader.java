@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class FirmwareUploader {
@@ -85,8 +87,17 @@ public class FirmwareUploader {
 		logger.debug("update finished");
 	}
 
-	private void runCommand(String[] cmd) throws Exception {
-		Process p = Runtime.getRuntime().exec(cmd);
+	private void runCommand(String[] options) throws Exception {
+		logger.debug("running command: {}",String.join(" ",options));
+
+		List<String> command = new ArrayList<>();
+		for (String option : options) {
+			command.add("\"" + option.replace("\\", "\\\\") + "\"");
+		}
+
+		ProcessBuilder builder = new ProcessBuilder(command);
+		builder.redirectErrorStream(true);
+		Process p = builder.start();
 		//runStreamReaders(p);
 		runBufferedReaders(p);
 	}
@@ -102,14 +113,12 @@ public class FirmwareUploader {
 		int s;
 		do {
 			if(stdError.ready()) {
-				if((s = stdError.read()) != -1) System.out.print((char)s);
-				else errorOpen=false;
+				if((s = stdError.read()) <=0) System.out.print("error: "+(char)s);
 			}
 			if(stdInput.ready()) {
-				if((s = stdInput.read()) != -1) System.out.print((char)s);
-				else inputOpen=false;
+				if((s = stdInput.read()) <=0) System.out.print("input: "+(char)s);
 			}
-		} while(errorOpen && inputOpen);
+		} while(p.isAlive());
 	}
 	
 	private void runBufferedReaders(Process p) throws IOException {
@@ -118,13 +127,17 @@ public class FirmwareUploader {
 
 		String s = null;
 
-		logger.debug("update: errors (if any)\n");
-		while ((s = stdError.readLine()) != null)
-			logger.debug("update: {}", s);
+		while(p.isAlive()) {
+			while ((s = stdError.readLine()) != null) {
+				logger.debug("error: {}", s);
+				System.out.println("error: " + s);
+			}
 
-		logger.debug("command out:\n");
-		while ((s = stdInput.readLine()) != null)
-			logger.debug("update: {}", s);
+			while ((s = stdInput.readLine()) != null) {
+				logger.debug("output: {}", s);
+				System.out.println("output: " + s);
+			}
+		}
 	}
 	
 	public String getAvrdudePath() {
