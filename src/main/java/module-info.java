@@ -3,7 +3,7 @@ module com.marginallyclever.makelangelo {
     requires org.slf4j;
     requires jssc;
     requires java.desktop;
-    requires jogamp.fat;
+    requires jogl.all;
     requires logback.core;
     requires org.json;
     requires org.apache.commons.io;
