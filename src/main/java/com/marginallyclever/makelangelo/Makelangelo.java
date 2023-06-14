@@ -48,13 +48,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +62,6 @@ import java.net.URI;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.prefs.Preferences;
@@ -83,10 +80,6 @@ import java.util.prefs.Preferences;
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
-	private static final String KEY_WINDOW_X = "windowX";
-	private static final String KEY_WINDOW_Y = "windowY";
-	private static final String KEY_WINDOW_WIDTH = "windowWidth";
-	private static final String KEY_WINDOW_HEIGHT = "windowHeight";
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
 	private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
 	private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
@@ -108,7 +101,7 @@ public final class Makelangelo {
 	private PlotterRenderer myPlotterRenderer;
 	
 	// GUI elements
-	private JFrame mainFrame;
+	private MainFrame mainFrame;
 	private JMenuBar mainMenuBar;
 	private PreviewPanel previewPanel;
 	private final SaveDialog saveDialog = new SaveDialog();
@@ -871,26 +864,11 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		mainFrame = new JFrame();
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		mainFrame = new MainFrame("",preferences);
 		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		mainFrame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				onClosing();
-			}
-		});
-		mainFrame.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-				saveWindowSizeAndPosition();
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				saveWindowSizeAndPosition();
-			}
-		});
 
 		try {
 			mainFrame.setIconImage(ImageIO.read(Objects.requireNonNull(Makelangelo.class.getResource("/logo-icon.png"))));
@@ -905,8 +883,7 @@ public final class Makelangelo {
 		
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
-		
-		setWindowSizeAndPosition();
+		mainFrame.setWindowSizeAndPosition();
 
 		setupDropTarget();
 
@@ -934,76 +911,7 @@ public final class Makelangelo {
 	
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		// drag files into the app with {@link DropTarget}
-		DropTarget dropTarget = new DropTarget(mainFrame, new DropTargetAdapter() {
-			@Override
-			public void drop(DropTargetDropEvent dtde) {
-				try {
-					Transferable tr = dtde.getTransferable();
-					DataFlavor[] flavors = tr.getTransferDataFlavors();
-					for (DataFlavor flavor : flavors) {
-						logger.debug("Possible flavor: {}", flavor.getMimeType());
-						if (flavor.isFlavorJavaFileListType()) {
-							dtde.acceptDrop(DnDConstants.ACTION_COPY);
-							Object o = tr.getTransferData(flavor);
-							if (o instanceof List<?>) {
-								List<?> list = (List<?>) o;
-								if (list.size() > 0) {
-									o = list.get(0);
-									if (o instanceof File) {
-										openFile(((File) o).getAbsolutePath());
-										dtde.dropComplete(true);
-										return;
-									}
-								}
-							}
-						}
-					}
-					logger.debug("Drop failed: {}", dtde);
-					dtde.rejectDrop();
-				} catch (Exception e) {
-					logger.error("Drop error", e);
-					dtde.rejectDrop();
-				}
-			}
-		});
-	}
-
-	private void setWindowSizeAndPosition() {
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
-		// Get default screen size
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-		// window size
-		int width = preferences.getInt(KEY_WINDOW_WIDTH, Math.min(screenSize.width,1200));
-		int height = preferences.getInt(KEY_WINDOW_HEIGHT, Math.min(screenSize.height,1020));
-    	int windowX = preferences.getInt(KEY_WINDOW_X, (screenSize.width - width)/2);
-    	int windowY = preferences.getInt(KEY_WINDOW_Y, (screenSize.height - height)/2);
-		mainFrame.setBounds( windowX, windowY, width, height);
-
-		boolean isFullscreen = preferences.getBoolean("isFullscreen",false);
-		if(isFullscreen) {
-			mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-		}
-	}
-
-	// save window position and size
-	private void saveWindowSizeAndPosition() {
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-
-		int state = mainFrame.getExtendedState();
-		boolean isFullscreen = ((state & JFrame.MAXIMIZED_BOTH)!=0);
-		preferences.putBoolean("isFullscreen", isFullscreen);
-		if(!isFullscreen) {
-			Dimension size = this.mainFrame.getSize();
-			preferences.putInt(KEY_WINDOW_WIDTH, size.width);
-			preferences.putInt(KEY_WINDOW_HEIGHT, size.height);
-
-			Point location = this.mainFrame.getLocation();
-			preferences.putInt(KEY_WINDOW_X, location.x);
-			preferences.putInt(KEY_WINDOW_Y, location.y);
-		}
+		new DropTarget(mainFrame, new MakelangeloDropTarget(this));
 	}
 
 	private boolean onClosing() {
@@ -1055,11 +963,10 @@ public final class Makelangelo {
 	}
 
 	private void setMainTitle(String title) {
-		String finalTitle = "";
-		if (! "".equals(title)) {
-			finalTitle += title + " - ";
+		String finalTitle = MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
+		if (!title.trim().isEmpty()) {
+			finalTitle = title + " - " + finalTitle;
 		}
-		finalTitle += MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue();
 		mainFrame.setTitle(finalTitle);
 	}
 
