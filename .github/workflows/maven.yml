@@ -94,6 +94,7 @@ jobs:
           src/main/package/logo*
           src/main/package/firmware*.hex
           LICENSE
+          README
           target/package/*
 
     - name: Check files 3
