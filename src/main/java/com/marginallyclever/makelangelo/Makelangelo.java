@@ -562,7 +562,7 @@ public final class Makelangelo {
 				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
 			});
 			buttonExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, SHORTCUT_CTRL));//"ctrl Q"
-			buttonExit.setMnemonic('q');
+			buttonExit.setMnemonic('Q');
 			menu.add(buttonExit);
 		}
 		return menu;
@@ -864,11 +864,20 @@ public final class Makelangelo {
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		mainFrame = new MainFrame("",preferences);
 		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setupDropTarget();
+
+		mainFrame.addWindowListener(new WindowAdapter() {
+			// when someone tries to close the app, confirm it.
+			@Override
+			public void windowClosing(WindowEvent e) {
+				confirmClose();
+				super.windowClosing(e);
+			}
+		});
 
 		try {
 			mainFrame.setIconImage(ImageIO.read(Objects.requireNonNull(Makelangelo.class.getResource("/logo-icon.png"))));
@@ -878,14 +887,11 @@ public final class Makelangelo {
 		buildMenuBar();
 		
 		mainFrame.setContentPane(createContentPane());
-
-		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
-		
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
 		mainFrame.setWindowSizeAndPosition();
 
-		setupDropTarget();
+		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 
 		openFileChooser = new OpenFileChooser(mainFrame);
 		openFileChooser.setOpenListener(this::openFile);
@@ -896,7 +902,7 @@ public final class Makelangelo {
 			Desktop desktop = Desktop.getDesktop();
 			if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
 				desktop.setQuitHandler((evt, res) -> {
-					if (onClosing()) {
+					if (confirmClose()) {
 						res.performQuit();
 					} else {
 						res.cancelQuit();
@@ -914,7 +920,7 @@ public final class Makelangelo {
 		new DropTarget(mainFrame, new MakelangeloDropTarget(this));
 	}
 
-	private boolean onClosing() {
+	private boolean confirmClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
