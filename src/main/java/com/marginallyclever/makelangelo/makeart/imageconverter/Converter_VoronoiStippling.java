@@ -168,10 +168,12 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 				for (int x = x0; x <= x1; ++x) {
 					if(image.canSampleAt(x,y)) {
 						double sampleWeight = 255.0 - image.sample(x,y,1);
-						weight += sampleWeight;
-						wx += sampleWeight*x;
-						wy += sampleWeight*y;
-						hits++;
+						if(sampleWeight>=lowpassCutoff) {
+							weight += sampleWeight;
+							wx += sampleWeight * x;
+							wy += sampleWeight * y;
+							hits++;
+						}
 					}
 				}
 			}
@@ -227,7 +229,8 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 
 	@Override
 	public void render(GL2 gl2) {
-		if(getThread().getPaused()) return;
+		ImageConverterThread thread = getThread();
+		if(thread==null || thread.getPaused()) return;
 
 		lock.lock();
 		try {
@@ -258,11 +261,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 
 		for( VoronoiCell c : cells ) {
 			double val = c.weight;
-			if(val < lowpassCutoff) continue;
 
 			double x = c.center.x;
 			double y = c.center.y;
-			double r = ((val- lowpassCutoff)/255.0) * scale + minDotSize;
+			double r = (val/255.0) * scale + minDotSize;
 			drawCircle(gl2,x,y,r);
 		}
 	}
@@ -288,11 +290,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 
 		for( VoronoiCell c : cells ) {
 			double val = c.weight;
-			if(val< lowpassCutoff) continue;
 
 			double x = c.center.x;
 			double y = c.center.y;
-			double r = ((val- lowpassCutoff)/255.0) * scale + minDotSize;
+			double r = (val/255.0) * scale + minDotSize;
 			turtleCircle(x, y, r);
 		}
 	}

@@ -2293,6 +2293,14 @@
 		<value>Step size</value>
 	</string>
 	<string>
+		<key>Generator_FlowField.stepVariation</key>
+		<value>Step variation</value>
+	</string>
+	<string>
+		<key>Generator_FlowField.stepLength</key>
+		<value>Step length</value>
+	</string>
+	<string>
 		<key>Generator_FlowField.fromEdge</key>
 		<value>Continuous</value>
 	</string>

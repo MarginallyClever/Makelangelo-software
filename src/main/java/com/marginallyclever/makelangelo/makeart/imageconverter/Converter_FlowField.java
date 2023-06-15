@@ -29,9 +29,13 @@ public class Converter_FlowField extends ImageConverter {
 	private static double  scaleY = 0.01; // controls complexity of curve
 	private static double  offsetX = 0; // controls complexity of curve
 	private static double  offsetY = 0; // controls complexity of curve
-	private static int     stepSize = 10; // the distance between lines at the edge of the paper, in mm.
+	private static int stepSize = 10; // the distance between lines at the edge of the paper, in mm.
+	private static int stepLength = 10;
+	private static int stepVariation = 5;
 	private static boolean rightAngle = false;
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
+	private static boolean fromEdge = false;  // continuous lines
+	private static int cutoff = 128;  // the sampling rate along each line, in mm.
 
 	private Noise noiseMaker = new PerlinNoise();
 
@@ -42,8 +46,12 @@ public class Converter_FlowField extends ImageConverter {
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
 		SelectDouble selectOffsetX = new SelectDouble("offsetX", Translator.get("Generator_FlowField.offsetX"), getOffsetX());
 		SelectDouble selectOffsetY = new SelectDouble("offsetY", Translator.get("Generator_FlowField.offsetY"), getOffsetY());
-		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 3, getStepSize());
+		SelectSlider selectStepSize = new SelectSlider("stepSize", Translator.get("Generator_FlowField.stepSize"), 20, 2, getStepSize());
+		SelectSlider fieldStepVariation = new SelectSlider("stepVariation",Translator.get("Generator_FlowField.stepVariation"),20,0,stepVariation);
+		SelectSlider fieldStepLength = new SelectSlider("stepLength",Translator.get("Generator_FlowField.stepLength"),20,1,stepLength);
+		SelectBoolean fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),fromEdge);
 		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
+		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255,0, cutoff);
 
 		add(fieldNoise);
 		fieldNoise.addPropertyChangeListener(evt->{
@@ -56,7 +64,11 @@ public class Converter_FlowField extends ImageConverter {
 		add(selectOffsetX);
 		add(selectOffsetY);
 		add(selectStepSize);
+		add(fieldStepVariation);
+		add(fieldStepLength);
+		add(fieldFromEdge);
 		add(selectRightAngle);
+		add(selectCutoff);
 
 		selectScaleX.addPropertyChangeListener((evt)->{
 			setScaleX((double)evt.getNewValue());
@@ -78,8 +90,24 @@ public class Converter_FlowField extends ImageConverter {
 			setStepSize((int)evt.getNewValue());
 			fireRestart();
 		});
+		fieldStepLength.addPropertyChangeListener((evt)->{
+			setStepLength((int)evt.getNewValue());
+			fireRestart();
+		});
+		fieldStepVariation.addPropertyChangeListener((evt)->{
+			setStepVariation((int)evt.getNewValue());
+			fireRestart();
+		});
+		fieldFromEdge.addPropertyChangeListener((evt)->{
+			setFromEdge((boolean)evt.getNewValue());
+			fireRestart();
+		});
 		selectRightAngle.addPropertyChangeListener((evt)->{
 			setRightAngle((boolean)evt.getNewValue());
+			fireRestart();
+		});
+		selectCutoff.addPropertyChangeListener((evt)->{
+			setCutoff((int)evt.getNewValue());
 			fireRestart();
 		});
 
@@ -106,8 +134,20 @@ public class Converter_FlowField extends ImageConverter {
 	public static void setStepSize(int stepSize) {
 		Converter_FlowField.stepSize = stepSize;
 	}
+	public static void setStepLength(int stepLength) {
+		Converter_FlowField.stepLength = stepLength;
+	}
+	public static void setStepVariation(int stepVariation) {
+		Converter_FlowField.stepVariation = stepVariation;
+	}
+	public static void setFromEdge(boolean fromEdge) {
+		Converter_FlowField.fromEdge = fromEdge;
+	}
 	public static void setRightAngle(boolean rightAngle) {
 		Converter_FlowField.rightAngle = rightAngle;
+	}
+	public static void setCutoff(int cutoff) {
+		Converter_FlowField.cutoff = cutoff;
 	}
 
 	public static double getScaleX() {
@@ -145,7 +185,7 @@ public class Converter_FlowField extends ImageConverter {
 	protected void convertLine(TransformedImage img, Turtle line) {
 		SampleAt [] samples = calculateSamplesOnce(img,line);
 
-		// TODO number of passses should be based on the size of the pen tip.
+		// TODO number of passes should be based on the size of the pen tip.
 		double passes=4;
 		double halfPasses=(passes-1)/2;
 		boolean first = true;
@@ -178,7 +218,7 @@ public class Converter_FlowField extends ImageConverter {
 		for(int i=0;i<numSamples;i++) {
 			Point2D p2 = line.interpolate((double)(i+1)* samplingRate);
 
-			double value = Math.abs(1.0 - (img.sample(p2.x, p2.y, 5.0)/255.0));
+			double value = 255.0 - (img.sample(p2.x, p2.y, 5.0));
 			value = Math.max(0,Math.min(255,value));
 
 			Point2D n = new Point2D(p2.y-p.y,-(p2.x-p.x));
@@ -200,18 +240,24 @@ public class Converter_FlowField extends ImageConverter {
 		Filter_Greyscale bw = new Filter_Greyscale(255);
 		TransformedImage img = bw.filter(myImage);
 
-		// get all the flow lines.
-		List<Turtle> list = fromEdge();
-		if(rightAngle) {
-			rightAngle=false;
-			list.addAll(fromEdge());
-			rightAngle=true;
-		}
+		turtle.history.clear();
 
-		// make the line thicc.
-		turtle = new Turtle();
-		for(Turtle t : list) {
-			convertLine(img,t);
+		if(fromEdge) {
+			// get all the flow lines.
+			List<Turtle> list = fromEdge();
+			if (rightAngle) {
+				rightAngle = false;
+				list.addAll(fromEdge());
+				rightAngle = true;
+			}
+
+			// make the line thicc.
+			turtle = new Turtle();
+			for (Turtle t : list) {
+				convertLine(img, t);
+			}
+		} else {
+			asGrid(image);
 		}
 
 		fireConversionFinished();
@@ -261,6 +307,48 @@ public class Converter_FlowField extends ImageConverter {
 			// stop if we leave the rectangle
 			if(!r.contains(nextStep.x,nextStep.y)) break;
 			line.moveTo(nextStep.x,nextStep.y);
+		}
+	}
+
+	private void asGrid(TransformedImage img) {
+		double xMin = myPaper.getMarginLeft();
+		double yMin = myPaper.getMarginBottom();
+		double yMax = myPaper.getMarginTop();
+		double xMax = myPaper.getMarginRight();
+		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
+		r.grow(1,1);
+		for(double y = yMin; y<yMax; y+=stepSize) {
+			for (double x = xMin; x < xMax; x += stepSize) {
+				followLine(img,x,y,r);
+			}
+		}
+	}
+
+	private void followLine(TransformedImage img,double x,double y,Rectangle r) {
+		double xx = x + stepVariation * (Math.random() * 2.0 - 1.0);
+		double yy = y + stepVariation * (Math.random() * 2.0 - 1.0);
+
+		turtle.jumpTo(xx, yy);
+		followLine(img, r, 2);
+		turtle.jumpTo(xx, yy);
+		followLine(img, r, -2);
+	}
+
+	private void followLine(TransformedImage img,Rectangle r, int step) {
+		for(int i=0;i<stepLength/2;++i) {
+			double value = 255.0 - (img.sample(turtle.getX(), turtle.getY(), 5.0));
+			value /= 255.0;
+
+			if(value + (Math.random() - 0.5) > (cutoff/255.0)) turtle.penDown();
+			else turtle.penUp();
+
+			double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
+			turtle.setAngle(v * 180);
+			Vector2d nextStep = turtle.getHeading();
+			nextStep.scale(step);
+			nextStep.add(turtle.getPosition());
+			if(!r.contains(nextStep.x,nextStep.y)) break;
+			turtle.forward(step);
 		}
 	}
 }
