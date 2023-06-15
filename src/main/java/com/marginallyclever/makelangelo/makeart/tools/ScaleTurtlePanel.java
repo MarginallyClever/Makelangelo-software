@@ -174,7 +174,7 @@ public class ScaleTurtlePanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(JFrame frame,Turtle t) {
+	public static void runAsDialog(Window frame,Turtle t) {
 		ScaleTurtlePanel panel = new ScaleTurtlePanel(t);
 
 		JDialog dialog = new JDialog(frame,Translator.get("Scale"));

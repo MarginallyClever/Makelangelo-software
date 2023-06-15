@@ -79,7 +79,7 @@ public class LogPanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(JFrame frame) {
+	public static void runAsDialog(Window frame) {
 		JDialog dialog = new JDialog(frame, Translator.get("LogPanel.Title"), Dialog.ModalityType.DOCUMENT_MODAL);
 
 		JPanel outerPanel = new JPanel(new BorderLayout());

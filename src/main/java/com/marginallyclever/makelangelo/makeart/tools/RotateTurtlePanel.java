@@ -72,7 +72,7 @@ public class RotateTurtlePanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(JFrame frame,Turtle t) {
+	public static void runAsDialog(Window frame,Turtle t) {
 		RotateTurtlePanel panel = new RotateTurtlePanel(t);
 
 		JDialog dialog = new JDialog(frame,Translator.get("Rotate"));

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 
 public class SaveDialog {
@@ -23,7 +24,7 @@ public class SaveDialog {
 		fc.setAcceptAllFileFilterUsed(false);
 	}
 	
-	public void run(Turtle t,JFrame parent) throws Exception {
+	public void run(Turtle t, Window parent) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
