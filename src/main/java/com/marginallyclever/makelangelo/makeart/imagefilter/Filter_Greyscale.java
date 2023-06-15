@@ -75,11 +75,19 @@ public class Filter_Greyscale extends ImageFilter {
 		return after;
 	}
 
-	// accepts and returns a number between 0 and 255, inclusive.
-	private double toneControl(double v) {
-		v /= 255.0;
-		v = 0.017 * Math.exp(3.29 * v) + 0.005 * Math.exp(7.27 * v);
-		return Math.min(1, Math.max(0, v)) * 255.0;
+	private double sRGBtoLinear(double b) {
+		b /= 255.0;
+		if (b <= 0.04045) b /= 12.92;
+		else b = Math.pow((b + 0.055) / 1.055, 2.4);
+		return b;
+	}
+
+	/**
+	 * accepts and returns a number between 0 and 255, inclusive.
+ 	 */
+	private double toneControl(double b) {
+		b = 0.017 * Math.exp(3.29 * b) + 0.005 * Math.exp(7.27 * b);
+		return Math.min(1, Math.max(0, b)) * 255.0;
 	}
 
 	public TransformedImage filterTone(TransformedImage img) {
@@ -94,7 +102,7 @@ public class Filter_Greyscale extends ImageFilter {
 		for (y = 0; y < h; ++y) {
 			for (x = 0; x < w; ++x) {
 				double pixel = decode32bit(bi.getRGB(x, y));
-				double v2 = toneControl(pixel);
+				double v2 = sRGBtoLinear(pixel);
 				int rgb = (int) Math.min(255, Math.max(0, v2));
 				afterBI.setRGB(x, y, ImageFilter.encode32bit(rgb));
 			}

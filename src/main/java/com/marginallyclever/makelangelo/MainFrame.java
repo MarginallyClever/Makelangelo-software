@@ -58,13 +58,11 @@ public class MainFrame extends JFrame {
     private void saveWindowSizeAndPosition() {
         int state = getExtendedState();
         boolean isFullscreen = ((state & JFrame.MAXIMIZED_BOTH)!=0);
-        System.out.println("fullscreen="+isFullscreen);
 
         prefs.putBoolean(KEY_IS_FULLSCREEN, isFullscreen);
         if(!isFullscreen) {
             Dimension frameSize = this.getSize();
             Point p = this.getLocation();
-            System.out.println("save size="+frameSize.width+"x"+frameSize.height+" pos="+p.x+","+p.y);
             prefs.putInt(KEY_WINDOW_WIDTH, frameSize.width);
             prefs.putInt(KEY_WINDOW_HEIGHT, frameSize.height);
             prefs.putInt(KEY_WINDOW_X, p.x);
