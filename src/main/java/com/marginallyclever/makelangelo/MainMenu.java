@@ -325,6 +325,10 @@ public class MainMenu extends JMenuBar {
         a6.setSource(app);		a6.addModifierListener(app::setTurtle);		menu.add(a6);
         a7.setSource(app);		a7.addModifierListener(app::setTurtle);		menu.add(a7);
 
+        JMenuItem translate = new JMenuItem(Translator.get("Translate"));
+        menu.add(translate);
+        translate.addActionListener((e) -> runTranslatePanel());
+
         JMenuItem scale = new JMenuItem(Translator.get("Scale"));
         menu.add(scale);
         scale.addActionListener((e) -> runScalePanel());
@@ -367,6 +371,10 @@ public class MainMenu extends JMenuBar {
         ScaleTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), app.getTurtle());
     }
 
+    private void runTranslatePanel() {
+        TranslateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), app.getTurtle());
+    }
+  
     private JMenu createRobotMenu() {
         JMenu menu = new JMenu(Translator.get("Robot"));
         menu.setMnemonic('k');
