@@ -39,12 +39,12 @@ public class TranslateTurtlePanel extends JPanel {
 		c.gridy=0;
 		c.weightx=1;
 		c.anchor=GridBagConstants.NORTHWEST;
-		add(new JLabel(Translator.get("Width")),c);
+		add(new JLabel("X"),c);
 		
 		c.gridx=0;
 		c.gridy=1;
 		c.anchor=GridBagConstants.NORTHWEST;
-		add(new JLabel(Translator.get("Height")),c);
+		add(new JLabel("Y"),c);
 		
 		c.gridx=1;
 		c.gridy=0;
