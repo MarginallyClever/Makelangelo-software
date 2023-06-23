@@ -374,7 +374,7 @@ public class MainMenu extends JMenuBar {
     private void runTranslatePanel() {
         TranslateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), app.getTurtle());
     }
-
+  
     private JMenu createRobotMenu() {
         JMenu menu = new JMenu(Translator.get("Robot"));
         menu.setMnemonic('k');
