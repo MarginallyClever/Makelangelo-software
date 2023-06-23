@@ -13,11 +13,8 @@ import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
-import java.io.Serial;
 
 public class ScaleTurtlePanel extends JPanel {
-	@Serial
-	private static final long serialVersionUID = -4566997988723228869L;
 	private static final Logger logger = LoggerFactory.getLogger(ScaleTurtlePanel.class);
 	
 	private final String [] unitTypes = new String[]{"mm","%"};
@@ -174,10 +171,10 @@ public class ScaleTurtlePanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(Window frame,Turtle t) {
+	public static void runAsDialog(Window parent,Turtle t) {
 		ScaleTurtlePanel panel = new ScaleTurtlePanel(t);
 
-		JDialog dialog = new JDialog(frame,Translator.get("Scale"));
+		JDialog dialog = new JDialog(parent,Translator.get("Scale"));
 
 		JButton okButton = new JButton(Translator.get("OK"));
 		JButton cancelButton = new JButton(Translator.get("Cancel"));
@@ -209,6 +206,7 @@ public class ScaleTurtlePanel extends JPanel {
 		
 		dialog.add(outerPanel);
 		dialog.pack();
+		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
 	}
 	
@@ -220,6 +218,8 @@ public class ScaleTurtlePanel extends JPanel {
 
 		JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
 		runAsDialog(frame,new Turtle());
 	}
 }

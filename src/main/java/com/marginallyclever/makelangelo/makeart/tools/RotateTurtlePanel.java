@@ -72,10 +72,10 @@ public class RotateTurtlePanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(Window frame,Turtle t) {
+	public static void runAsDialog(Window parent,Turtle t) {
 		RotateTurtlePanel panel = new RotateTurtlePanel(t);
 
-		JDialog dialog = new JDialog(frame,Translator.get("Rotate"));
+		JDialog dialog = new JDialog(parent,Translator.get("Rotate"));
 
 		JButton okButton = new JButton(Translator.get("OK"));
 		JButton cancelButton = new JButton(Translator.get("Cancel"));
@@ -107,6 +107,7 @@ public class RotateTurtlePanel extends JPanel {
 		
 		dialog.add(outerPanel);
 		dialog.pack();
+		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
 	}
 	
@@ -118,6 +119,8 @@ public class RotateTurtlePanel extends JPanel {
 
 		JFrame frame = new JFrame(RotateTurtlePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setLocationRelativeTo(null);
 		runAsDialog(frame,new Turtle());
 	}
 }
