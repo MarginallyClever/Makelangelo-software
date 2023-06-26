@@ -16,41 +16,58 @@ import java.util.List;
 public class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
 
-	private final String AVRDUDE_EXE;
+	private final String AVRDUDE_APP;
 	private String avrdudePath = "";
 
 	public FirmwareUploader() {
 		String OS = System.getProperty("os.name").toLowerCase();
-		AVRDUDE_EXE = (OS.indexOf("win") >= 0) ? "avrdude.exe" : "avrdude";
-
-		findAVRDude();
+		if(isWindows()) {
+			AVRDUDE_APP = "avrdude.exe";
+			findAVRDudeWindows();
+		} else {
+ 			AVRDUDE_APP = "avrdude";
+			findAVRDudeOther();
+		}
 	}
 
-	private void findAVRDude() {
-		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
-		if(attemptFindAVRDude(AVRDUDE_EXE)) return;
-
+	private boolean isWindows() {
 		String OS = System.getProperty("os.name").toLowerCase();
-		if(OS.indexOf("win") >= 0) {
-			// arduinoPath
-			if(attemptFindAVRDude("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\" + AVRDUDE_EXE)) return;
-		}
+		return OS.contains("win");
+	}
 
-		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_EXE)) return;
-		attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator + AVRDUDE_EXE);
+	private void findAVRDudeWindows() {
+		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
+		if(attemptFindAVRDude("")) return;
+		if(attemptFindAVRDude("C:\\Program Files\\Makelangelo\\app\\")) return;
+		if(attemptFindAVRDude("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\")) return;
+		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator)) return;
+		attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator);
+	}
+
+	private void findAVRDudeOther() {
+		try {
+			Process process = new ProcessBuilder("which", "avrdude").start();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String path = reader.readLine();
+			logger.debug("Possible AVRdude at {}",path);
+			attemptFindAVRDude(path);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private boolean attemptFindAVRDude(String path) {
-		File f = new File(path);
-		logger.debug("searching for avrdude in {}",f.getAbsolutePath());
+		File f = new File(path+AVRDUDE_APP);
+
+		logger.debug("Searching for avrdude in {}",f.getAbsolutePath());
 		if(f.exists()) {
-			avrdudePath = f.getAbsolutePath();
+			avrdudePath = f.getParent() + File.separator;
 			return true;
 		}
 		return false;
 	}
 
-	private File attempt(int i,String filename) {
+	private File attemptToFindConf(int i, String filename) {
 		Path p = Path.of(avrdudePath);
 		logger.debug("Trying {} {}",i, p.resolve(filename));
 		return p.resolve(filename).toFile();
@@ -60,27 +77,34 @@ public class FirmwareUploader {
 		logger.debug("update started");
 
 		int i=0;
-		File f = attempt(i++, "avrdude.conf");
-		if(!f.exists()) f = attempt(i++, ".."+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attempt(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attempt(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		File f = attemptToFindConf(i++, "avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
 		if(!f.exists()) {
 			throw new Exception("Cannot find nearby avrdude.conf");
 		}
 		
 		String confPath = f.getAbsolutePath();
-		String path = avrdudePath;
-		if(!path.endsWith(File.separator)) path+=File.separator;
+		String path;
+		if(isWindows()) {
+			path = avrdudePath;
+			if(!path.endsWith(File.separator)) path+=File.separator;
+			path += AVRDUDE_APP;
+		} else {
+			path = "/bin/bash -c "+ AVRDUDE_APP;
+		}
 		
 		String [] options = new String[]{
-				path+AVRDUDE_EXE,
-	    		"-C"+confPath,
+				path,
+	    		"-C "+confPath,
 	    		//"-v","-v","-v","-v",
-	    		"-patmega2560",
-	    		"-cwiring",
-	    		"-P"+portName,
+	    		"-p atmega2560",
+	    		"-c wiring",
+	    		"-P "+portName,
 	    		"-b115200",
-	    		"-D","-Uflash:w:"+hexPath+":i"
+	    		"-D",
+				"-U flash:w:"+hexPath+":i"
 		    }; 
 	    runCommand(options);
 
