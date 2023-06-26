@@ -2399,6 +2399,6 @@
 	</string>
 	<string>
 		<key>FirmwareUploader.help</key>
-		<value><![CDATA[<html><body><a href="">help</body></html>]]></value>
+		<value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value>
 	</string>
 </language>
