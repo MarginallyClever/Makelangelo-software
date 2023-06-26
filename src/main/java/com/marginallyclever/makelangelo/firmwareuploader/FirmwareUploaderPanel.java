@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.commons.io.FilenameUtils;
 
@@ -27,13 +28,15 @@ public class FirmwareUploaderPanel extends JPanel {
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
 	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
+	private final SelectReadOnlyText help = new SelectReadOnlyText("help",Translator.get("FirmwareUploader.help"));
 
 	private static String lastPath = "";
 	private static String lastHexFile = "";
 	
 	public FirmwareUploaderPanel() {
-		super();
-		
+		super(new GridBagLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
 		updateCOMPortList();
 		refreshLayout();
 
@@ -80,12 +83,9 @@ public class FirmwareUploaderPanel extends JPanel {
 	}
 
 	private void refreshLayout() {
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(port,BorderLayout.CENTER);
-		panel.add(refreshButton,BorderLayout.EAST);
-
-		setLayout(new GridBagLayout());
-		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		JPanel connectTo = new JPanel(new BorderLayout());
+		connectTo.add(port,BorderLayout.CENTER);
+		connectTo.add(refreshButton,BorderLayout.EAST);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -94,11 +94,13 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.weightx=1;
 		c.weighty=0;
 
+		add(help,c);
+		c.gridy++;
 		add(sourceAVRDude,c);
 		c.gridy++;
 		add(sourceHex,c);
 		c.gridy++;
-		add(panel,c);
+		add(connectTo,c);
 		c.gridy++;
 		c.weightx=1;
 		c.weighty=1;

@@ -15,7 +15,6 @@ import java.util.List;
 
 public class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
-
 	private final String AVRDUDE_APP;
 	private String avrdudePath = "";
 
