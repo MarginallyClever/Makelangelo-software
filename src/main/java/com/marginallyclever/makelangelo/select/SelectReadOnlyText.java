@@ -59,9 +59,11 @@ public class SelectReadOnlyText extends Select {
 				}
 			}
 			else if ( eventType == HyperlinkEvent.EventType.ENTERED ){
-				createdJEditorPane.setToolTipText(hyperlinkEvent.getURL().toExternalForm());
-				ToolTipManager.sharedInstance().setInitialDelay(0);// TODO sould be set at the starting of the application
-				ToolTipManager.sharedInstance().setDismissDelay(5000);// TODO sould be set at the starting of the application
+				if( !(hyperlinkEvent.getURL() == null || hyperlinkEvent.getURL().toString().isEmpty() ) ) {
+					createdJEditorPane.setToolTipText(hyperlinkEvent.getURL().toExternalForm());
+					ToolTipManager.sharedInstance().setInitialDelay(0);// TODO sould be set at the starting of the application
+					ToolTipManager.sharedInstance().setDismissDelay(5000);// TODO sould be set at the starting of the application
+				}
 			}
 			else if ( eventType == HyperlinkEvent.EventType.EXITED ){
 				createdJEditorPane.setToolTipText(null);// null to turn off the tooltips.
