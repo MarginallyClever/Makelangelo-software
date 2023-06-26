@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.firmwareuploader;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
@@ -68,7 +67,7 @@ public class FirmwareUploaderPanel extends JPanel {
 	}
 	
 	private void checkForHexFileInCurrentWorkingDirectory() {
-		String path = FileAccess.getWorkingDirectory();
+		String path = lastHexFile;
 		File folder = new File(path);
 		File [] contents = folder.listFiles();
 		for( File c : contents ) {
