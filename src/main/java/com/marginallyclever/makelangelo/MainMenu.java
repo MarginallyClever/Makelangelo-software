@@ -194,7 +194,7 @@ public class MainMenu extends JMenuBar {
         menu.add(buttonDonation);
 
         JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
-        buttonCheckForUpdate.addActionListener((e) -> app.checkForUpdate(false));
+        buttonCheckForUpdate.addActionListener((e) -> app.checkForUpdate(true));
         menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();

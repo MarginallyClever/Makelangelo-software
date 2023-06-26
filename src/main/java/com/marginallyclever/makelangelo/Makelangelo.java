@@ -32,10 +32,8 @@ import java.awt.*;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidParameterException;
@@ -243,37 +241,26 @@ public final class Makelangelo {
 		try {
 			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
 			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
-			conn.setInstanceFollowRedirects(false); // you still need to handle
-													// redirect manully.
-			HttpURLConnection.setFollowRedirects(false);
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
+			conn.setConnectTimeout(5000);
+			conn.connect();
+			int responseCode = conn.getResponseCode();
+			String responseMessage = conn.getHeaderField("Location");
+			conn.disconnect();
 
-			String inputLine = in.readLine();
-			if(inputLine == null) throw new Exception("Could not read from update server.");
+			// parse the last part of the redirect URL, which contains the
+			// release tag (which is the VERSION)
+			String line2 = responseMessage.substring(responseMessage.lastIndexOf("/") + 1);
 
-			// parse the URL in the text-only redirect
-			String matchStart = "<a href=\"";
-			String matchEnd = "\">";
-			int start = inputLine.indexOf(matchStart);
-			int end = inputLine.indexOf(matchEnd);
-			if (start != -1 && end != -1) {
-				String line2 = inputLine.substring(start + matchStart.length(), end);
-				// parse the last part of the redirect URL, which contains the
-				// release tag (which is the VERSION)
-				line2 = line2.substring(line2.lastIndexOf("/") + 1);
+			logger.debug("latest release: {}; this version: {}@{}", line2, MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
 
-				logger.debug("latest release: {}; this version: {}@{}", line2, MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
-				// logger.debug(inputLine.compareTo(MakelangeloVersion.VERSION));
+			int comp = line2.compareTo(MakelangeloVersion.VERSION);
+			String results;
+			if (comp > 0) results = Translator.get("UpdateNotice");
+			else if (comp < 0) results = "This version is from the future?!";
+			else results = Translator.get("UpToDate");
 
-				int comp = line2.compareTo(MakelangeloVersion.VERSION);
-				String results;
-				if (comp > 0) results = Translator.get("UpdateNotice");
-				else if (comp < 0) results = "This version is from the future?!";
-				else results = Translator.get("UpToDate");
-
-				JOptionPane.showMessageDialog(mainFrame, results);
-			}
-			in.close();
+			JOptionPane.showMessageDialog(mainFrame, results);
 		} catch (Exception e) {
 			if (announceIfFailure) {
 				JOptionPane.showMessageDialog(null, Translator.get("UpdateCheckFailed") + e.getLocalizedMessage());
