@@ -37,7 +37,7 @@ public class FirmwareUploader {
 		}
 
 		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_EXE)) return;
-		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator + AVRDUDE_EXE)) return;
+		attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator + AVRDUDE_EXE);
 	}
 
 	private boolean attemptFindAVRDude(String path) {
