@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
+import java.util.Objects;
 
 /**
  * A panel for uploading firmware to the robot.
@@ -72,8 +73,7 @@ public class FirmwareUploaderPanel extends JPanel {
 	private void checkForHexFileInCurrentWorkingDirectory() {
 		String path = lastHexFile;
 		File folder = new File(path);
-		File [] contents = folder.listFiles();
-		for( File c : contents ) {
+		for( File c : Objects.requireNonNull(folder.listFiles())) {
 			String ext = FilenameUtils.getExtension(c.getAbsolutePath());
 			if(ext.equalsIgnoreCase("hex")) {
 				sourceHex.setText(c.getAbsolutePath());
@@ -111,6 +111,7 @@ public class FirmwareUploaderPanel extends JPanel {
 	private void updateCOMPortList() {
 		String [] list = getListOfCOMPorts();
 		port.setNewList(list);
+		if(list.length==1) port.setSelectedIndex(0);
 	}
 	
 	private String[] getListOfCOMPorts() {
@@ -137,8 +138,7 @@ public class FirmwareUploaderPanel extends JPanel {
 	}
 	
 	private boolean AVRDudeExists() {
-		File f = new File(sourceAVRDude.getText());
-		boolean state = f.exists(); 
+		boolean state = firmwareUploader.hasFoundAVRdude();
 		if(!state) {
 			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload status",JOptionPane.ERROR_MESSAGE);
 		}
@@ -152,7 +152,6 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setPreferredSize(new Dimension(600, 400));
 		frame.setContentPane(new FirmwareUploaderPanel());
 		frame.pack();
 		frame.setLocationRelativeTo(null);
