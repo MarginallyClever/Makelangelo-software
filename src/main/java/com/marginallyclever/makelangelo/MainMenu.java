@@ -180,7 +180,7 @@ public class MainMenu extends JMenuBar {
 
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu(Translator.get("Help"));
-        menu.setMnemonic('H');//
+        menu.setMnemonic('H');
 
         JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
         buttonViewLog.addActionListener((e) -> runLogPanel());
