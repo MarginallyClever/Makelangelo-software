@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.firmwareuploader;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.convenience.helpers.OSHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectFile;
@@ -14,7 +15,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
-import java.util.Objects;
 
 /**
  * A panel for uploading firmware to the robot.
@@ -23,35 +23,42 @@ import java.util.Objects;
  * @author Dan Royer
  */
 public class FirmwareUploaderPanel extends JPanel {
-	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
-	private final SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
-	private final SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),firmwareUploader.getAvrdudePath());
+	private final FirmwareUploader firmwareUploader;
+	private final SelectFile sourceAVRDude;
+	private final SelectFile sourceHex;
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
 	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
 	private final SelectReadOnlyText help = new SelectReadOnlyText("help",Translator.get("FirmwareUploader.help"));
 
-	private static String lastPath = "";
+	private static String lastAVRDudePath = "";
 	private static String lastHexFile = "";
 	
 	public FirmwareUploaderPanel() {
 		super(new GridBagLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+		if(OSHelper.isWindows()) firmwareUploader = new FirmwareUploaderWindows();
+		else if(OSHelper.isOSX()) firmwareUploader = new FirmwareUploaderOSX();
+		else firmwareUploader = new FirmwareUploaderUbuntu();
+
+		sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAVRDudePath());
+		sourceHex = new SelectFile("file",Translator.get("*.hex file"),firmwareUploader.getAVRDudePath());
+
 		updateCOMPortList();
 		refreshLayout();
 
-		if(lastPath==null || lastPath.trim().isEmpty()) {
-			lastPath = firmwareUploader.getAvrdudePath();
+		if(lastAVRDudePath ==null || lastAVRDudePath.trim().isEmpty()) {
+			lastAVRDudePath = firmwareUploader.getAVRDudePath();
 		}
 		if(lastHexFile==null || lastHexFile.trim().isEmpty()) {
-			lastHexFile = firmwareUploader.getAvrdudePath();
+			lastHexFile = firmwareUploader.getHexPath();
 		}
 
 		sourceAVRDude.setPathOnly();
-		sourceAVRDude.setText(lastPath);
+		sourceAVRDude.setText(lastAVRDudePath);
 		sourceAVRDude.addPropertyChangeListener((e)->{
-			lastPath = sourceAVRDude.getText();
+			lastAVRDudePath = sourceAVRDude.getText();
 		});
 
 		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
@@ -73,7 +80,10 @@ public class FirmwareUploaderPanel extends JPanel {
 	private void checkForHexFileInCurrentWorkingDirectory() {
 		String path = lastHexFile;
 		File folder = new File(path);
-		for( File c : Objects.requireNonNull(folder.listFiles())) {
+		File [] list = folder.listFiles();
+		if( list == null ) return;
+
+		for( File c : list) {
 			String ext = FilenameUtils.getExtension(c.getAbsolutePath());
 			if(ext.equalsIgnoreCase("hex")) {
 				sourceHex.setText(c.getAbsolutePath());
@@ -125,8 +135,9 @@ public class FirmwareUploaderPanel extends JPanel {
 		String status = "Finished!";
 		int messageType = JOptionPane.PLAIN_MESSAGE;
 		try {
+			firmwareUploader.setHexPath(sourceHex.getText());
 			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
-			firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
+			firmwareUploader.run(port.getSelectedItem());
 		} catch (Exception e1) {
 			status = e1.getMessage();
 			messageType = JOptionPane.ERROR_MESSAGE;

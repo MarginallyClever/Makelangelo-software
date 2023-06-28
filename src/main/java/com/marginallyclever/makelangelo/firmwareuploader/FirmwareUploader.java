@@ -1,31 +1,33 @@
 package com.marginallyclever.makelangelo.firmwareuploader;
 
-import com.marginallyclever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class FirmwareUploader {
+/**
+ * Common methods for uploading firmware to an AVR microcontroller.
+ */
+public abstract class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
-	private final String AVRDUDE_APP;
-	private String avrdudePath = "";
-	private String confPath;
+	protected String AVRDUDE_APP = "";
+	protected String avrdudePath = "";
+	protected String hexPath = "";
+	protected String confPath = "";
 
-	public FirmwareUploader() {
-		if(isWindows()) {
-			AVRDUDE_APP = "avrdude.exe";
-		} else {
-			AVRDUDE_APP = "avrdude";
-		}
+	protected FirmwareUploader() {
+		super();
 	}
 
+	abstract public boolean findAVRDude();
+
 	public boolean hasFoundAVRdude() {
-		boolean found = isWindows() ? findAVRDudeWindows() : findAVRDudeOther();
+		boolean found = findAVRDude();
 		if(!found) {
 			logger.error("Cannot find avrdude");
 			return false;
@@ -37,36 +39,16 @@ public class FirmwareUploader {
 		return true;
 	}
 
-	private boolean isWindows() {
-		String OS = System.getProperty("os.name").toLowerCase();
-		return OS.contains("win");
+	// find avrdude.conf
+	abstract boolean findConf();
+
+	protected File attemptToFindConf(int i, String filename) {
+		Path p = Path.of(avrdudePath);
+		logger.debug("Trying {} {}",i, p.resolve(filename));
+		return p.resolve(filename).toFile();
 	}
 
-	private boolean findAVRDudeWindows() {
-		// if Arduino is not installed in the default windows location, offer the current working directory (fingers crossed)
-		if(attemptFindAVRDude(AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude("C:\\Program Files\\Makelangelo\\app\\"+AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_APP)) return true;
-		return attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator+AVRDUDE_APP);
-	}
-
-	private boolean findAVRDudeOther() {
-		try {
-			Process process = new ProcessBuilder("which", "avrdude").start();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String path;
-			while((path = reader.readLine()) != null) {
-				logger.debug("which: {}", path);
-				if(attemptFindAVRDude(path)) return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private boolean attemptFindAVRDude(String path) {
+	protected boolean attemptFindAVRDude(String path) {
 		File f = new File(path);
 
 		logger.debug("Searching for avrdude in {}",f.getAbsolutePath());
@@ -77,38 +59,14 @@ public class FirmwareUploader {
 		return false;
 	}
 
-	// find avrdude.conf
-	private boolean findConf() {
-		int i=0;
-		File f = attemptToFindConf(i++, "avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
+	abstract public String getCommand();
 
-		if(!f.exists()) return false;
-		confPath = f.getAbsolutePath();
-		return true;
-	}
-
-	private File attemptToFindConf(int i, String filename) {
-		Path p = Path.of(avrdudePath);
-		logger.debug("Trying {} {}",i, p.resolve(filename));
-		return p.resolve(filename).toFile();
-	}
-	
-	public void run(String hexPath,String portName) throws Exception {
+	public void run(String portName) throws Exception {
 		logger.debug("update started");
 
 		// setup avrdude command
-		String path;
-		if(isWindows()) {
-			path = avrdudePath;
-			if(!path.endsWith(File.separator)) path+=File.separator;
-			path += AVRDUDE_APP;
-		} else {
-			path = "/bin/bash -c "+ AVRDUDE_APP;
-		}
-		
+		String path = getCommand();
+
 		String [] options = new String[]{
 				path,
 	    		"-C"+confPath,
@@ -125,7 +83,7 @@ public class FirmwareUploader {
 		logger.debug("update finished");
 	}
 
-	private void runCommand(String[] options) throws Exception {
+	protected void runCommand(String[] options) throws Exception {
 		logger.debug("running command: {}",String.join(" ",options));
 
 		List<String> command = new ArrayList<>();
@@ -139,7 +97,7 @@ public class FirmwareUploader {
 		runBufferedReaders(p);
 	}
 
-	private void runBufferedReaders(Process p) throws IOException {
+	protected void runBufferedReaders(Process p) throws IOException {
 		InputStreamReader stdInput = new InputStreamReader(p.getInputStream());
 		InputStreamReader stdError = new InputStreamReader(p.getErrorStream());
 
@@ -165,18 +123,19 @@ public class FirmwareUploader {
 		}
 	}
 	
-	public String getAvrdudePath() {
+	String getAVRDudePath() {
 		return avrdudePath;
 	}
 
-	public void setAvrdudePath(String avrdudePath) {
+	void setAvrdudePath(String avrdudePath) {
 		this.avrdudePath = avrdudePath;
 	}
-	
-	// TEST
-	
-	public void main(String[] args) throws Exception {
-		FirmwareUploader fu = new FirmwareUploader();
-		fu.run("./firmware-m5.hex", "COM3");
+
+	public void setHexPath(String s) {
+		hexPath = s;
+	}
+
+	public String getHexPath() {
+		return hexPath;
 	}
 }
