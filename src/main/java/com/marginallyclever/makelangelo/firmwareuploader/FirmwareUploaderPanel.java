@@ -42,6 +42,8 @@ public class FirmwareUploaderPanel extends JPanel {
 		else if(OSHelper.isOSX()) firmwareUploader = new FirmwareUploaderOSX();
 		else firmwareUploader = new FirmwareUploaderUbuntu();
 
+		AVRDudeExists();
+
 		sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAVRDudePath());
 		sourceHex = new SelectFile("file",Translator.get("*.hex file"),firmwareUploader.getAVRDudePath());
 
