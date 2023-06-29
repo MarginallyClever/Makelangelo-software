@@ -23,12 +23,15 @@ public class FirmwareUploaderUbuntu extends FirmwareUploader {
             Process process = new ProcessBuilder("which", "avrdude").start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String path;
+            int hitCount=0;
             while((path = reader.readLine()) != null) {
+                hitCount++;
                 logger.debug("which: {}", path);
                 if(attemptFindAVRDude(path)) return true;
             }
+            logger.debug("which hit {} times.",hitCount);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("failed to run `which`: ",e);
         }
         return false;
     }

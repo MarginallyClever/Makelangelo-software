@@ -20,7 +20,7 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 
 	public boolean findAVRDude() {
 		try {
-			Process process = new ProcessBuilder("which", "avrdude").start();
+			Process process = new ProcessBuilder("mdfind", "-name", "avrdude").start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String path;
 			int hitCount=0;
