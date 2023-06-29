@@ -17,7 +17,9 @@ module com.marginallyclever.makelangelo {
     requires com.formdev.flatlaf;
     requires org.reflections;
 
-    requires org.locationtech.jts;            // jts-core
+    requires org.locationtech.jts;
+    requires org.apache.httpcomponents.httpclient;
+    requires org.apache.httpcomponents.httpcore;            // jts-core
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.convenience.voronoi;
