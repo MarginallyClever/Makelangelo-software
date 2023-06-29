@@ -16,7 +16,6 @@ public class FirmwareUploaderUbuntu extends FirmwareUploader {
             throw new RuntimeException("This class is for Ubuntu only.");
         }
         AVRDUDE_APP = "avrdude";
-        setHexPath("./firmware-m5.hex");
     }
 
     public boolean findAVRDude() {

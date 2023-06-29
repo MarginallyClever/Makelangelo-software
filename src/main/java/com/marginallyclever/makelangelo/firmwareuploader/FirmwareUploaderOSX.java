@@ -16,14 +16,6 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 		super();
 		if(!OSHelper.isOSX()) throw new RuntimeException("This class is for OSX only.");
 		AVRDUDE_APP = "avrdude";
-
-		File f = new File(System.getProperty("jpackage.app-path")+File.pathSeparator+".."+File.pathSeparator+".."+File.pathSeparator+"app");
-		if(f.exists()) {
-			logger.debug("found hex file.");
-			setHexPath(f.getAbsolutePath());
-		} else {
-			logger.error("cannot find hex file.");
-		}
 	}
 
 	public boolean findAVRDude() {

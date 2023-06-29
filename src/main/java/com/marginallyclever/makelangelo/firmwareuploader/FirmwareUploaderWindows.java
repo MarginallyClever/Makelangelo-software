@@ -15,15 +15,6 @@ public class FirmwareUploaderWindows extends FirmwareUploader {
 		super();
 		if(!OSHelper.isWindows()) throw new RuntimeException("This class is for Windows only.");
 		AVRDUDE_APP = "avrdude.exe";
-		if((new File("C:\\Program Files\\Makelangelo\\app\\firmware-m5.hex").exists())) {
-			logger.info("using hex file from install directory.");
-			setHexPath("C:\\Program Files\\Makelangelo\\app\\firmware-m5.hex");
-		} else if((new File("src\\main\\package\\firmware-m5.hex").exists())) {
-			logger.info("using hex file from source code.");
-			setHexPath("src\\main\\package\\firmware-m5.hex");
-		} else {
-			logger.error("cannot find hex file.");
-		}
 	}
 
 	public boolean findAVRDude() {
