@@ -50,7 +50,7 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 	}
 
 	public String getCommand() {
-		return "/bin/bash -c "+ AVRDUDE_APP;
+		return "/bin/bash -c "+ avrdudePath + File.separator+ AVRDUDE_APP;
 	}
 
 	// TEST
