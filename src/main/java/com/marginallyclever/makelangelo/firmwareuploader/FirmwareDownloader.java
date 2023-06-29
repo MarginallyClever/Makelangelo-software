@@ -136,24 +136,28 @@ public class FirmwareDownloader {
         return null;
     }
 
+    public String getDownloadPath(String name) {
+        return DOWNLOAD_PATH + name;
+    }
+
     /**
      * Query github.com for the latest release, then download the firmware file to the DOWNLOAD_PATH.
      * @param name the name of the firmware file to download
      */
-    private boolean getFirmware(String name) {
+    public boolean getFirmware(String name) {
         JSONObject asset = downloadAssetInformation(name);
         if(asset==null) return false;
 
+        String localPath = getDownloadPath(name);
+
         String updatedAt = asset.getString("updated_at");
-        if(fileExistsWithMatchingTimestamp(DOWNLOAD_PATH + name, updatedAt)) {
+        if(fileExistsWithMatchingTimestamp(localPath, updatedAt)) {
             logger.info("file already exists: {}",name);
             return true;
         }
 
         try {
-            downloadHexFile(asset.getString("browser_download_url"),
-                    DOWNLOAD_PATH + name,
-                    updatedAt);
+            downloadHexFile(asset.getString("browser_download_url"), localPath, updatedAt);
         } catch (IOException e) {
             logger.error("Download failed: {}", e.getMessage());
             return false;
@@ -163,21 +167,9 @@ public class FirmwareDownloader {
         return true;
     }
 
-    public boolean getFirmwareM5() throws IOException {
-        return getFirmware("firmware-m5.hex");
-    }
-
-    public boolean getFirmwareHUGE() throws IOException {
-        return getFirmware("firmware-huge.hex");
-    }
-
     public static void main(String[] args) {
         FirmwareDownloader fd = new FirmwareDownloader();
-        try {
-            fd.getFirmwareM5();
-            fd.getFirmwareHUGE();
-        } catch (IOException e) {
-            logger.error("Download failed: {}", e.getMessage());
-        }
+        fd.getFirmware("firmware-m5.hex");
+        fd.getFirmware("firmware-huge.hex");
     }
 }
