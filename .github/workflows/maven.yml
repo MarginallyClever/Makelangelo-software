@@ -39,7 +39,6 @@ jobs:
         mkdir -p target/universal-package &&
         cp src/main/package/avrdude.* target/universal-package/ &&
         cp src/main/package/*.dll target/universal-package/ &&
-        cp src/main/package/firmware*.hex target/universal-package/ &&
         cp src/main/package/*.bat target/universal-package/ &&
         cp src/main/package/start* target/universal-package/ &&
         cp src/main/package/thankyou.* target/universal-package/ &&
@@ -55,7 +54,6 @@ jobs:
       shell: bash
       run: |
         mkdir -p target/package &&
-        cp src/main/package/firmware*.hex target/package/ &&
         cp src/main/package/*.bat target/package/ &&
         cp src/main/package/start* target/package/ &&
         cp src/main/package/thankyou.* target/package/ &&
@@ -90,7 +88,6 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
-          src/main/package/firmware*.hex
           LICENSE
           README
           target/package/*
