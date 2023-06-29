@@ -19,19 +19,24 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 	}
 
 	public boolean findAVRDude() {
+		if(findAVRDudeInternal("which", "avrdude")) return true;
+		return findAVRDudeInternal("mdfind","\"kind:app\"", "avrdude");
+	}
+
+	private boolean findAVRDudeInternal(String... command) {
 		try {
-			Process process = new ProcessBuilder("mdfind", "-name", "avrdude").start();
+			Process process = new ProcessBuilder(command).start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String path;
 			int hitCount=0;
 			while((path = reader.readLine()) != null) {
 				hitCount++;
-				logger.debug("which: {}", path);
+				logger.debug("{}: {}",command[0], path);
 				if(attemptFindAVRDude(path)) return true;
 			}
-			logger.debug("which hit {} times.",hitCount);
+			logger.debug("{} hit {} times.",command[0],hitCount);
 		} catch (Exception e) {
-			logger.error("failed to run `which`: ",e);
+			logger.error("failed to run `{}`: ",command[0],e);
 		}
 		return false;
 	}
