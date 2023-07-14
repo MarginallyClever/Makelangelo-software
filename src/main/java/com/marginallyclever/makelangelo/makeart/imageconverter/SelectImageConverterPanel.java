@@ -128,8 +128,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	private JComboBox<String> getFillSelection() {
 		String[] imageFillNames = {
+				Translator.get("ConvertImagePaperFit"),
 				Translator.get("ConvertImagePaperFill"),
-				Translator.get("ConvertImagePaperFit")
 		};
 		JComboBox<String> box = new JComboBox<>(imageFillNames);
 
