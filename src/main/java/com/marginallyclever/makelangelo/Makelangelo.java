@@ -296,23 +296,11 @@ public final class Makelangelo {
 		previewPanel.addListener(myPlotter);
 		previewPanel.addListener(myTurtleRenderer);
 		addPlotterRendererToPreviewPanel();
-		
-		createRangeSlider(contentPane);
-		
+
 		contentPane.add(previewPanel, BorderLayout.CENTER);
+		contentPane.add(rangeSlider, BorderLayout.SOUTH);
 
 		return contentPane;
-	}
-
-	/**
-	 * Build and lay out the bottom-most components of the main view: 
-	 * the two-headed range slider and the numbers that show the head
-	 * values.
-	 * @param contentPane where to attach the new elements.
-	 */
-	private void createRangeSlider(JPanel contentPane) {
-		logger.debug("  create range slider...");
-		contentPane.add(rangeSlider, BorderLayout.SOUTH);
 	}
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
