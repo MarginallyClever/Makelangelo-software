@@ -30,6 +30,10 @@ public abstract class ImageConverterIterative extends ImageConverter {
     @Override
     public void start(Paper paper, TransformedImage image) {
         super.start(paper,image);
+        if(imageConverterThread!=null) {
+            logger.warn("start() called while thread is still running.  Stopping thread.");
+            stop();
+        }
         imageConverterThread = new ImageConverterThread(this);
         imageConverterThread.execute();
     }

@@ -9,8 +9,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class Converter_Crosshatch extends ImageConverter {
 	private static double intensity=2.0f;
-	private static double pass90=8.0f;
-	private static double pass75=16.0f;
+	private static double pass90=16.0f;
+	private static double pass75=32.0f;
 	private static double pass15=64.0f;
 	private static double pass45=128.0f;
 
