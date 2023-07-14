@@ -67,10 +67,10 @@ public abstract class FirmwareUploader {
 		// setup avrdude command
 		String path = getCommand();
 
-		String [] options = new String[]{
+		String [] options = new String[] {
 				path,
 	    		"-C"+confPath,
-	    		//"-v","-v","-v","-v",
+	    		"-v","-V",
 	    		"-patmega2560",
 	    		"-cwiring",
 	    		"-P"+portName,

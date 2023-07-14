@@ -55,13 +55,13 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 	}
 
 	public String getCommand() {
-		return "/bin/bash -c "+ avrdudePath + File.separator+ AVRDUDE_APP;
+		return AVRDUDE_APP;
 	}
 
 	// TEST
 	
-	public void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 		FirmwareUploaderOSX uploader = new FirmwareUploaderOSX();
-		uploader.run( "/dev/ttyACM0");
+		uploader.run("/dev/ttyACM0");
 	}
 }

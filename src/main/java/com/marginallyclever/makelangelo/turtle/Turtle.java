@@ -365,26 +365,6 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Log smallest bounding rectangle for Turtle path.
-	 */
-	public void showExtent() {
-		int i;
-		double xmin=0,xmax=0,ymin=0,ymax=0;
-		int first=1;
-		for(i=0;i<history.size();i++) {
-			TurtleMove mov=history.get(i);
-			if (mov.type == MovementType.DRAW_LINE) {
-				if(first == 1 || mov.x < xmin) xmin=mov.x;
-				if(first == 1 || mov.y < ymin) ymin=mov.y;
-				if(first == 1 || mov.x > xmax) xmax=mov.x;
-				if(first == 1 || mov.y > ymax) ymax=mov.y;
-				first=0;
-			}
-		}
-		logger.debug("extent is ({}/{} {}/{}", xmin, ymin, xmax, ymax);
-	}
-
-	/**
 	 * @return a list of all the pen-down lines while remembering their color.
  	 */
 	public LineCollection getAsLineSegments() {

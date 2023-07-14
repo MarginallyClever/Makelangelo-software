@@ -47,9 +47,9 @@ public class FirmwareUploaderWindows extends FirmwareUploader {
 
 	// TEST
 	
-	public void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 		FirmwareUploaderWindows uploader = new FirmwareUploaderWindows();
-		setHexPath("./firmware-m5.hex");
+		uploader.setHexPath("./firmware-m5.hex");
 		uploader.run("COM3");
 	}
 }
