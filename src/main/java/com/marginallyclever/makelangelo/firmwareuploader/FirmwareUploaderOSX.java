@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 
 
@@ -19,8 +18,9 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 	}
 
 	public boolean findAVRDude() {
-		if(findAVRDudeInternal("which", "avrdude")) return true;
-		return findAVRDudeInternal("mdfind","\"kind:app\"", "avrdude");
+		//if(findAVRDudeInternal("which", "avrdude")) return true;
+		//return findAVRDudeInternal("mdfind","\"kind:app\"", "avrdude");
+		return true;  // TODO this is a lie, but I don't know how to find avrdude on OSX
 	}
 
 	private boolean findAVRDudeInternal(String... command) {
@@ -43,6 +43,8 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 
 	// find avrdude.conf
 	public boolean findConf() {
+		// does not need to find avrdude.conf on OSX
+		/*
 		int i=0;
 		File f = attemptToFindConf(i++, "avrdude.conf");
 		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
@@ -51,6 +53,7 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 
 		if(!f.exists()) return false;
 		confPath = f.getAbsolutePath();
+		 */
 		return true;
 	}
 

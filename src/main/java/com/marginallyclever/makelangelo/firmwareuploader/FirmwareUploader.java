@@ -122,20 +122,8 @@ public abstract class FirmwareUploader {
 			logger.debug("{}: {}", label, s);
 		}
 	}
-	
-	String getAVRDudePath() {
-		return avrdudePath;
-	}
-
-	void setAvrdudePath(String avrdudePath) {
-		this.avrdudePath = avrdudePath;
-	}
 
 	public void setHexPath(String s) {
 		hexPath = s;
-	}
-
-	public String getHexPath() {
-		return hexPath;
 	}
 }

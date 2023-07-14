@@ -79,6 +79,7 @@ public class FirmwareUploaderPanel extends JPanel {
 
 	private void run(String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
+
 		if(!firmwareUploader.hasFoundAVRdude()) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotFound"),title,JOptionPane.ERROR_MESSAGE);
 			return;
