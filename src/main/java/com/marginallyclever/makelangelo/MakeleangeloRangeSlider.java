@@ -8,14 +8,13 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class MakeleangeloRangeSlider extends JPanel {
-    private RangeSlider rangeSlider;
+    private final RangeSlider rangeSlider;
     private final JLabel labelRangeMin = new JLabel();
     private final JLabel labelRangeMax = new JLabel();
 
     public MakeleangeloRangeSlider() {
         super(new BorderLayout());
 
-        JPanel bottomPanel = new JPanel(new BorderLayout());
         rangeSlider = new RangeSlider();
         rangeSlider.addChangeListener(this::onChangeSlider);
 
@@ -32,9 +31,9 @@ public class MakeleangeloRangeSlider extends JPanel {
         labelRangeMin.setPreferredSize(d);
         labelRangeMax.setPreferredSize(d);
 
-        bottomPanel.add(labelRangeMin, BorderLayout.WEST);
-        bottomPanel.add(rangeSlider, BorderLayout.CENTER);
-        bottomPanel.add(labelRangeMax, BorderLayout.EAST);
+        this.add(labelRangeMin, BorderLayout.WEST);
+        this.add(rangeSlider, BorderLayout.CENTER);
+        this.add(labelRangeMax, BorderLayout.EAST);
     }
 
     /**
