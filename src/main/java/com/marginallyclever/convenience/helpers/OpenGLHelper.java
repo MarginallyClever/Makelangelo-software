@@ -1,4 +1,4 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.convenience.helpers;
 
 import com.jogamp.opengl.GL2;
 
