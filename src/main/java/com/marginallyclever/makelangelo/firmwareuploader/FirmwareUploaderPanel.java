@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.firmwareuploader;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.helpers.OSHelper;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
@@ -20,7 +19,7 @@ import java.awt.*;
  */
 public class FirmwareUploaderPanel extends JPanel {
 	private final FirmwareDownloader firmwareDownloader = new FirmwareDownloader();
-	private final FirmwareUploader firmwareUploader;
+	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
 	private final SelectButton startM5 = new SelectButton("startM5",Translator.get("FirmwareUploaderPanel.startM5"));
@@ -31,10 +30,6 @@ public class FirmwareUploaderPanel extends JPanel {
 	public FirmwareUploaderPanel() {
 		super(new GridBagLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-		if(OSHelper.isWindows()) firmwareUploader = new FirmwareUploaderWindows();
-		else if(OSHelper.isOSX()) firmwareUploader = new FirmwareUploaderOSX();
-		else firmwareUploader = new FirmwareUploaderUbuntu();
 
 		updateCOMPortList();
 

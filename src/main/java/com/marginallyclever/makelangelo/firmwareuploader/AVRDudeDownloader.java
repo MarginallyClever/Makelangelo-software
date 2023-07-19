@@ -37,7 +37,12 @@ public class AVRDudeDownloader {
     public static String downloadAVRDude() throws IOException {
         String url = getURLforOS(getArch());
         if (url != null) {
-            return downloadAndExtract(url);
+            try {
+                return downloadAndExtract(url);
+            } catch (IOException e) {
+                logger.error("Error downloading avrdude", e);
+                throw e;
+            }
         }
         return null;
     }
@@ -121,7 +126,28 @@ public class AVRDudeDownloader {
 
     public static String downloadAndExtract(String urlStr) throws IOException {
         File toDeleteLater = downloadFileToTemp(urlStr);
-        return extractFile(toDeleteLater, urlStr);
+        String path = extractFile(toDeleteLater, urlStr);
+
+        makeExecutable(path);
+
+        return path;
+    }
+
+    private static void makeExecutable(String targetPath) throws IOException {
+        String app = "avrdude";
+        if(OSHelper.isWindows()) app+=".exe";
+
+        Path avrdudePath = Paths.get(targetPath, app);
+        logger.info("makeExecutable " + avrdudePath);
+        File avrdudeFile = avrdudePath.toFile();
+        if (avrdudeFile.exists()) {
+            boolean success = avrdudeFile.setExecutable(true);
+            if(!success) {
+                throw new IOException("Could not set executable permissions for " + avrdudeFile.getAbsolutePath());
+            }
+        } else {
+            throw new IOException("File " + avrdudeFile.getAbsolutePath() + " does not exist");
+        }
     }
 
     private static File downloadFileToTemp(String urlStr) throws IOException {
