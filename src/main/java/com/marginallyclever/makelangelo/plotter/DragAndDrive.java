@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 
 /**

@@ -7,6 +7,7 @@ module com.marginallyclever.makelangelo {
     requires logback.core;
     requires org.json;
     requires org.apache.commons.io;
+    requires org.apache.commons.compress;
     requires java.prefs;
     requires kabeja;
     requires batik.all;
@@ -33,6 +34,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes to com.marginallyclever.nodegraphcore;
     opens com.marginallyclever.convenience.noise;
+    opens com.marginallyclever.convenience.helpers;
 
     provides com.marginallyclever.nodegraphcore.NodeRegistry with
             com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;

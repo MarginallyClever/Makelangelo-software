@@ -2417,8 +2417,13 @@
 	</string>
 
 	<string>
-		<key>FirmwareUploaderPanel.avrdudeNotFound</key>
-		<value>AVRDude not found.</value>
+		<key>FirmwareUploaderPanel.avrdudeNotDownloaded</key>
+		<value>AVRDude not downloaded.</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.confNotFound</key>
+		<value>AVRDude.conf not found.</value>
 	</string>
 
 	<string>

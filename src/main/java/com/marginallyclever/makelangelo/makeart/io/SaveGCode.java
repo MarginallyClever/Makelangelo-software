@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;

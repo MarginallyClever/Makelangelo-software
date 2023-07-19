@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;

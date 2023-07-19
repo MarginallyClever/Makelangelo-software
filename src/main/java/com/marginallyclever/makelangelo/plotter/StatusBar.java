@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.Translator;
 
 import javax.swing.*;

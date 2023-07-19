@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
