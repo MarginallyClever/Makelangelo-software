@@ -4,9 +4,6 @@ import com.marginallyclever.convenience.helpers.OSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 
 public class FirmwareUploaderOSX extends FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploaderOSX.class);
@@ -14,51 +11,7 @@ public class FirmwareUploaderOSX extends FirmwareUploader {
 	public FirmwareUploaderOSX() {
 		super();
 		if(!OSHelper.isOSX()) throw new RuntimeException("This class is for OSX only.");
-		AVRDUDE_APP = "avrdude";
-	}
-
-	public boolean findAVRDude() {
-		//if(findAVRDudeInternal("which", "avrdude")) return true;
-		//return findAVRDudeInternal("mdfind","\"kind:app\"", "avrdude");
-		return true;  // TODO this is a lie, but I don't know how to find avrdude on OSX
-	}
-
-	private boolean findAVRDudeInternal(String... command) {
-		try {
-			Process process = new ProcessBuilder(command).start();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String path;
-			int hitCount=0;
-			while((path = reader.readLine()) != null) {
-				hitCount++;
-				logger.debug("{}: {}",command[0], path);
-				if(attemptFindAVRDude(path)) return true;
-			}
-			logger.debug("{} hit {} times.",command[0],hitCount);
-		} catch (Exception e) {
-			logger.error("failed to run `{}`: ",command[0],e);
-		}
-		return false;
-	}
-
-	// find avrdude.conf
-	public boolean findConf() {
-		// does not need to find avrdude.conf on OSX
-		/*
-		int i=0;
-		File f = attemptToFindConf(i++, "avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
-
-		if(!f.exists()) return false;
-		confPath = f.getAbsolutePath();
-		 */
-		return true;
-	}
-
-	public String getCommand() {
-		return AVRDUDE_APP;
+		avrdudePath = "avrdude";
 	}
 
 	// TEST

@@ -79,11 +79,20 @@ public class FirmwareUploaderPanel extends JPanel {
 
 	private void run(String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
-
-		if(!firmwareUploader.hasFoundAVRdude()) {
-			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotFound"),title,JOptionPane.ERROR_MESSAGE);
+		String AVRDudePath="";
+		try {
+			AVRDudePath = AVRDudeDownloader.downloadAVRDude();
+			firmwareUploader.setAVRDude(AVRDudePath);
+		} catch(Exception e) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotDownloaded"),title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+
+		if(!firmwareUploader.findConf()) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.confNotFound"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		if(port.getSelectedIndex()==-1) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.noPortSelected"),title,JOptionPane.ERROR_MESSAGE);
 			return;

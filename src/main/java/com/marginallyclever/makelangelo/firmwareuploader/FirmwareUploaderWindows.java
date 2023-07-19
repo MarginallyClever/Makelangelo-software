@@ -1,11 +1,8 @@
 package com.marginallyclever.makelangelo.firmwareuploader;
 
-import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.helpers.OSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 
 public class FirmwareUploaderWindows extends FirmwareUploader {
@@ -14,35 +11,7 @@ public class FirmwareUploaderWindows extends FirmwareUploader {
 	public FirmwareUploaderWindows() {
 		super();
 		if(!OSHelper.isWindows()) throw new RuntimeException("This class is for Windows only.");
-		AVRDUDE_APP = "avrdude.exe";
-	}
-
-	public boolean findAVRDude() {
-		if(attemptFindAVRDude(AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude("C:\\Program Files\\Makelangelo\\app\\"+AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude("C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\bin\\"+AVRDUDE_APP)) return true;
-		if(attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator+AVRDUDE_APP)) return true;
-		return attemptFindAVRDude(FileAccess.getWorkingDirectory() + File.separator + "app" + File.separator+AVRDUDE_APP);
-	}
-
-	// find avrdude.conf
-	public boolean findConf() {
-		int i=0;
-		File f = attemptToFindConf(i++, "avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
-
-		if(!f.exists()) return false;
-		confPath = f.getAbsolutePath();
-		return true;
-	}
-
-	public String getCommand() {
-		String path = avrdudePath;
-		if(!path.endsWith(File.separator)) path+=File.separator;
-		path += AVRDUDE_APP;
-		return path;
+		avrdudePath = "avrdude.exe";
 	}
 
 	// TEST

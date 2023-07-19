@@ -15,7 +15,6 @@ import java.util.List;
  */
 public abstract class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
-	protected String AVRDUDE_APP = "";
 	protected String avrdudePath = "";
 	protected String hexPath = "";
 	protected String confPath = "";
@@ -24,23 +23,17 @@ public abstract class FirmwareUploader {
 		super();
 	}
 
-	abstract public boolean findAVRDude();
-
-	public boolean hasFoundAVRdude() {
-		boolean found = findAVRDude();
-		if(!found) {
-			logger.error("Cannot find avrdude");
-			return false;
-		}
-		if(!findConf()) {
-			logger.error("Cannot find avrdude.conf");
-			return false;
-		}
+	// find avrdude.conf
+	public boolean findConf() {
+		int i=0;
+		File f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, "avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
+		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		if(!f.exists()) return false;
+		confPath = f.getAbsolutePath();
 		return true;
 	}
-
-	// find avrdude.conf
-	abstract boolean findConf();
 
 	protected File attemptToFindConf(int i, String filename) {
 		Path p = Path.of(avrdudePath);
@@ -59,13 +52,11 @@ public abstract class FirmwareUploader {
 		return false;
 	}
 
-	abstract public String getCommand();
-
 	public void run(String portName) throws Exception {
 		logger.debug("update started");
 
 		// setup avrdude command
-		String path = getCommand();
+		String path = avrdudePath + "avrdude";
 
 		String [] options = new String[] {
 				path,
@@ -78,12 +69,12 @@ public abstract class FirmwareUploader {
 	    		"-D",
 				"-Uflash:w:"+hexPath+":i"
 		    };
-
 	    runCommand(options);
 		logger.debug("update finished");
 	}
 
 	protected void runCommand(String[] options) throws Exception {
+		System.out.println("running command: "+String.join(" ",options));
 		logger.debug("running command: {}",String.join(" ",options));
 
 		List<String> command = new ArrayList<>();
@@ -126,4 +117,8 @@ public abstract class FirmwareUploader {
 	public void setHexPath(String s) {
 		hexPath = s;
 	}
+
+    public void setAVRDude(String avrDudePath) {
+		avrdudePath = avrDudePath;
+    }
 }
