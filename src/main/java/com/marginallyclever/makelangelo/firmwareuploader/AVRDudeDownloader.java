@@ -20,6 +20,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -31,11 +32,16 @@ public class AVRDudeDownloader {
     private static final String ARDUINO_PACKAGE_INDEX = "https://downloads.arduino.cc/packages/package_index.json";
 
     public static void main(String[] args) throws IOException {
-        downloadAVRDude();
+        downloadAVRDude(MACOS);
     }
 
+
     public static String downloadAVRDude() throws IOException {
-        String url = getURLforOS(getArch());
+        return downloadAVRDude(getArch());
+    }
+
+    public static String downloadAVRDude(String arch) throws IOException {
+        String url = getURLforOS(arch);
         if (url != null) {
             try {
                 return downloadAndExtract(url);
@@ -141,7 +147,7 @@ public class AVRDudeDownloader {
         logger.info("makeExecutable 1: " + targetPath);
         logger.info("makeExecutable 2: " + app);
         logger.info("makeExecutable 3: " + avrdudePath.toAbsolutePath());
-        
+
         File avrdudeFile = avrdudePath.toFile();
         if (!avrdudeFile.exists()) {
             throw new IOException("File " + avrdudeFile.getAbsolutePath() + " does not exist");
@@ -266,11 +272,20 @@ public class AVRDudeDownloader {
                         }
                     }
                 }
-                if (newFolderName.isEmpty() && entry.isDirectory()) {
-                    newFolderName = entry.getName();
+                if (newFolderName.isEmpty()) {
+                    newFolderName = getFolderNameFromEntry(entry.getName());
                 }
             }
             return newFolderName;
+        }
+    }
+
+    private static String getFolderNameFromEntry(String entryName) {
+        String[] parts = entryName.split("/");
+        if (parts.length > 1) {
+            return String.join(File.separator, Arrays.copyOfRange(parts, 0, parts.length - 1)) + File.separator;
+        } else {
+            return parts[0];
         }
     }
 }
