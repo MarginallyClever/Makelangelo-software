@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.firmwareuploader;
 
+import com.marginallyclever.convenience.helpers.OSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * Common methods for uploading firmware to an AVR microcontroller.
  */
-public abstract class FirmwareUploader {
+public class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
 	protected String avrdudePath = "";
 	protected String hexPath = "";
@@ -25,6 +26,7 @@ public abstract class FirmwareUploader {
 
 	// find avrdude.conf
 	public boolean findConf() {
+		logger.info("Searching for conf starting in "+avrdudePath);
 		int i=0;
 		File f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
 		if(!f.exists()) f = attemptToFindConf(i++, "avrdude.conf");
@@ -41,22 +43,12 @@ public abstract class FirmwareUploader {
 		return p.resolve(filename).toFile();
 	}
 
-	protected boolean attemptFindAVRDude(String path) {
-		File f = new File(path);
-
-		logger.debug("Searching for avrdude in {}",f.getAbsolutePath());
-		if(f.exists()) {
-			avrdudePath = f.getParent() + File.separator;
-			return true;
-		}
-		return false;
-	}
-
 	public void run(String portName) throws Exception {
 		logger.debug("update started");
 
 		// setup avrdude command
 		String path = avrdudePath + "avrdude";
+		if( OSHelper.isWindows()) path+=".exe";
 
 		String [] options = new String[] {
 				path,
