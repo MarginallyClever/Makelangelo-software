@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Common methods for uploading firmware to an AVR microcontroller.
@@ -68,13 +66,13 @@ public class FirmwareUploader {
 	protected void runCommand(String[] options) throws Exception {
 		System.out.println("running command: "+String.join(" ",options));
 		logger.debug("running command: {}",String.join(" ",options));
-
+/*
 		List<String> command = new ArrayList<>();
 		for (String option : options) {
 			command.add("\"" + option.replace("\\", "\\\\") + "\"");
-		}
+		}*/
 
-		ProcessBuilder builder = new ProcessBuilder(command);
+		ProcessBuilder builder = new ProcessBuilder(options);
 		builder.redirectErrorStream(true);
 		Process p = builder.start();
 		runBufferedReaders(p);

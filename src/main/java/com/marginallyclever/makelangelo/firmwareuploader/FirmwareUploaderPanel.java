@@ -7,6 +7,8 @@ import com.marginallyclever.makelangelo.select.SelectButton;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +20,7 @@ import java.awt.*;
  * @author Dan Royer
  */
 public class FirmwareUploaderPanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploaderPanel.class);
 	private final FirmwareDownloader firmwareDownloader = new FirmwareDownloader();
 	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
@@ -107,6 +110,7 @@ public class FirmwareUploaderPanel extends JPanel {
 		try {
 			firmwareUploader.run(port.getSelectedItem());
 		} catch (Exception e1) {
+			logger.error("failed to run avrdude: ",e1);
 			status = e1.getMessage();
 			messageType = JOptionPane.ERROR_MESSAGE;
 		}
