@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TranslatorTests {
+public class TranslatorTest {
 	@BeforeAll
 	public static void beforeAll() {
 		PreferencesHelper.start();

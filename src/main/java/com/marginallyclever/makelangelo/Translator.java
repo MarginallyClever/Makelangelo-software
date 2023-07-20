@@ -20,8 +20,9 @@ import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
 /**
- * MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
- * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a>
+ * <p></p>MultilingualSupport is the translation engine.  You ask for a string it finds the matching string in the currently selected language.
+ * See <a href="http://www.java-samples.com/showtutorial.php?tutorialid=152">XML and Java - Parsing XML using Java Tutorial</a></p>
+ * <p>TODO: This system loads all language files even though it only displays one at a time.  It could load a single language and save memory.</p>
  * @author Dan Royer
  * @author Peter Colapietro
  */
@@ -40,14 +41,15 @@ public final class Translator {
 	// The current choice
 	private static String currentLanguage;
 	// a list of all languages and their translations strings
-	private static final Map<String, TranslatorLanguage> languages = new HashMap<String, TranslatorLanguage>();
+	private static final Map<String, TranslatorLanguage> languages = new HashMap<>();
+	private static TranslatorLanguage currentLanguageContainer;
 
 	public static void start() {
-		logger.debug("starting translator...");
+		logger.info("starting translator...");
 		
 		Locale locale = Locale.getDefault();
 		defaultLanguage = locale.getDisplayLanguage(Locale.ENGLISH);
-		logger.debug("Default language = {}", defaultLanguage);
+		logger.info("Default language = {}", defaultLanguage);
 		
 		loadLanguages();
 		loadConfig();
@@ -61,18 +63,15 @@ public final class Translator {
 		// Did the language file disappear?  Offer the language dialog.
 		try {
 			if (doesLanguagePreferenceExist()) {
-
-				// Does the language preference have a language name value 
-				// that matches a language name value in an available language .xml file
+				// does the list of languages contain the preferred choice?
 				String languageNameFromPref = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
 				if (!languages.containsKey(languageNameFromPref)) {
-					logger.debug("isThisTheFirstTimeLoadingLanguageFiles() Language Name '{}' not available ...", languageNameFromPref);
+					logger.error("Language '{}' not available ...", languageNameFromPref);
 
 					// To avoid some null issues in Translator.get(String key),
 					// lets say it's the first run (to ask the user to select a valid language name)
 					return true;
 				}
-
 				return false;
 			}
 		} catch (BackingStoreException e) {
@@ -102,7 +101,7 @@ public final class Translator {
 	 */
 	public static void loadConfig() {
 		logger.debug("loadConfig: {}={}", languagePreferenceNode.toString(), defaultLanguage);
-		currentLanguage = languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage);
+		setCurrentLanguage(languagePreferenceNode.get(LANGUAGE_KEY, defaultLanguage));
 	}
 
 	/**
@@ -160,14 +159,14 @@ public final class Translator {
 		
 		Path myPath;
 		if (uri.getScheme().equals("jar")) {
-			FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+			FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
 			myPath = fileSystem.getPath(WORKING_DIRECTORY);
 		} else {
 			myPath = Paths.get(uri);
 		}
 
 		Path rootPath = FileSystems.getDefault().getPath(FileAccess.getWorkingDirectory());
-		logger.trace("rootDir={}", rootPath.toString());
+		logger.trace("rootDir={}", rootPath);
 
 		// we'll look inside the JAR file first, then look in the working directory.
 		// this way new translation files in the working directory will replace the old JAR files.
@@ -181,35 +180,40 @@ public final class Translator {
 
 
 	private static boolean attemptToLoadLanguageXML(String name) throws Exception {
-		String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
-		InputStream stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
-		String actualFilename = "Jar:"+nameInsideJar;
+		InputStream stream;
+		String actualFilename;
+
 		File externalFile = new File(name);
 		if(externalFile.exists()) {
-			stream = new FileInputStream(new File(name));
+			stream = new FileInputStream(name);
 			actualFilename = name;
+		} else {
+			String nameInsideJar = WORKING_DIRECTORY+"/"+FilenameUtils.getName(name);
+			stream = Translator.class.getClassLoader().getResourceAsStream(nameInsideJar);
+			actualFilename = "Jar:"+nameInsideJar;
 		}
 		if( stream == null ) return false;
-		
+
 		logger.trace("Found {}", actualFilename);
 		TranslatorLanguage lang = new TranslatorLanguage();
 		try {
 			lang.loadFromInputStream(stream);
 		} catch(Exception e) {
-			logger.error("Failed to load {}", actualFilename);
-			logger.debug("{}",e.getMessage());// To log the Exception stack in debug/dev mode.
+			logger.error("Failed to load {}", actualFilename, e);
 			// if the xml file is invalid then an exception can occur.
 			// make sure lang is empty in case of a partial-load failure.
 			lang = new TranslatorLanguage();
 		}
-		
-		if( !lang.getName().isEmpty() && 
+
+		stream.close();
+
+		if( !lang.getName().isEmpty() &&
 			!lang.getAuthor().isEmpty()) {
 			// we loaded a language file that seems pretty legit.
 			languages.put(lang.getName(), lang);
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -219,7 +223,7 @@ public final class Translator {
 	 * @return the translated value for key, or "missing:key".
 	 */
 	public static String get(String key) {
-		String translation = languages.get(currentLanguage).get(key);
+		String translation = currentLanguageContainer.get(key);
 		if (translation == null) {
 			logger.warn("Missing translation '{}' in language '{}'", key, currentLanguage);
 			return MISSING +key;
@@ -259,10 +263,11 @@ public final class Translator {
 	}
 
 	/**
-	 * @param currentLanguage the name of the language to make active.
+	 * @param language the name of the language to make active.
 	 */
-	public static void setCurrentLanguage(String currentLanguage) {
-		Translator.currentLanguage = currentLanguage;
+	public static void setCurrentLanguage(String language) {
+		currentLanguage = language;
+		currentLanguageContainer = languages.get(language);
 	}
 
 	public static int getCurrentLanguageIndex() {

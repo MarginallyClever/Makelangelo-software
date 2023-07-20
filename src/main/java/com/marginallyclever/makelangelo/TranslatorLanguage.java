@@ -1,14 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -17,13 +8,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class TranslatorLanguage {
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+public class TranslatorLanguage {
 	private static final Logger logger = LoggerFactory.getLogger(TranslatorLanguage.class);
 
 	private String name = "";
 	private String author = "";
-	private Map<String, String> strings = new HashMap<String, String>();
+	private final Map<String, String> strings = new HashMap<>();
 
 
 	/**
@@ -71,7 +70,7 @@ public class TranslatorLanguage {
 		author = docEle.getElementsByTagName("author").item(0).getFirstChild().getNodeValue();
 
 		NodeList nl = docEle.getElementsByTagName("string");
-		if (nl != null && nl.getLength() > 0) {
+		if (nl.getLength() > 0) {
 			for (int i = 0; i < nl.getLength(); i++) {
 
 				//get the element
@@ -126,7 +125,7 @@ public class TranslatorLanguage {
 	private String getTextValue(Element ele, String tagName) {
 		String textVal = null;
 		NodeList nl = ele.getElementsByTagName(tagName);
-		if (nl != null && nl.getLength() > 0) {
+		if (nl.getLength() > 0) {
 			Element el = (Element) nl.item(0);
 			// to allow empty value as translation 
 			final Node firstChild = el.getFirstChild();
@@ -146,5 +145,10 @@ public class TranslatorLanguage {
 
 	public String getAuthor() {
 		return author;
+	}
+
+	public Set<String> getKeys() {
+		// return a copy of strings
+		return strings.keySet();
 	}
 }

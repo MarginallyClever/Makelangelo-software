@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.marginallyclever.makelangelo.MissingTranslationTest.listFiles;
+import static com.marginallyclever.makelangelo.TranslationsMissingTest.listFiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LanguagesXmlValidationForNoDupKeyTest {

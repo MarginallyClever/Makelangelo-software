@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,12 +22,23 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MissingTranslationTest {
+public class TranslationsMissingTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(MissingTranslationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TranslationsMissingTest.class);
 
     private Pattern patternComment = Pattern.compile("^\\s*//.*");
     private Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\"(?<key>[^)]*)\"\\)");
+
+    public static class TranslationFileSearcher {
+        public final String key;
+        public final File file;
+        public final int lineNumber;
+        TranslationFileSearcher(String k,File f,int line) {
+            key=k;
+            file=f;
+            lineNumber=line;
+        }
+    }
 
     @BeforeAll
     public static void init() {
@@ -37,15 +49,15 @@ public class MissingTranslationTest {
     @Test
     public void findMissingTranslations() throws IOException {
         List<String> results = new ArrayList<>();
-        File srcDir = new File("src" + File.separator + "main" + File.separator + "java");
 
-        List<File> files = listFiles(srcDir.toPath(), ".java");
-        // search in the files ...
-        files.forEach(file -> {
-            try {
-                searchInAFile(file, results);
-            } catch (IOException e) {
-                logger.warn("Can read file {}", file, e);
+        searchAllSourceFiles((e)->{
+            String trans = Translator.get(e.key);
+            if (trans.startsWith(Translator.MISSING)) {
+                try {
+                    results.add(String.format("file://%s:%s: %s", e.file.getCanonicalPath(), e.lineNumber, e.key));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -58,12 +70,33 @@ public class MissingTranslationTest {
         assertEquals(0, results.size(), "Some translations are missing, see previous logs for details");
     }
 
+    public void searchAllSourceFiles(Consumer<TranslationFileSearcher> consumer) throws IOException {
+        File srcDir = new File("src" + File.separator + "main" + File.separator + "java");
+        List<File> files = listFiles(srcDir.toPath(), ".java");
+        files.forEach(file -> {
+            try {
+                searchInAFile(file, consumer);
+            } catch (IOException e) {
+                logger.warn("Can read file {}", file, e);
+            }
+        });
+    }
+
     @Test
     public void verifyThatMatcherWorks_results() throws IOException {
         List<String> results = new ArrayList<>();
 
         // matches.txt contains few entries with translation and one without. The list should not be empty
-        searchInAFile(new File("src/test/resources/translator/matches.txt"), results);
+        searchInAFile(new File("src/test/resources/translator/matches.txt"), e->{
+            String trans = Translator.get(e.key);
+            if (trans.startsWith(Translator.MISSING)) {
+                try {
+                    results.add(String.format("file://%s:%s: %s", e.file.getCanonicalPath(), e.lineNumber, e.key));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
 
         assertNotNull(results);
         assertEquals(1, results.size());
@@ -74,13 +107,13 @@ public class MissingTranslationTest {
     public void verifyThatMatcherWorks_noResult() throws IOException {
         List<String> results = new ArrayList<>();
 
-        searchInAFile(new File("src/test/resources/translator/no-matche.txt"), results);
+        searchInAFile(new File("src/test/resources/translator/no-match.txt"), e->results.add(e.key));
 
-        // no-matche does not contains any code matching the translator. The list must be empty
+        // no-match does not contains any code matching the translator. The list must be empty
         assertEquals(0, results.size());
     }
 
-    public void searchInAFile(File file, List<String> results) throws IOException {
+    public void searchInAFile(File file, Consumer<TranslationFileSearcher> consumer) throws IOException {
         int lineNb = 1;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -90,10 +123,7 @@ public class MissingTranslationTest {
                     m = patternTranslator.matcher(line);
                     while (m.find()) {
                         String key = m.group("key");
-                        String trans = Translator.get(key);
-                        if (trans.startsWith(Translator.MISSING)) {
-                            results.add(String.format("file://%s:%s: %s", file.getCanonicalPath(), lineNb, key));
-                        }
+                        consumer.accept(new TranslationFileSearcher(key, file, lineNb));
                     }
                 }
                 lineNb++;
