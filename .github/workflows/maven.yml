@@ -8,8 +8,6 @@ env:
 
 on:
   push:
-    branches:
-      - master
   pull_request:
 
 jobs:
@@ -41,7 +39,6 @@ jobs:
         mkdir -p target/universal-package &&
         cp src/main/package/avrdude.* target/universal-package/ &&
         cp src/main/package/*.dll target/universal-package/ &&
-        cp src/main/package/firmware*.hex target/universal-package/ &&
         cp src/main/package/*.bat target/universal-package/ &&
         cp src/main/package/start* target/universal-package/ &&
         cp src/main/package/thankyou.* target/universal-package/ &&
@@ -57,7 +54,6 @@ jobs:
       shell: bash
       run: |
         mkdir -p target/package &&
-        cp src/main/package/firmware*.hex target/package/ &&
         cp src/main/package/*.bat target/package/ &&
         cp src/main/package/start* target/package/ &&
         cp src/main/package/thankyou.* target/package/ &&
@@ -92,7 +88,6 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
-          src/main/package/firmware*.hex
           LICENSE
           README
           target/package/*
@@ -134,7 +129,8 @@ jobs:
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
     - name: Deploy installation release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+#      if: github.repository == 'MarginallyClever/Makelangelo-software'
+#      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v2.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions

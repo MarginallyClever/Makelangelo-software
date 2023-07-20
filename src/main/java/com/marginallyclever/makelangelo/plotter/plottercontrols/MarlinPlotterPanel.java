@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;

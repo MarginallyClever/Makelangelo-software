@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
@@ -180,7 +180,7 @@ public class MainMenu extends JMenuBar {
 
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu(Translator.get("Help"));
-        menu.setMnemonic('H');//
+        menu.setMnemonic('H');
 
         JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
         buttonViewLog.addActionListener((e) -> runLogPanel());

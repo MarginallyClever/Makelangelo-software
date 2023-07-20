@@ -3,14 +3,14 @@ package com.marginallyclever.communications.serial;
 import com.marginallyclever.communications.Configuration;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.TransportLayer;
+import jssc.SerialPortList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import jssc.SerialPortList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -31,7 +31,7 @@ public class SerialTransportLayer implements TransportLayer {
 	 * @return a list of port names
 	 */
 	public List<String> listConnections() {
-		logger.debug("Listing available serial port");
+		logger.debug("Listing available serial ports");
 		String[] portsDetected;
 
 		String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

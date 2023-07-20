@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 
 import java.awt.*;
 import java.util.Objects;

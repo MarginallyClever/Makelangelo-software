@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;

@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-import static com.marginallyclever.convenience.DrawingHelper.drawRectangle;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.drawRectangle;
 
 public class Makelangelo3_3 implements PlotterRenderer {
 

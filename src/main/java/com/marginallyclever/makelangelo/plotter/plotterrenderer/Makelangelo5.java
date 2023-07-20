@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
-import static com.marginallyclever.convenience.DrawingHelper.*;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class Makelangelo5 implements PlotterRenderer {
 	private static Texture textureMainBody;

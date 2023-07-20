@@ -6,7 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
-import static com.marginallyclever.convenience.DrawingHelper.*;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm

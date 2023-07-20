@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;

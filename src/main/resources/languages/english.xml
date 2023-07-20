@@ -542,13 +542,12 @@
 	</string>
 	<string>
 		<key>collectAnonymousMetrics</key>
-		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
+		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
-
 	<string>
 		<key>collectAnonymousMetricsOnUpdate</key>
-		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
+		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
 
@@ -877,7 +876,7 @@
 
 	<string>
 		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
+		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value>
 		<hint>check for update dialog</hint>
 	</string>
 	<string>
@@ -1573,14 +1572,14 @@
 	<string>
 		<key>firmwareVersionBadMessage</key>
 		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>
-		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value>
+		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value>
 		<hint>Software is too new for firmware</hint>
 	</string>
 
 	<string>
 		<key>hardwareVersionBadMessage</key>
 		<value><![CDATA[<html><body>I don't recognize this machine. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-5/">https://www.marginallyclever.com/product/makelangelo-5/</a><br>
-		   for the Makelangelo 5 art robot.</html></body>]]></value>
+		   for the Makelangelo 5 art robot.</body></html>]]></value>
 		<hint>Software is too new for firmware</hint>
 	</string>
 
@@ -2398,4 +2397,54 @@
 		<key>PlotterSettingsPanel.Style</key>
 		<value>Looks like a...</value>
 	</string>
+
+
+	<string>
+		<key>FirmwareUploaderPanel.status</key>
+		<value>Firmware upload status</value>
+	</string>
+	<string>
+		<key>FirmwareUploader.help</key>
+		<value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value>
+	</string>
+	<string>
+		<key>FirmwareUploaderPanel.startM5</key>
+		<value>M5</value>
+	</string>
+	<string>
+		<key>FirmwareUploaderPanel.startHuge</key>
+		<value>Huge</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.avrdudeNotDownloaded</key>
+		<value>AVRDude not downloaded.</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.confNotFound</key>
+		<value>AVRDude.conf not found.</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.failed</key>
+		<value>Firmware upload failed.</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.noPortSelected</key>
+		<value>No port selected.</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.downloadFailed</key>
+		<value>Download failed</value>
+	</string>
+
+	<string>
+		<key>FirmwareUploaderPanel.finished</key>
+		<value>Finished OK!</value>
+	</string>
+
+
 </language>
