@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -218,8 +219,13 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	@Override
 	public void setPenDiameter(double d) {}
-	
-	public void setSettings(PlotterSettings e) {
+
+    @Override
+    public String getTranslatedName() {
+        return Translator.get("MarlinSimulationVisualizer.name");
+    }
+
+    public void setSettings(PlotterSettings e) {
 		mySettings = e;
 	}
 }

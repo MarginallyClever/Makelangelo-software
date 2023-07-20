@@ -22,4 +22,6 @@ public interface TurtleRenderer {
 	void setPenUpColor(ColorRGB color);
 	
 	void setPenDiameter(double d);
+
+	String getTranslatedName();
 }

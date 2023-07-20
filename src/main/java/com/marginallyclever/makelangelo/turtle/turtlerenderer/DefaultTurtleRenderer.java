@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
@@ -79,5 +80,10 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter =(float)penDiameter;
+	}
+
+	@Override
+	public String getTranslatedName() {
+		return Translator.get("DefaultTurtleRenderer.name");
 	}
 }

@@ -407,7 +407,7 @@ public class MainMenu extends JMenuBar {
                 .forEach(iter -> {
                     TurtleRenderer renderer = iter.getTurtleRenderer();
                     String name = iter.getName();
-                    JRadioButtonMenuItem button = new JRadioButtonMenuItem(iter.getTranslatedText());
+                    JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
                     if (app.getTurtleRenderer() == renderer) button.setSelected(true);
                     button.addActionListener((e)-> onTurtleRenderChange(name));
                     menu.add(button);
