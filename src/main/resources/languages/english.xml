@@ -2430,7 +2430,7 @@
 		<key>FirmwareUploaderPanel.failed</key>
 		<value>Firmware upload failed.</value>
 	</string>
-	
+
 	<string>
 		<key>FirmwareUploaderPanel.noPortSelected</key>
 		<value>No port selected.</value>
