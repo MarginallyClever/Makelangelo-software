@@ -41,7 +41,12 @@ public class FirmwareUploader {
 		return p.resolve(filename).toFile();
 	}
 
-	public void run(String portName) throws Exception {
+	/**
+	 * @param portName
+	 * @return 0 if successful.
+	 * @throws Exception if the process fails.
+	 */
+	public int run(String portName) throws Exception {
 		logger.debug("update started");
 
 		// setup avrdude command
@@ -59,11 +64,17 @@ public class FirmwareUploader {
 	    		"-D",
 				"-Uflash:w:"+hexPath+":i"
 		    };
-	    runCommand(options);
+	    int result = runCommand(options);
 		logger.debug("update finished");
+		return result;
 	}
 
-	protected void runCommand(String[] options) throws Exception {
+	/**
+	 * @param options command line options to pass to the process.
+	 * @return 0 if successful.
+	 * @throws Exception if the process fails.
+	 */
+	protected int runCommand(String[] options) throws Exception {
 		System.out.println("running command: "+String.join(" ",options));
 		logger.debug("running command: {}",String.join(" ",options));
 /*
@@ -76,6 +87,7 @@ public class FirmwareUploader {
 		builder.redirectErrorStream(true);
 		Process p = builder.start();
 		runBufferedReaders(p);
+		return p.exitValue();
 	}
 
 	protected void runBufferedReaders(Process p) throws IOException {

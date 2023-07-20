@@ -107,8 +107,9 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		String status = Translator.get("FirmwareUploaderPanel.finished");
 		int messageType = JOptionPane.PLAIN_MESSAGE;
+		int result = 1;
 		try {
-			firmwareUploader.run(port.getSelectedItem());
+			result = firmwareUploader.run(port.getSelectedItem());
 		} catch (Exception e1) {
 			logger.error("failed to run avrdude: ",e1);
 			status = e1.getMessage();
@@ -118,6 +119,12 @@ public class FirmwareUploaderPanel extends JPanel {
 		setCursor(Cursor.getDefaultCursor());
 		startM5.setEnabled(true);
 		startHuge.setEnabled(true);
+
+		if(result!=0) {
+			logger.error("upload failed.");
+			status = Translator.get("FirmwareUploaderPanel.failed");
+			messageType = JOptionPane.ERROR_MESSAGE;
+		}
 
 		JOptionPane.showMessageDialog(this,status,title,messageType);
 	}
