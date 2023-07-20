@@ -37,19 +37,19 @@ public class Converter_Crosshatch extends ImageConverter {
 		});
 		add(selectPass75);
 
-		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
-		selectPass15.addPropertyChangeListener((evt)-> {
-			setPass15((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(selectPass15);
-
 		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
 		selectPass45.addPropertyChangeListener((evt)-> {
 			setPass45((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass45);
+
+		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
+		selectPass15.addPropertyChangeListener((evt)-> {
+			setPass15((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass15);
 	}
 
 	@Override
