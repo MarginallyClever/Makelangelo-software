@@ -12,7 +12,7 @@ public class ImageConverterFactory {
 		if(list==null) {
 			list = new ImageConverter [] {
 					new Converter_Boxxy(),
-					new Converter_CMYK(),
+					new Converter_CMYK_Crosshatch(),
 					new Converter_CMYK_Spiral(),
 					new Converter_CMYK_Circles(),
 					new Converter_Crosshatch(),

@@ -24,9 +24,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Dithering using a particle system
- * See <a href="http://en.wikipedia.org/wiki/Fortune%27s_algorithm">...</a>
- * See <a href="http://skynet.ie/~sos/mapviewer/voronoi.php">...</a>
+ * Dithering using a particle system.
+ * See <a href="http://en.wikipedia.org/wiki/Fortune%27s_algorithm">Fortune's algorithm</a>
+ * and <a href="http://skynet.ie/~sos/mapviewer/voronoi.php">Voronoi</a>
  * @author Dan
  * @since 7.0.0?
  */

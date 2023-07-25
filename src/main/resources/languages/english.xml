@@ -39,9 +39,10 @@
 	<string><key>ConfirmQuitTitle</key><value>Exit</value></string>
 	<string><key>ConvertImagePaperFill</key><value>Fill entire paper</value></string>
 	<string><key>ConvertImagePaperFit</key><value>Fit image on paper</value></string>
-	<string><key>ConverterCMYKName</key><value>CMYK</value></string>
-	<string><key>ConverterCMYKPasses</key><value>Passes</value></string>
-	<string><key>ConverterCMYKNote</key><value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value></string>
+	<string><key>Converter_CMYK_Crosshatch.Name</key><value>CMYK</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Passes</key><value>Passes</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Note</key><value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value></string>
+	<string><key>Converter_CMYK_Spiral.Name</key><value>CMYK Spiral</value></string>
 	<string><key>LoadFilePanel.title</key><value>Load file preview</value></string>
 	<string><key>OK</key><value>OK</value></string>
 	<string><key>Cancel</key><value>Cancel</value></string>
@@ -144,7 +145,6 @@
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
 	<string><key>YourMsgHereName</key><value>Your message here</value></string>
 	<string><key>SpiralName</key><value>Spiral</value></string>
-	<string><key>SpiralCMYKName</key><value>CMYK Spiral</value></string>
 	<string><key>SpiralPulseName</key><value>Pulsing Spiral</value></string>
 	<string><key>SharePromo</key><value>Try social media tag #plotter</value></string>
 	<string><key>DialogAbout.AboutHTML</key><value><![CDATA[

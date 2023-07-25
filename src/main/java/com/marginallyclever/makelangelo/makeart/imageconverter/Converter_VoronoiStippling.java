@@ -4,13 +4,12 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -49,8 +48,8 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 		super();
 
 		SelectInteger selectCells = new SelectInteger("cells", Translator.get("Converter_VoronoiStippling.CellCount"), getNumCells());
-		SelectDouble selectMax = new SelectDouble("max", Translator.get("Converter_VoronoiStippling.DotMax"), getMaxDotSize());
-		SelectDouble selectMin = new SelectDouble("min", Translator.get("Converter_VoronoiStippling.DotMin"), getMinDotSize());
+		SelectSlider selectMax = new SelectSlider("max", Translator.get("Converter_VoronoiStippling.DotMax"), 50,1, (int)(getMaxDotSize()*10));
+		SelectSlider selectMin = new SelectSlider("min", Translator.get("Converter_VoronoiStippling.DotMin"), 50,1, (int)(getMinDotSize()*10));
 		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255,0, getCutoff());
 		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
 
@@ -64,8 +63,8 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 			setNumCells((int) evt.getNewValue());
 			fireRestart();
 		});
-		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((double) evt.getNewValue()));
-		selectMin.addPropertyChangeListener(evt -> setMinDotSize((double) evt.getNewValue()));
+		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((int)evt.getNewValue()*0.1));
+		selectMin.addPropertyChangeListener(evt -> setMinDotSize((int)evt.getNewValue()*0.1));
 		selectCutoff.addPropertyChangeListener(evt -> setCutoff((int) evt.getNewValue()));
 		selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 	}
@@ -169,9 +168,10 @@ public class Converter_VoronoiStippling extends ImageConverterIterative implemen
 					if(image.canSampleAt(x,y)) {
 						double sampleWeight = 255.0 - image.sample(x,y,1);
 						if(sampleWeight>=lowpassCutoff) {
-							weight += sampleWeight;
-							wx += sampleWeight * x;
-							wy += sampleWeight * y;
+							double v = (sampleWeight-lowpassCutoff);
+							weight += v;
+							wx += v * x;
+							wy += v * y;
 							hits++;
 						}
 					}
