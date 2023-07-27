@@ -4,8 +4,10 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_ContrastAdjust;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -13,12 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.FileInputStream;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,8 +29,6 @@ import java.util.prefs.Preferences;
 
 public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
-	@Serial
-	private static final long serialVersionUID = 5574250944369730761L;
 
 	/**
 	 * Set of image file extensions.
@@ -46,67 +46,87 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private static JComboBox<String> styleNames;
 	private static JComboBox<String> fillNames;
 	private final JPanel cards = new JPanel(new CardLayout());
+	private final RangeSlider rangeSlider = new RangeSlider();
+	private static int rangeSliderMin = 0;
+	private static int rangeSliderMax = 255;
 
 	private ImageConverter myConverter;
 	
 	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
-		super();
+		super(new GridBagLayout());
 		myPaper = paper;
 		myImage = image;
-
-		cards.setPreferredSize(new Dimension(450, 300));
 
 		fillNames = getFillSelection();
 		styleNames = getStyleSelection();
 
-		setLayout(new GridBagLayout());
+		Insets insetTop = new Insets(5, 0, 0, 0);
+		Insets insetLeft = new Insets(0, 5, 0, 0);
+
 		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0;
+		c.weighty = 0;
+		c.gridwidth = 1;
+
 		int y = 0;
 
-		y++;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
+		c.anchor = GridBagConstraints.WEST;
 		c.gridx = 0;
 		c.gridy = y;
-		c.ipadx = 5;
+		c.insets = insetTop;
 		this.add(new JLabel(Translator.get("ConversionFill")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
 		c.gridx = 1;
-		c.ipadx = 0;
+		c.insets = insetLeft;
 		this.add(fillNames, c);
-
 		y++;
-		c.anchor = GridBagConstraints.EAST;
-		c.gridwidth = 1;
+
 		c.gridx = 0;
 		c.gridy = y;
-		c.ipadx = 5;
+		c.insets = insetTop;
 		this.add(new JLabel(Translator.get("ConversionStyle")), c);
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 3;
 		c.gridx = 1;
-		c.ipadx = 0;
+		c.insets = insetLeft;
 		this.add(styleNames, c);
-
 		y++;
-		c.anchor = GridBagConstraints.NORTH;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth = 4;
+
 		c.gridx = 0;
 		c.gridy = y;
-		c.insets = new Insets(10, 0, 0, 0);
-		cards.setPreferredSize(new Dimension(449, 325));
+		c.insets = insetTop;
+		this.add(new JLabel(Translator.get("SelectImageConverterPanel.Contrast")), c);
+		c.gridx = 1;
+		c.insets = insetLeft;
+		this.add(rangeSlider, c);
+		y++;
+
+		rangeSlider.setMinimum(0);
+		rangeSlider.setMaximum(255);
+		rangeSlider.setUpperValue(rangeSliderMax);
+		rangeSlider.setValue(rangeSliderMin);
+		rangeSlider.addChangeListener(this::onSliderChanged);
+
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		c.gridwidth = 2;
+		c.gridx = 0;
+		c.gridy = y;
+		c.weightx=1;
+		c.weighty=1;
+		c.insets = insetTop;
 		cards.setBorder(BorderFactory.createLoweredBevelBorder());
 		this.add(cards, c);
+	}
 
+	private void onSliderChanged(ChangeEvent changeEvent) {
+		rangeSliderMin = rangeSlider.getValue();
+		rangeSliderMax = rangeSlider.getUpperValue();
+		restart();
 	}
 
 	/**
 	 * Start the image conversion process.
 	 */
 	public void run() {
-		scaleImage(fillNames.getSelectedIndex());
 		showCard((String) styleNames.getSelectedItem());
 		int first = styleNames.getSelectedIndex();
 		changeConverter(ImageConverterFactory.getList()[first]);
@@ -137,7 +157,6 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		if(p>=box.getItemCount()) p=0;
 		box.setSelectedIndex(p);
 		box.addItemListener((e) ->{
-			scaleImage(box.getSelectedIndex());
 			setPreferredFillStyle(box.getSelectedIndex());
 			restart();
 		});
@@ -146,7 +165,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	private void onConverterChanged(ItemEvent e) {
-		logger.debug("onConverterChanged");
+		logger.debug("changing to {}", e.getItem());
 
 		showCard((String)e.getItem());
 
@@ -212,9 +231,13 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private void startConversion() {
 		if(myConverter==null || myImage==null || myPaper==null) return;
 
-		logger.debug("startConversion() {}", myConverter.getName());
+		logger.debug("starting {}", myConverter.getName());
 
-		myConverter.start(myPaper,myImage);
+		scaleImage(fillNames.getSelectedIndex());
+		Filter_ContrastAdjust filter = new Filter_ContrastAdjust(rangeSliderMin, rangeSliderMax);
+		TransformedImage result = filter.filter(myImage);
+
+		myConverter.start(myPaper,result);
 	}
 	
 	private void changeConverter(ImageConverter converter) {
@@ -288,10 +311,10 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 
-		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("C:/Users/aggra/Documents/drawbot art/grumpyCat.jpg")));
+		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/test.png")));
 		JFrame frame = new JFrame(SelectImageConverterPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new SelectImageConverterPanel(new Paper(),image));
+		frame.add(new SelectImageConverterPanel(new Paper(), image));
 		frame.pack();
 		frame.setVisible(true);
 	}
