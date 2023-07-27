@@ -9,17 +9,48 @@ import java.awt.*;
  * @author dan Royer
  */
 public class ImageFilter {
+	public static int red32(int color) {
+		return ((color >> 16) & 0xff);
+	}
+
+	public static int green32(int color) {
+		return ((color >> 8) & 0xff);
+	}
+
+	public static int blue32(int color) {
+		return ((color) & 0xff);
+	}
+
+	public static int alpha32(int color) {
+		return ((color >> 24) & 0xff);
+	}
+
 	/**
 	 * @param color RGBA
 	 * @return grayscale value
 	 */
 	public static int decode32bit(int color) {
-		int r = ((color >> 16) & 0xff);
-		int g = ((color >> 8) & 0xff);
-		int b = ((color) & 0xff);
-		double a = (double) ((color >> 24) & 0xff) / 255.0;
+		int r = red32(color);
+		int g = green32(color);
+		int b = blue32(color);
+		int a = alpha32(color);
 
-		return average(r, g, b, a);
+		return average(r, g, b, a / 255.0);
+	}
+
+	/**
+	 * @param red 0-255
+	 * @param green 0-255
+	 * @param blue 0-255
+	 * @param alpha 0-255
+	 * @return RGB color
+	 */
+	public static int encode32bit(int red,int green,int blue,int alpha) {
+		red &= 0xff;
+		green &= 0xff;
+		blue &= 0xff;
+		alpha &= 0xff;
+		return (alpha << 24) | (red << 16) | (green << 8) | blue;
 	}
 
 	/**
@@ -28,7 +59,7 @@ public class ImageFilter {
 	 */
 	public static int encode32bit(int greyscale) {
 		greyscale &= 0xff;
-		return (0xff << 24) | (greyscale << 16) | (greyscale << 8) | greyscale;
+		return encode32bit(greyscale,greyscale,greyscale,0xff);
 	}
 
 	/**
@@ -39,8 +70,8 @@ public class ImageFilter {
 		int r = color.getRed();
 		int g = color.getGreen();
 		int b = color.getBlue();
-		double a = (double)color.getAlpha() / 255.0;
-		return average(r, g, b, a);
+		int a = color.getAlpha();
+		return average(r, g, b, a / 255.0);
 	}
 
 	/**
