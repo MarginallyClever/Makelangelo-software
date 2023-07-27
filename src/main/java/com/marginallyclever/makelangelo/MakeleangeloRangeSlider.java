@@ -7,6 +7,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 
+/**
+ * Slider with two handles.
+ */
 public class MakeleangeloRangeSlider extends JPanel {
     private final RangeSlider rangeSlider;
     private final JLabel labelRangeMin = new JLabel();
