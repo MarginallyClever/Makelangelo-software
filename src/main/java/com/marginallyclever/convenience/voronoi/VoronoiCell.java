@@ -1,13 +1,19 @@
 package com.marginallyclever.convenience.voronoi;
 
-import com.marginallyclever.convenience.Point2D;
+import org.locationtech.jts.geom.Coordinate;
 
 public class VoronoiCell {
-    public final Point2D center = new Point2D();
+    public final Coordinate center = new Coordinate();
     public double weight;
+    public double change;
 
     public VoronoiCell(double x,double y) {
         super();
-        this.center.set(x,y);
+        set(x,y);
+    }
+
+    public void set(double x, double y) {
+        this.center.x=x;
+        this.center.y=y;
     }
 }
