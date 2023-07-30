@@ -200,12 +200,6 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 
 		lock.lock();
 		try {
-			// collect all cells above the cutoff value.
-			cells.clear();
-			for (VoronoiCell c : cells) {
-				cells.add(c);
-			}
-
 			// do a greedy sort
 			int size = cells.size();
 			for (int i = 0; i < size-1; ++i) {

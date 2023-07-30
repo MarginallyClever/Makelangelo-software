@@ -1,8 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
+import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Floyd/Steinberg dithering
@@ -97,5 +101,12 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     }
 
     return after;
+  }
+
+  public static void main(String[] args) throws IOException {
+    TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+    Filter_DitherFloydSteinberg f = new Filter_DitherFloydSteinberg();
+    TransformedImage dest = f.filter(src);
+    ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinberg" );
   }
 }

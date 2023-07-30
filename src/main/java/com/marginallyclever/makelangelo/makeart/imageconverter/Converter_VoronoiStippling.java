@@ -88,12 +88,13 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	private void renderDots(GL2 gl2) {
-		double scale = (maxDotSize - minDotSize)/255.0;
+		double scale = maxDotSize/255.0;
 
 		for( VoronoiCell c : cells ) {
 			double x = c.center.x;
 			double y = c.center.y;
-			double r = c.weight * scale + minDotSize;
+			double r = c.weight * scale;
+			if(r<minDotSize) continue;
 
 			gl2.glColor3f((float)c.change, 0, 0);
 			drawCircle(gl2,x,y,r);
@@ -115,14 +116,16 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	 */
 	@Override
 	public void writeOutCells() {
-		double scale = maxDotSize - minDotSize;
+		double scale = maxDotSize/255.0;
 
 		for( VoronoiCell c : cells ) {
 			double val = c.weight;
 
 			double x = c.center.x;
 			double y = c.center.y;
-			double r = (val/255.0) * scale + minDotSize;
+			double r = val * scale;
+			if(r<minDotSize) continue;
+
 			turtleCircle(x, y, r);
 		}
 	}

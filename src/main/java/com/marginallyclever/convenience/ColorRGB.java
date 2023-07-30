@@ -35,31 +35,31 @@ public class ColorRGB {
     }
 
     public void set(int pixel) {
-        int r = ((pixel >> 16) & 0xff);
-        int g = ((pixel >> 8) & 0xff);
-        int b = ((pixel) & 0xff);
-        set(r, g, b);
+        this.red   = (pixel >> 16) & 0xff;
+        this.green = (pixel >>  8) & 0xff;
+        this.blue  = (pixel      ) & 0xff;
     }
 
     public ColorRGB(Color c) {
-        red = c.getRed();
+        red   = c.getRed();
         green = c.getGreen();
-        blue = c.getBlue();
+        blue  = c.getBlue();
     }
 
     public int toInt() {
-        return ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff);
+        return (0xff<<24) | ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff);
     }
 
-    public ColorRGB set(ColorRGB x) {
-        set(x.red, x.green, x.blue);
-        return this;
+    public void set(ColorRGB x) {
+        this.red   = x.red;
+        this.green = x.green;
+        this.blue  = x.blue;
     }
 
     public void set(int red, int green, int blue) {
-        this.red = Math.max(0, Math.min(255, red));
-        this.green = Math.max(0, Math.min(255, green));
-        this.blue = Math.max(0, Math.min(255, blue));
+        this.red   = red;
+        this.green = green;
+        this.blue  = blue;
     }
 
     public void set(ColorHSB hsb) {
@@ -82,9 +82,9 @@ public class ColorRGB {
 
     public ColorRGB mul(double f) {
         return new ColorRGB(
-                (int) (this.red * f),
-                (int) (this.green * f),
-                (int) (this.blue * f));
+                (int) (f * this.red),
+                (int) (f * this.green),
+                (int) (f * this.blue));
     }
 
     public float diffSquared(ColorRGB other) {
@@ -95,7 +95,7 @@ public class ColorRGB {
     }
 
     public float diff(ColorRGB other) {
-        return (float) Math.sqrt(diffSquared(other));
+        return (float)Math.sqrt(diffSquared(other));
     }
 
     public String toString() {

@@ -237,8 +237,9 @@
 	<string><key>SpiralPulse.intensity</key><value>Intensity</value></string>
 	<string><key>SpiralPulse.spacing</key><value>Space between rings</value></string>
 	<string><key>SpiralPulse.height</key><value>Pulse height</value></string>
-	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Low-pass cutoff</value></string>
+	<string><key>SelectImageConverterPanel.Contrast</key><value>Contrast adjust</value></string>
 	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
+	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Cutoff</value></string>
 	<string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
 	<string><key>FillPageName</key><value>Fill page</value></string>
 	<string><key>GosperCurveName</key><value>Gosper curve</value></string>

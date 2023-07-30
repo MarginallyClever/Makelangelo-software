@@ -1,8 +1,15 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
+import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
+import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Adjusts the top and bottom of the constrast curve.
@@ -49,5 +56,34 @@ public class Filter_ContrastAdjust extends ImageFilter {
 	private int adjust(int color) {
 		color = Math.max(color-bottom,0);
 		return Math.min((int)(color*range),255);
+	}
+
+	public static void main(String[] args) throws IOException {
+		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+
+		final RangeSlider slider = new RangeSlider(0,255);
+		slider.setValue(0);
+		slider.setUpperValue(255);
+		panel.add(slider,BorderLayout.NORTH);
+
+		slider.addChangeListener(e->{
+			Filter_ContrastAdjust f = new Filter_ContrastAdjust(slider.getValue(),slider.getUpperValue());
+			TransformedImage dest = f.filter(src);
+			ResizableImagePanel rip = new ResizableImagePanel(dest.getSourceImage());
+			BorderLayout layout = (BorderLayout)panel.getLayout();
+			Component c = layout.getLayoutComponent(BorderLayout.CENTER);
+			if(c!=null) panel.remove(c);
+			panel.add(rip,BorderLayout.CENTER);
+			rip.revalidate();
+			rip.repaint();
+		});
+
+		JFrame frame = new JFrame("Filter_ContrastAdjust");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400, 500);
+		frame.add(panel);
+		frame.setVisible(true);
 	}
 }

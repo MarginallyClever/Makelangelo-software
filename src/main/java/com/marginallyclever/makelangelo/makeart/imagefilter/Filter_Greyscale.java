@@ -1,10 +1,14 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
+import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Converts an image to N shades of grey.
@@ -129,5 +133,12 @@ public class Filter_Greyscale extends ImageFilter {
 			}
 		}
 		return after;
+	}
+
+	public static void main(String[] args) throws IOException {
+		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+		Filter_Greyscale f = new Filter_Greyscale(255);
+		TransformedImage dest = f.filter(src);
+		ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_Greyscale" );
 	}
 }
