@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ConvexHull {
     private static final Logger logger = LoggerFactory.getLogger(ConvexHull.class);
-    private final ArrayList<Vector2d> points = new ArrayList<Vector2d>();
+    private final ArrayList<Vector2d> points = new ArrayList<>();
 
     public ConvexHull() {}
 
@@ -43,7 +43,7 @@ public class ConvexHull {
 
     public Rectangle2D getBounds() {
         Rectangle2D bounds = new Rectangle2D.Double();
-        if(points.size()>0) {
+        if(!points.isEmpty()) {
             Vector2d p = points.get(0);
             bounds.setRect(p.x,p.y,0,0);
             for(Vector2d p2 : points) {
@@ -98,21 +98,20 @@ public class ConvexHull {
     }
 
     /**
-     * See https://en.wikipedia.org/wiki/Gift_wrapping_algorithm
-     * @param p
-     * @throws Exception
+     * See <a href="https://en.wikipedia.org/wiki/Gift_wrapping_algorithm">Gift wrapping algorithm</a>
+     * @param p the point to add
      */
-    private void addPointCarefully(Vector2d p) throws Exception {
+    private void addPointCarefully(Vector2d p) {
         points.add(p);
         rebuildHull();
     }
 
     private void rebuildHull() {
         ArrayList<Vector2d> toKeep = new ArrayList<>();
-        int hullSize= points.size();
+        int hullSize = points.size();
         if(hullSize<=3) return;
 
-        Vector2d pointOnHull = getPointGuaranteedOnEdgeOfHull(points);
+        Vector2d pointOnHull = getPointGuaranteedOnEdgeOfHull();
         Vector2d firstPoint = pointOnHull;
         Vector2d endPoint;
         do {
@@ -135,7 +134,7 @@ public class ConvexHull {
         points.addAll(toKeep);
     }
 
-    private Vector2d getPointGuaranteedOnEdgeOfHull(ArrayList<Vector2d> hull2) {
+    private Vector2d getPointGuaranteedOnEdgeOfHull() {
         // first is left-most point in the set.
         Vector2d pointOnHull = points.get(0);
         for( Vector2d n : points) {
@@ -154,7 +153,7 @@ public class ConvexHull {
         Vector2d center = new Vector2d();
 
         int s = points.size();
-        for(int i=0;i<s;++i) center.add(points.get(i));
+        for (Vector2d point : points) center.add(point);
         center.scale(1.0/(double)s);
 
         return center;

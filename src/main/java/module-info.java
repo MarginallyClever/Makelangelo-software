@@ -20,7 +20,7 @@ module com.marginallyclever.makelangelo {
 
     requires org.locationtech.jts;
     requires org.apache.httpcomponents.httpclient;
-    requires org.apache.httpcomponents.httpcore;            // jts-core
+    requires org.apache.httpcomponents.httpcore;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.convenience.voronoi;

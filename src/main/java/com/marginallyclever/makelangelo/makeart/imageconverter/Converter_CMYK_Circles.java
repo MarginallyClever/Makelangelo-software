@@ -33,7 +33,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		});
 		add(maxCircleSize);
 
-		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+		add(new SelectReadOnlyText("note",Translator.get("Converter_CMYK_Crosshatch.Note")));
 	}
 
 	@Override

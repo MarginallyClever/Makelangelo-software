@@ -35,7 +35,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralCMYKName");
+		return Translator.get("Converter_CMYK_Spiral.Name");
 	}
 
 	public boolean getToCorners() {

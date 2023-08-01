@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -24,60 +23,56 @@ import java.util.ArrayList;
 
 public class LoadFilePanel extends JPanel implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
-	
-	private static final long serialVersionUID = 1L;
-	private Paper myPaper;
-
-	private JButton bChoose = new JButton(Translator.get("Open"));
-	private final JTextArea jtaFilename = new JTextArea();
-
+	private final Paper myPaper;
+	private final JButton bChoose = new JButton(Translator.get("Open"));
+	private final OpenFileChooser openFileChooser = new OpenFileChooser(this);
+	private final JLabel selectedFilename = new JLabel();
 	private SelectImageConverterPanel myConvertImage;
 	private PreviewListener mySubPreviewListener;
-	private final JPanel mySubPanel = new JPanel();
-	private OpenFileChooser openFileChooser;
 	private JDialog parent;
 
 	public LoadFilePanel(Paper paper,String filename) {
-		super();
+		super(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
 		myPaper = paper;
-		setLayout(new BorderLayout());
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
-		add(mySubPanel,BorderLayout.CENTER);
+		selectedFilename.setBorder(BorderFactory.createEmptyBorder(0,5,0,0));
 
-		this.jtaFilename.setEditable(false);
-		this.jtaFilename.setLineWrap(true);
-
-		openFileChooser = new OpenFileChooser(this);
-		openFileChooser.setOpenListener(this::load);
+		openFileChooser.setOpenListener(this::onNewFilenameChosen);
 	}
 	
 	private JPanel getFileSelectionPanel(String previousFile) {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(bChoose,BorderLayout.WEST);
-		panel.add(jtaFilename,BorderLayout.CENTER);
+		panel.add(selectedFilename,BorderLayout.CENTER);
 		
-		jtaFilename.setText(previousFile);
+		selectedFilename.setText(previousFile);
 		
 		bChoose.addActionListener((e)-> openFileChooser.chooseFile());
 		
 		return panel;
 	}
 
-	public boolean load(String filename) {
+	private void stopExistingImageConverter() {
 		if(myConvertImage!=null) {
 			myConvertImage.loadingFinished();
+			remove(myConvertImage);
 		}
+	}
+
+	public boolean onNewFilenameChosen(String filename) {
+		stopExistingImageConverter();
+		selectedFilename.setText(filename);
 
 		try {
 			if (SelectImageConverterPanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
-
 				myConvertImage = new SelectImageConverterPanel(myPaper, image);
-				// TODO replace this border with something more appropriate
-				myConvertImage.setBorder(BorderFactory.createTitledBorder(SelectImageConverterPanel.class.getSimpleName()));
 				myConvertImage.addActionListener(this::notifyListeners);
-				mySubPanel.removeAll();
-				mySubPanel.add(myConvertImage);
+
+				add(myConvertImage,BorderLayout.CENTER);
+
 				myConvertImage.run();
 				mySubPreviewListener = myConvertImage;
 				return true;
@@ -113,7 +108,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 	// OBSERVER PATTERN
 
-	private ArrayList<ActionListener> listeners = new ArrayList<>();
+	private final ArrayList<ActionListener> listeners = new ArrayList<>();
 
 	public void addActionListener(ActionListener a) {
 		listeners.add(a);

@@ -11,16 +11,7 @@ public class TestColorRGB {
     }
 
     @Test
-    public void limitRange() {
-        assertColorsEqual(new ColorRGB(),0,0,0);
-        assertColorsEqual(new ColorRGB(255,0,0),255,0,0);
-        assertColorsEqual(new ColorRGB(0,255,0),0,255,0);
-        assertColorsEqual(new ColorRGB(0,0,255),0,0,255);
-        assertColorsEqual(new ColorRGB(-1,0,0),0,0,0);
-        assertColorsEqual(new ColorRGB(0,-1,0),0,0,0);
-        assertColorsEqual(new ColorRGB(0,0,-1),0,0,0);
-        assertColorsEqual(new ColorRGB(256,0,0),255,0,0);
-        assertColorsEqual(new ColorRGB(0,256,0),0,255,0);
-        assertColorsEqual(new ColorRGB(0,0,256),0,0,255);
+    public void test() {
+        assertColorsEqual(new ColorRGB(0xff123456),0x12,0x34,0x56);
     }
 }

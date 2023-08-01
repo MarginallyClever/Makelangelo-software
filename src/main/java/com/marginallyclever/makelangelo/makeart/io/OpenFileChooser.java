@@ -20,10 +20,10 @@ import java.util.stream.Stream;
  */
 public class OpenFileChooser {
     private static final Logger logger = LoggerFactory.getLogger(OpenFileChooser.class);
-    private JFileChooser jFileChooser = new JFileChooser();
-    private Component parent;
-    private OpenListener openListener;
     private static final String KEY_PREFERENCE_LOAD_PATH = "loadPath";
+    private final JFileChooser jFileChooser = new JFileChooser();
+    private final Component parent;
+    private OpenListener openListener;
 
     public OpenFileChooser(Component parent) {
         this.parent = parent;

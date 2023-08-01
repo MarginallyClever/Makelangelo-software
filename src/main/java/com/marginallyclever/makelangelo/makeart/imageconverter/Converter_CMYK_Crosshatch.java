@@ -15,26 +15,26 @@ import org.slf4j.LoggerFactory;
  * See also <a href="http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html">...</a>
  * @author Dan Royer
  */
-public class Converter_CMYK extends ImageConverter {
-	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK.class);
+public class Converter_CMYK_Crosshatch extends ImageConverter {
+	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Crosshatch.class);
 	static protected int passes=1;// passes value have to be >=1.
 
-	public Converter_CMYK() {
+	public Converter_CMYK_Crosshatch() {
 		super();
 
-		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("ConverterCMYKPasses"), 5, 1, getPasses());
+		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("Converter_CMYK_Crosshatch.Passes"), 5, 1, getPasses());
 		selectPasses.addPropertyChangeListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPasses);
 
-		add(new SelectReadOnlyText("note",Translator.get("ConverterCMYKNote")));
+		add(new SelectReadOnlyText("note",Translator.get("Converter_CMYK_Crosshatch.Note")));
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("ConverterCMYKName");
+		return Translator.get("Converter_CMYK_Crosshatch.Name");
 	}
 
 	public int getPasses() {
