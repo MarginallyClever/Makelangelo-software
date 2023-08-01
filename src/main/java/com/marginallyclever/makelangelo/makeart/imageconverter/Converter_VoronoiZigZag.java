@@ -5,12 +5,13 @@ import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dithering using a particle system.
@@ -34,22 +35,13 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 			if(lowNoise) {
 				logger.debug("Running Lin/Kerighan optimization...");
 				renderMode = 1;
-				greedyTour();
+				sortLowPassToEnd();
+				greedySort();
 			} else {
 				logger.debug("Evolving...");
 				renderMode = 0;
 			}
 		});
-		SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
-		add(selectCells);
-		selectCells.addPropertyChangeListener(evt->{
-			setNumCells((int)evt.getNewValue());
-			fireRestart();
-		});
-
-		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
-		add(selectDrawVoronoi);
-		selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 	}
 
 	@Override
@@ -101,22 +93,42 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	}
 
 	private void renderPoints(GL2 gl2) {
-		gl2.glColor3f(0, 0, 0);
+		int lpc = getLowpassCutoff();
 
-		gl2.glBegin(GL2.GL_POINTS);
-		for( VoronoiCell c : cells ) {
-			gl2.glVertex2d(c.center.x, c.center.y);
+		lock.lock();
+		try {
+			gl2.glBegin(GL2.GL_POINTS);
+			for( VoronoiCell c : cells ) {
+				if(c.weight<lpc) {
+					gl2.glColor3f(1, 0, 0);
+				} else {
+					gl2.glColor3f(0, 0, 0);
+				}
+				gl2.glVertex2d(c.center.x, c.center.y);
+			}
+			gl2.glEnd();
 		}
-		gl2.glEnd();
+		finally {
+			lock.unlock();
+		}
 	}
 
 	private void drawTour(GL2 gl2) {
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_LINE_STRIP);
-		for( VoronoiCell c : cells) {
-			gl2.glVertex2d(c.center.x, c.center.y);
+		int lpc = getLowpassCutoff();
+
+		lock.lock();
+		try {
+			gl2.glColor3f(0, 0, 0);
+			gl2.glBegin(GL2.GL_LINE_STRIP);
+			for (VoronoiCell c : cells) {
+				if (c.weight < lpc) break;
+				gl2.glVertex2d(c.center.x, c.center.y);
+			}
+			gl2.glEnd();
 		}
-		gl2.glEnd();
+		finally {
+			lock.unlock();
+		}
 	}
 
 	private void optimizeTour() {
@@ -134,11 +146,13 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	 * BUT only flip the candidate which will have the most effect.
 	 */
 	public void flipTests() {
+		int lpc = getLowpassCutoff();
 		int size = cells.size();
 
 		for (int start = 0; start < size - 2 && !isThreadCancelled(); ++start) {
 			VoronoiCell a = cells.get(ti(start  ));
 			VoronoiCell b = cells.get(ti(start+1));
+			if(a.weight<lpc || b.weight<lpc) break;
 
 			double dAB = calculateLengthSq(a,b);
 			int bestIndex = -1;
@@ -147,6 +161,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 			for (int end = start + 2; end < size && !isThreadCancelled(); ++end) {
 				VoronoiCell c = cells.get(ti(end-1));
 				VoronoiCell d = cells.get(ti(end  ));
+				if(c.weight<lpc || d.weight<lpc) break;
 
 				double dOriginal = dAB + calculateLengthSq(c, d);
 				double dAC = calculateLengthSq(a, c);
@@ -190,13 +205,33 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		return x * x + y * y;
 	}
 
+	// find all the values below the cutoff and move them to the end of the list.
+	private void sortLowPassToEnd() {
+		lock.lock();
+		try {
+			int lpc = getLowpassCutoff();
+			List<VoronoiCell> toMove = new ArrayList<>();
+			for( VoronoiCell c : cells) {
+				if(c.weight<lpc) {
+					toMove.add(c);
+				}
+			}
+			cells.removeAll(toMove);
+			cells.addAll(toMove);
+		}
+			finally {
+			lock.unlock();
+		}
+	}
+
 	/**
 	 * Starting with point 0, find the next nearest point and repeat until all
 	 * points have been "found".
 	 */
-	private void greedyTour() {
+	private void greedySort() {
 		logger.debug("greedy tour started...");
 
+		int lpc = getLowpassCutoff();
 
 		lock.lock();
 		try {
@@ -204,11 +239,15 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 			int size = cells.size();
 			for (int i = 0; i < size-1; ++i) {
 				VoronoiCell p0 = cells.get(i);
+				if(p0.weight<lpc) break;
+
 				double bestDistance = Double.MAX_VALUE;
 				int bestIndex = i + 1;
 				for (int j = i + 1; j < size; ++j) {
 					// Find the nearest point not already in the line.
 					VoronoiCell p1 = cells.get(j);
+					if(p1.weight<lpc) break;
+
 					double d = calculateLengthSq(p0, p1);
 					if (bestDistance > d) {
 						bestDistance = d;
@@ -231,10 +270,12 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	 */
 	@Override
 	public void writeOutCells() {
+		int lpc = getLowpassCutoff();
 		turtle = new Turtle();
 
 		boolean first=true;
 		for( VoronoiCell c : cells) {
+			if(c.weight<lpc) continue;
 			double x = c.center.x;
 			double y = c.center.y;
 			if(first) {

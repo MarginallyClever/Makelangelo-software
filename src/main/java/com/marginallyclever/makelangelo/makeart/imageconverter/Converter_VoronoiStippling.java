@@ -6,8 +6,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -34,13 +32,6 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			sinTable[i] = Math.sin(i*2.0*Math.PI/TABLE_SIZE);
 		}
 
-		SelectInteger selectCells = new SelectInteger("cells", Translator.get("Converter_VoronoiStippling.CellCount"), getNumCells());
-		add(selectCells);
-		selectCells.addPropertyChangeListener(evt -> {
-			setNumCells((int) evt.getNewValue());
-			fireRestart();
-		});
-
 		SelectSlider selectMax = new SelectSlider("max", Translator.get("Converter_VoronoiStippling.DotMax"), 50,1, (int)(getMaxDotSize()*10));
 		add(selectMax);
 		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((int)evt.getNewValue()*0.1));
@@ -48,10 +39,6 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		SelectSlider selectMin = new SelectSlider("min", Translator.get("Converter_VoronoiStippling.DotMin"), 50,1, (int)(getMinDotSize()*10));
 		add(selectMin);
 		selectMin.addPropertyChangeListener(evt -> setMinDotSize((int)evt.getNewValue()*0.1));
-
-		SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
-		add(selectDrawVoronoi);
-		selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 	}
 	
 	@Override
@@ -87,21 +74,9 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		}
 	}
 
-	private void renderDots(GL2 gl2) {
-		double scale = maxDotSize/255.0;
-
-		for( VoronoiCell c : cells ) {
-			double x = c.center.x;
-			double y = c.center.y;
-			double r = c.weight * scale;
-			if(r<minDotSize) continue;
-
-			gl2.glColor3f((float)c.change, 0, 0);
-			drawCircle(gl2,x,y,r);
-		}
-	}
-
 	private void drawCircle(GL2 gl2,double x, double y, double r) {
+		if(r<=minDotSize) return;
+
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		for (int j = 0; j <= TABLE_SIZE; ++j) {
 			gl2.glVertex2d(
@@ -111,28 +86,40 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		gl2.glEnd();
 	}
 
+	private void renderDots(GL2 gl2) {
+		int lpc = getLowpassCutoff();
+		double scale = (maxDotSize-minDotSize)/255.0;
+
+		for( VoronoiCell c : cells ) {
+			if(c.weight<lpc) continue;
+			double r = (c.weight-lpc) * scale;
+			double x = c.center.x;
+			double y = c.center.y;
+			gl2.glColor3f((float)c.change, 0, 0);
+			drawCircle(gl2,x,y,r);
+		}
+	}
+
 	/**
 	 * write cell centers to gcode.
 	 */
 	@Override
 	public void writeOutCells() {
-		double scale = maxDotSize/255.0;
+		int lpc = getLowpassCutoff();
+		double scale = (maxDotSize-minDotSize)/255.0;
 
 		for( VoronoiCell c : cells ) {
-			double val = c.weight;
-
+			if(c.weight<lpc) continue;
+			double r = (c.weight-lpc) * scale;
 			double x = c.center.x;
 			double y = c.center.y;
-			double r = val * scale;
-			if(r<minDotSize) continue;
-
 			turtleCircle(x, y, r);
 		}
 	}
 
 	// filled circles
 	private void turtleCircle(double x, double y, double r) {
-		if(r<1) return;
+		if(r<=minDotSize) return;
 
 		int detail = (int)Math.max(4, Math.min(20,Math.ceil((r) * Math.PI * 2.0)));
 

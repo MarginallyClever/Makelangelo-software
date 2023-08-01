@@ -3,10 +3,14 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
@@ -36,6 +40,28 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
 
     private int iterations;
 
+    private int lowpassCutoff = 128;
+    private int cellBuffer = 100;
+
+
+    public Converter_Voronoi() {
+        super();
+
+        SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
+        add(selectCells);
+        selectCells.addPropertyChangeListener(evt->{
+            setNumCells((int)evt.getNewValue());
+            fireRestart();
+        });
+
+        SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
+        add(selectDrawVoronoi);
+        selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
+
+        SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getLowpassCutoff());
+        add(selectCutoff);
+        selectCutoff.addPropertyChangeListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
+    }
 
     @Override
     public void start(Paper paper, TransformedImage image) {
@@ -51,10 +77,16 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
 
             Rectangle2D bounds = myPaper.getMarginRectangle();
             cells.clear();
-            for(int i=0;i<numCells;++i) {
-                cells.add(new VoronoiCell(
-                        Math.random()*bounds.getWidth()+bounds.getMinX(),
-                        Math.random()*bounds.getHeight()+bounds.getMinY()));
+            int i=0;
+            while(i<numCells) {
+                double x = Math.random()*bounds.getWidth()+bounds.getMinX();
+                double y = Math.random()*bounds.getHeight()+bounds.getMinY();
+                if(image.canSampleAt(x,y)) {
+                    if(image.sample1x1Unchecked(x,y) < Math.random()*255) {
+                        cells.add( new VoronoiCell(x,y) );
+                        i++;
+                    }
+                }
             }
             voronoiDiagram.setNumHulls(numCells);
         }
@@ -114,25 +146,27 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
             cell.set(centroid.getX(),centroid.getY());
 
             Envelope e = poly.getEnvelopeInternal();
-            int miny = (int) Math.floor(e.getMinY());
-            int maxy = (int) Math.ceil(e.getMaxY());
-            int minx = (int) Math.floor(e.getMinX());
-            int maxx = (int) Math.ceil(e.getMaxX());
+            double miny = Math.floor(e.getMinY());
+            double maxy = Math.ceil(e.getMaxY());
+            double minx = Math.floor(e.getMinX());
+            double maxx = Math.ceil(e.getMaxX());
 
-            for(int y=miny;y<maxy;++y) {
-                int x0 = findLeftEdge(hull,y,factory,minx,maxx);
-                int x1 = findRightEdge(hull,y,factory,minx,maxx);
-                for (int x = x0; x <= x1; ++x) {
+            double xDiff = maxx-minx;
+            double stepSize = getStepSize(maxy, miny, xDiff);
+
+            for(double y=miny;y<maxy;y+=stepSize) {
+                double x0 = findLeftEdge(hull,factory,y,minx,maxx,stepSize);
+                double x1 = findRightEdge(hull,factory,y,minx,maxx,stepSize);
+                for (double x = x0; x <= x1; x+=stepSize) {
                     if(!image.canSampleAt(x,y)) continue;
-
-                    int v = 255 - image.sample1x1(x,y);
+                    double v = 255 - image.sample1x1Unchecked(x,y);
                     weight += v;
                     wx += v * x;
                     wy += v * y;
                     hits++;
                 }
             }
-            if(hits>0 && weight>0) {
+            if(weight>0) {
                 cell.weight = weight / hits;
                 wx /= weight;
                 wy /= weight;
@@ -146,18 +180,46 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
         return change;
     }
 
-    private int findLeftEdge(PreparedPolygon poly,int y,GeometryFactory factory,int minx,int maxx) {
+    private double getStepSize(double maxy, double miny, double xDiff) {
+        double yDiff = maxy - miny;
+        double maxSize = Math.max(xDiff, yDiff);
+        double minSize = Math.min(xDiff, yDiff);
+
+        double scaleFactor = 1;
+        // Maximum voronoi cell extent should be between
+        // cellBuffer/2 and cellBuffer in size.
+        while (maxSize > cellBuffer) {
+            scaleFactor *= 0.5;
+            maxSize *= 0.5;
+        }
+
+        while (maxSize < (cellBuffer / 2.0)) {
+            scaleFactor *= 2;
+            maxSize *= 2;
+        }
+
+        if ((minSize * scaleFactor) > (cellBuffer/2.0)) {
+            // Special correction for objects of near-unity (square-like) aspect ratio,
+            // which have larger area *and* where it is less essential to find the exact centroid:
+            scaleFactor *= 0.5;
+        }
+
+        double stepSize = 1.0/scaleFactor;
+        return stepSize;
+    }
+
+    private double findLeftEdge(PreparedPolygon poly,GeometryFactory factory,double y,double minx,double maxx,double stepSize) {
         Coordinate c = new Coordinate(minx,y);
-        for(int x = minx; x < maxx; ++x) {
+        for(double x = minx; x < maxx; x+=stepSize) {
             c.x=x;
             if(poly.intersects(factory.createPoint(c))) return x;
         }
         return maxx;
     }
 
-    private int findRightEdge(PreparedPolygon poly, int y,GeometryFactory factory,int minx,int maxx) {
+    private double findRightEdge(PreparedPolygon poly,GeometryFactory factory, double y,double minx,double maxx,double stepSize) {
         Coordinate c = new Coordinate(maxx,y);
-        for(int x = maxx; x > minx; --x) {
+        for(double x = maxx; x > minx; x-=stepSize) {
             c.x=x;
             if(poly.intersects(factory.createPoint(c))) return x;
         }
@@ -237,5 +299,13 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
         finally {
             lock.unlock();
         }
+    }
+
+    public int getLowpassCutoff() {
+        return lowpassCutoff;
+    }
+
+    public void setLowpassCutoff(int lowpassCutoff) {
+        this.lowpassCutoff = lowpassCutoff;
     }
 }
