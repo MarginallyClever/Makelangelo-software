@@ -217,9 +217,10 @@ public final class Translator {
 		return false;
 	}
 
-
 	/**
-	 * @param key name of key to find in translation list
+	 * @param key name of key to find in translation list.  <b>Keys must be Strings, not variables</b>.
+	 *            If you use a variable then the tests for missing and duplicate translations will not
+	 *            work in the distant future.
 	 * @return the translated value for key, or "missing:key".
 	 */
 	public static String get(String key) {

@@ -90,15 +90,6 @@
 	<string><key>RobotMenu.OpenControls</key><value>Open Controls</value></string>
 	<string><key>RobotMenu.SaveGCode</key><value>Save Gcode to file/SD</value></string>
 	<string><key>RobotMenu.GetTimeEstimate</key><value>Estimate time</value></string>
-	<string><key>PlotterControls.Title</key><value>Robot controls</value></string>
-	<string><key>PlotterControls.ConnectControls</key><value>Connect</value></string>
-	<string><key>PlotterControls.DrawControls</key><value>Draw controls</value></string>
-	<string><key>PlotterControls.Pause</key><value>Pause</value></string>
-	<string><key>PlotterControls.MarlinTab</key><value>Marlin</value></string>
-	<string><key>PlotterControls.ProgramTab</key><value>Program</value></string>
-	<string><key>PlotterControls.JogTab</key><value>Robot controls</value></string>
-	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
-	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
 	<string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value></string>
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
 	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
@@ -264,6 +255,7 @@
 	<string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
 	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
 	<string><key>LogPanel.Title</key><value>Log</value></string>
+	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
 	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
 	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
@@ -323,4 +315,29 @@
 	<string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
 	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
 	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
+
+	<string><key>PlotterControls.Title</key><value>Robot controls</value></string>
+	<string><key>PlotterControls.ConnectControls</key><value>Connect</value></string>
+	<string><key>PlotterControls.DrawControls</key><value>Draw controls</value></string>
+	<string><key>PlotterControls.FindHome</key><value>Find home</value></string>
+	<string><key>PlotterControls.Pause</key><value>Pause</value></string>
+	<string><key>PlotterControls.Rewind</key><value>Rewind</value></string>
+	<string><key>PlotterControls.Play</key><value>Draw</value></string>
+	<string><key>PlotterControls.EmergencyStop</key><value>Emergency Stop</value></string>
+	<string><key>PlotterControls.MarlinTab</key><value>Marlin</value></string>
+	<string><key>PlotterControls.ProgramTab</key><value>Program</value></string>
+	<string><key>PlotterControls.JogTab</key><value>Robot controls</value></string>
+	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
+	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
+	<string><key>PlotterControls.Step</key><value>Step</value></string>
+
+	<string><key>JogInterface.FindHome</key><value>Home</value></string>
+	<string><key>JogInterface.PenUp</key><value>Pen up</value></string>
+	<string><key>JogInterface.PenDown</key><value>Pen down</value></string>
+	<string><key>JogInterface.DisengageMotors</key><value>Disengage</value></string>
+	<string><key>JogInterface.EngageMotors</key><value>Engage</value></string>
+
+	<string><key>ConversationHistory.Clear</key><value>Clear</value></string>
+	<string><key>ConversationHistory.Save</key><value>Save</value></string>
+	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
 </language>

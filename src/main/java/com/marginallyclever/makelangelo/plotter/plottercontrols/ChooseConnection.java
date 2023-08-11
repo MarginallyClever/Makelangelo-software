@@ -17,8 +17,6 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
-
 /**
  * ChooseConnection provides a human interface to open or close a
  * connection to a remote device available through a {@link NetworkSession}.

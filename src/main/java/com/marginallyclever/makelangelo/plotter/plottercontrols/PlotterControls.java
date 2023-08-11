@@ -134,12 +134,12 @@ public class PlotterControls extends JPanel {
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
 		panel.setBorder(border);
 
-		bFindHome = new ButtonIcon("PlotterControls.FindHome", "/images/house.png");
-		bRewind = new ButtonIcon("PlotterControls.Rewind", "/images/control_start_blue.png");
-		bStart = new ButtonIcon("PlotterControls.Play", "/images/control_play_blue.png");
-		bStep = new ButtonIcon("PlotterControls.Step", "/images/control_fastforward_blue.png");
-		bPause = new ButtonIcon("PlotterControls.Pause", "/images/control_pause_blue.png");
-		bEmergencyStop = new ButtonIcon("PlotterControls.EmergencyStop", "/images/stop.png");
+		bFindHome = new ButtonIcon( Translator.get("PlotterControls.FindHome"), "/images/house.png");
+		bRewind = new ButtonIcon( Translator.get("PlotterControls.Rewind"), "/images/control_start_blue.png");
+		bStart = new ButtonIcon( Translator.get("PlotterControls.Play"), "/images/control_play_blue.png");
+		bStep = new ButtonIcon( Translator.get("PlotterControls.Step"), "/images/control_fastforward_blue.png");
+		bPause = new ButtonIcon( Translator.get("PlotterControls.Pause"), "/images/control_pause_blue.png");
+		bEmergencyStop = new ButtonIcon( Translator.get("PlotterControls.EmergencyStop"), "/images/stop.png");
 		bEmergencyStop.setForeground(Color.RED);
 
 		panel.add(bFindHome);

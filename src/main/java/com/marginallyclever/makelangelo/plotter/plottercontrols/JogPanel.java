@@ -95,10 +95,10 @@ public class JogPanel extends JPanel {
 	private JToolBar getToolBar() {
 		JToolBar bar = new JToolBar();
 		bar.setFloatable(false);
-		findHome = new ButtonIcon("JogInterface.FindHome", "/images/house.png");
-		penUp = new ButtonIcon("JogInterface.PenUp", "/images/arrow_up.png");
-		penDown  = new ButtonIcon("JogInterface.PenDown", "/images/arrow_down.png");
-		toggleEngageMotor = new ButtonIcon("JogInterface.DisengageMotors", "/images/lock_open.png");
+		findHome = new ButtonIcon(Translator.get("JogInterface.FindHome"), "/images/house.png");
+		penUp = new ButtonIcon(Translator.get("JogInterface.PenUp"), "/images/arrow_up.png");
+		penDown  = new ButtonIcon(Translator.get("JogInterface.PenDown"), "/images/arrow_down.png");
+		toggleEngageMotor = new ButtonIcon(Translator.get("JogInterface.DisengageMotors"), "/images/lock_open.png");
 
 		bar.add(findHome);
 		bar.addSeparator();
@@ -126,7 +126,10 @@ public class JogPanel extends JPanel {
 	}
 
 	private void updateButtonStatusWithPlotter() {
-		toggleEngageMotor.setText(Translator.get(myPlotter.getMotorsEngaged() ? "JogInterface.DisengageMotors" : "JogInterface.EngageMotors"));
+		toggleEngageMotor.setText( myPlotter.getMotorsEngaged() ?
+				Translator.get("JogInterface.DisengageMotors") :
+				Translator.get("JogInterface.EngageMotors")
+		);
 		boolean isHomed = myPlotter.getDidFindHome();
 		bCartesian.setEnabled(isHomed);
 	}

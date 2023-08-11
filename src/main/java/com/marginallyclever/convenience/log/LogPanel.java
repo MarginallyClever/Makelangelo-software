@@ -54,7 +54,7 @@ public class LogPanel extends JPanel {
 
 		displayLog(Log.getLogLocation());
 
-		ButtonIcon copyClipboardButton = new ButtonIcon("LogPanel.CopyClipboard", "/images/page_copy.png");
+		ButtonIcon copyClipboardButton = new ButtonIcon(Translator.get("LogPanel.CopyClipboard"), "/images/page_copy.png");
 		copyClipboardButton.addActionListener((e)-> {
 			StringSelection stringSelection = new StringSelection(logArea.getText());
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
