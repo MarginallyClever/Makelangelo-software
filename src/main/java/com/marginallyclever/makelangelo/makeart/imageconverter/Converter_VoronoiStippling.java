@@ -135,6 +135,7 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		}
 
 		InfillTurtle filler = new InfillTurtle();
+		filler.setPenDiameter(turtle.getDiameter());
 		try {
 			turtle.add(circle);
 			turtle.add(filler.run(circle));

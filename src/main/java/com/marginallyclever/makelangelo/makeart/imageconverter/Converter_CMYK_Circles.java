@@ -159,6 +159,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 
 		try {
 			InfillTurtle filler = new InfillTurtle();
+			filler.setPenDiameter(t.getDiameter());
 			Turtle t2 = filler.run(t);
 			turtle.add(t2);
 		} catch(Exception e) {
