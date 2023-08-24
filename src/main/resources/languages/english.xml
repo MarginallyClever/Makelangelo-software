@@ -86,10 +86,7 @@
 	<string><key>MenuLanguageTitle</key><value>Language</value></string>
 	<string><key>StartAt</key><value>Start at</value></string>
 	<string><key>Robot</key><value>Makelangelo</value></string>
-	<string><key>RobotMenu.RenderStyle</key><value>Render style</value></string>
-	<string><key>RobotMenu.OpenControls</key><value>Open Controls</value></string>
-	<string><key>RobotMenu.SaveGCode</key><value>Save Gcode to file/SD</value></string>
-	<string><key>RobotMenu.GetTimeEstimate</key><value>Estimate time</value></string>
+
 	<string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value></string>
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
 	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
@@ -111,6 +108,7 @@
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle fractal</value></string>
 	<string><key>Converter_VoronoiStippling.Name</key><value>Voronoi stipples</value></string>
 	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
+
 	<string><key>Converter_Voronoi.Name</key><value>Voronoi diagram</value></string>
 	<string><key>Converter_VoronoiStippling.CellCount</key><value>Number of cells</value></string>
 	<string><key>Converter_VoronoiStippling.DotMax</key><value>Max dot size</value></string>
@@ -256,26 +254,23 @@
 	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
 	<string><key>LogPanel.Title</key><value>Log</value></string>
 	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
-	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
-	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
-	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
 	<string><key>QuestionTitle</key><value>Question</value></string>
 	<string><key>InfoTitle</key><value>Information</value></string>
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
-	<string><key>PlotterSettingsPanel.Title</key><value>Plotter settings</value></string>
-	<string><key>PlotterSettingsPanel.TabEssential</key><value>Essential</value></string>
-	<string><key>PlotterSettingsPanel.TabPen</key><value>Pen</value></string>
-	<string><key>PlotterSettingsPanel.TabSimulation</key><value>Simulation</value></string>
+
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
 	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
     <string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
+
     <string><key>Converter_CMYK_Circles.name</key><value>CMYK circles</value></string>
 	<string><key>Converter_CMYK_Circles.maxCircleSize</key><value>max circle size</value></string>
+
 	<string><key>Converter_EdgeDetection.name</key><value>Edge detection</value></string>
 	<string><key>Converter_EdgeDetection.passes</key><value>Passes</value></string>
 	<string><key>Converter_EdgeDetection.stepSize</key><value>Step size</value></string>
 	<string><key>Converter_EdgeDetection.sampleSize</key><value>SampleSize</value></string>
+
 	<string><key>Generator_FlowField.name</key><value>Flow field</value></string>
 	<string><key>Generator_FlowField.scaleX</key><value>X scale</value></string>
 	<string><key>Generator_FlowField.scaleY</key><value>Y scale</value></string>
@@ -287,21 +282,56 @@
 	<string><key>Generator_FlowField.fromEdge</key><value>Continuous</value></string>
 	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
 	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
+
 	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
 	<string><key>Generator_GridFit.Name</key><value>Grid fit</value></string>
 	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
 	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
 	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
 	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
+
+	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
+	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
+	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
 	<string><key>PlotterSettings.userGeneralStartGcode</key><value>Start GCode</value></string>
 	<string><key>PlotterSettings.userGeneralEndGcode</key><value>End GCode</value></string>
+	<string><key>PlotterSettings.minimumPlannerSpeed</key><value>Min Planner Speed (mm/s)</value></string>
+	<string><key>PlotterSettings.blockBufferSize</key><value>Block Buffer Size</value></string>
+	<string><key>PlotterSettings.segmentsPerSecond</key><value>Segments Per Second</value></string>
+	<string><key>PlotterSettings.minSegmentLength</key><value>Min Segment Length (mm)</value></string>
+	<string><key>PlotterSettings.minSegTime</key><value>Min Seg Time (ns)</value></string>
+	<string><key>PlotterSettings.handleSmallSegments</key><value>Handle Small Segments</value></string>
+	<string><key>PlotterSettings.minAcceleration</key><value>Min Acceleration (mm/s²)</value></string>
+
+	<string><key>PlotterSettingsPanel.Title</key><value>Plotter settings</value></string>
+	<string><key>PlotterSettingsPanel.TabEssential</key><value>Essential</value></string>
+	<string><key>PlotterSettingsPanel.TabPen</key><value>Pen</value></string>
+	<string><key>PlotterSettingsPanel.TabSimulation</key><value>Simulation</value></string>
+	<string><key>PlotterSettingsPanel.MachineWidth</key><value>Machine width (mm)</value></string>
+	<string><key>PlotterSettingsPanel.MachineHeight</key><value>Machine height (mm)</value></string>
+	<string><key>PlotterSettingsPanel.ServoLengthNeeded</key><value>Servo wire length (m)</value></string>
+	<string><key>PlotterSettingsPanel.StepperLengthNeeded</key><value>Stepper wire length (m,each)</value></string>
+	<string><key>PlotterSettingsPanel.BeltLengthNeeded</key><value>Timing belt length (m,each)</value></string>
+	<string><key>PlotterSettingsPanel.penToolDiameter</key><value>Diameter (mm)</value></string>
+	<string><key>PlotterSettingsPanel.penToolMaxFeedRate</key><value>Travel speed (mm/min)</value></string>
+	<string><key>PlotterSettingsPanel.penToolUp</key><value>Up angle (degrees)</value></string>
+	<string><key>PlotterSettingsPanel.penToolDown</key><value>Down angle (degrees)</value></string>
+	<string><key>PlotterSettingsPanel.penToolLiftSpeed</key><value>Pen lift time (ms)</value></string>
+	<string><key>PlotterSettingsPanel.penToolLowerSpeed</key><value>Pen lower time (ms)</value></string>
+	<string><key>PlotterSettingsPanel.Speed</key><value>Draw speed (mm/min)</value></string>
+	<string><key>PlotterSettingsPanel.AdjustAcceleration</key><value>Acceleration (mm/s²)</value></string>
+	<string><key>PlotterSettingsPanel.pen up color</key><value>Up color</value></string>
+	<string><key>PlotterSettingsPanel.pen down color</key><value>Default down color</value></string>
+
 	<string><key>PlotterSettingsManagerPanel.RemoveProfile</key><value>-</value></string>
 	<string><key>PlotterSettingsManagerPanel.AddProfile</key><value>+</value></string>
 	<string><key>PlotterSettingsManagerPanel.NewProfileName</key><value>New unique name:</value></string>
 	<string><key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key><value>Name already in use. Try again!</value></string>
 	<string><key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key><value>Name cannot be blank. Try again!</value></string>
-	<string><key>FirmwareUploaderPanel.status</key><value>Firmware upload status</value></string>
+
 	<string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
+
+	<string><key>FirmwareUploaderPanel.status</key><value>Firmware upload status</value></string>
 	<string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
 	<string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>
 	<string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude not downloaded.</value></string>
@@ -334,6 +364,12 @@
 	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
 	<string><key>PlotterControls.Step</key><value>Step</value></string>
 
+	<string><key>RobotMenu.RobotStyle</key><value>Robot style</value></string>
+	<string><key>RobotMenu.RenderStyle</key><value>Render style</value></string>
+	<string><key>RobotMenu.OpenControls</key><value>Open Controls</value></string>
+	<string><key>RobotMenu.SaveGCode</key><value>Save Gcode to file/SD</value></string>
+	<string><key>RobotMenu.GetTimeEstimate</key><value>Estimate time</value></string>
+
 	<string><key>JogInterface.FindHome</key><value>Home</value></string>
 	<string><key>JogInterface.PenUp</key><value>Pen up</value></string>
 	<string><key>JogInterface.PenDown</key><value>Pen down</value></string>
@@ -343,4 +379,6 @@
 	<string><key>ConversationHistory.Clear</key><value>Clear</value></string>
 	<string><key>ConversationHistory.Save</key><value>Save</value></string>
 	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
+
+	<string><key>CartesianButtons.buttonCenter</key><value> </value></string>
 </language>

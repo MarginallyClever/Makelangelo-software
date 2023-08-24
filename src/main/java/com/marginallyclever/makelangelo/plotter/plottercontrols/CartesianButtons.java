@@ -111,7 +111,7 @@ public class CartesianButtons extends JComponent {
 			--v;
 		}
 
-		labels[ZONE_CENTER] = Translator.get( "CartesianButtons.buttonCenter" );
+		labels[ZONE_CENTER] = Translator.get("CartesianButtons.buttonCenter");
 	}
 
 	@Override

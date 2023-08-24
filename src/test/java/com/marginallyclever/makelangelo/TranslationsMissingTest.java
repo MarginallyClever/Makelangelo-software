@@ -26,8 +26,8 @@ public class TranslationsMissingTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TranslationsMissingTest.class);
 
-    private Pattern patternComment = Pattern.compile("^\\s*//.*");
-    private Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\"(?<key>[^)]*)\"\\)");
+    private final Pattern patternComment = Pattern.compile("^\\s*//.*");
+    private final Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\\s*\"(?<key>[^)]*)\"\\s*\\)");
 
     public static class TranslationFileSearcher {
         public final String key;
