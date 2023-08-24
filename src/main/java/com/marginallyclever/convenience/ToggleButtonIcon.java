@@ -1,6 +1,5 @@
 package com.marginallyclever.convenience;
 
-import com.marginallyclever.makelangelo.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,7 @@ public class ToggleButtonIcon extends JButton {
 
     public ToggleButtonIcon(Item... items) {
         for (Item item : items) {
-            translations.add(Translator.get(item.translation));
+            translations.add(item.translation);
             icons.add(createImageIcon(item.icon));
             foregroundColors.add(item.foregroundColor);
         }

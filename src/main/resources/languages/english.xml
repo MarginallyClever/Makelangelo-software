@@ -316,6 +316,9 @@
 	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
 	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
 
+	<string><key>ChooseConnection.ButtonConnect</key><value>Connect</value></string>
+	<string><key>ChooseConnection.ButtonDisconnect</key><value>Disconnect</value></string>
+
 	<string><key>PlotterControls.Title</key><value>Robot controls</value></string>
 	<string><key>PlotterControls.ConnectControls</key><value>Connect</value></string>
 	<string><key>PlotterControls.DrawControls</key><value>Draw controls</value></string>

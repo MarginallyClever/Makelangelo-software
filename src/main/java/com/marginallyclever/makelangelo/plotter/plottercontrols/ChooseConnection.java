@@ -27,11 +27,9 @@ import java.util.List;
 public class ChooseConnection extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(ChooseConnection.class);
 
-	private static final long serialVersionUID = 4773092967249064165L;
-
 	private final ToggleButtonIcon bConnect = new ToggleButtonIcon(
-			new ToggleButtonIcon.Item("ButtonConnect", "/images/connect.png", Color.GREEN),
-			new ToggleButtonIcon.Item("ButtonDisconnect", "/images/disconnect.png", Color.RED)
+			new ToggleButtonIcon.Item(Translator.get("ChooseConnection.ButtonConnect"), "/images/connect.png", Color.GREEN),
+			new ToggleButtonIcon.Item(Translator.get("ChooseConnection.ButtonDisconnect"), "/images/disconnect.png", Color.RED)
 		);
 	private final ButtonIcon refresh = new ButtonIcon("", "/images/arrow_refresh.png");
 	private final JComboBox<ComboItem> connectionComboBox = new JComboBox<>();
