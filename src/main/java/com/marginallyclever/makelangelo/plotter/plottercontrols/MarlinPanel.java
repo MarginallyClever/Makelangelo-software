@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -84,10 +83,6 @@ public class MarlinPanel extends JPanel {
 		});
 	}
 
-	public void addNetworkSessionListener(NetworkSessionListener a) {
-		chatInterface.addNetworkSessionListener(a);
-	}
-
 	private void onConnect() {
 		logger.debug("MarlinInterface connected.");
 		setupNetworkListener();
@@ -123,8 +118,11 @@ public class MarlinPanel extends JPanel {
 	private void setupNetworkListener() {
 		chatInterface.addNetworkSessionListener(this::onDataReceived);
 	}
-	
-	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+
+	/**
+	 * This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+	 * @param evt the network session event
+	 */
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			lastReceivedTime = System.currentTimeMillis();

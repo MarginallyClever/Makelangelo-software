@@ -3,15 +3,13 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.W3CColorNames;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serial;
 
 /**
  * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
@@ -21,15 +19,14 @@ import java.io.Serial;
  * @since 7.28.0
  */
 public class MarlinPlotterPanel extends MarlinPanel {
-	@Serial
-	private static final long serialVersionUID = -7114823910724405882L;
-
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterPanel.class);
 
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
 	private static final String MOTOR_ENGAGE = "M17";
 	private static final String MOTOR_DISENGAGE = "M18";
+
+	// M665 Set delta/polargraph configuration.
 	private static final String M665 = "M665";
 
 	private final Plotter myPlotter;
@@ -125,6 +122,10 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				+" H"+StringHelper.formatDouble(maxLen));
 	}
 
+	/**
+	 * This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+	 * @param evt the network session event
+	 */
 	@Override
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		super.onDataReceived(evt);

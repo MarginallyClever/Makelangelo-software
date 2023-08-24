@@ -24,10 +24,9 @@ import java.awt.event.ActionEvent;
  */
 public class JogPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(JogPanel.class);
-	
-	private static final long serialVersionUID = -7408469373702327861L;
-	private Plotter myPlotter;
-	private CartesianButtons bCartesian = new CartesianButtons();
+
+	private final Plotter myPlotter;
+	private final CartesianButtons bCartesian = new CartesianButtons();
 	private JButton toggleEngageMotor;
 	private JButton findHome;
 	private JButton penUp;
