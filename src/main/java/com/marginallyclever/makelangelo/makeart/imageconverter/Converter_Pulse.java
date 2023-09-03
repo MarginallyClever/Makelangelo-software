@@ -73,7 +73,7 @@ public class Converter_Pulse extends ImageConverter {
 	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2D a, Point2D b) {
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
-		dir.scale(1/len);
+		dir.scale(1.0/len);
 		Point2D ortho = new Point2D(-dir.y,dir.x);
 		
 		turtle.jumpTo(

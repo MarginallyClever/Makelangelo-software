@@ -93,15 +93,29 @@ public class PlotterControls extends JPanel {
 				MarlinPanelEvent.DID_NOT_FIND,
 				MarlinPanelEvent.COMMUNICATION_FAILURE -> {
 					if (!isErrorAlreadyDisplayed) {
-						/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
-						 * robot being turned off while COM port is connected.
+						String message;
+
+						switch(e.getActionCommand()) {
+							case "communicationFailure" -> message = Translator.get("PlotterControls.communicationFailure");
+							case "didNotFind" -> message = Translator.get("PlotterControls.didNotFind");
+							case "Printed halted" -> message = Translator.get("PlotterControls.halted");
+							default -> message = e.getActionCommand();
+						}
+						/* TODO Source of dialog box titled "Error" that says "PlotterControls.null".
+						 *      Caused by robot being turned off while COM port is connected.
 						 */
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls."+e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this,
+								message,
+								Translator.get("ErrorTitle"),
+								JOptionPane.ERROR_MESSAGE);
 						isErrorAlreadyDisplayed = true;
 					}
 				}
 			case MarlinPanelEvent.HOME_XY_FIRST ->
-					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.homeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(this,
+							Translator.get("PlotterControls.homeXYFirst"),
+							Translator.get("InfoTitle"),
+							JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
 	}

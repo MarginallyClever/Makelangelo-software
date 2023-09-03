@@ -362,6 +362,9 @@
 	<string><key>PlotterControls.JogTab</key><value>Robot controls</value></string>
 	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
 	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
+	<string><key>PlotterControls.didNotFind</key><value>Error in communicating with the robot.</value></string>
+	<string><key>PlotterControls.communicationFailure</key><value>No answer from the robot, please check the USB cable or speed settings.</value></string>
+	<string><key>PlotterControls.halted</key><value>Printer halted!</value></string>
 	<string><key>PlotterControls.Step</key><value>Step</value></string>
 
 	<string><key>RobotMenu.RobotStyle</key><value>Robot style</value></string>
@@ -381,4 +384,9 @@
 	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
 
 	<string><key>CartesianButtons.buttonCenter</key><value> </value></string>
+
+	<string><key>Converter_IntensityToHeight.name</key><value>Intensity to height</value></string>
+	<string><key>Converter_IntensityToHeight.spacing</key><value>Wave spacing</value></string>
+	<string><key>Converter_IntensityToHeight.maxHeight</key><value>Wave height</value></string>
+	<string><key>Converter_IntensityToHeight.sampleRate</key><value>Sample rate</value></string>
 </language>
