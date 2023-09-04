@@ -84,6 +84,7 @@ public class Converter_IntensityToHeight extends ImageConverter {
 			double z = img.sample( x - sampleSpacing, y - halfStep, x + sampleSpacing, y + halfStep);
 			// scale the intensity value
 			double scale_z = z / 255.0f;
+			scale_z = (scale_z-0.5)*2.0;
 			//scale_z *= scale_z;  // quadratic curve
 			double pulseSize = halfStep * scale_z;
 			double py=y + pulseSize;
