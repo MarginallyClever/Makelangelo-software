@@ -15,8 +15,11 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  * @since 7.40.3
  */
 public class Converter_IntensityToHeight extends ImageConverter {
+	// vertical distance between lines
 	private static int spacing = 2;
+	// horizontal distance between samples.  more samples = more detail.
 	private static int sampleRate = 5;
+	// max height of the wave will be +/-(waveIntensity/2)
 	private static int waveIntensity = 30;
 
 	public Converter_IntensityToHeight() {
@@ -24,7 +27,7 @@ public class Converter_IntensityToHeight extends ImageConverter {
 
 		SelectSlider selectSize = new SelectSlider("size",Translator.get("Converter_IntensityToHeight.spacing"), 20,1,getSpacing());
 		SelectSlider selectSampleRate = new SelectSlider("sampleRate",Translator.get("Converter_IntensityToHeight.sampleRate"),20,1,getSampleRate());
-		SelectSlider selectWaveIntensity = new SelectSlider("waveIntensity",Translator.get("Converter_IntensityToHeight.waveIntensity"),150,-150,getWaveIntensity());
+		SelectSlider selectWaveIntensity = new SelectSlider("waveIntensity",Translator.get("Converter_IntensityToHeight.waveIntensity"),50,-50,getWaveIntensity());
 
 		add(selectSize);
 		add(selectSampleRate);
@@ -83,10 +86,10 @@ public class Converter_IntensityToHeight extends ImageConverter {
 			// read a block of the image and find the average intensity in this block
 			double z = img.sample( x - sampleSpacing, y - halfStep, x + sampleSpacing, y + halfStep);
 			// scale the intensity value
-			double scale_z = 1-z / 255.0f;
+			double scale_z = 1 - z / 255.0f;
 			//scale_z *= scale_z;  // quadratic curve
 			double pulseSize = waveIntensity * scale_z;
-			double py=y + pulseSize - waveIntensity;
+			double py=y + pulseSize - waveIntensity/2.0f;
 			if(first) {
 				turtle.jumpTo(x, py);
 				first = false;
