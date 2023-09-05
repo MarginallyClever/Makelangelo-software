@@ -130,7 +130,7 @@ public class Converter_IntensityToHeight extends ImageConverter {
 				a.set(xRight,y);
 				b.set(xLeft,y);
 			}
-			convertLine(img,sampleRate,sampleSpacing/2.0,a,b);
+			convertLine(img,sampleRate,sampleRate/2.0,a,b);
 		}
 
 		fireConversionFinished();
