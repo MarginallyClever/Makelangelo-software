@@ -389,4 +389,10 @@
 	<string><key>Converter_IntensityToHeight.spacing</key><value>Wave spacing</value></string>
 	<string><key>Converter_IntensityToHeight.sampleRate</key><value>Sample rate</value></string>
 	<string><key>Converter_IntensityToHeight.waveIntensity</key><value>Wave intensity</value></string>
+
+	<string><key>Converter_Quadtree.name</key><value>Quadtree</value></string>
+	<string><key>Converter_Quadtree.style</key><value>Style</value></string>
+	<string><key>Converter_Quadtree.squares</key><value>Squares</value></string>
+	<string><key>Converter_Quadtree.circles</key><value>Circles</value></string>
+	<string><key>Converter_Quadtree.xs</key><value>Xs</value></string>
 </language>

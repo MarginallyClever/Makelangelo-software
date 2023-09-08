@@ -37,9 +37,9 @@ public class Converter_Quadtree extends ImageConverterIterative {
 	private int iterations;
 
 	private static final String [] styles = {
-		Translator.get("Converter_Quadtree.box"),
-		Translator.get("Converter_Quadtree.circle"),
-		Translator.get("Converter_Quadtree.x"),
+		Translator.get("Converter_Quadtree.squares"),
+		Translator.get("Converter_Quadtree.circles"),
+		Translator.get("Converter_Quadtree.xs"),
 	};
 	private static int cutoff = 128;
 	private static int style = 0;
@@ -229,8 +229,8 @@ public class Converter_Quadtree extends ImageConverterIterative {
 	private void renderCircles(GL2 gl2) {
 		gl2.glColor3f(0, 0, 0);
 		for(Box b : boxes) {
-			float r= (b.x1-b.x0)/2;
-			DrawingHelper.drawCircle(gl2,(b.x0+b.x1)/2,(b.y0+b.y1)/2,r);
+			float r= (b.x1-b.x0)/2f;
+			DrawingHelper.drawCircle(gl2,(b.x0+b.x1)/2f,(b.y0+b.y1)/2f,r);
 		}
 	}
 
