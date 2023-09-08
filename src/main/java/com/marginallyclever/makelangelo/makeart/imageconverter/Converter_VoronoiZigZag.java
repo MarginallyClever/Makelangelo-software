@@ -52,7 +52,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		renderMode = 0;
-		lowNoise=false;
+		lowNoise = false;
 		turtle = new Turtle();
 		super.start(paper, image);
 	}
