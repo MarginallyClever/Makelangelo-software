@@ -31,14 +31,14 @@ public class MathHelperTest {
         for(int i=0;i<50;++i) {
             a.set(Math.random()*500-250, Math.random()*500-250);
             b.set(Math.random()*500-250, Math.random()*500-250);
-            c = MathHelper.lerp(a,b,1.0001+Math.random());
+            c = MathHelper.lerp(a,b,1.0+epsilon+Math.random());
             Assertions.assertFalse(MathHelper.between(a, b, c, epsilon));
         }
 
         for(int i=0;i<50;++i) {
             a.set(Math.random()*500-250, Math.random()*500-250);
             b.set(Math.random()*500-250, Math.random()*500-250);
-            c = MathHelper.lerp(a,b,-0.0001-Math.random());
+            c = MathHelper.lerp(a,b,-epsilon-Math.random());
             Assertions.assertFalse(MathHelper.between(a, b, c, epsilon));
         }
     }
@@ -54,7 +54,29 @@ public class MathHelperTest {
         for(int i=0;i<50;++i) {
             a.set(Math.random()*500-250, Math.random()*500-250);
             b.set(Math.random()*500-250, Math.random()*500-250);
-            c = MathHelper.lerp(a,b,1.0001+Math.random());
+            c = MathHelper.lerp(a,b,Math.random());
+            ortho.set(b);
+            ortho.sub(a);
+            c.x+=ortho.y;
+            c.y+=ortho.x;
+            Assertions.assertFalse(MathHelper.between(a, b, c, epsilon));
+        }
+
+        for(int i=0;i<50;++i) {
+            a.set(Math.random()*500-250, Math.random()*500-250);
+            b.set(Math.random()*500-250, Math.random()*500-250);
+            c = MathHelper.lerp(a,b,1.0+epsilon+Math.random());
+            ortho.set(b);
+            ortho.sub(a);
+            c.x+=ortho.y;
+            c.y+=ortho.x;
+            Assertions.assertFalse(MathHelper.between(a, b, c, epsilon));
+        }
+
+        for(int i=0;i<50;++i) {
+            a.set(Math.random()*500-250, Math.random()*500-250);
+            b.set(Math.random()*500-250, Math.random()*500-250);
+            c = MathHelper.lerp(a,b,-epsilon-Math.random());
             ortho.set(b);
             ortho.sub(a);
             c.x+=ortho.y;
