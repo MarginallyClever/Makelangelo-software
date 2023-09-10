@@ -389,4 +389,9 @@
 	<string><key>Converter_IntensityToHeight.spacing</key><value>Wave spacing</value></string>
 	<string><key>Converter_IntensityToHeight.sampleRate</key><value>Sample rate</value></string>
 	<string><key>Converter_IntensityToHeight.waveIntensity</key><value>Wave intensity</value></string>
+
+	<string><key>Converter_QuadTreeInstant</key><value>Quad tree instant</value></string>
+	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
+	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
+	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
 </language>

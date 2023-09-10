@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.LSystem;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
