@@ -11,10 +11,9 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 /**
  * Convert image to quad tree fractal
  * @author Mohammed Thaier
- * @since ?
+ * @since 7.41
  */
 public class Converter_QuadTreeInstant extends ImageConverter{
-
     private TransformedImage img;
     private static int maxDepth = 5;
     private static int baseCutOff = 120;
@@ -43,12 +42,13 @@ public class Converter_QuadTreeInstant extends ImageConverter{
      * Determines what sides of the box should be drawn,
      * useful for canceling duplicate lines
      */
-    static class BoxCondition{
-            public Boolean drawTop =false;
-            public Boolean drawBottom =false;
-            public Boolean drawLeft =false;
-            public Boolean drawRight =false;
-        public BoxCondition(boolean _top, boolean _bottom, boolean _left, boolean _right){
+    static class BoxCondition {
+        public Boolean drawTop;
+        public Boolean drawBottom;
+        public Boolean drawLeft;
+        public Boolean drawRight;
+
+        public BoxCondition(boolean _top, boolean _bottom, boolean _left, boolean _right) {
             drawTop = _top;
             drawBottom = _bottom;
             drawLeft = _left;
@@ -85,6 +85,7 @@ public class Converter_QuadTreeInstant extends ImageConverter{
     public String getName(){
         return Translator.get("Converter_QuadTreeInstant");
     }
+
     @Override
     public void start(Paper paper, TransformedImage image){
         super.start(paper, image);
@@ -98,88 +99,81 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         turtle = new Turtle();
 
         BoxCondition boxCondition = new BoxCondition(true,true,true,true);
-        //BoxCondition boxCondition = new BoxCondition(false,false,false,false);
-        Fractal(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
+        fractal(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
         fireConversionFinished();
     }
 
-    private void Fractal(Point2D topLeft, Point2D bottomRight, BoxCondition boxCondition, int curDepth, int cutOff){
-        if(curDepth > maxDepth){
-            return;
-        }
-
-        int xDiff = (int)(bottomRight.x - topLeft.x);
-        int yDiff = (int)(topLeft.y - bottomRight.y);
+    private float getAverageOfRegion(Point2D topLeft, Point2D bottomRight) {
         float sum = 0;
         int c = 0;
         for(int i=(int)topLeft.x; i<bottomRight.x; i++){
             for(int k=(int)bottomRight.y; k<topLeft.y; k++){
-                float p = img.sample1x1(i,k);
-                sum += p;
+                sum += img.sample1x1(i,k);
                 c++;
             }
         }
-        if(sum/c > cutOff){
-            return;
-        }
-        System.out.println("Sum: "+sum);
+        if(c==0) return 0;
+        return sum/c;
+    }
 
-        if(boxCondition.drawTop){
-            Point2D p1 = new Point2D(topLeft.x, topLeft.y);
-            Point2D p2 = new Point2D(bottomRight.x, topLeft.y);
-            DrawLine(p1, p2);
+    private void fractal(Point2D topLeft, Point2D bottomRight, BoxCondition boxCondition, int curDepth, int cutOff){
+        if(curDepth > maxDepth) return;
+
+        float average = getAverageOfRegion(topLeft, bottomRight);
+        // if this region is brighter than the cutoff, stop.
+        if(average > cutOff) return;
+
+        // only draw the sides of the box that are needed
+        if(boxCondition.drawTop) {
+            drawLine(new Point2D(topLeft.x, topLeft.y),
+                     new Point2D(bottomRight.x, topLeft.y));
         }
-        if(boxCondition.drawBottom){
-            Point2D p1 = new Point2D(topLeft.x, bottomRight.y);
-            Point2D p2 = new Point2D(bottomRight.x, bottomRight.y);
-            DrawLine(p1, p2);
+        if(boxCondition.drawBottom) {
+            drawLine(new Point2D(topLeft.x, bottomRight.y),
+                     new Point2D(bottomRight.x, bottomRight.y));
         }
-        if(boxCondition.drawLeft){
-            Point2D p1 = new Point2D(topLeft.x, topLeft.y);
-            Point2D p2 = new Point2D(topLeft.x, bottomRight.y);
-            DrawLine(p1, p2);
+        if(boxCondition.drawLeft) {
+            drawLine(new Point2D(topLeft.x, topLeft.y),
+                     new Point2D(topLeft.x, bottomRight.y));
         }
-        if(boxCondition.drawRight){
-            Point2D p1 = new Point2D(bottomRight.x, topLeft.y);
-            Point2D p2 = new Point2D(bottomRight.x, bottomRight.y);
-            DrawLine(p1, p2);
+        if(boxCondition.drawRight) {
+            drawLine(new Point2D(bottomRight.x, topLeft.y),
+                     new Point2D(bottomRight.x, bottomRight.y));
         }
 
+        // go deeper, but each time lower the cutoff.  darker regions will start to fail the test.
+        int newCutOff = cutOff - cutOffIncrement;
         //Drawing sub-fractals
-        int newCutOff = cutOff-cutOffIncrement;
-        Fractal(
-                new Point2D(topLeft.x, topLeft.y),
-                new Point2D(topLeft.x + xDiff/2, topLeft.y-yDiff/2),
+        int w2 = (int)(bottomRight.x - topLeft.x)/2;
+        int h2 = (int)(topLeft.y - bottomRight.y)/2;
+        // top left corner
+        fractal(new Point2D(topLeft.x, topLeft.y),
+                new Point2D(topLeft.x + w2, topLeft.y-h2),
                 new BoxCondition(false,true,false,true),
               curDepth+1,
-                newCutOff
-        );
-        Fractal(
-                new Point2D(topLeft.x + xDiff/2, topLeft.y),
-                new Point2D(bottomRight.x, topLeft.y-yDiff/2),
+                newCutOff);
+        // top right corner
+        fractal(new Point2D(topLeft.x + w2, topLeft.y),
+                new Point2D(bottomRight.x, topLeft.y-h2),
                 new BoxCondition(false,true,true,false),
                 curDepth+1,
-                newCutOff
-        );
-        Fractal(
-                new Point2D(topLeft.x, topLeft.y-yDiff/2),
-                new Point2D(topLeft.x+xDiff/2, bottomRight.y),
+                newCutOff);
+        // bottom left corner
+        fractal(new Point2D(topLeft.x, topLeft.y-h2),
+                new Point2D(topLeft.x+w2, bottomRight.y),
                 new BoxCondition(true,false,false,true),
                 curDepth+1,
-                newCutOff
-        );
-        Fractal(
-                new Point2D(topLeft.x+xDiff/2, topLeft.y-yDiff/2),
+                newCutOff);
+        // bottom right corner
+        fractal(new Point2D(topLeft.x+w2, topLeft.y-h2),
                 new Point2D(bottomRight.x, bottomRight.y),
                 new BoxCondition(true,false,true,false),
                 curDepth+1,
-                newCutOff
-        );
-
+                newCutOff);
     }
-    private void DrawLine(Point2D p1, Point2D p2){
+
+    private void drawLine(Point2D p1, Point2D p2) {
         turtle.jumpTo(p1.x,p1.y);
         turtle.moveTo(p2.x,p2.y);
     }
-
 }
