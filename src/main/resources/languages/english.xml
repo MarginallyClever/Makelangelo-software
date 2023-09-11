@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
-
 	<!--
         To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
         please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
@@ -259,9 +258,13 @@
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
 
+	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
+	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>
+
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
 	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
 	<string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
+	<string><key>SaveGCode.splitGCodeQuestion</key><value>There are %1 tool changes in this drawing.  Split into separate files?</value></string>
 
 	<string><key>Converter_CMYK_Circles.name</key><value>CMYK circles</value></string>
 	<string><key>Converter_CMYK_Circles.maxCircleSize</key><value>max circle size</value></string>
@@ -395,4 +398,10 @@
 	<string><key>Converter_Quadtree.squares</key><value>Squares</value></string>
 	<string><key>Converter_Quadtree.circles</key><value>Circles</value></string>
 	<string><key>Converter_Quadtree.xs</key><value>Xs</value></string>
+
+  <string><key>Converter_QuadTreeInstant</key><value>Quad tree instant</value></string>
+	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
+	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
+	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
+
 </language>

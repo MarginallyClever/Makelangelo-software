@@ -22,7 +22,7 @@ public class ImageConverterFactory {
 					new Converter_Moire(),
 					new Converter_Multipass(),
 					new Converter_Pulse(),
-					new Converter_Quadtree(),
+					new Converter_QuadTreeInstant(),
 					new Converter_RandomLines(),
 					new Converter_Sandy(),
 					new Converter_Spiral(),
