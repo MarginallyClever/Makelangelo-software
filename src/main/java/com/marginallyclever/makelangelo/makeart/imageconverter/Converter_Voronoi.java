@@ -7,7 +7,6 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -20,26 +19,20 @@ import org.slf4j.LoggerFactory;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Shared methods for Voronoi converters
  * @author Dan Royer
  * @since 7.39.9
  */
-public abstract class Converter_Voronoi extends ImageConverterIterative implements PreviewListener {
+public abstract class Converter_Voronoi extends ImageConverterIterative {
     private static final Logger logger = LoggerFactory.getLogger(Converter_Voronoi.class);
     private static int numCells = 9000;
     private static boolean drawVoronoi = false;
 
     private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
     protected final List<VoronoiCell> cells = new ArrayList<>();
-
-    protected final Lock lock = new ReentrantLock();
-
     private int iterations;
-
     private int lowpassCutoff = 128;
     private int cellBuffer = 100;
 
