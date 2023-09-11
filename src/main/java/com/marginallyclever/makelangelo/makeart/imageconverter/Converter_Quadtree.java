@@ -52,7 +52,7 @@ public class Converter_Quadtree extends ImageConverterIterative {
 		add(fieldNoise);
 		fieldNoise.addPropertyChangeListener(evt -> {
 			style = fieldNoise.getSelectedIndex();
-			fireRestart();
+			//fireRestart();
 		});
 
 	}
@@ -80,7 +80,7 @@ public class Converter_Quadtree extends ImageConverterIterative {
 		Box b = new Box((int)paper.getMarginLeft(),(int)paper.getMarginBottom(),(int)paper.getMarginRight(),(int)paper.getMarginTop());
 		//Box b = new Box(0,0,(int)paper.getMarginWidth(),(int)paper.getMarginHeight());
 		updateBox(b);
-		boxes.add(b);
+		addBox(b);
 	}
 
 
@@ -89,23 +89,30 @@ public class Converter_Quadtree extends ImageConverterIterative {
 		float sum=0;
 		float c=0;
 		for(int y=b.y0;y<b.y1;++y) {
-			for(int x=b.x0;x<b.x1;++x) {
-				float p = img.sample1x1(x,y);
+			for (int x = b.x0; x < b.x1; ++x) {
+				float p = 255f - img.sample1x1(x, y);
 				c++;
-				sum += p;			}
+				sum += p;
+			}
 		}
+		//float div = (float)Math.log(c);
+		//float div = (float)Math.log10(c);  // this log10 makes a huge difference.  also tried sqrt() and various pow()
+		//float div = (float)Math.sqrt(c);
+		//float div = (float)Math.pow(c,0.4);
+		float div = -1f / c + 1f;
+
+		b.average = sum / div;
 		sum/=c;
-		b.average = sum;
 
 		// from the average, find the error.
 		float error=0;
 		for(int y=b.y0;y<b.y1;++y) {
 			for(int x=b.x0;x<b.x1;++x) {
-				float p = img.sample1x1(x,y);
+				float p = 255f-img.sample1x1(x,y);
 				error += Math.abs(sum - p);
 			}
 		}
-		b.error = error;
+		b.error = error/c;
 	}
 
 	/**
@@ -132,12 +139,7 @@ public class Converter_Quadtree extends ImageConverterIterative {
 
 		// find box with biggest error term
 		Box worstBox=boxes.get(0);
-		for(int i=1;i<boxes.size();++i) {
-			Box b = boxes.get(i);
-			if(worstBox.error<b.error) {
-				worstBox=b;
-			}
-		}
+
 		// replace the box with four smaller boxes
 		boxes.remove(worstBox);
 		int x0=worstBox.x0;
@@ -159,8 +161,19 @@ public class Converter_Quadtree extends ImageConverterIterative {
 
 		for( Box bn : b4 ) {
 			updateBox(bn);
-			boxes.add(bn);
+			addBox(bn);
 		}
+	}
+
+	// add this box to the list such that the list stays sorted with biggest average first.
+	private void addBox(Box b) {
+		for(int i=0;i<boxes.size();++i) {
+			if(boxes.get(i).average<b.average) {
+				boxes.add(i,b);
+				return;
+			}
+		}
+		boxes.add(b);
 	}
 
 	/**
@@ -186,6 +199,11 @@ public class Converter_Quadtree extends ImageConverterIterative {
 	}
 
 	private void writeOutTurtle() {
+		switch (style) {
+			case 0 -> writeBoxes();
+			case 1 -> writeCircles();
+			case 2 -> writeXs();
+		}
 	}
 
 	@Override
@@ -244,5 +262,28 @@ public class Converter_Quadtree extends ImageConverterIterative {
 			gl2.glVertex2d(b.x0,b.y1);
 		}
 		gl2.glEnd();
+	}
+
+	private void writeBoxes() {
+		for(Box b : boxes) {
+			turtle.jumpTo(b.x0,b.y0);
+			turtle.moveTo(b.x1,b.y0);
+			turtle.moveTo(b.x1,b.y1);
+			turtle.moveTo(b.x0,b.y1);
+			turtle.moveTo(b.x0,b.y0);
+		}
+	}
+
+	private void writeCircles() {
+
+	}
+
+	private void writeXs() {
+		for(Box b : boxes) {
+			turtle.jumpTo(b.x0,b.y0);
+			turtle.moveTo(b.x1,b.y1);
+			turtle.jumpTo(b.x0,b.y1);
+			turtle.moveTo(b.x1,b.y0);
+		}
 	}
 }
