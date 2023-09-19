@@ -5,13 +5,17 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 /**
  * Makes a "well formed" maze.
- * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+ * See also <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker">wikipedia</a>
  * @author Dan Royer
  */
 public class Generator_Maze extends TurtleGenerator {
-	// MazeCells are the rooms separted by MazeWalls
+	// MazeCells are the rooms separated by MazeWalls
 	protected static class MazeCell {
 		int x, y;
 		boolean visited;
@@ -26,8 +30,8 @@ public class Generator_Maze extends TurtleGenerator {
 
 	protected static int rows = 5, columns = 5;
 	protected double xMax, xMin, yMax, yMin;
-	protected MazeCell[] cells;
-	protected MazeWall[] walls;
+	protected List<MazeCell> cells = new ArrayList<>();
+	protected List<MazeWall> walls = new ArrayList<>();
 
 	public Generator_Maze() {
 		super();
@@ -73,51 +77,51 @@ public class Generator_Maze extends TurtleGenerator {
 	 */
 	@Override
 	public void generate() {
-		// build the cells
-		cells = new MazeCell[rows * columns];
+		cells.clear();
 
-		int x, y, i = 0;
+		// build the cells
+		int x, y, i ;
 		for (y = 0; y < rows; ++y) {
 			for (x = 0; x < columns; ++x) {
-				cells[i] = new MazeCell();
-				cells[i].visited = false;
-				cells[i].onStack = false;
-				cells[i].x = x;
-				cells[i].y = y;
-				++i;
+				MazeCell c = new MazeCell();
+				c.visited = false;
+				c.x = x;
+				c.y = y;
+				cells.add(c);
 			}
 		}
 
 		// build the graph
-		walls = new MazeWall[((rows - 1) * columns) + ((columns - 1) * rows)];
-		i = 0;
+		walls.clear();
 		for (y = 0; y < rows; ++y) {
 			for (x = 0; x < columns; ++x) {
 				if (x < columns - 1) {
 					// vertical wall between horizontal cells
-					walls[i] = new MazeWall();
-					walls[i].removed = false;
-					walls[i].cellA = y * columns + x;
-					walls[i].cellB = y * columns + x + 1;
-					++i;
+					MazeWall w = new MazeWall();
+					w.removed = false;
+					w.cellA = y * columns + x;
+					w.cellB = y * columns + x + 1;
+					walls.add(w);
 				}
 				if (y < rows - 1) {
 					// horizontal wall between vertical cells
-					walls[i] = new MazeWall();
-					walls[i].removed = false;
-					walls[i].cellA = y * columns + x;
-					walls[i].cellB = y * columns + x + columns;
-					++i;
+					MazeWall w = new MazeWall();
+					w.removed = false;
+					w.cellA = y * columns + x;
+					w.cellB = y * columns + x + columns;
+					walls.add(w);
 				}
 			}
 		}
 
-		int unvisitedCells = cells.length; // -1 for initial cell.
+		Stack<MazeCell> stack = new Stack<>();
+		int unvisitedCells = cells.size();
 		int cellsOnStack = 0;
 
 		// Make the initial cell the current cell and mark it as visited
 		int currentCell = 0;
-		cells[currentCell].visited = true;
+		cells.get(currentCell).visited = true;
+		stack.add(cells.get(currentCell));
 		--unvisitedCells;
 
 		// While there are unvisited cells
@@ -127,27 +131,20 @@ public class Generator_Maze extends TurtleGenerator {
 			int nextCell = chooseUnvisitedNeighbor(currentCell);
 			if (nextCell != -1) {
 				// Push the current cell to the stack
-				cells[currentCell].onStack = true;
 				++cellsOnStack;
-				// Remove the wall between the current cell and the chosen cell
+				// Remove the wall between the current cell and the next cell
 				int wallIndex = findWallBetween(currentCell, nextCell);
 				assert (wallIndex != -1);
-				walls[wallIndex].removed = true;
-				// Make the chosen cell the current cell and mark it as visited
+				walls.get(wallIndex).removed = true;
+				// Make the next cell into the current cell and mark it as visited
 				currentCell = nextCell;
-				cells[currentCell].visited = true;
+				stack.add(cells.get(currentCell));
+				cells.get(currentCell).visited = true;
 				--unvisitedCells;
-			} else if (cellsOnStack > 0) {
+			} else {
 				// else if stack is not empty pop a cell from the stack
-				for (i = 0; i < cells.length; ++i) {
-					if (cells[i].onStack) {
-						// Make it the current cell
-						currentCell = i;
-						cells[i].onStack = false;
-						--cellsOnStack;
-						break;
-					}
-				}
+				MazeCell c = stack.pop();
+				currentCell = cells.indexOf(c);
 			}
 		}
 
@@ -179,15 +176,16 @@ public class Generator_Maze extends TurtleGenerator {
 		turtle.moveTo(xMin, yMax - h);
 
 		int i;
-		for (i = 0; i < walls.length; ++i) {
-			if (walls[i].removed)
+		for (i = 0; i < walls.size(); ++i) {
+			MazeWall wall = walls.get(i);
+			if (wall.removed)
 				continue;
-			int a = walls[i].cellA;
-			int b = walls[i].cellB;
-			int ax = cells[a].x;
-			int ay = cells[a].y;
-			int bx = cells[b].x;
-			int by = cells[b].y;
+			int a = wall.cellA;
+			int b = wall.cellB;
+			int ax = cells.get(a).x;
+			int ay = cells.get(a).y;
+			int bx = cells.get(b).x;
+			int by = cells.get(b).y;
 			if (ay == by) {
 				// vertical wall
 				double x = xMin + (ax + 1) * w;
@@ -208,26 +206,26 @@ public class Generator_Maze extends TurtleGenerator {
 	}
 
 	private int chooseUnvisitedNeighbor(int currentCell) {
-		int x = cells[currentCell].x;
-		int y = cells[currentCell].y;
+		int x = cells.get(currentCell).x;
+		int y = cells.get(currentCell).y;
 
 		int[] candidates = new int[4];
 		int found = 0;
 
 		// left
-		if (x > 0 && cells[currentCell - 1].visited == false) {
+		if (x > 0 && !cells.get(currentCell - 1).visited) {
 			candidates[found++] = currentCell - 1;
 		}
 		// right
-		if (x < columns - 1 && !cells[currentCell + 1].visited) {
+		if (x < columns - 1 && !cells.get(currentCell + 1).visited) {
 			candidates[found++] = currentCell + 1;
 		}
 		// up
-		if (y > 0 && !cells[currentCell - columns].visited) {
+		if (y > 0 && !cells.get(currentCell - columns).visited) {
 			candidates[found++] = currentCell - columns;
 		}
 		// down
-		if (y < rows - 1 && !cells[currentCell + columns].visited) {
+		if (y < rows - 1 && !cells.get(currentCell + columns).visited) {
 			candidates[found++] = currentCell + columns;
 		}
 
@@ -243,9 +241,9 @@ public class Generator_Maze extends TurtleGenerator {
 
 	private int findWallBetween(int currentCell, int nextCell) {
 		int i;
-		for (i = 0; i < walls.length; ++i) {
-			if (walls[i].cellA == currentCell || walls[i].cellA == nextCell) {
-				if (walls[i].cellB == currentCell || walls[i].cellB == nextCell)
+		for (i = 0; i < walls.size(); ++i) {
+			if (walls.get(i).cellA == currentCell || walls.get(i).cellA == nextCell) {
+				if (walls.get(i).cellB == currentCell || walls.get(i).cellB == nextCell)
 					return i;
 			}
 		}
