@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**
  * Makes a "well formed" maze.
- * See also https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker
+ * See also <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker">wikipedia</a>
  * @author Dan Royer
  */
 public class Generator_Maze extends TurtleGenerator {
@@ -26,8 +26,8 @@ public class Generator_Maze extends TurtleGenerator {
 
 	protected static int rows = 5, columns = 5;
 	protected double xMax, xMin, yMax, yMin;
-	protected MazeCell[] cells;
-	protected MazeWall[] walls;
+	protected MazeCell [] cells;
+	protected MazeWall [] walls;
 
 	public Generator_Maze() {
 		super();
@@ -112,7 +112,7 @@ public class Generator_Maze extends TurtleGenerator {
 			}
 		}
 
-		int unvisitedCells = cells.length; // -1 for initial cell.
+		int unvisitedCells = cells.length;
 		int cellsOnStack = 0;
 
 		// Make the initial cell the current cell and mark it as visited
@@ -129,11 +129,11 @@ public class Generator_Maze extends TurtleGenerator {
 				// Push the current cell to the stack
 				cells[currentCell].onStack = true;
 				++cellsOnStack;
-				// Remove the wall between the current cell and the chosen cell
+				// Remove the wall between the current cell and the next cell
 				int wallIndex = findWallBetween(currentCell, nextCell);
 				assert (wallIndex != -1);
 				walls[wallIndex].removed = true;
-				// Make the chosen cell the current cell and mark it as visited
+				// Make the next cell into the current cell and mark it as visited
 				currentCell = nextCell;
 				cells[currentCell].visited = true;
 				--unvisitedCells;

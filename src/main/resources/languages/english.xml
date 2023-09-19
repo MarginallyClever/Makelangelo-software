@@ -398,4 +398,7 @@
 	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
 	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
 
+	<string><key>Generator_MazeCircle.name</key><value>Maze circle</value></string>
+	<string><key>Generator_MazeCircle.rings</key><value>rings</value></string>
+	<string><key>Generator_MazeCircle.inner</key><value>inner rooms</value></string>
 </language>
