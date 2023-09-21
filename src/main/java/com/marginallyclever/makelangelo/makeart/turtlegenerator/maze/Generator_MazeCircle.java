@@ -67,25 +67,20 @@ public class Generator_MazeCircle extends Generator_Maze {
 		walls.clear();
 		MazeWall w;
 
-		int k=0;
-
 		// wall between cells in the same ring
 		int first=1;
 		for(int y = 1; y < 1+rings; ++y) {
 			int count = getCellsPerRing(y);
 			for (int x = 0; x < count; ++x) {
-				w = new MazeWall();
-				w.cellA = first + x;
-				w.cellB = first + ((x + 1) % count);
+				w = new MazeWall(
+						first + x,
+						first + ((x + 1) % count));
 				walls.add(w);
 				cells.get(w.cellA).walls.add(w);
 				cells.get(w.cellB).walls.add(w);
-				System.out.println(k+" "+w); k++;
 			}
-			System.out.println();
 			first+=count;
 		}
-		System.out.println();
 
 		// wall between cells in adjacent rings
 		first=1;
@@ -93,16 +88,13 @@ public class Generator_MazeCircle extends Generator_Maze {
 		int before=1;
 		for(int y = 1; y < 1+rings; ++y) {
 			int count = getCellsPerRing(y);
-			double ratio = count / (double)before;
-			//System.out.println("count="+count+", prev="+prev);
 			for(int x = 0; x < count; ++x) {
-				w = new MazeWall();
-				w.cellB = first + x;
-				w.cellA = (y==1) ? 0 : (prev + getParentCell(w.cellB));  // only works if the ring ratio is always 1:2
+				int b = first + x;
+				int a = (y==1) ? 0 : (prev + getParentCell(b));  // only works if the ring ratio is always 1:2
+				w = new MazeWall(a,b);
+				walls.add(w);
 				cells.get(w.cellA).walls.add(w);
 				cells.get(w.cellB).walls.add(w);
-				walls.add(w);
-				//System.out.println(k+" "+w); k++;
 			}
 			first += count;
 			prev += before;

@@ -68,23 +68,27 @@ public class Generator_MazeRectangle extends Generator_Maze {
 	@Override
 	public void buildWalls() {
 		walls.clear();
-
+		MazeWall w;
 		int x, y;
 		for (y = 0; y < rows; ++y) {
 			for (x = 0; x < columns; ++x) {
 				if (x < columns - 1) {
 					// vertical wall between horizontal cells
-					MazeWall w = new MazeWall();
-					w.cellA = y * columns + x;
-					w.cellB = y * columns + x + 1;
+					w = new MazeWall(
+							y * columns + x,
+							y * columns + x + 1);
 					walls.add(w);
+					cells.get(w.cellA).walls.add(w);
+					cells.get(w.cellB).walls.add(w);
 				}
 				if (y < rows - 1) {
 					// horizontal wall between vertical cells
-					MazeWall w = new MazeWall();
-					w.cellA = (y  ) * columns + x;
-					w.cellB = (y+1) * columns + x;
+					w = new MazeWall(
+						(y  ) * columns + x,
+						(y+1) * columns + x);
 					walls.add(w);
+					cells.get(w.cellA).walls.add(w);
+					cells.get(w.cellB).walls.add(w);
 				}
 			}
 		}

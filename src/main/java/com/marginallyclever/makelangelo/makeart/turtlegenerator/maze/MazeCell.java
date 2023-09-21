@@ -18,7 +18,7 @@ public class MazeCell {
         this.x=x;
         this.y=y;
     }
-    
+
     @Override
     public String toString() {
         return "(" + y + "," + x + ")" + (visited ? "v" : "");

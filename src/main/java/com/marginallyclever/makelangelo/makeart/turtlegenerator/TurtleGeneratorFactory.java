@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
 
 public class TurtleGeneratorFactory {
@@ -19,6 +20,7 @@ public class TurtleGeneratorFactory {
 			new Generator_LSystemTree(),
 			new Generator_MazeRectangle(),
 			new Generator_MazeCircle(),
+			new Generator_MazeHoneycomb(),
 			new Generator_Package(),
 			new Generator_Polyeder(),
 			new Generator_SierpinskiTriangle(),

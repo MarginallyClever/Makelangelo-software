@@ -304,6 +304,7 @@
 	<string><key>Generator_MazeRectangle.columns</key><value>Columns</value></string>
 	<string><key>Generator_MazeCircle.name</key><value>Maze circle</value></string>
 	<string><key>Generator_MazeCircle.rings</key><value>rings</value></string>
+	<string><key>Generator_MazeHoneycomb.name</key><value>Maze honeycomb</value></string>
 
 	<string><key>Generator_GridFit.Name</key><value>Grid fit</value></string>
 	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
