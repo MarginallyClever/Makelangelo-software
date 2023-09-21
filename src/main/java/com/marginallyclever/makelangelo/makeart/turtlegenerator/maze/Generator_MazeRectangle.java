@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -15,23 +16,9 @@ import java.util.Stack;
  * @author Dan Royer
  */
 public class Generator_MazeRectangle extends TurtleGenerator {
-	// MazeCells are the rooms separated by MazeWalls
-	protected static class MazeCell {
-		int x, y;
-		boolean visited;
-		boolean onStack;
-	}
-
-	// MazeWalls separate MazeCells
-	protected static class MazeWall {
-		int cellA, cellB;
-		boolean removed;
-	}
-
-	protected static int rows = 5, columns = 5;
-	protected double xMax, xMin, yMax, yMin;
-	protected List<MazeCell> cells = new ArrayList<>();
-	protected List<MazeWall> walls = new ArrayList<>();
+	private static int rows = 5, columns = 5;
+	private final List<MazeCell> cells = new ArrayList<>();
+	private final List<MazeWall> walls = new ArrayList<>();
 
 	public Generator_MazeRectangle() {
 		super();
@@ -155,10 +142,10 @@ public class Generator_MazeRectangle extends TurtleGenerator {
 	}
 
 	private Turtle drawMaze() {
-		yMin = myPaper.getMarginBottom();
-		yMax = myPaper.getMarginTop();
-		xMin = myPaper.getMarginLeft();
-		xMax = myPaper.getMarginRight();
+		double yMin = myPaper.getMarginBottom();
+		double yMax = myPaper.getMarginTop();
+		double xMin = myPaper.getMarginLeft();
+		double xMax = myPaper.getMarginRight();
 		
 		double w = (xMax - xMin) / columns;
 		double h = (yMax - yMin) / rows;

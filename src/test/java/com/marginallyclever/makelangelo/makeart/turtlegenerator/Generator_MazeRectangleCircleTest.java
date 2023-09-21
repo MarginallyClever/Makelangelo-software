@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
