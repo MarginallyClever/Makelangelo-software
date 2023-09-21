@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class Generator_MazeCircleTest {
+public class Generator_MazeRectangleCircleTest {
     @BeforeAll
     public static void setup() {
         PreferencesHelper.start();
