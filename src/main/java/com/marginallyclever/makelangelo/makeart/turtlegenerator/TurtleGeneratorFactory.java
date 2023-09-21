@@ -14,7 +14,7 @@ public class TurtleGeneratorFactory {
 			new Generator_KochCurve(),
 			new Generator_Lissajous(),
 			new Generator_LSystemTree(),
-			new Generator_Maze(),
+			new Generator_MazeRectangle(),
 			new Generator_MazeCircle(),
 			new Generator_Package(),
 			new Generator_Polyeder(),

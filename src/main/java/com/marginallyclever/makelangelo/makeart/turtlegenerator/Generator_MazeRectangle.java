@@ -14,7 +14,7 @@ import java.util.Stack;
  * See also <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker">wikipedia</a>
  * @author Dan Royer
  */
-public class Generator_Maze extends TurtleGenerator {
+public class Generator_MazeRectangle extends TurtleGenerator {
 	// MazeCells are the rooms separated by MazeWalls
 	protected static class MazeCell {
 		int x, y;
@@ -33,18 +33,18 @@ public class Generator_Maze extends TurtleGenerator {
 	protected List<MazeCell> cells = new ArrayList<>();
 	protected List<MazeWall> walls = new ArrayList<>();
 
-	public Generator_Maze() {
+	public Generator_MazeRectangle() {
 		super();
 
 		SelectSlider field_rows;
 		SelectSlider field_columns;
 
-		add(field_rows = new SelectSlider("rows",Translator.get("MazeRows"),100,1,getRows()));
+		add(field_rows = new SelectSlider("rows",Translator.get("Generator_MazeRectangle.rows"),100,1,getRows()));
 		field_rows.addPropertyChangeListener(evt->{
 			setRows(field_rows.getValue());
 			generate();
 		});
-		add(field_columns = new SelectSlider("columns",Translator.get("MazeColumns"),100,1,getCols()));
+		add(field_columns = new SelectSlider("columns",Translator.get("Generator_MazeRectangle.columns"),100,1,getCols()));
 		field_columns.addPropertyChangeListener(evt->{
 			setCols(field_columns.getValue());
 			generate();
@@ -54,7 +54,7 @@ public class Generator_Maze extends TurtleGenerator {
 	
 	@Override
 	public String getName() {
-		return Translator.get("MazeName");
+		return Translator.get("Generator_MazeRectangle.name");
 	}
 
 	public int getRows() {

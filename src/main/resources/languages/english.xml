@@ -109,9 +109,6 @@
 	<string><key>Flap</key><value>Flap</value></string>
 	<string><key>Model</key><value>Model</value></string>
 	<string><key>Length</key><value>Length</value></string>
-	<string><key>MazeName</key><value>Maze</value></string>
-	<string><key>MazeRows</key><value>Rows</value></string>
-	<string><key>MazeColumns</key><value>Columns</value></string>
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
 	<string><key>YourMsgHereName</key><value>Your message here</value></string>
 	<string><key>SpiralName</key><value>Spiral</value></string>
@@ -231,8 +228,8 @@
 	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>
 
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
-
 	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
+	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
 
 	<string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
 	<string><key>SaveGCode.splitGCodeQuestion</key><value>There are %1 tool changes in this drawing.  Split into separate files?</value></string>
@@ -302,6 +299,9 @@
 	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
 	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
 
+	<string><key>Generator_MazeRectangle.name</key><value>Maze Rectangle</value></string>
+	<string><key>Generator_MazeRectangle.rows</key><value>Rows</value></string>
+	<string><key>Generator_MazeRectangle.columns</key><value>Columns</value></string>
 	<string><key>Generator_MazeCircle.name</key><value>Maze circle</value></string>
 	<string><key>Generator_MazeCircle.rings</key><value>rings</value></string>
 
@@ -309,7 +309,6 @@
 	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
 	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
 	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
-	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
 
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
 	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>

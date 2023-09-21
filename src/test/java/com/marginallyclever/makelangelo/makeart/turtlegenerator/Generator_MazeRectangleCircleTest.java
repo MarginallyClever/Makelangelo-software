@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class Generator_MazeCircleTest {
+public class Generator_MazeRectangleCircleTest {
     @BeforeAll
     public static void setup() {
         PreferencesHelper.start();
