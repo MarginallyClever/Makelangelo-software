@@ -8,12 +8,17 @@ import java.util.List;
  * @since 7.43.0
  * @author Dan Royer
  */
-class MazeCell {
+public class MazeCell {
     public int x, y;
     public boolean visited = false;
 
     public List<MazeWall> walls = new ArrayList<>();
 
+    public MazeCell(int x,int y) {
+        this.x=x;
+        this.y=y;
+    }
+    
     @Override
     public String toString() {
         return "(" + y + "," + x + ")" + (visited ? "v" : "");

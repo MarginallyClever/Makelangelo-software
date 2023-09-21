@@ -5,7 +5,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
  * @since 7.43.0
  * @author Dan Royer
   */
-class MazeWall {
+public class MazeWall {
     public int cellA, cellB;
     public boolean removed = false;
 

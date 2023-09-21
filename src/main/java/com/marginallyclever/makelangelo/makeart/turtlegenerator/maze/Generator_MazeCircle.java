@@ -1,25 +1,19 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 
 /**
  * Makes a "well formed" maze in a circle.
  * See also <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker">wikipedia</a>
  * @author Dan Royer
  */
-public class Generator_MazeCircle extends TurtleGenerator {
+public class Generator_MazeCircle extends Generator_Maze {
 	private static int rings = 5;
-	private final List<MazeCell> cells = new ArrayList<>();
-	private final List<MazeWall> walls = new ArrayList<>();
 
 	public Generator_MazeCircle() {
 		super();
@@ -57,38 +51,19 @@ public class Generator_MazeCircle extends TurtleGenerator {
 		return (int)Math.pow(2,x+3);
 	}
 
-	/**
-	 * build a list of walls in the maze, cells in the maze, and how they connect to each other.
-	 */
 	@Override
-	public void generate() {
-		buildCells();
-		buildWalls();
-		buildMaze();
-
-		// draw the maze
-		Turtle turtle = drawMaze();
-
-		notifyListeners(turtle);
-	}
-
-	private void buildCells() {
+	public void buildCells() {
 		cells.clear();
-		int i=0;
 		for(int y = 0; y < 1+rings; ++y) {
 			int count = getCellsPerRing(y);
 			for(int x = 0; x < count; ++x) {
-				MazeCell c = new MazeCell();
-				c.x = x;
-				c.y = y;
-				cells.add(c);
-				System.out.println(i+" "+c);  i++;
+				cells.add(new MazeCell(x,y));
 			}
 		}
-		System.out.println();
 	}
 
-	private void buildWalls() {
+	@Override
+	public void buildWalls() {
 		walls.clear();
 		MazeWall w;
 
@@ -146,45 +121,8 @@ public class Generator_MazeCircle extends TurtleGenerator {
 		}
 	}
 
-	/**
-	 * depth first search of the maze, removing walls as we go.
-	 */
-	private void buildMaze() {
-		int unvisitedCells = cells.size(); // -1 for initial cell.
-
-		Stack<MazeCell> stack = new Stack<>();
-
-		// Make the initial cell the current cell and mark it as visited
-		int currentCell = (int)(Math.random()*unvisitedCells);
-
-		cells.get(currentCell).visited = true;
-		stack.add(cells.get(currentCell));
-		--unvisitedCells;
-
-		// While there are unvisited cells
-		while (unvisitedCells > 0) {
-			// If the current cell has any neighbours which have not been visited
-			// Choose randomly one of the unvisited neighbours
-			int nextCell = chooseUnvisitedNeighbor(currentCell);
-			if (nextCell != -1) {
-				// Remove the wall between the current cell and the next cell
-				int wallIndex = findWallBetween(currentCell, nextCell);
-				walls.get(wallIndex).removed = true;
-				// Make the next cell into the current cell and mark it as visited
-				currentCell = nextCell;
-
-				cells.get(currentCell).visited = true;
-				stack.add(cells.get(currentCell));
-				--unvisitedCells;
-			} else {
-				// else if stack is not empty pop a cell from the stack
-				MazeCell c = stack.pop();
-				currentCell = cells.indexOf(c);
-			}
-		}
-	}
-
-	private Turtle drawMaze() {
+	@Override
+	public Turtle drawMaze() {
 		// find radius of maze
 		double yMin = myPaper.getMarginBottom();
 		double yMax = myPaper.getMarginTop();
@@ -255,39 +193,6 @@ public class Generator_MazeCircle extends TurtleGenerator {
 
 	private double getAngle(double numerator, double denominator) {
 		return Math.PI * 2.0 * numerator / denominator;
-	}
-
-	private int chooseUnvisitedNeighbor(int currentCell) {
-		List<Integer> candidates = new ArrayList<>();
-		MazeCell c = cells.get(currentCell);
-		for(int i=0;i<c.walls.size();++i) {
-			MazeWall w = c.walls.get(i);
-			if(w.removed) continue;
-			if(w.cellA==currentCell) {
-				if(cells.get(w.cellB).visited) continue;
-				candidates.add(w.cellB);
-			} else {
-				if(cells.get(w.cellA).visited) continue;
-				candidates.add(w.cellA);
-			}
-		}
-
-		if(candidates.isEmpty())
-			return -1;
-
-		// choose a random candidate
-		int choice = (int) (Math.random() * candidates.size());
-		return candidates.get(choice);
-	}
-
-	private int findWallBetween(int currentCell, int nextCell) {
-		MazeCell c = cells.get(currentCell);
-		for(MazeWall w : c.walls) {
-			if(w.cellA==nextCell || w.cellB==nextCell) {
-				return walls.indexOf(w);
-			}
-		}
-		return -1;
 	}
 
 	/**
