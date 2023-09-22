@@ -154,12 +154,13 @@ public class Generator_MazeCircle extends Generator_Maze {
 					turtle.moveTo(q.x, q.y);
 				} else {
 					// wall between two cells of different rings
-					drawArc(turtle,
+					turtle.drawArc(
 							0,
 							0,
 							ringSize * by,
 							getAngle(bx + 0, getCellsPerRing(by)),
-							getAngle(bx + 1, getCellsPerRing(by))
+							getAngle(bx + 1, getCellsPerRing(by)),
+							10
 					);
 				}
 			}
