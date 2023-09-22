@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -361,6 +362,30 @@ public class Turtle implements Cloneable {
 				}
 				default -> {}
 			}
+		}
+	}
+
+	/**
+	 * Draw an arc.
+	 * @param cx absolute center of arc
+	 * @param cy absolute center of arc
+	 * @param radius of arc
+	 * @param a1 start angle, in radians
+	 * @param a2 end angle, in radians
+	 * @param steps must be greater than zero.
+	 */
+	public void drawArc(double cx, double cy, double radius, double a1, double a2,int steps) {
+		if(steps<=0) throw new InvalidParameterException("steps must be greater than zero.");
+
+		double delta = (a2 - a1) / (double) steps;
+		double f = a1;
+
+		for (int i = 0; i <= steps; i++) {
+			double x2 = cx + Math.cos(f) * radius;
+			double y2 = cy + Math.sin(f) * radius;
+			if(i==0) this.jumpTo(x2, y2);
+			else     this.moveTo(x2, y2);
+			f += delta;
 		}
 	}
 

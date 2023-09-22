@@ -286,6 +286,9 @@
 	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
 	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
 	<string><key>Generator_TruchetTiles.LinesPerTile</key><value>Lines per tile</value></string>
+	<string><key>Generator_TruchetTiles.diagonal</key><value>Diagonal</value></string>
+	<string><key>Generator_TruchetTiles.orthogonal</key><value>Orthogonal</value></string>
+	<string><key>Generator_TruchetTiles.curved</key><value>Curved</value></string>
 
 	<string><key>Generator_FlowField.name</key><value>Flow field</value></string>
 	<string><key>Generator_FlowField.scaleX</key><value>X scale</value></string>

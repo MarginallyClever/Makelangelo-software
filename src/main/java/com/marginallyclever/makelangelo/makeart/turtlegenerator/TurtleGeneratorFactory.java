@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet.Generator_TruchetTiles;
 
 public class TurtleGeneratorFactory {
 	public static TurtleGenerator [] available = {
