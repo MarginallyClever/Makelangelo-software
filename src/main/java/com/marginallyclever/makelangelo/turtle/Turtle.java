@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>moving relative or absolute amounts regardless of direction</li>
  *     <li>changing the tool (color and diameter)</li>
  * </ul>
+ * The turtle's starting angle is 0 degrees, which is to the right.  The turtle starts with the tail down.
  *
  * @author Dan Royer
  * @since 7.0?
@@ -214,10 +215,10 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Relative turn in degrees.
-	 * @param degrees relative change in degrees.  Positive is counter clockwise.
+	 * @param degreesCCW relative change in degrees.  Positive is counter clockwise.
 	 */
-	public void turn(double degrees) {
-		setAngle(angle+degrees);
+	public void turn(double degreesCCW) {
+		setAngle(angle+degreesCCW);
 	}
 
 	// Get absolute angle degrees

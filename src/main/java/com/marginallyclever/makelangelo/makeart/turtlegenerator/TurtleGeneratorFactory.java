@@ -1,5 +1,9 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.*;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GraphPaper;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridFit;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridHexagons;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
@@ -15,6 +19,7 @@ public class TurtleGeneratorFactory {
 			new Generator_GosperCurve(),
 			new Generator_GraphPaper(),
 			new Generator_GridFit(),
+			new Generator_GridHexagons(),
 			new Generator_HilbertCurve(),
 			new Generator_KochCurve(),
 			new Generator_Lissajous(),

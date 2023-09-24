@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 	}
 
 
-	private int[] neighbors = new int[6];
+	private final int[] neighbors = new int[6];
 	private int neighborCount;
 
 	@Override
@@ -151,10 +151,9 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 		drawInteriorWalls(turtle,len,horiz,vert);
 		drawOutsideEdge(turtle,len,horiz,vert);
 
-		Rectangle2D.Double r = turtle.getBounds();
-		turtle.translate(-r.width/2.0,-r.height/2.0);
-		turtle.translate(horiz/2,vert*(Math.sqrt(3)-1.0));
-		turtle.scale((xMax-xMin)/r.width,(yMax-yMin)/r.height);
+		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(myPaper,false,"");
+		turtle = act.run(turtle);
+
 		return turtle;
 	}
 
