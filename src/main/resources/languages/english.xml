@@ -314,6 +314,9 @@
 	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
 	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
 
+	<string><key>Generator_GridHexagons.Name</key><value>Grid Hexagons</value></string>
+	<string><key>Generator_GridHexagons.radius</key><value>Major radius</value></string>
+
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
 	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
 	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
