@@ -15,7 +15,8 @@ import javax.vecmath.Vector2d;
  */
 public class Generator_GridHexagons extends TurtleGenerator {
 	private final SelectDouble radius;
-	private double majorRadius, minorRadius, sideLength;
+	private double minorRadius;
+	private double majorRadius;
 
 	public Generator_GridHexagons() {
 		add(radius = new SelectDouble("radius",Translator.get("Generator_GridHexagons.radius"),25));
@@ -32,10 +33,8 @@ public class Generator_GridHexagons extends TurtleGenerator {
 		majorRadius = radius.getValue();
 		minorRadius = majorRadius*Math.sqrt(3);
 
-		sideLength = majorRadius;
-
-		double horiz = Math.sqrt(3)*(majorRadius);
-		double vert = (3.0/2.0)*(majorRadius);
+		double horiz = Math.sqrt(3)*majorRadius;
+		double vert = (3.0/2.0)*majorRadius;
 
 		double yMin = myPaper.getMarginBottom();
 		double yMax = myPaper.getMarginTop();
@@ -75,14 +74,14 @@ public class Generator_GridHexagons extends TurtleGenerator {
 	 */
 	private void drawHexagon(Turtle turtle, Vector2d center, int sideMask) {
 		turtle.setAngle(90);
-		turtle.jumpTo(center.x+minorRadius,center.y-sideLength/2);
+		turtle.jumpTo(center.x+minorRadius,center.y-majorRadius/2);
 		for(int i=0;i<6;++i) {
 			if( (sideMask & (1<<i)) == 0 ) {
 				turtle.penUp();
 			} else {
 				turtle.penDown();
 			}
-			turtle.forward(sideLength);
+			turtle.forward(majorRadius);
 			turtle.turn(60);
 		}
 	}
