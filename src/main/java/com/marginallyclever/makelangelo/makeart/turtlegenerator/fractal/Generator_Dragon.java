@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -19,7 +20,7 @@ public class Generator_Dragon extends TurtleGenerator {
 
 	private final List<Integer> sequence = new ArrayList<>();
 
-	Generator_Dragon() {
+	public Generator_Dragon() {
 		super();
 
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));

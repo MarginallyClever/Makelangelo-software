@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -24,7 +25,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 	public Generator_FibonacciSpiral() {
 		super();
 
-		SelectSlider fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder());
+		SelectSlider fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0, Generator_Dragon.getOrder());
 		add(fieldOrder);
 		fieldOrder.addPropertyChangeListener(evt->{
 			order = Math.max(1,fieldOrder.getValue());
