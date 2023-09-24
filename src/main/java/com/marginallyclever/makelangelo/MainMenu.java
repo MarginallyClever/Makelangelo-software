@@ -262,14 +262,21 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createGenerateMenu() {
-        JMenu menu = new JMenu(Translator.get("MenuGenerate"));
-        menu.setMnemonic('A');
-        for( TurtleGenerator ici : TurtleGeneratorFactory.available ) {
-            JMenuItem mi = new JMenuItem(ici.getName());
-            mi.addActionListener((e) -> runGeneratorDialog(ici));
-            menu.add(mi);
-        }
+        return createGeneratorMenuFromTree(TurtleGeneratorFactory.available );
+    }
 
+    public JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorNode root) {
+        JMenu menu = new JMenu(root.getName());
+        for (TurtleGeneratorFactory.TurtleGeneratorNode child : root.getChildren()) {
+            if (child.getChildren().isEmpty()) {
+                JMenuItem menuItem = new JMenuItem(child.getName());
+                menu.add(menuItem);
+                menuItem.addActionListener((e) -> runGeneratorDialog(child.getGenerator()));
+            } else {
+                JMenu subMenu = createGeneratorMenuFromTree(child);
+                menu.add(subMenu);
+            }
+        }
         return menu;
     }
 

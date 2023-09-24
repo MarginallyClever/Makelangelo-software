@@ -89,7 +89,7 @@
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
-	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle fractal</value></string>
+	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 
 	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
 	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
@@ -97,7 +97,7 @@
 	<string><key>BoxGeneratorName</key><value>Boxxy</value></string>
 	<string><key>BoxGeneratorMaxSize</key><value>Max size</value></string>
 	<string><key>BoxGeneratorCutoff</key><value>Cutoff</value></string>
-	<string><key>HilbertCurveName</key><value>Hilbert Curve Fractal</value></string>
+	<string><key>HilbertCurveName</key><value>Hilbert Curve</value></string>
 	<string><key>HilbertCurveSize</key><value>Size</value></string>
 	<string><key>HilbertCurveOrder</key><value>Order</value></string>
 	<string><key>penDiameter</key><value>Pen diameter</value></string>
@@ -131,13 +131,18 @@
     </html>
     ]]></value></string>
 	<string><key>MenuResetMachinePreferencesWarning</key><value>Are you sure you want to erase all your preferences?</value></string>
+
 	<string><key>MenuGenerate</key><value>Generate art</value></string>
+	<string><key>MenuGenerate.Fractals</key><value>Fractals</value></string>
+	<string><key>MenuGenerate.Grids</key><value>Grids</value></string>
+	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
+
 	<string><key>MenuNewFile</key><value>New</value></string>
 	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
-	<string><key>LSystemTreeName</key><value>L System Tree Fractal</value></string>
-	<string><key>KochTreeName</key><value>Koch Curve Fractal</value></string>
-	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral Fractal</value></string>
-	<string><key>DragonName</key><value>Dragon Fractal</value></string>
+	<string><key>LSystemTreeName</key><value>L System Tree</value></string>
+	<string><key>KochTreeName</key><value>Koch Curve</value></string>
+	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral</value></string>
+	<string><key>DragonName</key><value>Dragon</value></string>
 	<string><key>ClickAndDrag</key><value>Click &amp; Drag</value></string>
 	<string><key>ConverterWanderName</key><value>Wander</value></string>
 	<string><key>ConverterWanderLineCount</key><value># Lines</value></string>
@@ -302,19 +307,19 @@
 	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
 	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
 
-	<string><key>Generator_MazeRectangle.name</key><value>Maze Rectangle</value></string>
+	<string><key>Generator_MazeRectangle.name</key><value>Rectangle</value></string>
 	<string><key>Generator_MazeRectangle.rows</key><value>Rows</value></string>
 	<string><key>Generator_MazeRectangle.columns</key><value>Columns</value></string>
-	<string><key>Generator_MazeCircle.name</key><value>Maze circle</value></string>
-	<string><key>Generator_MazeCircle.rings</key><value>rings</value></string>
-	<string><key>Generator_MazeHoneycomb.name</key><value>Maze honeycomb</value></string>
+	<string><key>Generator_MazeCircle.name</key><value>Circle</value></string>
+	<string><key>Generator_MazeCircle.rings</key><value>Rings</value></string>
+	<string><key>Generator_MazeHoneycomb.name</key><value>Honeycomb</value></string>
 
-	<string><key>Generator_GridFit.Name</key><value>Grid fit</value></string>
+	<string><key>Generator_GridFit.Name</key><value>Rectangles</value></string>
 	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
 	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
 	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
 
-	<string><key>Generator_GridHexagons.Name</key><value>Grid Hexagons</value></string>
+	<string><key>Generator_GridHexagons.Name</key><value>Hexagons</value></string>
 	<string><key>Generator_GridHexagons.radius</key><value>Major radius</value></string>
 
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
