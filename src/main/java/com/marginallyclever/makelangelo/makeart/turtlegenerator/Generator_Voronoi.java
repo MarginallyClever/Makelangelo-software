@@ -47,19 +47,27 @@ public class Generator_Voronoi extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
+		// seed random points on the paper.
 		Rectangle2D bounds = myPaper.getMarginRectangle();
-
 		List<VoronoiCell> points = new ArrayList<>();
 		for(int i=0;i<numCells;++i) {
 			points.add(new VoronoiCell(
-					Math.random()*bounds.getWidth() +bounds.getMinX(),
-					Math.random()*bounds.getHeight()+bounds.getMinY()));
+					Math.random()*bounds.getWidth()  + bounds.getMinX(),
+					Math.random()*bounds.getHeight() + bounds.getMinY()));
 		}
 
+		// generate the voronoi diagram
 		VoronoiTesselator2 diagram = new VoronoiTesselator2();
 		diagram.tessellate(points,bounds,0.0001);
 
-		// draw all the graph edges according to the cells.
+		drawGraphEdges(turtle,diagram);
+		drawCellCenters(turtle,points);
+		turtle.penUp();
+		notifyListeners(turtle);
+	}
+
+	// draw all the graph edges according to the cells.
+	private void drawGraphEdges(Turtle turtle, VoronoiTesselator2 diagram) {
 		for(int i=0;i<diagram.getNumHulls();++i) {
 			boolean first = true;
 			Polygon poly = diagram.getHull(i);
@@ -70,22 +78,23 @@ public class Generator_Voronoi extends TurtleGenerator {
 				} else turtle.moveTo(p.x, p.y);
 			}
 		}
+	}
 
+	private void drawCellCenters(Turtle turtle, List<VoronoiCell> points) {
 		// draw all the cell centers
 		turtle.setColor(new ColorRGB(0,0,255));
+
 		for( VoronoiCell p : points ) {
+			// jump to corner
+			turtle.jumpTo(p.center.x-0.5,p.center.y-0.5);
+			// box
+			for(int i=0;i<4;++i) {
+				turtle.forward(1);
+				turtle.turn(90);
+			}
+			// point in center
 			turtle.jumpTo(p.center.x,p.center.y);
-			turtle.forward(1);
-			turtle.turn(90);
-			turtle.forward(1);
-			turtle.turn(90);
-			turtle.forward(1);
-			turtle.turn(90);
-			turtle.forward(1);
+			turtle.forward(0.1);
 		}
-
-		turtle.penUp();
-
-		notifyListeners(turtle);
 	}
 }
