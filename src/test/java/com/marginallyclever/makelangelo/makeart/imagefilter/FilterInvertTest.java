@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class Filter_InvertTest {
+public class FilterInvertTest {
     // pixel-to-pixel comparison
     public static void compareBitmaps(BufferedImage a,BufferedImage b) {
         int h = a.getHeight();
@@ -26,8 +26,8 @@ public class Filter_InvertTest {
     @Test
     public void test() throws IOException {
         TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-        Filter_Invert f = new Filter_Invert();
-        TransformedImage dest = f.filter(src);
+        Filter_Invert f = new Filter_Invert(src);
+        TransformedImage dest = f.filter();
         //ImageIO.write(dest.getSourceImage(), "png", new java.io.File("src/test/resources/mandrill-inverse.png"));
 
         TransformedImage compare = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill-inverse.png")) );

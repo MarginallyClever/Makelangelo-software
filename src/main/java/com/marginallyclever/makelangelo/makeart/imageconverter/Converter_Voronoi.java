@@ -59,8 +59,8 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     @Override
     public void start(Paper paper, TransformedImage image) {
         // make black & white
-        Filter_Greyscale bw = new Filter_Greyscale(255);
-        super.start(paper, bw.filter(image));
+        Filter_Greyscale bw = new Filter_Greyscale(image,255);
+        super.start(paper, bw.filter());
 
         lock.lock();
         try {

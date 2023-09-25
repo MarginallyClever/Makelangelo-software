@@ -179,8 +179,8 @@ public class Converter_Wander extends ImageConverter {
 	}
 	
 	protected void finishCMYK() {
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		Filter_CMYK cmyk = new Filter_CMYK(myImage);
+		cmyk.filter();
 		
 		turtle = new Turtle();
 		
@@ -193,8 +193,8 @@ public class Converter_Wander extends ImageConverter {
 	
 	protected void finishBlackAndWhite() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
 		

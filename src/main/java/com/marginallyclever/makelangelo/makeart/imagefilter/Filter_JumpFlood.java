@@ -21,12 +21,15 @@ public class Filter_JumpFlood extends ImageFilter {
 	private final List<Point> points = new ArrayList<>();
 	private int stepSize;
 	private int scale;
+	private final TransformedImage img;
 
-	public Filter_JumpFlood() {
+	public Filter_JumpFlood(TransformedImage img) {
 		super();
+		this.img = img;
 	}
 
-	public TransformedImage filter(TransformedImage img) {
+	@Override
+	public TransformedImage filter() {
 		BufferedImage src = img.getSourceImage();
 		TransformedImage after = new TransformedImage(img);
 		BufferedImage dest = after.getSourceImage();
@@ -92,8 +95,8 @@ public class Filter_JumpFlood extends ImageFilter {
 		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
 		//*/
 
-		Filter_JumpFlood f = new Filter_JumpFlood();
-		TransformedImage dest = f.filter(src);
+		Filter_JumpFlood f = new Filter_JumpFlood(src);
+		TransformedImage dest = f.filter();
 		ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_JumpFlood" );
 	}
 }

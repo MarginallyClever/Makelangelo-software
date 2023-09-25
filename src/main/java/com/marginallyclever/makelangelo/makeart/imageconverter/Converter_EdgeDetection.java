@@ -66,8 +66,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		img = bw.filter();
 		turtle = new Turtle();
 
 		int edgeStep = 255/(passes+1);

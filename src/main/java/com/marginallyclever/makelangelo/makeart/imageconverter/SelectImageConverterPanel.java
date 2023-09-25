@@ -234,8 +234,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("starting {}", myConverter.getName());
 
 		scaleImage(fillNames.getSelectedIndex());
-		Filter_ContrastAdjust filter = new Filter_ContrastAdjust(rangeSliderMin, rangeSliderMax);
-		TransformedImage result = filter.filter(myImage);
+		Filter_ContrastAdjust filter = new Filter_ContrastAdjust(myImage,rangeSliderMin, rangeSliderMax);
+		TransformedImage result = filter.filter();
 
 		myConverter.start(myPaper,result);
 	}

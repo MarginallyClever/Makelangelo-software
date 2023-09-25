@@ -67,8 +67,8 @@ public class Converter_Multipass extends ImageConverter {
 		super.start(paper, image);
 
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 		
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));

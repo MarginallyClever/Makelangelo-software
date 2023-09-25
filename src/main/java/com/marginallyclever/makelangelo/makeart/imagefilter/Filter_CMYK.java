@@ -20,13 +20,19 @@ public class Filter_CMYK extends ImageFilter {
     private static final Logger logger = LoggerFactory.getLogger(Filter_CMYK.class);
     protected static double levels = 2;
 
+    protected TransformedImage img;
     protected TransformedImage channelCyan;
     protected TransformedImage channelMagenta;
     protected TransformedImage channelYellow;
     protected TransformedImage channelBlack;
 
 
-    public Filter_CMYK() {
+    /**
+     * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
+     */
+    public Filter_CMYK(TransformedImage img) {
+        super();
+        this.img = img;
     }
 
 
@@ -50,11 +56,10 @@ public class Filter_CMYK extends ImageFilter {
     /**
      * Converts an image to 4 greyscale images, one for each channel of CMYK.
      * See <a href="http://www.rapidtables.com/convert/color/rgb-to-cmyk.htm">RGB to CMYK</a>
-     * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
      * @return the original image.
      */
     @Override
-    public TransformedImage filter(TransformedImage img) {
+    public TransformedImage filter() {
         int h = img.getSourceImage().getHeight();
         int w = img.getSourceImage().getWidth();
         int px, py;
@@ -168,8 +173,8 @@ public class Filter_CMYK extends ImageFilter {
 
     public static void main(String[] args) throws IOException {
         TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-        Filter_CMYK f = new Filter_CMYK();
-        f.filter(src);
+        Filter_CMYK f = new Filter_CMYK(src);
+        f.filter();
 
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Original", new JLabel(new ImageIcon(src.getSourceImage())));

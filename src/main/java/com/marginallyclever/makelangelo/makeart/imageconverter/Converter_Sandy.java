@@ -52,8 +52,8 @@ public class Converter_Sandy extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin

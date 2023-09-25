@@ -54,8 +54,8 @@ public class Converter_Spiral extends ImageConverter {
 		turtle = new Turtle();
 
 		// black and white
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 
 		double maxr;
 		if (convertToCorners) {

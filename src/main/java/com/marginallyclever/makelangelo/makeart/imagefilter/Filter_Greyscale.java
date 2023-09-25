@@ -16,14 +16,18 @@ import java.io.IOException;
  */
 public class Filter_Greyscale extends ImageFilter {
 	private static final Logger logger = LoggerFactory.getLogger(Filter_Greyscale.class);
+	private final TransformedImage img;
 	private double levels = 2;
 	private int mode = 1;
 
-	public Filter_Greyscale(int _levels) {
+	public Filter_Greyscale(TransformedImage img,int _levels) {
+		super();
+		this.img = img;
 		levels = (double) _levels;
 	}
 
-	public TransformedImage filter(TransformedImage img) {
+	@Override
+	public TransformedImage filter() {
 		return switch (mode) {
 			case 0 -> filterLevels(img);
 			case 1 -> filterTone(img);
@@ -137,8 +141,7 @@ public class Filter_Greyscale extends ImageFilter {
 
 	public static void main(String[] args) throws IOException {
 		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-		Filter_Greyscale f = new Filter_Greyscale(255);
-		TransformedImage dest = f.filter(src);
-		ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_Greyscale" );
+		Filter_Greyscale f = new Filter_Greyscale(src,255);
+		ResizableImagePanel.showImage(f.filter().getSourceImage(), "Filter_Greyscale" );
 	}
 }

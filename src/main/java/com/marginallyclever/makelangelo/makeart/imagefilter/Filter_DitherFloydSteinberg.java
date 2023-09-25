@@ -16,13 +16,17 @@ import java.io.IOException;
  */
 public class Filter_DitherFloydSteinberg extends ImageFilter {
   private long tone;
+  private final TransformedImage img;
 
+  public Filter_DitherFloydSteinberg(TransformedImage img) {
+    super();
+    this.img = img;
+  }
 
   private int quantizeColor(int original) {
     int i = (int) Math.min(Math.max(original, 0), 255);
     return (i > tone) ? 255 : 0;
   }
-
 
   private void ditherDirection(TransformedImage img, BufferedImage after, int y, int[] error, int[] nexterror, int direction) {
     int w = img.getSourceImage().getWidth();
@@ -64,8 +68,8 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
     }
   }
 
-  
-  public TransformedImage filter(TransformedImage img) {
+  @Override
+  public TransformedImage filter() {
     int y, x;
     int h = img.getSourceImage().getHeight();
     int w = img.getSourceImage().getWidth();
@@ -105,8 +109,8 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
 
   public static void main(String[] args) throws IOException {
     TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-    Filter_DitherFloydSteinberg f = new Filter_DitherFloydSteinberg();
-    TransformedImage dest = f.filter(src);
+    Filter_DitherFloydSteinberg f = new Filter_DitherFloydSteinberg(src);
+    TransformedImage dest = f.filter();
     ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinberg" );
   }
 }

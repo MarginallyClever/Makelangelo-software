@@ -85,8 +85,8 @@ public class Converter_Crosshatch extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
 		finishPass(new int[]{(int)pass90},90,img);

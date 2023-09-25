@@ -90,8 +90,8 @@ public class Converter_QuadTreeInstant extends ImageConverter{
     public void start(Paper paper, TransformedImage image){
         super.start(paper, image);
 
-        Filter_Greyscale bw = new Filter_Greyscale(255);
-        img = bw.filter(myImage);
+        Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+        TransformedImage img = bw.filter();
 
         Point2D topLeftP = new Point2D(myPaper.getMarginLeft(),paper.getMarginTop());
         Point2D bottomRightP = new Point2D(myPaper.getMarginRight(), paper.getMarginBottom());

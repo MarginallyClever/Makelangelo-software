@@ -17,6 +17,7 @@ import java.io.IOException;
  * @since 7.39.9
  */
 public class Filter_ContrastAdjust extends ImageFilter {
+	private final TransformedImage img;
 	private final int bottom;
 	private final float range;
 
@@ -25,13 +26,15 @@ public class Filter_ContrastAdjust extends ImageFilter {
 	 * @param bottom the new bottom range
 	 * @param top the new top range.
 	 */
-	public Filter_ContrastAdjust(int bottom,int top) {
+	public Filter_ContrastAdjust(TransformedImage img,int bottom,int top) {
 		super();
+		this.img = img;
 		this.bottom = bottom;
 		range = 255f / (top-bottom);
 	}
 
-	public TransformedImage filter(TransformedImage img) {
+	@Override
+	public TransformedImage filter() {
 		int h = img.getSourceImage().getHeight();
 		int w = img.getSourceImage().getWidth();
 		BufferedImage bi = img.getSourceImage();
@@ -69,9 +72,8 @@ public class Filter_ContrastAdjust extends ImageFilter {
 		panel.add(slider,BorderLayout.NORTH);
 
 		slider.addChangeListener(e->{
-			Filter_ContrastAdjust f = new Filter_ContrastAdjust(slider.getValue(),slider.getUpperValue());
-			TransformedImage dest = f.filter(src);
-			ResizableImagePanel rip = new ResizableImagePanel(dest.getSourceImage());
+			Filter_ContrastAdjust f = new Filter_ContrastAdjust(src,slider.getValue(),slider.getUpperValue());
+			ResizableImagePanel rip = new ResizableImagePanel(f.filter().getSourceImage());
 			BorderLayout layout = (BorderLayout)panel.getLayout();
 			Component c = layout.getLayoutComponent(BorderLayout.CENTER);
 			if(c!=null) panel.remove(c);

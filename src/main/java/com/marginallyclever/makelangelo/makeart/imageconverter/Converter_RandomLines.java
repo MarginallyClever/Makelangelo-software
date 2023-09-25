@@ -36,8 +36,8 @@ public class Converter_RandomLines extends ImageConverter {
 		super.start(paper, image);
 
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 
 
 		double stepSize = 5;

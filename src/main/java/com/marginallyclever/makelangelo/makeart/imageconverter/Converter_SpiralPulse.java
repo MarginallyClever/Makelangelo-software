@@ -57,8 +57,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		super.start(paper, image);
 
 		// black and white
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		Filter_Greyscale bw = new Filter_Greyscale(myImage,255);
+		TransformedImage img = bw.filter();
 
 		double toolDiameter = 1;
 

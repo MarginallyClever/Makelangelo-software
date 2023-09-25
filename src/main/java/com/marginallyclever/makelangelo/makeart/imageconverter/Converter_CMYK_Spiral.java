@@ -53,8 +53,8 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		Filter_CMYK cmyk = new Filter_CMYK(myImage);
+		cmyk.filter();
 
 		double separation; 
 		float h2 = (float)myPaper.getPaperHeight();
