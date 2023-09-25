@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.Coordinate;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 public class Generator_Voronoi extends TurtleGenerator {
 	private static int numCells = 500;
+	private static boolean showCenters = false;
 
 	public Generator_Voronoi() {
 		super();
@@ -29,6 +31,13 @@ public class Generator_Voronoi extends TurtleGenerator {
 			setNumCells(Math.max(1,cells.getValue()));
 			generate();
 		});
+		SelectBoolean showCenterChoice;
+		add(showCenterChoice = new SelectBoolean("showCenters",Translator.get("Converter_Voronoi.ShowCenters"),false));
+		showCenterChoice.addPropertyChangeListener(evt->{
+			showCenters = showCenterChoice.isSelected();
+			generate();
+		});
+
 	}
 
 	@Override
@@ -47,23 +56,27 @@ public class Generator_Voronoi extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
-		// seed random points on the paper.
 		Rectangle2D bounds = myPaper.getMarginRectangle();
+		List<VoronoiCell> points = seedRandomPoints(bounds);
+		// generate the voronoi diagram
+		VoronoiTesselator2 diagram = new VoronoiTesselator2();
+		diagram.tessellate(points,bounds,0.0001);
+
+		drawGraphEdges(turtle,diagram);
+		if(showCenters) drawCellCenters(turtle,points);
+		turtle.penUp();
+		notifyListeners(turtle);
+	}
+
+	// seed random points on the paper.
+	private List<VoronoiCell> seedRandomPoints(Rectangle2D bounds) {
 		List<VoronoiCell> points = new ArrayList<>();
 		for(int i=0;i<numCells;++i) {
 			points.add(new VoronoiCell(
 					Math.random()*bounds.getWidth()  + bounds.getMinX(),
 					Math.random()*bounds.getHeight() + bounds.getMinY()));
 		}
-
-		// generate the voronoi diagram
-		VoronoiTesselator2 diagram = new VoronoiTesselator2();
-		diagram.tessellate(points,bounds,0.0001);
-
-		drawGraphEdges(turtle,diagram);
-		drawCellCenters(turtle,points);
-		turtle.penUp();
-		notifyListeners(turtle);
+		return points;
 	}
 
 	// draw all the graph edges according to the cells.
