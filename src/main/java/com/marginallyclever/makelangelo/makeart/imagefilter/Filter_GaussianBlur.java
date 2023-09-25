@@ -71,7 +71,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 	}
 
 	public static void main(String[] args) throws IOException {
-		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 

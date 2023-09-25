@@ -25,12 +25,12 @@ public class Filter_InvertTest {
 
     @Test
     public void test() throws IOException {
-        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
         Filter_Invert f = new Filter_Invert();
         TransformedImage dest = f.filter(src);
-        //ImageIO.write(dest.getSourceImage(), "png", new java.io.File("src/test/resources/test_invert.png"));
+        //ImageIO.write(dest.getSourceImage(), "png", new java.io.File("src/test/resources/mandrill-inverse.png"));
 
-        TransformedImage compare = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/test_invert.png")) );
+        TransformedImage compare = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill-inverse.png")) );
         compareBitmaps(compare.getSourceImage(),dest.getSourceImage());
     }
 }

@@ -89,7 +89,7 @@ public class Filter_JumpFlood extends ImageFilter {
 		}
 		TransformedImage src = new TransformedImage( image );
 		/*/
-		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
 		//*/
 
 		Filter_JumpFlood f = new Filter_JumpFlood();

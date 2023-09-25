@@ -104,7 +104,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
   }
 
   public static void main(String[] args) throws IOException {
-    TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+    TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
     Filter_DitherFloydSteinberg f = new Filter_DitherFloydSteinberg();
     TransformedImage dest = f.filter(src);
     ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinberg" );

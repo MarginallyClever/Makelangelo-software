@@ -167,7 +167,7 @@ public class Filter_CMYK extends ImageFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
         Filter_CMYK f = new Filter_CMYK();
         f.filter(src);
 

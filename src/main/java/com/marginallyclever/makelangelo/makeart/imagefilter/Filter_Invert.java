@@ -39,7 +39,7 @@ public class Filter_Invert extends ImageFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
         Filter_Invert f = new Filter_Invert();
         TransformedImage dest = f.filter(src);
         ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_Invert" );

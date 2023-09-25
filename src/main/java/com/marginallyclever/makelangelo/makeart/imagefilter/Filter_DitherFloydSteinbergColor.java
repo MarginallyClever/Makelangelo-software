@@ -81,7 +81,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")));
+        TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")));
         Filter_DitherFloydSteinbergColor f = new Filter_DitherFloydSteinbergColor();
         TransformedImage dest = f.filter(src);
         ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinbergColor");
