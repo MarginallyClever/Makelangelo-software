@@ -16,11 +16,11 @@ import java.io.IOException;
  *
  * @author Dan Royer
  */
-public class Filter_DitherFloydSteinbergColor extends ImageFilter {
+public class FilterDitherFloydSteinbergColor extends ImageFilter {
     public final ColorRGB[] palette;
     private final TransformedImage img;
 
-    public Filter_DitherFloydSteinbergColor(TransformedImage img) {
+    public FilterDitherFloydSteinbergColor(TransformedImage img) {
         super();
         this.img = img;
         palette = new ColorRGB[]{
@@ -86,7 +86,7 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
 
     public static void main(String[] args) throws IOException {
         TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")));
-        Filter_DitherFloydSteinbergColor f = new Filter_DitherFloydSteinbergColor(src);
+        FilterDitherFloydSteinbergColor f = new FilterDitherFloydSteinbergColor(src);
         TransformedImage dest = f.filter();
         ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinbergColor");
     }

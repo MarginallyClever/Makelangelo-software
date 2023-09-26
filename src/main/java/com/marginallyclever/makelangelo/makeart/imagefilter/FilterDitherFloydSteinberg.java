@@ -14,11 +14,11 @@ import java.io.IOException;
  * @author Dan
  * See <a href="http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29">http://en.literateprograms.org/Floyd-Steinberg_dithering_%28C%29</a> and <a href="http://www.home.unix-ag.org/simon/gimp/fsdither.c">http://www.home.unix-ag.org/simon/gimp/fsdither.c</a>
  */
-public class Filter_DitherFloydSteinberg extends ImageFilter {
+public class FilterDitherFloydSteinberg extends ImageFilter {
   private long tone;
   private final TransformedImage img;
 
-  public Filter_DitherFloydSteinberg(TransformedImage img) {
+  public FilterDitherFloydSteinberg(TransformedImage img) {
     super();
     this.img = img;
   }
@@ -109,7 +109,7 @@ public class Filter_DitherFloydSteinberg extends ImageFilter {
 
   public static void main(String[] args) throws IOException {
     TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-    Filter_DitherFloydSteinberg f = new Filter_DitherFloydSteinberg(src);
+    FilterDitherFloydSteinberg f = new FilterDitherFloydSteinberg(src);
     TransformedImage dest = f.filter();
     ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinberg" );
   }

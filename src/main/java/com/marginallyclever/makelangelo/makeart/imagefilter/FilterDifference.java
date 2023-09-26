@@ -6,14 +6,14 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import java.awt.image.BufferedImage;
 
 /**
- * Calculate the relative difference between two images.
+ * Calculate abs(a-b) for every pixel
  * @author Dan Royer
  * @since 7.46.0
  */
-public class Filter_Difference extends ImageFilter {
+public class FilterDifference extends ImageFilter {
     private final TransformedImage a,b;
 
-    public Filter_Difference(TransformedImage a,TransformedImage b) {
+    public FilterDifference(TransformedImage a, TransformedImage b) {
         this.a = a;
         this.b = b;
     }
@@ -21,27 +21,32 @@ public class Filter_Difference extends ImageFilter {
     @Override
     public TransformedImage filter() {
         TransformedImage result = new TransformedImage(a);
-        int w = a.getSourceImage().getWidth();
-        int h = a.getSourceImage().getHeight();
-        if(w != b.getSourceImage().getWidth() || h != b.getSourceImage().getHeight()) {
+        BufferedImage aa = a.getSourceImage();
+        BufferedImage bb = b.getSourceImage();
+        int w = aa.getWidth();
+        int h = aa.getHeight();
+        if(w != bb.getWidth() || h != bb.getHeight()) {
             throw new RuntimeException("Images must be the same size.");
         }
 
-        BufferedImage aa = a.getSourceImage();
-        BufferedImage bb = b.getSourceImage();
         BufferedImage rr = result.getSourceImage();
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
                 ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
                 ColorRGB other = new ColorRGB(bb.getRGB(x, y));
-                diff.red   = Math.max(0,diff.red   - other.red  );
-                diff.green = Math.max(0,diff.green - other.green);
-                diff.blue  = Math.max(0,diff.blue  - other.blue );
+                diff.red   = modify(diff.red  , other.red  );
+                diff.green = modify(diff.green, other.green);
+                diff.blue  = modify(diff.blue , other.blue );
                 rr.setRGB(x, y, diff.toInt());
             }
         }
 
         return result;
+    }
+
+    private int modify(int a,int b) {
+        double v = Math.abs(a-b);
+        return (int)Math.max(0,Math.min(255, v));
     }
 }

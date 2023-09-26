@@ -11,19 +11,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
- * Converts an image to N shades of grey.
+ * Converts an image to N levels.
  * @author Dan Royer
  */
-public class Filter_Greyscale extends ImageFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Filter_Greyscale.class);
+public class FilterLevels extends ImageFilter {
+	private static final Logger logger = LoggerFactory.getLogger(FilterLevels.class);
 	private final TransformedImage img;
-	private double levels = 2;
-	private int mode = 1;
+	private final double levels;
+	private final int mode = 1;
 
-	public Filter_Greyscale(TransformedImage img,int _levels) {
+	public FilterLevels(TransformedImage img, int levels) {
 		super();
 		this.img = img;
-		levels = (double) _levels;
+		this.levels = levels;
 	}
 
 	@Override
@@ -58,11 +58,6 @@ public class Filter_Greyscale extends ImageFilter {
 		if (levels != 0)
 			ilevels = 1.0 / levels;
 
-		// logger.debug("min_intensity="+min_intensity);
-		// logger.debug("max_intensity="+max_intensity);
-		// logger.debug("levels="+levels);
-		// logger.debug("inverse="+ilevels);
-
 		double pixel;
 
 		TransformedImage after = new TransformedImage(img);
@@ -71,11 +66,9 @@ public class Filter_Greyscale extends ImageFilter {
 		for (y = 0; y < h; ++y) {
 			for (x = 0; x < w; ++x) {
 				pixel = decode32bit(bi.getRGB(x, y));
-
 				double a = (pixel - min_intensity) / intensity_range;
 				double c = a * levels * ilevels;
 				int b = (int) Math.max(Math.min(c * 255.0, 255), 0);
-				// if(b==255) logger.debug(x+"\t"+y+"\t"+i+"\t"+b);
 				afterBI.setRGB(x, y, ImageFilter.encode32bit(b));
 			}
 		}
@@ -111,8 +104,8 @@ public class Filter_Greyscale extends ImageFilter {
 		for (y = 0; y < h; ++y) {
 			for (x = 0; x < w; ++x) {
 				double pixel = decode32bit(bi.getRGB(x, y));
-				double v2 = sRGBtoLinear(pixel);
-				//double v2 = toneControl(pixel);
+				//double v2 = sRGBtoLinear(pixel);
+				double v2 = toneControl(pixel);
 				int rgb = (int) Math.min(255, Math.max(0, v2));
 				afterBI.setRGB(x, y, ImageFilter.encode32bit(rgb));
 			}
@@ -141,7 +134,7 @@ public class Filter_Greyscale extends ImageFilter {
 
 	public static void main(String[] args) throws IOException {
 		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-		Filter_Greyscale f = new Filter_Greyscale(src,255);
+		FilterLevels f = new FilterLevels(src,255);
 		ResizableImagePanel.showImage(f.filter().getSourceImage(), "Filter_Greyscale" );
 	}
 }

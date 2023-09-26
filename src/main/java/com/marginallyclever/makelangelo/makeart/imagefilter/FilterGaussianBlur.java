@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,12 +18,11 @@ import java.io.IOException;
  *
  * @author Dan
  */
-public class Filter_GaussianBlur extends ImageFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Filter_GaussianBlur.class);
+public class FilterGaussianBlur extends ImageFilter {
 	private final TransformedImage img;
-	int radius = 1;
+	private final int radius;
 
-	public Filter_GaussianBlur(TransformedImage img,int radius) {
+	public FilterGaussianBlur(TransformedImage img, int radius) {
 		super();
 		this.img = img;
 		assert (radius >= 1);
@@ -34,8 +31,8 @@ public class Filter_GaussianBlur extends ImageFilter {
 
 	@Override
 	public TransformedImage filter() {
-		BufferedImage src = img.getSourceImage();
 	    TransformedImage after = new TransformedImage(img);
+		BufferedImage src = img.getSourceImage();
 		BufferedImage dest = after.getSourceImage();
 		BufferedImage inter = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
 		getGaussianBlurFilter(true).filter(src,inter);
@@ -48,7 +45,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 		int size = radius * 2 + 1;
 		float[] data = new float[size];
 
-		// sigma here is the lowercase sigma σ, not the uppercase Σ.
+		// sigma here is the lowercase σ, not the uppercase Σ.
 		float sigma = radius / 3.0f;
 		float twoSigmaSquare = 2.0f * sigma * sigma;
 		float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
@@ -84,7 +81,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 		panel.add(slider,BorderLayout.NORTH);
 
 		slider.addChangeListener(e->{
-			Filter_GaussianBlur f = new Filter_GaussianBlur(src,slider.getValue());
+			FilterGaussianBlur f = new FilterGaussianBlur(src,slider.getValue());
 			TransformedImage dest = f.filter();
 			ResizableImagePanel rip = new ResizableImagePanel(dest.getSourceImage());
 			BorderLayout layout = (BorderLayout)panel.getLayout();

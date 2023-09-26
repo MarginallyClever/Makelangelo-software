@@ -16,7 +16,7 @@ import java.io.IOException;
  * @author Dan Royer
  * @since 7.39.9
  */
-public class Filter_ContrastAdjust extends ImageFilter {
+public class FilterContrastAdjust extends ImageFilter {
 	private final TransformedImage img;
 	private final int bottom;
 	private final float range;
@@ -26,7 +26,7 @@ public class Filter_ContrastAdjust extends ImageFilter {
 	 * @param bottom the new bottom range
 	 * @param top the new top range.
 	 */
-	public Filter_ContrastAdjust(TransformedImage img,int bottom,int top) {
+	public FilterContrastAdjust(TransformedImage img, int bottom, int top) {
 		super();
 		this.img = img;
 		this.bottom = bottom;
@@ -72,7 +72,7 @@ public class Filter_ContrastAdjust extends ImageFilter {
 		panel.add(slider,BorderLayout.NORTH);
 
 		slider.addChangeListener(e->{
-			Filter_ContrastAdjust f = new Filter_ContrastAdjust(src,slider.getValue(),slider.getUpperValue());
+			FilterContrastAdjust f = new FilterContrastAdjust(src,slider.getValue(),slider.getUpperValue());
 			ResizableImagePanel rip = new ResizableImagePanel(f.filter().getSourceImage());
 			BorderLayout layout = (BorderLayout)panel.getLayout();
 			Component c = layout.getLayoutComponent(BorderLayout.CENTER);

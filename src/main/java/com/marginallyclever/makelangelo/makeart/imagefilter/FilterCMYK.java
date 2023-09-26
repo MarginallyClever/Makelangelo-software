@@ -16,8 +16,8 @@ import java.io.IOException;
  *
  * @author Dan
  */
-public class Filter_CMYK extends ImageFilter {
-    private static final Logger logger = LoggerFactory.getLogger(Filter_CMYK.class);
+public class FilterCMYK extends ImageFilter {
+    private static final Logger logger = LoggerFactory.getLogger(FilterCMYK.class);
     protected static double levels = 2;
 
     protected TransformedImage img;
@@ -30,7 +30,7 @@ public class Filter_CMYK extends ImageFilter {
     /**
      * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
      */
-    public Filter_CMYK(TransformedImage img) {
+    public FilterCMYK(TransformedImage img) {
         super();
         this.img = img;
     }
@@ -173,7 +173,7 @@ public class Filter_CMYK extends ImageFilter {
 
     public static void main(String[] args) throws IOException {
         TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-        Filter_CMYK f = new Filter_CMYK(src);
+        FilterCMYK f = new FilterCMYK(src);
         f.filter();
 
         JTabbedPane tabs = new JTabbedPane();

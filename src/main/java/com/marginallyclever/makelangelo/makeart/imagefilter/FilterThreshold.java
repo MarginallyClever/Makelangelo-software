@@ -6,17 +6,17 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import java.awt.image.BufferedImage;
 
 /**
- * Scale every pixel in the image by a value.
+ * Any pixel above the threshold is made white.  Everything else is made black.
  * @author Dan Royer
  * @since 7.46.0
  */
-public class Filter_Scale extends ImageFilter {
+public class FilterThreshold extends ImageFilter {
     private final TransformedImage a;
-    private final double scale;
+    private final int threshold;
 
-    public Filter_Scale(TransformedImage a, double scale) {
+    public FilterThreshold(TransformedImage a, int threshold) {
         this.a = a;
-        this.scale = scale;
+        this.threshold = threshold;
     }
 
     @Override
@@ -31,13 +31,17 @@ public class Filter_Scale extends ImageFilter {
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
                 ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
-                diff.red   = (int)Math.max(0,Math.min(255,diff.red * scale));
-                diff.green = (int)Math.max(0,Math.min(255,diff.green * scale));
-                diff.blue  = (int)Math.max(0,Math.min(255,diff.blue * scale));
+                diff.red   = modify(diff.red  );
+                diff.green = modify(diff.green);
+                diff.blue  = modify(diff.blue );
                 rr.setRGB(x, y, diff.toInt());
             }
         }
 
         return result;
+    }
+
+    int modify(int input) {
+        return input >= threshold ? 255 : 0;
     }
 }

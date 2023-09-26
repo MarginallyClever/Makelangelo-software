@@ -15,15 +15,15 @@ import java.util.List;
  * Converts an image to N shades of grey.
  * @author Dan Royer
  */
-public class Filter_JumpFlood extends ImageFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Filter_JumpFlood.class);
+public class FilterJumpFlood extends ImageFilter {
+	private static final Logger logger = LoggerFactory.getLogger(FilterJumpFlood.class);
 	// Initialize the list of points
 	private final List<Point> points = new ArrayList<>();
 	private int stepSize;
 	private int scale;
 	private final TransformedImage img;
 
-	public Filter_JumpFlood(TransformedImage img) {
+	public FilterJumpFlood(TransformedImage img) {
 		super();
 		this.img = img;
 	}
@@ -95,7 +95,7 @@ public class Filter_JumpFlood extends ImageFilter {
 		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
 		//*/
 
-		Filter_JumpFlood f = new Filter_JumpFlood(src);
+		FilterJumpFlood f = new FilterJumpFlood(src);
 		TransformedImage dest = f.filter();
 		ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_JumpFlood" );
 	}
