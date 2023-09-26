@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.tools.RemoveExtraColorChangesFromTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -59,7 +59,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_CMYK cmyk = new Filter_CMYK(myImage);
+		FilterCMYK cmyk = new FilterCMYK(myImage);
 		cmyk.filter();
 		
 		turtle = new Turtle();

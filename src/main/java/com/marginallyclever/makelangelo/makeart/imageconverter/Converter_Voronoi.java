@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -59,7 +59,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     @Override
     public void start(Paper paper, TransformedImage image) {
         // make black & white
-        Filter_Greyscale bw = new Filter_Greyscale(image,255);
+        FilterDesaturate bw = new FilterDesaturate(image);
         super.start(paper, bw.filter());
 
         lock.lock();
