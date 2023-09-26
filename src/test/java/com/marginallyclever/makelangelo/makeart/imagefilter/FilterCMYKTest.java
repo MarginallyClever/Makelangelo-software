@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.imageio.ImageIO;
@@ -18,7 +17,7 @@ public class FilterCMYKTest {
         File file = new File(PATH_NAME + "." + EXT);
         assert (file.isFile());
         TransformedImage img = new TransformedImage(ImageIO.read(new FileInputStream(file)));
-        Filter_CMYK filter = new Filter_CMYK(img);
+        FilterCMYK filter = new FilterCMYK(img);
         filter.filter();
 
         ImageIO.write(filter.getC().getSourceImage(), EXT, new File(PATH_NAME + "C." + EXT));
