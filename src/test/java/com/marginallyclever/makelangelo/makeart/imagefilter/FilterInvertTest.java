@@ -26,7 +26,7 @@ public class FilterInvertTest {
     @Test
     public void test() throws IOException {
         TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-        Filter_Invert f = new Filter_Invert(src);
+        FilterInvert f = new FilterInvert(src);
         TransformedImage dest = f.filter();
         //ImageIO.write(dest.getSourceImage(), "png", new java.io.File("src/test/resources/mandrill-inverse.png"));
 
