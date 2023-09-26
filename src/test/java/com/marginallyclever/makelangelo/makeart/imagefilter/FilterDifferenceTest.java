@@ -11,15 +11,17 @@ public class FilterDifferenceTest {
     @Test
     public void test() throws IOException {
         TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/chicken.png")) );
-        FilterGaussianBlur a = new FilterGaussianBlur(src,2);
+        FilterDesaturate desaturate = new FilterDesaturate(src);
+
+        FilterGaussianBlur a = new FilterGaussianBlur(desaturate.filter(),2);
         TransformedImage a2 = a.filter();
         ImageIO.write(a2.getSourceImage(), "jpg", new java.io.File("src/test/resources/chicken-a.jpg"));
 
-        FilterGaussianBlur b = new FilterGaussianBlur(src,4);
+        FilterGaussianBlur b = new FilterGaussianBlur(desaturate.filter(),4);
         TransformedImage b2 = b.filter();
         ImageIO.write(b2.getSourceImage(), "jpg", new java.io.File("src/test/resources/chicken-b.jpg"));
 
-        FilterScale scale = new FilterScale(b2,0.85);
+        FilterScale scale = new FilterScale(b2,0.95);
         TransformedImage afterScale = scale.filter();
         ImageIO.write(afterScale.getSourceImage(), "jpg", new java.io.File("src/test/resources/chicken-c.jpg"));
 
