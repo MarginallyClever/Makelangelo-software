@@ -1,7 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -11,8 +12,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class TurtleToBufferedImage extends Node {
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<BufferedImage> output = NodeVariable.newInstance("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB),false,true);
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockShipping<BufferedImage> output = new DockShipping<>("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
 
     public TurtleToBufferedImage() {
         super("TurtleToImage");
@@ -21,7 +22,7 @@ public class TurtleToBufferedImage extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null && !myTurtle.history.isEmpty()) {
             Rectangle2D r = myTurtle.getBounds();
@@ -56,7 +57,6 @@ public class TurtleToBufferedImage extends Node {
                 }
             }
             output.setValue(img);
-            cleanAllInputs();
         }
     }
 }

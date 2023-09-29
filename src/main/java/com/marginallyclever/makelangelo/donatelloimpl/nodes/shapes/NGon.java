@@ -1,17 +1,18 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NGon extends Node {
     private static final Logger logger = LoggerFactory.getLogger(NGon.class);
 
-    private final NodeVariable<Number> radius = NodeVariable.newInstance("radius", Number.class, 10,true,true);
-    private final NodeVariable<Number> steps = NodeVariable.newInstance("steps", Number.class, 4,true,true);
-    private final NodeVariable<Turtle> contents = NodeVariable.newInstance("contents", Turtle.class, new Turtle(),false,true);
+    private final DockReceiving<Number> radius = new DockReceiving<>("radius", Number.class, 10);
+    private final DockReceiving<Number> steps = new DockReceiving<>("steps", Number.class, 4);
+    private final DockShipping<Turtle> contents = new DockShipping<>("contents", Turtle.class, new Turtle());
 
     public NGon() {
         super("NGon");
@@ -34,7 +35,6 @@ public class NGon extends Node {
             }
             t.penUp();
             contents.setValue(t);
-            cleanAllInputs();
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

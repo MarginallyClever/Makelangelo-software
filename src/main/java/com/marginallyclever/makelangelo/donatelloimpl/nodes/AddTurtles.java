@@ -1,13 +1,14 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 
 public class AddTurtles extends Node {
-    private final NodeVariable<Turtle> turtleA = NodeVariable.newInstance("A", Turtle.class, new Turtle(),true,false);
-    private final NodeVariable<Turtle> turtleB = NodeVariable.newInstance("B", Turtle.class, new Turtle(),true,false);
-    private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class, new Turtle(),false,true);
+    private final DockReceiving<Turtle> turtleA = new DockReceiving<>("A", Turtle.class, new Turtle());
+    private final DockReceiving<Turtle> turtleB = new DockReceiving<>("B", Turtle.class, new Turtle());
+    private final DockShipping<Turtle> output = new DockShipping<>("output", Turtle.class, new Turtle());
 
     public AddTurtles() {
         super("AddTurtles");
@@ -17,12 +18,11 @@ public class AddTurtles extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
         Turtle a = turtleA.getValue();
         Turtle b = turtleB.getValue();
         Turtle sum = new Turtle(a);
         sum.add(b);
         output.setValue(sum);
-        cleanAllInputs();
     }
 }

@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 
 import java.awt.*;
 
@@ -12,8 +13,8 @@ import java.awt.*;
  * @since 2022-04-14
  */
 public class TurtleToRectangle extends Node {
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<Rectangle> output = NodeVariable.newInstance("output", Rectangle.class, new Rectangle(0,0,0,0),false,true);
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockShipping<Rectangle> output = new DockShipping<>("output", Rectangle.class, new Rectangle(0,0,0,0));
 
     public TurtleToRectangle() {
         super("TurtleToRectangle");
@@ -22,11 +23,10 @@ public class TurtleToRectangle extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null ) {
             output.setValue(myTurtle.getBounds());
-            cleanAllInputs();
         }
     }
 }

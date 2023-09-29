@@ -2,8 +2,9 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 
 /**
  * <p>(px,py) = path(index), where path(0) is the start and path(path.length) is the end.</p>
@@ -14,12 +15,12 @@ import com.marginallyclever.nodegraphcore.NodeVariable;
  * <p>path.length can be obtained from LoadTurtle.</p>
  */
 public class PointOnPath extends Node {
-    private final NodeVariable<Turtle> path = NodeVariable.newInstance("path", Turtle.class, new Turtle(),true,false);
-    private final NodeVariable<Number> index = NodeVariable.newInstance("index", Number.class, 0,true,false);
-    private final NodeVariable<Number> px = NodeVariable.newInstance("px", Number.class, 0,false,true);
-    private final NodeVariable<Number> py = NodeVariable.newInstance("py", Number.class, 0,false,true);
-    private final NodeVariable<Number> nx = NodeVariable.newInstance("nx", Number.class, 0,false,true);
-    private final NodeVariable<Number> ny = NodeVariable.newInstance("ny", Number.class, 0,false,true);
+    private final DockReceiving<Turtle> path = new DockReceiving<>("path", Turtle.class, new Turtle());
+    private final DockReceiving<Number> index = new DockReceiving<>("index", Number.class, 0);
+    private final DockReceiving<Number> px = new DockReceiving<>("px", Number.class, 0);
+    private final DockReceiving<Number> py = new DockReceiving<>("py", Number.class, 0);
+    private final DockReceiving<Number> nx = new DockReceiving<>("nx", Number.class, 0);
+    private final DockShipping<Number> ny = new DockShipping<>("ny", Number.class, 0);
 
     public PointOnPath() {
         super("PointOnPath");
@@ -33,7 +34,7 @@ public class PointOnPath extends Node {
     private static final double EPSILON=0.00001;
 
     @Override
-    public void update() throws Exception {
+    public void update() {
         Turtle sum = new Turtle();
         Turtle myPath = path.getValue();
         double total = myPath.getDrawDistance();
@@ -66,6 +67,5 @@ public class PointOnPath extends Node {
             nx.setValue(1);
             ny.setValue(0);
         }
-        cleanAllInputs();
     }
 }

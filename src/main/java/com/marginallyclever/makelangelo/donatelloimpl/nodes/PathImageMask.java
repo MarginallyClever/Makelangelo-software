@@ -2,8 +2,9 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 
 import java.awt.image.BufferedImage;
 
@@ -14,12 +15,12 @@ import java.awt.image.BufferedImage;
  * @since 2022-03-08
  */
 public class PathImageMask extends Node {
-    private final NodeVariable<BufferedImage> image = NodeVariable.newInstance("image", BufferedImage.class,new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB),true,false);
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<Number> stepSize = NodeVariable.newInstance("stepSize", Number.class, 5,true,false);
-    private final NodeVariable<Number> threshold = NodeVariable.newInstance("threshold", Number.class, 128,true,false);
-    private final NodeVariable<Turtle> outputAbove = NodeVariable.newInstance("above", Turtle.class,new Turtle(),false,true);
-    private final NodeVariable<Turtle> outputBelow = NodeVariable.newInstance("below", Turtle.class,new Turtle(),false,true);
+    private final DockReceiving<BufferedImage> image = new DockReceiving<>("image", BufferedImage.class,new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB));
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockReceiving<Number> stepSize = new DockReceiving<>("stepSize", Number.class, 5);
+    private final DockReceiving<Number> threshold = new DockReceiving<>("threshold", Number.class, 128);
+    private final DockReceiving<Turtle> outputAbove = new DockReceiving<>("above", Turtle.class,new Turtle());
+    private final DockShipping<Turtle> outputBelow = new DockShipping<>("below", Turtle.class,new Turtle());
 
     private final LineCollection listAbove = new LineCollection();
     private final LineCollection listBelow = new LineCollection();
@@ -35,7 +36,7 @@ public class PathImageMask extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
@@ -59,8 +60,6 @@ public class PathImageMask extends Node {
         Turtle resultBelow = new Turtle();
         resultBelow.addLineSegments(listBelow);
         outputBelow.setValue(resultBelow);
-
-        cleanAllInputs();
     }
 
     /**
