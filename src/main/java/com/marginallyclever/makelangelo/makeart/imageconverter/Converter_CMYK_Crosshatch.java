@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -55,8 +55,8 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		FilterCMYK cmyk = new FilterCMYK(myImage);
+		cmyk.filter();
 		
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle

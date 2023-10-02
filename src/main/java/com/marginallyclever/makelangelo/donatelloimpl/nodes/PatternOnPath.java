@@ -2,14 +2,16 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class PatternOnPath extends Node {
-    private final NodeVariable<Turtle> pattern = NodeVariable.newInstance("pattern", Turtle.class, new Turtle(),true,false);
-    private final NodeVariable<Turtle> path = NodeVariable.newInstance("path", Turtle.class, new Turtle(),true,false);
-    private final NodeVariable<Number> count = NodeVariable.newInstance("count", Number.class, 10,true,false);
-    private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class, new Turtle(),false,true);
+    private final DockReceiving<Turtle> pattern = new DockReceiving<>("pattern", Turtle.class, new Turtle());
+    private final DockReceiving<Turtle> path = new DockReceiving<>("path", Turtle.class, new Turtle());
+    private final DockReceiving<Number> count = new DockReceiving<>("count", Number.class, 10);
+    private final DockShipping<Turtle> output = new DockShipping<>("output", Turtle.class, new Turtle());
 
     public PatternOnPath() {
         super("PatternOnPath");
@@ -17,11 +19,14 @@ public class PatternOnPath extends Node {
         addVariable(path);
         addVariable(count);
         addVariable(output);
-        pattern.setIsDirty(true);
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
+        if(pattern.hasPacketWaiting()) pattern.receive();
+        if(path.hasPacketWaiting()) path.receive();
+        if(count.hasPacketWaiting()) count.receive();
+
         Turtle sum = new Turtle();
         Turtle myPattern = pattern.getValue();
         Turtle myPath = path.getValue();
@@ -42,7 +47,6 @@ public class PatternOnPath extends Node {
                 sum.add(stamp);
             }
         }
-        output.setValue(sum);
-        cleanAllInputs();
+        output.send(new Packet<>(sum));
     }
 }

@@ -19,13 +19,12 @@ import org.w3c.dom.svg.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
-import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.List;
 
 /**
  * @author Dan Royer
- * See https://www.w3.org/TR/SVG/paths.html
+ * See <a href="https://www.w3.org/TR/SVG/paths.html">w3</a>
  */
 public class LoadSVG implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadSVG.class);
@@ -164,7 +163,7 @@ public class LoadSVG implements TurtleLoader {
 
 	private ColorRGB getStroke(Element element) {
 		if(element.hasAttribute("style")) {
-			String style = element.getAttribute("style").toLowerCase().replace("\s","");
+			String style = element.getAttribute("style").toLowerCase().replace("\\s+","");
 			if(!style.contains(LABEL_STROKE)) {
 				// default SVG stroke is "none", which isn't even transparent - it's nothing!
 				return null;
@@ -175,7 +174,7 @@ public class LoadSVG implements TurtleLoader {
 			}
 		}
 		if(element.hasAttribute("stroke")) {
-			String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\s","");
+			String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+","");
 			return stringToColor(strokeStyleName);
 		}
 		return null;
@@ -196,7 +195,7 @@ public class LoadSVG implements TurtleLoader {
 				return new ColorRGB(r,g,b);
 			}
 		} else if(strokeName.startsWith("rgb(")) {
-			strokeName.substring(4,strokeName.length()-1);
+			strokeName = strokeName.substring(4,strokeName.length()-1);
 			if(strokeName.contains("%")) {
 				strokeName = strokeName.replace("%","");
 				String [] parts = strokeName.split(",");
@@ -220,15 +219,16 @@ public class LoadSVG implements TurtleLoader {
 	/**
 	 * Draw rectangles that may have rounded corners.
 	 * given corners
+	 * <pre>
 	 *    x0 x1 x2 x3
 	 * y0    a  b
 	 * y1 c  i  j  d
 	 * y2 e  m  k  f
 	 * y3    g  h
+	 * </pre>
 	 * draw a-b-d-f-h-g-e-c-a.
-	 *
-	 * See https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
-	 * @param node
+	 * See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">mozilla</a>
+	 * @param node the source of the elements
 	 */
 	private void parseRectElements(NodeList node) throws Exception {
 	    int pathNodeCount = node.getLength();
@@ -280,7 +280,7 @@ public class LoadSVG implements TurtleLoader {
 
 	/**
 	 *
-	 * @param turtle
+	 * @param turtle the drawing tool
 	 * @param cx center position
 	 * @param cy center position
 	 * @param rx radius on X
@@ -292,7 +292,7 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d v2;
 		double steps=1;
 		if(rx>0 && ry>0) {
-			double r = rx>ry?rx:ry;
+			double r = Math.max(rx, ry);
 			double circ = Math.PI*r*2.0;  // radius to circumference
 			steps = Math.ceil(circ/4.0);  // 1/4 circumference
 			steps = Math.max(steps,1);
@@ -403,7 +403,7 @@ public class LoadSVG implements TurtleLoader {
 					case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m);  	// L H V
 					case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m);  	// l h v
 					case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m);	// C c
-					case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(m); 			// Z z
+					case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(); 			// Z z
 					default -> throw new Exception("Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString());
 				}
 			}
@@ -469,12 +469,12 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		logger.debug("Move Abs {}", p);
 		pathPoint.set(p);
-		if(isNewPath==true) pathFirstPoint.set(pathPoint);
+		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
 		isNewPath=false;
 	}
 
-	private void doClosePath(Matrix3d m) {
+	private void doClosePath() {
 		logger.debug("Close path");
 		myTurtle.moveTo(pathFirstPoint.x,pathFirstPoint.y);
 		isNewPath=true;
@@ -487,24 +487,22 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private Matrix3d getMatrixFromElement(Element element) {
+		Matrix3d m = new Matrix3d();
+
 		if(!(element instanceof SVGGraphicsElement)) {
-			Matrix3d m = new Matrix3d();
 			m.setIdentity();
 			return m;
 		}
 
-		Matrix3d m = new Matrix3d();
-
 		try {
 			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
-
 			SVGMatrix svgMatrix = svgge.getCTM();
 			// [ a c e ]
 			// [ b d f ]
 			// [ 0 0 1 ]
-			m.m00 = svgMatrix.getA();	m.m10 = svgMatrix.getB();	m.m20 = 0;
-			m.m01 = svgMatrix.getC();	m.m11 = svgMatrix.getD();	m.m21 = 0;
-			m.m02 = svgMatrix.getE();	m.m12 = svgMatrix.getF();	m.m22 = 1;
+			m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
+			m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
+			m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
 		}
 		catch(Exception e) {
 			m.setIdentity();
@@ -515,10 +513,8 @@ public class LoadSVG implements TurtleLoader {
 	/**
 	 * Enhance the SVG DOM for the given document to provide CSS- and
 	 * SVG-specific DOM interfaces.
-	 *
-	 * @param document
-	 *            The document to enhance.
-	 * @link https://cwiki.apache.org/confluence/display/XMLGRAPHICSBATIK/BootSvgAndCssDom
+	 * See <a href="https://cwiki.apache.org/confluence/display/XMLGRAPHICSBATIK/BootSvgAndCssDom">apache</a>
+	 * @param document The document to enhance.
 	 */
 	private void initSVGDOM(Document document) {
 		UserAgent userAgent = new UserAgentAdapter();

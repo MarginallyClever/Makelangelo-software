@@ -3,18 +3,19 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 
 import java.awt.*;
 
 public class PrintTurtle extends Node implements PrintWithGraphics {
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<Number> px = NodeVariable.newInstance("X",Number.class,0,true,false);
-    private final NodeVariable<Number> py = NodeVariable.newInstance("Y",Number.class,0,true,false);
-    private final NodeVariable<Color> travelColor = NodeVariable.newInstance("travel color",Color.class,Color.GREEN,true,false);
-    private final NodeVariable<Boolean> showTravel = NodeVariable.newInstance("show travel",Boolean.class,false,true,false);
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockReceiving<Number> px = new DockReceiving<>("X",Number.class,0);
+    private final DockReceiving<Number> py = new DockReceiving<>("Y",Number.class,0);
+    private final DockReceiving<Color> travelColor = new DockReceiving<>("travel color",Color.class,Color.GREEN);
+    private final DockShipping<Boolean> showTravel = new DockShipping<>("show travel",Boolean.class,false);
 
     public PrintTurtle() {
         super("PrintTurtle");
@@ -24,12 +25,15 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     }
 
     @Override
-    public void update() throws Exception {
-        cleanAllInputs();
-    }
+    public void update() {}
 
     @Override
     public void print(Graphics g) {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(px.hasPacketWaiting()) px.receive();
+        if(py.hasPacketWaiting()) py.receive();
+        if(travelColor.hasPacketWaiting()) travelColor.receive();
+
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 

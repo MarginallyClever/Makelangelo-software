@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -59,8 +59,8 @@ public class Converter_Boxxy extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 
 		double yBottom = myPaper.getMarginBottom();
 		double yTop    = myPaper.getMarginTop();

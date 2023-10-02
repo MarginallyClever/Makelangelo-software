@@ -16,10 +16,13 @@ import java.io.IOException;
  *
  * @author Dan Royer
  */
-public class Filter_DitherFloydSteinbergColor extends ImageFilter {
+public class FilterDitherFloydSteinbergColor extends ImageFilter {
     public final ColorRGB[] palette;
+    private final TransformedImage img;
 
-    public Filter_DitherFloydSteinbergColor() {
+    public FilterDitherFloydSteinbergColor(TransformedImage img) {
+        super();
+        this.img = img;
         palette = new ColorRGB[]{
                 new ColorRGB(0, 0, 0),
                 new ColorRGB(0, 0, 255),
@@ -32,7 +35,8 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
         };
     }
 
-    public TransformedImage filter(TransformedImage img) {
+    @Override
+    public TransformedImage filter() {
         BufferedImage src = img.getSourceImage();
         int h = src.getHeight();
         int w = src.getWidth();
@@ -81,9 +85,9 @@ public class Filter_DitherFloydSteinbergColor extends ImageFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")));
-        Filter_DitherFloydSteinbergColor f = new Filter_DitherFloydSteinbergColor();
-        TransformedImage dest = f.filter(src);
+        TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")));
+        FilterDitherFloydSteinbergColor f = new FilterDitherFloydSteinbergColor(src);
+        TransformedImage dest = f.filter();
         ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_DitherFloydSteinbergColor");
     }
 }

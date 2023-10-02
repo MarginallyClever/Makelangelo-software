@@ -6,7 +6,7 @@
 
 	<groupId>com.marginallyclever</groupId>
 	<artifactId>Makelangelo</artifactId>
-	<version>7.47.0</version>
+	<version>7.47.1</version>
 	<name>Makelangelo</name>
 		<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
 It pairs really well with Marlin-polargraph, the code in the brain of the robot that receives instructions and moves the motors.</description>
@@ -20,7 +20,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	<licenses>
 		<license>
 			<name>GPLv2</name>
-			<url>http://opensource.org/licenses/GPL-2.0</url>
+			<url>https://opensource.org/licenses/GPL-2.0</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -353,7 +353,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version>
+			<version>2.11.0</version>
 		</dependency>
 		<!-- https://github.com/java-native/jssc/ -->
 		<dependency>
@@ -365,12 +365,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.4.0</version>
+			<version>2.5.0-rc-20230523</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
 			<artifactId>jogl-all-main</artifactId>
-			<version>2.4.0</version>
+			<version>2.5.0-rc-20230523</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
@@ -382,13 +382,13 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.14</version>
+			<version>4.4.15</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.5.13</version>
+			<version>4.5.14</version>
 		</dependency>
 		<!-- for bz2 compression -->
 		<dependency>
@@ -412,19 +412,19 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.2.10</version>
+			<version>1.4.7</version>
 		</dependency>
 		<!-- logging -->
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
-			<version>3.1.6</version>
+			<version>3.1.9</version>
 		</dependency>
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.32</version>
+			<version>2.0.5</version>
 		</dependency>
 
 		<dependency>
@@ -447,7 +447,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>20.1.0</version>
+			<version>24.0.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
 		<dependency>
@@ -459,7 +459,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-all</artifactId>
-			<version>1.16</version>
+			<version>1.17</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
@@ -477,25 +477,19 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>me.saharnooby</groupId>
 			<artifactId>qoi-java</artifactId>
-			<version>1.2.0</version>
+			<version>1.2.1</version>
 		</dependency>
 		<!-- Also add this, if you want to use QOI with ImageIO -->
 		<dependency>
 			<groupId>me.saharnooby</groupId>
 			<artifactId>qoi-java-awt</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.marginallyclever</groupId>
-			<artifactId>nodegraphcore</artifactId>
-			<version>1.0.19</version>
+			<version>1.2.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
-			<version>2.1</version>
+			<version>3.2.1</version>
 		</dependency>
 
 		<!-- for voronoi -->
@@ -503,14 +497,31 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
-			<version>1.18.2</version>
+			<version>1.19.0</version>
+		</dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.161</version>
+        </dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.10.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.marginallyclever</groupId>
+			<artifactId>nodegraphcore</artifactId>
+			<version>1.0.21</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.8.1</minimum.maven.version>
-		<minimum.java.version>15</minimum.java.version>
+		<minimum.java.version>17</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>

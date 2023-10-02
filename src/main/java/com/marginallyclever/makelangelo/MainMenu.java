@@ -327,10 +327,12 @@ public class MainMenu extends JMenuBar {
             logger.debug("PiCaptureAction unavailable.");
         }
 
-        TurtleModifierAction a6 = new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"));
-        TurtleModifierAction a7 = new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"));
-        a6.setSource(app);		a6.addModifierListener(app::setTurtle);		menu.add(a6);
-        a7.setSource(app);		a7.addModifierListener(app::setTurtle);		menu.add(a7);
+        TurtleModifierAction paperFit = new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"));
+        TurtleModifierAction paperFill = new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"));
+        TurtleModifierAction paperCenter = new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"));
+        paperFit.setSource(app);		paperFit.addModifierListener(app::setTurtle);		menu.add(paperFit);
+        paperFill.setSource(app);		paperFill.addModifierListener(app::setTurtle);		menu.add(paperFill);
+        paperCenter.setSource(app);		paperCenter.addModifierListener(app::setTurtle);	menu.add(paperCenter);
 
         JMenuItem translate = new JMenuItem(Translator.get("Translate"));
         menu.add(translate);

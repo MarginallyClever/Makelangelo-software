@@ -3,9 +3,9 @@ package com.marginallyclever.makelangelo.donatelloimpl;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.Graph;
 import com.marginallyclever.nodegraphcore.NodeFactory;
-import com.marginallyclever.nodegraphcore.NodeGraph;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestNodeGraphMakelangelo {
     private static final Logger logger = LoggerFactory.getLogger(TestNodeGraphMakelangelo.class);
 
-    private static NodeGraph model = new NodeGraph();
+    private static Graph model = new Graph();
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -47,8 +47,8 @@ public class TestNodeGraphMakelangelo {
     }
 
     private <T> void testNodeVariableToJSONAndBack(Class<T> myClass,T instA,T instB) throws Exception {
-        NodeVariable<?> a = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instA,false,false);
-        NodeVariable<?> b = NodeVariable.newInstance(myClass.getSimpleName(),myClass,instB,false,false);
+        DockReceiving<?> a = new DockReceiving<>(myClass.getSimpleName(),myClass,instA);
+        DockReceiving<?> b = new DockReceiving<>(myClass.getSimpleName(),myClass,instB);
 
         b.parseJSON(a.toJSON());
         assertEquals(a.toString(),b.toString());

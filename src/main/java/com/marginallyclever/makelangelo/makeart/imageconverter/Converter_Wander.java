@@ -4,8 +4,8 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -179,8 +179,8 @@ public class Converter_Wander extends ImageConverter {
 	}
 	
 	protected void finishCMYK() {
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		FilterCMYK cmyk = new FilterCMYK(myImage);
+		cmyk.filter();
 		
 		turtle = new Turtle();
 		
@@ -193,8 +193,8 @@ public class Converter_Wander extends ImageConverter {
 	
 	protected void finishBlackAndWhite() {
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
 		

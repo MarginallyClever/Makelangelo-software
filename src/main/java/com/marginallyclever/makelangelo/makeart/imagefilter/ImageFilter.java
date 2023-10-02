@@ -8,20 +8,20 @@ import java.awt.*;
  * Filters modify a {@link TransformedImage}.
  * @author dan Royer
  */
-public class ImageFilter {
-	public static int red32(int color) {
+public abstract class ImageFilter {
+	protected static int red32(int color) {
 		return ((color >> 16) & 0xff);
 	}
 
-	public static int green32(int color) {
+	protected static int green32(int color) {
 		return ((color >> 8) & 0xff);
 	}
 
-	public static int blue32(int color) {
+	protected static int blue32(int color) {
 		return ((color) & 0xff);
 	}
 
-	public static int alpha32(int color) {
+	protected static int alpha32(int color) {
 		return ((color >> 24) & 0xff);
 	}
 
@@ -45,7 +45,7 @@ public class ImageFilter {
 	 * @param alpha 0-255
 	 * @return RGB color
 	 */
-	public static int encode32bit(int red,int green,int blue,int alpha) {
+	protected static int encode32bit(int red,int green,int blue,int alpha) {
 		red &= 0xff;
 		green &= 0xff;
 		blue &= 0xff;
@@ -57,7 +57,7 @@ public class ImageFilter {
 	 * @param greyscale 0-255
 	 * @return RGB fully opaque
 	 */
-	public static int encode32bit(int greyscale) {
+	protected static int encode32bit(int greyscale) {
 		greyscale &= 0xff;
 		return encode32bit(greyscale,greyscale,greyscale,0xff);
 	}
@@ -66,7 +66,7 @@ public class ImageFilter {
 	 * @param color RGBA
 	 * @return grayscale value
 	 */
-	public static int decodeColor(Color color) {
+	protected static int decodeColor(Color color) {
 		int r = color.getRed();
 		int g = color.getGreen();
 		int b = color.getBlue();
@@ -88,12 +88,10 @@ public class ImageFilter {
 
 		return (r2 + g2 + b2) / 3;
 	}
-	
+
 	/**
-	 * @param img the <code>java.awt.image.BufferedImage</code> this filter is using as source material.
+	 * Apply this filter and return the result as an image.
 	 * @return the altered image
 	 */
-	public TransformedImage filter(TransformedImage img) {
-		return img;
-	}
+	abstract public TransformedImage filter();
 }

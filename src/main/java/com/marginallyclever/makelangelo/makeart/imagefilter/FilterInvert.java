@@ -15,8 +15,15 @@ import java.io.IOException;
  *
  * @author Dan
  */
-public class Filter_Invert extends ImageFilter {
-    public TransformedImage filter(TransformedImage img) {
+public class FilterInvert extends ImageFilter {
+    private final TransformedImage img;
+
+    public FilterInvert(TransformedImage img) {
+        super();
+        this.img = img;
+    }
+
+    public TransformedImage filter() {
         BufferedImage src = img.getSourceImage();
         int h = src.getHeight();
         int w = src.getWidth();
@@ -39,9 +46,8 @@ public class Filter_Invert extends ImageFilter {
     }
 
     public static void main(String[] args) throws IOException {
-        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
-        Filter_Invert f = new Filter_Invert();
-        TransformedImage dest = f.filter(src);
-        ResizableImagePanel.showImage(dest.getSourceImage(), "Filter_Invert" );
+        TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
+        FilterInvert f = new FilterInvert(src);
+        ResizableImagePanel.showImage(f.filter().getSourceImage(), "Filter_Invert" );
     }
 }
