@@ -4,7 +4,7 @@ module com.marginallyclever.makelangelo {
     requires jssc;
     requires java.desktop;
     requires jogl.all;
-    requires logback.core;
+    requires ch.qos.logback.core;
     requires org.json;
     requires org.apache.commons.io;
     requires org.apache.commons.compress;
@@ -28,7 +28,7 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.makelangelo.plotter.plottercontrols;
     opens com.marginallyclever.makelangelo.turtle;
 
-    exports com.marginallyclever.convenience.log to logback.core;
+    exports com.marginallyclever.convenience.log to ch.qos.logback.core;
 
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
