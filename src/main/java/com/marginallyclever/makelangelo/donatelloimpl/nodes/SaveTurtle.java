@@ -23,6 +23,8 @@ public class SaveTurtle extends Node {
 
     @Override
     public void update() {
+        if(filename.hasPacketWaiting()) filename.receive();
+
         if(filename.getValue().isEmpty()) return;
 
         try {

@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,9 @@ public class Rectangle extends Node {
 
     @Override
     public void update() {
+        if(w.hasPacketWaiting()) w.receive();
+        if(h.hasPacketWaiting()) h.receive();
+
         try {
             Turtle t = new Turtle();
             double ww = w.getValue().doubleValue()/2.0;
@@ -33,7 +37,7 @@ public class Rectangle extends Node {
             t.moveTo(-ww, hh);
             t.moveTo(-ww,-hh);
             t.penUp();
-            contents.setValue(t);
+            contents.send(new Packet<>(t));
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

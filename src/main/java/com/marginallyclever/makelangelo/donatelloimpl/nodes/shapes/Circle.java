@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,8 @@ public class Circle extends Node {
 
     @Override
     public void update() {
+        if(radius.hasPacketWaiting()) radius.receive();
+
         try {
             Turtle t = new Turtle();
             double r = radius.getValue().doubleValue()/2.0;
@@ -32,7 +35,7 @@ public class Circle extends Node {
             }
             t.jumpTo(r,0);
             t.penUp();
-            contents.setValue(t);
+            contents.send(new Packet<>(t));
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

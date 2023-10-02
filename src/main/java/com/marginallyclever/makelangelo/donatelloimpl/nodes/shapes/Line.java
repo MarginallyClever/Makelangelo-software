@@ -1,10 +1,7 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.Dock;
-import com.marginallyclever.nodegraphcore.DockReceiving;
-import com.marginallyclever.nodegraphcore.DockShipping;
-import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +25,17 @@ public class Line extends Node {
 
     @Override
     public void update() {
+        if(x0.hasPacketWaiting()) x0.receive();
+        if(y0.hasPacketWaiting()) y0.receive();
+        if(x1.hasPacketWaiting()) x1.receive();
+        if(y1.hasPacketWaiting()) y1.receive();
+
         try {
             Turtle t = new Turtle();
             t.jumpTo(x0.getValue().doubleValue(),y0.getValue().doubleValue());
             t.moveTo(x1.getValue().doubleValue(),y1.getValue().doubleValue());
             t.penUp();
-            contents.setValue(t);
+            contents.send(new Packet<>(t));
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

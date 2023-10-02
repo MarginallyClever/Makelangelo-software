@@ -4,6 +4,7 @@ import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class TransformTurtle extends Node {
     private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
@@ -27,11 +28,18 @@ public class TransformTurtle extends Node {
 
     @Override
     public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(sx.hasPacketWaiting()) sx.receive();
+        if(sy.hasPacketWaiting()) sy.receive();
+        if(rotate.hasPacketWaiting()) rotate.receive();
+        if(tx.hasPacketWaiting()) tx.receive();
+        if(ty.hasPacketWaiting()) ty.receive();
+
         Turtle input = turtle.getValue();
         Turtle moved = new Turtle(input);
         moved.scale(sx.getValue().doubleValue(),sy.getValue().doubleValue());
         moved.rotate(rotate.getValue().doubleValue());
         moved.translate(tx.getValue().doubleValue(),ty.getValue().doubleValue());
-        output.setValue(moved);
+        output.send(new Packet<>(moved));
     }
 }

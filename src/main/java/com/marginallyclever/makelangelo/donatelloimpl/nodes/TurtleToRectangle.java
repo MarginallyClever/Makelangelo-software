@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 
 import java.awt.*;
 
@@ -24,9 +25,11 @@ public class TurtleToRectangle extends Node {
 
     @Override
     public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null ) {
-            output.setValue(myTurtle.getBounds());
+            output.send(new Packet<>(myTurtle.getBounds()));
         }
     }
 }

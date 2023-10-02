@@ -6,6 +6,7 @@ import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.Packet;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -23,6 +24,8 @@ public class TurtleToBufferedImage extends Node {
 
     @Override
     public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null && !myTurtle.history.isEmpty()) {
             Rectangle2D r = myTurtle.getBounds();
@@ -56,7 +59,7 @@ public class TurtleToBufferedImage extends Node {
                     }
                 }
             }
-            output.setValue(img);
+            output.send(new Packet<>(img));
         }
     }
 }

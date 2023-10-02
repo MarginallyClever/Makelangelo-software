@@ -5,14 +5,15 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 
 import java.awt.geom.Rectangle2D;
 
 public class LoadTurtle extends Node {
     private final DockReceiving<String> filename = new DockReceiving<>("filename",String.class,null);
-    private final DockReceiving<Turtle> contents = new DockReceiving<>("contents", Turtle.class, new Turtle());
-    private final DockReceiving<Number> w = new DockReceiving<>("width", Number.class, 0);
-    private final DockReceiving<Number> h = new DockReceiving<>("height", Number.class, 0);
+    private final DockShipping<Turtle> contents = new DockShipping<>("contents", Turtle.class, new Turtle());
+    private final DockShipping<Number> w = new DockShipping<>("width", Number.class, 0);
+    private final DockShipping<Number> h = new DockShipping<>("height", Number.class, 0);
     private final DockShipping<Number> length = new DockShipping<>("length", Number.class, 0);
 
 
@@ -26,13 +27,15 @@ public class LoadTurtle extends Node {
 
     @Override
     public void update() {
+        if(filename.hasPacketWaiting()) filename.receive();
+
         try {
             Turtle t = TurtleFactory.load(filename.getValue());
-            contents.setValue(t);
+            contents.send(new Packet<>(t));
             Rectangle2D r = t.getBounds();
-            w.setValue(r.getWidth());
-            h.setValue(r.getHeight());
-            length.setValue(t.getDrawDistance());
+            w.send(new Packet<>(r.getWidth()));
+            h.send(new Packet<>(r.getHeight()));
+            length.send(new Packet<>(t.getDrawDistance()));
         } catch (Exception e) {
             e.printStackTrace();
         }

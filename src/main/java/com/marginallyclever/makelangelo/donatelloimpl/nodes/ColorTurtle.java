@@ -7,6 +7,7 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class ColorTurtle extends Node {
     private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
@@ -26,10 +27,15 @@ public class ColorTurtle extends Node {
 
     @Override
     public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(red.hasPacketWaiting()) red.receive();
+        if(green.hasPacketWaiting()) green.receive();
+        if(blue.hasPacketWaiting()) blue.receive();
+
         Turtle input = turtle.getValue();
         int r = red.getValue().intValue();
-        int b = blue.getValue().intValue();
         int g = green.getValue().intValue();
+        int b = blue.getValue().intValue();
         ColorRGB c = new ColorRGB(r, g, b);
         Turtle moved = new Turtle();
         for( TurtleMove m : input.history ) {
@@ -39,6 +45,6 @@ public class ColorTurtle extends Node {
                 moved.history.add(new TurtleMove(m));
             }
         }
-        output.setValue(moved);
+        output.send(new Packet<>(moved));
     }
 }

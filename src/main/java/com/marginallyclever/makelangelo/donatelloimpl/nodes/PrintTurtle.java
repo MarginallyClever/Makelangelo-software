@@ -29,6 +29,11 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     @Override
     public void print(Graphics g) {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(px.hasPacketWaiting()) px.receive();
+        if(py.hasPacketWaiting()) py.receive();
+        if(travelColor.hasPacketWaiting()) travelColor.receive();
+
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 

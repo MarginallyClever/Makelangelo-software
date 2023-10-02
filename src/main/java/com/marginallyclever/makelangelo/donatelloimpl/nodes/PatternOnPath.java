@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class PatternOnPath extends Node {
     private final DockReceiving<Turtle> pattern = new DockReceiving<>("pattern", Turtle.class, new Turtle());
@@ -22,6 +23,10 @@ public class PatternOnPath extends Node {
 
     @Override
     public void update() {
+        if(pattern.hasPacketWaiting()) pattern.receive();
+        if(path.hasPacketWaiting()) path.receive();
+        if(count.hasPacketWaiting()) count.receive();
+
         Turtle sum = new Turtle();
         Turtle myPattern = pattern.getValue();
         Turtle myPath = path.getValue();
@@ -42,6 +47,6 @@ public class PatternOnPath extends Node {
                 sum.add(stamp);
             }
         }
-        output.setValue(sum);
+        output.send(new Packet<>(sum));
     }
 }

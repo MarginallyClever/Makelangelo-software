@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.Packet;
 
 import java.awt.image.BufferedImage;
 
@@ -19,7 +20,7 @@ public class PathImageMask extends Node {
     private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
     private final DockReceiving<Number> stepSize = new DockReceiving<>("stepSize", Number.class, 5);
     private final DockReceiving<Number> threshold = new DockReceiving<>("threshold", Number.class, 128);
-    private final DockReceiving<Turtle> outputAbove = new DockReceiving<>("above", Turtle.class,new Turtle());
+    private final DockShipping<Turtle> outputAbove = new DockShipping<>("above", Turtle.class,new Turtle());
     private final DockShipping<Turtle> outputBelow = new DockShipping<>("below", Turtle.class,new Turtle());
 
     private final LineCollection listAbove = new LineCollection();
@@ -37,6 +38,11 @@ public class PathImageMask extends Node {
 
     @Override
     public void update() {
+        if(image.hasPacketWaiting()) image.receive();
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(stepSize.hasPacketWaiting()) stepSize.receive();
+        if(threshold.hasPacketWaiting()) threshold.receive();
+
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
@@ -55,11 +61,11 @@ public class PathImageMask extends Node {
 
         Turtle resultAbove = new Turtle();
         resultAbove.addLineSegments(listAbove);
-        outputAbove.setValue(resultAbove);
+        outputAbove.send(new Packet<>(resultAbove));
 
         Turtle resultBelow = new Turtle();
         resultBelow.addLineSegments(listBelow);
-        outputBelow.setValue(resultBelow);
+        outputBelow.send(new Packet<>(resultBelow));
     }
 
     /**
