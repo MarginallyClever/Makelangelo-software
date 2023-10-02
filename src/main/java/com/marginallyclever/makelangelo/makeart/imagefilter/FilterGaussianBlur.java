@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,19 +18,21 @@ import java.io.IOException;
  *
  * @author Dan
  */
-public class Filter_GaussianBlur extends ImageFilter {
-	private static final Logger logger = LoggerFactory.getLogger(Filter_GaussianBlur.class);
-	int radius = 1;
+public class FilterGaussianBlur extends ImageFilter {
+	private final TransformedImage img;
+	private final int radius;
 
-	public Filter_GaussianBlur(int radius) {
+	public FilterGaussianBlur(TransformedImage img, int radius) {
+		super();
+		this.img = img;
 		assert (radius >= 1);
 		this.radius = radius;
 	}
 
 	@Override
-	public TransformedImage filter(TransformedImage img) {
-		BufferedImage src = img.getSourceImage();
+	public TransformedImage filter() {
 	    TransformedImage after = new TransformedImage(img);
+		BufferedImage src = img.getSourceImage();
 		BufferedImage dest = after.getSourceImage();
 		BufferedImage inter = new BufferedImage(src.getWidth(), src.getHeight(), src.getType());
 		getGaussianBlurFilter(true).filter(src,inter);
@@ -45,6 +45,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 		int size = radius * 2 + 1;
 		float[] data = new float[size];
 
+		// sigma here is the lowercase σ, not the uppercase Σ.
 		float sigma = radius / 3.0f;
 		float twoSigmaSquare = 2.0f * sigma * sigma;
 		float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
@@ -71,7 +72,7 @@ public class Filter_GaussianBlur extends ImageFilter {
 	}
 
 	public static void main(String[] args) throws IOException {
-		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/Lenna.png")) );
+		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 
@@ -80,8 +81,8 @@ public class Filter_GaussianBlur extends ImageFilter {
 		panel.add(slider,BorderLayout.NORTH);
 
 		slider.addChangeListener(e->{
-			Filter_GaussianBlur f = new Filter_GaussianBlur(slider.getValue());
-			TransformedImage dest = f.filter(src);
+			FilterGaussianBlur f = new FilterGaussianBlur(src,slider.getValue());
+			TransformedImage dest = f.filter();
 			ResizableImagePanel rip = new ResizableImagePanel(dest.getSourceImage());
 			BorderLayout layout = (BorderLayout)panel.getLayout();
 			Component c = layout.getLayoutComponent(BorderLayout.CENTER);

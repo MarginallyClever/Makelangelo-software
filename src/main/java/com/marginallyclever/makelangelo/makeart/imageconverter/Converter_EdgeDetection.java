@@ -3,7 +3,9 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterExtendedDifferenceOfGaussians;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -66,12 +68,20 @@ public class Converter_EdgeDetection extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		img = bw.filter(myImage);
+		FilterDesaturate desaturates = new FilterDesaturate(myImage);
+		img = desaturates.filter();
+
+		FilterGaussianBlur blur1 = new FilterGaussianBlur(img, 1);
+		FilterGaussianBlur blur2 = new FilterGaussianBlur(img, 4);
+		TransformedImage img1 = blur1.filter();
+		TransformedImage img2 = blur2.filter();
+		FilterExtendedDifferenceOfGaussians dog = new FilterExtendedDifferenceOfGaussians(img1,img2,20);
+		img = dog.filter();
+
+
 		turtle = new Turtle();
 
 		int edgeStep = 255/(passes+1);
-		int d = 40;
 		edge = 255-edgeStep;
 
 		for(int i=0;i<passes;++i) {
