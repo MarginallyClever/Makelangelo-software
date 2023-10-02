@@ -152,7 +152,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Absolute position change, make sure pen is up before move and put pen down after move.
+	 * Absolute position change. Raise the pen before move and lower pen after move.
 	 * @param x absolute x position
 	 * @param y absolute y position
 	 */
@@ -163,7 +163,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Absolute position change, do not adjust pen status
+	 * Absolute position change, do not change current pen status
 	 * @param x relative x position
 	 * @param y relative y position
 	 */

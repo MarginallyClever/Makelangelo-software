@@ -21,7 +21,7 @@ public class VoronoiTesselator2 {
     }
 
     public void tessellate(List<VoronoiCell> points, Rectangle2D bounds, double tolerance) {
-        if(points.size()!=coordinates.length) setNumHulls(points.size());
+        if(coordinates==null || points.size()!=coordinates.length) setNumHulls(points.size());
 
         int i=0;
         for(VoronoiCell cell : points) {

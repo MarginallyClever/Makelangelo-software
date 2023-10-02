@@ -272,6 +272,7 @@
 	<string><key>Converter_VoronoiStippling.DotMin</key><value>Min dot size</value></string>
 	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
 	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Cutoff</value></string>
+	<string><key>Converter_Voronoi.ShowCenters</key><value>Show centers</value></string>
 
 	<string><key>SandyNoble.title</key><value>Sandy Noble Style</value></string>
 	<string><key>SandyNoble.rings</key><value>Rings</value></string>
