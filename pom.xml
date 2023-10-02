@@ -365,12 +365,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.4.0</version>
+			<version>2.5.0-rc-20230523</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
 			<artifactId>jogl-all-main</artifactId>
-			<version>2.4.0</version>
+			<version>2.5.0-rc-20230523</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
@@ -511,7 +511,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
 			<version>1.0.21</version>
 			<scope>compile</scope>
