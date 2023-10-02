@@ -33,8 +33,11 @@
 	<string><key>StartAtExactly</key><value>Do nothing special</value></string>
 	<string><key>ConfirmQuitQuestion</key><value>Are you sure you want to quit?</value></string>
 	<string><key>ConfirmQuitTitle</key><value>Exit</value></string>
+
 	<string><key>ConvertImagePaperFill</key><value>Fill entire paper</value></string>
 	<string><key>ConvertImagePaperFit</key><value>Fit image on paper</value></string>
+	<string><key>ConvertImagePaperCenter</key><value>Center image</value></string>
+
 	<string><key>LoadFilePanel.title</key><value>Load file preview</value></string>
 	<string><key>OK</key><value>OK</value></string>
 	<string><key>Cancel</key><value>Cancel</value></string>

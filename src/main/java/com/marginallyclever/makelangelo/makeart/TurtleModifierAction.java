@@ -17,8 +17,6 @@ public abstract class TurtleModifierAction extends AbstractAction {
 	private final ArrayList<TurtleModifierListener> listeners = new ArrayList<TurtleModifierListener>();
 	private Makelangelo myMakelangelo;
 	
-	public TurtleModifierAction() {}
-	
 	public TurtleModifierAction(String string) {
 		super(string);
 	}
