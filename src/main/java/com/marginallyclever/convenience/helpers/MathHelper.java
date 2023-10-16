@@ -3,6 +3,7 @@ package com.marginallyclever.convenience.helpers;
 import javax.vecmath.Point2d;
 import javax.vecmath.Tuple2d;
 import javax.vecmath.Vector2d;
+import java.security.InvalidParameterException;
 
 public class MathHelper {
 
@@ -100,5 +101,26 @@ public class MathHelper {
 		ba.scale(t);
 		ba.add(a);
 		return ba;
+	}
+
+	/**
+	 * Calculates an intersection of two circles.  Assume the first circle is at the origin and the second is
+	 * moved along the positive x axis.
+	 * @param r1 radius of circle 0
+	 * @param r2 radius of circle 1
+	 * @param d distance between the two circles
+	 * @return one of the two points where the circles intersect.
+	 * @throws InvalidParameterException if r0, r1, or d are negative.
+	 * @throws IllegalArgumentException if the circles do not intersect.
+	 */
+	public static Vector2d intersectionOfCircles(double r1,double r2,double d) {
+		if(r1<0) throw new InvalidParameterException("r1 must be >= 0");
+		if(r2<0) throw new InvalidParameterException("r2 must be >= 0");
+		if(d<0) throw new InvalidParameterException("d must be >= 0");
+		if(r1+r2<d) throw new IllegalArgumentException("circles do not intersect");
+
+		double x = (r1*r1 - r2*r2 + d*d) / (2.0*d);
+		double y = Math.sqrt(r1*r1 - x*x);
+		return new Vector2d(x,y);
 	}
 }
