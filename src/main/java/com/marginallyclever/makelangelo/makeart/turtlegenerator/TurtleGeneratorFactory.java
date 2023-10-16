@@ -58,18 +58,21 @@ public class TurtleGeneratorFactory {
 					new TurtleGeneratorNode(new Generator_GridFit()),
 					new TurtleGeneratorNode(new Generator_GridHexagons()),
 			}),
+			new TurtleGeneratorNode(Translator.get("MenuGenerate.SpaceFillers"), new TurtleGeneratorNode[]{
+					new TurtleGeneratorNode(new Generator_FlowField()),
+					new TurtleGeneratorNode(new Generator_Spiral()),
+					new TurtleGeneratorNode(new Generator_TruchetTiles()),
+					new TurtleGeneratorNode(new Generator_Voronoi()),
+			}),
 			new TurtleGeneratorNode(Translator.get("MenuGenerate.Mazes"), new TurtleGeneratorNode[]{
 					new TurtleGeneratorNode(new Generator_MazeCircle()),
 					new TurtleGeneratorNode(new Generator_MazeHoneycomb()),
 					new TurtleGeneratorNode(new Generator_MazeRectangle()),
 			}),
-			new TurtleGeneratorNode(new Generator_FlowField()),
 			new TurtleGeneratorNode(new Generator_Lissajous()),
 			new TurtleGeneratorNode(new Generator_Package()),
 			new TurtleGeneratorNode(new Generator_Polyeder()),
 			new TurtleGeneratorNode(new Generator_Spirograph()),
 			new TurtleGeneratorNode(new Generator_Text()),
-			new TurtleGeneratorNode(new Generator_TruchetTiles()),
-			new TurtleGeneratorNode(new Generator_Voronoi()),
 	});
 }

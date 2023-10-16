@@ -138,6 +138,7 @@
 	<string><key>MenuGenerate</key><value>Generate art</value></string>
 	<string><key>MenuGenerate.Fractals</key><value>Fractals</value></string>
 	<string><key>MenuGenerate.Grids</key><value>Grids</value></string>
+	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
 	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
 
 	<string><key>MenuNewFile</key><value>New</value></string>
@@ -310,6 +311,9 @@
 	<string><key>Generator_FlowField.fromEdge</key><value>Continuous</value></string>
 	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
 	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
+
+	<string><key>Generator_Spiral.name</key><value>Spiral</value></string>
+	<string><key>Generator_Spiral.radius</key><value>Radius</value></string>
 
 	<string><key>Generator_MazeRectangle.name</key><value>Rectangle</value></string>
 	<string><key>Generator_MazeRectangle.rows</key><value>Rows</value></string>
