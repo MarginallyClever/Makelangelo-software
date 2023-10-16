@@ -379,14 +379,13 @@ public class Turtle implements Cloneable {
 		if(steps<=0) throw new InvalidParameterException("steps must be greater than zero.");
 
 		double delta = (a2 - a1) / (double) steps;
-		double f = a1;
 
 		for (int i = 0; i <= steps; i++) {
+			double f = a1 + delta * i;
 			double x2 = cx + Math.cos(f) * radius;
 			double y2 = cy + Math.sin(f) * radius;
 			if(i==0) this.jumpTo(x2, y2);
 			else     this.moveTo(x2, y2);
-			f += delta;
 		}
 	}
 
