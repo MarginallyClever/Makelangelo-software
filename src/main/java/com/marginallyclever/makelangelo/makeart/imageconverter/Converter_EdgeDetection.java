@@ -78,7 +78,6 @@ public class Converter_EdgeDetection extends ImageConverter {
 		FilterExtendedDifferenceOfGaussians dog = new FilterExtendedDifferenceOfGaussians(img1,img2,20);
 		img = dog.filter();
 
-
 		turtle = new Turtle();
 
 		int edgeStep = 255/(passes+1);
