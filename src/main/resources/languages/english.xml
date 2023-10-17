@@ -436,4 +436,9 @@
 	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
 	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
 	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
+
+	<string><key>LineWeightByImageIntensity.name</key><value>Line image weight</value></string>
+	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
+	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
+
 </language>

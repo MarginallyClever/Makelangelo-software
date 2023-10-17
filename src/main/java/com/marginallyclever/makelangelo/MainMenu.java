@@ -262,10 +262,10 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createGenerateMenu() {
-        return createGeneratorMenuFromTree(TurtleGeneratorFactory.available );
+        return createGeneratorMenuFromTree(TurtleGeneratorFactory.available);
     }
 
-    public JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorNode root) {
+    private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorNode root) {
         JMenu menu = new JMenu(root.getName());
         for (TurtleGeneratorFactory.TurtleGeneratorNode child : root.getChildren()) {
             if (child.getChildren().isEmpty()) {
@@ -283,6 +283,7 @@ public class MainMenu extends JMenuBar {
     private void runGeneratorDialog(TurtleGenerator turtleGenerator) {
         turtleGenerator.setPaper(app.getPaper());
         turtleGenerator.addListener(app::setTurtle);
+        turtleGenerator.setTurtle(app.getTurtle());
         turtleGenerator.generate();
 
         if(turtleGenerator.getPanelElements().isEmpty()) {
