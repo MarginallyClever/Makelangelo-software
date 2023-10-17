@@ -8,7 +8,6 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_G
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet.Generator_TruchetTiles;
 
 import java.util.ArrayList;
 import java.util.List;

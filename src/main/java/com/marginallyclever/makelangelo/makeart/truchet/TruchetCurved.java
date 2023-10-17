@@ -1,11 +1,11 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet;
+package com.marginallyclever.makelangelo.makeart.truchet;
 
 import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 
-public class TruchetCurved implements TruchetTileGenerator {
+public class TruchetCurved implements TruchetTile {
     private final Turtle turtle;
     private final double spaceBetweenLines;
     private final double tileSize;

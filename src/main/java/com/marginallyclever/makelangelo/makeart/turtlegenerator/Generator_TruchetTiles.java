@@ -1,8 +1,11 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet;
+package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.tools.CropTurtle;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.makeart.truchet.TruchetCurved;
+import com.marginallyclever.makelangelo.makeart.truchet.TruchetDiagonal;
+import com.marginallyclever.makelangelo.makeart.truchet.TruchetOrthogonal;
+import com.marginallyclever.makelangelo.makeart.truchet.TruchetTile;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -78,10 +81,10 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 
 		Turtle turtle = new Turtle();
 
-		List<TruchetTileGenerator> ttgList = new ArrayList<>();
-		if(allowDiagonal  ) ttgList.add(new TruchetDiagonal  (turtle,spaceBetweenLines,linesPerTileCount));
+		List<TruchetTile> ttgList = new ArrayList<>();
+		if(allowDiagonal  ) ttgList.add(new TruchetDiagonal(turtle,spaceBetweenLines,linesPerTileCount));
 		if(allowOrthogonal) ttgList.add(new TruchetOrthogonal(turtle,spaceBetweenLines,linesPerTileCount));
-		if(allowCurved    ) ttgList.add(new TruchetCurved    (turtle,spaceBetweenLines,linesPerTileCount));
+		if(allowCurved    ) ttgList.add(new TruchetCurved(turtle,spaceBetweenLines,linesPerTileCount));
 
 		if(!ttgList.isEmpty()) {
 			for(double y=yMin;y<yMax;y+= tileSize) {
