@@ -2,10 +2,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.tools.CropTurtle;
-import com.marginallyclever.makelangelo.makeart.truchet.TruchetCurved;
-import com.marginallyclever.makelangelo.makeart.truchet.TruchetDiagonal;
-import com.marginallyclever.makelangelo.makeart.truchet.TruchetOrthogonal;
-import com.marginallyclever.makelangelo.makeart.truchet.TruchetTile;
+import com.marginallyclever.makelangelo.makeart.truchet.*;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -17,32 +14,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Generate random Truchet tiles.
+ * Generate random Truchet tiles using the {@link TruchetTileFactory} as a menu of available tiles.
  * @author Dan Royer
- *
+ * @since 7.48.0
  */
 public class Generator_TruchetTiles extends TurtleGenerator {
 	private static final Logger logger = LoggerFactory.getLogger(Generator_TruchetTiles.class);
-	private final SelectBoolean allowDiagonalChoice;
-	private final SelectBoolean allowOrthogonalChoice;
-	private final SelectBoolean allowCurvedChoice;
 	private final SelectSlider lineSpacing;
 	private final SelectSlider linesPerTile;
 	private static int spaceBetweenLines = 10;
 	private static int linesPerTileCount = 10;
-	private static boolean allowDiagonal = true;
-	private static boolean allowOrthogonal = true;
-	private static boolean allowCurved = true;
+
+	private final List<Boolean> allowedTiles = new ArrayList<>();
 
 	public Generator_TruchetTiles() {
 		super();
 
-		add(allowDiagonalChoice = new SelectBoolean("allowDiagonal",Translator.get("Generator_TruchetTiles.diagonal"),allowDiagonal));
-		allowDiagonalChoice.addPropertyChangeListener(evt->generate());
-		add(allowOrthogonalChoice = new SelectBoolean("allowOrthogonal",Translator.get("Generator_TruchetTiles.orthogonal"),allowOrthogonal));
-		allowOrthogonalChoice.addPropertyChangeListener(evt->generate());
-		add(allowCurvedChoice = new SelectBoolean("allowCurved",Translator.get("Generator_TruchetTiles.curved"),allowCurved));
-		allowCurvedChoice.addPropertyChangeListener(evt->generate());
+		List<String> names = TruchetTileFactory.getNames();
+		// first time
+		if(allowedTiles.size() != names.size()) {
+			for(String name : names) {
+				allowedTiles.add(true);
+			}
+		}
+
+		for(int i=0;i<names.size();++i) {
+			SelectBoolean allow = new SelectBoolean("allow"+i,Translator.get("Generator_TruchetTiles.allow",new String[]{names.get(i)}),allowedTiles.get(i));
+			add(allow);
+			int finalI = i;
+			allow.addPropertyChangeListener(evt->{
+				allowedTiles.set(finalI,allow.isSelected());
+					generate();
+			});
+		}
 
 		add(lineSpacing = new SelectSlider("lineSpacing",Translator.get("Generator_TruchetTiles.LineSpacing"),20,2,Generator_TruchetTiles.getSpacing()));
 		lineSpacing.addPropertyChangeListener(evt->generate());
@@ -73,18 +77,17 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 
 		spaceBetweenLines = lineSpacing.getValue();
 		linesPerTileCount = linesPerTile.getValue();
-		allowDiagonal = allowDiagonalChoice.isSelected();
-		allowOrthogonal = allowOrthogonalChoice.isSelected();
-		allowCurved = allowCurvedChoice.isSelected();
 
 		int tileSize = spaceBetweenLines * linesPerTileCount;
 
 		Turtle turtle = new Turtle();
 
 		List<TruchetTile> ttgList = new ArrayList<>();
-		if(allowDiagonal  ) ttgList.add(new TruchetDiagonal(turtle,spaceBetweenLines,linesPerTileCount));
-		if(allowOrthogonal) ttgList.add(new TruchetOrthogonal(turtle,spaceBetweenLines,linesPerTileCount));
-		if(allowCurved    ) ttgList.add(new TruchetCurved(turtle,spaceBetweenLines,linesPerTileCount));
+		for(int i=0;i<allowedTiles.size();++i) {
+			if(allowedTiles.get(i)) {
+				ttgList.add(TruchetTileFactory.getTile(i,turtle,spaceBetweenLines,linesPerTileCount));
+			}
+		}
 
 		if(!ttgList.isEmpty()) {
 			for(double y=yMin;y<yMax;y+= tileSize) {

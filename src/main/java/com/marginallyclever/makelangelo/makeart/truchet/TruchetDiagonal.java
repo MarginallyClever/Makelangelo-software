@@ -3,6 +3,12 @@ package com.marginallyclever.makelangelo.makeart.truchet;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 public class TruchetDiagonal implements TruchetTile {
+    public static final int TYPE_RANDOM = 0;
+    public static final int TYPE_RISING = 1;
+    public static final int TYPE_FALLING = 2;
+    public static final int MAX_TYPES = 3;
+
+    private int type = TYPE_RANDOM;
     private final Turtle turtle;
     private final double spaceBetweenLines;
     private final double tileSize;
@@ -16,8 +22,14 @@ public class TruchetDiagonal implements TruchetTile {
 
     @Override
     public void drawTile(double x,double y) {
-        if(Math.random() >= 0.5) tileA(x,y);
-        else                     tileB(x,y);
+        switch(type) {
+            case TYPE_RANDOM -> {
+                if (Math.random() >= 0.5) tileA(x, y);
+                else tileB(x, y);
+            }
+            case TYPE_RISING -> tileA(x, y);
+            case TYPE_FALLING -> tileB(x, y);
+        }
     }
 
     // style=/
@@ -50,5 +62,14 @@ public class TruchetDiagonal implements TruchetTile {
         turtle.moveTo(x0,y0);
         turtle.penDown();
         turtle.moveTo(x1,y1);
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        if(type<0 || type >=MAX_TYPES) throw new IllegalArgumentException("Invalid type");
+        this.type = type;
     }
 }
