@@ -141,6 +141,10 @@
 	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
 	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
 
+	<string><key>Converter_TruchetFromImage.name</key><value>Truchet from image</value></string>
+	<string><key>Converter_TruchetFromImage.spacing</key><value>Space between lines</value></string>
+	<string><key>Converter_TruchetFromImage.linesPerTile</key><value>Lines per tile</value></string>
+
 	<string><key>MenuNewFile</key><value>New</value></string>
 	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
 	<string><key>LSystemTreeName</key><value>L System Tree</value></string>

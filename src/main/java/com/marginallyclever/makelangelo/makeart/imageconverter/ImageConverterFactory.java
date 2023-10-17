@@ -27,6 +27,7 @@ public class ImageConverterFactory {
 					new Converter_Sandy(),
 					new Converter_Spiral(),
 					new Converter_SpiralPulse(),
+					new Converter_TruchetFromImage(),
 					new Converter_VoronoiStippling(),
 					new Converter_VoronoiZigZag(),
 					new Converter_Wander(),
