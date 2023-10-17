@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,14 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converts an image to N shades of grey.
+ * Converts an image using the jump flood algorithm.  On a white surface, black pixels will "spread out" creating
+ * an effect like water caustics.
  * @author Dan Royer
  */
 public class FilterJumpFlood extends ImageFilter {
-	private static final Logger logger = LoggerFactory.getLogger(FilterJumpFlood.class);
-	// Initialize the list of points
 	private final List<Point> points = new ArrayList<>();
-	private int stepSize;
 	private int scale;
 	private final TransformedImage img;
 
@@ -91,9 +87,6 @@ public class FilterJumpFlood extends ImageFilter {
 			image.setRGB((int)(Math.random()*image.getWidth()), (int)(Math.random()*image.getHeight()), Color.BLACK.getRGB());
 		}
 		TransformedImage src = new TransformedImage( image );
-		/*/
-		TransformedImage src = new TransformedImage( ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")) );
-		//*/
 
 		FilterJumpFlood f = new FilterJumpFlood(src);
 		TransformedImage dest = f.filter();
