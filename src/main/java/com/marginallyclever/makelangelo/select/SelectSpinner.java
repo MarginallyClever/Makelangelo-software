@@ -5,6 +5,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link SelectSpinner} is a {@link Select} that uses a {@link JSpinner} to select a value.
+ */
 public class SelectSpinner extends Select {
     private final JSpinner field;
 
