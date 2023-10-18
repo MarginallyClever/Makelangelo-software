@@ -599,4 +599,22 @@ public class Turtle implements Cloneable {
 	public Vector2d getPosition() {
 		return new Vector2d(px,py);
 	}
+
+
+	/**
+	 * @return the number of times the pen is lowered to draw a line.
+	 */
+	public int countLoops() {
+		int sum=0;
+		MovementType before = MovementType.TRAVEL;
+
+		for( TurtleMove m : history) {
+			if(m.type==before) continue;
+			if(m.type==MovementType.DRAW_LINE && before==MovementType.TRAVEL) {
+				sum++;
+			}
+			before = m.type;
+		}
+		return sum;
+	}
 }
