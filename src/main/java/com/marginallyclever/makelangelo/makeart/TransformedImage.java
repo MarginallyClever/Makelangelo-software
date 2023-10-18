@@ -108,9 +108,9 @@ public class TransformedImage {
 		int top    = (int)Math.ceil (y1);
 
 		// calculate the weight matrix
-		int w = right-left;
-		int h = top-bottom;
-		if(w<=1 && h<=1) {
+		int w = Math.max(1,right-left);
+		int h = Math.max(1,top-bottom);
+		if(w==1 && h==1) {
 			if (canSampleAt(left, bottom)) {
 				return sample1x1Unchecked(left, bottom);
 			} else {
