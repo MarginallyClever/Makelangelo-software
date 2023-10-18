@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GraphPaper;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridFit;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridHexagons;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightByImageIntensity;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
