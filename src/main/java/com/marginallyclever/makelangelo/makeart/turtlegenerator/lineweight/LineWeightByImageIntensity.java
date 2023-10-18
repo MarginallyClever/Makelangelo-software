@@ -95,8 +95,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         sortSegmentsIntoLines();
         flipAndSmooth();
         sortLinesByTravel();
-        //generateNewLines(turtle);
-        generateLines(turtle);
+        generateThickLines(turtle);
+        //generateLines(turtle);
 
         // clean up
         unsorted.clear();
@@ -157,10 +157,10 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             for( LineWeight b : sortedLines ) {
                 double [] scorePair = scoreLine(activeLine,b);
                 double newScore = Math.min( scorePair[0], scorePair[1] );
-                if(bestScore>newScore) {
+                if(bestScore > newScore) {
+                    best = b;
                     bestScore = newScore;
                     bestEnd = scorePair[0] < scorePair[1];
-                    best=b;
                 }
             }
             sortedLines.remove(best);
@@ -277,8 +277,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         }
     }
 
-    private void generateNewLines(Turtle turtle) {
-        logger.debug("generateNewLines");
+    private void generateThickLines(Turtle turtle) {
+        logger.debug("generateThickLines");
         for(LineWeight i : orderedLines) {
             if(i.segments.isEmpty()) continue;
             generateOneLine(turtle,i);
@@ -295,7 +295,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         maxWeight = Math.max(1,Math.ceil(maxWeight));
 
         LineSegmentWeight start = line.segments.get(0);
-        // travel the length of the line and back maxWeiht times.  Each time offset by a different amount.
+        // travel the length of the line and back maxWeight times.  Each time offset by a different amount.
         List<Point2D> offsetSequence = new ArrayList<>();
 
         boolean first=true;
@@ -444,15 +444,15 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
                 found=false;
                 for (LineSegmentWeight s : unsorted) {
                     if (closeEnough(head, s)) {  // try to match with head of line
-                        unsorted.remove(s);
                         activeLine.segments.add(0, s);
                         head = s;
+                        unsorted.remove(s);
                         found = true;
                         break;
                     } else if (closeEnough(tail, s)) {  // try to match with tail of line
-                        unsorted.remove(s);
                         activeLine.segments.add(s);
                         tail = s;
+                        unsorted.remove(s);
                         found = true;
                         break;
                     }
@@ -500,20 +500,19 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     /**
      * Add a segment to the list of unsorted lines.  Splits long lines into smaller pieces.
-     * @param before the line to split
+     * @param segment the segment to split
      */
-    private void maybeSplitLine(LineSegment2D before) {
-        double beforeLen = Math.sqrt(before.lengthSquared());
-        if(stepSize > beforeLen) {
-            addOneUnsortedSegment(before.start,before.end);
+    private void maybeSplitLine(LineSegment2D segment) {
+        double beforeLen = Math.sqrt(segment.lengthSquared());
+        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize));
+        if(pieces==1) {
+            addOneUnsortedSegment(segment.start,segment.end);
             return;
         }
 
-        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize));
-
         Vector2d diff = new Vector2d(
-            before.end.x - before.start.x,
-            before.end.y - before.start.y
+            segment.end.x - segment.start.x,
+            segment.end.y - segment.start.y
         );
 
         for(int i=0;i<pieces;++i) {
@@ -522,11 +521,11 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
             addOneUnsortedSegment(
                     new Point2D(
-                            before.start.x + diff.x * t0,
-                            before.start.y + diff.y * t0),
+                            segment.start.x + diff.x * t0,
+                            segment.start.y + diff.y * t0),
                     new Point2D(
-                            before.start.x + diff.x * t1,
-                            before.start.y + diff.y * t1));
+                            segment.start.x + diff.x * t1,
+                            segment.start.y + diff.y * t1));
         }
     }
 
@@ -539,11 +538,11 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;
 
-        double intensity = (255-sourceImage.sample(mx,my,stepSize/2))*thickness/255.0;
-        LineSegmentWeight a = new LineSegmentWeight(start,end,intensity);
+        double intensity = 1.0-(sourceImage.sample(mx,my,stepSize/2)/255.0);
+        LineSegmentWeight a = new LineSegmentWeight(start,end,intensity*thickness);
         // make a fast search index
-        a.ix = (int)Math.floor(mx * 2.0 / stepSize);
-        a.iy = (int)Math.floor(my * 2.0 / stepSize);
+        a.ix = (int)Math.floor(mx * 6.0 / stepSize);
+        a.iy = (int)Math.floor(my * 6.0 / stepSize);
         return a;
     }
 }
