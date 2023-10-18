@@ -1,15 +1,14 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 class LineWeight {
-    public List<LineSegmentWeight> segments = new ArrayList<>();
+    public LinkedList<LineWeightSegment> segments = new LinkedList<>();
 
     public void flip() {
         Collections.reverse(segments);
-        for (LineSegmentWeight s : segments) {
+        for (LineWeightSegment s : segments) {
             s.flip();
         }
     }
