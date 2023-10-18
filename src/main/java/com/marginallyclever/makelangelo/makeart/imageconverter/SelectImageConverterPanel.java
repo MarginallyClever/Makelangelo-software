@@ -185,9 +185,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		boolean test;
 		if (mode == 0) {
-			test = width < height;  // fill paper
+			test = width < height;  // fit paper
 		} else {
-			test = width > height;  // fit paper
+			test = width > height;  // fill paper
 		}
 
 		float f;
