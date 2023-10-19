@@ -91,7 +91,7 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         super.start(paper, image);
 
         FilterDesaturate bw = new FilterDesaturate(myImage);
-        TransformedImage img = bw.filter();
+        img = bw.filter();
 
         Point2D topLeftP = new Point2D(myPaper.getMarginLeft(),paper.getMarginTop());
         Point2D bottomRightP = new Point2D(myPaper.getMarginRight(), paper.getMarginBottom());
