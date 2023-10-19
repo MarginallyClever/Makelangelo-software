@@ -442,11 +442,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     private void addOneUnsortedSegment(Point2D start, Point2D end) {
-        LineWeightSegment seg = createLSW(start,end);
-        if(seg==null) {
-            throw new RuntimeException("seg is null");
-        }
-        unsorted.add(seg);
+        unsorted.add(createLSW(start,end));
     }
 
     private LineWeightSegment createLSW(Point2D start, Point2D end) {
@@ -462,4 +458,3 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return a;
     }
 }
-
