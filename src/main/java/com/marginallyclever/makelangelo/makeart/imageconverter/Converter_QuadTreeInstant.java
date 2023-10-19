@@ -99,7 +99,7 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         turtle = new Turtle();
 
         BoxCondition boxCondition = new BoxCondition(true,true,true,true);
-        fractal(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
+        recurse(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
         fireConversionFinished();
     }
 
@@ -116,7 +116,7 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         return sum/c;
     }
 
-    private void fractal(Point2D topLeft, Point2D bottomRight, BoxCondition boxCondition, int curDepth, int cutOff){
+    private void recurse(Point2D topLeft, Point2D bottomRight, BoxCondition boxCondition, int curDepth, int cutOff){
         if(curDepth > maxDepth) return;
 
         float average = getAverageOfRegion(topLeft, bottomRight);
@@ -125,20 +125,20 @@ public class Converter_QuadTreeInstant extends ImageConverter{
 
         // only draw the sides of the box that are needed
         if(boxCondition.drawTop) {
-            drawLine(new Point2D(topLeft.x, topLeft.y),
+            drawLine(topLeft,
                      new Point2D(bottomRight.x, topLeft.y));
         }
         if(boxCondition.drawBottom) {
             drawLine(new Point2D(topLeft.x, bottomRight.y),
-                     new Point2D(bottomRight.x, bottomRight.y));
+                     bottomRight);
         }
         if(boxCondition.drawLeft) {
-            drawLine(new Point2D(topLeft.x, topLeft.y),
+            drawLine(topLeft,
                      new Point2D(topLeft.x, bottomRight.y));
         }
         if(boxCondition.drawRight) {
             drawLine(new Point2D(bottomRight.x, topLeft.y),
-                     new Point2D(bottomRight.x, bottomRight.y));
+                     bottomRight);
         }
 
         // go deeper, but each time lower the cutoff.  darker regions will start to fail the test.
@@ -147,26 +147,26 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         int w2 = (int)(bottomRight.x - topLeft.x)/2;
         int h2 = (int)(topLeft.y - bottomRight.y)/2;
         // top left corner
-        fractal(new Point2D(topLeft.x, topLeft.y),
+        recurse(topLeft,
                 new Point2D(topLeft.x + w2, topLeft.y-h2),
                 new BoxCondition(false,true,false,true),
               curDepth+1,
                 newCutOff);
         // top right corner
-        fractal(new Point2D(topLeft.x + w2, topLeft.y),
+        recurse(new Point2D(topLeft.x + w2, topLeft.y),
                 new Point2D(bottomRight.x, topLeft.y-h2),
                 new BoxCondition(false,true,true,false),
                 curDepth+1,
                 newCutOff);
         // bottom left corner
-        fractal(new Point2D(topLeft.x, topLeft.y-h2),
+        recurse(new Point2D(topLeft.x, topLeft.y-h2),
                 new Point2D(topLeft.x+w2, bottomRight.y),
                 new BoxCondition(true,false,false,true),
                 curDepth+1,
                 newCutOff);
         // bottom right corner
-        fractal(new Point2D(topLeft.x+w2, topLeft.y-h2),
-                new Point2D(bottomRight.x, bottomRight.y),
+        recurse(new Point2D(topLeft.x+w2, topLeft.y-h2),
+                bottomRight,
                 new BoxCondition(true,false,true,false),
                 curDepth+1,
                 newCutOff);
