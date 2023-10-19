@@ -7,7 +7,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serial;
 import java.util.ArrayList;
 
 /**
@@ -17,8 +16,6 @@ import java.util.ArrayList;
  * @since 7.31.0
  */
 public class SimplifyTurtleAction extends TurtleModifierAction {
-	@Serial
-	private static final long serialVersionUID = 7013596037448318526L;
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
 	private static double distanceTolerance = 1.6;
 	

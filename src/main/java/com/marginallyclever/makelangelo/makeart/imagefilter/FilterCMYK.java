@@ -10,11 +10,9 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-
 /**
- * Converts an image to N shades of grey.
- *
- * @author Dan
+ * Converts an image four color channels: Cyan, Magenta, Yellow, and Black. *
+ * @author Dan Royer
  */
 public class FilterCMYK extends ImageFilter {
     private static final Logger logger = LoggerFactory.getLogger(FilterCMYK.class);

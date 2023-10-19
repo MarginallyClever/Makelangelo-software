@@ -5,10 +5,10 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GraphPaper;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridFit;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.grid.Generator_GridHexagons;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightByImageIntensity;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeCircle;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeHoneycomb;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_MazeRectangle;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet.Generator_TruchetTiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +69,7 @@ public class TurtleGeneratorFactory {
 					new TurtleGeneratorNode(new Generator_MazeHoneycomb()),
 					new TurtleGeneratorNode(new Generator_MazeRectangle()),
 			}),
+			new TurtleGeneratorNode(new LineWeightByImageIntensity()),
 			new TurtleGeneratorNode(new Generator_Lissajous()),
 			new TurtleGeneratorNode(new Generator_Package()),
 			new TurtleGeneratorNode(new Generator_Polyeder()),

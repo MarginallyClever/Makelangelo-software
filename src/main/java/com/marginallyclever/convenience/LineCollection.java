@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class LineCollection extends ArrayList<LineSegment2D> {
-	private static final long serialVersionUID = 1L;
 	private boolean[] usePt;
 
 	public LineCollection() {

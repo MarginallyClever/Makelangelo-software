@@ -197,9 +197,9 @@ public final class Makelangelo {
 				previewPanel.addListener(loader);
 				JDialog dialog = new JDialog(mainFrame, Translator.get("LoadFilePanel.title"));
 				dialog.add(loader);
-				dialog.setLocationRelativeTo(mainFrame);
 				dialog.setMinimumSize(new Dimension(500,500));
 				dialog.pack();
+				dialog.setLocationRelativeTo(mainFrame);
 				loader.setParent(dialog);
 
 				enableMenuBar(false);

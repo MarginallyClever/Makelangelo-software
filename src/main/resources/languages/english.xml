@@ -141,6 +141,10 @@
 	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
 	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
 
+	<string><key>Converter_TruchetFromImage.name</key><value>Truchet from image</value></string>
+	<string><key>Converter_TruchetFromImage.spacing</key><value>Space between lines</value></string>
+	<string><key>Converter_TruchetFromImage.linesPerTile</key><value>Lines per tile</value></string>
+
 	<string><key>MenuNewFile</key><value>New</value></string>
 	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
 	<string><key>LSystemTreeName</key><value>L System Tree</value></string>
@@ -296,9 +300,7 @@
 	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
 	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
 	<string><key>Generator_TruchetTiles.LinesPerTile</key><value>Lines per tile</value></string>
-	<string><key>Generator_TruchetTiles.diagonal</key><value>Diagonal</value></string>
-	<string><key>Generator_TruchetTiles.orthogonal</key><value>Orthogonal</value></string>
-	<string><key>Generator_TruchetTiles.curved</key><value>Curved</value></string>
+	<string><key>Generator_TruchetTiles.allow</key><value>Allow '%1'</value></string>
 
 	<string><key>Generator_FlowField.name</key><value>Flow field</value></string>
 	<string><key>Generator_FlowField.scaleX</key><value>X scale</value></string>
@@ -384,6 +386,7 @@
 	<string><key>DefaultTurtleRenderer.name</key><value>Default</value></string>
 	<string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
 	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
+	<string><key>DirectionLoopTurtleRenderer.name</key><value>Direction loops</value></string>
 	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
 
 	<string><key>ChooseConnection.ButtonConnect</key><value>Connect</value></string>
@@ -434,4 +437,9 @@
 	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
 	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
 	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
+
+	<string><key>LineWeightByImageIntensity.name</key><value>Line image weight</value></string>
+	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
+	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
+
 </language>

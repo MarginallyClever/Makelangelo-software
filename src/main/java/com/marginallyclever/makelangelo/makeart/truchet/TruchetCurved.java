@@ -1,11 +1,19 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.truchet;
+package com.marginallyclever.makelangelo.makeart.truchet;
 
 import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 
-public class TruchetCurved implements TruchetTileGenerator {
+public class TruchetCurved implements TruchetTile {
+    public static final int TYPE_RANDOM = 0;
+    public static final int TYPE_CURTAIN_LEFT = 1;
+    public static final int TYPE_CURTAIN_RIGHT = 2;
+    public static final int TYPE_FAN_LEFT = 3;
+    public static final int TYPE_FAN_RIGHT = 4;
+    public static final int MAX_TYPES = 5;
+
+    private int type = 0;
     private final Turtle turtle;
     private final double spaceBetweenLines;
     private final double tileSize;
@@ -19,12 +27,20 @@ public class TruchetCurved implements TruchetTileGenerator {
 
     @Override
     public void drawTile(double x,double y) {
-        double r = Math.random();
+        switch(type) {
+            case TYPE_RANDOM -> {
+                double r = Math.random();
 
-             if(r<0.25) tileA1(x,y);
-        else if(r<0.50) tileB1(x,y);
-        else if(r<0.75) tileA2(x,y);
-        else            tileB2(x,y);
+                if(r<0.25) tileA1(x,y);
+                else if(r<0.50) tileB1(x,y);
+                else if(r<0.75) tileA2(x,y);
+                else            tileB2(x,y);
+            }
+            case TYPE_CURTAIN_LEFT -> tileA1(x,y);
+            case TYPE_CURTAIN_RIGHT -> tileB1(x,y);
+            case TYPE_FAN_LEFT -> tileA2(x,y);
+            case TYPE_FAN_RIGHT -> tileB2(x,y);
+        }
     }
 
     /**
@@ -130,5 +146,14 @@ public class TruchetCurved implements TruchetTileGenerator {
     // Interpolate from (x0,y0) to (x1,y1) in steps of length iterSize.
     private void interTile(double cx,double cy,double radius,double a0, double a1) {
         turtle.drawArc(cx,cy,radius,a0,a1,10);
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        if(type<0 || type >=MAX_TYPES) throw new IllegalArgumentException("Invalid type");
+        this.type = type;
     }
 }
