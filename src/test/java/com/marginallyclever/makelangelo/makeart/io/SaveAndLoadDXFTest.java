@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ReorderTurtleAction;
+import com.marginallyclever.makelangelo.makeart.tools.SimplifyTurtleAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.Generator_TruchetTiles;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -39,11 +41,16 @@ public class SaveAndLoadDXFTest {
         g.generate();
     }
 
-    private void saveAndLoad(Turtle before) throws Exception {
+    private void saveAndLoad(Turtle original) throws Exception {
         // given
         File fileTemp = File.createTempFile("unit", null);
 
         try {
+            SimplifyTurtleAction simplify = new SimplifyTurtleAction();
+            Turtle b2 = simplify.run(original);
+            ReorderTurtleAction reorder = new ReorderTurtleAction();
+            Turtle before = reorder.run(b2);
+
             SaveDXF save = new SaveDXF();
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
             save.save(fileOutputStream, before);
@@ -54,9 +61,7 @@ public class SaveAndLoadDXFTest {
             Turtle after = load.load(input);
             input.close();
 
-            Assertions.assertEquals(before.history.size(),after.history.size(),"Different sizes");
-            Assertions.assertEquals(before.getBounds(),after.getBounds(),"Different bounds");
-            //Assertions.assertEquals(before.history.toString(),after.history.toString());
+            Assertions.assertEquals(before.history.toString(),after.history.toString(),"Different history");
         } finally {
             fileTemp.delete();
         }
