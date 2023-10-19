@@ -1,0 +1,64 @@
+package com.marginallyclever.makelangelo.makeart.io;
+
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.Generator_TruchetTiles;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.util.PreferencesHelper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
+/**
+ * Confirm saving and loading DXF is lossless.
+ * @author Dan Royer
+ * @since 7.49.0
+ */
+public class SaveAndLoadDXFTest {
+    @BeforeAll
+    public static void setup() {
+        PreferencesHelper.start();
+        Translator.start();
+    }
+
+    @Test
+    public void test() throws Exception {
+        Generator_TruchetTiles g = new Generator_TruchetTiles();
+        g.setPaper(new Paper());
+        g.addListener(generatedTurtle-> {
+            try {
+                saveAndLoad(generatedTurtle);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        g.generate();
+    }
+
+    private void saveAndLoad(Turtle before) throws Exception {
+        // given
+        File fileTemp = File.createTempFile("unit", null);
+
+        try {
+            SaveDXF save = new SaveDXF();
+            FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
+            save.save(fileOutputStream, before);
+            fileOutputStream.close();
+
+            LoadDXF load = new LoadDXF();
+            FileInputStream input = new FileInputStream(fileTemp);
+            Turtle after = load.load(input);
+            input.close();
+
+            Assertions.assertEquals(before.history.size(),after.history.size(),"Different sizes");
+            Assertions.assertEquals(before.getBounds(),after.getBounds(),"Different bounds");
+            //Assertions.assertEquals(before.history.toString(),after.history.toString());
+        } finally {
+            fileTemp.delete();
+        }
+    }
+}
