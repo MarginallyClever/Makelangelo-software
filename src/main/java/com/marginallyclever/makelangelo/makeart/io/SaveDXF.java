@@ -107,14 +107,12 @@ public class SaveDXF implements TurtleSaver {
 				break;
 			case DRAW_LINE:
 				if(isUp) isUp=false;
-				else {
-					out.write("0\nLINE\n");
-					out.write("8\n1\n");  // layer 1
-					out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
-					out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
-					out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
-					out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
-				}
+				out.write("0\nLINE\n");
+				out.write("8\n1\n");  // layer 1
+				out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
+				out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
+				out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
+				out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
 				x0=m.x;
 				y0=m.y;
 				

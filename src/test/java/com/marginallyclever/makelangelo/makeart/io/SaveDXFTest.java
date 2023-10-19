@@ -56,7 +56,7 @@ class SaveDXFTest {
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
+            assertThat(fileTemp).hasSameTextualContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }
