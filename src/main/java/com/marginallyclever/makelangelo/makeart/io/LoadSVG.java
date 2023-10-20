@@ -389,6 +389,7 @@ public class LoadSVG implements TurtleLoader {
 
 
 			Matrix3d m = getMatrixFromElement(element);
+			logger.debug("Matrix {}", m);
 
 			SVGPathSegList pathList = element.getNormalizedPathSegList();
 			int itemCount = pathList.getNumberOfItems();
@@ -486,6 +487,15 @@ public class LoadSVG implements TurtleLoader {
 		return p;
 	}
 
+	/**
+	 * Get the transformation matrix from the given element.  The {@link SVGGraphicsElement} matrix is
+	 * <pre>
+	 * [ a c e ]
+	 * [ b d f ]
+	 * [ 0 0 1 ]</pre>
+	 * @param element the source of the matrix
+	 * @return the matrix
+	 */
 	private Matrix3d getMatrixFromElement(Element element) {
 		Matrix3d m = new Matrix3d();
 
@@ -497,9 +507,6 @@ public class LoadSVG implements TurtleLoader {
 		try {
 			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
 			SVGMatrix svgMatrix = svgge.getCTM();
-			// [ a c e ]
-			// [ b d f ]
-			// [ 0 0 1 ]
 			m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
 			m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
 			m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
@@ -526,7 +533,7 @@ public class LoadSVG implements TurtleLoader {
 		(new GVTBuilder()).build(bridgeContext, document);
 	}
 
-	private static SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
+	private SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
 		String parser = XMLResourceDescriptor.getXMLParserClassName();
 		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
 		return (SVGDocument) factory.createDocument("",in);

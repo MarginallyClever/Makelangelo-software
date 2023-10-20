@@ -35,10 +35,14 @@ public class SaveSVG implements TurtleSaver {
 		Rectangle2D.Double dim= turtle.getBounds();
 		
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
+		String viewBox = StringHelper.formatDouble(dim.getMinX())+" "
+						+StringHelper.formatDouble(-dim.getMaxY())+" "
+						+StringHelper.formatDouble(dim.getWidth())+" "
+						+StringHelper.formatDouble(dim.getHeight())+"\"";
 		// header
 		out.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n");
 		out.write("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n");
-		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\""+dim.getMinX()+" "+(-dim.getMaxY())+" "+dim.getWidth()+" "+dim.getHeight()+"\">\n");
+		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n"); // viewbox would go in svg tag
 
 		boolean isUp=true;
 		double x0 = turtle.history.get(0).x;
