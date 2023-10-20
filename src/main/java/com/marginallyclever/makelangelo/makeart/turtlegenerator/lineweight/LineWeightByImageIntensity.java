@@ -94,7 +94,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         Turtle turtle = new Turtle();
         buildSegmentList(from);
         sortSegmentsIntoLines();
-        smoothAllLines();
         generateThickLines(turtle);
         //generateThinLines(turtle);
 
@@ -147,66 +146,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         sourceImage.setScale(f,-f);
     }
 
-    private void smoothAllLines() {
-        logger.debug("smoothAllLines");
-        // all segments are now in lines.
-        for( LineWeight n : sortedLines ) {
-            // Some segments are shorter than others.  Smooth them out.
-            smoothOneLine(n);
-        }
-    }
-
-    /**
-     * Lines can turn corners.  smooth all segments at each corner.
-     * @param line the line to smooth
-     */
-    private void smoothOneLine(LineWeight line) {
-        LineWeight temp = new LineWeight();
-
-        LineWeightSegment head = line.segments.get(0);
-        Vector2d n0 = head.getUnit();
-        int headIndex=0;
-
-        for(int i=1;i<line.segments.size();++i) {
-            LineWeightSegment s = line.segments.get(i);
-            Vector2d n1 = s.getUnit();
-            if(n0.dot(n1) < CORNER_THRESHOLD) {
-                // The deltas are too different.  This is a corner.
-                smoothSection(temp,head,line.segments.get(i-1));
-
-                head = s;
-                headIndex = i;
-                n0 = n1;
-            }
-        }
-        if(headIndex<line.segments.size()) {
-            // There's a section after a corner.  Maybe we never hit a corner!
-            // Either way, make sure that last straight part is processed.
-            smoothSection(temp,head,line.segments.get(line.segments.size()-1));
-        }
-
-        // temp.segments is now filled with smoothed lines
-        line.segments = temp.segments;
-    }
-
-    void smoothSection(LineWeight temp, LineWeightSegment head, LineWeightSegment s) {
-        double dx=s.end.x-head.start.x;
-        double dy=s.end.y-head.start.y;
-        double len = Math.sqrt(dx*dx + dy*dy);
-        for(double j=0;j<len;j+=stepSize) {
-            double vA = (j         ) / len;
-            double vB = (j+stepSize) / len;
-            vB = Math.min(vB,1);
-            temp.segments.add(createLSW(
-                    new Point2D(
-                            head.start.x + dx*vA,
-                            head.start.y + dy*vA),
-                    new Point2D(
-                            head.start.x + dx*vB,
-                            head.start.y + dy*vB)));
-        }
-    }
-
     private void generateThickLines(Turtle turtle) {
         logger.debug("generateThickLines");
         for(LineWeight i : sortedLines) {
@@ -221,7 +160,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         for(LineWeightSegment s : line.segments) {
             maxWeight = Math.max(maxWeight,s.weight);
         }
-
         maxWeight = Math.max(1,Math.ceil(maxWeight));
 
         LineWeightSegment start = line.segments.get(0);
@@ -231,11 +169,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // collect all the points, write them at the end.
         for(int pass=0; pass<=maxWeight; ++pass) {
             double ratio = pass/maxWeight;
-
             List<Point2D> offsetLine = generateOneThickLinePass(line,start,ratio);
-
             if((pass%2)==1) Collections.reverse(offsetLine);
-            //List<Point2D> newSequence = optimizeLine(offsetLine);
 
             // draw pass
             for( Point2D p : offsetLine ) {
@@ -262,11 +197,17 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         for(int i=1;i<line.segments.size();++i) {
             LineWeightSegment seg = line.segments.get(i);
             double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
-            double [] inter = findIntersection(
-                    s0[0],s0[1],s0[2],s0[3],
-                    s1[0],s1[1],s1[2],s1[3]
-            );
-            offsetSequence.add(new Point2D(inter[0],inter[1]));
+            if(Math.abs(dotProduct(s0,s1))<0.5) {
+                // this is a corner.  add a point at the intersection of the two lines.
+                double [] inter = findIntersection(
+                        s0[0],s0[1],s0[2],s0[3],
+                        s1[0],s1[1],s1[2],s1[3]
+                );
+                offsetSequence.add(new Point2D(inter[0],inter[1]));
+                //offsetSequence.add(new Point2D(s1[0],s1[1]));
+            } else {
+                offsetSequence.add(new Point2D(s1[0], s1[1]));
+            }
             s0=s1;
         }
         // add the last point of the line
@@ -274,6 +215,19 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         unit.scale(distance);
         offsetSequence.add(new Point2D(s0[2]+unit.x,s0[3]+unit.y));
         return offsetSequence;
+    }
+
+    /**
+     * @param s0 the first line segment
+     * @param s1 the second line
+     * @return the dot product of the two lines
+     */
+    private double dotProduct(double[] s0, double[] s1) {
+        double dx0 = s0[2]-s0[0];
+        double dy0 = s0[3]-s0[1];
+        double dx1 = s1[2]-s1[0];
+        double dy1 = s1[3]-s1[1];
+        return dx0*dx1 + dy0*dy1;
     }
 
     private double [] findIntersection(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4) {
@@ -366,7 +320,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             throw new IllegalArgumentException("next is null");
         }
         // fast reject if truchet index too far apart
-        if(Math.abs(head.ix-next.ix)>2 || Math.abs(head.iy-next.iy)>2) return false;
+        if(Math.abs(head.ix-next.ix)>6 || Math.abs(head.iy-next.iy)>6) return false;
         if(closeEnough(head.start,next.end)) return true;
         if(closeEnough(head.start,next.start)) {
             // next is backwards
@@ -442,11 +396,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     private void addOneUnsortedSegment(Point2D start, Point2D end) {
-        LineWeightSegment seg = createLSW(start,end);
-        if(seg==null) {
-            throw new RuntimeException("seg is null");
-        }
-        unsorted.add(seg);
+        unsorted.add(createLSW(start,end));
     }
 
     private LineWeightSegment createLSW(Point2D start, Point2D end) {
@@ -457,9 +407,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         double intensity = 1.0-(sourceImage.sample(mx,my,stepSize/2)/255.0);
         LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness);
         // make a fast search index
-        a.ix = (int)Math.floor(mx * 3.0 / stepSize);
-        a.iy = (int)Math.floor(my * 3.0 / stepSize);
+        a.ix = (int)Math.floor(mx / stepSize);
+        a.iy = (int)Math.floor(my / stepSize);
         return a;
     }
 }
-

@@ -20,7 +20,7 @@ public class Generator_MazeCircle extends Generator_Maze {
 
 		SelectSlider field_rings;
 
-		add(field_rings = new SelectSlider("rings",Translator.get("Generator_MazeCircle.rings"),30,1,getRings()));
+		add(field_rings = new SelectSlider("rings",Translator.get("Generator_MazeCircle.rings"),50,1,getRings()));
 		field_rings.addPropertyChangeListener(evt->{
 			setRings(field_rings.getValue());
 			generate();
