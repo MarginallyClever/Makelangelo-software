@@ -1,19 +1,17 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import java.awt.*;
-import java.io.Serial;
-import java.util.Collection;
-
-import javax.swing.*;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.Serial;
+import java.util.Collection;
 
 /**
  * {@link PlotterSettingsManagerPanel} manages the list of available machine configurations.
@@ -21,8 +19,6 @@ import com.marginallyclever.util.PreferencesHelper;
  * @author Dan Royer
  */
 public class PlotterSettingsManagerPanel extends JPanel {
-	@Serial
-	private static final long serialVersionUID = 7163572330672713872L;
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManagerPanel.class);
 
 	private final PlotterSettingsManager plotterSettingsManager;
@@ -150,6 +146,12 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception ex) {
+			logger.warn("failed to set native look and feel.", ex);
+		}
 
 		JFrame frame = new JFrame(PlotterSettingsManagerPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

@@ -7,12 +7,6 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class Makelangelo5Huge implements PlotterRenderer {
-
-	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
-	public final static double COUNTERWEIGHT_W = 30;
-	public final static double COUNTERWEIGHT_H = 60;
-	public final static double PULLEY_RADIUS = 1.27;
-	public final static double MOTOR_WIDTH = 42;
 	private static Texture texture1;
 	private static Texture texture2;
 	private static Texture texture3;

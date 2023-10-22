@@ -5,11 +5,13 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
 import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link PlotterSettingsPanel} is the user interface to adjust {@link PlotterSettings}.
@@ -18,8 +20,8 @@ import java.awt.*;
  * @since 7.1.4
  */
 public class PlotterSettingsPanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsPanel.class);
 	private final PlotterSettings settings;
-
 	private final PlotterSettingsUserGcodePanel userGcodePanel;
 
 	private final SelectOneOfMany style;
@@ -28,7 +30,6 @@ public class PlotterSettingsPanel extends JPanel {
 	private final SelectDouble totalServoNeeded;
 	private final SelectDouble totalStepperNeeded;
 	private final SelectDouble acceleration;
-	
 	private final SelectDouble penDiameter;
 	private final SelectDouble travelFeedRate;
 	private final SelectDouble drawFeedRate;
@@ -71,26 +72,20 @@ public class PlotterSettingsPanel extends JPanel {
 
 		List<String> machineStyles = getMachineStyleNames();
 		String myStyle = settings.getStyle();
-		int index;
-		for(index=0;index< machineStyles.size();++index) {
-			if(machineStyles.get(index).contentEquals(myStyle)) {
-				break;
-			}
-		}
-		if(index<0 || index >= machineStyles.size()) index=0;
+		int index = Math.max(0,machineStyles.indexOf(myStyle));
 
-		interior0.add(style              = new SelectOneOfMany("style",       Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
-		interior0.add(machineWidth 		 = new SelectDouble("width",		 	 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));
+		interior0.add(style              = new SelectOneOfMany("style",		 Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
+		interior0.add(machineWidth 		 = new SelectDouble("width",		 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));
 		interior0.add(machineHeight 	 = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getLimitTop() - settings.getLimitBottom()));
-		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength",  Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
+		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength", Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
 		interior0.add(totalBeltNeeded 	 = new SelectDouble("beltLength",	 Translator.get("PlotterSettingsPanel.BeltLengthNeeded"		),0));
 		interior0.add(totalServoNeeded 	 = new SelectDouble("servoLength",	 Translator.get("PlotterSettingsPanel.ServoLengthNeeded"	),0));
 
 		interior1.add(penDiameter 		 = new SelectDouble("diameter",		 Translator.get("PlotterSettingsPanel.penToolDiameter"		),settings.getPenDiameter()));
 	    interior1.add(travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	),settings.getTravelFeedRate()));
-	    interior1.add(drawFeedRate 		 = new SelectDouble("speed",		 	 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDrawFeedRate()));
+	    interior1.add(drawFeedRate 		 = new SelectDouble("speed",		 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDrawFeedRate()));
 	    interior1.add(acceleration 		 = new SelectDouble("acceleration",	 Translator.get("PlotterSettingsPanel.AdjustAcceleration"	),settings.getMaxAcceleration()));
-		interior1.add(penRaiseRate       = new SelectDouble("liftSpeed",	 	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getPenLiftTime()));
+		interior1.add(penRaiseRate       = new SelectDouble("liftSpeed",	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getPenLiftTime()));
 		interior1.add(penLowerRate       = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getPenLowerTime()));
 	    interior1.add(penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getPenUpAngle()));
 	    interior1.add(penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getPenDownAngle()));
@@ -234,6 +229,12 @@ public class PlotterSettingsPanel extends JPanel {
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception ex) {
+			logger.warn("failed to set native look and feel.", ex);
+		}
 
 		PlotterSettings plotterSettings = new PlotterSettings();
 		JFrame frame = new JFrame(PlotterSettingsPanel.class.getSimpleName());
