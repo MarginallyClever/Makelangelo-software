@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
@@ -10,12 +11,14 @@ public class Makelangelo5 implements PlotterRenderer {
 	private static Texture textureMainBody;
 	private static Texture textureMotors;
 	private static Texture textureLogo;
+	private static Texture textureWeight;
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
 		if (textureMainBody == null) textureMainBody = loadTexture("/textures/makelangelo5.png");
 		if (textureMotors == null) textureMotors = loadTexture("/textures/makelangelo5-motors.png");
 		if (textureLogo == null) textureLogo = loadTexture("/logo.png");
+		if (textureWeight == null) textureWeight = loadTexture("/textures/weight.png");
 
 		if (textureMainBody == null) {
 			paintControlBoxPlain(gl2, robot);
@@ -26,9 +29,9 @@ public class Makelangelo5 implements PlotterRenderer {
 		Polargraph.paintSafeArea(gl2, robot);
 
 		if (robot.getDidFindHome())
-			Polargraph.paintPenHolderToCounterweights(gl2, robot);
+			paintPenHolderToCounterweights(gl2, robot);
 
-		if (textureMainBody == null || textureMotors == null) {
+		if (textureMotors == null) {
 			Polargraph.paintMotors(gl2, robot);
 		} else {
 			paintControlBoxFancy(gl2, robot, textureMotors);
@@ -39,6 +42,78 @@ public class Makelangelo5 implements PlotterRenderer {
 		} else {
 			paintLogoFancy(gl2, robot);
 		}
+	}
+
+	public void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+		Point2D pos = robot.getPos();
+		double gx = pos.x;
+		double gy = pos.y;
+
+		double top = robot.getLimitTop();
+		double bottom = robot.getLimitBottom();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+
+		if (gx < left || gx > right) return;
+		if (gy > top || gy < bottom) return;
+
+		double mw = right - left;
+		double mh = top - bottom;
+		double beltLength = Math.sqrt(mw * mw + mh * mh) + 50;  // TODO replace with robot.getBeltLength()
+
+		double dx = gx - left;
+		double dy = gy - top;
+		double left_a = Math.sqrt(dx * dx + dy * dy);
+		double left_b = (beltLength - left_a) / 2 - 55;
+
+		dx = gx - right;
+		double right_a = Math.sqrt(dx * dx + dy * dy);
+		double right_b = (beltLength - right_a) / 2 - 55;
+
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glColor3d(0.2, 0.2, 0.2);
+
+		// belt from motor to pen holder left
+		gl2.glVertex2d(left, top);
+		gl2.glVertex2d(gx, gy);
+		// belt from motor to pen holder right
+		gl2.glVertex2d(right, top);
+		gl2.glVertex2d(gx, gy);
+		gl2.glEnd();
+
+		// belt from motor to counterweight left
+		paintBeltSide(gl2,left,top,left_b);
+		// belt from motor to counterweight right
+		paintBeltSide(gl2,right,top,right_b);
+
+		paintGondola(gl2,gx,gy,robot);
+
+		// left
+		paintCounterweight(gl2,left,top-left_b);
+		// right
+		paintCounterweight(gl2,right,top-right_b);
+	}
+
+	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glVertex2d(x, y);
+		gl2.glVertex2d(x, y - length);
+		gl2.glEnd();
+	}
+
+	private void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+		Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
+		if (robot.getPenIsUp()) {
+			Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
+		}
+	}
+
+	private void paintCounterweight(GL2 gl2,double x,double y) {
+		if(textureWeight==null) {
+			Polargraph.paintCounterweight(gl2,x,y);
+			return;
+		}
+		paintTexture(gl2, textureWeight, x-20, y-74, 40,80);
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot,Texture texture) {
