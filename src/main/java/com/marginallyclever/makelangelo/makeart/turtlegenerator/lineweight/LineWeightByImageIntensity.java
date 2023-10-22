@@ -24,7 +24,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
     private final double EPSILON = 0.001;
-    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(1));
+    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(30));
 
     /**
      * must be greater than zero.
@@ -156,19 +156,18 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     private void generateOneThickLine(Turtle turtle, LineWeight line) {
         // find the thickest part of the line, which tells us how many cycles we'll have to make.
-        double maxWeight=0;
+        double numPasses=0;
         for(LineWeightSegment s : line.segments) {
-            maxWeight = Math.max(maxWeight,s.weight);
+            numPasses = Math.max(numPasses,s.weight);
         }
-        maxWeight = Math.max(1,Math.ceil(maxWeight));
+        numPasses = Math.max(1,Math.ceil(numPasses));
 
         LineWeightSegment start = line.segments.get(0);
-        // travel the length of the line and back maxWeight times.  Each time offset by a different amount.
 
         boolean first=true;
         // collect all the points, write them at the end.
-        for(int pass=0; pass<=maxWeight; ++pass) {
-            double ratio = pass/maxWeight;
+        for(int pass=0; pass<=numPasses; ++pass) {
+            double ratio = pass/numPasses;
             List<Point2D> offsetLine = generateOneThickLinePass(line,start,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
 
@@ -197,7 +196,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         for(int i=1;i<line.segments.size();++i) {
             LineWeightSegment seg = line.segments.get(i);
             double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
-            if(Math.abs(dotProduct(s0,s1))<0.5) {
+            if(Math.abs(dotProduct(s0,s1))<CORNER_THRESHOLD) {
                 // this is a corner.  add a point at the intersection of the two lines.
                 double [] inter = findIntersection(
                         s0[0],s0[1],s0[2],s0[3],
