@@ -37,22 +37,16 @@ public class Generator_Spiral extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
-
 		Turtle turtle = new Turtle();
-
 		double cx = Math.cos(Math.toRadians(0));
 		double cy = Math.sin(Math.toRadians(0));
 
 		double maxr;
 		if(toCorners) {
 			// go right to the corners
-			double h2 = myPaper.getMarginHeight();
-			double w2 = myPaper.getMarginWidth();
-			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
+			double h = myPaper.getMarginHeight();
+			double w = myPaper.getMarginWidth();
+			maxr = Math.sqrt(h * h + w * w)/2 + 1.0;
 		} else {
 			// do the largest circle that still fits in the image.
 			double w = myPaper.getMarginWidth()/2.0f;
@@ -64,7 +58,7 @@ public class Generator_Spiral extends TurtleGenerator {
 
 		double r = maxr;
 		double fx, fy;
-		while (r > radius) {
+		while (r > radius/2) {
 			// find circumference of current circle
 			double c1 = Math.floor((2.0f * r - radius) * Math.PI);
 
