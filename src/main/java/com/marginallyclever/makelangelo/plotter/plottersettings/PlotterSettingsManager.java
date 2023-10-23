@@ -40,6 +40,7 @@ public class PlotterSettingsManager {
         PlotterSettings profile = new PlotterSettings();
         profile.setRobotUID("Makelangelo Huge");
         profile.setMachineSize(1336,2000);
+        profile.setStyle("MAKELANGELO_5_HUGE");
         profile.saveConfig();
     }
 
