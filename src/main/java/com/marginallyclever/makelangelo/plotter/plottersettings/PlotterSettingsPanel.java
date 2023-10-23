@@ -24,7 +24,7 @@ public class PlotterSettingsPanel extends JPanel {
 	private final PlotterSettings settings;
 	private final PlotterSettingsUserGcodePanel userGcodePanel;
 
-	private final SelectOneOfMany style;
+	private final SelectOneOfMany visualStyle;
 	private final SelectDouble machineWidth, machineHeight;
 	private final SelectDouble totalBeltNeeded;
 	private final SelectDouble totalServoNeeded;
@@ -74,7 +74,7 @@ public class PlotterSettingsPanel extends JPanel {
 		String myStyle = settings.getStyle();
 		int index = Math.max(0,machineStyles.indexOf(myStyle));
 
-		interior0.add(style              = new SelectOneOfMany("style",		 Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
+		interior0.add(visualStyle        = new SelectOneOfMany("style",		 Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
 		interior0.add(machineWidth 		 = new SelectDouble("width",		 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getLimitRight() - settings.getLimitLeft()));
 		interior0.add(machineHeight 	 = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getLimitTop() - settings.getLimitBottom()));
 		interior0.add(totalStepperNeeded = new SelectDouble("stepperLength", Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
@@ -161,7 +161,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setZMotorType(zMotorType.getSelectedIndex()+1);
 
 		List<String> machineStyles = getMachineStyleNames();
-		settings.setStyle(machineStyles.get(style.getSelectedIndex()));
+		settings.setStyle(machineStyles.get(visualStyle.getSelectedIndex()));
 
 		settings.saveConfig();
 	}
