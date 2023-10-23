@@ -22,10 +22,8 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManagerPanel.class);
 
 	private final PlotterSettingsManager plotterSettingsManager;
-
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final JComboBox<String> configurationList = new JComboBox<>(model);
-
 	private PlotterSettingsPanel plotterSettingsPanel = null;
 
 	public PlotterSettingsManagerPanel(PlotterSettingsManager plotterSettingsManager) {

@@ -12,6 +12,8 @@ public class Makelangelo5 implements PlotterRenderer {
 	private static Texture textureMotors;
 	private static Texture textureLogo;
 	private static Texture textureWeight;
+	private static Texture textureGondola;
+	private static Texture textureArm;
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
@@ -19,6 +21,8 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (textureMotors == null) textureMotors = loadTexture("/textures/makelangelo5-motors.png");
 		if (textureLogo == null) textureLogo = loadTexture("/logo.png");
 		if (textureWeight == null) textureWeight = loadTexture("/textures/weight.png");
+		if (textureGondola == null) textureGondola = loadTexture("/textures/phBody.png");
+		if (textureArm == null) textureArm = loadTexture("/textures/phArm2.png");
 
 		if (textureMainBody == null) {
 			paintControlBoxPlain(gl2, robot);
@@ -70,16 +74,10 @@ public class Makelangelo5 implements PlotterRenderer {
 		double right_a = Math.sqrt(dx * dx + dy * dy);
 		double right_b = (beltLength - right_a) / 2 - 55;
 
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glColor3d(0.2, 0.2, 0.2);
-
 		// belt from motor to pen holder left
-		gl2.glVertex2d(left, top);
-		gl2.glVertex2d(gx, gy);
+		drawBeltMinus10(gl2,left,top,gx,gy);
 		// belt from motor to pen holder right
-		gl2.glVertex2d(right, top);
-		gl2.glVertex2d(gx, gy);
-		gl2.glEnd();
+		drawBeltMinus10(gl2,right,top,gx,gy);
 
 		// belt from motor to counterweight left
 		paintBeltSide(gl2,left,top,left_b);
@@ -94,6 +92,20 @@ public class Makelangelo5 implements PlotterRenderer {
 		paintCounterweight(gl2,right,top-right_b);
 	}
 
+	private void drawBeltMinus10(GL2 gl2, double cornerX, double cornerY, double penX, double penY) {
+		double dx = penX - cornerX;
+		double dy = penY - cornerY;
+		double len = Math.sqrt(dx * dx + dy * dy);
+		penX = cornerX + dx * (len-100) / len;
+		penY = cornerY + dy * (len-100) / len;
+
+		gl2.glBegin(GL2.GL_LINES);
+		gl2.glColor3d(0.2, 0.2, 0.2);
+		gl2.glVertex2d(cornerX, cornerY);
+		gl2.glVertex2d(penX, penY);
+		gl2.glEnd();
+	}
+
 	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2d(x, y);
@@ -102,10 +114,42 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	private void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+		if(textureGondola!=null && textureArm!=null) {
+			paintGondolaFancy(gl2,gx,gy,robot);
+			return;
+		}
 		Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
 		if (robot.getPenIsUp()) {
 			Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
 		}
+	}
+
+	private void paintGondolaFancy(GL2 gl2, double gx, double gy,Plotter robot) {
+		double top = robot.getLimitTop();
+		double left = robot.getLimitLeft();
+		double right = robot.getLimitRight();
+		// get angle from top-left to gx,gy
+		double dx = gx - left;
+		double dy = gy - top;
+		double angleLeft = Math.atan2(dy, dx);
+		//get angle from top-right to gx,gy
+		dx = gx - right;
+		double angleRight = Math.atan2(dy, dx);
+
+		gl2.glPushMatrix();
+		gl2.glTranslated(gx,gy,0);
+		gl2.glRotated(Math.toDegrees(angleLeft)+90,0,0,1);
+		paintTexture(gl2,textureArm,-100,-100,200,200);
+		gl2.glPopMatrix();
+
+		gl2.glPushMatrix();
+		gl2.glTranslated(gx,gy,0);
+		gl2.glRotated(Math.toDegrees(angleRight)+90,0,0,1);
+		paintTexture(gl2,textureArm,-100,-100,200,200);
+		gl2.glPopMatrix();
+
+		// paint body last so it's on top
+		paintTexture(gl2,textureGondola,gx-50,gy-50,100,100);
 	}
 
 	private void paintCounterweight(GL2 gl2,double x,double y) {
