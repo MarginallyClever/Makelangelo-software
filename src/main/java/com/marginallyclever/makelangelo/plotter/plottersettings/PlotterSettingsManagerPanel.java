@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.io.Serial;
 import java.util.Collection;
@@ -24,10 +25,12 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private final PlotterSettingsManager plotterSettingsManager;
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final JComboBox<String> configurationList = new JComboBox<>(model);
+	private final JPanel container = new JPanel(new BorderLayout());
 	private PlotterSettingsPanel plotterSettingsPanel = null;
 
 	public PlotterSettingsManagerPanel(PlotterSettingsManager plotterSettingsManager) {
 		super(new BorderLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		this.plotterSettingsManager = plotterSettingsManager;
 
 		model.addAll(plotterSettingsManager.getProfileNames());
@@ -132,7 +135,9 @@ public class PlotterSettingsManagerPanel extends JPanel {
 			plotterSettingsManager.setLastSelectedProfile(name);
 			PlotterSettings plotterSettings = plotterSettingsManager.loadProfile(name);
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
-			this.add(plotterSettingsPanel,BorderLayout.CENTER);
+			this.add(container,BorderLayout.CENTER);
+			container.add(plotterSettingsPanel,BorderLayout.CENTER);
+			container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 			this.revalidate();
 		}
 	}
