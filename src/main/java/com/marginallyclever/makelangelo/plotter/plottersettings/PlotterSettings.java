@@ -148,7 +148,7 @@ public class PlotterSettings {
 		listeners.remove(listener);
 	}
 
-	protected void notifyListeners() {
+	public void firePlotterSettingsEvent() {
 		for (PlotterSettingsListener listener : listeners) {
 			listener.settingsChangedEvent(this);
 		}
@@ -314,7 +314,7 @@ public class PlotterSettings {
 		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
 		thisMachineNode.put(PREF_KEY_STYLE, style);
 
-		notifyListeners();
+		firePlotterSettingsEvent();
 	}
 
 	private void saveJerkConfig(Preferences thisMachineNode) {

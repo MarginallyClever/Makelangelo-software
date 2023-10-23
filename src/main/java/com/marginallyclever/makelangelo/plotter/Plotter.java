@@ -168,6 +168,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	public void setSettings(PlotterSettings s) throws InvalidParameterException {
 		if(s==null) throw new InvalidParameterException(PlotterSettings.class.getSimpleName()+" cannot be null.");
 		settings=s;
+		s.firePlotterSettingsEvent();
 	}
 	
 	/**
