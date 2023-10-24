@@ -134,6 +134,11 @@ public class PlotterSettings {
 		super();
 	}
 
+	public PlotterSettings(String UID) {
+		super();
+		load(UID);
+	}
+
 	public double getMaxAcceleration() {
 		return maxAcceleration;
 	}

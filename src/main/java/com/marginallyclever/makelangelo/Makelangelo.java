@@ -111,18 +111,21 @@ public final class Makelangelo {
 		}
 	}
 
-	public void onPlotterSettingsUpdate(PlotterSettings e) {
-		myPlotter.setSettings(e);
-		if(previewPanel != null) previewPanel.repaint();
+	public void onPlotterSettingsUpdate(PlotterSettings settings) {
+		myPlotter.setSettings(settings);
+
 		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
 		if(f instanceof MarlinSimulationVisualizer) {
 			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
-			msv.setSettings(e);
+			msv.setSettings(settings);
 		}
-		myTurtleRenderer.setUpColor(e.getPenUpColor());
-		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
+		myTurtleRenderer.setUpColor(settings.getPenUpColor());
+		myTurtleRenderer.setPenDiameter(settings.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
+
 		updatePlotterRenderer();
+
+		if(previewPanel != null) previewPanel.repaint();
 	}
 
 	private void addPlotterRendererToPreviewPanel() {

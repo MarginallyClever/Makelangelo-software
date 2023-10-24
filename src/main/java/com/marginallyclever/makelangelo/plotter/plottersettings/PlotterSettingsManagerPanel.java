@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
-import java.io.Serial;
 import java.util.Collection;
 
 /**
@@ -27,6 +26,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private final JComboBox<String> configurationList = new JComboBox<>(model);
 	private final JPanel container = new JPanel(new BorderLayout());
 	private PlotterSettingsPanel plotterSettingsPanel = null;
+	private PlotterSettingsListener listener;
 
 	public PlotterSettingsManagerPanel(PlotterSettingsManager plotterSettingsManager) {
 		super(new BorderLayout());
@@ -40,6 +40,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		this.add(container,BorderLayout.CENTER);
 		container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
+		configurationList.setName("configurationList");
 		configurationList.addActionListener((e)->changeProfile());
 		if(model.getSize()>0) {
 			PlotterSettings lastSelectedProfile = plotterSettingsManager.getLastSelectedProfile();
@@ -50,25 +51,25 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private Component createTopButtons() {
 		JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topButtons.add(configurationList);
-		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
-			@Serial
-			private static final long serialVersionUID = 1L;
-
+		JButton add = new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				// copy the current profile and rename the new instance.
 				runRenameProfileDialog((String)model.getSelectedItem());
 			}
-		}));
-		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.RemoveProfile")) {
-			@Serial
-			private static final long serialVersionUID = 1L;
+		});
+		add.setName("addProfile");
+		topButtons.add(add);
 
+		JButton remove = new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.RemoveProfile")) {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				deleteProfile((String)model.getSelectedItem());
 			}
-		}));
+		});
+		add.setName("removeProfile");
+		topButtons.add(remove);
+
 		return topButtons;
 	}
 
@@ -115,6 +116,11 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		return false;
 	}
 
+	/**
+	 * Checks if the given name is already in use.
+	 * @param newUID the name to check
+	 * @return true if the name is already in use.
+	 */
 	// TODO could use a unit test
 	private boolean nameIsTaken(String newUID) {
 		Collection<String> list = plotterSettingsManager.getProfileNames();
@@ -139,11 +145,33 @@ public class PlotterSettingsManagerPanel extends JPanel {
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
 			container.add(plotterSettingsPanel,BorderLayout.CENTER);
 			this.revalidate();
+			plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
+			firePlotterSettingsChanged(plotterSettings);
 		}
 	}
-	
-	// TEST
-	
+
+	/**
+	 * Add a listener to be notified when the settings change.
+	 * @param listener the listener to add
+	 */
+	public void addListener(PlotterSettingsListener listener) {
+		this.listener = listener;
+	}
+
+	/**
+	 * Fire a settings changed event.
+	 * @param settings the new settings
+	 */
+	private void firePlotterSettingsChanged(PlotterSettings settings) {
+		if(listener!=null) {
+			listener.settingsChangedEvent(settings);
+		}
+	}
+
+	/**
+	 * Test the PlotterSettingsManagerPanel
+	 * @param args not used
+	 */
 	public static void main(String[] args) {
 		Log.start();
 		PreferencesHelper.start();
