@@ -37,6 +37,8 @@ public class PlotterSettingsManagerPanel extends JPanel {
 
 		Component topButtons = createTopButtons();
 		this.add(topButtons,BorderLayout.NORTH);
+		this.add(container,BorderLayout.CENTER);
+		container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
 		configurationList.addActionListener((e)->changeProfile());
 		if(model.getSize()>0) {
@@ -64,7 +66,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				removeProfile((String)model.getSelectedItem());
+				deleteProfile((String)model.getSelectedItem());
 			}
 		}));
 		return topButtons;
@@ -84,7 +86,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 				goAgain = true;
 			} else {
 				// found a unique name.  try to update the backing store.
-				goAgain = renameProfile(uid,newUID);
+				goAgain = copyAndRenameProfile(uid,newUID);
 			}
 		} while(goAgain);
 	}
@@ -93,17 +95,17 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 * Creates a copy of the current profile, changes the RobotUID, and saves it as a new instance.  Does not change the
 	 * old profile.
 	 * TODO needs a unit test
-	 * @param oldUID
-	 * @param newUID
+	 * @param oldUID the name of the profile to copy
+	 * @param newUID the name of the new profile
 	 * @return true if there was a problem.
 	 */
-	private boolean renameProfile(String oldUID,String newUID) {
+	private boolean copyAndRenameProfile(String oldUID, String newUID) {
 		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
 		ps.setRobotUID(newUID);
 		try {
-			ps.saveConfig();
+			ps.save();
 		} catch(Exception e) {
-			logger.error("failed to rename {} to {}. {}",oldUID,newUID,e);
+			logger.error("failed to rename {} to {}.",oldUID,newUID,e);
 			return true;
 		}
 
@@ -119,7 +121,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		return list.contains(newUID);
 	}
 
-	private void removeProfile(String uid) {
+	private void deleteProfile(String uid) {
 		if(!plotterSettingsManager.deleteProfile(uid)) {
 			model.removeElement(uid);
 		}
@@ -135,9 +137,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 			plotterSettingsManager.setLastSelectedProfile(name);
 			PlotterSettings plotterSettings = plotterSettingsManager.loadProfile(name);
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
-			this.add(container,BorderLayout.CENTER);
 			container.add(plotterSettingsPanel,BorderLayout.CENTER);
-			container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 			this.revalidate();
 		}
 	}
