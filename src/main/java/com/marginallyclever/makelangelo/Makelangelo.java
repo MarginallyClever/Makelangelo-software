@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferen
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
@@ -104,10 +104,10 @@ public final class Makelangelo {
 
 	private void updatePlotterRenderer() {
 		try {
-			myPlotterRenderer = Machines.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
 		} catch (Exception e) {
 			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
-			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
 		}
 	}
 
@@ -366,7 +366,7 @@ public final class Makelangelo {
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			myPlotter.getSettings().saveConfig();
+			myPlotter.getSettings().save();
 			plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
 			savePaths();
 

@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -163,12 +163,12 @@ public class PlotterSettingsPanel extends JPanel {
 		List<String> machineStyles = getMachineStyleNames();
 		settings.setStyle(machineStyles.get(visualStyle.getSelectedIndex()));
 
-		settings.saveConfig();
+		settings.save();
 	}
 
 	private List<String> getMachineStyleNames() {
 		List<String> machineStyleNames = new ArrayList<>();
-		for(Machines m : Machines.values()) {
+		for(PlotterRendererFactory m : PlotterRendererFactory.values()) {
 			machineStyleNames.add(m.name());
 		}
 		return machineStyleNames;

@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +14,6 @@ import java.util.prefs.Preferences;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlotterSettingsTest {
-
     private static final String ROBOT_TEST_UID = "123456";
 
     @BeforeAll
@@ -52,17 +51,17 @@ public class PlotterSettingsTest {
 		plotterSettings.setMinPlannerSpeed(28);
         plotterSettings.setPenLowerTime(29);
 
-        Machines [] allMachines = Machines.values();
+        PlotterRendererFactory[] allMachines = PlotterRendererFactory.values();
         int index = (int)(Math.random()*allMachines.length);
         String styleName = allMachines[index].getName();
         plotterSettings.setStyle(styleName);
 
         // when
-        plotterSettings.saveConfig();
+        plotterSettings.save();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
+        plotterSettingsRead.load(ROBOT_TEST_UID);
         assertEquals(2, plotterSettingsRead.getLimitTop());
         assertEquals(3, plotterSettingsRead.getLimitBottom());
         assertEquals(4, plotterSettingsRead.getLimitRight());
@@ -104,11 +103,11 @@ public class PlotterSettingsTest {
         plotterSettings.setRobotUID(ROBOT_TEST_UID);
         plotterSettings.setZMotorType(type);
 
-        plotterSettings.saveConfig();
+        plotterSettings.save();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
+        plotterSettingsRead.load(ROBOT_TEST_UID);
         Assertions.assertEquals(plotterSettings.getZMotorType(),plotterSettingsRead.getZMotorType());
 
     }

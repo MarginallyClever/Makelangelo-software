@@ -2,15 +2,15 @@ package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
- * {@link PlotterSettings} stores the physical plottersettings for a single plotter robot.  That is to say it stores the
- * properties that are consistent across all instances of one type of plotter.
+ * {@link PlotterSettings} stores the physical settings for a single {@link com.marginallyclever.makelangelo.plotter.Plotter}.
+ * Not to be confused with the dynamic state of a {@link com.marginallyclever.makelangelo.plotter.Plotter}.
  * @author Dan Royer
  */
 public class PlotterSettings {
@@ -74,7 +74,6 @@ public class PlotterSettings {
 
 	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
 	private int blockBufferSize = 16;
-
 	private int segmentsPerSecond = 5;
 	private double minSegmentLength = 0.5;  // mm
 	private long minSegTime = 20000;  // us
@@ -89,7 +88,6 @@ public class PlotterSettings {
 	private double [] maxJerk = { 10, 10, 0.3 };
 
 	private ColorRGB paperColor = new ColorRGB(255, 255, 255);
-
 	private ColorRGB penDownColorDefault = new ColorRGB(0, 0, 0);
 	private ColorRGB penDownColor = new ColorRGB(0, 0, 0);
 	private ColorRGB penUpColor = new ColorRGB(0, 255, 0);
@@ -130,31 +128,11 @@ public class PlotterSettings {
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
 	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
-	private String style = Machines.MAKELANGELO_5.getName();
+	private String style = PlotterRendererFactory.MAKELANGELO_5.getName();
 
 	public PlotterSettings() {
 		super();
 	}
-
-	// OBSERVER PATTERN START
-
-	private final List<PlotterSettingsListener> listeners = new ArrayList<>();
-
-	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removePlotterSettingsListener(PlotterSettingsListener listener) {
-		listeners.remove(listener);
-	}
-
-	public void firePlotterSettingsEvent() {
-		for (PlotterSettingsListener listener : listeners) {
-			listener.settingsChangedEvent(this);
-		}
-	}
-
-	// OBSERVER PATTERN END
 
 	public double getMaxAcceleration() {
 		return maxAcceleration;
@@ -208,7 +186,7 @@ public class PlotterSettings {
 	 * Load the machine configuration from {@link Preferences}.
 	 * @param uid the unique id of the robot to be loaded
 	 */
-	public void loadConfig(String uid) {
+	public void load(String uid) {
 		robotUID = uid;
 
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -281,7 +259,10 @@ public class PlotterSettings {
 		userGeneralEndGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
 
-	public void saveConfig() {
+	/**
+	 * Save the machine configuration to {@link Preferences}.  The preference node will be the unique id of the robot.
+	 */
+	public void save() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 
@@ -313,8 +294,6 @@ public class PlotterSettings {
 
 		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
 		thisMachineNode.put(PREF_KEY_STYLE, style);
-
-		firePlotterSettingsEvent();
 	}
 
 	private void saveJerkConfig(Preferences thisMachineNode) {
@@ -348,8 +327,8 @@ public class PlotterSettings {
 
 	public void reset() {
 		PlotterSettings ps = new PlotterSettings();
-		ps.saveConfig();
-		loadConfig(getUID());
+		ps.save();
+		load(getUID());
 	}
 
 	public void setAcceleration(double f) {
