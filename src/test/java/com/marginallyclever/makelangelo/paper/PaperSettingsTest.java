@@ -6,6 +6,7 @@ import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.awt.*;
 
@@ -20,10 +21,14 @@ import static org.assertj.swing.launcher.ApplicationLauncher.application;
 public class PaperSettingsTest extends AssertJSwingJUnitTestCase {
 	private FrameFixture window;
 
-	@Override
-	protected void onSetUp() {
+	@BeforeAll
+	public static void beforeAll() {
 		PreferencesHelper.start();
 		Translator.start();
+	}
+
+	@Override
+	protected void onSetUp() {
 		application(PaperSettings.class).start();
 		
 		final String title = PaperSettings.class.getSimpleName();
