@@ -11,7 +11,7 @@ import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePrefere
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;

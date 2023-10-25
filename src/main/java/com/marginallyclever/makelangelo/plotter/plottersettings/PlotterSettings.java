@@ -80,9 +80,9 @@ public class PlotterSettings {
 	private boolean handleSmallSegments = false;
 
 	// values for {@link MarlinSimulation} that can be tweaked in firmware at run time.
-	private double travelFeedRate = 3000;  // 5400 = 90*60 mm/s
-	private double drawFeedRate = 3000;  // 5400 = 90*60 mm/s
-	private double maxAcceleration = 100;  // 2400=40*60 mm/s/s
+	private double travelFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
+	private double drawFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
+	private double maxAcceleration = 100;  // mm/s/s
 	private double minAcceleration = 0.0;  // mm/s/s
 	private double minimumPlannerSpeed = 0.05;  // mm/s
 	private double [] maxJerk = { 10, 10, 0.3 };
@@ -336,44 +336,75 @@ public class PlotterSettings {
 		load(getUID());
 	}
 
-	public void setAcceleration(double f) {
-		maxAcceleration = f;
+	/**
+	 * @param accel mm/s/s
+	 */
+	public void setAcceleration(double accel) {
+		maxAcceleration = accel;
 	}
 
-	public void setTravelFeedRate(double f) {
-		if(f < 0.001) f = 0.001f;
-		travelFeedRate = f;
+	/**
+	 * @param feedRate mm/min
+	 */
+	public void setTravelFeedRate(double feedRate) {
+		if(feedRate < 0.001) feedRate = 0.001f;
+		travelFeedRate = feedRate;
 	}
 
+	/**
+	 * @return the travel feed rate in mm/min
+	 */
 	public double getTravelFeedRate() {
 		return travelFeedRate;
 	}
 
+	/**
+	 * @return the draw feed rate in mm/min
+	 */
 	public double getDrawFeedRate() {
 		return drawFeedRate;
 	}
 
-	public void setDrawFeedRate(double f) {
-		if(f < 0.001) f = 0.001f;
-		drawFeedRate = f;
+	/**
+	 * @param feedRate mm/min
+	 */
+	public void setDrawFeedRate(double feedRate) {
+		if(feedRate < 0.001) feedRate = 0.001f;
+		drawFeedRate = feedRate;
 	}
 
-	public void setLimitBottom(double limitBottom) {
-		this.limitBottom = limitBottom;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitBottom(double limit) {
+		this.limitBottom = limit;
 	}
 
-	public void setLimitLeft(double limitLeft) {
-		this.limitLeft = limitLeft;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitLeft(double limit) {
+		this.limitLeft = limit;
 	}
 
-	public void setLimitRight(double limitRight) {
-		this.limitRight = limitRight;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitRight(double limit) {
+		this.limitRight = limit;
 	}
 
-	public void setLimitTop(double limitTop) {
-		this.limitTop = limitTop;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitTop(double limit) {
+		this.limitTop = limit;
 	}
 
+	/**
+	 * @param width mm
+	 * @param height mm
+	 */
 	public void setMachineSize(double width, double height) {
 		this.limitLeft = -width / 2.0;
 		this.limitRight = width / 2.0;

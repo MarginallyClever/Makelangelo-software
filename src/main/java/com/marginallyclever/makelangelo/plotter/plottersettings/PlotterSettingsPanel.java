@@ -154,6 +154,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setPenDiameter(penDiameter.getValue());
 		settings.setTravelFeedRate(travelFeedRate.getValue());
 		settings.setDrawFeedRate(drawFeedRate.getValue());
+		settings.setAcceleration(acceleration.getValue());
 		settings.setPenLiftTime(penRaiseRate.getValue());
 		settings.setPenLowerTime(penLowerRate.getValue());
 		settings.setPenUpAngle(penUpAngle.getValue());
