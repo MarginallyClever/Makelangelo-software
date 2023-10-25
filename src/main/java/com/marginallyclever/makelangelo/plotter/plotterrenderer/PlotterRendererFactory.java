@@ -3,12 +3,12 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import java.util.Arrays;
 
 /**
- * {@link Machines} is a Factory pattern for {@link PlotterRenderer} instances, written
+ * {@link PlotterRendererFactory} is a Factory pattern for {@link PlotterRenderer} instances, written
  * as an enum so that it does extra checks at compile time.
  * 
  * @author coliss86
  */
-public enum Machines {
+public enum PlotterRendererFactory {
 	MAKELANGELO_5("Makelangelo 5", new Makelangelo5()),
 	MAKELANGELO_5_HUGE("Makelangelo 5 Huge", new Makelangelo5Huge()),
 	MAKELANGELO_3_3("Makelangelo 3.3", new Makelangelo3_3()),
@@ -20,7 +20,7 @@ public enum Machines {
 
 	private final String name;
 
-	Machines(String name, PlotterRenderer plotterRenderer) {
+	PlotterRendererFactory(String name, PlotterRenderer plotterRenderer) {
 		this.name = name;
 		this.plotterRenderer = plotterRenderer;
 	}
@@ -33,7 +33,7 @@ public enum Machines {
 		return name;
 	}
 
-	public static Machines findByName(String name) {
+	public static PlotterRendererFactory findByName(String name) {
 		return Arrays.stream(values())
 				.filter(enumValue -> enumValue.getName().contains(name))
 				.findFirst()

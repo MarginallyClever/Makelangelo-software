@@ -24,7 +24,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
     private final double EPSILON = 0.001;
-    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(30));
+    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(15));
 
     /**
      * must be greater than zero.
@@ -196,7 +196,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         for(int i=1;i<line.segments.size();++i) {
             LineWeightSegment seg = line.segments.get(i);
             double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
-            if(Math.abs(dotProduct(s0,s1))<CORNER_THRESHOLD) {
+            if(Math.abs(dotProduct(s0,s1))<Math.cos(Math.toRadians(75))) {
                 // this is a corner.  add a point at the intersection of the two lines.
                 double [] inter = findIntersection(
                         s0[0],s0[1],s0[2],s0[3],

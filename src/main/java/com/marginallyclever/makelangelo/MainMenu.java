@@ -480,6 +480,8 @@ public class MainMenu extends JMenuBar {
 
     private void openPlotterSettings() {
         PlotterSettingsManagerPanel plotterSettingsPanel = new PlotterSettingsManagerPanel(app.getPlotterSettingsManager());
+        plotterSettingsPanel.addListener(app::onPlotterSettingsUpdate);
+
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PlotterSettingsPanel.Title"));
         dialog.add(plotterSettingsPanel);
         dialog.setMinimumSize(new Dimension(350,300));

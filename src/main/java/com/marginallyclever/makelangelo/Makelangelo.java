@@ -11,8 +11,8 @@ import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePrefere
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
@@ -104,25 +104,28 @@ public final class Makelangelo {
 
 	private void updatePlotterRenderer() {
 		try {
-			myPlotterRenderer = Machines.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
 		} catch (Exception e) {
 			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
-			myPlotterRenderer = Machines.MAKELANGELO_5.getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
 		}
 	}
 
-	public void onPlotterSettingsUpdate(PlotterSettings e) {
-		myPlotter.setSettings(e);
-		if(previewPanel != null) previewPanel.repaint();
+	public void onPlotterSettingsUpdate(PlotterSettings settings) {
+		myPlotter.setSettings(settings);
+
 		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
 		if(f instanceof MarlinSimulationVisualizer) {
 			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
-			msv.setSettings(e);
+			msv.setSettings(settings);
 		}
-		myTurtleRenderer.setUpColor(e.getPenUpColor());
-		myTurtleRenderer.setPenDiameter(e.getPenDiameter());
+		myTurtleRenderer.setUpColor(settings.getPenUpColor());
+		myTurtleRenderer.setPenDiameter(settings.getPenDiameter());
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
+
 		updatePlotterRenderer();
+
+		if(previewPanel != null) previewPanel.repaint();
 	}
 
 	private void addPlotterRendererToPreviewPanel() {
@@ -366,7 +369,7 @@ public final class Makelangelo {
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			myPlotter.getSettings().saveConfig();
+			myPlotter.getSettings().save();
 			plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());
 			savePaths();
 

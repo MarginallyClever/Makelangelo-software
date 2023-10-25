@@ -1,12 +1,13 @@
-package com.marginallyclever.makelangelo.plotter.marlinsimulation;
+package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
+import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 public class MarlinSimulationVisualizer implements TurtleRenderer {
 	//private Turtle previousTurtle=null;
 	private GL2 gl2;
-	private Turtle myTurtle = new Turtle();
+	private final Turtle myTurtle = new Turtle();
 	private PlotterSettings mySettings;
 	
 	private int renderMode = 0;
@@ -33,7 +34,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private boolean showEntry=false;
 	private boolean showExit=true;
 
-	private class ColorPoint {
+	static private class ColorPoint {
 		public Vector3d c;
 		public Vector3d p;
 		
@@ -43,7 +44,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 	};
 	
-	private ArrayList<ColorPoint> buffer = new ArrayList<ColorPoint>();
+	private final ArrayList<ColorPoint> buffer = new ArrayList<>();
 	
 	public MarlinSimulationVisualizer() {}
 	
@@ -100,6 +101,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	
 	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
 		double t,a,d;
+		useDistance=true;
 		if(useDistance) {
 			t = block.distance;
 			a = block.accelerateUntilD;
@@ -111,7 +113,6 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			d = block.decelerateAfterT;
 		}
 		//if(d>t) d=t;
-
 		//if(--limit<=0) return;
 		//if(limit<20) block.report();
 		// nominal vs entry speed
@@ -153,37 +154,48 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			buffer.add(new ColorPoint(black,block.start));
 		}
 
-		double v = 1;
-		if(a>0) {
-			v = block.entrySpeed / block.nominalSpeed;
-			// accel part of block
+		// accel part of block
+		buffer.add(new ColorPoint(rainbow(block.entrySpeed / block.nominalSpeed),block.start));
+
+		if(a<d) {
+			// nominal part of block.  add point at start.
 			Vector3d p0 = new Vector3d(block.delta);
 			p0.scale(a/t);
 			p0.add(block.start);
-			Vector3d green = new Vector3d(0,1.0-v,v);
-			buffer.add(new ColorPoint(green,block.start));
-			buffer.add(new ColorPoint(green,p0));
-		}
-		if(a<d) {
-			v=1;
-			// nominal part of block
+			buffer.add(new ColorPoint(rainbow(1),p0));
+
 			Vector3d p1 = new Vector3d(block.delta);
 			p1.scale(d/t);
 			p1.add(block.start);
-			Vector3d blue = new Vector3d(0,0,v);
-			//buffer.add(new ColorPoint(blue,pLast));
-			buffer.add(new ColorPoint(blue,p1));
+			buffer.add(new ColorPoint(rainbow(1),p1));
+		} else {
+			// not nominal, add a point anyhow for correct color
+			Vector3d p0 = new Vector3d(block.delta);
+			p0.scale(a/t);
+			p0.add(block.start);
+			double peakSpeed = block.entrySpeed + block.acceleration * block.accelerateUntilT;
+			buffer.add(new ColorPoint(rainbow(peakSpeed / block.nominalSpeed),p0));
 		}
-		if(d<t) {
-			// decel part of block
-			v = block.exitSpeed / block.nominalSpeed;
-			Vector3d red = new Vector3d(1.0-v,0,v);
-			//buffer.add(new ColorPoint(red,pLast));
-			buffer.add(new ColorPoint(red,block.end));
-		}
+
+		// decel part of block
+		buffer.add(new ColorPoint(rainbow(block.exitSpeed / block.nominalSpeed),block.end));
 	}
 
-	
+	// return a color from red to blue to green
+	private Vector3d rainbow(double v) {
+		v= Math.max(0,Math.min(1,v));
+		double r=0,g=0,b;
+		if(v<0.5) {
+			r = 1.0 - v*2;
+			b = v*2;
+		} else {
+			g = (v-0.5)*2;
+			b = 1.0 - (v-0.5)*2;
+		}
+		return new Vector3d(r,g,b);
+	}
+
+
 	@Override
 	public void start(GL2 gl2) {
 		this.gl2 = gl2;

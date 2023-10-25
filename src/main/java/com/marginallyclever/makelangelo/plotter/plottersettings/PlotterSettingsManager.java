@@ -10,13 +10,12 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
- * Manages the list of available machine configurations, both default and custom.
+ * Manages the list of all existing {@link PlotterSettings}.
  * @author Dan Royer
  * @since 7.33.2
  */
 public class PlotterSettingsManager {
     private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsManager.class);
-    public static final String KEY_MACHINE_STYLE = "machineStyle";
     public static final String KEY_MACHINE_LAST_SELECTED = "lastLoadedMachine";
     private final List<String> profileNames = new ArrayList<>();
     private final Preferences topLevelMachinesPreferenceNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -25,7 +24,6 @@ public class PlotterSettingsManager {
         super();
         writeMakelangelo5Profile();
         writeMakelangeloHugeProfile();
-
         loadAllProfiles();
     }
 
@@ -33,7 +31,8 @@ public class PlotterSettingsManager {
         PlotterSettings profile = new PlotterSettings();
         profile.setRobotUID("Makelangelo 5");
         profile.setMachineSize(650,1000);
-        profile.saveConfig();
+        profile.setStyle("MAKELANGELO_5");
+        profile.save();
     }
 
     private void writeMakelangeloHugeProfile() {
@@ -41,7 +40,7 @@ public class PlotterSettingsManager {
         profile.setRobotUID("Makelangelo Huge");
         profile.setMachineSize(1336,2000);
         profile.setStyle("MAKELANGELO_5_HUGE");
-        profile.saveConfig();
+        profile.save();
     }
 
     /**
@@ -64,7 +63,7 @@ public class PlotterSettingsManager {
 
     public PlotterSettings loadProfile(String name) {
         PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.loadConfig(name);
+        plotterSettings.load(name);
         return plotterSettings;
     }
 

@@ -2,15 +2,15 @@ package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
- * {@link PlotterSettings} stores the physical plottersettings for a single plotter robot.  That is to say it stores the
- * properties that are consistent across all instances of one type of plotter.
+ * {@link PlotterSettings} stores the physical settings for a single {@link com.marginallyclever.makelangelo.plotter.Plotter}.
+ * Not to be confused with the dynamic state of a {@link com.marginallyclever.makelangelo.plotter.Plotter}.
  * @author Dan Royer
  */
 public class PlotterSettings {
@@ -74,22 +74,20 @@ public class PlotterSettings {
 
 	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
 	private int blockBufferSize = 16;
-
 	private int segmentsPerSecond = 5;
 	private double minSegmentLength = 0.5;  // mm
 	private long minSegTime = 20000;  // us
 	private boolean handleSmallSegments = false;
 
 	// values for {@link MarlinSimulation} that can be tweaked in firmware at run time.
-	private double travelFeedRate = 3000;  // 5400 = 90*60 mm/s
-	private double drawFeedRate = 3000;  // 5400 = 90*60 mm/s
-	private double maxAcceleration = 100;  // 2400=40*60 mm/s/s
+	private double travelFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
+	private double drawFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
+	private double maxAcceleration = 100;  // mm/s/s
 	private double minAcceleration = 0.0;  // mm/s/s
 	private double minimumPlannerSpeed = 0.05;  // mm/s
 	private double [] maxJerk = { 10, 10, 0.3 };
 
 	private ColorRGB paperColor = new ColorRGB(255, 255, 255);
-
 	private ColorRGB penDownColorDefault = new ColorRGB(0, 0, 0);
 	private ColorRGB penDownColor = new ColorRGB(0, 0, 0);
 	private ColorRGB penUpColor = new ColorRGB(0, 255, 0);
@@ -130,31 +128,16 @@ public class PlotterSettings {
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
 	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
-	private String style = Machines.MAKELANGELO_5.getName();
+	private String style = PlotterRendererFactory.MAKELANGELO_5.getName();
 
 	public PlotterSettings() {
 		super();
 	}
 
-	// OBSERVER PATTERN START
-
-	private final List<PlotterSettingsListener> listeners = new ArrayList<>();
-
-	public void addPlotterSettingsListener(PlotterSettingsListener listener) {
-		listeners.add(listener);
+	public PlotterSettings(String UID) {
+		super();
+		load(UID);
 	}
-
-	public void removePlotterSettingsListener(PlotterSettingsListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected void notifyListeners() {
-		for (PlotterSettingsListener listener : listeners) {
-			listener.settingsChangedEvent(this);
-		}
-	}
-
-	// OBSERVER PATTERN END
 
 	public double getMaxAcceleration() {
 		return maxAcceleration;
@@ -208,7 +191,7 @@ public class PlotterSettings {
 	 * Load the machine configuration from {@link Preferences}.
 	 * @param uid the unique id of the robot to be loaded
 	 */
-	public void loadConfig(String uid) {
+	public void load(String uid) {
 		robotUID = uid;
 
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
@@ -281,7 +264,10 @@ public class PlotterSettings {
 		userGeneralEndGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
 
-	public void saveConfig() {
+	/**
+	 * Save the machine configuration to {@link Preferences}.  The preference node will be the unique id of the robot.
+	 */
+	public void save() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 
@@ -313,8 +299,6 @@ public class PlotterSettings {
 
 		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
 		thisMachineNode.put(PREF_KEY_STYLE, style);
-
-		notifyListeners();
 	}
 
 	private void saveJerkConfig(Preferences thisMachineNode) {
@@ -348,48 +332,79 @@ public class PlotterSettings {
 
 	public void reset() {
 		PlotterSettings ps = new PlotterSettings();
-		ps.saveConfig();
-		loadConfig(getUID());
+		ps.save();
+		load(getUID());
 	}
 
-	public void setAcceleration(double f) {
-		maxAcceleration = f;
+	/**
+	 * @param accel mm/s/s
+	 */
+	public void setAcceleration(double accel) {
+		maxAcceleration = accel;
 	}
 
-	public void setTravelFeedRate(double f) {
-		if(f < 0.001) f = 0.001f;
-		travelFeedRate = f;
+	/**
+	 * @param feedRate mm/min
+	 */
+	public void setTravelFeedRate(double feedRate) {
+		if(feedRate < 0.001) feedRate = 0.001f;
+		travelFeedRate = feedRate;
 	}
 
+	/**
+	 * @return the travel feed rate in mm/min
+	 */
 	public double getTravelFeedRate() {
 		return travelFeedRate;
 	}
 
+	/**
+	 * @return the draw feed rate in mm/min
+	 */
 	public double getDrawFeedRate() {
 		return drawFeedRate;
 	}
 
-	public void setDrawFeedRate(double f) {
-		if(f < 0.001) f = 0.001f;
-		drawFeedRate = f;
+	/**
+	 * @param feedRate mm/min
+	 */
+	public void setDrawFeedRate(double feedRate) {
+		if(feedRate < 0.001) feedRate = 0.001f;
+		drawFeedRate = feedRate;
 	}
 
-	public void setLimitBottom(double limitBottom) {
-		this.limitBottom = limitBottom;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitBottom(double limit) {
+		this.limitBottom = limit;
 	}
 
-	public void setLimitLeft(double limitLeft) {
-		this.limitLeft = limitLeft;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitLeft(double limit) {
+		this.limitLeft = limit;
 	}
 
-	public void setLimitRight(double limitRight) {
-		this.limitRight = limitRight;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitRight(double limit) {
+		this.limitRight = limit;
 	}
 
-	public void setLimitTop(double limitTop) {
-		this.limitTop = limitTop;
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitTop(double limit) {
+		this.limitTop = limit;
 	}
 
+	/**
+	 * @param width mm
+	 * @param height mm
+	 */
 	public void setMachineSize(double width, double height) {
 		this.limitLeft = -width / 2.0;
 		this.limitRight = width / 2.0;

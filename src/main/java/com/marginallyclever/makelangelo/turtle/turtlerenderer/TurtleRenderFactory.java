@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
-
 import java.util.Arrays;
 
 /**

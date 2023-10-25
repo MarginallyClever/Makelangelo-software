@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
-import java.io.Serial;
 import java.util.Collection;
 
 /**
@@ -24,17 +24,23 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private final PlotterSettingsManager plotterSettingsManager;
 	private final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
 	private final JComboBox<String> configurationList = new JComboBox<>(model);
+	private final JPanel container = new JPanel(new BorderLayout());
 	private PlotterSettingsPanel plotterSettingsPanel = null;
+	private PlotterSettingsListener listener;
 
 	public PlotterSettingsManagerPanel(PlotterSettingsManager plotterSettingsManager) {
 		super(new BorderLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		this.plotterSettingsManager = plotterSettingsManager;
 
 		model.addAll(plotterSettingsManager.getProfileNames());
 
 		Component topButtons = createTopButtons();
 		this.add(topButtons,BorderLayout.NORTH);
+		this.add(container,BorderLayout.CENTER);
+		container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
+		configurationList.setName("configurationList");
 		configurationList.addActionListener((e)->changeProfile());
 		if(model.getSize()>0) {
 			PlotterSettings lastSelectedProfile = plotterSettingsManager.getLastSelectedProfile();
@@ -45,25 +51,25 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	private Component createTopButtons() {
 		JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topButtons.add(configurationList);
-		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
-			@Serial
-			private static final long serialVersionUID = 1L;
-
+		JButton add = new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				// copy the current profile and rename the new instance.
 				runRenameProfileDialog((String)model.getSelectedItem());
 			}
-		}));
-		topButtons.add(new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.RemoveProfile")) {
-			@Serial
-			private static final long serialVersionUID = 1L;
+		});
+		add.setName("addProfile");
+		topButtons.add(add);
 
+		JButton remove = new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.RemoveProfile")) {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				removeProfile((String)model.getSelectedItem());
+				deleteProfile((String)model.getSelectedItem());
 			}
-		}));
+		});
+		add.setName("removeProfile");
+		topButtons.add(remove);
+
 		return topButtons;
 	}
 
@@ -81,7 +87,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 				goAgain = true;
 			} else {
 				// found a unique name.  try to update the backing store.
-				goAgain = renameProfile(uid,newUID);
+				goAgain = copyAndRenameProfile(uid,newUID);
 			}
 		} while(goAgain);
 	}
@@ -90,17 +96,17 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 * Creates a copy of the current profile, changes the RobotUID, and saves it as a new instance.  Does not change the
 	 * old profile.
 	 * TODO needs a unit test
-	 * @param oldUID
-	 * @param newUID
+	 * @param oldUID the name of the profile to copy
+	 * @param newUID the name of the new profile
 	 * @return true if there was a problem.
 	 */
-	private boolean renameProfile(String oldUID,String newUID) {
+	private boolean copyAndRenameProfile(String oldUID, String newUID) {
 		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
 		ps.setRobotUID(newUID);
 		try {
-			ps.saveConfig();
+			ps.save();
 		} catch(Exception e) {
-			logger.error("failed to rename {} to {}. {}",oldUID,newUID,e);
+			logger.error("failed to rename {} to {}.",oldUID,newUID,e);
 			return true;
 		}
 
@@ -110,13 +116,18 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		return false;
 	}
 
+	/**
+	 * Checks if the given name is already in use.
+	 * @param newUID the name to check
+	 * @return true if the name is already in use.
+	 */
 	// TODO could use a unit test
 	private boolean nameIsTaken(String newUID) {
 		Collection<String> list = plotterSettingsManager.getProfileNames();
 		return list.contains(newUID);
 	}
 
-	private void removeProfile(String uid) {
+	private void deleteProfile(String uid) {
 		if(!plotterSettingsManager.deleteProfile(uid)) {
 			model.removeElement(uid);
 		}
@@ -132,13 +143,35 @@ public class PlotterSettingsManagerPanel extends JPanel {
 			plotterSettingsManager.setLastSelectedProfile(name);
 			PlotterSettings plotterSettings = plotterSettingsManager.loadProfile(name);
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
-			this.add(plotterSettingsPanel,BorderLayout.CENTER);
+			container.add(plotterSettingsPanel,BorderLayout.CENTER);
 			this.revalidate();
+			plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
+			firePlotterSettingsChanged(plotterSettings);
 		}
 	}
-	
-	// TEST
-	
+
+	/**
+	 * Add a listener to be notified when the settings change.
+	 * @param listener the listener to add
+	 */
+	public void addListener(PlotterSettingsListener listener) {
+		this.listener = listener;
+	}
+
+	/**
+	 * Fire a settings changed event.
+	 * @param settings the new settings
+	 */
+	private void firePlotterSettingsChanged(PlotterSettings settings) {
+		if(listener!=null) {
+			listener.settingsChangedEvent(settings);
+		}
+	}
+
+	/**
+	 * Test the PlotterSettingsManagerPanel
+	 * @param args not used
+	 */
 	public static void main(String[] args) {
 		Log.start();
 		PreferencesHelper.start();
