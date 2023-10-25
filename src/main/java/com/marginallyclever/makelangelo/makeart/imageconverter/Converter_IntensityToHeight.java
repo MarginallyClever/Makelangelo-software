@@ -8,9 +8,14 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Horizontal lines.  The height of each line is determined by the average intensity of the pixels in that line.
+ * Masks the lines in the "back" by the lines in the "front" using a height buffer.
  * @author Dan Royer
  * @since 7.40.3
  */
@@ -21,6 +26,8 @@ public class Converter_IntensityToHeight extends ImageConverter {
 	private static int sampleRate = 5;
 	// max height of the wave will be +/-(waveIntensity/2)
 	private static int waveIntensity = 30;
+	// track the height of each line as they are added.  Use this to mask the later lines.
+	private final List<Double> heights = new ArrayList<>();
 
 	public Converter_IntensityToHeight() {
 		super();
@@ -73,30 +80,34 @@ public class Converter_IntensityToHeight extends ImageConverter {
 		waveIntensity = value;
 	}
 
-	protected void convertLine(TransformedImage img, double sampleSpacing, double halfStep, Point2D a, Point2D b) {
+	/**
+	 * Travel from a to b, sampling the image at regular intervals.  Move the turtle in the y-axis by the sampled height.
+	 * @param a start point
+	 * @param b end point
+	 * @param img the image to sample
+	 * @param numSamples how many samples to take
+	 * @param sampleRadius how far to move the turtle in the y-axis
+	 * @return a list of points
+	 */
+	protected List<Point2D> convertLine(TransformedImage img, Point2D a, Point2D b, int numSamples, double sampleRadius) {
+		List<Point2D> points = new ArrayList<>();
+
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1.0/len);
 
-		boolean first=true;
 
-		for (double p = 0; p <= len; p += sampleSpacing) {
-			double x = a.x + dir.x * p; 
-			double y = a.y + dir.y * p; 
-			// read a block of the image and find the average intensity in this block
-			double z = img.sample( x - sampleSpacing, y - halfStep, x + sampleSpacing, y + halfStep);
-			// scale the intensity value
-			double scale_z = 1 - z / 255.0f;
-			//scale_z *= scale_z;  // quadratic curve
-			double pulseSize = waveIntensity * scale_z;
-			double py=y + pulseSize - waveIntensity/2.0f;
-			if(first) {
-				turtle.jumpTo(x, py);
-				first = false;
-			} else {
-				turtle.moveTo(x, py);
-			}
+		for(double p = 0; p <= numSamples; ++p) {
+			double fraction = p * len / numSamples;
+			double x = a.x + dir.x * fraction;
+			double y = a.y + dir.y * fraction;
+			// sample the image and scale the result.
+			double z = 1.0 - img.sample( x, y, sampleRadius ) / 255.0f;
+			//z *= z;  // quadratic curve
+			double py = y + waveIntensity * z - waveIntensity/2.0f;
+			points.add(new Point2D(x,py));
 		}
+		return points;
 	}
 
 	/**
@@ -114,23 +125,55 @@ public class Converter_IntensityToHeight extends ImageConverter {
 		double xLeft   = myPaper.getMarginLeft();
 		double xRight  = myPaper.getMarginRight();
 
-		// from top to bottom of the image...
+		// from bottom to top of the image...
 		int i=0;
-		Point2D a = new Point2D();
-		Point2D b = new Point2D();
+		Point2D lineStart = new Point2D();
+		Point2D lineEnd = new Point2D();
 		
 		turtle = new Turtle();
 
+		heights.clear();
+		// heights should contain (xRight-xLeft) / sampleRate values
+		int numSamples = (int)Math.ceil(Math.abs(xRight-xLeft)/sampleRate);
+		for(int j=0;j<=numSamples;++j) {
+			heights.add(yBottom-1);
+		}
+
 		// horizontal
 		for (double y = yBottom; y < yTop; y += spacing) {
+			// flip the direction of the line so the pen makes a zigzag
 			if ((++i % 2) == 0) {
-				a.set(xLeft,y);
-				b.set(xRight,y);
+				lineStart.set(xLeft,y);
+				lineEnd.set(xRight,y);
 			} else {
-				a.set(xRight,y);
-				b.set(xLeft,y);
+				lineStart.set(xRight,y);
+				lineEnd.set(xLeft,y);
 			}
-			convertLine(img,sampleRate,sampleRate/2.0,a,b);
+			// because the line direction is flipped every turn, the height buffer must also be flipped every turn.
+			Collections.reverse(heights);
+
+			// sample the image along the line
+			List<Point2D> points = convertLine(img,lineStart,lineEnd,numSamples,sampleRate);
+
+			boolean first=true;
+			// mask the line using the heights values and update heights as we go
+			for(int j=0;j<=numSamples;++j) {
+				Point2D p = points.get(j);
+				double x = p.x;
+				double heightNew = p.y;
+				double heightOld = heights.get(j);
+				if(heightNew < heightOld) {
+					heightNew = heightOld;
+				}
+				heights.set(j,heightNew);
+
+				if(first) {
+					turtle.jumpTo(x, heightNew);
+					first = false;
+				} else {
+					turtle.moveTo(x,heightNew);
+				}
+			}
 		}
 
 		fireConversionFinished();
