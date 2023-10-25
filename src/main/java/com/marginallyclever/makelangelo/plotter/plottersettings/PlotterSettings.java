@@ -4,8 +4,10 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
+import org.json.JSONObject;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -38,6 +40,9 @@ public class PlotterSettings {
 	private static final String PREF_KEY_PEN_DOWN_COLOR_B = "penDownColorB";
 	private static final String PREF_KEY_PEN_DOWN_COLOR_G = "penDownColorG";
 	private static final String PREF_KEY_PEN_DOWN_COLOR_R = "penDownColorR";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B = "penDownColorDefaultB";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G = "penDownColorDefaultG";
+	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R = "penDownColorDefaultR";
 	private static final String PREF_KEY_PEN_UP_COLOR_B = "penUpColorB";
 	private static final String PREF_KEY_PEN_UP_COLOR_G = "penUpColorG";
 	private static final String PREF_KEY_PEN_UP_COLOR_R = "penUpColorR";
@@ -249,10 +254,14 @@ public class PlotterSettings {
 		// tool_number = Integer.valueOf(prefs.get("tool_number",Integer.toString(tool_number)));
 
 		int r, g, b;
+		r = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R, penDownColorDefault.getRed());
+		g = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G, penDownColorDefault.getGreen());
+		b = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B, penDownColorDefault.getBlue());
+		penDownColorDefault = new ColorRGB(r, g, b);
 		r = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColor.getRed());
 		g = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColor.getGreen());
 		b = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColor.getBlue());
-		penDownColor = penDownColorDefault = new ColorRGB(r, g, b);
+		penDownColor = new ColorRGB(r, g, b);
 		r = prefs.getInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
 		g = prefs.getInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
 		b = prefs.getInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
@@ -317,9 +326,12 @@ public class PlotterSettings {
 		prefs.put(PREF_KEY_Z_OFF, Double.toString(getPenUpAngle()));
 		prefs.put(PREF_KEY_FEED_RATE, Double.toString(travelFeedRate));
 		prefs.put(PREF_KEY_FEED_RATE_CURRENT, Double.toString(drawFeedRate));
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColorDefault.getRed());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColorDefault.getGreen());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColorDefault.getBlue());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R, penDownColorDefault.getRed());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G, penDownColorDefault.getGreen());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B, penDownColorDefault.getBlue());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColor.getRed());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColor.getGreen());
+		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColor.getBlue());
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
 		prefs.putInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
@@ -661,5 +673,43 @@ public class PlotterSettings {
 
 	public void setStyle(String style) {
 		this.style = style;
+	}
+
+	@Override
+	public String toString() {
+		JSONObject json = new JSONObject();
+		json.put("robotUID", robotUID);
+		json.put("isRegistered", isRegistered);
+		json.put("hardwareName", hardwareName);
+		json.put("limitLeft", limitLeft);
+		json.put("limitRight", limitRight);
+		json.put("limitBottom", limitBottom);
+		json.put("limitTop", limitTop);
+		json.put("blockBufferSize", blockBufferSize);
+		json.put("segmentsPerSecond", segmentsPerSecond);
+		json.put("minSegmentLength", minSegmentLength);
+		json.put("minSegTime", minSegTime);
+		json.put("handleSmallSegments", handleSmallSegments);
+		json.put("maxAcceleration", maxAcceleration);
+		json.put("minAcceleration", minAcceleration);
+		json.put("minimumPlannerSpeed", minimumPlannerSpeed);
+		json.put("maxJerk", Arrays.toString(maxJerk));
+		json.put("paperColor", paperColor);
+		json.put("penDownColorDefault", penDownColorDefault);
+		json.put("penDownColor", penDownColor);
+		json.put("penUpColor", penUpColor);
+		json.put("penDiameter", penDiameter);
+		json.put("penUpAngle", penUpAngle);
+		json.put("penDownAngle", penDownAngle);
+		json.put("penLiftTime", penLiftTime);
+		json.put("penLowerTime", penLowerTime);
+		json.put("startingPositionIndex", startingPositionIndex);
+		json.put("userGeneralStartGcode", userGeneralStartGcode);
+		json.put("userGeneralEndGcode", userGeneralEndGcode);
+		json.put("zMotorType", zMotorType);
+		json.put("style", style);
+		json.put("travelFeedRate", travelFeedRate);
+		json.put("drawFeedRate", drawFeedRate);
+		return json.toString();
 	}
 }

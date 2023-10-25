@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class PlotterSettingsTest {
     private static final String ROBOT_TEST_UID = "123456";
 
@@ -62,33 +60,8 @@ public class PlotterSettingsTest {
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
         plotterSettingsRead.load(ROBOT_TEST_UID);
-        assertEquals(2, plotterSettingsRead.getLimitTop());
-        assertEquals(3, plotterSettingsRead.getLimitBottom());
-        assertEquals(4, plotterSettingsRead.getLimitRight());
-        assertEquals(5, plotterSettingsRead.getLimitLeft());
-        assertEquals(6, plotterSettingsRead.getStartingPositionIndex());
-        assertEquals(7, plotterSettingsRead.getPenDiameter());
-        assertEquals(8, plotterSettingsRead.getPenLiftTime());
-        assertEquals(9, plotterSettingsRead.getPenDownAngle());
-        assertEquals(10, plotterSettingsRead.getPenUpAngle());
-        assertEquals(11, plotterSettingsRead.getTravelFeedRate());
-        assertEquals(new ColorRGB(12, 13, 14), plotterSettingsRead.getPenDownColorDefault());
-        assertEquals(new ColorRGB(15, 16, 17), plotterSettingsRead.getPenUpColor());
-        assertEquals(new ColorRGB(18, 19, 20), plotterSettingsRead.getPaperColor());
-        assertEquals(21, plotterSettingsRead.getDrawFeedRate());
-        assertEquals(22, plotterSettingsRead.getMaxAcceleration());
-        assertEquals("TestRobot", plotterSettingsRead.getHardwareName());
-        
-        assertEquals(23, plotterSettingsRead.getBlockBufferSize());
-        assertEquals(24, plotterSettingsRead.getSegmentsPerSecond());
-        assertEquals(25, plotterSettingsRead.getMinSegmentLength());
-        assertEquals(26, plotterSettingsRead.getMinSegmentTime());
-        assertFalse(plotterSettingsRead.isHandleSmallSegments());
-        assertEquals(27, plotterSettingsRead.getMinAcceleration());
-        assertEquals(28, plotterSettingsRead.getMinPlannerSpeed());
-        assertEquals(29,plotterSettingsRead.getPenLowerTime());
 
-        assertEquals(styleName, plotterSettingsRead.getStyle());
+        Assertions.assertEquals(plotterSettings.toString(),plotterSettingsRead.toString());
     }
 
     @Test
