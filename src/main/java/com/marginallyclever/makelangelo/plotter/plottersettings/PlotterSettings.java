@@ -2,12 +2,10 @@ package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -16,106 +14,125 @@ import java.util.prefs.Preferences;
  * @author Dan Royer
  */
 public class PlotterSettings {
-	private static final String PREF_KEY_ACCELERATION = "acceleration";
-	private static final String PREF_KEY_BLOCK_BUFFER_SIZE = "blockBufferSize";
-	private static final String PREF_KEY_DIAMETER = "diameter";
-	private static final String PREF_KEY_FEED_RATE = "feed_rate";
-	private static final String PREF_KEY_FEED_RATE_CURRENT = "feed_rate_current";
-	private static final String PREF_KEY_HANDLE_SMALL_SEGMENTS = "handleSmallSegments";
-	private static final String PREF_KEY_HARDWARE_VERSION = "hardwareVersion";
-	private static final String PREF_KEY_IS_REGISTERED = "isRegistered";
-	private static final String PREF_KEY_LIMIT_BOTTOM = "limit_bottom";
-	private static final String PREF_KEY_LIMIT_LEFT = "limit_left";
-	private static final String PREF_KEY_LIMIT_RIGHT = "limit_right";
-	private static final String PREF_KEY_LIMIT_TOP = "limit_top";
-	private static final String PREF_KEY_MAX_JERK = "maxJerk";
-	private static final String PREF_KEY_MINIMUM_PLANNER_SPEED = "minimumPlannerSpeed";
-	private static final String PREF_KEY_MIN_ACCELERATION = "minAcceleration";
-	private static final String PREF_KEY_MIN_SEGMENT_LENGTH = "minSegmentLength";
-	private static final String PREF_KEY_MIN_SEG_TIME = "minSegTime";
-	private static final String PREF_KEY_PAPER_COLOR_B = "paperColorB";
-	private static final String PREF_KEY_PAPER_COLOR_G = "paperColorG";
-	private static final String PREF_KEY_PAPER_COLOR_R = "paperColorR";
-	private static final String PREF_KEY_PEN = "Pen";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_B = "penDownColorB";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_G = "penDownColorG";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_R = "penDownColorR";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B = "penDownColorDefaultB";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G = "penDownColorDefaultG";
-	private static final String PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R = "penDownColorDefaultR";
-	private static final String PREF_KEY_PEN_UP_COLOR_B = "penUpColorB";
-	private static final String PREF_KEY_PEN_UP_COLOR_G = "penUpColorG";
-	private static final String PREF_KEY_PEN_UP_COLOR_R = "penUpColorR";
-	private static final String PREF_KEY_SEGMENTS_PER_SECOND = "segmentsPerSecond";
-	private static final String PREF_KEY_STARTING_POS_INDEX = "startingPosIndex";
-	private static final String PREF_KEY_Z_OFF = "z_off";
-	private static final String PREF_KEY_Z_ON = "z_on";
-	private static final String PREF_KEY_Z_RATE = "z_rate";
-	private static final String PREF_KEY_Z_RATE_UP = "z_rate_up";
-	private static final String PREF_KEY_USER_GENERAL_END_GCODE = "userGeneralEndGcode";
-	private static final String PREF_KEY_USER_GENERAL_START_GCODE = "userGeneralStartGcode";
-
-	private static final String PREF_KEY_Z_MOTOR_TYPE = "zMotorType";
-	private static final String PREF_KEY_STYLE = "style";
-
-	// Each robot has a global unique identifier
-	private String robotUID = "0";
-
-	// if we wanted to test for Marginally Clever brand Makelangelo robots
-	private boolean isRegistered = false;
-
-	private String hardwareName = "Makelangelo 5";
-
-	// physical limits
-	private final double machineHeight = 1000; // mm
-	private final double machineWidth = 650; // mm
-
-	private double limitLeft = -machineWidth / 2;
-	private double limitRight = machineWidth / 2;
-	private double limitBottom = -machineHeight / 2;
-	private double limitTop = machineHeight / 2;
-
-	// speed control
-
-	// values for {@link MarlinSimulation} that cannot be tweaked in firmware at run time.
-	private int blockBufferSize = 16;
-	private int segmentsPerSecond = 5;
-	private double minSegmentLength = 0.5;  // mm
-	private long minSegTime = 20000;  // us
-	private boolean handleSmallSegments = false;
-
-	// values for {@link MarlinSimulation} that can be tweaked in firmware at run time.
-	private double travelFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
-	private double drawFeedRate = 3000;  // mm/min.  3000 = 50 mm/s
-	private double maxAcceleration = 100;  // mm/s/s
-	private double minAcceleration = 0.0;  // mm/s/s
-	private double minimumPlannerSpeed = 0.05;  // mm/s
-	private double [] maxJerk = { 10, 10, 0.3 };
-
-	private ColorRGB paperColor = new ColorRGB(255, 255, 255);
-	private ColorRGB penDownColorDefault = new ColorRGB(0, 0, 0);
-	private ColorRGB penDownColor = new ColorRGB(0, 0, 0);
-	private ColorRGB penUpColor = new ColorRGB(0, 255, 0);
-
-	private double penDiameter=0.8; // mm, >0
-	private double penUpAngle=90; // servo angle (degrees,0...180)
-	private double penDownAngle=25; // servo angle (degrees,0...180)
-
 	/**
-	 * The milliseconds delay to raise the pen.  Marlin firmware will send intermediate values to the servo
-	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 * mm/s/s
 	 */
-	private double penLiftTime=50;
-
+	public static final String ACCELERATION = "acceleration";
 	/**
-	 * The milliseconds delay to lower the pen.  Marlin firmware will send intermediate values to the servo
-	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 * int
 	 */
-	private double penLowerTime=50;
-
+	public static final String BLOCK_BUFFER_SIZE = "blockBufferSize";
 	/**
-	 * top left, bottom center, etc...
-	 *
+	 * double
+	 */
+	public static final String DIAMETER = "diameter";
+	/**
+	 * double
+	 */
+	public static final String FEED_RATE_TRAVEL = "feed_rate";
+	/**
+	 * double
+	 */
+	public static final String FEED_RATE_DRAW = "feed_rate_current";
+	/**
+	 * boolean
+	 */
+	public static final String HANDLE_SMALL_SEGMENTS = "handleSmallSegments";
+	/**
+	 * String
+	 */
+	public static final String HARDWARE_VERSION = "hardwareVersion";
+	/**
+	 * boolean.  if we wanted to test for Marginally Clever brand Makelangelo robots
+	 */
+	public static final String IS_REGISTERED = "isRegistered";
+	/**
+	 * double
+	 */
+	public static final String LIMIT_BOTTOM = "limit_bottom";
+	/**
+	 * double
+	 */
+	public static final String LIMIT_LEFT = "limit_left";
+	/**
+	 * double
+	 */
+	public static final String LIMIT_RIGHT = "limit_right";
+	/**
+	 * double
+	 */
+	public static final String LIMIT_TOP = "limit_top";
+	/**
+	 * array of doubles
+	 */
+	public static final String MAX_JERK = "maxJerk";
+	/**
+	 * double
+	 */
+	public static final String MINIMUM_PLANNER_SPEED = "minimumPlannerSpeed";
+	/**
+	 * double
+	 */
+	public static final String MIN_ACCELERATION = "minAcceleration";
+	/**
+	 * double
+	 */
+	public static final String MIN_SEGMENT_LENGTH = "minSegmentLength";
+	public static final String MIN_SEG_TIME = "minSegTime";
+	/**
+	 * double
+	 */
+	public static final String PAPER_COLOR_B = "paperColorB";
+	/**
+	 * double
+	 */
+	public static final String PAPER_COLOR_G = "paperColorG";
+	/**
+	 * double
+	 */
+	public static final String PAPER_COLOR_R = "paperColorR";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_B = "penDownColorB";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_G = "penDownColorG";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_R = "penDownColorR";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_DEFAULT_B = "penDownColorDefaultB";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_DEFAULT_G = "penDownColorDefaultG";
+	/**
+	 * double
+	 */
+	public static final String PEN_DOWN_COLOR_DEFAULT_R = "penDownColorDefaultR";
+	/**
+	 * double
+	 */
+	public static final String PEN_UP_COLOR_B = "penUpColorB";
+	/**
+	 * double
+	 */
+	public static final String PEN_UP_COLOR_G = "penUpColorG";
+	/**
+	 * double
+	 */
+	public static final String PEN_UP_COLOR_R = "penUpColorR";
+	/**
+	 * integer
+	 */
+	public static final String SEGMENTS_PER_SECOND = "segmentsPerSecond";
+	/**
+	 * integer.
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -124,16 +141,49 @@ public class PlotterSettings {
 	 * }
 	 * </pre>
 	 */
-	private int startingPositionIndex = 4;
-
-	private String userGeneralStartGcode = "";
-	private String userGeneralEndGcode = "";
+	public static final String STARTING_POS_INDEX = "startingPosIndex";
+	/**
+	 * double
+	 */
+	public static final String PEN_ANGLE_UP = "z_off";
+	/**
+	 * double
+	 */
+	public static final String PEN_ANGLE_DOWN = "z_on";
+	/**
+	 * double.
+	 * The milliseconds delay to raise the pen.  Marlin firmware will send intermediate values to the servo
+	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 */
+	public static final String PEN_ANGLE_UP_TIME = "z_rate_up";
+	/**
+	 * double.
+	 * The milliseconds delay to lower the pen.  Marlin firmware will send intermediate values to the servo
+	 * to approximate the slow movement, but it may cause the servo to jitter.  Use with care.
+	 */
+	public static final String PEN_ANGLE_DOWN_TIME = "z_rate";
+	/**
+	 * String
+	 */
+	public static final String USER_GENERAL_END_GCODE = "userGeneralEndGcode";
+	/**
+	 * String
+	 */
+	public static final String USER_GENERAL_START_GCODE = "userGeneralStartGcode";
+	/**
+	 * integer
+	 */
+	public static final String Z_MOTOR_TYPE = "zMotorType";
+	/**
+	 * String
+	 */
+	public static final String STYLE = "style";
 
 	public static final int Z_MOTOR_TYPE_SERVO = 1;
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
-	private int zMotorType = Z_MOTOR_TYPE_SERVO;
 
-	private String style = PlotterRendererFactory.MAKELANGELO_5.getName();
+	private String robotUID = "0";
+	private double [] maxJerk = { 10, 10, 0.3 };
 
 	public PlotterSettings() {
 		super();
@@ -144,42 +194,6 @@ public class PlotterSettings {
 		load(UID);
 	}
 
-	public double getMaxAcceleration() {
-		return maxAcceleration;
-	}
-
-	public Point2D getHome() {
-		return new Point2D(0,0);
-	}
-
-	/**
-	 * @return bottom limit in mm
-	 */
-	public double getLimitBottom() {
-		return limitBottom;
-	}
-
-	/**
-	 * @return left limit in mm
-	 */
-	public double getLimitLeft() {
-		return limitLeft;
-	}
-
-	/**
-	 * @return right limit in mm
-	 */
-	public double getLimitRight() {
-		return limitRight;
-	}
-
-	/**
-	 * @return top limit in mm
-	 */
-	public double getLimitTop() {
-		return limitTop;
-	}
-
 	public String getUID() {
 		return robotUID;
 	}
@@ -188,8 +202,144 @@ public class PlotterSettings {
 		this.robotUID = robotUID;
 	}
 
-	public boolean isRegistered() {
-		return isRegistered;
+	/**
+	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public double getDouble(String key) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		return thisMachineNode.getDouble(key, 0);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public int getInteger(String key) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		return thisMachineNode.getInt(key, 0);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public String getString(String key) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		return thisMachineNode.get(key, "");
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public boolean getBoolean(String key) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		return thisMachineNode.getBoolean(key, false);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @param value the value to set
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public void setDouble(String key,double value) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		thisMachineNode.putDouble(key, value);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @param value the value to set
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public void setInteger(String key,int value) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		thisMachineNode.putInt(key,value);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @param value the value to set
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public void setString(String key,String value) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		thisMachineNode.put(key, value);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @param value the value to set
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public void setBoolean(String key,boolean value) throws NullPointerException, IllegalStateException {
+		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
+		Preferences thisMachineNode = allMachinesNode.node(robotUID);
+		thisMachineNode.putBoolean(key, value);
+	}
+
+	/**
+	 * @param accel mm/s/s
+	 */
+	public void setAcceleration(double accel) {
+		setDouble(ACCELERATION,accel);
+	}
+
+	public Point2D getHome() {
+		return new Point2D(0,0);
+	}
+
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitBottom(double limit) {
+		setDouble(LIMIT_BOTTOM,limit);
+	}
+
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitLeft(double limit) {
+		setDouble(LIMIT_LEFT,limit);
+	}
+
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitRight(double limit) {
+		setDouble(LIMIT_RIGHT,limit);
+	}
+
+	/**
+	 * @param limit mm
+	 */
+	public void setLimitTop(double limit) {
+		setDouble(LIMIT_TOP,limit);
+	}
+
+	@Deprecated
+	public void setRegistered(boolean isRegistered) {
+		setBoolean(IS_REGISTERED,isRegistered);
 	}
 
 	/**
@@ -198,79 +348,12 @@ public class PlotterSettings {
 	 */
 	public void load(String uid) {
 		robotUID = uid;
-
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-
-		limitTop 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_TOP, limitTop);
-		limitBottom 			= thisMachineNode.getDouble(PREF_KEY_LIMIT_BOTTOM, limitBottom);
-		limitLeft 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_LEFT, limitLeft);
-		limitRight 				= thisMachineNode.getDouble(PREF_KEY_LIMIT_RIGHT, limitRight);
-		maxAcceleration 		= thisMachineNode.getDouble(PREF_KEY_ACCELERATION, maxAcceleration);
-		startingPositionIndex 	= thisMachineNode.getInt(PREF_KEY_STARTING_POS_INDEX, startingPositionIndex);
-
-		int r = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
-		int g = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
-		int b = thisMachineNode.getInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
-		paperColor = new ColorRGB(r, g, b);
-
-		// setCurrentToolNumber(Integer.valueOf(uniqueMachinePreferencesNode.get("current_tool",
-		// Integer.toString(getCurrentToolNumber()))));
-		isRegistered = Boolean.parseBoolean(thisMachineNode.get(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered)));
-		hardwareName = thisMachineNode.get(PREF_KEY_HARDWARE_VERSION, hardwareName);
-
-		blockBufferSize 		= thisMachineNode.getInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
-		segmentsPerSecond 		= thisMachineNode.getInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
-		minSegmentLength 		= thisMachineNode.getDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
-		minSegTime 				= thisMachineNode.getLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
-		handleSmallSegments 	= thisMachineNode.getBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
-		minAcceleration			= thisMachineNode.getDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
-		minimumPlannerSpeed 	= thisMachineNode.getDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
-
-		loadUserGcode(thisMachineNode);
-		loadJerkConfig(thisMachineNode);
-		loadPenConfig(thisMachineNode);
-
-		zMotorType = thisMachineNode.getInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
-		style = thisMachineNode.get(PREF_KEY_STYLE, style);
-	}
-
-	private void loadJerkConfig(Preferences thisMachineNode) {
-		Preferences jerkNode = thisMachineNode.node(PREF_KEY_MAX_JERK);
+		Preferences jerkNode = thisMachineNode.node(PlotterSettings.MAX_JERK);
 		for(int i=0;i<maxJerk.length;i++) {
 			maxJerk[i] = jerkNode.getDouble(Integer.toString(i), maxJerk[i]);
 		}
-	}
-
-	private void loadPenConfig(Preferences prefs) {
-		prefs = prefs.node(PREF_KEY_PEN);
-		setPenDiameter(		prefs.getDouble(PREF_KEY_DIAMETER, penDiameter	));
-		setPenLiftTime(		prefs.getDouble(PREF_KEY_Z_RATE, penLiftTime	));
-		setPenLowerTime(    prefs.getDouble(PREF_KEY_Z_RATE_UP,penLowerTime ));
-		setPenDownAngle(	prefs.getDouble(PREF_KEY_Z_ON, penDownAngle	));
-		setPenUpAngle(		prefs.getDouble(PREF_KEY_Z_OFF, penUpAngle	));
-		setTravelFeedRate(	prefs.getDouble(PREF_KEY_FEED_RATE, travelFeedRate));
-		setDrawFeedRate(	prefs.getDouble(PREF_KEY_FEED_RATE_CURRENT, drawFeedRate	));
-		// tool_number = Integer.valueOf(prefs.get("tool_number",Integer.toString(tool_number)));
-
-		int r, g, b;
-		r = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R, penDownColorDefault.getRed());
-		g = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G, penDownColorDefault.getGreen());
-		b = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B, penDownColorDefault.getBlue());
-		penDownColorDefault = new ColorRGB(r, g, b);
-		r = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColor.getRed());
-		g = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColor.getGreen());
-		b = prefs.getInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColor.getBlue());
-		penDownColor = new ColorRGB(r, g, b);
-		r = prefs.getInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
-		g = prefs.getInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
-		b = prefs.getInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
-		penUpColor = new ColorRGB(r, g, b);
-	}
-
-	private void loadUserGcode(Preferences thisMachineNode) {
-		userGeneralStartGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
-		userGeneralEndGcode = thisMachineNode.get(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
 	}
 
 	/**
@@ -279,69 +362,13 @@ public class PlotterSettings {
 	public void save() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-
-		thisMachineNode.put(PREF_KEY_LIMIT_TOP, Double.toString(limitTop));
-		thisMachineNode.put(PREF_KEY_LIMIT_BOTTOM, Double.toString(limitBottom));
-		thisMachineNode.put(PREF_KEY_LIMIT_RIGHT, Double.toString(limitRight));
-		thisMachineNode.put(PREF_KEY_LIMIT_LEFT, Double.toString(limitLeft));
-		thisMachineNode.put(PREF_KEY_ACCELERATION, Double.toString(maxAcceleration));
-		thisMachineNode.put(PREF_KEY_STARTING_POS_INDEX, Integer.toString(startingPositionIndex));
-
-		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_R, paperColor.getRed());
-		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_G, paperColor.getGreen());
-		thisMachineNode.putInt(PREF_KEY_PAPER_COLOR_B, paperColor.getBlue());
-
-		thisMachineNode.put(PREF_KEY_IS_REGISTERED, Boolean.toString(isRegistered()));
-		thisMachineNode.put(PREF_KEY_HARDWARE_VERSION, hardwareName);
-
-		thisMachineNode.putInt(PREF_KEY_BLOCK_BUFFER_SIZE, blockBufferSize);
-		thisMachineNode.putInt(PREF_KEY_SEGMENTS_PER_SECOND, segmentsPerSecond);
-		thisMachineNode.putDouble(PREF_KEY_MIN_SEGMENT_LENGTH, minSegmentLength);
-		thisMachineNode.putLong(PREF_KEY_MIN_SEG_TIME, minSegTime);
-		thisMachineNode.putBoolean(PREF_KEY_HANDLE_SMALL_SEGMENTS, handleSmallSegments);
-		thisMachineNode.putDouble(PREF_KEY_MIN_ACCELERATION, minAcceleration);
-		thisMachineNode.putDouble(PREF_KEY_MINIMUM_PLANNER_SPEED, minimumPlannerSpeed);
-
-		saveUserGcode(thisMachineNode);
-		saveJerkConfig(thisMachineNode);
-		savePenConfig(thisMachineNode);
-
-		thisMachineNode.putInt(PREF_KEY_Z_MOTOR_TYPE, zMotorType);
-		thisMachineNode.put(PREF_KEY_STYLE, style);
-	}
-
-	private void saveJerkConfig(Preferences thisMachineNode) {
-		Preferences jerkNode = thisMachineNode.node(PREF_KEY_MAX_JERK);
+		Preferences jerkNode = thisMachineNode.node(PlotterSettings.MAX_JERK);
 		for(int i=0;i<maxJerk.length;i++) {
 			jerkNode.putDouble(Integer.toString(i), maxJerk[i] );
 		}
 	}
 
-	private void savePenConfig(Preferences prefs) {
-		prefs = prefs.node(PREF_KEY_PEN);
-		prefs.put(PREF_KEY_DIAMETER, Double.toString(getPenDiameter()));
-		prefs.put(PREF_KEY_Z_RATE, Double.toString(getPenLiftTime()));
-		prefs.put(PREF_KEY_Z_RATE_UP, Double.toString(getPenLowerTime()));
-		prefs.put(PREF_KEY_Z_ON, Double.toString(getPenDownAngle()));
-		prefs.put(PREF_KEY_Z_OFF, Double.toString(getPenUpAngle()));
-		prefs.put(PREF_KEY_FEED_RATE, Double.toString(travelFeedRate));
-		prefs.put(PREF_KEY_FEED_RATE_CURRENT, Double.toString(drawFeedRate));
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_R, penDownColorDefault.getRed());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_G, penDownColorDefault.getGreen());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_DEFAULT_B, penDownColorDefault.getBlue());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_R, penDownColor.getRed());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_G, penDownColor.getGreen());
-		prefs.putInt(PREF_KEY_PEN_DOWN_COLOR_B, penDownColor.getBlue());
-		prefs.putInt(PREF_KEY_PEN_UP_COLOR_R, penUpColor.getRed());
-		prefs.putInt(PREF_KEY_PEN_UP_COLOR_G, penUpColor.getGreen());
-		prefs.putInt(PREF_KEY_PEN_UP_COLOR_B, penUpColor.getBlue());
-	}
-
-	private void saveUserGcode(Preferences thisMachineNode) {
-		thisMachineNode.put(PREF_KEY_USER_GENERAL_START_GCODE, userGeneralStartGcode);
-		thisMachineNode.put(PREF_KEY_USER_GENERAL_END_GCODE, userGeneralEndGcode);
-	}
-
+	// TODO reset to what, exactly?
 	public void reset() {
 		PlotterSettings ps = new PlotterSettings();
 		ps.save();
@@ -349,32 +376,12 @@ public class PlotterSettings {
 	}
 
 	/**
-	 * @param accel mm/s/s
-	 */
-	public void setAcceleration(double accel) {
-		maxAcceleration = accel;
-	}
-
-	/**
 	 * @param feedRate mm/min
 	 */
+	@Deprecated
 	public void setTravelFeedRate(double feedRate) {
 		if(feedRate < 0.001) feedRate = 0.001f;
-		travelFeedRate = feedRate;
-	}
-
-	/**
-	 * @return the travel feed rate in mm/min
-	 */
-	public double getTravelFeedRate() {
-		return travelFeedRate;
-	}
-
-	/**
-	 * @return the draw feed rate in mm/min
-	 */
-	public double getDrawFeedRate() {
-		return drawFeedRate;
+		setDouble(FEED_RATE_TRAVEL,feedRate);
 	}
 
 	/**
@@ -382,35 +389,7 @@ public class PlotterSettings {
 	 */
 	public void setDrawFeedRate(double feedRate) {
 		if(feedRate < 0.001) feedRate = 0.001f;
-		drawFeedRate = feedRate;
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitBottom(double limit) {
-		this.limitBottom = limit;
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitLeft(double limit) {
-		this.limitLeft = limit;
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitRight(double limit) {
-		this.limitRight = limit;
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitTop(double limit) {
-		this.limitTop = limit;
+		setDouble(FEED_RATE_DRAW,feedRate);
 	}
 
 	/**
@@ -418,214 +397,154 @@ public class PlotterSettings {
 	 * @param height mm
 	 */
 	public void setMachineSize(double width, double height) {
-		this.limitLeft = -width / 2.0;
-		this.limitRight = width / 2.0;
-		this.limitBottom = -height / 2.0;
-		this.limitTop = height / 2.0;
+		setLimitLeft(-width / 2.0);
+		setLimitRight(width / 2.0);
+		setLimitBottom(-height / 2.0);
+		setLimitTop(height / 2.0);
 	}
 
-	public void setRegistered(boolean isRegistered) {
-		this.isRegistered = isRegistered;
-	}
-
+	@Deprecated
 	public void setHardwareName(String hardwareName) {
-		this.hardwareName = hardwareName;
-	}
-
-	public String getHardwareName() {
-		return hardwareName;
+		setString(HARDWARE_VERSION,hardwareName);
 	}
 
 	public ColorRGB getPaperColor() {
-		return paperColor;
+		int r = getInteger(PlotterSettings.PAPER_COLOR_R);
+		int g = getInteger(PlotterSettings.PAPER_COLOR_G);
+		int b = getInteger(PlotterSettings.PAPER_COLOR_B);
+		return new ColorRGB(r,g,b);
 	}
 
 	public void setPaperColor(ColorRGB paperColor) {
-		this.paperColor = paperColor;
+		setInteger(PAPER_COLOR_B,paperColor.blue);
+		setInteger(PAPER_COLOR_G,paperColor.green);
+		setInteger(PAPER_COLOR_R,paperColor.red);
 	}
 
 	public ColorRGB getPenDownColorDefault() {
-		return penDownColorDefault;
+		int r = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_R);
+		int g = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_G);
+		int b = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_B);
+		return new ColorRGB(r,g,b);
 	}
 
 	public ColorRGB getPenDownColor() {
-		return penDownColor;
+		int r = getInteger(PlotterSettings.PEN_DOWN_COLOR_R);
+		int g = getInteger(PlotterSettings.PEN_DOWN_COLOR_G);
+		int b = getInteger(PlotterSettings.PEN_DOWN_COLOR_B);
+		return new ColorRGB(r,g,b);
 	}
 
 	public void setPenDownColorDefault(ColorRGB color) {
-		penDownColorDefault = color;
+		setInteger(PEN_DOWN_COLOR_DEFAULT_B,color.blue);
+		setInteger(PEN_DOWN_COLOR_DEFAULT_G,color.green);
+		setInteger(PEN_DOWN_COLOR_DEFAULT_R,color.red);
 	}
 
 	public void setPenDownColor(ColorRGB color) {
-		penDownColor = color;
+		setInteger(PEN_DOWN_COLOR_B,color.blue);
+		setInteger(PEN_DOWN_COLOR_G,color.green);
+		setInteger(PEN_DOWN_COLOR_R,color.red);
 	}
 
 	public void setPenUpColor(ColorRGB color) {
-		penUpColor = color;
+		setInteger(PEN_UP_COLOR_B,color.blue);
+		setInteger(PEN_UP_COLOR_G,color.green);
+		setInteger(PEN_UP_COLOR_R,color.red);
 	}
 
+	@Deprecated
 	public ColorRGB getPenUpColor() {
-		return penUpColor;
+		int r = getInteger(PlotterSettings.PEN_UP_COLOR_R);
+		int g = getInteger(PlotterSettings.PEN_UP_COLOR_G);
+		int b = getInteger(PlotterSettings.PEN_UP_COLOR_B);
+		return new ColorRGB(r,g,b);
 	}
 
+	@Deprecated
 	public void setPenDiameter(double diameter) {
-		penDiameter = diameter;
+		setDouble(DIAMETER,diameter);
 	}
 
-	public double getPenDiameter() {
-		return penDiameter;
-	}
-
-	public double getPenUpAngle() {
-		return penUpAngle;
-	}
-
+	@Deprecated
 	public void setPenUpAngle(double angle) {
-		this.penUpAngle = angle;
+		setDouble(PEN_ANGLE_UP,angle);
 	}
 
-	public double getPenDownAngle() {
-		return penDownAngle;
-	}
-
+	@Deprecated
 	public void setPenDownAngle(double angle) {
-		this.penDownAngle = angle;
+		setDouble(PEN_ANGLE_DOWN,angle);
 	}
 
-	public double getPenLiftTime() {
-		return penLiftTime;
-	}
-
-	public double getPenLowerTime() {
-		return penLowerTime;
-	}
-
+	@Deprecated
 	public void setPenLiftTime(double ms) {
-		this.penLiftTime = ms;
+		setDouble(PEN_ANGLE_UP_TIME,ms);
 	}
 
+	@Deprecated
 	public void setPenLowerTime(double ms) {
-		this.penLowerTime = ms;
+		setDouble(PEN_ANGLE_DOWN_TIME,ms);
 	}
 
-	public boolean canChangeMachineSize() {
-		return false;
-	}
-
-	public boolean canAccelerate() {
-		return false;
-	}
-
+	@Deprecated
 	public void setStartingPositionIndex(int startingPositionIndex) {
-		this.startingPositionIndex = startingPositionIndex;
-	}
-
-	public int getStartingPositionIndex() {
-		return this.startingPositionIndex;
-	}
-	/**
-	 * @return the blockBufferSize
-	 */
-	public int getBlockBufferSize() {
-		return blockBufferSize;
+		setInteger(STARTING_POS_INDEX,startingPositionIndex);
 	}
 
 	/**
 	 * @param blockBufferSize the blockBufferSize to set
 	 */
+	@Deprecated
 	public void setBlockBufferSize(int blockBufferSize) {
-		this.blockBufferSize = blockBufferSize;
-	}
-
-	/**
-	 * @return the segmentsPerSecond
-	 */
-	public int getSegmentsPerSecond() {
-		return segmentsPerSecond;
+		setInteger(BLOCK_BUFFER_SIZE,blockBufferSize);
 	}
 
 	/**
 	 * @param segmentsPerSecond the segmentsPerSecond to set
 	 */
+	@Deprecated
 	public void setSegmentsPerSecond(int segmentsPerSecond) {
-		this.segmentsPerSecond = segmentsPerSecond;
-	}
-
-	/**
-	 * @return the minSegmentLength
-	 */
-	public double getMinSegmentLength() {
-		return minSegmentLength;
+		setInteger(SEGMENTS_PER_SECOND,segmentsPerSecond);
 	}
 
 	/**
 	 * @param minSegmentLength the minSegmentLength to set
 	 */
+	@Deprecated
 	public void setMinSegmentLength(double minSegmentLength) {
-		this.minSegmentLength = minSegmentLength;
-	}
-
-	/**
-	 * @return the minSegTime
-	 */
-	public long getMinSegmentTime() {
-		return minSegTime;
+		setDouble(MIN_SEGMENT_LENGTH,minSegmentLength);
 	}
 
 	/**
 	 * @param minSegTime the minSegTime to set
 	 */
-	public void setMinSegmentTime(long minSegTime) {
-		this.minSegTime = minSegTime;
-	}
-
-	/**
-	 * @return the handleSmallSegments
-	 */
-	public boolean isHandleSmallSegments() {
-		return handleSmallSegments;
+	@Deprecated
+	public void setMinSegmentTime(int minSegTime) {
+		setInteger(MIN_SEG_TIME,minSegTime);
 	}
 
 	/**
 	 * @param handleSmallSegments the handleSmallSegments to set
 	 */
+	@Deprecated
 	public void setHandleSmallSegments(boolean handleSmallSegments) {
-		this.handleSmallSegments = handleSmallSegments;
-	}
-
-	/**
-	 * @return the minAcceleration
-	 */
-	public double getMinAcceleration() {
-		return minAcceleration;
+		setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,handleSmallSegments);
 	}
 
 	/**
 	 * @param minAcceleration the minAcceleration to set
 	 */
+	@Deprecated
 	public void setMinAcceleration(double minAcceleration) {
-		this.minAcceleration = minAcceleration;
-	}
-
-	/**
-	 * @return the minimumPlannerSpeed
-	 */
-	public double getMinPlannerSpeed() {
-		return minimumPlannerSpeed;
+		setDouble(MIN_ACCELERATION,minAcceleration);
 	}
 
 	/**
 	 * @param minimumPlannerSpeed the minimumPlannerSpeed to set
 	 */
+	@Deprecated
 	public void setMinPlannerSpeed(double minimumPlannerSpeed) {
-		this.minimumPlannerSpeed = minimumPlannerSpeed;
-	}
-
-	/**
-	 * @return the maxJerk
-	 */
-	public double[] getMaxJerk() {
-		return maxJerk;
+		setDouble(MINIMUM_PLANNER_SPEED,minimumPlannerSpeed);
 	}
 
 	/**
@@ -635,81 +554,68 @@ public class PlotterSettings {
 		this.maxJerk = maxJerk;
 	}
 
-	public String getUserGeneralStartGcode() {
-		return userGeneralStartGcode;
+	/**
+	 * @return the maxJerk
+	 */
+	public double[] getMaxJerk() {
+		return maxJerk;
 	}
 
-	public List<String> getUserGeneralStartGcodeList() {
-		return Arrays.asList(userGeneralStartGcode.split(System.getProperty("line.separator")).clone());
-	}
-
+	@Deprecated
 	public void setUserGeneralStartGcode(String userGeneralStartGcode) {
-		this.userGeneralStartGcode = userGeneralStartGcode;
+		setString(USER_GENERAL_START_GCODE,userGeneralStartGcode);
 	}
 
-	public String getUserGeneralEndGcode() {
-		return userGeneralEndGcode;
-	}
-
-	public List<String> getUserGeneralEndGcodeList() {
-		return Arrays.asList(userGeneralEndGcode.split(System.getProperty("line.separator")).clone());
-	}
-
+	@Deprecated
 	public void setUserGeneralEndGcode(String userGeneralEndGcode) {
-		this.userGeneralEndGcode = userGeneralEndGcode;
+		setString(USER_GENERAL_END_GCODE,userGeneralEndGcode);
 	}
 
-    public int getZMotorType() {
-		return this.zMotorType;
-    }
-
+	@Deprecated
 	public void setZMotorType(int i) {
-		zMotorType=i;
+		setInteger(Z_MOTOR_TYPE,i);
 	}
 
-	public String getStyle() {
-		return style;
-	}
-
+	@Deprecated
 	public void setStyle(String style) {
-		this.style = style;
+		setString(STYLE,style);
 	}
 
 	@Override
 	public String toString() {
 		JSONObject json = new JSONObject();
-		json.put("robotUID", robotUID);
-		json.put("isRegistered", isRegistered);
-		json.put("hardwareName", hardwareName);
-		json.put("limitLeft", limitLeft);
-		json.put("limitRight", limitRight);
-		json.put("limitBottom", limitBottom);
-		json.put("limitTop", limitTop);
-		json.put("blockBufferSize", blockBufferSize);
-		json.put("segmentsPerSecond", segmentsPerSecond);
-		json.put("minSegmentLength", minSegmentLength);
-		json.put("minSegTime", minSegTime);
-		json.put("handleSmallSegments", handleSmallSegments);
-		json.put("maxAcceleration", maxAcceleration);
-		json.put("minAcceleration", minAcceleration);
-		json.put("minimumPlannerSpeed", minimumPlannerSpeed);
+		json.put("robotUID", robotUID);		
+		json.put("isRegistered", getBoolean(IS_REGISTERED));
+		json.put("hardwareName", getString(HARDWARE_VERSION));
+		json.put("limitLeft", getDouble(PlotterSettings.LIMIT_LEFT));	// mm
+		json.put("limitRight", getDouble(PlotterSettings.LIMIT_RIGHT));	// mm
+		json.put("limitBottom", getDouble(PlotterSettings.LIMIT_BOTTOM));	// mm
+		json.put("limitTop", getDouble(PlotterSettings.LIMIT_TOP));		// mm
+		json.put("blockBufferSize", getInteger(PlotterSettings.BLOCK_BUFFER_SIZE));
+		json.put("segmentsPerSecond", getInteger(PlotterSettings.SEGMENTS_PER_SECOND));
+		json.put("minSegmentLength", getDouble(PlotterSettings.MIN_SEGMENT_LENGTH));	// mm
+		json.put("minSegTime", getInteger(PlotterSettings.MIN_SEG_TIME));		// us
+		json.put("handleSmallSegments", getBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS));
+		json.put("maxAcceleration", getDouble(PlotterSettings.ACCELERATION));	// mm/s/s
+		json.put("minAcceleration", getDouble(PlotterSettings.MIN_ACCELERATION));	// mm/s/s
+		json.put("minimumPlannerSpeed", getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));	// mm/s
 		json.put("maxJerk", Arrays.toString(maxJerk));
-		json.put("paperColor", paperColor);
-		json.put("penDownColorDefault", penDownColorDefault);
-		json.put("penDownColor", penDownColor);
-		json.put("penUpColor", penUpColor);
-		json.put("penDiameter", penDiameter);
-		json.put("penUpAngle", penUpAngle);
-		json.put("penDownAngle", penDownAngle);
-		json.put("penLiftTime", penLiftTime);
-		json.put("penLowerTime", penLowerTime);
-		json.put("startingPositionIndex", startingPositionIndex);
-		json.put("userGeneralStartGcode", userGeneralStartGcode);
-		json.put("userGeneralEndGcode", userGeneralEndGcode);
-		json.put("zMotorType", zMotorType);
-		json.put("style", style);
-		json.put("travelFeedRate", travelFeedRate);
-		json.put("drawFeedRate", drawFeedRate);
+		json.put("paperColor", getPaperColor());
+		json.put("penDownColorDefault", getPenDownColorDefault());
+		json.put("penDownColor", getPenDownColor());
+		json.put("penUpColor", getPenUpColor());
+		json.put("penDiameter", getDouble(PlotterSettings.DIAMETER));	// mm, >0
+		json.put("penUpAngle", getDouble(PlotterSettings.PEN_ANGLE_UP));	// servo angle (degrees,0...180)
+		json.put("penDownAngle", getDouble(PlotterSettings.PEN_ANGLE_DOWN));	// servo angle (degrees,0...180)
+		json.put("penLiftTime", getDouble(PlotterSettings.PEN_ANGLE_UP_TIME));
+		json.put("penLowerTime", getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME));
+		json.put("startingPositionIndex", getInteger(STARTING_POS_INDEX));
+		json.put("userGeneralStartGcode", getString(USER_GENERAL_START_GCODE));
+		json.put("userGeneralEndGcode", getString(USER_GENERAL_END_GCODE));
+		json.put("zMotorType", getInteger(Z_MOTOR_TYPE));
+		json.put("style", getString(STYLE));
+		json.put("travelFeedRate", getDouble(PlotterSettings.FEED_RATE_TRAVEL));	// mm/min.  3000 = 50 mm/s
+		json.put("drawFeedRate", getDouble(PlotterSettings.FEED_RATE_DRAW));	// mm/min.  3000 = 50 mm/s
 		return json.toString();
 	}
 }

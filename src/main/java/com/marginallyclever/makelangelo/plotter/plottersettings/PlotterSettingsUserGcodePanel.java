@@ -17,7 +17,7 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 
         this.settings = settings;
 
-        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getUserGeneralStartGcode());
+        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
         userGeneralStartGcode.setLineWrap(false);
         userGeneralStartGcode.setAlignmentX(0);
         JLabel label0 = new JLabel(Translator.get("PlotterSettings.userGeneralStartGcode"));
@@ -26,7 +26,7 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
         this.add(label0);
         this.add(userGeneralStartGcode);
 
-        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getUserGeneralEndGcode());
+        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
         userGeneralEndGcode.setLineWrap(false);
         userGeneralEndGcode.setAlignmentX(0);
         label0 = new JLabel(Translator.get("PlotterSettings.userGeneralEndGcode"));
@@ -45,7 +45,7 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
     }
 
     public void reset() {
-        userGeneralStartGcode.setText(settings.getUserGeneralStartGcode());
-        userGeneralEndGcode.setText(settings.getUserGeneralEndGcode());
+        userGeneralStartGcode.setText(settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
+        userGeneralEndGcode.setText(settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
     }
 }

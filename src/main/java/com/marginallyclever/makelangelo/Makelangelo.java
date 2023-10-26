@@ -104,9 +104,9 @@ public final class Makelangelo {
 
 	private void updatePlotterRenderer() {
 		try {
-			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
 		} catch (Exception e) {
-			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
+			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
 			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
 		}
 	}
@@ -120,7 +120,7 @@ public final class Makelangelo {
 			msv.setSettings(settings);
 		}
 		myTurtleRenderer.setUpColor(settings.getPenUpColor());
-		myTurtleRenderer.setPenDiameter(settings.getPenDiameter());
+		myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 
 		updatePlotterRenderer();

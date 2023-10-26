@@ -81,7 +81,7 @@ public class PlotterSettingsTest {
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
         plotterSettingsRead.load(ROBOT_TEST_UID);
-        Assertions.assertEquals(plotterSettings.getZMotorType(),plotterSettingsRead.getZMotorType());
+        Assertions.assertEquals(plotterSettings.getInteger(PlotterSettings.Z_MOTOR_TYPE),plotterSettingsRead.getInteger(PlotterSettings.Z_MOTOR_TYPE));
 
     }
 

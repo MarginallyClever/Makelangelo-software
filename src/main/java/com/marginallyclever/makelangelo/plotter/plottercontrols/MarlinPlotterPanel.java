@@ -105,10 +105,10 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	 */
 	private void sendSizeUpdate() {
 		var settings = myPlotter.getSettings();
-		var top = settings.getLimitTop();
-		var bottom = settings.getLimitBottom();
-		var left = settings.getLimitLeft();
-		var right = settings.getLimitRight();
+		var top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		var bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		var left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		var right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		var width = right-left;
 		var height = top-bottom;
 		var maxLen = Math.sqrt(width*width + height*height);
@@ -118,7 +118,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				+" B"+StringHelper.formatDouble(bottom)
 				+" L"+StringHelper.formatDouble(left)
 				+" R"+StringHelper.formatDouble(right)
-				+" S"+ settings.getSegmentsPerSecond()
+				+" S"+ settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND)
 				+" H"+StringHelper.formatDouble(maxLen));
 	}
 
@@ -199,32 +199,41 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getTravelToString(Plotter p,double x, double y) {
-		return "G0 " + getPosition(x, y) + " F" + p.getSettings().getTravelFeedRate();
+		return "G0 " + getPosition(x, y)
+				+ " F" + p.getSettings().getDouble(PlotterSettings.FEED_RATE_TRAVEL);
 	}
 
 	// "By convention, most G-code generators use G0 for non-extrusion movements"
 	// https://marlinfw.org/docs/gcode/G000-G001.html
 	public static String getDrawToString(Plotter p,double x, double y) {
-		return "G1 " + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
+		return "G1 " + getPosition(x, y)
+				+ " F" + p.getSettings().getDouble(PlotterSettings.FEED_RATE_DRAW);
 	}
 
 	private static String getPosition(double x, double y) {
-		return "X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
+		return "X" + StringHelper.formatDouble(x)
+				+ " Y" + StringHelper.formatDouble(y);
 	}
 
-	public static String getPenUpString(Plotter p) {
-		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+	public static String getPenUpString(Plotter plotter) {
+		PlotterSettings settings = plotter.getSettings();
+		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP)
+					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
 		} else {
-			return "G0 Z" + (int)p.getPenUpAngle();
+			return "G0 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
 		}
 	}
 
-	public static String getPenDownString(Plotter p) {
-		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0 S" + (int)p.getPenDownAngle() + " T"+(int)p.getPenLowerTime();
+	public static String getPenDownString(Plotter plotter) {
+		PlotterSettings settings = plotter.getSettings();
+		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)
+					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME);
 		} else {
-			return "G1 Z" + (int)p.getPenDownAngle();
+			return "G1 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
 		}
 	}
 

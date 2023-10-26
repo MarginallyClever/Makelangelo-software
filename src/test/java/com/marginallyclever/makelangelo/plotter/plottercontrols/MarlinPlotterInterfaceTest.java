@@ -56,7 +56,7 @@ public class MarlinPlotterInterfaceTest {
         String message = "echo:  M201 X300.00 Y300.00 Z300.00";
         mpi.onHearAcceleration(message);
 
-        assertEquals(300, plotter.getSettings().getMaxAcceleration());
+        assertEquals(300, plotter.getSettings().getDouble(PlotterSettings.ACCELERATION));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class MarlinPlotterInterfaceTest {
         mpi.onHearAcceleration(message);
 
         // original values
-        assertEquals(42, plotter.getSettings().getMaxAcceleration());
+        assertEquals(42, plotter.getSettings().getDouble(PlotterSettings.ACCELERATION));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class MarlinPlotterInterfaceTest {
         String message = "echo:  M203 X200.00 Y200.00 Z200.00";
         mpi.onHearFeedrate(message);
 
-        assertEquals(200, plotter.getSettings().getDrawFeedRate());
+        assertEquals(200, plotter.getSettings().getDouble(PlotterSettings.FEED_RATE_DRAW));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class MarlinPlotterInterfaceTest {
         mpi.onHearFeedrate(message);
 
         // original values
-        assertEquals(42, plotter.getSettings().getDrawFeedRate());
+        assertEquals(42, plotter.getSettings().getDouble(PlotterSettings.FEED_RATE_DRAW));
     }
 
     @Test
@@ -118,17 +118,18 @@ public class MarlinPlotterInterfaceTest {
     }
     @Test
     public void testZAxisGcode() {
-        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T50");
+        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T150");
         testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_STEPPER,"G1 Z45","G0 Z90");
     }
 
     private void testZAxisGcode(int type,String matchDown,String matchUp) {
         Plotter plotter = new Plotter();
-        PlotterSettings ps = new PlotterSettings();
+        PlotterSettings ps = plotter.getSettings();
         ps.setZMotorType(type);
         ps.setPenDownAngle(45);
         ps.setPenUpAngle(90);
         ps.setPenLowerTime(50);
+        ps.setPenLiftTime(150);
         plotter.setSettings(ps);
         Assertions.assertEquals(matchDown, MarlinPlotterPanel.getPenDownString(plotter));
         Assertions.assertEquals(matchUp, MarlinPlotterPanel.getPenUpString(plotter));

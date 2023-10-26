@@ -52,9 +52,9 @@ public class MarlinSimulation {
 	
 	public MarlinSimulation(PlotterSettings settings) {
 		this.settings = settings;
-		XMAX=settings.getLimitRight();
-		XMIN=settings.getLimitLeft();
-		YMAX=settings.getLimitTop();
+		XMAX = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		XMIN = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		YMAX = settings.getDouble(PlotterSettings.LIMIT_TOP);
 	}
 	
 	/**
@@ -67,12 +67,12 @@ public class MarlinSimulation {
 		Vector3d delta = new Vector3d();
 		delta.sub(destination,poseNow);
 		
-		acceleration = Math.min(settings.getMaxAcceleration(), acceleration);
+		acceleration = Math.min(settings.getDouble(PlotterSettings.ACCELERATION), acceleration);
 		
 		double len = delta.length();		
 		double seconds = len / feedrate;
-		int segments = (int)Math.ceil(seconds * settings.getSegmentsPerSecond());
-		int maxSeg = (int)Math.ceil(len / settings.getMinSegmentLength());
+		int segments = (int)Math.ceil(seconds * settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND));
+		int maxSeg = (int)Math.ceil(len / settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH));
 		segments = Math.max(1,Math.min(maxSeg,segments));
 		Vector3d deltaSegment = new Vector3d(delta);
 		deltaSegment.scale(1.0/segments);
@@ -102,9 +102,9 @@ public class MarlinSimulation {
 		double inverse_secs = feedrate / block.distance;
 		
 		// slow down if the buffer is nearly empty.
-		if( queue.size() >= 2 && queue.size() <= (settings.getBlockBufferSize()/2)-1 ) {
+		if( queue.size() >= 2 && queue.size() <= (settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)/2)-1 ) {
 			long segment_time_us = Math.round(1000000.0f / inverse_secs);
-			long timeDiff = settings.getMinSegmentTime() - segment_time_us;
+			long timeDiff = settings.getInteger(PlotterSettings.MIN_SEG_TIME) - segment_time_us;
 			if( timeDiff>0 ) {
 				double nst = segment_time_us + Math.round(2.0 * timeDiff / queue.size());
 				inverse_secs = 1000000.0 / nst;
@@ -149,7 +149,7 @@ public class MarlinSimulation {
 			default:                  vmax_junction = block.nominalSpeed;  break;
 		}
 
-		block.allowableSpeed = maxSpeedAllowed(-block.acceleration,settings.getMinPlannerSpeed(),block.distance);
+		block.allowableSpeed = maxSpeedAllowed(-block.acceleration,settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED),block.distance);
 		block.entrySpeedMax = vmax_junction;
 		block.entrySpeed = Math.min(vmax_junction, block.allowableSpeed);
 		block.nominalLength = ( block.allowableSpeed >= block.nominalSpeed );
@@ -167,7 +167,7 @@ public class MarlinSimulation {
 	private double dotProductJerk(MarlinSimulationBlock next) { 
 		double vmax_junction = next.nominalSpeed * next.normal.dot(previousNormal) * 1.1;
 		vmax_junction = Math.min(vmax_junction, next.nominalSpeed);
-		vmax_junction = Math.max(vmax_junction, settings.getMinPlannerSpeed());
+		vmax_junction = Math.max(vmax_junction, settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));
 		previousNormal.set(next.normal);
 		
 		return vmax_junction;
@@ -186,7 +186,7 @@ public class MarlinSimulation {
 			// NOTE: Computed without any expensive trig, sin() or acos(), by trig half angle identity of cos(theta).
 			if (junction_cos_theta > 0.999999f) {
 				// For a 0 degree acute junction, just set minimum junction speed.
-				vmax_junction = settings.getMinPlannerSpeed();
+				vmax_junction = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
 			} else {
 				// Check for numerical round-off to avoid divide by zero.
 				junction_cos_theta = Math.max(junction_cos_theta, -0.999999f); 
@@ -196,13 +196,13 @@ public class MarlinSimulation {
 				junction_unit_vec.sub(next.normal, previousNormal);
 				junction_unit_vec.normalize();
 				if (junction_unit_vec.length() > 0) {
-					final double junction_acceleration = limit_value_by_axis_maximum(next.acceleration,junction_unit_vec, settings.getMaxAcceleration());
+					final double junction_acceleration = limit_value_by_axis_maximum(next.acceleration,junction_unit_vec, settings.getDouble(PlotterSettings.ACCELERATION));
 					// Trig half angle identity. Always positive.
 					final double sin_theta_d2 = Math.sqrt(0.5 * (1.0 - junction_cos_theta)); 
 
 					vmax_junction = junction_acceleration * junction_deviation * sin_theta_d2 / (1.0f - sin_theta_d2);
 
-					if (settings.isHandleSmallSegments()) {
+					if (settings.getBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS)) {
 						// For small moves with >135° junction (octagon) find speed for approximate arc
 						if (next.distance < 1 && junction_cos_theta < -0.7071067812f) {
 							double junction_theta = Math.acos(-junction_cos_theta);
@@ -314,7 +314,7 @@ public class MarlinSimulation {
 	}
 
 	private double limitPolargraphAcceleration(final Vector3d to, final Vector3d cartesianDelta, final double acceleration) {
-		double maxAcceleration = settings.getMaxAcceleration();
+		double maxAcceleration = settings.getDouble(PlotterSettings.ACCELERATION);
 		
 		// Adjust the maximum acceleration based on the plotter position to reduce
 		// wobble at the bottom of the picture.
@@ -364,7 +364,7 @@ public class MarlinSimulation {
 
 			// The maximum acceleration is given by cT if cT>0
 			if (cT > 0) {
-				maxAcceleration = Math.max(Math.min(maxAcceleration, cT), (double)settings.getMinAcceleration());
+				maxAcceleration = Math.max(Math.min(maxAcceleration, cT), (double)settings.getDouble(PlotterSettings.MIN_ACCELERATION));
 			}
 		}
 		return maxAcceleration;
@@ -392,7 +392,7 @@ public class MarlinSimulation {
 		if(current.entrySpeed != top || (next!=null && next.recalculate)) {
 			double newEntrySpeed = current.nominalLength 
 					? top
-					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getMinPlannerSpeed()), current.distance));
+					: Math.min( top, maxSpeedAllowed( -current.acceleration, (next!=null? next.entrySpeed : settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)), current.distance));
 			current.entrySpeed = newEntrySpeed;
 			current.recalculate = true;
 		}
@@ -442,15 +442,15 @@ public class MarlinSimulation {
 		if(current!=null) {
 			current.recalculate = true;
 			if( !current.busy ) {
-				recalculateTrapezoidForBlock(current, currentEntrySpeed, settings.getMinPlannerSpeed());
+				recalculateTrapezoidForBlock(current, currentEntrySpeed, settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));
 			}
 			current.recalculate = false;
 		}
 	}
 	
 	protected void recalculateTrapezoidForBlock(MarlinSimulationBlock block, double entrySpeed, double exitSpeed) {
-		if( entrySpeed < settings.getMinPlannerSpeed() ) entrySpeed = settings.getMinPlannerSpeed();
-		if( exitSpeed  < settings.getMinPlannerSpeed() ) exitSpeed  = settings.getMinPlannerSpeed();
+		if( entrySpeed < settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED) ) entrySpeed = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
+		if( exitSpeed  < settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED) ) exitSpeed  = settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED);
 		
 		double accel = block.acceleration;
 		double accelerateD = estimateAccelerationDistance(entrySpeed, block.nominalSpeed, accel);
@@ -521,12 +521,12 @@ public class MarlinSimulation {
 
 		double perSecond = 1.0/60.0;
 
-		double travelFeedrate = settings.getTravelFeedRate() * perSecond;
-		double drawFeedRate = settings.getDrawFeedRate() * perSecond;
-		double penLiftTime = settings.getPenLiftTime();
-		double maxAcceleration = settings.getMaxAcceleration();
-		double upAngle = settings.getPenUpAngle();
-		double downAngle = settings.getPenDownAngle();
+		double travelFeedrate = settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL) * perSecond;
+		double drawFeedRate = settings.getDouble(PlotterSettings.FEED_RATE_DRAW) * perSecond;
+		double penLiftTime = settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
+		double maxAcceleration = settings.getDouble(PlotterSettings.ACCELERATION);
+		double upAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
+		double downAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
 		boolean isUp=true;
 		
 		Point2D home = settings.getHome();
@@ -558,7 +558,7 @@ public class MarlinSimulation {
 			default:
 				break;
 			}
-			while(queue.size()>settings.getBlockBufferSize()) consumer.run(queue.remove(0));
+			while(queue.size()>settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)) consumer.run(queue.remove(0));
 		}
 		while(!queue.isEmpty()) consumer.run(queue.remove(0));
 	}

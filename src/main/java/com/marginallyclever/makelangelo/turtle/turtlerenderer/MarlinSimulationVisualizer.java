@@ -91,7 +91,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderMinLength(MarlinSimulationBlock block) {
-		double d = block.distance / (mySettings.getMinSegmentLength()*2.0);
+		double d = block.distance / (mySettings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)*2.0);
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;
@@ -125,7 +125,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		
 		if(showNominal) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.nominalSpeed / settings.getDrawFeedRate();
+			double f = block.nominalSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(1-f,f,0);
@@ -135,7 +135,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 		if(showEntry) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.entrySpeed / settings.getDrawFeedRate();
+			double f = block.entrySpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d red = new Vector3d(1-f,0,f);
@@ -145,7 +145,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 		if(showExit) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.exitSpeed / settings.getDrawFeedRate();
+			double f = block.exitSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(0,1-f,f);

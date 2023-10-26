@@ -16,16 +16,16 @@ public class Generator_FillPage extends TurtleGenerator {
 
 	public Generator_FillPage() {
 		super();
-		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle());
-		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),Generator_FillPage.getPenDiameter());
+		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),angle);
+		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),penDiameter);
 		add(selectAngle);
 		add(selectPenDiameter);
 		selectAngle.addPropertyChangeListener(evt->{
-			Generator_FillPage.setAngle(selectAngle.getValue());
+			angle = selectAngle.getValue();
 			generate();
 		});
 		selectPenDiameter.addPropertyChangeListener(evt->{
-			Generator_FillPage.setPenDiameter(selectPenDiameter.getValue());
+			penDiameter = selectPenDiameter.getValue();
 			generate();
 
 		});
@@ -34,21 +34,6 @@ public class Generator_FillPage extends TurtleGenerator {
 	@Override
 	public String getName() {
 		return Translator.get("FillPageName");
-	}
-
-	static public double getAngle() {
-		return angle;
-	}
-	static public void setAngle(double value) {
-		Generator_FillPage.angle = value;
-	}
-	
-	public static double getPenDiameter() {
-		return penDiameter;
-	}
-
-	public static void setPenDiameter(double penDiameter) {
-		Generator_FillPage.penDiameter = penDiameter;
 	}
 
 	@Override

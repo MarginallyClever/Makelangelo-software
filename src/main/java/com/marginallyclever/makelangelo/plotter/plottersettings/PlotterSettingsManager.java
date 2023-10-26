@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
+import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +32,40 @@ public class PlotterSettingsManager {
     private void writeMakelangelo5Profile() {
         PlotterSettings profile = new PlotterSettings();
         profile.setRobotUID("Makelangelo 5");
+
+        profile.setBoolean(PlotterSettings.IS_REGISTERED, false);
+        profile.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS, false);
+
         profile.setMachineSize(650,1000);
-        profile.setStyle("MAKELANGELO_5");
+        profile.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH, 0.5);	// mm
+        profile.setDouble(PlotterSettings.ACCELERATION, 100);	// mm/s/s
+        profile.setDouble(PlotterSettings.MIN_ACCELERATION, 0.0);	// mm/s/s
+        profile.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED, 0.05);	// mm/s
+        profile.setDouble(PlotterSettings.DIAMETER, 0.8);	// mm, >0
+        profile.setDouble(PlotterSettings.PEN_ANGLE_UP, 90);	// servo angle (degrees,0...180)
+        profile.setDouble(PlotterSettings.PEN_ANGLE_DOWN, 25);	// servo angle (degrees,0...180)
+        profile.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME, 50);
+        profile.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME, 50);
+        profile.setDouble(PlotterSettings.FEED_RATE_TRAVEL, 3000);	// mm/min.  3000 = 50 mm/s
+        profile.setDouble(PlotterSettings.FEED_RATE_DRAW, 3000);	// mm/min.  3000 = 50 mm/s
+
+        profile.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE, 16);
+        profile.setInteger(PlotterSettings.SEGMENTS_PER_SECOND, 5);
+        profile.setInteger(PlotterSettings.MIN_SEG_TIME, 20000);		// us
+        profile.setInteger(PlotterSettings.STARTING_POS_INDEX, 4);
+        profile.setInteger(PlotterSettings.Z_MOTOR_TYPE, PlotterSettings.Z_MOTOR_TYPE_SERVO);
+
+        profile.setString(PlotterSettings.HARDWARE_VERSION, "Makelangelo 5");
+        profile.setString(PlotterSettings.USER_GENERAL_START_GCODE, "");
+        profile.setString(PlotterSettings.USER_GENERAL_END_GCODE, "");
+        profile.setString(PlotterSettings.STYLE, PlotterRendererFactory.MAKELANGELO_5.getName());
+
+        profile.setPaperColor(new ColorRGB(255, 255, 255));
+        profile.setPenDownColorDefault(new ColorRGB(0, 0, 0));
+        profile.setPenDownColor(new ColorRGB(0, 0, 0));
+        profile.setPenUpColor(new ColorRGB(0, 255, 0));
+
+        profile.setMaxJerk(new double []{ 10, 10, 0.3 });
         profile.save();
     }
 

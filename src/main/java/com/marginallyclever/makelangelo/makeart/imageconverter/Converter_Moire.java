@@ -76,7 +76,7 @@ public class Converter_Moire extends ImageConverter {
 		line.setAmplitude(0.4);
 		
 		double CUTOFF = 1.0/255.0;
-		double iterStepSize = 0.002;//machine.getPenDiameter()/2;
+		double iterStepSize = 0.002;//machine.getDouble(PlotterSettings.DIAMETER)/2;
 		
 		// examine the line once.  all Z values will be in the range 0...1
 		ArrayList<Double> zList = new ArrayList<Double>();

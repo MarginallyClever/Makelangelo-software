@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,7 +48,9 @@ class SaveGCodeTest {
         File fileTemp = File.createTempFile("unit", null);
 
         try {
+            PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
+            plotter.getSettings().load("Makelangelo 5");
             plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
             plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
 
@@ -55,6 +58,9 @@ class SaveGCodeTest {
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
             compareExpectedToActual(expectedFilename, fileTemp);
+
+            plotter.getSettings().setUserGeneralStartGcode("");
+            plotter.getSettings().setUserGeneralEndGcode("");
         } finally {
             fileTemp.delete();
         }
@@ -81,13 +87,20 @@ class SaveGCodeTest {
         File fileTemp = File.createTempFile("unit", null);
 
         try {
+            PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
+            plotter.getSettings().load("Makelangelo 5");
+            plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
+            plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
 
             // when
             files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
             compareExpectedToActual("/gcode/save_multi_colors-1.gcode", new File(files.get(0)));
             compareExpectedToActual("/gcode/save_multi_colors-2.gcode", new File(files.get(1)));
+
+            plotter.getSettings().setUserGeneralStartGcode("");
+            plotter.getSettings().setUserGeneralEndGcode("");
         } finally {
             fileTemp.delete();
             if (files != null) {
@@ -113,12 +126,7 @@ class SaveGCodeTest {
         turtle = saveGCode.trimTurtle(turtle, 10, 20);
 
         File fileTemp = File.createTempFile("unit", null);
-
-        try {
-            saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
-            compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
-        } finally {
-            fileTemp.delete();
-        }
+        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
+        compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
     }
 }

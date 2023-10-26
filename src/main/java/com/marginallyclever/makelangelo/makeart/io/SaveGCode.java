@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterPanel;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramPanel;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -183,7 +184,7 @@ public class SaveGCode {
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
 			out.write(";Start of user gcode\n");
-			out.write(robot.getSettings().getUserGeneralStartGcode());
+			out.write(robot.getSettings().getString(PlotterSettings.USER_GENERAL_START_GCODE));
 			out.write("\n;End of user gcode\n");
 			out.write(MarlinPlotterPanel.getFindHomeString()+"\n");  // go home
 
@@ -221,7 +222,7 @@ public class SaveGCode {
 			}
 			if (!isUp) out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
 			out.write(";Start of user gcode\n");
-			out.write(robot.getSettings().getUserGeneralEndGcode());
+			out.write(robot.getSettings().getString(PlotterSettings.USER_GENERAL_END_GCODE));
 			out.write("\n;End of user gcode\n");
 			out.write(";End of Gcode\n");
 			out.flush();
