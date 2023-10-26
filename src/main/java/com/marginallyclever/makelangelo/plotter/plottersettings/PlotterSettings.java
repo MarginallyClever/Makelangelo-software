@@ -80,53 +80,21 @@ public class PlotterSettings {
 	public static final String MIN_SEGMENT_LENGTH = "minSegmentLength";
 	public static final String MIN_SEG_TIME = "minSegTime";
 	/**
-	 * double
+	 * color
 	 */
-	public static final String PAPER_COLOR_B = "paperColorB";
+	public static final String PAPER_COLOR = "paperColor";
 	/**
-	 * double
+	 * color
 	 */
-	public static final String PAPER_COLOR_G = "paperColorG";
+	public static final String PEN_DOWN_COLOR = "penDownColor";
 	/**
-	 * double
+	 * color
 	 */
-	public static final String PAPER_COLOR_R = "paperColorR";
+	public static final String PEN_DOWN_COLOR_DEFAULT = "penDownColorDefault";
 	/**
-	 * double
+	 * color
 	 */
-	public static final String PEN_DOWN_COLOR_B = "penDownColorB";
-	/**
-	 * double
-	 */
-	public static final String PEN_DOWN_COLOR_G = "penDownColorG";
-	/**
-	 * double
-	 */
-	public static final String PEN_DOWN_COLOR_R = "penDownColorR";
-	/**
-	 * double
-	 */
-	public static final String PEN_DOWN_COLOR_DEFAULT_B = "penDownColorDefaultB";
-	/**
-	 * double
-	 */
-	public static final String PEN_DOWN_COLOR_DEFAULT_G = "penDownColorDefaultG";
-	/**
-	 * double
-	 */
-	public static final String PEN_DOWN_COLOR_DEFAULT_R = "penDownColorDefaultR";
-	/**
-	 * double
-	 */
-	public static final String PEN_UP_COLOR_B = "penUpColorB";
-	/**
-	 * double
-	 */
-	public static final String PEN_UP_COLOR_G = "penUpColorG";
-	/**
-	 * double
-	 */
-	public static final String PEN_UP_COLOR_R = "penUpColorR";
+	public static final String PEN_UP_COLOR = "penUpColor";
 	/**
 	 * integer
 	 */
@@ -252,6 +220,17 @@ public class PlotterSettings {
 
 	/**
 	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public ColorRGB getColor(String key) throws NullPointerException, IllegalStateException {
+		int v = getInteger(key);
+		return new ColorRGB(v);
+	}
+
+	/**
+	 * @param key the key to look up
 	 * @param value the value to set
 	 * @throws NullPointerException key does not exist
 	 * @throws IllegalStateException profile does not exist.
@@ -296,6 +275,16 @@ public class PlotterSettings {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 		thisMachineNode.putBoolean(key, value);
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @param value the value to set
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public void setColor(String key,ColorRGB value) throws NullPointerException, IllegalStateException {
+		setInteger(key,value.toInt());
 	}
 
 	public Point2D getHome() {
@@ -346,58 +335,6 @@ public class PlotterSettings {
 		setDouble(PlotterSettings.LIMIT_TOP,height / 2.0);
 	}
 
-	public ColorRGB getPaperColor() {
-		int r = getInteger(PlotterSettings.PAPER_COLOR_R);
-		int g = getInteger(PlotterSettings.PAPER_COLOR_G);
-		int b = getInteger(PlotterSettings.PAPER_COLOR_B);
-		return new ColorRGB(r,g,b);
-	}
-
-	public void setPaperColor(ColorRGB paperColor) {
-		setInteger(PlotterSettings.PAPER_COLOR_B,paperColor.blue);
-		setInteger(PlotterSettings.PAPER_COLOR_G,paperColor.green);
-		setInteger(PlotterSettings.PAPER_COLOR_R,paperColor.red);
-	}
-
-	public ColorRGB getPenDownColorDefault() {
-		int r = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_R);
-		int g = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_G);
-		int b = getInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_B);
-		return new ColorRGB(r,g,b);
-	}
-
-	public ColorRGB getPenDownColor() {
-		int r = getInteger(PlotterSettings.PEN_DOWN_COLOR_R);
-		int g = getInteger(PlotterSettings.PEN_DOWN_COLOR_G);
-		int b = getInteger(PlotterSettings.PEN_DOWN_COLOR_B);
-		return new ColorRGB(r,g,b);
-	}
-
-	public void setPenDownColorDefault(ColorRGB color) {
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_B,color.blue);
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_G,color.green);
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_R,color.red);
-	}
-
-	public void setPenDownColor(ColorRGB color) {
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_B,color.blue);
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_G,color.green);
-		setInteger(PlotterSettings.PEN_DOWN_COLOR_R,color.red);
-	}
-
-	public void setPenUpColor(ColorRGB color) {
-		setInteger(PlotterSettings.PEN_UP_COLOR_B,color.blue);
-		setInteger(PlotterSettings.PEN_UP_COLOR_G,color.green);
-		setInteger(PlotterSettings.PEN_UP_COLOR_R,color.red);
-	}
-
-	public ColorRGB getPenUpColor() {
-		int r = getInteger(PlotterSettings.PEN_UP_COLOR_R);
-		int g = getInteger(PlotterSettings.PEN_UP_COLOR_G);
-		int b = getInteger(PlotterSettings.PEN_UP_COLOR_B);
-		return new ColorRGB(r,g,b);
-	}
-
 	/**
 	 * @param maxJerk the maxJerk to set
 	 */
@@ -431,10 +368,10 @@ public class PlotterSettings {
 		json.put("minAcceleration", getDouble(PlotterSettings.MIN_ACCELERATION));	// mm/s/s
 		json.put("minimumPlannerSpeed", getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));	// mm/s
 		json.put("maxJerk", Arrays.toString(maxJerk));
-		json.put("paperColor", getPaperColor());
-		json.put("penDownColorDefault", getPenDownColorDefault());
-		json.put("penDownColor", getPenDownColor());
-		json.put("penUpColor", getPenUpColor());
+		json.put("paperColor", getColor(PlotterSettings.PAPER_COLOR));
+		json.put("penDownColorDefault", getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT));
+		json.put("penDownColor", getColor(PlotterSettings.PEN_DOWN_COLOR));
+		json.put("penUpColor", getColor(PlotterSettings.PEN_UP_COLOR));
 		json.put("penDiameter", getDouble(PlotterSettings.DIAMETER));	// mm, >0
 		json.put("penUpAngle", getDouble(PlotterSettings.PEN_ANGLE_UP));	// servo angle (degrees,0...180)
 		json.put("penDownAngle", getDouble(PlotterSettings.PEN_ANGLE_DOWN));	// servo angle (degrees,0...180)

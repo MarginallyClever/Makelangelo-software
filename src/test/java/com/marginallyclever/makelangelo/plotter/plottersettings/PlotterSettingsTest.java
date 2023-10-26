@@ -34,9 +34,9 @@ public class PlotterSettingsTest {
         plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
         plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
         plotterSettings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
-        plotterSettings.setPenDownColorDefault(new ColorRGB(12, 13, 14));
-        plotterSettings.setPenUpColor(new ColorRGB(15, 16, 17));
-        plotterSettings.setPaperColor(new ColorRGB(18, 19, 20));
+        plotterSettings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(12, 13, 14));
+        plotterSettings.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(15, 16, 17));
+        plotterSettings.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
         plotterSettings.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
         plotterSettings.setDouble(PlotterSettings.ACCELERATION,22);
         plotterSettings.setString(PlotterSettings.HARDWARE_VERSION,"TestRobot");

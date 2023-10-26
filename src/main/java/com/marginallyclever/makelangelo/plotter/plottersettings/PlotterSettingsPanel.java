@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
+import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
@@ -91,8 +92,8 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(interior1,penLowerRate        = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
 	    addToPanel(interior1,penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
 	    addToPanel(interior1,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
-		addToPanel(interior1,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getPenUpColor(),this));
-		addToPanel(interior1,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getPenDownColor(),this));
+		addToPanel(interior1,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
+		addToPanel(interior1,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
 
 		addToPanel(interior1,zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
 				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
@@ -159,9 +160,11 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,penLowerRate.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_UP,penUpAngle.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,penDownAngle.getValue());
-		settings.setPenDownColor(selectPenDownColor.getColor());
-		settings.setPenDownColorDefault(selectPenDownColor.getColor());
-		settings.setPenUpColor(selectPenUpColor.getColor());
+
+		settings.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(255,255,255));
+		settings.setColor(PlotterSettings.PEN_DOWN_COLOR,selectPenDownColor.getColor());
+		settings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,selectPenDownColor.getColor());
+		settings.setColor(PlotterSettings.PEN_UP_COLOR,selectPenUpColor.getColor());
 		
 		settings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,blockBufferSize.getValue());
 		settings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,segmentsPerSecond.getValue());

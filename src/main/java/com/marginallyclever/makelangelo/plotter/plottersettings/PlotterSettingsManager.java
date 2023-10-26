@@ -60,10 +60,10 @@ public class PlotterSettingsManager {
         profile.setString(PlotterSettings.USER_GENERAL_END_GCODE, "");
         profile.setString(PlotterSettings.STYLE, PlotterRendererFactory.MAKELANGELO_5.getName());
 
-        profile.setPaperColor(new ColorRGB(255, 255, 255));
-        profile.setPenDownColorDefault(new ColorRGB(0, 0, 0));
-        profile.setPenDownColor(new ColorRGB(0, 0, 0));
-        profile.setPenUpColor(new ColorRGB(0, 255, 0));
+        profile.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(255, 255, 255));
+        profile.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(0, 0, 0));
+        profile.setColor(PlotterSettings.PEN_DOWN_COLOR,new ColorRGB(0, 0, 0));
+        profile.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(0, 255, 0));
 
         profile.setMaxJerk(new double []{ 10, 10, 0.3 });
         profile.save();
