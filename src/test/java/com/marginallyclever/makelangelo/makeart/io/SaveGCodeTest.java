@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
@@ -51,16 +52,16 @@ class SaveGCodeTest {
             PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
             plotter.getSettings().load("Makelangelo 5");
-            plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
-            plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
 
             // when
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
             compareExpectedToActual(expectedFilename, fileTemp);
 
-            plotter.getSettings().setUserGeneralStartGcode("");
-            plotter.getSettings().setUserGeneralEndGcode("");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"");
         } finally {
             fileTemp.delete();
         }
@@ -90,8 +91,8 @@ class SaveGCodeTest {
             PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
             plotter.getSettings().load("Makelangelo 5");
-            plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
-            plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
 
             // when
             files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
@@ -99,8 +100,8 @@ class SaveGCodeTest {
             compareExpectedToActual("/gcode/save_multi_colors-1.gcode", new File(files.get(0)));
             compareExpectedToActual("/gcode/save_multi_colors-2.gcode", new File(files.get(1)));
 
-            plotter.getSettings().setUserGeneralStartGcode("");
-            plotter.getSettings().setUserGeneralEndGcode("");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"");
+            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"");
         } finally {
             fileTemp.delete();
             if (files != null) {

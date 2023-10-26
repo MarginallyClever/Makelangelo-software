@@ -40,8 +40,8 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
     }
 
     public void save() {
-        settings.setUserGeneralStartGcode(userGeneralStartGcode.getText());
-        settings.setUserGeneralEndGcode(userGeneralEndGcode.getText());
+        settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,userGeneralStartGcode.getText());
+        settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,userGeneralEndGcode.getText());
     }
 
     public void reset() {

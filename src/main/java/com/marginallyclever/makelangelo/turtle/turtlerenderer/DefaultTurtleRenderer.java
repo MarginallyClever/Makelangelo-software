@@ -77,7 +77,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	
 	@Override
 	public void setPenDiameter(double penDiameter) {
-		this.penDiameter =(float)penDiameter;
+		this.penDiameter = (float)penDiameter;
 	}
 
 	@Override

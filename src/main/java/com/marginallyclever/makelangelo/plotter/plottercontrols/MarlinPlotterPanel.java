@@ -174,7 +174,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				throw new Exception("M201 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
-			myPlotter.getSettings().setAcceleration(v);
+			myPlotter.getSettings().setDouble(PlotterSettings.ACCELERATION,v);
 		} catch (Exception e) {
 			logger.warn("M201 problem, continuing anyway: {}", message);
 		}
@@ -190,7 +190,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				throw new Exception("M203 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
-			myPlotter.getSettings().setDrawFeedRate(v);
+			myPlotter.getSettings().setDouble(PlotterSettings.FEED_RATE_DRAW,v);
 		} catch (Exception e) {
 			logger.warn("M203 problem, continuing anyway: {}", message);
 		}

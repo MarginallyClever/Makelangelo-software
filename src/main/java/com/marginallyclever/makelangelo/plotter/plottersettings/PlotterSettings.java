@@ -298,48 +298,8 @@ public class PlotterSettings {
 		thisMachineNode.putBoolean(key, value);
 	}
 
-	/**
-	 * @param accel mm/s/s
-	 */
-	public void setAcceleration(double accel) {
-		setDouble(ACCELERATION,accel);
-	}
-
 	public Point2D getHome() {
 		return new Point2D(0,0);
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitBottom(double limit) {
-		setDouble(LIMIT_BOTTOM,limit);
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitLeft(double limit) {
-		setDouble(LIMIT_LEFT,limit);
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitRight(double limit) {
-		setDouble(LIMIT_RIGHT,limit);
-	}
-
-	/**
-	 * @param limit mm
-	 */
-	public void setLimitTop(double limit) {
-		setDouble(LIMIT_TOP,limit);
-	}
-
-	@Deprecated
-	public void setRegistered(boolean isRegistered) {
-		setBoolean(IS_REGISTERED,isRegistered);
 	}
 
 	/**
@@ -376,36 +336,14 @@ public class PlotterSettings {
 	}
 
 	/**
-	 * @param feedRate mm/min
-	 */
-	@Deprecated
-	public void setTravelFeedRate(double feedRate) {
-		if(feedRate < 0.001) feedRate = 0.001f;
-		setDouble(FEED_RATE_TRAVEL,feedRate);
-	}
-
-	/**
-	 * @param feedRate mm/min
-	 */
-	public void setDrawFeedRate(double feedRate) {
-		if(feedRate < 0.001) feedRate = 0.001f;
-		setDouble(FEED_RATE_DRAW,feedRate);
-	}
-
-	/**
 	 * @param width mm
 	 * @param height mm
 	 */
 	public void setMachineSize(double width, double height) {
-		setLimitLeft(-width / 2.0);
-		setLimitRight(width / 2.0);
-		setLimitBottom(-height / 2.0);
-		setLimitTop(height / 2.0);
-	}
-
-	@Deprecated
-	public void setHardwareName(String hardwareName) {
-		setString(HARDWARE_VERSION,hardwareName);
+		setDouble(PlotterSettings.LIMIT_LEFT,-width / 2.0);
+		setDouble(PlotterSettings.LIMIT_RIGHT,width / 2.0);
+		setDouble(PlotterSettings.LIMIT_BOTTOM,-height / 2.0);
+		setDouble(PlotterSettings.LIMIT_TOP,height / 2.0);
 	}
 
 	public ColorRGB getPaperColor() {
@@ -416,9 +354,9 @@ public class PlotterSettings {
 	}
 
 	public void setPaperColor(ColorRGB paperColor) {
-		setInteger(PAPER_COLOR_B,paperColor.blue);
-		setInteger(PAPER_COLOR_G,paperColor.green);
-		setInteger(PAPER_COLOR_R,paperColor.red);
+		setInteger(PlotterSettings.PAPER_COLOR_B,paperColor.blue);
+		setInteger(PlotterSettings.PAPER_COLOR_G,paperColor.green);
+		setInteger(PlotterSettings.PAPER_COLOR_R,paperColor.red);
 	}
 
 	public ColorRGB getPenDownColorDefault() {
@@ -436,115 +374,28 @@ public class PlotterSettings {
 	}
 
 	public void setPenDownColorDefault(ColorRGB color) {
-		setInteger(PEN_DOWN_COLOR_DEFAULT_B,color.blue);
-		setInteger(PEN_DOWN_COLOR_DEFAULT_G,color.green);
-		setInteger(PEN_DOWN_COLOR_DEFAULT_R,color.red);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_B,color.blue);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_G,color.green);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_DEFAULT_R,color.red);
 	}
 
 	public void setPenDownColor(ColorRGB color) {
-		setInteger(PEN_DOWN_COLOR_B,color.blue);
-		setInteger(PEN_DOWN_COLOR_G,color.green);
-		setInteger(PEN_DOWN_COLOR_R,color.red);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_B,color.blue);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_G,color.green);
+		setInteger(PlotterSettings.PEN_DOWN_COLOR_R,color.red);
 	}
 
 	public void setPenUpColor(ColorRGB color) {
-		setInteger(PEN_UP_COLOR_B,color.blue);
-		setInteger(PEN_UP_COLOR_G,color.green);
-		setInteger(PEN_UP_COLOR_R,color.red);
+		setInteger(PlotterSettings.PEN_UP_COLOR_B,color.blue);
+		setInteger(PlotterSettings.PEN_UP_COLOR_G,color.green);
+		setInteger(PlotterSettings.PEN_UP_COLOR_R,color.red);
 	}
 
-	@Deprecated
 	public ColorRGB getPenUpColor() {
 		int r = getInteger(PlotterSettings.PEN_UP_COLOR_R);
 		int g = getInteger(PlotterSettings.PEN_UP_COLOR_G);
 		int b = getInteger(PlotterSettings.PEN_UP_COLOR_B);
 		return new ColorRGB(r,g,b);
-	}
-
-	@Deprecated
-	public void setPenDiameter(double diameter) {
-		setDouble(DIAMETER,diameter);
-	}
-
-	@Deprecated
-	public void setPenUpAngle(double angle) {
-		setDouble(PEN_ANGLE_UP,angle);
-	}
-
-	@Deprecated
-	public void setPenDownAngle(double angle) {
-		setDouble(PEN_ANGLE_DOWN,angle);
-	}
-
-	@Deprecated
-	public void setPenLiftTime(double ms) {
-		setDouble(PEN_ANGLE_UP_TIME,ms);
-	}
-
-	@Deprecated
-	public void setPenLowerTime(double ms) {
-		setDouble(PEN_ANGLE_DOWN_TIME,ms);
-	}
-
-	@Deprecated
-	public void setStartingPositionIndex(int startingPositionIndex) {
-		setInteger(STARTING_POS_INDEX,startingPositionIndex);
-	}
-
-	/**
-	 * @param blockBufferSize the blockBufferSize to set
-	 */
-	@Deprecated
-	public void setBlockBufferSize(int blockBufferSize) {
-		setInteger(BLOCK_BUFFER_SIZE,blockBufferSize);
-	}
-
-	/**
-	 * @param segmentsPerSecond the segmentsPerSecond to set
-	 */
-	@Deprecated
-	public void setSegmentsPerSecond(int segmentsPerSecond) {
-		setInteger(SEGMENTS_PER_SECOND,segmentsPerSecond);
-	}
-
-	/**
-	 * @param minSegmentLength the minSegmentLength to set
-	 */
-	@Deprecated
-	public void setMinSegmentLength(double minSegmentLength) {
-		setDouble(MIN_SEGMENT_LENGTH,minSegmentLength);
-	}
-
-	/**
-	 * @param minSegTime the minSegTime to set
-	 */
-	@Deprecated
-	public void setMinSegmentTime(int minSegTime) {
-		setInteger(MIN_SEG_TIME,minSegTime);
-	}
-
-	/**
-	 * @param handleSmallSegments the handleSmallSegments to set
-	 */
-	@Deprecated
-	public void setHandleSmallSegments(boolean handleSmallSegments) {
-		setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,handleSmallSegments);
-	}
-
-	/**
-	 * @param minAcceleration the minAcceleration to set
-	 */
-	@Deprecated
-	public void setMinAcceleration(double minAcceleration) {
-		setDouble(MIN_ACCELERATION,minAcceleration);
-	}
-
-	/**
-	 * @param minimumPlannerSpeed the minimumPlannerSpeed to set
-	 */
-	@Deprecated
-	public void setMinPlannerSpeed(double minimumPlannerSpeed) {
-		setDouble(MINIMUM_PLANNER_SPEED,minimumPlannerSpeed);
 	}
 
 	/**
@@ -559,26 +410,6 @@ public class PlotterSettings {
 	 */
 	public double[] getMaxJerk() {
 		return maxJerk;
-	}
-
-	@Deprecated
-	public void setUserGeneralStartGcode(String userGeneralStartGcode) {
-		setString(USER_GENERAL_START_GCODE,userGeneralStartGcode);
-	}
-
-	@Deprecated
-	public void setUserGeneralEndGcode(String userGeneralEndGcode) {
-		setString(USER_GENERAL_END_GCODE,userGeneralEndGcode);
-	}
-
-	@Deprecated
-	public void setZMotorType(int i) {
-		setInteger(Z_MOTOR_TYPE,i);
-	}
-
-	@Deprecated
-	public void setStyle(String style) {
-		setString(STYLE,style);
 	}
 
 	@Override

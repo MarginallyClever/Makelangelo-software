@@ -24,35 +24,35 @@ public class PlotterSettingsTest {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setLimitTop(2);
-        plotterSettings.setLimitBottom(3);
-        plotterSettings.setLimitRight(4);
-        plotterSettings.setLimitLeft(5);
-        plotterSettings.setStartingPositionIndex(6);
-        plotterSettings.setPenDiameter(7);
-        plotterSettings.setPenLiftTime(8);
-        plotterSettings.setPenDownAngle(9);
-        plotterSettings.setPenUpAngle(10);
-        plotterSettings.setTravelFeedRate(11);
+        plotterSettings.setDouble(PlotterSettings.LIMIT_TOP,2);
+        plotterSettings.setDouble(PlotterSettings.LIMIT_BOTTOM,3);
+        plotterSettings.setDouble(PlotterSettings.LIMIT_RIGHT,4);
+        plotterSettings.setDouble(PlotterSettings.LIMIT_LEFT,5);
+        plotterSettings.setInteger(PlotterSettings.STARTING_POS_INDEX,6);
+        plotterSettings.setDouble(PlotterSettings.DIAMETER,7);
+        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,8);
+        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
+        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
+        plotterSettings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
         plotterSettings.setPenDownColorDefault(new ColorRGB(12, 13, 14));
         plotterSettings.setPenUpColor(new ColorRGB(15, 16, 17));
         plotterSettings.setPaperColor(new ColorRGB(18, 19, 20));
-        plotterSettings.setDrawFeedRate(21);
-        plotterSettings.setAcceleration(22);
-        plotterSettings.setHardwareName("TestRobot");
-		plotterSettings.setBlockBufferSize(23);
-		plotterSettings.setSegmentsPerSecond(24);
-		plotterSettings.setMinSegmentLength(25);
-		plotterSettings.setMinSegmentTime(26);
-		plotterSettings.setHandleSmallSegments(false);
-		plotterSettings.setMinAcceleration(27);
-		plotterSettings.setMinPlannerSpeed(28);
-        plotterSettings.setPenLowerTime(29);
+        plotterSettings.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
+        plotterSettings.setDouble(PlotterSettings.ACCELERATION,22);
+        plotterSettings.setString(PlotterSettings.HARDWARE_VERSION,"TestRobot");
+		plotterSettings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);
+		plotterSettings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,24);
+		plotterSettings.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,25);
+		plotterSettings.setInteger(PlotterSettings.MIN_SEG_TIME,26);
+		plotterSettings.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,false);
+		plotterSettings.setDouble(PlotterSettings.MIN_ACCELERATION,27);
+		plotterSettings.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,28);
+        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,29);
 
         PlotterRendererFactory[] allMachines = PlotterRendererFactory.values();
         int index = (int)(Math.random()*allMachines.length);
         String styleName = allMachines[index].getName();
-        plotterSettings.setStyle(styleName);
+        plotterSettings.setString(PlotterSettings.STYLE,styleName);
 
         // when
         plotterSettings.save();
@@ -74,7 +74,7 @@ public class PlotterSettingsTest {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setZMotorType(type);
+        plotterSettings.setInteger(PlotterSettings.Z_MOTOR_TYPE,type);
 
         plotterSettings.save();
 

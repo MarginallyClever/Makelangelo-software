@@ -149,31 +149,31 @@ public class PlotterSettingsPanel extends JPanel {
 		userGcodePanel.save();
 		
 		settings.setMachineSize(mwf, mhf);
-		settings.setAcceleration(accel);
+		settings.setDouble(PlotterSettings.ACCELERATION,accel);
 	
-		settings.setPenDiameter(penDiameter.getValue());
-		settings.setTravelFeedRate(travelFeedRate.getValue());
-		settings.setDrawFeedRate(drawFeedRate.getValue());
-		settings.setAcceleration(acceleration.getValue());
-		settings.setPenLiftTime(penRaiseRate.getValue());
-		settings.setPenLowerTime(penLowerRate.getValue());
-		settings.setPenUpAngle(penUpAngle.getValue());
-		settings.setPenDownAngle(penDownAngle.getValue());
+		settings.setDouble(PlotterSettings.DIAMETER,penDiameter.getValue());
+		settings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,travelFeedRate.getValue());
+		settings.setDouble(PlotterSettings.FEED_RATE_DRAW,drawFeedRate.getValue());
+		settings.setDouble(PlotterSettings.ACCELERATION,acceleration.getValue());
+		settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,penRaiseRate.getValue());
+		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,penLowerRate.getValue());
+		settings.setDouble(PlotterSettings.PEN_ANGLE_UP,penUpAngle.getValue());
+		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,penDownAngle.getValue());
 		settings.setPenDownColor(selectPenDownColor.getColor());
 		settings.setPenDownColorDefault(selectPenDownColor.getColor());
 		settings.setPenUpColor(selectPenUpColor.getColor());
 		
-		settings.setBlockBufferSize(blockBufferSize.getValue());
-		settings.setSegmentsPerSecond(segmentsPerSecond.getValue());
-		settings.setMinSegmentLength(minSegmentLength.getValue());
-		settings.setMinSegmentTime(minSegTime.getValue());
-		settings.setHandleSmallSegments(handleSmallSegments.isSelected());
-		settings.setMinAcceleration(minAcceleration.getValue());
-		settings.setMinPlannerSpeed(minPlannerSpeed.getValue());
-		settings.setZMotorType(zMotorType.getSelectedIndex()+1);
+		settings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,blockBufferSize.getValue());
+		settings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,segmentsPerSecond.getValue());
+		settings.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,minSegmentLength.getValue());
+		settings.setInteger(PlotterSettings.MIN_SEG_TIME,minSegTime.getValue());
+		settings.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,handleSmallSegments.isSelected());
+		settings.setDouble(PlotterSettings.MIN_ACCELERATION,minAcceleration.getValue());
+		settings.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,minPlannerSpeed.getValue());
+		settings.setInteger(PlotterSettings.Z_MOTOR_TYPE,zMotorType.getSelectedIndex()+1);
 
 		List<String> machineStyles = getMachineStyleNames();
-		settings.setStyle(machineStyles.get(visualStyle.getSelectedIndex()));
+		settings.setString(PlotterSettings.STYLE,machineStyles.get(visualStyle.getSelectedIndex()));
 
 		settings.save();
 	}

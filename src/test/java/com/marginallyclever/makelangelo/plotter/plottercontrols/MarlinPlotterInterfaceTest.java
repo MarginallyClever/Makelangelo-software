@@ -49,7 +49,7 @@ public class MarlinPlotterInterfaceTest {
     public void onHearAcceleration_OK() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setAcceleration(42);
+        ps.setDouble(PlotterSettings.ACCELERATION,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -63,7 +63,7 @@ public class MarlinPlotterInterfaceTest {
     public void onHearAcceleration_KO() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setAcceleration(42);
+        ps.setDouble(PlotterSettings.ACCELERATION,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -78,7 +78,7 @@ public class MarlinPlotterInterfaceTest {
     public void onHearFeedrate_OK() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setDrawFeedRate(42);
+        ps.setDouble(PlotterSettings.FEED_RATE_DRAW,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -92,7 +92,7 @@ public class MarlinPlotterInterfaceTest {
     public void onHearFeedrate_KO() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setDrawFeedRate(42);
+        ps.setDouble(PlotterSettings.FEED_RATE_DRAW,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -107,7 +107,7 @@ public class MarlinPlotterInterfaceTest {
     public void removeComment() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setDrawFeedRate(42);
+        ps.setDouble(PlotterSettings.FEED_RATE_DRAW,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -125,11 +125,11 @@ public class MarlinPlotterInterfaceTest {
     private void testZAxisGcode(int type,String matchDown,String matchUp) {
         Plotter plotter = new Plotter();
         PlotterSettings ps = plotter.getSettings();
-        ps.setZMotorType(type);
-        ps.setPenDownAngle(45);
-        ps.setPenUpAngle(90);
-        ps.setPenLowerTime(50);
-        ps.setPenLiftTime(150);
+        ps.setInteger(PlotterSettings.Z_MOTOR_TYPE,type);
+        ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN,45);
+        ps.setDouble(PlotterSettings.PEN_ANGLE_UP,90);
+        ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
+        ps.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,150);
         plotter.setSettings(ps);
         Assertions.assertEquals(matchDown, MarlinPlotterPanel.getPenDownString(plotter));
         Assertions.assertEquals(matchUp, MarlinPlotterPanel.getPenUpString(plotter));
