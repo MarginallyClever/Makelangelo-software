@@ -131,7 +131,7 @@ public class MarlinPlotterInterfaceTest {
         ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
         ps.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,150);
         plotter.setSettings(ps);
-        Assertions.assertEquals(matchDown, MarlinPlotterPanel.getPenDownString(plotter));
-        Assertions.assertEquals(matchUp, MarlinPlotterPanel.getPenUpString(plotter));
+        Assertions.assertEquals(matchDown, MarlinPlotterPanel.getPenDownString(plotter.getSettings()));
+        Assertions.assertEquals(matchUp, MarlinPlotterPanel.getPenUpString(plotter.getSettings()));
     }
 }

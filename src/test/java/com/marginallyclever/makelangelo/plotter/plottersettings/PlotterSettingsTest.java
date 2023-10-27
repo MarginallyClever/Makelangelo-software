@@ -39,7 +39,6 @@ public class PlotterSettingsTest {
         plotterSettings.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
         plotterSettings.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
         plotterSettings.setDouble(PlotterSettings.ACCELERATION,22);
-        plotterSettings.setString(PlotterSettings.HARDWARE_VERSION,"TestRobot");
 		plotterSettings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);
 		plotterSettings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,24);
 		plotterSettings.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,25);

@@ -26,7 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-
+/**
+ * This panel allows the user to select an image converter and set its parameters.
+ */
 public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 
