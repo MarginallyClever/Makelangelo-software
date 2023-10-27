@@ -1,5 +1,7 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
@@ -28,7 +30,8 @@ public class SaveTurtle extends Node {
         if(filename.getValue().isEmpty()) return;
 
         try {
-            TurtleFactory.save(turtle.getValue(),filename.getValue());
+            PlotterSettings settings = PlotterSettingsManager.buildMakelangelo5();
+            TurtleFactory.save(turtle.getValue(),filename.getValue(),settings);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

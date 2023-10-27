@@ -237,7 +237,7 @@ public class MainMenu extends JMenuBar {
     private void saveFile() {
         logger.debug("Saving vector file...");
         try {
-            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this));
+            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this),app.getPlotter().getSettings());
         } catch(Exception e) {
             logger.error("Error while saving the vector file", e);
             JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);

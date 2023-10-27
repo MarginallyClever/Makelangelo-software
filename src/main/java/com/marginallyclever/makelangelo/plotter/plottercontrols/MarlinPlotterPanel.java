@@ -66,7 +66,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendToolChange(int toolNumber) {
-		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter));
+		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter.getSettings()));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
@@ -76,8 +76,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 
 	private void sendPenUpDown() {
 		String str = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getPenUpString(myPlotter)
-				: MarlinPlotterPanel.getPenDownString(myPlotter);
+				? MarlinPlotterPanel.getPenUpString(myPlotter.getSettings())
+				: MarlinPlotterPanel.getPenDownString(myPlotter.getSettings());
 		queueAndSendCommand(str);
 	}
 
@@ -88,8 +88,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
 		String msg = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getTravelToString(myPlotter, p.x, p.y)
-				: MarlinPlotterPanel.getDrawToString(myPlotter, p.x, p.y);
+				? MarlinPlotterPanel.getTravelToString(myPlotter.getSettings(), p.x, p.y)
+				: MarlinPlotterPanel.getDrawToString(myPlotter.getSettings(), p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 
@@ -196,18 +196,28 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		}
 	}
 
-	// "By convention, most G-code generators use G0 for non-extrusion movements"
-	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getTravelToString(Plotter p,double x, double y) {
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public static String getTravelToString(PlotterSettings settings,double x, double y) {
 		return "G0 " + getPosition(x, y)
-				+ " F" + p.getSettings().getDouble(PlotterSettings.FEED_RATE_TRAVEL);
+				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL);
 	}
 
-	// "By convention, most G-code generators use G0 for non-extrusion movements"
-	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getDrawToString(Plotter p,double x, double y) {
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public static String getDrawToString(PlotterSettings settings,double x, double y) {
 		return "G1 " + getPosition(x, y)
-				+ " F" + p.getSettings().getDouble(PlotterSettings.FEED_RATE_DRAW);
+				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 	}
 
 	private static String getPosition(double x, double y) {
@@ -215,8 +225,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				+ " Y" + StringHelper.formatDouble(y);
 	}
 
-	public static String getPenUpString(Plotter plotter) {
-		PlotterSettings settings = plotter.getSettings();
+	public static String getPenUpString(PlotterSettings settings) {
 		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
 					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP)
@@ -226,8 +235,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		}
 	}
 
-	public static String getPenDownString(Plotter plotter) {
-		PlotterSettings settings = plotter.getSettings();
+	public static String getPenDownString(PlotterSettings settings) {
 		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
 					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)
