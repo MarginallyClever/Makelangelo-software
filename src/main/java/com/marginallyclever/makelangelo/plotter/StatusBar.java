@@ -6,10 +6,11 @@ import com.marginallyclever.makelangelo.Translator;
 import javax.swing.*;
 import java.awt.*;
 
-// manages the status bar at the bottom of the application window
+/**
+ *  manages the status bar at the bottom of the application window
+ */
+@Deprecated
 public class StatusBar extends JPanel {
-	static final long serialVersionUID = 1;
-
 	protected long t_start;
 	protected final String sSoFar = "so far: ";
 	protected final String sRemaining = " remaining: ";
