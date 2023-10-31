@@ -49,21 +49,21 @@ public class MarlinPlotterInterfaceTest {
     public void onHearAcceleration_OK() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setDouble(PlotterSettings.ACCELERATION,42);
+        ps.setDouble(PlotterSettings.MAX_ACCELERATION,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
         String message = "echo:  M201 X300.00 Y300.00 Z300.00";
         mpi.onHearAcceleration(message);
 
-        assertEquals(300, plotter.getSettings().getDouble(PlotterSettings.ACCELERATION));
+        assertEquals(300, plotter.getSettings().getDouble(PlotterSettings.MAX_ACCELERATION));
     }
 
     @Test
     public void onHearAcceleration_KO() {
         Plotter plotter = new Plotter();
         PlotterSettings ps = new PlotterSettings();
-        ps.setDouble(PlotterSettings.ACCELERATION,42);
+        ps.setDouble(PlotterSettings.MAX_ACCELERATION,42);
         plotter.setSettings(ps);
         MarlinPlotterPanel mpi = new MarlinPlotterPanel(plotter, new ChooseConnection());
 
@@ -71,7 +71,7 @@ public class MarlinPlotterInterfaceTest {
         mpi.onHearAcceleration(message);
 
         // original values
-        assertEquals(42, plotter.getSettings().getDouble(PlotterSettings.ACCELERATION));
+        assertEquals(42, plotter.getSettings().getDouble(PlotterSettings.MAX_ACCELERATION));
     }
 
     @Test

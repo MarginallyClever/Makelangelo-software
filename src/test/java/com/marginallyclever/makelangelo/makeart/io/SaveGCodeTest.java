@@ -59,9 +59,6 @@ class SaveGCodeTest {
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
             // then
             compareExpectedToActual(expectedFilename, fileTemp);
-
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"");
         } finally {
             fileTemp.delete();
         }
@@ -88,7 +85,6 @@ class SaveGCodeTest {
         File fileTemp = File.createTempFile("unit", null);
 
         try {
-            PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
             plotter.getSettings().load("Makelangelo 5");
             plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
@@ -99,9 +95,6 @@ class SaveGCodeTest {
             // then
             compareExpectedToActual("/gcode/save_multi_colors-1.gcode", new File(files.get(0)));
             compareExpectedToActual("/gcode/save_multi_colors-2.gcode", new File(files.get(1)));
-
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"");
         } finally {
             fileTemp.delete();
             if (files != null) {

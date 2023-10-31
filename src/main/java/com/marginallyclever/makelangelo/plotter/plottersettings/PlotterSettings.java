@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
@@ -14,10 +15,11 @@ import java.util.prefs.Preferences;
  * @author Dan Royer
  */
 public class PlotterSettings {
+	public static final String ANCESTOR = "ancestor";
 	/**
 	 * mm/s/s
 	 */
-	public static final String ACCELERATION = "acceleration";
+	public static final String MAX_ACCELERATION = "acceleration";
 	/**
 	 * int
 	 */
@@ -38,10 +40,6 @@ public class PlotterSettings {
 	 * boolean
 	 */
 	public static final String HANDLE_SMALL_SEGMENTS = "handleSmallSegments";
-	/**
-	 * String
-	 */
-	public static final String HARDWARE_VERSION = "hardwareVersion";
 	/**
 	 * boolean.  if we wanted to test for Marginally Clever brand Makelangelo robots
 	 */
@@ -150,11 +148,45 @@ public class PlotterSettings {
 	public static final int Z_MOTOR_TYPE_SERVO = 1;
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
 
+	private final JSONObject json = new JSONObject();
 	private String robotUID = "0";
-	private double [] maxJerk = { 10, 10, 0.3 };
 
 	public PlotterSettings() {
 		super();
+		setDefaults();
+	}
+
+	private void setDefaults() {
+		json.put(IS_REGISTERED, 			false);
+		json.put(HANDLE_SMALL_SEGMENTS, 	false);
+		json.put(MIN_SEGMENT_LENGTH, 		0.5);	// mm
+		json.put(MAX_ACCELERATION, 			100);	// mm/s/s
+		json.put(MIN_ACCELERATION, 			0.0);	// mm/s/s
+		json.put(MINIMUM_PLANNER_SPEED, 	0.05);	// mm/s
+		json.put(LIMIT_LEFT, 				-325);	// mm
+		json.put(LIMIT_RIGHT, 				325);	// mm
+		json.put(LIMIT_BOTTOM,				-500);	// mm
+		json.put(LIMIT_TOP, 				500);		// mm
+		json.put(DIAMETER, 					0.8);	// mm, >0
+		json.put(PEN_ANGLE_UP, 				90);	// servo angle (degrees,0...180)
+		json.put(PEN_ANGLE_DOWN, 			25);	// servo angle (degrees,0...180)
+		json.put(PEN_ANGLE_UP_TIME, 		250);
+		json.put(PEN_ANGLE_DOWN_TIME, 		150);
+		json.put(FEED_RATE_TRAVEL, 			3000);	// mm/min.  3000 = 50 mm/s
+		json.put(FEED_RATE_DRAW, 			3000);	// mm/min.  3000 = 50 mm/s
+		json.put(BLOCK_BUFFER_SIZE, 		16);
+		json.put(SEGMENTS_PER_SECOND, 		5);
+		json.put(MIN_SEG_TIME, 				20000);		// us
+		json.put(STARTING_POS_INDEX, 		4);
+		json.put(Z_MOTOR_TYPE, 				PlotterSettings.Z_MOTOR_TYPE_SERVO);
+		json.put(USER_GENERAL_START_GCODE, 	"");
+		json.put(USER_GENERAL_END_GCODE, 	"");
+		json.put(STYLE,         			 PlotterRendererFactory.MAKELANGELO_5.getName());
+		json.put(PAPER_COLOR,		 		(new ColorRGB(255, 255, 255).toInt()));
+		json.put(PEN_DOWN_COLOR_DEFAULT, 	(new ColorRGB(0, 0, 0).toInt()));
+		json.put(PEN_DOWN_COLOR, 			(new ColorRGB(0, 0, 0).toInt()));
+		json.put(PEN_UP_COLOR, 				(new ColorRGB(0, 255, 0).toInt()));
+		json.put(MAX_JERK,           		"[10,10,3]");
 	}
 
 	public PlotterSettings(String UID) {
@@ -168,6 +200,7 @@ public class PlotterSettings {
 
 	protected void setRobotUID(String robotUID) {
 		this.robotUID = robotUID;
+		json.put("robotUID", robotUID);
 	}
 
 	/**
@@ -177,9 +210,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public double getDouble(String key) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		return thisMachineNode.getDouble(key, 0);
+		return json.getDouble(key);
 	}
 
 	/**
@@ -189,9 +220,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public int getInteger(String key) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		return thisMachineNode.getInt(key, 0);
+		return json.getInt(key);
 	}
 
 	/**
@@ -201,9 +230,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public String getString(String key) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		return thisMachineNode.get(key, "");
+		return json.getString(key);
 	}
 
 	/**
@@ -213,9 +240,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public boolean getBoolean(String key) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		return thisMachineNode.getBoolean(key, false);
+		return json.getBoolean(key);
 	}
 
 	/**
@@ -231,14 +256,33 @@ public class PlotterSettings {
 
 	/**
 	 * @param key the key to look up
+	 * @return the value of the key
+	 * @throws NullPointerException key does not exist
+	 * @throws IllegalStateException profile does not exist.
+	 */
+	public double [] getDoubleArray(String key) throws NullPointerException, IllegalStateException {
+		String s = getString(key);
+		String [] parts = s.substring(1,s.length()-1).split(",");
+		if(parts.length==0) return new double[0];
+		try {
+			double[] result = new double[parts.length];
+			for (int i = 0; i < parts.length; ++i) {
+				result[i] = Double.parseDouble(parts[i].trim());
+			}
+			return result;
+		} catch(Exception e) {
+			return new double[0];
+		}
+	}
+
+	/**
+	 * @param key the key to look up
 	 * @param value the value to set
 	 * @throws NullPointerException key does not exist
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public void setDouble(String key,double value) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		thisMachineNode.putDouble(key, value);
+		json.put(key, value);
 	}
 
 	/**
@@ -248,9 +292,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public void setInteger(String key,int value) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		thisMachineNode.putInt(key,value);
+		json.put(key,value);
 	}
 
 	/**
@@ -260,9 +302,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public void setString(String key,String value) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		thisMachineNode.put(key, value);
+		json.put(key, value);
 	}
 
 	/**
@@ -272,9 +312,7 @@ public class PlotterSettings {
 	 * @throws IllegalStateException profile does not exist.
 	 */
 	public void setBoolean(String key,boolean value) throws NullPointerException, IllegalStateException {
-		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
-		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		thisMachineNode.putBoolean(key, value);
+		json.put(key, value);
 	}
 
 	/**
@@ -285,6 +323,10 @@ public class PlotterSettings {
 	 */
 	public void setColor(String key,ColorRGB value) throws NullPointerException, IllegalStateException {
 		setInteger(key,value.toInt());
+	}
+
+	public void setDoubleArray(String key,double [] values) throws NullPointerException, IllegalStateException {
+		setString(key,Arrays.toString(values));
 	}
 
 	public Point2D getHome() {
@@ -299,32 +341,97 @@ public class PlotterSettings {
 		robotUID = uid;
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		Preferences jerkNode = thisMachineNode.node(PlotterSettings.MAX_JERK);
-		for(int i=0;i<maxJerk.length;i++) {
-			maxJerk[i] = jerkNode.getDouble(Integer.toString(i), maxJerk[i]);
-		}
+
+		json.put("robotUID", robotUID);
+		json.put(IS_REGISTERED, 			thisMachineNode.getBoolean(IS_REGISTERED,false));
+		json.put(HANDLE_SMALL_SEGMENTS, 	thisMachineNode.getBoolean(HANDLE_SMALL_SEGMENTS,false));
+		json.put(MIN_SEGMENT_LENGTH, 		thisMachineNode.getDouble(MIN_SEGMENT_LENGTH,0.5));	// mm
+		json.put(MAX_ACCELERATION, 			thisMachineNode.getDouble(MAX_ACCELERATION,100));	// mm/s/s
+		json.put(MIN_ACCELERATION, 			thisMachineNode.getDouble(MIN_ACCELERATION,0.0));	// mm/s/s
+		json.put(MINIMUM_PLANNER_SPEED, 	thisMachineNode.getDouble(MINIMUM_PLANNER_SPEED,0.05));	// mm/s
+		json.put(LIMIT_LEFT, 				thisMachineNode.getDouble(LIMIT_LEFT,-325));	// mm
+		json.put(LIMIT_RIGHT, 				thisMachineNode.getDouble(LIMIT_RIGHT,325));	// mm
+		json.put(LIMIT_BOTTOM,				thisMachineNode.getDouble(LIMIT_BOTTOM,-500));	// mm
+		json.put(LIMIT_TOP, 				thisMachineNode.getDouble(LIMIT_TOP,500));		// mm
+		json.put(DIAMETER, 					thisMachineNode.getDouble(DIAMETER,0.8));	// mm, >0
+		json.put(PEN_ANGLE_UP, 				thisMachineNode.getDouble(PEN_ANGLE_UP,90));	// servo angle (degrees,0...180)
+		json.put(PEN_ANGLE_DOWN, 			thisMachineNode.getDouble(PEN_ANGLE_DOWN,25));	// servo angle (degrees,0...180)
+		json.put(PEN_ANGLE_UP_TIME, 		thisMachineNode.getDouble(PEN_ANGLE_UP_TIME,250));
+		json.put(PEN_ANGLE_DOWN_TIME, 		thisMachineNode.getDouble(PEN_ANGLE_DOWN_TIME,150));
+		json.put(FEED_RATE_TRAVEL, 			thisMachineNode.getDouble(FEED_RATE_TRAVEL,3000));	// mm/min.  3000 = 50 mm/s
+		json.put(FEED_RATE_DRAW, 			thisMachineNode.getDouble(FEED_RATE_DRAW,3000));	// mm/min.  3000 = 50 mm/s
+		json.put(BLOCK_BUFFER_SIZE, 		thisMachineNode.getInt(BLOCK_BUFFER_SIZE,16));
+		json.put(SEGMENTS_PER_SECOND, 		thisMachineNode.getInt(SEGMENTS_PER_SECOND,5));
+		json.put(MIN_SEG_TIME, 				thisMachineNode.getInt(MIN_SEG_TIME,20000));		// us
+		json.put(STARTING_POS_INDEX, 		thisMachineNode.getInt(STARTING_POS_INDEX,4));
+		json.put(Z_MOTOR_TYPE, 				thisMachineNode.getInt(Z_MOTOR_TYPE,PlotterSettings.Z_MOTOR_TYPE_SERVO));
+		json.put(USER_GENERAL_START_GCODE, 	thisMachineNode.get(USER_GENERAL_START_GCODE,""));
+		json.put(USER_GENERAL_END_GCODE, 	thisMachineNode.get(USER_GENERAL_END_GCODE,""));
+		json.put(STYLE,         			thisMachineNode.get(STYLE, PlotterRendererFactory.MAKELANGELO_5.getName()));
+		json.put(PAPER_COLOR,		 		thisMachineNode.getInt(PAPER_COLOR,(new ColorRGB(255, 255, 255).toInt())));
+		json.put(PEN_DOWN_COLOR_DEFAULT, 	thisMachineNode.getInt(PEN_DOWN_COLOR_DEFAULT,(new ColorRGB(0, 0, 0).toInt())));
+		json.put(PEN_DOWN_COLOR, 			thisMachineNode.getInt(PEN_DOWN_COLOR,(new ColorRGB(0, 0, 0).toInt())));
+		json.put(PEN_UP_COLOR, 				thisMachineNode.getInt(PEN_UP_COLOR,(new ColorRGB(0, 255, 0).toInt())));
+		json.put(MAX_JERK,           		thisMachineNode.get(MAX_JERK,"[10,10,3]"));
 	}
 
 	/**
 	 * Save the machine configuration to {@link Preferences}.  The preference node will be the unique id of the robot.
+	 * Preferences save every time a value is changed, so save() does nothing.
 	 */
 	public void save() {
 		Preferences allMachinesNode = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.MACHINES);
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
-		Preferences jerkNode = thisMachineNode.node(PlotterSettings.MAX_JERK);
-		for(int i=0;i<maxJerk.length;i++) {
-			jerkNode.putDouble(Integer.toString(i), maxJerk[i] );
-		}
-	}
 
-	// TODO reset to what, exactly?
-	public void reset() {
-		PlotterSettings ps = new PlotterSettings();
-		ps.save();
-		load(getUID());
+		thisMachineNode.put("robotUID", robotUID);
+		thisMachineNode.putBoolean(IS_REGISTERED, 			json.getBoolean(IS_REGISTERED));
+		thisMachineNode.putBoolean(HANDLE_SMALL_SEGMENTS, 	json.getBoolean(HANDLE_SMALL_SEGMENTS));
+		thisMachineNode.putDouble(MIN_SEGMENT_LENGTH, 		json.getDouble(MIN_SEGMENT_LENGTH));
+		thisMachineNode.putDouble(MAX_ACCELERATION, 		json.getDouble(MAX_ACCELERATION));
+		thisMachineNode.putDouble(MIN_ACCELERATION, 		json.getDouble(MIN_ACCELERATION));
+		thisMachineNode.putDouble(MINIMUM_PLANNER_SPEED, 	json.getDouble(MINIMUM_PLANNER_SPEED));
+		thisMachineNode.putDouble(LIMIT_LEFT, 				json.getDouble(LIMIT_LEFT));
+		thisMachineNode.putDouble(LIMIT_RIGHT, 				json.getDouble(LIMIT_RIGHT));
+		thisMachineNode.putDouble(LIMIT_BOTTOM, 			json.getDouble(LIMIT_BOTTOM));
+		thisMachineNode.putDouble(LIMIT_TOP, 				json.getDouble(LIMIT_TOP));
+		thisMachineNode.putDouble(DIAMETER, 				json.getDouble(DIAMETER));
+		thisMachineNode.putDouble(PEN_ANGLE_UP, 			json.getDouble(PEN_ANGLE_UP));
+		thisMachineNode.putDouble(PEN_ANGLE_DOWN, 			json.getDouble(PEN_ANGLE_DOWN));
+		thisMachineNode.putDouble(PEN_ANGLE_UP_TIME, 		json.getDouble(PEN_ANGLE_UP_TIME));
+		thisMachineNode.putDouble(PEN_ANGLE_DOWN_TIME, 		json.getDouble(PEN_ANGLE_DOWN_TIME));
+		thisMachineNode.putDouble(FEED_RATE_TRAVEL, 		json.getDouble(FEED_RATE_TRAVEL));
+		thisMachineNode.putDouble(FEED_RATE_DRAW, 			json.getDouble(FEED_RATE_DRAW));
+		thisMachineNode.putInt(BLOCK_BUFFER_SIZE, 			json.getInt(BLOCK_BUFFER_SIZE));
+		thisMachineNode.putInt(SEGMENTS_PER_SECOND, 		json.getInt(SEGMENTS_PER_SECOND));
+		thisMachineNode.putInt(MIN_SEG_TIME, 				json.getInt(MIN_SEG_TIME));
+		thisMachineNode.putInt(STARTING_POS_INDEX, 			json.getInt(STARTING_POS_INDEX));
+		thisMachineNode.putInt(Z_MOTOR_TYPE, 				json.getInt(Z_MOTOR_TYPE));
+		thisMachineNode.put(USER_GENERAL_START_GCODE, 		json.getString(USER_GENERAL_START_GCODE));
+		thisMachineNode.put(USER_GENERAL_END_GCODE, 		json.getString(USER_GENERAL_END_GCODE));
+		thisMachineNode.put(STYLE, 							json.getString(STYLE));
+		thisMachineNode.putInt(PAPER_COLOR, 				json.getInt(PAPER_COLOR));
+		thisMachineNode.putInt(PEN_DOWN_COLOR_DEFAULT, 		json.getInt(PEN_DOWN_COLOR_DEFAULT));
+		thisMachineNode.putInt(PEN_DOWN_COLOR, 				json.getInt(PEN_DOWN_COLOR));
+		thisMachineNode.putInt(PEN_UP_COLOR, 				json.getInt(PEN_UP_COLOR));
+		thisMachineNode.put(MAX_JERK, 						json.getString(MAX_JERK));
 	}
 
 	/**
+	 * Reset the machine configuration to the value of the most recent ancestor.
+	 * Will do nothing if this profile has no ancestor.
+	 */
+	public void reset() {
+		String uid = getUID();
+		String ancestorName = getString(ANCESTOR);
+		if(ancestorName==null || ancestorName.isEmpty()) return;
+
+		PlotterSettings settings = new PlotterSettings(ancestorName);
+		settings.setRobotUID(uid);
+		settings.save();
+	}
+
+	/**
+	 * Sets the machine limits.
 	 * @param width mm
 	 * @param height mm
 	 */
@@ -335,55 +442,27 @@ public class PlotterSettings {
 		setDouble(PlotterSettings.LIMIT_TOP,height / 2.0);
 	}
 
-	/**
-	 * @param maxJerk the maxJerk to set
-	 */
-	public void setMaxJerk(double[] maxJerk) {
-		this.maxJerk = maxJerk;
-	}
-
-	/**
-	 * @return the maxJerk
-	 */
-	public double[] getMaxJerk() {
-		return maxJerk;
-	}
-
 	@Override
 	public String toString() {
-		JSONObject json = new JSONObject();
-		json.put("robotUID", robotUID);		
-		json.put("isRegistered", getBoolean(IS_REGISTERED));
-		json.put("hardwareName", getString(HARDWARE_VERSION));
-		json.put("limitLeft", getDouble(PlotterSettings.LIMIT_LEFT));	// mm
-		json.put("limitRight", getDouble(PlotterSettings.LIMIT_RIGHT));	// mm
-		json.put("limitBottom", getDouble(PlotterSettings.LIMIT_BOTTOM));	// mm
-		json.put("limitTop", getDouble(PlotterSettings.LIMIT_TOP));		// mm
-		json.put("blockBufferSize", getInteger(PlotterSettings.BLOCK_BUFFER_SIZE));
-		json.put("segmentsPerSecond", getInteger(PlotterSettings.SEGMENTS_PER_SECOND));
-		json.put("minSegmentLength", getDouble(PlotterSettings.MIN_SEGMENT_LENGTH));	// mm
-		json.put("minSegTime", getInteger(PlotterSettings.MIN_SEG_TIME));		// us
-		json.put("handleSmallSegments", getBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS));
-		json.put("maxAcceleration", getDouble(PlotterSettings.ACCELERATION));	// mm/s/s
-		json.put("minAcceleration", getDouble(PlotterSettings.MIN_ACCELERATION));	// mm/s/s
-		json.put("minimumPlannerSpeed", getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED));	// mm/s
-		json.put("maxJerk", Arrays.toString(maxJerk));
-		json.put("paperColor", getColor(PlotterSettings.PAPER_COLOR));
-		json.put("penDownColorDefault", getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT));
-		json.put("penDownColor", getColor(PlotterSettings.PEN_DOWN_COLOR));
-		json.put("penUpColor", getColor(PlotterSettings.PEN_UP_COLOR));
-		json.put("penDiameter", getDouble(PlotterSettings.DIAMETER));	// mm, >0
-		json.put("penUpAngle", getDouble(PlotterSettings.PEN_ANGLE_UP));	// servo angle (degrees,0...180)
-		json.put("penDownAngle", getDouble(PlotterSettings.PEN_ANGLE_DOWN));	// servo angle (degrees,0...180)
-		json.put("penLiftTime", getDouble(PlotterSettings.PEN_ANGLE_UP_TIME));
-		json.put("penLowerTime", getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME));
-		json.put("startingPositionIndex", getInteger(STARTING_POS_INDEX));
-		json.put("userGeneralStartGcode", getString(USER_GENERAL_START_GCODE));
-		json.put("userGeneralEndGcode", getString(USER_GENERAL_END_GCODE));
-		json.put("zMotorType", getInteger(Z_MOTOR_TYPE));
-		json.put("style", getString(STYLE));
-		json.put("travelFeedRate", getDouble(PlotterSettings.FEED_RATE_TRAVEL));	// mm/min.  3000 = 50 mm/s
-		json.put("drawFeedRate", getDouble(PlotterSettings.FEED_RATE_DRAW));	// mm/min.  3000 = 50 mm/s
 		return json.toString();
+	}
+
+	/**
+	 * @param key the key to look up
+	 * @return true if the value of this key is the same as the default value.
+	 */
+	public boolean isDefaultValue(String key) {
+		String ancestorName = getString(ANCESTOR);
+		if(ancestorName==null || ancestorName.isEmpty()) return true;
+		PlotterSettings ancestor = new PlotterSettings(ancestorName);
+		return ancestor.getString(key).equals(getString(key));
+	}
+
+	/**
+	 * @return true if this profile has no ancestors.
+	 */
+	public boolean isMostAncestral() {
+		String ancestorName = getString(ANCESTOR);
+		return ancestorName==null || ancestorName.isEmpty();
 	}
 }

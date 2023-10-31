@@ -24,12 +24,25 @@ public class PlotterSettingsManager {
 
     public PlotterSettingsManager() {
         super();
-        writeMakelangelo5Profile();
+        writeMakelangelo5();
         writeMakelangeloHugeProfile();
         loadAllProfiles();
     }
 
-    private void writeMakelangelo5Profile() {
+    private void writeMakelangelo5() {
+        PlotterSettings profile = buildMakelangelo5();
+        profile.save();
+    }
+
+    private void writeMakelangeloHugeProfile() {
+        PlotterSettings profile = buildMakelangelo5();
+        profile.setRobotUID("Makelangelo Huge");
+        profile.setMachineSize(1336,2000);
+        profile.setString(PlotterSettings.STYLE,"MAKELANGELO_5_HUGE");
+        profile.save();
+    }
+
+    public static PlotterSettings buildMakelangelo5() {
         PlotterSettings profile = new PlotterSettings();
         profile.setRobotUID("Makelangelo 5");
 
@@ -38,7 +51,7 @@ public class PlotterSettingsManager {
 
         profile.setMachineSize(650,1000);
         profile.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH, 0.5);	// mm
-        profile.setDouble(PlotterSettings.ACCELERATION, 100);	// mm/s/s
+        profile.setDouble(PlotterSettings.MAX_ACCELERATION, 100);	// mm/s/s
         profile.setDouble(PlotterSettings.MIN_ACCELERATION, 0.0);	// mm/s/s
         profile.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED, 0.05);	// mm/s
         profile.setDouble(PlotterSettings.DIAMETER, 0.8);	// mm, >0
@@ -55,7 +68,6 @@ public class PlotterSettingsManager {
         profile.setInteger(PlotterSettings.STARTING_POS_INDEX, 4);
         profile.setInteger(PlotterSettings.Z_MOTOR_TYPE, PlotterSettings.Z_MOTOR_TYPE_SERVO);
 
-        profile.setString(PlotterSettings.HARDWARE_VERSION, "Makelangelo 5");
         profile.setString(PlotterSettings.USER_GENERAL_START_GCODE, "");
         profile.setString(PlotterSettings.USER_GENERAL_END_GCODE, "");
         profile.setString(PlotterSettings.STYLE, PlotterRendererFactory.MAKELANGELO_5.getName());
@@ -65,16 +77,8 @@ public class PlotterSettingsManager {
         profile.setColor(PlotterSettings.PEN_DOWN_COLOR,new ColorRGB(0, 0, 0));
         profile.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(0, 255, 0));
 
-        profile.setMaxJerk(new double []{ 10, 10, 0.3 });
-        profile.save();
-    }
-
-    private void writeMakelangeloHugeProfile() {
-        PlotterSettings profile = new PlotterSettings();
-        profile.setRobotUID("Makelangelo Huge");
-        profile.setMachineSize(1336,2000);
-        profile.setString(PlotterSettings.STYLE,"MAKELANGELO_5_HUGE");
-        profile.save();
+        profile.setDoubleArray(PlotterSettings.MAX_JERK,new double []{ 10, 10, 0.3 });
+        return profile;
     }
 
     /**

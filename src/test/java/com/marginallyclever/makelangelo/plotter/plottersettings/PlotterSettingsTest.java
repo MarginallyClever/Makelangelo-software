@@ -22,45 +22,45 @@ public class PlotterSettingsTest {
     @Test
     public void saveAndLoadConfig() {
         // given
-        PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setDouble(PlotterSettings.LIMIT_TOP,2);
-        plotterSettings.setDouble(PlotterSettings.LIMIT_BOTTOM,3);
-        plotterSettings.setDouble(PlotterSettings.LIMIT_RIGHT,4);
-        plotterSettings.setDouble(PlotterSettings.LIMIT_LEFT,5);
-        plotterSettings.setInteger(PlotterSettings.STARTING_POS_INDEX,6);
-        plotterSettings.setDouble(PlotterSettings.DIAMETER,7);
-        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,8);
-        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
-        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
-        plotterSettings.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
-        plotterSettings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(12, 13, 14));
-        plotterSettings.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(15, 16, 17));
-        plotterSettings.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
-        plotterSettings.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
-        plotterSettings.setDouble(PlotterSettings.ACCELERATION,22);
-		plotterSettings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);
-		plotterSettings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,24);
-		plotterSettings.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,25);
-		plotterSettings.setInteger(PlotterSettings.MIN_SEG_TIME,26);
-		plotterSettings.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,false);
-		plotterSettings.setDouble(PlotterSettings.MIN_ACCELERATION,27);
-		plotterSettings.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,28);
-        plotterSettings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,29);
+        PlotterSettings expected = new PlotterSettings();
+        expected.setRobotUID(ROBOT_TEST_UID);
+        expected.setDouble(PlotterSettings.LIMIT_TOP,2);
+        expected.setDouble(PlotterSettings.LIMIT_BOTTOM,3);
+        expected.setDouble(PlotterSettings.LIMIT_RIGHT,4);
+        expected.setDouble(PlotterSettings.LIMIT_LEFT,5);
+        expected.setInteger(PlotterSettings.STARTING_POS_INDEX,6);
+        expected.setDouble(PlotterSettings.DIAMETER,7);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,8);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
+        expected.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
+        expected.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(12, 13, 14));
+        expected.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(15, 16, 17));
+        expected.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
+        expected.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
+        expected.setDouble(PlotterSettings.MAX_ACCELERATION,22);
+		expected.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);
+		expected.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,24);
+		expected.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,25);
+		expected.setInteger(PlotterSettings.MIN_SEG_TIME,26);
+		expected.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,false);
+		expected.setDouble(PlotterSettings.MIN_ACCELERATION,27);
+		expected.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,28);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,29);
 
         PlotterRendererFactory[] allMachines = PlotterRendererFactory.values();
         int index = (int)(Math.random()*allMachines.length);
         String styleName = allMachines[index].getName();
-        plotterSettings.setString(PlotterSettings.STYLE,styleName);
+        expected.setString(PlotterSettings.STYLE,styleName);
 
         // when
-        plotterSettings.save();
+        expected.save();
 
         // then
-        PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.load(ROBOT_TEST_UID);
+        PlotterSettings actual = new PlotterSettings();
+        actual.load(ROBOT_TEST_UID);
 
-        Assertions.assertEquals(plotterSettings.toString(),plotterSettingsRead.toString());
+        Assertions.assertEquals(expected.toString(),actual.toString());
     }
 
     @Test

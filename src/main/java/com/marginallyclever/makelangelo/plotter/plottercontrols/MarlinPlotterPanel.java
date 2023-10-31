@@ -174,7 +174,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				throw new Exception("M201 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
-			myPlotter.getSettings().setDouble(PlotterSettings.ACCELERATION,v);
+			myPlotter.getSettings().setDouble(PlotterSettings.MAX_ACCELERATION,v);
 		} catch (Exception e) {
 			logger.warn("M201 problem, continuing anyway: {}", message);
 		}

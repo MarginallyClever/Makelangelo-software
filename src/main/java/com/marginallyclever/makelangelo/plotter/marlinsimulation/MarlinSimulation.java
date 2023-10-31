@@ -70,7 +70,7 @@ public class MarlinSimulation {
 		Vector3d delta = new Vector3d();
 		delta.sub(destination,poseNow);
 		
-		acceleration = Math.min(settings.getDouble(PlotterSettings.ACCELERATION), acceleration);
+		acceleration = Math.min(settings.getDouble(PlotterSettings.MAX_ACCELERATION), acceleration);
 		
 		double len = delta.length();		
 		double seconds = len / feedrate;
@@ -199,7 +199,7 @@ public class MarlinSimulation {
 				junction_unit_vec.sub(next.normal, previousNormal);
 				junction_unit_vec.normalize();
 				if (junction_unit_vec.length() > 0) {
-					final double junction_acceleration = limit_value_by_axis_maximum(next.acceleration,junction_unit_vec, settings.getDouble(PlotterSettings.ACCELERATION));
+					final double junction_acceleration = limit_value_by_axis_maximum(next.acceleration,junction_unit_vec, settings.getDouble(PlotterSettings.MAX_ACCELERATION));
 					// Trig half angle identity. Always positive.
 					final double sin_theta_d2 = Math.sqrt(0.5 * (1.0 - junction_cos_theta)); 
 
@@ -316,7 +316,7 @@ public class MarlinSimulation {
 	}
 
 	private double limitPolargraphAcceleration(final Vector3d to, final Vector3d cartesianDelta, final double acceleration) {
-		double maxAcceleration = settings.getDouble(PlotterSettings.ACCELERATION);
+		double maxAcceleration = settings.getDouble(PlotterSettings.MAX_ACCELERATION);
 		
 		// Adjust the maximum acceleration based on the plotter position to reduce
 		// wobble at the bottom of the picture.
@@ -526,7 +526,7 @@ public class MarlinSimulation {
 		double travelFeedrate = settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL) * perSecond;
 		double drawFeedRate = settings.getDouble(PlotterSettings.FEED_RATE_DRAW) * perSecond;
 		double penLiftTime = settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
-		double maxAcceleration = settings.getDouble(PlotterSettings.ACCELERATION);
+		double maxAcceleration = settings.getDouble(PlotterSettings.MAX_ACCELERATION);
 		double upAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
 		double downAngle = settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
 		boolean isUp=true;

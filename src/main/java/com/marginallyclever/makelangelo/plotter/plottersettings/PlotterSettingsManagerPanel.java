@@ -102,7 +102,10 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 */
 	private boolean copyAndRenameProfile(String oldUID, String newUID) {
 		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
+		System.out.println("A="+ps);
 		ps.setRobotUID(newUID);
+		ps.setString(PlotterSettings.ANCESTOR,oldUID);
+		System.out.println("B="+ps);
 		try {
 			ps.save();
 		} catch(Exception e) {
@@ -113,6 +116,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		// in with the new
 		plotterSettingsManager.loadAllProfiles();
 		model.addElement(newUID);
+		model.setSelectedItem(newUID);
 		return false;
 	}
 
@@ -121,18 +125,23 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 * @param newUID the name to check
 	 * @return true if the name is already in use.
 	 */
-	// TODO could use a unit test
 	private boolean nameIsTaken(String newUID) {
 		Collection<String> list = plotterSettingsManager.getProfileNames();
 		return list.contains(newUID);
 	}
 
 	private void deleteProfile(String uid) {
+		PlotterSettings me = new PlotterSettings(uid);
+		String ancestorName = me.getString(PlotterSettings.ANCESTOR);
 		if(!plotterSettingsManager.deleteProfile(uid)) {
 			model.removeElement(uid);
+			model.setSelectedItem(ancestorName);
 		}
 	}
 
+	/**
+	 * Swap the active profile.
+	 */
 	private void changeProfile() {
 		String name = (String)configurationList.getSelectedItem();
 		if(name!=null) {
