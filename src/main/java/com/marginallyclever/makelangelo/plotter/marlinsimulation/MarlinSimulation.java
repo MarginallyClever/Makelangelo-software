@@ -49,12 +49,15 @@ public class MarlinSimulation {
 	private double previousNominalSpeed=0;
 	private double junction_deviation = 0.05;
 	private boolean polargraphLimit=false;
+
+	private final double [] maxJerk;
 	
 	public MarlinSimulation(PlotterSettings settings) {
 		this.settings = settings;
 		XMAX = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		XMIN = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		YMAX = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		maxJerk = settings.getDoubleArray(PlotterSettings.MAX_JERK);
 	}
 	
 	/**
@@ -253,7 +256,6 @@ public class MarlinSimulation {
 
 	private double classicJerk(MarlinSimulationBlock next,double[] currentSpeed,double safeSpeed) {
 		boolean limited=false;
-		double [] maxJerk = settings.getMaxJerk(); 
 		
 		for(int i=0;i<currentSpeed.length;++i) {
 			double jerk = Math.abs(currentSpeed[i]),
@@ -271,7 +273,7 @@ public class MarlinSimulation {
 		
 		double vmax_junction;
 		
-		if(queue.size()>0) { 
+		if(!queue.isEmpty()) {
 			// look at difference between this move and previous move
 			MarlinSimulationBlock prev = queue.getLast();
 			if(prev.nominalSpeed > 1e-6) {				
