@@ -47,6 +47,7 @@ public class PlotterSettingsTest {
 		expected.setDouble(PlotterSettings.MIN_ACCELERATION,27);
 		expected.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,28);
         expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,29);
+        expected.setString(PlotterSettings.ANCESTOR,"Makelangelo 5");
 
         PlotterRendererFactory[] allMachines = PlotterRendererFactory.values();
         int index = (int)(Math.random()*allMachines.length);
