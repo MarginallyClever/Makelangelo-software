@@ -10,6 +10,10 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Facade for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a {@link TurtleRenderer}.
+ *
+ */
 public class TurtleRenderFacade implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 

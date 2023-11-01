@@ -23,34 +23,32 @@ import java.util.ArrayList;
  *
  */
 public class MarlinSimulationVisualizer implements TurtleRenderer {
-	//private Turtle previousTurtle=null;
-	private GL2 gl2;
-	private final Turtle myTurtle = new Turtle();
-	private PlotterSettings mySettings;
-	
-	private int renderMode = 0;
-	private boolean useDistance=true;
-	private boolean showNominal=false;
-	private boolean showEntry=false;
-	private boolean showExit=true;
-
 	static private class ColorPoint {
 		public Vector3d c;
 		public Vector3d p;
-		
+
 		public ColorPoint(Vector3d cc, Vector3d pp) {
 			c=cc;
 			p=pp;
 		}
 	};
-	
+
+	//private Turtle previousTurtle=null;
+	private GL2 gl2;
+	private final Turtle myTurtle = new Turtle();
+	private Turtle previousTurtle=null;
+	private PlotterSettings mySettings;
+	private int renderMode = 0;
+	private boolean useDistance=true;
+	private boolean showNominal=false;
+	private boolean showEntry=false;
+	private boolean showExit=true;
 	private final ArrayList<ColorPoint> buffer = new ArrayList<>();
 	
 	public MarlinSimulationVisualizer() {}
 	
 	private void drawBufferedTurtle(GL2 gl2) {
 		gl2.glPushMatrix();
-		gl2.glLineWidth(2);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 
 		for( ColorPoint a : buffer ) {
@@ -82,8 +80,8 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
 		Vector3d c;
 		switch(block.id % 3) {
-		case 0: c=new Vector3d(1,0,0); break;
-		case 1: c=new Vector3d(0,1,0); break;
+		case 0 : c=new Vector3d(1,0,0); break;
+		case 1 : c=new Vector3d(0,1,0); break;
 		default: c=new Vector3d(0,0,1); break;
 		}
 		buffer.add(new ColorPoint(c,block.start));
@@ -101,7 +99,6 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	
 	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
 		double t,a,d;
-		useDistance=true;
 		if(useDistance) {
 			t = block.distance;
 			a = block.accelerateUntilD;
@@ -215,10 +212,10 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	@Override
 	public void end() {
-		//if(previousTurtle!=myTurtle || previousTurtle.history.size() != myTurtle.history.size()) {
+		if(previousTurtle!=myTurtle) {
 			recalculateBuffer(myTurtle,mySettings);
-			//previousTurtle = myTurtle;
-		//}
+			previousTurtle = myTurtle;
+		}
 		
 		drawBufferedTurtle(gl2);
 	}
