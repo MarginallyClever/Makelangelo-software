@@ -70,11 +70,6 @@ public class PlotterSettingsPanel extends JPanel {
 
 		JPanel bottom = new JPanel(new FlowLayout());
 
-		if(!settings.isMostAncestral()) {
-			bottom.add(buttonSave);
-			bottom.add(buttonReset);
-		}
-
 		SelectPanel interior0 = new SelectPanel();
 		SelectPanel interior1 = new SelectPanel();
 		SelectPanel interior2 = new SelectPanel();
@@ -114,9 +109,16 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(interior2,minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getDouble(PlotterSettings.MIN_ACCELERATION)));
 		addToPanel(interior2,minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)));
 
+		if(!settings.isMostAncestral()) {
+			bottom.add(buttonSave);
+			bottom.add(buttonReset);
+			machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
+			machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
+		} else {
+			machineWidth.setReadOnly();
+			machineHeight.setReadOnly();
+		}
 
-		machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
-		machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
 		totalStepperNeeded.setReadOnly();
 		totalBeltNeeded.setReadOnly();
 		totalServoNeeded.setReadOnly();
