@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,11 +48,13 @@ class SaveGCodeTest {
         File fileTemp = File.createTempFile("unit", null);
 
         try {
-            PlotterSettingsManager manager = new PlotterSettingsManager();
             Plotter plotter = new Plotter();
-            plotter.getSettings().load("Makelangelo 5");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            PlotterSettings settings = plotter.getSettings();
+            settings.load("Makelangelo 5");
+            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+            settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
             // when
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
@@ -86,9 +87,12 @@ class SaveGCodeTest {
 
         try {
             Plotter plotter = new Plotter();
-            plotter.getSettings().load("Makelangelo 5");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
-            plotter.getSettings().setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            PlotterSettings settings = plotter.getSettings();
+            settings.load("Makelangelo 5");
+            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+            settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
             // when
             files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
@@ -120,7 +124,12 @@ class SaveGCodeTest {
         turtle = saveGCode.trimTurtle(turtle, 10, 20);
 
         File fileTemp = File.createTempFile("unit", null);
-        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
+        Plotter plotter = new Plotter();
+        PlotterSettings settings = plotter.getSettings();
+        settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+        settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
+
+        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
         compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
     }
 }
