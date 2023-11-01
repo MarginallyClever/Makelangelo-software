@@ -57,8 +57,8 @@ public class PlotterSettingsManager {
         profile.setDouble(PlotterSettings.DIAMETER, 0.8);	// mm, >0
         profile.setDouble(PlotterSettings.PEN_ANGLE_UP, 90);	// servo angle (degrees,0...180)
         profile.setDouble(PlotterSettings.PEN_ANGLE_DOWN, 25);	// servo angle (degrees,0...180)
-        profile.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME, 50);
-        profile.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME, 50);
+        profile.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME, 150);
+        profile.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME, 250);
         profile.setDouble(PlotterSettings.FEED_RATE_TRAVEL, 3000);	// mm/min.  3000 = 50 mm/s
         profile.setDouble(PlotterSettings.FEED_RATE_DRAW, 3000);	// mm/min.  3000 = 50 mm/s
 
