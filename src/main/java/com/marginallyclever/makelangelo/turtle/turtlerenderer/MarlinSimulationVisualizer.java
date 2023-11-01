@@ -237,4 +237,13 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
     public void setSettings(PlotterSettings e) {
 		mySettings = e;
 	}
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {
+		previousTurtle=null;
+	}
 }

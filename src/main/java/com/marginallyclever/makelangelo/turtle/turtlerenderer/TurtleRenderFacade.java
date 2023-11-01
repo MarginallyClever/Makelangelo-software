@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Facade for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a {@link TurtleRenderer}.
- *
+ * TODO explain reason for facade?
+ * @author Dan Royer
  */
 public class TurtleRenderFacade implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
@@ -94,6 +95,9 @@ public class TurtleRenderFacade implements PreviewListener {
 		int size=0;
 		if(turtle!=null) size = turtle.history.size();
 		myTurtle = turtle;
+		if(myRenderer!=null) {
+			myRenderer.reset();
+		}
 
 		setFirst(0);
 		setLast(size);

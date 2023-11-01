@@ -99,4 +99,11 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
     public String getTranslatedName() {
         return Translator.get("DirectionLoopTurtleRenderer.name");
     }
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {}
 }
