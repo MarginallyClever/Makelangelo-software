@@ -70,12 +70,9 @@ public class PlotterSettingsPanel extends JPanel {
 
 		JPanel bottom = new JPanel(new FlowLayout());
 
-		bottom.add(buttonSave);
-		bottom.add(buttonReset);
-
-		if(settings.isMostAncestral()) {
-			buttonSave.setEnabled(false);
-			buttonReset.setEnabled(false);
+		if(!settings.isMostAncestral()) {
+			bottom.add(buttonSave);
+			bottom.add(buttonReset);
 		}
 
 		SelectPanel interior0 = new SelectPanel();
