@@ -179,6 +179,7 @@ public class PlotterSettings {
 		json.put(MIN_SEG_TIME, 				20000);		// us
 		json.put(STARTING_POS_INDEX, 		4);
 		json.put(Z_MOTOR_TYPE, 				PlotterSettings.Z_MOTOR_TYPE_SERVO);
+		json.put(ANCESTOR,					"");
 		json.put(USER_GENERAL_START_GCODE, 	"");
 		json.put(USER_GENERAL_END_GCODE, 	"");
 		json.put(STYLE,         			 PlotterRendererFactory.MAKELANGELO_5.getName());
@@ -365,6 +366,7 @@ public class PlotterSettings {
 		json.put(MIN_SEG_TIME, 				thisMachineNode.getInt(MIN_SEG_TIME,20000));		// us
 		json.put(STARTING_POS_INDEX, 		thisMachineNode.getInt(STARTING_POS_INDEX,4));
 		json.put(Z_MOTOR_TYPE, 				thisMachineNode.getInt(Z_MOTOR_TYPE,PlotterSettings.Z_MOTOR_TYPE_SERVO));
+		json.put(ANCESTOR,					thisMachineNode.get(ANCESTOR,""));
 		json.put(USER_GENERAL_START_GCODE, 	thisMachineNode.get(USER_GENERAL_START_GCODE,""));
 		json.put(USER_GENERAL_END_GCODE, 	thisMachineNode.get(USER_GENERAL_END_GCODE,""));
 		json.put(STYLE,         			thisMachineNode.get(STYLE, PlotterRendererFactory.MAKELANGELO_5.getName()));
@@ -406,6 +408,7 @@ public class PlotterSettings {
 		thisMachineNode.putInt(MIN_SEG_TIME, 				json.getInt(MIN_SEG_TIME));
 		thisMachineNode.putInt(STARTING_POS_INDEX, 			json.getInt(STARTING_POS_INDEX));
 		thisMachineNode.putInt(Z_MOTOR_TYPE, 				json.getInt(Z_MOTOR_TYPE));
+		thisMachineNode.put(ANCESTOR, 						json.getString(ANCESTOR));
 		thisMachineNode.put(USER_GENERAL_START_GCODE, 		json.getString(USER_GENERAL_START_GCODE));
 		thisMachineNode.put(USER_GENERAL_END_GCODE, 		json.getString(USER_GENERAL_END_GCODE));
 		thisMachineNode.put(STYLE, 							json.getString(STYLE));
@@ -449,13 +452,24 @@ public class PlotterSettings {
 
 	/**
 	 * @param key the key to look up
-	 * @return true if the value of this key is the same as the default value.
+	 * @return true if the value of this key is the same as the value of the previous ancestor.
 	 */
 	public boolean isDefaultValue(String key) {
-		String ancestorName = getString(ANCESTOR);
-		if(ancestorName==null || ancestorName.isEmpty()) return true;
-		PlotterSettings ancestor = new PlotterSettings(ancestorName);
+		if(isMostAncestral()) return true;  // ancestors are not editable.
+		PlotterSettings ancestor = new PlotterSettings(getProgenitor());
 		return ancestor.getString(key).equals(getString(key));
+	}
+
+	/**
+	 * Walk up the chain of ancestors to find the progenitor, the original, god's first draft.
+	 * @return the name of the progenitor.
+	 */
+	private String getProgenitor() {
+		PlotterSettings ancestor = this;
+		while(!ancestor.isMostAncestral()) {
+			ancestor = new PlotterSettings(ancestor.getString(ANCESTOR));
+		}
+		return ancestor.getUID();
 	}
 
 	/**
