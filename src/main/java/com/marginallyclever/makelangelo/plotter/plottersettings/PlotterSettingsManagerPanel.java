@@ -101,11 +101,11 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 * @return true if there was a problem.
 	 */
 	private boolean copyAndRenameProfile(String oldUID, String newUID) {
-		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
-		ps.setRobotUID(newUID);
-		ps.setString(PlotterSettings.ANCESTOR,oldUID);
+		PlotterSettings settings = plotterSettingsManager.loadProfile(oldUID);
+		settings.setString(PlotterSettings.ANCESTOR,settings.getProgenitor());
+		settings.setRobotUID(newUID);
 		try {
-			ps.save();
+			settings.save();
 		} catch(Exception e) {
 			logger.error("failed to rename {} to {}.",oldUID,newUID,e);
 			return true;
