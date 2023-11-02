@@ -102,10 +102,8 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 */
 	private boolean copyAndRenameProfile(String oldUID, String newUID) {
 		PlotterSettings ps = plotterSettingsManager.loadProfile(oldUID);
-		System.out.println("A="+ps);
 		ps.setRobotUID(newUID);
 		ps.setString(PlotterSettings.ANCESTOR,oldUID);
-		System.out.println("B="+ps);
 		try {
 			ps.save();
 		} catch(Exception e) {
