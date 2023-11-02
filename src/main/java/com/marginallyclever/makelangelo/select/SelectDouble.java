@@ -59,7 +59,7 @@ public class SelectDouble extends Select {
 
 			public void validate() {
 				try {
-					double newValue = Float.valueOf(field.getText());
+					double newValue = Float.parseFloat(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newValue) {
 						double oldValue = value; 
@@ -111,8 +111,8 @@ public class SelectDouble extends Select {
 
 	/**
 	 * Set the value visible in the field.  Do not fire a property change event.
-	 * @param newValue
-	 */
+	 * @param newValue the new value to display
+     */
 	public void setValue(double newValue) {
 		field.setText(StringHelper.formatDouble(newValue));
 	}
