@@ -12,7 +12,7 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorF
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MakelangeloSettingPanel;
-import com.marginallyclever.makelangelo.paper.PaperSettings;
+import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
@@ -502,7 +502,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private void openPaperSettings() {
-        PaperSettings settings = new PaperSettings(app.getPaper());
+        PaperSettingsPanel settings = new PaperSettingsPanel(app.getPaper());
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PaperSettings.Title"));
         dialog.add(settings);
         dialog.setMinimumSize(new Dimension(300,300));
