@@ -23,6 +23,7 @@ public class SelectTextArea extends Select {
 		field.setLineWrap(true);
 		field.setWrapStyleWord(true);
 		field.setBorder(BorderFactory.createLoweredBevelBorder());
+		field.setFont(UIManager.getFont("Label.font"));
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
