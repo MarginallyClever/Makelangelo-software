@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 
-public class PaperSettings extends SelectPanel {
-	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
+public class PaperSettingsPanel extends SelectPanel {
+	private static final Logger logger = LoggerFactory.getLogger(PaperSettingsPanel.class);
 
 	private static final PaperSize[] commonPaperSizes = {
 		new PaperSize("4A0",1682,2378),
@@ -49,7 +49,7 @@ public class PaperSettings extends SelectPanel {
 	private final SelectSlider paperMargin;
 	private final SelectColor paperColor;
 	
-	public PaperSettings(Paper paper) {
+	public PaperSettingsPanel(Paper paper) {
 		this.myPaper = paper;
 		
 		// common paper sizes
@@ -245,9 +245,9 @@ public class PaperSettings extends SelectPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
+		JFrame frame = new JFrame(PaperSettingsPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PaperSettings(new Paper()));
+		frame.add(new PaperSettingsPanel(new Paper()));
 		frame.pack();
 		frame.setVisible(true);
 	}
