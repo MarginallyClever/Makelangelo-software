@@ -13,8 +13,8 @@ import java.util.List;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class Select extends JPanel {
-	private List<PropertyChangeListener> propertyChangeListeners = null;
+public abstract class Select extends JPanel {
+	private final List<PropertyChangeListener> propertyChangeListeners = new ArrayList<>();
 		
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
@@ -25,25 +25,15 @@ public class Select extends JPanel {
 	
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener p) {	
-		if ( propertyChangeListeners == null ){
-			// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
-			propertyChangeListeners = new ArrayList<>();
-		}
 		propertyChangeListeners.add(p);
 	}
 	
 	@Override
 	public void removePropertyChangeListener(PropertyChangeListener p) {
-		if ( propertyChangeListeners == null ){
-			propertyChangeListeners = new ArrayList<>();
-		}
 		propertyChangeListeners.remove(p);
 	}
 	
 	protected void firePropertyChange(Object oldValue,Object newValue) {
-		if ( propertyChangeListeners == null ){
-			propertyChangeListeners = new ArrayList<>();
-		}
 		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
 		for( PropertyChangeListener p : propertyChangeListeners ) {
 			p.propertyChange(evt);
