@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * A panel for uploading firmware to the robot.
@@ -61,8 +62,8 @@ public class FirmwareUploaderPanel extends JPanel {
 		add(startHuge,c);
 
 		refreshButton.addPropertyChangeListener(e -> updateCOMPortList());
-		startM5.addPropertyChangeListener(e -> run("firmware-m5.hex"));
-		startHuge.addPropertyChangeListener(e -> run("firmware-huge.hex"));
+		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
+		startHuge.addActionListener(e -> run(e,"firmware-huge.hex"));
 	}
 
 	private void updateCOMPortList() {
@@ -75,7 +76,7 @@ public class FirmwareUploaderPanel extends JPanel {
 		return new SerialTransportLayer().listConnections().toArray(new String[0]);
 	}
 
-	private void run(String name) {
+	private void run(ActionEvent evt, String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
 		String AVRDudePath="";
 		try {
