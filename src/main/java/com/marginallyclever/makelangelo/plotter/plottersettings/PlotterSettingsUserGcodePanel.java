@@ -7,7 +7,6 @@ import javax.swing.*;
 
 public class PlotterSettingsUserGcodePanel extends JPanel {
     private final PlotterSettings settings;
-
     private final SelectTextArea userGeneralStartGcode;
     private final SelectTextArea userGeneralEndGcode;
 
