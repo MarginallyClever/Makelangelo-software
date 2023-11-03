@@ -420,17 +420,10 @@ public class PlotterSettings {
 	}
 
 	/**
-	 * Reset the machine configuration to the value of the most recent ancestor.
-	 * Will do nothing if this profile has no ancestor.
+	 * Reset the machine configuration to the value of the progenitor (original ancestor).
 	 */
 	public void reset() {
-		String uid = getUID();
-		String ancestorName = getString(ANCESTOR);
-		if(ancestorName==null || ancestorName.isEmpty()) return;
-
-		PlotterSettings settings = new PlotterSettings(ancestorName);
-		settings.setRobotUID(uid);
-		settings.save();
+		// TODO finish me?
 	}
 
 	/**
@@ -455,21 +448,22 @@ public class PlotterSettings {
 	 * @return true if the value of this key is the same as the value of the previous ancestor.
 	 */
 	public boolean isDefaultValue(String key) {
-		if(isMostAncestral()) return true;  // ancestors are not editable.
-		PlotterSettings ancestor = new PlotterSettings(getProgenitor());
+		String progenitor = getProgenitor();
+		if(progenitor.equals(getUID())) return true;
+		PlotterSettings ancestor = new PlotterSettings(progenitor);
 		return ancestor.getString(key).equals(getString(key));
 	}
 
 	/**
-	 * Walk up the chain of ancestors to find the progenitor, the original, god's first draft.
+	 * Walk up the chain of ancestors to find the progenitor, the original.
 	 * @return the name of the progenitor.
 	 */
-	private String getProgenitor() {
-		PlotterSettings ancestor = this;
-		while(!ancestor.isMostAncestral()) {
-			ancestor = new PlotterSettings(ancestor.getString(ANCESTOR));
+	public String getProgenitor() {
+		PlotterSettings trace = this;
+		while(!trace.isMostAncestral()) {
+			trace = new PlotterSettings(trace.getString(ANCESTOR));
 		}
-		return ancestor.getUID();
+		return trace.getUID();
 	}
 
 	/**

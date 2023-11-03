@@ -95,24 +95,14 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	/**
 	 * Creates a copy of the current profile, changes the RobotUID, and saves it as a new instance.  Does not change the
 	 * old profile.
-	 * TODO needs a unit test
+	 *
 	 * @param oldUID the name of the profile to copy
 	 * @param newUID the name of the new profile
 	 * @return true if there was a problem.
 	 */
 	private boolean copyAndRenameProfile(String oldUID, String newUID) {
-		PlotterSettings settings = plotterSettingsManager.loadProfile(oldUID);
-		settings.setString(PlotterSettings.ANCESTOR,settings.getProgenitor());
-		settings.setRobotUID(newUID);
-		try {
-			settings.save();
-		} catch(Exception e) {
-			logger.error("failed to rename {} to {}.",oldUID,newUID,e);
-			return true;
-		}
-
+		plotterSettingsManager.saveAs(oldUID,newUID);
 		// in with the new
-		plotterSettingsManager.loadAllProfiles();
 		model.addElement(newUID);
 		model.setSelectedItem(newUID);
 		return false;
@@ -148,7 +138,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 				this.remove(plotterSettingsPanel);
 			}
 			plotterSettingsManager.setLastSelectedProfile(name);
-			PlotterSettings plotterSettings = plotterSettingsManager.loadProfile(name);
+			PlotterSettings plotterSettings = new PlotterSettings(name);
 			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
 			container.add(plotterSettingsPanel,BorderLayout.CENTER);
 			this.revalidate();

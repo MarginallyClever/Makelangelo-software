@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -95,14 +94,8 @@ public class PlotterSettingsManager {
         }
     }
 
-    public Collection<String> getProfileNames() {
+    public List<String> getProfileNames() {
         return profileNames;
-    }
-
-    public PlotterSettings loadProfile(String name) {
-        PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.load(name);
-        return plotterSettings;
     }
 
     /**
@@ -111,7 +104,7 @@ public class PlotterSettingsManager {
      */
     public PlotterSettings getLastSelectedProfile() {
         String uid = topLevelMachinesPreferenceNode.get(KEY_MACHINE_LAST_SELECTED, "0");
-        return loadProfile(uid);
+        return new PlotterSettings(uid);
     }
 
     public void setLastSelectedProfile(String robotUID) {
@@ -137,4 +130,25 @@ public class PlotterSettingsManager {
         return false;
     }
 
+    /**
+     * Creates a copy of the current profile, changes the RobotUID, and saves it as a new instance.  Does not change the
+     * old profile.
+     *
+     * @param oldUID the name of the profile to copy
+     * @param newUID the name of the new profile
+     * @return true if there was a problem.
+     */
+    public boolean saveAs(String oldUID, String newUID) {
+        PlotterSettings settings = new PlotterSettings(oldUID);
+        settings.setString(PlotterSettings.ANCESTOR,settings.getProgenitor());
+        settings.setRobotUID(newUID);
+        try {
+            settings.save();
+        } catch(Exception e) {
+            logger.error("failed to rename {} to {}.",oldUID,newUID,e);
+            return true;
+        }
+        profileNames.add( newUID );
+        return false;
+    }
 }
