@@ -42,16 +42,16 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 			SelectBoolean allow = new SelectBoolean("allow"+i,Translator.get("Generator_TruchetTiles.allow",new String[]{names.get(i)}),allowedTiles.get(i));
 			add(allow);
 			int finalI = i;
-			allow.addPropertyChangeListener(evt->{
+			allow.addSelectListener(evt->{
 				allowedTiles.set(finalI,allow.isSelected());
 					generate();
 			});
 		}
 
 		add(lineSpacing = new SelectSlider("lineSpacing",Translator.get("Generator_TruchetTiles.LineSpacing"),20,2,Generator_TruchetTiles.getSpacing()));
-		lineSpacing.addPropertyChangeListener(evt->generate());
+		lineSpacing.addSelectListener(evt->generate());
 		add(linesPerTile = new SelectSlider("linesPerTile",Translator.get("Generator_TruchetTiles.LinesPerTile"),15,1,Generator_TruchetTiles.getLinesPerTile()));
-		linesPerTile.addPropertyChangeListener(evt->generate());
+		linesPerTile.addSelectListener(evt->generate());
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Truchet_tiles'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 

@@ -27,12 +27,12 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 		SelectSlider field_columns;
 
 		add(field_rows = new SelectSlider("rows",Translator.get("Generator_MazeRectangle.rows"),100,1,getRows()));
-		field_rows.addPropertyChangeListener(evt->{
+		field_rows.addSelectListener(evt->{
 			setRows(field_rows.getValue());
 			generate();
 		});
 		add(field_columns = new SelectSlider("columns",Translator.get("Generator_MazeRectangle.columns"),100,1,getCols()));
-		field_columns.addPropertyChangeListener(evt->{
+		field_columns.addSelectListener(evt->{
 			setCols(field_columns.getValue());
 			generate();
 		});

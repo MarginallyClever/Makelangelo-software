@@ -18,14 +18,12 @@ public class SelectTextField extends Select {
 		//this.setBorder(BorderFactory.createLineBorder(Color.RED));
 
 		JLabel label = new JLabel(labelKey, JLabel.LEADING);
-		
-		field = new JTextField(defaultText);
 
+		field = new JTextField(defaultText);
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -43,7 +41,7 @@ public class SelectTextField extends Select {
 			}
 			
 			void validate() {
-				firePropertyChange(null,field.getText());
+				fireSelectEvent(null,field.getText());
 			}
 		});
 

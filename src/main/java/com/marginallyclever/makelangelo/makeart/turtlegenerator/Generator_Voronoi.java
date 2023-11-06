@@ -27,13 +27,13 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 		SelectInteger cells;
 		add(cells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells()));
-		cells.addPropertyChangeListener(evt->{
+		cells.addSelectListener(evt->{
 			setNumCells(Math.max(1,cells.getValue()));
 			generate();
 		});
 		SelectBoolean showCenterChoice;
 		add(showCenterChoice = new SelectBoolean("showCenters",Translator.get("Converter_Voronoi.ShowCenters"),false));
-		showCenterChoice.addPropertyChangeListener(evt->{
+		showCenterChoice.addSelectListener(evt->{
 			showCenters = showCenterChoice.isSelected();
 			generate();
 		});

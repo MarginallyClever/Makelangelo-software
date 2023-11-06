@@ -22,7 +22,7 @@ public class Generator_GraphPaper extends TurtleGenerator {
 
 		add(angle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_GraphPaper.getAngle()));
 
-		angle.addPropertyChangeListener(evt->{
+		angle.addSelectListener(evt->{
 			setAngle(angle.getValue());
 			generate();
 		});

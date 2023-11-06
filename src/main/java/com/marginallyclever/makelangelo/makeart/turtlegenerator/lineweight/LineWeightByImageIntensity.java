@@ -49,14 +49,14 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
         SelectDouble selectThickness = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"),thickness);
         add(selectThickness);
-        selectThickness.addPropertyChangeListener(e->{
+        selectThickness.addSelectListener(e->{
             thickness = selectThickness.getValue();
             generate();
         });
 
         SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName);
         add(selectFile);
-        selectFile.addPropertyChangeListener(e->{
+        selectFile.addSelectListener(e->{
             imageName = selectFile.getText();
             generate();
         });

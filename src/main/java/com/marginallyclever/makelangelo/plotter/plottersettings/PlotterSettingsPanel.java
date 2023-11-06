@@ -112,8 +112,8 @@ public class PlotterSettingsPanel extends JPanel {
 		if(!settings.isMostAncestral()) {
 			bottom.add(buttonSave);
 			bottom.add(buttonReset);
-			machineWidth.addPropertyChangeListener((e)->updateLengthNeeded());
-			machineHeight.addPropertyChangeListener((e)->updateLengthNeeded());
+			machineWidth.addSelectListener((e)->updateLengthNeeded());
+			machineHeight.addSelectListener((e)->updateLengthNeeded());
 		} else {
 			machineWidth.setReadOnly();
 			machineHeight.setReadOnly();
@@ -138,7 +138,7 @@ public class PlotterSettingsPanel extends JPanel {
 
 	private void addToPanel(SelectPanel interior2, Select minPlannerSpeed) {
 		interior2.add(minPlannerSpeed);
-		minPlannerSpeed.addPropertyChangeListener((e)->{
+		minPlannerSpeed.addSelectListener((e)->{
 			save();
 			fireSettingsChangedEvent();
 		});

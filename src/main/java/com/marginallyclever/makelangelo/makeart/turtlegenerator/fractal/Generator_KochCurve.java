@@ -21,7 +21,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Koch_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			setOrder(fieldOrder.getValue());
 			generate();
 		});

@@ -26,12 +26,12 @@ public class Converter_Multipass extends ImageConverter {
 		add(selectAngle);
 		add(selectLevel);
 
-		selectAngle.addPropertyChangeListener(evt->{
+		selectAngle.addSelectListener(evt->{
 			setAngle((double)evt.getNewValue());
 			fireRestart();
 		});
 
-		selectLevel.addPropertyChangeListener(evt->{
+		selectLevel.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});

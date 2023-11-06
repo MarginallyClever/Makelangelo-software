@@ -27,7 +27,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 		SelectSlider fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0, Generator_Dragon.getOrder());
 		add(fieldOrder);
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			order = Math.max(1,fieldOrder.getValue());
 			generate();
 		});

@@ -22,17 +22,17 @@ public class Generator_Package extends TurtleGenerator {
 		SelectInteger height;
 
 		add(width = new SelectInteger("width",Translator.get("Width"),getLastWidth()));
-		width.addPropertyChangeListener(evt->{
+		width.addSelectListener(evt->{
 			setWidth(((Number)width.getValue()).intValue());
 			generate();
 		});
 		add(height = new SelectInteger("height",Translator.get("Height"),getLastHeight()));
-		height.addPropertyChangeListener(evt->{
+		height.addSelectListener(evt->{
 			setHeight(((Number)height.getValue()).intValue());
 			generate();
 		});
 		add(length = new SelectInteger("length",Translator.get("Length"),getLastLength()));
-		length.addPropertyChangeListener(evt->{
+		length.addSelectListener(evt->{
 			setLength(((Number)length.getValue()).intValue());
 			generate();
 		});

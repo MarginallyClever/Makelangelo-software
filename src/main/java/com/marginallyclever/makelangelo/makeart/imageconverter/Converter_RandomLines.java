@@ -20,8 +20,8 @@ public class Converter_RandomLines extends ImageConverter {
 		SelectInteger selectTotal = new SelectInteger("total",Translator.get("ConverterRandomLinesCount"),getLineCount());
 		add(selectTotal);
 
-		selectTotal.addPropertyChangeListener((evt)->{
-			if(evt.getPropertyName().equals("total")) setLineCount((int)evt.getNewValue());
+		selectTotal.addSelectListener((evt)->{
+			setLineCount((int)evt.getNewValue());
 			fireRestart();
 		});
 	}

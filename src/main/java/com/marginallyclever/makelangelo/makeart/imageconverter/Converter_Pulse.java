@@ -32,15 +32,15 @@ public class Converter_Pulse extends ImageConverter {
 		add(selectDirection);
 		add(selectCutoff);
 
-		selectSize.addPropertyChangeListener(evt->{
+		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
-		selectDirection.addPropertyChangeListener(evt->{
+		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int) evt.getNewValue());
 			fireRestart();
 		});
-		selectCutoff.addPropertyChangeListener(evt->{
+		selectCutoff.addSelectListener(evt->{
 			setCutoff((int) evt.getNewValue());
 			fireRestart();
 		});
@@ -75,10 +75,12 @@ public class Converter_Pulse extends ImageConverter {
 		double len = dir.length();
 		dir.scale(1.0/len);
 		Point2D ortho = new Point2D(-dir.y,dir.x);
-		
+
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 		turtle.jumpTo(
-			a.x + ortho.x*halfStep,
-			a.y + ortho.y*halfStep
+				cx+a.x + ortho.x*halfStep,
+				cy+a.y + ortho.y*halfStep
 		);
 
 		int n=1;
@@ -94,8 +96,8 @@ public class Converter_Pulse extends ImageConverter {
 
 			double px=x + ortho.x * pulseSize * n;
 			double py=y + ortho.y * pulseSize * n;
-			if(z>cutOff) turtle.moveTo(px,py);
-			else turtle.jumpTo(px,py);
+			if(z>cutOff) turtle.moveTo(cx+px,cy+py);
+			else turtle.jumpTo(cx+px,cy+py);
 			n = -n;
 		}
 	}

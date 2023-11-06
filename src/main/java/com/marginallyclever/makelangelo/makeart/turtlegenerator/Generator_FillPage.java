@@ -20,11 +20,11 @@ public class Generator_FillPage extends TurtleGenerator {
 		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),penDiameter);
 		add(selectAngle);
 		add(selectPenDiameter);
-		selectAngle.addPropertyChangeListener(evt->{
+		selectAngle.addSelectListener(evt->{
 			angle = selectAngle.getValue();
 			generate();
 		});
-		selectPenDiameter.addPropertyChangeListener(evt->{
+		selectPenDiameter.addSelectListener(evt->{
 			penDiameter = selectPenDiameter.getValue();
 			generate();
 

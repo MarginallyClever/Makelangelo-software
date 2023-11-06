@@ -67,15 +67,15 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         add(selectBaseCutOff);
         add(selectCutOffIncrement);
 
-        selectMaxDepth.addPropertyChangeListener(evt -> {
+        selectMaxDepth.addSelectListener(evt -> {
             setMaxDepth((int) evt.getNewValue());
             fireRestart();
         });
-        selectBaseCutOff.addPropertyChangeListener(evt -> {
+        selectBaseCutOff.addSelectListener(evt -> {
             setCutOff((int) evt.getNewValue());
             fireRestart();
         });
-        selectCutOffIncrement.addPropertyChangeListener(evt -> {
+        selectCutOffIncrement.addSelectListener(evt -> {
             setCutOffIncrement((int) evt.getNewValue());
             fireRestart();
         });
@@ -93,11 +93,10 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         FilterDesaturate bw = new FilterDesaturate(myImage);
         img = bw.filter();
 
-        Point2D topLeftP = new Point2D(myPaper.getMarginLeft(),paper.getMarginTop());
-        Point2D bottomRightP = new Point2D(myPaper.getMarginRight(), paper.getMarginBottom());
-
         turtle = new Turtle();
 
+        Point2D topLeftP = new Point2D(myPaper.getMarginLeft(),paper.getMarginTop());
+        Point2D bottomRightP = new Point2D(myPaper.getMarginRight(), paper.getMarginBottom());
         BoxCondition boxCondition = new BoxCondition(true,true,true,true);
         recurse(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
         fireConversionFinished();
@@ -173,7 +172,10 @@ public class Converter_QuadTreeInstant extends ImageConverter{
     }
 
     private void drawLine(Point2D p1, Point2D p2) {
-        turtle.jumpTo(p1.x,p1.y);
-        turtle.moveTo(p2.x,p2.y);
+        double px = myPaper.getCenterX();
+        double py = myPaper.getCenterY();
+
+        turtle.jumpTo(px+p1.x,py+p1.y);
+        turtle.moveTo(px+p2.x,py+p2.y);
     }
 }

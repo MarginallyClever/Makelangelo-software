@@ -21,7 +21,7 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 		add(field_order = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,Generator_SierpinskiTriangle.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
-		field_order.addPropertyChangeListener(evt-> {
+		field_order.addSelectListener(evt-> {
 			Generator_SierpinskiTriangle.setOrder(Math.max(1, field_order.getValue()));
 			generate();
 		});

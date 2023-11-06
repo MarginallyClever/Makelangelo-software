@@ -24,7 +24,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 				,6,1,Generator_GosperCurve.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Gosper_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 
-		fieldOrder.addPropertyChangeListener(evt-> {
+		fieldOrder.addSelectListener(evt-> {
 			order = Math.max(1, fieldOrder.getValue());
 			generate();
 		});

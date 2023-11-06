@@ -48,53 +48,53 @@ public class Generator_FlowField extends TurtleGenerator {
 		SelectBoolean fieldRightAngle = new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),rightAngle);
 
 		add(fieldNoise);
-		fieldNoise.addPropertyChangeListener(evt->{
+		fieldNoise.addSelectListener(evt->{
 			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
 			generate();
 		});
 
 		add(fieldScaleX);
-		fieldScaleX.addPropertyChangeListener(evt->{
+		fieldScaleX.addSelectListener(evt->{
 			scaleX = (fieldScaleX.getValue());
 			generate();
 		});
 		add(fieldScaleY);
-		fieldScaleY.addPropertyChangeListener(evt->{
+		fieldScaleY.addSelectListener(evt->{
 			scaleY = (fieldScaleY.getValue());
 			generate();
 		});
 		add(fieldOffsetX);
-		fieldOffsetX.addPropertyChangeListener(evt->{
+		fieldOffsetX.addSelectListener(evt->{
 			offsetX = (fieldOffsetX.getValue());
 			generate();
 		});
 		add(fieldOffsetY);
-		fieldOffsetY.addPropertyChangeListener(evt->{
+		fieldOffsetY.addSelectListener(evt->{
 			offsetY =(fieldOffsetY.getValue());
 			generate();
 		});
 		add(fieldStepSize);
-		fieldStepSize.addPropertyChangeListener(evt->{
+		fieldStepSize.addSelectListener(evt->{
 			stepSize = (fieldStepSize.getValue());
 			generate();
 		});
 		add(fieldStepVariation);
-		fieldStepVariation.addPropertyChangeListener(evt->{
+		fieldStepVariation.addSelectListener(evt->{
 			stepVariation = (fieldStepVariation.getValue());
 			generate();
 		});
 		add(fieldStepLength);
-		fieldStepLength.addPropertyChangeListener(evt->{
+		fieldStepLength.addSelectListener(evt->{
 			stepLength = (fieldStepLength.getValue());
 			generate();
 		});
 		add(fieldFromEdge);
-		fieldFromEdge.addPropertyChangeListener(evt->{
+		fieldFromEdge.addSelectListener(evt->{
 			fromEdge = (fieldFromEdge.isSelected());
 			generate();
 		});
 		add(fieldRightAngle);
-		fieldRightAngle.addPropertyChangeListener(evt->{
+		fieldRightAngle.addSelectListener(evt->{
 			rightAngle = (fieldRightAngle.isSelected());
 			generate();
 		});

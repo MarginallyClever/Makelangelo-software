@@ -23,7 +23,7 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		super();
 
 		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("Converter_CMYK_Crosshatch.Passes"), 5, 1, getPasses());
-		selectPasses.addPropertyChangeListener(evt->{
+		selectPasses.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -81,8 +81,8 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		double stepSize = passes;
 
 		// from top to bottom of the margin area...
-		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
-		double width   = myPaper.getMarginRight() - myPaper.getMarginLeft();
+		double height  = myPaper.getMarginHeight();
+		double width   = myPaper.getMarginWidth();
 		double maxLen  = Math.sqrt(width*width+height*height);
 
 		double a;

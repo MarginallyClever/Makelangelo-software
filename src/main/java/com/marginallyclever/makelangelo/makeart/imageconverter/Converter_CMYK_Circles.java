@@ -27,7 +27,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		super();
 
 		SelectSlider maxCircleSize = new SelectSlider("maxCircleSize", Translator.get("Converter_CMYK_Circles.maxCircleSize"), 10, 1, getMaxCircleSize());
-		maxCircleSize.addPropertyChangeListener((evt)->{
+		maxCircleSize.addSelectListener((evt)->{
 			setMaxCircleSize((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -124,13 +124,14 @@ public class Converter_CMYK_Circles extends ImageConverter {
 			return;
 		}
 
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 		double dx=P1.x-P0.x;
 		double dy=P1.y-P0.y;
 		double halfStep = maxCircleRadius;
 		double distance = Math.sqrt(dx*dx+dy*dy);
 
 		double n,x,y,v;
-
 		double b;
 		for( b = 0; b <= distance; b+= maxCircleRadius*2) {
 			n = b / distance;
@@ -139,7 +140,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 
 			v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
 
-			drawCircle(x, y, maxCircleRadius * ((255.0-v)/255.0));
+			drawCircle(cx + x, cy + y, maxCircleRadius * ((255.0-v)/255.0));
 		}
 	}
 

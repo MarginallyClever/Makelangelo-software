@@ -42,18 +42,18 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
         SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
         add(selectCells);
-        selectCells.addPropertyChangeListener(evt->{
+        selectCells.addSelectListener(evt->{
             setNumCells((int)evt.getNewValue());
             fireRestart();
         });
 
         SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
         add(selectDrawVoronoi);
-        selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
+        selectDrawVoronoi.addSelectListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 
         SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getLowpassCutoff());
         add(selectCutoff);
-        selectCutoff.addPropertyChangeListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
+        selectCutoff.addSelectListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
     }
 
     @Override
@@ -68,19 +68,20 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
             iterations=0;
 
-            Rectangle2D bounds = myPaper.getMarginRectangle();
+            Rectangle2D bounds = paper.getMarginRectangle();
+
             cells.clear();
             int i=0;
-            while(i<numCells) {
-                double x = Math.random()*bounds.getWidth()+bounds.getMinX();
-                double y = Math.random()*bounds.getHeight()+bounds.getMinY();
+            do {
+                double x = Math.random() * bounds.getWidth()+bounds.getMinX();
+                double y = Math.random() * bounds.getHeight()+bounds.getMinY();
                 if(image.canSampleAt(x,y)) {
                     if(image.sample1x1Unchecked(x,y) < Math.random()*255) {
                         cells.add( new VoronoiCell(x,y) );
                         i++;
                     }
                 }
-            }
+            } while(i<numCells);
             voronoiDiagram.setNumHulls(numCells);
         }
         finally {
@@ -235,6 +236,11 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     protected void renderEdges(GL2 gl2) {
         gl2.glColor3d(0.9, 0.9, 0.9);
 
+        double cx = myPaper.getCenterX();
+        double cy = myPaper.getCenterY();
+        gl2.glPushMatrix();
+        gl2.glTranslated(cx, cy, 0);
+
         for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
             Polygon poly = voronoiDiagram.getHull(i);
             gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -243,6 +249,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
             }
             gl2.glEnd();
         }
+        gl2.glPopMatrix();
     }
 
     public void setNumCells(int value) {

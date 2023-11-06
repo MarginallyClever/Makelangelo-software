@@ -24,11 +24,11 @@ public class Converter_TruchetFromImage extends ImageConverter {
         add(selectSpacing);
         add(selectLinesPerTile);
 
-        selectSpacing.addPropertyChangeListener(evt->{
+        selectSpacing.addSelectListener(evt->{
             spaceBetweenLines = (int)evt.getNewValue();
             fireRestart();
         });
-        selectLinesPerTile.addPropertyChangeListener(evt->{
+        selectLinesPerTile.addSelectListener(evt->{
             linesPerTile = (int) evt.getNewValue();
             fireRestart();
         });
@@ -62,12 +62,14 @@ public class Converter_TruchetFromImage extends ImageConverter {
         double miny = paper.getMarginBottom()+adjy;
         double maxx = paper.getMarginRight()-adjx;
         double maxy = paper.getMarginTop()-adjy;
+        double px = myPaper.getCenterX();
+        double py = myPaper.getCenterY();
 
         for(double y=miny;y<maxy;y+=tileSize) {
             for(double x=minx;x<maxx;x+=tileSize) {
                 int intensity = result.sample(x,y,x+tileSize,y+tileSize);
-                if(intensity>128) truchet.tileA(x,y);
-                else              truchet.tileB(x,y);
+                if(intensity>128) truchet.tileA(px+x,py+y);
+                else              truchet.tileB(px+x,py+y);
             }
         }
 

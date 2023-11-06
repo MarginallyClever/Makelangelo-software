@@ -106,11 +106,14 @@ public abstract class ImageConverter {
 			// entire line clipped
 			return;
 		}
+
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 		
 		double ox=turtle.getX()-P0.x;
 		double oy=turtle.getY()-P0.y;
 		boolean firstJump = MathHelper.lengthSquared(ox, oy)>2;
-		if(firstJump) turtle.jumpTo(P0.x,P0.y);
+		if(firstJump) turtle.jumpTo(cx+P0.x,cy+P0.y);
 			
 		double b;
 		double dx=P1.x-P0.x;
@@ -127,6 +130,8 @@ public abstract class ImageConverter {
 			
 			v = img.sample( x, y , halfStep);
 
+			x+=cx;
+			y+=cy;
 			if(v<channelCutoff) turtle.moveTo(x,y);
 			else turtle.jumpTo(x,y);
 		}

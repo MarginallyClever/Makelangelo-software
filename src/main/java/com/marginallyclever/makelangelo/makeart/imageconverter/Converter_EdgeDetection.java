@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterExtendedDifferenceOfGaussians;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -19,30 +20,38 @@ public class Converter_EdgeDetection extends ImageConverter {
 	private static int passes=5;
 	private static int stepSize=10;
 	private static int sampleSize=2;
+	private static boolean border=false;
 
 	private int edge;
 	private TransformedImage img;
+	private double px,py;
+
 
 	public Converter_EdgeDetection() {
 		super();
 		SelectSlider selectPasses     = new SelectSlider("passes", Translator.get("Converter_EdgeDetection.passes"), 20, 1, (int) (getPasses()));
 		SelectSlider selectStepSize   = new SelectSlider("stepSize", Translator.get("Converter_EdgeDetection.stepSize"), 25, 2, (int) getStepSize());
 		SelectSlider selectSampleSize = new SelectSlider("sampleSize", Translator.get("Converter_EdgeDetection.sampleSize"), 5, 1, (int) getSampleSize());
+		SelectBoolean selectBorder    = new SelectBoolean("border", Translator.get("Converter_EdgeDetection.border"), border);
 
 		add(selectPasses);
 		add(selectStepSize);
 		add(selectSampleSize);
 
-		selectPasses.addPropertyChangeListener(evt->{
+		selectPasses.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
-		selectStepSize.addPropertyChangeListener(evt->{
+		selectStepSize.addSelectListener(evt->{
 			setStepSize((int)evt.getNewValue());
 			fireRestart();
 		});
-		selectSampleSize.addPropertyChangeListener(evt->{
+		selectSampleSize.addSelectListener(evt->{
 			setSampleSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectBorder.addSelectListener(evt->{
+			setBorder((boolean)evt.getNewValue());
 			fireRestart();
 		});
 	}
@@ -63,6 +72,10 @@ public class Converter_EdgeDetection extends ImageConverter {
 	public int getSampleSize() {
 		return sampleSize;
 	}
+
+	public void setBorder(boolean newValue) {
+		border=newValue;
+	}
 	
 	@Override
 	public void start(Paper paper, TransformedImage image) {
@@ -79,6 +92,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 		img = dog.filter();
 
 		turtle = new Turtle();
+		px = myPaper.getCenterX();
+		py = myPaper.getCenterY();
 
 		int edgeStep = 255/(passes+1);
 		edge = 255-edgeStep;
@@ -87,13 +102,15 @@ public class Converter_EdgeDetection extends ImageConverter {
 			marchingSquares();
 			edge -= edgeStep;
 		}
-/*
-		// add border
-		turtle.jumpTo(myPaper.getMarginLeft(),myPaper.getMarginBottom());
-		turtle.moveTo(myPaper.getMarginRight(),myPaper.getMarginBottom());
-		turtle.moveTo(myPaper.getMarginRight(),myPaper.getMarginTop());
-		turtle.moveTo(myPaper.getMarginLeft(),myPaper.getMarginTop());
-		turtle.moveTo(myPaper.getMarginLeft(),myPaper.getMarginBottom());*/
+
+		if(border) {
+			// add border
+			turtle.jumpTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginBottom());
+			turtle.moveTo(px+myPaper.getMarginRight(), py+myPaper.getMarginBottom());
+			turtle.moveTo(px+myPaper.getMarginRight(), py+myPaper.getMarginTop());
+			turtle.moveTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginTop());
+			turtle.moveTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginBottom());
+		}
 
 		fireConversionFinished();
 	}
@@ -157,8 +174,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	}
 
 	void line(Point2D a,Point2D b) {
-		turtle.jumpTo(a.x,a.y);
-		turtle.moveTo(b.x,b.y);
+		turtle.jumpTo(px+a.x,py+a.y);
+		turtle.moveTo(px+b.x,py+b.y);
 	}
 
 	void case1(int x0,int y0) {

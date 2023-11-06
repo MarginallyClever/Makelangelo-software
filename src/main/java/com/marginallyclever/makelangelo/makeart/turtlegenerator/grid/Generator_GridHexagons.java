@@ -20,7 +20,7 @@ public class Generator_GridHexagons extends TurtleGenerator {
 
 	public Generator_GridHexagons() {
 		add(radius = new SelectDouble("radius",Translator.get("Generator_GridHexagons.radius"),25));
-		radius.addPropertyChangeListener(evt->generate());
+		radius.addSelectListener(evt->generate());
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -38,7 +39,6 @@ public class Paper implements PreviewListener {
 	// % from edge of paper.
 	private double paperMargin;
 	
-	// not used by renderer, ... need a coordinats reccalculation of the paper corner position and a reveiw of the render algo ?
 	private double rotation;
 	private double rotationRef;
 
@@ -73,13 +73,16 @@ public class Paper implements PreviewListener {
 	private void renderMargin(GL2 gl2) {
 		gl2.glLineWidth(1);
 		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
+
+		gl2.glPushMatrix();
+		gl2.glTranslated(centerX, centerY, 0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		
 		gl2.glVertex2d(getMarginLeft(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginTop());
 		gl2.glVertex2d(getMarginRight(), getMarginBottom());
 		gl2.glVertex2d(getMarginLeft(), getMarginBottom());
 		gl2.glEnd();
+		gl2.glPopMatrix();
 	}
 
 	/**
@@ -94,12 +97,15 @@ public class Paper implements PreviewListener {
 				(double)paperColor.getRed() / 255.0, 
 				(double)paperColor.getGreen() / 255.0, 
 				(double)paperColor.getBlue() / 255.0);
+		gl2.glPushMatrix();
+		gl2.glTranslated(centerX, centerY, 0);
 		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
 		gl2.glVertex2d(getPaperLeft(), getPaperTop());
 		gl2.glVertex2d(getPaperRight(), getPaperTop());
 		gl2.glVertex2d(getPaperRight(), getPaperBottom());
 		gl2.glVertex2d(getPaperLeft(), getPaperBottom());
 		gl2.glEnd();
+		gl2.glPopMatrix();
 	}
 
 	/**
@@ -164,8 +170,8 @@ public class Paper implements PreviewListener {
 		Rectangle2D.Double rectangle = new Rectangle2D.Double();
 		rectangle.x = getMarginLeft();
 		rectangle.y = getMarginBottom();
-		rectangle.width = getMarginRight() - rectangle.x;
-		rectangle.height = getMarginTop() - rectangle.y;
+		rectangle.width = getMarginWidth();
+		rectangle.height = getMarginHeight();
 		return rectangle;
 	}
 
@@ -191,7 +197,6 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper height in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperHeight() {
 		return paperTop - paperBottom;
 	}
@@ -199,99 +204,93 @@ public class Paper implements PreviewListener {
 	/**
 	 * @return paper width in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperWidth() {
 		return paperRight - paperLeft;
 	}
 
 	/**
-	 * @return paper left edge in mm.
+	 * @return absolute paper left edge in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperLeft() {
-		return paperLeft + getCenterX();
+		return paperLeft;
 	}
 
 	/**
-	 * @return paper right edge in mm.
+	 * @return absolute paper right edge in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperRight() {
-		return paperRight + getCenterX();
+		return paperRight;
 	}
 
+
 	/**
-	 * @return paper top edge in mm.
+	 * @return absolute paper top edge in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperTop() {
-		return paperTop + getCenterY();
+		return paperTop;
 	}
 
+
 	/**
-	 * @return paper bottom edge in mm.
+	 * @return absolute paper bottom edge in mm.
 	 */
-	// TODO clean up this name
 	public double getPaperBottom() {
-		return paperBottom + getCenterY();
+		return paperBottom;
 	}
 
 	/**
-	 * @return paper left edge in mm.
+	 * @return absolute margin left edge in mm.
 	 */
 	public double getMarginLeft() {
-		return getPaperMargin() * paperLeft + getCenterX();
+		return getPaperMargin() * paperLeft;
 	}
 
 	/**
-	 * @return paper right edge in mm.
+	 * @return absolute margin right edge in mm.
 	 */
 	public double getMarginRight() {
-		return getPaperMargin() * paperRight + getCenterX();
+		return getPaperMargin() * paperRight;
 	}
 
 	/**
-	 * @return paper top edge in mm.
+	 * @return absolute margin top edge in mm.
 	 */
 	public double getMarginTop() {
-		return getPaperMargin() * paperTop + getCenterY();
+		return getPaperMargin() * paperTop;
 	}
 
 	/**
-	 * @return paper bottom edge in mm.
+	 * @return absolute margin bottom edge in mm.
 	 */
 	public double getMarginBottom() {
-		return getPaperMargin() * paperBottom + getCenterY();
+		return getPaperMargin() * paperBottom;
 	}
 
 	/**
 	 * @return paper width in mm.
 	 */
 	public double getMarginHeight() {
-		return getMarginTop() - getMarginBottom();
+		return (paperTop-paperBottom) * paperMargin;
 	}
 
 	/**
 	 * @return paper width in mm.
 	 */
 	public double getMarginWidth() {
-		return getMarginRight() - getMarginLeft();
+		return (paperRight-paperLeft) * paperMargin;
 	}
 
 	/**
 	 * @return paper margin %.
 	 */
-	// TODO clean up this name
 	public double getPaperMargin() {
 		return paperMargin;
 	}
 
-	// TODO clean up this name
 	public boolean isPaperConfigured() {
 		return (paperTop > paperBottom && paperRight > paperLeft);
 	}
 
-	// TODO clean up this name
 	public boolean isInsidePaperMargins(double x,double y) {
 		if( x < getMarginLeft()  ) return false;
 		if( x > getMarginRight() ) return false;

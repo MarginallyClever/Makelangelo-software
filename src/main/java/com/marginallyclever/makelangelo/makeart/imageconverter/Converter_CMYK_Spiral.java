@@ -26,7 +26,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 		super();
 
 		SelectBoolean toCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"), getToCorners());
-		toCorners.addPropertyChangeListener(evt->{
+		toCorners.addSelectListener(evt->{
 			setToCorners((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -91,6 +91,8 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 			maxr = Math.min(h, w);
 		}
 
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 		double toolDiameter = 1;
 
 		int i, j;
@@ -128,7 +130,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 					if(z<level) turtle.penDown();
 					else turtle.penUp();
 				} else turtle.penUp();
-				turtle.moveTo(fx, fy);
+				turtle.moveTo(px+fx, py+fy);
 			}
 			r -= toolDiameter;
 			++numRings;

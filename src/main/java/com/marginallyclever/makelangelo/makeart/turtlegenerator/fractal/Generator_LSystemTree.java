@@ -30,31 +30,31 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		SelectSlider field_noise;
 
 		add(field_order      = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,getOrder()));
-		field_order.addPropertyChangeListener(evt->{
+		field_order.addSelectListener(evt->{
 			setOrder(field_order.getValue());
 			generate();
 		});
 
 		add(field_branches   = new SelectSlider("branches",Translator.get("LSystemBranches"),8,1,getBranches()));
-		field_branches.addPropertyChangeListener(evt->{
+		field_branches.addSelectListener(evt->{
 			setBranches(field_branches.getValue());
 			generate();
 		});
 
 		add(field_orderScale = new SelectSlider("scale",Translator.get("LSystemOrderScale"),100,1,(int)(getScale()*100)));
-		field_orderScale.addPropertyChangeListener(evt->{
+		field_orderScale.addSelectListener(evt->{
 			setScale(field_orderScale.getValue()/100.0f);
 			generate();
 		});
 
 		add(field_angle      = new SelectSlider("angle",Translator.get("LSystemAngle"),360,1,(int)getAngle()));
-		field_angle.addPropertyChangeListener(evt->{
+		field_angle.addSelectListener(evt->{
 			setAngle(field_angle.getValue());
 			generate();
 		});
 
 		add(field_noise      = new SelectSlider("noise",Translator.get("LSystemNoise"),100,0,(int)getNoise()));
-		field_noise.addPropertyChangeListener(evt->{
+		field_noise.addSelectListener(evt->{
 			setNoise(field_noise.getValue());
 			generate();
 		});

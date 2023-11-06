@@ -26,19 +26,19 @@ public class Converter_SpiralPulse extends ImageConverter {
 		super();
 		SelectDouble selectIntensity = new SelectDouble("intensity", Translator.get("SpiralPulse.intensity"),getIntensity());
 		add(selectIntensity);
-		selectIntensity.addPropertyChangeListener(evt->{
+		selectIntensity.addSelectListener(evt->{
 			setIntensity((double)evt.getNewValue());
 			fireRestart();
 		});
 		SelectDouble selectSpacing = new SelectDouble("spacing",Translator.get("SpiralPulse.spacing"),getSpacing());
 		add(selectSpacing);
-		selectSpacing.addPropertyChangeListener(evt->{
+		selectSpacing.addSelectListener(evt->{
 			setSpacing((double)evt.getNewValue());
 			fireRestart();
 		});
 		SelectDouble selectHeight = new SelectDouble("height",Translator.get("SpiralPulse.height"),getHeight());
 		add(selectHeight);
-		selectHeight.addPropertyChangeListener(evt->{
+		selectHeight.addSelectListener(evt->{
 			setHeight((double)evt.getNewValue());
 			fireRestart();
 		});
@@ -91,6 +91,8 @@ public class Converter_SpiralPulse extends ImageConverter {
 		double r2,scale_z,pulse_size,nx,ny;
 
 		turtle = new Turtle();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 		
 		while (r > toolDiameter) {
 			// find circumference of current circle
@@ -113,19 +115,19 @@ public class Converter_SpiralPulse extends ImageConverter {
 					ny = (halfStep+pulse_size*n) * fy / r2;
 
 					if (!init) {
-						turtle.moveTo(fx+nx, fy+ny);
+						turtle.moveTo(px+fx+nx, py+fy+ny);
 						init = true;
 					}
 					if(pulse_size < PULSE_MINIMUM) turtle.penUp();
 					else turtle.penDown();
-					turtle.moveTo(fx+nx, fy + ny);
+					turtle.moveTo(px+fx+nx, py+fy + ny);
 					n = -n;
 				} else {
 					if (!init) {
 						init = true;
 					}
 					turtle.penUp();
-					turtle.moveTo(fx, fy);
+					turtle.moveTo(px+fx, py+fy);
 				}
 			}
 			n = -n;

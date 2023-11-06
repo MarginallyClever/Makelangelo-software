@@ -45,13 +45,13 @@ public class Converter_Wander extends ImageConverter {
 		super();
 		SelectInteger selectCount = new SelectInteger("count",Translator.get("ConverterWanderLineCount"),getLineCount());
 		add(selectCount);
-		selectCount.addPropertyChangeListener(evt->{
+		selectCount.addSelectListener(evt->{
 			setLineCount((int)evt.getNewValue());
 			fireRestart();
 		});
 		SelectBoolean selectCmyk = new SelectBoolean("cmyk",Translator.get("ConverterWanderCMYK"),isCMYK());
 		add(selectCmyk);
-		selectCmyk.addPropertyChangeListener(evt->{
+		selectCmyk.addSelectListener(evt->{
 			setCMYK((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -86,6 +86,8 @@ public class Converter_Wander extends ImageConverter {
 		double yTop    = myPaper.getMarginTop()   ;
 		double xLeft   = myPaper.getMarginLeft()  ;
 		double xRight  = myPaper.getMarginRight() ;
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;
@@ -172,7 +174,7 @@ public class Converter_Wander extends ImageConverter {
 		for (Bucket bucket : buckets) {
 			while (!bucket.sortedPoints.isEmpty()) {
 				Point2D a = bucket.sortedPoints.pop();
-				turtle.moveTo(a.getX(), a.getY());
+				turtle.moveTo(px+a.getX(), py+a.getY());
 				turtle.penDown();
 			}
 		}

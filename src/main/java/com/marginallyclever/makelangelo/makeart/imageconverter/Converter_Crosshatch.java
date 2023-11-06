@@ -17,35 +17,35 @@ public class Converter_Crosshatch extends ImageConverter {
 	public Converter_Crosshatch() {
 		super();
 		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 100, 1, (int) (getIntensity() * 10.0));
-		selectIntesity.addPropertyChangeListener(evt->{
+		selectIntesity.addSelectListener(evt->{
 			setIntensity((float)((int)evt.getNewValue())/10.0f);
 			fireRestart();
 		});
 		add(selectIntesity);
 
 		SelectSlider selectPass90 = new SelectSlider("pass90", Translator.get("pass90"), 256, 0, (int) getPass90());
-		selectPass90.addPropertyChangeListener((evt)-> {
+		selectPass90.addSelectListener((evt)-> {
 			setPass90((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass90);
 
 		SelectSlider selectPass75 = new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)getPass75());
-		selectPass75.addPropertyChangeListener((evt)-> {
+		selectPass75.addSelectListener((evt)-> {
 			setPass75((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass75);
 
 		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
-		selectPass45.addPropertyChangeListener((evt)-> {
+		selectPass45.addSelectListener((evt)-> {
 			setPass45((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass45);
 
 		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
-		selectPass15.addPropertyChangeListener((evt)-> {
+		selectPass15.addSelectListener((evt)-> {
 			setPass15((int)evt.getNewValue());
 			fireRestart();
 		});

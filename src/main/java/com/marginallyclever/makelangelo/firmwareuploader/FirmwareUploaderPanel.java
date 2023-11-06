@@ -61,7 +61,7 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.gridx++;
 		add(startHuge,c);
 
-		refreshButton.addPropertyChangeListener(e -> updateCOMPortList());
+		refreshButton.addActionListener(e -> updateCOMPortList());
 		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
 		startHuge.addActionListener(e -> run(e,"firmware-huge.hex"));
 	}

@@ -73,17 +73,17 @@ public class Generator_Text extends TurtleGenerator {
 		SelectTextArea text;
 
 		add(fontChoices = new SelectOneOfMany("face",Translator.get("FontFace"),getFontNames(),getLastFont()));
-		fontChoices.addPropertyChangeListener(evt->{
+		fontChoices.addSelectListener(evt->{
 			setFont(fontChoices.getSelectedIndex());
 			generate();
 		});
 		add(size = new SelectInteger("size",Translator.get("TextSize"),getLastSize()));
-		size.addPropertyChangeListener(evt->{
+		size.addSelectListener(evt->{
 			setSize(((Number)size.getValue()).intValue());
 			generate();
 		});
 		add(text = new SelectTextArea("message",Translator.get("TextMessage"),getLastMessage()));
-		text.addPropertyChangeListener(evt->{
+		text.addSelectListener(evt->{
 			setMessage(text.getText());
 			generate();
 		});

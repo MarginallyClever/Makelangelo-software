@@ -21,17 +21,17 @@ public class Generator_GridFit extends TurtleGenerator {
 		add(cellsWide = new SelectInteger("cellsWide",Translator.get("Generator_GridFit.cellsWide"),1));
 		add(cellsHigh = new SelectInteger("cellsHigh",Translator.get("Generator_GridFit.cellsHigh"),1));
 
-		margin.addPropertyChangeListener(evt->{
+		margin.addSelectListener(evt->{
 			if(!checkMargin()) return;
 			generate();
 		});
 
-		cellsWide.addPropertyChangeListener(evt->{
+		cellsWide.addSelectListener(evt->{
 			changeWide();
 			generate();
 		});
 
-		cellsHigh.addPropertyChangeListener(evt->{
+		cellsHigh.addSelectListener(evt->{
 			changeHigh();
 			generate();
 		});

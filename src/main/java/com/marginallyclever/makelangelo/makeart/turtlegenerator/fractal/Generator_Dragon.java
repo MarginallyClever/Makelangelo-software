@@ -24,7 +24,7 @@ public class Generator_Dragon extends TurtleGenerator {
 		super();
 
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),16,0,Generator_Dragon.getOrder()));
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			order = Math.max(1,fieldOrder.getValue());
 			generate();
 		});

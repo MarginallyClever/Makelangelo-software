@@ -28,22 +28,22 @@ public class Generator_Lissajous extends TurtleGenerator {
 		SelectSlider field_delta;
 
 		add(field_a = new SelectSlider("a",Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
-		field_a.addPropertyChangeListener(evt->{
+		field_a.addSelectListener(evt->{
 			setA(field_a.getValue());
 			generate();
 		});
 		add(field_b = new SelectSlider("b",Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
-		field_b.addPropertyChangeListener(evt->{
+		field_b.addSelectListener(evt->{
 			setB(field_b.getValue());
 			generate();
 		});
 		add(field_delta = new SelectSlider("delta",Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
-		field_delta.addPropertyChangeListener(evt->{
+		field_delta.addSelectListener(evt->{
 			setDelta(field_delta.getValue());
 			generate();
 		});
 		add(field_numSamples = new SelectSlider("samples",Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
-		field_numSamples.addPropertyChangeListener(evt->{
+		field_numSamples.addSelectListener(evt->{
 			setNumSamples(field_numSamples.getValue());
 			generate();
 		});

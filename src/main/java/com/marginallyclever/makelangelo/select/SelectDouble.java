@@ -30,14 +30,13 @@ public class SelectDouble extends Select {
 		label.setName(internalName+".label");
 
 		field.setName(internalName+".field");
-		
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-
 		field.setText(StringHelper.formatDouble(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
+
 		field.getDocument().addDocumentListener(new DocumentListener() {
         	@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -69,13 +68,12 @@ public class SelectDouble extends Select {
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								firePropertyChange(oldValue,newValue);
+								fireSelectEvent(oldValue,newValue);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}
 				} catch (NumberFormatException e) {
 					field.setForeground(Color.RED);
-					return;
 				}
 			}
 		});

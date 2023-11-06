@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
 
 public class PaperSettingsPanel extends SelectPanel {
 	private static final Logger logger = LoggerFactory.getLogger(PaperSettingsPanel.class);
@@ -79,18 +78,18 @@ public class PaperSettingsPanel extends SelectPanel {
 		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
 		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
-		paperSizes.addPropertyChangeListener(this::onPaperSizeChange);
-		pw.addPropertyChangeListener(this::onPaperDimensionsChange);
-		ph.addPropertyChangeListener(this::onPaperDimensionsChange);
-		shiftX.addPropertyChangeListener((e)->setPaperFromPanel());
-		shiftY.addPropertyChangeListener((e)->setPaperFromPanel());
-		ang.addPropertyChangeListener((e)->setPaperFromPanel());
-		isLandscape.addPropertyChangeListener(this::onLandscapeChange);
-		paperMargin.addPropertyChangeListener((e)->setPaperFromPanel());
-		paperColor.addPropertyChangeListener((e)->setPaperFromPanel());
+		paperSizes.addSelectListener(this::onPaperSizeChange);
+		pw.addSelectListener(this::onPaperDimensionsChange);
+		ph.addSelectListener(this::onPaperDimensionsChange);
+		shiftX.addSelectListener((e)->setPaperFromPanel());
+		shiftY.addSelectListener((e)->setPaperFromPanel());
+		ang.addSelectListener((e)->setPaperFromPanel());
+		isLandscape.addSelectListener(this::onLandscapeChange);
+		paperMargin.addSelectListener((e)->setPaperFromPanel());
+		paperColor.addSelectListener((e)->setPaperFromPanel());
 	}
 	
-	private void onPaperDimensionsChange(PropertyChangeEvent e) {
+	private void onPaperDimensionsChange(SelectEvent e) {
 		logger.debug("onPaperDimensionsChange()");
 		double w=getPaperWidthFromPanel();
 		double h=getPaperHeightFromPanel();
@@ -110,7 +109,7 @@ public class PaperSettingsPanel extends SelectPanel {
 		logger.debug("onPaperDimensionsChange() done");
 	}
 
-	private void onLandscapeChange(PropertyChangeEvent e) {
+	private void onLandscapeChange(SelectEvent e) {
 		logger.debug("onLandscapeChange()");
 		double w = pw.getValue();
 		double h = ph.getValue();
@@ -120,7 +119,7 @@ public class PaperSettingsPanel extends SelectPanel {
 		logger.debug("onLandscapeChange() done");
 	}
 
-	private void onPaperSizeChange(PropertyChangeEvent e) {
+	private void onPaperSizeChange(SelectEvent e) {
 		logger.debug("onPaperSizeChange()");
 		final int selectedIndex = paperSizes.getSelectedIndex();
 		if(selectedIndex != 0) {

@@ -33,11 +33,11 @@ public class Converter_Moire extends ImageConverter {
 		add(selectSize);
 		add(selectDirection);
 
-		selectSize.addPropertyChangeListener(evt->{
+		selectSize.addSelectListener(evt->{
 			setScale((double)evt.getNewValue());
 			fireRestart();
 		});
-		selectDirection.addPropertyChangeListener(evt->{
+		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -79,7 +79,7 @@ public class Converter_Moire extends ImageConverter {
 		double iterStepSize = 0.002;//machine.getDouble(PlotterSettings.DIAMETER)/2;
 		
 		// examine the line once.  all Z values will be in the range 0...1
-		ArrayList<Double> zList = new ArrayList<Double>();
+		ArrayList<Double> zList = new ArrayList<>();
 		
 		Point2D p = new Point2D();
 		//Point2D n = new Point2D();
@@ -144,7 +144,7 @@ public class Converter_Moire extends ImageConverter {
 						line.getPoint(t, p);
 						double x=p.x;
 						double y=p.y;
-						turtle.jumpTo(x,y);
+						turtle.jumpTo(myPaper.getCenterX()+x,myPaper.getCenterY()+y);
 						
 						// draw back and forth over the segment, each line a little offset from the one before.
 						double halfSpace = pd*(double)passesThisSegment/2.0;
@@ -183,8 +183,8 @@ public class Converter_Moire extends ImageConverter {
 		Point2D n = new Point2D();
 		line.getPoint(t, p);
 		line.getNormal(t, n);
-		double x=p.x + n.x*pulseSize;
-		double y=p.y + n.y*pulseSize;
+		double x=myPaper.getCenterX()+p.x + n.x*pulseSize;
+		double y=myPaper.getCenterY()+p.y + n.y*pulseSize;
 		turtle.moveTo(x,y);
 	}
 
@@ -235,5 +235,4 @@ public class Converter_Moire extends ImageConverter {
 
 		fireConversionFinished();
 	}
-
 }

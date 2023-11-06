@@ -1,8 +1,8 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.select;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.select.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +28,7 @@ public class SelectGUITest {
 
         // test observer fires
         testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
+        b.addSelectListener(evt -> ++testObservation);
 
         b.setSelected(true);
         assertTrue(b.isSelected());
@@ -47,7 +47,7 @@ public class SelectGUITest {
 
         // test observer fires
         testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
+        b.addActionListener(evt -> ++testObservation);
 
         b.doClick();
         assertTrue(testObservation > 0);
@@ -136,7 +136,7 @@ public class SelectGUITest {
 
         // test observer fires
         testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
+        b.addSelectListener(evt -> ++testObservation);
 
         b.setSelectedIndex(2);
         assertTrue(testObservation > 0);
@@ -156,7 +156,7 @@ public class SelectGUITest {
 
         // test observer fires
         testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
+        b.addSelectListener(evt -> ++testObservation);
 
         b.setValue(30);
         assertEquals(30, b.getValue());
@@ -179,7 +179,7 @@ public class SelectGUITest {
 
         // test observer fires
         testObservation = 0;
-        b.addPropertyChangeListener(evt -> ++testObservation);
+        b.addSelectListener(evt -> ++testObservation);
 
         b.setText("third test");
         assertEquals("third test", b.getText());

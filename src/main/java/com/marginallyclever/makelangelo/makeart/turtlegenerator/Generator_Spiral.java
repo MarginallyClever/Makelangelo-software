@@ -18,13 +18,13 @@ public class Generator_Spiral extends TurtleGenerator {
 		super();
 		SelectDouble chooseRadius = new SelectDouble("radius", Translator.get("Generator_Spiral.radius"), radius);
 		add(chooseRadius);
-		chooseRadius.addPropertyChangeListener(e->{
+		chooseRadius.addSelectListener(e->{
 			radius = Math.max(0,chooseRadius.getValue());
 			generate();
 		});
 		SelectBoolean chooseToCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"), toCorners);
 		add(chooseToCorners);
-		chooseToCorners.addPropertyChangeListener(e->{
+		chooseToCorners.addSelectListener(e->{
 			toCorners = chooseToCorners.isSelected();
 			generate();
 		});

@@ -20,7 +20,7 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 		SelectSlider fieldOrder;
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			Generator_HilbertCurve.setOrder(Math.max(1,fieldOrder.getValue()));
 			generate();
 		});

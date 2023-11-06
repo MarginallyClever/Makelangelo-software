@@ -24,7 +24,7 @@ public class Converter_Spiral extends ImageConverter {
 		SelectBoolean selectToCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),getToCorners());
 		add(selectToCorners);
 
-		selectToCorners.addPropertyChangeListener((evt) -> {
+		selectToCorners.addSelectListener((evt) -> {
 			setToCorners((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -53,21 +53,21 @@ public class Converter_Spiral extends ImageConverter {
 
 		turtle = new Turtle();
 
+		double cx = paper.getCenterX();
+		double cy = paper.getCenterY();
+
 		// black and white
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
 		double maxr;
+		double h2 = myPaper.getMarginHeight()/2.0f;
+		double w2 = myPaper.getMarginWidth()/2.0f;
 		if (convertToCorners) {
-			// go right to the corners
-			double h2 = myPaper.getMarginHeight();
-			double w2 = myPaper.getMarginWidth();
-			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
+			maxr = Math.sqrt(h2 * h2 + w2 * w2);
 		} else {
 			// do the largest circle that still fits in the image.
-			double w = myPaper.getMarginWidth()/2.0f;
-			double h = myPaper.getMarginHeight()/2.0f;
-			maxr = Math.min(h, w);
+			maxr = Math.min(h2, w2);
 		}
 
 		double toolDiameter = 1;
@@ -108,7 +108,7 @@ public class Converter_Spiral extends ImageConverter {
 					if(z<level) turtle.penDown();
 					else turtle.penUp();
 				} else turtle.penUp();
-				turtle.moveTo(fx, fy);
+				turtle.moveTo(cx + fx, cy + fy);
 			}
 			r -= toolDiameter;
 			++numRings;
