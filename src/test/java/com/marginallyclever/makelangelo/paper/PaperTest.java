@@ -11,19 +11,6 @@ public class PaperTest {
 		PreferencesHelper.start();
 	}
 
-	/*
-	@Test
-	public void testChangeToolMessage() {
-		Translator.start();
-		MakelangeloRobot r = new MakelangeloRobot();
-		r.changeToTool(0);
-		r.changeToTool((255<<16));
-		r.changeToTool((255<< 8));
-		r.changeToTool((255<< 0));
-		r.changeToTool((255<< 8)+(255<< 0));
-	}
-	*/
-
 	@Test
 	public void testPaperSettingChanges() {
 		Paper a = new Paper();
@@ -39,5 +26,29 @@ public class PaperTest {
 		a.setPaperSize(w,h,0,0);
 		a.saveConfig();
 		// TODO: this is a potentially destructive change if the test fails.
+	}
+
+	@Test
+	public void testPaperLocation() {
+		Paper a = new Paper();
+		a.setPaperSize(200,100,0,0);
+		a.setPaperMargin(0.9);
+		Assertions.assertEquals(180,a.getMarginWidth());
+		Assertions.assertEquals(90,a.getMarginHeight());
+		Assertions.assertEquals(-90,a.getMarginLeft());
+		Assertions.assertEquals(-45,a.getMarginBottom());
+		Assertions.assertEquals(90,a.getMarginRight());
+		Assertions.assertEquals(45,a.getMarginTop());
+		Assertions.assertEquals(0,a.getCenterX());
+		Assertions.assertEquals(0,a.getCenterY());
+		a.setPaperSize(200,100,50,100);
+		Assertions.assertEquals(180,a.getMarginWidth());
+		Assertions.assertEquals(90,a.getMarginHeight());
+		Assertions.assertEquals(-90,a.getMarginLeft());
+		Assertions.assertEquals(-45,a.getMarginBottom());
+		Assertions.assertEquals(90,a.getMarginRight());
+		Assertions.assertEquals(45,a.getMarginTop());
+		Assertions.assertEquals(50,a.getCenterX());
+		Assertions.assertEquals(100,a.getCenterY());
 	}
 }

@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -152,7 +151,12 @@ public class Paper implements PreviewListener {
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_Y, centerY);
 	}
 
+	/**
+	 * @param paperMargin 0...1
+	 */
 	public void setPaperMargin(double paperMargin) {
+		if( paperMargin<0 ) paperMargin = 0;
+		if( paperMargin>1 ) paperMargin = 1;
 		this.paperMargin = paperMargin;
 		saveConfig();
 	}
@@ -281,7 +285,7 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
-	 * @return paper margin %.
+	 * @return paper margin as a value 0...1.
 	 */
 	public double getPaperMargin() {
 		return paperMargin;

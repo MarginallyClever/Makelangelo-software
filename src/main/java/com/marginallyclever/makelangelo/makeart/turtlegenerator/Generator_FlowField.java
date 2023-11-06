@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
+import java.util.Random;
 
 /**
  * Two kinds of flow fields.  Uses Perlin noise to generate the field.
@@ -26,6 +27,8 @@ public class Generator_FlowField extends TurtleGenerator {
 	private static boolean fromEdge = false;  // continuous lines
 	private static boolean rightAngle = false;
 	private Noise noiseMaker = new PerlinNoise();
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	public static void setStepSize(int stepSize) {
 		Generator_FlowField.stepSize = stepSize;
@@ -36,6 +39,14 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	public Generator_FlowField() {
 		super();
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener((evt)->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			generate();
+		});
+
 		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble fieldScaleX = new SelectDouble("scaleX",Translator.get("Generator_FlowField.scaleX"),scaleX);
 		SelectDouble fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),scaleY);
@@ -180,8 +191,8 @@ public class Generator_FlowField extends TurtleGenerator {
 	}
 
 	private void followLine(Turtle turtle,double x,double y,Rectangle r) {
-		double xx = x + stepVariation * (Math.random() * 2.0 - 1.0);
-		double yy = y + stepVariation * (Math.random() * 2.0 - 1.0);
+		double xx = x + stepVariation * (random.nextDouble() * 2.0 - 1.0);
+		double yy = y + stepVariation * (random.nextDouble() * 2.0 - 1.0);
 
 		turtle.jumpTo(xx, yy);
 		followLine(turtle, r, 2);

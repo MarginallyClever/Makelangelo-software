@@ -13,9 +13,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 
@@ -36,11 +34,14 @@ public class Converter_FlowField extends ImageConverter {
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
 	private static boolean fromEdge = false;  // continuous lines
 	private static int cutoff = 128;  // the sampling rate along each line, in mm.
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	private Noise noiseMaker = new PerlinNoise();
 
 	public Converter_FlowField() {
 		super();
+		SelectRandomSeed fieldRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
 		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
@@ -52,6 +53,13 @@ public class Converter_FlowField extends ImageConverter {
 		SelectBoolean fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),fromEdge);
 		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
 		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255,0, cutoff);
+
+		add(fieldRandomSeed);
+		fieldRandomSeed.addSelectListener(evt->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			fireRestart();
+		});
 
 		add(fieldNoise);
 		fieldNoise.addSelectListener(evt->{
@@ -240,6 +248,7 @@ public class Converter_FlowField extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
+		random.setSeed(seed);
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
@@ -333,8 +342,8 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void followLine(TransformedImage img,double x,double y,Rectangle r) {
-		double xx = x + stepVariation * (Math.random() * 2.0 - 1.0);
-		double yy = y + stepVariation * (Math.random() * 2.0 - 1.0);
+		double xx = x + stepVariation * (random.nextDouble() * 2.0 - 1.0);
+		double yy = y + stepVariation * (random.nextDouble() * 2.0 - 1.0);
 
 		turtle.jumpTo(xx, yy);
 		followLine(img, r, 2);
@@ -350,7 +359,7 @@ public class Converter_FlowField extends ImageConverter {
 			double value = 255.0 - (img.sample(turtle.getX()-px, turtle.getY()-py, 5.0));
 			value /= 255.0;
 
-			if(value + (Math.random() - 0.5) > (cutoff/255.0)) turtle.penDown();
+			if(value + (random.nextDouble() - 0.5) > (cutoff/255.0)) turtle.penDown();
 			else turtle.penUp();
 
 			double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);

@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.tools.CropTurtle;
 import com.marginallyclever.makelangelo.makeart.truchet.*;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Generate random Truchet tiles using the {@link TruchetTileFactory} as a menu of available tiles.
@@ -24,11 +26,21 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 	private final SelectSlider linesPerTile;
 	private static int spaceBetweenLines = 10;
 	private static int linesPerTileCount = 10;
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	private final List<Boolean> allowedTiles = new ArrayList<>();
 
 	public Generator_TruchetTiles() {
 		super();
+
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener((evt)->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			generate();
+		});
 
 		List<String> names = TruchetTileFactory.getNames();
 		// first time
@@ -92,7 +104,7 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 		if(!ttgList.isEmpty()) {
 			for(double y=yMin;y<yMax;y+= tileSize) {
 				for(double x=xMin;x<xMax;x+= tileSize) {
-					int v = (int)(Math.random()* ttgList.size());
+					int v = (int)(random.nextDouble()* ttgList.size());
 					ttgList.get(v).drawTile(x,y);
 				}
 			}

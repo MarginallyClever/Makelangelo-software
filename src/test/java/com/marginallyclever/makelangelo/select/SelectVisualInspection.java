@@ -26,6 +26,7 @@ public class SelectVisualInspection {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(buildPanel());
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
@@ -45,6 +46,7 @@ public class SelectVisualInspection {
         SelectTextArea j = new SelectTextArea("J","J",ipsum);
         SelectSpinner k = new SelectSpinner("K", "K", 1, 10, 3);
         SelectTextField m = new SelectTextField("M", "M", "M");
+        SelectRandomSeed n = new SelectRandomSeed("N", "N", 0);
 
         panel.add(a);
         panel.add(b);
@@ -58,6 +60,7 @@ public class SelectVisualInspection {
         panel.add(j);
         panel.add(k);
         panel.add(m);
+        panel.add(n);
 
         // test finish
         panel.setPreferredSize(new Dimension(400,600));
