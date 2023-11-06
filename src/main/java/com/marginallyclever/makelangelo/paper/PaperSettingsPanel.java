@@ -43,7 +43,7 @@ public class PaperSettingsPanel extends SelectPanel {
 
 	private final Paper myPaper;
 	private final SelectOneOfMany paperSizes;
-	private final SelectDouble pw, ph, shiftX, shiftY, ang;
+	private final SelectDouble pw, ph, shiftX, shiftY;// ang;
 	private final SelectBoolean isLandscape;
 	private final SelectSlider paperMargin;
 	private final SelectColor paperColor;
@@ -59,18 +59,12 @@ public class PaperSettingsPanel extends SelectPanel {
 			commonPaperNames[i+1] = commonPaperSizes[i].toString();
 		}
 
-		double top = myPaper.getPaperTop();
-		double bot = myPaper.getPaperBottom();
-		double left = myPaper.getPaperLeft();
-		double right = myPaper.getPaperRight();
-		double rot = myPaper.getRotation();
-
 		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSettings.PaperSize"),commonPaperNames,0));
-		add(pw = new SelectDouble("width",Translator.get("PaperSettings.PaperWidth"),right-left));
-		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),top-bot));
-		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),(float)(left+right)/2.0f));
-		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),(float)(top+bot)/2.0f));
-		add(ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),(float)rot));
+		add(pw = new SelectDouble("width",Translator.get("PaperSettings.PaperWidth"),myPaper.getPaperWidth()));
+		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),myPaper.getPaperHeight()));
+		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),myPaper.getCenterX()));
+		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),myPaper.getCenterY()));
+		//add(ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),myPaper.getRotation()));
 		add(isLandscape = new SelectBoolean("landscape",Translator.get("PaperSettings.Landscape"),false));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperSettings.PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("PaperSettings.PaperColor"),myPaper.getPaperColor(),this));
@@ -83,7 +77,7 @@ public class PaperSettingsPanel extends SelectPanel {
 		ph.addSelectListener(this::onPaperDimensionsChange);
 		shiftX.addSelectListener((e)->setPaperFromPanel());
 		shiftY.addSelectListener((e)->setPaperFromPanel());
-		ang.addSelectListener((e)->setPaperFromPanel());
+		//ang.addSelectListener((e)->setPaperFromPanel());
 		isLandscape.addSelectListener(this::onLandscapeChange);
 		paperMargin.addSelectListener((e)->setPaperFromPanel());
 		paperColor.addSelectListener((e)->setPaperFromPanel());
@@ -182,9 +176,9 @@ public class PaperSettingsPanel extends SelectPanel {
 		double h = ((Number)ph.getValue()).doubleValue();
 		double sx = ((Number)shiftX.getValue()).doubleValue();
 		double sy = ((Number)shiftY.getValue()).doubleValue();
-		double rot = ((Number)ang.getValue()).doubleValue();
+		//double rot = ((Number)ang.getValue()).doubleValue();
 		myPaper.setPaperSize(w, h, sx, sy);
-		myPaper.setRotation(rot);
+		//myPaper.setRotation(rot);
 		myPaper.setPaperColor(paperColor.getColor());
 		myPaper.setPaperMargin((100 - paperMargin.getValue()) * 0.01);
 		myPaper.saveConfig();
@@ -220,7 +214,7 @@ public class PaperSettingsPanel extends SelectPanel {
 		double phf = ((Number)ph.getValue()).doubleValue();
 		double shiftxf = ((Number)shiftX.getValue()).doubleValue();
 		double shiftyf = ((Number)shiftY.getValue()).doubleValue();
-		double rot = ((Number)ang.getValue()).doubleValue();
+		//double rot = ((Number)ang.getValue()).doubleValue();
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
@@ -228,7 +222,7 @@ public class PaperSettingsPanel extends SelectPanel {
 
 		if (data_is_sane) {
 			myPaper.setPaperSize(pwf,phf,shiftxf,shiftyf);
-			myPaper.setRotation(rot);
+			//myPaper.setRotation(rot);
 			myPaper.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
