@@ -43,7 +43,7 @@ public class PaperSettingsPanel extends SelectPanel {
 
 	private final Paper myPaper;
 	private final SelectOneOfMany paperSizes;
-	private final SelectDouble pw, ph, shiftX, shiftY;// ang;
+	private final SelectDouble pw, ph, shiftX, shiftY, ang;
 	private final SelectBoolean isLandscape;
 	private final SelectSlider paperMargin;
 	private final SelectColor paperColor;
@@ -64,7 +64,8 @@ public class PaperSettingsPanel extends SelectPanel {
 		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),myPaper.getPaperHeight()));
 		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),myPaper.getCenterX()));
 		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),myPaper.getCenterY()));
-		//add(ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),myPaper.getRotation()));
+		ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),myPaper.getRotation());
+		//add();
 		add(isLandscape = new SelectBoolean("landscape",Translator.get("PaperSettings.Landscape"),false));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperSettings.PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("PaperSettings.PaperColor"),myPaper.getPaperColor(),this));

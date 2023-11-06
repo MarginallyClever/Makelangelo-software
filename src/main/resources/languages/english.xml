@@ -296,6 +296,7 @@
 	<string><key>Converter_EdgeDetection.passes</key><value>Passes</value></string>
 	<string><key>Converter_EdgeDetection.stepSize</key><value>Step size</value></string>
 	<string><key>Converter_EdgeDetection.sampleSize</key><value>SampleSize</value></string>
+	<string><key>Converter_EdgeDetection.border</key><value>Draw border</value></string>
 
 	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
 	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
