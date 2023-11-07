@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -49,7 +50,7 @@ public class Generator_GosperCurve extends TurtleGenerator {
 		double v = Math.min(rect.getWidth(),rect.getHeight());
 
 		Turtle turtle = new Turtle();
-                turtle.penDown();
+		turtle.jumpTo(myPaper.getCenterX(),myPaper.getCenterY());
 		gosperA(turtle,order);
 
 		// scale the image to fit on the paper
@@ -72,6 +73,10 @@ public class Generator_GosperCurve extends TurtleGenerator {
 		double ty = dims.getY();
 		
 		turtle.translate(-tx-tw/2, -ty-th/2);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

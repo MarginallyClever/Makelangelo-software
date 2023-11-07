@@ -104,6 +104,8 @@ public class Generator_Package extends TurtleGenerator {
 		drawRect(turtle,x2,y5-1,x3,y5+1); // lasche
 		drawRect(turtle,x2+20,y1,x3-20,y2); // lasche
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

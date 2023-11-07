@@ -52,6 +52,8 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		lines(turtle,100,0);
 		lines(turtle,100,90);
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

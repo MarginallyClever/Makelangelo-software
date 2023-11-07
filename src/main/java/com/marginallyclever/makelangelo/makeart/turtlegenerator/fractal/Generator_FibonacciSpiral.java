@@ -105,6 +105,8 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 			fibonacciCell(turtle,o*scale1);
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

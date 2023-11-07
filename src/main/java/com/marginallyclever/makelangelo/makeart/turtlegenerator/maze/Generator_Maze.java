@@ -43,6 +43,8 @@ public abstract class Generator_Maze extends TurtleGenerator {
         // draw the maze
         Turtle turtle = drawMaze();
 
+        turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
         notifyListeners(turtle);
     }
 

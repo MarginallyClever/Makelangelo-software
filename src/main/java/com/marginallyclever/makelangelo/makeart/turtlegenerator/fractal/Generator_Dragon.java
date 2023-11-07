@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -60,12 +61,18 @@ public class Generator_Dragon extends TurtleGenerator {
         }
         
 		// move to starting position
+		turtle.jumpTo(myPaper.getCenterX(),myPaper.getCenterY());
+
         turtle.penDown();
 		// draw the fractal
         for (Integer turn : sequence) {
             turtle.turn(turn * 90);
             turtle.forward(1);
-        }  
+        }
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
         notifyListeners(turtle);
 	}

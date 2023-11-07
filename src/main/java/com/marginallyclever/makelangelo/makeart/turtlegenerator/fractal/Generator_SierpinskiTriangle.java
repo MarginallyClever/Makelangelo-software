@@ -73,6 +73,8 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 			drawCurve(turtle,order, maxSize,-60);
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

@@ -79,6 +79,8 @@ public class Generator_Spiral extends TurtleGenerator {
 			r -= radius;
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 }

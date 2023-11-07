@@ -133,6 +133,8 @@ public class Generator_FlowField extends TurtleGenerator {
 			asGrid(turtle);
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

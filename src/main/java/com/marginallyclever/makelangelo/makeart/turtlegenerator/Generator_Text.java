@@ -298,6 +298,8 @@ public class Generator_Text extends TurtleGenerator {
 		textSetVAlign(VAlign.MIDDLE);
 		Turtle turtle = writeBeautifulMessage(fontName,lastSize,lastMessage);
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 	

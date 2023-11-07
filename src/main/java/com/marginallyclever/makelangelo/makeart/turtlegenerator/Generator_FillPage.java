@@ -49,9 +49,9 @@ public class Generator_FillPage extends TurtleGenerator {
 		double yMax = rect.getMaxY();
 		double xMin = rect.getMinX();
 		double xMax = rect.getMaxX();
-		double dy = (yMax - yMin)/2;
-		double dx = (xMax - xMin)/2;
-		double radius = Math.sqrt(dx*dx+dy*dy);
+		double height = rect.getHeight();
+		double width = rect.getWidth();
+		double radius = Math.sqrt(width*width+height*height)/2;
 
 		Turtle turtle = new Turtle();
 		turtle.setDiameter(penDiameter);
@@ -67,9 +67,9 @@ public class Generator_FillPage extends TurtleGenerator {
 				double majorPX = majorX * a;
 				double majorPY = majorY * a;
 				P0.set( majorPX - majorY * radius,
-								majorPY + majorX * radius);
+						majorPY + majorX * radius);
 				P1.set( majorPX + majorY * radius,
-								majorPY - majorX * radius);
+						majorPY - majorX * radius);
 				if(Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 					if ((i % 2) == 0) 	{
 						turtle.moveTo(P0.x,P0.y);
@@ -85,6 +85,8 @@ public class Generator_FillPage extends TurtleGenerator {
 			}
 		}
 		// else throw error message "penDiameter must be greater than zero."
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

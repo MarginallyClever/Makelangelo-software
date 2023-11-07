@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -51,11 +52,15 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 		turtleStep = (float) ((v - xMin) / (Math.pow(2, order)));
 
 		// move to starting position
-		turtle.moveTo(
+		turtle.jumpTo(
 				-v + turtleStep / 2,
 				-v + turtleStep / 2);
 		turtle.penDown();
 		hilbert(turtle,order);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

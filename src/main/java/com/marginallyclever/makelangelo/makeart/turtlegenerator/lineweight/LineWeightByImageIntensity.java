@@ -88,6 +88,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
         sourceImage = null;
 
+        turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
         notifyListeners(turtle);
     }
 

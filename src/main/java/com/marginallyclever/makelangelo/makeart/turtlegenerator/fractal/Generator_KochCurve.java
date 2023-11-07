@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -65,6 +66,10 @@ public class Generator_KochCurve extends TurtleGenerator {
 		
 		turtle.penDown();
 		drawTriangle(turtle,order, maxSize);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

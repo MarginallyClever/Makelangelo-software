@@ -78,6 +78,9 @@ public class Generator_Voronoi extends TurtleGenerator {
 		drawGraphEdges(turtle,diagram);
 		if(showCenters) drawCellCenters(turtle,points);
 		turtle.penUp();
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

@@ -103,6 +103,8 @@ public class Generator_GridFit extends TurtleGenerator {
 			turtle.moveTo(x2, halfHeight);
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 }

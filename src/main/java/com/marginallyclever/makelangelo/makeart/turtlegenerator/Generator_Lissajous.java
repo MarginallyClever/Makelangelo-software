@@ -97,6 +97,8 @@ public class Generator_Lissajous extends TurtleGenerator {
 
 		Turtle turtle = drawLissajous();
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

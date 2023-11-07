@@ -107,6 +107,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	@Override
 	public void generate() {
 		Turtle turtle = drawSpirograph();
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

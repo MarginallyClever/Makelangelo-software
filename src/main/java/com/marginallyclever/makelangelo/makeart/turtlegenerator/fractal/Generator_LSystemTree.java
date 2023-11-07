@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
@@ -90,6 +91,10 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		turtle.penDown();
 		// do the curve
 		lSystemTree(turtle,order, 10);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

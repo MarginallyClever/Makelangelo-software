@@ -113,6 +113,8 @@ public class Generator_TruchetTiles extends TurtleGenerator {
 		}
 
 		CropTurtle.run(turtle,myPaper.getMarginRectangle());
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 }

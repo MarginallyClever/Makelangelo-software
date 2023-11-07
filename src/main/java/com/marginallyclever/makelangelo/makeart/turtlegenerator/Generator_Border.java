@@ -24,16 +24,18 @@ public class Generator_Border extends TurtleGenerator {
 		double yMax = rect.getMaxY();
 		double xMin = rect.getMinX();
 		double xMax = rect.getMaxX();
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 
 		Turtle turtle = new Turtle();
 		turtle.penUp();
-		turtle.moveTo(xMin,yMax);
+		turtle.moveTo(cx+xMin,cy+yMax);
 		turtle.penDown();
-		turtle.moveTo(xMin,yMax);
-		turtle.moveTo(xMax,yMax);
-		turtle.moveTo(xMax,yMin);
-		turtle.moveTo(xMin,yMin);
-		turtle.moveTo(xMin,yMax);
+		turtle.moveTo(cx+xMin,cy+yMax);
+		turtle.moveTo(cx+xMax,cy+yMax);
+		turtle.moveTo(cx+xMax,cy+yMin);
+		turtle.moveTo(cx+xMin,cy+yMin);
+		turtle.moveTo(cx+xMin,cy+yMax);
 		
 		notifyListeners(turtle);
 	}

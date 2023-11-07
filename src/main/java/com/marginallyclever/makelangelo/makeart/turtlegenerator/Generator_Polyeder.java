@@ -261,6 +261,8 @@ public class Generator_Polyeder extends TurtleGenerator {
 		geneneratePolygonStep(turtle,t);
 		logger.debug("end");
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 

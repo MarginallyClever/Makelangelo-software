@@ -65,6 +65,8 @@ public class Generator_GridHexagons extends TurtleGenerator {
 		ResizeTurtleToPaperAction act = new ResizeTurtleToPaperAction(myPaper,false,"");
 		turtle = act.run(turtle);
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 
