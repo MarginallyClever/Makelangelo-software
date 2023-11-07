@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 
@@ -281,10 +282,11 @@ public class Converter_FlowField extends ImageConverter {
 		double px = myPaper.getCenterX();
 		double py = myPaper.getCenterY();
 
-		double xMin = px+myPaper.getMarginLeft()+stepSize;
-		double xMax = px+myPaper.getMarginRight()-stepSize;
-		double yMin = py+myPaper.getMarginBottom()+stepSize;
-		double yMax = py+myPaper.getMarginTop()-stepSize;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMin = rect.getMinX()+stepSize;
+		double xMax = rect.getMaxX()-stepSize;
+		double yMin = rect.getMinY()+stepSize;
+		double yMax = rect.getMaxY()-stepSize;
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 
@@ -326,12 +328,14 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void asGrid(TransformedImage img) {
+
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
 		double px = myPaper.getCenterX();
 		double py = myPaper.getCenterY();
-		double xMin = px+myPaper.getMarginLeft();
-		double xMax = px+myPaper.getMarginRight();
-		double yMin = py+myPaper.getMarginBottom();
-		double yMax = py+myPaper.getMarginTop();
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 		for(double y = yMin; y<yMax; y+=stepSize) {

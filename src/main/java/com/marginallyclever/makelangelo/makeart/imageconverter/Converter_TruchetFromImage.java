@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Choose from two truchet tile patterns based on the intensity of a source image.
  * @author Dan Royer
@@ -55,13 +57,13 @@ public class Converter_TruchetFromImage extends ImageConverter {
         TruchetDiagonal truchet = new TruchetDiagonal(turtle,spaceBetweenLines,linesPerTile);
         double tileSize = spaceBetweenLines * linesPerTile;
 
-        double adjx = (paper.getMarginWidth() % tileSize)/2;
-        double adjy = (paper.getMarginHeight() % tileSize)/2;
-
-        double minx = paper.getMarginLeft()+adjx;
-        double miny = paper.getMarginBottom()+adjy;
-        double maxx = paper.getMarginRight()-adjx;
-        double maxy = paper.getMarginTop()-adjy;
+        Rectangle2D.Double rect = myPaper.getMarginRectangle();
+        double adjx = (rect.getWidth() % tileSize)/2;
+        double adjy = (rect.getHeight() % tileSize)/2;
+        double minx = rect.getMinX()+adjx;
+        double miny = rect.getMinY()+adjy;
+        double maxx = rect.getMaxX()-adjx;
+        double maxy = rect.getMaxY()-adjy;
         double px = myPaper.getCenterX();
         double py = myPaper.getCenterY();
 

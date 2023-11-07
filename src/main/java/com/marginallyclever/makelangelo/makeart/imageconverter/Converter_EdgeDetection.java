@@ -11,6 +11,8 @@ import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Uses <a href="http://en.wikipedia.org/wiki/Marching_squares">marching squares</a> to detect edges.
  * @author Dan Royer
@@ -105,27 +107,34 @@ public class Converter_EdgeDetection extends ImageConverter {
 
 		if(border) {
 			// add border
-			turtle.jumpTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginBottom());
-			turtle.moveTo(px+myPaper.getMarginRight(), py+myPaper.getMarginBottom());
-			turtle.moveTo(px+myPaper.getMarginRight(), py+myPaper.getMarginTop());
-			turtle.moveTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginTop());
-			turtle.moveTo(px+myPaper.getMarginLeft(), py+myPaper.getMarginBottom());
+			Rectangle2D.Double rect = myPaper.getMarginRectangle();
+			double xLeft   = rect.getMinX();
+			double yBottom = rect.getMinY();
+			double xRight  = rect.getMaxX();
+			double yTop    = rect.getMaxY();
+
+			turtle.jumpTo(px+xLeft, py+yBottom);
+			turtle.moveTo(px+xRight, py+yBottom);
+			turtle.moveTo(px+xRight, py+yTop);
+			turtle.moveTo(px+xLeft, py+yTop);
+			turtle.moveTo(px+xLeft, py+yBottom);
 		}
 
 		fireConversionFinished();
 	}
 
 	void marchingSquares() {
-		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
-		double width   = myPaper.getMarginRight() - myPaper.getMarginLeft();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double height  = rect.getHeight();
+		double width   = rect.getWidth();
 
 		int stepsOnY = (int)Math.floor(height / stepSize);
 		int stepsOnX = (int)Math.floor(width / stepSize);
 
 		for(int y=0;y<stepsOnY;++y) {
 			for(int x=0;x<stepsOnX;++x) {
-				marchSquare((int)myPaper.getMarginLeft() + x*stepSize,
-						(int)myPaper.getMarginBottom() + y*stepSize);
+				marchSquare((int)rect.getMinX() + x*stepSize,
+						(int)rect.getMinY() + y*stepSize);
 			}
 		}
 	}

@@ -4,6 +4,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Makes a "well formed" maze.
  * See also <a href="https://en.wikipedia.org/wiki/Maze_generation_algorithm#Recursive_backtracker">wikipedia</a>
@@ -96,11 +98,12 @@ public class Generator_MazeRectangle extends Generator_Maze {
 
 	@Override
 	public Turtle drawMaze() {
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
-		
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+
 		double w = (xMax - xMin) / columns;
 		double h = (yMax - yMin) / rows;
 

@@ -71,11 +71,11 @@ public class PaperSettingsPanel extends SelectPanel {
 		add(paperColor = new SelectColor("color",Translator.get("PaperSettings.PaperColor"),myPaper.getPaperColor(),this));
 
 		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
-		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
+		onPaperWidthOrHeightChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
-		paperSizes.addSelectListener(this::onPaperSizeChange);
-		pw.addSelectListener(this::onPaperDimensionsChange);
-		ph.addSelectListener(this::onPaperDimensionsChange);
+		paperSizes.addSelectListener(this::onPaperSizePresetChange);
+		pw.addSelectListener(this::onPaperWidthOrHeightChange);
+		ph.addSelectListener(this::onPaperWidthOrHeightChange);
 		shiftX.addSelectListener((e)->setPaperFromPanel());
 		shiftY.addSelectListener((e)->setPaperFromPanel());
 		//ang.addSelectListener((e)->setPaperFromPanel());
@@ -83,8 +83,12 @@ public class PaperSettingsPanel extends SelectPanel {
 		paperMargin.addSelectListener((e)->setPaperFromPanel());
 		paperColor.addSelectListener((e)->setPaperFromPanel());
 	}
-	
-	private void onPaperDimensionsChange(SelectEvent e) {
+
+	/**
+	 * Called when the user changes the paper width or height.
+	 * @param e the event that triggered this call
+	 */
+	private void onPaperWidthOrHeightChange(SelectEvent e) {
 		logger.debug("onPaperDimensionsChange()");
 		double w=getPaperWidthFromPanel();
 		double h=getPaperHeightFromPanel();
@@ -114,7 +118,11 @@ public class PaperSettingsPanel extends SelectPanel {
 		logger.debug("onLandscapeChange() done");
 	}
 
-	private void onPaperSizeChange(SelectEvent e) {
+	/**
+	 * Called when the user selects a paper size from the list.
+	 * @param e the event that triggered this call
+	 */
+	private void onPaperSizePresetChange(SelectEvent e) {
 		logger.debug("onPaperSizeChange()");
 		final int selectedIndex = paperSizes.getSelectedIndex();
 		if(selectedIndex != 0) {

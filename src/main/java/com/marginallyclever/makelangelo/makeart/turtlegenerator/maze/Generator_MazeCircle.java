@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Makes a "well formed" maze in a circle.
@@ -116,10 +117,11 @@ public class Generator_MazeCircle extends Generator_Maze {
 	@Override
 	public Turtle drawMaze() {
 		// find radius of maze
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
 
 		double r = Math.min(xMax-xMin,yMax-yMin)/2.0;
 

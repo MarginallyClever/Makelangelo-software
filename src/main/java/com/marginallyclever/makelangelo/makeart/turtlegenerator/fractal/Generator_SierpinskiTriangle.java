@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * See <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve">Wikipedia</a>
  * @author Dan Royer
@@ -42,8 +44,9 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double xMax = myPaper.getMarginWidth() / 2.0f;
-		double yMax = myPaper.getMarginHeight() / 2.0f;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMax = rect.getWidth() / 2.0f;
+		double yMax = rect.getHeight() / 2.0f;
 		double xMin = -xMax;
 		double yMin = -yMax;
 

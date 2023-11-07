@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * A grid of boxes across the paper, and make the boxes bigger if the image is darker in that area.
  * @author Dan Royer
@@ -62,10 +64,11 @@ public class Converter_Boxxy extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop();
-		double xLeft   = myPaper.getMarginLeft();
-		double xRight  = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double yBottom = rect.getMinY();
+		double xRight  = rect.getMaxX();
+		double yTop    = rect.getMaxY();
 		double cx = paper.getCenterX();
 		double cy = paper.getCenterY();
 		double pw = xRight - xLeft;

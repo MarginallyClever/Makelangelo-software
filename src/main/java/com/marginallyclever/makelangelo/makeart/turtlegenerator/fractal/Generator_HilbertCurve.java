@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Hilbert Curve fractal.
  * @author Dan Royer
@@ -41,7 +43,8 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double v = Math.min(rect.getWidth(),rect.getHeight());
 		double xMin = -v;
 
 		Turtle turtle = new Turtle();

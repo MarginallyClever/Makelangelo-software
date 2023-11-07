@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
 
@@ -60,10 +61,11 @@ public class Converter_RandomLines extends ImageConverter {
 		double level = 255.0 / 4.0;
 
 		// from top to bottom of the margin area...
-		float yBottom = (float)myPaper.getMarginBottom();
-		float yTop    = (float)myPaper.getMarginTop()   ;
-		float xLeft   = (float)myPaper.getMarginLeft()  ;
-		float xRight  = (float)myPaper.getMarginRight() ;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yBottom = rect.getMinY();
+		double yTop    = rect.getMaxY();
+		double xLeft   = rect.getMinX();
+		double xRight  = rect.getMaxX();
 		double dy = yTop - yBottom-1;
 		double dx = xRight - xLeft-1;
 

@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,8 +101,9 @@ public abstract class ImageConverter {
 		Point2D P0 = new Point2D(x0,y0);
 		Point2D P1 = new Point2D(x1,y1);
 
-		Point2D rMax = new Point2D(myPaper.getMarginRight(),myPaper.getMarginTop());
-		Point2D rMin = new Point2D(myPaper.getMarginLeft(),myPaper.getMarginBottom());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		Point2D rMax = new Point2D(rect.getMaxX(),rect.getMaxY());
+		Point2D rMin = new Point2D(rect.getMinX(),rect.getMinY());
 		if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 			// entire line clipped
 			return;
@@ -164,11 +166,13 @@ public abstract class ImageConverter {
 		boolean penUp;
 		int steps=0;
 
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+
 		for (b = 0; b <= distance; b+=stepSize) {
 			n = b / distance;
 			x = dx * n + x0;
 			y = dy * n + y0;
-			isInside = myPaper.isInsidePaperMargins(x,y);
+			isInside = rect.contains(x,y);
 			if(isInside) {
 				oldPixel = img.sample( x, y, halfStep);
 				int b2 = (int)Math.min(b, error0.length-2);

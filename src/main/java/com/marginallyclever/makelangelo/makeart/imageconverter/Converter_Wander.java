@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -94,10 +95,11 @@ public class Converter_Wander extends ImageConverter {
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double xRight  = rect.getMaxX();
+		double yBottom = rect.getMinY();
+		double yTop    = rect.getMaxY();
 		double px = myPaper.getCenterX();
 		double py = myPaper.getCenterY();
 

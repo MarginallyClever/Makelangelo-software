@@ -45,7 +45,8 @@ public class Generator_GosperCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double v = Math.min(rect.getWidth(),rect.getHeight());
 
 		Turtle turtle = new Turtle();
                 turtle.penDown();

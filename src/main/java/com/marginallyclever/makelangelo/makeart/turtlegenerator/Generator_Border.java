@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Draws a border around the paper.  Uses current paper myPaper.
  * @author Dan Royer
@@ -17,10 +19,11 @@ public class Generator_Border extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
 
 		Turtle turtle = new Turtle();
 		turtle.penUp();

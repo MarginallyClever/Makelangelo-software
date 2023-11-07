@@ -10,6 +10,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
+
 
 /**
  * based on polagraph style by Sandy Noble.
@@ -63,10 +65,11 @@ public class Converter_Sandy extends ImageConverter {
 		double xLeft   = myPaper.getPaperLeft();
 		double xRight  = myPaper.getPaperRight();
 
-		double pBottom = myPaper.getMarginBottom() +1.0;
-		double pTop    = myPaper.getMarginTop()    -1.0;
-		double pLeft   = myPaper.getMarginLeft()   +1.0;
-		double pRight  = myPaper.getMarginRight()  -1.0;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double pLeft   = rect.getMinX() +1.0;
+		double pBottom = rect.getMinY() +1.0;
+		double pRight  = rect.getMaxX() -1.0;
+		double pTop    = rect.getMaxY() -1.0;
 
 		double cx,cy;
 		double last_x=0,last_y=0;
@@ -141,7 +144,7 @@ public class Converter_Sandy extends ImageConverter {
 					dy = Math.sin(t_dir *t);
 					x = cx + dx * r;
 					y = cy + dy * r;
-					if(!myPaper.isInsidePaperMargins(x,y)) {
+					if(!rect.contains(x,y)) {
 						if(wasDrawing) {
 							turtle.jumpTo(px+last_x,py+last_y);
 							wasDrawing=false;

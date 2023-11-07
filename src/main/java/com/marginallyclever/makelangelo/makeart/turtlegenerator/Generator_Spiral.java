@@ -5,6 +5,8 @@ import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Draws a spiral.
  * @author Dan Royer
@@ -41,16 +43,17 @@ public class Generator_Spiral extends TurtleGenerator {
 		double cx = Math.cos(Math.toRadians(0));
 		double cy = Math.sin(Math.toRadians(0));
 
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		double maxr;
 		if(toCorners) {
 			// go right to the corners
-			double h = myPaper.getMarginHeight();
-			double w = myPaper.getMarginWidth();
+			double h = rect.getHeight();
+			double w = rect.getWidth();
 			maxr = Math.sqrt(h * h + w * w)/2 + 1.0;
 		} else {
 			// do the largest circle that still fits in the image.
-			double w = myPaper.getMarginWidth()/2.0f;
-			double h = myPaper.getMarginHeight()/2.0f;
+			double w = rect.getWidth()/2.0f;
+			double h = rect.getHeight()/2.0f;
 			maxr = Math.min(h, w);
 		}
 
@@ -70,7 +73,7 @@ public class Generator_Spiral extends TurtleGenerator {
 				fy = cy + Math.sin(f) * r1;
 
 				turtle.moveTo(fx, fy);
-				if(myPaper.isInsidePaperMargins(fx, fy)) turtle.penDown();
+				if(rect.contains(fx, fy)) turtle.penDown();
 				else turtle.penUp();
 			}
 			r -= radius;

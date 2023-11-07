@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
 import java.util.Stack;
 
 /**
@@ -58,8 +59,9 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		float xMax = (float) (myPaper.getMarginWidth() / 2.0f);
-		float yMax = (float) (myPaper.getMarginHeight() / 2.0f);
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMax = rect.getWidth() / 2.0;
+		double yMax = rect.getHeight() / 2.0;
 		logger.debug("xMax={}", xMax);
 		logger.debug("yMax={}", yMax);
 		
@@ -68,20 +70,20 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 		
 		// scale the fractal to fit on the page
 		// short side
-		float s1 = fibonacciSequence.peek();
+		double s1 = fibonacciSequence.peek();
 		logger.debug("s1={}", s1);
-		float scale1 = Math.min(xMax, yMax) * 2.0f / s1;
+		double scale1 = Math.min(xMax, yMax) * 2.0f / s1;
 		// long side
-		float s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
+		double s2 = fibonacciSequence.get(fibonacciSequence.size()-2) + s1;
 		logger.debug("s2={}", s2);
-		float scale2 = Math.max(xMax, yMax) * 2.0f / s2;
+		double scale2 = Math.max(xMax, yMax) * 2.0f / s2;
 
 		if(scale1>scale2) scale1=scale2;
 		
 		Turtle turtle = new Turtle();
 		
 		// move to starting position
-		float shortSide = fibonacciSequence.peek() * scale1 /2.0f; 
+		double shortSide = fibonacciSequence.peek() * scale1 /2.0f;
 		logger.debug("shortSide={}", shortSide);
 		if( xMax < yMax) {
 			logger.debug("tall thin");
@@ -108,7 +110,7 @@ public class Generator_FibonacciSpiral extends TurtleGenerator {
 
 
 	// L System tree
-	private void fibonacciCell(Turtle turtle,float size) {
+	private void fibonacciCell(Turtle turtle,double size) {
 		// make the square around the cell
 		turtle.forward(size);
 		turtle.turn(90);

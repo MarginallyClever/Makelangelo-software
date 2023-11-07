@@ -73,13 +73,19 @@ public class Paper implements PreviewListener {
 		gl2.glLineWidth(1);
 		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
 
+		Rectangle2D.Double rect = getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+
 		gl2.glPushMatrix();
 		gl2.glTranslated(centerX, centerY, 0);
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(getMarginLeft(), getMarginTop());
-		gl2.glVertex2d(getMarginRight(), getMarginTop());
-		gl2.glVertex2d(getMarginRight(), getMarginBottom());
-		gl2.glVertex2d(getMarginLeft(), getMarginBottom());
+		gl2.glVertex2d(xMin, yMax);
+		gl2.glVertex2d(xMax, yMax);
+		gl2.glVertex2d(xMax, yMin);
+		gl2.glVertex2d(xMin, yMin);
 		gl2.glEnd();
 		gl2.glPopMatrix();
 	}
@@ -108,22 +114,21 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
-	    for debug purpose can be modified.
-	    @return description (position left,right,top,bottom and deducted width and height) of the paper.
-	*/
+	 * @return description of the paper.
+	 */
 	@Override
 	public String toString() {
 		return String.format(
-				"Paper Width = %5.2f Height = %5.2f (left=%5.2f right=%5.2f top=%5.2f bottom=%5.2f) centerShift(X=%5.2f Y=%5.2f) color %s",
-				getPaperWidth(), getPaperHeight(), paperLeft, paperRight, paperTop, paperBottom, centerX, centerY, paperColor);
+				"Paper Width=%5.2f Height=%5.2f center(%5.2f,%5.2f) color %s",
+				getPaperWidth(), getPaperHeight(), centerX, centerY, paperColor);
 	}
 
 	/** 
-	 * TODO control values consictancy ? 
-	 * TODO color hase RGB hexa string value ?
+	 * TODO control values consistency ?
+	 * TODO color hase RGB hex string value ?
 	 */
 	public void loadConfig() {
-		logger.debug("loadConfig() before "+this.toString());
+		logger.debug("loading...");
 		paperLeft = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_LEFT, Double.toString(paperLeft)));
 		paperRight = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_RIGHT, Double.toString(paperRight)));
 		paperTop = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_TOP, Double.toString(paperTop)));
@@ -135,11 +140,11 @@ public class Paper implements PreviewListener {
 		rotationRef = 0;
 		centerX=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_X, Double.toString(rotation)));
 		centerY=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_Y, Double.toString(rotation)));
-		logger.debug("loadConfig() after "+this.toString());
+		logger.debug(this.toString());
 	}
 
 	public void saveConfig() {
-		logger.debug("saveConfig() "+this.toString() );
+		logger.debug("saving "+this+"...");
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_LEFT, paperLeft);
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_RIGHT, paperRight);
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_TOP, paperTop);
@@ -151,16 +156,6 @@ public class Paper implements PreviewListener {
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_Y, centerY);
 	}
 
-	/**
-	 * @param paperMargin 0...1
-	 */
-	public void setPaperMargin(double paperMargin) {
-		if( paperMargin<0 ) paperMargin = 0;
-		if( paperMargin>1 ) paperMargin = 1;
-		this.paperMargin = paperMargin;
-		saveConfig();
-	}
-
 	public void setPaperSize(double width, double height, double shiftx, double shifty) {
 		this.centerX = shiftx;
 		this.centerY = shifty;
@@ -169,25 +164,13 @@ public class Paper implements PreviewListener {
 		this.paperTop = height / 2;
 		this.paperBottom = -height / 2;		
 	}
-	
-	public Rectangle2D.Double getMarginRectangle() {
-		Rectangle2D.Double rectangle = new Rectangle2D.Double();
-		rectangle.x = getMarginLeft();
-		rectangle.y = getMarginBottom();
-		rectangle.width = getMarginWidth();
-		rectangle.height = getMarginHeight();
-		return rectangle;
-	}
 
-	// TODO clean up this name
 	public ColorRGB getPaperColor() {
 		return paperColor;
 	}
 
-	// TODO clean up this name
 	public void setPaperColor(ColorRGB arg0) {
 		paperColor = arg0;
-		saveConfig();
 	}
 
 	public double getCenterX() {
@@ -197,7 +180,7 @@ public class Paper implements PreviewListener {
 	public double getCenterY() {
 		return centerY;
 	}
-	
+
 	/**
 	 * @return paper height in mm.
 	 */
@@ -243,45 +226,12 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
-	 * @return absolute margin left edge in mm.
+	 * @param paperMargin 0...1
 	 */
-	public double getMarginLeft() {
-		return getPaperMargin() * paperLeft;
-	}
-
-	/**
-	 * @return absolute margin right edge in mm.
-	 */
-	public double getMarginRight() {
-		return getPaperMargin() * paperRight;
-	}
-
-	/**
-	 * @return absolute margin top edge in mm.
-	 */
-	public double getMarginTop() {
-		return getPaperMargin() * paperTop;
-	}
-
-	/**
-	 * @return absolute margin bottom edge in mm.
-	 */
-	public double getMarginBottom() {
-		return getPaperMargin() * paperBottom;
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginHeight() {
-		return (paperTop-paperBottom) * paperMargin;
-	}
-
-	/**
-	 * @return paper width in mm.
-	 */
-	public double getMarginWidth() {
-		return (paperRight-paperLeft) * paperMargin;
+	public void setPaperMargin(double paperMargin) {
+		if( paperMargin<0 ) paperMargin = 0;
+		if( paperMargin>1 ) paperMargin = 1;
+		this.paperMargin = paperMargin;
 	}
 
 	/**
@@ -291,16 +241,13 @@ public class Paper implements PreviewListener {
 		return paperMargin;
 	}
 
-	public boolean isPaperConfigured() {
-		return (paperTop > paperBottom && paperRight > paperLeft);
-	}
-
-	public boolean isInsidePaperMargins(double x,double y) {
-		if( x < getMarginLeft()  ) return false;
-		if( x > getMarginRight() ) return false;
-		if( y < getMarginBottom()) return false;
-		if( y > getMarginTop()   ) return false;
-		return true;
+	public Rectangle2D.Double getMarginRectangle() {
+		Rectangle2D.Double rectangle = new Rectangle2D.Double();
+		rectangle.x = paperLeft * paperMargin;
+		rectangle.y = paperBottom * paperMargin;
+		rectangle.width = (paperRight-paperLeft) * paperMargin;
+		rectangle.height = (paperTop-paperBottom) * paperMargin;
+		return rectangle;
 	}
 
 	public double getRotation() {
@@ -309,15 +256,9 @@ public class Paper implements PreviewListener {
 
 	public void setRotation(double rot) {
 		this.rotation = rot;
-		saveConfig();
 	}
 
 	public void setRotationRef(double ang) {
 		this.rotationRef = ang;
-		saveConfig();
-	}
-
-	public double getRotationRef() {
-		return this.rotationRef;
 	}
 }

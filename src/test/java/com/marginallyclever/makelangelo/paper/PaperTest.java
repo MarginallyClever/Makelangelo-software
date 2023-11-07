@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Rectangle2D;
+
 public class PaperTest {
 	@BeforeEach
 	public void beforeEach() {
@@ -33,21 +35,25 @@ public class PaperTest {
 		Paper a = new Paper();
 		a.setPaperSize(200,100,0,0);
 		a.setPaperMargin(0.9);
-		Assertions.assertEquals(180,a.getMarginWidth());
-		Assertions.assertEquals(90,a.getMarginHeight());
-		Assertions.assertEquals(-90,a.getMarginLeft());
-		Assertions.assertEquals(-45,a.getMarginBottom());
-		Assertions.assertEquals(90,a.getMarginRight());
-		Assertions.assertEquals(45,a.getMarginTop());
+
+		Rectangle2D.Double rect = a.getMarginRectangle();		
+		Assertions.assertEquals(180,rect.getWidth());
+		Assertions.assertEquals(90,rect.getHeight());
+		Assertions.assertEquals(-90,rect.getMinX());
+		Assertions.assertEquals(-45,rect.getMinY());
+		Assertions.assertEquals(90,rect.getMaxX());
+		Assertions.assertEquals(45,rect.getMaxY());
 		Assertions.assertEquals(0,a.getCenterX());
 		Assertions.assertEquals(0,a.getCenterY());
+		
 		a.setPaperSize(200,100,50,100);
-		Assertions.assertEquals(180,a.getMarginWidth());
-		Assertions.assertEquals(90,a.getMarginHeight());
-		Assertions.assertEquals(-90,a.getMarginLeft());
-		Assertions.assertEquals(-45,a.getMarginBottom());
-		Assertions.assertEquals(90,a.getMarginRight());
-		Assertions.assertEquals(45,a.getMarginTop());
+		rect = a.getMarginRectangle();
+		Assertions.assertEquals(180,rect.getWidth());
+		Assertions.assertEquals(90,rect.getHeight());
+		Assertions.assertEquals(-90,rect.getMinX());
+		Assertions.assertEquals(-45,rect.getMinY());
+		Assertions.assertEquals(90,rect.getMaxX());
+		Assertions.assertEquals(45,rect.getMaxY());
 		Assertions.assertEquals(50,a.getCenterX());
 		Assertions.assertEquals(100,a.getCenterY());
 	}

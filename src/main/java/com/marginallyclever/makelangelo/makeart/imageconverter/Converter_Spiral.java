@@ -9,6 +9,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
@@ -61,8 +63,9 @@ public class Converter_Spiral extends ImageConverter {
 		TransformedImage img = bw.filter();
 
 		double maxr;
-		double h2 = myPaper.getMarginHeight()/2.0f;
-		double w2 = myPaper.getMarginWidth()/2.0f;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double h2 = rect.getHeight()/2.0f;
+		double w2 = rect.getWidth()/2.0f;
 		if (convertToCorners) {
 			maxr = Math.sqrt(h2 * h2 + w2 * w2);
 		} else {
@@ -97,7 +100,7 @@ public class Converter_Spiral extends ImageConverter {
 				fx = Math.cos(f) * r1;
 				fy = Math.sin(f) * r1;
 
-				if(myPaper.isInsidePaperMargins(fx, fy)) {
+				if(rect.contains(fx, fy)) {
 					try {
 						z = img.sample(fx, fy,1);
 					} catch(Exception e) {

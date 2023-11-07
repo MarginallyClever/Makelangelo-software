@@ -9,6 +9,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
  * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
@@ -63,16 +65,17 @@ public class Converter_SpiralPulse extends ImageConverter {
 		double toolDiameter = 1;
 
 		double maxr;
-		
+
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		if (convertToCorners) {
 			// go right to the corners
-			float h2 = (float)myPaper.getMarginHeight();
-			float w2 = (float)myPaper.getMarginWidth();
+			double h2 = rect.getHeight();
+			double w2 = rect.getWidth();
 			maxr = (float) (Math.sqrt(h2 * h2 + w2 * w2) + 1.0f);
 		} else {
 			// do the largest circle that still fits in the margin.
-			float w = (float)(myPaper.getMarginWidth())/2.0f;
-			float h = (float)(myPaper.getMarginHeight())/2.0f;
+			double w = rect.getWidth()/2.0f;
+			double h = rect.getHeight()/2.0f;
 			maxr = Math.min(h, w);
 		}
 		
@@ -107,7 +110,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 				fx = Math.cos(f) * r2;
 				fy = Math.sin(f) * r2;
 				// clip to paper boundaries
-				if( myPaper.isInsidePaperMargins(fx, fy) ) {
+				if( rect.contains(fx, fy) ) {
 					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
 					scale_z = (255.0f - z) / 255.0f;
 					pulse_size = halfStep * scale_z;

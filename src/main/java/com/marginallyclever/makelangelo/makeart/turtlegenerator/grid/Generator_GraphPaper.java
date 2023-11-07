@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * 1cm and 10cm grid lines
  * @author Dan Royer
@@ -58,19 +60,21 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		double majorY = Math.sin(Math.toRadians(angle_deg));
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
-		double dy = (yTop - yBottom)/2;
-		double dx = (xRight - xLeft)/2;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+
+		double dy = (yMax - yMin)/2;
+		double dx = (xMax - xMin)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(xRight,yTop);
-		Point2D rMin = new Point2D(xLeft,yBottom);
+		Point2D rMax = new Point2D(xMax,yMax);
+		Point2D rMin = new Point2D(xMin,yMin);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize_mm) {

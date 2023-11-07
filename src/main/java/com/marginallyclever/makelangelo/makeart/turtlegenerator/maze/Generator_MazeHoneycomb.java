@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,10 +136,11 @@ public class Generator_MazeHoneycomb extends Generator_Maze {
 	public Turtle drawMaze() {
 		Turtle turtle = new Turtle();
 
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
 
 		double w = (xMax - xMin) / columns;
 		double h = (yMax - yMin) / rows;

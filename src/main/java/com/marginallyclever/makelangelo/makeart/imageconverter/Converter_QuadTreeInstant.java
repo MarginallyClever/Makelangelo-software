@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Convert image to quad tree fractal
  * @author Mohammed Thaier
@@ -95,8 +97,9 @@ public class Converter_QuadTreeInstant extends ImageConverter{
 
         turtle = new Turtle();
 
-        Point2D topLeftP = new Point2D(myPaper.getMarginLeft(),paper.getMarginTop());
-        Point2D bottomRightP = new Point2D(myPaper.getMarginRight(), paper.getMarginBottom());
+        Rectangle2D.Double rect = myPaper.getMarginRectangle();
+        Point2D topLeftP = new Point2D(rect.getMaxX(),rect.getMaxY());
+        Point2D bottomRightP = new Point2D(rect.getMinX(),rect.getMinY());
         BoxCondition boxCondition = new BoxCondition(true,true,true,true);
         recurse(topLeftP, bottomRightP, boxCondition, 0,baseCutOff);
         fireConversionFinished();

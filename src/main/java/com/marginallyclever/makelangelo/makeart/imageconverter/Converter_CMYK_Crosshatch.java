@@ -11,6 +11,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * See also <a href="http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html">...</a>
  * @author Dan Royer
@@ -81,8 +83,9 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		double stepSize = passes;
 
 		// from top to bottom of the margin area...
-		double height  = myPaper.getMarginHeight();
-		double width   = myPaper.getMarginWidth();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double height  = rect.getHeight();
+		double width   = rect.getWidth();
 		double maxLen  = Math.sqrt(width*width+height*height);
 
 		double a;

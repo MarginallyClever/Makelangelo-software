@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Draws pointy-top tiled hexagons based on the diameter of the hexagons.
@@ -36,10 +37,11 @@ public class Generator_GridHexagons extends TurtleGenerator {
 		double horiz = Math.sqrt(3)*majorRadius;
 		double vert = (3.0/2.0)*majorRadius;
 
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMin = myPaper.getMarginLeft();
-		double xMax = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
 
 		Turtle turtle = new Turtle();
 

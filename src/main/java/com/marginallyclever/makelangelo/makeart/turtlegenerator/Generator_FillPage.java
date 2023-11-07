@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Completely fills the page with ink.
  * @author Dan Royer
@@ -42,12 +44,13 @@ public class Generator_FillPage extends TurtleGenerator {
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
-		double dy = (yTop - yBottom)/2;
-		double dx = (xRight - xLeft)/2;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+		double dy = (yMax - yMin)/2;
+		double dx = (xMax - xMin)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
 		Turtle turtle = new Turtle();
@@ -55,8 +58,8 @@ public class Generator_FillPage extends TurtleGenerator {
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(xRight,yTop);
-		Point2D rMin = new Point2D(xLeft,yBottom);
+		Point2D rMax = new Point2D(xMax,yMax);
+		Point2D rMin = new Point2D(xMin,yMin);
 		
 		int i=0;
 		if ( penDiameter > 0 ){

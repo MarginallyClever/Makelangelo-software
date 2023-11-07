@@ -20,6 +20,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,8 +183,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	private void scaleImage(int mode) {
-		double width  = myPaper.getMarginWidth();
-		double height = myPaper.getMarginHeight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double width  = rect.getWidth();
+		double height = rect.getHeight();
 
 		boolean test;
 		if (mode == 0) {

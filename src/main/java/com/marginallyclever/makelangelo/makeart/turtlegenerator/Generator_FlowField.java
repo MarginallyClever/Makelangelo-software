@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
 /**
@@ -136,10 +137,11 @@ public class Generator_FlowField extends TurtleGenerator {
 	}
 
 	private void fromEdge(Turtle turtle) {
-		double xMin = myPaper.getMarginLeft()+stepSize;
-		double yMin = myPaper.getMarginBottom()+stepSize;
-		double yMax = myPaper.getMarginTop()-stepSize;
-		double xMax = myPaper.getMarginRight()-stepSize;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY()-stepSize;
+		double xMin = rect.getMinX()-stepSize;
+		double yMax = rect.getMaxY()+stepSize;
+		double xMax = rect.getMaxX()+stepSize;
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 
@@ -178,10 +180,11 @@ public class Generator_FlowField extends TurtleGenerator {
 	}
 
 	private void asGrid(Turtle turtle) {
-		double xMin = myPaper.getMarginLeft();
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMax = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		for(double y = yMin; y<yMax; y+=stepSize) {
 			for (double x = xMin; x < xMax; x += stepSize) {
