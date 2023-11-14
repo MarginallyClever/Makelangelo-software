@@ -76,19 +76,11 @@ public final class Makelangelo {
 	public Makelangelo() {
 		super();
 
-		logger.debug("Locale={}", Locale.getDefault().toString());
-		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-
-		startRobot();
-		
-		logger.debug("Starting virtual camera...");
-		camera = new Camera();
-	}
-
-	private void startRobot() {
-		logger.debug("Starting robot...");
+		logger.info("Locale={}", Locale.getDefault().toString());
+		logger.info("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
+		myPaper.loadConfig();
 
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
@@ -101,6 +93,9 @@ public final class Makelangelo {
 		});
 
 		onPlotterSettingsUpdate(myPlotter.getSettings());
+		
+		logger.debug("Starting virtual camera...");
+		camera = new Camera();
 	}
 
 	private void updatePlotterRenderer() {
