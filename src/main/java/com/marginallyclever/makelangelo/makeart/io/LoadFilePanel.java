@@ -1,14 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,20 +120,5 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		for( ActionListener a : listeners ) {
 			a.actionPerformed(e);
 		}
-	}
-
-	// TEST
-	
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		
-		JFrame frame = new JFrame(LoadFilePanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new LoadFilePanel(new Paper(),""));
-		frame.setPreferredSize(new Dimension(800,600));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

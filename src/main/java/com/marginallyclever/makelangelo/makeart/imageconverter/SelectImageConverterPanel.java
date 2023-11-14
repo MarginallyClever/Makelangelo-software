@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
@@ -13,7 +12,6 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -21,7 +19,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.geom.Rectangle2D;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -306,20 +303,5 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		for( ActionListener a : listeners ) {
 			a.actionPerformed(e);
 		}
-	}
-
-	// TEST
-	
-	public static void main(String[] args) throws Exception {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/test.png")));
-		JFrame frame = new JFrame(SelectImageConverterPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new SelectImageConverterPanel(new Paper(), image));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }
