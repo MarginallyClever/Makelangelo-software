@@ -50,7 +50,8 @@ public class PaperSettingsPanel extends SelectPanel {
 	
 	public PaperSettingsPanel(Paper paper) {
 		this.myPaper = paper;
-		
+		this.setName(PaperSettingsPanel.class.getSimpleName());
+
 		// common paper sizes
 		String[] commonPaperNames = new String[commonPaperSizes.length+1];
 		commonPaperNames[0]="---";
@@ -180,7 +181,6 @@ public class PaperSettingsPanel extends SelectPanel {
 	 * Apply this panel values to {@code myPaper}
 	 */
 	private void setPaperFromPanel() {
-		logger.debug("updatePaperFromPanel()");
 		double w = ((Number)pw.getValue()).doubleValue();
 		double h = ((Number)ph.getValue()).doubleValue();
 		double sx = ((Number)shiftX.getValue()).doubleValue();
@@ -190,7 +190,6 @@ public class PaperSettingsPanel extends SelectPanel {
 		//myPaper.setRotation(rot);
 		myPaper.setPaperColor(paperColor.getColor());
 		myPaper.setPaperMargin((100 - paperMargin.getValue()) * 0.01);
-		myPaper.saveConfig();
 	}
 
 	/**
