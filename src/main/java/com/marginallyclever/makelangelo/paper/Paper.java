@@ -36,7 +36,7 @@ public class Paper implements PreviewListener {
 	private double paperBottom;
 	private double paperTop;
 	// % from edge of paper.
-	private double paperMargin;
+	private double paperMargin = 0.95;
 	
 	private double rotation;
 	private double rotationRef;
@@ -48,13 +48,8 @@ public class Paper implements PreviewListener {
 	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
 	
 	public Paper() {
-		// paper area (default values)
-		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);		
-		
-		paperMargin = 0.95;
-
-		// If prefs values exist this load the pref values using last setPaperSize(...) setted values as default.
-		loadConfig();
+		super();
+		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
 	}
 	
 	@Override
