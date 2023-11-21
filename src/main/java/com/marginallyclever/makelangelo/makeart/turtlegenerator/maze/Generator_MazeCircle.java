@@ -26,7 +26,6 @@ public class Generator_MazeCircle extends Generator_Maze {
 			setRings(field_rings.getValue());
 			generate();
 		});
-		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 	}
 	
 	@Override
