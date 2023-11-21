@@ -92,6 +92,7 @@
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
+	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 
 	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>

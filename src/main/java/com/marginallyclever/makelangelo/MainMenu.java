@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
@@ -186,6 +187,16 @@ public class MainMenu extends JMenuBar {
         buttonViewLog.addActionListener((e) -> runLogPanel());
         buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
         menu.add(buttonViewLog);
+
+        JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
+        buttonLogFolder.addActionListener((e) -> {
+            try {
+                Desktop.getDesktop().open(Log.logDir);
+            } catch (IOException e1) {
+                logger.error("Can't open log folder", e1);
+            }
+        });
+        menu.add(buttonLogFolder);
 
         JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
         menu.add(buttonForums);
