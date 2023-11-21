@@ -5,6 +5,8 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * x(t)=(R-r)*cos(t) + p*cos((R-r)*t/r)
  * y(t)=(R-r)*sin(t) - p*sin((R-r)*t/r)
@@ -13,8 +15,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
  *
  */
 public class Generator_Lissajous extends TurtleGenerator {
-	private double WIDTH,HEIGHT;
-
+	private double width, height;
 	private static double delta = Math.PI/6;
 	private static int a = 11;
 	private static int b = 8; // controls complexity of curve
@@ -28,22 +29,22 @@ public class Generator_Lissajous extends TurtleGenerator {
 		SelectSlider field_delta;
 
 		add(field_a = new SelectSlider("a",Translator.get("LissajousA"),100,1,Generator_Lissajous.getA()));
-		field_a.addPropertyChangeListener(evt->{
+		field_a.addSelectListener(evt->{
 			setA(field_a.getValue());
 			generate();
 		});
 		add(field_b = new SelectSlider("b",Translator.get("LissajousB"),100,1,Generator_Lissajous.getB()));
-		field_b.addPropertyChangeListener(evt->{
+		field_b.addSelectListener(evt->{
 			setB(field_b.getValue());
 			generate();
 		});
 		add(field_delta = new SelectSlider("delta",Translator.get("LissajousDelta"),1000,0,(int)(Generator_Lissajous.getDelta()*1000.0)));
-		field_delta.addPropertyChangeListener(evt->{
+		field_delta.addSelectListener(evt->{
 			setDelta(field_delta.getValue());
 			generate();
 		});
 		add(field_numSamples = new SelectSlider("samples",Translator.get("SpirographNumSamples"),2000,50,Generator_Lissajous.getNumSamples()));
-		field_numSamples.addPropertyChangeListener(evt->{
+		field_numSamples.addSelectListener(evt->{
 			setNumSamples(field_numSamples.getValue());
 			generate();
 		});
@@ -90,10 +91,13 @@ public class Generator_Lissajous extends TurtleGenerator {
 	@Override
 	public void generate() {		
 		// scale the step size so the curve fits on the paper
-		WIDTH = myPaper.getMarginWidth()/2.0;
-		HEIGHT = myPaper.getMarginHeight()/2.0;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		width = rect.getWidth()/2.0;
+		height = rect.getHeight()/2.0;
 
 		Turtle turtle = drawLissajous();
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}
@@ -112,8 +116,8 @@ public class Generator_Lissajous extends TurtleGenerator {
 		for(int t1=0; t1<=numSamples; ++t1) {
 			t = ( Math.PI*2.0 * t1 / (double)numSamples );
 			
-			x = WIDTH * Math.sin(a*t + delta*Math.PI);
-			y = HEIGHT * Math.sin(b*t);
+			x = width * Math.sin(a*t + delta*Math.PI);
+			y = height * Math.sin(b*t);
 			turtle.moveTo(x, y);
 			turtle.penDown();
 		}

@@ -22,7 +22,7 @@ public class SelectSlider extends Select {
 	        
 			if(field.getValueIsAdjusting()) return;
 			
-			firePropertyChange(null,n);			
+			fireSelectEvent(null,n);
 		});
 		field.setValue(defaultValue);
 

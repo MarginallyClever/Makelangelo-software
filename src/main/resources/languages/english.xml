@@ -92,6 +92,7 @@
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
+	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 
 	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
@@ -296,6 +297,9 @@
 	<string><key>Converter_EdgeDetection.passes</key><value>Passes</value></string>
 	<string><key>Converter_EdgeDetection.stepSize</key><value>Step size</value></string>
 	<string><key>Converter_EdgeDetection.sampleSize</key><value>SampleSize</value></string>
+	<string><key>Converter_EdgeDetection.border</key><value>Draw border</value></string>
+
+	<string><key>Generator.randomSeed</key><value>Random seed value</value></string>
 
 	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
 	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>

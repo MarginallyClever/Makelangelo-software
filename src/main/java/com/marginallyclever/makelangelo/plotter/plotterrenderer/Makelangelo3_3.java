@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.drawRectangle;
 
@@ -21,9 +22,9 @@ public class Makelangelo3_3 implements PlotterRenderer {
 	 * @param robot the machine to draw.
 	 */
 	private void paintControlBox(GL2 gl2,Plotter robot) {
-		double cy = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double cx = 0;
 
 		gl2.glPushMatrix();

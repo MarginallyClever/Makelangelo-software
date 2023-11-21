@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,15 +41,15 @@ public class Converter_IntensityToHeight extends ImageConverter {
 		add(selectSampleRate);
 		add(selectWaveIntensity);
 
-		selectSize.addPropertyChangeListener(evt->{
+		selectSize.addSelectListener(evt->{
 			setSpacing((int) evt.getNewValue());
 			fireRestart();
 		});
-		selectSampleRate.addPropertyChangeListener(evt->{
+		selectSampleRate.addSelectListener(evt->{
 			setSampleRate((int) evt.getNewValue());
 			fireRestart();
 		});
-		selectWaveIntensity.addPropertyChangeListener(evt->{
+		selectWaveIntensity.addSelectListener(evt->{
 			setWaveIntensity((int) evt.getNewValue());
 			fireRestart();
 		});
@@ -119,11 +120,14 @@ public class Converter_IntensityToHeight extends ImageConverter {
 
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
-		
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop();
-		double xLeft   = myPaper.getMarginLeft();
-		double xRight  = myPaper.getMarginRight();
+
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double yBottom = rect.getMinY();
+		double xRight  = rect.getMaxX();
+		double yTop    = rect.getMaxY();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 
 		// from bottom to top of the image...
 		int i=0;
@@ -168,10 +172,10 @@ public class Converter_IntensityToHeight extends ImageConverter {
 				heights.set(j,heightNew);
 
 				if(first) {
-					turtle.jumpTo(x, heightNew);
+					turtle.jumpTo(px+x, py+heightNew);
 					first = false;
 				} else {
-					turtle.moveTo(x,heightNew);
+					turtle.moveTo(px+x, py+heightNew);
 				}
 			}
 		}

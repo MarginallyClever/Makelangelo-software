@@ -9,12 +9,13 @@ import java.util.Arrays;
  * @author coliss86
  */
 public enum PlotterRendererFactory {
-	MAKELANGELO_5("Makelangelo 5", new Makelangelo5()),
-	MAKELANGELO_5_HUGE("Makelangelo 5 Huge", new Makelangelo5Huge()),
-	MAKELANGELO_3_3("Makelangelo 3.3", new Makelangelo3_3()),
-	MAKELANGELO_CUSTOM("Makelangelo (Custom)", new MakelangeloCustom()), 
-	CARTESIAN("Cartesian", new Cartesian()),
-	ZARPLOTTER("Zarplotter", new Zarplotter());
+	// name must match enum label for PlotterRendererFactory.valueOf() to work.
+	MAKELANGELO_5("MAKELANGELO_5", new Makelangelo5()),
+	MAKELANGELO_5_HUGE("MAKELANGELO_5_HUGE", new Makelangelo5Huge()),
+	MAKELANGELO_3_3("MAKELANGELO_3_3", new Makelangelo3_3()),
+	MAKELANGELO_CUSTOM("MAKELANGELO_CUSTOM", new MakelangeloCustom()),
+	CARTESIAN("CARTESIAN", new Cartesian()),
+	ZARPLOTTER("ZARPLOTTER", new Zarplotter());
 
 	private final PlotterRenderer plotterRenderer;
 

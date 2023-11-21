@@ -9,12 +9,15 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
+import java.util.Random;
 
 
 /**
@@ -27,6 +30,8 @@ public class Converter_Wander extends ImageConverter {
 	static private int numLines = 9000;
 	static private boolean isCMYK = false;
 	static private double stepSize = 5.0;
+	private static int seed=0;
+	private static final Random random = new Random();
 	
 	private static class Bucket {
 		public Point2D a,b;
@@ -43,15 +48,23 @@ public class Converter_Wander extends ImageConverter {
 
 	public Converter_Wander() {
 		super();
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener(evt->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			fireRestart();
+		});
+
 		SelectInteger selectCount = new SelectInteger("count",Translator.get("ConverterWanderLineCount"),getLineCount());
 		add(selectCount);
-		selectCount.addPropertyChangeListener(evt->{
+		selectCount.addSelectListener(evt->{
 			setLineCount((int)evt.getNewValue());
 			fireRestart();
 		});
 		SelectBoolean selectCmyk = new SelectBoolean("cmyk",Translator.get("ConverterWanderCMYK"),isCMYK());
 		add(selectCmyk);
-		selectCmyk.addPropertyChangeListener(evt->{
+		selectCmyk.addSelectListener(evt->{
 			setCMYK((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -82,10 +95,13 @@ public class Converter_Wander extends ImageConverter {
 		// Lift the pen any time the color value is > cutoff.
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double xRight  = rect.getMaxX();
+		double yBottom = rect.getMinY();
+		double yTop    = rect.getMaxY();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 
 		// find numLines number of random points darker than the cutoff value
 		double height = yTop - yBottom-1;
@@ -118,8 +134,8 @@ public class Converter_Wander extends ImageConverter {
 			int v, tries=0;
 			double endPX,endPY; 
 			do {
-				endPX = xLeft   + (Math.random() * width)+0.5; 
-				endPY = yBottom + (Math.random() * height)+0.5; 
+				endPX = xLeft   + (random.nextDouble() * width)+0.5; 
+				endPY = yBottom + (random.nextDouble() * height)+0.5; 
 				v = img.sample(
 						endPX - halfStep, endPY - halfStep, 
 						endPX + halfStep, endPY + halfStep);
@@ -172,7 +188,7 @@ public class Converter_Wander extends ImageConverter {
 		for (Bucket bucket : buckets) {
 			while (!bucket.sortedPoints.isEmpty()) {
 				Point2D a = bucket.sortedPoints.pop();
-				turtle.moveTo(a.getX(), a.getY());
+				turtle.moveTo(px+a.getX(), py+a.getY());
 				turtle.penDown();
 			}
 		}

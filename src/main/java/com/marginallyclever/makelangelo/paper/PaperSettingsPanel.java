@@ -8,10 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
 
-public class PaperSettings extends SelectPanel {
-	private static final Logger logger = LoggerFactory.getLogger(PaperSettings.class);
+public class PaperSettingsPanel extends SelectPanel {
+	private static final Logger logger = LoggerFactory.getLogger(PaperSettingsPanel.class);
 
 	private static final PaperSize[] commonPaperSizes = {
 		new PaperSize("4A0",1682,2378),
@@ -49,9 +48,10 @@ public class PaperSettings extends SelectPanel {
 	private final SelectSlider paperMargin;
 	private final SelectColor paperColor;
 	
-	public PaperSettings(Paper paper) {
+	public PaperSettingsPanel(Paper paper) {
 		this.myPaper = paper;
-		
+		this.setName(PaperSettingsPanel.class.getSimpleName());
+
 		// common paper sizes
 		String[] commonPaperNames = new String[commonPaperSizes.length+1];
 		commonPaperNames[0]="---";
@@ -60,37 +60,36 @@ public class PaperSettings extends SelectPanel {
 			commonPaperNames[i+1] = commonPaperSizes[i].toString();
 		}
 
-		double top = myPaper.getPaperTop();
-		double bot = myPaper.getPaperBottom();
-		double left = myPaper.getPaperLeft();
-		double right = myPaper.getPaperRight();
-		double rot = myPaper.getRotation();
-
 		add(paperSizes = new SelectOneOfMany("size",Translator.get("PaperSettings.PaperSize"),commonPaperNames,0));
-		add(pw = new SelectDouble("width",Translator.get("PaperSettings.PaperWidth"),right-left));
-		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),top-bot));
-		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),(float)(left+right)/2.0f));
-		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),(float)(top+bot)/2.0f));
-		add(ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),(float)rot));
+		add(pw = new SelectDouble("width",Translator.get("PaperSettings.PaperWidth"),myPaper.getPaperWidth()));
+		add(ph = new SelectDouble("height",Translator.get("PaperSettings.PaperHeight"),myPaper.getPaperHeight()));
+		add(shiftX = new SelectDouble("shiftx",Translator.get("PaperSettings.ShiftX"),myPaper.getCenterX()));
+		add(shiftY = new SelectDouble("shifty",Translator.get("PaperSettings.ShiftY"),myPaper.getCenterY()));
+		ang = new SelectDouble("rotation",Translator.get("PaperSettings.Rotation"),myPaper.getRotation());
+		//add();
 		add(isLandscape = new SelectBoolean("landscape",Translator.get("PaperSettings.Landscape"),false));
 		add(paperMargin = new SelectSlider("margin",Translator.get("PaperSettings.PaperMargin"),50,0,100 - (int) (myPaper.getPaperMargin() * 100)));
 		add(paperColor = new SelectColor("color",Translator.get("PaperSettings.PaperColor"),myPaper.getPaperColor(),this));
 
 		getValuesFromPaper();// As the paper load this value from the pref when instancied.		
-		onPaperDimensionsChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
+		onPaperWidthOrHeightChange(null);//this set the SelectOneOfMany paperSizes and the landscape checkbox to the correcte values.
 		
-		paperSizes.addPropertyChangeListener(this::onPaperSizeChange);
-		pw.addPropertyChangeListener(this::onPaperDimensionsChange);
-		ph.addPropertyChangeListener(this::onPaperDimensionsChange);
-		shiftX.addPropertyChangeListener((e)->setPaperFromPanel());
-		shiftY.addPropertyChangeListener((e)->setPaperFromPanel());
-		ang.addPropertyChangeListener((e)->setPaperFromPanel());
-		isLandscape.addPropertyChangeListener(this::onLandscapeChange);
-		paperMargin.addPropertyChangeListener((e)->setPaperFromPanel());
-		paperColor.addPropertyChangeListener((e)->setPaperFromPanel());
+		paperSizes.addSelectListener(this::onPaperSizePresetChange);
+		pw.addSelectListener(this::onPaperWidthOrHeightChange);
+		ph.addSelectListener(this::onPaperWidthOrHeightChange);
+		shiftX.addSelectListener((e)->setPaperFromPanel());
+		shiftY.addSelectListener((e)->setPaperFromPanel());
+		//ang.addSelectListener((e)->setPaperFromPanel());
+		isLandscape.addSelectListener(this::onLandscapeChange);
+		paperMargin.addSelectListener((e)->setPaperFromPanel());
+		paperColor.addSelectListener((e)->setPaperFromPanel());
 	}
-	
-	private void onPaperDimensionsChange(PropertyChangeEvent e) {
+
+	/**
+	 * Called when the user changes the paper width or height.
+	 * @param e the event that triggered this call
+	 */
+	private void onPaperWidthOrHeightChange(SelectEvent e) {
 		logger.debug("onPaperDimensionsChange()");
 		double w=getPaperWidthFromPanel();
 		double h=getPaperHeightFromPanel();
@@ -110,7 +109,7 @@ public class PaperSettings extends SelectPanel {
 		logger.debug("onPaperDimensionsChange() done");
 	}
 
-	private void onLandscapeChange(PropertyChangeEvent e) {
+	private void onLandscapeChange(SelectEvent e) {
 		logger.debug("onLandscapeChange()");
 		double w = pw.getValue();
 		double h = ph.getValue();
@@ -120,7 +119,11 @@ public class PaperSettings extends SelectPanel {
 		logger.debug("onLandscapeChange() done");
 	}
 
-	private void onPaperSizeChange(PropertyChangeEvent e) {
+	/**
+	 * Called when the user selects a paper size from the list.
+	 * @param e the event that triggered this call
+	 */
+	private void onPaperSizePresetChange(SelectEvent e) {
 		logger.debug("onPaperSizeChange()");
 		final int selectedIndex = paperSizes.getSelectedIndex();
 		if(selectedIndex != 0) {
@@ -178,17 +181,15 @@ public class PaperSettings extends SelectPanel {
 	 * Apply this panel values to {@code myPaper}
 	 */
 	private void setPaperFromPanel() {
-		logger.debug("updatePaperFromPanel()");
 		double w = ((Number)pw.getValue()).doubleValue();
 		double h = ((Number)ph.getValue()).doubleValue();
 		double sx = ((Number)shiftX.getValue()).doubleValue();
 		double sy = ((Number)shiftY.getValue()).doubleValue();
-		double rot = ((Number)ang.getValue()).doubleValue();
+		//double rot = ((Number)ang.getValue()).doubleValue();
 		myPaper.setPaperSize(w, h, sx, sy);
-		myPaper.setRotation(rot);
+		//myPaper.setRotation(rot);
 		myPaper.setPaperColor(paperColor.getColor());
 		myPaper.setPaperMargin((100 - paperMargin.getValue()) * 0.01);
-		myPaper.saveConfig();
 	}
 
 	/**
@@ -221,7 +222,7 @@ public class PaperSettings extends SelectPanel {
 		double phf = ((Number)ph.getValue()).doubleValue();
 		double shiftxf = ((Number)shiftX.getValue()).doubleValue();
 		double shiftyf = ((Number)shiftY.getValue()).doubleValue();
-		double rot = ((Number)ang.getValue()).doubleValue();
+		//double rot = ((Number)ang.getValue()).doubleValue();
 		
 		boolean data_is_sane=true;
 		if( pwf<=0 ) data_is_sane=false;
@@ -229,7 +230,7 @@ public class PaperSettings extends SelectPanel {
 
 		if (data_is_sane) {
 			myPaper.setPaperSize(pwf,phf,shiftxf,shiftyf);
-			myPaper.setRotation(rot);
+			//myPaper.setRotation(rot);
 			myPaper.setPaperColor(paperColor.getColor());
 
 			double pm = (100 - paperMargin.getValue()) * 0.01;
@@ -245,9 +246,9 @@ public class PaperSettings extends SelectPanel {
 		CommandLineOptions.setFromMain(args);
 		Translator.start();
 		
-		JFrame frame = new JFrame(PaperSettings.class.getSimpleName());
+		JFrame frame = new JFrame(PaperSettingsPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PaperSettings(new Paper()));
+		frame.add(new PaperSettingsPanel(new Paper()));
 		frame.pack();
 		frame.setVisible(true);
 	}

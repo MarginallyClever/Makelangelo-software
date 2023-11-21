@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.helpers.MathHelper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class SaveDXF implements TurtleSaver {
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream,Turtle turtle) throws Exception {
+	public boolean save(OutputStream outputStream,Turtle turtle, PlotterSettings settings) throws Exception {
 		logger.debug("saving...");
 		
 		Rectangle2D.Double box = turtle.getBounds();

@@ -2,8 +2,6 @@ package com.marginallyclever.makelangelo.select;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,40 +11,26 @@ import java.util.List;
  * @author Dan Royer
  * @since 7.24.0
  */
-public class Select extends JPanel {
-	private List<PropertyChangeListener> propertyChangeListeners = null;
-		
+public abstract class Select extends JPanel {
+	private final List<SelectListener> listeners = new ArrayList<>();
+
 	protected Select(String name) {
 		super(new BorderLayout(2,0));
 		setName(name);
 	}
-	
-	// OBSERVER PATTERN
-	
-	@Override
-	public void addPropertyChangeListener(PropertyChangeListener p) {	
-		if ( propertyChangeListeners == null ){
-			// some Look and Feel (like "com.sun.java.swing.plaf.gtk.GTKLookAndFeel") can run this override method before the class is fully initialized ...
-			propertyChangeListeners = new ArrayList<>();
-		}
-		propertyChangeListeners.add(p);
+
+	public void addSelectListener(SelectListener listener) {
+		listeners.add(listener);
 	}
-	
-	@Override
-	public void removePropertyChangeListener(PropertyChangeListener p) {
-		if ( propertyChangeListeners == null ){
-			propertyChangeListeners = new ArrayList<>();
-		}
-		propertyChangeListeners.remove(p);
+
+	public void removeSelectListener(SelectListener listener) {
+		listeners.remove(listener);
 	}
-	
-	protected void firePropertyChange(Object oldValue,Object newValue) {
-		if ( propertyChangeListeners == null ){
-			propertyChangeListeners = new ArrayList<>();
-		}
-		PropertyChangeEvent evt = new PropertyChangeEvent(this,this.getName(),oldValue,newValue);
-		for( PropertyChangeListener p : propertyChangeListeners ) {
-			p.propertyChange(evt);
+
+	protected void fireSelectEvent(Object oldValue,Object newValue) {
+		SelectEvent evt = new SelectEvent(this,oldValue,newValue);
+		for(SelectListener listener : listeners) {
+			listener.selectEvent(evt);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -17,6 +18,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -291,11 +293,15 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void addUserStartGCODE() {
-		myPlotter.getSettings().getUserGeneralStartGcodeList().forEach(marlinInterface::queueAndSendCommand);
+		String gcode = myPlotter.getSettings().getString(PlotterSettings.USER_GENERAL_START_GCODE);
+		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
+				.forEach(marlinInterface::queueAndSendCommand);
 	}
 
 	private void addUserEndGCODE() {
-		myPlotter.getSettings().getUserGeneralEndGcodeList().forEach(marlinInterface::queueAndSendCommand);
+		String gcode = myPlotter.getSettings().getString(PlotterSettings.USER_GENERAL_END_GCODE);
+		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
+				.forEach(marlinInterface::queueAndSendCommand);
 	}
 
 	/**

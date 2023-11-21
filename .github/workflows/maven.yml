@@ -25,7 +25,7 @@ jobs:
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
     - name: Build and Test with Maven
       timeout-minutes: 15
-      run: ./mvnw -B test
+      run: ./mvnw -B test -Djava.awt.headless=true
 
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests

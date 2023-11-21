@@ -13,5 +13,5 @@ public interface PreviewListener {
 	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
 	 * @param gl2 the render context
 	 */
-	public void render(GL2 gl2);
+	void render(GL2 gl2);
 }

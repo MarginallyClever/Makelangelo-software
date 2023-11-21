@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
@@ -12,7 +13,7 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorF
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MakelangeloSettingPanel;
-import com.marginallyclever.makelangelo.paper.PaperSettings;
+import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
@@ -187,6 +188,16 @@ public class MainMenu extends JMenuBar {
         buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
         menu.add(buttonViewLog);
 
+        JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
+        buttonLogFolder.addActionListener((e) -> {
+            try {
+                Desktop.getDesktop().open(Log.logDir);
+            } catch (IOException e1) {
+                logger.error("Can't open log folder", e1);
+            }
+        });
+        menu.add(buttonLogFolder);
+
         JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
         menu.add(buttonForums);
 
@@ -237,7 +248,7 @@ public class MainMenu extends JMenuBar {
     private void saveFile() {
         logger.debug("Saving vector file...");
         try {
-            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this));
+            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this),app.getPlotter().getSettings());
         } catch(Exception e) {
             logger.error("Error while saving the vector file", e);
             JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -502,7 +513,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private void openPaperSettings() {
-        PaperSettings settings = new PaperSettings(app.getPaper());
+        PaperSettingsPanel settings = new PaperSettingsPanel(app.getPaper());
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PaperSettings.Title"));
         dialog.add(settings);
         dialog.setMinimumSize(new Dimension(300,300));

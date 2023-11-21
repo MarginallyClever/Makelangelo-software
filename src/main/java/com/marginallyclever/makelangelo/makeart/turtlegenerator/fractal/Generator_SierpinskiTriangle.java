@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * See <a href="https://en.wikipedia.org/wiki/Sierpi%C5%84ski_arrowhead_curve">Wikipedia</a>
  * @author Dan Royer
@@ -21,7 +23,7 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 		add(field_order = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,Generator_SierpinskiTriangle.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Sierpi%C5%84ski_triangle'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
-		field_order.addPropertyChangeListener(evt-> {
+		field_order.addSelectListener(evt-> {
 			Generator_SierpinskiTriangle.setOrder(Math.max(1, field_order.getValue()));
 			generate();
 		});
@@ -42,8 +44,9 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double xMax = myPaper.getMarginWidth() / 2.0f;
-		double yMax = myPaper.getMarginHeight() / 2.0f;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMax = rect.getWidth() / 2.0f;
+		double yMax = rect.getHeight() / 2.0f;
 		double xMin = -xMax;
 		double yMin = -yMax;
 
@@ -69,6 +72,8 @@ public class Generator_SierpinskiTriangle extends TurtleGenerator {
 			turtle.turn(60);
 			drawCurve(turtle,order, maxSize,-60);
 		}
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

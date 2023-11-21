@@ -1,12 +1,15 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.security.SecureRandom;
+import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 /**
  * L System fractal
@@ -18,7 +21,8 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	private static int numBranches = 3;
 	private static int noise = 0;
 	private static double orderScale = 0.76f;
-	private SecureRandom random;
+	private final Random random = new Random();
+	private static int seed=0xDEADBEEF;
 
 	public Generator_LSystemTree() {
 		super();
@@ -29,32 +33,40 @@ public class Generator_LSystemTree extends TurtleGenerator {
 		SelectSlider field_angle;
 		SelectSlider field_noise;
 
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener(evt->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			generate();
+		});
+
 		add(field_order      = new SelectSlider("order",Translator.get("HilbertCurveOrder"),10,1,getOrder()));
-		field_order.addPropertyChangeListener(evt->{
+		field_order.addSelectListener(evt->{
 			setOrder(field_order.getValue());
 			generate();
 		});
 
 		add(field_branches   = new SelectSlider("branches",Translator.get("LSystemBranches"),8,1,getBranches()));
-		field_branches.addPropertyChangeListener(evt->{
+		field_branches.addSelectListener(evt->{
 			setBranches(field_branches.getValue());
 			generate();
 		});
 
 		add(field_orderScale = new SelectSlider("scale",Translator.get("LSystemOrderScale"),100,1,(int)(getScale()*100)));
-		field_orderScale.addPropertyChangeListener(evt->{
+		field_orderScale.addSelectListener(evt->{
 			setScale(field_orderScale.getValue()/100.0f);
 			generate();
 		});
 
 		add(field_angle      = new SelectSlider("angle",Translator.get("LSystemAngle"),360,1,(int)getAngle()));
-		field_angle.addPropertyChangeListener(evt->{
+		field_angle.addSelectListener(evt->{
 			setAngle(field_angle.getValue());
 			generate();
 		});
 
 		add(field_noise      = new SelectSlider("noise",Translator.get("LSystemNoise"),100,0,(int)getNoise()));
-		field_noise.addPropertyChangeListener(evt->{
+		field_noise.addSelectListener(evt->{
 			setNoise(field_noise.getValue());
 			generate();
 		});
@@ -71,15 +83,18 @@ public class Generator_LSystemTree extends TurtleGenerator {
 	public void generate() {
 		Turtle turtle = new Turtle();
 
-		random = new SecureRandom();
-		random.setSeed(0xDEADBEEF);
-		
+		random.setSeed(seed);
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		// move to starting position
-		turtle.moveTo(0,-myPaper.getMarginHeight()/2);
+		turtle.moveTo(0,-rect.getHeight()/2);
 		turtle.turn(90);
 		turtle.penDown();
 		// do the curve
 		lSystemTree(turtle,order, 10);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

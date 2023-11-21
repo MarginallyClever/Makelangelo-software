@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
@@ -18,17 +19,17 @@ public class Cartesian implements PlotterRenderer {
 		paintControlBox(gl2,robot);
 	}
 	
-	private void paintGantryAndHead(GL2 gl2, Plotter robot) {
+	private void paintGantryAndHead(GL2 gl2, Plotter plotter) {
 		//double dx, dy;
-		Point2D pos = robot.getPos();
+		Point2D pos = plotter.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
-		double gz = (robot.getPenIsUp() ? robot.getPenUpAngle() : robot.getPenDownAngle())/10;
+		double gz = (plotter.getPenIsUp() ? plotter.getSettings().getDouble(PlotterSettings.PEN_ANGLE_UP) : plotter.getSettings().getDouble(PlotterSettings.PEN_ANGLE_DOWN))/10;
 
-		double top = robot.getLimitTop();
-		double bottom = robot.getLimitBottom();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 
 		gl2.glBegin(GL2.GL_QUADS);
 		gl2.glColor3f(1, 0.8f, 0.5f);
@@ -64,10 +65,10 @@ public class Cartesian implements PlotterRenderer {
 		gl2.glEnd();
 	}
 	
-	protected void paintMotors(GL2 gl2,Plotter robot) {
-		double top = robot.getLimitTop();
-		double right = robot.getLimitRight();
-		double left = robot.getLimitLeft();
+	protected void paintMotors(GL2 gl2,Plotter plotter) {
+		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		gl2.glPushMatrix();
 		gl2.glTranslated(left, top, 0);
@@ -95,11 +96,11 @@ public class Cartesian implements PlotterRenderer {
 	
 	/**
 	 * paint the controller and the LCD panel
-	 * @param gl2
-	 * @param settings
+	 * @param gl2 the render context
+	 * @param plotter the plotter reference for generating the gcode.
 	 */
-	private void paintControlBox(GL2 gl2,Plotter robot) {
-		double cy = robot.getLimitTop();
+	private void paintControlBox(GL2 gl2,Plotter plotter) {
+		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
 		gl2.glPushMatrix();

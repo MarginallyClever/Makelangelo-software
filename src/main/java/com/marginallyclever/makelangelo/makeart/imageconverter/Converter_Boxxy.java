@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * A grid of boxes across the paper, and make the boxes bigger if the image is darker in that area.
  * @author Dan Royer
@@ -21,14 +23,14 @@ public class Converter_Boxxy extends ImageConverter {
 		super();
 
 		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,2,getBoxMasSize());
-		size.addPropertyChangeListener((evt)->{
+		size.addSelectListener((evt)->{
 			setBoxMaxSize((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(size);
 
 		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,getCutoff());
-		cutoff.addPropertyChangeListener((evt)->{
+		cutoff.addSelectListener((evt)->{
 			setCutoff((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -62,10 +64,13 @@ public class Converter_Boxxy extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop();
-		double xLeft   = myPaper.getMarginLeft();
-		double xRight  = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double yBottom = rect.getMinY();
+		double xRight  = rect.getMaxX();
+		double yTop    = rect.getMaxY();
+		double cx = paper.getCenterX();
+		double cy = paper.getCenterY();
 		double pw = xRight - xLeft;
 		
 		// figure out how many lines we're going to have on this image.
@@ -76,6 +81,7 @@ public class Converter_Boxxy extends ImageConverter {
 		if (steps < 1) steps = 1;
 
 		turtle = new Turtle();
+
 
 		double lowpass = cutoff/255.0;
 		
@@ -93,7 +99,7 @@ public class Converter_Boxxy extends ImageConverter {
 					double scaleZ =  (255.0f - z) / 255.0;
 					if (scaleZ > lowpass) {
 						double ratio = (scaleZ-lowpass)/(1.0-lowpass);
-						drawBox(x,y,ratio,halfStep);
+						drawBox(cx+x,cy+y,ratio,halfStep);
 					}
 				}
 			} else {
@@ -105,7 +111,7 @@ public class Converter_Boxxy extends ImageConverter {
 					double scaleZ = (255.0f - z) / 255.0f;
 					if (scaleZ > lowpass) {
 						double ratio = (scaleZ-lowpass)/(1.0-lowpass);
-						drawBox(x,y,ratio,halfStep);
+						drawBox(cx+x,cy+y,ratio,halfStep);
 					}
 				}
 			}

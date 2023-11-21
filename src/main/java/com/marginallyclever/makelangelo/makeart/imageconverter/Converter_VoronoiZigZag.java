@@ -30,7 +30,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 
 		SelectToggleButton selectOptimizePath = new SelectToggleButton("optimizePath",Translator.get("VoronoiZigZag.optimizePath"));
 		add(selectOptimizePath);
-		selectOptimizePath.addPropertyChangeListener(evt -> {
+		selectOptimizePath.addSelectListener(evt -> {
 			lowNoise = selectOptimizePath.isSelected();
 			if(lowNoise) {
 				logger.debug("Running Lin/Kerighan optimization...");
@@ -82,6 +82,9 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		super.render(gl2);
 		if(getThread().getPaused()) return;
 
+		gl2.glPushMatrix();
+		gl2.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
+
 		lock.lock();
 		try {
 			if (renderMode == 0) renderPoints(gl2);
@@ -90,6 +93,8 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		finally {
 			lock.unlock();
 		}
+
+		gl2.glPopMatrix();
 	}
 
 	private void renderPoints(GL2 gl2) {
@@ -273,11 +278,14 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		int lpc = getLowpassCutoff();
 		turtle = new Turtle();
 
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
+
 		boolean first=true;
 		for( VoronoiCell c : cells) {
 			if(c.weight<lpc) continue;
-			double x = c.center.x;
-			double y = c.center.y;
+			double x = cx + c.center.x;
+			double y = cy + c.center.y;
 			if(first) {
 				turtle.jumpTo(x, y);
 				first=false;
