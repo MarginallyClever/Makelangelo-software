@@ -16,8 +16,12 @@ import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+/**
+ * Generator_OpenAI is an experiment to see if we can use OpenAI to generate prompt-to-vector.
+ * @author Dan Royer
+ * @since 7.52.0
+ */
 public class Generator_OpenAI extends TurtleGenerator {
-
     private static final Logger logger = LoggerFactory.getLogger(Generator_OpenAI.class);
     private static String APIKey = "";
     private static final String prefix = "Tersely use gcode to trace a vector image in the z=0 plane.  I want to draw: ";
@@ -56,7 +60,7 @@ public class Generator_OpenAI extends TurtleGenerator {
 
     @Override
     public String getName() {
-        return "OpenAI";
+        return Translator.get("Generator_OpenAI.name");
     }
 
     @Override

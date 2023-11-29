@@ -13,6 +13,12 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.maze.Generator_M
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is a factory for {@link TurtleGenerator}s.  It sorts available generators into a tree.
+ * The tree is used to build a menu of available generators.
+ * @author Dan Royer
+ * @since 7.52.0
+ */
 public class TurtleGeneratorFactory {
 	public static class TurtleGeneratorNode {
 		private final String name;
@@ -69,11 +75,16 @@ public class TurtleGeneratorFactory {
 					new TurtleGeneratorNode(new Generator_MazeHoneycomb()),
 					new TurtleGeneratorNode(new Generator_MazeRectangle()),
 			}),
-			new TurtleGeneratorNode(new LineWeightByImageIntensity()),
-			new TurtleGeneratorNode(new Generator_Lissajous()),
-			new TurtleGeneratorNode(new Generator_Package()),
-			new TurtleGeneratorNode(new Generator_Polyeder()),
-			new TurtleGeneratorNode(new Generator_Spirograph()),
-			new TurtleGeneratorNode(new Generator_Text()),
+			new TurtleGeneratorNode(Translator.get("MenuGenerate.Patterns"), new TurtleGeneratorNode[]{
+					new TurtleGeneratorNode(new Generator_Lissajous()),
+					new TurtleGeneratorNode(new Generator_Spirograph()),
+			}),
+			new TurtleGeneratorNode(Translator.get("MenuGenerate.Other"), new TurtleGeneratorNode[]{
+					new TurtleGeneratorNode(new LineWeightByImageIntensity()),
+					new TurtleGeneratorNode(new Generator_OpenAI()),
+					new TurtleGeneratorNode(new Generator_Package()),
+					new TurtleGeneratorNode(new Generator_Polyeder()),
+					new TurtleGeneratorNode(new Generator_Text()),
+			}),
 	});
 }

@@ -141,6 +141,8 @@
 	<string><key>MenuGenerate.Grids</key><value>Grids</value></string>
 	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
 	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
+	<string><key>MenuGenerate.Patterns</key><value>Patterns</value></string>
+	<string><key>MenuGenerate.Other</key><value>Other</value></string>
 
 	<string><key>Converter_TruchetFromImage.name</key><value>Truchet from image</value></string>
 	<string><key>Converter_TruchetFromImage.spacing</key><value>Space between lines</value></string>
@@ -446,6 +448,7 @@
 	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
 	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
 
+	<string><key>Generator_OpenAI.name</key><value>OpenAI prompt-to-vector</value></string>
 	<string><key>Generator_OpenAI.APIKey</key><value>API key</value></string>
 	<string><key>Generator_OpenAI.prompt</key><value>Prompt</value></string>
 	<string><key>Generator_OpenAI.generate</key><value>Generate</value></string>
