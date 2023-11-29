@@ -1,10 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Hilbert Curve fractal.
@@ -20,7 +23,7 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 		SelectSlider fieldOrder;
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),8,1,Generator_HilbertCurve.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Hilbert_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			Generator_HilbertCurve.setOrder(Math.max(1,fieldOrder.getValue()));
 			generate();
 		});
@@ -41,18 +44,23 @@ public class Generator_HilbertCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double v = Math.min(rect.getWidth(),rect.getHeight());
 		double xMin = -v;
 
 		Turtle turtle = new Turtle();
 		turtleStep = (float) ((v - xMin) / (Math.pow(2, order)));
 
 		// move to starting position
-		turtle.moveTo(
+		turtle.jumpTo(
 				-v + turtleStep / 2,
 				-v + turtleStep / 2);
 		turtle.penDown();
 		hilbert(turtle,order);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

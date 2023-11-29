@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.makeart.tools.ReorderTurtleAction;
 import com.marginallyclever.makelangelo.makeart.tools.SimplifyTurtleAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.Generator_TruchetTiles;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.Assertions;
@@ -53,7 +54,7 @@ public class SaveAndLoadDXFTest {
 
             SaveDXF save = new SaveDXF();
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-            save.save(fileOutputStream, before);
+            save.save(fileOutputStream, before, PlotterSettingsManager.buildMakelangelo5());
             fileOutputStream.close();
 
             LoadDXF load = new LoadDXF();

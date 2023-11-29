@@ -30,14 +30,13 @@ public class SelectDouble extends Select {
 		label.setName(internalName+".label");
 
 		field.setName(internalName+".field");
-		
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-
 		field.setText(StringHelper.formatDouble(defaultValue));
 		field.setHorizontalAlignment(JTextField.RIGHT);
+
 		field.getDocument().addDocumentListener(new DocumentListener() {
         	@Override
 			public void changedUpdate(DocumentEvent arg0) {
@@ -59,7 +58,7 @@ public class SelectDouble extends Select {
 
 			public void validate() {
 				try {
-					double newValue = Float.valueOf(field.getText());
+					double newValue = Float.parseFloat(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newValue) {
 						double oldValue = value; 
@@ -69,13 +68,12 @@ public class SelectDouble extends Select {
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								firePropertyChange(oldValue,newValue);
+								fireSelectEvent(oldValue,newValue);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}
 				} catch (NumberFormatException e) {
 					field.setForeground(Color.RED);
-					return;
 				}
 			}
 		});
@@ -111,8 +109,8 @@ public class SelectDouble extends Select {
 
 	/**
 	 * Set the value visible in the field.  Do not fire a property change event.
-	 * @param newValue
-	 */
+	 * @param newValue the new value to display
+     */
 	public void setValue(double newValue) {
 		field.setText(StringHelper.formatDouble(newValue));
 	}

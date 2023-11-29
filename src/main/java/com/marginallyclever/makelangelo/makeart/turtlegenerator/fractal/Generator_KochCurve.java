@@ -1,10 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Koch Curve fractal
@@ -21,7 +24,7 @@ public class Generator_KochCurve extends TurtleGenerator {
 		add(fieldOrder = new SelectSlider("order",Translator.get("HilbertCurveOrder"),7,1,Generator_HilbertCurve.getOrder()));
 		add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Koch_curve'>"+Translator.get("TurtleGenerators.LearnMore.Link.Text")+"</a>"));
 
-		fieldOrder.addPropertyChangeListener(evt->{
+		fieldOrder.addSelectListener(evt->{
 			setOrder(fieldOrder.getValue());
 			generate();
 		});
@@ -42,7 +45,8 @@ public class Generator_KochCurve extends TurtleGenerator {
 
 	@Override
 	public void generate() {
-		double v = Math.min(myPaper.getMarginWidth(),myPaper.getMarginHeight());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double v = Math.min(rect.getWidth(),rect.getHeight());
 		double xMin = -v;
 		double yMin = -v;
 
@@ -62,6 +66,10 @@ public class Generator_KochCurve extends TurtleGenerator {
 		
 		turtle.penDown();
 		drawTriangle(turtle,order, maxSize);
+
+		// scale turtle to fit paper
+		ResizeTurtleToPaperAction action = new ResizeTurtleToPaperAction(myPaper,false,null);
+		turtle = action.run(turtle);
 
 		notifyListeners(turtle);
 	}

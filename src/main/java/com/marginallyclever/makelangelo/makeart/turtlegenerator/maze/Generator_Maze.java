@@ -2,21 +2,33 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 public abstract class Generator_Maze extends TurtleGenerator {
     protected final List<MazeCell> cells = new ArrayList<>();
     protected final List<MazeWall> walls = new ArrayList<>();
+    private static int seed = 0;
+    private static final Random random = new Random();
 
     public Generator_Maze() {
         super();
         add(new SelectReadOnlyText("url","<a href='https://en.wikipedia.org/wiki/Maze_generation_algorithm'>" +
                 Translator.get("TurtleGenerators.LearnMore.Link.Text") + "</a>"));
+
+        SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed", Translator.get("Generator.randomSeed"), seed);
+        add(selectRandomSeed);
+        selectRandomSeed.addSelectListener((evt) -> {
+            seed = (int) evt.getNewValue();
+            random.setSeed((long) evt.getNewValue());
+            generate();
+        });
     }
 
     /**
@@ -30,6 +42,8 @@ public abstract class Generator_Maze extends TurtleGenerator {
 
         // draw the maze
         Turtle turtle = drawMaze();
+
+        turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
         notifyListeners(turtle);
     }
@@ -55,7 +69,7 @@ public abstract class Generator_Maze extends TurtleGenerator {
         Stack<MazeCell> stack = new Stack<>();
 
         // Make the initial cell the current cell and mark it as visited
-        int currentCell = (int)(Math.random()*unvisitedCells);
+        int currentCell = (int)(random.nextDouble()*unvisitedCells);
         cells.get(currentCell).visited = true;
         stack.add(cells.get(currentCell));
         --unvisitedCells;
@@ -102,7 +116,7 @@ public abstract class Generator_Maze extends TurtleGenerator {
             return -1;
 
         // choose a random candidate
-        int choice = (int) (Math.random() * candidates.size());
+        int choice = (int) (random.nextDouble() * candidates.size());
         return candidates.get(choice);
     }
 

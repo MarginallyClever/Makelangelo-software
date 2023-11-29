@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Draws a set of squares that fit inside an even margin.
  * @author Dan Royer
@@ -21,17 +23,17 @@ public class Generator_GridFit extends TurtleGenerator {
 		add(cellsWide = new SelectInteger("cellsWide",Translator.get("Generator_GridFit.cellsWide"),1));
 		add(cellsHigh = new SelectInteger("cellsHigh",Translator.get("Generator_GridFit.cellsHigh"),1));
 
-		margin.addPropertyChangeListener(evt->{
+		margin.addSelectListener(evt->{
 			if(!checkMargin()) return;
 			generate();
 		});
 
-		cellsWide.addPropertyChangeListener(evt->{
+		cellsWide.addSelectListener(evt->{
 			changeWide();
 			generate();
 		});
 
-		cellsHigh.addPropertyChangeListener(evt->{
+		cellsHigh.addSelectListener(evt->{
 			changeHigh();
 			generate();
 		});
@@ -60,14 +62,16 @@ public class Generator_GridFit extends TurtleGenerator {
 	}
 
 	private void changeWide() {
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		int w = cellsWide.getValue();
-		int h = (int)Math.floor(w*myPaper.getMarginHeight()/myPaper.getMarginWidth());
+		int h = (int)Math.floor(w*rect.getHeight()/rect.getWidth());
 		cellsHigh.setValue(h);
 	}
 
 	private void changeHigh() {
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		int h = cellsHigh.getValue();
-		int w = (int)Math.ceil(h*myPaper.getMarginWidth()/myPaper.getMarginHeight());
+		int w = (int)Math.ceil(h*rect.getWidth()/rect.getHeight());
 		cellsWide.setValue(w);
 	}
 
@@ -98,6 +102,8 @@ public class Generator_GridFit extends TurtleGenerator {
 			turtle.jumpTo(x2,-halfHeight);
 			turtle.moveTo(x2, halfHeight);
 		}
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

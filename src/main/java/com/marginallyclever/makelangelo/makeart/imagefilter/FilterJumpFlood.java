@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Converts an image using the jump flood algorithm.  On a white surface, black pixels will "spread out" creating
@@ -18,6 +19,7 @@ public class FilterJumpFlood extends ImageFilter {
 	private final List<Point> points = new ArrayList<>();
 	private int scale;
 	private final TransformedImage img;
+	private static int seed=0;
 
 	public FilterJumpFlood(TransformedImage img) {
 		super();

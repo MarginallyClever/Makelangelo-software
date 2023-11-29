@@ -31,27 +31,27 @@ public class Generator_Spirograph extends TurtleGenerator {
 		SelectInteger field_numSamples;
 
 		add(field_isEpitrochoid = new SelectBoolean("Epitrochoid",Translator.get("SpirographEpitrochoid"),Generator_Spirograph.getEpitrochoid()));
-		field_isEpitrochoid.addPropertyChangeListener(evt->{
+		field_isEpitrochoid.addSelectListener(evt->{
 			Generator_Spirograph.setEpitrochoid(field_isEpitrochoid.isSelected());
 			generate();
 		});
 		add(field_majorRadius = new SelectInteger("MajorRadius",Translator.get("SpirographMajorRadius"),Generator_Spirograph.getMajorRadius()));
-		field_majorRadius.addPropertyChangeListener(evt->{
+		field_majorRadius.addSelectListener(evt->{
 			Generator_Spirograph.setMajorRadius(field_majorRadius.getValue());
 			generate();
 		});
 		add(field_minorRadius = new SelectInteger("MinorRadius",Translator.get("SpirographMinorRadius"),Generator_Spirograph.getMinorRadius()));
-		field_minorRadius.addPropertyChangeListener(evt->{
+		field_minorRadius.addSelectListener(evt->{
 			Generator_Spirograph.setMinorRadius(field_minorRadius.getValue());
 			generate();
 		});
 		add(field_pScale = new SelectDouble("PScale",Translator.get("SpirographPScale"),Generator_Spirograph.getPScale()));
-		field_pScale.addPropertyChangeListener(evt->{
+		field_pScale.addSelectListener(evt->{
 			Generator_Spirograph.setPScale(field_pScale.getValue());
 			generate();
 		});
 		add(field_numSamples = new SelectInteger("NumSamples",Translator.get("SpirographNumSamples"),Generator_Spirograph.getNumSamples()));
-		field_numSamples.addPropertyChangeListener(evt->{
+		field_numSamples.addSelectListener(evt->{
 			Generator_Spirograph.setNumSamples(field_numSamples.getValue());
 			generate();
 		});
@@ -107,6 +107,7 @@ public class Generator_Spirograph extends TurtleGenerator {
 	@Override
 	public void generate() {
 		Turtle turtle = drawSpirograph();
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

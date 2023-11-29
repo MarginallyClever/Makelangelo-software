@@ -13,9 +13,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
 import java.util.List;
 
 
@@ -36,11 +35,14 @@ public class Converter_FlowField extends ImageConverter {
 	private static double samplingRate = 5;  // the sampling rate along each line, in mm.
 	private static boolean fromEdge = false;  // continuous lines
 	private static int cutoff = 128;  // the sampling rate along each line, in mm.
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	private Noise noiseMaker = new PerlinNoise();
 
 	public Converter_FlowField() {
 		super();
+		SelectRandomSeed fieldRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
 		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble selectScaleX = new SelectDouble("scaleX", Translator.get("Generator_FlowField.scaleX"), getScaleX());
 		SelectDouble selectScaleY = new SelectDouble("scaleY", Translator.get("Generator_FlowField.scaleY"), getScaleY());
@@ -53,8 +55,15 @@ public class Converter_FlowField extends ImageConverter {
 		SelectBoolean selectRightAngle = new SelectBoolean("rightAngle", Translator.get("Generator_FlowField.rightAngle"), getRightAngle());
 		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255,0, cutoff);
 
+		add(fieldRandomSeed);
+		fieldRandomSeed.addSelectListener(evt->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			fireRestart();
+		});
+
 		add(fieldNoise);
-		fieldNoise.addPropertyChangeListener(evt->{
+		fieldNoise.addSelectListener(evt->{
 			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
 			fireRestart();
 		});
@@ -70,43 +79,43 @@ public class Converter_FlowField extends ImageConverter {
 		add(selectRightAngle);
 		add(selectCutoff);
 
-		selectScaleX.addPropertyChangeListener((evt)->{
+		selectScaleX.addSelectListener((evt)->{
 			setScaleX((double)evt.getNewValue());
 			fireRestart();
 		});
-		selectScaleY.addPropertyChangeListener((evt)->{
+		selectScaleY.addSelectListener((evt)->{
 			setScaleY((double)evt.getNewValue());
 			fireRestart();
 		});
-		selectOffsetX.addPropertyChangeListener((evt)->{
+		selectOffsetX.addSelectListener((evt)->{
 			setOffsetX((double)evt.getNewValue());
 			fireRestart();
 		});
-		selectOffsetY.addPropertyChangeListener((evt)->{
+		selectOffsetY.addSelectListener((evt)->{
 			setOffsetY((double)evt.getNewValue());
 			fireRestart();
 		});
-		selectStepSize.addPropertyChangeListener((evt)->{
+		selectStepSize.addSelectListener((evt)->{
 			setStepSize((int)evt.getNewValue());
 			fireRestart();
 		});
-		fieldStepLength.addPropertyChangeListener((evt)->{
+		fieldStepLength.addSelectListener((evt)->{
 			setStepLength((int)evt.getNewValue());
 			fireRestart();
 		});
-		fieldStepVariation.addPropertyChangeListener((evt)->{
+		fieldStepVariation.addSelectListener((evt)->{
 			setStepVariation((int)evt.getNewValue());
 			fireRestart();
 		});
-		fieldFromEdge.addPropertyChangeListener((evt)->{
+		fieldFromEdge.addSelectListener((evt)->{
 			setFromEdge((boolean)evt.getNewValue());
 			fireRestart();
 		});
-		selectRightAngle.addPropertyChangeListener((evt)->{
+		selectRightAngle.addSelectListener((evt)->{
 			setRightAngle((boolean)evt.getNewValue());
 			fireRestart();
 		});
-		selectCutoff.addPropertyChangeListener((evt)->{
+		selectCutoff.addSelectListener((evt)->{
 			setCutoff((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -186,6 +195,9 @@ public class Converter_FlowField extends ImageConverter {
 		SampleAt [] samples = calculateSamplesOnce(img,line);
 
 		// TODO number of passes should be based on the size of the pen tip.
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
+
 		double passes=4;
 		double halfPasses=(passes-1)/2;
 		boolean first = true;
@@ -198,10 +210,10 @@ public class Converter_FlowField extends ImageConverter {
 				p3.scale(offset*sample.value);
 				p3.add(sample.p);
 				if(first) {
-					turtle.jumpTo(p3.x,p3.y);
+					turtle.jumpTo(px + p3.x, py + p3.y);
 					first=false;
 				} else {
-					turtle.moveTo(p3.x, p3.y);
+					turtle.moveTo(px + p3.x, py + p3.y);
 				}
 			}
 			// reverse the samples, which reverses the line direction.
@@ -237,10 +249,12 @@ public class Converter_FlowField extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
+		random.setSeed(seed);
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
 		turtle.history.clear();
+
 
 		if(fromEdge) {
 			// get all the flow lines.
@@ -264,12 +278,15 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private List<Turtle> fromEdge() {
-		List<Turtle> list = new ArrayList<Turtle>();
+		List<Turtle> list = new ArrayList<>();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 
-		double xMin = myPaper.getMarginLeft()+stepSize;
-		double yMin = myPaper.getMarginBottom()+stepSize;
-		double yMax = myPaper.getMarginTop()-stepSize;
-		double xMax = myPaper.getMarginRight()-stepSize;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMin = rect.getMinX()+stepSize;
+		double xMax = rect.getMaxX()-stepSize;
+		double yMin = rect.getMinY()+stepSize;
+		double yMax = rect.getMaxY()-stepSize;
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 
@@ -311,10 +328,14 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void asGrid(TransformedImage img) {
-		double xMin = myPaper.getMarginLeft();
-		double yMin = myPaper.getMarginBottom();
-		double yMax = myPaper.getMarginTop();
-		double xMax = myPaper.getMarginRight();
+
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 		for(double y = yMin; y<yMax; y+=stepSize) {
@@ -325,8 +346,8 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void followLine(TransformedImage img,double x,double y,Rectangle r) {
-		double xx = x + stepVariation * (Math.random() * 2.0 - 1.0);
-		double yy = y + stepVariation * (Math.random() * 2.0 - 1.0);
+		double xx = x + stepVariation * (random.nextDouble() * 2.0 - 1.0);
+		double yy = y + stepVariation * (random.nextDouble() * 2.0 - 1.0);
 
 		turtle.jumpTo(xx, yy);
 		followLine(img, r, 2);
@@ -335,11 +356,14 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void followLine(TransformedImage img,Rectangle r, int step) {
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
+
 		for(int i=0;i<stepLength/2;++i) {
-			double value = 255.0 - (img.sample(turtle.getX(), turtle.getY(), 5.0));
+			double value = 255.0 - (img.sample(turtle.getX()-px, turtle.getY()-py, 5.0));
 			value /= 255.0;
 
-			if(value + (Math.random() - 0.5) > (cutoff/255.0)) turtle.penDown();
+			if(value + (random.nextDouble() - 0.5) > (cutoff/255.0)) turtle.penDown();
 			else turtle.penUp();
 
 			double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);

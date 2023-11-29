@@ -77,11 +77,18 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	
 	@Override
 	public void setPenDiameter(double penDiameter) {
-		this.penDiameter =(float)penDiameter;
+		this.penDiameter = (float)penDiameter;
 	}
 
 	@Override
 	public String getTranslatedName() {
 		return Translator.get("DefaultTurtleRenderer.name");
 	}
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {}
 }

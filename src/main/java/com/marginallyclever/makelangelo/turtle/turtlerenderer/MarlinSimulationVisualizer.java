@@ -23,34 +23,32 @@ import java.util.ArrayList;
  *
  */
 public class MarlinSimulationVisualizer implements TurtleRenderer {
-	//private Turtle previousTurtle=null;
-	private GL2 gl2;
-	private final Turtle myTurtle = new Turtle();
-	private PlotterSettings mySettings;
-	
-	private int renderMode = 0;
-	private boolean useDistance=true;
-	private boolean showNominal=false;
-	private boolean showEntry=false;
-	private boolean showExit=true;
-
 	static private class ColorPoint {
 		public Vector3d c;
 		public Vector3d p;
-		
+
 		public ColorPoint(Vector3d cc, Vector3d pp) {
 			c=cc;
 			p=pp;
 		}
 	};
-	
+
+	//private Turtle previousTurtle=null;
+	private GL2 gl2;
+	private final Turtle myTurtle = new Turtle();
+	private Turtle previousTurtle=null;
+	private PlotterSettings mySettings;
+	private int renderMode = 0;
+	private boolean useDistance=true;
+	private boolean showNominal=false;
+	private boolean showEntry=false;
+	private boolean showExit=true;
 	private final ArrayList<ColorPoint> buffer = new ArrayList<>();
 	
 	public MarlinSimulationVisualizer() {}
 	
 	private void drawBufferedTurtle(GL2 gl2) {
 		gl2.glPushMatrix();
-		gl2.glLineWidth(2);
 		gl2.glBegin(GL2.GL_LINE_STRIP);
 
 		for( ColorPoint a : buffer ) {
@@ -82,8 +80,8 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
 		Vector3d c;
 		switch(block.id % 3) {
-		case 0: c=new Vector3d(1,0,0); break;
-		case 1: c=new Vector3d(0,1,0); break;
+		case 0 : c=new Vector3d(1,0,0); break;
+		case 1 : c=new Vector3d(0,1,0); break;
 		default: c=new Vector3d(0,0,1); break;
 		}
 		buffer.add(new ColorPoint(c,block.start));
@@ -91,7 +89,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderMinLength(MarlinSimulationBlock block) {
-		double d = block.distance / (mySettings.getMinSegmentLength()*2.0);
+		double d = block.distance / (mySettings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)*2.0);
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;
@@ -101,7 +99,6 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	
 	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
 		double t,a,d;
-		useDistance=true;
 		if(useDistance) {
 			t = block.distance;
 			a = block.accelerateUntilD;
@@ -125,7 +122,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		
 		if(showNominal) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.nominalSpeed / settings.getDrawFeedRate();
+			double f = block.nominalSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(1-f,f,0);
@@ -135,7 +132,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 		if(showEntry) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.entrySpeed / settings.getDrawFeedRate();
+			double f = block.entrySpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d red = new Vector3d(1-f,0,f);
@@ -145,7 +142,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 		if(showExit) {
 			Vector3d o = new Vector3d(ortho);
-			double f = block.exitSpeed / settings.getDrawFeedRate();
+			double f = block.exitSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
 			Vector3d black = new Vector3d(0,1-f,f);
@@ -215,10 +212,10 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 	@Override
 	public void end() {
-		//if(previousTurtle!=myTurtle || previousTurtle.history.size() != myTurtle.history.size()) {
+		if(previousTurtle!=myTurtle) {
 			recalculateBuffer(myTurtle,mySettings);
-			//previousTurtle = myTurtle;
-		//}
+			previousTurtle = myTurtle;
+		}
 		
 		drawBufferedTurtle(gl2);
 	}
@@ -239,5 +236,14 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
     public void setSettings(PlotterSettings e) {
 		mySettings = e;
+	}
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {
+		previousTurtle=null;
 	}
 }

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2d;
+import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,14 +50,14 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
         SelectDouble selectThickness = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"),thickness);
         add(selectThickness);
-        selectThickness.addPropertyChangeListener(e->{
+        selectThickness.addSelectListener(e->{
             thickness = selectThickness.getValue();
             generate();
         });
 
         SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName);
         add(selectFile);
-        selectFile.addPropertyChangeListener(e->{
+        selectFile.addSelectListener(e->{
             imageName = selectFile.getText();
             generate();
         });
@@ -86,6 +87,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         }
 
         sourceImage = null;
+
+        turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
         notifyListeners(turtle);
     }
@@ -127,8 +130,9 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
      * @param mode the mode to scale the image
      */
     private void scaleImage(int mode) {
-        double width  = myPaper.getMarginWidth();
-        double height = myPaper.getMarginHeight();
+        Rectangle2D.Double rect = myPaper.getMarginRectangle();
+        double width  = rect.getWidth();
+        double height = rect.getHeight();
 
         boolean test;
         if (mode == 0) {

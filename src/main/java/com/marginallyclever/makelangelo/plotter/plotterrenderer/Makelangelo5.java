@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
@@ -53,10 +54,10 @@ public class Makelangelo5 implements PlotterRenderer {
 		double gx = pos.x;
 		double gy = pos.y;
 
-		double top = robot.getLimitTop();
-		double bottom = robot.getLimitBottom();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 
 		if (gx < left || gx > right) return;
 		if (gy > top || gy < bottom) return;
@@ -125,9 +126,9 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	private void paintGondolaFancy(GL2 gl2, double gx, double gy,Plotter robot) {
-		double top = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		// get angle from top-left to gx,gy
 		double dx = gx - left;
 		double dy = gy - top;
@@ -161,8 +162,8 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot,Texture texture) {
-		double left = robot.getLimitLeft();
-		// double top = robot.getLimitTop();
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		// double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 
 		final double scale = 650.0 / 811.0; // machine is 650 motor-to-motor. texture is 811. scale accordingly.
 		final double TW = 1024 * scale;
@@ -184,8 +185,8 @@ public class Makelangelo5 implements PlotterRenderer {
 		final double TW = 128 * scale;
 		final double TH = 128 * scale;
 
-		final float LOGO_X = (float)robot.getLimitLeft() - 65; // bottom left corner of safe Area
-		final float LOGO_Y = (float)robot.getLimitBottom()+10;
+		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
+		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
 		paintTexture(gl2, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
@@ -197,10 +198,10 @@ public class Makelangelo5 implements PlotterRenderer {
 	 * @param robot the machine to draw.
 	 */
 	private void paintControlBoxPlain(GL2 gl2, Plotter robot) {
-		double cy = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
-		double top = robot.getLimitTop();
+		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
 		gl2.glPushMatrix();

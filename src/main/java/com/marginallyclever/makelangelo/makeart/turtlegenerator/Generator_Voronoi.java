@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
@@ -13,6 +14,7 @@ import org.locationtech.jts.geom.Polygon;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 1cm and 10cm grid lines
@@ -21,19 +23,30 @@ import java.util.List;
 public class Generator_Voronoi extends TurtleGenerator {
 	private static int numCells = 500;
 	private static boolean showCenters = false;
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	public Generator_Voronoi() {
 		super();
 
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener((evt)->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			generate();
+		});
+
 		SelectInteger cells;
 		add(cells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells()));
-		cells.addPropertyChangeListener(evt->{
+		cells.addSelectListener(evt->{
 			setNumCells(Math.max(1,cells.getValue()));
 			generate();
 		});
+
 		SelectBoolean showCenterChoice;
 		add(showCenterChoice = new SelectBoolean("showCenters",Translator.get("Converter_Voronoi.ShowCenters"),false));
-		showCenterChoice.addPropertyChangeListener(evt->{
+		showCenterChoice.addSelectListener(evt->{
 			showCenters = showCenterChoice.isSelected();
 			generate();
 		});
@@ -65,6 +78,9 @@ public class Generator_Voronoi extends TurtleGenerator {
 		drawGraphEdges(turtle,diagram);
 		if(showCenters) drawCellCenters(turtle,points);
 		turtle.penUp();
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 
@@ -73,8 +89,8 @@ public class Generator_Voronoi extends TurtleGenerator {
 		List<VoronoiCell> points = new ArrayList<>();
 		for(int i=0;i<numCells;++i) {
 			points.add(new VoronoiCell(
-					Math.random()*bounds.getWidth()  + bounds.getMinX(),
-					Math.random()*bounds.getHeight() + bounds.getMinY()));
+					random.nextDouble()*bounds.getWidth()  + bounds.getMinX(),
+					random.nextDouble()*bounds.getHeight() + bounds.getMinY()));
 		}
 		return points;
 	}

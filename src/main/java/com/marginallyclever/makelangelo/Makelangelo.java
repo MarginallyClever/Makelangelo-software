@@ -11,14 +11,14 @@ import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePrefere
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.preview.Camera;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
@@ -35,23 +35,24 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.security.InvalidParameterException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
 /**
- * The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of segments made of points)
- * into instructions in GCODE format, as described in <a href="https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description">the wiki</a>.
+ * <p>The Makelangelo app is a tool for programming CNC robots, typically plotters.  It converts lines (made of
+ * segments made of points) into instructions in GCODE format, as described in <a
+ * href="https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description">the wiki</a>.</p>
+ * <p>In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors
+ * ({@link com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator}s), or
+ * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA,PIO) into vectors
+ * ({@link com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverter}s).</p>
+ * <p>The app must also know some details about the machine, the surface onto which drawings will be made, and the
+ * drawing tool making the mark on the paper.  This knowledge helps the app to create better gcode.</p>
  *
- * In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors (ImageGenerators), or 
- * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA,PIO) into vectors (ImageConverters).
- *
- * The app must also know some details about the machine, the surface onto which drawings will be made, and the drawing tool making
- * the mark on the paper.  This knowledge helps the app to create better gcode.  
- *
- * @author Dan Royer (dan@marginallyClever.com)
+ * @author Dan Royer (dan@marginallyclever.com)
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
@@ -67,7 +68,7 @@ public final class Makelangelo {
 	
 	// GUI elements
 	private MainFrame mainFrame;
-	private MainMenu mainMenuBar = new MainMenu(this);
+	private final MainMenu mainMenuBar = new MainMenu(this);
 	private PreviewPanel previewPanel;
 	private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
 
@@ -75,19 +76,11 @@ public final class Makelangelo {
 	public Makelangelo() {
 		super();
 
-		logger.debug("Locale={}", Locale.getDefault().toString());
-		logger.debug("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
-
-		startRobot();
-		
-		logger.debug("Starting virtual camera...");
-		camera = new Camera();
-	}
-
-	private void startRobot() {
-		logger.debug("Starting robot...");
+		logger.info("Locale={}", Locale.getDefault().toString());
+		logger.info("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
 
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
+		myPaper.loadConfig();
 
 		if(previewPanel != null) {
 			previewPanel.addListener(myPlotter);
@@ -100,13 +93,16 @@ public final class Makelangelo {
 		});
 
 		onPlotterSettingsUpdate(myPlotter.getSettings());
+		
+		logger.debug("Starting virtual camera...");
+		camera = new Camera();
 	}
 
 	private void updatePlotterRenderer() {
 		try {
-			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getStyle()).getPlotterRenderer();
+			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
 		} catch (Exception e) {
-			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getStyle());
+			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
 			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
 		}
 	}
@@ -114,13 +110,13 @@ public final class Makelangelo {
 	public void onPlotterSettingsUpdate(PlotterSettings settings) {
 		myPlotter.setSettings(settings);
 
-		TurtleRenderer f = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
-		if(f instanceof MarlinSimulationVisualizer) {
-			MarlinSimulationVisualizer msv = (MarlinSimulationVisualizer)f;
+		TurtleRenderer turtleRenderer = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
+		if(turtleRenderer instanceof MarlinSimulationVisualizer msv) {
 			msv.setSettings(settings);
+			msv.reset();
 		}
-		myTurtleRenderer.setUpColor(settings.getPenUpColor());
-		myTurtleRenderer.setPenDiameter(settings.getPenDiameter());
+		myTurtleRenderer.setUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
+		myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 
 		updatePlotterRenderer();
@@ -242,8 +238,8 @@ public final class Makelangelo {
 	public void checkForUpdate(boolean announceIfFailure) {
 		logger.debug("checking for updates...");
 		try {
-			URL github = new URL("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
-			HttpURLConnection conn = (HttpURLConnection) github.openConnection();
+			URI link = new URI("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
+			HttpURLConnection conn = (HttpURLConnection)link.toURL().openConnection();
 			conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
 			conn.setConnectTimeout(5000);
 			conn.connect();

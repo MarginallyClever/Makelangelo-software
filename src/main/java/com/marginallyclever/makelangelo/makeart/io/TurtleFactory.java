@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author Dan Royer
  */
 public class TurtleFactory {
-	private static TurtleLoader [] loaders = {
+	private static final TurtleLoader [] loaders = {
 			new LoadDXF(),
 			new LoadGCode(),
 			new LoadScratch2(),
@@ -22,19 +23,19 @@ public class TurtleFactory {
 			new LoadSVG(),
 	};
 	
-	private static TurtleSaver [] savers = {
+	private static final TurtleSaver [] savers = {
 			new SaveDXF(),
 			new SaveSVG(),
+			new SaveGCode(),
 			new SaveBitmap("BMP",false),
 			new SaveBitmap("GIF",false),
 			new SaveBitmap("JPG",false),
 			new SaveBitmap("PIO",false),
 			new SaveBitmap("PNG",true),
-			// TODO no SaveGCode?
 	};
 	
 	public static Turtle load(String filename) throws Exception {
-		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
+		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
 		for( TurtleLoader loader : loaders ) {
 			if(isValidExtension(filename,loader.getFileNameFilter())) {
@@ -72,13 +73,13 @@ public class TurtleFactory {
 		return filters;
 	}
 
-	public static void save(Turtle turtle,String filename) throws Exception {
-		if(filename == null || filename.trim().length()==0) throw new InvalidParameterException("filename cannot be empty");
+	public static void save(Turtle turtle,String filename, PlotterSettings settings) throws Exception {
+		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
 		for (TurtleSaver saver : savers) {
 			if(isValidExtension(filename,saver.getFileNameFilter())) {
 				try (FileOutputStream out = new FileOutputStream(filename)) {
-					saver.save(out, turtle);
+					saver.save(out, turtle,settings);
 				}
 				return;
 			}
