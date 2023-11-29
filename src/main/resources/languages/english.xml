@@ -1,1389 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+	<!--
+        To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
+        please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
+            and change the begining of the file with :
 
-<!--
-    To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
-    please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
-        and change the begining of the file with :
+    <?xml version="1.0" encoding="UTF-8"?>
+    <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
 
-<?xml version="1.0" encoding="UTF-8"?>
-<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-
--->
+    -->
 	<meta>
 		<name>English</name>
 		<author>Dan Royer (dan@marginallyclever.com)</author>
 	</meta>
 
-	<string>
-		<key>BorderName</key>
-		<value>Outline paper</value>
-		<hint>Border generator</hint>
-	</string>
-
-	<string>
-		<key>Generator_TruchetTiles.Name</key>
-		<value>Truchet Tiles</value>
-		<hint>Truchet Tiles generator</hint>
-	</string>
-	<string>
-		<key>Generator_TruchetTiles.LineSpacing</key>
-		<value>Space between lines (mm)</value>
-		<hint>Truchet Tiles generator</hint>
-	</string>
-	<string>
-		<key>Generator_TruchetTiles.LinesPerTile</key>
-		<value>Lines per tile</value>
-		<hint>Truchet Tiles generator</hint>
-	</string>
-
-	<string>
-		<key>LissajousName</key>
-		<value>Lissajous</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousA</key>
-		<value>A (&gt;0)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousB</key>
-		<value>B (&gt;0)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousDelta</key>
-		<value>Delta (0...1)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-
-	<string>
-		<key>SpirographName</key>
-		<value>Spirograph</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographMajorRadius</key>
-		<value>Major radius (R)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographMinorRadius</key>
-		<value>Minor radius (r)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographPScale</key>
-		<value>Scale (p)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographNumSamples</key>
-		<value>Samples (quality)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographEpitrochoid</key>
-		<value>is epitrochoid</value>
-		<hint>Spirograph generator</hint>
-	</string>
-
-	<string>
-		<key>ConverterCannyEdgeName</key>
-		<value>Canny Edge Detection</value>
-	</string>
-	<string>
-		<key>ConverterColorFloodFillName</key>
-		<value>Color Flood Fill</value>
-	</string>
-
-	<string>
-		<key>ConverterRandomLinesName</key>
-		<value>Random lines</value>
-		<hint>Random Lines generator</hint>
-	</string>
-	<string>
-		<key>ConverterRandomLinesCount</key>
-		<value>Number of lines</value>
-		<hint>Random Lines generator</hint>
-	</string>
-
-	<string>
-		<key>StartAtLastPenDown</key>
-		<value>Back up to last pen down</value>
-		<hint>Start At option</hint>
-	</string>
-	<string>
-		<key>StartAtAddPenDown</key>
-		<value>Add pen down command here</value>
-		<hint>Start At option</hint>
-	</string>
-	<string>
-		<key>StartAtExactly</key>
-		<value>Do nothing special</value>
-		<hint>Start At option</hint>
-	</string>
-
-
-
-	<string>
-		<key>ConfirmQuitQuestion</key>
-		<value>Are you sure you want to quit?</value>
-		<hint>confirm quit dialog question</hint>
-	</string>
-	<string>
-		<key>ConfirmQuitTitle</key>
-		<value>Exit</value>
-		<hint>confirm quit dialog title</hint>
-	</string>
-
-	<string>
-		<key>ConvertImagePaperOriginal</key>
-		<value>Original size</value>
-		<hint>Converter hint</hint>
-	</string>
-	<string>
-		<key>ConvertImagePaperFill</key>
-		<value>Fill entire paper</value>
-		<hint>Converter hint</hint>
-	</string>
-	<string>
-		<key>ConvertImagePaperFit</key>
-		<value>Fit image on paper</value>
-		<hint>Converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKName</key>
-		<value>CMYK</value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKPasses</key>
-		<value>Passes</value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKNote</key>
-		<value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>DXFScaleOnLoad</key>
-		<value>Scale image to fit paper</value>
-		<hint>DXF load option</hint>
-	</string>
-
-	<string>
-		<key>DXFInfillOnLoad</key>
-		<value>Fill in closed areas</value>
-		<hint>DXF load option</hint>
-	</string>
-
-	<string>
-		<key>DXFOptimizeOnLoad</key>
-		<value>Improve route efficiency</value>
-		<hint>DXF load option</hint>
-	</string>
-
-	<string>
-		<key>LoadFilePanel.title</key>
-		<value>Load file preview</value>
-		<hint>Load file panel</hint>
-	</string>
-
-	<string>
-		<key>TempFolderLabel</key>
-		<value>Temporary files location:</value>
-		<hint>Where to save temporary files used in gcode management.</hint>
-	</string>
-
-	<string>
-		<key>OK</key>
-		<value>OK</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Cancel</key>
-		<value>Cancel</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Save</key>
-		<value>Save</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Load</key>
-		<value>Load</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>CouldNotFind</key>
-		<value>Could not find </value>
-		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>Scale</key>
-		<value>Scale</value>
-	</string>
-	<string>
-		<key>Rotate</key>
-		<value>Rotate</value>
-	</string>
-	<string>
-		<key>Width</key>
-		<value>Width</value>
-	</string>
-	<string>
-		<key>Height</key>
-		<value>Height</value>
-	</string>
-
-	<string>
-		<key>PlotterSettingsPanel.MachineWidth</key>
-		<value>Machine width (mm)</value>
-		<hint>Machine settings</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.MachineHeight</key>
-		<value>Machine height (mm)</value>
-		<hint>Machine settings</hint>
-	</string>
-
-	<string>
-		<key>PaperSettings.Title</key>
-		<value>Paper settings</value>
-		<hint>Paper settings panel title</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperSize</key>
-		<value>Paper Size</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperWidth</key>
-		<value>Paper width (mm)</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperHeight</key>
-		<value>Paper height (mm)</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.ShiftX</key>
-		<value>Shift left</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.ShiftY</key>
-		<value>Shift up</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.Rotation</key>
-		<value>Rotation</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.Landscape</key>
-		<value>Landscape</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperMargin</key>
-		<value>Margin (%)</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperColor</key>
-		<value>Paper color</value>
-		<hint>Paper settings panel</hint>
-	</string>
-
-	<string>
-		<key>isLandscape</key>
-		<value>Is landscape?</value>
-		<hint>Paper settings dialog</hint>
-	</string>
-
-	<string>
-		<key>InvertLeft</key>
-		<value>Invert left</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
-		<key>InvertRight</key>
-		<value>Invert right</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
-		<key>ToolType</key>
-		<value>Tool type</value>
-		<hint>tool settings</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>Paper Size</value>
-		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>AdjustPulleySize</key>
-		<value>Pulley diameter</value>
-		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.AdjustAcceleration</key>
-		<value>Acceleration (mm/s²)</value>
-		<hint>machine size control panel</hint>
-	</string>
-
-	<string>
-		<key>Left</key>
-		<value>Left</value>
-		<hint>used in many places like in manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>Right</value>
-		<hint>used in many places like in manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Millimeters</key>
-		<value>mm</value>
-	</string>
-
-	<string>
-		<key>ConnectingTo</key>
-		<value>Connecting to </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>PortNotConfigured</key>
-		<value>Port could not be configured: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>PortOpened</key>
-		<value>Port opened.</value>
-		<hint>status message</hint>
-	</string>
-	<string>
-		<key>TitlePrefix</key>
-		<value>Makelangelo</value>
-		<hint>window title</hint>
-	</string>
-	<string>
-		<key>TitlePostfix</key>
-		<value> connected</value>
-		<hint>window title</hint>
-	</string>
-
-	<string>
-		<key>LineSegments</key>
-		<value> line segments.</value>
-		<hint>status message</hint>
-	</string>
-	<string>
-		<key>Centimeters</key>
-		<value>cm</value>
-	</string>
-
-	<string>
-		<key>LoadError</key>
-		<value>File could not be loaded: </value>
-		<hint>status message.</hint>
-	</string>
-
-	<string>
-		<key>SaveError</key>
-		<value>File could not be saved: </value>
-		<hint>status message.</hint>
-	</string>
-
-	<string>
-		<key>ConversionOptions</key>
-		<value>Conversion options</value>
-		<hint>dialog title</hint>
-	</string>
-
-	<string>
-		<key>Start</key>
-		<value>Start</value>
-		<hint>As in "start drawing"</hint>
-	</string>
-
-	<string>
-		<key>Log</key>
-		<value>Log</value>
-		<hint>title of log window</hint>
-	</string>
-
-	<string>
-		<key>PaperMargin</key>
-		<value>Margin (%)</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>Converting</key>
-		<value>Converting</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Finished</key>
-		<value>Completed</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Cancelled</key>
-		<value>Cancelled</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Failed</key>
-		<value>Failed: </value>
-		<hint>status update. keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>ConversionStyle</key>
-		<value>Style</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>ConversionFill</key>
-		<value>Fill</value>
-		<hint>conversion options</hint>
-	</string>
-
-	<string>
-		<key>OpeningFile</key>
-		<value>Opening </value>
-		<hint>status update. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>UnknownFileType</key>
-		<value>Unknown file type</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>SetPaperSize</key>
-		<value>Please set a paper size before importing an image.</value>
-		<hint>warning message</hint>
-	</string>
-
-	<string>
-		<key>OpenFileChooser.FileTypeImage</key>
-		<value>Image (jpg/bmp/png/gif)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string>
-		<key>OpenFileChooser.AllSupportedFiles</key>
-		<value>All supported files</value>
-		<hint>file open dialog</hint>
-	</string>
-
-	<string>
-		<key>PlotterSettingsPanel.pen up color</key>
-		<value>Up color</value>
-		<hint>Pen settings</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.pen down color</key>
-		<value>Default down color</value>
-		<hint>Pen settings</hint>
-	</string>
-
-	<string>
-		<key>MenuAxisDriveControls</key>
-		<value>Manual Driving</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuCommonDriveControls</key>
-		<value>Popular Driving Commands</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuCreativeControl</key>
-		<value>Creative control</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuAnimate</key>
-		<value>Animation control</value>
-		<hint>context sensitive menu</hint>
-	</string>
-
-	<string>
-		<key>MenuFileTitle</key>
-		<value>File</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuMetricsTitle</key>
-		<value>Metrics</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>collectAnonymousMetrics</key>
-		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>collectAnonymousMetricsOnUpdate</key>
-		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuSoundsTitle</key>
-		<value>Sounds</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuSoundsConnect</key>
-		<value>Connect</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsDisconnect</key>
-		<value>Disconnect</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsFinishConvert</key>
-		<value>Finish converting</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuSoundsFinishDraw</key>
-		<value>Finish drawing</value>
-		<hint>sound settings dialog</hint>
-	</string>
-
-	<string>
-		<key>MenuGraphicsTitle</key>
-		<value>Graphics</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.showPenUp</key>
-		<value>Show travel moves</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.antialias</key>
-		<value>Antialias lines</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.speedVSQuality</key>
-		<value>Speed over quality</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.showAllWhileDrawing</key>
-		<value>Show entire image while drawing</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.dragSpeed</key>
-		<value>camera travel speed</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuLanguageTitle</key>
-		<value>Language</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>InvalidTool</key>
-		<value>Requested invalid tool #</value>
-		<hint>warning message</hint>
-	</string>
-	<string>
-		<key>ChangeToolTitle</key>
-		<value>Change Pen</value>
-		<hint>tool change prompt.</hint>
-	</string>
-	<string>
-		<key>ChangeToolMessage</key>
-		<value>Please change the pen to match this color.</value>
-		<hint>tool change prompt.</hint>
-	</string>
-
-	<string>
-		<key>StartAt</key>
-		<value>Start at</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>StartAtLine</key>
-		<value>Start at line #</value>
-		<hint>start at dialog</hint>
-	</string>
-
-
-
-	<string>
-		<key>Robot</key>
-		<value>Makelangelo</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>RobotMenu.RobotStyle</key>
-		<value>Robot style</value>
-		<hint>select style of robot to draw around art</hint>
-	</string>
-	<string>
-		<key>RobotMenu.RenderStyle</key>
-		<value>Render style</value>
-		<hint>select style of art</hint>
-	</string>
-	<string>
-		<key>RobotMenu.OpenControls</key>
-		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>RobotMenu.SaveGCode</key>
-		<value>Save Gcode to file/SD</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>RobotMenu.Style</key>
-		<value>Machine style</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>RobotMenu.GetTimeEstimate</key>
-		<value>Estimate time</value>
-		<hint>menu or dialog title, status message. ?keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>PlotterControls.Title</key>
-		<value>Robot controls</value>
-		<hint>title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.ConnectControls</key>
-		<value>Connect</value>
-		<hint>title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.DrawControls</key>
-		<value>Draw controls</value>
-		<hint>panel title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.FindHome</key>
-		<value>Find home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Pause</key>
-		<value>Pause</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Rewind</key>
-		<value>Rewind</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Play</key>
-		<value>Draw</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Connect</key>
-		<value>Connect</value>
-		<hint>title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.EmergencyStop</key>
-		<value>Emergency Stop</value>
-		<hint>button</hint>
-	</string>
-	<string>
-		<key>PlotterControls.MarlinTab</key>
-		<value>Marlin</value>
-		<hint>panel tab title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.ProgramTab</key>
-		<value>Program</value>
-		<hint>panel tab title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.JogTab</key>
-		<value>Robot controls</value>
-		<hint>panel tab title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.AdvancedControls</key>
-		<value>Advanced controls</value>
-		<hint>panel title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Error</key>
-		<value>The printer encountered an error, check the MarlinInterface tab to get details.</value>
-		<hint>text</hint>
-	</string>
-	<string>
-		<key>PlotterControls.homeXYFirst</key>
-		<value>Home the printer first.</value>
-		<hint>text</hint>
-	</string>
-	<string>
-		<key>PlotterControls.didNotFind</key>
-		<value>Error in communicating with the robot.</value>
-		<hint>text</hint>
-	</string>
-	<string>
-		<key>PlotterControls.communicationFailure</key>
-		<value>No answer from the robot, please check the USB cable or speed settings.</value>
-		<hint>text</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Printed halted</key>
-		<value>Printer halted!</value>
-		<hint>text</hint>
-	</string>
-
-	<string>
-		<key>ConversationHistory.Clear</key>
-		<value>Clear</value>
-		<hint>button</hint>
-	</string>
-	<string>
-		<key>ConversationHistory.Save</key>
-		<value>Save</value>
-		<hint>button</hint>
-	</string>
-	<string>
-		<key>ConversationHistory.Copy</key>
-		<value>Copy</value>
-		<hint>button</hint>
-	</string>
-
-	<string>
-		<key>GoPaperBorder</key>
-		<value>Border</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>Top</key>
-		<value>Top</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Bottom</key>
-		<value>Bottom</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.FindHome</key>
-		<value>Home</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.PenUp</key>
-		<value>Pen up</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.PenDown</key>
-		<value>Pen down</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.DisengageMotors</key>
-		<value>Disengage</value>
-		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.EngageMotors</key>
-		<value>Engage</value>
-		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Set</key>
-		<value>Set</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.Speed</key>
-		<value>Draw speed (mm/min)</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Rate</key>
-		<value>mm/s</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>RateDeg</key>
-		<value>deg/s</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>RateAccel</key>
-		<value>mm/s²</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>JogMotors</key>
-		<value>Motors</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>JogIn</key>
-		<value>IN</value>
-		<hint>jog motors dialog</hint>
-	</string>
-	<string>
-		<key>JogOut</key>
-		<value>OUT</value>
-		<hint>jog motors dialog</hint>
-	</string>
-	<string>
-		<key>Invert</key>
-		<value>Invert</value>
-		<hint>jog motors dialog</hint>
-	</string>
-
-	<string>
-		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
-		<hint>check for update dialog</hint>
-	</string>
-	<string>
-		<key>UpToDate</key>
-		<value>This software is up to date.</value>
-		<hint>check for update dialog</hint>
-	</string>
-	<string>
-		<key>UpdateCheckFailed</key>
-		<value>Sorry, I failed. Please visit http://www.marginallyclever.com/
-			to check yourself.</value>
-		<hint>check for update dialog</hint>
-	</string>
-
-	<string>
-		<key>Send</key>
-		<value>Send</value>
-		<hint>drive manually dialog</hint>
-	</string>
-	<string>
-		<key>TitleNotConnected</key>
-		<value> not connected</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuMakelangelo</key>
-		<value>File</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuPreferences</key>
-		<value>Preferences</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuUpdate</key>
-		<value>Check for updates</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuQuit</key>
-		<value>Quit</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuConnect</key>
-		<value>Connect</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuHelp</key>
-		<value>Help</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuForums</key>
-		<value>Online help forums</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAbout</key>
-		<value>About</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>ButtonConnect</key>
-		<value>Connect</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>ButtonDisconnect</key>
-		<value>Disconnect</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuRescan</key>
-		<value>Rescan</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuDisconnect</key>
-		<value>Disconnect</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuLoadMachineConfig</key>
-		<value>Load settings for...</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuSettings</key>
-		<value>Settings</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuSettingsMachine</key>
-		<value>Machine</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustPaper</key>
-		<value>Paper</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustPulleys</key>
-		<value>Pulley size</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuJogMotors</key>
-		<value>Jog Motors</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuSelectTool</key>
-		<value>Select active tool</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustTool</key>
-		<value>Pen</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuGCODE</key>
-		<value>Convert</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuTextToGCODE</key>
-		<value>Your message here</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuConvertImage</key>
-		<value>Open Recent...</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuOpenFile</key>
-		<value>Open File...</value>
-	</string>
-
-	<string>
-		<key>MenuSaveFile</key>
-		<value>Save File...</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuReopenFile</key>
-		<value>Reopen last file</value>
-	</string>
-	<string>
-		<key>PlotterControls.Step</key>
-		<value>Step</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuDraw</key>
-		<value>Draw</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Halt</key>
-		<value>Halt</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuView</key>
-		<value>View</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomIn</key>
-		<value>Zoom +</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomOut</key>
-		<value>Zoom -</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomFit</key>
-		<value>Zoom to fit</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>ShowLog</key>
-		<value>Show Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>HideLog</key>
-		<value>Hide Log</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>mmNotice</key>
-		<value>All values in mm.</value>
-		<hint>Machine size</hint>
-	</string>
-
-	<string>
-		<key>PlotterSettingsPanel.penToolAdjust</key>
-		<value>Pen</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolDiameter</key>
-		<value>Diameter (mm)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolMaxFeedRate</key>
-		<value>Travel speed (mm/min)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolUp</key>
-		<value>Up angle (degrees)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolDown</key>
-		<value>Down angle (degrees)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolLiftSpeed</key>
-		<value>Pen lift time (ms)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolLowerSpeed</key>
-		<value>Pen lower time (ms)</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.penToolTest</key>
-		<value>Test</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolTest</key>
-		<value>Spraypaint</value>
-		<hint>Spraypaint tool Make a dot</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolDiameter</key>
-		<value>Dot size</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolMaxFeedRate</key>
-		<value>max speed</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolUp</key>
-		<value>Off</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolDown</key>
-		<value>On</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.spraypaintToolLiftSpeed</key>
-		<value>On/off speed</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>SierpinskiTriangleName</key>
-		<value>Sierpinski triangle fractal</value>
-		<hint>name of generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.Name</key>
-		<value>Voronoi stipples</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>VoronoiZigZagName</key>
-		<value>Voronoi zigzag</value>
-		<hint>voronoi zigzag generator</hint>
-	</string>
-
-
-	<string>
-		<key>Converter_Voronoi.Name</key>
-		<value>Voronoi diagram</value>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.CellCount</key>
-		<value>Number of cells</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.GenCount</key>
-		<value>Number of Generations</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.DotMax</key>
-		<value>Max dot size</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.DotMin</key>
-		<value>Min dot size</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-
-	<string>
-		<key>BoxGeneratorName</key>
-		<value>Boxxy</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorMaxSize</key>
-		<value>Max size</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorCutoff</key>
-		<value>Cutoff</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorMaxSizeNote</key>
-		<value>Max size greater than or equal to 1. Cutoff 0...1</value>
-		<hint>Boxxy generator</hint>
-	</string>
-
-	<string>
-		<key>CrosshatchName</key>
-		<value>Crosshatch</value>
-		<hint>Crosshatch generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveName</key>
-		<value>Hilbert Curve Fractal</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveSize</key>
-		<value>Size</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveOrder</key>
-		<value>Order</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>penDiameter</key>
-		<value>Pen diameter</value>
-		<hint>Fill page generator</hint>
-	</string>
-	<string>
-		<key>LSystemBranches</key>
-		<value>Branches</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>LSystemOrderScale</key>
-		<value>Scale</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>LSystemAngle</key>
-		<value>Angle span</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>LSystemNoise</key>
-		<value>Noise</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>Size</key>
-		<value>Size</value>
-		<hint>Polyeder generator</hint>
-	</string>
-	<string>
-		<key>Flap</key>
-		<value>Flap</value>
-		<hint>Polyeder generator</hint>
-	</string>
-	<string>
-		<key>Model</key>
-		<value>Model</value>
-		<hint>Polyeder generator</hint>
-	</string>
-	<string>
-		<key>Length</key>
-		<value>Length</value>
-		<hint>Package generator</hint>
-	</string>
-
-	<string>
-		<key>MazeName</key>
-		<value>Maze</value>
-		<hint>Maze generator</hint>
-	</string>
-	<string>
-		<key>MazeRows</key>
-		<value>Rows</value>
-		<hint>Maze generator</hint>
-	</string>
-	<string>
-		<key>MazeColumns</key>
-		<value>Columns</value>
-		<hint>Maze generator</hint>
-	</string>
-
-	<string>
-		<key>PulseLineName</key>
-		<value>Pulse Line</value>
-		<hint>Pulse Line generator</hint>
-	</string>
-	<string>
-		<key>ZigZagName</key>
-		<value>Big zig zag</value>
-		<hint>Zig Zag generator</hint>
-	</string>
-	<string>
-		<key>YourMsgHereName</key>
-		<value>Your message here</value>
-		<hint>Your message here generator</hint>
-	</string>
-	<string>
-		<key>SpiralName</key>
-		<value>Spiral</value>
-		<hint>Spiral generator</hint>
-	</string>
-	<string>
-		<key>SpiralCMYKName</key>
-		<value>CMYK Spiral</value>
-		<hint>Spiral generator</hint>
-	</string>
-
-	<string>
-		<key>SpiralPulseName</key>
-		<value>Pulsing Spiral</value>
-		<hint>Spiral Pulse generator</hint>
-	</string>
-	<string>
-		<key>ScanlineName</key>
-		<value>Scanline</value>
-		<hint>Scanline generator</hint>
-	</string>
-	<string>
-		<key>RGBName</key>
-		<value>Red Green Blue</value>
-		<hint>RGB generator</hint>
-	</string>
-
-	<string>
-		<key>SharePromo</key>
-		<value>Try social media tag #plotter</value>
-		<hint>Your drawing is finished. Share it</hint>
-	</string>
-
-	<string>
-		<key>StatusSoFar</key>
-		<value>Time running: </value>
-		<hint>time machine has been drawing</hint>
-	</string>
-
-	<string>
-		<key>StatusRemaining</key>
-		<value>Estimated time left: </value>
-		<hint>time machine will be drawing</hint>
-	</string>
-
-	<string>
-		<key>EstimatedTime</key>
-		<value>Estimated draw time: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>EstimatedTimeIs</key>
-		<value>Estimated time is %1</value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>DialogAbout.AboutHTML</key>
-		<value><![CDATA[
+	<string><key>BorderName</key><value>Outline paper</value></string>
+	<string><key>LissajousName</key><value>Lissajous</value></string>
+	<string><key>LissajousA</key><value>A (&gt;0)</value></string>
+	<string><key>LissajousB</key><value>B (&gt;0)</value></string>
+	<string><key>LissajousDelta</key><value>Delta (0...1)</value></string>
+	<string><key>SpirographName</key><value>Spirograph</value></string>
+	<string><key>SpirographMajorRadius</key><value>Major radius (R)</value></string>
+	<string><key>SpirographMinorRadius</key><value>Minor radius (r)</value></string>
+	<string><key>SpirographPScale</key><value>Scale (p)</value></string>
+	<string><key>SpirographNumSamples</key><value>Samples (quality)</value></string>
+	<string><key>SpirographEpitrochoid</key><value>is epitrochoid</value></string>
+	<string><key>ConverterRandomLinesName</key><value>Random lines</value></string>
+	<string><key>ConverterRandomLinesCount</key><value>Number of lines</value></string>
+	<string><key>StartAtLastPenDown</key><value>Back up to last pen down</value></string>
+	<string><key>StartAtAddPenDown</key><value>Add pen down command here</value></string>
+	<string><key>StartAtExactly</key><value>Do nothing special</value></string>
+	<string><key>ConfirmQuitQuestion</key><value>Are you sure you want to quit?</value></string>
+	<string><key>ConfirmQuitTitle</key><value>Exit</value></string>
+
+	<string><key>ConvertImagePaperFill</key><value>Fill entire paper</value></string>
+	<string><key>ConvertImagePaperFit</key><value>Fit image on paper</value></string>
+	<string><key>ConvertImagePaperCenter</key><value>Center image</value></string>
+
+	<string><key>LoadFilePanel.title</key><value>Load file preview</value></string>
+	<string><key>OK</key><value>OK</value></string>
+	<string><key>Cancel</key><value>Cancel</value></string>
+	<string><key>Save</key><value>Save</value></string>
+	<string><key>Translate</key><value>Translate</value></string>
+	<string><key>Scale</key><value>Scale</value></string>
+	<string><key>Rotate</key><value>Rotate</value></string>
+	<string><key>Width</key><value>Width</value></string>
+	<string><key>Height</key><value>Height</value></string>
+
+	<string><key>TitlePrefix</key><value>Makelangelo</value></string>
+	<string><key>LoadError</key><value>File could not be loaded:</value></string>
+	<string><key>SaveError</key><value>File could not be saved:</value></string>
+	<string><key>ConversionStyle</key><value>Style</value></string>
+	<string><key>ConversionFill</key><value>Fill</value></string>
+	<string><key>OpenFileChooser.FileTypeImage</key><value>Image (jpg/bmp/png/gif)</value></string>
+	<string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
+	<string><key>MenuMetricsTitle</key><value>Metrics</value></string>
+	<string><key>collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value></string>
+	<string><key>collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
+	<string><key>MenuSoundsTitle</key><value>Sounds</value></string>
+	<string><key>MenuSoundsConnect</key><value>Connect</value></string>
+	<string><key>MenuSoundsDisconnect</key><value>Disconnect</value></string>
+	<string><key>MenuSoundsFinishConvert</key><value>Finish converting</value></string>
+	<string><key>MenuSoundsFinishDraw</key><value>Finish drawing</value></string>
+	<string><key>MenuGraphicsTitle</key><value>Graphics</value></string>
+	<string><key>MenuLanguageTitle</key><value>Language</value></string>
+	<string><key>StartAt</key><value>Start at</value></string>
+	<string><key>Robot</key><value>Makelangelo</value></string>
+
+	<string><key>GFXPreferences.showPenUp</key><value>Show travel moves</value></string>
+	<string><key>GFXPreferences.antialias</key><value>Antialias lines</value></string>
+	<string><key>GFXPreferences.speedVSQuality</key><value>Speed over quality</value></string>
+	<string><key>GFXPreferences.showAllWhileDrawing</key><value>Show entire image while drawing</value></string>
+	<string><key>GFXPreferences.dragSpeed</key><value>camera travel speed</value></string>
+
+	<string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value></string>
+	<string><key>UpToDate</key><value>This software is up to date.</value></string>
+	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
+	<string><key>MenuMakelangelo</key><value>File</value></string>
+	<string><key>MenuPreferences</key><value>Preferences</value></string>
+	<string><key>MenuUpdate</key><value>Check for updates</value></string>
+	<string><key>MenuQuit</key><value>Quit</value></string>
+	<string><key>MenuForums</key><value>Online help forums</value></string>
+	<string><key>MenuAbout</key><value>About</value></string>
+	<string><key>MenuSettings</key><value>Settings</value></string>
+	<string><key>MenuOpenFile</key><value>Open File...</value></string>
+	<string><key>MenuSaveFile</key><value>Save File...</value></string>
+	<string><key>MenuReopenFile</key><value>Reopen last file</value></string>
+	<string><key>MenuView</key><value>View</value></string>
+	<string><key>MenuView.zoomIn</key><value>Zoom +</value></string>
+	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
+	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
+	<string><key>ShowLog</key><value>Show Log</value></string>
+	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
+	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
+
+	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
+	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
+
+	<string><key>BoxGeneratorName</key><value>Boxxy</value></string>
+	<string><key>BoxGeneratorMaxSize</key><value>Max size</value></string>
+	<string><key>BoxGeneratorCutoff</key><value>Cutoff</value></string>
+	<string><key>HilbertCurveName</key><value>Hilbert Curve</value></string>
+	<string><key>HilbertCurveSize</key><value>Size</value></string>
+	<string><key>HilbertCurveOrder</key><value>Order</value></string>
+	<string><key>penDiameter</key><value>Pen diameter</value></string>
+	<string><key>LSystemBranches</key><value>Branches</value></string>
+	<string><key>LSystemOrderScale</key><value>Scale</value></string>
+	<string><key>LSystemAngle</key><value>Angle span</value></string>
+	<string><key>LSystemNoise</key><value>Noise</value></string>
+	<string><key>Size</key><value>Size</value></string>
+	<string><key>Flap</key><value>Flap</value></string>
+	<string><key>Model</key><value>Model</value></string>
+	<string><key>Length</key><value>Length</value></string>
+	<string><key>PulseLineName</key><value>Pulse Line</value></string>
+	<string><key>YourMsgHereName</key><value>Your message here</value></string>
+	<string><key>SpiralName</key><value>Spiral</value></string>
+	<string><key>SpiralPulseName</key><value>Pulsing Spiral</value></string>
+	<string><key>SharePromo</key><value>Try social media tag #plotter</value></string>
+	<string><key>DialogAbout.AboutHTML</key><value><![CDATA[
     <html>
       <body>
         <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
@@ -1398,935 +133,317 @@
         Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p>
       </body>
     </html>
-    ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>MenuSettingsRegister</key>
-		<value>Register</value>
-		<hint>Machine Configuration > Register tab title</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegister</key>
-		<value><![CDATA[<p>Register your robot with your Marginally Clever user account to Unlock features and show your support.</p>]]></value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterCreateAccountButton</key>
-		<value>Create an account</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterUsername</key>
-		<value>User name</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterPassword</key>
-		<value>Password</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>MachineNumber</key>
-		<value>Machine #</value>
-		<hint>Prepare image panel</hint>
-	</string>
-
-	<string>
-		<key>MenuResetMachinePreferencesWarning</key>
-		<value>Are you sure you want to erase all your preferences?</value>
-		<hint>Makelangelo > preferences > reset preferences</hint>
-	</string>
-
-	<string>
-		<key>MenuGenerate</key>
-		<value>Generate art</value>
-	</string>
-
-	<string>
-		<key>MenuNewFile</key>
-		<value>New</value>
-	</string>
-
-	<string>
-		<key>MenuCaptureImage</key>
-		<value>Capture From Camera</value>
-	</string>
-
-	<string>
-		<key>LSystemTreeName</key>
-		<value>L System Tree Fractal</value>
-	</string>
-
-	<string>
-		<key>LimitTestName</key>
-		<value>Limit Test</value>
-	</string>
-
-	<string>
-		<key>KochTreeName</key>
-		<value>Koch Curve Fractal</value>
-	</string>
-
-	<string>
-		<key>FibonacciSpiralName</key>
-		<value>Fibonacci Spiral Fractal</value>
-	</string>
-
-	<string>
-		<key>DragonName</key>
-		<value>Dragon Fractal</value>
-	</string>
-
-	<string>
-		<key>ClickAndDrag</key>
-		<value>Click &amp; Drag</value>
-		<hint>live drawing panel</hint>
-	</string>
-	<string>
-		<key>configureMachine</key>
-		<value>Settings</value>
-		<hint>open machine settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>Reset Preferences</value>
-		<hint>Preferences menu</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.ServoLengthNeeded</key>
-		<value>Servo wire length (m)</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.StepperLengthNeeded</key>
-		<value>Stepper wire length (m,each)</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.BeltLengthNeeded</key>
-		<value>Timing belt length (m,each)</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>ConverterWanderName</key>
-		<value>Wander</value>
-		<hint>name of Wander converter style</hint>
-	</string>
-	<string>
-		<key>ConverterWanderLineCount</key>
-		<value># Lines</value>
-		<hint>Wander converter style parameter</hint>
-	</string>
-
-	<string>
-		<key>ConverterMultipassName</key>
-		<value>Multipass</value>
-		<hint>name of Multipass converter style</hint>
-	</string>
-	<string>
-		<key>ConverterMultipassAngle</key>
-		<value>Angle (degrees)</value>
-		<hint>Multipass converter option</hint>
-	</string>
-	<string>
-		<key>ConverterMultipassLevels</key>
-		<value>Levels</value>
-		<hint>Multipass converter option</hint>
-	</string>
-
-	<string>
-		<key>firmwareVersionBadTitle</key>
-		<value>Firmware update</value>
-		<hint>Software is too new for firmware</hint>
-	</string>
-
-	<string>
-		<key>HardwareVersion</key>
-		<value>Model: </value>
-		<hint>What is the hardware model of this robot?</hint>
-	</string>
-
-	<string>
-		<key>firmwareVersionBadMessage</key>
-		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>
-		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value>
-		<hint>Software is too new for firmware</hint>
-	</string>
-
-	<string>
-		<key>hardwareVersionBadMessage</key>
-		<value><![CDATA[<html><body>I don't recognize this machine. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-5/">https://www.marginallyclever.com/product/makelangelo-5/</a><br>
-		   for the Makelangelo 5 art robot.</html></body>]]></value>
-		<hint>Software is too new for firmware</hint>
-	</string>
-
-	<string>
-		<key>TextSize</key>
-		<value>Size</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>TextFont</key>
-		<value>Font</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>FontFace</key>
-		<value>Typeface</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>TextMessage</key>
-		<value>Message</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>CaptureImageTitle</key>
-		<value>Capture Camera Image</value>
-		<hint>Capture Image from host camera</hint>
-	</string>
-	<string>
-		<key>CaptureImage</key>
-		<value>Capture</value>
-		<hint>Capture Image from host camera</hint>
-	</string>
-	<string>
-		<key>UseCapture</key>
-		<value>Use</value>
-		<hint>Use Image for processing</hint>
-	</string>
-	<string>
-		<key>CancelCapture</key>
-		<value>Cancel</value>
-		<hint>Cancel Capture. Don't process.</hint>
-	</string>
-	<string>
-		<key>AWB</key>
-		<value>Automatic White Balance</value>
-		<hint>Image Automatic White Balance setting</hint>
-	</string>
-	<string>
-		<key>DRC</key>
-		<value>Dynamic Range</value>
-		<hint>Image Dynamic Range Setting</hint>
-	</string>
-	<string>
-		<key>Exposure</key>
-		<value>Exposure</value>
-		<hint>Image Exposure Setting</hint>
-	</string>
-	<string>
-		<key>Contrast</key>
-		<value>Contrast</value>
-		<hint>Image Contrast Setting</hint>
-	</string>
-	<string>
-		<key>Quality</key>
-		<value>Quality</value>
-		<hint>Image Quality Setting</hint>
-	</string>
-	<string>
-		<key>Sharpness</key>
-		<value>Sharpness</value>
-		<hint>Image Sharpness Setting</hint>
-	</string>
-	<string>
-		<key>Off</key>
-		<value>Off</value>
-	</string>
-	<string>
-		<key>Auto</key>
-		<value>Auto</value>
-	</string>
-	<string>
-		<key>Sun</key>
-		<value>Sun</value>
-	</string>
-	<string>
-		<key>Cloud</key>
-		<value>Cloud</value>
-	</string>
-	<string>
-		<key>Shade</key>
-		<value>Shade</value>
-	</string>
-	<string>
-		<key>Tungsten</key>
-		<value>Tungsten</value>
-	</string>
-	<string>
-		<key>Fluorescent</key>
-		<value>Fluorescent</value>
-	</string>
-	<string>
-		<key>Incandescent</key>
-		<value>Incandescent</value>
-	</string>
-	<string>
-		<key>Flash</key>
-		<value>Flash</value>
-	</string>
-	<string>
-		<key>Horizon</key>
-		<value>Horizon</value>
-	</string>
-	<string>
-		<key>High</key>
-		<value>High</value>
-	</string>
-	<string>
-		<key>Medium</key>
-		<value>Medium</value>
-	</string>
-	<string>
-		<key>Low</key>
-		<value>Low</value>
-	</string>
-	<string>
-		<key>Antishake</key>
-		<value>Antishake</value>
-	</string>
-	<string>
-		<key>Backlight</key>
-		<value>Backlight</value>
-	</string>
-	<string>
-		<key>Beach</key>
-		<value>Beach</value>
-	</string>
-	<string>
-		<key>Fireworks</key>
-		<value>Fireworks</value>
-	</string>
-	<string>
-		<key>FixedFPS</key>
-		<value>FixedFPS</value>
-	</string>
-	<string>
-		<key>Night</key>
-		<value>Night</value>
-	</string>
-	<string>
-		<key>NightPreview</key>
-		<value>NightPreview</value>
-	</string>
-	<string>
-		<key>Snow</key>
-		<value>Snow</value>
-	</string>
-	<string>
-		<key>Sports</key>
-		<value>Sports</value>
-	</string>
-	<string>
-		<key>Spotlight</key>
-		<value>Spotlight</value>
-	</string>
-	<string>
-		<key>Verylong</key>
-		<value>Verylong</value>
-	</string>
-
-	<string>
-		<key>Choose</key>
-		<value>Choose</value>
-	</string>
-
-	<string>
-		<key>Import</key>
-		<value>Import</value>
-	</string>
-
-	<string>
-		<key>Export</key>
-		<value>Export</value>
-	</string>
-
-	<string>
-		<key>Reset</key>
-		<value>Reset</value>
-	</string>
-
-	<string>
-		<key>Help</key>
-		<value>Help</value>
-	</string>
-
-	<string>
-		<key>Art Pipeline</key>
-		<value>Tools</value>
-	</string>
-
-	<string>
-		<key>Crosshatch</key>
-		<value>Crosshatch</value>
-	</string>
-
-	<string>
-		<key>MoireName</key>
-		<value>Moire</value>
-	</string>
-
-	<string>
-		<key>horizontal</key>
-		<value>Horizontal</value>
-	</string>
-
-	<string>
-		<key>vertical</key>
-		<value>Vertical</value>
-	</string>
-
-	<string>
-		<key>SandyNoble.title</key>
-		<value>Sandy Noble Style</value>
-	</string>
-	<string>
-		<key>SandyNoble.rings</key>
-		<value>Rings</value>
-	</string>
-	<string>
-		<key>SandyNoble.center</key>
-		<value>Center</value>
-	</string>
-
-	<string>
-		<key>ConverterIntensity</key>
-		<value>Intensity</value>
-	</string>
-
-	<string>
-		<key>top right</key>
-		<value>Top right</value>
-	</string>
-
-	<string>
-		<key>top left</key>
-		<value>Top left</value>
-	</string>
-
-	<string>
-		<key>bottom right</key>
-		<value>Bottom right</value>
-	</string>
-
-	<string>
-		<key>bottom left</key>
-		<value>Bottom left</value>
-	</string>
-
-	<string>
-		<key>center</key>
-		<value>Center</value>
-	</string>
-
-	<string>
-		<key>Spiral.toCorners</key>
-		<value>Spiral to corners</value>
-	</string>
-
-	<string>
-		<key>SpiralPulse.intensity</key>
-		<value>Intensity</value>
-	</string>
-
-	<string>
-		<key>SpiralPulse.spacing</key>
-		<value>Space between rings</value>
-	</string>
-
-	<string>
-		<key>SpiralPulse.height</key>
-		<value>Pulse height</value>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.Cutoff</key>
-		<value>Low-pass cutoff</value>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.DrawBorders</key>
-		<value>Draw borders?</value>
-	</string>
-	<string>
-		<key>ConverterWanderCMYK</key>
-		<value>CMYK?</value>
-	</string>
-
-	<string>
-		<key>FillPageName</key>
-		<value>Fill page</value>
-	</string>
-
-	<string>
-		<key>GosperCurveName</key>
-		<value>Gosper curve</value>
-	</string>
-
-	<string>
-		<key>GosperCurveOrder</key>
-		<value>Order</value>
-	</string>
-
-	<string>
-		<key>pass90</key>
-		<value>Pass 90</value>
-	</string>
-	<string>
-		<key>pass75</key>
-		<value>Pass 75</value>
-	</string>
-	<string>
-		<key>pass45</key>
-		<value>Pass 45</value>
-	</string>
-	<string>
-		<key>pass15</key>
-		<value>Pass 15</value>
-	</string>
-	<string>
-		<key>Direction</key>
-		<value>Direction</value>
-	</string>
-
-	<string>
-		<key>Resize</key>
-		<value>Resize</value>
-		<hint>Art Pipeline</hint>
-	</string>
-	<string>
-		<key>Flip</key>
-		<value>Flip</value>
-		<hint>Art Pipeline</hint>
-	</string>
-	<string>
-		<key>FlipNone</key>
-		<value>No Flip</value>
-		<hint>Art Pipeline</hint>
-	</string>
-	<string>
-		<key>FlipH</key>
-		<value>Flip horizontal</value>
-		<hint>Art Pipeline</hint>
-	</string>
-	<string>
-		<key>FlipV</key>
-		<value>Flip vertical</value>
-		<hint>Art Pipeline</hint>
-	</string>
-
-	<string>
-		<key>Reorder</key>
-		<value>Reorder</value>
-		<hint>Art Pipeline</hint>
-	</string>
-
-	<string>
-		<key>Simplify</key>
-		<value>Simplify</value>
-		<hint>Art Pipeline</hint>
-	</string>
-	<string>
-		<key>Crop to margins</key>
-		<value>Crop to margins</value>
-		<hint>Art Pipeline</hint>
-	</string>
-
-	<string>
-		<key>GraphPaperName</key>
-		<value>Graph Paper</value>
-		<hint>Generator</hint>
-	</string>
-
-	<string>
-		<key>Package</key>
-		<value>Papercraft Box</value>
-		<hint>Generator</hint>
-	</string>
-
-	<string>
-		<key>Polyeder</key>
-		<value>Papercraft Polyhedron</value>
-		<hint>Generator</hint>
-	</string>
-
-	<string>
-		<key>FirmwareUpdate</key>
-		<value>Update firmware</value>
-		<hint>build-in arduino hex flashing action</hint>
-	</string>
-
-	<string>
-		<key>avrDude path</key>
-		<value>avrDude path</value>
-		<hint>FirmwareUpdate action</hint>
-	</string>
-
-	<string>
-		<key>*.hex file</key>
-		<value>*.hex file</value>
-		<hint>FirmwareUpdate action</hint>
-	</string>
-
-	<string>
-		<key>Port</key>
-		<value>Port</value>
-		<hint>FirmwareUpdate action</hint>
-	</string>
-
-	<string>
-		<key>Refresh</key>
-		<value>Refresh</value>
-		<hint>FirmwareUpdate action</hint>
-	</string>
-	<string>
-		<key>NotConnected</key>
-		<value>Not connected</value>
-		<hint>Network session information, menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>OpenPaperSettings</key>
-		<value>Paper settings</value>
-		<hint>MenuItem</hint>
-	</string>
-	
-	<string>
-		<key>OpenPlotterSettings</key>
-		<value>Plotter settings</value>
-	</string>
-
-	<string>
-		<key>FileTypeScratch3</key>
-		<value>Scratch 3</value>
-		<hint>load file dialog</hint>
-	</string>
-	
-	<string>
-		<key>Open</key>
-		<value>Open file...</value>
-		<hint>load file dialog</hint>
-	</string>
-	<string>
-		<key>InfillTurtleAction.title</key>
-		<value>Fill in closed loops</value>
-	</string>
-
-	<string>
-		<key>LogPanel.CopyClipboard</key>
-		<value>Copy to clipboard</value>
-	</string>
-	<string>
-		<key>LogPanel.LogFiles</key>
-		<value>Log files</value>
-	</string>
-	<string>
-		<key>LogPanel.Title</key>
-		<value>Log</value>
-	</string>
-
-	<string>
-		<key>PlotterSettings.blockBufferSize</key>
-		<value>Block Buffer Size</value>
-	</string>
-	<string>
-		<key>PlotterSettings.segmentsPerSecond</key>
-		<value>Segments Per Second</value>
-	</string>
-	<string>
-		<key>PlotterSettings.minSegmentLength</key>
-		<value>Min Segment Length (mm)</value>
-	</string>
-	<string>
-		<key>PlotterSettings.minSegTime</key>
-		<value>Min Seg Time (ns)</value>
-	</string>
-	<string>
-		<key>PlotterSettings.handleSmallSegments</key>
-		<value>Handle Small Segments</value>
-	</string>
-	<string>
-		<key>PlotterSettings.minAcceleration</key>
-		<value>Min Acceleration (mm/s²)</value>
-	</string>
-	<string>
-		<key>PlotterSettings.minimumPlannerSpeed</key>
-		<value>Min Planner Speed (mm/s)</value>
-	</string>
-	<string>
-		<key>PlotterSettings.zMotorType</key>
-		<value>Z axis type</value>
-	</string>
-	<string>
-		<key>PlotterSettings.zMotorType.servo</key>
-		<value>Servo</value>
-	</string>
-	<string>
-		<key>PlotterSettings.zMotorType.stepper</key>
-		<value>Stepper</value>
-	</string>
-
-	<string>
-		<key>QuestionTitle</key>
-		<value>Question</value>
-		<hint>Dialog</hint>
-	</string>
-	<string>
-		<key>InfoTitle</key>
-		<value>Information</value>
-		<hint>Dialog</hint>
-	</string>
-	<string>
-		<key>ErrorTitle</key>
-		<value>Error</value>
-		<hint>Dialog</hint>
-	</string>
-  
-	<string>
-		<key>MenuItemPayPalDonation</key>
-		<value>PayPal donation</value>
-		<hint>Help Menu, PayPal donation</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.Title</key>
-		<value>Plotter settings</value>
-		<hint>panel title</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.TabEssential</key>
-		<value>Essential</value>
-		<hint>plotter shape and size</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.TabPen</key>
-		<value>Pen</value>
-		<hint>pen shape, color, and speed</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.TabSimulation</key>
-		<value>Simulation</value>
-		<hint>plotter simulation for time estimates</hint>
-	</string>
-
-  <string>
-      <key>TurtleRenderFactory.DEFAULT</key>
-      <value>Default</value>
-  </string>
-  <string>
-      <key>TurtleRenderFactory.BARBER_POLE</key>
-      <value>Barber pole</value>
-      <hint>Barber pole (red, blue)</hint>
-  </string>
-  <string>
-      <key>TurtleRenderFactory.SEPARATE_LOOP</key>
-      <value>Separate loops</value>
-  </string>
-  <string>
-      <key>TurtleRenderFactory.MARLIN_SIM</key>
-      <value>Marlin simulation</value>
-  </string>
-  <string>
-      <key>TurtleGenerators.LearnMore.Link.Text</key>
-      <value>Learn more</value>
-      <hint>Used in many Generator Panel as link text to Wikipedia URLs</hint>
-  </string>
-
-<!--
-    <string>
-        <key></key>
-        <value></value>
-
-    </string>
- -->                
-
-	<string>
-		<key>CartesianButtons.buttonCenter</key>
-		<value></value>
-		<hint>jog controls</hint>
-	</string>
-
-	<string>
-		<key>LoadScratch3.foreverNotAllowed</key>
-		<value>Forever loops are forever forbidden.</value>
-	</string>
-
-	<!-- to update / review -->
-	<string>
-		<key>SaveGCode.splitGCodeTitle</key>
-		<value>Many colors detected</value>
-	</string>
-
-	<!-- to update / review -->
-	<string>
-		<key>SaveGCode.splitGCodeQuestion</key>
-		<value>There are %1 tool changes in this drawing.  Split into separate files?</value>
-	</string>
-
-	<!-- to update / review -->
-	<string>
-		<key>Converter_CMYK_Circles.name</key>
-		<value>CMYK circles</value>
-	</string>
-	<string>
-		<key>Converter_CMYK_Circles.maxCircleSize</key>
-		<value>max circle size</value>
-	</string>
-
-	<string>
-		<key>Converter_EdgeDetection.name</key>
-		<value>Edge detection</value>
-	</string>
-	<string>
-		<key>Converter_EdgeDetection.passes</key>
-		<value>Passes</value>
-	</string>
-	<string>
-		<key>Converter_EdgeDetection.stepSize</key>
-		<value>Step size</value>
-	</string>
-	<string>
-		<key>Converter_EdgeDetection.sampleSize</key>
-		<value>SampleSize</value>
-	</string>
-
-	<string>
-		<key>Generator_FlowField.name</key>
-		<value>Flow field</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.scaleX</key>
-		<value>X scale</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.scaleY</key>
-		<value>Y scale</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.offsetX</key>
-		<value>X offset</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.offsetY</key>
-		<value>Y offset</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.stepSize</key>
-		<value>Step size</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.fromEdge</key>
-		<value>Continuous</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.rightAngle</key>
-		<value>Add orthogonal lines</value>
-	</string>
-	<string>
-		<key>Generator_FlowField.noiseType</key>
-		<value>Noise type</value>
-	</string>
-
-	<string>
-		<key>VoronoiZigZag.optimizePath</key>
-		<value>Optimize path</value>
-	</string>
-
-	<string>
-		<key>Generator_GridFit.Name</key>
-		<value>Grid fit</value>
-	</string>
-	<string>
-		<key>Generator_GridFit.margin</key>
-		<value>Minimum margin each side (mm)</value>
-	</string>
-	<string>
-		<key>Generator_GridFit.cellsWide</key>
-		<value>Cells horizontal</value>
-	</string>
-	<string>
-		<key>Generator_GridFit.cellsHigh</key>
-		<value>Cells vertical</value>
-	</string>
-
-	<string>
-		<key>OpenPlotterSettingsUserGcode</key>
-		<value>Plotter user Start/End GCode</value>
-		<hint>Menu item</hint>
-	</string>
-	<string>
-		<key>PlotterSettingsUserGcodePanel.Title</key>
-		<value>Custom GCode</value>
-		<hint>Dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterSettings.userGeneralStartGcode</key>
-		<value>Start GCode</value>
-		<hint>TextArea Label</hint>
-	</string>
-	<string>
-		<key>PlotterSettings.userGeneralEndGcode</key>
-		<value>End GCode</value>
-		<hint>TextArea Label</hint>
-	</string>
-	<string>
-		<key>PlotterSettings.userToolChangeStartGcode</key>
-		<value>Tool Start-GCode</value>
-		<hint>TextArea Label</hint>
-	</string>
-	<string>
-		<key>PlotterSettings.userToolChangeEndGcode</key>
-		<value>Tool End-GCode</value>
-		<hint>TextArea Label</hint>
-	</string>
-
-	<string>
-		<key>PlotterSettingsManagerPanel.RemoveProfile</key>
-		<value>-</value>
-	</string>
-	<string>
-		<key>PlotterSettingsManagerPanel.AddProfile</key>
-		<value>+</value>
-	</string>
-	<string>
-		<key>PlotterSettingsManagerPanel.NewProfileName</key>
-		<value>New unique name:</value>
-	</string>
-	<string>
-		<key>PlotterSettingsManagerPanel.NewProfileNameSameAsOld</key>
-		<value>Name unchanged.  Try again!</value>
-	</string>
-	<string>
-		<key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key>
-		<value>Name already in use.  Try again!</value>
-	</string>
-	<string>
-		<key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key>
-		<value>Name cannot be blank.  Try again!</value>
-	</string>
-	<string>
-		<key>PlotterSettingsPanel.Style</key>
-		<value>Looks like a...</value>
-	</string>
-
-	<string>
-		<key>Generator_OpenAI.APIKey</key>
-		<value>Your API key</value>
-	</string>
-	<string>
-		<key>Generator_OpenAI.prompt</key>
-		<value>English prompt</value>
-	</string>
-	<string>
-		<key>Generator_OpenAI.generate</key>
-		<value>Generate</value>
-	</string>
+    ]]></value></string>
+	<string><key>MenuResetMachinePreferencesWarning</key><value>Are you sure you want to erase all your preferences?</value></string>
+
+	<string><key>MenuGenerate</key><value>Generate art</value></string>
+	<string><key>MenuGenerate.Fractals</key><value>Fractals</value></string>
+	<string><key>MenuGenerate.Grids</key><value>Grids</value></string>
+	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
+	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
+
+	<string><key>Converter_TruchetFromImage.name</key><value>Truchet from image</value></string>
+	<string><key>Converter_TruchetFromImage.spacing</key><value>Space between lines</value></string>
+	<string><key>Converter_TruchetFromImage.linesPerTile</key><value>Lines per tile</value></string>
+
+	<string><key>MenuNewFile</key><value>New</value></string>
+	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
+	<string><key>LSystemTreeName</key><value>L System Tree</value></string>
+	<string><key>KochTreeName</key><value>Koch Curve</value></string>
+	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral</value></string>
+	<string><key>DragonName</key><value>Dragon</value></string>
+	<string><key>ClickAndDrag</key><value>Click &amp; Drag</value></string>
+	<string><key>ConverterWanderName</key><value>Wander</value></string>
+	<string><key>ConverterWanderLineCount</key><value># Lines</value></string>
+	<string><key>ConverterMultipassName</key><value>Multipass</value></string>
+	<string><key>ConverterMultipassAngle</key><value>Angle (degrees)</value></string>
+	<string><key>ConverterMultipassLevels</key><value>Levels</value></string>
+	<string><key>firmwareVersionBadTitle</key><value>Firmware update</value></string>
+	<string><key>TextSize</key><value>Size</value></string>
+	<string><key>FontFace</key><value>Typeface</value></string>
+	<string><key>TextMessage</key><value>Message</value></string>
+	<string><key>CaptureImageTitle</key><value>Capture Camera Image</value></string>
+	<string><key>CaptureImage</key><value>Capture</value></string>
+	<string><key>UseCapture</key><value>Use</value></string>
+	<string><key>CancelCapture</key><value>Cancel</value></string>
+	<string><key>AWB</key><value>Automatic White Balance</value></string>
+	<string><key>DRC</key><value>Dynamic Range</value></string>
+	<string><key>Exposure</key><value>Exposure</value></string>
+	<string><key>Contrast</key><value>Contrast</value></string>
+	<string><key>Quality</key><value>Quality</value></string>
+	<string><key>Sharpness</key><value>Sharpness</value></string>
+	<string><key>Off</key><value>Off</value></string>
+	<string><key>Auto</key><value>Auto</value></string>
+	<string><key>Sun</key><value>Sun</value></string>
+	<string><key>Cloud</key><value>Cloud</value></string>
+	<string><key>Shade</key><value>Shade</value></string>
+	<string><key>Tungsten</key><value>Tungsten</value></string>
+	<string><key>Fluorescent</key><value>Fluorescent</value></string>
+	<string><key>Incandescent</key><value>Incandescent</value></string>
+	<string><key>Flash</key><value>Flash</value></string>
+	<string><key>Horizon</key><value>Horizon</value></string>
+	<string><key>High</key><value>High</value></string>
+	<string><key>Medium</key><value>Medium</value></string>
+	<string><key>Low</key><value>Low</value></string>
+	<string><key>Antishake</key><value>Antishake</value></string>
+	<string><key>Backlight</key><value>Backlight</value></string>
+	<string><key>Beach</key><value>Beach</value></string>
+	<string><key>Fireworks</key><value>Fireworks</value></string>
+	<string><key>FixedFPS</key><value>FixedFPS</value></string>
+	<string><key>Night</key><value>Night</value></string>
+	<string><key>NightPreview</key><value>NightPreview</value></string>
+	<string><key>Snow</key><value>Snow</value></string>
+	<string><key>Sports</key><value>Sports</value></string>
+	<string><key>Spotlight</key><value>Spotlight</value></string>
+	<string><key>Verylong</key><value>Verylong</value></string>
+	<string><key>Import</key><value>Import</value></string>
+	<string><key>Export</key><value>Export</value></string>
+	<string><key>Reset</key><value>Reset</value></string>
+	<string><key>Help</key><value>Help</value></string>
+	<string><key>Art Pipeline</key><value>Tools</value></string>
+	<string><key>Crosshatch</key><value>Crosshatch</value></string>
+	<string><key>MoireName</key><value>Moire</value></string>
+	<string><key>horizontal</key><value>Horizontal</value></string>
+	<string><key>vertical</key><value>Vertical</value></string>
+	<string><key>ConverterIntensity</key><value>Intensity</value></string>
+	<string><key>top right</key><value>Top right</value></string>
+	<string><key>top left</key><value>Top left</value></string>
+	<string><key>bottom right</key><value>Bottom right</value></string>
+	<string><key>bottom left</key><value>Bottom left</value></string>
+	<string><key>center</key><value>Center</value></string>
+	<string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
+	<string><key>FillPageName</key><value>Fill page</value></string>
+	<string><key>GosperCurveName</key><value>Gosper curve</value></string>
+	<string><key>pass90</key><value>Pass 90</value></string>
+	<string><key>pass75</key><value>Pass 75</value></string>
+	<string><key>pass45</key><value>Pass 45</value></string>
+	<string><key>pass15</key><value>Pass 15</value></string>
+	<string><key>Direction</key><value>Direction</value></string>
+	<string><key>FlipH</key><value>Flip horizontal</value></string>
+	<string><key>FlipV</key><value>Flip vertical</value></string>
+	<string><key>Reorder</key><value>Reorder</value></string>
+	<string><key>Simplify</key><value>Simplify</value></string>
+	<string><key>GraphPaperName</key><value>Graph Paper</value></string>
+	<string><key>Package</key><value>Papercraft Box</value></string>
+	<string><key>Polyeder</key><value>Papercraft Polyhedron</value></string>
+	<string><key>FirmwareUpdate</key><value>Update firmware</value></string>
+	<string><key>Port</key><value>Port</value></string>
+	<string><key>OpenPaperSettings</key><value>Paper settings</value></string>
+	<string><key>OpenPlotterSettings</key><value>Plotter settings</value></string>
+	<string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
+	<string><key>Open</key><value>Open file...</value></string>
+	<string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
+	<string><key>QuestionTitle</key><value>Question</value></string>
+	<string><key>InfoTitle</key><value>Information</value></string>
+	<string><key>ErrorTitle</key><value>Error</value></string>
+	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
+
+	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
+	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>
+
+	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
+	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
+	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
+
+	<string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
+	<string><key>SaveGCode.splitGCodeQuestion</key><value>There are %1 tool changes in this drawing.  Split into separate files?</value></string>
+
+	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
+	<string><key>LogPanel.Title</key><value>Log</value></string>
+	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
+
+	<string><key>Spiral.toCorners</key><value>Spiral to corners</value></string>
+
+	<string><key>SpiralPulse.intensity</key><value>Intensity</value></string>
+	<string><key>SpiralPulse.spacing</key><value>Space between rings</value></string>
+	<string><key>SpiralPulse.height</key><value>Pulse height</value></string>
+
+	<string><key>SelectImageConverterPanel.Contrast</key><value>Contrast adjust</value></string>
+
+	<string><key>PaperSettings.Title</key><value>Paper settings</value></string>
+	<string><key>PaperSettings.PaperSize</key><value>Paper Size</value></string>
+	<string><key>PaperSettings.PaperWidth</key><value>Paper width (mm)</value></string>
+	<string><key>PaperSettings.PaperHeight</key><value>Paper height (mm)</value></string>
+	<string><key>PaperSettings.ShiftX</key><value>Shift left</value></string>
+	<string><key>PaperSettings.ShiftY</key><value>Shift up</value></string>
+	<string><key>PaperSettings.Rotation</key><value>Rotation</value></string>
+	<string><key>PaperSettings.Landscape</key><value>Landscape</value></string>
+	<string><key>PaperSettings.PaperMargin</key><value>Margin (%)</value></string>
+	<string><key>PaperSettings.PaperColor</key><value>Paper color</value></string>
+
+	<string><key>Converter_Voronoi.Name</key><value>Voronoi diagram</value></string>
+	<string><key>Converter_VoronoiStippling.Name</key><value>Voronoi stipples</value></string>
+	<string><key>Converter_VoronoiStippling.CellCount</key><value>Number of cells</value></string>
+	<string><key>Converter_VoronoiStippling.DotMax</key><value>Max dot size</value></string>
+	<string><key>Converter_VoronoiStippling.DotMin</key><value>Min dot size</value></string>
+	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
+	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Cutoff</value></string>
+	<string><key>Converter_Voronoi.ShowCenters</key><value>Show centers</value></string>
+
+	<string><key>SandyNoble.title</key><value>Sandy Noble Style</value></string>
+	<string><key>SandyNoble.rings</key><value>Rings</value></string>
+	<string><key>SandyNoble.center</key><value>Center</value></string>
+
+	<string><key>Converter_CMYK_Crosshatch.Name</key><value>CMYK</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Passes</key><value>Passes</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Note</key><value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value></string>
+
+	<string><key>Converter_CMYK_Spiral.Name</key><value>CMYK Spiral</value></string>
+
+	<string><key>Converter_CMYK_Circles.name</key><value>CMYK circles</value></string>
+	<string><key>Converter_CMYK_Circles.maxCircleSize</key><value>max circle size</value></string>
+
+	<string><key>Converter_EdgeDetection.name</key><value>Edge detection</value></string>
+	<string><key>Converter_EdgeDetection.passes</key><value>Passes</value></string>
+	<string><key>Converter_EdgeDetection.stepSize</key><value>Step size</value></string>
+	<string><key>Converter_EdgeDetection.sampleSize</key><value>SampleSize</value></string>
+	<string><key>Converter_EdgeDetection.border</key><value>Draw border</value></string>
+
+	<string><key>Generator.randomSeed</key><value>Random seed value</value></string>
+
+	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
+	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
+	<string><key>Generator_TruchetTiles.LinesPerTile</key><value>Lines per tile</value></string>
+	<string><key>Generator_TruchetTiles.allow</key><value>Allow '%1'</value></string>
+
+	<string><key>Generator_FlowField.name</key><value>Flow field</value></string>
+	<string><key>Generator_FlowField.scaleX</key><value>X scale</value></string>
+	<string><key>Generator_FlowField.scaleY</key><value>Y scale</value></string>
+	<string><key>Generator_FlowField.offsetX</key><value>X offset</value></string>
+	<string><key>Generator_FlowField.offsetY</key><value>Y offset</value></string>
+	<string><key>Generator_FlowField.stepSize</key><value>Step size</value></string>
+	<string><key>Generator_FlowField.stepVariation</key><value>Step variation</value></string>
+	<string><key>Generator_FlowField.stepLength</key><value>Step length</value></string>
+	<string><key>Generator_FlowField.fromEdge</key><value>Continuous</value></string>
+	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
+	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
+
+	<string><key>Generator_Spiral.name</key><value>Spiral</value></string>
+	<string><key>Generator_Spiral.radius</key><value>Radius</value></string>
+
+	<string><key>Generator_MazeRectangle.name</key><value>Rectangle</value></string>
+	<string><key>Generator_MazeRectangle.rows</key><value>Rows</value></string>
+	<string><key>Generator_MazeRectangle.columns</key><value>Columns</value></string>
+	<string><key>Generator_MazeCircle.name</key><value>Circle</value></string>
+	<string><key>Generator_MazeCircle.rings</key><value>Rings</value></string>
+	<string><key>Generator_MazeHoneycomb.name</key><value>Honeycomb</value></string>
+
+	<string><key>Generator_GridFit.Name</key><value>Rectangles</value></string>
+	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
+	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
+	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
+
+	<string><key>Generator_GridHexagons.Name</key><value>Hexagons</value></string>
+	<string><key>Generator_GridHexagons.radius</key><value>Major radius</value></string>
+
+	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
+	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
+	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
+	<string><key>PlotterSettings.userGeneralStartGcode</key><value>Start GCode</value></string>
+	<string><key>PlotterSettings.userGeneralEndGcode</key><value>End GCode</value></string>
+	<string><key>PlotterSettings.minimumPlannerSpeed</key><value>Min Planner Speed (mm/s)</value></string>
+	<string><key>PlotterSettings.blockBufferSize</key><value>Block Buffer Size</value></string>
+	<string><key>PlotterSettings.segmentsPerSecond</key><value>Segments Per Second</value></string>
+	<string><key>PlotterSettings.minSegmentLength</key><value>Min Segment Length (mm)</value></string>
+	<string><key>PlotterSettings.minSegTime</key><value>Min Seg Time (ns)</value></string>
+	<string><key>PlotterSettings.handleSmallSegments</key><value>Handle Small Segments</value></string>
+	<string><key>PlotterSettings.minAcceleration</key><value>Min Acceleration (mm/s²)</value></string>
+
+	<string><key>PlotterSettingsPanel.Title</key><value>Plotter settings</value></string>
+	<string><key>PlotterSettingsPanel.TabEssential</key><value>Essential</value></string>
+	<string><key>PlotterSettingsPanel.TabPen</key><value>Pen</value></string>
+	<string><key>PlotterSettingsPanel.TabSimulation</key><value>Simulation</value></string>
+	<string><key>PlotterSettingsPanel.MachineWidth</key><value>Machine width (mm)</value></string>
+	<string><key>PlotterSettingsPanel.MachineHeight</key><value>Machine height (mm)</value></string>
+	<string><key>PlotterSettingsPanel.ServoLengthNeeded</key><value>Servo wire length (m)</value></string>
+	<string><key>PlotterSettingsPanel.StepperLengthNeeded</key><value>Stepper wire length (m,each)</value></string>
+	<string><key>PlotterSettingsPanel.BeltLengthNeeded</key><value>Timing belt length (m,each)</value></string>
+	<string><key>PlotterSettingsPanel.penToolDiameter</key><value>Diameter (mm)</value></string>
+	<string><key>PlotterSettingsPanel.penToolMaxFeedRate</key><value>Travel speed (mm/min)</value></string>
+	<string><key>PlotterSettingsPanel.penToolUp</key><value>Up angle (degrees)</value></string>
+	<string><key>PlotterSettingsPanel.penToolDown</key><value>Down angle (degrees)</value></string>
+	<string><key>PlotterSettingsPanel.penToolLiftSpeed</key><value>Pen lift time (ms)</value></string>
+	<string><key>PlotterSettingsPanel.penToolLowerSpeed</key><value>Pen lower time (ms)</value></string>
+	<string><key>PlotterSettingsPanel.Speed</key><value>Draw speed (mm/min)</value></string>
+	<string><key>PlotterSettingsPanel.AdjustAcceleration</key><value>Acceleration (mm/s²)</value></string>
+	<string><key>PlotterSettingsPanel.pen up color</key><value>Up color</value></string>
+	<string><key>PlotterSettingsPanel.pen down color</key><value>Default down color</value></string>
+
+	<string><key>PlotterSettingsManagerPanel.RemoveProfile</key><value>-</value></string>
+	<string><key>PlotterSettingsManagerPanel.AddProfile</key><value>+</value></string>
+	<string><key>PlotterSettingsManagerPanel.NewProfileName</key><value>New unique name:</value></string>
+	<string><key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key><value>Name already in use. Try again!</value></string>
+	<string><key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key><value>Name cannot be blank. Try again!</value></string>
+
+	<string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
+
+	<string><key>FirmwareUploaderPanel.status</key><value>Firmware upload status</value></string>
+	<string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
+	<string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>
+	<string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude not downloaded.</value></string>
+	<string><key>FirmwareUploaderPanel.confNotFound</key><value>AVRDude.conf not found.</value></string>
+	<string><key>FirmwareUploaderPanel.failed</key><value>Firmware upload failed.</value></string>
+	<string><key>FirmwareUploaderPanel.noPortSelected</key><value>No port selected.</value></string>
+	<string><key>FirmwareUploaderPanel.downloadFailed</key><value>Download failed</value></string>
+	<string><key>FirmwareUploaderPanel.finished</key><value>Finished OK!</value></string>
+
+	<string><key>DefaultTurtleRenderer.name</key><value>Default</value></string>
+	<string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
+	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
+	<string><key>DirectionLoopTurtleRenderer.name</key><value>Direction loops</value></string>
+	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
+
+	<string><key>ChooseConnection.ButtonConnect</key><value>Connect</value></string>
+	<string><key>ChooseConnection.ButtonDisconnect</key><value>Disconnect</value></string>
+
+	<string><key>PlotterControls.Title</key><value>Robot controls</value></string>
+	<string><key>PlotterControls.ConnectControls</key><value>Connect</value></string>
+	<string><key>PlotterControls.DrawControls</key><value>Draw controls</value></string>
+	<string><key>PlotterControls.FindHome</key><value>Find home</value></string>
+	<string><key>PlotterControls.Pause</key><value>Pause</value></string>
+	<string><key>PlotterControls.Rewind</key><value>Rewind</value></string>
+	<string><key>PlotterControls.Play</key><value>Draw</value></string>
+	<string><key>PlotterControls.EmergencyStop</key><value>Emergency Stop</value></string>
+	<string><key>PlotterControls.MarlinTab</key><value>Marlin</value></string>
+	<string><key>PlotterControls.ProgramTab</key><value>Program</value></string>
+	<string><key>PlotterControls.JogTab</key><value>Robot controls</value></string>
+	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
+	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
+	<string><key>PlotterControls.didNotFind</key><value>Error in communicating with the robot.</value></string>
+	<string><key>PlotterControls.communicationFailure</key><value>No answer from the robot, please check the USB cable or speed settings.</value></string>
+	<string><key>PlotterControls.halted</key><value>Printer halted!</value></string>
+	<string><key>PlotterControls.Step</key><value>Step</value></string>
+
+	<string><key>RobotMenu.RobotStyle</key><value>Robot style</value></string>
+	<string><key>RobotMenu.RenderStyle</key><value>Render style</value></string>
+	<string><key>RobotMenu.OpenControls</key><value>Open Controls</value></string>
+	<string><key>RobotMenu.SaveGCode</key><value>Save Gcode to file/SD</value></string>
+	<string><key>RobotMenu.GetTimeEstimate</key><value>Estimate time</value></string>
+
+	<string><key>JogInterface.FindHome</key><value>Home</value></string>
+	<string><key>JogInterface.PenUp</key><value>Pen up</value></string>
+	<string><key>JogInterface.PenDown</key><value>Pen down</value></string>
+	<string><key>JogInterface.DisengageMotors</key><value>Disengage</value></string>
+	<string><key>JogInterface.EngageMotors</key><value>Engage</value></string>
+
+	<string><key>ConversationHistory.Clear</key><value>Clear</value></string>
+	<string><key>ConversationHistory.Save</key><value>Save</value></string>
+	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
+
+	<string><key>CartesianButtons.buttonCenter</key><value> </value></string>
+
+	<string><key>Converter_IntensityToHeight.name</key><value>Intensity to height</value></string>
+	<string><key>Converter_IntensityToHeight.spacing</key><value>Wave spacing</value></string>
+	<string><key>Converter_IntensityToHeight.sampleRate</key><value>Sample rate</value></string>
+	<string><key>Converter_IntensityToHeight.waveIntensity</key><value>Wave intensity</value></string>
+
+	<string><key>Converter_QuadTreeInstant</key><value>Quad tree instant</value></string>
+	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
+	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
+	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
+
+	<string><key>LineWeightByImageIntensity.name</key><value>Line image weight</value></string>
+	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
+	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
+
 </language>

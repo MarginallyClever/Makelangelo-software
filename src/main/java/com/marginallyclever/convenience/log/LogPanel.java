@@ -54,7 +54,7 @@ public class LogPanel extends JPanel {
 
 		displayLog(Log.getLogLocation());
 
-		ButtonIcon copyClipboardButton = new ButtonIcon("LogPanel.CopyClipboard", "/images/page_copy.png");
+		ButtonIcon copyClipboardButton = new ButtonIcon(Translator.get("LogPanel.CopyClipboard"), "/images/page_copy.png");
 		copyClipboardButton.addActionListener((e)-> {
 			StringSelection stringSelection = new StringSelection(logArea.getText());
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -79,7 +79,7 @@ public class LogPanel extends JPanel {
 		}
 	}
 
-	public static void runAsDialog(JFrame frame) {
+	public static void runAsDialog(Window frame) {
 		JDialog dialog = new JDialog(frame, Translator.get("LogPanel.Title"), Dialog.ModalityType.DOCUMENT_MODAL);
 
 		JPanel outerPanel = new JPanel(new BorderLayout());

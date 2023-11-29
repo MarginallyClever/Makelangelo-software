@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>moving relative or absolute amounts regardless of direction</li>
  *     <li>changing the tool (color and diameter)</li>
  * </ul>
+ * The turtle's starting angle is 0 degrees, which is to the right.  The turtle starts with the tail down.
  *
  * @author Dan Royer
  * @since 7.0?
@@ -150,7 +152,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Absolute position change, make sure pen is up before move and put pen down after move.
+	 * Absolute position change. Raise the pen before move and lower pen after move.
 	 * @param x absolute x position
 	 * @param y absolute y position
 	 */
@@ -161,7 +163,7 @@ public class Turtle implements Cloneable {
 	}
 	
 	/**
-	 * Absolute position change, do not adjust pen status
+	 * Absolute position change, do not change current pen status
 	 * @param x relative x position
 	 * @param y relative y position
 	 */
@@ -213,10 +215,10 @@ public class Turtle implements Cloneable {
 
 	/**
 	 * Relative turn in degrees.
-	 * @param degrees relative change in degrees.  Positive is counter clockwise.
+	 * @param degreesCCW relative change in degrees.  Positive is counter clockwise.
 	 */
-	public void turn(double degrees) {
-		setAngle(angle+degrees);
+	public void turn(double degreesCCW) {
+		setAngle(angle+degreesCCW);
 	}
 
 	// Get absolute angle degrees
@@ -365,23 +367,26 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * Log smallest bounding rectangle for Turtle path.
+	 * Draw an arc.
+	 * @param cx absolute center of arc
+	 * @param cy absolute center of arc
+	 * @param radius of arc
+	 * @param a1 start angle, in radians
+	 * @param a2 end angle, in radians
+	 * @param steps must be greater than zero.
 	 */
-	public void showExtent() {
-		int i;
-		double xmin=0,xmax=0,ymin=0,ymax=0;
-		int first=1;
-		for(i=0;i<history.size();i++) {
-			TurtleMove mov=history.get(i);
-			if (mov.type == MovementType.DRAW_LINE) {
-				if(first == 1 || mov.x < xmin) xmin=mov.x;
-				if(first == 1 || mov.y < ymin) ymin=mov.y;
-				if(first == 1 || mov.x > xmax) xmax=mov.x;
-				if(first == 1 || mov.y > ymax) ymax=mov.y;
-				first=0;
-			}
+	public void drawArc(double cx, double cy, double radius, double a1, double a2,int steps) {
+		if(steps<=0) throw new InvalidParameterException("steps must be greater than zero.");
+
+		double delta = (a2 - a1) / (double) steps;
+
+		for (int i = 0; i <= steps; i++) {
+			double f = a1 + delta * i;
+			double x2 = cx + Math.cos(f) * radius;
+			double y2 = cy + Math.sin(f) * radius;
+			if(i==0) this.jumpTo(x2, y2);
+			else     this.moveTo(x2, y2);
 		}
-		logger.debug("extent is ({}/{} {}/{}", xmin, ymin, xmax, ymax);
 	}
 
 	/**
@@ -593,5 +598,23 @@ public class Turtle implements Cloneable {
 
 	public Vector2d getPosition() {
 		return new Vector2d(px,py);
+	}
+
+
+	/**
+	 * @return the number of times the pen is lowered to draw a line.
+	 */
+	public int countLoops() {
+		int sum=0;
+		MovementType before = MovementType.TRAVEL;
+
+		for( TurtleMove m : history) {
+			if(m.type==before) continue;
+			if(m.type==MovementType.DRAW_LINE && before==MovementType.TRAVEL) {
+				sum++;
+			}
+			before = m.type;
+		}
+		return sum;
 	}
 }

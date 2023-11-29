@@ -5,15 +5,12 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;
-import java.io.Serial;
 
 /**
  * Scale the input {@link Turtle} to fit the margins of the {@link Paper} provided.
  * @author Dan Royer
  */
 public class ResizeTurtleToPaperAction extends TurtleModifierAction {
-	@Serial
-	private static final long serialVersionUID = -2481567507951197219L;
 	private final Paper myPaper;
 	private final boolean fillPage;
 	
@@ -30,10 +27,11 @@ public class ResizeTurtleToPaperAction extends TurtleModifierAction {
 		// find the scale
 		double iw = turtleBounds.width; // image width
 		double ih = turtleBounds.height; // image height
-		double pw = myPaper.getMarginWidth();
-		double ph = myPaper.getMarginHeight();
-		double px = (myPaper.getMarginRight()+myPaper.getMarginLeft())*0.5;
-		double py = (myPaper.getMarginTop()+myPaper.getMarginBottom())*0.5;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double pw = rect.getWidth();
+		double ph = rect.getHeight();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 		double ratioH = ph/ih;
 		double ratioW = pw/iw;
 		double ratio = 1;

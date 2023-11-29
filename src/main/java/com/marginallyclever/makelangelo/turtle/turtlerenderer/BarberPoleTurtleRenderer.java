@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
@@ -82,4 +83,16 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter =(float)penDiameter;
 	}
+
+    @Override
+    public String getTranslatedName() {
+        return Translator.get("BarberPoleTurtleRenderer.name");
+    }
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {}
 }

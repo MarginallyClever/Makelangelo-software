@@ -42,7 +42,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				firePropertyChange(null,field.getText());
+				fireSelectEvent(null,field.getText());
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));
@@ -69,6 +69,7 @@ public class SelectFile extends Select {
 	
 	private String selectFile(String cancelValue) {
 		choose.setFileFilter(filter);
+		choose.setCurrentDirectory(new File(cancelValue));
 		int returnVal = choose.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = choose.getSelectedFile();

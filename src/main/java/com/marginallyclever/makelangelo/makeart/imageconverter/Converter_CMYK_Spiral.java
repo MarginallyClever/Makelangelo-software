@@ -3,12 +3,14 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -26,7 +28,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 		super();
 
 		SelectBoolean toCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"), getToCorners());
-		toCorners.addPropertyChangeListener(evt->{
+		toCorners.addSelectListener(evt->{
 			setToCorners((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -35,7 +37,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	
 	@Override
 	public String getName() {
-		return Translator.get("SpiralCMYKName");
+		return Translator.get("Converter_CMYK_Spiral.Name");
 	}
 
 	public boolean getToCorners() {
@@ -53,8 +55,8 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		FilterCMYK cmyk = new FilterCMYK(myImage);
+		cmyk.filter();
 
 		double separation; 
 		float h2 = (float)myPaper.getPaperHeight();
@@ -79,18 +81,21 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 		turtle.setColor(newColor);
 		
 		double maxr;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		if (convertToCorners) {
 			// go right to the corners
-			double h2 = myPaper.getMarginHeight();
-			double w2 = myPaper.getMarginWidth();
+			double h2 = rect.getHeight();
+			double w2 = rect.getWidth();
 			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
 		} else {
 			// do the largest circle that still fits in the image.
-			double w = myPaper.getMarginWidth()/2.0f;
-			double h = myPaper.getMarginHeight()/2.0f;
+			double w = rect.getWidth()/2.0f;
+			double h = rect.getHeight()/2.0f;
 			maxr = Math.min(h, w);
 		}
 
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 		double toolDiameter = 1;
 
 		int i, j;
@@ -117,7 +122,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 				fx = cx + Math.cos(f) * r1;
 				fy = cy + Math.sin(f) * r1;
 
-				if(myPaper.isInsidePaperMargins(fx, fy)) {
+				if(rect.contains(fx, fy)) {
 					try {
 						z = img.sample(fx, fy,1);
 					} catch(Exception e) {
@@ -128,7 +133,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 					if(z<level) turtle.penDown();
 					else turtle.penUp();
 				} else turtle.penUp();
-				turtle.moveTo(fx, fy);
+				turtle.moveTo(px+fx, py+fy);
 			}
 			r -= toolDiameter;
 			++numRings;

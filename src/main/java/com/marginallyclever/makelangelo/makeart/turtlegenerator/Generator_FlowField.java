@@ -9,6 +9,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 /**
  * Two kinds of flow fields.  Uses Perlin noise to generate the field.
@@ -21,9 +23,13 @@ public class Generator_FlowField extends TurtleGenerator {
 	private static double offsetX = 0; // controls complexity of curve
 	private static double offsetY = 0; // controls complexity of curve
 	private static int stepSize = 5; // controls complexity of curve
+	private static int stepLength = 10;
+	private static int stepVariation = 5;
 	private static boolean fromEdge = false;  // continuous lines
 	private static boolean rightAngle = false;
 	private Noise noiseMaker = new PerlinNoise();
+	private static int seed=0;
+	private static final Random random = new Random();
 
 	public static void setStepSize(int stepSize) {
 		Generator_FlowField.stepSize = stepSize;
@@ -34,58 +40,73 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	public Generator_FlowField() {
 		super();
+		SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+		add(selectRandomSeed);
+		selectRandomSeed.addSelectListener((evt)->{
+			seed = (int)evt.getNewValue();
+			random.setSeed(seed);
+			generate();
+		});
+
 		SelectOneOfMany fieldNoise = new SelectOneOfMany("noiseType",Translator.get("Generator_FlowField.noiseType"), NoiseFactory.getNames(),0);
 		SelectDouble fieldScaleX = new SelectDouble("scaleX",Translator.get("Generator_FlowField.scaleX"),scaleX);
 		SelectDouble fieldScaleY = new SelectDouble("scaleY",Translator.get("Generator_FlowField.scaleY"),scaleY);
 		SelectDouble fieldOffsetX = new SelectDouble("offsetX",Translator.get("Generator_FlowField.offsetX"),offsetX);
 		SelectDouble fieldOffsetY = new SelectDouble("offsetY",Translator.get("Generator_FlowField.offsetY"),offsetY);
-		SelectSlider fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),20,3,stepSize);
+		SelectSlider fieldStepSize = new SelectSlider("stepSize",Translator.get("Generator_FlowField.stepSize"),25,2,stepSize);
+		SelectSlider fieldStepVariation = new SelectSlider("stepVariation",Translator.get("Generator_FlowField.stepVariation"),20,0,stepVariation);
+		SelectSlider fieldStepLength = new SelectSlider("stepLength",Translator.get("Generator_FlowField.stepLength"),20,1,stepLength);
 		SelectBoolean fieldFromEdge = new SelectBoolean("fromEdge",Translator.get("Generator_FlowField.fromEdge"),fromEdge);
 		SelectBoolean fieldRightAngle = new SelectBoolean("rightAngle",Translator.get("Generator_FlowField.rightAngle"),rightAngle);
 
 		add(fieldNoise);
-		fieldNoise.addPropertyChangeListener(evt->{
+		fieldNoise.addSelectListener(evt->{
 			noiseMaker = NoiseFactory.getNoise(fieldNoise.getSelectedIndex());
 			generate();
 		});
 
 		add(fieldScaleX);
-		fieldScaleX.addPropertyChangeListener(evt->{
+		fieldScaleX.addSelectListener(evt->{
 			scaleX = (fieldScaleX.getValue());
 			generate();
-
 		});
 		add(fieldScaleY);
-		fieldScaleY.addPropertyChangeListener(evt->{
+		fieldScaleY.addSelectListener(evt->{
 			scaleY = (fieldScaleY.getValue());
 			generate();
-
 		});
 		add(fieldOffsetX);
-		fieldOffsetX.addPropertyChangeListener(evt->{
+		fieldOffsetX.addSelectListener(evt->{
 			offsetX = (fieldOffsetX.getValue());
 			generate();
-
 		});
 		add(fieldOffsetY);
-		fieldOffsetY.addPropertyChangeListener(evt->{
+		fieldOffsetY.addSelectListener(evt->{
 			offsetY =(fieldOffsetY.getValue());
 			generate();
-
 		});
 		add(fieldStepSize);
-		fieldStepSize.addPropertyChangeListener(evt->{
+		fieldStepSize.addSelectListener(evt->{
 			stepSize = (fieldStepSize.getValue());
 			generate();
-
+		});
+		add(fieldStepVariation);
+		fieldStepVariation.addSelectListener(evt->{
+			stepVariation = (fieldStepVariation.getValue());
+			generate();
+		});
+		add(fieldStepLength);
+		fieldStepLength.addSelectListener(evt->{
+			stepLength = (fieldStepLength.getValue());
+			generate();
 		});
 		add(fieldFromEdge);
-		fieldFromEdge.addPropertyChangeListener(evt->{
+		fieldFromEdge.addSelectListener(evt->{
 			fromEdge = (fieldFromEdge.isSelected());
 			generate();
 		});
 		add(fieldRightAngle);
-		fieldRightAngle.addPropertyChangeListener(evt->{
+		fieldRightAngle.addSelectListener(evt->{
 			rightAngle = (fieldRightAngle.isSelected());
 			generate();
 		});
@@ -112,14 +133,17 @@ public class Generator_FlowField extends TurtleGenerator {
 			asGrid(turtle);
 		}
 
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
+
 		notifyListeners(turtle);
 	}
 
 	private void fromEdge(Turtle turtle) {
-		double xMin = myPaper.getMarginLeft()+stepSize;
-		double yMin = myPaper.getMarginBottom()+stepSize;
-		double yMax = myPaper.getMarginTop()-stepSize;
-		double xMax = myPaper.getMarginRight()-stepSize;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY()-stepSize;
+		double xMin = rect.getMinX()-stepSize;
+		double yMax = rect.getMaxY()+stepSize;
+		double xMax = rect.getMaxX()+stepSize;
 		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		r.grow(1,1);
 
@@ -158,18 +182,38 @@ public class Generator_FlowField extends TurtleGenerator {
 	}
 
 	private void asGrid(Turtle turtle) {
-		double xMin = myPaper.getMarginLeft()+stepSize;
-		double yMin = myPaper.getMarginBottom()+stepSize;
-		double yMax = myPaper.getMarginTop()-stepSize;
-		double xMax = myPaper.getMarginRight()-stepSize;
-
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+		Rectangle r = new Rectangle((int)xMin,(int)yMin,(int)(xMax-xMin),(int)(yMax-yMin));
 		for(double y = yMin; y<yMax; y+=stepSize) {
-			for(double x = xMin; x<xMax; x+=stepSize) {
-				double v = noiseMaker.noise(x*scaleX + offsetX,y*scaleY+offsetY,0);
-				turtle.jumpTo(x,y);
-				turtle.setAngle(v*180);
-				turtle.forward(stepSize);
+			for (double x = xMin; x < xMax; x += stepSize) {
+				followLine(turtle,x,y,r);
 			}
+		}
+	}
+
+	private void followLine(Turtle turtle,double x,double y,Rectangle r) {
+		double xx = x + stepVariation * (random.nextDouble() * 2.0 - 1.0);
+		double yy = y + stepVariation * (random.nextDouble() * 2.0 - 1.0);
+
+		turtle.jumpTo(xx, yy);
+		followLine(turtle, r, 2);
+		turtle.jumpTo(xx, yy);
+		followLine(turtle, r, -2);
+	}
+
+	private void followLine(Turtle turtle, Rectangle r, int step) {
+		for(int i=0;i<stepLength/2;++i) {
+			double v = noiseMaker.noise(turtle.getX() * scaleX + offsetX, turtle.getY() * scaleY + offsetY, 0);
+			turtle.setAngle(v * 180);
+			Vector2d nextStep = turtle.getHeading();
+			nextStep.scale(step);
+			nextStep.add(turtle.getPosition());
+			if(!r.contains(nextStep.x,nextStep.y)) break;
+			turtle.forward(step);
 		}
 	}
 }

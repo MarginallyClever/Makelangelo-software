@@ -2,18 +2,17 @@ package com.marginallyclever.makelangelo.firmwareuploader;
 
 import com.marginallyclever.communications.serial.SerialTransportLayer;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectButton;
-import com.marginallyclever.makelangelo.select.SelectFile;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
-import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.File;
+import java.awt.event.ActionEvent;
 
 /**
  * A panel for uploading firmware to the robot.
@@ -22,71 +21,25 @@ import java.io.File;
  * @author Dan Royer
  */
 public class FirmwareUploaderPanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploaderPanel.class);
+	private final FirmwareDownloader firmwareDownloader = new FirmwareDownloader();
 	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
-	private final SelectFile sourceAVRDude = new SelectFile("path",Translator.get("avrDude path"),firmwareUploader.getAvrdudePath());
-	private final SelectFile sourceHex = new SelectFile("file",Translator.get("*.hex file"),firmwareUploader.getAvrdudePath());
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
 	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
-	private final SelectButton goButton = new SelectButton("start",Translator.get("Start"));
+	private final SelectButton startM5 = new SelectButton("startM5",Translator.get("FirmwareUploaderPanel.startM5"));
+	private final SelectButton startHuge = new SelectButton("startHuge",Translator.get("FirmwareUploaderPanel.startHuge"));
+	private final SelectReadOnlyText help = new SelectReadOnlyText("help",Translator.get("FirmwareUploader.help"));
 
-	private static String lastPath = "";
-	private static String lastHexFile = "";
-	
+
 	public FirmwareUploaderPanel() {
-		super();
-		
-		updateCOMPortList();
-		refreshLayout();
-
-		if(lastPath==null || lastPath.trim().isEmpty()) {
-			lastPath = firmwareUploader.getAvrdudePath();
-		}
-		if(lastHexFile==null || lastHexFile.trim().isEmpty()) {
-			lastHexFile = firmwareUploader.getAvrdudePath();
-		}
-
-		sourceAVRDude.setPathOnly();
-		sourceAVRDude.setText(lastPath);
-		sourceAVRDude.addPropertyChangeListener((e)->{
-			lastPath = sourceAVRDude.getText();
-		});
-
-		sourceHex.setFilter(new FileNameExtensionFilter(Translator.get("*.hex file"),"hex"));
-		sourceHex.setText(lastHexFile);
-		sourceHex.addPropertyChangeListener((e)->{
-			lastHexFile = sourceHex.getText();
-		});
-
-		refreshButton.addPropertyChangeListener((e)->{
-			updateCOMPortList();
-		});
-		goButton.addPropertyChangeListener((e)->{
-			if(AVRDudeExists()) uploadNow();
-		});
-		
-		checkForHexFileInCurrentWorkingDirectory();
-	}
-	
-	private void checkForHexFileInCurrentWorkingDirectory() {
-		String path = FileAccess.getWorkingDirectory();
-		File folder = new File(path);
-		File [] contents = folder.listFiles();
-		for( File c : contents ) {
-			String ext = FilenameUtils.getExtension(c.getAbsolutePath());
-			if(ext.equalsIgnoreCase("hex")) {
-				sourceHex.setText(c.getAbsolutePath());
-				return;
-			}
-		}
-	}
-
-	private void refreshLayout() {
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(port,BorderLayout.CENTER);
-		panel.add(refreshButton,BorderLayout.EAST);
-
-		setLayout(new GridBagLayout());
+		super(new GridBagLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+		updateCOMPortList();
+
+		JPanel connectTo = new JPanel(new BorderLayout());
+		connectTo.add(port,BorderLayout.CENTER);
+		connectTo.add(refreshButton,BorderLayout.EAST);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -95,53 +48,86 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.weightx=1;
 		c.weighty=0;
 
-		add(sourceAVRDude,c);
+		add(help,c);
 		c.gridy++;
-		add(sourceHex,c);
+		c.gridwidth=2;
+		add(connectTo,c);
 		c.gridy++;
-		add(panel,c);
-		c.gridy++;
+		c.gridwidth=1;
 		c.weightx=1;
 		c.weighty=1;
 		c.anchor = GridBagConstraints.PAGE_END;
-		add(goButton,c);
+		add(startM5,c);
+		c.gridx++;
+		add(startHuge,c);
+
+		refreshButton.addActionListener(e -> updateCOMPortList());
+		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
+		startHuge.addActionListener(e -> run(e,"firmware-huge.hex"));
 	}
 
 	private void updateCOMPortList() {
 		String [] list = getListOfCOMPorts();
 		port.setNewList(list);
+		if(list.length==1) port.setSelectedIndex(0);
 	}
 	
 	private String[] getListOfCOMPorts() {
 		return new SerialTransportLayer().listConnections().toArray(new String[0]);
 	}
 
-	private void uploadNow() {
-		goButton.setEnabled(false);
+	private void run(ActionEvent evt, String name) {
+		String title = Translator.get("FirmwareUploaderPanel.status");
+		String AVRDudePath="";
+		try {
+			AVRDudePath = AVRDudeDownloader.downloadAVRDude();
+			firmwareUploader.setAVRDude(AVRDudePath);
+		} catch(Exception e) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotDownloaded"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if(!firmwareUploader.findConf()) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.confNotFound"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if(port.getSelectedIndex()==-1) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.noPortSelected"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if(!firmwareDownloader.getFirmware(name)) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.downloadFailed"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		firmwareUploader.setHexPath(firmwareDownloader.getDownloadPath(name));
+
+		startM5.setEnabled(false);
+		startHuge.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		String status = "Finished!";
+		String status = Translator.get("FirmwareUploaderPanel.finished");
 		int messageType = JOptionPane.PLAIN_MESSAGE;
+		int result = 1;
 		try {
-			firmwareUploader.setAvrdudePath( sourceAVRDude.getText() );
-			firmwareUploader.run(sourceHex.getText(),port.getSelectedItem());
+			result = firmwareUploader.run(port.getSelectedItem());
 		} catch (Exception e1) {
+			logger.error("failed to run avrdude: ",e1);
 			status = e1.getMessage();
 			messageType = JOptionPane.ERROR_MESSAGE;
 		}
 
 		setCursor(Cursor.getDefaultCursor());
-		goButton.setEnabled(true);
-		JOptionPane.showMessageDialog(this,status,"Firmware upload status",messageType);
-	}
-	
-	private boolean AVRDudeExists() {
-		File f = new File(sourceAVRDude.getText());
-		boolean state = f.exists(); 
-		if(!state) {
-			JOptionPane.showMessageDialog(this,"AVRDude not found.","Firmware upload status",JOptionPane.ERROR_MESSAGE);
+		startM5.setEnabled(true);
+		startHuge.setEnabled(true);
+
+		if(result!=0) {
+			logger.error("upload failed.");
+			status = Translator.get("FirmwareUploaderPanel.failed");
+			messageType = JOptionPane.ERROR_MESSAGE;
 		}
-		return state;
+
+		JOptionPane.showMessageDialog(this,status,title,messageType);
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -151,8 +137,8 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		JFrame frame = new JFrame(FirmwareUploaderPanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setPreferredSize(new Dimension(600, 400));
 		frame.setContentPane(new FirmwareUploaderPanel());
+		frame.setPreferredSize(new Dimension(250,150));
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);

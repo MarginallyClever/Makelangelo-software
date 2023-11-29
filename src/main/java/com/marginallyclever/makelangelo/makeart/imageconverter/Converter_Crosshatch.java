@@ -2,54 +2,56 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 public class Converter_Crosshatch extends ImageConverter {
 	private static double intensity=2.0f;
-	private static double pass90=8.0f;
-	private static double pass75=16.0f;
+	private static double pass90=16.0f;
+	private static double pass75=32.0f;
 	private static double pass15=64.0f;
 	private static double pass45=128.0f;
 
 	public Converter_Crosshatch() {
 		super();
 		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 100, 1, (int) (getIntensity() * 10.0));
-		selectIntesity.addPropertyChangeListener(evt->{
+		selectIntesity.addSelectListener(evt->{
 			setIntensity((float)((int)evt.getNewValue())/10.0f);
 			fireRestart();
 		});
 		add(selectIntesity);
 
 		SelectSlider selectPass90 = new SelectSlider("pass90", Translator.get("pass90"), 256, 0, (int) getPass90());
-		selectPass90.addPropertyChangeListener((evt)-> {
+		selectPass90.addSelectListener((evt)-> {
 			setPass90((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass90);
 
 		SelectSlider selectPass75 = new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)getPass75());
-		selectPass75.addPropertyChangeListener((evt)-> {
+		selectPass75.addSelectListener((evt)-> {
 			setPass75((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass75);
 
-		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
-		selectPass15.addPropertyChangeListener((evt)-> {
-			setPass15((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(selectPass15);
-
 		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
-		selectPass45.addPropertyChangeListener((evt)-> {
+		selectPass45.addSelectListener((evt)-> {
 			setPass45((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(selectPass45);
+
+		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
+		selectPass15.addSelectListener((evt)-> {
+			setPass15((int)evt.getNewValue());
+			fireRestart();
+		});
+		add(selectPass15);
 	}
 
 	@Override
@@ -85,8 +87,8 @@ public class Converter_Crosshatch extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
 		finishPass(new int[]{(int)pass90},90,img);
@@ -109,10 +111,11 @@ public class Converter_Crosshatch extends ImageConverter {
 		// Lift the pen any time the color value is > level (128 or more).
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop();
-		double xLeft   = myPaper.getMarginLeft();
-		double xRight  = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double yBottom = rect.getMinY();
+		double xRight  = rect.getMaxX();
+		double yTop    = rect.getMaxY();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);

@@ -2,13 +2,14 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
- * Draws Turtle in red/blue sequence to show line segments.
+ * Draw {@link com.marginallyclever.makelangelo.turtle.Turtle} with a new color every time the pen is lowered.
+ * This illustrates each "loop" of the drawing.
  * @author Dan Royer
- *
  */
 public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	private GL2 gl2;
@@ -16,7 +17,7 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	private final ColorRGB colorTravel = new ColorRGB(0,255,0);
 	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
-	private float penDiameter =1;
+	private float penDiameter = 1;
 	private int moveCounter;
 		
 	@Override
@@ -87,4 +88,16 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter =(float)penDiameter;
 	}
+
+    @Override
+    public String getTranslatedName() {
+        return Translator.get("SeparateLoopTurtleRenderer.name");
+    }
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {}
 }

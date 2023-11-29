@@ -3,15 +3,13 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.StringHelper;
 import com.marginallyclever.convenience.W3CColorNames;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serial;
 
 /**
  * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
@@ -21,15 +19,14 @@ import java.io.Serial;
  * @since 7.28.0
  */
 public class MarlinPlotterPanel extends MarlinPanel {
-	@Serial
-	private static final long serialVersionUID = -7114823910724405882L;
-
 	private static final Logger logger = LoggerFactory.getLogger(MarlinPlotterPanel.class);
 
 	private static final String STR_FEEDRATE = "echo:  M203";
 	private static final String STR_ACCELERATION = "echo:  M201";
 	private static final String MOTOR_ENGAGE = "M17";
 	private static final String MOTOR_DISENGAGE = "M18";
+
+	// M665 Set delta/polargraph configuration.
 	private static final String M665 = "M665";
 
 	private final Plotter myPlotter;
@@ -69,7 +66,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendToolChange(int toolNumber) {
-		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter));
+		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter.getSettings()));
 		queueAndSendCommand(getToolChangeString(toolNumber));
 	}
 
@@ -79,8 +76,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 
 	private void sendPenUpDown() {
 		String str = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getPenUpString(myPlotter)
-				: MarlinPlotterPanel.getPenDownString(myPlotter);
+				? MarlinPlotterPanel.getPenUpString(myPlotter.getSettings())
+				: MarlinPlotterPanel.getPenDownString(myPlotter.getSettings());
 		queueAndSendCommand(str);
 	}
 
@@ -91,8 +88,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
 		String msg = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getTravelToString(myPlotter, p.x, p.y)
-				: MarlinPlotterPanel.getDrawToString(myPlotter, p.x, p.y);
+				? MarlinPlotterPanel.getTravelToString(myPlotter.getSettings(), p.x, p.y)
+				: MarlinPlotterPanel.getDrawToString(myPlotter.getSettings(), p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 
@@ -108,10 +105,10 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	 */
 	private void sendSizeUpdate() {
 		var settings = myPlotter.getSettings();
-		var top = settings.getLimitTop();
-		var bottom = settings.getLimitBottom();
-		var left = settings.getLimitLeft();
-		var right = settings.getLimitRight();
+		var top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		var bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		var left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		var right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		var width = right-left;
 		var height = top-bottom;
 		var maxLen = Math.sqrt(width*width + height*height);
@@ -121,10 +118,14 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				+" B"+StringHelper.formatDouble(bottom)
 				+" L"+StringHelper.formatDouble(left)
 				+" R"+StringHelper.formatDouble(right)
-				+" S"+ settings.getSegmentsPerSecond()
+				+" S"+ settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND)
 				+" H"+StringHelper.formatDouble(maxLen));
 	}
 
+	/**
+	 * This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+	 * @param evt the network session event
+	 */
 	@Override
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		super.onDataReceived(evt);
@@ -173,7 +174,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				throw new Exception("M201 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found acceleration {}", v);
-			myPlotter.getSettings().setAcceleration(v);
+			myPlotter.getSettings().setDouble(PlotterSettings.MAX_ACCELERATION,v);
 		} catch (Exception e) {
 			logger.warn("M201 problem, continuing anyway: {}", message);
 		}
@@ -189,41 +190,58 @@ public class MarlinPlotterPanel extends MarlinPanel {
 				throw new Exception("M203 format bad: " + message);
 			double v = Double.parseDouble(parts[1].substring(1));
 			logger.debug("MarlinPlotterInterface found feedrate {}", v);
-			myPlotter.getSettings().setDrawFeedRate(v);
+			myPlotter.getSettings().setDouble(PlotterSettings.FEED_RATE_DRAW,v);
 		} catch (Exception e) {
 			logger.warn("M203 problem, continuing anyway: {}", message);
 		}
 	}
 
-	// "By convention, most G-code generators use G0 for non-extrusion movements"
-	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getTravelToString(Plotter p,double x, double y) {
-		return "G0 " + getPosition(x, y) + " F" + p.getSettings().getTravelFeedRate();
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public static String getTravelToString(PlotterSettings settings,double x, double y) {
+		return "G0 " + getPosition(x, y)
+				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL);
 	}
 
-	// "By convention, most G-code generators use G0 for non-extrusion movements"
-	// https://marlinfw.org/docs/gcode/G000-G001.html
-	public static String getDrawToString(Plotter p,double x, double y) {
-		return "G1 " + getPosition(x, y) + " F" + p.getSettings().getDrawFeedRate();
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public static String getDrawToString(PlotterSettings settings,double x, double y) {
+		return "G1 " + getPosition(x, y)
+				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 	}
 
 	private static String getPosition(double x, double y) {
-		return "X" + StringHelper.formatDouble(x) + " Y" + StringHelper.formatDouble(y);
+		return "X" + StringHelper.formatDouble(x)
+				+ " Y" + StringHelper.formatDouble(y);
 	}
 
-	public static String getPenUpString(Plotter p) {
-		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0 S" + (int)p.getPenUpAngle() + " T" + (int) p.getPenLiftTime();
+	public static String getPenUpString(PlotterSettings settings) {
+		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP)
+					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
 		} else {
-			return "G0 Z" + (int)p.getPenUpAngle();
+			return "G0 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
 		}
 	}
 
-	public static String getPenDownString(Plotter p) {
-		if(p.getSettings().getZMotorType()== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0 S" + (int)p.getPenDownAngle() + " T"+(int)p.getPenLowerTime();
+	public static String getPenDownString(PlotterSettings settings) {
+		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)
+					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME);
 		} else {
-			return "G1 Z" + (int)p.getPenDownAngle();
+			return "G1 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
 		}
 	}
 

@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Convenience methods for logging.
@@ -27,13 +24,17 @@ public class Log {
 	 * Initialize log file
 	 */
 	public static void start() {
-		logger.info("------------------------------------------------");
+		logger.info("Properties:");
 		Properties p = System.getProperties();
 		List<String> names = new ArrayList<>(p.stringPropertyNames());
 		Collections.sort(names);
-		for (String name : names) {
-			logger.info("{} = {}", name, p.get(name));
-		}
+		names.forEach(name -> logger.info(name + " = " + p.get(name)));
+		logger.info("------------------------------------------------");
+		logger.info("Environment:");
+		Map<String,String> env = System.getenv();
+		names = new ArrayList<>(env.keySet());
+		Collections.sort(names);
+		names.forEach(name -> logger.info(name + " = " + env.get(name)));
 		logger.info("------------------------------------------------");
 	}
 

@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,8 +49,12 @@ class SaveGCodeTest {
 
         try {
             Plotter plotter = new Plotter();
-            plotter.getSettings().setUserGeneralStartGcode("M300\nM200");
-            plotter.getSettings().setUserGeneralEndGcode("M400\nM200");
+            PlotterSettings settings = plotter.getSettings();
+            settings.load("Makelangelo 5");
+            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+            settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
             // when
             saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
@@ -82,6 +87,12 @@ class SaveGCodeTest {
 
         try {
             Plotter plotter = new Plotter();
+            PlotterSettings settings = plotter.getSettings();
+            settings.load("Makelangelo 5");
+            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+            settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
             // when
             files = saveGCode.saveSeparateFiles(fileTemp.getAbsolutePath(), turtle, plotter);
@@ -113,12 +124,12 @@ class SaveGCodeTest {
         turtle = saveGCode.trimTurtle(turtle, 10, 20);
 
         File fileTemp = File.createTempFile("unit", null);
+        Plotter plotter = new Plotter();
+        PlotterSettings settings = plotter.getSettings();
+        settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
+        settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
-        try {
-            saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, new Plotter());
-            compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
-        } finally {
-            fileTemp.delete();
-        }
+        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
+        compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
     }
 }

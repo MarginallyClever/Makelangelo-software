@@ -12,15 +12,21 @@ import java.util.List;
  * @since 2022-04-08
  */
 public class VoronoiTesselator2 {
+    private final GeometryFactory geometryFactory = new GeometryFactory();
+    private Coordinate[] coordinates;
     private Geometry diagram;
 
+    public void setNumHulls(int numHulls) {
+        coordinates = new Coordinate[numHulls];
+    }
+
     public void tessellate(List<VoronoiCell> points, Rectangle2D bounds, double tolerance) {
-        Coordinate[] coordinates = new Coordinate[points.size()];
+        if(coordinates==null || points.size()!=coordinates.length) setNumHulls(points.size());
+
         int i=0;
         for(VoronoiCell cell : points) {
-            coordinates[i++] = new Coordinate(cell.center.x,cell.center.y);
+            coordinates[i++] = cell.center;
         }
-        GeometryFactory geometryFactory = new GeometryFactory();
         MultiPoint multiPoint = geometryFactory.createMultiPointFromCoords(coordinates);
 
         VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
@@ -38,4 +44,5 @@ public class VoronoiTesselator2 {
     public Polygon getHull(int i) {
         return (Polygon)diagram.getGeometryN(i);
     }
+
 }

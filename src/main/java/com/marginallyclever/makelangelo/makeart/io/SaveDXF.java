@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.MathHelper;
+import com.marginallyclever.convenience.helpers.MathHelper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class SaveDXF implements TurtleSaver {
 	}
 
 	@Override
-	public boolean save(OutputStream outputStream,Turtle turtle) throws Exception {
+	public boolean save(OutputStream outputStream,Turtle turtle, PlotterSettings settings) throws Exception {
 		logger.debug("saving...");
 		
 		Rectangle2D.Double box = turtle.getBounds();
@@ -107,14 +108,12 @@ public class SaveDXF implements TurtleSaver {
 				break;
 			case DRAW_LINE:
 				if(isUp) isUp=false;
-				else {
-					out.write("0\nLINE\n");
-					out.write("8\n1\n");  // layer 1
-					out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
-					out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
-					out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
-					out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
-				}
+				out.write("0\nLINE\n");
+				out.write("8\n1\n");  // layer 1
+				out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
+				out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
+				out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
+				out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
 				x0=m.x;
 				y0=m.y;
 				

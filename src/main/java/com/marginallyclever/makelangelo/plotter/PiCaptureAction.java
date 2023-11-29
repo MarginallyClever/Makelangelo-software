@@ -1,26 +1,5 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-
 import com.hopding.jrpicam.RPiCamera;
 import com.hopding.jrpicam.enums.AWB;
 import com.hopding.jrpicam.enums.DRC;
@@ -32,6 +11,15 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.paper.Paper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Raspi camera capture to file for image processing
@@ -57,7 +45,7 @@ public class PiCaptureAction {
 		super();
 	}
 	
-	public void run(JFrame mainFrame, Paper myPaper) {
+	public void run(Frame mainFrame, Paper myPaper) {
         // let's make the image the correct width and height for the paper
 		useImage = false;
         double aspectRatio = myPaper.getPaperWidth() / myPaper.getPaperHeight();

@@ -31,12 +31,10 @@ public class SelectInteger extends Select {
 
 		field = new JFormattedTextField();
 		createAndAttachFormatter(locale);
-
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
 		field.setMinimumSize(d);
-
 		field.setValue(defaultValue);
 		field.setHorizontalAlignment(JTextField.RIGHT);
 		field.getDocument().addDocumentListener(new DocumentListener() {
@@ -57,7 +55,7 @@ public class SelectInteger extends Select {
 			
 			public void validate() {
 				try {
-					int newNumber = Integer.valueOf(field.getText());
+					int newNumber = Integer.parseInt(field.getText());
 					field.setForeground(UIManager.getColor("Textfield.foreground"));
 					if(value != newNumber) {
 						int oldValue = value;
@@ -67,7 +65,7 @@ public class SelectInteger extends Select {
 						timer = new Timer("Delayed response");
 						timer.schedule(new TimerTask() { 
 							public void run() {
-								firePropertyChange(oldValue,newNumber);
+								fireSelectEvent(oldValue,newNumber);
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}

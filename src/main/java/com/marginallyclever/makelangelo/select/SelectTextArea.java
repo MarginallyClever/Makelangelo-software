@@ -18,11 +18,12 @@ public class SelectTextArea extends Select {
 		//this.setBorder(BorderFactory.createLineBorder(Color.RED));
 
 		JLabel label = new JLabel(labelKey, JLabel.LEADING);
-		
+
 		field = new JTextArea(defaultText,4,20);
 		field.setLineWrap(true);
 		field.setWrapStyleWord(true);
 		field.setBorder(BorderFactory.createLoweredBevelBorder());
+		field.setFont(UIManager.getFont("Label.font"));
 		field.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
@@ -40,7 +41,7 @@ public class SelectTextArea extends Select {
 			}
 			
 			void validate() {
-				firePropertyChange(null,field.getText());
+				fireSelectEvent(null,field.getText());
 			}
 		});
 

@@ -2,12 +2,14 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Generate a Gcode file from the BufferedImage supplied.<br>
@@ -24,7 +26,7 @@ public class Converter_Spiral extends ImageConverter {
 		SelectBoolean selectToCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"),getToCorners());
 		add(selectToCorners);
 
-		selectToCorners.addPropertyChangeListener((evt) -> {
+		selectToCorners.addSelectListener((evt) -> {
 			setToCorners((boolean)evt.getNewValue());
 			fireRestart();
 		});
@@ -53,21 +55,22 @@ public class Converter_Spiral extends ImageConverter {
 
 		turtle = new Turtle();
 
+		double cx = paper.getCenterX();
+		double cy = paper.getCenterY();
+
 		// black and white
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 
 		double maxr;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double h2 = rect.getHeight()/2.0f;
+		double w2 = rect.getWidth()/2.0f;
 		if (convertToCorners) {
-			// go right to the corners
-			double h2 = myPaper.getMarginHeight();
-			double w2 = myPaper.getMarginWidth();
-			maxr = Math.sqrt(h2 * h2 + w2 * w2) + 1.0;
+			maxr = Math.sqrt(h2 * h2 + w2 * w2);
 		} else {
 			// do the largest circle that still fits in the image.
-			double w = myPaper.getMarginWidth()/2.0f;
-			double h = myPaper.getMarginHeight()/2.0f;
-			maxr = Math.min(h, w);
+			maxr = Math.min(h2, w2);
 		}
 
 		double toolDiameter = 1;
@@ -97,7 +100,7 @@ public class Converter_Spiral extends ImageConverter {
 				fx = Math.cos(f) * r1;
 				fy = Math.sin(f) * r1;
 
-				if(myPaper.isInsidePaperMargins(fx, fy)) {
+				if(rect.contains(fx, fy)) {
 					try {
 						z = img.sample(fx, fy,1);
 					} catch(Exception e) {
@@ -108,7 +111,7 @@ public class Converter_Spiral extends ImageConverter {
 					if(z<level) turtle.penDown();
 					else turtle.penUp();
 				} else turtle.penUp();
-				turtle.moveTo(fx, fy);
+				turtle.moveTo(cx + fx, cy + fy);
 			}
 			r -= toolDiameter;
 			++numRings;

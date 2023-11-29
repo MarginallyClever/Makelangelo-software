@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,7 +20,13 @@ import java.util.List;
  */
 public class InfillTurtle {
 	public static final double MINIMUM_PEN_DIAMETER = 0.1;
-	private double penDiameter = 0.8; // TODO adjust me before running infill
+
+	private double penDiameter = 0.8;
+
+	/**
+	 * Direction of lines to draw. 0 is horizontal. 90 is vertical.
+	 */
+	private double angle = 90.0;
 
 	public InfillTurtle() {}
 
@@ -52,13 +59,25 @@ public class InfillTurtle {
 
 		// do this once here instead of once per line.
 		LineCollection convertedPath = input.getAsLineSegments();
+
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2D(), new Point2D(), input.getColor());
 
-		for (double y = bounds.getMinY(); y < bounds.getMaxY(); y += penDiameter) {
-			line.start.set(bounds.getMinX(), y);
-			line.end.set(bounds.getMaxX(), y);
+		double size = Math.max(bounds.getHeight(), bounds.getWidth());
+		Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle   )), Math.sin(Math.toRadians(angle   )));
+		Vector2d minorDir = new Vector2d(Math.cos(Math.toRadians(angle+90)), Math.sin(Math.toRadians(angle+90)));
+		Vector2d minorStart = new Vector2d(bounds.getCenterX(),bounds.getCenterY());
+		minorStart.scaleAdd(-size,minorDir,minorStart);
+		Vector2d majorStart = new Vector2d();
+		Vector2d majorEnd = new Vector2d();
+
+		for(double i=0;i<size*2;i+=penDiameter) {
+			majorStart.scaleAdd(-size,majorDir,minorStart);
+			majorEnd.scaleAdd(size,majorDir,minorStart);
+			line.start.set(majorStart.x,majorStart.y);
+			line.end.set(majorEnd.x,majorEnd.y);
 			results.addAll(trimLineToPath(line, convertedPath));
+			minorStart.scaleAdd(penDiameter,minorDir,minorStart);
 		}
 
 		return results;
@@ -191,5 +210,16 @@ public class InfillTurtle {
 
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter = Math.max(penDiameter, MINIMUM_PEN_DIAMETER);
+	}
+
+	public double getAngle() {
+		return angle;
+	}
+
+	/**
+	 * Direction of lines to draw. 0 is horizontal. 90 is vertical.
+	 */
+	public void setAngle(double angle) {
+		this.angle = angle;
 	}
 }

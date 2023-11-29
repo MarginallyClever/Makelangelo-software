@@ -3,10 +3,15 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterExtendedDifferenceOfGaussians;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * Uses <a href="http://en.wikipedia.org/wiki/Marching_squares">marching squares</a> to detect edges.
@@ -17,30 +22,38 @@ public class Converter_EdgeDetection extends ImageConverter {
 	private static int passes=5;
 	private static int stepSize=10;
 	private static int sampleSize=2;
+	private static boolean border=false;
 
 	private int edge;
 	private TransformedImage img;
+	private double px,py;
+
 
 	public Converter_EdgeDetection() {
 		super();
 		SelectSlider selectPasses     = new SelectSlider("passes", Translator.get("Converter_EdgeDetection.passes"), 20, 1, (int) (getPasses()));
 		SelectSlider selectStepSize   = new SelectSlider("stepSize", Translator.get("Converter_EdgeDetection.stepSize"), 25, 2, (int) getStepSize());
 		SelectSlider selectSampleSize = new SelectSlider("sampleSize", Translator.get("Converter_EdgeDetection.sampleSize"), 5, 1, (int) getSampleSize());
+		SelectBoolean selectBorder    = new SelectBoolean("border", Translator.get("Converter_EdgeDetection.border"), border);
 
 		add(selectPasses);
 		add(selectStepSize);
 		add(selectSampleSize);
 
-		selectPasses.addPropertyChangeListener(evt->{
+		selectPasses.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
-		selectStepSize.addPropertyChangeListener(evt->{
+		selectStepSize.addSelectListener(evt->{
 			setStepSize((int)evt.getNewValue());
 			fireRestart();
 		});
-		selectSampleSize.addPropertyChangeListener(evt->{
+		selectSampleSize.addSelectListener(evt->{
 			setSampleSize((int)evt.getNewValue());
+			fireRestart();
+		});
+		selectBorder.addSelectListener(evt->{
+			setBorder((boolean)evt.getNewValue());
 			fireRestart();
 		});
 	}
@@ -61,45 +74,67 @@ public class Converter_EdgeDetection extends ImageConverter {
 	public int getSampleSize() {
 		return sampleSize;
 	}
+
+	public void setBorder(boolean newValue) {
+		border=newValue;
+	}
 	
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		img = bw.filter(myImage);
+		FilterDesaturate desaturates = new FilterDesaturate(myImage);
+		img = desaturates.filter();
+
+		FilterGaussianBlur blur1 = new FilterGaussianBlur(img, 1);
+		FilterGaussianBlur blur2 = new FilterGaussianBlur(img, 4);
+		TransformedImage img1 = blur1.filter();
+		TransformedImage img2 = blur2.filter();
+		FilterExtendedDifferenceOfGaussians dog = new FilterExtendedDifferenceOfGaussians(img1,img2,20);
+		img = dog.filter();
+
 		turtle = new Turtle();
+		px = myPaper.getCenterX();
+		py = myPaper.getCenterY();
 
 		int edgeStep = 255/(passes+1);
-		int d = 40;
 		edge = 255-edgeStep;
 
 		for(int i=0;i<passes;++i) {
 			marchingSquares();
 			edge -= edgeStep;
 		}
-/*
-		// add border
-		turtle.jumpTo(myPaper.getMarginLeft(),myPaper.getMarginBottom());
-		turtle.moveTo(myPaper.getMarginRight(),myPaper.getMarginBottom());
-		turtle.moveTo(myPaper.getMarginRight(),myPaper.getMarginTop());
-		turtle.moveTo(myPaper.getMarginLeft(),myPaper.getMarginTop());
-		turtle.moveTo(myPaper.getMarginLeft(),myPaper.getMarginBottom());*/
+
+		if(border) {
+			// add border
+			Rectangle2D.Double rect = myPaper.getMarginRectangle();
+			double xLeft   = rect.getMinX();
+			double yBottom = rect.getMinY();
+			double xRight  = rect.getMaxX();
+			double yTop    = rect.getMaxY();
+
+			turtle.jumpTo(px+xLeft, py+yBottom);
+			turtle.moveTo(px+xRight, py+yBottom);
+			turtle.moveTo(px+xRight, py+yTop);
+			turtle.moveTo(px+xLeft, py+yTop);
+			turtle.moveTo(px+xLeft, py+yBottom);
+		}
 
 		fireConversionFinished();
 	}
 
 	void marchingSquares() {
-		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
-		double width   = myPaper.getMarginRight() - myPaper.getMarginLeft();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double height  = rect.getHeight();
+		double width   = rect.getWidth();
 
 		int stepsOnY = (int)Math.floor(height / stepSize);
 		int stepsOnX = (int)Math.floor(width / stepSize);
 
 		for(int y=0;y<stepsOnY;++y) {
 			for(int x=0;x<stepsOnX;++x) {
-				marchSquare((int)myPaper.getMarginLeft() + x*stepSize,
-						(int)myPaper.getMarginBottom() + y*stepSize);
+				marchSquare((int)rect.getMinX() + x*stepSize,
+						(int)rect.getMinY() + y*stepSize);
 			}
 		}
 	}
@@ -148,8 +183,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	}
 
 	void line(Point2D a,Point2D b) {
-		turtle.jumpTo(a.x,a.y);
-		turtle.moveTo(b.x,b.y);
+		turtle.jumpTo(px+a.x,py+a.y);
+		turtle.moveTo(px+b.x,py+b.y);
 	}
 
 	void case1(int x0,int y0) {

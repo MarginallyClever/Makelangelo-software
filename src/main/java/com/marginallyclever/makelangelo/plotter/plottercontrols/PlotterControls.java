@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -17,6 +18,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,15 +95,29 @@ public class PlotterControls extends JPanel {
 				MarlinPanelEvent.DID_NOT_FIND,
 				MarlinPanelEvent.COMMUNICATION_FAILURE -> {
 					if (!isErrorAlreadyDisplayed) {
-						/* TODO source of dialog box titled "Error" that says "PlotterControls.null". Caused by
-						 * robot being turned off while COM port is connected.
+						String message;
+
+						switch(e.getActionCommand()) {
+							case "communicationFailure" -> message = Translator.get("PlotterControls.communicationFailure");
+							case "didNotFind" -> message = Translator.get("PlotterControls.didNotFind");
+							case "Printed halted" -> message = Translator.get("PlotterControls.halted");
+							default -> message = e.getActionCommand();
+						}
+						/* TODO Source of dialog box titled "Error" that says "PlotterControls.null".
+						 *      Caused by robot being turned off while COM port is connected.
 						 */
-						JOptionPane.showMessageDialog(this, Translator.get("PlotterControls."+e.getActionCommand()), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this,
+								message,
+								Translator.get("ErrorTitle"),
+								JOptionPane.ERROR_MESSAGE);
 						isErrorAlreadyDisplayed = true;
 					}
 				}
 			case MarlinPanelEvent.HOME_XY_FIRST ->
-					JOptionPane.showMessageDialog(this, Translator.get("PlotterControls.homeXYFirst"), Translator.get("InfoTitle"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(this,
+							Translator.get("PlotterControls.homeXYFirst"),
+							Translator.get("InfoTitle"),
+							JOptionPane.WARNING_MESSAGE);
 		}
 		updateProgressBar();
 	}
@@ -134,12 +150,12 @@ public class PlotterControls extends JPanel {
 		Border border = BorderFactory.createTitledBorder(Translator.get("PlotterControls.DrawControls"));
 		panel.setBorder(border);
 
-		bFindHome = new ButtonIcon("PlotterControls.FindHome", "/images/house.png");
-		bRewind = new ButtonIcon("PlotterControls.Rewind", "/images/control_start_blue.png");
-		bStart = new ButtonIcon("PlotterControls.Play", "/images/control_play_blue.png");
-		bStep = new ButtonIcon("PlotterControls.Step", "/images/control_fastforward_blue.png");
-		bPause = new ButtonIcon("PlotterControls.Pause", "/images/control_pause_blue.png");
-		bEmergencyStop = new ButtonIcon("PlotterControls.EmergencyStop", "/images/stop.png");
+		bFindHome = new ButtonIcon( Translator.get("PlotterControls.FindHome"), "/images/house.png");
+		bRewind = new ButtonIcon( Translator.get("PlotterControls.Rewind"), "/images/control_start_blue.png");
+		bStart = new ButtonIcon( Translator.get("PlotterControls.Play"), "/images/control_play_blue.png");
+		bStep = new ButtonIcon( Translator.get("PlotterControls.Step"), "/images/control_fastforward_blue.png");
+		bPause = new ButtonIcon( Translator.get("PlotterControls.Pause"), "/images/control_pause_blue.png");
+		bEmergencyStop = new ButtonIcon( Translator.get("PlotterControls.EmergencyStop"), "/images/stop.png");
 		bEmergencyStop.setForeground(Color.RED);
 
 		panel.add(bFindHome);
@@ -277,11 +293,15 @@ public class PlotterControls extends JPanel {
 	}
 
 	private void addUserStartGCODE() {
-		myPlotter.getSettings().getUserGeneralStartGcodeList().forEach(marlinInterface::queueAndSendCommand);
+		String gcode = myPlotter.getSettings().getString(PlotterSettings.USER_GENERAL_START_GCODE);
+		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
+				.forEach(marlinInterface::queueAndSendCommand);
 	}
 
 	private void addUserEndGCODE() {
-		myPlotter.getSettings().getUserGeneralEndGcodeList().forEach(marlinInterface::queueAndSendCommand);
+		String gcode = myPlotter.getSettings().getString(PlotterSettings.USER_GENERAL_END_GCODE);
+		Arrays.asList(gcode.split(System.getProperty("line.separator")).clone())
+				.forEach(marlinInterface::queueAndSendCommand);
 	}
 
 	/**

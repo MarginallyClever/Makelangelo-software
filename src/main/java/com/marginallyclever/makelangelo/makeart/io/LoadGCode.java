@@ -1,14 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import java.io.InputStream;
-import java.util.Scanner;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.InputStream;
+import java.util.Scanner;
 
 public class LoadGCode implements TurtleLoader {
 
@@ -64,6 +63,8 @@ public class LoadGCode implements TurtleLoader {
 			while (scanner.hasNextLine()) {
 				line = scanner.nextLine();
 				lineNumber++;
+				// lose anything in parenthesis () because it's a comment
+				line = line.replaceAll("\\(.*\\)", "");
 				// lose anything after a ; because it's a comment
 				String[] pieces = line.split(";");
 				if (pieces.length == 0) continue;

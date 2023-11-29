@@ -1,19 +1,14 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import com.marginallyclever.convenience.StringHelper;
-import com.marginallyclever.makelangelo.Translator;
 
 /**
  * Drag cursor to drive plotter control. 
@@ -60,8 +55,8 @@ public class DragAndDrive extends JPanel {
 
 		// TODO dimensioning doesn't work right.  The better way would be a pen tool to drag on the 3d view.  That's a lot of work.
 		Dimension dims = new Dimension();
-		double w = robot.getLimitRight()-robot.getLimitLeft();
-		double h = robot.getLimitTop()-robot.getLimitBottom();
+		double w = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT)-robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double h = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP)-robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
 		dims.setSize( 150, 150 * w / h);
 		dragAndDrive.setPreferredSize(dims);
 		dragAndDrive.add(coordinates,c);
@@ -112,8 +107,8 @@ public class DragAndDrive extends JPanel {
 			double cy = h/2.0;
 			x = x - cx;
 			y = cy - y;
-			double w2 = robot.getLimitRight()-robot.getLimitLeft();
-			double h2 = robot.getLimitTop()-robot.getLimitBottom();
+			double w2 = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT)-robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+			double h2 = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP)-robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
 			x *= 10 * w2 / w;
 			y *= 10 * h2 / h;
 			double dx = x-mouseLastX;

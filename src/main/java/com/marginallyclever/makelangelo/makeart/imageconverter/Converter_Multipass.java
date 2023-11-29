@@ -2,11 +2,13 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -26,12 +28,12 @@ public class Converter_Multipass extends ImageConverter {
 		add(selectAngle);
 		add(selectLevel);
 
-		selectAngle.addPropertyChangeListener(evt->{
+		selectAngle.addSelectListener(evt->{
 			setAngle((double)evt.getNewValue());
 			fireRestart();
 		});
 
-		selectLevel.addPropertyChangeListener(evt->{
+		selectLevel.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -67,8 +69,8 @@ public class Converter_Multipass extends ImageConverter {
 		super.start(paper, image);
 
 		// The picture might be in color.  Smash it to 255 shades of grey.
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 		
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
@@ -80,10 +82,11 @@ public class Converter_Multipass extends ImageConverter {
 		double level = 255.0 / (double)(passes+1);
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop();
-		double xLeft   = myPaper.getMarginLeft();
-		double xRight  = myPaper.getMarginRight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yBottom = rect.getMinY();
+		double yTop    = rect.getMaxY();
+		double xLeft   = rect.getMinX();
+		double xRight  = rect.getMaxX();
 		double height = yTop - yBottom;
 		double width = xRight - xLeft;
 		double maxLen = Math.sqrt(width*width+height*height);

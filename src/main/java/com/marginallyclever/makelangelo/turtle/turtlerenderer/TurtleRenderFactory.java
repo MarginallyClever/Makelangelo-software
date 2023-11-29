@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
-
 import java.util.Arrays;
 
 /**
@@ -12,27 +9,19 @@ import java.util.Arrays;
  * @author Dan Royer
  */
 public enum TurtleRenderFactory {
-	DEFAULT("Default", new DefaultTurtleRenderer(),"TurtleRenderFactory.DEFAULT"),
-	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer(),"TurtleRenderFactory.BARBER_POLE"),
-	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer(),"TurtleRenderFactory.SEPARATE_LOOP"),
-	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer(),"TurtleRenderFactory.MARLIN_SIM");
+	DEFAULT("Default", new DefaultTurtleRenderer()),
+	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
+	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
+	DIRECTION_LOOP("Direction loops",new DirectionLoopTurtleRenderer()),
+	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
 
 	private final TurtleRenderer turtleRenderer;
 
 	private final String name;
-	
-	private final String translatKey;
 
-	/**
-	 * 
-	 * @param name
-	 * @param turtleRenderer
-	 *  @param translatKey The key used with Translator.get in getTranslatedText to obtaine the translated Text.
-	 */
-	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer, String translatKey) {
+	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer) {
 		this.name = name;
 		this.turtleRenderer = turtleRenderer;
-		this.translatKey = translatKey;
 	}
 
 	public TurtleRenderer getTurtleRenderer() {
@@ -41,14 +30,6 @@ public enum TurtleRenderFactory {
 
 	public String getName() {
 		return name;
-	}
-	
-	/**
-	 * 
-	 * @return The translated text to be used as text in the GUI
-	 */
-	public String getTranslatedText() {
-		return Translator.get(translatKey);
 	}
 
 	public static TurtleRenderFactory findByName(String name) {

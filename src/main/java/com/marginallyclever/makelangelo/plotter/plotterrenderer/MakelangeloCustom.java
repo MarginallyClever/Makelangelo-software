@@ -6,7 +6,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
-import static com.marginallyclever.convenience.DrawingHelper.*;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -32,10 +32,10 @@ public class MakelangeloCustom implements PlotterRenderer {
 	 * @param settings plottersettings of the robot
 	 */
 	private void paintControlBox(GL2 gl2, PlotterSettings settings) {
-		double cy = settings.getLimitTop();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
-		double top = settings.getLimitTop();
+		double cy = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -86,9 +86,9 @@ public class MakelangeloCustom implements PlotterRenderer {
 
 	// draw left & right motor
 	private void paintMotors(GL2 gl2, PlotterSettings settings) {
-		double top = settings.getLimitTop();
-		double right = settings.getLimitRight();
-		double left = settings.getLimitLeft();
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 
 		// left motor
 		gl2.glColor3d(0.3,0.3,0.3);
@@ -146,10 +146,10 @@ public class MakelangeloCustom implements PlotterRenderer {
 		double gx = pos.x;
 		double gy = pos.y;
 		
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		
 		if(gx<left  ) return;
 		if(gx>right ) return;
@@ -159,7 +159,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		float bottleCenter = 8f+7.5f;
 		
 		double mw = right-left;
-		double mh = top-settings.getLimitBottom();
+		double mh = top-settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
 		double suggestedLength = Math.sqrt(mw*mw+mh*mh)+50;
 
 		dx = gx - left;

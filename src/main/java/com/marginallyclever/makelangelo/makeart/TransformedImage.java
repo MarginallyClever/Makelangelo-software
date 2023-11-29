@@ -2,10 +2,10 @@ package com.marginallyclever.makelangelo.makeart;
 
 import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+import java.util.Arrays;
 
 /**
  * TransformedImage is a {@link BufferedImage}, with a transformation matrix on top.
@@ -108,9 +108,9 @@ public class TransformedImage {
 		int top    = (int)Math.ceil (y1);
 
 		// calculate the weight matrix
-		int w = right-left;
-		int h = top-bottom;
-		if(w<=1 && h<=1) {
+		int w = Math.max(1,right-left);
+		int h = Math.max(1,top-bottom);
+		if(w==1 && h==1) {
 			if (canSampleAt(left, bottom)) {
 				return sample1x1Unchecked(left, bottom);
 			} else {
@@ -119,9 +119,8 @@ public class TransformedImage {
 		}
 		
 		double [] m = new double[w*h];
-		for(int i=0;i<m.length;++i) {
-			m[i]=1;
-		}
+		Arrays.fill(m, 1);
+
 		// bottom edge
 		if(bottom<y0) {
 			double yWeightStart = y0-bottom;
@@ -193,9 +192,8 @@ public class TransformedImage {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
 
-		Color c = new Color(sourceImage.getRGB(sampleX, sampleY));
-		int c2 = ImageFilter.decodeColor(c) & 0xFF;  // clamp to 0..255
-		return c2;
+		int c2 = sourceImage.getRGB(sampleX, sampleY);
+		return ImageFilter.decode32bit(c2) & 0xFF;
 	}
 
 	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)

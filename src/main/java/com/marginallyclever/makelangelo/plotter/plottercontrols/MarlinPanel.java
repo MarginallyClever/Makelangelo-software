@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.communications.NetworkSessionListener;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -84,10 +83,6 @@ public class MarlinPanel extends JPanel {
 		});
 	}
 
-	public void addNetworkSessionListener(NetworkSessionListener a) {
-		chatInterface.addNetworkSessionListener(a);
-	}
-
 	private void onConnect() {
 		logger.debug("MarlinInterface connected.");
 		setupNetworkListener();
@@ -111,7 +106,7 @@ public class MarlinPanel extends JPanel {
 		if (delay > TIMEOUT_DELAY) {
 			if (delay > FATAL_TIMEOUT_DELAY) {
 				logger.error("No answer from the robot");
-				notifyListeners( MarlinPanelEvent.COMMUNICATION_FAILURE, "communicationFailure");
+				notifyListeners( MarlinPanelEvent.COMMUNICATION_FAILURE, MarlinPanelEvent.COMMUNICATION_COMMAND);
 				chatInterface.displayError("No answer from the robot, retrying...");
 			} else {
 				logger.trace("Heartbeat: M400");
@@ -123,8 +118,11 @@ public class MarlinPanel extends JPanel {
 	private void setupNetworkListener() {
 		chatInterface.addNetworkSessionListener(this::onDataReceived);
 	}
-	
-	// This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+
+	/**
+	 * This does not fire on the Swing EVT thread.  Be careful!  Concurrency problems may happen.
+	 * @param evt the network session event
+	 */
 	protected void onDataReceived(NetworkSessionEvent evt) {
 		if (evt.flag == NetworkSessionEvent.DATA_RECEIVED) {
 			lastReceivedTime = System.currentTimeMillis();
@@ -180,13 +178,13 @@ public class MarlinPanel extends JPanel {
 		
 		// only notify listeners of a fatal error (MarlinInterface.ERROR) if the printer halts.
 		if (message.contains(STR_PRINTER_HALTED)) {
-			notifyListeners( MarlinPanelEvent.ERROR, STR_PRINTER_HALTED );
+			notifyListeners( MarlinPanelEvent.ERROR, MarlinPanelEvent.HALTED_COMMAND );
 		}
 	}
 
 	private void onHearHomeXYFirst() {
 		logger.warn("Home XY First");
-		notifyListeners( MarlinPanelEvent.HOME_XY_FIRST,"homeXYFirst" );
+		notifyListeners( MarlinPanelEvent.HOME_XY_FIRST,MarlinPanelEvent.HOME_XY_COMMAND );
 	}
 
 	private void onHearActionCommand(String command) {
@@ -198,11 +196,11 @@ public class MarlinPanel extends JPanel {
 	}
 
 	private void onDidNotFindCommandInHistory() {
-		notifyListeners( MarlinPanelEvent.DID_NOT_FIND, "didNotFind" );
+		notifyListeners( MarlinPanelEvent.DID_NOT_FIND, MarlinPanelEvent.DID_NOT_FIND_COMMAND );
 	}
 
 	private void fireIdleNotice() {
-		notifyListeners( MarlinPanelEvent.IDLE, "idle" );
+		notifyListeners( MarlinPanelEvent.IDLE, MarlinPanelEvent.IDLE_COMMAND );
 	}
 
 	private void clearOldHistory() {

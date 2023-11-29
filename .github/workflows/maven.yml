@@ -8,8 +8,6 @@ env:
 
 on:
   push:
-    branches:
-      - master
   pull_request:
 
 jobs:
@@ -27,7 +25,7 @@ jobs:
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
     - name: Build and Test with Maven
       timeout-minutes: 15
-      run: ./mvnw -B test
+      run: ./mvnw -B test -Djava.awt.headless=true
 
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
@@ -39,8 +37,6 @@ jobs:
       shell: bash
       run: |
         mkdir -p target/universal-package &&
-        cp src/main/package/avrdude.* target/universal-package/ &&
-        cp src/main/package/firmware*.hex target/universal-package/ &&
         cp src/main/package/*.bat target/universal-package/ &&
         cp src/main/package/start* target/universal-package/ &&
         cp src/main/package/thankyou.* target/universal-package/ &&
@@ -56,7 +52,6 @@ jobs:
       shell: bash
       run: |
         mkdir -p target/package &&
-        cp src/main/package/firmware*.hex target/package/ &&
         cp src/main/package/*.bat target/package/ &&
         cp src/main/package/start* target/package/ &&
         cp src/main/package/thankyou.* target/package/ &&
@@ -77,7 +72,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
         upload_url: ${{ env.UPLOAD_URL }}
-        release_id: ${{ env.RELEASE_ID }}{
+        release_id: ${{ env.RELEASE_ID }}
         asset_path: Makelangelo.zip # path to archive to upload
         asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
         asset_content_type: application/zip # required by GitHub API
@@ -91,8 +86,8 @@ jobs:
         path: |
           src/main/package/jpackage*
           src/main/package/logo*
-          src/main/package/firmware*.hex
           LICENSE
+          README
           target/package/*
 
     - name: Check files 3
@@ -127,12 +122,13 @@ jobs:
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{matrix.os}}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,," | head -1) &&
-        BINARY_NIGHTLY=$(echo $BINARY | sed 's/\(.*\)\.\(.*\)/\1-nightly-$$.\2/') &&
+        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-$$.\2/') &&
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
     - name: Deploy installation release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+#      if: github.repository == 'MarginallyClever/Makelangelo-software'
+#      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v2.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions

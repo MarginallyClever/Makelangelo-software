@@ -3,12 +3,18 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Facade for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a {@link TurtleRenderer}.
+ * TODO explain reason for facade?
+ * @author Dan Royer
+ */
 public class TurtleRenderFacade implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
@@ -26,7 +32,7 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
-			TurtleMove previousMove = null;
+			TurtleMove previousMove = new TurtleMove(0,0, MovementType.TRAVEL);
 			
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
@@ -44,14 +50,14 @@ public class TurtleRenderFacade implements PreviewListener {
 					boolean inShow = (showCount >= first && showCount < last);
 					switch (m.type) {
 					case TRAVEL:
-						if (inShow && previousMove != null) {
+						if (inShow) {
 							myRenderer.travel(previousMove, m);
 						}
 						showCount++;
 						previousMove = m;
 						break;
 					case DRAW_LINE:
-						if (inShow && previousMove != null) {
+						if (inShow) {
 							myRenderer.draw(previousMove, m);
 						}
 						showCount++;
@@ -89,6 +95,9 @@ public class TurtleRenderFacade implements PreviewListener {
 		int size=0;
 		if(turtle!=null) size = turtle.history.size();
 		myTurtle = turtle;
+		if(myRenderer!=null) {
+			myRenderer.reset();
+		}
 
 		setFirst(0);
 		setLast(size);

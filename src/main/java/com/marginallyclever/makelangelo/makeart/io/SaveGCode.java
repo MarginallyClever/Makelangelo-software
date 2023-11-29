@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.StringHelper;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterPanel;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramPanel;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -16,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +29,7 @@ import java.util.List;
  * @author Dan Royer
  * @since 7.28.0
  */
-public class SaveGCode {
+public class SaveGCode implements TurtleSaver {
 	private static final Logger logger = LoggerFactory.getLogger(SaveGCode.class);
 
 	private final JFileChooser fc = new JFileChooser();
@@ -168,8 +166,28 @@ public class SaveGCode {
 		
 	protected void saveOneFile(String filename, Turtle turtle, Plotter robot) throws Exception {
 		logger.debug("saving...");
-		
-		try (Writer out = new OutputStreamWriter(new FileOutputStream(filename))) {			
+		try (FileOutputStream stream = new FileOutputStream(filename)) {
+			save(stream, turtle, robot.getSettings());
+		}
+		logger.debug("done.");
+	}
+
+	@Override
+	public FileNameExtensionFilter getFileNameFilter() {
+		return new FileNameExtensionFilter("GCode", "gcode");
+	}
+
+	/**
+	 * Save a turtle to a stream
+	 * @param outputStream destination of path
+	 * @param turtle source of path
+	 * @param settings plotter settings
+	 * @return true if save successful.
+	 * @throws Exception if save failed.
+	 */
+	@Override
+	public boolean save(OutputStream outputStream, Turtle turtle, PlotterSettings settings) throws Exception {
+		try (Writer out = new OutputStreamWriter(outputStream)) {
 			out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
 			out.write(";FLAVOR:Marlin-polargraph\n");
 			Rectangle2D.Double bounds = turtle.getBounds();
@@ -183,9 +201,9 @@ public class SaveGCode {
 			Date date = new Date(System.currentTimeMillis());
 			out.write("; " + formatter.format(date) + "\n");
 			out.write(";Start of user gcode\n");
-			out.write(robot.getSettings().getUserGeneralStartGcode());
+			out.write(settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
 			out.write("\n;End of user gcode\n");
-			out.write(MarlinPlotterPanel.getFindHomeString()+"\n");  // go home
+			out.write(MarlinPlotterPanel.getFindHomeString() + "\n");  // go home
 
 			boolean isUp = true;
 
@@ -197,7 +215,7 @@ public class SaveGCode {
 					case TRAVEL -> {
 						if (!isUp) {
 							// lift pen up
-							out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
+							out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
 							isUp = true;
 						}
 						previousMovement = m;
@@ -206,26 +224,26 @@ public class SaveGCode {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
-							out.write(MarlinPlotterPanel.getTravelToString(robot,previousMovement.x, previousMovement.y) + "\n");
-							out.write(MarlinPlotterPanel.getPenDownString(robot) + "\n");
+							out.write(MarlinPlotterPanel.getTravelToString(settings, previousMovement.x, previousMovement.y) + "\n");
+							out.write(MarlinPlotterPanel.getPenDownString(settings) + "\n");
 							isUp = false;
 						}
-						out.write(MarlinPlotterPanel.getDrawToString(robot,m.x, m.y) + "\n");
+						out.write(MarlinPlotterPanel.getDrawToString(settings, m.x, m.y) + "\n");
 						previousMovement = m;
 					}
 					case TOOL_CHANGE -> {
-						out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
+						out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
 						out.write(MarlinPlotterPanel.getToolChangeString(m.getColor().toInt()) + "\n");
 					}
 				}
 			}
-			if (!isUp) out.write(MarlinPlotterPanel.getPenUpString(robot) + "\n");
+			if (!isUp) out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
 			out.write(";Start of user gcode\n");
-			out.write(robot.getSettings().getUserGeneralEndGcode());
+			out.write(settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
 			out.write("\n;End of user gcode\n");
 			out.write(";End of Gcode\n");
 			out.flush();
+			return true;
 		}
-		logger.debug("done.");
 	}
 }
