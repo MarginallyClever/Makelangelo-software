@@ -446,4 +446,8 @@
 	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
 	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
 
+	<string><key>Generator_OpenAI.APIKey</key><value>API key</value></string>
+	<string><key>Generator_OpenAI.prompt</key><value>Prompt</value></string>
+	<string><key>Generator_OpenAI.generate</key><value>Generate</value></string>
+
 </language>
