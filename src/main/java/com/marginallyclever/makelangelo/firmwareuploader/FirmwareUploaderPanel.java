@@ -79,6 +79,9 @@ public class FirmwareUploaderPanel extends JPanel {
 	private void run(ActionEvent evt, String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
 		String AVRDudePath="";
+
+
+		logger.debug("maybe downloading avrdude...");
 		try {
 			AVRDudePath = AVRDudeDownloader.downloadAVRDude();
 			firmwareUploader.setAVRDude(AVRDudePath);
@@ -87,21 +90,24 @@ public class FirmwareUploaderPanel extends JPanel {
 			return;
 		}
 
+		logger.debug("maybe downloading firmware...");
+		if(!firmwareDownloader.getFirmware(name)) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.downloadFailed"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		logger.debug("finding conf file...");
 		if(!firmwareUploader.findConf()) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.confNotFound"),title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
+		logger.debug("setup...");
 		if(port.getSelectedIndex()==-1) {
-			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.noPortSelected"),title,JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		if(!firmwareDownloader.getFirmware(name)) {
-			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.downloadFailed"),title,JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, Translator.get("FirmwareUploaderPanel.noPortSelected"), title, JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		firmwareUploader.setHexPath(firmwareDownloader.getDownloadPath(name));
-
 		startM5.setEnabled(false);
 		startHuge.setEnabled(false);
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -110,6 +116,7 @@ public class FirmwareUploaderPanel extends JPanel {
 		int messageType = JOptionPane.PLAIN_MESSAGE;
 		int result = 1;
 		try {
+			logger.debug("uploading firmware...");
 			result = firmwareUploader.run(port.getSelectedItem());
 		} catch (Exception e1) {
 			logger.error("failed to run avrdude: ",e1);
