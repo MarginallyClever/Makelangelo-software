@@ -412,7 +412,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.4.7</version>
+			<version>1.4.12</version>
 		</dependency>
 		<!-- logging -->
 		<dependency>
