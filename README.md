@@ -1,6 +1,7 @@
 ﻿# Makelangelo Software
 
-![workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg)
+![workflow](https://github.com/MarginallyClever/Makelangelo-software/actions/workflows/maven.yml/badge.svg) 
+[![Crowdin](https://badges.crowdin.net/makelangelo-software/localized.svg)](https://crowdin.com/project/makelangelo-software)
 
 Makelangelo Software is a Java program that prepares art for CNC plotters.  It was originally designed for the
 [Makelangelo Art Robot](http://www.makelangelo.com/).  It runs in Windows, OSX, and several flavors of linux.
