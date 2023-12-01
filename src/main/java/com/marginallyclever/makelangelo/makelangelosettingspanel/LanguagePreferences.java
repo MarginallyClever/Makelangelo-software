@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +15,20 @@ public class LanguagePreferences {
 
 	private static final Logger logger = LoggerFactory.getLogger(LanguagePreferences.class);
 	
-	static private SelectPanel panel;
-	static private String[] languageList;
+	static private final SelectPanel panel = new SelectPanel();
+	static private final String[] languageList = Translator.getLanguageList();
 	static private SelectOneOfMany languageOptions;
 	
 	
-	static SelectPanel buildPanel() {
-		panel = new SelectPanel();
-		
-		languageList = Translator.getLanguageList();
+	static SelectPanel buildPanel() {	
 		int currentIndex = Translator.getCurrentLanguageIndex();
 		languageOptions = new SelectOneOfMany("language","Language",languageList,currentIndex);
 		
 		panel.add(languageOptions);
+		panel.add(new SelectReadOnlyText("learnMore",
+				"<![CDATA[<html><body>"
+						+"<a href=\"https://www.marginallyclever.com/2020/06/how-to-translate-makelangelo-software/\">Add translations</a>"
+						+"</body></html>]]>"));
 
 		return panel;
 	}
