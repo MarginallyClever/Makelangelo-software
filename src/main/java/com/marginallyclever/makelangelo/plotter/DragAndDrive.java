@@ -18,16 +18,11 @@ import java.awt.event.MouseMotionListener;
  */
 @Deprecated
 public class DragAndDrive extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private JLabel coordinates;
-	private JPanel dragAndDrive;
+	private final Plotter robot;
+	private final JLabel coordinates;
+	private final JPanel dragAndDrive;
 	private boolean mouseInside, mouseOn;
 	private double mouseLastX, mouseLastY;
-	private Plotter robot;
 	
 	DragAndDrive(Plotter robot) {
 		super(new GridBagLayout());

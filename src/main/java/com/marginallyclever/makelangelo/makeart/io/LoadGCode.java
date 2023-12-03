@@ -79,11 +79,8 @@ public class LoadGCode implements TurtleLoader {
 				double ni = nx;
 				double nj = ny;
 
-				boolean codeFound=false;
-
 				String mCodeToken=tokenExists("M",tokens);
 				if(mCodeToken!=null) {
-					codeFound=true;
 					int mCode = Integer.parseInt(mCodeToken.substring(1));
 					switch(mCode) {
 					case 6:
@@ -107,89 +104,81 @@ public class LoadGCode implements TurtleLoader {
 						// ignore all others
 						break;
 					}
+					continue;
 				}
 
-				if(!codeFound) {
-					String gCodeToken=tokenExists("G",tokens);
-					if(gCodeToken!=null) {
-						int gCode = Integer.parseInt(gCodeToken.substring(1));
-						switch(gCode) {
-						case 20: scaleXY=25.4;  break;  // in -> mm
-						case 21: scaleXY= 1.0;  break;  // mm
-						case 90: isAbsolute=true;	break;  // absolute mode
-						case 91: isAbsolute=false;	break;  // relative mode
-						default:
-							break;
+				String gCodeToken=tokenExists("G",tokens);
+				if(gCodeToken!=null) {
+					int gCode = Integer.parseInt(gCodeToken.substring(1));
+					switch(gCode) {
+					case 20: scaleXY=25.4;  break;  // in -> mm
+					case 21: scaleXY= 1.0;  break;  // mm
+					case 90: isAbsolute=true;	break;  // absolute mode
+					case 91: isAbsolute=false;	break;  // relative mode
+					default:
+						break;
+					}
+
+					if( gCode==28 ) {
+						// TODO set to machine home position.
+						nx = ni = 0;
+						ny = nj = 0;
+						continue;
+					}
+
+					nx = parseScaled(tokens,"X",nx,scaleXY,isAbsolute);
+					ny = parseScaled(tokens,"Y",ny,scaleXY,isAbsolute);
+					nz = parseUnscaled(tokens,nz,isAbsolute);
+
+					if(gCode==0 || gCode==1) {
+						if(nz!=oz) {
+							// z change
+							if(turtle.isUp()) turtle.penDown();
+							else turtle.penUp();
+							oz=nz;
 						}
-
-						if(tokenExists("X",tokens)!=null) {
-							double v = Float.parseFloat(tokenExists("X",tokens).substring(1)) * scaleXY;
-							nx = isAbsolute ? v : nx+v;
-						}
-						if(tokenExists("Y",tokens)!=null) {
-							double v = Float.parseFloat(tokenExists("Y",tokens).substring(1)) * scaleXY;
-							ny = isAbsolute ? v : ny+v;
-						}
-						if(tokenExists("Z",tokens)!=null) {
-							double v = Float.parseFloat(tokenExists("Z",tokens).substring(1));  // do not scale
-							nz = isAbsolute ? v : nz+v;
-						}
-						if(tokenExists("I",tokens)!=null) {
-							double v = Float.parseFloat(tokenExists("I",tokens).substring(1)) * scaleXY;
-							ni = isAbsolute ? v : ni+v;
-						}
-						if(tokenExists("J",tokens)!=null) {
-							double v = Float.parseFloat(tokenExists("J",tokens).substring(1)) * scaleXY;
-							nj = isAbsolute ? v : nj+v;
-						}
-
-						if(gCode==0 || gCode==1) {
-							if(nz!=oz) {
-								// z change
-								if(turtle.isUp()) turtle.penDown();
-								else turtle.penUp();
-								oz=nz;
-							}
-							if(nx!=ox || ny!=oy) {
-								turtle.moveTo(nx, ny);
-								ox=nx;
-								oy=ny;
-							}
-						} else if(gCode==2 || gCode==3) {
-							// arc
-							int dir = (gCode==2) ? -1 : 1;
-
-							double dx = ox - ni;
-							double dy = oy - nj;
-							double radius = Math.sqrt(dx * dx + dy * dy);
-
-							// find angle of arc (sweep)
-							double angle1 = atan3(dy, dx);
-							double angle2 = atan3(ny - nj, nx - ni);
-							double theta = angle2 - angle1;
-
-							if (dir > 0 && theta < 0) angle2 += Math.PI * 2.0;
-							else if (dir < 0 && theta > 0) angle1 += Math.PI * 2.0;
-
-							theta = angle2 - angle1;
-
-							double len = Math.abs(theta) * radius;
-							double angle3, scale;
-
-							// TODO turtle support for arcs
-							// Draw the arc from a lot of little line segments.
-							for(double k = 0; k < len; k++) {
-								scale = k / len;
-								angle3 = theta * scale + angle1;
-								double ix = ni + Math.cos(angle3) * radius;
-								double iy = nj + Math.sin(angle3) * radius;
-
-								turtle.moveTo(ix,iy);
-							}
-							turtle.moveTo(nx,ny);
+						if(nx!=ox || ny!=oy) {
+							turtle.moveTo(nx, ny);
 							ox=nx;
 							oy=ny;
 						}
+					} else if(gCode==2 || gCode==3) {
+						// arc
+						int dir = (gCode==2) ? -1 : 1;
+						ni = parseScaled(tokens,"I",nx,scaleXY,isAbsolute);
+						nj = parseScaled(tokens,"J",ny,scaleXY,isAbsolute);
+
+						double dx = ox - ni;
+						double dy = oy - nj;
+						double radius = Math.sqrt(dx * dx + dy * dy);
+
+						// find angle of arc (sweep)
+						double angle1 = atan3(dy, dx);
+						double angle2 = atan3(ny - nj, nx - ni);
+						double theta = angle2 - angle1;
+
+						if (dir > 0 && theta < 0) angle2 += Math.PI * 2.0;
+						else if (dir < 0 && theta > 0) angle1 += Math.PI * 2.0;
+
+						theta = angle2 - angle1;
+
+						double len = Math.abs(theta) * radius;
+						double angle3, scale;
+
+						// TODO turtle support for arcs
+						// Draw the arc from a lot of little line segments.
+						for(double k = 0; k < len; k++) {
+							scale = k / len;
+							angle3 = theta * scale + angle1;
+							double ix = ni + Math.cos(angle3) * radius;
+							double iy = nj + Math.sin(angle3) * radius;
+
+							turtle.moveTo(ix,iy);
+						}
+						turtle.moveTo(nx,ny);
+						ox=nx;
+						oy=ny;
+						continue;
 					}
 					// else do nothing.
 				}
@@ -200,5 +189,21 @@ public class LoadGCode implements TurtleLoader {
 		}
 
 		return turtle;
+	}
+
+	private double parseUnscaled(String[] tokens, double nz, boolean isAbsolute) {
+		if(tokenExists("Z",tokens)!=null) {
+			double v = Float.parseFloat(tokenExists("Z",tokens).substring(1));  // do not scale
+			nz = isAbsolute ? v : nz+v;
+		}
+		return nz;
+	}
+
+	private double parseScaled(String[] tokens, String key,double nx, double scaleXY, boolean isAbsolute) {
+		if(tokenExists(key,tokens)!=null) {
+			double v = Float.parseFloat(tokenExists(key,tokens).substring(1)) * scaleXY;
+			nx = isAbsolute ? v : nx+v;
+		}
+		return nx;
 	}
 }
