@@ -20,7 +20,7 @@ public class LanguagePreferences {
 	static private SelectOneOfMany languageOptions;
 	
 	
-	static SelectPanel buildPanel() {	
+	static SelectPanel buildPanel() {
 		int currentIndex = Translator.getCurrentLanguageIndex();
 		languageOptions = new SelectOneOfMany("language","Language",languageList,currentIndex);
 		
