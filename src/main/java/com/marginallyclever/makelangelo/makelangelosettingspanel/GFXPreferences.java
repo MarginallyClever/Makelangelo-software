@@ -59,7 +59,7 @@ public class GFXPreferences {
 		GFXPreferences.addListener((e)->{
 			showPenUp.setSelected((boolean)e.getNewValue());
 		});
-		showPenUp.addPropertyChangeListener((e)->{
+		showPenUp.addSelectListener((e)->{
 			GFXPreferences.setShowPenUp((boolean)e.getNewValue());
 		});
 

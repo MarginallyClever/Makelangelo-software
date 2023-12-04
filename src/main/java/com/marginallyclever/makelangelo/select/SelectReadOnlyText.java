@@ -18,11 +18,11 @@ import java.net.URISyntaxException;
  * @since 7.24.0
  */
 public class SelectReadOnlyText extends Select {
-	
 	private static final Logger logger = LoggerFactory.getLogger(SelectReadOnlyText.class);
 
 	public SelectReadOnlyText(String internalName,String labelKey) {
 		super(internalName);
+
 		JEditorPane jEdPane = createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse("<html>" + labelKey + "</html>");
 		this.add(jEdPane,BorderLayout.CENTER);
 	}
@@ -38,37 +38,41 @@ public class SelectReadOnlyText extends Select {
 		createdJEditorPane.setOpaque(false);
 		createdJEditorPane.setContentType("text/html");
 		createdJEditorPane.setText(sToSetAsTextToTheHtmlEditorPane);
-		createdJEditorPane.addHyperlinkListener((HyperlinkEvent hyperlinkEvent) -> {
-			HyperlinkEvent.EventType eventType = hyperlinkEvent.getEventType();
-			if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
-				if (Desktop.isDesktopSupported()) {
-					try {
-						URI u = hyperlinkEvent.getURL().toURI();
-						Desktop desktop = Desktop.getDesktop();
-						if ( desktop.isSupported(Desktop.Action.BROWSE)){
-							logger.debug("Desktop.Action.BROWSE {}", u);
-							desktop.browse(u);
-						}else{
-							logger.error("Desktop.Action.BROWSE not supported. Cant browse {}", u);
-						}
-					} catch (IOException | URISyntaxException e) {
-						logger.error("Failed to open the browser to the url", e);
-					}
-				}else{
-					logger.error("Desktop not supported. Cant browse {}", hyperlinkEvent.getURL());
-				}
-			}
-			else if ( eventType == HyperlinkEvent.EventType.ENTERED ){
-				if( !(hyperlinkEvent.getURL() == null || hyperlinkEvent.getURL().toString().isEmpty() ) ) {
-					createdJEditorPane.setToolTipText(hyperlinkEvent.getURL().toExternalForm());
-					ToolTipManager.sharedInstance().setInitialDelay(0);// TODO sould be set at the starting of the application
-					ToolTipManager.sharedInstance().setDismissDelay(5000);// TODO sould be set at the starting of the application
-				}
-			}
-			else if ( eventType == HyperlinkEvent.EventType.EXITED ){
-				createdJEditorPane.setToolTipText(null);// null to turn off the tooltips.
-			}
-		});
+		createdJEditorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+		createdJEditorPane.setFont(UIManager.getFont("Label.font"));
+		createdJEditorPane.addHyperlinkListener((HyperlinkEvent hyperlinkEvent) -> reactToHyperlink(hyperlinkEvent,createdJEditorPane));
 		return createdJEditorPane;
+	}
+
+	private static void reactToHyperlink(HyperlinkEvent hyperlinkEvent,JEditorPane createdJEditorPane) {
+		HyperlinkEvent.EventType eventType = hyperlinkEvent.getEventType();
+		if(eventType == HyperlinkEvent.EventType.ACTIVATED) {
+			if (Desktop.isDesktopSupported()) {
+				try {
+					URI u = hyperlinkEvent.getURL().toURI();
+					Desktop desktop = Desktop.getDesktop();
+					if (desktop.isSupported(Desktop.Action.BROWSE)) {
+						logger.debug("Desktop.Action.BROWSE {}", u);
+						desktop.browse(u);
+					} else {
+						logger.error("Desktop.Action.BROWSE not supported. Cant browse {}", u);
+					}
+				} catch (IOException | URISyntaxException e) {
+					logger.error("Failed to open the browser to the url", e);
+				}
+			} else {
+				logger.error("Desktop not supported. Cant browse {}", hyperlinkEvent.getURL());
+			}
+		} else if(eventType == HyperlinkEvent.EventType.ENTERED) {
+			if (!(hyperlinkEvent.getURL() == null || hyperlinkEvent.getURL().toString().isEmpty())) {
+				createdJEditorPane.setToolTipText(hyperlinkEvent.getURL().toExternalForm());
+
+				// TODO should be set at the starting of the application
+				ToolTipManager.sharedInstance().setInitialDelay(0);
+				ToolTipManager.sharedInstance().setDismissDelay(5000);
+			}
+		} else if(eventType == HyperlinkEvent.EventType.EXITED) {
+			createdJEditorPane.setToolTipText(null);// null to turn off the tooltips.
+		}
 	}
 }

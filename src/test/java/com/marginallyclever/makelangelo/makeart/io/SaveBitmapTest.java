@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
@@ -91,7 +92,7 @@ public class SaveBitmapTest {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
             // when
             SaveBitmap save = new SaveBitmap(extension, supportAlpha);
-            save.save(fileOutputStream, turtle);
+            save.save(fileOutputStream, turtle, PlotterSettingsManager.buildMakelangelo5());
             fileOutputStream.close();
 
             // then

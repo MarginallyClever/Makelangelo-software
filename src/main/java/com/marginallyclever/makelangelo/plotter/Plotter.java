@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * @since 7.2.10
  */
 public class Plotter implements PreviewListener, Cloneable {	
-	private PlotterSettings settings = new PlotterSettings();
+	private PlotterSettings settings = new PlotterSettings("Makelangelo 5");
 
 	// are motors actively engaged?  when disengaged pen can drift and re-homing is required.
 	private boolean areMotorsEngaged = true;
@@ -193,10 +193,10 @@ public class Plotter implements PreviewListener, Cloneable {
 		gl2.glColor3f(0.9f, 0.9f, 0.9f); // #color 
 		
 		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitTop());
-		gl2.glVertex2d(settings.getLimitRight(), settings.getLimitBottom());
-		gl2.glVertex2d(settings.getLimitLeft(), settings.getLimitBottom());
+		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_TOP));
+		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_TOP));
+		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
+		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
 		gl2.glEnd();
 	}
 
@@ -218,61 +218,5 @@ public class Plotter implements PreviewListener, Cloneable {
 			requestUserChangeTool((int)move.x);
 			break;
 		}
-	}
-
-	/**
-	 * @return the angle the pen holder servo should be at when the pen is up.
-	 */
-	public double getPenUpAngle() {
-		return settings.getPenUpAngle();
-	}
-
-	/**
-	 * @return the angle the pen holder servo should be at when the pen is down.
-	 */
-	public double getPenDownAngle() {
-		return settings.getPenDownAngle();
-	}
-
-	/**
-	 * @return the time it should take to move the pen lift servo from down position to up position.
-	 */
-	public double getPenLiftTime() {
-		return settings.getPenLiftTime();
-	}
-
-	/**
-	 * @return the time it should take to move the pen lift servo from down position to up position.
-	 */
-	public double getPenLowerTime() {
-		return settings.getPenLowerTime();
-	}
-
-	/**
-	 * @return the top physical limit of the drawing area.
-	 */
-	public double getLimitTop() {
-		return settings.getLimitTop();
-	}
-
-	/**
-	 * @return the bottom physical limit of the drawing area.
-	 */
-	public double getLimitBottom() {
-		return settings.getLimitBottom();
-	}
-
-	/**
-	 * @return the left physical limit of the drawing area.
-	 */
-	public double getLimitLeft() {
-		return settings.getLimitLeft();
-	}
-
-	/**
-	 * @return the right physical limit of the drawing area.
-	 */
-	public double getLimitRight() {
-		return settings.getLimitRight();
 	}
 }

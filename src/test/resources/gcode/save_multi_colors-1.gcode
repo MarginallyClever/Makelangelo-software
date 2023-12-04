@@ -4,7 +4,8 @@
 ;MAXX:12.000
 ;MAXY:18.000
 ;Start of user gcode
-
+M300
+M200
 ;End of user gcode
 G28 X Y
 M280 P0 S90 T50
@@ -22,6 +23,7 @@ M280 P0 S25 T50
 G1 X6.000 Y10.000 F3000.0
 M280 P0 S90 T50
 ;Start of user gcode
-
+M400
+M200
 ;End of user gcode
 ;End of Gcode

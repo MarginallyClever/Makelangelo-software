@@ -271,6 +271,9 @@ public final class Translator {
 		currentLanguageContainer = languages.get(language);
 	}
 
+	/**
+	 * @return the index of the current language
+	 */
 	public static int getCurrentLanguageIndex() {
 		String [] set = getLanguageList();
 		// find the current language

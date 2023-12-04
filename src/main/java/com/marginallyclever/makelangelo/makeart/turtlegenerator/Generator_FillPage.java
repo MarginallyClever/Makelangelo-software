@@ -6,6 +6,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * Completely fills the page with ink.
  * @author Dan Royer
@@ -16,16 +18,16 @@ public class Generator_FillPage extends TurtleGenerator {
 
 	public Generator_FillPage() {
 		super();
-		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),Generator_FillPage.getAngle());
-		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),Generator_FillPage.getPenDiameter());
+		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),angle);
+		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),penDiameter);
 		add(selectAngle);
 		add(selectPenDiameter);
-		selectAngle.addPropertyChangeListener(evt->{
-			Generator_FillPage.setAngle(selectAngle.getValue());
+		selectAngle.addSelectListener(evt->{
+			angle = selectAngle.getValue();
 			generate();
 		});
-		selectPenDiameter.addPropertyChangeListener(evt->{
-			Generator_FillPage.setPenDiameter(selectPenDiameter.getValue());
+		selectPenDiameter.addSelectListener(evt->{
+			penDiameter = selectPenDiameter.getValue();
 			generate();
 
 		});
@@ -36,42 +38,28 @@ public class Generator_FillPage extends TurtleGenerator {
 		return Translator.get("FillPageName");
 	}
 
-	static public double getAngle() {
-		return angle;
-	}
-	static public void setAngle(double value) {
-		Generator_FillPage.angle = value;
-	}
-	
-	public static double getPenDiameter() {
-		return penDiameter;
-	}
-
-	public static void setPenDiameter(double penDiameter) {
-		Generator_FillPage.penDiameter = penDiameter;
-	}
-
 	@Override
 	public void generate() {
 		double majorX = Math.cos(Math.toRadians(angle));
 		double majorY = Math.sin(Math.toRadians(angle));
 
 		// from top to bottom of the margin area...
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
-		double dy = (yTop - yBottom)/2;
-		double dx = (xRight - xLeft)/2;
-		double radius = Math.sqrt(dx*dx+dy*dy);
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double yMin = rect.getMinY();
+		double yMax = rect.getMaxY();
+		double xMin = rect.getMinX();
+		double xMax = rect.getMaxX();
+		double height = rect.getHeight();
+		double width = rect.getWidth();
+		double radius = Math.sqrt(width*width+height*height)/2;
 
 		Turtle turtle = new Turtle();
 		turtle.setDiameter(penDiameter);
 		Point2D P0=new Point2D();
 		Point2D P1=new Point2D();
 
-		Point2D rMax = new Point2D(xRight,yTop);
-		Point2D rMin = new Point2D(xLeft,yBottom);
+		Point2D rMax = new Point2D(xMax,yMax);
+		Point2D rMin = new Point2D(xMin,yMin);
 		
 		int i=0;
 		if ( penDiameter > 0 ){
@@ -79,9 +67,9 @@ public class Generator_FillPage extends TurtleGenerator {
 				double majorPX = majorX * a;
 				double majorPY = majorY * a;
 				P0.set( majorPX - majorY * radius,
-								majorPY + majorX * radius);
+						majorPY + majorX * radius);
 				P1.set( majorPX + majorY * radius,
-								majorPY - majorX * radius);
+						majorPY - majorX * radius);
 				if(Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 					if ((i % 2) == 0) 	{
 						turtle.moveTo(P0.x,P0.y);
@@ -97,6 +85,8 @@ public class Generator_FillPage extends TurtleGenerator {
 			}
 		}
 		// else throw error message "penDiameter must be greater than zero."
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

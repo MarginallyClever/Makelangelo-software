@@ -5,8 +5,8 @@ import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 /**
- * Interface for a TurtleRenderer.  A {@link TurtleRenderer} is a class that can draw a
- * {@link com.marginallyclever.makelangelo.turtle.Turtle} in a given style.
+ * {@link TurtleRenderer} is an interface class that can draw a
+ * {@link com.marginallyclever.makelangelo.turtle.Turtle} in a specific style.
  */
 public interface TurtleRenderer {
 	void start(GL2 gl2);
@@ -23,5 +23,14 @@ public interface TurtleRenderer {
 	
 	void setPenDiameter(double d);
 
+	/**
+	 * @return the name of this renderer, translated into the current language.
+	 */
 	String getTranslatedName();
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	void reset();
 }

@@ -22,7 +22,7 @@ import java.awt.*;
 public class ProgramPanel extends JPanel {
 	private final Plotter myPlotter;
 	private final Turtle myTurtle;
-	private final DefaultListModel<TurtleMove> listModel = new DefaultListModel<TurtleMove>();
+	private final DefaultListModel<TurtleMove> listModel = new DefaultListModel<>();
 	private final JList<TurtleMove> listView = new JList<>(listModel);
 
 	public ProgramPanel(Plotter plotter, Turtle turtle) {
@@ -49,17 +49,15 @@ public class ProgramPanel extends JPanel {
 	}
 
 	private void createCellRenderingSystem() {
-		listView.setCellRenderer(new ListCellRenderer<TurtleMove>() {
-			private DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+		listView.setCellRenderer(new ListCellRenderer<>() {
+			private final DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
 			@Override
 			public Component getListCellRendererComponent(JList<? extends TurtleMove> list, TurtleMove value, int index,
 					boolean isSelected, boolean cellHasFocus) {
-				Component c = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected,
-						cellHasFocus);
+				Component c = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-				if (c instanceof JLabel) {
-					JLabel jc = (JLabel) c;
+				if (c instanceof JLabel jc) {
 					jc.setText(value.toString());
 				}
 				return c;

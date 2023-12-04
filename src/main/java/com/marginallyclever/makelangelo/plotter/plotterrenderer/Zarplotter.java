@@ -30,10 +30,10 @@ public class Zarplotter implements PlotterRenderer {
 		double gx = pos.x;
 		double gy = pos.y;
 
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
 		gl2.glEnable(GL2.GL_BLEND);
 		gl2.glBlendFunc(GL2.GL_SRC_ALPHA,GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -75,11 +75,11 @@ public class Zarplotter implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	private void paintMotors(GL2 gl2,Plotter robot) {
-		double top = robot.getLimitTop();
-		double bottom = robot.getLimitBottom();
-		double right = robot.getLimitRight();
-		double left = robot.getLimitLeft();
+	private void paintMotors(GL2 gl2,Plotter plotter) {
+		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 
 		gl2.glPushMatrix();		gl2.glTranslated(left , top   , 0);		gl2.glRotated(270, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
@@ -110,8 +110,8 @@ public class Zarplotter implements PlotterRenderer {
 		gl2.glEnd();
 	}
 	
-	private void paintControlBox(GL2 gl2,Plotter robot) {
-		double cy = robot.getLimitTop();
+	private void paintControlBox(GL2 gl2,Plotter plotter) {
+		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -202,7 +202,7 @@ public class Zarplotter implements PlotterRenderer {
 	}
 
 	@Override
-	public float getPenLiftTime() {
+	public float getDouble(PlotterSettings.PEN_ANGLE_UP_TIME) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

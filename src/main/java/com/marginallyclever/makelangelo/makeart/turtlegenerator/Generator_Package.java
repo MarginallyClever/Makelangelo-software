@@ -22,17 +22,17 @@ public class Generator_Package extends TurtleGenerator {
 		SelectInteger height;
 
 		add(width = new SelectInteger("width",Translator.get("Width"),getLastWidth()));
-		width.addPropertyChangeListener(evt->{
+		width.addSelectListener(evt->{
 			setWidth(((Number)width.getValue()).intValue());
 			generate();
 		});
 		add(height = new SelectInteger("height",Translator.get("Height"),getLastHeight()));
-		height.addPropertyChangeListener(evt->{
+		height.addSelectListener(evt->{
 			setHeight(((Number)height.getValue()).intValue());
 			generate();
 		});
 		add(length = new SelectInteger("length",Translator.get("Length"),getLastLength()));
-		length.addPropertyChangeListener(evt->{
+		length.addSelectListener(evt->{
 			setLength(((Number)length.getValue()).intValue());
 			generate();
 		});
@@ -103,6 +103,8 @@ public class Generator_Package extends TurtleGenerator {
 		drawRect(turtle,x2+20,y6-1,x3-20,y6+1); // lasche
 		drawRect(turtle,x2,y5-1,x3,y5+1); // lasche
 		drawRect(turtle,x2+20,y1,x3-20,y2); // lasche
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}

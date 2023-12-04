@@ -1,7 +1,10 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -11,8 +14,8 @@ public class SaveTurtle extends Node {
 
     private static final Logger logger = LoggerFactory.getLogger(SaveTurtle.class);
 
-    private final NodeVariable<String> filename = NodeVariable.newInstance("filename",String.class,null,true,false);
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
+    private final DockReceiving<String> filename = new DockReceiving<>("filename",String.class,null);
+    private final DockShipping<Turtle> turtle = new DockShipping<>("turtle", Turtle.class,new Turtle());
 
     public SaveTurtle() {
         super("SaveTurtle");
@@ -21,12 +24,14 @@ public class SaveTurtle extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
+        if(filename.hasPacketWaiting()) filename.receive();
+
         if(filename.getValue().isEmpty()) return;
 
         try {
-            TurtleFactory.save(turtle.getValue(),filename.getValue());
-            cleanAllInputs();
+            PlotterSettings settings = PlotterSettingsManager.buildMakelangelo5();
+            TurtleFactory.save(turtle.getValue(),filename.getValue(),settings);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

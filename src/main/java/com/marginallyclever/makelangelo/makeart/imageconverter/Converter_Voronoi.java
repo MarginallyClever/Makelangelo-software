@@ -5,11 +5,11 @@ import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
@@ -20,54 +20,59 @@ import org.slf4j.LoggerFactory;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Random;
 
 /**
  * Shared methods for Voronoi converters
  * @author Dan Royer
  * @since 7.39.9
  */
-public abstract class Converter_Voronoi extends ImageConverterIterative implements PreviewListener {
+public abstract class Converter_Voronoi extends ImageConverterIterative {
     private static final Logger logger = LoggerFactory.getLogger(Converter_Voronoi.class);
     private static int numCells = 9000;
     private static boolean drawVoronoi = false;
 
     private final VoronoiTesselator2 voronoiDiagram = new VoronoiTesselator2();
     protected final List<VoronoiCell> cells = new ArrayList<>();
-
-    protected final Lock lock = new ReentrantLock();
-
     private int iterations;
-
     private int lowpassCutoff = 128;
     private int cellBuffer = 100;
+    private static int seed=0;
+    private static final Random random = new Random();
 
 
     public Converter_Voronoi() {
         super();
 
+        SelectRandomSeed selectRandomSeed = new SelectRandomSeed("randomSeed",Translator.get("Generator.randomSeed"),seed);
+        add(selectRandomSeed);
+        selectRandomSeed.addSelectListener(evt->{
+            seed = (int)evt.getNewValue();
+            random.setSeed(seed);
+            fireRestart();
+        });
+        
         SelectInteger selectCells = new SelectInteger("cells",Translator.get("Converter_VoronoiStippling.CellCount"),getNumCells());
         add(selectCells);
-        selectCells.addPropertyChangeListener(evt->{
+        selectCells.addSelectListener(evt->{
             setNumCells((int)evt.getNewValue());
             fireRestart();
         });
 
         SelectBoolean selectDrawVoronoi = new SelectBoolean("drawVoronoi", Translator.get("Converter_VoronoiStippling.DrawBorders"), getDrawVoronoi());
         add(selectDrawVoronoi);
-        selectDrawVoronoi.addPropertyChangeListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
+        selectDrawVoronoi.addSelectListener(evt -> setDrawVoronoi((boolean) evt.getNewValue()));
 
         SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getLowpassCutoff());
         add(selectCutoff);
-        selectCutoff.addPropertyChangeListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
+        selectCutoff.addSelectListener(evt-> setLowpassCutoff((int)evt.getNewValue()));
     }
 
     @Override
     public void start(Paper paper, TransformedImage image) {
         // make black & white
-        Filter_Greyscale bw = new Filter_Greyscale(255);
-        super.start(paper, bw.filter(image));
+        FilterDesaturate bw = new FilterDesaturate(image);
+        super.start(paper, bw.filter());
 
         lock.lock();
         try {
@@ -75,19 +80,20 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
 
             iterations=0;
 
-            Rectangle2D bounds = myPaper.getMarginRectangle();
+            Rectangle2D bounds = paper.getMarginRectangle();
+
             cells.clear();
             int i=0;
-            while(i<numCells) {
-                double x = Math.random()*bounds.getWidth()+bounds.getMinX();
-                double y = Math.random()*bounds.getHeight()+bounds.getMinY();
+            do {
+                double x = random.nextDouble() * bounds.getWidth()+bounds.getMinX();
+                double y = random.nextDouble() * bounds.getHeight()+bounds.getMinY();
                 if(image.canSampleAt(x,y)) {
-                    if(image.sample1x1Unchecked(x,y) < Math.random()*255) {
+                    if(image.sample1x1Unchecked(x,y) < random.nextDouble()*255) {
                         cells.add( new VoronoiCell(x,y) );
                         i++;
                     }
                 }
-            }
+            } while(i<numCells);
             voronoiDiagram.setNumHulls(numCells);
         }
         finally {
@@ -242,6 +248,11 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
     protected void renderEdges(GL2 gl2) {
         gl2.glColor3d(0.9, 0.9, 0.9);
 
+        double cx = myPaper.getCenterX();
+        double cy = myPaper.getCenterY();
+        gl2.glPushMatrix();
+        gl2.glTranslated(cx, cy, 0);
+
         for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
             Polygon poly = voronoiDiagram.getHull(i);
             gl2.glBegin(GL2.GL_LINE_LOOP);
@@ -250,6 +261,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative implemen
             }
             gl2.glEnd();
         }
+        gl2.glPopMatrix();
     }
 
     public void setNumCells(int value) {

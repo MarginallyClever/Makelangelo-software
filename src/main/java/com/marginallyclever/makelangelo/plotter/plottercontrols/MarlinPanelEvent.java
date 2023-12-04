@@ -34,6 +34,11 @@ public class MarlinPanelEvent {
      * There should have been news and very likely the connection has failed.
      */
     public static final int COMMUNICATION_FAILURE = 6;
+    public static final String HALTED_COMMAND = "Printer halted";
+    public static final String HOME_XY_COMMAND = "homeXYFirst";
+    public static final String COMMUNICATION_COMMAND = "communicationFailure";
+    public static final String DID_NOT_FIND_COMMAND = "didNotFind";
+    public static final String IDLE_COMMAND = "idle";
 
     private final Object source;
     private final int id;

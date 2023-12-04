@@ -32,12 +32,11 @@ public class SelectColor extends Select {
 		chooseButton.setSize(chooseButton.getMinimumSize());
 		chooseButton.setBackground(new Color(defaultValue.toInt()));
 		chooseButton.setBorder(new LineBorder(Color.BLACK));
-
 		chooseButton.addActionListener(e -> {
 			Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
 			if ( c != null ){
 				chooseButton.setBackground(c);
-				firePropertyChange(null,c);
+				fireSelectEvent(null,c);
 			}
 		});
 

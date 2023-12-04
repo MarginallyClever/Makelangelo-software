@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MarlinPanelTest {
-
     @BeforeAll
     public static void init() {
         PreferencesHelper.start();

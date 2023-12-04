@@ -20,8 +20,9 @@ public class SelectToggleButton extends Select {
 		super(internalName);
 		
 		button = new JToggleButton(labelText);
+
 		button.addActionListener((e) -> {
-			firePropertyChange(null,null);
+			fireSelectEvent(!button.isSelected(),button.isSelected());
 		});
 
 		this.add(button,BorderLayout.CENTER);

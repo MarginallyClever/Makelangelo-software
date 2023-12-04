@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationVisualizer;
-
 import java.util.Arrays;
 
 /**
@@ -14,6 +12,7 @@ public enum TurtleRenderFactory {
 	DEFAULT("Default", new DefaultTurtleRenderer()),
 	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
 	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
+	DIRECTION_LOOP("Direction loops",new DirectionLoopTurtleRenderer()),
 	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
 
 	private final TurtleRenderer turtleRenderer;

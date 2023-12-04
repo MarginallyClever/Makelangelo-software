@@ -34,11 +34,11 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 
 		SelectSlider selectMax = new SelectSlider("max", Translator.get("Converter_VoronoiStippling.DotMax"), 50,1, (int)(getMaxDotSize()*10));
 		add(selectMax);
-		selectMax.addPropertyChangeListener(evt -> setMaxDotSize((int)evt.getNewValue()*0.1));
+		selectMax.addSelectListener(evt -> setMaxDotSize((int)evt.getNewValue()*0.1));
 
 		SelectSlider selectMin = new SelectSlider("min", Translator.get("Converter_VoronoiStippling.DotMin"), 50,1, (int)(getMinDotSize()*10));
 		add(selectMin);
-		selectMin.addPropertyChangeListener(evt -> setMinDotSize((int)evt.getNewValue()*0.1));
+		selectMin.addSelectListener(evt -> setMinDotSize((int)evt.getNewValue()*0.1));
 	}
 	
 	@Override
@@ -65,6 +65,11 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;
 
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
+		gl2.glPushMatrix();
+		gl2.glTranslated(cx,cy,0);
+
 		lock.lock();
 		try {
 			renderDots(gl2);
@@ -72,6 +77,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		finally {
 			lock.unlock();
 		}
+
+		gl2.glPopMatrix();
 	}
 
 	private void drawCircle(GL2 gl2,double x, double y, double r) {
@@ -89,6 +96,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	private void renderDots(GL2 gl2) {
 		int lpc = getLowpassCutoff();
 		double scale = (maxDotSize-minDotSize)/255.0;
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 
 		for( VoronoiCell c : cells ) {
 			if(c.weight<lpc) continue;
@@ -107,12 +116,14 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	public void writeOutCells() {
 		int lpc = getLowpassCutoff();
 		double scale = (maxDotSize-minDotSize)/255.0;
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 
 		for( VoronoiCell c : cells ) {
 			if(c.weight<lpc) continue;
 			double r = (c.weight-lpc) * scale;
-			double x = c.center.x;
-			double y = c.center.y;
+			double x = cx + c.center.x;
+			double y = cy + c.center.y;
 			turtleCircle(x, y, r);
 		}
 	}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language>
+<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
 	<meta>
 		<name>English_NO_DUP</name>
 		<author>TEST_SET_NO_DUP_KEY</author>
@@ -9,24 +9,20 @@
 	<string>
 		<key>KEY_A</key>
 		<value>...</value>
-                <hint></hint>
 	</string>
 
 	<string>
 		<key>KEY_B</key>
 		<value>...</value>
-                <hint></hint>
 	</string>
 
 	<string>
 		<key>BorderName</key>
 		<value>Outline paper</value>
-		<hint>Border generator</hint>
 	</string>
 
 	<string>
 		<key>LissajousName</key>
 		<value>Lissajous</value>
-		<hint>Lissajous generator</hint>
 	</string>
 </language>

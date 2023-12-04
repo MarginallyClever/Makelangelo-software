@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class LoadDXF implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadDXF.class);
-	
+	public static final double EPSILON = 0.01;
 	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("DXF R12", "dxf");
 	private final Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
@@ -59,7 +59,7 @@ public class LoadDXF implements TurtleLoader {
 		while (layerItr.hasNext()) {
 			DXFLayer layer = (DXFLayer)layerItr.next();
 			int color = layer.getColor();
-			logger.debug("Found layer {}(color index={})", layer.getName(), color);
+			logger.debug("Found layer {} (color index={})", layer.getName(), color);
 			
 			// Some DXF layers are empty.  Only write the tool change command if there's something on this layer.
 			Iterator<?> entityTypeItr = layer.getDXFEntityTypeIterator();
@@ -94,71 +94,24 @@ public class LoadDXF implements TurtleLoader {
 			}
 		}
 	}
-
-	private double TX(double x) {
-		return x;
-	}
-	
-	private double TY(double y) {
-		return y;
-	}
 	
 	private void parseDXFLine(DXFLine entity) {
 		Point start = entity.getStartPoint();
-		Point end = entity.getEndPoint();
-
-		double x = TX(start.getX());
-		double y = TY(start.getY());
-		double x2 = TX(end.getX());
-		double y2 = TY(end.getY());
-			
-		// which end is closer to the previous point?
-		double dx = previousX - x;
-		double dy = previousY - y;
-		double dx2 = previousX - x2;
-		double dy2 = previousY - y2;
-		if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-			parseDXFLineEnds(x,y,x2,y2);
-		} else {
-			parseDXFLineEnds(x2,y2,x,y);
+		double x = start.getX();
+		double y = start.getY();
+		if(Math.abs(x-previousX)>EPSILON || Math.abs(y-previousY)>EPSILON) {
+			myTurtle.jumpTo(TX(x), TY(y));
 		}
-	}
-	
-	private void parseDXFLineEnds(double x,double y,double x2,double y2) {
-		myTurtle.jumpTo(x,y);
-		myTurtle.moveTo(x2,y2);
+
+		Point end = entity.getEndPoint();
+		double x2 = end.getX();
+		double y2 = end.getY();
+		myTurtle.moveTo(TX(x2),TY(y2));
 		previousX = x2;
 		previousY = y2;
 	}
 
 	private void parseDXFPolyline(DXFPolyline entity) {
-		if(entity.isClosed()) {
-			// only one end to care about
-			parseDXFPolylineForward(entity);
-		} else {
-			// which end is closest to the previous (x,y)?
-			int n = entity.getVertexCount()-1;
-			double x = TX(entity.getVertex(0).getX());
-			double y = TY(entity.getVertex(0).getY());
-			double x2 = TX(entity.getVertex(n).getX());
-			double y2 = TY(entity.getVertex(n).getY());
-
-			// which end is closer to the previous (x,y) ?
-			double dx = x - previousX;
-			double dy = y - previousY;
-			double dx2 = x2 - previousX;
-			double dy2 = y2 - previousY;
-			if ( dx * dx + dy * dy < dx2 * dx2 + dy2 * dy2 ) {
-				// first point is closer
-				parseDXFPolylineForward(entity);
-			} else {
-				// last point is closer
-				parseDXFPolylineBackward(entity);
-			}
-		}
-	}
-	
-	private void parseDXFPolylineForward(DXFPolyline entity) {
 		boolean first = true;
 		int c = entity.getVertexCount();
 		int count = c + (entity.isClosed()?1:0);
@@ -166,36 +119,30 @@ public class LoadDXF implements TurtleLoader {
 		double x,y;
 		for (int j = 0; j < count; ++j) {
 			v = entity.getVertex(j % c);
-			x = TX(v.getX());
-			y = TY(v.getY());
-			parsePolylineShared(x,y,first,j<count-1);
+			x = v.getX();
+			y = v.getY();
+			drawPolylinePoint(x,y,first);
 			first = false;
 		}
 	}
-	
-	private void parseDXFPolylineBackward(DXFPolyline entity) {
-		boolean first = true;
-		int c = entity.getVertexCount();
-		int count = c + (entity.isClosed()?1:0);
-		DXFVertex v;
-		double x,y;
-		for (int j = 0; j < count; ++j) {
-			v = entity.getVertex((c*2-1-j) % c);
-			x = TX(v.getX());
-			y = TY(v.getY());
-			parsePolylineShared(x,y,first,j<count-1);
-			first = false;
-		}
-	}
-	
-	private void parsePolylineShared(double x,double y,boolean first,boolean notLast) {
+
+	private void drawPolylinePoint(double x, double y, boolean first) {
 		if (first) {
-			myTurtle.jumpTo(x,y);
+			if(Math.abs(x-previousX)>EPSILON || Math.abs(y-previousY)>EPSILON) {
+				myTurtle.jumpTo(TX(x),TY(y));
+			}
 		} else {
-			myTurtle.penDown();
-			myTurtle.moveTo(x,y);
+			myTurtle.moveTo(TX(x),TY(y));
 		}
 		previousX = x;
 		previousY = y;
+	}
+
+	private double TX(double x) {
+		return x;
+	}
+
+	private double TY(double y) {
+		return y;
 	}
 }

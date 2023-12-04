@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import java.io.File;
 public class SaveDialog {
 	private static final Logger logger = LoggerFactory.getLogger(SaveDialog.class);
 	
-	private static JFileChooser fc = new JFileChooser();
+	private static final JFileChooser fc = new JFileChooser();
 	
 	public SaveDialog() {
 		for( FileNameExtensionFilter ff : TurtleFactory.getSaveExtensions() ) {
@@ -24,12 +25,12 @@ public class SaveDialog {
 		fc.setAcceptAllFileFilterUsed(false);
 	}
 	
-	public void run(Turtle t, Window parent) throws Exception {
+	public void run(Turtle t, Window parent, PlotterSettings settings) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String withExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", withExtension);
-			TurtleFactory.save(t,withExtension);
+			TurtleFactory.save(t,withExtension,settings);
 		}
 	}
 

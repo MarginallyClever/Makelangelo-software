@@ -73,17 +73,17 @@ public class Generator_Text extends TurtleGenerator {
 		SelectTextArea text;
 
 		add(fontChoices = new SelectOneOfMany("face",Translator.get("FontFace"),getFontNames(),getLastFont()));
-		fontChoices.addPropertyChangeListener(evt->{
+		fontChoices.addSelectListener(evt->{
 			setFont(fontChoices.getSelectedIndex());
 			generate();
 		});
 		add(size = new SelectInteger("size",Translator.get("TextSize"),getLastSize()));
-		size.addPropertyChangeListener(evt->{
+		size.addSelectListener(evt->{
 			setSize(((Number)size.getValue()).intValue());
 			generate();
 		});
 		add(text = new SelectTextArea("message",Translator.get("TextMessage"),getLastMessage()));
-		text.addPropertyChangeListener(evt->{
+		text.addSelectListener(evt->{
 			setMessage(text.getText());
 			generate();
 		});
@@ -123,20 +123,24 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	protected void setupTransform() {
-		setupTransform(myPaper.getMarginHeight(),myPaper.getMarginWidth());
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		setupTransform(
+				rect.getHeight(),
+				rect.getWidth()
+		);
 	}
 
 
 	protected void setupTransform(double width, double height) {
-		if (width > myPaper.getMarginWidth()) {
-			float resize = (float) myPaper.getMarginWidth() / (float) width;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		if (width > rect.getWidth()) {
+			float resize = (float) rect.getWidth() / (float) width;
 			height *= resize;
-			width = myPaper.getMarginWidth();
+			width = rect.getWidth();
 		}
-		if (height > myPaper.getMarginHeight()) {
-			float resize = (float) myPaper.getMarginHeight() / (float) height;
+		if (height > rect.getHeight()) {
+			float resize = (float) rect.getHeight() / (float) height;
 			width *= resize;
-			//height = myPaper.getMarginHeight();
 		}
 
 		textFindCharsPerLine(width);
@@ -293,6 +297,8 @@ public class Generator_Text extends TurtleGenerator {
 		textSetAlign(Align.CENTER);
 		textSetVAlign(VAlign.MIDDLE);
 		Turtle turtle = writeBeautifulMessage(fontName,lastSize,lastMessage);
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}
@@ -561,11 +567,12 @@ public class Generator_Text extends TurtleGenerator {
 	public void signName() {
 		setupTransform();
 
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		textSetAlign(Align.RIGHT);
 		textSetVAlign(VAlign.BOTTOM);
 		textSetPosition(
-				(float)(myPaper.getMarginWidth() *10.0f),
-				(float)(myPaper.getMarginHeight()*10.0f));
+				(float)(rect.getWidth() *10.0f),
+				(float)(rect.getHeight()*10.0f));
 
 		textSetCharsPerLine(25);
 

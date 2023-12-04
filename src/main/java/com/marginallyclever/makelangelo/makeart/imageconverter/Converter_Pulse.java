@@ -3,12 +3,14 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -32,15 +34,15 @@ public class Converter_Pulse extends ImageConverter {
 		add(selectDirection);
 		add(selectCutoff);
 
-		selectSize.addPropertyChangeListener(evt->{
+		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
-		selectDirection.addPropertyChangeListener(evt->{
+		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int) evt.getNewValue());
 			fireRestart();
 		});
-		selectCutoff.addPropertyChangeListener(evt->{
+		selectCutoff.addSelectListener(evt->{
 			setCutoff((int) evt.getNewValue());
 			fireRestart();
 		});
@@ -73,12 +75,14 @@ public class Converter_Pulse extends ImageConverter {
 	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2D a, Point2D b) {
 		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
 		double len = dir.length();
-		dir.scale(1/len);
+		dir.scale(1.0/len);
 		Point2D ortho = new Point2D(-dir.y,dir.x);
-		
+
+		double cx = myPaper.getCenterX();
+		double cy = myPaper.getCenterY();
 		turtle.jumpTo(
-			a.x + ortho.x*halfStep,
-			a.y + ortho.y*halfStep
+				cx+a.x + ortho.x*halfStep,
+				cy+a.y + ortho.y*halfStep
 		);
 
 		int n=1;
@@ -94,8 +98,8 @@ public class Converter_Pulse extends ImageConverter {
 
 			double px=x + ortho.x * pulseSize * n;
 			double py=y + ortho.y * pulseSize * n;
-			if(z>cutOff) turtle.moveTo(px,py);
-			else turtle.jumpTo(px,py);
+			if(z>cutOff) turtle.moveTo(cx+px,cy+py);
+			else turtle.jumpTo(cx+px,cy+py);
 			n = -n;
 		}
 	}
@@ -107,13 +111,14 @@ public class Converter_Pulse extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
-		
-		double yBottom = myPaper.getMarginBottom();
-		double yTop    = myPaper.getMarginTop()   ;
-		double xLeft   = myPaper.getMarginLeft()  ;
-		double xRight  = myPaper.getMarginRight() ;
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
+
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double xLeft   = rect.getMinX();
+		double yBottom = rect.getMinY();
+		double xRight  = rect.getMaxX();
+		double yTop    = rect.getMaxY();
 		
 		// figure out how many lines we're going to have on this image.
 		double stepSize = blockScale;

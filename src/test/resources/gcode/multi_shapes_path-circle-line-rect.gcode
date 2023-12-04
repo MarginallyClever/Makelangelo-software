@@ -5,7 +5,8 @@
 ;MAXX:92.030
 ;MAXY:133.650
 ; 2022-03-04 at 22:29:49 CET
-G28
+(a comment on its own line)
+G28 (a comment on a line of gcode)
 M280 P0 S90 T50
 M0 Ready black and click
 M280 P0 S90 T50

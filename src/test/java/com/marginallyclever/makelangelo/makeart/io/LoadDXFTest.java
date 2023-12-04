@@ -60,14 +60,9 @@ public class LoadDXFTest {
 
     private void verifyLoadDXF(String filenameToTest, String fileExpected) {
         try {
-
-            // given
             TurtleLoader loader = new LoadDXF();
-
-            // when
             Turtle turtle = loader.load(LoadDXFTest.class.getResourceAsStream(filenameToTest));
 
-            // then
             assertNotNull(turtle);
             assertNotNull(turtle.history);
             assertEquals(readFile(fileExpected), turtle.history.toString());

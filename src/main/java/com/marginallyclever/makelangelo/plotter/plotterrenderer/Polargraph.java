@@ -21,9 +21,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @return cartesian coordinate 
 	 */
 	public Point2D FK(Plotter plotter,double beltL, double beltR) {
-		double top = plotter.getLimitTop();
-		double right = plotter.getLimitRight();
-		double left = plotter.getLimitLeft();
+		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		// use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 		double a = beltL;
@@ -46,9 +46,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @return Point2D with x=belt left and y=belt right.
 	 */
 	public Point2D IK(Plotter plotter,double x,double y) {
-		double right = plotter.getLimitRight();
-		double left = plotter.getLimitLeft();
-		double top = plotter.getLimitTop();
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		
 		double dy = top-y;
 		double dx = left-x;
@@ -69,9 +69,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	static public void paintMotors(GL2 gl2,Plotter robot) {
-		double top = robot.getLimitTop();
-		double right = robot.getLimitRight();
-		double left = robot.getLimitLeft();
+		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		// left motor
 		gl2.glColor3f(0, 0, 0);
@@ -89,9 +89,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	private void paintControlBox(GL2 gl2, Plotter robot) {
-		double cy = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double cx = 0;
 
 		gl2.glPushMatrix();
@@ -139,10 +139,10 @@ public abstract class Polargraph implements PlotterRenderer {
 		double gx = pos.x;
 		double gy = pos.y;
 
-		double top = robot.getLimitTop();
-		double bottom = robot.getLimitBottom();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 
 		if (gx < left || gx > right) return;
 		if (gy > top || gy < bottom) return;
@@ -211,14 +211,14 @@ public abstract class Polargraph implements PlotterRenderer {
 
 		// bottom clearance arcs
 		// right
-		double w = machine.getSettings().getLimitRight() - machine.getSettings().getLimitLeft() + 2.1;
-		double h = machine.getSettings().getLimitTop() - machine.getSettings().getLimitBottom() + 2.1;
+		double w = machine.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT) - machine.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) + 2.1;
+		double h = machine.getSettings().getDouble(PlotterSettings.LIMIT_TOP) - machine.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM) + 2.1;
 		float r=(float)Math.sqrt(h*h + w*w); // circle radius
-		double gy = machine.getSettings().getLimitTop() + 2.1;
+		double gy = machine.getSettings().getDouble(PlotterSettings.LIMIT_TOP) + 2.1;
 		double v;
 		gl2.glColor3d(0.6, 0.6, 0.6);
 
-		double gx = machine.getSettings().getLimitLeft() - 2.1;
+		double gx = machine.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 2.1;
 		double start = (float)1.5*(float)Math.PI;
 		double end = (2*Math.PI-Math.atan(h/w));
 		gl2.glBegin(GL2.GL_LINE_STRIP);
@@ -229,7 +229,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();
 
 		// left
-		gx = machine.getSettings().getLimitRight() + 2.1;
+		gx = machine.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT) + 2.1;
 		start = (float)(1*Math.PI+Math.atan(h/w));
 		end = (float)1.5*(float)Math.PI;
 		gl2.glBegin(GL2.GL_LINE_STRIP);
@@ -256,10 +256,10 @@ public abstract class Polargraph implements PlotterRenderer {
 
 	public static void paintSafeArea(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
-		double top = settings.getLimitTop();
-		double bottom = settings.getLimitBottom();
-		double left = settings.getLimitLeft();
-		double right = settings.getLimitRight();
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
 		// gl2.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
 		gl2.glColor4f(1, 1, 1, 1); // #color Safe area

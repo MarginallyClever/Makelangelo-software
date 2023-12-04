@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo;
 
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
@@ -12,7 +13,7 @@ import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorF
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MakelangeloSettingPanel;
-import com.marginallyclever.makelangelo.paper.PaperSettings;
+import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
@@ -187,6 +188,16 @@ public class MainMenu extends JMenuBar {
         buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
         menu.add(buttonViewLog);
 
+        JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
+        buttonLogFolder.addActionListener((e) -> {
+            try {
+                Desktop.getDesktop().open(Log.logDir);
+            } catch (IOException e1) {
+                logger.error("Can't open log folder", e1);
+            }
+        });
+        menu.add(buttonLogFolder);
+
         JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
         menu.add(buttonForums);
 
@@ -237,7 +248,7 @@ public class MainMenu extends JMenuBar {
     private void saveFile() {
         logger.debug("Saving vector file...");
         try {
-            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this));
+            saveDialog.run(app.getTurtle(), SwingUtilities.getWindowAncestor(this),app.getPlotter().getSettings());
         } catch(Exception e) {
             logger.error("Error while saving the vector file", e);
             JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
@@ -262,20 +273,28 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createGenerateMenu() {
-        JMenu menu = new JMenu(Translator.get("MenuGenerate"));
-        menu.setMnemonic('A');
-        for( TurtleGenerator ici : TurtleGeneratorFactory.available ) {
-            JMenuItem mi = new JMenuItem(ici.getName());
-            mi.addActionListener((e) -> runGeneratorDialog(ici));
-            menu.add(mi);
-        }
+        return createGeneratorMenuFromTree(TurtleGeneratorFactory.available);
+    }
 
+    private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorNode root) {
+        JMenu menu = new JMenu(root.getName());
+        for (TurtleGeneratorFactory.TurtleGeneratorNode child : root.getChildren()) {
+            if (child.getChildren().isEmpty()) {
+                JMenuItem menuItem = new JMenuItem(child.getName());
+                menu.add(menuItem);
+                menuItem.addActionListener((e) -> runGeneratorDialog(child.getGenerator()));
+            } else {
+                JMenu subMenu = createGeneratorMenuFromTree(child);
+                menu.add(subMenu);
+            }
+        }
         return menu;
     }
 
     private void runGeneratorDialog(TurtleGenerator turtleGenerator) {
         turtleGenerator.setPaper(app.getPaper());
         turtleGenerator.addListener(app::setTurtle);
+        turtleGenerator.setTurtle(app.getTurtle());
         turtleGenerator.generate();
 
         if(turtleGenerator.getPanelElements().isEmpty()) {
@@ -320,10 +339,12 @@ public class MainMenu extends JMenuBar {
             logger.debug("PiCaptureAction unavailable.");
         }
 
-        TurtleModifierAction a6 = new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"));
-        TurtleModifierAction a7 = new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"));
-        a6.setSource(app);		a6.addModifierListener(app::setTurtle);		menu.add(a6);
-        a7.setSource(app);		a7.addModifierListener(app::setTurtle);		menu.add(a7);
+        TurtleModifierAction paperFit = new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"));
+        TurtleModifierAction paperFill = new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"));
+        TurtleModifierAction paperCenter = new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"));
+        paperFit.setSource(app);		paperFit.addModifierListener(app::setTurtle);		menu.add(paperFit);
+        paperFill.setSource(app);		paperFill.addModifierListener(app::setTurtle);		menu.add(paperFill);
+        paperCenter.setSource(app);		paperCenter.addModifierListener(app::setTurtle);	menu.add(paperCenter);
 
         JMenuItem translate = new JMenuItem(Translator.get("Translate"));
         menu.add(translate);
@@ -470,6 +491,8 @@ public class MainMenu extends JMenuBar {
 
     private void openPlotterSettings() {
         PlotterSettingsManagerPanel plotterSettingsPanel = new PlotterSettingsManagerPanel(app.getPlotterSettingsManager());
+        plotterSettingsPanel.addListener(app::onPlotterSettingsUpdate);
+
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PlotterSettingsPanel.Title"));
         dialog.add(plotterSettingsPanel);
         dialog.setMinimumSize(new Dimension(350,300));
@@ -490,7 +513,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private void openPaperSettings() {
-        PaperSettings settings = new PaperSettings(app.getPaper());
+        PaperSettingsPanel settings = new PaperSettingsPanel(app.getPaper());
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PaperSettings.Title"));
         dialog.add(settings);
         dialog.setMinimumSize(new Dimension(300,300));

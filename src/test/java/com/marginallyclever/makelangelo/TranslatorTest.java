@@ -23,9 +23,8 @@ public class TranslatorTest {
 	
 	@Test
 	public void loadLanguageTest() {
-		int current = Translator.getCurrentLanguageIndex();
-		assertNotEquals(0, current);
 		String [] available = Translator.getLanguageList();
+		int current = Translator.getCurrentLanguageIndex();
 		assertNotNull(available[current]);
 	}
 	

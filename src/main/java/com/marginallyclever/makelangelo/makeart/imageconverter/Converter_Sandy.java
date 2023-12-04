@@ -2,13 +2,15 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_Greyscale;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -31,13 +33,13 @@ public class Converter_Sandy extends ImageConverter {
 		super();
 		SelectSlider selectRings = new SelectSlider("rings",Translator.get("SandyNoble.rings"),300,10,getScale());
 		add(selectRings);
-		selectRings.addPropertyChangeListener(evt->{
+		selectRings.addSelectListener(evt->{
 			setScale((int)evt.getNewValue());
 			fireRestart();
 		});
 		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("SandyNoble.center"),getDirections(),getDirectionIndex());
 		add(selectDirection);
-		selectDirection.addPropertyChangeListener(evt->{
+		selectDirection.addSelectListener(evt->{
 			setDirection((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -52,8 +54,8 @@ public class Converter_Sandy extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_Greyscale bw = new Filter_Greyscale(255);
-		TransformedImage img = bw.filter(myImage);
+		FilterDesaturate bw = new FilterDesaturate(myImage);
+		TransformedImage img = bw.filter();
 
 		// if the image were projected on the paper, where would the top left corner of the image be in paper space?
 		// image(0,0) is (-paperWidth/2,-paperHeight/2)*paperMargin
@@ -63,10 +65,11 @@ public class Converter_Sandy extends ImageConverter {
 		double xLeft   = myPaper.getPaperLeft();
 		double xRight  = myPaper.getPaperRight();
 
-		double pBottom = myPaper.getMarginBottom() +1.0;
-		double pTop    = myPaper.getMarginTop()    -1.0;
-		double pLeft   = myPaper.getMarginLeft()   +1.0;
-		double pRight  = myPaper.getMarginRight()  -1.0;
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double pLeft   = rect.getMinX() +1.0;
+		double pBottom = rect.getMinY() +1.0;
+		double pRight  = rect.getMaxX() -1.0;
+		double pTop    = rect.getMaxY() -1.0;
 
 		double cx,cy;
 		double last_x=0,last_y=0;
@@ -124,6 +127,8 @@ public class Converter_Sandy extends ImageConverter {
 		turtle = new Turtle();
 		logger.debug("Sandy started.");
 		//Thread.dumpStack();
+		double px = myPaper.getCenterX();
+		double py = myPaper.getCenterY();
 
 		turtle.lock();
 		try {
@@ -139,9 +144,9 @@ public class Converter_Sandy extends ImageConverter {
 					dy = Math.sin(t_dir *t);
 					x = cx + dx * r;
 					y = cy + dy * r;
-					if(!myPaper.isInsidePaperMargins(x,y)) {
+					if(!rect.contains(x,y)) {
 						if(wasDrawing) {
-							turtle.jumpTo(last_x,last_y);
+							turtle.jumpTo(px+last_x,py+last_y);
 							wasDrawing=false;
 						}
 						continue;
@@ -157,19 +162,19 @@ public class Converter_Sandy extends ImageConverter {
 					scaleZ = (255.0 -  z) / 255.0;
 	
 					if(!wasDrawing) {
-						turtle.jumpTo(last_x,last_y);
+						turtle.jumpTo(px+last_x,py+last_y);
 						wasDrawing=true;
 					}
 	
-					turtle.moveTo(	x + dx * pulseSize*pulseFlip,
-									y + dy * pulseSize*pulseFlip);
+					turtle.moveTo(	px + x + dx * pulseSize*pulseFlip,
+									py + y + dy * pulseSize*pulseFlip);
 					
 					flipSum+=scaleZ;
 					if(flipSum >= 1) {
 						flipSum-=1;
 						pulseFlip = -pulseFlip;
-						turtle.moveTo(	x + dx * pulseSize*pulseFlip,
-										y + dy * pulseSize*pulseFlip);
+						turtle.moveTo(	px + x + dx * pulseSize*pulseFlip,
+										py + y + dy * pulseSize*pulseFlip);
 					}
 				}
 				t_dir=-t_dir;

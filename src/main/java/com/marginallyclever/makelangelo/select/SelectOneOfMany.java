@@ -18,7 +18,7 @@ public class SelectOneOfMany extends Select {
 
 		JLabel label = new JLabel(labelKey, JLabel.LEADING);
 
-		field.addActionListener((e)-> firePropertyChange(null, field.getSelectedIndex()) );
+		field.addActionListener((e)-> fireSelectEvent(null, field.getSelectedIndex()) );
 
 		this.removeAll();
 		this.setBorder(new EmptyBorder(0,0,0,1));

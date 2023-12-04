@@ -1,10 +1,9 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_ContrastAdjust;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
@@ -13,20 +12,21 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.io.FileInputStream;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-
+/**
+ * This panel allows the user to select an image converter and set its parameters.
+ */
 public class SelectImageConverterPanel extends JPanel implements PreviewListener, ImageConverterListener {
 	private static final Logger logger = LoggerFactory.getLogger(SelectImageConverterPanel.class);
 
@@ -180,14 +180,15 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	private void scaleImage(int mode) {
-		double width  = myPaper.getMarginWidth();
-		double height = myPaper.getMarginHeight();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double width  = rect.getWidth();
+		double height = rect.getHeight();
 
 		boolean test;
 		if (mode == 0) {
-			test = width < height;  // fill paper
+			test = width < height;  // fit paper
 		} else {
-			test = width > height;  // fit paper
+			test = width > height;  // fill paper
 		}
 
 		float f;
@@ -234,8 +235,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		logger.debug("starting {}", myConverter.getName());
 
 		scaleImage(fillNames.getSelectedIndex());
-		Filter_ContrastAdjust filter = new Filter_ContrastAdjust(rangeSliderMin, rangeSliderMax);
-		TransformedImage result = filter.filter(myImage);
+		FilterContrastAdjust filter = new FilterContrastAdjust(myImage,rangeSliderMin, rangeSliderMax);
+		TransformedImage result = filter.filter();
 
 		myConverter.start(myPaper,result);
 	}
@@ -302,20 +303,5 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		for( ActionListener a : listeners ) {
 			a.actionPerformed(e);
 		}
-	}
-
-	// TEST
-	
-	public static void main(String[] args) throws Exception {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		TransformedImage image = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/test.png")));
-		JFrame frame = new JFrame(SelectImageConverterPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new SelectImageConverterPanel(new Paper(), image));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

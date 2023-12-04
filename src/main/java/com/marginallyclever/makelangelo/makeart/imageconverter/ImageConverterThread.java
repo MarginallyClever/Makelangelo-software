@@ -46,22 +46,27 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 
 		int iterations = 0;
 		int pauseCount=-1;
-		while(!enough && !isCancelled()) {
-			if(!paused) {
-				if(pauseCount== iterations) {
-					myConverter.resume();
+		try {
+			while (!enough && !isCancelled()) {
+				if (!paused) {
+					if (pauseCount == iterations) {
+						myConverter.resume();
+					}
+					myConverter.iterate();
+					iterations++;
+				} else {
+					if (pauseCount != iterations) {
+						pauseCount = iterations;
+						myConverter.generateOutput();
+					}
 				}
-				myConverter.iterate();
-				iterations++;
-			} else {
-				if(pauseCount!= iterations) {
-					pauseCount= iterations;
-					myConverter.generateOutput();
+				try {
+					Thread.sleep(5);
+				} catch (Exception ignored) {
 				}
 			}
-			try {
-				Thread.sleep(5);
-			} catch (Exception ignored) {}
+		} catch(Exception e) {
+			logger.error("caught exception",e);
 		}
 
 		logger.debug("doInBackground() ending {} after {} loop(s).", name, iterations);

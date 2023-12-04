@@ -22,7 +22,7 @@ public class SelectBoolean extends Select {
 		field.addItemListener((e)-> {
 			boolean newValue = field.isSelected();
 			boolean oldValue = !newValue;
-			firePropertyChange(oldValue, newValue);
+			fireSelectEvent(oldValue, newValue);
 		});
 
 		this.add(label,BorderLayout.LINE_START);

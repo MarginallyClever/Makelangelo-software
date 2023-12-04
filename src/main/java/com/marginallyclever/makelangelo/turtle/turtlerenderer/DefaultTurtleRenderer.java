@@ -23,8 +23,6 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void start(GL2 gl2) {
 		this.gl2=gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
-		//colorTravel.set(plottersettings.getPenUpColor());
-		//colorDraw.set(plottersettings.getPenDownColorDefault());
 
 		// Multiply blend mode
 		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);
@@ -79,11 +77,18 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	
 	@Override
 	public void setPenDiameter(double penDiameter) {
-		this.penDiameter =(float)penDiameter;
+		this.penDiameter = (float)penDiameter;
 	}
 
 	@Override
 	public String getTranslatedName() {
 		return Translator.get("DefaultTurtleRenderer.name");
 	}
+
+	/**
+	 * Reset any internal state to defaults.  This makes sure rendering optimizations cleaned
+	 * up when the turtle is changed.
+	 */
+	@Override
+	public void reset() {}
 }

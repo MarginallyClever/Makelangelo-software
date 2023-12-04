@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-15.0 -30.0 35.0 38.0">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
   <path fill='none' stroke='#FF9900' d='M -15.000 7.000 L 3.000 -4.000 M 12.000 -18.000 L 7.000 -8.000 M 5.000 -2.000 L 6.000 -10.000 '/>
   <path fill='none' stroke='#0044FF' d='M -15.000 7.000 L 20.000 -30.000 M -4.000 8.000 L 10.000 -15.000 '/>
 </svg>

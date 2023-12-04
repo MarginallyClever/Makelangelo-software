@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 /**
  * Deprecated because it cannot find home.
@@ -21,12 +22,12 @@ public class Makelangelo3 implements PlotterRenderer {
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl2
-	 * @param robot
+	 * @param plotter
 	 */
-	private void paintControlBox(GL2 gl2,Plotter robot) {
-		double cy = robot.getLimitTop();
-		double left = robot.getLimitLeft();
-		double right = robot.getLimitRight();
+	private void paintControlBox(GL2 gl2,Plotter plotter) {
+		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double cx = 0;
 
 		gl2.glPushMatrix();

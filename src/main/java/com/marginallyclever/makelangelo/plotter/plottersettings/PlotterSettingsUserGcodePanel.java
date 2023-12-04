@@ -7,7 +7,6 @@ import javax.swing.*;
 
 public class PlotterSettingsUserGcodePanel extends JPanel {
     private final PlotterSettings settings;
-
     private final SelectTextArea userGeneralStartGcode;
     private final SelectTextArea userGeneralEndGcode;
 
@@ -17,7 +16,7 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
 
         this.settings = settings;
 
-        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getUserGeneralStartGcode());
+        userGeneralStartGcode = new SelectTextArea("userGeneralStartGcode", null, settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
         userGeneralStartGcode.setLineWrap(false);
         userGeneralStartGcode.setAlignmentX(0);
         JLabel label0 = new JLabel(Translator.get("PlotterSettings.userGeneralStartGcode"));
@@ -26,7 +25,7 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
         this.add(label0);
         this.add(userGeneralStartGcode);
 
-        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getUserGeneralEndGcode());
+        userGeneralEndGcode = new SelectTextArea("userGeneralEndGcode", null, settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
         userGeneralEndGcode.setLineWrap(false);
         userGeneralEndGcode.setAlignmentX(0);
         label0 = new JLabel(Translator.get("PlotterSettings.userGeneralEndGcode"));
@@ -40,12 +39,12 @@ public class PlotterSettingsUserGcodePanel extends JPanel {
     }
 
     public void save() {
-        settings.setUserGeneralStartGcode(userGeneralStartGcode.getText());
-        settings.setUserGeneralEndGcode(userGeneralEndGcode.getText());
+        settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,userGeneralStartGcode.getText());
+        settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,userGeneralEndGcode.getText());
     }
 
     public void reset() {
-        userGeneralStartGcode.setText(settings.getUserGeneralStartGcode());
-        userGeneralEndGcode.setText(settings.getUserGeneralEndGcode());
+        userGeneralStartGcode.setText(settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
+        userGeneralEndGcode.setText(settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
     }
 }

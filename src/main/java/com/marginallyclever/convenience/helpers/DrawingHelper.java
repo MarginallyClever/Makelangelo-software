@@ -89,7 +89,7 @@ public class DrawingHelper {
     }
 
     /**
-     * Paint the given texture to the coordinate with the desired size.
+     * Paint a quad with the given texture
      * @param gl2 the render context
      * @param x x center coordinate
      * @param y y center coordinate

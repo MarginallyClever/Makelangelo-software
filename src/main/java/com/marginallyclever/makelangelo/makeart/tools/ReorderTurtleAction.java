@@ -10,7 +10,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,6 @@ import java.util.List;
  *
  */
 public class ReorderTurtleAction extends TurtleModifierAction {
-	@Serial
-	private static final long serialVersionUID = 3473530693924971574L;
 	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtleAction.class);
 	
 	public ReorderTurtleAction() {
@@ -32,7 +29,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	}
 	
 	public Turtle run(Turtle turtle) {
-		if(turtle.history.size()==0) return turtle;
+		if(turtle.history.isEmpty()) return turtle;
 		
 		logger.debug("reorder() start @ {} instructions.", turtle.history.size());
 		

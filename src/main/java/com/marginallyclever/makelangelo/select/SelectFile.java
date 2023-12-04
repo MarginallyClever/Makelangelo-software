@@ -42,7 +42,7 @@ public class SelectFile extends Select {
 			}
 			
 			void validate() {
-				firePropertyChange(null,field.getText());
+				fireSelectEvent(null,field.getText());
 			}
 		});
 		//field.setBorder(new LineBorder(Color.BLACK));

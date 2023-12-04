@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
-
-    <!--
+	<!--
         To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
         please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
             and change the begining of the file with :
-    
+
     <?xml version="1.0" encoding="UTF-8"?>
     <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-    
+
     -->
-    <meta>
-        <name>English</name>
-        <author>Dan Royer (dan@marginallyclever.com)</author>
-    </meta>	
-    
-    <string><key>BorderName</key><value>Outline paper</value></string>
-	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
-	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
-	<string><key>Generator_TruchetTiles.LinesPerTile</key><value>Lines per tile</value></string>
+	<meta>
+		<name>English</name>
+		<author>Dan Royer (dan@marginallyclever.com)</author>
+	</meta>
+
+	<string><key>BorderName</key><value>Outline paper</value></string>
 	<string><key>LissajousName</key><value>Lissajous</value></string>
 	<string><key>LissajousA</key><value>A (&gt;0)</value></string>
 	<string><key>LissajousB</key><value>B (&gt;0)</value></string>
@@ -37,12 +33,11 @@
 	<string><key>StartAtExactly</key><value>Do nothing special</value></string>
 	<string><key>ConfirmQuitQuestion</key><value>Are you sure you want to quit?</value></string>
 	<string><key>ConfirmQuitTitle</key><value>Exit</value></string>
+
 	<string><key>ConvertImagePaperFill</key><value>Fill entire paper</value></string>
 	<string><key>ConvertImagePaperFit</key><value>Fit image on paper</value></string>
-	<string><key>Converter_CMYK_Crosshatch.Name</key><value>CMYK</value></string>
-	<string><key>Converter_CMYK_Crosshatch.Passes</key><value>Passes</value></string>
-	<string><key>Converter_CMYK_Crosshatch.Note</key><value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value></string>
-	<string><key>Converter_CMYK_Spiral.Name</key><value>CMYK Spiral</value></string>
+	<string><key>ConvertImagePaperCenter</key><value>Center image</value></string>
+
 	<string><key>LoadFilePanel.title</key><value>Load file preview</value></string>
 	<string><key>OK</key><value>OK</value></string>
 	<string><key>Cancel</key><value>Cancel</value></string>
@@ -52,16 +47,7 @@
 	<string><key>Rotate</key><value>Rotate</value></string>
 	<string><key>Width</key><value>Width</value></string>
 	<string><key>Height</key><value>Height</value></string>
-	<string><key>PaperSettings.Title</key><value>Paper settings</value></string>
-	<string><key>PaperSettings.PaperSize</key><value>Paper Size</value></string>
-	<string><key>PaperSettings.PaperWidth</key><value>Paper width (mm)</value></string>
-	<string><key>PaperSettings.PaperHeight</key><value>Paper height (mm)</value></string>
-	<string><key>PaperSettings.ShiftX</key><value>Shift left</value></string>
-	<string><key>PaperSettings.ShiftY</key><value>Shift up</value></string>
-	<string><key>PaperSettings.Rotation</key><value>Rotation</value></string>
-	<string><key>PaperSettings.Landscape</key><value>Landscape</value></string>
-	<string><key>PaperSettings.PaperMargin</key><value>Margin (%)</value></string>
-	<string><key>PaperSettings.PaperColor</key><value>Paper color</value></string>
+
 	<string><key>TitlePrefix</key><value>Makelangelo</value></string>
 	<string><key>LoadError</key><value>File could not be loaded:</value></string>
 	<string><key>SaveError</key><value>File could not be saved:</value></string>
@@ -78,14 +64,15 @@
 	<string><key>MenuSoundsFinishConvert</key><value>Finish converting</value></string>
 	<string><key>MenuSoundsFinishDraw</key><value>Finish drawing</value></string>
 	<string><key>MenuGraphicsTitle</key><value>Graphics</value></string>
+	<string><key>MenuLanguageTitle</key><value>Language</value></string>
+	<string><key>StartAt</key><value>Start at</value></string>
+	<string><key>Robot</key><value>Makelangelo</value></string>
+
 	<string><key>GFXPreferences.showPenUp</key><value>Show travel moves</value></string>
 	<string><key>GFXPreferences.antialias</key><value>Antialias lines</value></string>
 	<string><key>GFXPreferences.speedVSQuality</key><value>Speed over quality</value></string>
 	<string><key>GFXPreferences.showAllWhileDrawing</key><value>Show entire image while drawing</value></string>
 	<string><key>GFXPreferences.dragSpeed</key><value>camera travel speed</value></string>
-	<string><key>MenuLanguageTitle</key><value>Language</value></string>
-	<string><key>StartAt</key><value>Start at</value></string>
-	<string><key>Robot</key><value>Makelangelo</value></string>
 
 	<string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value></string>
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
@@ -105,18 +92,16 @@
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
-	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle fractal</value></string>
-	<string><key>Converter_VoronoiStippling.Name</key><value>Voronoi stipples</value></string>
-	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
+	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
+	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 
-	<string><key>Converter_Voronoi.Name</key><value>Voronoi diagram</value></string>
-	<string><key>Converter_VoronoiStippling.CellCount</key><value>Number of cells</value></string>
-	<string><key>Converter_VoronoiStippling.DotMax</key><value>Max dot size</value></string>
-	<string><key>Converter_VoronoiStippling.DotMin</key><value>Min dot size</value></string>
+	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
+	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
+
 	<string><key>BoxGeneratorName</key><value>Boxxy</value></string>
 	<string><key>BoxGeneratorMaxSize</key><value>Max size</value></string>
 	<string><key>BoxGeneratorCutoff</key><value>Cutoff</value></string>
-	<string><key>HilbertCurveName</key><value>Hilbert Curve Fractal</value></string>
+	<string><key>HilbertCurveName</key><value>Hilbert Curve</value></string>
 	<string><key>HilbertCurveSize</key><value>Size</value></string>
 	<string><key>HilbertCurveOrder</key><value>Order</value></string>
 	<string><key>penDiameter</key><value>Pen diameter</value></string>
@@ -128,9 +113,6 @@
 	<string><key>Flap</key><value>Flap</value></string>
 	<string><key>Model</key><value>Model</value></string>
 	<string><key>Length</key><value>Length</value></string>
-	<string><key>MazeName</key><value>Maze</value></string>
-	<string><key>MazeRows</key><value>Rows</value></string>
-	<string><key>MazeColumns</key><value>Columns</value></string>
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
 	<string><key>YourMsgHereName</key><value>Your message here</value></string>
 	<string><key>SpiralName</key><value>Spiral</value></string>
@@ -153,13 +135,23 @@
     </html>
     ]]></value></string>
 	<string><key>MenuResetMachinePreferencesWarning</key><value>Are you sure you want to erase all your preferences?</value></string>
+
 	<string><key>MenuGenerate</key><value>Generate art</value></string>
+	<string><key>MenuGenerate.Fractals</key><value>Fractals</value></string>
+	<string><key>MenuGenerate.Grids</key><value>Grids</value></string>
+	<string><key>MenuGenerate.SpaceFillers</key><value>Space Fillers</value></string>
+	<string><key>MenuGenerate.Mazes</key><value>Mazes</value></string>
+
+	<string><key>Converter_TruchetFromImage.name</key><value>Truchet from image</value></string>
+	<string><key>Converter_TruchetFromImage.spacing</key><value>Space between lines</value></string>
+	<string><key>Converter_TruchetFromImage.linesPerTile</key><value>Lines per tile</value></string>
+
 	<string><key>MenuNewFile</key><value>New</value></string>
 	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
-	<string><key>LSystemTreeName</key><value>L System Tree Fractal</value></string>
-	<string><key>KochTreeName</key><value>Koch Curve Fractal</value></string>
-	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral Fractal</value></string>
-	<string><key>DragonName</key><value>Dragon Fractal</value></string>
+	<string><key>LSystemTreeName</key><value>L System Tree</value></string>
+	<string><key>KochTreeName</key><value>Koch Curve</value></string>
+	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral</value></string>
+	<string><key>DragonName</key><value>Dragon</value></string>
 	<string><key>ClickAndDrag</key><value>Click &amp; Drag</value></string>
 	<string><key>ConverterWanderName</key><value>Wander</value></string>
 	<string><key>ConverterWanderLineCount</key><value># Lines</value></string>
@@ -213,22 +205,12 @@
 	<string><key>MoireName</key><value>Moire</value></string>
 	<string><key>horizontal</key><value>Horizontal</value></string>
 	<string><key>vertical</key><value>Vertical</value></string>
-	<string><key>SandyNoble.title</key><value>Sandy Noble Style</value></string>
-	<string><key>SandyNoble.rings</key><value>Rings</value></string>
-	<string><key>SandyNoble.center</key><value>Center</value></string>
 	<string><key>ConverterIntensity</key><value>Intensity</value></string>
 	<string><key>top right</key><value>Top right</value></string>
 	<string><key>top left</key><value>Top left</value></string>
 	<string><key>bottom right</key><value>Bottom right</value></string>
 	<string><key>bottom left</key><value>Bottom left</value></string>
 	<string><key>center</key><value>Center</value></string>
-	<string><key>Spiral.toCorners</key><value>Spiral to corners</value></string>
-	<string><key>SpiralPulse.intensity</key><value>Intensity</value></string>
-	<string><key>SpiralPulse.spacing</key><value>Space between rings</value></string>
-	<string><key>SpiralPulse.height</key><value>Pulse height</value></string>
-	<string><key>SelectImageConverterPanel.Contrast</key><value>Contrast adjust</value></string>
-	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
-	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Cutoff</value></string>
 	<string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
 	<string><key>FillPageName</key><value>Fill page</value></string>
 	<string><key>GosperCurveName</key><value>Gosper curve</value></string>
@@ -251,25 +233,78 @@
 	<string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
 	<string><key>Open</key><value>Open file...</value></string>
 	<string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
-	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
-	<string><key>LogPanel.Title</key><value>Log</value></string>
-	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
 	<string><key>QuestionTitle</key><value>Question</value></string>
 	<string><key>InfoTitle</key><value>Information</value></string>
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
 
+	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
+	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>
+
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
 	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
-    <string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
+	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
 
-    <string><key>Converter_CMYK_Circles.name</key><value>CMYK circles</value></string>
+	<string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
+	<string><key>SaveGCode.splitGCodeQuestion</key><value>There are %1 tool changes in this drawing.  Split into separate files?</value></string>
+
+	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
+	<string><key>LogPanel.Title</key><value>Log</value></string>
+	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
+
+	<string><key>Spiral.toCorners</key><value>Spiral to corners</value></string>
+
+	<string><key>SpiralPulse.intensity</key><value>Intensity</value></string>
+	<string><key>SpiralPulse.spacing</key><value>Space between rings</value></string>
+	<string><key>SpiralPulse.height</key><value>Pulse height</value></string>
+
+	<string><key>SelectImageConverterPanel.Contrast</key><value>Contrast adjust</value></string>
+
+	<string><key>PaperSettings.Title</key><value>Paper settings</value></string>
+	<string><key>PaperSettings.PaperSize</key><value>Paper Size</value></string>
+	<string><key>PaperSettings.PaperWidth</key><value>Paper width (mm)</value></string>
+	<string><key>PaperSettings.PaperHeight</key><value>Paper height (mm)</value></string>
+	<string><key>PaperSettings.ShiftX</key><value>Shift left</value></string>
+	<string><key>PaperSettings.ShiftY</key><value>Shift up</value></string>
+	<string><key>PaperSettings.Rotation</key><value>Rotation</value></string>
+	<string><key>PaperSettings.Landscape</key><value>Landscape</value></string>
+	<string><key>PaperSettings.PaperMargin</key><value>Margin (%)</value></string>
+	<string><key>PaperSettings.PaperColor</key><value>Paper color</value></string>
+
+	<string><key>Converter_Voronoi.Name</key><value>Voronoi diagram</value></string>
+	<string><key>Converter_VoronoiStippling.Name</key><value>Voronoi stipples</value></string>
+	<string><key>Converter_VoronoiStippling.CellCount</key><value>Number of cells</value></string>
+	<string><key>Converter_VoronoiStippling.DotMax</key><value>Max dot size</value></string>
+	<string><key>Converter_VoronoiStippling.DotMin</key><value>Min dot size</value></string>
+	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
+	<string><key>Converter_VoronoiStippling.Cutoff</key><value>Cutoff</value></string>
+	<string><key>Converter_Voronoi.ShowCenters</key><value>Show centers</value></string>
+
+	<string><key>SandyNoble.title</key><value>Sandy Noble Style</value></string>
+	<string><key>SandyNoble.rings</key><value>Rings</value></string>
+	<string><key>SandyNoble.center</key><value>Center</value></string>
+
+	<string><key>Converter_CMYK_Crosshatch.Name</key><value>CMYK</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Passes</key><value>Passes</value></string>
+	<string><key>Converter_CMYK_Crosshatch.Note</key><value><![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]></value></string>
+
+	<string><key>Converter_CMYK_Spiral.Name</key><value>CMYK Spiral</value></string>
+
+	<string><key>Converter_CMYK_Circles.name</key><value>CMYK circles</value></string>
 	<string><key>Converter_CMYK_Circles.maxCircleSize</key><value>max circle size</value></string>
 
 	<string><key>Converter_EdgeDetection.name</key><value>Edge detection</value></string>
 	<string><key>Converter_EdgeDetection.passes</key><value>Passes</value></string>
 	<string><key>Converter_EdgeDetection.stepSize</key><value>Step size</value></string>
 	<string><key>Converter_EdgeDetection.sampleSize</key><value>SampleSize</value></string>
+	<string><key>Converter_EdgeDetection.border</key><value>Draw border</value></string>
+
+	<string><key>Generator.randomSeed</key><value>Random seed value</value></string>
+
+	<string><key>Generator_TruchetTiles.Name</key><value>Truchet Tiles</value></string>
+	<string><key>Generator_TruchetTiles.LineSpacing</key><value>Space between lines (mm)</value></string>
+	<string><key>Generator_TruchetTiles.LinesPerTile</key><value>Lines per tile</value></string>
+	<string><key>Generator_TruchetTiles.allow</key><value>Allow '%1'</value></string>
 
 	<string><key>Generator_FlowField.name</key><value>Flow field</value></string>
 	<string><key>Generator_FlowField.scaleX</key><value>X scale</value></string>
@@ -283,12 +318,23 @@
 	<string><key>Generator_FlowField.rightAngle</key><value>Add orthogonal lines</value></string>
 	<string><key>Generator_FlowField.noiseType</key><value>Noise type</value></string>
 
-	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
-	<string><key>Generator_GridFit.Name</key><value>Grid fit</value></string>
+	<string><key>Generator_Spiral.name</key><value>Spiral</value></string>
+	<string><key>Generator_Spiral.radius</key><value>Radius</value></string>
+
+	<string><key>Generator_MazeRectangle.name</key><value>Rectangle</value></string>
+	<string><key>Generator_MazeRectangle.rows</key><value>Rows</value></string>
+	<string><key>Generator_MazeRectangle.columns</key><value>Columns</value></string>
+	<string><key>Generator_MazeCircle.name</key><value>Circle</value></string>
+	<string><key>Generator_MazeCircle.rings</key><value>Rings</value></string>
+	<string><key>Generator_MazeHoneycomb.name</key><value>Honeycomb</value></string>
+
+	<string><key>Generator_GridFit.Name</key><value>Rectangles</value></string>
 	<string><key>Generator_GridFit.margin</key><value>Minimum margin each side (mm)</value></string>
 	<string><key>Generator_GridFit.cellsWide</key><value>Cells horizontal</value></string>
 	<string><key>Generator_GridFit.cellsHigh</key><value>Cells vertical</value></string>
-	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
+
+	<string><key>Generator_GridHexagons.Name</key><value>Hexagons</value></string>
+	<string><key>Generator_GridHexagons.radius</key><value>Major radius</value></string>
 
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
 	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
@@ -344,6 +390,7 @@
 	<string><key>DefaultTurtleRenderer.name</key><value>Default</value></string>
 	<string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
 	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
+	<string><key>DirectionLoopTurtleRenderer.name</key><value>Direction loops</value></string>
 	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
 
 	<string><key>ChooseConnection.ButtonConnect</key><value>Connect</value></string>
@@ -362,6 +409,9 @@
 	<string><key>PlotterControls.JogTab</key><value>Robot controls</value></string>
 	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
 	<string><key>PlotterControls.homeXYFirst</key><value>Home the printer first.</value></string>
+	<string><key>PlotterControls.didNotFind</key><value>Error in communicating with the robot.</value></string>
+	<string><key>PlotterControls.communicationFailure</key><value>No answer from the robot, please check the USB cable or speed settings.</value></string>
+	<string><key>PlotterControls.halted</key><value>Printer halted!</value></string>
 	<string><key>PlotterControls.Step</key><value>Step</value></string>
 
 	<string><key>RobotMenu.RobotStyle</key><value>Robot style</value></string>
@@ -381,4 +431,19 @@
 	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
 
 	<string><key>CartesianButtons.buttonCenter</key><value> </value></string>
+
+	<string><key>Converter_IntensityToHeight.name</key><value>Intensity to height</value></string>
+	<string><key>Converter_IntensityToHeight.spacing</key><value>Wave spacing</value></string>
+	<string><key>Converter_IntensityToHeight.sampleRate</key><value>Sample rate</value></string>
+	<string><key>Converter_IntensityToHeight.waveIntensity</key><value>Wave intensity</value></string>
+
+	<string><key>Converter_QuadTreeInstant</key><value>Quad tree instant</value></string>
+	<string><key>Converter_QuadTreeInstant.maxDepth</key><value>Max depth</value></string>
+	<string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
+	<string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
+
+	<string><key>LineWeightByImageIntensity.name</key><value>Line image weight</value></string>
+	<string><key>LineWeightByImageIntensity.thickness</key><value>Thickness</value></string>
+	<string><key>LineWeightByImageIntensity.image</key><value>Image</value></string>
+
 </language>

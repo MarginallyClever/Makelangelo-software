@@ -5,24 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.geom.Rectangle2D;
+
 public class PaperTest {
 	@BeforeEach
 	public void beforeEach() {
 		PreferencesHelper.start();
 	}
-
-	/*
-	@Test
-	public void testChangeToolMessage() {
-		Translator.start();
-		MakelangeloRobot r = new MakelangeloRobot();
-		r.changeToTool(0);
-		r.changeToTool((255<<16));
-		r.changeToTool((255<< 8));
-		r.changeToTool((255<< 0));
-		r.changeToTool((255<< 8)+(255<< 0));
-	}
-	*/
 
 	@Test
 	public void testPaperSettingChanges() {
@@ -39,5 +28,33 @@ public class PaperTest {
 		a.setPaperSize(w,h,0,0);
 		a.saveConfig();
 		// TODO: this is a potentially destructive change if the test fails.
+	}
+
+	@Test
+	public void testPaperLocation() {
+		Paper a = new Paper();
+		a.setPaperSize(200,100,0,0);
+		a.setPaperMargin(0.9);
+
+		Rectangle2D.Double rect = a.getMarginRectangle();		
+		Assertions.assertEquals(180,rect.getWidth());
+		Assertions.assertEquals(90,rect.getHeight());
+		Assertions.assertEquals(-90,rect.getMinX());
+		Assertions.assertEquals(-45,rect.getMinY());
+		Assertions.assertEquals(90,rect.getMaxX());
+		Assertions.assertEquals(45,rect.getMaxY());
+		Assertions.assertEquals(0,a.getCenterX());
+		Assertions.assertEquals(0,a.getCenterY());
+		
+		a.setPaperSize(200,100,50,100);
+		rect = a.getMarginRectangle();
+		Assertions.assertEquals(180,rect.getWidth());
+		Assertions.assertEquals(90,rect.getHeight());
+		Assertions.assertEquals(-90,rect.getMinX());
+		Assertions.assertEquals(-45,rect.getMinY());
+		Assertions.assertEquals(90,rect.getMaxX());
+		Assertions.assertEquals(45,rect.getMaxY());
+		Assertions.assertEquals(50,a.getCenterX());
+		Assertions.assertEquals(100,a.getCenterY());
 	}
 }

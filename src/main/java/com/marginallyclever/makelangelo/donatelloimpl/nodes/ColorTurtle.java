@@ -1,18 +1,20 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class ColorTurtle extends Node {
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<Number> red   = NodeVariable.newInstance("red",Number.class,0,true,false);
-    private final NodeVariable<Number> green = NodeVariable.newInstance("green",Number.class,0,true,false);
-    private final NodeVariable<Number> blue   = NodeVariable.newInstance("blue",Number.class,0,true,false);
-    private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class,new Turtle(),false,true);
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockReceiving<Number> red   = new DockReceiving<>("red",Number.class,0);
+    private final DockReceiving<Number> green = new DockReceiving<>("green",Number.class,0);
+    private final DockReceiving<Number> blue   = new DockReceiving<>("blue",Number.class,0);
+    private final DockShipping<Turtle> output = new DockShipping<>("output", Turtle.class,new Turtle());
 
     public ColorTurtle() {
         super("ColorTurtle");
@@ -24,11 +26,16 @@ public class ColorTurtle extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(red.hasPacketWaiting()) red.receive();
+        if(green.hasPacketWaiting()) green.receive();
+        if(blue.hasPacketWaiting()) blue.receive();
+
         Turtle input = turtle.getValue();
         int r = red.getValue().intValue();
-        int b = blue.getValue().intValue();
         int g = green.getValue().intValue();
+        int b = blue.getValue().intValue();
         ColorRGB c = new ColorRGB(r, g, b);
         Turtle moved = new Turtle();
         for( TurtleMove m : input.history ) {
@@ -38,7 +45,6 @@ public class ColorTurtle extends Node {
                 moved.history.add(new TurtleMove(m));
             }
         }
-        output.setValue(moved);
-        cleanAllInputs();
+        output.send(new Packet<>(moved));
     }
 }

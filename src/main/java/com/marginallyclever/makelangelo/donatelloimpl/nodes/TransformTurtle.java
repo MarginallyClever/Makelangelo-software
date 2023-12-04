@@ -1,17 +1,19 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.NodeVariable;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Packet;
 
 public class TransformTurtle extends Node {
-    private final NodeVariable<Turtle> turtle = NodeVariable.newInstance("turtle", Turtle.class,new Turtle(),true,false);
-    private final NodeVariable<Number> sx = NodeVariable.newInstance("scale x",Number.class,1,true,false);
-    private final NodeVariable<Number> sy = NodeVariable.newInstance("scale y",Number.class,1,true,false);
-    private final NodeVariable<Number> rotate = NodeVariable.newInstance("rotate degrees",Number.class,0,true,false);
-    private final NodeVariable<Number> tx = NodeVariable.newInstance("translate x",Number.class,0,true,false);
-    private final NodeVariable<Number> ty = NodeVariable.newInstance("translate y",Number.class,0,true,false);
-    private final NodeVariable<Turtle> output = NodeVariable.newInstance("output", Turtle.class,new Turtle(),false,true);
+    private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
+    private final DockReceiving<Number> sx = new DockReceiving<>("scale x",Number.class,1);
+    private final DockReceiving<Number> sy = new DockReceiving<>("scale y",Number.class,1);
+    private final DockReceiving<Number> rotate = new DockReceiving<>("rotate degrees",Number.class,0);
+    private final DockReceiving<Number> tx = new DockReceiving<>("translate x",Number.class,0);
+    private final DockReceiving<Number> ty = new DockReceiving<>("translate y",Number.class,0);
+    private final DockShipping<Turtle> output = new DockShipping<>("output", Turtle.class,new Turtle());
 
     public TransformTurtle() {
         super("TransformTurtle");
@@ -25,13 +27,19 @@ public class TransformTurtle extends Node {
     }
 
     @Override
-    public void update() throws Exception {
+    public void update() {
+        if(turtle.hasPacketWaiting()) turtle.receive();
+        if(sx.hasPacketWaiting()) sx.receive();
+        if(sy.hasPacketWaiting()) sy.receive();
+        if(rotate.hasPacketWaiting()) rotate.receive();
+        if(tx.hasPacketWaiting()) tx.receive();
+        if(ty.hasPacketWaiting()) ty.receive();
+
         Turtle input = turtle.getValue();
         Turtle moved = new Turtle(input);
         moved.scale(sx.getValue().doubleValue(),sy.getValue().doubleValue());
         moved.rotate(rotate.getValue().doubleValue());
         moved.translate(tx.getValue().doubleValue(),ty.getValue().doubleValue());
-        output.setValue(moved);
-        cleanAllInputs();
+        output.send(new Packet<>(moved));
     }
 }

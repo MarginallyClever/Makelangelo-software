@@ -17,10 +17,9 @@ public class SelectPassword extends Select {
 		super(internalName);
 
 		JLabel label = new JLabel(labelKey, JLabel.LEADING);
-		
+
 		field = new JPasswordField(defaultText);
 		field.setEchoChar('*');
-
 		Dimension d = field.getPreferredSize();
 		d.width = 100;
 		field.setPreferredSize(d);
@@ -43,7 +42,7 @@ public class SelectPassword extends Select {
 			}
 			
 			void validate() {
-				firePropertyChange(null,field.getPassword());
+				fireSelectEvent(null,field.getPassword());
 			}
 		});
 

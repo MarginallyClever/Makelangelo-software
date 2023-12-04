@@ -27,7 +27,7 @@ public class TranslationsMissingTest {
     private static final Logger logger = LoggerFactory.getLogger(TranslationsMissingTest.class);
 
     private final Pattern patternComment = Pattern.compile("^\\s*//.*");
-    private final Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\\s*\"(?<key>[^)]*)\"\\s*\\)");
+    private final Pattern patternTranslator = Pattern.compile("Translator\\s*\\.\\s*get\\s*\\(\\s*\"(?<key>[^)]*)\"\\s*[,\\)]");
 
     public static class TranslationFileSearcher {
         public final String key;
@@ -99,8 +99,9 @@ public class TranslationsMissingTest {
         });
 
         assertNotNull(results);
-        assertEquals(1, results.size());
+        assertEquals(2, results.size());
         assertTrue(results.get(0).contains("matches.txt:4: unknownKey"));
+        assertTrue(results.get(1).contains("matches.txt:8: valueToBeFilledIn"));
     }
 
     @Test

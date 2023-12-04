@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.Machines;
+import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class PlotterSettingsTest {
-
     private static final String ROBOT_TEST_UID = "123456";
 
     @BeforeAll
@@ -25,71 +22,46 @@ public class PlotterSettingsTest {
     @Test
     public void saveAndLoadConfig() {
         // given
-        PlotterSettings plotterSettings = new PlotterSettings();
-        plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setLimitTop(2);
-        plotterSettings.setLimitBottom(3);
-        plotterSettings.setLimitRight(4);
-        plotterSettings.setLimitLeft(5);
-        plotterSettings.setStartingPositionIndex(6);
-        plotterSettings.setPenDiameter(7);
-        plotterSettings.setPenLiftTime(8);
-        plotterSettings.setPenDownAngle(9);
-        plotterSettings.setPenUpAngle(10);
-        plotterSettings.setTravelFeedRate(11);
-        plotterSettings.setPenDownColorDefault(new ColorRGB(12, 13, 14));
-        plotterSettings.setPenUpColor(new ColorRGB(15, 16, 17));
-        plotterSettings.setPaperColor(new ColorRGB(18, 19, 20));
-        plotterSettings.setDrawFeedRate(21);
-        plotterSettings.setAcceleration(22);
-        plotterSettings.setHardwareName("TestRobot");
-		plotterSettings.setBlockBufferSize(23);
-		plotterSettings.setSegmentsPerSecond(24);
-		plotterSettings.setMinSegmentLength(25);
-		plotterSettings.setMinSegmentTime(26);
-		plotterSettings.setHandleSmallSegments(false);
-		plotterSettings.setMinAcceleration(27);
-		plotterSettings.setMinPlannerSpeed(28);
-        plotterSettings.setPenLowerTime(29);
+        PlotterSettings expected = new PlotterSettings();
+        expected.setRobotUID(ROBOT_TEST_UID);
+        expected.setDouble(PlotterSettings.LIMIT_TOP,2);
+        expected.setDouble(PlotterSettings.LIMIT_BOTTOM,3);
+        expected.setDouble(PlotterSettings.LIMIT_RIGHT,4);
+        expected.setDouble(PlotterSettings.LIMIT_LEFT,5);
+        expected.setInteger(PlotterSettings.STARTING_POS_INDEX,6);
+        expected.setDouble(PlotterSettings.DIAMETER,7);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,8);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
+        expected.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
+        expected.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(12, 13, 14));
+        expected.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(15, 16, 17));
+        expected.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
+        expected.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
+        expected.setDouble(PlotterSettings.MAX_ACCELERATION,22);
+		expected.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);
+		expected.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,24);
+		expected.setDouble(PlotterSettings.MIN_SEGMENT_LENGTH,25);
+		expected.setInteger(PlotterSettings.MIN_SEG_TIME,26);
+		expected.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,false);
+		expected.setDouble(PlotterSettings.MIN_ACCELERATION,27);
+		expected.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,28);
+        expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,29);
+        expected.setString(PlotterSettings.ANCESTOR,"Makelangelo 5");
 
-        Machines [] allMachines = Machines.values();
+        PlotterRendererFactory[] allMachines = PlotterRendererFactory.values();
         int index = (int)(Math.random()*allMachines.length);
         String styleName = allMachines[index].getName();
-        plotterSettings.setStyle(styleName);
+        expected.setString(PlotterSettings.STYLE,styleName);
 
         // when
-        plotterSettings.saveConfig();
+        expected.save();
 
         // then
-        PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
-        assertEquals(2, plotterSettingsRead.getLimitTop());
-        assertEquals(3, plotterSettingsRead.getLimitBottom());
-        assertEquals(4, plotterSettingsRead.getLimitRight());
-        assertEquals(5, plotterSettingsRead.getLimitLeft());
-        assertEquals(6, plotterSettingsRead.getStartingPositionIndex());
-        assertEquals(7, plotterSettingsRead.getPenDiameter());
-        assertEquals(8, plotterSettingsRead.getPenLiftTime());
-        assertEquals(9, plotterSettingsRead.getPenDownAngle());
-        assertEquals(10, plotterSettingsRead.getPenUpAngle());
-        assertEquals(11, plotterSettingsRead.getTravelFeedRate());
-        assertEquals(new ColorRGB(12, 13, 14), plotterSettingsRead.getPenDownColorDefault());
-        assertEquals(new ColorRGB(15, 16, 17), plotterSettingsRead.getPenUpColor());
-        assertEquals(new ColorRGB(18, 19, 20), plotterSettingsRead.getPaperColor());
-        assertEquals(21, plotterSettingsRead.getDrawFeedRate());
-        assertEquals(22, plotterSettingsRead.getMaxAcceleration());
-        assertEquals("TestRobot", plotterSettingsRead.getHardwareName());
-        
-        assertEquals(23, plotterSettingsRead.getBlockBufferSize());
-        assertEquals(24, plotterSettingsRead.getSegmentsPerSecond());
-        assertEquals(25, plotterSettingsRead.getMinSegmentLength());
-        assertEquals(26, plotterSettingsRead.getMinSegmentTime());
-        assertFalse(plotterSettingsRead.isHandleSmallSegments());
-        assertEquals(27, plotterSettingsRead.getMinAcceleration());
-        assertEquals(28, plotterSettingsRead.getMinPlannerSpeed());
-        assertEquals(29,plotterSettingsRead.getPenLowerTime());
+        PlotterSettings actual = new PlotterSettings();
+        actual.load(ROBOT_TEST_UID);
 
-        assertEquals(styleName, plotterSettingsRead.getStyle());
+        Assertions.assertEquals(expected.toString(),actual.toString());
     }
 
     @Test
@@ -102,14 +74,14 @@ public class PlotterSettingsTest {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setZMotorType(type);
+        plotterSettings.setInteger(PlotterSettings.Z_MOTOR_TYPE,type);
 
-        plotterSettings.saveConfig();
+        plotterSettings.save();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
-        plotterSettingsRead.loadConfig(ROBOT_TEST_UID);
-        Assertions.assertEquals(plotterSettings.getZMotorType(),plotterSettingsRead.getZMotorType());
+        plotterSettingsRead.load(ROBOT_TEST_UID);
+        Assertions.assertEquals(plotterSettings.getInteger(PlotterSettings.Z_MOTOR_TYPE),plotterSettingsRead.getInteger(PlotterSettings.Z_MOTOR_TYPE));
 
     }
 

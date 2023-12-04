@@ -41,6 +41,6 @@ public class TranslationsUnusedTest {
         for(String key : keys) {
             System.out.println(key);
         }
-        Assertions.assertEquals(0,keys.size());
+        Assertions.assertEquals(0,keys.size(),"Unused translations found: "+ keys);
     }
 }

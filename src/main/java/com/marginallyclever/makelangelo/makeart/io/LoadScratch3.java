@@ -33,6 +33,8 @@ import java.util.zip.ZipInputStream;
 public class LoadScratch3 implements TurtleLoader {
 	private static final Logger logger = LoggerFactory.getLogger(LoadScratch3.class);
 	private final String PROJECT_JSON = "project.json";
+	private static int seed=0;
+	private static final Random random = new Random();
 	
 	
 	private static class Scratch3Variable {
@@ -126,7 +128,7 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 		logger.debug("Loading...");
 		JSONObject tree = getTreeFromInputStream(in);
-		
+		random.setSeed(0);
 		if(!confirmAtLeastVersion3(tree)) throw new Exception("File must be at least version 3.0.0.");
 		if(!confirmHasPenExtension(tree)) throw new Exception("File must include pen extension.");
 		
@@ -894,7 +896,7 @@ public class LoadScratch3 implements TurtleLoader {
 		JSONArray TO = inputs.getJSONArray("TO");
 		double a = resolveValue(FROM.get(1));
 		double b = resolveValue(TO.get(1));
-		return Math.random() * (b-a) + a;
+		return random.nextDouble() * (b-a) + a;
 	}
 	
 	private double doRound(JSONObject currentBlock) throws Exception {
@@ -980,7 +982,7 @@ public class LoadScratch3 implements TurtleLoader {
 		if(index.equals("last")) {
 			listIndex = list.contents.size()-1;
 		} else if(index.equals("random")) {
-			listIndex = (int) (Math.random() * list.contents.size());
+			listIndex = (int) (random.nextDouble() * list.contents.size());
 		} else {
 			listIndex = Integer.parseInt(index);
 		}

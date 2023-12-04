@@ -3,13 +3,15 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.Filter_CMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.geom.Rectangle2D;
 
 /**
  * See also <a href="http://the-print-guide.blogspot.ca/2009/05/halftone-screen-angles.html">...</a>
@@ -23,7 +25,7 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		super();
 
 		SelectSlider selectPasses = new SelectSlider("passes", Translator.get("Converter_CMYK_Crosshatch.Passes"), 5, 1, getPasses());
-		selectPasses.addPropertyChangeListener(evt->{
+		selectPasses.addSelectListener(evt->{
 			setPasses((int)evt.getNewValue());
 			fireRestart();
 		});
@@ -55,8 +57,8 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
 
-		Filter_CMYK cmyk = new Filter_CMYK();
-		cmyk.filter(myImage);
+		FilterCMYK cmyk = new FilterCMYK(myImage);
+		cmyk.filter();
 		
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
@@ -81,8 +83,9 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		double stepSize = passes;
 
 		// from top to bottom of the margin area...
-		double height  = myPaper.getMarginTop() - myPaper.getMarginBottom();
-		double width   = myPaper.getMarginRight() - myPaper.getMarginLeft();
+		Rectangle2D.Double rect = myPaper.getMarginRectangle();
+		double height  = rect.getHeight();
+		double width   = rect.getWidth();
 		double maxLen  = Math.sqrt(width*width+height*height);
 
 		double a;

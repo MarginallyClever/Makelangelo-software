@@ -5,4 +5,5 @@ JTabbedPane tabbedPane = new JTabbedPane();
 
 		CollapsiblePanel collapsiblePanel = new CollapsiblePanel(parentWindow, Translator.get("PlotterControls.AdvancedControls"), DIMENSION_COLLAPSIBLE_HEIGHT);
 		collapsiblePanel.add(tabbedPane);
+		Translator . get ( "valueToBeFilledIn" , "aValue");
 //		st = Translator.get("unknownKeyInAComment") + " - ";

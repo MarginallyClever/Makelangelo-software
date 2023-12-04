@@ -1,38 +1,36 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import java.awt.Component;
-import javax.swing.JOptionPane;
-
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 
+import javax.swing.*;
+import java.awt.*;
+
+/**
+ * Dialog to select the starting line number.
+ */
+@Deprecated
 public class StartAtPanel extends SelectPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private int lineNumber;
 	private boolean findPreviousPenDown = true;
 	private boolean addPenDownCommand = false;
+	private final SelectInteger starting_line = new SelectInteger("lineNumber","StartAtLine",0);
+	private final SelectOneOfMany comboBox;
 
-	private SelectInteger starting_line = new SelectInteger("lineNumber","StartAtLine",0);
-	private SelectOneOfMany comboBox;
-	private String [] optionsList;
-	
 	public StartAtPanel() {
 		super();
 		
 		this.add(starting_line);
-		
-		optionsList = new String [] {
-			Translator.get("StartAtLastPenDown"),
-			Translator.get("StartAtAddPenDown"),
-			Translator.get("StartAtExactly"),
+
+		String[] optionsList = new String[]{
+				Translator.get("StartAtLastPenDown"),
+				Translator.get("StartAtAddPenDown"),
+				Translator.get("StartAtExactly"),
 		};
 
-		comboBox = new SelectOneOfMany("startAt",Translator.get("StartAt"),optionsList,0);
+		comboBox = new SelectOneOfMany("startAt",Translator.get("StartAt"), optionsList,0);
 
 		this.add(comboBox);		
 	}

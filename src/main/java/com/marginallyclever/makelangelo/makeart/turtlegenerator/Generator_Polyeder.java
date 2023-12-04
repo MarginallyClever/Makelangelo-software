@@ -142,17 +142,17 @@ public class Generator_Polyeder extends TurtleGenerator {
 		String [] models=getModelNames();
 
 		add(selectSize = new SelectInteger("size",Translator.get("Size"),getLastSize()));
-		selectSize.addPropertyChangeListener(evt->{
+		selectSize.addSelectListener(evt->{
 			setSize(((Number)selectSize.getValue()).intValue());
 			generate();
 		});
 		add(selectFlap = new SelectInteger("flap",Translator.get("Flap"),getLastFlap()));
-		selectFlap.addPropertyChangeListener(evt->{
+		selectFlap.addSelectListener(evt->{
 			setFlap(((Number)selectFlap.getValue()).intValue());
 			generate();
 		});
 		add(selectModel = new SelectOneOfMany("model",Translator.get("Model"),models,getLastModel()));
-		selectModel.addPropertyChangeListener(evt->{
+		selectModel.addSelectListener(evt->{
 			setModel(selectModel.getSelectedIndex());
 			generate();
 		});
@@ -260,6 +260,8 @@ public class Generator_Polyeder extends TurtleGenerator {
 		logger.debug("start");
 		geneneratePolygonStep(turtle,t);
 		logger.debug("end");
+
+		turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
 		notifyListeners(turtle);
 	}
