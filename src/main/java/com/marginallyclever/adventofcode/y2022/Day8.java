@@ -1,4 +1,4 @@
-package com.marginallyclever.adventofcode;
+package com.marginallyclever.adventofcode.y2022;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;

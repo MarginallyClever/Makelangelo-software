@@ -1,4 +1,4 @@
-package com.marginallyclever.adventofcode;
+package com.marginallyclever.adventofcode.y2022;
 
 import java.io.*;
 import java.util.ArrayList;
