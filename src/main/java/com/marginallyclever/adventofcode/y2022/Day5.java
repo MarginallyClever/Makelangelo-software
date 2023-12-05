@@ -18,7 +18,7 @@ public class Day5 {
             stacks.add(new Stack<>());
         }
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("day5.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 processLine(line);

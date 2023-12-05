@@ -66,7 +66,7 @@ public class Day8 {
     public static Matrix grid, visible;
 
     public static void main(String[] args) {
-        processFile("day8.txt");
+        processFile("input.txt");
         printGrid(grid);
         countVisibleFromOutside();
         printGrid(visible);

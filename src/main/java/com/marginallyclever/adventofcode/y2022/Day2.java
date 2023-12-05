@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 public class Day2 {
     static int totalScore = 0;
     public static void main(String[] args) {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("day2.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 processLine(line.trim());

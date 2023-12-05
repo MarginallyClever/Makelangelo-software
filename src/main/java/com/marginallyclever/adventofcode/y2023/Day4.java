@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Day4 {
     public static void main(String[] args) {
         Day4 me = new Day4();
-        me.processFile("day4.txt");
+        me.processFile("input.txt");
     }
 
     private void processFile(String filename) {

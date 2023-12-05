@@ -33,7 +33,7 @@ public class Day11 {
 
     public static void main(String[] args) {
         Day11 me = new Day11();
-        me.processFile("day11.txt");
+        me.processFile("input.txt");
         me.calculateLCM();
 
         for(int i=0;i<10000;++i) {

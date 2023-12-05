@@ -8,7 +8,7 @@ public class Day1 {
     static List<Integer> sums = new ArrayList<>();
     public static void main(String[] args) throws FileNotFoundException {
         sums.add(0);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("day1.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 processLine(line.trim());

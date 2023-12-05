@@ -82,7 +82,7 @@ public class Day9 {
             }
         }
 
-        knots[0].processFile("day9.txt", knots[0]::moveDrag);
+        knots[0].processFile("input.txt", knots[0]::moveDrag);
         knots[8].printGrid(knots[8].visible);
         knots[8].countGrid(knots[8].visible);
     }

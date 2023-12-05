@@ -56,7 +56,7 @@ public class Day12 {
 
     public static void main(String[] args) {
         Day12 me = new Day12();
-        me.processFile("day12.txt");
+        me.processFile("input.txt");
         //me.map.display();
         //me.doSearch(indexStart);
         me.doSearch2();

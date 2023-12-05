@@ -25,7 +25,7 @@ public class Day3 {
 
     public static void main(String[] args) {
         Day3 me = new Day3();
-        me.processFile("day3.txt");
+        me.processFile("input.txt");
         //System.out.println(me.isAdjacentToSymbol(137,96));
         me.findAllGearPoints();
         me.sumNumbersAdjacentToSymbol();

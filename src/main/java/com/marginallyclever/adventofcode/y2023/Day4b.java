@@ -60,7 +60,7 @@ public class Day4b {
         // get time in nanoseconds
         long t0 = System.nanoTime();
 
-        me.processFile("day4.txt");
+        me.processFile("input.txt");
         long t1 = System.nanoTime();
         me.countCardsObtained();
         long t2 = System.nanoTime();

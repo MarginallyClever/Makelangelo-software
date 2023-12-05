@@ -70,7 +70,7 @@ public class Day10 {
 
     public static void main(String[] args) {
         Day10 day = new Day10();
-        day.processFile("day10.txt");
+        day.processFile("input.txt");
         System.out.println("sum: "+sum);
         day.screen.draw();
     }

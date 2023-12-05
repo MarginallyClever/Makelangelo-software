@@ -43,7 +43,7 @@ public class Day13 {
     public static void main(String[] args) {
         Day13 me = new Day13();
         me.root.isList=true;
-        me.processFile("day13.txt");
+        me.processFile("input.txt");
         me.root.display(0);
 
     }

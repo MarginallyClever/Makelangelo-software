@@ -19,7 +19,7 @@ public class Day6 {
     public static void main(String[] args) {
         stack.push(root);
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day6.class.getResourceAsStream("day6.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day6.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 processLine(br,line);

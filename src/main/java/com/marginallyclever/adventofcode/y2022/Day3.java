@@ -20,7 +20,7 @@ public class Day3 {
         int sum2=0;
         int counter=0;
         String [] lines = new String[3];
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("day3.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 sum += examineSack(line.trim());

@@ -9,7 +9,7 @@ public class Day2b {
 
     public static void main(String[] args) {
         Day2b me = new Day2b();
-        me.processFile("day2.txt");
+        me.processFile("input.txt");
     }
 
     private void processFile(String filename) {

@@ -11,7 +11,7 @@ public class Day4 {
         System.out.println(processLine("2-8,3-7"));
 
         int sum=0;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("day4.txt"))))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(Day1.class.getResourceAsStream("input.txt"))))) {
             String line;
             while ((line = br.readLine()) != null) {
                 sum += processLine(line.trim());
