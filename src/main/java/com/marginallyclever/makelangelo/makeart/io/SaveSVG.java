@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -15,11 +14,11 @@ import java.io.OutputStreamWriter;
 
 /**
  * @author Dan Royer
- * See https://www.w3.org/TR/SVG/paths.html
+ * See <a href="https://www.w3.org/TR/SVG/paths.html">...</a>
  */
 public class SaveSVG implements TurtleSaver {
 	private static final Logger logger = LoggerFactory.getLogger(SaveSVG.class);
-	private static FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
+	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -27,8 +26,8 @@ public class SaveSVG implements TurtleSaver {
 	}
 
 	/**
-	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
-	 */
+     * see <a href="http://paulbourke.net/dataformats/dxf/min3d.html">paulbourke.net</a> for details
+     */
 	@Override
 	public boolean save(OutputStream outputStream, Turtle turtle, PlotterSettings settings) throws Exception {
 		logger.debug("saving...");
@@ -48,7 +47,6 @@ public class SaveSVG implements TurtleSaver {
 		boolean isUp=true;
 		double x0 = turtle.history.get(0).x;
 		double y0 = turtle.history.get(0).y;
-		ColorRGB color = new ColorRGB(0,0,0);
 		boolean hasStarted=false;
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
