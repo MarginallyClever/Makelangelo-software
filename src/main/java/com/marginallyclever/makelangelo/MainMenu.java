@@ -91,6 +91,11 @@ public class MainMenu extends JMenuBar {
         recentFiles.addSubmenuListener((e)-> app.openFile(((JMenuItem)e.getSource()).getText()));
         menu.add(recentFiles);
 
+        JMenuItem buttonImportFile = new JMenuItem(Translator.get("MenuImportFile"));
+        buttonImportFile.addActionListener((e) -> app.importFile());
+        buttonImportFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-import-16.png"))));
+        menu.add(buttonImportFile);
+
         JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
         buttonSaveFile.addActionListener((e) -> saveFile());
         buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, SHORTCUT_CTRL));//"ctrl S"
@@ -417,6 +422,7 @@ public class MainMenu extends JMenuBar {
         JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
         bSaveToSD.addActionListener((e)-> app.saveGCode());
         bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_CTRL));
+        bSaveToSD.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-export-16.png"))));
         menu.add(bSaveToSD);
 
         JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
