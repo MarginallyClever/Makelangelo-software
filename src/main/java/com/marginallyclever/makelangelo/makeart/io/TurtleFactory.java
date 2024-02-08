@@ -39,10 +39,9 @@ public class TurtleFactory {
 
 		for( TurtleLoader loader : loaders ) {
 			if(isValidExtension(filename,loader.getFileNameFilter())) {
-				FileInputStream in = new FileInputStream(filename);
-				Turtle result = loader.load(in);
-				in.close();
-				return result;
+				try(FileInputStream in = new FileInputStream(filename)) {
+					return loader.load(in);
+				}
 			}
 		}
 		throw new IllegalStateException("TurtleFactory could not load '"+filename+"'.");

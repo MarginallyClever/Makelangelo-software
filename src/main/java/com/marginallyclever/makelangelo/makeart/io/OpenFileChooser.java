@@ -20,13 +20,15 @@ import java.util.stream.Stream;
  */
 public class OpenFileChooser {
     private static final Logger logger = LoggerFactory.getLogger(OpenFileChooser.class);
-    private static final String KEY_PREFERENCE_LOAD_PATH = "loadPath";
+    public static final String KEY_PREFERENCE_LOAD_PATH = "loadPath";
     private final JFileChooser jFileChooser = new JFileChooser();
     private final JLabel previewLabel = new JLabel();
     private final Component parent;
     private OpenListener openListener;
 
     public OpenFileChooser(Component parent) {
+        super();
+
         this.parent = parent;
 
         // add all supported type
@@ -51,7 +53,6 @@ public class OpenFileChooser {
 
         // no wild card filter, please.
         jFileChooser.setAcceptAllFileFilterUsed(false);
-
 
         // display a preview
         jFileChooser.addPropertyChangeListener(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, (evt) ->{

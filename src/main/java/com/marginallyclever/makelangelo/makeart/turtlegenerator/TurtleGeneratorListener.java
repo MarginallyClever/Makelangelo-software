@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-public interface TurtleGeneratorListener {
+import java.util.EventListener;
+
+public interface TurtleGeneratorListener extends EventListener {
 	void turtleReady(Turtle t);
 }
