@@ -81,21 +81,36 @@ public class LoadSVG implements TurtleLoader {
 
 	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
+		parseCommonElements(documentElement);
+	}
 
-		logger.debug("...parse path");			parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		logger.debug("...parse polylines");		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		logger.debug("...parse polygons");		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		logger.debug("...parse lines");			parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		logger.debug("...parse rects");			parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		logger.debug("...parse circles");		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		logger.debug("...parse ellipses");		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
+	private void parseGroupElements(NodeList g) throws Exception {
+		int pathNodeCount = g.getLength();
+		logger.debug("{} elements", pathNodeCount);
+		for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
+			Element element = (Element)g.item( iPathNode );
+			if(setStrokeToElementColorBecomesNone(element)) continue;
+
+			parseCommonElements(element);
+		}
+	}
+
+	private void parseCommonElements(Element element) throws Exception {
+		logger.debug("...parse groups");        parseGroupElements(   element.getElementsByTagName( "g"        ));
+		logger.debug("...parse path");			parsePathElements(    element.getElementsByTagName( "path"     ));
+		logger.debug("...parse polylines");		parsePolylineElements(element.getElementsByTagName( "polyline" ));
+		logger.debug("...parse polygons");		parsePolylineElements(element.getElementsByTagName( "polygon"  ));
+		logger.debug("...parse lines");			parseLineElements(    element.getElementsByTagName( "line"     ));
+		logger.debug("...parse rects");			parseRectElements(    element.getElementsByTagName( "rect"     ));
+		logger.debug("...parse circles");		parseCircleElements(  element.getElementsByTagName( "circle"   ));
+		logger.debug("...parse ellipses");		parseEllipseElements( element.getElementsByTagName( "ellipse"  ));
 	}
 
 	/**
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	private void parsePolylineElements(NodeList pathNodes) throws Exception {
+	private void parsePolylineElements(NodeList pathNodes) {
 	    int pathNodeCount = pathNodes.getLength();
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -137,7 +152,7 @@ public class LoadSVG implements TurtleLoader {
 		return false;
 	}
 
-	private void parseLineElements(NodeList node) throws Exception {
+	private void parseLineElements(NodeList node) {
 		Vector3d v2;
 	    int pathNodeCount = node.getLength();
 		logger.debug("{} elements", pathNodeCount);
@@ -196,6 +211,7 @@ public class LoadSVG implements TurtleLoader {
 			}
 		} else if(strokeName.startsWith("rgb(")) {
 			strokeName = strokeName.substring(4,strokeName.length()-1);
+			strokeName = strokeName.substring(0,strokeName.indexOf(")"));
 			if(strokeName.contains("%")) {
 				strokeName = strokeName.replace("%","");
 				String [] parts = strokeName.split(",");
@@ -230,7 +246,7 @@ public class LoadSVG implements TurtleLoader {
 	 * See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">mozilla</a>
 	 * @param node the source of the elements
 	 */
-	private void parseRectElements(NodeList node) throws Exception {
+	private void parseRectElements(NodeList node) {
 	    int pathNodeCount = node.getLength();
 		logger.debug("{} elements", pathNodeCount);
 	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
@@ -307,7 +323,7 @@ public class LoadSVG implements TurtleLoader {
 		}
 	}
 
-	private void parseCircleElements(NodeList node) throws Exception {
+	private void parseCircleElements(NodeList node) {
 		Vector3d v2;
 
 	    int pathNodeCount = node.getLength();
@@ -387,13 +403,12 @@ public class LoadSVG implements TurtleLoader {
 			SVGOMPathElement element = ((SVGOMPathElement)paths.item( iPath ));
 			if(setStrokeToElementColorBecomesNone(element)) continue;
 
-
 			Matrix3d m = getMatrixFromElement(element);
-			logger.debug("Matrix {}", m);
+			//logger.debug("Matrix {}", m);
 
 			SVGPathSegList pathList = element.getNormalizedPathSegList();
 			int itemCount = pathList.getNumberOfItems();
-			logger.debug("Node has {} elements.", itemCount);
+			//logger.debug("Node has {} elements.", itemCount);
 			isNewPath=true;
 
 			for(int i=0; i<itemCount; i++) {
@@ -449,7 +464,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doLineToAbs(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Line Abs {}", p);
+		//logger.debug("Line Abs {}", p);
 		pathPoint.set(p);
 		myTurtle.moveTo(pathPoint.x,pathPoint.y);
 		isNewPath=false;
@@ -458,7 +473,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doMoveRel(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Move Rel {}", p);
+		//logger.debug("Move Rel {}", p);
 		pathPoint.add(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
@@ -468,7 +483,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doMoveToAbs(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Move Abs {}", p);
+		//logger.debug("Move Abs {}", p);
 		pathPoint.set(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
@@ -476,7 +491,7 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private void doClosePath() {
-		logger.debug("Close path");
+		//logger.debug("Close path");
 		myTurtle.moveTo(pathFirstPoint.x,pathFirstPoint.y);
 		isNewPath=true;
 	}

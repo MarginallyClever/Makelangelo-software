@@ -191,13 +191,7 @@ public class MainMenu extends JMenuBar {
         menu.add(buttonViewLog);
 
         JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
-        buttonLogFolder.addActionListener((e) -> {
-            try {
-                Desktop.getDesktop().open(Log.logDir);
-            } catch (IOException e1) {
-                logger.error("Can't open log folder", e1);
-            }
-        });
+        buttonLogFolder.addActionListener((e) -> openLogDirectory());
         buttonLogFolder.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-folder-16.png"))));
         menu.add(buttonLogFolder);
 
@@ -222,6 +216,14 @@ public class MainMenu extends JMenuBar {
         }
 
         return menu;
+    }
+
+    private void openLogDirectory() {
+        try {
+            Desktop.getDesktop().open(Log.logDir);
+        } catch (IOException e1) {
+            logger.error("Can't open log folder", e1);
+        }
     }
 
     public JMenuItem createMenuItemBrowse(String menuLabelAlreadyTranslated, String urlAsString) {
