@@ -85,6 +85,7 @@
 	<string><key>MenuAbout</key><value>About</value></string>
 	<string><key>MenuSettings</key><value>Settings</value></string>
 	<string><key>MenuOpenFile</key><value>Open File...</value></string>
+	<string><key>MenuImportFile</key><value>Import File...</value></string>
 	<string><key>MenuSaveFile</key><value>Save File...</value></string>
 	<string><key>MenuReopenFile</key><value>Reopen last file</value></string>
 	<string><key>MenuView</key><value>View</value></string>

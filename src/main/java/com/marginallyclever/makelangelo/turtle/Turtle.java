@@ -87,7 +87,7 @@ public class Turtle implements Cloneable {
 	@Override
 	public String toString() {
 		return "Turtle{" +
-				"history=" + history +
+				"history=" + history.size() +
 				", px=" + px +
 				", py=" + py +
 				", nx=" + nx +
