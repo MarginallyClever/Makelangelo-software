@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -15,6 +14,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -68,10 +68,10 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		// remove extra change color at the start of the turtle
 		turtle.history.clear();
 		
-		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 ,new ColorRGB(255,255,  0));
-		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,new ColorRGB(  0,255,255));
-		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,new ColorRGB(255,  0,255));
-		logger.debug("Black...");		outputChannel(cmyk.getK(),45,new ColorRGB(  0,  0,  0));
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 ,Color.YELLOW);
+		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,Color.CYAN);
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),75,Color.MAGENTA);
+		logger.debug("Black...");		outputChannel(cmyk.getK(),45,Color.BLACK);
 
 		RemoveExtraColorChangesFromTurtle.run(turtle);
 		fireConversionFinished();
@@ -85,7 +85,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	private void removeRedundantColorChanges(Turtle turtle) {
 	}
 	
-	protected void outputChannel(TransformedImage img, float angle, ColorRGB newColor) {
+	protected void outputChannel(TransformedImage img, float angle, Color newColor) {
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
 		

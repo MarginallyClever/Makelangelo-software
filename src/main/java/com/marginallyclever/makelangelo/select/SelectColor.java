@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.select;
 
-import com.marginallyclever.convenience.ColorRGB;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
@@ -19,7 +17,7 @@ public class SelectColor extends Select {
 	 * @param labelValue
 	 * @param defaultValue
 	 */
-	public SelectColor(String internalName,String labelValue,ColorRGB defaultValue,final Component parentComponent) {
+	public SelectColor(String internalName,String labelValue,Color defaultValue,final Component parentComponent) {
 		super(internalName);
 
 		JLabel label = new JLabel(labelValue,JLabel.LEADING);
@@ -30,7 +28,7 @@ public class SelectColor extends Select {
 		chooseButton.setMaximumSize(chooseButton.getMinimumSize());
 		chooseButton.setPreferredSize(chooseButton.getMinimumSize());
 		chooseButton.setSize(chooseButton.getMinimumSize());
-		chooseButton.setBackground(new Color(defaultValue.toInt()));
+		chooseButton.setBackground(defaultValue);
 		chooseButton.setBorder(new LineBorder(Color.BLACK));
 		chooseButton.addActionListener(e -> {
 			Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
@@ -48,12 +46,11 @@ public class SelectColor extends Select {
 		this.add(chooseButton,BorderLayout.LINE_END);
 	}
 	
-	public ColorRGB getColor() {
-		Color c = chooseButton.getBackground();
-		return new ColorRGB(c.getRed(),c.getGreen(),c.getBlue());
+	public Color getColor() {
+		return chooseButton.getBackground();
 	}
 	
-	public void setColor(ColorRGB c) {
-		chooseButton.setBackground(new Color(c.red,c.green,c.blue));
+	public void setColor(Color c) {
+		chooseButton.setBackground(c);
 	}
 }

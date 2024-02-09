@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -88,23 +88,23 @@ class TurtleTest {
     @Test
     public void colorChange() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // when
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
-        turtle.setColor(new ColorRGB(4, 5, 6));
+        turtle.setColor(new Color(4, 5, 6));
         turtle.jumpTo(-15, -7);
 
         // then
         assertEquals("[TOOL R1 G2 B3 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R4 G5 B6 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
-        assertEquals(new ColorRGB(1,2,3), turtle.getFirstColor());
+        assertEquals(new Color(1,2,3), turtle.getFirstColor());
     }
 
     @Test
     public void firstColor() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // then
         assertEquals("[TOOL R1 G2 B3 D1.000]", turtle.history.toString());
@@ -113,7 +113,7 @@ class TurtleTest {
     @Test
     public void toolChange() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // when
         turtle.moveTo(20, 30);
@@ -220,7 +220,7 @@ class TurtleTest {
         turtle.jumpTo(-15, -7);
         turtle.moveTo(3, 4);
 
-        Turtle turtle2 = new Turtle(new ColorRGB(6,7,8));
+        Turtle turtle2 = new Turtle(new Color(6,7,8));
         turtle2.jumpTo(-8, 4);
         turtle2.moveTo(1, 6);
 

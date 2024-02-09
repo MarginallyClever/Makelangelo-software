@@ -1,10 +1,11 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+
+import java.awt.*;
 
 /**
  * Draws Turtle instructions one line segment at a time.
@@ -13,19 +14,19 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
  */
 public class DefaultTurtleRenderer implements TurtleRenderer {
 	private GL2 gl2;
-	private final ColorRGB colorTravel = new ColorRGB(0,255,0);
-	private final ColorRGB colorDraw = new ColorRGB(0,0,0);
+	private Color colorTravel = Color.GREEN;
+	private Color colorDraw = Color.BLACK;
 	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter =1;
+	private boolean isPenUp = true;
 	
 	@Override
 	public void start(GL2 gl2) {
-		this.gl2=gl2;
+		this.gl2 = gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
+		isPenUp = true;
 
-		// Multiply blend mode
-		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);
 		// set pen diameter
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		gl2.glLineWidth(penDiameter);
@@ -39,40 +40,49 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 		gl2.glEnd();
 		// restore pen diameter
 		gl2.glLineWidth(lineWidthBuf[0]);
-		// restore blend mode
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
-		gl2.glColor3d(
-				colorDraw.getRed() / 255.0,
-				colorDraw.getGreen() / 255.0,
-				colorDraw.getBlue() / 255.0);
+		if(isPenUp) {
+			gl2.glColor4d(
+					colorDraw.getRed() / 255.0,
+					colorDraw.getGreen() / 255.0,
+					colorDraw.getBlue() / 255.0,
+					colorDraw.getAlpha() / 255.0);
+			isPenUp = false;
+		}
+
 		gl2.glVertex2d(p0.x, p0.y);
 		gl2.glVertex2d(p1.x, p1.y);
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
+		if(!isPenUp) {
+			isPenUp = true;
+			if(showPenUp) {
+				gl2.glColor4d(
+						colorTravel.getRed() / 255.0,
+						colorTravel.getGreen() / 255.0,
+						colorTravel.getBlue() / 255.0,
+						colorTravel.getAlpha() / 255.0);
+			}
+		}
 		if(!showPenUp) return;
-		
-		gl2.glColor3d(
-				colorTravel.getRed() / 255.0,
-				colorTravel.getGreen() / 255.0,
-				colorTravel.getBlue() / 255.0);
+
 		gl2.glVertex2d(p0.x, p0.y);
 		gl2.glVertex2d(p1.x, p1.y);
 	}
 
 	@Override
-	public void setPenDownColor(ColorRGB color) {
-		colorDraw.set(color);
+	public void setPenDownColor(Color color) {
+		colorDraw = color;
 	}
 
 	@Override
-	public void setPenUpColor(ColorRGB color) {
-		colorTravel.set(color);
+	public void setPenUpColor(Color color) {
+		colorTravel = color;
 	}
 	
 	@Override

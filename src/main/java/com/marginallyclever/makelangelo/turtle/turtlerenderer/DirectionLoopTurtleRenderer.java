@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	private GL2 gl2;
-	private final ColorRGB colorTravel = new ColorRGB(0,255,0);
+	private Color colorTravel = Color.GREEN;
 	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter = 1;
@@ -26,9 +26,6 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	public void start(GL2 gl2) {
 		this.gl2=gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
-
-		// Multiply blend mode
-		gl2.glBlendFunc(GL2.GL_DST_COLOR, GL2.GL_ZERO);
 
 		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 		gl2.glLineWidth(penDiameter);
@@ -42,8 +39,6 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		gl2.glEnd();
 		// restore pen diameter
 		gl2.glLineWidth(lineWidthBuf[0]);
-		// restore blend mode
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	@Override
@@ -83,11 +78,11 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	}
 
 	@Override
-	public void setPenDownColor(ColorRGB color) {}
+	public void setPenDownColor(Color color) {}
 
 	@Override
-	public void setPenUpColor(ColorRGB color) {
-		colorTravel.set(color);
+	public void setPenUpColor(Color color) {
+		colorTravel=(color);
 	}
 
 	@Override

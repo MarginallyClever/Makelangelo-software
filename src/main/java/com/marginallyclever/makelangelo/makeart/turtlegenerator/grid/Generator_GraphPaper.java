@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.grid;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -45,10 +45,10 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();
-		turtle.setColor(new ColorRGB(255,0,0));
+		turtle.setColor(Color.RED);
 		lines(turtle,10,0);
 		lines(turtle,10,90);
-		turtle.setColor(new ColorRGB(0,0,0));
+		turtle.setColor(Color.BLACK);
 		lines(turtle,100,0);
 		lines(turtle,100,90);
 

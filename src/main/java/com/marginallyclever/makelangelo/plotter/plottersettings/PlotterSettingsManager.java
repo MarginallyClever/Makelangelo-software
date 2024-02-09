@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -71,10 +71,10 @@ public class PlotterSettingsManager {
         profile.setString(PlotterSettings.USER_GENERAL_END_GCODE, "");
         profile.setString(PlotterSettings.STYLE, PlotterRendererFactory.MAKELANGELO_5.getName());
 
-        profile.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(255, 255, 255));
-        profile.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(0, 0, 0));
-        profile.setColor(PlotterSettings.PEN_DOWN_COLOR,new ColorRGB(0, 0, 0));
-        profile.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(0, 255, 0));
+        profile.setColor(PlotterSettings.PAPER_COLOR, Color.WHITE);
+        profile.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,Color.BLACK);
+        profile.setColor(PlotterSettings.PEN_DOWN_COLOR,Color.BLACK);
+        profile.setColor(PlotterSettings.PEN_UP_COLOR,Color.GREEN);
 
         profile.setDoubleArray(PlotterSettings.MAX_JERK,new double []{ 10, 10, 0.3 });
         return profile;

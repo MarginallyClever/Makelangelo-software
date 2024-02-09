@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
@@ -169,7 +168,7 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setDouble(PlotterSettings.PEN_ANGLE_UP,penUpAngle.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,penDownAngle.getValue());
 
-		settings.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(255,255,255));
+		settings.setColor(PlotterSettings.PAPER_COLOR,Color.WHITE);
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_UP_COLOR,selectPenUpColor.getColor());

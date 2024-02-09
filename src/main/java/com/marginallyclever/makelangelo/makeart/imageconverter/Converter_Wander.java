@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
+import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
@@ -14,6 +13,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
@@ -87,7 +87,7 @@ public class Converter_Wander extends ImageConverter {
 		fireConversionFinished();
 	}
 
-	protected void outputChannel(TransformedImage img, ColorRGB newColor, int pointsPerChannel, double cutoff) {
+	protected void outputChannel(TransformedImage img, Color newColor, int pointsPerChannel, double cutoff) {
 		stepSize = Math.max(1,stepSize);
 		double halfStep = stepSize/2;
 
@@ -200,10 +200,10 @@ public class Converter_Wander extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		logger.debug("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),numLines,255.0*3.0/4.0);
-		logger.debug("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),numLines,128.0);
-		logger.debug("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),numLines,128.0);
-		logger.debug("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),numLines,128.0);
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),Color.YELLOW,numLines,255.0*3.0/4.0);
+		logger.debug("Cyan...");		outputChannel(cmyk.getC(),Color.CYAN,numLines,128.0);
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),Color.MAGENTA,numLines,128.0);
+		logger.debug("Black...");		outputChannel(cmyk.getK(),Color.BLACK,numLines,128.0);
 		logger.debug("Finishing...");
 	}
 	
@@ -214,7 +214,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		turtle = new Turtle();
 		
-		outputChannel(img,new ColorRGB(0,0,0),numLines,255.0/4.0);
+		outputChannel(img,Color.BLACK,numLines,255.0/4.0);
 	}
 	
 

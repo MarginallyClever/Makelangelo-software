@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
+import com.marginallyclever.convenience.ColorPalette;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -73,7 +74,7 @@ public class SaveSVG implements TurtleSaver {
 				if(hasStarted) {
 					out.write("'/>\n");
 				}
-				out.write("  <path fill='none' stroke='"+m.getColor().toHexString()+"' d='");
+				out.write("  <path fill='none' stroke='"+ ColorPalette.getHexCode(m.getColor())+"' d='");
 				isUp=true;
 				hasStarted=true;
 				break;

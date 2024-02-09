@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.convenience.ColorRGB;
-import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Packet;
 
 import java.awt.*;
@@ -36,7 +35,7 @@ public class TurtleToBufferedImage extends Node {
             g.translate(-r.getX(),-r.getY());
 
             TurtleMove previousMove = null;
-            Color downColor = new Color(0, 0, 0);
+            Color downColor = Color.BLACK;
 
             for (TurtleMove m : myTurtle.history) {
                 if (m == null) throw new NullPointerException();
@@ -53,8 +52,7 @@ public class TurtleToBufferedImage extends Node {
                         previousMove = m;
                     }
                     case TOOL_CHANGE -> {
-                        ColorRGB c = m.getColor();
-                        downColor = new Color(c.red, c.green, c.blue);
+                        downColor = m.getColor();
                         g.setStroke(new BasicStroke((int) m.getDiameter()));
                     }
                 }

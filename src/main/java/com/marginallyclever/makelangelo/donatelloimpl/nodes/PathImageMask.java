@@ -7,6 +7,7 @@ import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.Packet;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -104,9 +105,9 @@ public class PathImageMask extends Node {
             Point2D b = new Point2D(dx * fraction + P0.x,dy * fraction + P0.y);
             double sampleResult = sampleImageUnderStep(img,a,b);
             if(sampleResult < channelCutoff) {
-                listBelow.add(new LineSegment2D(a,b,new ColorRGB(0,0,0)));
+                listBelow.add(new LineSegment2D(a,b, Color.BLACK));
             } else {
-                listAbove.add(new LineSegment2D(a,b,new ColorRGB(0,0,0)));
+                listAbove.add(new LineSegment2D(a,b, Color.BLACK));
             }
             a = b;
         }

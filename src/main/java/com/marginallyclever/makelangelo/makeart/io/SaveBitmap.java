@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -8,13 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
-import java.util.Iterator;
 
 /**
  * Save Turtle to any supported bitmap format.
@@ -57,7 +54,7 @@ public class SaveBitmap implements TurtleSaver {
 		g.translate(-r.getX(),-r.getY());
 
 		TurtleMove previousMove = null;
-		Color downColor = new Color(0, 0, 0);
+		Color downColor = Color.BLACK;
 
 		for (TurtleMove m : myTurtle.history) {
 			if (m == null) throw new NullPointerException();
@@ -74,16 +71,11 @@ public class SaveBitmap implements TurtleSaver {
 					previousMove = m;
 				}
 				case TOOL_CHANGE -> {
-					ColorRGB c = m.getColor();
-					downColor = new Color(c.red, c.green, c.blue);
+					downColor = m.getColor();
 					g.setStroke(new BasicStroke((int) m.getDiameter()));
 				}
 			}
 		}
-
-		Iterator writers = ImageIO.getImageWritersByFormatName(extension);
-		ImageWriter writer = (ImageWriter)writers.next();
-
 
 		ImageIO.write(img, extension, outputStream);
 

@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.Bezier;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -20,6 +19,7 @@ import org.w3c.dom.svg.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
+import java.awt.*;
 import java.io.InputStream;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class LoadSVG implements TurtleLoader {
 	private boolean isNewPath;  // for cubic paths
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
-	private final ColorRGB paperColor = new ColorRGB(255,255,255);
+	private final Color paperColor = new Color(255,255,255);
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -63,7 +63,7 @@ public class LoadSVG implements TurtleLoader {
 		initSVGDOM(document);
 
 		myTurtle = new Turtle();
-		myTurtle.setColor(new ColorRGB(0,0,0));  // initial pen color
+		myTurtle.setColor(Color.BLACK);  // initial pen color
 		parseAll(document);
 
 		// plotter coordinates are inverted in Y so flip the image.
@@ -141,8 +141,9 @@ public class LoadSVG implements TurtleLoader {
 	 * @return true if the stroke color is 'none' or white (assumed to be the paper color)
 	 */
 	private boolean setStrokeToElementColorBecomesNone(Element element) {
-		ColorRGB color = getStroke(element);
+		Color color = getStroke(element);
 		if(color==null) return false;  // none
+		if(color.getAlpha()==0) return false;  // transparent
 		if(color.equals(paperColor)) return true;
 
 		if(!color.equals(myTurtle.getColor())) {
@@ -169,38 +170,52 @@ public class LoadSVG implements TurtleLoader {
 		myTurtle.moveTo(v2.x,v2.y);
 	}
 
-	private ColorRGB getStroke(Element element) {
+	private Color getStroke(Element element) {
+		Color c=null;
 		if(element.hasAttribute("style")) {
 			String style = element.getAttribute("style").toLowerCase().replace("\\s+","");
 			if(!style.contains(LABEL_STROKE)) {
 				// default SVG stroke is "none", which isn't even transparent - it's nothing!
-				return null;
 			} else {
 				int k = style.indexOf(LABEL_STROKE);
 				String strokeStyleName = style.substring(k + LABEL_STROKE.length());
-				return stringToColor(strokeStyleName);
+				c = stringToColor(strokeStyleName);
+				if(c!=null) {
+					k = style.indexOf("stroke-opacity:");
+					if (k >= 0) {
+						style = style.substring(k + 15, style.indexOf(";", k + 15));
+						c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(style) * 255.0));
+					}
+				}
 			}
 		}
-		if(element.hasAttribute("stroke")) {
-			String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+","");
-			return stringToColor(strokeStyleName);
+		if(c!=null) {
+			if (element.hasAttribute("stroke")) {
+				String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+", "");
+				c = stringToColor(strokeStyleName);
+			}
 		}
-		return null;
+		if(c!=null) {
+			if (element.hasAttribute("stroke-opacity")) {
+				c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(element.getAttribute("stroke-opacity")) * 255.0));
+			}
+		}
+		return c;
 	}
 
-	private ColorRGB stringToColor(String strokeName) {
+	private Color stringToColor(String strokeName) {
 		if(strokeName.startsWith("#")) {
 			strokeName = strokeName.substring(1);
 			if(strokeName.length()==3) {
 				int r = Integer.parseInt(strokeName.substring(0,1),16);
 				int g = Integer.parseInt(strokeName.substring(1,2),16);
 				int b = Integer.parseInt(strokeName.substring(2,3),16);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			} else if(strokeName.length()==6) {
 				int r = Integer.parseInt(strokeName.substring(0,2),16);
 				int g = Integer.parseInt(strokeName.substring(2,4),16);
 				int b = Integer.parseInt(strokeName.substring(4,6),16);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			}
 		} else if(strokeName.startsWith("rgb(")) {
 			// isolate the portion between the ()
@@ -213,14 +228,14 @@ public class LoadSVG implements TurtleLoader {
 				int r = (int)(Integer.parseInt(parts[0])*255.0/100.0);
 				int g = (int)(Integer.parseInt(parts[1])*255.0/100.0);
 				int b = (int)(Integer.parseInt(parts[2])*255.0/100.0);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			} else {
 				// already in 0-255
 				String [] parts = strokeName.split(",");
 				int r = Integer.parseInt(parts[0]);
 				int g = Integer.parseInt(parts[1]);
 				int b = Integer.parseInt(parts[2]);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			}
 		} else {
 			return W3CColorNames.get(strokeName);

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -33,12 +33,13 @@ public class FilterDifference extends ImageFilter {
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
-                ColorRGB other = new ColorRGB(bb.getRGB(x, y));
-                diff.red   = modify(diff.red  , other.red  );
-                diff.green = modify(diff.green, other.green);
-                diff.blue  = modify(diff.blue , other.blue );
-                rr.setRGB(x, y, diff.toInt());
+                Color diff = new Color(aa.getRGB(x, y));
+                Color other = new Color(bb.getRGB(x, y));
+                var diff2 = new Color(
+                        modify(diff.getRed()  , other.getRed()  ),
+                        modify(diff.getGreen(), other.getGreen()),
+                        modify(diff.getBlue() , other.getBlue() ) );
+                rr.setRGB(x, y, diff2.hashCode());
             }
         }
 

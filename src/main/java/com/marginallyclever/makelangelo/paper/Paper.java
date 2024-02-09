@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
 
@@ -44,8 +44,7 @@ public class Paper implements PreviewListener {
 	// shift apply to the center of the paper
 	private double centerX=0.0d;
 	private double centerY=0.0d;
-	
-	ColorRGB paperColor = new ColorRGB(255,255,255); // Paper #color
+	private Color paperColor = Color.WHITE;
 	
 	public Paper() {
 		super();
@@ -130,8 +129,8 @@ public class Paper implements PreviewListener {
 		paperBottom = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_BOTTOM, Double.toString(paperBottom)));
 		paperMargin = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_MARGIN, Double.toString(paperMargin)));
 		rotation = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_ROTATION, Double.toString(rotation)));
-		int colorFromPref = Integer.parseInt(paperPreferenceNode.get(PREF_KEY_PAPER_COLOR, Integer.toString(paperColor.toInt())));
-		paperColor = new ColorRGB(colorFromPref);
+		int colorFromPref = Integer.parseInt(paperPreferenceNode.get(PREF_KEY_PAPER_COLOR, Integer.toString(paperColor.hashCode())));
+		paperColor = new Color(colorFromPref);
 		rotationRef = 0;
 		centerX=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_X, Double.toString(rotation)));
 		centerY=Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_CENTER_Y, Double.toString(rotation)));
@@ -146,7 +145,7 @@ public class Paper implements PreviewListener {
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_BOTTOM, paperBottom);
 		paperPreferenceNode.put(PREF_KEY_PAPER_MARGIN, Double.toString(paperMargin));
 		paperPreferenceNode.putDouble(PREF_KEY_ROTATION, rotation);
-		paperPreferenceNode.putInt(PREF_KEY_PAPER_COLOR, paperColor.toInt());
+		paperPreferenceNode.putInt(PREF_KEY_PAPER_COLOR, paperColor.hashCode());
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_X, centerX);
 		paperPreferenceNode.putDouble(PREF_KEY_PAPER_CENTER_Y, centerY);
 	}
@@ -160,11 +159,11 @@ public class Paper implements PreviewListener {
 		this.paperBottom = -height / 2;		
 	}
 
-	public ColorRGB getPaperColor() {
+	public Color getPaperColor() {
 		return paperColor;
 	}
 
-	public void setPaperColor(ColorRGB arg0) {
+	public void setPaperColor(Color arg0) {
 		paperColor = arg0;
 	}
 

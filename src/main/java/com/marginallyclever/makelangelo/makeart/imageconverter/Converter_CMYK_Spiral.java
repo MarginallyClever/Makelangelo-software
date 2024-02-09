@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
@@ -10,6 +9,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -67,15 +67,15 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 		// remove extra change color at the start of the turtle
 		turtle.history.clear();
 		
-		logger.debug("Yellow...");		outputChannel(cmyk.getY(),new ColorRGB(255,255,  0),45    ,separation);
-		logger.debug("Cyan...");		outputChannel(cmyk.getC(),new ColorRGB(  0,255,255),45+ 90,separation);
-		logger.debug("Magenta...");		outputChannel(cmyk.getM(),new ColorRGB(255,  0,255),45+180,separation);
-		logger.debug("Black...");		outputChannel(cmyk.getK(),new ColorRGB(  0,  0,  0),45+270,separation);
+		logger.debug("Yellow...");		outputChannel(cmyk.getY(),Color.YELLOW,45    ,separation);
+		logger.debug("Cyan...");		outputChannel(cmyk.getC(),Color.CYAN,45+ 90,separation);
+		logger.debug("Magenta...");		outputChannel(cmyk.getM(),Color.MAGENTA,45+180,separation);
+		logger.debug("Black...");		outputChannel(cmyk.getK(),Color.BLACK,45+270,separation);
 
 		fireConversionFinished();
 	}
 
-	protected void outputChannel(TransformedImage img, ColorRGB newColor, double angle, double separation) {
+	protected void outputChannel(TransformedImage img, Color newColor, double angle, double separation) {
 		double cx = Math.cos(Math.toRadians(angle))*separation;
 		double cy = Math.sin(Math.toRadians(angle))*separation;
 		turtle.setColor(newColor);

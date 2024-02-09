@@ -1,13 +1,14 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.nodegraphcore.DockReceiving;
-import com.marginallyclever.nodegraphcore.DockShipping;
-import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.nodegraphcore.DockReceiving;
+import com.marginallyclever.nodegraphcore.DockShipping;
+import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.Packet;
+
+import java.awt.*;
 
 public class ColorTurtle extends Node {
     private final DockReceiving<Turtle> turtle = new DockReceiving<>("turtle", Turtle.class,new Turtle());
@@ -36,11 +37,11 @@ public class ColorTurtle extends Node {
         int r = red.getValue().intValue();
         int g = green.getValue().intValue();
         int b = blue.getValue().intValue();
-        ColorRGB c = new ColorRGB(r, g, b);
+        Color c = new Color(r, g, b);
         Turtle moved = new Turtle();
         for( TurtleMove m : input.history ) {
             if(m.type== MovementType.TOOL_CHANGE) {
-                moved.history.add(new TurtleMove(c.toInt(),m.getDiameter(),MovementType.TOOL_CHANGE));
+                moved.history.add(new TurtleMove(c.hashCode(),m.getDiameter(),MovementType.TOOL_CHANGE));
             } else {
                 moved.history.add(new TurtleMove(m));
             }

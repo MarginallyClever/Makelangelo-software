@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
@@ -11,6 +10,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +111,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 	private void drawCellCenters(Turtle turtle, List<VoronoiCell> points) {
 		// draw all the cell centers
-		turtle.setColor(new ColorRGB(0,0,255));
+		turtle.setColor(Color.BLUE);
 
 		for( VoronoiCell p : points ) {
 			// jump to corner

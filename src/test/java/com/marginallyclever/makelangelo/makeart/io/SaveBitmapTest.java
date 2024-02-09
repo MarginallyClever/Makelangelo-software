@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SaveBitmapTest {
-
     @BeforeAll
     public static void beforeAll() {
         PreferencesHelper.start();
