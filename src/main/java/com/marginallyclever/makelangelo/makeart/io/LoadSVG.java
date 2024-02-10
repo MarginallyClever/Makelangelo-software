@@ -39,6 +39,11 @@ public class LoadSVG implements TurtleLoader {
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
 	private final Color paperColor = new Color(255,255,255);
+	private final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
+
+	public LoadSVG() {
+		super();
+	}
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -104,9 +109,9 @@ public class LoadSVG implements TurtleLoader {
 		// Recursively process all child elements
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node node = childNodes.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				processElement((Element) node);
+			Node child = childNodes.item(i);
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				processElement((Element) child);
 			}
 		}
 	}
@@ -189,8 +194,9 @@ public class LoadSVG implements TurtleLoader {
 				}
 			}
 		}
-		if(c!=null) {
+		if(c==null) {
 			if (element.hasAttribute("stroke")) {
+
 				String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+", "");
 				c = stringToColor(strokeStyleName);
 			}
@@ -206,7 +212,13 @@ public class LoadSVG implements TurtleLoader {
 	private Color stringToColor(String strokeName) {
 		if(strokeName.startsWith("#")) {
 			strokeName = strokeName.substring(1);
-			if(strokeName.length()==3) {
+			if(strokeName.length()==1) {
+				int r = Integer.parseInt(strokeName.substring(0,1),16);
+				return new Color(r,r,r);
+			} else if(strokeName.length()==2) {
+				int r = Integer.parseInt(strokeName.substring(0,2),16);
+				return new Color(r,r,r);
+			} else if(strokeName.length()==3) {
 				int r = Integer.parseInt(strokeName.substring(0,1),16);
 				int g = Integer.parseInt(strokeName.substring(1,2),16);
 				int b = Integer.parseInt(strokeName.substring(2,3),16);
@@ -216,6 +228,12 @@ public class LoadSVG implements TurtleLoader {
 				int g = Integer.parseInt(strokeName.substring(2,4),16);
 				int b = Integer.parseInt(strokeName.substring(4,6),16);
 				return new Color(r,g,b);
+			} else if(strokeName.length()==8) {
+				int r = Integer.parseInt(strokeName.substring(0,2),16);
+				int g = Integer.parseInt(strokeName.substring(2,4),16);
+				int b = Integer.parseInt(strokeName.substring(4,6),16);
+				int a = Integer.parseInt(strokeName.substring(6,8),16);
+				return new Color(r,g,b,a);
 			}
 		} else if(strokeName.startsWith("rgb(")) {
 			// isolate the portion between the ()
@@ -527,8 +545,6 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
 		return (SVGDocument) factory.createDocument("",in);
 	}
 }

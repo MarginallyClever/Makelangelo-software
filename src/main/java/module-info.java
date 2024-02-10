@@ -28,7 +28,13 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.makelangelo.plotter.plottercontrols;
     opens com.marginallyclever.makelangelo.turtle;
 
+    exports com.marginallyclever.communications;
     exports com.marginallyclever.convenience.log to ch.qos.logback.core;
+    exports com.marginallyclever.makelangelo;
+    exports com.marginallyclever.makelangelo.config;
+    exports com.marginallyclever.makelangelo.makeart;
+    exports com.marginallyclever.makelangelo.makeart.imagefilter;
+    exports com.marginallyclever.makelangelo.makeart.tools;
     exports com.marginallyclever.makelangelo.paper;
     exports com.marginallyclever.makelangelo.plotter.plottersettings;
 
