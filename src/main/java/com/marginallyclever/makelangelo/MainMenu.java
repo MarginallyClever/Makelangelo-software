@@ -200,6 +200,10 @@ public class MainMenu extends JMenuBar {
         buttonLogFolder.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-folder-16.png"))));
         menu.add(buttonLogFolder);
 
+        JMenuItem buttonManual = createMenuItemBrowse(Translator.get("MenuManual"), "https://mcr.dozuki.com/c/Makelangelo_3_and_5_Guide");
+        buttonManual.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-open-book-16.png"))));
+        menu.add(buttonManual);
+
         JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
         buttonForums.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-discord-16.png"))));
         menu.add(buttonForums);
@@ -377,23 +381,39 @@ public class MainMenu extends JMenuBar {
         TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
         a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
         a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
+        a4.setSource(app);
+        a4.addModifierListener(app::setTurtle);
+        menu.add(a4);
+
         TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
         a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
         a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, SHORTCUT_CTRL));//"ctrl F"
-        a4.setSource(app);		a4.addModifierListener(app::setTurtle);		menu.add(a4);
-        a5.setSource(app);		a5.addModifierListener(app::setTurtle);		menu.add(a5);
+        a5.setSource(app);
+        a5.addModifierListener(app::setTurtle);
+        menu.add(a5);
 
         menu.addSeparator();
 
         TurtleModifierAction a1 = new SimplifyTurtleAction();
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
+        a1.setSource(app);
+        a1.addModifierListener(app::setTurtle);
+        //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
+        menu.add(a1);
+
         TurtleModifierAction a2 = new ReorderTurtleAction();
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
+        a2.setSource(app);
+        a2.addModifierListener(app::setTurtle);
+        a2.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-sort-16.png"))));
+        menu.add(a2);
+
         TurtleModifierAction a3 = new InfillTurtleAction();
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
-        a1.setSource(app);		a1.addModifierListener(app::setTurtle);		menu.add(a1);
-        a2.setSource(app);		a2.addModifierListener(app::setTurtle);		menu.add(a2);
-        a3.setSource(app);		a3.addModifierListener(app::setTurtle);		menu.add(a3);
+        a3.setSource(app);
+        a3.addModifierListener(app::setTurtle);
+        a3.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-fill-color-16.png"))));
+        menu.add(a3);
 
         return menu;
     }
@@ -417,6 +437,7 @@ public class MainMenu extends JMenuBar {
         JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
         bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));
         bEstimate.addActionListener((e)-> estimateTime());
+        bEstimate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-stopwatch-16.png"))));
         menu.add(bEstimate);
 
         JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));

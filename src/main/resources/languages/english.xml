@@ -82,6 +82,7 @@
 	<string><key>MenuUpdate</key><value>Check for updates</value></string>
 	<string><key>MenuQuit</key><value>Quit</value></string>
 	<string><key>MenuForums</key><value>Online help forums</value></string>
+	<string><key>MenuManual</key><value>Read the Friendly Manual</value></string>
 	<string><key>MenuAbout</key><value>About</value></string>
 	<string><key>MenuSettings</key><value>Settings</value></string>
 	<string><key>MenuOpenFile</key><value>Open File...</value></string>
