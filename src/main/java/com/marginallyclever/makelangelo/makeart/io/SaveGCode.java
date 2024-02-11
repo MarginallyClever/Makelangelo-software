@@ -233,7 +233,7 @@ public class SaveGCode implements TurtleSaver {
 					}
 					case TOOL_CHANGE -> {
 						out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
-						out.write(MarlinPlotterPanel.getToolChangeString(m.getColor().toInt()) + "\n");
+						out.write(MarlinPlotterPanel.getToolChangeString(m.getColor().hashCode()) + "\n");
 					}
 				}
 			}

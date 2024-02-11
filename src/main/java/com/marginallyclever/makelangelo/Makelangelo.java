@@ -6,7 +6,9 @@ import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
+import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
+import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePreferences;
 import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.dnd.DropTarget;
 import java.awt.event.WindowAdapter;
@@ -218,11 +221,43 @@ public final class Makelangelo {
 			}
 
 			setMainTitle(new File(filename).getName());
-
 		} catch(Exception e) {
 			logger.error("Error while loading the file {}", filename, e);
 			JOptionPane.showMessageDialog(mainFrame, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
 			mainMenuBar.getRecentFiles().removeFilename(filename);
+		}
+	}
+
+	/**
+	 * Load a vector and add it to the existing {@link Turtle}.
+	 */
+	public void importFile() {
+		JFileChooser jFileChooser = new JFileChooser();
+
+		// add vector formats
+		for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
+			jFileChooser.addChoosableFileFilter(ff);
+		}
+
+		// no wild card filter, please.
+		jFileChooser.setAcceptAllFileFilterUsed(false);
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		String lastPath = preferences.get(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory());
+		jFileChooser.setCurrentDirectory(new File(lastPath));
+
+		if (jFileChooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+			String filename = jFileChooser.getSelectedFile().getAbsolutePath();
+			preferences.put(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, jFileChooser.getCurrentDirectory().toString());
+			logger.debug("File selected by user: {}", filename);
+			try {
+				Turtle t = TurtleFactory.load(filename);
+				myTurtle.add(t);
+				setTurtle(myTurtle);
+			} catch(Exception e) {
+				logger.error("Failed to load {}", filename, e);
+				JOptionPane.showMessageDialog(mainFrame, e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 

@@ -195,7 +195,7 @@ public class CollapsiblePanel extends JPanel {
         jPanel.add(cpanel, BorderLayout.CENTER);
 
         SelectButton b = new SelectButton("B", "B");
-        SelectColor c = new SelectColor("C", "CCCCCC", new ColorRGB(0, 0, 0), frame);
+        SelectColor c = new SelectColor("C", "CCCCCC", Color.BLACK, frame);
         SelectFile d = new SelectFile("D", "D", null);
         SelectDouble e = new SelectDouble("E", "E", 0.0f);
         SelectInteger f = new SelectInteger("F", "FFF", 0);

@@ -99,8 +99,8 @@ public class TransformedImage {
 	 * @return greyscale intensity in this region. [0...255]v
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
-		float sampleValue = 0;
-		float weightedSum = 0;
+		double sampleValue = 0;
+		double weightedSum = 0;
 
 		int left   = (int)Math.floor(x0);
 		int right  = (int)Math.ceil (x1);

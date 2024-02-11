@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.select;
 
-import com.marginallyclever.convenience.ColorRGB;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,26 +57,26 @@ public class SelectGUITest {
     @Test
     public void testColor() {
         // test contructor(s)
-        SelectColor b = new SelectColor("test", "test", new ColorRGB(0, 0, 0), panel);
-        ColorRGB c = b.getColor();
-        assertEquals(0, c.red);
-        assertEquals(0, c.green);
-        assertEquals(0, c.blue);
+        SelectColor b = new SelectColor("test", "test", new Color(0, 0, 0), panel);
+        Color c = b.getColor();
+        assertEquals(0, c.getRed());
+        assertEquals(0, c.getGreen());
+        assertEquals(0, c.getBlue());
 
         // test constructor sets value ok.
-        b = new SelectColor("test2", "test2", new ColorRGB(1, 2, 3), panel);
+        b = new SelectColor("test2", "test2", new Color(1, 2, 3), panel);
         c = b.getColor();
-        assertEquals(1, c.red);
-        assertEquals(2, c.green);
-        assertEquals(3, c.blue);
+        assertEquals(1, c.getRed());
+        assertEquals(2, c.getGreen());
+        assertEquals(3, c.getBlue());
 
         panel.add(b);
         // test setValue
-        b.setColor(new ColorRGB(255, 128, 64));
+        b.setColor(new Color(255, 128, 64));
         c = b.getColor();
-        assertEquals(255, c.red);
-        assertEquals(128, c.green);
-        assertEquals(64, c.blue);
+        assertEquals(255, c.getRed());
+        assertEquals(128, c.getGreen());
+        assertEquals(64 , c.getBlue());
     }
 
     @Test

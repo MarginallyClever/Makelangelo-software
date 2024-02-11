@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainMenu extends JMenuBar {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
@@ -77,23 +78,28 @@ public class MainMenu extends JMenuBar {
         JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
         buttonNewFile.addActionListener((e) -> newFile());
         buttonNewFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, SHORTCUT_CTRL));//"ctrl N"
-        buttonNewFile.setIcon(new UnicodeIcon("\uD83C\uDF31"));
+        buttonNewFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-new-16.png"))));
         menu.add(buttonNewFile);
 
         JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
         buttonOpenFile.addActionListener((e) -> openLoadFile());
         buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, SHORTCUT_CTRL));//"ctrl O"
-        buttonOpenFile.setIcon(new UnicodeIcon("\uD83D\uDDC1"));
+        buttonOpenFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-load-16.png"))));
         menu.add(buttonOpenFile);
 
         recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
         recentFiles.addSubmenuListener((e)-> app.openFile(((JMenuItem)e.getSource()).getText()));
         menu.add(recentFiles);
 
+        JMenuItem buttonImportFile = new JMenuItem(Translator.get("MenuImportFile"));
+        buttonImportFile.addActionListener((e) -> app.importFile());
+        buttonImportFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-import-16.png"))));
+        menu.add(buttonImportFile);
+
         JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
         buttonSaveFile.addActionListener((e) -> saveFile());
         buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, SHORTCUT_CTRL));//"ctrl S"
-        buttonSaveFile.setIcon(new UnicodeIcon("\uD83D\uDCBE"));
+        buttonSaveFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-save-16.png"))));
         menu.add(buttonSaveFile);
 
         menu.addSeparator();
@@ -105,12 +111,12 @@ public class MainMenu extends JMenuBar {
         } else {
             buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_ALT));//"alt P"
         }
-        buttonAdjustPreferences.setIcon(new UnicodeIcon("⚙"));
+        buttonAdjustPreferences.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-settings-16.png"))));
         menu.add(buttonAdjustPreferences);
 
         JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
         buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
-        buttonFirmwareUpdate.setIcon(new UnicodeIcon("⬆"));
+        buttonFirmwareUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-install-16.png"))));
         menu.add(buttonFirmwareUpdate);
 
         if (!isMacOS) {
@@ -123,6 +129,7 @@ public class MainMenu extends JMenuBar {
             });
             buttonExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, SHORTCUT_CTRL));//"ctrl Q"
             buttonExit.setMnemonic('Q');
+            buttonExit.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-stop-16.png"))));
             menu.add(buttonExit);
         }
         return menu;
@@ -148,13 +155,13 @@ public class MainMenu extends JMenuBar {
         JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
         buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
         buttonZoomOut.addActionListener((e) -> app.getCamera().zoom(1));
-        buttonZoomOut.setIcon(new UnicodeIcon("\uD83D\uDD0D-"));
+        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
         menu.add(buttonZoomOut);
 
         JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
         buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
         buttonZoomIn.addActionListener((e) -> app.getCamera().zoom(-1));
-        buttonZoomIn.setIcon(new UnicodeIcon("\uD83D\uDD0D+"));
+        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
         menu.add(buttonZoomIn);
 
         JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
@@ -171,7 +178,7 @@ public class MainMenu extends JMenuBar {
         GFXPreferences.addListener((e)->{
             checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
         });
-        checkboxShowPenUpMoves.setIcon(new UnicodeIcon("\uD83D\uDC41"));
+        checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
         menu.add(checkboxShowPenUpMoves);
 
         menu.add(createRenderStyleMenu());
@@ -189,16 +196,16 @@ public class MainMenu extends JMenuBar {
         menu.add(buttonViewLog);
 
         JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
-        buttonLogFolder.addActionListener((e) -> {
-            try {
-                Desktop.getDesktop().open(Log.logDir);
-            } catch (IOException e1) {
-                logger.error("Can't open log folder", e1);
-            }
-        });
+        buttonLogFolder.addActionListener((e) -> openLogDirectory());
+        buttonLogFolder.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-folder-16.png"))));
         menu.add(buttonLogFolder);
 
+        JMenuItem buttonManual = createMenuItemBrowse(Translator.get("MenuManual"), "https://mcr.dozuki.com/c/Makelangelo_3_and_5_Guide");
+        buttonManual.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-open-book-16.png"))));
+        menu.add(buttonManual);
+
         JMenuItem buttonForums = createMenuItemBrowse(Translator.get("MenuForums"), "https://discord.gg/Q5TZFmB");
+        buttonForums.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-discord-16.png"))));
         menu.add(buttonForums);
 
         JMenuItem buttonDonation = createMenuItemBrowse(Translator.get("MenuItemPayPalDonation"), "https://www.marginallyclever.com/products/makelangelo-software/");
@@ -206,6 +213,7 @@ public class MainMenu extends JMenuBar {
 
         JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
         buttonCheckForUpdate.addActionListener((e) -> app.checkForUpdate(true));
+        //buttonCheckForUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-update-16.png"))));
         menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();
@@ -217,6 +225,14 @@ public class MainMenu extends JMenuBar {
         }
 
         return menu;
+    }
+
+    private void openLogDirectory() {
+        try {
+            Desktop.getDesktop().open(Log.logDir);
+        } catch (IOException e1) {
+            logger.error("Can't open log folder", e1);
+        }
     }
 
     public JMenuItem createMenuItemBrowse(String menuLabelAlreadyTranslated, String urlAsString) {
@@ -332,7 +348,7 @@ public class MainMenu extends JMenuBar {
 
             JButton bCapture = new JButton(Translator.get("MenuCaptureImage"));
             bCapture.addActionListener((e)-> pc.run((Frame)SwingUtilities.getWindowAncestor(this),app.getPaper()));
-            bCapture.setIcon(new UnicodeIcon("📷"));
+            bCapture.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-camera-16.png"))));
             menu.add(bCapture);
             menu.addSeparator();
         } catch (FailedToRunRaspistillException e) {
@@ -348,38 +364,56 @@ public class MainMenu extends JMenuBar {
 
         JMenuItem translate = new JMenuItem(Translator.get("Translate"));
         menu.add(translate);
+        translate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-move-16.png"))));
         translate.addActionListener((e) -> runTranslatePanel());
 
         JMenuItem scale = new JMenuItem(Translator.get("Scale"));
         menu.add(scale);
+        scale.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-resize-16.png"))));
         scale.addActionListener((e) -> runScalePanel());
 
         JMenuItem rotate = new JMenuItem(Translator.get("Rotate"));
-        rotate.setIcon(new UnicodeIcon("↻"));
+        rotate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-rotate-16.png"))));
         menu.add(rotate);
         rotate.addActionListener((e) -> runRotatePanel());
         menu.addSeparator();
 
         TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
-        a4.putValue(Action.SMALL_ICON, new UnicodeIcon("↕"));
+        a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
         a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
+        a4.setSource(app);
+        a4.addModifierListener(app::setTurtle);
+        menu.add(a4);
+
         TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
-        a5.putValue(Action.SMALL_ICON, new UnicodeIcon("↔"));
+        a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
         a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, SHORTCUT_CTRL));//"ctrl F"
-        a4.setSource(app);		a4.addModifierListener(app::setTurtle);		menu.add(a4);
-        a5.setSource(app);		a5.addModifierListener(app::setTurtle);		menu.add(a5);
+        a5.setSource(app);
+        a5.addModifierListener(app::setTurtle);
+        menu.add(a5);
 
         menu.addSeparator();
 
         TurtleModifierAction a1 = new SimplifyTurtleAction();
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
+        a1.setSource(app);
+        a1.addModifierListener(app::setTurtle);
+        //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
+        menu.add(a1);
+
         TurtleModifierAction a2 = new ReorderTurtleAction();
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
+        a2.setSource(app);
+        a2.addModifierListener(app::setTurtle);
+        a2.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-sort-16.png"))));
+        menu.add(a2);
+
         TurtleModifierAction a3 = new InfillTurtleAction();
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
-        a1.setSource(app);		a1.addModifierListener(app::setTurtle);		menu.add(a1);
-        a2.setSource(app);		a2.addModifierListener(app::setTurtle);		menu.add(a2);
-        a3.setSource(app);		a3.addModifierListener(app::setTurtle);		menu.add(a3);
+        a3.setSource(app);
+        a3.addModifierListener(app::setTurtle);
+        a3.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-fill-color-16.png"))));
+        menu.add(a3);
 
         return menu;
     }
@@ -401,19 +435,21 @@ public class MainMenu extends JMenuBar {
         menu.setMnemonic('k');
 
         JMenuItem bEstimate = new JMenuItem(Translator.get("RobotMenu.GetTimeEstimate"));
-        bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));//"ctrl E"
+        bEstimate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, SHORTCUT_CTRL));
         bEstimate.addActionListener((e)-> estimateTime());
+        bEstimate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-stopwatch-16.png"))));
         menu.add(bEstimate);
 
         JMenuItem bSaveToSD = new JMenuItem(Translator.get("RobotMenu.SaveGCode"));
         bSaveToSD.addActionListener((e)-> app.saveGCode());
-        bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_CTRL));//"ctrl G"
+        bSaveToSD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_CTRL));
+        bSaveToSD.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-export-16.png"))));
         menu.add(bSaveToSD);
 
         JMenuItem bOpenControls = new JMenuItem(Translator.get("RobotMenu.OpenControls"));
         bOpenControls.addActionListener((e)-> openPlotterControls());
-        bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, SHORTCUT_CTRL));//"ctrl C"
-        bOpenControls.setIcon(new UnicodeIcon("\uD83D\uDD79"));
+        bOpenControls.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, SHORTCUT_CTRL));
+        bOpenControls.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-joystick-16.png"))));
         menu.add(bOpenControls);
 
         return menu;

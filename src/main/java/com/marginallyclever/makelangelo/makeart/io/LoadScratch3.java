@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.json.JSONArray;
@@ -10,11 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.*;
+import java.io.*;
+import java.util.List;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -496,7 +493,7 @@ public class LoadScratch3 implements TurtleLoader {
 	
 	boolean ignoreDoSetPenColor = false; // As setColor can bug the Makelangelo Render a quick/bad hack to enable/disable this implementation.
 	private void doSetPenColor(JSONObject currentBlock) throws Exception {
-		ColorRGB c = new ColorRGB((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));		
+		Color c = new Color((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));
 		if ( !ignoreDoSetPenColor ){
 			logger.trace("SET COLOR {}",c);
 			myTurtle.setColor(c);

@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
+import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
@@ -279,7 +280,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	@Override
 	public void onConvertFinished(Turtle turtle) {
-		notifyListeners(new ActionEvent(turtle,0,"turtle"));
+		notifyListeners(new ActionEvent(turtle,0, LoadFilePanel.COMMAND_TURTLE));
 	}
 
 	public void loadingFinished() {

@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.swing.event.EventListenerList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,17 +46,19 @@ public abstract class TurtleGenerator {
 	
 	// OBSERVER PATTERN
 
-	private final ArrayList<TurtleGeneratorListener> listeners = new ArrayList<>();
+	private final EventListenerList listeners = new EventListenerList();
 	public void addListener(TurtleGeneratorListener a) {
-		listeners.add(a);
+		listeners.add(TurtleGeneratorListener.class, a);
 	}
 	
 	public void removeListener(TurtleGeneratorListener a) {
-		listeners.remove(a);
+		listeners.remove(TurtleGeneratorListener.class, a);
 	}
 	
 	protected void notifyListeners(Turtle turtle) {
-		for( TurtleGeneratorListener a : listeners ) a.turtleReady(turtle);
+		for( TurtleGeneratorListener a : listeners.getListeners(TurtleGeneratorListener.class) ) {
+			a.turtleReady(turtle);
+		}
 	}
 
 	public void setTurtle(Turtle turtle) {

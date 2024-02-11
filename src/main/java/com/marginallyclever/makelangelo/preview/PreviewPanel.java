@@ -4,7 +4,6 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -35,9 +34,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private final List<PreviewListener> previewListeners = new ArrayList<>();
 	
 	private Camera camera;
-	
-	// background color, rgb values 0...255
-	public ColorRGB backgroundColor = new ColorRGB(255-67,255-67,255-67);
+
+	public Color backgroundColor = new Color(255-67,255-67,255-67);
 
 	/**
 	 * button state tracking
@@ -253,7 +251,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		
 		// turn on blending
 		gl2.glEnable(GL2.GL_BLEND);
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);  
+		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		
 		paintBackground(gl2);
 		paintCamera(gl2);

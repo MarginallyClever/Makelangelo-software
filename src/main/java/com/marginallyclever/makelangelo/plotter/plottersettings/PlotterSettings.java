@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
@@ -183,10 +183,10 @@ public class PlotterSettings {
 		json.put(USER_GENERAL_START_GCODE, 	"");
 		json.put(USER_GENERAL_END_GCODE, 	"");
 		json.put(STYLE,         			 PlotterRendererFactory.MAKELANGELO_5.getName());
-		json.put(PAPER_COLOR,		 		(new ColorRGB(255, 255, 255).toInt()));
-		json.put(PEN_DOWN_COLOR_DEFAULT, 	(new ColorRGB(0, 0, 0).toInt()));
-		json.put(PEN_DOWN_COLOR, 			(new ColorRGB(0, 0, 0).toInt()));
-		json.put(PEN_UP_COLOR, 				(new ColorRGB(0, 255, 0).toInt()));
+		json.put(PAPER_COLOR,		 		(Color.WHITE.hashCode()));
+		json.put(PEN_DOWN_COLOR_DEFAULT, 	(Color.BLACK.hashCode()));
+		json.put(PEN_DOWN_COLOR, 			(Color.BLACK.hashCode()));
+		json.put(PEN_UP_COLOR, 				(Color.GREEN.hashCode()));
 		json.put(MAX_JERK,           		"[10,10,3]");
 	}
 
@@ -250,9 +250,9 @@ public class PlotterSettings {
 	 * @throws NullPointerException key does not exist
 	 * @throws IllegalStateException profile does not exist.
 	 */
-	public ColorRGB getColor(String key) throws NullPointerException, IllegalStateException {
+	public Color getColor(String key) throws NullPointerException, IllegalStateException {
 		int v = getInteger(key);
-		return new ColorRGB(v);
+		return new Color(v);
 	}
 
 	/**
@@ -322,8 +322,8 @@ public class PlotterSettings {
 	 * @throws NullPointerException key does not exist
 	 * @throws IllegalStateException profile does not exist.
 	 */
-	public void setColor(String key,ColorRGB value) throws NullPointerException, IllegalStateException {
-		setInteger(key,value.toInt());
+	public void setColor(String key,Color value) throws NullPointerException, IllegalStateException {
+		setInteger(key,value.hashCode());
 	}
 
 	public void setDoubleArray(String key,double [] values) throws NullPointerException, IllegalStateException {
@@ -370,10 +370,10 @@ public class PlotterSettings {
 		json.put(USER_GENERAL_START_GCODE, 	thisMachineNode.get(USER_GENERAL_START_GCODE,""));
 		json.put(USER_GENERAL_END_GCODE, 	thisMachineNode.get(USER_GENERAL_END_GCODE,""));
 		json.put(STYLE,         			thisMachineNode.get(STYLE, PlotterRendererFactory.MAKELANGELO_5.getName()));
-		json.put(PAPER_COLOR,		 		thisMachineNode.getInt(PAPER_COLOR,(new ColorRGB(255, 255, 255).toInt())));
-		json.put(PEN_DOWN_COLOR_DEFAULT, 	thisMachineNode.getInt(PEN_DOWN_COLOR_DEFAULT,(new ColorRGB(0, 0, 0).toInt())));
-		json.put(PEN_DOWN_COLOR, 			thisMachineNode.getInt(PEN_DOWN_COLOR,(new ColorRGB(0, 0, 0).toInt())));
-		json.put(PEN_UP_COLOR, 				thisMachineNode.getInt(PEN_UP_COLOR,(new ColorRGB(0, 255, 0).toInt())));
+		json.put(PAPER_COLOR,		 		thisMachineNode.getInt(PAPER_COLOR,(Color.WHITE.hashCode())));
+		json.put(PEN_DOWN_COLOR_DEFAULT, 	thisMachineNode.getInt(PEN_DOWN_COLOR_DEFAULT,(Color.BLACK.hashCode())));
+		json.put(PEN_DOWN_COLOR, 			thisMachineNode.getInt(PEN_DOWN_COLOR,(Color.BLACK.hashCode())));
+		json.put(PEN_UP_COLOR, 				thisMachineNode.getInt(PEN_UP_COLOR,(Color.GREEN.hashCode())));
 		json.put(MAX_JERK,           		thisMachineNode.get(MAX_JERK,"[10,10,3]"));
 	}
 

@@ -56,7 +56,7 @@ class SaveSVGTest {
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameContentAs(new File(SaveSVGTest.class.getResource(expectedFilename).toURI()));
+            assertThat(fileTemp).hasSameTextualContentAs(new File(SaveSVGTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }

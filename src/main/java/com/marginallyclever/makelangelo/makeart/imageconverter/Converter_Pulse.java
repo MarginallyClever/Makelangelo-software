@@ -114,6 +114,12 @@ public class Converter_Pulse extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
+		convertOneLayer(img);
+
+		fireConversionFinished();
+	}
+
+	protected void convertOneLayer(TransformedImage img) {
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		double xLeft   = rect.getMinX();
 		double yBottom = rect.getMinY();
@@ -165,8 +171,6 @@ public class Converter_Pulse extends ImageConverter {
 				}
 			}
 		}
-
-		fireConversionFinished();
 	}
 
     public int getCutoff() {

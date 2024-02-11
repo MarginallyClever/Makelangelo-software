@@ -2,15 +2,17 @@ package com.marginallyclever.makelangelo.makeart;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.util.EventListener;
+
 /**
  * {@link TurtleModifierListener} subscribe to {@link TurtleModifierAction}s in order
  * to be notified when the action is complete.
  * @author Dan Royer
  * @since 7.31.0
  */
-public abstract interface TurtleModifierListener {
+public interface TurtleModifierListener extends EventListener {
 	/**
 	 * @param turtle the result of a {@link TurtleModifierAction} being run.
 	 */
-	public void turtleModifiedEvent(Turtle turtle);
+	void turtleModifiedEvent(Turtle turtle);
 }

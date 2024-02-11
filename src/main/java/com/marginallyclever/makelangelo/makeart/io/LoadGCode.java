@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -86,7 +86,7 @@ public class LoadGCode implements TurtleLoader {
 					case 6:
 						// tool change
 						String color = tokenExists("T",tokens);
-						ColorRGB penDownColor = new ColorRGB(Integer.parseInt(color.substring(1)));
+						Color penDownColor = new Color(Integer.parseInt(color.substring(1)));
 						turtle.setColor(penDownColor);
 						break;
 					case 280:

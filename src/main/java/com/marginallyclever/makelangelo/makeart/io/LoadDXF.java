@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.kabeja.dxf.*;
 import org.kabeja.dxf.helpers.DXFSplineConverter;
@@ -12,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Dan Royer
@@ -65,7 +66,7 @@ public class LoadDXF implements TurtleLoader {
 			Iterator<?> entityTypeItr = layer.getDXFEntityTypeIterator();
 			if(entityTypeItr.hasNext()) {
 				// ignore the color index, DXF is dumb.
-				myTurtle.setColor(new ColorRGB(0,0,0));
+				myTurtle.setColor(Color.BLACK);
 
 				parseLayer(layer);
 			}

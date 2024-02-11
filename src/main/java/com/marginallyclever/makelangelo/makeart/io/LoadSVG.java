@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.Bezier;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -13,12 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
+import java.awt.*;
 import java.io.InputStream;
 import java.util.List;
 
@@ -37,6 +38,12 @@ public class LoadSVG implements TurtleLoader {
 	private boolean isNewPath;  // for cubic paths
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
+	private final Color paperColor = new Color(255,255,255);
+	private final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
+
+	public LoadSVG() {
+		super();
+	}
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -61,7 +68,7 @@ public class LoadSVG implements TurtleLoader {
 		initSVGDOM(document);
 
 		myTurtle = new Turtle();
-		myTurtle.setColor(new ColorRGB(0,0,0));
+		myTurtle.setColor(Color.BLACK);  // initial pen color
 		parseAll(document);
 
 		// plotter coordinates are inverted in Y so flip the image.
@@ -81,42 +88,55 @@ public class LoadSVG implements TurtleLoader {
 
 	private void parseAll(Document document) throws Exception {
 		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
+		processElement(documentElement);
+	}
 
-		logger.debug("...parse path");			parsePathElements(    documentElement.getElementsByTagName( "path"     ));
-		logger.debug("...parse polylines");		parsePolylineElements(documentElement.getElementsByTagName( "polyline" ));
-		logger.debug("...parse polygons");		parsePolylineElements(documentElement.getElementsByTagName( "polygon"  ));
-		logger.debug("...parse lines");			parseLineElements(    documentElement.getElementsByTagName( "line"     ));
-		logger.debug("...parse rects");			parseRectElements(    documentElement.getElementsByTagName( "rect"     ));
-		logger.debug("...parse circles");		parseCircleElements(  documentElement.getElementsByTagName( "circle"   ));
-		logger.debug("...parse ellipses");		parseEllipseElements( documentElement.getElementsByTagName( "ellipse"  ));
+	private void processElement(Element element) throws Exception {
+		if(setStrokeToElementColorBecomesNone(element)) return;
+
+		// Check if the element is a "g" element and process it
+		switch(element.getTagName()) {
+			case "path" -> parsePathElement(element);
+			case "polyline" -> parsePolylineElement(element);
+			case "polygon" -> parsePolylineElement(element);
+			case "line" -> parseLineElement(element);
+			case "rect" -> parseRectElement(element);
+			case "circle" -> parseCircleElement(element);
+			case "ellipse" -> parseEllipseElement(element);
+			default -> logger.debug("Unknown element {}", element.getTagName());
+		}
+
+		// Recursively process all child elements
+		NodeList childNodes = element.getChildNodes();
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node child = childNodes.item(i);
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				processElement((Element) child);
+			}
+		}
 	}
 
 	/**
 	 * Parse through all the SVG polyline elements and raster them to gcode.
 	 * @param pathNodes the source of the elements
 	 */
-	private void parsePolylineElements(NodeList pathNodes) throws Exception {
-	    int pathNodeCount = pathNodes.getLength();
-		logger.debug("{} elements", pathNodeCount);
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-	    	SVGPointShapeElement element = (SVGPointShapeElement)pathNodes.item( iPathNode );
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+	private void parsePolylineElement(Element pathNodes) {
+		SVGPointShapeElement element = (SVGPointShapeElement)pathNodes;
 
-			Matrix3d m = getMatrixFromElement(element);
+		Matrix3d m = getMatrixFromElement(element);
 
-			SVGPointList pointList = element.getAnimatedPoints();
-			int numPoints = pointList.getNumberOfItems();
-			//logger.debug("New Node has "+pathObjects+" elements.");
+		SVGPointList pointList = element.getAnimatedPoints();
+		int numPoints = pointList.getNumberOfItems();
+		//logger.debug("New Node has "+pathObjects+" elements.");
 
-			SVGPoint item = pointList.getItem(0);
-			Vector3d v2 = transform(item.getX(),item.getY(),m);
-			myTurtle.jumpTo(v2.x,v2.y);
+		SVGPoint item = pointList.getItem(0);
+		Vector3d v2 = transform(item.getX(),item.getY(),m);
+		myTurtle.jumpTo(v2.x,v2.y);
 
-			for( int i=1; i<numPoints; ++i ) {
-				item = pointList.getItem(i);
-				v2 = transform(item.getX(),item.getY(),m);
-				myTurtle.moveTo(v2.x,v2.y);
-			}
+		for( int i=1; i<numPoints; ++i ) {
+			item = pointList.getItem(i);
+			v2 = transform(item.getX(),item.getY(),m);
+			myTurtle.moveTo(v2.x,v2.y);
 		}
 	}
 
@@ -126,9 +146,10 @@ public class LoadSVG implements TurtleLoader {
 	 * @return true if the stroke color is 'none' or white (assumed to be the paper color)
 	 */
 	private boolean setStrokeToElementColorBecomesNone(Element element) {
-		ColorRGB color = getStroke(element);
+		Color color = getStroke(element);
 		if(color==null) return false;  // none
-		if(color.equals(new ColorRGB(255,255,255))) return true;  // white
+		if(color.getAlpha()==0) return false;  // transparent
+		if(color.equals(paperColor)) return true;
 
 		if(!color.equals(myTurtle.getColor())) {
 			logger.debug("Setting stroke color to {}",color);
@@ -137,78 +158,102 @@ public class LoadSVG implements TurtleLoader {
 		return false;
 	}
 
-	private void parseLineElements(NodeList node) throws Exception {
+	private void parseLineElement(Element element) {
 		Vector3d v2;
-	    int pathNodeCount = node.getLength();
-		logger.debug("{} elements", pathNodeCount);
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-			Element element = (Element)node.item( iPathNode );
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+		Matrix3d m = getMatrixFromElement(element);
 
-			Matrix3d m = getMatrixFromElement(element);
+		double x1=0,y1=0;
+		double x2=0,y2=0;
 
-			double x1=0,y1=0;
-			double x2=0,y2=0;
-
-			if(element.hasAttribute("x1")) x1 = Double.parseDouble(element.getAttribute("x1"));
-			if(element.hasAttribute("y1")) y1 = Double.parseDouble(element.getAttribute("y1"));
-			if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
-			if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));
-			v2 = transform(x1,y1,m);
-			myTurtle.jumpTo(v2.x,v2.y);
-			v2 = transform(x2,y2,m);
-			myTurtle.moveTo(v2.x,v2.y);
-		}
+		if(element.hasAttribute("x1")) x1 = Double.parseDouble(element.getAttribute("x1"));
+		if(element.hasAttribute("y1")) y1 = Double.parseDouble(element.getAttribute("y1"));
+		if(element.hasAttribute("x2")) x2 = Double.parseDouble(element.getAttribute("x2"));
+		if(element.hasAttribute("y2")) y2 = Double.parseDouble(element.getAttribute("y2"));
+		v2 = transform(x1,y1,m);
+		myTurtle.jumpTo(v2.x,v2.y);
+		v2 = transform(x2,y2,m);
+		myTurtle.moveTo(v2.x,v2.y);
 	}
 
-	private ColorRGB getStroke(Element element) {
+	private Color getStroke(Element element) {
+		Color c=null;
 		if(element.hasAttribute("style")) {
 			String style = element.getAttribute("style").toLowerCase().replace("\\s+","");
 			if(!style.contains(LABEL_STROKE)) {
 				// default SVG stroke is "none", which isn't even transparent - it's nothing!
-				return null;
 			} else {
 				int k = style.indexOf(LABEL_STROKE);
 				String strokeStyleName = style.substring(k + LABEL_STROKE.length());
-				return stringToColor(strokeStyleName);
+				c = stringToColor(strokeStyleName);
+				if(c!=null) {
+					k = style.indexOf("stroke-opacity:");
+					if (k >= 0) {
+						style = style.substring(k + 15, style.indexOf(";", k + 15));
+						c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(style) * 255.0));
+					}
+				}
 			}
 		}
-		if(element.hasAttribute("stroke")) {
-			String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+","");
-			return stringToColor(strokeStyleName);
+		if(c==null) {
+			if (element.hasAttribute("stroke")) {
+
+				String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+", "");
+				c = stringToColor(strokeStyleName);
+			}
 		}
-		return null;
+		if(c!=null) {
+			if (element.hasAttribute("stroke-opacity")) {
+				c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(element.getAttribute("stroke-opacity")) * 255.0));
+			}
+		}
+		return c;
 	}
 
-	private ColorRGB stringToColor(String strokeName) {
+	private Color stringToColor(String strokeName) {
 		if(strokeName.startsWith("#")) {
 			strokeName = strokeName.substring(1);
-			if(strokeName.length()==3) {
+			if(strokeName.length()==1) {
+				int r = Integer.parseInt(strokeName.substring(0,1),16);
+				return new Color(r,r,r);
+			} else if(strokeName.length()==2) {
+				int r = Integer.parseInt(strokeName.substring(0,2),16);
+				return new Color(r,r,r);
+			} else if(strokeName.length()==3) {
 				int r = Integer.parseInt(strokeName.substring(0,1),16);
 				int g = Integer.parseInt(strokeName.substring(1,2),16);
 				int b = Integer.parseInt(strokeName.substring(2,3),16);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			} else if(strokeName.length()==6) {
 				int r = Integer.parseInt(strokeName.substring(0,2),16);
 				int g = Integer.parseInt(strokeName.substring(2,4),16);
 				int b = Integer.parseInt(strokeName.substring(4,6),16);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
+			} else if(strokeName.length()==8) {
+				int r = Integer.parseInt(strokeName.substring(0,2),16);
+				int g = Integer.parseInt(strokeName.substring(2,4),16);
+				int b = Integer.parseInt(strokeName.substring(4,6),16);
+				int a = Integer.parseInt(strokeName.substring(6,8),16);
+				return new Color(r,g,b,a);
 			}
 		} else if(strokeName.startsWith("rgb(")) {
+			// isolate the portion between the ()
 			strokeName = strokeName.substring(4,strokeName.length()-1);
+			strokeName = strokeName.substring(0,strokeName.indexOf(")"));
 			if(strokeName.contains("%")) {
+				// convert from percent to 0-255
 				strokeName = strokeName.replace("%","");
 				String [] parts = strokeName.split(",");
 				int r = (int)(Integer.parseInt(parts[0])*255.0/100.0);
 				int g = (int)(Integer.parseInt(parts[1])*255.0/100.0);
 				int b = (int)(Integer.parseInt(parts[2])*255.0/100.0);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			} else {
+				// already in 0-255
 				String [] parts = strokeName.split(",");
 				int r = Integer.parseInt(parts[0]);
 				int g = Integer.parseInt(parts[1]);
 				int b = Integer.parseInt(parts[2]);
-				return new ColorRGB(r,g,b);
+				return new Color(r,g,b);
 			}
 		} else {
 			return W3CColorNames.get(strokeName);
@@ -216,70 +261,61 @@ public class LoadSVG implements TurtleLoader {
 		return null;
 	}
 
-	/**
+ 	/**
 	 * Draw rectangles that may have rounded corners.
 	 * given corners
 	 * <pre>
 	 *    x0 x1 x2 x3
 	 * y0    a  b
-	 * y1 c  i  j  d
-	 * y2 e  m  k  f
+	 * y1 c        d
+	 * y2 e        f
 	 * y3    g  h
 	 * </pre>
 	 * draw a-b-d-f-h-g-e-c-a.
 	 * See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">mozilla</a>
-	 * @param node the source of the elements
+	 * @param element the source of the elements
 	 */
-	private void parseRectElements(NodeList node) throws Exception {
-	    int pathNodeCount = node.getLength();
-		logger.debug("{} elements", pathNodeCount);
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-			Element element = (Element)node.item( iPathNode );
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+	private void parseRectElement(Element element) {
+		Matrix3d m = getMatrixFromElement(element);
 
-			Matrix3d m = getMatrixFromElement(element);
+		double x=0,y=0;
+		double rx=0,ry=0;
 
-			double x=0,y=0;
-			double rx=0,ry=0;
-
-			if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
-			if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
-			if(element.hasAttribute("rx")) {
-				rx = Double.parseDouble(element.getAttribute("rx"));
-				if(element.hasAttribute("ry")) {
-					ry = Double.parseDouble(element.getAttribute("ry"));
-				} else {
-					// ry defaults to rx if specified
-					ry = rx;
-				}
-			} else if(element.hasAttribute("ry")) {
-				// rx defaults to ry if specified
-				rx = ry = Double.parseDouble(element.getAttribute("ry"));
-
+		if(element.hasAttribute("x")) x = Double.parseDouble(element.getAttribute("x"));
+		if(element.hasAttribute("y")) y = Double.parseDouble(element.getAttribute("y"));
+		if(element.hasAttribute("rx")) {
+			rx = Double.parseDouble(element.getAttribute("rx"));
+			if(element.hasAttribute("ry")) {
+				ry = Double.parseDouble(element.getAttribute("ry"));
+			} else {
+				// ry defaults to rx if specified
+				ry = rx;
 			}
-			double w = Double.parseDouble(element.getAttribute("width"));
-			double h = Double.parseDouble(element.getAttribute("height"));
-
-			//double x0=x;
-			double x1=x+rx;
-			double x2=x+w-rx;
-			//double x3=x+w;
-			double y0=y;
-			double y1=y+ry;
-			double y2=y+h-ry;
-			//double y3=y+h;
-
-			Vector3d v2 = transform(x1,y0,m);
-			myTurtle.jumpTo(v2.x,v2.y);
-			arcTurtle(myTurtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m);
-			arcTurtle(myTurtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
-			arcTurtle(myTurtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
-			arcTurtle(myTurtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
+		} else if(element.hasAttribute("ry")) {
+			// rx defaults to ry if specified
+			rx = ry = Double.parseDouble(element.getAttribute("ry"));
 		}
+		double w = Double.parseDouble(element.getAttribute("width"));
+		double h = Double.parseDouble(element.getAttribute("height"));
+
+		//double x0=x;
+		double x1=x+rx;
+		double x2=x+w-rx;
+		//double x3=x+w;
+		double y0=y;
+		double y1=y+ry;
+		double y2=y+h-ry;
+		//double y3=y+h;
+
+		Vector3d v2 = transform(x1,y0,m);
+		myTurtle.jumpTo(v2.x,v2.y);
+		arcTurtle(myTurtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m);
+		arcTurtle(myTurtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
+		arcTurtle(myTurtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
+		arcTurtle(myTurtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
 	}
 
 	/**
-	 *
 	 * @param turtle the drawing tool
 	 * @param cx center position
 	 * @param cy center position
@@ -307,55 +343,41 @@ public class LoadSVG implements TurtleLoader {
 		}
 	}
 
-	private void parseCircleElements(NodeList node) throws Exception {
+	private void parseCircleElement(Element element) {
 		Vector3d v2;
 
-	    int pathNodeCount = node.getLength();
-		logger.debug("{} elements", pathNodeCount);
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-			Element element = (Element)node.item( iPathNode );
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+		Matrix3d m = getMatrixFromElement(element);
 
-			Matrix3d m = getMatrixFromElement(element);
+		double cx=0,cy=0,r=0;
+		if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+		if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+		if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
+		v2 = transform(cx+r,cy,m);
+		myTurtle.jumpTo(v2.x,v2.y);
 
-			double cx=0,cy=0,r=0;
-			if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
-			if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
-			if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
-			v2 = transform(cx+r,cy,m);
-			myTurtle.jumpTo(v2.x,v2.y);
+		double circ = Math.PI * 2.0 * r;
+		circ = Math.ceil(Math.min(Math.max(3,circ),360));
 
-			double circ = Math.PI * 2.0 * r;
-			circ = Math.ceil(Math.min(Math.max(3,circ),360));
-
-			logger.debug("circ={}", circ);
-			printEllipse(m, cx, cy, r, r, circ);
-		}
+		//logger.debug("circ={}", circ);
+		printEllipse(m, cx, cy, r, r, circ);
 	}
 
-	private void parseEllipseElements(NodeList node) {
+	private void parseEllipseElement(Element element) {
 		Vector3d v2;
-	    int pathNodeCount = node.getLength();
-		logger.debug("{} elements", pathNodeCount);
-	    for( int iPathNode = 0; iPathNode < pathNodeCount; iPathNode++ ) {
-			Element element = (Element)node.item( iPathNode );
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+		Matrix3d m = getMatrixFromElement(element);
 
-			Matrix3d m = getMatrixFromElement(element);
+		double cx=0,cy=0,rx=0,ry=0;
+		if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
+		if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
+		if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
+		if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
+		v2 = transform(cx+rx,cy,m);
+		myTurtle.jumpTo(v2.x,v2.y);
 
-			double cx=0,cy=0,rx=0,ry=0;
-			if(element.hasAttribute("cx")) cx = Double.parseDouble(element.getAttribute("cx"));
-			if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
-			if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
-			if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
-			v2 = transform(cx+rx,cy,m);
-			myTurtle.jumpTo(v2.x,v2.y);
-
-			double perimeterOfAnEllipseApprox = Math.PI * 2.0 * Math.sqrt((ry*ry + rx*rx)/2.0);
-			double steps = Math.max(3,perimeterOfAnEllipseApprox);
-			steps = Math.min(60,steps);
-			printEllipse(m, cx, cy, rx, ry, steps);
-		}
+		double perimeterOfAnEllipseApprox = Math.PI * 2.0 * Math.sqrt((ry*ry + rx*rx)/2.0);
+		double steps = Math.max(3,perimeterOfAnEllipseApprox);
+		steps = Math.min(60,steps);
+		printEllipse(m, cx, cy, rx, ry, steps);
 	}
 
 	private void printEllipse(Matrix3d m, double cx, double cy, double rx, double ry, double steps) {
@@ -375,38 +397,27 @@ public class LoadSVG implements TurtleLoader {
 	 * Parse through all the SVG path elements and raster them to {@link Turtle}.
 	 * @param paths the source of the elements
 	 */
-	private void parsePathElements(NodeList paths) throws Exception {
-		int pathCount = paths.getLength();
-		logger.debug("{} elements", pathCount);
-		for( int iPath = 0; iPath < pathCount; iPath++ ) {
-			if(paths.item( iPath ) instanceof SVGOMPolylineElement) {
-				logger.debug("Node is a polyline.");
-				parsePolylineElements(paths);
-				continue;
-			}
-			SVGOMPathElement element = ((SVGOMPathElement)paths.item( iPath ));
-			if(setStrokeToElementColorBecomesNone(element)) continue;
+	private void parsePathElement(Element paths) throws Exception {
+		if(paths instanceof SVGOMPolylineElement) {
+			logger.debug("Node is a polyline.");
+			parsePolylineElement(paths);
+			return;
+		}
+		SVGOMPathElement element = (SVGOMPathElement)paths;
+		Matrix3d m = getMatrixFromElement(element);
 
-
-			Matrix3d m = getMatrixFromElement(element);
-			logger.debug("Matrix {}", m);
-
-			SVGPathSegList pathList = element.getNormalizedPathSegList();
-			int itemCount = pathList.getNumberOfItems();
-			logger.debug("Node has {} elements.", itemCount);
-			isNewPath=true;
-
-			for(int i=0; i<itemCount; i++) {
-				SVGPathSeg item = pathList.getItem(i);
-				switch( item.getPathSegType() ) {
-					case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m);  	// M
-					case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m);  		// m
-					case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m);  	// L H V
-					case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m);  	// l h v
-					case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m);	// C c
-					case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(); 			// Z z
-					default -> throw new Exception("Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString());
-				}
+		isNewPath=true;
+		SVGPathSegList pathList = element.getNormalizedPathSegList();
+		for(int i=0; i<pathList.getNumberOfItems(); i++) {
+			SVGPathSeg item = pathList.getItem(i);
+			switch( item.getPathSegType() ) {
+				case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m);  	// M
+				case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m);  		// m
+				case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m);  	// L H V
+				case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m);  	// l h v
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m);	// C c
+				case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(); 			// Z z
+				default -> throw new Exception("Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString());
 			}
 		}
 	}
@@ -449,7 +460,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doLineToAbs(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Line Abs {}", p);
+		//logger.debug("Line Abs {}", p);
 		pathPoint.set(p);
 		myTurtle.moveTo(pathPoint.x,pathPoint.y);
 		isNewPath=false;
@@ -458,7 +469,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doMoveRel(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Move Rel {}", p);
+		//logger.debug("Move Rel {}", p);
 		pathPoint.add(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
@@ -468,7 +479,7 @@ public class LoadSVG implements TurtleLoader {
 	private void doMoveToAbs(SVGPathSeg item, Matrix3d m) {
 		SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
-		logger.debug("Move Abs {}", p);
+		//logger.debug("Move Abs {}", p);
 		pathPoint.set(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
 		myTurtle.jumpTo(p.x,p.y);
@@ -476,7 +487,7 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private void doClosePath() {
-		logger.debug("Close path");
+		//logger.debug("Close path");
 		myTurtle.moveTo(pathFirstPoint.x,pathFirstPoint.y);
 		isNewPath=true;
 	}
@@ -534,8 +545,6 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
 		return (SVGDocument) factory.createDocument("",in);
 	}
 }

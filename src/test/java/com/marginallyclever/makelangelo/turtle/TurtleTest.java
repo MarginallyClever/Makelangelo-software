@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -17,7 +17,7 @@ class TurtleTest {
         Turtle turtle = new Turtle();
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000]", turtle.history.toString());
     }
 
     @Test
@@ -31,7 +31,7 @@ class TurtleTest {
         turtle.moveTo(2, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, TRAVEL X10.000 Y12.000, TRAVEL X2.000 Y3.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X10.000 Y12.000, TRAVEL X2.000 Y3.000]", turtle.history.toString());
         assertFalse(turtle.getHasAnyDrawingMoves());
     }
 
@@ -49,7 +49,7 @@ class TurtleTest {
         turtle.penUp();
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y12.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y12.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
     }
 
     @Test
@@ -63,7 +63,7 @@ class TurtleTest {
         turtle.moveTo(10, 15);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000]", turtle.history.toString());
         assertTrue(turtle.getHasAnyDrawingMoves());
     }
 
@@ -81,39 +81,39 @@ class TurtleTest {
         turtle.jumpTo(-15, -7);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TRAVEL X11.414 Y13.586, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TRAVEL X11.414 Y13.586, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
         assertFalse(turtle.getHasAnyDrawingMoves());
     }
 
     @Test
     public void colorChange() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // when
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
-        turtle.setColor(new ColorRGB(4, 5, 6));
+        turtle.setColor(new Color(4, 5, 6));
         turtle.jumpTo(-15, -7);
 
         // then
-        assertEquals("[TOOL R1 G2 B3 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R4 G5 B6 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
-        assertEquals(new ColorRGB(1,2,3), turtle.getFirstColor());
+        assertEquals("[TOOL R1 G2 B3 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R4 G5 B6 A255 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
+        assertEquals(new Color(1,2,3), turtle.getFirstColor());
     }
 
     @Test
     public void firstColor() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // then
-        assertEquals("[TOOL R1 G2 B3 D1.000]", turtle.history.toString());
+        assertEquals("[TOOL R1 G2 B3 A255 D1.000]", turtle.history.toString());
     }
 
     @Test
     public void toolChange() {
         // given
-        Turtle turtle = new Turtle(new ColorRGB(1,2,3));
+        Turtle turtle = new Turtle(new Color(1,2,3));
 
         // when
         turtle.moveTo(20, 30);
@@ -121,7 +121,7 @@ class TurtleTest {
         turtle.setDiameter(10);
 
         // then
-        assertEquals("[TOOL R1 G2 B3 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R1 G2 B3 D10.000]", turtle.history.toString());
+        assertEquals("[TOOL R1 G2 B3 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R1 G2 B3 A255 D10.000]", turtle.history.toString());
     }
 
     @Test
@@ -162,7 +162,7 @@ class TurtleTest {
         turtle.scale(2, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X40.000 Y90.000, DRAW_LINE X20.000 Y45.000, TRAVEL X-30.000 Y-21.000, DRAW_LINE X6.000 Y12.000, TRAVEL X24.000 Y54.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X40.000 Y90.000, DRAW_LINE X20.000 Y45.000, TRAVEL X-30.000 Y-21.000, DRAW_LINE X6.000 Y12.000, TRAVEL X24.000 Y54.000]", turtle.history.toString());
     }
 
     @Test
@@ -181,7 +181,7 @@ class TurtleTest {
         turtle.translate(-10, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X10.000 Y33.000, DRAW_LINE X0.000 Y18.000, TRAVEL X-25.000 Y-4.000, DRAW_LINE X-7.000 Y7.000, TRAVEL X2.000 Y21.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X10.000 Y33.000, DRAW_LINE X0.000 Y18.000, TRAVEL X-25.000 Y-4.000, DRAW_LINE X-7.000 Y7.000, TRAVEL X2.000 Y21.000]", turtle.history.toString());
     }
 
     @Test
@@ -204,8 +204,8 @@ class TurtleTest {
         List<Turtle> turtles = turtle.splitByToolChange();
         assertNotNull(turtles);
         assertEquals(2, turtles.size());
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TRAVEL X12.000 Y18.000]", turtles.get(0).history.toString());
-        assertEquals("[TOOL R0 G0 B0 D2.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtles.get(1).history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TRAVEL X12.000 Y18.000]", turtles.get(0).history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D2.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtles.get(1).history.toString());
     }
 
     @Test
@@ -220,14 +220,14 @@ class TurtleTest {
         turtle.jumpTo(-15, -7);
         turtle.moveTo(3, 4);
 
-        Turtle turtle2 = new Turtle(new ColorRGB(6,7,8));
+        Turtle turtle2 = new Turtle(new Color(6,7,8));
         turtle2.jumpTo(-8, 4);
         turtle2.moveTo(1, 6);
 
         turtle.add(turtle2);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TOOL R6 G7 B8 D1.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TOOL R6 G7 B8 A255 D1.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtle.history.toString());
     }
 
     @Test

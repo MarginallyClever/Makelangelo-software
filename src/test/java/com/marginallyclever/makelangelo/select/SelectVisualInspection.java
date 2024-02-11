@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.select;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 
@@ -34,7 +33,7 @@ public class SelectVisualInspection {
         SelectPanel panel = new SelectPanel();
         SelectBoolean a = new SelectBoolean("A","AAAAAAAAAAA",false);
         SelectButton b = new SelectButton("B","B");
-        SelectColor c = new SelectColor("C","CCCCCC",new ColorRGB(0,0,0),panel);
+        SelectColor c = new SelectColor("C","CCCCCC",Color.BLACK,panel);
         SelectFile d = new SelectFile("D","D",null);
         SelectDouble e = new SelectDouble("E","E",0.0f);
         SelectInteger f = new SelectInteger("F","FFF",0);

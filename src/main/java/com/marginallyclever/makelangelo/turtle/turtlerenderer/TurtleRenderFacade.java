@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 /**
  * Facade for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a {@link TurtleRenderer}.
@@ -23,8 +23,8 @@ public class TurtleRenderFacade implements PreviewListener {
 	private Turtle myTurtle = new Turtle();
 	private int first=0;
 	private int last;
-	private final ColorRGB penDownColor = new ColorRGB(0,0,0);
-	private final ColorRGB penUpColor = new ColorRGB(0,255,0);
+	private Color penDownColor = Color.BLACK;
+	private Color penUpColor = Color.GREEN;
 	private double penDiameter=0.8;
 
 	@Override
@@ -135,12 +135,12 @@ public class TurtleRenderFacade implements PreviewListener {
 		return last;
 	}
 
-	public void setDownColor(ColorRGB penDownColor) {
-		this.penDownColor.set(penDownColor);
+	public void setDownColor(Color penDownColor) {
+		this.penDownColor=penDownColor;
 	}
 
-	public void setUpColor(ColorRGB penUpColor) {
-		this.penUpColor.set(penUpColor);
+	public void setUpColor(Color penUpColor) {
+		this.penUpColor=penUpColor;
 	}
 
 	public void setPenDiameter(double penDiameter) {

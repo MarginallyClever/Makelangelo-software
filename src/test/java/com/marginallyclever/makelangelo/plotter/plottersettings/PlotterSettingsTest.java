@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -34,9 +34,9 @@ public class PlotterSettingsTest {
         expected.setDouble(PlotterSettings.PEN_ANGLE_DOWN,9);
         expected.setDouble(PlotterSettings.PEN_ANGLE_UP,10);
         expected.setDouble(PlotterSettings.FEED_RATE_TRAVEL,11);
-        expected.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new ColorRGB(12, 13, 14));
-        expected.setColor(PlotterSettings.PEN_UP_COLOR,new ColorRGB(15, 16, 17));
-        expected.setColor(PlotterSettings.PAPER_COLOR,new ColorRGB(18, 19, 20));
+        expected.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,new Color(12, 13, 14));
+        expected.setColor(PlotterSettings.PEN_UP_COLOR,new Color(15, 16, 17));
+        expected.setColor(PlotterSettings.PAPER_COLOR,new Color(18, 19, 20));
         expected.setDouble(PlotterSettings.FEED_RATE_DRAW,21);
         expected.setDouble(PlotterSettings.MAX_ACCELERATION,22);
 		expected.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,23);

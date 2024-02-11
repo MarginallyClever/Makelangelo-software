@@ -1,11 +1,8 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
@@ -34,10 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 7.0?
  */
 public class Turtle implements Cloneable {
-	private static final Logger logger = LoggerFactory.getLogger(Turtle.class);
-	
 	public final List<TurtleMove> history = new ArrayList<>();
-
 	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
@@ -45,12 +39,12 @@ public class Turtle implements Cloneable {
 	private double nx, ny;  // normal of angle. aka sin() and cos() of angle.
 	private double angle;
 	private boolean isUp;
-	private ColorRGB color;
+	private Color color;
 	private double diameter=1;
 
 	public Turtle() {
 		super();
-		reset(new ColorRGB(0,0,0));
+		reset(Color.BLACK);
 	}
 	
 	public Turtle(Turtle t) {
@@ -61,7 +55,7 @@ public class Turtle implements Cloneable {
 		this.ny = t.ny;
 		this.angle = t.angle;
 		this.isUp = t.isUp;
-		this.color.set(t.color);
+		this.color=t.color;
 		this.diameter = t.diameter; 
 		// deep copy
 		history.clear();
@@ -70,7 +64,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 	
-	public Turtle(ColorRGB firstColor) {
+	public Turtle(Color firstColor) {
 		super();
 		reset(firstColor);
 	}
@@ -87,7 +81,7 @@ public class Turtle implements Cloneable {
 	@Override
 	public String toString() {
 		return "Turtle{" +
-				"history=" + history +
+				"history=" + history.size() +
 				", px=" + px +
 				", py=" + py +
 				", nx=" + nx +
@@ -103,7 +97,7 @@ public class Turtle implements Cloneable {
 	 * Returns this {@link Turtle} to mint condition.  Erases history and resets all parameters.  Called by constructor.
 	 * @param c The starting color for this {@link Turtle}.
 	 */
-	private void reset(ColorRGB c) {
+	private void reset(Color c) {
 		px = 0;
 		py = 0;
 		setAngle(0);
@@ -129,22 +123,24 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	public void setColor(ColorRGB c) {
+	public void setColor(Color c) {
 		if(color!=null) {
-			if(color.red==c.red && color.green==c.green && color.blue==c.blue) return;
+			if(color.getRed()==c.getRed() &&
+				color.getGreen()==c.getGreen() &&
+				color.getBlue()==c.getBlue()) return;
 		}
-		color = new ColorRGB(c);
-		history.add( new TurtleMove(color.toInt(),diameter,MovementType.TOOL_CHANGE) );
+		color = c;
+		history.add( new TurtleMove(color.hashCode(),diameter,MovementType.TOOL_CHANGE) );
 	}
 	
-	public ColorRGB getColor() {
+	public Color getColor() {
 		return color;
 	}
 	
 	public void setDiameter(double d) {
 		if(diameter==d) return;
 		diameter=d;
-		history.add( new TurtleMove(color.toInt(),diameter,MovementType.TOOL_CHANGE) );
+		history.add( new TurtleMove(color.hashCode(),diameter,MovementType.TOOL_CHANGE) );
 	}
 	
 	public double getDiameter() {
@@ -395,7 +391,7 @@ public class Turtle implements Cloneable {
 	public LineCollection getAsLineSegments() {
 		LineCollection lines = new LineCollection();
 		TurtleMove previousMovement=null;
-		ColorRGB color = new ColorRGB(0,0,0);
+		Color color = Color.BLACK;
 
 		//logger.debug("  Found {} instructions.", history.size());
 		
@@ -513,13 +509,13 @@ public class Turtle implements Cloneable {
 		this.history.addAll(t.history);
 	}
 
-	public ColorRGB getFirstColor() {
+	public Color getFirstColor() {
 		for( TurtleMove m : history) {
 			if(m.type==MovementType.TOOL_CHANGE)
 				return m.getColor();
 		}
 		
-		return new ColorRGB(0,0,0);
+		return Color.BLACK;
 	}
 
 	/**

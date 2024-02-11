@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.tools;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -146,7 +146,7 @@ public class InfillTurtle {
 	 * @return return Intersections sorted by ascending x value. If x values match,
 	 *         sort by ascending y value.
 	 */
-	private LineCollection sortIntersectionsIntoSegments(List<Point2D> intersections, ColorRGB color) {
+	private LineCollection sortIntersectionsIntoSegments(List<Point2D> intersections, Color color) {
 		Point2D first = intersections.get(0);
 		Point2D second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {

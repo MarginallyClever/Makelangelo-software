@@ -1,12 +1,11 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
-import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 
 import java.awt.*;
 
@@ -78,8 +77,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                         previousMove = m;
                     }
                     case TOOL_CHANGE -> {
-                        ColorRGB c = m.getColor();
-                        downColor = new Color(c.red, c.green, c.blue);
+                        downColor = m.getColor();
                         ((Graphics2D) g).setStroke(new BasicStroke((int) m.getDiameter()));
                     }
                 }

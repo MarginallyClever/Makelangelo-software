@@ -82,9 +82,11 @@
 	<string><key>MenuUpdate</key><value>Check for updates</value></string>
 	<string><key>MenuQuit</key><value>Quit</value></string>
 	<string><key>MenuForums</key><value>Online help forums</value></string>
+	<string><key>MenuManual</key><value>Read the Friendly Manual</value></string>
 	<string><key>MenuAbout</key><value>About</value></string>
 	<string><key>MenuSettings</key><value>Settings</value></string>
 	<string><key>MenuOpenFile</key><value>Open File...</value></string>
+	<string><key>MenuImportFile</key><value>Import File...</value></string>
 	<string><key>MenuSaveFile</key><value>Save File...</value></string>
 	<string><key>MenuReopenFile</key><value>Reopen last file</value></string>
 	<string><key>MenuView</key><value>View</value></string>
@@ -114,6 +116,9 @@
 	<string><key>Model</key><value>Model</value></string>
 	<string><key>Length</key><value>Length</value></string>
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
+	<string><key>Converter_PulseCMYK.Name</key><value>Pulse CMYK</value></string>
+	<string><key>Converter_PulseCMYK.SampleRate</key><value>Sample rate</value></string>
+
 	<string><key>YourMsgHereName</key><value>Your message here</value></string>
 	<string><key>SpiralName</key><value>Spiral</value></string>
 	<string><key>SpiralPulseName</key><value>Pulsing Spiral</value></string>

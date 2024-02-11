@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.convenience.helpers.StringHelper;
@@ -10,6 +9,8 @@ import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 /**
  * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
@@ -251,7 +252,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private static String getColorName(int toolNumber) {
-		String name = W3CColorNames.get(new ColorRGB(toolNumber));
+		String name = W3CColorNames.get(new Color(toolNumber));
 		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
 		return name;
 	}

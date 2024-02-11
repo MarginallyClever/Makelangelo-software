@@ -10,6 +10,7 @@ import java.util.Objects;
  *
  * @author Dan Royer
  */
+@Deprecated
 public class ColorRGB {
     public int red;
     public int green;

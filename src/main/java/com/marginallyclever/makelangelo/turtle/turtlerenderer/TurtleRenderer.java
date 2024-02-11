@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
+
+import java.awt.*;
 
 /**
  * {@link TurtleRenderer} is an interface class that can draw a
@@ -17,9 +18,9 @@ public interface TurtleRenderer {
 
 	void end();
 
-	void setPenDownColor(ColorRGB color);
+	void setPenDownColor(Color color);
 
-	void setPenUpColor(ColorRGB color);
+	void setPenUpColor(Color color);
 	
 	void setPenDiameter(double d);
 

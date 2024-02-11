@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
@@ -10,6 +9,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import javax.vecmath.Vector3d;
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -221,10 +221,10 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	@Override
-	public void setPenDownColor(ColorRGB color) {}
+	public void setPenDownColor(Color color) {}
 
 	@Override
-	public void setPenUpColor(ColorRGB color) {}
+	public void setPenUpColor(Color color) {}
 
 	@Override
 	public void setPenDiameter(double d) {}

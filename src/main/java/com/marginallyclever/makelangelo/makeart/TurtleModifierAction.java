@@ -4,8 +4,8 @@ import com.marginallyclever.makelangelo.Makelangelo;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 
 /**
  * {@link TurtleModifierAction} is the base class for all Actions which modify a {@link Turtle}.
@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @since 7.31.0
  */
 public abstract class TurtleModifierAction extends AbstractAction {
-	private final ArrayList<TurtleModifierListener> listeners = new ArrayList<TurtleModifierListener>();
+	private final EventListenerList listeners = new EventListenerList();
 	private Makelangelo myMakelangelo;
 	
 	public TurtleModifierAction(String string) {
@@ -30,15 +30,15 @@ public abstract class TurtleModifierAction extends AbstractAction {
 	}
 	
 	public void addModifierListener(TurtleModifierListener arg0) {
-		listeners.add(arg0);
+		listeners.add(TurtleModifierListener.class,arg0);
 	}
 	
 	public void removeModifierListener(TurtleModifierListener arg0) {
-		listeners.remove(arg0);
+		listeners.remove(TurtleModifierListener.class,arg0);
 	}
 	
 	protected void fireModificationEvent(Turtle turtle) {
-		for(TurtleModifierListener a : listeners) {
+		for(TurtleModifierListener a : listeners.getListeners(TurtleModifierListener.class)) {
 			a.turtleModifiedEvent(turtle);
 		}
 	}

@@ -1,17 +1,19 @@
 package com.marginallyclever.convenience;
 
-/** 
+import java.awt.*;
+
+/**
  * {@link LineSegment2D} represents two connected points and line color. 
  * @author Dan Royer
  *
  */
 public class LineSegment2D {
 	public Point2D start, end;
-	public ColorRGB color;
+	public Color color;
 	// used while processing line segments.
 	public boolean flag;
 
-	public LineSegment2D(Point2D start, Point2D end, ColorRGB color) {
+	public LineSegment2D(Point2D start, Point2D end, Color color) {
 		super();
 		this.start = start;
 		this.end = end;
