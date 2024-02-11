@@ -116,7 +116,9 @@
 	<string><key>Model</key><value>Model</value></string>
 	<string><key>Length</key><value>Length</value></string>
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
-	<string><key>PulseCMYKName</key><value>Pulse CMYK</value></string>
+	<string><key>Converter_PulseCMYK.Name</key><value>Pulse CMYK</value></string>
+	<string><key>Converter_PulseCMYK.SampleRate</key><value>Sample rate</value></string>
+
 	<string><key>YourMsgHereName</key><value>Your message here</value></string>
 	<string><key>SpiralName</key><value>Spiral</value></string>
 	<string><key>SpiralPulseName</key><value>Pulsing Spiral</value></string>

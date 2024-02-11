@@ -58,7 +58,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return Translator.get("PulseCMYKName");
+		return Translator.get("Converter_PulseCMYK.Name");
 	}
 
 	public double getScale() {
