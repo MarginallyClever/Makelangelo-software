@@ -111,12 +111,13 @@ public class PlotterSettingsPanel extends JPanel {
 		if(!settings.isMostAncestral()) {
 			bottom.add(buttonSave);
 			bottom.add(buttonReset);
-			machineWidth.addSelectListener((e)->updateLengthNeeded());
-			machineHeight.addSelectListener((e)->updateLengthNeeded());
 		} else {
 			machineWidth.setReadOnly();
 			machineHeight.setReadOnly();
 		}
+
+		machineWidth.addSelectListener((e)->updateLengthNeeded());
+		machineHeight.addSelectListener((e)->updateLengthNeeded());
 
 		totalStepperNeeded.setReadOnly();
 		totalBeltNeeded.setReadOnly();
@@ -133,6 +134,15 @@ public class PlotterSettingsPanel extends JPanel {
 		this.add(tabbedPane,BorderLayout.CENTER);
 		this.add(bottom,BorderLayout.SOUTH);
 		this.repaint();
+
+		visualStyle.addSelectListener(e->updateSizeEditable());
+	}
+
+	private void updateSizeEditable() {
+		var matches = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
+		matches |= !settings.isMostAncestral();
+		machineWidth.setReadOnly(matches);
+		machineHeight.setReadOnly(matches);
 	}
 
 	private void addToPanel(SelectPanel interior2, Select minPlannerSpeed) {
