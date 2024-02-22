@@ -102,6 +102,10 @@ public class SelectDouble extends Select {
 		field.setEditable(false);
 	}
 
+	public void setReadOnly(boolean state) {
+		field.setEditable(!state);
+	}
+
 	// @return last valid value typed into field
 	public double getValue() {
 		return value;
