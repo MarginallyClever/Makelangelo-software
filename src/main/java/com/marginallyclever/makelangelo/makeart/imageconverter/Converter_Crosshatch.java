@@ -14,7 +14,7 @@ public class Converter_Crosshatch extends ImageConverter {
 	private static double pass90=16.0f;
 	private static double pass75=32.0f;
 	private static double pass15=64.0f;
-	private static double pass45=128.0f;
+	private static double pass45=192.0f;
 
 	public Converter_Crosshatch() {
 		super();
@@ -92,8 +92,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		
 		turtle = new Turtle();
 		finishPass(new int[]{(int)pass90},90,img);
-		finishPass(new int[]{(int)pass75},15,img);
-		finishPass(new int[]{(int)pass15},75,img);
+		finishPass(new int[]{(int)pass75},75,img);
+		finishPass(new int[]{(int)pass15},15,img);
 		finishPass(new int[]{(int)pass45},45,img);
 
 		fireConversionFinished();
