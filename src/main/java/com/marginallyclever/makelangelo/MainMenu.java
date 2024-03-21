@@ -382,16 +382,14 @@ public class MainMenu extends JMenuBar {
         rotate.addActionListener((e) -> runRotatePanel());
         menu.addSeparator();
 
-        TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipH"));
+        TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
         a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
-        a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
         a4.setSource(app);
         a4.addModifierListener(app::setTurtle);
         menu.add(a4);
 
-        TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipV"));
+        TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
         a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
-        a5.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, SHORTCUT_CTRL));//"ctrl F"
         a5.setSource(app);
         a5.addModifierListener(app::setTurtle);
         menu.add(a5);
