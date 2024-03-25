@@ -31,6 +31,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.communications;
     exports com.marginallyclever.convenience.log to ch.qos.logback.core;
     exports com.marginallyclever.makelangelo;
+    exports com.marginallyclever.makelangelo.turtle;
     exports com.marginallyclever.makelangelo.config;
     exports com.marginallyclever.makelangelo.makeart;
     exports com.marginallyclever.makelangelo.makeart.imagefilter;

@@ -39,7 +39,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	}
 
 	@Override
-	protected Turtle doInBackground() throws Exception {
+	protected Turtle doInBackground() {
 		logger.debug("doInBackground() start {}", name);
 		
 		Turtle turtle = new Turtle();
@@ -62,8 +62,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 				}
 				try {
 					Thread.sleep(5);
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 			}
 		} catch(Exception e) {
 			logger.error("caught exception",e);

@@ -180,24 +180,28 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		cl.show(cards, cardName);
 	}
 
+	/**
+	 *
+	 * @param mode 0=fit paper, 1=fill paper
+	 */
 	private void scaleImage(int mode) {
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		double width  = rect.getWidth();
-		double height = rect.getHeight();
+		double paperW = rect.getWidth();
+		double paperH = rect.getHeight();
+		double imageW = myImage.getSourceImage().getWidth();
+		double imageH = myImage.getSourceImage().getHeight();
 
-		boolean test;
-		if (mode == 0) {
-			test = width < height;  // fit paper
+		// find some value f that will scale the image.
+		// in mode=0, the image must fit inside the paper.
+		// in mode=1, the image must fill the paper.
+		double f;
+
+		if(mode==0) {
+			f = Math.min(paperW/imageW,paperH/imageH);
 		} else {
-			test = width > height;  // fill paper
+			f = Math.max(paperW/imageW,paperH/imageH);
 		}
 
-		float f;
-		if( test ) {
-			f = (float)( width / (double)myImage.getSourceImage().getWidth() );
-		} else {
-			f = (float)( height / (double)myImage.getSourceImage().getHeight() );
-		}
 		myImage.setScale(f,-f);
 	}
 

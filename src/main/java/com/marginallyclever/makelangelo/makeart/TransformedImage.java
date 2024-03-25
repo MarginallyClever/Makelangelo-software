@@ -16,8 +16,8 @@ import java.util.Arrays;
  */
 public class TransformedImage {
 	private final BufferedImage sourceImage;
-	private float scaleX, scaleY;
-	private float translateX, translateY;
+	private double scaleX, scaleY;
+	private double translateX, translateY;
 
 	public TransformedImage(BufferedImage src) {
 		sourceImage = src;
@@ -59,11 +59,11 @@ public class TransformedImage {
 		translateY = other.translateY;
 	}
 
-	public float getScaleX() {
+	public double getScaleX() {
 		return scaleX;
 	}
 
-	public float getScaleY() {
+	public double getScaleY() {
 		return scaleY;
 	}
 
@@ -216,13 +216,13 @@ public class TransformedImage {
 		return value / sum;
 	}	
 
-	public void setScale(float x,float y) {
+	public void setScale(double x,double y) {
 		scaleX = x;
 		scaleY = y;
 	}
 
 
-	public void setRGB(float x, float y, int c) {
+	public void setRGB(double x, double y, int c) {
 		sourceImage.setRGB(getTransformedX(x), getTransformedY(y), c);
 	}
 }
