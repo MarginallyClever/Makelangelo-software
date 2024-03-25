@@ -117,7 +117,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 
 		LineCollection output = new LineCollection();
 
-		if(secondPass.size()==0) {
+		if(secondPass.isEmpty()) {
 			logger.debug("  no reordering.");
 			return output;
 		}
