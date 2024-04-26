@@ -1,9 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.util.PreferencesHelper;
-
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
@@ -81,17 +77,5 @@ public class TextInterfaceWithHistory extends JPanel {
 	public void setEnabled(boolean state) {
 		super.setEnabled(state);
 		myInterface.setEnabled(state);
-	}
-
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		JFrame frame = new JFrame(TextInterfaceWithHistory.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new TextInterfaceWithHistory());
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

@@ -68,7 +68,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		}
 	}
 
-	static public void paintMotors(GL2 gl2,Plotter robot) {
+	protected void paintMotors(GL2 gl2,Plotter robot) {
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -88,7 +88,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	private void paintControlBox(GL2 gl2, Plotter robot) {
+	protected void paintControlBox(GL2 gl2, Plotter robot) {
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -134,7 +134,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glPopMatrix();
 	}
 
-	static public void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	protected void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -183,21 +183,14 @@ public abstract class Polargraph implements PlotterRenderer {
 		paintCounterweight(gl2,right,top-right_b);
 	}
 
-	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
-		gl2.glVertex2d(x - 2, y);
-		gl2.glVertex2d(x - 2, y - length);
-		gl2.glVertex2d(x + 2, y);
-		gl2.glVertex2d(x + 2, y - length);
-	}
-
-	private static void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+	protected void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
 		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2, 20);
 		if (robot.getPenIsUp()) {
 			drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2 + 5, 20);
 		}
 	}
 
-	static public void paintCounterweight(GL2 gl2,double x,double y) {
+	protected void paintCounterweight(GL2 gl2,double x,double y) {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
 		gl2.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y);
@@ -207,8 +200,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	static public void paintBottomClearanceArea(GL2 gl2, Plotter machine) {
-
+	protected void paintBottomClearanceArea(GL2 gl2, Plotter machine) {
 		// bottom clearance arcs
 		// right
 		double w = machine.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT) - machine.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) + 2.1;
@@ -241,20 +233,20 @@ public abstract class Polargraph implements PlotterRenderer {
 
 	}
 
-	public static void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
+	protected void drawCircle(GL2 gl2, double gx, double gy, float penHolderRadius2, int steps) {
 		gl2.glBegin(GL2.GL_LINE_LOOP);
 		gl2.glColor3f(0, 0, 1);
 		float f;
 		for (f = 0; f < steps;++f) {
 			double f2 = Math.PI*2.0 * (double)f/(double)steps;
 			gl2.glVertex2d(
-					gx + Math.cos(f2) * PEN_HOLDER_RADIUS_2, 
-					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
+					gx + Math.cos(f2) * penHolderRadius2,
+					gy + Math.sin(f2) * penHolderRadius2);
 		}
 		gl2.glEnd();
 	}
 
-	public static void paintSafeArea(GL2 gl2, Plotter robot) {
+	protected void paintSafeArea(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);

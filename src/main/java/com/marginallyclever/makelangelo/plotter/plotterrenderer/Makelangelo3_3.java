@@ -6,14 +6,14 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.drawRectangle;
 
-public class Makelangelo3_3 implements PlotterRenderer {
+public class Makelangelo3_3 extends Polargraph {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintControlBox(gl2,robot);
-		Polargraph.paintMotors(gl2,robot);
+		paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
+			paintPenHolderToCounterweights(gl2,robot);
 	}
 	
 	/**
@@ -21,7 +21,8 @@ public class Makelangelo3_3 implements PlotterRenderer {
 	 * @param gl2   the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintControlBox(GL2 gl2,Plotter robot) {
+	@Override
+	protected void paintControlBox(GL2 gl2,Plotter robot) {
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);

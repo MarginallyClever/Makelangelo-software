@@ -3,9 +3,6 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 import com.marginallyclever.communications.NetworkSession;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.communications.NetworkSessionListener;
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -120,18 +117,4 @@ public class TextInterfaceToNetworkSession extends JPanel implements NetworkSess
 		mySession.removeListener(a);
 	}
 
-	// TEST 
-	
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		
-		JFrame frame = new JFrame(TextInterfaceToNetworkSession.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.setPreferredSize(new Dimension(600, 400));
-		frame.add(new TextInterfaceToNetworkSession(new ChooseConnection()));
-		frame.pack();
-		frame.setVisible(true);
-	}
 }

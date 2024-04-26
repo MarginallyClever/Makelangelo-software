@@ -1,11 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -121,19 +118,5 @@ public class ProgramPanel extends JPanel {
 			listView.clearSelection();
 			myPlotter.raisePen();
 		}
-	}
-
-	// TEST
-
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		JFrame frame = new JFrame(ProgramPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new ProgramPanel(new Plotter(), new Turtle()));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

@@ -1,10 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.select.*;
-import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -242,28 +240,5 @@ public class PlotterSettingsPanel extends JPanel {
 		if(listener!=null) {
 			listener.settingsChangedEvent(settings);
 		}
-	}
-
-	/**
-	 * Start the PlotterSettingsPanel.
- 	 * @param args not used
-	 */
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) {
-			logger.warn("failed to set native look and feel.", ex);
-		}
-
-		PlotterSettings plotterSettings = new PlotterSettings();
-		JFrame frame = new JFrame(PlotterSettingsPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterSettingsPanel(plotterSettings));
-		frame.pack();
-		frame.setVisible(true);	
 	}
 }

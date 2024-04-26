@@ -8,7 +8,7 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
-public class Makelangelo5Huge implements PlotterRenderer {
+public class Makelangelo5Huge extends Polargraph {
 	private static Texture textureMainBody;
 	private static Texture textureMotorMounts;
 	private static Texture textureLogo;
@@ -31,13 +31,13 @@ public class Makelangelo5Huge implements PlotterRenderer {
 			paintControlBoxFancy(gl2, robot, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(gl2, robot);
+		paintSafeArea(gl2, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl2, robot);
 
 		if (textureMotorMounts == null) {
-			Polargraph.paintMotors(gl2, robot);
+			paintMotors(gl2, robot);
 		} else {
 			paintControlBoxFancy(gl2, robot, textureMotorMounts);
 		}
@@ -120,21 +120,22 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
+	private void paintBeltSide(GL2 gl2,double x, double y, double length) {
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2d(x , y);
 		gl2.glVertex2d(x, y - length);
 		gl2.glEnd();
 	}
 
-	private void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+	@Override
+	protected void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
 		if(textureGondola!=null && textureArm!=null) {
 			paintGondolaFancy(gl2,gx,gy,robot);
 			return;
 		}
-		Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
+		drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
 		if (robot.getPenIsUp()) {
-			Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
+			drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
 		}
 	}
 
@@ -166,9 +167,10 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		paintTexture(gl2,textureGondola,gx-50,gy-50,100,100);
 	}
 
-	private void paintCounterweight(GL2 gl2,double x,double y) {
+	@Override
+	protected void paintCounterweight(GL2 gl2,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(gl2,x,y);
+			paintCounterweight(gl2,x,y);
 			return;
 		}
 
@@ -290,10 +292,10 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		final float SUCTION_CUP_Y = 35f;
 		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
 		gl2.glColor3f(1, 1f, 1f); // #color of suction cups
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl2, left - SUCTION_CUP_Y, top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, left - SUCTION_CUP_Y, top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, right + SUCTION_CUP_Y, top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, right + SUCTION_CUP_Y, top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
 	}
 
 	private void renderLCD(GL2 gl2, double left, double right) {

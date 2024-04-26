@@ -9,14 +9,14 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
  * @author Dan Royer
  */
 @Deprecated
-public class Makelangelo3 implements PlotterRenderer {
+public class Makelangelo3 extends Polargraph {
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
 		paintControlBox(gl2,robot);
-		Polargraph.paintMotors(gl2,robot);
+		paintMotors(gl2,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
+			paintPenHolderToCounterweights(gl2,robot);
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class Makelangelo3 implements PlotterRenderer {
 	 * @param gl2
 	 * @param plotter
 	 */
-	private void paintControlBox(GL2 gl2,Plotter plotter) {
+	protected void paintControlBox(GL2 gl2,Plotter plotter) {
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);

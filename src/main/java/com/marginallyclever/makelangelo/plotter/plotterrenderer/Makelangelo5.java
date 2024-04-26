@@ -3,12 +3,12 @@ package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
-import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
-public class Makelangelo5 implements PlotterRenderer {
+public class Makelangelo5 extends Polargraph {
 	private static Texture textureMainBody;
 	private static Texture textureMotors;
 	private static Texture textureLogo;
@@ -18,12 +18,12 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (textureMainBody == null) textureMainBody = loadTexture("/textures/makelangelo5.png");
-		if (textureMotors == null) textureMotors = loadTexture("/textures/makelangelo5-motors.png");
-		if (textureLogo == null) textureLogo = loadTexture("/logo.png");
-		if (textureWeight == null) textureWeight = loadTexture("/textures/weight.png");
-		if (textureGondola == null) textureGondola = loadTexture("/textures/phBody.png");
-		if (textureArm == null) textureArm = loadTexture("/textures/phArm2.png");
+		if (textureMainBody == null) textureMainBody = DrawingHelper.loadTexture("/textures/makelangelo5.png");
+		if (textureMotors == null) textureMotors = DrawingHelper.loadTexture("/textures/makelangelo5-motors.png");
+		if (textureLogo == null) textureLogo = DrawingHelper.loadTexture("/logo.png");
+		if (textureWeight == null) textureWeight = DrawingHelper.loadTexture("/textures/weight.png");
+		if (textureGondola == null) textureGondola = DrawingHelper.loadTexture("/textures/phBody.png");
+		if (textureArm == null) textureArm = DrawingHelper.loadTexture("/textures/phArm2.png");
 
 		if (textureMainBody == null) {
 			paintControlBoxPlain(gl2, robot);
@@ -31,13 +31,13 @@ public class Makelangelo5 implements PlotterRenderer {
 			paintControlBoxFancy(gl2, robot, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(gl2, robot);
+		paintSafeArea(gl2, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl2, robot);
 
 		if (textureMotors == null) {
-			Polargraph.paintMotors(gl2, robot);
+			paintMotors(gl2, robot);
 		} else {
 			paintControlBoxFancy(gl2, robot, textureMotors);
 		}
@@ -107,21 +107,22 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glEnd();
 	}
 
-	private static void paintBeltSide(GL2 gl2,double x, double y, double length) {
+	private void paintBeltSide(GL2 gl2,double x, double y, double length) {
 		gl2.glBegin(GL2.GL_LINES);
 		gl2.glVertex2d(x, y);
 		gl2.glVertex2d(x, y - length);
 		gl2.glEnd();
 	}
 
-	private void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
+	@Override
+	protected void paintGondola(GL2 gl2, double gx, double gy,Plotter robot) {
 		if(textureGondola!=null && textureArm!=null) {
 			paintGondolaFancy(gl2,gx,gy,robot);
 			return;
 		}
-		Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
+		drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
 		if (robot.getPenIsUp()) {
-			Polargraph.drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
+			drawCircle(gl2, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
 		}
 	}
 
@@ -140,25 +141,26 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl2.glPushMatrix();
 		gl2.glTranslated(gx,gy,0);
 		gl2.glRotated(Math.toDegrees(angleLeft)+90,0,0,1);
-		paintTexture(gl2,textureArm,-100,-100,200,200);
+		DrawingHelper.paintTexture(gl2,textureArm,-100,-100,200,200);
 		gl2.glPopMatrix();
 
 		gl2.glPushMatrix();
 		gl2.glTranslated(gx,gy,0);
 		gl2.glRotated(Math.toDegrees(angleRight)+90,0,0,1);
-		paintTexture(gl2,textureArm,-100,-100,200,200);
+		DrawingHelper.paintTexture(gl2,textureArm,-100,-100,200,200);
 		gl2.glPopMatrix();
 
 		// paint body last so it's on top
-		paintTexture(gl2,textureGondola,gx-50,gy-50,100,100);
+		DrawingHelper.paintTexture(gl2,textureGondola,gx-50,gy-50,100,100);
 	}
 
-	private void paintCounterweight(GL2 gl2,double x,double y) {
+	@Override
+	protected void paintCounterweight(GL2 gl2,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(gl2,x,y);
+			paintCounterweight(gl2,x,y);
 			return;
 		}
-		paintTexture(gl2, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(gl2, textureWeight, x-20, y-74, 40,80);
 	}
 
 	private void paintControlBoxFancy(GL2 gl2, Plotter robot,Texture texture) {
@@ -171,7 +173,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final double ox = left - 106 * scale; // 106 taken from offset in texture map
 		final double oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
 
-		paintTexture(gl2, texture, ox, oy, TW, TH);
+		DrawingHelper.paintTexture(gl2, texture, ox, oy, TW, TH);
 	}
 
 	/**
@@ -188,7 +190,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
-		paintTexture(gl2, textureLogo, LOGO_X, LOGO_Y, TW, TH);
+		DrawingHelper.paintTexture(gl2, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**
@@ -289,10 +291,10 @@ public class Makelangelo5 implements PlotterRenderer {
 		final float SUCTION_CUP_Y = 35f;
 		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
 		gl2.glColor3f(1, 1f, 1f); // #color of suction cups
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
+		drawCircle(gl2, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS, 20);
 	}
 
 	private void renderLCD(GL2 gl2, double left, double right) {

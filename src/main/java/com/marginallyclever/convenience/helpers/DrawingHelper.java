@@ -20,8 +20,8 @@ public class DrawingHelper {
      * @param y y center coordinate
      * @param radius radius
      */
-    public static void drawCircle(GL2 gl2, float x, float y, float radius) {
-        gl2.glTranslatef(x, y, 0);
+    public static void drawCircle(GL2 gl2, double x, double y, float radius) {
+        gl2.glTranslated(x, y, 0);
         gl2.glBegin(GL2.GL_LINE_LOOP);
         for (float f = 0; f < 2.0 * Math.PI; f += 0.3f) {
             gl2.glVertex2d(
@@ -29,7 +29,7 @@ public class DrawingHelper {
                     Math.sin(f) * radius);
         }
         gl2.glEnd();
-        gl2.glTranslatef(-x, -y, 0);
+        gl2.glTranslated(-x, -y, 0);
     }
 
     /**

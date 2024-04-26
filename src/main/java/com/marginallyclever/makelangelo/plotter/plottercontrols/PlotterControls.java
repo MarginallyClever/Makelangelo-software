@@ -1,10 +1,7 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
-import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.ButtonIcon;
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.CollapsiblePanel;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
@@ -13,7 +10,6 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -312,23 +308,5 @@ public class PlotterControls extends JPanel {
 		chooseConnection.closeConnection();
 		// make sure to unregister listeners
 		marlinInterface.stopListeningToPlotter();
-	}
-
-	// TEST
-
-	public static void main(String[] args) throws UnsupportedLookAndFeelException {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-		FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
-		UIManager.setLookAndFeel( new FlatLightLaf() );
-
-		JFrame frame = new JFrame(Translator.get("PlotterControls.Title"));
-		frame.setPreferredSize(new Dimension(DIMENSION_PANEL_WIDTH, DIMENSION_PANEL_HEIGHT));
-		frame.setMinimumSize(new Dimension(DIMENSION_PANEL_WIDTH, DIMENSION_PANEL_HEIGHT));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterControls(new Plotter(), new Turtle(), frame));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

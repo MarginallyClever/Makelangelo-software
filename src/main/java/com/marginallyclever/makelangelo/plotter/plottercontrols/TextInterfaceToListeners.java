@@ -1,8 +1,5 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,19 +88,5 @@ public class TextInterfaceToListeners extends JPanel {
 		for (ActionListener a : listeners) {
 			a.actionPerformed(e);
 		}
-	}
-
-	// TEST
-
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		JFrame frame = new JFrame(TextInterfaceToListeners.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new TextInterfaceToListeners());
-		frame.pack();
-		frame.setVisible(true);
 	}
 }
