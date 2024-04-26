@@ -116,6 +116,7 @@ public class MarlinPlotterInterfaceTest {
         assertEquals("G0 Y60",mpi.removeComment(" G0 Y60"));
         assertEquals("G0 F600",mpi.removeComment(" G0 F600 ; ;;;"));
     }
+
     @Test
     public void testZAxisGcode() {
         testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T150");
@@ -131,7 +132,7 @@ public class MarlinPlotterInterfaceTest {
         ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
         ps.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,150);
         plotter.setSettings(ps);
-        Assertions.assertEquals(matchDown, MarlinPlotterPanel.getPenDownString(plotter.getSettings()));
-        Assertions.assertEquals(matchUp, MarlinPlotterPanel.getPenUpString(plotter.getSettings()));
+        Assertions.assertEquals(matchDown, plotter.getSettings().getPenDownString());
+        Assertions.assertEquals(matchUp, plotter.getSettings().getPenUpString());
     }
 }

@@ -203,7 +203,7 @@ public class SaveGCode implements TurtleSaver {
 			out.write(";Start of user gcode\n");
 			out.write(settings.getString(PlotterSettings.USER_GENERAL_START_GCODE));
 			out.write("\n;End of user gcode\n");
-			out.write(MarlinPlotterPanel.getFindHomeString() + "\n");  // go home
+			out.write(PlotterSettings.getFindHomeString() + "\n");  // go home
 
 			boolean isUp = true;
 
@@ -215,7 +215,7 @@ public class SaveGCode implements TurtleSaver {
 					case TRAVEL -> {
 						if (!isUp) {
 							// lift pen up
-							out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
+							out.write(settings.getPenUpString() + "\n");
 							isUp = true;
 						}
 						previousMovement = m;
@@ -224,20 +224,20 @@ public class SaveGCode implements TurtleSaver {
 						if (isUp) {
 							// go to m and put pen down
 							if (previousMovement == null) previousMovement = m;
-							out.write(MarlinPlotterPanel.getTravelToString(settings, previousMovement.x, previousMovement.y) + "\n");
-							out.write(MarlinPlotterPanel.getPenDownString(settings) + "\n");
+							out.write(settings.getTravelToString(previousMovement.x, previousMovement.y) + "\n");
+							out.write(settings.getPenDownString() + "\n");
 							isUp = false;
 						}
-						out.write(MarlinPlotterPanel.getDrawToString(settings, m.x, m.y) + "\n");
+						out.write(settings.getDrawToString(m.x, m.y) + "\n");
 						previousMovement = m;
 					}
 					case TOOL_CHANGE -> {
-						out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
-						out.write(MarlinPlotterPanel.getToolChangeString(m.getColor().hashCode()) + "\n");
+						out.write(settings.getPenUpString() + "\n");
+						out.write(settings.getToolChangeString(m.getColor().hashCode()) + "\n");
 					}
 				}
 			}
-			if (!isUp) out.write(MarlinPlotterPanel.getPenUpString(settings) + "\n");
+			if (!isUp) out.write(settings.getPenUpString() + "\n");
 			out.write(";Start of user gcode\n");
 			out.write(settings.getString(PlotterSettings.USER_GENERAL_END_GCODE));
 			out.write("\n;End of user gcode\n");

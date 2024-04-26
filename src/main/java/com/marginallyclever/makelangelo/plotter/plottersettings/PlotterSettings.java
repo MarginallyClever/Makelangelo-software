@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.W3CColorNames;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
@@ -154,6 +156,71 @@ public class PlotterSettings {
 	public PlotterSettings() {
 		super();
 		setDefaults();
+	}
+
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public String getTravelToString(double x, double y) {
+		return "G0 " + getPosition(x, y)
+				+ " F" + getDouble(FEED_RATE_TRAVEL);
+	}
+
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param settings plotter settings
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public String getDrawToString(double x, double y) {
+		return "G1 " + getPosition(x, y)
+				+ " F" + getDouble(FEED_RATE_DRAW);
+	}
+
+	public String getPenUpString() {
+		if(getInteger(Z_MOTOR_TYPE)== Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)getDouble(PEN_ANGLE_UP)
+					+ " T" + (int)getDouble(PEN_ANGLE_UP_TIME);
+		} else {
+			return "G0 Z" + (int)getDouble(PEN_ANGLE_UP);
+		}
+	}
+
+	public String getPenDownString() {
+		if(getInteger(Z_MOTOR_TYPE)== Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)getDouble(PEN_ANGLE_DOWN)
+					+ " T" + (int)getDouble(PEN_ANGLE_DOWN_TIME);
+		} else {
+			return "G1 Z" + (int)getDouble(PEN_ANGLE_DOWN);
+		}
+	}
+
+	public String getToolChangeString(int toolNumber) {
+		String colorName = getColorName(toolNumber & 0xFFFFFF);
+		return "M0 Ready " + colorName + " and click";
+	}
+
+	private String getPosition(double x, double y) {
+		return "X" + StringHelper.formatDouble(x)
+				+ " Y" + StringHelper.formatDouble(y);
+	}
+
+	private String getColorName(int toolNumber) {
+		String name = W3CColorNames.get(new Color(toolNumber));
+		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
+		return name;
+	}
+
+
+	public static String getFindHomeString() {
+		return "G28 X Y";
 	}
 
 	private void setDefaults() {

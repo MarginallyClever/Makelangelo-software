@@ -2,15 +2,12 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.awt.*;
 
 /**
  * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
@@ -67,18 +64,18 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendToolChange(int toolNumber) {
-		queueAndSendCommand(MarlinPlotterPanel.getPenUpString(myPlotter.getSettings()));
-		queueAndSendCommand(getToolChangeString(toolNumber));
+		queueAndSendCommand(myPlotter.getSettings().getPenUpString());
+		queueAndSendCommand(myPlotter.getSettings().getToolChangeString(toolNumber));
 	}
 
 	private void sendFindHome() {
-		queueAndSendCommand(getFindHomeString());
+		queueAndSendCommand(PlotterSettings.getFindHomeString());
 	}
 
 	private void sendPenUpDown() {
 		String str = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getPenUpString(myPlotter.getSettings())
-				: MarlinPlotterPanel.getPenDownString(myPlotter.getSettings());
+				? myPlotter.getSettings().getPenUpString()
+				: myPlotter.getSettings().getPenDownString();
 		queueAndSendCommand(str);
 	}
 
@@ -89,8 +86,8 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	private void sendGoto() {
 		Point2D p = myPlotter.getPos();
 		String msg = myPlotter.getPenIsUp()
-				? MarlinPlotterPanel.getTravelToString(myPlotter.getSettings(), p.x, p.y)
-				: MarlinPlotterPanel.getDrawToString(myPlotter.getSettings(), p.x, p.y);
+				? myPlotter.getSettings().getTravelToString(p.x, p.y)
+				: myPlotter.getSettings().getDrawToString(p.x, p.y);
 		queueAndSendCommand(msg);
 	}
 
@@ -195,69 +192,5 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		} catch (Exception e) {
 			logger.warn("M203 problem, continuing anyway: {}", message);
 		}
-	}
-
-	/**
-	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
-	 * @param settings plotter settings
-	 * @param x destination point
-	 * @param y destination point
-	 * @return the formatted string
-	 */
-	public static String getTravelToString(PlotterSettings settings,double x, double y) {
-		return "G0 " + getPosition(x, y)
-				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL);
-	}
-
-	/**
-	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
-	 * @param settings plotter settings
-	 * @param x destination point
-	 * @param y destination point
-	 * @return the formatted string
-	 */
-	public static String getDrawToString(PlotterSettings settings,double x, double y) {
-		return "G1 " + getPosition(x, y)
-				+ " F" + settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
-	}
-
-	private static String getPosition(double x, double y) {
-		return "X" + StringHelper.formatDouble(x)
-				+ " Y" + StringHelper.formatDouble(y);
-	}
-
-	public static String getPenUpString(PlotterSettings settings) {
-		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0"
-					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP)
-					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME);
-		} else {
-			return "G0 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_UP);
-		}
-	}
-
-	public static String getPenDownString(PlotterSettings settings) {
-		if(settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)== PlotterSettings.Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0"
-					+ " S" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)
-					+ " T" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME);
-		} else {
-			return "G1 Z" + (int)settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN);
-		}
-	}
-
-	public static String getToolChangeString(int toolNumber) {
-		String colorName = getColorName(toolNumber & 0xFFFFFF);
-		return "M0 Ready " + colorName + " and click";
-	}
-
-	private static String getColorName(int toolNumber) {
-		String name = W3CColorNames.get(new Color(toolNumber));
-		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
-		return name;
-	}
-
-	public static String getFindHomeString() {
-		return "G28 X Y";
 	}
 }
