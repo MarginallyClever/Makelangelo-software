@@ -26,10 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -359,27 +356,14 @@ public class MainMenu extends JMenuBar {
             logger.debug("PiCaptureAction unavailable.");
         }
 
-        TurtleModifierAction paperFit = new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"));
-        TurtleModifierAction paperFill = new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"));
-        TurtleModifierAction paperCenter = new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"));
-        paperFit.setSource(app);		paperFit.addModifierListener(app::setTurtle);		menu.add(paperFit);
-        paperFill.setSource(app);		paperFill.addModifierListener(app::setTurtle);		menu.add(paperFill);
-        paperCenter.setSource(app);		paperCenter.addModifierListener(app::setTurtle);	menu.add(paperCenter);
+        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(app.getPaper(),false,Translator.get("ConvertImagePaperFit"))));
+        menu.add(createActionMenuItem(new ResizeTurtleToPaperAction(app.getPaper(),true,Translator.get("ConvertImagePaperFill"))));
+        menu.add(createActionMenuItem(new CenterTurtleToPaperAction(Translator.get("ConvertImagePaperCenter"))));
 
-        JMenuItem translate = new JMenuItem(Translator.get("Translate"));
-        menu.add(translate);
-        translate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-move-16.png"))));
-        translate.addActionListener((e) -> runTranslatePanel());
+        menu.add(createMover(Translator.get("Translate"),"/com/marginallyclever/makelangelo/icons8-move-16.png",(e)->runTranslatePanel()));
+        menu.add(createMover(Translator.get("Scale"),"/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
+        menu.add(createMover(Translator.get("Rotate"),"/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
 
-        JMenuItem scale = new JMenuItem(Translator.get("Scale"));
-        menu.add(scale);
-        scale.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-resize-16.png"))));
-        scale.addActionListener((e) -> runScalePanel());
-
-        JMenuItem rotate = new JMenuItem(Translator.get("Rotate"));
-        rotate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-rotate-16.png"))));
-        menu.add(rotate);
-        rotate.addActionListener((e) -> runRotatePanel());
         menu.addSeparator();
 
         TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
@@ -396,28 +380,43 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        TurtleModifierAction a1 = new SimplifyTurtleAction();
+        TurtleModifierAction a1 = createModifier(new SimplifyTurtleAction(),null);
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
-        a1.setSource(app);
-        a1.addModifierListener(app::setTurtle);
         //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
         menu.add(a1);
 
-        TurtleModifierAction a2 = new ReorderTurtleAction();
+        TurtleModifierAction a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
-        a2.setSource(app);
-        a2.addModifierListener(app::setTurtle);
-        a2.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-sort-16.png"))));
         menu.add(a2);
 
-        TurtleModifierAction a3 = new InfillTurtleAction();
+        TurtleModifierAction a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
-        a3.setSource(app);
-        a3.addModifierListener(app::setTurtle);
-        a3.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-fill-color-16.png"))));
         menu.add(a3);
 
         return menu;
+    }
+
+    private TurtleModifierAction createModifier(TurtleModifierAction action, String resource) {
+        if(resource!=null) {
+            action.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource(resource))));
+        }
+        action.setSource(app);
+        action.addModifierListener(app::setTurtle);
+
+        return action;
+    }
+
+    private JMenuItem createMover(String label, String resource, ActionListener listener) {
+        JMenuItem menuItem = new JMenuItem(label);
+        menuItem.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(resource))));
+        menuItem.addActionListener(listener);
+        return menuItem;
+    }
+
+    private TurtleModifierAction createActionMenuItem(TurtleModifierAction action) {
+        action.setSource(app);
+        action.addModifierListener(app::setTurtle);
+        return action;
     }
 
     private void runRotatePanel() {

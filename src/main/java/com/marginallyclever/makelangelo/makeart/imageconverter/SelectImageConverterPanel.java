@@ -35,7 +35,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	 * Set of image file extensions.
 	 * TODO These should be populated from the ImageIO.getReaderFileSuffixes() method after the image converters are loaded.
  	 */
-	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif","qoi"};
+	public static final String [] IMAGE_FILE_EXTENSIONS = {"bmp","gif","jpg","jpeg","png","qoi","webp","wbmp"};
 
 	@SuppressWarnings("deprecation")
 	private final Preferences prefs = PreferencesHelper

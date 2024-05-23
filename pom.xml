@@ -502,6 +502,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>qoi-java</artifactId>
 			<version>1.2.1</version>
 		</dependency>
+		<!-- webp image format support -->
+		<dependency>
+			<groupId>org.sejda.imageio</groupId>
+			<artifactId>webp-imageio</artifactId>
+			<version>0.1.6</version>
+		</dependency>
 		<!-- Also add this, if you want to use QOI with ImageIO -->
 		<dependency>
 			<groupId>me.saharnooby</groupId>

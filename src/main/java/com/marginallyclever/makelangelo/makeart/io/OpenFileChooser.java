@@ -47,8 +47,12 @@ public class OpenFileChooser {
             jFileChooser.addChoosableFileFilter(ff);
         }
 
+        // merge SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS into a string separated by /
+        String names = Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS)
+                .reduce((a, b) -> a + "/" + b)
+                .orElse("");
         // add image formats
-        FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage"), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
+        FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage",new String[]{names}), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         jFileChooser.addChoosableFileFilter(images);
 
         // no wild card filter, please.
