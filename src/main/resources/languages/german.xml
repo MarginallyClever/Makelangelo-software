@@ -437,7 +437,7 @@
     </string>
     <string>
         <key>OpenFileChooser.FileTypeImage</key>
-        <value>Bild (jpg/bmp/png/gif)</value>
+        <value>Bild (%1)</value>
         <hint>[file open dialog]</hint>
     </string>
     <string>

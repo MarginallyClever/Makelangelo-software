@@ -57,7 +57,7 @@
     <string><key>SaveError</key><value>تعذر حفظ الملف</value></string>
     <string><key>ConversionStyle</key><value>نمط</value></string>
     <string><key>ConversionFill</key><value>ملئ</value></string>
-    <string><key>OpenFileChooser.FileTypeImage</key><value>نوع الصورة</value></string>
+    <string><key>OpenFileChooser.FileTypeImage</key><value>(%1) نوع الصورة</value></string>
     <string><key>OpenFileChooser.AllSupportedFiles</key><value>الملفات المدعومة</value></string>
     <string><key>MenuMetricsTitle</key><value>قياس</value></string>
     <string><key>collectAnonymousMetrics</key><value>
