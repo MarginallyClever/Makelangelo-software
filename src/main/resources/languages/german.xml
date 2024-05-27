@@ -2,7 +2,7 @@
 <language>
     <meta>
         <name>Deutsch (de)</name>
-        <author>Chris Tarantl (chris@tarantl.com), UPDATED BY Pablo Geilert (pgeilert)</author>
+        <author>Chris Tarantl (chris@tarantl.com), UPDATED BY Pablo Geilert (pgeilert) and Peter Prisille (peterprisil@gmail.com)</author>
         <!-- https://crowdin.com/project/marginallyclevermakelangelo-so/ -->
     </meta>
     <string>
@@ -11,7 +11,7 @@
         <hint>[Manual driving dialog]</hint>
     </string>
     <string>
-        <key>ButtonConnect</key>
+        <key>ChooseConnection.ButtonConnect</key>
         <value>Verbinden</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -166,7 +166,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>Converter_VoronoiStippling.Name</key>
+        <key>Converter_Voronoi.Name</key>
         <value>Voronoi Punkte</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -437,7 +437,7 @@
     </string>
     <string>
         <key>OpenFileChooser.FileTypeImage</key>
-        <value>Bild (jpg/bmp/png/gif)</value>
+        <value>Bild (%1)</value>
         <hint>[file open dialog]</hint>
     </string>
     <string>
@@ -881,7 +881,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>ButtonDisconnect</key>
+        <key>ChooseConnection.ButtonDisconnect</key>
         <value>Trennen</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1752,7 +1752,7 @@
     </string>
     <string>
         <key>YourMsgHereName</key>
-        <value>Deine Nachricht hier</value>
+        <value>Text für Schriftzug eingeben</value>
         <hint>[Your message here generator]</hint>
     </string>
     <string>
@@ -1919,5 +1919,449 @@
         <key>InfillTurtleAction.title</key>
         <value>Fülle geschlossene Bereiche</value>
         <hint>[]</hint>
+    </string>
+    <string>   
+        <key>MenuImportFile</key>
+        <value>Datei importieren...</value>
+        <hint>[menu or dialog title]</hint>
+    </string>
+    <string>
+        <key>MenuGenerate.Fractals</key>
+        <value>Fraktals</value>
+        <hint>[Fractals]</hint>
+    </string>
+	<string>
+        <key>MenuGenerate.Grids</key>
+        <value>Raster</value>
+        <hint>[Raster]</hint>
+    </string>
+	<string>
+        <key>MenuGenerate.SpaceFillers</key>
+        <value>Zwischenräume auffüllen</value>
+        <hint>[Space Fillers]</hint>
+    </string>
+	<string
+        ><key>MenuGenerate.Mazes</key>
+        <value>Irrgarten</value>
+        <hint>[Mazes]</hint>
+    </string>
+    <string>
+        <key>Generator_GridFit.Name</key>
+        <value>Rechteck</value>
+        <hint>[Rectangles]</hint>
+    </string>
+	<string>
+        <key>Generator_GridFit.margin</key>
+        <value>Minimaler Rand an jeder Seite (mm)</value>
+        <hint>[Minimum margin each side (mm)]</hint>
+    </string>
+	<string><key>Generator_GridFit.cellsWide</key>
+        <value>Zellen horizontal</value>
+        <hint>[Cells horizontal]</hint>
+    </string>
+	<string>
+        <key>Generator_GridFit.cellsHigh</key>
+        <value>Zellen vertical</value>
+        <hint>[Cells vertical]</hint>
+    </string>
+    <string>
+        <key>TurtleGenerators.LearnMore.Link.Text</key>
+        <value>Weitere Informationen...</value>
+        <hint>[Learn more]</hint>
+    </string>
+    <string>
+        <key>Generator_GridHexagons.Name</key>
+        <value>Sechseck</value>
+        <hint>[Hexagons]</hint>
+    </string>
+	<string>
+        <key>Generator_GridHexagons.radius</key>
+        <value>Umkreisradius</value>
+        <hint>[Major radius]</hint>
+    </string>
+    <string>
+        <key>Generator.randomSeed</key>
+        <value>Startwert (Seed)</value>
+        <hint>[Random seed value]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.name</key>
+        <value>Strömungsfeld</value>
+        <hint>[Flow field]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.scaleX</key>
+        <value>X Maßstab</value>
+        <hint>[X scale]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.scaleY</key>
+        <value>Y Maßstab</value>
+        <hint>[Y scale]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.offsetX</key>
+        <value>X Offset</value>
+        <hint>[X offset]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.offsetY</key>
+        <value>Y Offset</value>
+        <hint>[Y offset]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.stepSize</key>
+        <value>Schrittgröße</value>
+        <hint>[Step size]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.stepVariation</key>
+        <value>Schrittvariation</value>
+        <hint>[Step variation]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.stepLength</key>
+        <value>Schrittlänge</value>
+        <hint>[Step length]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.fromEdge</key>
+        <value>Kontinuierlich</value>
+        <hint>[Continuous]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.rightAngle</key>
+        <value>Füge orthogonale Linien hinzu</value>
+        <hint>[Add orthogonal lines]</hint>
+    </string>
+	<string>
+        <key>Generator_FlowField.noiseType</key>
+        <value>Rauschart</value>
+        <hint>[Noise type]</hint>
+    </string>
+	<string>
+        <key>Generator_Spiral.name</key>
+        <value>Spirale</value>
+        <hint>[Spiral]</hint>
+    </string>
+	<string>
+        <key>Generator_Spiral.radius</key>
+        <value>Radius</value>
+        <hint>[Radius]</hint>
+    </string>
+    <string>
+        <key>Generator_TruchetTiles.Name</key>
+        <value>Truchet-Fliesen</value>
+        <hint>[Truchet Tiles]</hint>
+    </string>
+	<string>
+        <key>Generator_TruchetTiles.LineSpacing</key>
+        <value>Abstand zwischen den Linien (mm)</value>
+        <hint>[Space between lines (mm)]</hint>
+    </string>
+	<string>
+        <key>Generator_TruchetTiles.LinesPerTile</key>
+        <value>Linien pro Fliese</value>
+        <hint>[Lines per tile]</hint>
+    </string>
+	<string>
+        <key>Generator_TruchetTiles.allow</key>
+        <value>Erlaube '%1'</value>
+        <hint>[Allow '%1']</hint>
+    </string>
+	<string>
+        <key>Converter_Voronoi.ShowCenters</key>
+        <value>Zeige die Zentren</value>
+        <hint>[Show centers]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeRectangle.name</key>
+        <value>Rechteck</value>
+        <hint>[Rectangle]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeRectangle.rows</key>
+        <value>Zeilen</value>
+        <hint>[Rows]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeRectangle.columns</key>
+        <value>Spalten</value>
+        <hint>[Columns]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeCircle.name</key>
+        <value>Kreis</value>
+        <hint>[Circle]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeCircle.rings</key>
+        <value>Ringe</value>
+        <hint>[Rings]</hint>
+    </string>
+	<string>
+        <key>Generator_MazeHoneycomb.name</key>
+        <value>Bienenwabe</value>
+        <hint>[Honeycomb]</hint>
+    </string>
+    <string>
+        <key>LineWeightByImageIntensity.name</key>
+        <value>Linienstärke</value>
+        <hint>[Line image weight]</hint>
+    </string>
+	<string>
+        <key>LineWeightByImageIntensity.thickness</key>
+        <value>Strichstärke</value>
+        <hint>[Thickness]</hint>
+    </string>
+	<string>
+        <key>LineWeightByImageIntensity.image</key>
+        <value>Bild</value>
+        <hint>[Image]</hint>
+    </string>
+    <string>
+        <key>Rotate</key>
+        <value>Rotieren</value>
+        <hint>[Rotate]</hint>
+    </string>
+    <string>
+        <key>ConvertImagePaperCenter</key>
+        <value>Bild zentrieren</value>
+        <hint>[Center image]</hint>
+    </string>
+    <string>
+        <key>Translate</key>
+        <value>Verschieben</value>
+        <hint>[Translate]</hint>
+    </string>
+    <string>
+        <key>OpenLogFolder</key>
+        <value>Öffne Protokoll Verzeichnis</value>
+        <hint>[Open log folder]</hint>
+    </string>
+    <string>
+        <key>ReportBug</key>
+        <value>Ein Problem melden</value>
+        <hint>[Report an issue]</hint>
+    </string>
+	<string>
+        <key>MenuManual</key>
+        <value>Anleitung lesen</value>
+        <hint>[Read the Friendly Manual]</hint>
+    </string>
+    <string>
+        <key>MenuItemPayPalDonation</key>
+        <value>PayPal Spende</value>
+        <hint>[PayPal donation]</hint>
+    </string>
+    <string>
+        <key>GFXPreferences.dragSpeed</key>
+        <value>Kamerageschwindigkeit</value>
+        <hint>[camera travel speed]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.Title</key>
+        <value>Plotter Einstellungen</value>
+        <hint>[Plotter settings]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.TabEssential</key>
+        <value>Basis</value>
+        <hint>[Essential]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.TabPen</key>
+        <value>Stift</value>
+        <hint>[Pen]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.TabSimulation</key>
+        <value>Simulation</value>
+        <hint>[Simulation]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.MachineWidth</key>
+        <value>Maschinenbreite (mm)</value>
+        <hint>[Machine width (mm)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.MachineHeight</key>
+        <value>Maschinenhöhe (mm)</value>
+        <hint>[Machine height (mm)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.ServoLengthNeeded</key>
+        <value>Servokabellänge (m)</value>
+        <hint>[Servo wire length (m)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.StepperLengthNeeded</key>
+        <value>Schrittmotorkabellänge (m,jeweils)</value>
+        <hint>[Stepper wire length (m,each)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.BeltLengthNeeded</key>
+        <value>Timing belt length (m,each)</value>
+        <hint>[Timing belt length (m,each)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolDiameter</key>
+        <value>Durchmesser (mm)</value>
+        <hint>[Diameter (mm)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolMaxFeedRate</key>
+        <value>Bewegungsgeschwindigkeit (mm/min)</value>
+        <hint>[Travel speed (mm/min)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolUp</key>
+        <value>Oben-Winkel (Grad)</value>
+        <hint>[Up angle (degrees)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolDown</key>
+        <value>Unten-Winkel (Grad)</value>
+        <hint>[Down angle (degrees)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolLiftSpeed</key>
+        <value>Stift-Anheben-Zeit (ms)</value>
+        <hint>[Pen lift time (ms)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.penToolLowerSpeed</key>
+        <value>Stift-Senken-Zeit (ms)</value>
+        <hint>[Pen lower time (ms)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.Speed</key>
+        <value>Zeichengeschwindigkeit (mm/min)</value>
+        <hint>[Draw speed (mm/min)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.AdjustAcceleration</key>
+        <value>Beschleuningung (mm/s²)</value>
+        <hint>[Acceleration (mm/s²)]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.pen up color</key>
+        <value>Stift-Oben Farbe</value>
+        <hint>[Up color]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsPanel.pen down color</key>
+        <value>Stift-Unten Farbe</value>
+        <hint>[Default down color]</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.zMotorType</key>
+        <value>Z-Achsen Typ</value>
+        <hint>[Z axis type]</hint>
+    </string>
+	<string>
+        <key>PlotterSettings.zMotorType.servo</key>
+        <value>Servo</value>
+        <hint>[Servo]</hint>
+    </string>
+	<string>
+        <key>PlotterSettings.zMotorType.stepper</key>
+        <value>Schrittmotor</value>
+        <hint>[Stepper]</hint>
+    </string>
+    <string>
+        <key>PlotterSettingsManagerPanel.RemoveProfile</key>
+        <value>-</value>
+        <hint>[-]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsManagerPanel.AddProfile</key>
+        <value>+</value>
+        <hint>[+]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsManagerPanel.NewProfileName</key>
+        <value>Neuer eindeutiger Name</value>
+        <hint>[New unique name:]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key>
+        <value>Der Name exisiert bereits. Neuer Versuch:</value>
+        <hint>[Name already in use. Try again!]</hint>
+    </string>
+	<string>
+        <key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key>
+        <value>Der Name darf nicht Leer sein. Neuer Versuch:</value>
+        <hint>[Name cannot be blank. Try again!]</hint>
+    </string>
+    <string>
+        <key>PlotterSettings.userGeneralStartGcode</key>
+        <value>GCode für den Start</value>
+        <hint>[Start GCode]</hint>
+    </string>
+	<string>
+        <key>PlotterSettings.userGeneralEndGcode</key>
+        <value>GCode für das Ende</value>
+        <hint>[End GCode]</hint>
+    </string>
+    <string>
+        <key>PlotterSettingsUserGcodePanel.Title</key>
+        <value>Benutzer spezifischer GCode</value>
+        <hint>[Custom GCode]</hint>
+    </string>
+    <string>
+        <key>DefaultTurtleRenderer.name</key>
+        <value>Default</value>
+        <hint>[Default]</hint>
+    </string>
+	<string>
+        <key>BarberPoleTurtleRenderer.name</key>
+        <value>Barber pole</value>
+        <hint>[Barber pole]</hint>
+    </string>
+	<string>
+        <key>SeparateLoopTurtleRenderer.name</key>
+        <value>Separate Schleifen</value>
+        <hint>[Separate loops]</hint>
+    </string>
+	<string>
+        <key>DirectionLoopTurtleRenderer.name</key>
+        <value>Richtungsschleifen</value>
+        <hint>[Direction loops]</hint>
+    </string>
+	<string>
+        <key>MarlinSimulationVisualizer.name</key>
+        <value>Marlin Simulation</value>
+        <hint>[Marlin simulation]</hint>
+    </string>
+    <string>
+        <key>LogPanel.LogFiles</key>
+        <value>Protokoll Dateien</value>
+        <hint>[Log files]</hint>
+    </string>
+	<string>
+        <key>LogPanel.Title</key>
+        <value>Protokoll</value>
+        <hint>[Log]</hint>
+    </string>
+	<string>
+        <key>LogPanel.CopyClipboard</key>
+        <value>Kopieren</value>
+        <hint>[Copy]</hint>
+    </string>
+    <string>
+        <key>ConversationHistory.Copy</key>
+        <value>Kopieren</value>
+        <hint>[Copy]</hint>
+    </string>
+	<string>
+        <key>CartesianButtons.buttonCenter</key>
+        <value> </value>
+        <hint>[ ]</hint>
+    </string>
+    <string>
+        <key>PlotterControls.communicationFailure</key>
+        <value>Keine Anwort vom Plotter. Bitte das USB-Kabel und die Geschwindikeitseinstellungen prüfen</value>
+        <hint>[No answer from the robot, please check the USB cable or speed settings.]</hint>
     </string>
 </language>
