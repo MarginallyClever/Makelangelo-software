@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 
 /**
- * Save Turtle to any supported bitmap format.
+ * Save {@link Turtle} to any bitmap format supported by {@link ImageIO}.
  * @author Dan Royer
  */
 public class SaveBitmap implements TurtleSaver {
@@ -78,6 +78,8 @@ public class SaveBitmap implements TurtleSaver {
 		}
 
 		ImageIO.write(img, extension, outputStream);
+		// webp requires a flush or there will be a zero-length file.
+		outputStream.flush();
 
 		logger.debug("done.");
 		return true;

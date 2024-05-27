@@ -1,16 +1,18 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import java.io.InputStream;
-
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.InputStream;
+
+/**
+ * A TurtleLoader is a plugin that can load a file into the system as a {@link Turtle}.
+ */
 public interface TurtleLoader {		
 	/**
 	 * @return returns a FileNameExtensionFilter with the extensions supported by this filter.
 	 */
-	public FileNameExtensionFilter getFileNameFilter();
+	FileNameExtensionFilter getFileNameFilter();
 
 	/**
 	 * Checks a string's filename, which includes the file extension, (e.g. foo.jpg).
@@ -18,12 +20,12 @@ public interface TurtleLoader {
 	 * @param filename absolute path of file to load.
 	 * @return true if this plugin can load this file.
 	 */
-	public boolean canLoad(String filename);
+	boolean canLoad(String filename);
 
 	/**
 	 * attempt to load a file into the system from a given stream
 	 * @param inputStream source of image
 	 * @return true if load successful.
 	 */
-	public Turtle load(InputStream inputStream) throws Exception;
+	Turtle load(InputStream inputStream) throws Exception;
 }

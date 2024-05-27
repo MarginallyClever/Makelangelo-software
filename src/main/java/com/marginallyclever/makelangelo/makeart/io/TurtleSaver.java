@@ -6,6 +6,9 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.OutputStream;
 
+/**
+ * Save a {@link Turtle} to a file.
+ */
 public interface TurtleSaver {
 	FileNameExtensionFilter getFileNameFilter();
 
