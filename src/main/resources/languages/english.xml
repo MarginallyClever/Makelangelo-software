@@ -53,7 +53,7 @@
 	<string><key>SaveError</key><value>File could not be saved:</value></string>
 	<string><key>ConversionStyle</key><value>Style</value></string>
 	<string><key>ConversionFill</key><value>Fill</value></string>
-	<string><key>OpenFileChooser.FileTypeImage</key><value>Image (jpg/bmp/png/gif)</value></string>
+	<string><key>OpenFileChooser.FileTypeImage</key><value>Image (%1)</value></string>
 	<string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
 	<string><key>MenuMetricsTitle</key><value>Metrics</value></string>
 	<string><key>collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value></string>

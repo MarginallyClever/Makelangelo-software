@@ -13,6 +13,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
@@ -33,9 +34,8 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	/**
 	 * Set of image file extensions.
-	 * TODO These should be populated from the ImageIO.getReaderFileSuffixes() method after the image converters are loaded.
- 	 */
-	public static final String [] IMAGE_FILE_EXTENSIONS = {"jpg","jpeg","png","wbmp","bmp","gif","qoi"};
+	 */
+	public static final String [] IMAGE_FILE_EXTENSIONS = Arrays.stream(ImageIO.getReaderFileSuffixes()).sorted().toArray(String[]::new);
 
 	@SuppressWarnings("deprecation")
 	private final Preferences prefs = PreferencesHelper
