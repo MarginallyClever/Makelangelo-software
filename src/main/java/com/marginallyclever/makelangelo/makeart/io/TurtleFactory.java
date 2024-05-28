@@ -27,11 +27,13 @@ public class TurtleFactory {
 			new SaveDXF(),
 			new SaveSVG(),
 			new SaveGCode(),
-			new SaveBitmap("BMP",false),
-			new SaveBitmap("GIF",false),
-			new SaveBitmap("JPG",false),
-			new SaveBitmap("PIO",false),
-			new SaveBitmap("PNG",true),
+			new SaveBitmap("bmp",false),
+			new SaveBitmap("gif",false),
+			new SaveBitmap("jpg",false),
+			new SaveBitmap("pio",false),
+			new SaveBitmap("png",true),
+			new SaveBitmap("tif",false),
+			new SaveBitmap("webp",true),
 	};
 	
 	public static Turtle load(String filename) throws Exception {

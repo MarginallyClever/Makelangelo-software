@@ -219,7 +219,7 @@
 
 	<string>
 		<key>OpenFileChooser.FileTypeImage</key>
-		<value>Afbeelding (jpg/bmp/png/gif)</value>
+		<value>Afbeelding (%1)</value>
 		<hint>file open dialog</hint>
 	</string>
 	<string><!-- translation value to review-->
