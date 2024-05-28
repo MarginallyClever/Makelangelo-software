@@ -37,6 +37,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.makeart.tools;
     exports com.marginallyclever.makelangelo.paper;
     exports com.marginallyclever.makelangelo.plotter.plottersettings;
+    exports com.marginallyclever.makelangelo.turtle;
 
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
