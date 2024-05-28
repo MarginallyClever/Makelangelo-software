@@ -166,7 +166,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>Converter_Voronoi.Name</key>
+        <key>Converter_VoronoiStippling.Name</key>
         <value>Voronoi Punkte</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -2364,4 +2364,161 @@
         <value>Keine Anwort vom Plotter. Bitte das USB-Kabel und die Geschwindikeitseinstellungen prüfen</value>
         <hint>[No answer from the robot, please check the USB cable or speed settings.]</hint>
     </string>
+    <string>
+        <key>FirmwareUploader.help</key>
+        <value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value>
+        <hint>[Link to firmware upload guide]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.status</key>
+        <value>Firmware-Upload Status</value>
+        <hint>[Firmware upload status]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.startM5</key>
+        <value>M5</value>
+        <hint>[Makelangelo type=M5]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.startHuge</key>
+        <value>Huge</value>
+        <hint>[Makelangelo type=Huge]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.avrdudeNotDownloaded</key>
+        <value>AVRDude wurde nicht heruntergeladen.</value>
+        <hint>[AVRDude not downloaded.]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.confNotFound</key>
+        <value>AVRDude.conf nicht gefunden.</value>
+        <hint>[AVRDude.conf not found.]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.failed</key>
+        <value>Firmware upload fehlgeschlagen.</value>
+        <hint>[Firmware upload failed.]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.noPortSelected</key>
+        <value>Kein Port ausgewählt</value>
+        <hint>[No port selected.]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.downloadFailed</key>
+        <value>Download fehlgeschlagen.</value>
+        <hint>[Download failed]</hint>
+    </string>
+	<string>
+        <key>FirmwareUploaderPanel.finished</key>
+        <value>Firmwareupdate OK!</value>
+        <hint>[Finished OK!]</hint>
+    </string>
+    <string>
+        <key>LoadScratch3.foreverNotAllowed</key>
+        <value>Forever Schleifen sind für immer verboten.</value>
+        <hint>Forever loops are forever forbidden.</hint>
+    </string>
+    <string>
+        <key>SaveGCode.splitGCodeTitle</key>
+        <value>Mehrere Farben entdeckt</value>
+        <hint>[Many colors detected]</hint>
+    </string>
+	<string>
+        <key>SaveGCode.splitGCodeQuestion</key>
+        <value>Diese Zeichung benötigt %1 Stiftwechsel.  In mehrere Dateien zerlegen?</value>
+        <hint>[There are %1 tool changes in this drawing.  Split into separate files?]</hint>
+    </string>
+	<string>
+        <key>Converter_QuadTreeInstant</key>
+        <value>Quad tree instant</value>
+        <hint>[Quad tree instant]</hint>
+    </string>
+	<string>
+        <key>Converter_QuadTreeInstant.maxDepth</key>
+        <value>Maximale Tiefe</value>
+        <hint>[Max depth]</hint>
+    </string>
+	<string>
+        <key>Converter_QuadTreeInstant.baseCutOff</key>
+        <value>Basis cut-off</value>
+        <hint>[Base cut-off]</hint>
+    </string>
+	<string>
+        <key>Converter_QuadTreeInstant.cutOffIncrement</key>
+        <value>Cut-off Schrittweite</value>
+        <hint>[Cut-off increment]</hint>
+    </string>
+    <string>
+        <key>Converter_TruchetFromImage.name</key>
+        <value>Truchet-Kachel vom Bild</value>
+        <hint>[Truchet from image]</hint>
+    </string>
+	<string>
+        <key>Converter_TruchetFromImage.spacing</key>
+        <value>Raum zwischen den Linien</value>
+        <hint>[Space between lines]</hint>
+    </string>
+	<string>
+        <key>Converter_TruchetFromImage.linesPerTile</key>
+        <value>Linien pro Kachel</value>
+        <hint>[Lines per tile]</hint>
+    </string>
+    <string>
+        <key>Converter_Voronoi.Name</key>
+        <value>Voronoi Diagramm</value>
+        <hint>[Voronoi diagram]</hint>
+    </string>
+	<string>
+        <key>Converter_CMYK_Crosshatch.Name</key>
+        <value>CMYK</value>
+        <hint>[CMYK]</hint>
+    </string>
+	<string>
+        <key>Converter_CMYK_Crosshatch.Passes</key>
+        <value>Durchgänge</value>
+        <hint>[Passes]</hint>
+    </string>
+
+	<string>
+        <key>Converter_CMYK_Spiral.Name</key>
+        <value>CMYK Spirale</value>
+        <hint>[CMYK Spiral]</hint>
+    </string>
+	<string>
+        <key>Converter_CMYK_Circles.name</key>
+        <value>CMYK Kreise</value>
+        <hint>[CMYK circles]</hint>
+    </string>
+	<string>
+        <key>Converter_CMYK_Circles.maxCircleSize</key>
+        <value>Maximaler Kreisdurchmesser</value>
+        <hint>[max circle size]</hint>
+    </string>
+	<string>
+        <key>Converter_EdgeDetection.name</key>
+        <value>Kantenerkennung</value>
+        <hint>[Edge detection]</hint>
+    </string>
+	<string>
+        <key>Converter_EdgeDetection.passes</key>
+        <value>Durchgänge</value>
+        <hint>[Passes]</hint>
+    </string>
+	<string>
+        <key>Converter_EdgeDetection.stepSize</key>
+        <value>Schrittweite</value>
+        <hint>[Step size]</hint>
+    </string>
+	<string>
+        <key>Converter_EdgeDetection.sampleSize</key>
+        <value>Abtastabstand</value>
+        <hint>[SampleSize]</hint>
+    </string>
+	<string>
+        <key>Converter_EdgeDetection.border</key>
+        <value>Zeichne Rand</value>
+        <hint>[Draw border]</hint>
+    </string>
+
 </language>
