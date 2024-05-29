@@ -15,8 +15,6 @@ import javax.swing.JSlider;
  * @author Ernest Yu 
  */
 public class RangeSlider extends JSlider {
-	private static final long serialVersionUID = -885578691794434374L;
-
 	/**
      * Constructs a RangeSlider with default minimum and maximum values of 0
      * and 100.

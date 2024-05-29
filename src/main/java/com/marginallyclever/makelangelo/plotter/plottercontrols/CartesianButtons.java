@@ -36,8 +36,6 @@ import java.util.ArrayList;
 public class CartesianButtons extends JComponent {
 	private static final Logger logger = LoggerFactory.getLogger(CartesianButtons.class);
 
-	private static final long serialVersionUID = 1L;
-
 	public static final int NUM_ZONES_PER_QUADRANT = 3;
 	public static final int TOTAL_ZONES = NUM_ZONES_PER_QUADRANT * 4 + 1;
 	public static final int ZONE_CENTER = NUM_ZONES_PER_QUADRANT * 4;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
+package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -13,14 +13,13 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 /**
- * Application plottersettings
+ * Application settings
  * @author Dan Royer
- *
  */
-public class MakelangeloSettingPanel {
-	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
+public class ApplicationSettings {
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationSettings.class);
 	
-	public MakelangeloSettingPanel() {
+	public ApplicationSettings() {
 		super();
 	}
 	
@@ -45,23 +44,18 @@ public class MakelangeloSettingPanel {
 		panel.add(top,BorderLayout.NORTH);
 
 		JTabbedPane pane = new JTabbedPane();
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
+		pane.add(Translator.get("SoundPreferences.Title"), SoundPreferences.buildPanel());
+		pane.add(Translator.get("GFXPreferences.Title"), GFXPreferences.buildPanel());
+		pane.add(Translator.get("LanguagePreferences.Title"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("MetricsPreferences.Title"), MetricsPreferences.buildPanel());
 		panel.add(pane,BorderLayout.CENTER);
 
-		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("ApplicationSettings.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			SoundPreferences.save();
 			GFXPreferences.save();
 			LanguagePreferences.save();
 			MetricsPreferences.save();
-		} else {
-			SoundPreferences.cancel();
-			GFXPreferences.cancel();
-			LanguagePreferences.cancel();
-			MetricsPreferences.cancel();
 		}
 	}
 

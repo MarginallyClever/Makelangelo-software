@@ -1,10 +1,7 @@
 package com.marginallyclever.makelangelo.select;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.JButton;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A {@link JButton} filled with the background color.  Especially useful for color selection dialogs.
@@ -13,8 +10,6 @@ import javax.swing.JButton;
  *
  */
 public class BackgroundPaintedButton extends JButton {
-	private static final long serialVersionUID = 1294423717816753743L;
-
 	public BackgroundPaintedButton(String label) {
 		super(label);
 	}

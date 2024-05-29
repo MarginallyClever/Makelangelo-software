@@ -453,50 +453,50 @@
 	</string>
 
 	<string>
-		<key>MenuMetricsTitle</key>
+		<key>MetricsPreferences.Title</key>
 		<value>指标</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>collectAnonymousMetrics</key>
+		<key>MetricsPreferences.collectAnonymousMetrics</key>
 		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
-		<key>collectAnonymousMetricsOnUpdate</key>
+		<key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key>
 		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
 		<hint>menu or dialog title</hint>
 	</string>
 
 	<string>
-		<key>MenuSoundsTitle</key>
+		<key>SoundPreferences.Title</key>
 		<value>声音</value>
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuSoundsConnect</key>
+		<key>SoundPreferences.Connect</key>
 		<value>连接</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuSoundsDisconnect</key>
+		<key>SoundPreferences.Disconnect</key>
 		<value>断开</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuSoundsFinishConvert</key>
+		<key>SoundPreferences.FinishConvert</key>
 		<value>完成转换</value>
 		<hint>sound settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuSoundsFinishDraw</key>
+		<key>SoundPreferences.FinishDraw</key>
 		<value>完成绘制</value>
 		<hint>sound settings dialog</hint>
 	</string>
 
 	<string>
-		<key>MenuGraphicsTitle</key>
+		<key>GFXPreferences.Title</key>
 		<value>图形</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -521,7 +521,7 @@
 		<hint>graphics settings dialog</hint>
 	</string>
 	<string>
-		<key>MenuLanguageTitle</key>
+		<key>LanguagePreferences.Title</key>
 		<value>语言</value>
 		<hint>menu or dialog title</hint>
 	</string>
@@ -687,7 +687,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuPreferences</key>
+		<key>ApplicationSettings.title</key>
 		<value>首选项</value>
 		<hint>menu or dialog title</hint>
 	</string>

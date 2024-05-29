@@ -11,8 +11,6 @@ import java.io.Serial;
  * @author Dan Royer
  */
 public class ButtonIcon extends JButton {
-	@Serial
-    private static final long serialVersionUID = 6329805223648415348L;
 	private static final Logger logger = LoggerFactory.getLogger(ButtonIcon.class);
 
     public ButtonIcon(String translation, String iconPath) {

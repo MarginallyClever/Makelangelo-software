@@ -1,6 +1,6 @@
 package com.marginallyclever.convenience;
 
-import com.marginallyclever.makelangelo.makelangelosettingspanel.SoundPreferences;
+import com.marginallyclever.makelangelo.applicationsettings.SoundPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class SoundSystem {
 	}
 
 	static public void playDisconnectSound() {
-		playSound(SoundPreferences.getDisonnectSoundFilename());
+		playSound(SoundPreferences.getDisconnectSoundFilename());
 	}
 
 	static public void playConversionFinishedSound() {
