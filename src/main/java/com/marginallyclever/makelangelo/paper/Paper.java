@@ -11,11 +11,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
 
 public class Paper implements PreviewListener {
+	private static final Logger logger = LoggerFactory.getLogger(Paper.class);
 
 	public static final int DEFAULT_WIDTH = 420; // mm
 	public static final int DEFAULT_HEIGHT = 594; // mm
-
-	private static final Logger logger = LoggerFactory.getLogger(Paper.class);
 
 	private static final String PREF_KEY_ROTATION = "rotation";
 	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
@@ -58,10 +57,8 @@ public class Paper implements PreviewListener {
 	}
 	
 	/**
-	 * TODO review to use rotation ... ? but no src attached to the jar so ... ???
-	 * The trick is that concept have been mix
-	 * getPaper* getMargin* for distances from the center coordinate of the machine.
-	 * @param gl2 
+	 * Render the paper margin rectangle.
+	 * @param gl2 the render context
 	 */
 	private void renderMargin(GL2 gl2) {
 		gl2.glLineWidth(1);
@@ -85,10 +82,7 @@ public class Paper implements PreviewListener {
 	}
 
 	/**
-	 * TODO review to take in account rotation ...
-	 * The trick is that concept have been mix
-	 * this.paper* for distances from the center of the paper.
-	 * getPaper* getMargin* for distances from the center coordinate of the machine.
+	 * Draw paper as a rectangle.
 	 * @param gl2 
 	 */
 	private void renderPaper(GL2 gl2) {
