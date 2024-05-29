@@ -21,8 +21,6 @@ import java.util.Comparator;
 public class LogPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(LogPanel.class);
 
-	private static final long serialVersionUID = -2753297349917155256L;
-
 	private final JTextArea logArea = new JTextArea();
 	private final JComboBox<File> filesJComboBox = new JComboBox<>();
 

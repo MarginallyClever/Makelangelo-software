@@ -13,9 +13,8 @@ import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
 
 /**
- * Application plottersettings
+ * Application settings
  * @author Dan Royer
- *
  */
 public class MakelangeloSettingPanel {
 	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
