@@ -55,16 +55,16 @@
 	<string><key>ConversionFill</key><value>Fill</value></string>
 	<string><key>OpenFileChooser.FileTypeImage</key><value>Image (%1)</value></string>
 	<string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
-	<string><key>MenuMetricsTitle</key><value>Metrics</value></string>
-	<string><key>collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value></string>
-	<string><key>collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
-	<string><key>MenuSoundsTitle</key><value>Sounds</value></string>
-	<string><key>MenuSoundsConnect</key><value>Connect</value></string>
-	<string><key>MenuSoundsDisconnect</key><value>Disconnect</value></string>
-	<string><key>MenuSoundsFinishConvert</key><value>Finish converting</value></string>
-	<string><key>MenuSoundsFinishDraw</key><value>Finish drawing</value></string>
-	<string><key>MenuGraphicsTitle</key><value>Graphics</value></string>
-	<string><key>MenuLanguageTitle</key><value>Language</value></string>
+	<string><key>MetricsPreferences.Title</key><value>Metrics</value></string>
+	<string><key>MetricsPreferences.collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value></string>
+	<string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
+	<string><key>SoundPreferences.Title</key><value>Sounds</value></string>
+	<string><key>SoundPreferences.Connect</key><value>Connect</value></string>
+	<string><key>SoundPreferences.Disconnect</key><value>Disconnect</value></string>
+	<string><key>SoundPreferences.FinishConvert</key><value>Finish converting</value></string>
+	<string><key>SoundPreferences.FinishDraw</key><value>Finish drawing</value></string>
+	<string><key>GFXPreferences.Title</key><value>Graphics</value></string>
+	<string><key>LanguagePreferences.Title</key><value>Language</value></string>
 	<string><key>StartAt</key><value>Start at</value></string>
 	<string><key>Robot</key><value>Makelangelo</value></string>
 
@@ -78,7 +78,7 @@
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
 	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
 	<string><key>MenuMakelangelo</key><value>File</value></string>
-	<string><key>MenuPreferences</key><value>Preferences</value></string>
+	<string><key>ApplicationSettings.title</key><value>Preferences</value></string>
 	<string><key>MenuUpdate</key><value>Check for updates</value></string>
 	<string><key>MenuQuit</key><value>Quit</value></string>
 	<string><key>MenuForums</key><value>Online help forums</value></string>
@@ -124,22 +124,15 @@
 	<string><key>SpiralName</key><value>Spiral</value></string>
 	<string><key>SpiralPulseName</key><value>Pulsing Spiral</value></string>
 	<string><key>SharePromo</key><value>Try social media tag #plotter</value></string>
-	<string><key>DialogAbout.AboutHTML</key><value><![CDATA[
-    <html>
-      <body>
-        <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
-      <h3>
-        <a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a>
-      </h3>
-        <p>To get the latest version please visit<br>
-          <a href='https://www.marginallyclever.com/product/makelangelo-software/'>https://www.marginallyclever.com/product/makelangelo-software/</a></p>
-        <p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.</p>
-        <p>Additional software and hardware contributions by<br>
-        Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, Miguel Sánchez<br>
-        Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p>
-      </body>
-    </html>
-    ]]></value></string>
+	<string><key>DialogAbout.AboutHTML</key><value><![CDATA[<html><body>
+	  <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
+      <h3><a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a></h3>
+	  <p>To get the latest version please visit<br><a href='https://www.marginallyclever.com/product/makelangelo-software/'>https://www.marginallyclever.com/product/makelangelo-software/</a></p>
+	  <p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.</p>
+	  <p>Additional contributions by<br>
+	  Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, Miguel Sánchez<br>
+	  Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p>
+      </body></html>]]></value></string>
 	<string><key>MenuResetMachinePreferencesWarning</key><value>Are you sure you want to erase all your preferences?</value></string>
 
 	<string><key>MenuGenerate</key><value>Generate art</value></string>

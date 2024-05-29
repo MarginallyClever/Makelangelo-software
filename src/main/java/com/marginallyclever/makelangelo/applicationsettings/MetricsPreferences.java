@@ -1,23 +1,23 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
-
-import java.util.prefs.Preferences;
+package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
+import java.util.prefs.Preferences;
+
 public class MetricsPreferences {
+	static private final String COLLECT_ANONYMOUS_METRICS_LABEL = "Collect Anonymous Metrics";
+
 	static private SelectPanel panel;
 	static private SelectBoolean collectAnonymousMetricsCheckbox;
 
-	static private String COLLECT_ANONYMOUS_METRICS_LABEL = "Collect Anonymous Metrics";
-	
 	static public SelectPanel buildPanel() {
 		panel = new SelectPanel();
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		collectAnonymousMetricsCheckbox = new SelectBoolean("collect",
-				Translator.get("collectAnonymousMetrics"),
+				Translator.get("MetricsPreferences.collectAnonymousMetrics"),
 				prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, false));
 
 		panel.add(collectAnonymousMetricsCheckbox);
@@ -29,11 +29,7 @@ public class MetricsPreferences {
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
 		prefs.putBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, collectAnonymousMetricsCheckbox.isSelected());
 	}
-	
-	static public void cancel() {
-		
-	}
-	
+
 	static public boolean areAllowedToShare() {
 		if(collectAnonymousMetricsCheckbox != null) return collectAnonymousMetricsCheckbox.isSelected();
 		

@@ -23,8 +23,6 @@ import java.util.ArrayList;
  */
 public class TextInterfaceToListeners extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(TextInterfaceToListeners.class);
-	@Serial
-	private static final long serialVersionUID = 7996257740483513358L;
 	private final JTextField commandLine = new JTextField(60);
 	private final JButton send = new JButton("Send");
 

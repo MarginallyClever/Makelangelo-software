@@ -3,10 +3,6 @@ package com.marginallyclever.communications;
 import java.util.EventObject;
 
 public class NetworkSessionEvent extends EventObject {
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1727188492088759549L;
     // connection has been opened
     public static final int CONNECTION_OPENED = 1;
     // connection has closed

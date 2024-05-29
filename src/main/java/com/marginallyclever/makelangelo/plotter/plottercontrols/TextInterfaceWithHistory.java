@@ -19,8 +19,6 @@ import java.io.Serial;
  * @since 7.28.0
  */
 public class TextInterfaceWithHistory extends JPanel {
-	@Serial
-	private static final long serialVersionUID = 5542831703742185676L;
 	private final TextInterfaceToListeners myInterface = new TextInterfaceToListeners();
 	private final ConversationHistory myHistory = new ConversationHistory();
 

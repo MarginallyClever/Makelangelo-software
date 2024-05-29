@@ -1,14 +1,15 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.prefs.Preferences;
+package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.*;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectSpinner;
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.swing.event.EventListenerList;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.prefs.Preferences;
 
 /**
  * Graphics plottersettings
@@ -20,18 +21,18 @@ public class GFXPreferences {
 	static private SelectBoolean speedOverQuality;
 	static private SelectBoolean showAllWhileDrawing;
 	static private SelectSpinner dragSpeed;
-	static List<PropertyChangeListener> listeners = new ArrayList<PropertyChangeListener>();
+	static EventListenerList listeners = new EventListenerList();
 
 	static public void addListener(PropertyChangeListener p) {
-		listeners.add(p);
+		listeners.add(PropertyChangeListener.class,p);
 	}
 
 	static public void removeListener(PropertyChangeListener p) {
-		listeners.remove(p);
+		listeners.remove(PropertyChangeListener.class,p);
 	}
 
 	static protected void firePropertyChange(PropertyChangeEvent e) {
-		for(PropertyChangeListener p : listeners) {
+		for(PropertyChangeListener p : listeners.getListeners(PropertyChangeListener.class)) {
 			p.propertyChange(e);
 		}
 	}
@@ -74,9 +75,7 @@ public class GFXPreferences {
 		prefs.putBoolean("Draw all while running", showAllWhileDrawing.isSelected());
 		prefs.putInt("dragSpeed", dragSpeed.getValue());
 	}
-	
-	static public void cancel() {}
-	
+
 	static public boolean getShowPenUp() {
 		Preferences prefs = getMyNode();
 		return prefs.getBoolean("show pen up",false);

@@ -9,8 +9,8 @@ import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
-import com.marginallyclever.makelangelo.makelangelosettingspanel.LanguagePreferences;
-import com.marginallyclever.makelangelo.makelangelosettingspanel.MetricsPreferences;
+import com.marginallyclever.makelangelo.applicationsettings.LanguagePreferences;
+import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
@@ -171,7 +171,7 @@ public final class Makelangelo {
 		int comparison = MakelangeloVersion.VERSION.compareTo(v);
 		if(comparison!=0) {
 			preferences.put(SHARING_CHECK_STRING, MakelangeloVersion.VERSION);
-			int dialogResult = JOptionPane.showConfirmDialog(mainFrame, Translator.get("collectAnonymousMetricsOnUpdate"),"Sharing Is Caring",JOptionPane.YES_NO_OPTION);
+			int dialogResult = JOptionPane.showConfirmDialog(mainFrame, Translator.get("MetricsPreferences.collectAnonymousMetricsOnUpdate"),"Sharing Is Caring",JOptionPane.YES_NO_OPTION);
 			MetricsPreferences.setAllowedToShare(dialogResult == JOptionPane.YES_OPTION);
 		}
 	}
