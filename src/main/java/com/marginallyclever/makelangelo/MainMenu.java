@@ -11,8 +11,8 @@ import com.marginallyclever.makelangelo.makeart.tools.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
-import com.marginallyclever.makelangelo.makelangelosettingspanel.MakelangeloSettingPanel;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
 import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
@@ -40,7 +40,7 @@ public class MainMenu extends JMenuBar {
     private final Makelangelo app;
     private final SaveDialog saveDialog = new SaveDialog();
     private RecentFiles recentFiles;
-    private final MakelangeloSettingPanel myPreferencesPanel = new MakelangeloSettingPanel();
+    private final ApplicationSettings myPreferencesPanel = new ApplicationSettings();
     private boolean isMacOS = false;
 
     public MainMenu(Makelangelo app) {

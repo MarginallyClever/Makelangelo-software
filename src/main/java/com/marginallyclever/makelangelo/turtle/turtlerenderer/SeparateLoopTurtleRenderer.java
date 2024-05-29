@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makelangelosettingspanel.GFXPreferences;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;

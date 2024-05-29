@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
+package com.marginallyclever.makelangelo.applicationsettings;
 
 import java.util.prefs.Preferences;
 

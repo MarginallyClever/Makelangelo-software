@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
+package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
@@ -16,10 +16,10 @@ import java.util.prefs.Preferences;
  * Application settings
  * @author Dan Royer
  */
-public class MakelangeloSettingPanel {
-	private static final Logger logger = LoggerFactory.getLogger(MakelangeloSettingPanel.class);
+public class ApplicationSettings {
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationSettings.class);
 	
-	public MakelangeloSettingPanel() {
+	public ApplicationSettings() {
 		super();
 	}
 	

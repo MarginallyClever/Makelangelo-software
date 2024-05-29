@@ -1,14 +1,16 @@
-package com.marginallyclever.makelangelo.makelangelosettingspanel;
+package com.marginallyclever.makelangelo.applicationsettings;
+
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
+import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectSpinner;
+import com.marginallyclever.util.PreferencesHelper;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
-
-import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.*;
-import com.marginallyclever.util.PreferencesHelper;
 
 /**
  * Graphics plottersettings
