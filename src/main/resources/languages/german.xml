@@ -2525,5 +2525,60 @@
         <value>Zeichne Rand</value>
         <hint>[Draw border]</hint>
     </string>
+	<string>
+        <key>SelectImageConverterPanel.Contrast</key>
+        <value>Kontastkorrektur</value>
+        <hint>[Contrast adjust]</hint>
+    </string>
+    <string>
+        <key>Converter_PulseCMYK.Name</key>
+        <value>Pulse CMYK</value>
+        <hint>[Pulse CMYK]</hint>
+    </string>
+	<string>
+        <key>Converter_PulseCMYK.SampleRate</key>
+        <value>Abtastrate</value>
+        <hint>[Sample rate]</hint>
+    </string>
+	<string>
+        <key>VoronoiZigZag.optimizePath</key>
+        <value>Optimierter Pfad</value>
+        <hint>[Optimize path]</hint>
+    </string>
+    <string>
+        <key>Converter_IntensityToHeight.name</key>
+        <value>Intensität - Höhe</value>
+        <hint>[Intensity to height]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.spacing</key>
+        <value>Wellenabstand</value>
+        <hint>[Wave spacing]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.sampleRate</key>
+        <value>Abtastrate</value>
+        <hint>[Sample rate]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.waveIntensity</key>
+        <value>Wellenintensität</value>
+        <hint>[Wave intensity]</hint>
+    </string>
+    <string>
+        <key>PaperSettings.Title</key>
+        <value>Papiereinstellungen</value>
+        <hint>[Paper settings]</hint>
+    </string>
+	<string>
+        <key>PlotterControls.didNotFind</key>
+        <value>Fehler in der Kommunikation mit dem Plotter</value>
+        <hint>[Error in communicating with the robot.]</hint>
+    </string>
+    <string>
+        <key>PlotterControls.halted</key>
+        <value>Plotter angehalten!</value>
+        <hint>[Printer halted!]</hint>
+    </string>
 
 </language>
