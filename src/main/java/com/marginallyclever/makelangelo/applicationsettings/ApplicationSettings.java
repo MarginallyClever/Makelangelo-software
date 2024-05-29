@@ -50,7 +50,7 @@ public class ApplicationSettings {
 		pane.add(Translator.get("MetricsPreferences.Title"), MetricsPreferences.buildPanel());
 		panel.add(pane,BorderLayout.CENTER);
 
-		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("ApplicationSettings.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			SoundPreferences.save();
 			GFXPreferences.save();

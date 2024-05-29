@@ -57,7 +57,7 @@
 	<string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
 	<string><key>MetricsPreferences.Title</key><value>Metrics</value></string>
 	<string><key>MetricsPreferences.collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</body></html>]]></value></string>
-	<string><key>collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
+	<string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
 	<string><key>SoundPreferences.Title</key><value>Sounds</value></string>
 	<string><key>SoundPreferences.Connect</key><value>Connect</value></string>
 	<string><key>SoundPreferences.Disconnect</key><value>Disconnect</value></string>
@@ -78,7 +78,7 @@
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
 	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
 	<string><key>MenuMakelangelo</key><value>File</value></string>
-	<string><key>MenuPreferences</key><value>Preferences</value></string>
+	<string><key>ApplicationSettings.title</key><value>Preferences</value></string>
 	<string><key>MenuUpdate</key><value>Check for updates</value></string>
 	<string><key>MenuQuit</key><value>Quit</value></string>
 	<string><key>MenuForums</key><value>Online help forums</value></string>

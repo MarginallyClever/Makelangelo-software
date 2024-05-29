@@ -101,7 +101,7 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("MenuPreferences"));
+        JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("ApplicationSettings.title"));
         buttonAdjustPreferences.addActionListener((e)-> myPreferencesPanel.run(SwingUtilities.getWindowAncestor(this)));
         if (isMacOS) {
             buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, SHORTCUT_CTRL));//"cmd ,"

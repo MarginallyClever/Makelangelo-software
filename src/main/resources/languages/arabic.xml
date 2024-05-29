@@ -62,7 +62,7 @@
     <string><key>MetricsPreferences.Title</key><value>قياس</value></string>
     <string><key>MetricsPreferences.collectAnonymousMetrics</key><value>
     <![CDATA[<html><body>  أتعهد بمشاركة بيانات الأستخدام المجهول مع شركة <br> Maginally Clever Robots ltd </body></html>]]></value></string>
-    <string><key>collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>السماح للتطبيق بجمع البيانات مجهولة المصدر<br><br>يمكنك تغيير الصلاحية في أي وقت بالذهاب الى <i>Makelangelo &gt; التفضيلات &gt; القياس</i></body></html>]]></value></string>
+    <string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>السماح للتطبيق بجمع البيانات مجهولة المصدر<br><br>يمكنك تغيير الصلاحية في أي وقت بالذهاب الى <i>Makelangelo &gt; التفضيلات &gt; القياس</i></body></html>]]></value></string>
     <string><key>SoundPreferences.Title</key><value>الأصوات</value></string>
     <string><key>SoundPreferences.Connect</key><value>اتصال</value></string>
     <string><key>SoundPreferences.Disconnect</key><value>الغاء الأتصال</value></string>
@@ -81,7 +81,7 @@
     <string><key>UpToDate</key><value>لديك أحدث نسخة من التطبيق</value></string>
     <string><key>UpdateCheckFailed</key><value>عذرا, حصل خطأ ما, الرجاء زيارة http://www.marginallyclever.com/ للعثور على حل مناسب</value></string>
     <string><key>MenuMakelangelo</key><value>ملف</value></string>
-    <string><key>MenuPreferences</key><value>تفضيلات</value></string>
+    <string><key>ApplicationSettings.title</key><value>تفضيلات</value></string>
     <string><key>MenuUpdate</key><value>بحث عن تحديثات</value></string>
     <string><key>MenuQuit</key><value>خروج</value></string>
     <string><key>MenuForums</key><value>زيارة نادي الدعم</value></string>

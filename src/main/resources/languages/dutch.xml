@@ -425,7 +425,7 @@
 		<hint>menu or dialog title</hint>
 	</string>
 	<string>
-		<key>MenuPreferences</key>
+		<key>ApplicationSettings.title</key>
 		<value>Instellingen</value>
 		<hint>menu or dialog title</hint>
 	</string>

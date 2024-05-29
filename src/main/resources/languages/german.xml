@@ -701,7 +701,7 @@
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetricsOnUpdate</key>
+        <key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key>
         <value>&lt;html&gt;&lt;body&gt;Darf Marginally Clever Robots, Ltd. anonyme Metriken über diese app sammeln?&lt;br&gt;&lt;br&gt;Du kannst dies jederzeit unter &lt;i&gt;Makelangelo &amp;gt; Einstellungen &amp;gt; Metriken ändern&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1896,7 +1896,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>MenuPreferences</key>
+        <key>ApplicationSettings.title</key>
         <value>Einstellungen</value>
         <hint>[menu or dialog title]</hint>
     </string>
