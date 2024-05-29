@@ -34,7 +34,7 @@ public class SoundSystem {
 	}
 
 	static public void playDisconnectSound() {
-		playSound(SoundPreferences.getDisonnectSoundFilename());
+		playSound(SoundPreferences.getDisconnectSoundFilename());
 	}
 
 	static public void playConversionFinishedSound() {

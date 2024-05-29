@@ -61,7 +61,7 @@
         <hint>[Dialog]</hint>
     </string>
     <string>
-        <key>MenuLanguageTitle</key>
+        <key>LanguagePreferences.Title</key>
         <value>Sprache</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -296,7 +296,7 @@
         <hint>[Dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsConnect</key>
+        <key>SoundPreferences.Connect</key>
         <value>Verbinden</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -381,7 +381,7 @@
         <hint>[Multipass converter option]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishConvert</key>
+        <key>SoundPreferences.FinishConvert</key>
         <value>Umwandlung fertig</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -441,7 +441,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuGraphicsTitle</key>
+        <key>GFXPreferences.Title</key>
         <value>Grafik</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -561,7 +561,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishDraw</key>
+        <key>SoundPreferences.FinishDraw</key>
         <value>Zeichnen abgeschlossen</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -951,7 +951,7 @@
         <hint>[menu or dialog title]</hint>
     </string>
     <string>
-        <key>MenuMetricsTitle</key>
+        <key>MetricsPreferences.Title</key>
         <value>Maße</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1206,7 +1206,7 @@
         <hint>[]</hint>
     </string>
     <string>
-        <key>MenuSoundsDisconnect</key>
+        <key>SoundPreferences.Disconnect</key>
         <value>Trennen</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -1446,7 +1446,7 @@
         <hint>[Image Dynamic Range Setting]</hint>
     </string>
     <string>
-        <key>MenuSoundsTitle</key>
+        <key>SoundPreferences.Title</key>
         <value>Klänge</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1716,7 +1716,7 @@
         <hint>[FirmwareUpdate action]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetrics</key>
+        <key>MetricsPreferences.collectAnonymousMetrics</key>
         <value>&lt;html&gt;&lt;body&gt;Ich stimme zu, anonyme Benutzungsdaten mit&lt;br&gt;Marginally Clever Robots, Limited zu teilen.&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>

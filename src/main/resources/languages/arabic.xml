@@ -59,22 +59,22 @@
     <string><key>ConversionFill</key><value>ملئ</value></string>
     <string><key>OpenFileChooser.FileTypeImage</key><value>(%1) نوع الصورة</value></string>
     <string><key>OpenFileChooser.AllSupportedFiles</key><value>الملفات المدعومة</value></string>
-    <string><key>MenuMetricsTitle</key><value>قياس</value></string>
-    <string><key>collectAnonymousMetrics</key><value>
+    <string><key>MetricsPreferences.Title</key><value>قياس</value></string>
+    <string><key>MetricsPreferences.collectAnonymousMetrics</key><value>
     <![CDATA[<html><body>  أتعهد بمشاركة بيانات الأستخدام المجهول مع شركة <br> Maginally Clever Robots ltd </body></html>]]></value></string>
     <string><key>collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>السماح للتطبيق بجمع البيانات مجهولة المصدر<br><br>يمكنك تغيير الصلاحية في أي وقت بالذهاب الى <i>Makelangelo &gt; التفضيلات &gt; القياس</i></body></html>]]></value></string>
-    <string><key>MenuSoundsTitle</key><value>الأصوات</value></string>
-    <string><key>MenuSoundsConnect</key><value>اتصال</value></string>
-    <string><key>MenuSoundsDisconnect</key><value>الغاء الأتصال</value></string>
-    <string><key>MenuSoundsFinishConvert</key><value>إنهاء التحويل</value></string>
-    <string><key>MenuSoundsFinishDraw</key><value>إنهاء الرسم</value></string>
-    <string><key>MenuGraphicsTitle</key><value>الرسومات</value></string>
+    <string><key>SoundPreferences.Title</key><value>الأصوات</value></string>
+    <string><key>SoundPreferences.Connect</key><value>اتصال</value></string>
+    <string><key>SoundPreferences.Disconnect</key><value>الغاء الأتصال</value></string>
+    <string><key>SoundPreferences.FinishConvert</key><value>إنهاء التحويل</value></string>
+    <string><key>SoundPreferences.FinishDraw</key><value>إنهاء الرسم</value></string>
+    <string><key>GFXPreferences.Title</key><value>الرسومات</value></string>
     <string><key>GFXPreferences.showPenUp</key><value>إظهار تحركات القلم</value></string>
     <string><key>GFXPreferences.antialias</key><value>خطوط انسيابية</value></string>
     <string><key>GFXPreferences.speedVSQuality</key><value> تسريع (اهمال الدقة)</value></string>
     <string><key>GFXPreferences.showAllWhileDrawing</key><value>إظهار كامل الصورة أثناء الرسم</value></string>
     <string><key>GFXPreferences.dragSpeed</key><value>سرعة الكاميرا</value></string>
-    <string><key>MenuLanguageTitle</key><value>اللغة</value></string>
+    <string><key>LanguagePreferences.Title</key><value>اللغة</value></string>
     <string><key>StartAt</key><value>تحديد نقطة البداية</value></string>
     <string><key>Robot</key><value>مايكل انجلو</value></string>
     <string><key>UpdateNotice</key><value><![CDATA[<html><body>يتوفر إصدار جديد من التطبيق<br/>قم بزيارة <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> للحصول على أحدث المميزات</body></html>]]></value></string>

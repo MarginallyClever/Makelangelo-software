@@ -44,10 +44,10 @@ public class ApplicationSettings {
 		panel.add(top,BorderLayout.NORTH);
 
 		JTabbedPane pane = new JTabbedPane();
-		pane.add(Translator.get("MenuSoundsTitle"), SoundPreferences.buildPanel());
-		pane.add(Translator.get("MenuGraphicsTitle"), GFXPreferences.buildPanel());
-		pane.add(Translator.get("MenuLanguageTitle"), LanguagePreferences.buildPanel());
-		pane.add(Translator.get("MenuMetricsTitle"), MetricsPreferences.buildPanel());
+		pane.add(Translator.get("SoundPreferences.Title"), SoundPreferences.buildPanel());
+		pane.add(Translator.get("GFXPreferences.Title"), GFXPreferences.buildPanel());
+		pane.add(Translator.get("LanguagePreferences.Title"), LanguagePreferences.buildPanel());
+		pane.add(Translator.get("MetricsPreferences.Title"), MetricsPreferences.buildPanel());
 		panel.add(pane,BorderLayout.CENTER);
 
 		int result = JOptionPane.showConfirmDialog(parentComponent, panel, Translator.get("MenuPreferences"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -56,11 +56,6 @@ public class ApplicationSettings {
 			GFXPreferences.save();
 			LanguagePreferences.save();
 			MetricsPreferences.save();
-		} else {
-			SoundPreferences.cancel();
-			GFXPreferences.cancel();
-			LanguagePreferences.cancel();
-			MetricsPreferences.cancel();
 		}
 	}
 

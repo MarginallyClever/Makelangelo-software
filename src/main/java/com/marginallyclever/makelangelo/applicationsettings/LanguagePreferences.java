@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 
 public class LanguagePreferences {
-
 	private static final Logger logger = LoggerFactory.getLogger(LanguagePreferences.class);
 	
 	static private final SelectPanel panel = new SelectPanel();
@@ -38,8 +37,6 @@ public class LanguagePreferences {
 		Translator.setCurrentLanguage(languageList[languageOptions.getSelectedIndex()]);
 		Translator.saveConfig();
 	}
-	
-	static public void cancel() {}
 
 	/**
 	 * Display a dialog box of available languages and let the user select their preference.
