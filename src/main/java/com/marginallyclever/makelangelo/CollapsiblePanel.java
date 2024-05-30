@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.select.*;
 
 import javax.swing.*;
