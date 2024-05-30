@@ -13,15 +13,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TranslatorLanguage {
 	private static final Logger logger = LoggerFactory.getLogger(TranslatorLanguage.class);
 
 	private String name = "";
-	private String author = "";
+	private final List<String> authors = new ArrayList<>();
 	private final Map<String, String> strings = new HashMap<>();
 
 
@@ -67,21 +65,44 @@ public class TranslatorLanguage {
 		final Element docEle = dom.getDocumentElement();
 
 		name = docEle.getElementsByTagName("name").item(0).getFirstChild().getNodeValue();
-		author = docEle.getElementsByTagName("author").item(0).getFirstChild().getNodeValue();
+		readAllAuthors(docEle);
+		readAllStrings(docEle);
+	}
 
-		NodeList nl = docEle.getElementsByTagName("string");
-		if (nl.getLength() > 0) {
-			for (int i = 0; i < nl.getLength(); i++) {
-
-				//get the element
-				Element el = (Element) nl.item(i);
-				String key = getTextValue(el, "key");
-				String value = getTextValue(el, "value");
-
-				// store key/value pairs into a map
-				//logger.debug(language_file +"\t"+key+"\t=\t"+value);
-				strings.put(key, value);
+	private void readAllAuthors(Element docEle) {
+		NodeList authors = docEle.getElementsByTagName("authors");
+		for (int i = 0; i < authors.getLength(); i++) {
+			Node authorNode = authors.item(i);
+			if (authorNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element authorElement = (Element) authorNode;
+				NodeList authorList = authorElement.getElementsByTagName("author");
+				for (int j = 0; j < authorList.getLength(); j++) {
+					Node author = authorList.item(j);
+					if (author.getNodeType() == Node.ELEMENT_NODE) {
+						Element authorElement2 = (Element) author;
+						this.authors.add(authorElement2.getFirstChild().getNodeValue());
+					}
+				}
 			}
+		}
+	}
+
+	/**
+	 * read all key/value pairs from the xml file.
+	 * @param docEle the root element of the xml file
+	 */
+	private void readAllStrings(Element docEle) {
+		NodeList nl = docEle.getElementsByTagName("string");
+		for (int i = 0; i < nl.getLength(); i++) {
+
+			//get the element
+			Element el = (Element) nl.item(i);
+			String key = getTextValue(el, "key");
+			String value = getTextValue(el, "value");
+
+			// store key/value pairs into a map
+			//logger.debug(language_file +"\t"+key+"\t=\t"+value);
+			strings.put(key, value);
 		}
 	}
 
@@ -143,8 +164,8 @@ public class TranslatorLanguage {
 		return name;
 	}
 
-	public String getAuthor() {
-		return author;
+	public List<String> getAuthors() {
+		return authors;
 	}
 
 	public Set<String> getKeys() {
