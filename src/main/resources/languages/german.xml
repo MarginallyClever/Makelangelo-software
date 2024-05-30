@@ -2,8 +2,11 @@
 <language>
     <meta>
         <name>Deutsch (de)</name>
-        <author>Chris Tarantl (chris@tarantl.com), UPDATED BY Pablo Geilert (pgeilert) and Peter Prisille (peterprisil@gmail.com)</author>
-        <!-- https://crowdin.com/project/marginallyclevermakelangelo-so/ -->
+        <authors>
+            <author>Chris Tarantl (chris@tarantl.com)</author>
+            <author>Pablo Geilert (pgeilert)</author>
+            <author>Peter Prisille (peterprisil@gmail.com)</author>
+        </authors>
     </meta>
     <string>
         <key>JogInterface.DisengageMotors</key>

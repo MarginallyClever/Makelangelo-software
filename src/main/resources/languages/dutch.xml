@@ -2,14 +2,14 @@
 <!DOCTYPE language>
 <language>       
     <!--
-
-<?xml version="1.0" encoding="UTF-8"?>    
+<?xml version="1.0" encoding="UTF-8"?>
 <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-
     -->
 	<meta>
 		<name>Nederlands</name>
-		<author>Bart Derks (bderks@zeelandnet.nl)</author>
+		<authors>
+			<author>Bart Derks (bderks@zeelandnet.nl)</author>
+		</authors>
 	</meta>
 
 	<string>

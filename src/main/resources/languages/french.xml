@@ -2,7 +2,9 @@
 <language>
     <meta>
         <name>Français (fr_FR)</name>
-        <author>https://github.com/PPAC37</author>
+        <authors>
+            <author>https://github.com/PPAC37</author>
+        </authors>
     </meta>
     <string>
         <key>Left</key>

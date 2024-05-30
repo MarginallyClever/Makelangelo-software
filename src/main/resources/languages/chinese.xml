@@ -3,7 +3,9 @@
 <language>
 	<meta>
 		<name>Chinese</name> <!-- zh-CN -->
-		<author>Kmimax(kmimax2016@gmail.com)</author>
+		<authors>
+			<author>Kmimax(kmimax2016@gmail.com)</author>
+		</authors>
 	</meta>
 
 	<string>
