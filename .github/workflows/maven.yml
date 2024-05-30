@@ -132,6 +132,7 @@ jobs:
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v3.1.0
       with:
+        permission: write-all
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
