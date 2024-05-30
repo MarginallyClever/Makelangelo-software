@@ -131,9 +131,8 @@ jobs:
 #      if: github.repository == 'MarginallyClever/Makelangelo-software'
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
       uses: WebFreak001/deploy-nightly@v3.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
+        token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
         asset_path: ${{ env.BINARY }} # path to archive to upload
