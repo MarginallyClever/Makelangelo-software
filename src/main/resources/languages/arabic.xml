@@ -3,9 +3,9 @@
 <language>
     <meta>
         <name>Arabic</name>
-        <authos>
+        <authors>
             <author>Zainab Abdul Kareem Dinar - github.com/ZainabAKD</author>
-        </authos>
+        </authors>
     </meta>
 
     <string><key>BorderName</key><value>ورقة التخطيط</value></string>

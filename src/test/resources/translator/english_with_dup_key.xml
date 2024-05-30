@@ -4,7 +4,9 @@
 
 	<meta>
 		<name>English_DUP</name>
-		<author>TEST_SET_DUP_KEY</author>
+		<authors>
+			<author>TEST_SET_DUP_KEY</author>
+		</authors>
 	</meta>
 
 	<string>
