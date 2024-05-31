@@ -11,8 +11,6 @@ import java.util.prefs.Preferences;
 
 public final class RecentFiles extends JMenu {
 	private static final Logger logger = LoggerFactory.getLogger(RecentFiles.class);
-	
-	private static final long serialVersionUID = -4331360984016876093L;
 
 	public final int MAX_FILES = 10;
 

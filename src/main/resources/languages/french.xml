@@ -2,7 +2,9 @@
 <language>
     <meta>
         <name>Français (fr_FR)</name>
-        <author>https://github.com/PPAC37</author>
+        <authors>
+            <author>https://github.com/PPAC37</author>
+        </authors>
     </meta>
     <string>
         <key>Left</key>
@@ -30,7 +32,7 @@
         <hint>[status message]</hint>
     </string>
     <string>
-        <key>MenuLanguageTitle</key>
+        <key>LanguagePreferences.Title</key>
         <value>Langue</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -175,7 +177,7 @@
         <hint>[Dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsConnect</key>
+        <key>SoundPreferences.Connect</key>
         <value>Connexion</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -250,7 +252,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuGraphicsTitle</key>
+        <key>GFXPreferences.Title</key>
         <value>Graphique</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -373,7 +375,7 @@
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetricsOnUpdate</key>
+        <key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key>
         <value>&lt;html&gt;&lt;body&gt;Est-ce que Marginally Clever Robots, Ltd. peut collecter des statistiques d'utilisation anonymes sur cette application ?&lt;br&gt;&lt;br&gt;Vous pouvez mettre à jour cela à tout moment dans &lt;i&gt;Makelangelo &amp;gt; Préférences &amp;gt; Métriques&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -488,7 +490,7 @@
         <hint>[LSystem generator]</hint>
     </string>
     <string>
-        <key>MenuMetricsTitle</key>
+        <key>MetricsPreferences.Title</key>
         <value>Métrique</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -618,7 +620,7 @@
         <hint>[]</hint>
     </string>
     <string>
-        <key>MenuSoundsDisconnect</key>
+        <key>SoundPreferences.Disconnect</key>
         <value>Déconnexion</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -988,7 +990,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>MenuPreferences</key>
+        <key>ApplicationSettings.title</key>
         <value>Préférences</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1183,7 +1185,7 @@
         <hint>[Multipass converter option]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishConvert</key>
+        <key>SoundPreferences.FinishConvert</key>
         <value>Fin de conversion</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -1283,7 +1285,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishDraw</key>
+        <key>SoundPreferences.FinishDraw</key>
         <value>Fin du dessin</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -1723,7 +1725,7 @@
         <hint>[Pulse Line generator]</hint>
     </string>
     <string>
-        <key>MenuSoundsTitle</key>
+        <key>SoundPreferences.Title</key>
         <value>Sons</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1863,7 +1865,7 @@
         <hint>[menu or dialog title]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetrics</key>
+        <key>MetricsPreferences.collectAnonymousMetrics</key>
         <value>&lt;html&gt;&lt;body&gt;J'accepte de partager des données d'utilisation anonymes&lt;br&gt;avec Marginally Clever Robots, Limited.&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>

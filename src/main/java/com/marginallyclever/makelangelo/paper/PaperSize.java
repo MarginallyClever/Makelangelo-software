@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.paper;
 
+/**
+ * Convenience class to hold paper size information.
+ */
 public class PaperSize {
 	public String name;
 	public int width;

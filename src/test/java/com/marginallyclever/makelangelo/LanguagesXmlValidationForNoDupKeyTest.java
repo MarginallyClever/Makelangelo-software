@@ -80,7 +80,7 @@ public class LanguagesXmlValidationForNoDupKeyTest {
 		// english_with_dup_key.xml contains some duplicated an en empty key //language/string/key
 		boolean isValide = xmlValidationWithExternalXsdShema(new File(resource.getFile()), schemaFile);
 
-		assertTrue(!isValide);
+        assertFalse(isValide);
 	}
 
 	@Test

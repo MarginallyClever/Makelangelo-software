@@ -6,8 +6,7 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import java.awt.*;
 
 /**
- * {@link TurtleRenderer} is an interface class that can draw a
- * {@link com.marginallyclever.makelangelo.turtle.Turtle} in a specific style.
+ * {@link TurtleRenderer} draws a {@link com.marginallyclever.makelangelo.turtle.Turtle} in a specific style.
  */
 public interface TurtleRenderer {
 	void start(GL2 gl2);

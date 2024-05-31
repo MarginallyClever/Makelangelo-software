@@ -6,8 +6,6 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import java.io.Serial;
 
 public class FlipTurtleAction extends TurtleModifierAction {
-	@Serial
-	private static final long serialVersionUID = 3429861670595048893L;
 	private final double scaleX,scaleY;
 	
 	public FlipTurtleAction(double x,double y,String name) {

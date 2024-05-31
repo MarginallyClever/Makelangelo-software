@@ -2,8 +2,11 @@
 <language>
     <meta>
         <name>Deutsch (de)</name>
-        <author>Chris Tarantl (chris@tarantl.com), UPDATED BY Pablo Geilert (pgeilert) and Peter Prisille (peterprisil@gmail.com)</author>
-        <!-- https://crowdin.com/project/marginallyclevermakelangelo-so/ -->
+        <authors>
+            <author>Chris Tarantl (chris@tarantl.com)</author>
+            <author>Pablo Geilert (pgeilert)</author>
+            <author>Peter Prisille (peterprisil@gmail.com)</author>
+        </authors>
     </meta>
     <string>
         <key>JogInterface.DisengageMotors</key>
@@ -61,7 +64,7 @@
         <hint>[Dialog]</hint>
     </string>
     <string>
-        <key>MenuLanguageTitle</key>
+        <key>LanguagePreferences.Title</key>
         <value>Sprache</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -166,7 +169,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>Converter_Voronoi.Name</key>
+        <key>Converter_VoronoiStippling.Name</key>
         <value>Voronoi Punkte</value>
         <hint>[voronoi stippling generator]</hint>
     </string>
@@ -296,7 +299,7 @@
         <hint>[Dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsConnect</key>
+        <key>SoundPreferences.Connect</key>
         <value>Verbinden</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -381,7 +384,7 @@
         <hint>[Multipass converter option]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishConvert</key>
+        <key>SoundPreferences.FinishConvert</key>
         <value>Umwandlung fertig</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -441,7 +444,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuGraphicsTitle</key>
+        <key>GFXPreferences.Title</key>
         <value>Grafik</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -561,7 +564,7 @@
         <hint>[file open dialog]</hint>
     </string>
     <string>
-        <key>MenuSoundsFinishDraw</key>
+        <key>SoundPreferences.FinishDraw</key>
         <value>Zeichnen abgeschlossen</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -701,7 +704,7 @@
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetricsOnUpdate</key>
+        <key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key>
         <value>&lt;html&gt;&lt;body&gt;Darf Marginally Clever Robots, Ltd. anonyme Metriken über diese app sammeln?&lt;br&gt;&lt;br&gt;Du kannst dies jederzeit unter &lt;i&gt;Makelangelo &amp;gt; Einstellungen &amp;gt; Metriken ändern&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -951,7 +954,7 @@
         <hint>[menu or dialog title]</hint>
     </string>
     <string>
-        <key>MenuMetricsTitle</key>
+        <key>MetricsPreferences.Title</key>
         <value>Maße</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1206,7 +1209,7 @@
         <hint>[]</hint>
     </string>
     <string>
-        <key>MenuSoundsDisconnect</key>
+        <key>SoundPreferences.Disconnect</key>
         <value>Trennen</value>
         <hint>[sound settings dialog]</hint>
     </string>
@@ -1446,7 +1449,7 @@
         <hint>[Image Dynamic Range Setting]</hint>
     </string>
     <string>
-        <key>MenuSoundsTitle</key>
+        <key>SoundPreferences.Title</key>
         <value>Klänge</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1716,7 +1719,7 @@
         <hint>[FirmwareUpdate action]</hint>
     </string>
     <string>
-        <key>collectAnonymousMetrics</key>
+        <key>MetricsPreferences.collectAnonymousMetrics</key>
         <value>&lt;html&gt;&lt;body&gt;Ich stimme zu, anonyme Benutzungsdaten mit&lt;br&gt;Marginally Clever Robots, Limited zu teilen.&lt;/html&gt;&lt;/body&gt;</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1896,7 +1899,7 @@
         <hint></hint>
     </string>
     <string>
-        <key>MenuPreferences</key>
+        <key>ApplicationSettings.title</key>
         <value>Einstellungen</value>
         <hint>[menu or dialog title]</hint>
     </string>
@@ -1920,7 +1923,7 @@
         <value>Fülle geschlossene Bereiche</value>
         <hint>[]</hint>
     </string>
-    <string>   
+    <string>
         <key>MenuImportFile</key>
         <value>Datei importieren...</value>
         <hint>[menu or dialog title]</hint>
@@ -1930,18 +1933,18 @@
         <value>Fraktals</value>
         <hint>[Fractals]</hint>
     </string>
-	<string>
+    <string>
         <key>MenuGenerate.Grids</key>
         <value>Raster</value>
         <hint>[Raster]</hint>
     </string>
-	<string>
+    <string>
         <key>MenuGenerate.SpaceFillers</key>
         <value>Zwischenräume auffüllen</value>
         <hint>[Space Fillers]</hint>
     </string>
-	<string
-        ><key>MenuGenerate.Mazes</key>
+    <string>
+        <key>MenuGenerate.Mazes</key>
         <value>Irrgarten</value>
         <hint>[Mazes]</hint>
     </string>
@@ -1950,16 +1953,17 @@
         <value>Rechteck</value>
         <hint>[Rectangles]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_GridFit.margin</key>
         <value>Minimaler Rand an jeder Seite (mm)</value>
         <hint>[Minimum margin each side (mm)]</hint>
     </string>
-	<string><key>Generator_GridFit.cellsWide</key>
+    <string>
+        <key>Generator_GridFit.cellsWide</key>
         <value>Zellen horizontal</value>
         <hint>[Cells horizontal]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_GridFit.cellsHigh</key>
         <value>Zellen vertical</value>
         <hint>[Cells vertical]</hint>
@@ -1974,7 +1978,7 @@
         <value>Sechseck</value>
         <hint>[Hexagons]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_GridHexagons.radius</key>
         <value>Umkreisradius</value>
         <hint>[Major radius]</hint>
@@ -1984,67 +1988,67 @@
         <value>Startwert (Seed)</value>
         <hint>[Random seed value]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.name</key>
         <value>Strömungsfeld</value>
         <hint>[Flow field]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.scaleX</key>
         <value>X Maßstab</value>
         <hint>[X scale]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.scaleY</key>
         <value>Y Maßstab</value>
         <hint>[Y scale]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.offsetX</key>
         <value>X Offset</value>
         <hint>[X offset]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.offsetY</key>
         <value>Y Offset</value>
         <hint>[Y offset]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.stepSize</key>
         <value>Schrittgröße</value>
         <hint>[Step size]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.stepVariation</key>
         <value>Schrittvariation</value>
         <hint>[Step variation]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.stepLength</key>
         <value>Schrittlänge</value>
         <hint>[Step length]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.fromEdge</key>
         <value>Kontinuierlich</value>
         <hint>[Continuous]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.rightAngle</key>
         <value>Füge orthogonale Linien hinzu</value>
         <hint>[Add orthogonal lines]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_FlowField.noiseType</key>
         <value>Rauschart</value>
         <hint>[Noise type]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_Spiral.name</key>
         <value>Spirale</value>
         <hint>[Spiral]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_Spiral.radius</key>
         <value>Radius</value>
         <hint>[Radius]</hint>
@@ -2054,52 +2058,52 @@
         <value>Truchet-Fliesen</value>
         <hint>[Truchet Tiles]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_TruchetTiles.LineSpacing</key>
         <value>Abstand zwischen den Linien (mm)</value>
         <hint>[Space between lines (mm)]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_TruchetTiles.LinesPerTile</key>
         <value>Linien pro Fliese</value>
         <hint>[Lines per tile]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_TruchetTiles.allow</key>
         <value>Erlaube '%1'</value>
         <hint>[Allow '%1']</hint>
     </string>
-	<string>
+    <string>
         <key>Converter_Voronoi.ShowCenters</key>
         <value>Zeige die Zentren</value>
         <hint>[Show centers]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeRectangle.name</key>
         <value>Rechteck</value>
         <hint>[Rectangle]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeRectangle.rows</key>
         <value>Zeilen</value>
         <hint>[Rows]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeRectangle.columns</key>
         <value>Spalten</value>
         <hint>[Columns]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeCircle.name</key>
         <value>Kreis</value>
         <hint>[Circle]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeCircle.rings</key>
         <value>Ringe</value>
         <hint>[Rings]</hint>
     </string>
-	<string>
+    <string>
         <key>Generator_MazeHoneycomb.name</key>
         <value>Bienenwabe</value>
         <hint>[Honeycomb]</hint>
@@ -2109,12 +2113,12 @@
         <value>Linienstärke</value>
         <hint>[Line image weight]</hint>
     </string>
-	<string>
+    <string>
         <key>LineWeightByImageIntensity.thickness</key>
         <value>Strichstärke</value>
         <hint>[Thickness]</hint>
     </string>
-	<string>
+    <string>
         <key>LineWeightByImageIntensity.image</key>
         <value>Bild</value>
         <hint>[Image]</hint>
@@ -2144,7 +2148,7 @@
         <value>Ein Problem melden</value>
         <hint>[Report an issue]</hint>
     </string>
-	<string>
+    <string>
         <key>MenuManual</key>
         <value>Anleitung lesen</value>
         <hint>[Read the Friendly Manual]</hint>
@@ -2159,97 +2163,97 @@
         <value>Kamerageschwindigkeit</value>
         <hint>[camera travel speed]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.Title</key>
         <value>Plotter Einstellungen</value>
         <hint>[Plotter settings]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.TabEssential</key>
         <value>Basis</value>
         <hint>[Essential]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.TabPen</key>
         <value>Stift</value>
         <hint>[Pen]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.TabSimulation</key>
         <value>Simulation</value>
         <hint>[Simulation]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.MachineWidth</key>
         <value>Maschinenbreite (mm)</value>
         <hint>[Machine width (mm)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.MachineHeight</key>
         <value>Maschinenhöhe (mm)</value>
         <hint>[Machine height (mm)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.ServoLengthNeeded</key>
         <value>Servokabellänge (m)</value>
         <hint>[Servo wire length (m)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.StepperLengthNeeded</key>
         <value>Schrittmotorkabellänge (m,jeweils)</value>
         <hint>[Stepper wire length (m,each)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.BeltLengthNeeded</key>
         <value>Timing belt length (m,each)</value>
         <hint>[Timing belt length (m,each)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolDiameter</key>
         <value>Durchmesser (mm)</value>
         <hint>[Diameter (mm)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolMaxFeedRate</key>
         <value>Bewegungsgeschwindigkeit (mm/min)</value>
         <hint>[Travel speed (mm/min)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolUp</key>
         <value>Oben-Winkel (Grad)</value>
         <hint>[Up angle (degrees)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolDown</key>
         <value>Unten-Winkel (Grad)</value>
         <hint>[Down angle (degrees)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolLiftSpeed</key>
         <value>Stift-Anheben-Zeit (ms)</value>
         <hint>[Pen lift time (ms)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.penToolLowerSpeed</key>
         <value>Stift-Senken-Zeit (ms)</value>
         <hint>[Pen lower time (ms)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.Speed</key>
         <value>Zeichengeschwindigkeit (mm/min)</value>
         <hint>[Draw speed (mm/min)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.AdjustAcceleration</key>
         <value>Beschleuningung (mm/s²)</value>
         <hint>[Acceleration (mm/s²)]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.pen up color</key>
         <value>Stift-Oben Farbe</value>
         <hint>[Up color]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsPanel.pen down color</key>
         <value>Stift-Unten Farbe</value>
         <hint>[Default down color]</hint>
@@ -2259,12 +2263,12 @@
         <value>Z-Achsen Typ</value>
         <hint>[Z axis type]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettings.zMotorType.servo</key>
         <value>Servo</value>
         <hint>[Servo]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettings.zMotorType.stepper</key>
         <value>Schrittmotor</value>
         <hint>[Stepper]</hint>
@@ -2274,22 +2278,22 @@
         <value>-</value>
         <hint>[-]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsManagerPanel.AddProfile</key>
         <value>+</value>
         <hint>[+]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsManagerPanel.NewProfileName</key>
         <value>Neuer eindeutiger Name</value>
         <hint>[New unique name:]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsManagerPanel.NewProfileNameAlreadyExists</key>
         <value>Der Name exisiert bereits. Neuer Versuch:</value>
         <hint>[Name already in use. Try again!]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettingsManagerPanel.NewProfileNameCannotBeBlank</key>
         <value>Der Name darf nicht Leer sein. Neuer Versuch:</value>
         <hint>[Name cannot be blank. Try again!]</hint>
@@ -2299,7 +2303,7 @@
         <value>GCode für den Start</value>
         <hint>[Start GCode]</hint>
     </string>
-	<string>
+    <string>
         <key>PlotterSettings.userGeneralEndGcode</key>
         <value>GCode für das Ende</value>
         <hint>[End GCode]</hint>
@@ -2314,22 +2318,22 @@
         <value>Default</value>
         <hint>[Default]</hint>
     </string>
-	<string>
+    <string>
         <key>BarberPoleTurtleRenderer.name</key>
         <value>Barber pole</value>
         <hint>[Barber pole]</hint>
     </string>
-	<string>
+    <string>
         <key>SeparateLoopTurtleRenderer.name</key>
         <value>Separate Schleifen</value>
         <hint>[Separate loops]</hint>
     </string>
-	<string>
+    <string>
         <key>DirectionLoopTurtleRenderer.name</key>
         <value>Richtungsschleifen</value>
         <hint>[Direction loops]</hint>
     </string>
-	<string>
+    <string>
         <key>MarlinSimulationVisualizer.name</key>
         <value>Marlin Simulation</value>
         <hint>[Marlin simulation]</hint>
@@ -2339,12 +2343,12 @@
         <value>Protokoll Dateien</value>
         <hint>[Log files]</hint>
     </string>
-	<string>
+    <string>
         <key>LogPanel.Title</key>
         <value>Protokoll</value>
         <hint>[Log]</hint>
     </string>
-	<string>
+    <string>
         <key>LogPanel.CopyClipboard</key>
         <value>Kopieren</value>
         <hint>[Copy]</hint>
@@ -2354,7 +2358,7 @@
         <value>Kopieren</value>
         <hint>[Copy]</hint>
     </string>
-	<string>
+    <string>
         <key>CartesianButtons.buttonCenter</key>
         <value> </value>
         <hint>[ ]</hint>
@@ -2364,4 +2368,220 @@
         <value>Keine Anwort vom Plotter. Bitte das USB-Kabel und die Geschwindikeitseinstellungen prüfen</value>
         <hint>[No answer from the robot, please check the USB cable or speed settings.]</hint>
     </string>
+    <string>
+        <key>FirmwareUploader.help</key>
+        <value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value>
+        <hint>[Link to firmware upload guide]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.status</key>
+        <value>Firmware-Upload Status</value>
+        <hint>[Firmware upload status]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.startM5</key>
+        <value>M5</value>
+        <hint>[Makelangelo type=M5]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.startHuge</key>
+        <value>Huge</value>
+        <hint>[Makelangelo type=Huge]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.avrdudeNotDownloaded</key>
+        <value>AVRDude wurde nicht heruntergeladen.</value>
+        <hint>[AVRDude not downloaded.]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.confNotFound</key>
+        <value>AVRDude.conf nicht gefunden.</value>
+        <hint>[AVRDude.conf not found.]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.failed</key>
+        <value>Firmware upload fehlgeschlagen.</value>
+        <hint>[Firmware upload failed.]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.noPortSelected</key>
+        <value>Kein Port ausgewählt</value>
+        <hint>[No port selected.]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.downloadFailed</key>
+        <value>Download fehlgeschlagen.</value>
+        <hint>[Download failed]</hint>
+    </string>
+    <string>
+        <key>FirmwareUploaderPanel.finished</key>
+        <value>Firmwareupdate OK!</value>
+        <hint>[Finished OK!]</hint>
+    </string>
+    <string>
+        <key>LoadScratch3.foreverNotAllowed</key>
+        <value>Forever Schleifen sind für immer verboten.</value>
+        <hint>Forever loops are forever forbidden.</hint>
+    </string>
+    <string>
+        <key>SaveGCode.splitGCodeTitle</key>
+        <value>Mehrere Farben entdeckt</value>
+        <hint>[Many colors detected]</hint>
+    </string>
+    <string>
+        <key>SaveGCode.splitGCodeQuestion</key>
+        <value>Diese Zeichung benötigt %1 Stiftwechsel.  In mehrere Dateien zerlegen?</value>
+        <hint>[There are %1 tool changes in this drawing.  Split into separate files?]</hint>
+    </string>
+    <string>
+        <key>Converter_QuadTreeInstant</key>
+        <value>Quad tree instant</value>
+        <hint>[Quad tree instant]</hint>
+    </string>
+    <string>
+        <key>Converter_QuadTreeInstant.maxDepth</key>
+        <value>Maximale Tiefe</value>
+        <hint>[Max depth]</hint>
+    </string>
+    <string>
+        <key>Converter_QuadTreeInstant.baseCutOff</key>
+        <value>Basis cut-off</value>
+        <hint>[Base cut-off]</hint>
+    </string>
+    <string>
+        <key>Converter_QuadTreeInstant.cutOffIncrement</key>
+        <value>Cut-off Schrittweite</value>
+        <hint>[Cut-off increment]</hint>
+    </string>
+    <string>
+        <key>Converter_TruchetFromImage.name</key>
+        <value>Truchet-Kachel vom Bild</value>
+        <hint>[Truchet from image]</hint>
+    </string>
+    <string>
+        <key>Converter_TruchetFromImage.spacing</key>
+        <value>Raum zwischen den Linien</value>
+        <hint>[Space between lines]</hint>
+    </string>
+    <string>
+        <key>Converter_TruchetFromImage.linesPerTile</key>
+        <value>Linien pro Kachel</value>
+        <hint>[Lines per tile]</hint>
+    </string>
+    <string>
+        <key>Converter_Voronoi.Name</key>
+        <value>Voronoi Diagramm</value>
+        <hint>[Voronoi diagram]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Crosshatch.Name</key>
+        <value>CMYK</value>
+        <hint>[CMYK]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Crosshatch.Passes</key>
+        <value>Durchgänge</value>
+        <hint>[Passes]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Crosshatch.Note</key>
+        <value><![CDATA[Zeichnet Gelb, Cyan, Magenta, und Schwarz.]]></value>
+        <hint>[<![CDATA[Draws Yellow, Cyan, Magenta, and then Black.]]>]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Spiral.Name</key>
+        <value>CMYK Spirale</value>
+        <hint>[CMYK Spiral]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Circles.name</key>
+        <value>CMYK Kreise</value>
+        <hint>[CMYK circles]</hint>
+    </string>
+    <string>
+        <key>Converter_CMYK_Circles.maxCircleSize</key>
+        <value>Maximaler Kreisdurchmesser</value>
+        <hint>[max circle size]</hint>
+    </string>
+    <string>
+        <key>Converter_EdgeDetection.name</key>
+        <value>Kantenerkennung</value>
+        <hint>[Edge detection]</hint>
+    </string>
+    <string>
+        <key>Converter_EdgeDetection.passes</key>
+        <value>Durchgänge</value>
+        <hint>[Passes]</hint>
+    </string>
+    <string>
+        <key>Converter_EdgeDetection.stepSize</key>
+        <value>Schrittweite</value>
+        <hint>[Step size]</hint>
+    </string>
+    <string>
+        <key>Converter_EdgeDetection.sampleSize</key>
+        <value>Abtastabstand</value>
+        <hint>[SampleSize]</hint>
+    </string>
+    <string>
+        <key>Converter_EdgeDetection.border</key>
+        <value>Zeichne Rand</value>
+        <hint>[Draw border]</hint>
+    </string>
+	<string>
+        <key>SelectImageConverterPanel.Contrast</key>
+        <value>Kontastkorrektur</value>
+        <hint>[Contrast adjust]</hint>
+    </string>
+    <string>
+        <key>Converter_PulseCMYK.Name</key>
+        <value>Pulse CMYK</value>
+        <hint>[Pulse CMYK]</hint>
+    </string>
+	<string>
+        <key>Converter_PulseCMYK.SampleRate</key>
+        <value>Abtastrate</value>
+        <hint>[Sample rate]</hint>
+    </string>
+	<string>
+        <key>VoronoiZigZag.optimizePath</key>
+        <value>Optimierter Pfad</value>
+        <hint>[Optimize path]</hint>
+    </string>
+    <string>
+        <key>Converter_IntensityToHeight.name</key>
+        <value>Intensität - Höhe</value>
+        <hint>[Intensity to height]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.spacing</key>
+        <value>Wellenabstand</value>
+        <hint>[Wave spacing]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.sampleRate</key>
+        <value>Abtastrate</value>
+        <hint>[Sample rate]</hint>
+    </string>
+	<string>
+        <key>Converter_IntensityToHeight.waveIntensity</key>
+        <value>Wellenintensität</value>
+        <hint>[Wave intensity]</hint>
+    </string>
+    <string>
+        <key>PaperSettings.Title</key>
+        <value>Papiereinstellungen</value>
+        <hint>[Paper settings]</hint>
+    </string>
+	<string>
+        <key>PlotterControls.didNotFind</key>
+        <value>Fehler in der Kommunikation mit dem Plotter</value>
+        <hint>[Error in communicating with the robot.]</hint>
+    </string>
+    <string>
+        <key>PlotterControls.halted</key>
+        <value>Plotter angehalten!</value>
+        <hint>[Printer halted!]</hint>
+    </string>
+
 </language>

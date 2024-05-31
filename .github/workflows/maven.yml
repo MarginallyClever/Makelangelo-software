@@ -6,6 +6,7 @@ env:
   UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
   RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
 
+
 on:
   push:
   pull_request:
@@ -14,9 +15,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v4
 
-    - uses: actions/setup-java@v3.9.0
+    - uses: actions/setup-java@v4.2.1
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -67,10 +68,10 @@ jobs:
 
     - name: Deploy universal release
       if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-      uses: WebFreak001/deploy-nightly@v2.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      uses: WebFreak001/deploy-nightly@v3.1.0
       with:
+        permission: write-all
+        token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
         asset_path: Makelangelo.zip # path to archive to upload
@@ -79,7 +80,7 @@ jobs:
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
     - name: Upload artifact for package
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.3
       with:
         name: jar
         retention-days: 1
@@ -105,7 +106,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - uses: actions/download-artifact@v3.0.2
+    - uses: actions/download-artifact@v4.1.7
       with:
         name: jar
         
@@ -129,10 +130,10 @@ jobs:
     - name: Deploy installation release
 #      if: github.repository == 'MarginallyClever/Makelangelo-software'
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-      uses: WebFreak001/deploy-nightly@v2.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      uses: WebFreak001/deploy-nightly@v3.1.0
       with:
+        permission: write-all
+        token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
         release_id: ${{ env.RELEASE_ID }}
         asset_path: ${{ env.BINARY }} # path to archive to upload
@@ -142,7 +143,7 @@ jobs:
 
     - name: Upload artifact for testing purpose
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' || github.ref != 'refs/heads/master'
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.3
       with:
         name: ${{ env.BINARY }}
         retention-days: 2

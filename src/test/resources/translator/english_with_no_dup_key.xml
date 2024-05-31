@@ -3,7 +3,9 @@
 <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
 	<meta>
 		<name>English_NO_DUP</name>
-		<author>TEST_SET_NO_DUP_KEY</author>
+		<authors>
+			<author>TEST_SET_NO_DUP_KEY</author>
+		</authors>
 	</meta>
 
 	<string>

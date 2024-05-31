@@ -208,7 +208,7 @@ public final class Translator {
 		stream.close();
 
 		if( !lang.getName().isEmpty() &&
-			!lang.getAuthor().isEmpty()) {
+			!lang.getAuthors().isEmpty()) {
 			// we loaded a language file that seems pretty legit.
 			languages.put(lang.getName(), lang);
 			return true;
