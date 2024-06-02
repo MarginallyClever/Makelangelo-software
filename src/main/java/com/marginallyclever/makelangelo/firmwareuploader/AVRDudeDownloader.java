@@ -32,7 +32,7 @@ public class AVRDudeDownloader {
     private static final String ARDUINO_PACKAGE_INDEX = "https://downloads.arduino.cc/packages/package_index.json";
 
     public static void main(String[] args) throws IOException {
-        downloadAVRDude(MACOS);
+        downloadAVRDude(getArch());
     }
 
 
@@ -143,19 +143,19 @@ public class AVRDudeDownloader {
         String app = "avrdude";
         if(OSHelper.isWindows()) app+=".exe";
 
-        Path avrdudePath = Paths.get(targetPath, app);
-        logger.info("makeExecutable 1: " + targetPath);
-        logger.info("makeExecutable 2: " + app);
-        logger.info("makeExecutable 3: " + avrdudePath.toAbsolutePath());
-
-        File avrdudeFile = avrdudePath.toFile();
-        if (!avrdudeFile.exists()) {
-            throw new IOException("File " + avrdudeFile.getAbsolutePath() + " does not exist");
+        File avrDudeFile = tryPath(Paths.get(targetPath, app));
+        if(!avrDudeFile.exists()) avrDudeFile = tryPath(Paths.get(targetPath, "bin", app));
+        if(!avrDudeFile.exists()) {
+            throw new IOException("File " + app + " does not exist");
         }
-
-        if(!avrdudeFile.setExecutable(true)) {
-            throw new IOException("Could not set executable permissions for " + avrdudeFile.getAbsolutePath());
+        if(!avrDudeFile.setExecutable(true)) {
+            throw new IOException("Could not set executable permissions for " + avrDudeFile.getAbsolutePath());
         }
+    }
+
+    private static File tryPath(Path avrdudePath) {
+        logger.info("trying path: " + avrdudePath.toAbsolutePath());
+        return avrdudePath.toFile();
     }
 
     private static File downloadFileToTemp(String urlStr) throws IOException {
