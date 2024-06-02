@@ -36,10 +36,21 @@ public class AVRDudeDownloader {
     }
 
 
+    /**
+     * Download AVRDude for the current OS architecture.
+     * @return the path to the extracted avrdude executable.
+     * @throws IOException if the download fails.
+     */
     public static String downloadAVRDude() throws IOException {
         return downloadAVRDude(getArch());
     }
 
+    /**
+     * Download AVRDude for the given OS architecture.
+     * @param arch one of WINDOWS, LINUX, MACOS
+     * @return the path to the extracted avrdude executable.
+     * @throws IOException if the download fails.
+     */
     public static String downloadAVRDude(String arch) throws IOException {
         String url = getURLforOS(arch);
         if (url != null) {
@@ -71,7 +82,6 @@ public class AVRDudeDownloader {
 
         if (arduinoPackage != null) {
             JSONObject avrdudeTool = getLastToolNamedAVRDude(arduinoPackage);
-
             if (avrdudeTool != null) {
                 JSONObject system = getSystemForHost(avrdudeTool, arch);
                 if (system != null) {
@@ -82,9 +92,14 @@ public class AVRDudeDownloader {
         return null;
     }
 
-    // search the systems list for the one where host contains "apple"
-    private static JSONObject getSystemForHost(JSONObject avrdudeTool, String arch) {
-        JSONArray systems = avrdudeTool.getJSONArray("systems");
+    /**
+     * Search the systems list for the one where host contains the given architecture.
+     * @param jsonObject the avrdude tool object
+     * @param arch the architecture to search for
+     * @return the system object that matches the given architecture
+     */
+    private static JSONObject getSystemForHost(JSONObject jsonObject, String arch) {
+        JSONArray systems = jsonObject.getJSONArray("systems");
         for (int i = 0; i < systems.length(); i++) {
             JSONObject systemObject = systems.getJSONObject(i);
             if (systemObject.getString("host").contains(arch)) {
@@ -94,7 +109,11 @@ public class AVRDudeDownloader {
         return null;
     }
 
-    // find the arduinoPackage element with name=avrdude.  last is latest release.
+    /**
+     * Search the arduinoPackage for element with name=avrdude.  the last item is the latest release.
+     * @param arduinoPackage the package to search
+     * @return the last item in the tools list with name=avrdude
+     */
     private static JSONObject getLastToolNamedAVRDude(JSONObject arduinoPackage) {
         JSONArray tools = arduinoPackage.getJSONArray("tools");
         JSONObject avrdudeTool = null;

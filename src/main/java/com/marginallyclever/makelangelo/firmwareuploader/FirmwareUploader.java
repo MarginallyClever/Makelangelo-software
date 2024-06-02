@@ -7,29 +7,58 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 /**
  * Common methods for uploading firmware to an AVR microcontroller.
  */
 public class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
+	private static final String CONF = "avrdude.conf";
+	protected String installPath = "";
 	protected String avrdudePath = "";
 	protected String hexPath = "";
 	protected String confPath = "";
+
 
 	protected FirmwareUploader() {
 		super();
 	}
 
+	/**
+	 * Search the tree starting at avrdudePath for the given filename.
+	 * @param target the name of the file to find.
+	 * @return the file if found, null otherwise.
+	 */
+	public File findFile(String target) {
+		logger.info("Searching for "+target+" starting in "+installPath);
+		Path startPath = Paths.get(installPath);
+		try {
+			Optional<Path> filePath = Files.walk(startPath)
+					.filter(path -> path.getFileName().toString().equals(target))
+					.findFirst();
+			return filePath.map(Path::toFile).orElse(null);
+		} catch (IOException e) {
+			logger.error("An error occurred while searching for the file: ", e);
+			return null;
+		}
+	}
+
+	public boolean findAVRDude() {
+		String path = "avrdude";
+		if( OSHelper.isWindows()) path+=".exe";
+		File f = findFile(path);
+		if(!f.exists()) return false;
+		avrdudePath = f.getAbsolutePath();
+		return true;
+	}
+
 	// find avrdude.conf
 	public boolean findConf() {
-		logger.info("Searching for conf starting in "+avrdudePath);
-		int i=0;
-		File f = attemptToFindConf(i++, ".."+File.separator+"etc"+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, "avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+"avrdude.conf");
-		if(!f.exists()) f = attemptToFindConf(i++, ".."+File.separator+".."+File.separator+"etc"+File.separator+"avrdude.conf");
+		File f = findFile(CONF);
 		if(!f.exists()) return false;
 		confPath = f.getAbsolutePath();
 		return true;
@@ -46,15 +75,13 @@ public class FirmwareUploader {
 	 * @return 0 if successful.
 	 * @throws Exception if the process fails.
 	 */
-	public int run(String portName) throws Exception {
-		logger.debug("update started");
+	public int performUpdate(String portName) throws Exception {
+		logger.debug("uploading firmware...");
 
 		// setup avrdude command
-		String path = avrdudePath + "avrdude";
-		if( OSHelper.isWindows()) path+=".exe";
 
 		String [] options = new String[] {
-				path,
+				avrdudePath,
 	    		"-C"+confPath,
 	    		"-v","-V",
 	    		"-patmega2560",
@@ -121,6 +148,12 @@ public class FirmwareUploader {
 	}
 
     public void setAVRDude(String avrDudePath) {
+		logger.debug("setting avrdude to {}",avrDudePath);
 		avrdudePath = avrDudePath;
     }
+
+	public void setInstallPath(String avrDudePath) {
+		logger.debug("setting install path to {}",avrDudePath);
+		installPath = avrDudePath;
+	}
 }

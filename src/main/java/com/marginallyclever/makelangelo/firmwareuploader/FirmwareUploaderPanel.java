@@ -25,13 +25,11 @@ public class FirmwareUploaderPanel extends JPanel {
 	private final FirmwareDownloader firmwareDownloader = new FirmwareDownloader();
 	private final FirmwareUploader firmwareUploader = new FirmwareUploader();
 	private final SelectOneOfMany port = new SelectOneOfMany("port",Translator.get("Port"));
-	private final SelectButton refreshButton = new SelectButton("refresh","⟳");
-	private final SelectButton startM5 = new SelectButton("startM5",Translator.get("FirmwareUploaderPanel.startM5"));
+    private final SelectButton startM5 = new SelectButton("startM5",Translator.get("FirmwareUploaderPanel.startM5"));
 	private final SelectButton startHuge = new SelectButton("startHuge",Translator.get("FirmwareUploaderPanel.startHuge"));
-	private final SelectReadOnlyText help = new SelectReadOnlyText("help",Translator.get("FirmwareUploader.help"));
 
 
-	public FirmwareUploaderPanel() {
+    public FirmwareUploaderPanel() {
 		super(new GridBagLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -39,7 +37,10 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		JPanel connectTo = new JPanel(new BorderLayout());
 		connectTo.add(port,BorderLayout.CENTER);
-		connectTo.add(refreshButton,BorderLayout.EAST);
+
+        SelectButton refreshButton = new SelectButton("refresh", "⟳");
+		refreshButton.addActionListener(e -> updateCOMPortList());
+        connectTo.add(refreshButton,BorderLayout.EAST);
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -48,7 +49,8 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.weightx=1;
 		c.weighty=0;
 
-		add(help,c);
+        SelectReadOnlyText help = new SelectReadOnlyText("help", Translator.get("FirmwareUploader.help"));
+        add(help,c);
 		c.gridy++;
 		c.gridwidth=2;
 		add(connectTo,c);
@@ -61,7 +63,6 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.gridx++;
 		add(startHuge,c);
 
-		refreshButton.addActionListener(e -> updateCOMPortList());
 		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
 		startHuge.addActionListener(e -> run(e,"firmware-huge.hex"));
 	}
@@ -78,13 +79,11 @@ public class FirmwareUploaderPanel extends JPanel {
 
 	private void run(ActionEvent evt, String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
-		String AVRDudePath="";
-
 
 		logger.debug("maybe downloading avrdude...");
 		try {
-			AVRDudePath = AVRDudeDownloader.downloadAVRDude();
-			firmwareUploader.setAVRDude(AVRDudePath);
+			String AVRDudePath = AVRDudeDownloader.downloadAVRDude();
+			firmwareUploader.setInstallPath(AVRDudePath);
 		} catch(Exception e) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotDownloaded"),title,JOptionPane.ERROR_MESSAGE);
 			return;
@@ -93,6 +92,12 @@ public class FirmwareUploaderPanel extends JPanel {
 		logger.debug("maybe downloading firmware...");
 		if(!firmwareDownloader.getFirmware(name)) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.downloadFailed"),title,JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		logger.debug("finding avrdude file...");
+		if(!firmwareUploader.findAVRDude()) {
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotFound"),title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -116,8 +121,7 @@ public class FirmwareUploaderPanel extends JPanel {
 		int messageType = JOptionPane.PLAIN_MESSAGE;
 		int result = 1;
 		try {
-			logger.debug("uploading firmware...");
-			result = firmwareUploader.run(port.getSelectedItem());
+			result = firmwareUploader.performUpdate(port.getSelectedItem());
 		} catch (Exception e1) {
 			logger.error("failed to run avrdude: ",e1);
 			status = e1.getMessage();
