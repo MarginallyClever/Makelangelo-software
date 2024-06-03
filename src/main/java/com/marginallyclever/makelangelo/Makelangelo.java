@@ -391,7 +391,7 @@ public final class Makelangelo {
 	
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		new DropTarget(mainFrame, new MakelangeloDropTarget(this));
+		new DropTarget(mainFrame, new MainFrameDropTarget(this));
 	}
 
 	private boolean confirmClose() {

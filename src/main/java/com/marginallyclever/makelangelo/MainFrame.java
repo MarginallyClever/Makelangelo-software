@@ -69,11 +69,4 @@ public class MainFrame extends JFrame {
             prefs.putInt(KEY_WINDOW_Y, p.y);
         }
     }
-
-    public static void main(String[] args) {
-        MainFrame frame = new MainFrame("Test",Preferences.userRoot().node("com/marginallyclever/makelangelo"));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setWindowSizeAndPosition();
-        frame.setVisible(true);
-    }
 }

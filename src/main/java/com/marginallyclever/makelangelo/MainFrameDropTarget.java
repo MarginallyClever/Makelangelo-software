@@ -11,11 +11,11 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
 
-public class MakelangeloDropTarget extends DropTargetAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(MakelangeloDropTarget.class);
+public class MainFrameDropTarget extends DropTargetAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(MainFrameDropTarget.class);
     private final Makelangelo app;
 
-    public MakelangeloDropTarget(Makelangelo app) {
+    public MainFrameDropTarget(Makelangelo app) {
         super();
         this.app = app;
     }
