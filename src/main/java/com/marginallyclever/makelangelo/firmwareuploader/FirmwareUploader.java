@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.firmwareuploader;
 
 import com.marginallyclever.convenience.helpers.OSHelper;
+import com.marginallyclever.makelangelo.Translator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ import java.util.Optional;
  */
 public class FirmwareUploader {
 	private static final Logger logger = LoggerFactory.getLogger(FirmwareUploader.class);
-	private static final String CONF = "avrdude.conf";
+	private final FirmwareDownloader firmwareDownloader = new FirmwareDownloader();
 	protected String installPath = "";
 	protected String avrdudePath = "";
 	protected String hexPath = "";
@@ -58,7 +59,7 @@ public class FirmwareUploader {
 
 	// find avrdude.conf
 	public boolean findConf() {
-		File f = findFile(CONF);
+		File f = findFile("avrdude.conf");
 		if(!f.exists()) return false;
 		confPath = f.getAbsolutePath();
 		return true;
@@ -72,14 +73,41 @@ public class FirmwareUploader {
 
 	/**
 	 * @param portName
-	 * @return 0 if successful.
 	 * @throws Exception if the process fails.
 	 */
-	public int performUpdate(String portName) throws Exception {
+	public void performUpdate(String firmwareName,String portName) throws Exception {
+		logger.debug("setup...");
+		if(portName==null || portName.isEmpty()) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.noPortSelected"));
+		}
+
+		logger.debug("maybe downloading avrdude...");
+		try {
+			String AVRDudePath = AVRDudeDownloader.downloadAVRDude();
+			setInstallPath(AVRDudePath);
+		} catch(Exception e) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.avrdudeNotDownloaded"));
+		}
+
+		logger.debug("maybe downloading firmware...");
+		if(!firmwareDownloader.getFirmware(firmwareName)) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.downloadFailed"));
+		}
+
+		logger.debug("finding avrdude file...");
+		if(!findAVRDude()) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.notFound",new String[]{"avrdude"}));
+		}
+
+		logger.debug("finding conf file...");
+		if(!findConf()) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.notFound",new String []{"avrdude.conf"}));
+		}
+		setHexPath(firmwareDownloader.getDownloadPath(firmwareName));
+
 		logger.debug("uploading firmware...");
 
 		// setup avrdude command
-
 		String [] options = new String[] {
 				avrdudePath,
 	    		"-C"+confPath,
@@ -91,9 +119,13 @@ public class FirmwareUploader {
 	    		"-D",
 				"-Uflash:w:"+hexPath+":i"
 		    };
+		// run avrdude
 	    int result = runCommand(options);
+		if(result!=0) {
+			throw new Exception(Translator.get("FirmwareUploaderPanel.failed"));
+		}
+		// cleanup
 		logger.debug("update finished");
-		return result;
 	}
 
 	/**
@@ -104,11 +136,6 @@ public class FirmwareUploader {
 	protected int runCommand(String[] options) throws Exception {
 		System.out.println("running command: "+String.join(" ",options));
 		logger.debug("running command: {}",String.join(" ",options));
-/*
-		List<String> command = new ArrayList<>();
-		for (String option : options) {
-			command.add("\"" + option.replace("\\", "\\\\") + "\"");
-		}*/
 
 		ProcessBuilder builder = new ProcessBuilder(options);
 		builder.redirectErrorStream(true);

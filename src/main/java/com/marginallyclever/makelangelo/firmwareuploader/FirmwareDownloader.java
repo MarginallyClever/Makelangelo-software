@@ -25,7 +25,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 
 /**
- * Common methods for downloading firmware from Github
+ * Common methods for downloading Makelangelo robot firmware from Github
  * @since 7.39.3
  * @author Dan Royer
  */
