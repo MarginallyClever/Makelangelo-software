@@ -331,7 +331,7 @@
     <string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
     <string><key>FirmwareUploaderPanel.startHuge</key><value>ضخم</value></string>
     <string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude لم يتم تنزيل</value></string>
-    <string><key>FirmwareUploaderPanel.confNotFound</key><value>AVRDude.conf لا يمكن إيجاد</value></string>
+    <string><key>FirmwareUploaderPanel.notFound</key><value>لا يمكن إيجاد %1</value></string>
     <string><key>FirmwareUploaderPanel.failed</key><value>فشل تحميل البرنامج</value></string>
     <string><key>FirmwareUploaderPanel.noPortSelected</key><value>لم يتم إختيار منفذ</value></string>
     <string><key>FirmwareUploaderPanel.downloadFailed</key><value>فشل التنزيل</value></string>

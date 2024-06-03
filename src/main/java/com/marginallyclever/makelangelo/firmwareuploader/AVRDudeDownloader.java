@@ -35,7 +35,6 @@ public class AVRDudeDownloader {
         downloadAVRDude(getArch());
     }
 
-
     /**
      * Download AVRDude for the current OS architecture.
      * @return the path to the extracted avrdude executable.

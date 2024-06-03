@@ -2394,9 +2394,9 @@
         <hint>[AVRDude not downloaded.]</hint>
     </string>
     <string>
-        <key>FirmwareUploaderPanel.confNotFound</key>
-        <value>AVRDude.conf nicht gefunden.</value>
-        <hint>[AVRDude.conf not found.]</hint>
+        <key>FirmwareUploaderPanel.notFound</key>
+        <value>%1 nicht gefunden.</value>
+        <hint>[file not found.]</hint>
     </string>
     <string>
         <key>FirmwareUploaderPanel.failed</key>

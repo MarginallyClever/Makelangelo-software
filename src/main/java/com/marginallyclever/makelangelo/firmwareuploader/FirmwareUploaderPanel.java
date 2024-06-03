@@ -97,13 +97,13 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		logger.debug("finding avrdude file...");
 		if(!firmwareUploader.findAVRDude()) {
-			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotFound"),title,JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.notFound",new String[]{"avrdude"}),title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
 		logger.debug("finding conf file...");
 		if(!firmwareUploader.findConf()) {
-			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.confNotFound"),title,JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.notFound",new String []{"avrdude.conf"}),title,JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 

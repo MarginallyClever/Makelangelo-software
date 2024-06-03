@@ -382,7 +382,7 @@
 	<string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
 	<string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>
 	<string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude not downloaded.</value></string>
-	<string><key>FirmwareUploaderPanel.confNotFound</key><value>AVRDude.conf not found.</value></string>
+	<string><key>FirmwareUploaderPanel.notFound</key><value>%1 not found.</value></string>
 	<string><key>FirmwareUploaderPanel.failed</key><value>Firmware upload failed.</value></string>
 	<string><key>FirmwareUploaderPanel.noPortSelected</key><value>No port selected.</value></string>
 	<string><key>FirmwareUploaderPanel.downloadFailed</key><value>Download failed</value></string>
