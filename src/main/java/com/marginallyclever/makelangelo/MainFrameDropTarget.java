@@ -30,15 +30,12 @@ public class MainFrameDropTarget extends DropTargetAdapter {
                 if (flavor.isFlavorJavaFileListType()) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
                     Object o = tr.getTransferData(flavor);
-                    if (o instanceof List<?>) {
-                        List<?> list = (List<?>) o;
-                        if (list.size() > 0) {
-                            o = list.get(0);
-                            if (o instanceof File) {
-                                app.openFile(((File) o).getAbsolutePath());
-                                dtde.dropComplete(true);
-                                return;
-                            }
+                    if (o instanceof List<?> list && !list.isEmpty()) {
+                        o = list.get(0);
+                        if (o instanceof File file) {
+                            app.openFile(file.getAbsolutePath());
+                            dtde.dropComplete(true);
+                            return;
                         }
                     }
                 }
