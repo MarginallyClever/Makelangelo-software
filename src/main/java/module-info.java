@@ -24,6 +24,7 @@ module com.marginallyclever.makelangelo {
     requires com.formdev.flatlaf;
     requires com.github.weisj.jsvg;
     requires org.reflections;
+    requires org.apache.commons.lang3;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.convenience.voronoi;

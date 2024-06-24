@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.turtle.turtlerenderer;
+package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import java.util.Arrays;
 

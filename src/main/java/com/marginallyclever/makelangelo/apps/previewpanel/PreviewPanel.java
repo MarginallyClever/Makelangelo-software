@@ -10,16 +10,17 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer.PlotterRenderer;
 import com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer.PlotterRendererFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.TurtleRenderFacade;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.TurtleRenderFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.rangeslider.DoubleRangeSlider;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,12 +93,12 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		addListener(myPaper);
 		addListener(myPlotter);
-		addListener(myTurtleRenderer);
 		addListener((gl2)->{
 			if(myPlotterRenderer!=null) {
 				myPlotterRenderer.render(gl2, myPlotter);
 			}
 		});
+		addListener(myTurtleRenderer);
 
 		try {
 			logger.debug("  get GL capabilities...");
@@ -337,7 +338,9 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		paintBackground(gl2);
 		paintCamera(gl2);
 
-		for( PreviewListener p : previewListeners.getListeners(PreviewListener.class) ) {
+		var list = previewListeners.getListeners(PreviewListener.class);
+		ArrayUtils.reverse(list);
+		for( PreviewListener p : list ) {
 			gl2.glPushMatrix();
 			p.render(gl2);
 			gl2.glPopMatrix();

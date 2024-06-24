@@ -17,9 +17,9 @@ import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.MarlinSimulationVisualizer;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.TurtleRenderFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -86,7 +86,6 @@ public final class Makelangelo {
 
 		javax.swing.SwingUtilities.invokeLater( () -> (new Makelangelo()).run() );
 	}
-
 
 	public Makelangelo() {
 		super();

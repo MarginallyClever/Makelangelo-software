@@ -140,8 +140,8 @@ public abstract class ImageConverter {
 	}
 	
 	/**
-	 * Drag the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.  If the intensity of img
-	 * at a sample location is greater than the channelCutff, raise the pen.  Print the gcode results to out.
+	 * <a href="https://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering">Floyd-Steinberg Dithering</a>.
+	 * Move the pen across the paper from p0 to p1, sampling (p1-p0)/stepSize times.
 	 * This method is used by several converters.
 	 * 
 	 * @param x0 starting position on the paper.
@@ -174,15 +174,15 @@ public abstract class ImageConverter {
 			y = dy * n + y0;
 			isInside = rect.contains(x,y);
 			if(isInside) {
-				oldPixel = img.sample( x, y, halfStep);
+				oldPixel = img.sample( x, y, halfStep );
 				int b2 = (int)Math.min(b, error0.length-2);
 				oldPixel += error0[b2];
 				newPixel = oldPixel>=channelCutoff? 255:0;
-				double quantError = oldPixel - newPixel;
-				if(b2+1< steps) error0[b2+1] += quantError * 7.0/16.0;
-				if(b2-1>=0    ) error1[b2-1] += quantError * 3.0/16.0;
-				                error1[b2  ] += quantError * 5.0/16.0;
-				if(b2+1< steps) error1[b2+1] += quantError * 1.0/16.0;
+				double quantError = (oldPixel - newPixel)/16.0;
+				if(b2+1< steps) error0[b2+1] += quantError * 7.0;
+				if(b2-1>=0    ) error1[b2-1] += quantError * 3.0;
+				                error1[b2  ] += quantError * 5.0;
+				if(b2+1< steps) error1[b2+1] += quantError;
 				
 				penUp = (newPixel==255);
 			} else {
