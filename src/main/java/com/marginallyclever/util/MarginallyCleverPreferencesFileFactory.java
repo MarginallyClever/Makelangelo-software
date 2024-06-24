@@ -79,7 +79,7 @@ public final class MarginallyCleverPreferencesFileFactory<A extends AbstractPref
 	private static File getPreferenceFile(File preferencesFile, String systemPropertyKey, String defaultFilePath) {
 		if (preferencesFile == null) {
 			String preferenceFilePath = System.getProperty(systemPropertyKey);
-			if (preferenceFilePath == null || preferenceFilePath.length() == 0) {
+			if (preferenceFilePath == null || preferenceFilePath.isEmpty()) {
 				preferenceFilePath = defaultFilePath;
 				System.setProperty(systemPropertyKey, preferenceFilePath);
 			}

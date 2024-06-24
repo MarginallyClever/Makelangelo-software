@@ -8,7 +8,7 @@ public class PaperSize {
 	public int width;
 	public int height;
 	
-	PaperSize(String name,int width,int height) {
+	public PaperSize(String name, int width, int height) {
 		this.name = name;
 		this.width = width;
 		this.height = height;

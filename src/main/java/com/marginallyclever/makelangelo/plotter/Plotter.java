@@ -4,8 +4,8 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.security.InvalidParameterException;

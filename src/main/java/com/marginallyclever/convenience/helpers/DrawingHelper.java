@@ -1,14 +1,9 @@
 package com.marginallyclever.convenience.helpers;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-import com.marginallyclever.convenience.FileAccess;
+import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
 
 public class DrawingHelper {
     private static final Logger logger = LoggerFactory.getLogger(DrawingHelper.class);
@@ -74,21 +69,6 @@ public class DrawingHelper {
     }
 
     /**
-     * Load the given file from the classpath. Make sure the size of the picture is a power of 2
-     * @param name filename
-     * @return a texture
-     */
-    public static Texture loadTexture(String name) {
-        Texture tex = null;
-        try (BufferedInputStream bis = FileAccess.open(name)) {
-            tex = TextureIO.newTexture(bis, false, name.substring(name.lastIndexOf('.') + 1));
-        } catch (IOException e) {
-            logger.warn("Can't load {}", name, e);
-        }
-        return tex;
-    }
-
-    /**
      * Paint a quad with the given texture
      * @param gl2 the render context
      * @param x x center coordinate
@@ -96,8 +76,8 @@ public class DrawingHelper {
      * @param width with of the texture
      * @param height height of the texture
      */
-    public static void paintTexture(GL2 gl2, Texture texture, double x, double y, double width, double height) {
-        texture.bind(gl2);
+    public static void paintTexture(GL2 gl2, TextureWithMetadata texture, double x, double y, double width, double height) {
+        texture.use(gl2);
         gl2.glColor4d(1, 1, 1, 1);
         gl2.glEnable(GL2.GL_TEXTURE_2D);
         gl2.glBegin(GL2.GL_QUADS);

@@ -96,6 +96,7 @@
 	<string><key>MenuView.zoomIn</key><value>Zoom +</value></string>
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
+	<string><key>MenuWindows</key><value>Windows</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
 	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
@@ -227,7 +228,6 @@
 	<string><key>GraphPaperName</key><value>Graph Paper</value></string>
 	<string><key>Package</key><value>Papercraft Box</value></string>
 	<string><key>Polyeder</key><value>Papercraft Polyhedron</value></string>
-	<string><key>FirmwareUpdate</key><value>Update firmware</value></string>
 	<string><key>Port</key><value>Port</value></string>
 	<string><key>OpenPaperSettings</key><value>Paper settings</value></string>
 	<string><key>OpenPlotterSettings</key><value>Plotter settings</value></string>
@@ -378,6 +378,7 @@
 
 	<string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
 
+	<string><key>FirmwareUpdate</key><value>Update firmware</value></string>
 	<string><key>FirmwareUploaderPanel.status</key><value>Firmware upload status</value></string>
 	<string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
 	<string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>

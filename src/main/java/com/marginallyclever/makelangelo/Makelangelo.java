@@ -1,30 +1,27 @@
 package com.marginallyclever.makelangelo;
 
-import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.makelangelo.applicationsettings.LanguagePreferences;
+import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
+import com.marginallyclever.makelangelo.apps.AboutPanel;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
-import com.marginallyclever.makelangelo.applicationsettings.LanguagePreferences;
-import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
-import com.marginallyclever.makelangelo.preview.Camera;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import com.marginallyclever.util.PreferencesHelper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.Locale;
 import java.util.Objects;
@@ -50,7 +48,7 @@ import java.util.prefs.Preferences;
  * href="https://github.com/MarginallyClever/Makelangelo-firmware/wiki/gcode-description">the wiki</a>.</p>
  * <p>In order to do this the app also provides convenient methods to load vectors (like DXF or SVG), create vectors
  * ({@link com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator}s), or
- * interpret bitmaps (like BMP,JPEG,PNG,GIF,TGA,PIO) into vectors
+ * interpret bitmaps (like BMP,JPEG,PNG,etc) into vectors
  * ({@link com.marginallyclever.makelangelo.makeart.imageconverter.ImageConverter}s).</p>
  * <p>The app must also know some details about the machine, the surface onto which drawings will be made, and the
  * drawing tool making the mark on the paper.  This knowledge helps the app to create better gcode.</p>
@@ -59,55 +57,51 @@ import java.util.prefs.Preferences;
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
-	private static final String PREFERENCE_SAVE_PATH = "savePath";
 	private static Logger logger;
-	private final Camera camera;
+
+	private static final String PREFERENCE_SAVE_PATH = "savePath";
 	private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
 	private final Plotter myPlotter = new Plotter();
 	private final Paper myPaper = new Paper();
 	private Turtle myTurtle = new Turtle();
-	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
-	private PlotterRenderer myPlotterRenderer;
 	
 	// GUI elements
-	private MainFrame mainFrame;
-	private final MainMenu mainMenuBar = new MainMenu(this);
-	private PreviewPanel previewPanel;
-	private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
+	private final MainFrame mainFrame;
+	private final MainMenu mainMenuBar;
+	private final PreviewPanel previewPanel;
+
+
+	public static void main(String[] args) {
+		Log.start();
+		logger = LoggerFactory.getLogger(Makelangelo.class);
+		logger.info("Locale={}", Locale.getDefault().toString());
+		logger.info("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
+		PreferencesHelper.start();
+		CommandLineOptions.setFromMain(args);
+		Translator.start();
+
+		if(Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
+			LanguagePreferences.chooseLanguage();
+		}
+
+		javax.swing.SwingUtilities.invokeLater( () -> (new Makelangelo()).run() );
+	}
 
 
 	public Makelangelo() {
 		super();
 
-		logger.info("Locale={}", Locale.getDefault().toString());
-		logger.info("Headless={}", (GraphicsEnvironment.isHeadless()?"Y":"N"));
+		setLookAndFeel();
+		mainFrame = new MainFrame();
+		mainFrame.setLocationByPlatform(true);
+		previewPanel = mainFrame.getPreviewPanel();
+
+		mainMenuBar = new MainMenu(this);
 
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
 		myPaper.loadConfig();
 
-		if(previewPanel != null) {
-			previewPanel.addListener(myPlotter);
-			addPlotterRendererToPreviewPanel();
-		}
-
-		rangeSlider.addChangeListener(e->{
-			myTurtleRenderer.setFirst(rangeSlider.getBottom());
-			myTurtleRenderer.setLast(rangeSlider.getTop());
-		});
-
 		onPlotterSettingsUpdate(myPlotter.getSettings());
-		
-		logger.debug("Starting virtual camera...");
-		camera = new Camera();
-	}
-
-	private void updatePlotterRenderer() {
-		try {
-			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
-		} catch (Exception e) {
-			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
-			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
-		}
 	}
 
 	public void onPlotterSettingsUpdate(PlotterSettings settings) {
@@ -118,21 +112,12 @@ public final class Makelangelo {
 			msv.setSettings(settings);
 			msv.reset();
 		}
-		myTurtleRenderer.setUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
-		myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
+
+		previewPanel.updatePlotterRenderer();
+		previewPanel.getTurtleRenderer().setPenUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
+		previewPanel.getTurtleRenderer().setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
-
-		updatePlotterRenderer();
-
-		if(previewPanel != null) previewPanel.repaint();
-	}
-
-	private void addPlotterRendererToPreviewPanel() {
-		previewPanel.addListener((gl2)->{
-			if(myPlotterRenderer!=null) {
-				myPlotterRenderer.render(gl2, myPlotter);
-			}
-		});
+		previewPanel.repaint();
 	}
 
 	public void run() {
@@ -143,13 +128,16 @@ public final class Makelangelo {
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
 	}
 
-	private static void setSystemLookAndFeel() {
+	private void setLookAndFeel() {
 		if(!CommandLineOptions.hasOption("-nolf")) {
 			try {
-				FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
+				logger.info("Setting look and feel...");
+				FlatLightLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
 				UIManager.setLookAndFeel( new FlatLightLaf() );
+				// option 2: UIManager.setLookAndFeel(new FlatDarkLaf());
+				// option 3: UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch( Exception e ) {
-				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);
+				logger.warn("failed to set flat look and feel. falling back to default native look and feel", e);
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				} catch (Exception ex) {
@@ -261,11 +249,6 @@ public final class Makelangelo {
 		}
 	}
 
-	public void onDialogAbout() {
-		DialogAbout a = new DialogAbout();
-		a.display(mainFrame,MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
-	}
-
 	/**
 	 * Parse <a href="https://github.com/MarginallyClever/Makelangelo/releases/latest">https://github.com/MarginallyClever/Makelangelo/releases/latest</a>
 	 * redirect notice to find the latest release tag.
@@ -273,22 +256,10 @@ public final class Makelangelo {
 	public void checkForUpdate(boolean announceIfFailure) {
 		logger.debug("checking for updates...");
 		try {
-			URI link = new URI("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
-			HttpURLConnection conn = (HttpURLConnection)link.toURL().openConnection();
-			conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
-			conn.setConnectTimeout(5000);
-			conn.connect();
-			int responseCode = conn.getResponseCode();
-			String responseMessage = conn.getHeaderField("Location");
-			conn.disconnect();
+			String latestVersion = getLatestReleaseVersionFromGithub();
+			logger.debug("latest release: {}; this version: {}@{}", latestVersion, MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
 
-			// parse the last part of the redirect URL, which contains the
-			// release tag (which is the VERSION)
-			String line2 = responseMessage.substring(responseMessage.lastIndexOf("/") + 1);
-
-			logger.debug("latest release: {}; this version: {}@{}", line2, MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
-
-			int comp = line2.compareTo(MakelangeloVersion.VERSION);
+			int comp = latestVersion.compareTo(MakelangeloVersion.VERSION);
 			String results;
 			if (comp > 0) results = Translator.get("UpdateNotice");
 			else if (comp < 0) results = "This version is from the future?!";
@@ -301,6 +272,23 @@ public final class Makelangelo {
 			}
 			logger.error("Update check failed", e);
 		}
+	}
+
+	private static @NotNull String getLatestReleaseVersionFromGithub() throws URISyntaxException, IOException {
+		URI link = new URI("https://github.com/MarginallyClever/Makelangelo-Software/releases/latest");
+		HttpURLConnection conn = (HttpURLConnection)link.toURL().openConnection();
+		conn.setInstanceFollowRedirects(false); // you still need to handle redirect manually.
+		conn.setConnectTimeout(5000);
+		conn.connect();
+		int responseCode = conn.getResponseCode();
+		if (responseCode != HttpURLConnection.HTTP_MOVED_TEMP && responseCode != HttpURLConnection.HTTP_MOVED_PERM) {
+			throw new IOException("Unexpected response code: " + responseCode);
+		}
+		String responseMessage = conn.getHeaderField("Location");
+		conn.disconnect();
+
+		// parse the last part of the redirect URL, which contains the release tag (which is the VERSION)
+		return responseMessage.substring(responseMessage.lastIndexOf("/") + 1);
 	}
 
 	/**
@@ -317,32 +305,10 @@ public final class Makelangelo {
 	 * }
 	 */
 
-	private Container createContentPane() {
-		logger.debug("create content pane...");
-
-		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.setOpaque(true);
-
-		logger.debug("  create PreviewPanel...");
-		previewPanel = new PreviewPanel();
-		previewPanel.setCamera(camera);
-		previewPanel.addListener(myPaper);
-		previewPanel.addListener(myPlotter);
-		previewPanel.addListener(myTurtleRenderer);
-		addPlotterRendererToPreviewPanel();
-
-		contentPane.add(previewPanel, BorderLayout.CENTER);
-		contentPane.add(rangeSlider, BorderLayout.SOUTH);
-
-		return contentPane;
-	}
-
 	//  For thread safety this method should be invoked from the event-dispatching thread.
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		mainFrame = new MainFrame("",preferences);
 		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setupDropTarget();
@@ -357,18 +323,15 @@ public final class Makelangelo {
 		});
 
 		try {
-			mainFrame.setIconImage(ImageIO.read(Objects.requireNonNull(Makelangelo.class.getResource("/logo-icon.png"))));
+			mainFrame.setIconImage(ImageIO.read(Objects.requireNonNull(getClass().getResource("/logo-icon.png"))));
 		} catch (IOException e) {
 			logger.warn("Can't load icon", e);
 		}
 
 		mainFrame.setJMenuBar(mainMenuBar);
-		mainFrame.setContentPane(createContentPane());
+
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
-		mainFrame.setWindowSizeAndPosition();
-
-		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 
 		loadPaths();
 
@@ -384,7 +347,17 @@ public final class Makelangelo {
 				});
 			}
 			if (desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-				desktop.setAboutHandler((e) -> onDialogAbout());
+				desktop.setAboutHandler((e) -> {
+					var panels = mainFrame.getDockingPanels();
+					// find the DockingPanel that contains the about panel.  do not rely on the tab text
+					for (var panel : panels) {
+						if (panel.getComponent(0) instanceof AboutPanel) {
+							// display the DockingPanel
+							panel.setVisible(true);
+							return;
+						}
+					}
+				});
 			}
 		}
 	}
@@ -442,33 +415,11 @@ public final class Makelangelo {
 
 	public void setTurtle(Turtle turtle) {
 		myTurtle = turtle;
-		myTurtleRenderer.setTurtle(turtle);
-		int top = turtle.history.size();
-		rangeSlider.setLimits(0,top);
+		previewPanel.setTurtle(turtle);
 	}
 
 	public Turtle getTurtle() {
 		return myTurtle;
-	}
-
-	public static void main(String[] args) {
-		Log.start();
-		logger = LoggerFactory.getLogger(Makelangelo.class);
-
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		if(Translator.isThisTheFirstTimeLoadingLanguageFiles()) {
-			LanguagePreferences.chooseLanguage();
-		}
-		
-		setSystemLookAndFeel();
-
-		javax.swing.SwingUtilities.invokeLater(()->{
-			Makelangelo makelangeloProgram = new Makelangelo();
-			makelangeloProgram.run();
-		});
 	}
 
 	public void saveGCode() {
@@ -476,8 +427,8 @@ public final class Makelangelo {
 
 		SaveGCode save = new SaveGCode();
 		try {
-			int head = rangeSlider.getValue();
-			int tail = rangeSlider.getUpperValue();
+			int head = previewPanel.getRangeBottom();
+			int tail = previewPanel.getRangeTop();
 			save.run(getTurtle(), getPlotter(), mainFrame, head, tail);
 		} catch(Exception e) {
 			logger.error("Error while exporting the gcode", e);
@@ -493,19 +444,11 @@ public final class Makelangelo {
 		return myPlotter;
 	}
 
-	public TurtleRenderer getTurtleRenderer() {
-		return myTurtleRenderer.getRenderer();
-	}
-
-	public Camera getCamera() {
-		return camera;
-	}
-
-	public void setTurtleRenderer(TurtleRenderer renderer) {
-		myTurtleRenderer.setRenderer(renderer);
-	}
-
 	public PlotterSettingsManager getPlotterSettingsManager() {
 		return plotterSettingsManager;
+	}
+
+	public MainFrame getFrame() {
+		return mainFrame;
 	}
 }

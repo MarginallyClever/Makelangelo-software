@@ -2,9 +2,10 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public abstract class ImageConverterIterative extends ImageConverter implements 
     public abstract void resume();
 
     /**
-     * Callback from {@link com.marginallyclever.makelangelo.preview.PreviewPanel} that it is time to render to the WYSIWYG display.
+     * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
      * @param gl2 the render context
      */
     @Override

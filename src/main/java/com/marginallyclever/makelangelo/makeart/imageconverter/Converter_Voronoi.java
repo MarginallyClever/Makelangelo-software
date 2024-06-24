@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -293,7 +294,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     abstract void writeOutCells();
 
     /**
-     * Callback from {@link com.marginallyclever.makelangelo.preview.PreviewPanel} that it is time to render to the WYSIWYG display.
+     * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
      *
      * @param gl2 the render context
      */

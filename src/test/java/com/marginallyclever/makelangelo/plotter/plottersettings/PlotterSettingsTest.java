@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

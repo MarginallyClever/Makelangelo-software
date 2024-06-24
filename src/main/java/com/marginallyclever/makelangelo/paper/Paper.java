@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;

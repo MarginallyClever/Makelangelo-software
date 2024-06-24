@@ -1,26 +1,20 @@
 package com.marginallyclever.makelangelo;
 
+import ModernDocking.app.DockableMenuItem;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
-import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
+import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.apps.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.tools.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
-import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
-import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
-import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
-import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +23,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * The main menu for the Makelangelo application.
+ */
 public class MainMenu extends JMenuBar {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
-    private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
-    private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
+    private int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
+    private int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
     private final Makelangelo app;
     private final SaveDialog saveDialog = new SaveDialog();
     private RecentFiles recentFiles;
@@ -48,14 +44,12 @@ public class MainMenu extends JMenuBar {
         this.app = app;
         setSystemLookAndFeelForMacos();
         add(createFileMenu());
-        add(createSettingsMenu());
         add(createGenerateMenu());
         add(createToolsMenu());
-        add(createViewMenu());
         add(createRobotMenu());
+        add(createWindowMenu());
         add(createHelpMenu());
         updateUI();
-
     }
 
     private void setSystemLookAndFeelForMacos() {
@@ -111,11 +105,6 @@ public class MainMenu extends JMenuBar {
         buttonAdjustPreferences.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-settings-16.png"))));
         menu.add(buttonAdjustPreferences);
 
-        JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
-        buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
-        buttonFirmwareUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-install-16.png"))));
-        menu.add(buttonFirmwareUpdate);
-
         if (!isMacOS) {
             menu.addSeparator();
 
@@ -145,56 +134,14 @@ public class MainMenu extends JMenuBar {
         openFileChooser.chooseFile();
     }
 
-    private JMenu createViewMenu() {
-        JMenu menu = new JMenu(Translator.get("MenuView"));
-        menu.setMnemonic('V');
-
-        JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
-        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-        buttonZoomOut.addActionListener((e) -> app.getCamera().zoom(1));
-        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
-        menu.add(buttonZoomOut);
-
-        JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
-        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-        buttonZoomIn.addActionListener((e) -> app.getCamera().zoom(-1));
-        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
-        menu.add(buttonZoomIn);
-
-        JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
-        buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
-        buttonZoomToFit.addActionListener((e) -> app.getCamera().zoomToFit(app.getPaper().getPaperWidth(),app.getPaper().getPaperHeight()));
-        menu.add(buttonZoomToFit);
-
-        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
-        checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
-        checkboxShowPenUpMoves.addActionListener((e) -> {
-            boolean b = GFXPreferences.getShowPenUp();
-            GFXPreferences.setShowPenUp(!b);
-        });
-        GFXPreferences.addListener((e)->{
-            checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
-        });
-        checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
-        menu.add(checkboxShowPenUpMoves);
-
-        menu.add(createRenderStyleMenu());
-
-        return menu;
-    }
-
     private JMenu createHelpMenu() {
         JMenu menu = new JMenu(Translator.get("Help"));
         menu.setMnemonic('H');
 
-        JMenuItem buttonViewLog = new JMenuItem(Translator.get("ShowLog"));
-        buttonViewLog.addActionListener((e) -> runLogPanel());
-        buttonViewLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
-        menu.add(buttonViewLog);
-
         JMenuItem buttonLogFolder = new JMenuItem(Translator.get("OpenLogFolder"));
         buttonLogFolder.addActionListener((e) -> openLogDirectory());
         buttonLogFolder.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-folder-16.png"))));
+        buttonLogFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, SHORTCUT_CTRL));//"ctrl L"
         menu.add(buttonLogFolder);
 
         JMenuItem buttonReportBug = createMenuItemBrowse(Translator.get("ReportBug"),"https://github.com/MarginallyClever/Makelangelo-Software/issues");
@@ -218,12 +165,6 @@ public class MainMenu extends JMenuBar {
         menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();
-
-        if (!isMacOS) {
-            JMenuItem buttonAbout = new JMenuItem(Translator.get("MenuAbout"));
-            buttonAbout.addActionListener((e) -> app.onDialogAbout());
-            menu.add(buttonAbout);
-        }
 
         return menu;
     }
@@ -258,10 +199,6 @@ public class MainMenu extends JMenuBar {
         return jmi;
     }
 
-    private void runLogPanel() {
-        LogPanel.runAsDialog(SwingUtilities.getWindowAncestor(this));
-    }
-
     private void saveFile() {
         logger.debug("Saving vector file...");
         try {
@@ -270,23 +207,6 @@ public class MainMenu extends JMenuBar {
             logger.error("Error while saving the vector file", e);
             JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void runFirmwareUpdate() {
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),"Firmware Update");
-        dialog.add(new FirmwareUploaderPanel());
-        dialog.pack();
-        dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-
-        app.enableMenuBar(false);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                app.enableMenuBar(true);
-            }
-        });
-
-        dialog.setVisible(true);
     }
 
     private JMenu createGenerateMenu() {
@@ -456,29 +376,33 @@ public class MainMenu extends JMenuBar {
         return menu;
     }
 
-    private JMenuItem createRenderStyleMenu() {
-        JMenu menu = new JMenu(Translator.get("RobotMenu.RenderStyle"));
+    private JMenuItem createWindowMenu() {
+        JMenu menuWindows = new JMenu(Translator.get("MenuWindows"));
 
-        ButtonGroup group = new ButtonGroup();
+        int index=0;
+        for(DockingPanel w : app.getFrame().getDockingPanels()) {
+            DockableMenuItem item = new DockableMenuItem(w.getPersistentID(),w.getTabText());
+            menuWindows.add(item);
+            item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1 + index, InputEvent.SHIFT_DOWN_MASK));
+            index++;
+        }
 
-        Arrays.stream(TurtleRenderFactory.values())
-                .forEach(iter -> {
-                    TurtleRenderer renderer = iter.getTurtleRenderer();
-                    String name = iter.getName();
-                    JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
-                    if (app.getTurtleRenderer() == renderer) button.setSelected(true);
-                    button.addActionListener((e)-> onTurtleRenderChange(name));
-                    menu.add(button);
-                    group.add(button);
-                });
+        menuWindows.add(new JSeparator());
+        menuWindows.add(new JMenuItem(new AbstractAction() {
+            {
+                putValue(Action.NAME, "Reset default layout");
+                // no accelerator key.
+                putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("icons8-reset-16.png"))));
+                putValue(Action.SHORT_DESCRIPTION, "Reset the layout to the default.");
+            }
 
-        return menu;
-    }
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                app.getFrame().resetDefaultLayout();
+            }
+        }));
 
-    private void onTurtleRenderChange(String name) {
-        logger.debug("Switching to render style '{}'", name);
-        TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
-        app.setTurtleRenderer(renderer);
+        return menuWindows;
     }
 
     private void estimateTime() {
@@ -509,14 +433,10 @@ public class MainMenu extends JMenuBar {
         dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
         dialog.setVisible(true);
     }
-
+/*
     private JMenu createSettingsMenu() {
         JMenu menu = new JMenu(Translator.get("MenuSettings"));
         menu.setMnemonic('S');
-
-        JMenuItem bOpenPaperSettings = new JMenuItem(Translator.get("OpenPaperSettings"));
-        bOpenPaperSettings.addActionListener((e)-> openPaperSettings());
-        menu.add(bOpenPaperSettings);
 
         JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
         bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
@@ -524,29 +444,6 @@ public class MainMenu extends JMenuBar {
         menu.add(bOpenPlotterSettings);
 
         return menu;
-    }
-
-    private void openPlotterSettings() {
-        PlotterSettingsManagerPanel plotterSettingsPanel = new PlotterSettingsManagerPanel(app.getPlotterSettingsManager());
-        plotterSettingsPanel.addListener(app::onPlotterSettingsUpdate);
-
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PlotterSettingsPanel.Title"));
-        dialog.add(plotterSettingsPanel);
-        dialog.setMinimumSize(new Dimension(350,300));
-        dialog.setResizable(false);
-        dialog.pack();
-
-        app.enableMenuBar(false);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                app.onPlotterSettingsUpdate(app.getPlotterSettingsManager().getLastSelectedProfile());
-                app.enableMenuBar(true);
-            }
-        });
-
-        dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-        dialog.setVisible(true);
     }
 
     private void openPaperSettings() {
@@ -568,7 +465,7 @@ public class MainMenu extends JMenuBar {
         dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
         dialog.setVisible(true);
     }
-
+*/
     public RecentFiles getRecentFiles() {
         return recentFiles;
     }
