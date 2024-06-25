@@ -66,22 +66,12 @@ public class MainFrame extends JFrame {
         DockingPanel renderView = new DockingPanel("8e50154c-a149-4e95-9db5-4611d24cc0cc", "Preview");
         renderView.add(previewPanel, BorderLayout.CENTER);
         windows.add(renderView);
-        /*
-        DockingPanel treeView = new DockingPanel("c6b04902-7e53-42bc-8096-fa5d43289362", "Scene");
-        NodeTreeView nodeTreeView = new NodeTreeView();
-        treeView.add(nodeTreeView, BorderLayout.CENTER);
-        windows.add(treeView);
 
-        DockingPanel detailView = new DockingPanel("67e45223-79f5-4ce2-b15a-2912228b356f", "Details");
-        NodeDetailView FirmwareUploaderPanel = new FirmwareUploaderPanel();
-        detailView.add(nodeDetailView, BorderLayout.CENTER);
-        windows.add(detailView);
-*/
-        DockingPanel paperSettingsView = new DockingPanel("31ffe343-c085-44b1-9c61-28a049942287", Translator.get("OpenPaperSettings"));
+        DockingPanel paperSettingsView = new DockingPanel("31ffe343-c085-44b1-9c61-28a049942287", Translator.get("PaperSettings.Title"));
         paperSettingsView.add(paperSettingsPanel, BorderLayout.CENTER);
         windows.add(paperSettingsView);
 
-        DockingPanel machineSettingsView = new DockingPanel("67e525e8-111a-47c9-a490-127f94a99d1a", Translator.get("OpenPlotterSettings"));
+        DockingPanel machineSettingsView = new DockingPanel("67e525e8-111a-47c9-a490-127f94a99d1a", Translator.get("PlotterSettingsPanel.Title"));
         machineSettingsView.add(plotterSettingsPanel, BorderLayout.CENTER);
         windows.add(machineSettingsView);
 
@@ -93,11 +83,7 @@ public class MainFrame extends JFrame {
         DockingPanel logView = new DockingPanel("5e565f83-9734-4281-9828-92cd711939df", Translator.get("LogPanel.Title"));
         logView.add(logPanel, BorderLayout.CENTER);
         windows.add(logView);
-/*
-        DockingPanel editorView = new DockingPanel("3f8f54e1-af78-4994-a1c2-21a68ec294c9", "Editor");
-        editorView.add(editPanel, BorderLayout.CENTER);
-        windows.add(editorView);
-*/
+
         DockingPanel aboutView = new DockingPanel("976af87b-90f3-42ce-a5d6-e4ab663fbb15", Translator.get("MenuAbout"));
         aboutView.add(new AboutPanel(), BorderLayout.CENTER);
         windows.add(aboutView);

@@ -2,14 +2,14 @@ package com.marginallyclever.makelangelo.plotter;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.swing.event.EventListenerList;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 
 /**
  * {@link Plotter} contains the live state of the drawing robot: the position of the pen, is it homed, and
@@ -32,7 +32,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		Plotter b = (Plotter)super.clone();
-		b.listeners = new ArrayList<PlotterEventListener>();
+		b.listeners = new EventListenerList();
 		b.pos = new Point2D();
 		b.pos.set(this.pos);
 		return b;
@@ -40,14 +40,14 @@ public class Plotter implements PreviewListener, Cloneable {
 	
 	// OBSERVER PATTERN
 	
-	private ArrayList<PlotterEventListener> listeners = new ArrayList<PlotterEventListener>();
+	private EventListenerList listeners = new EventListenerList();
 
 	/**
 	 * Subscribe to listen to {@link PlotterEvent}s.
 	 * @param listener
 	 */
 	public void addPlotterEventListener(PlotterEventListener listener) {
-		listeners.add(listener);
+		listeners.add(PlotterEventListener.class,listener);
 	}
 
 	/**
@@ -55,11 +55,11 @@ public class Plotter implements PreviewListener, Cloneable {
 	 * @param listener
 	 */
 	public void removePlotterEventListener(PlotterEventListener listener) {
-		listeners.remove(listener);
+		listeners.remove(PlotterEventListener.class,listener);
 	}
 	
 	private void firePlotterEvent(PlotterEvent e) {
-		for (PlotterEventListener listener : listeners) listener.plotterEvent(e);
+		for (PlotterEventListener listener : listeners.getListeners(PlotterEventListener.class)) listener.plotterEvent(e);
 	}
 
 	// OBSERVER PATTERN ENDS

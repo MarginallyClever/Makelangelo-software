@@ -97,7 +97,6 @@
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>
 	<string><key>MenuWindows</key><value>Windows</value></string>
-	<string><key>ShowLog</key><value>Show Log</value></string>
 	<string><key>OpenLogFolder</key><value>Open log folder</value></string>
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 
@@ -229,8 +228,6 @@
 	<string><key>Package</key><value>Papercraft Box</value></string>
 	<string><key>Polyeder</key><value>Papercraft Polyhedron</value></string>
 	<string><key>Port</key><value>Port</value></string>
-	<string><key>OpenPaperSettings</key><value>Paper settings</value></string>
-	<string><key>OpenPlotterSettings</key><value>Plotter settings</value></string>
 	<string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
 	<string><key>Open</key><value>Open file...</value></string>
 	<string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
