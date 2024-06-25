@@ -25,6 +25,7 @@ module com.marginallyclever.makelangelo {
     requires com.github.weisj.jsvg;
     requires org.reflections;
     requires org.apache.commons.lang3;
+    requires org.joml;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.convenience.voronoi;

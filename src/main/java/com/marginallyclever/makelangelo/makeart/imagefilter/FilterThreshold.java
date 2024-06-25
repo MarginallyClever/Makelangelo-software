@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -30,11 +30,12 @@ public class FilterThreshold extends ImageFilter {
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
-                diff.red   = modify(diff.red  );
-                diff.green = modify(diff.green);
-                diff.blue  = modify(diff.blue );
-                rr.setRGB(x, y, diff.toInt());
+                Color diff = new Color(aa.getRGB(x, y));
+                Color r2 = new Color(
+                    modify(diff.getRed()  ),
+                    modify(diff.getGreen()),
+                    modify(diff.getBlue() ));
+                rr.setRGB(x, y, r2.getRGB());
             }
         }
 

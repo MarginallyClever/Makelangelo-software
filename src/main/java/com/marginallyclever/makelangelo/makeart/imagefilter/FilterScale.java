@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -30,11 +30,12 @@ public class FilterScale extends ImageFilter {
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                ColorRGB diff = new ColorRGB(aa.getRGB(x, y));
-                diff.red   = (int)Math.max(0,Math.min(255,diff.red * scale));
-                diff.green = (int)Math.max(0,Math.min(255,diff.green * scale));
-                diff.blue  = (int)Math.max(0,Math.min(255,diff.blue * scale));
-                rr.setRGB(x, y, diff.toInt());
+                Color diff = new Color(aa.getRGB(x, y));
+                Color r2 = new Color(
+                    (int)Math.max(0,Math.min(255,diff.getRed() * scale)),
+                    (int)Math.max(0,Math.min(255,diff.getGreen() * scale)),
+                    (int)Math.max(0,Math.min(255,diff.getBlue() * scale)));
+                rr.setRGB(x, y, r2.getRGB());
             }
         }
 

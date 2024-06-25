@@ -2,9 +2,10 @@ package com.marginallyclever.makelangelo.apps.previewpanel;
 
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.helpers.MatrixHelper;
+import com.marginallyclever.convenience.helpers.ResourceHelper;
 import com.marginallyclever.makelangelo.Camera;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
@@ -26,7 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Vector2d;
+import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,9 +45,6 @@ import java.util.prefs.Preferences;
  */
 public class PreviewPanel extends JPanel implements GLEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
-	// Use debug pipeline?
-	private static final boolean DEBUG_GL_ON = false;
-	private static final boolean TRACE_GL_ON = false;
 
 	private final EventListenerList previewListeners = new EventListenerList();
 	private final JToolBar toolBar = new JToolBar();
@@ -68,15 +68,14 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	 */
 	private int mouseLastZoomDirection = 0;
 
-	private final Paper myPaper;
 	private final Plotter myPlotter;
 	private PlotterRenderer myPlotterRenderer;
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private final DoubleRangeSlider rangeSlider = new DoubleRangeSlider();
 
 	// OpenGL stuff
-	private GLU glu;
 	private FPSAnimator animator;
+	private ShaderProgram shader;
 
 	public PreviewPanel() {
 		this(new Paper(),new Plotter());
@@ -84,39 +83,39 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 	public PreviewPanel(Paper paper, Plotter plotter) {
 		super(new BorderLayout());
-		myPaper = paper;
 		myPlotter = plotter;
 
 		add(toolBar, BorderLayout.NORTH);
 		add(glCanvas, BorderLayout.CENTER);
 		add(rangeSlider, BorderLayout.SOUTH);
 
-		addListener(myPaper);
-		addListener(myPlotter);
-		addListener((gl2)->{
+		addListener(paper);
+		addListener(myTurtleRenderer);
+		addListener((gl) -> {
 			if(myPlotterRenderer!=null) {
-				myPlotterRenderer.render(gl2, myPlotter);
+				myPlotterRenderer.render(gl, myPlotter);
 			}
 		});
-		addListener(myTurtleRenderer);
 
-		try {
-			logger.debug("  get GL capabilities...");
-			GLProfile glProfile = GLProfile.getDefault();
-			GLCapabilities caps = new GLCapabilities(glProfile);
-			// caps.setSampleBuffers(true);
-			// caps.setHardwareAccelerated(true);
-			// caps.setNumSamples(4);
-			glCanvas.setRequestedGLCapabilities(caps);
-		} catch(GLException e) {
-			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
-			System.exit(1);
-		}
-
+		setGLCapabilities();
 		glCanvas.addGLEventListener(this);
+		addMouseListeners();
 
-		final JPanel me = this;
+		rangeSlider.addChangeListener(e->{
+			myTurtleRenderer.setFirst(rangeSlider.getBottom());
+			myTurtleRenderer.setLast(rangeSlider.getTop());
+		});
 
+		buildToolBar();
+
+		// start animation system
+		logger.debug("  starting animator...");
+		animator = new FPSAnimator(1);
+		animator.add(glCanvas);
+		animator.start();
+	}
+
+	private void addMouseListeners() {		final JPanel me = this;
 		// scroll the mouse wheel to zoom
 		addMouseWheelListener(new MouseAdapter() {
 			@Override
@@ -139,7 +138,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				repaint();
 			}
 		});
-		
+
 		// remember button states for when we need them.
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -154,7 +153,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				buttonPressed = MouseEvent.NOBUTTON;
 			}
 		});
-		
+
 		// left click + drag to move the camera around.
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
@@ -186,19 +185,21 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				setTipXY();
 			}
 		});
+	}
 
-		rangeSlider.addChangeListener(e->{
-			myTurtleRenderer.setFirst(rangeSlider.getBottom());
-			myTurtleRenderer.setLast(rangeSlider.getTop());
-		});
-
-		buildToolBar();
-
-		// start animation system
-		logger.debug("  starting animator...");
-		animator = new FPSAnimator(1);
-		animator.add(glCanvas);
-		animator.start();
+	private void setGLCapabilities() {
+		try {
+			logger.debug("  get GL capabilities...");
+			GLProfile glProfile = GLProfile.getDefault();
+			GLCapabilities caps = new GLCapabilities(glProfile);
+			// caps.setSampleBuffers(true);
+			// caps.setHardwareAccelerated(true);
+			// caps.setNumSamples(4);
+			glCanvas.setRequestedGLCapabilities(caps);
+		} catch(GLException e) {
+			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
+			System.exit(1);
+		}
 	}
 
 	private void buildToolBar() {
@@ -219,18 +220,20 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(app.getPaper().getPaperWidth(),app.getPaper().getPaperHeight()));
 		toolBar.add(buttonZoomToFit);
 */
-		JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
+		JCheckBox checkboxShowPenUpMoves = new JCheckBox(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
 		//checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
 			GFXPreferences.setShowPenUp(!b);
 		});
 		GFXPreferences.addListener((e)->{
-			checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
+			checkboxShowPenUpMoves.setSelected((boolean)e.getNewValue());
 		});
 		checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
 		toolBar.add(checkboxShowPenUpMoves);
 
+		JLabel label = new JLabel(Translator.get("RobotMenu.RenderStyle"));
+		toolBar.add(label);
 		TurtleRenderFactory[] values = TurtleRenderFactory.values();
 		String [] names = Arrays.stream(values).map(TurtleRenderFactory::getName).toArray(String[]::new);
 		JComboBox<String> comboBox = new JComboBox<>(names);
@@ -240,7 +243,11 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 			String name = (String)cb.getSelectedItem();
 			onTurtleRenderChange(name);
 		});
+		// Set the maximum size of the JComboBox to its preferred size
+		Dimension preferredSize = comboBox.getPreferredSize();
+		comboBox.setMaximumSize(preferredSize);
 		toolBar.add(comboBox);
+		label.setLabelFor(comboBox);
 	}
 
 	private void onTurtleRenderChange(String name) {
@@ -255,25 +262,6 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	
 	public void removeListener(PreviewListener arg0) {
 		previewListeners.remove(PreviewListener.class,arg0);
-	}
-	
-	/**
-	 * Set up the correct projection so the image appears in the right location and aspect ratio.
-	 */
-	@Override
-	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
-		logger.debug("reshape {}x{}",width,height);
-		GL2 gl2 = glautodrawable.getGL().getGL2();
-		
-		camera.setWidth(width);
-		camera.setHeight(height);
-
-		gl2.glMatrixMode(GL2.GL_PROJECTION);
-		gl2.glLoadIdentity();
-		// orthographic projection
-		float w2 = width/2.0f;
-		float h2 = height/2.0f;
-		glu.gluOrtho2D(-w2, w2, -h2, h2);
 	}
 
 	public Vector2d getMousePositionInWorld() {
@@ -295,20 +283,36 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	 * Startup OpenGL.  Turn on debug pipeline(s) if needed.
 	 */
 	@Override
-	public void init(GLAutoDrawable glautodrawable) {
+	public void init(GLAutoDrawable glAutoDrawable) {
 		logger.debug("init");
-		GL gl = glautodrawable.getGL();
-		maybeAddDebugPipeline(gl);
-		maybeAddTracePipeline(gl);
-		// must come after adding any extra pipelines.
-		glu = GLU.createGLU(gl);
+		GL3 gl3 = glAutoDrawable.getGL().getGL3();
+		gl3.setSwapInterval(1);
+
+		try {
+			shader = new ShaderProgram(gl3,
+					ResourceHelper.readResource(this.getClass(), "/com/marginallyclever/ro3/apps/viewport/default.vert"),
+					ResourceHelper.readResource(this.getClass(), "/com/marginallyclever/ro3/apps/viewport/default.frag"));
+		} catch(Exception e) {
+			logger.error("Failed to load shader", e);
+		}
 	}
 
 	@Override
-	public void dispose(GLAutoDrawable glautodrawable) {
+	public void dispose(GLAutoDrawable glAutoDrawable) {
 		logger.debug("dispose");
-		GL gl = glautodrawable.getGL();
+		GL3 gl = glAutoDrawable.getGL().getGL3();
 		TextureFactory.unloadAll(gl);
+		shader.delete(gl);
+	}
+
+	/**
+	 * Set up the correct projection so the image appears in the right location and aspect ratio.
+	 */
+	@Override
+	public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
+		logger.debug("reshape {}x{}",width,height);
+		camera.setWidth(width);
+		camera.setHeight(height);
 	}
 
 	/**
@@ -317,79 +321,90 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable glautodrawable) {
 		// draw the world
-		GL2 gl2 = glautodrawable.getGL().getGL2();
+		GL3 gl3 = glautodrawable.getGL().getGL3();
 
 		// set some render quality options
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		if(prefs != null && prefs.getBoolean("antialias", true)) {
-			gl2.glEnable(GL2.GL_LINE_SMOOTH);
-			gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
-			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+			gl3.glEnable(GL3.GL_LINE_SMOOTH);
+			gl3.glEnable(GL3.GL_POLYGON_SMOOTH);
+			gl3.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
+			gl3.glEnable(GL3.GL_MULTISAMPLE);
 		} else {
-			gl2.glDisable(GL2.GL_LINE_SMOOTH);
-			gl2.glDisable(GL2.GL_POLYGON_SMOOTH);
-			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_FASTEST);
+			gl3.glDisable(GL3.GL_LINE_SMOOTH);
+			gl3.glDisable(GL3.GL_POLYGON_SMOOTH);
+			gl3.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_FASTEST);
+			gl3.glDisable(GL3.GL_MULTISAMPLE);
 		}
 		
 		// turn on blending
-		gl2.glEnable(GL2.GL_BLEND);
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+		gl3.glEnable(GL3.GL_BLEND);
+		gl3.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
 		
-		paintBackground(gl2);
-		paintCamera(gl2);
+		paintBackground(gl3);
+
+		shader.use(gl3);
+		//shader.setVector3d(gl3,"lightPos",cameraWorldPos);  // Light position in world space
+		shader.setColor(gl3,"lightColor", Color.WHITE);
+		shader.setColor(gl3,"diffuseColor",Color.WHITE);
+		shader.setColor(gl3,"specularColor",Color.BLACK);
+		shader.setColor(gl3,"ambientColor",Color.BLACK);
+		shader.set1i(gl3,"useVertexColor",0);
+		shader.set1i(gl3,"useLighting",0);
+		shader.set1i(gl3,"diffuseTexture",0);
+		shader.set1i(gl3,"useTexture",1);
+
+		shader.setMatrix4d(gl3,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+
+		paintCamera(gl3);
 
 		var list = previewListeners.getListeners(PreviewListener.class);
 		ArrayUtils.reverse(list);
 		for( PreviewListener p : list ) {
-			gl2.glPushMatrix();
-			p.render(gl2);
-			gl2.glPopMatrix();
-		}
-	}
-
-	private void maybeAddTracePipeline(GL gl) {
-		if (!TRACE_GL_ON) return;
-
-		try {
-			// Trace ..
-			gl = gl.getContext().setGL(
-					GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }));
-		} catch (Exception e) {
-			logger.error("Failed to init OpenGL trace", e);
-		}
-	}
-
-	private void maybeAddDebugPipeline(GL gl) {
-		if (!DEBUG_GL_ON) return;
-
-		try {
-			// Debug ..
-			gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null));
-		} catch (Exception e) {
-			logger.error("Failed to init OpenGL debug pipeline", e);
+			p.render(gl3);
 		}
 	}
 
 	/**
 	 * Set up the correct modelview so the robot appears where it should.
 	 *
-	 * @param gl2 OpenGL context
+	 * @param gl3 OpenGL context
 	 */
-	private void paintCamera(GL2 gl2) {
-		gl2.glMatrixMode(GL2.GL_MODELVIEW);
-		gl2.glLoadIdentity();
-		gl2.glScaled(camera.getZoom(),camera.getZoom(),1);
-		gl2.glTranslated(-camera.getX(), camera.getY(),0);
+	private void paintCamera(GL3 gl3) {
+		//gl.glScaled(camera.getZoom(),camera.getZoom(),1);
+		//gl.glTranslated(-camera.getX(), camera.getY(),0);
+
+		Matrix4d inverseCamera = new Matrix4d();
+		inverseCamera.setIdentity();
+		// scale
+		inverseCamera.m00 = camera.getZoom();
+		inverseCamera.m11 = camera.getZoom();
+		// translate
+		inverseCamera.setTranslation(new Vector3d(-camera.getX(),-camera.getY(),0));
+
+		shader.setMatrix4d(gl3,"viewMatrix",inverseCamera);
+		shader.setMatrix4d(gl3,"projectionMatrix",getOrthographicMatrix(camera.getWidth(),camera.getHeight()));
+		Vector3d cameraWorldPos = new Vector3d(camera.getX(),-camera.getY(),0);
+		shader.setVector3d(gl3,"cameraPos",cameraWorldPos);  // Camera position in world space
+	}
+
+	/**
+	 * Render the scene in orthographic projection.
+	 */
+	public Matrix4d getOrthographicMatrix(int width,int height) {
+		double h = 5.0;  // why 5?
+		double w = h * (double)width / (double)height;
+		return MatrixHelper.orthographicMatrix4d(-w,w,-h,h,0.001,10);
 	}
 
 	/**
 	 * Clear the panel
 	 *
-	 * @param gl2 OpenGL context
+	 * @param gl OpenGL context
 	 */
-	private void paintBackground(GL2 gl2) {
+	private void paintBackground(GL3 gl) {
 		// Clear The Screen And The Depth Buffer
-		gl2.glClearColor(
+		gl.glClearColor(
 				(float)backgroundColor.getRed()/255.0f,
 				(float)backgroundColor.getGreen()/255.0f,
 				(float)backgroundColor.getBlue()/255.0f,
@@ -400,9 +415,9 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		if (GLProfile.isAWTAvailable()
 				&& !isOpaque()
 				&& glCanvas.shouldPreserveColorBufferIfTranslucent()) {
-			gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+			gl.glClear(GL3.GL_DEPTH_BUFFER_BIT);
 		} else {
-			gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+			gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 		}
 	}
 
@@ -431,12 +446,13 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		myTurtleRenderer.setRenderer(renderer);
 	}
 
-	public void updatePlotterRenderer() {
+	public void updatePlotterSettings(PlotterSettings settings) {
 		try {
 			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
 		} catch (Exception e) {
 			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
 			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();
 		}
+		myPlotterRenderer.updatePlotterSettings(settings);
 	}
 }

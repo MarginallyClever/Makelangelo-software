@@ -425,11 +425,6 @@
         <hint>[manual driving dialog]</hint>
     </string>
     <string>
-        <key>OpenPlotterSettings</key>
-        <value>Paramètres du traceur</value>
-        <hint>[]</hint>
-    </string>
-    <string>
         <key>bottom left</key>
         <value>En bas à gauche</value>
         <hint>[]</hint>
@@ -1343,11 +1338,6 @@
         <key>MenuMakelangelo</key>
         <value>Fichier</value>
         <hint>[menu or dialog title]</hint>
-    </string>
-    <string>
-        <key>OpenPaperSettings</key>
-        <value>Paramètres papier</value>
-        <hint>[]</hint>
     </string>
     <string>
         <key>vertical</key>

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -28,7 +28,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	private double penDiameter=0.8;
 
 	@Override
-	public void render(GL2 gl2) {
+	public void render(GL3 gl) {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
@@ -42,7 +42,7 @@ public class TurtleRenderFacade implements PreviewListener {
 				myRenderer.setPenUpColor(penUpColor);
 				myRenderer.setPenDownColor(penDownColor);
 				myRenderer.setPenDiameter(penDiameter);
-				myRenderer.start(gl2);
+				myRenderer.start(gl);
 				showCount++;
 
 				for (TurtleMove m : myTurtle.history) {

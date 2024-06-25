@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.texture;
 
 import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
@@ -75,7 +75,7 @@ public class TextureWithMetadata {
         gl3.glGetFloatv(GL3.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy, 0);
         gl3.glTexParameterf(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy[0]);
     }*/
-    public void use(GL2 gl) {
+    public void use(GL3 gl) {
         if(texture == null) {
             BufferedImage flip = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
             for(int y=0;y<image.getHeight();++y) {

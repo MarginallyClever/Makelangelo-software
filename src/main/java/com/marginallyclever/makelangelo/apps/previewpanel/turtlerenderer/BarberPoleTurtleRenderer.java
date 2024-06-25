@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -13,59 +14,64 @@ import java.awt.*;
  *
  */
 public class BarberPoleTurtleRenderer implements TurtleRenderer {
-	private GL2 gl2;
+	private GL3 gl;
 	
 	private Color colorTravel = Color.GREEN;
 	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter =1;
 	private int moveCounter;
+
+	private final Mesh mesh = new Mesh();
+	private boolean isDone=false;
 		
 	@Override
-	public void start(GL2 gl2) {
-		this.gl2=gl2;
+	public void start(GL3 gl) {
+		this.gl=gl;
 		showPenUp = GFXPreferences.getShowPenUp();
 
 		// set pen diameter
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		gl2.glLineWidth(penDiameter);
+		gl.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
+		gl.glLineWidth(penDiameter);
 
-		gl2.glBegin(GL2.GL_LINES);
+		if(!isDone) {
+			mesh.setRenderStyle(GL3.GL_LINES);
+		}
+
 		moveCounter=0;
 	}
 
 	@Override
 	public void end() {
-		// end drawing lines
-		gl2.glEnd();
-		// restore pen diameter
-		gl2.glLineWidth(lineWidthBuf[0]);
+		isDone=true;
+		mesh.render(gl);
 	}
 	
 	private void setDrawColor() {
-		if(moveCounter%2==0) gl2.glColor3d(1,0,0);
-		//else if(moveCounter%3==1) gl2.glColor3d(1,0,1);
-		else gl2.glColor3d(0,0,1);
-		moveCounter++;
+		if(moveCounter%2==0) mesh.addColor(1,0,0,1);
+		else mesh.addColor(0,0,1,1);
 	}
 	
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
-		setDrawColor();
-		gl2.glVertex2d(p0.x, p0.y);
-		gl2.glVertex2d(p1.x, p1.y);
+		if(isDone) return;
+		setDrawColor();		mesh.addVertex((float)p0.x, (float)p0.y,0);
+		setDrawColor();		mesh.addVertex((float)p1.x, (float)p1.y,0);
+		moveCounter++;
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
+		if(isDone) return;
 		if(!showPenUp) return;
-		
-		gl2.glColor3d(
-				colorTravel.getRed() / 255.0,
-				colorTravel.getGreen() / 255.0,
-				colorTravel.getBlue() / 255.0);
-		gl2.glVertex2d(p0.x, p0.y);
-		gl2.glVertex2d(p1.x, p1.y);
+
+		float r = colorTravel.getRed() / 255.0f;
+		float g = colorTravel.getGreen() / 255.0f;
+		float b = colorTravel.getBlue() / 255.0f;
+		float a = colorTravel.getAlpha() / 255.0f;
+
+		mesh.addColor(r,g,b,a);		mesh.addVertex((float)p0.x, (float)p0.y,0);
+		mesh.addColor(r,g,b,a);		mesh.addVertex((float)p1.x, (float)p1.y,0);
 	}
 
 	@Override
@@ -91,5 +97,8 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	 * up when the turtle is changed.
 	 */
 	@Override
-	public void reset() {}
+	public void reset() {
+		mesh.clear();
+		isDone=false;
+	}
 }

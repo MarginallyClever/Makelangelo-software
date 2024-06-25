@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -86,8 +86,8 @@ public abstract class ImageConverterIterative extends ImageConverter implements 
 
     /**
      * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
-     * @param gl2 the render context
+     * @param gl the render context
      */
     @Override
-    public void render(GL2 gl2) {}
+    public void render(GL3 gl) {}
 }

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -78,58 +78,58 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void resume() {}
 
 	@Override
-	public void render(GL2 gl2) {
-		super.render(gl2);
+	public void render(GL3 gl) {
+		super.render(gl);
 		if(getThread().getPaused()) return;
 
-		gl2.glPushMatrix();
-		gl2.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
+		gl.glPushMatrix();
+		gl.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
 
 		lock.lock();
 		try {
-			if (renderMode == 0) renderPoints(gl2);
-			if (renderMode == 1 && cells != null) drawTour(gl2);
+			if (renderMode == 0) renderPoints(gl);
+			if (renderMode == 1 && cells != null) drawTour(gl);
 		}
 		finally {
 			lock.unlock();
 		}
 
-		gl2.glPopMatrix();
+		gl.glPopMatrix();
 	}
 
-	private void renderPoints(GL2 gl2) {
+	private void renderPoints(GL3 gl) {
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
 		try {
-			gl2.glBegin(GL2.GL_POINTS);
+			gl.glBegin(GL3.GL_POINTS);
 			for( VoronoiCell c : cells ) {
 				if(c.weight<lpc) {
-					gl2.glColor3f(1, 0, 0);
+					gl.glColor3f(1, 0, 0);
 				} else {
-					gl2.glColor3f(0, 0, 0);
+					gl.glColor3f(0, 0, 0);
 				}
-				gl2.glVertex2d(c.center.x, c.center.y);
+				gl.glVertex2d(c.center.x, c.center.y);
 			}
-			gl2.glEnd();
+			gl.glEnd();
 		}
 		finally {
 			lock.unlock();
 		}
 	}
 
-	private void drawTour(GL2 gl2) {
+	private void drawTour(GL3 gl) {
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
 		try {
-			gl2.glColor3f(0, 0, 0);
-			gl2.glBegin(GL2.GL_LINE_STRIP);
+			gl.glColor3f(0, 0, 0);
+			gl.glBegin(GL3.GL_LINE_STRIP);
 			for (VoronoiCell c : cells) {
 				if (c.weight < lpc) break;
-				gl2.glVertex2d(c.center.x, c.center.y);
+				gl.glVertex2d(c.center.x, c.center.y);
 			}
-			gl2.glEnd();
+			gl.glEnd();
 		}
 		finally {
 			lock.unlock();

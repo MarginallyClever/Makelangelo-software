@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.plotter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
@@ -17,7 +17,7 @@ import java.security.InvalidParameterException;
  * @author Dan
  * @since 7.2.10
  */
-public class Plotter implements PreviewListener, Cloneable {	
+public class Plotter implements Cloneable {
 	private PlotterSettings settings = new PlotterSettings("Makelangelo 5");
 
 	// are motors actively engaged?  when disengaged pen can drift and re-homing is required.
@@ -168,36 +168,6 @@ public class Plotter implements PreviewListener, Cloneable {
 	public void setSettings(PlotterSettings s) throws InvalidParameterException {
 		if(s==null) throw new InvalidParameterException(PlotterSettings.class.getSimpleName()+" cannot be null.");
 		settings=s;
-	}
-	
-	/**
-	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
-	 * @param gl2 the render context
-	 */
-	@Override
-	public void render(GL2 gl2) {		
-		float[] lineWidthBuf = new float[1];
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		
-		drawPhysicalLimits(gl2);
-		
-		gl2.glLineWidth(lineWidthBuf[0]);
-	}	
-	
-	/**
-	 * Outline the drawing limits
-	 * @param gl2
-	 */
-	private void drawPhysicalLimits(GL2 gl2) {
-		gl2.glLineWidth(1);
-		gl2.glColor3f(0.9f, 0.9f, 0.9f); // #color 
-		
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_TOP));
-		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_TOP));
-		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
-		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
-		gl2.glEnd();
 	}
 
 	/**

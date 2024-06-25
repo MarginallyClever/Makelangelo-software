@@ -1,6 +1,5 @@
 package com.marginallyclever.convenience;
 
-import com.jogamp.opengl.GL2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,18 +170,6 @@ public class ConvexHull {
 
     private Vector2d orthogonalXY(Vector2d d) {
         return new Vector2d(d.y,-d.x);
-    }
-
-    public void renderAsFan(GL2 gl2) {
-        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
-        gl2.glEnd();
-    }
-
-    public void renderAsLineLoop(GL2 gl2) {
-        gl2.glBegin(GL2.GL_LINE_LOOP);
-        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
-        gl2.glEnd();
     }
 
     @Override

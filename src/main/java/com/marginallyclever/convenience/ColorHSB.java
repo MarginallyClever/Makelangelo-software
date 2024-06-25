@@ -28,8 +28,8 @@ public class ColorHSB {
         this.brightness = Math.max(0.0f, Math.min(1.0f, brightness));
     }
 
-    public void set(ColorRGB rgb) {
-        float[] values = Color.RGBtoHSB(rgb.red, rgb.blue, rgb.green, null);
+    public void set(Color rgb) {
+        float[] values = Color.RGBtoHSB(rgb.getRed(), rgb.getBlue(), rgb.getGreen(), null);
         set(values[0], values[1], values[2]);
     }
 

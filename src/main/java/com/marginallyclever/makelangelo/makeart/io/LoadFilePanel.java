@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
@@ -90,8 +90,8 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	}
 
 	@Override
-	public void render(GL2 gl2) {
-		if(mySubPreviewListener!=null) mySubPreviewListener.render(gl2);
+	public void render(GL3 gl3) {
+		if(mySubPreviewListener!=null) mySubPreviewListener.render(gl3);
 	}
 
 	public void setParent(JDialog parent) {

@@ -112,7 +112,7 @@ public final class Makelangelo {
 			msv.reset();
 		}
 
-		previewPanel.updatePlotterRenderer();
+		previewPanel.updatePlotterSettings(settings);
 		previewPanel.getTurtleRenderer().setPenUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
 		previewPanel.getTurtleRenderer().setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
 		// myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.

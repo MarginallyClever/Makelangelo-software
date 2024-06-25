@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -59,41 +59,41 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void render(GL2 gl2) {
-		super.render(gl2);
+	public void render(GL3 gl) {
+		super.render(gl);
 
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;
 
 		double cx = myPaper.getCenterX();
 		double cy = myPaper.getCenterY();
-		gl2.glPushMatrix();
-		gl2.glTranslated(cx,cy,0);
+		gl.glPushMatrix();
+		gl.glTranslated(cx,cy,0);
 
 		lock.lock();
 		try {
-			renderDots(gl2);
+			renderDots(gl);
 		}
 		finally {
 			lock.unlock();
 		}
 
-		gl2.glPopMatrix();
+		gl.glPopMatrix();
 	}
 
-	private void drawCircle(GL2 gl2,double x, double y, double r) {
+	private void drawCircle(GL3 gl,double x, double y, double r) {
 		if(r<=minDotSize) return;
 
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
+		gl.glBegin(GL3.GL_TRIANGLE_FAN);
 		for (int j = 0; j <= TABLE_SIZE; ++j) {
-			gl2.glVertex2d(
+			gl.glVertex2d(
 					x + r * cosTable[j],
 					y + r * sinTable[j] );
 		}
-		gl2.glEnd();
+		gl.glEnd();
 	}
 
-	private void renderDots(GL2 gl2) {
+	private void renderDots(GL3 gl) {
 		int lpc = getLowpassCutoff();
 		double scale = (maxDotSize-minDotSize)/255.0;
 		double cx = myPaper.getCenterX();
@@ -104,8 +104,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			double r = (c.weight-lpc) * scale;
 			double x = c.center.x;
 			double y = c.center.y;
-			gl2.glColor3f((float)c.change, 0, 0);
-			drawCircle(gl2,x,y,r);
+			gl.glColor3f((float)c.change, 0, 0);
+			drawCircle(gl,x,y,r);
 		}
 	}
 

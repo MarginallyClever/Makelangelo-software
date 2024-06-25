@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.paper;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -49,20 +49,20 @@ public class Paper implements PreviewListener {
 		super();
 		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
 	}
-	
+
 	@Override
-	public void render(GL2 gl2) {
-		renderPaper(gl2);
-		renderMargin(gl2);
+	public void render(GL3 gl) {
+		renderPaper(gl);
+		renderMargin(gl);
 	}
-	
+
 	/**
 	 * Render the paper margin rectangle.
-	 * @param gl2 the render context
+	 * @param gl the render context
 	 */
-	private void renderMargin(GL2 gl2) {
-		gl2.glLineWidth(1);
-		gl2.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
+	private void renderMargin(GL3 gl) {
+		gl.glLineWidth(1);
+		gl.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
 
 		Rectangle2D.Double rect = getMarginRectangle();
 		double yMin = rect.getMinY();
@@ -70,35 +70,35 @@ public class Paper implements PreviewListener {
 		double xMin = rect.getMinX();
 		double xMax = rect.getMaxX();
 
-		gl2.glPushMatrix();
-		gl2.glTranslated(centerX, centerY, 0);
-		gl2.glBegin(GL2.GL_LINE_LOOP);
-		gl2.glVertex2d(xMin, yMax);
-		gl2.glVertex2d(xMax, yMax);
-		gl2.glVertex2d(xMax, yMin);
-		gl2.glVertex2d(xMin, yMin);
-		gl2.glEnd();
-		gl2.glPopMatrix();
+		gl.glPushMatrix();
+		gl.glTranslated(centerX, centerY, 0);
+		gl.glBegin(GL3.GL_LINE_LOOP);
+		gl.glVertex2d(xMin, yMax);
+		gl.glVertex2d(xMax, yMax);
+		gl.glVertex2d(xMax, yMin);
+		gl.glVertex2d(xMin, yMin);
+		gl.glEnd();
+		gl.glPopMatrix();
 	}
 
 	/**
 	 * Draw paper as a rectangle.
-	 * @param gl2 
+	 * @param gl
 	 */
-	private void renderPaper(GL2 gl2) {
-		gl2.glColor3d(
-				(double)paperColor.getRed() / 255.0, 
-				(double)paperColor.getGreen() / 255.0, 
+	private void renderPaper(GL3 gl) {
+		gl.glColor3d(
+				(double)paperColor.getRed() / 255.0,
+				(double)paperColor.getGreen() / 255.0,
 				(double)paperColor.getBlue() / 255.0);
-		gl2.glPushMatrix();
-		gl2.glTranslated(centerX, centerY, 0);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(getPaperLeft(), getPaperTop());
-		gl2.glVertex2d(getPaperRight(), getPaperTop());
-		gl2.glVertex2d(getPaperRight(), getPaperBottom());
-		gl2.glVertex2d(getPaperLeft(), getPaperBottom());
-		gl2.glEnd();
-		gl2.glPopMatrix();
+		gl.glPushMatrix();
+		gl.glTranslated(centerX, centerY, 0);
+		gl.glBegin(GL3.GL_TRIANGLE_FAN);
+		gl.glVertex2d(getPaperLeft(), getPaperTop());
+		gl.glVertex2d(getPaperRight(), getPaperTop());
+		gl.glVertex2d(getPaperRight(), getPaperBottom());
+		gl.glVertex2d(getPaperLeft(), getPaperBottom());
+		gl.glEnd();
+		gl.glPopMatrix();
 	}
 
 	/**

@@ -19,7 +19,7 @@ public class Camera {
 	private double zoom = 1.0;
 
 	// window size (for aspect ratio?)
-	private double width, height;
+	private int width, height;
 
 	public Camera() {}
 
@@ -92,19 +92,19 @@ public class Camera {
 		return zoom;
 	}
 	
-	public double getWidth() {
+	public int getWidth() {
 		return width;
 	}
 
-	public void setWidth(double width) {
+	public void setWidth(int width) {
 		this.width = width;
 	}
 
-	public double getHeight() {
+	public int getHeight() {
 		return height;
 	}
 
-	public void setHeight(double height) {
+	public void setHeight(int height) {
 		this.height = height;
 	}
 }

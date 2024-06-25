@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
@@ -16,14 +16,14 @@ public class Zarplotter implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(GL2 gl2,Plotter robot) {
-		paintMotors(gl2,robot);
-		paintControlBox(gl2,robot);
+	public void render(GL3 gl,Plotter robot) {
+		paintMotors(gl,robot);
+		paintControlBox(gl,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(gl2,robot);		
+			paintPenHolderToCounterweights(gl,robot);		
 	}
 
-	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	private void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
 		Point2D pos = robot.getPos();
@@ -35,111 +35,111 @@ public class Zarplotter implements PlotterRenderer {
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		gl2.glEnable(GL2.GL_BLEND);
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA,GL2.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL3.GL_BLEND);
+		gl.glBlendFunc(GL3.GL_SRC_ALPHA,GL3.GL_ONE_MINUS_SRC_ALPHA);
 		
-		gl2.glColor4d(0, 0, 0,0.5);
+		gl.glColor4d(0, 0, 0,0.5);
 		// plotter
-		gl2.glPushMatrix();
-		gl2.glTranslated(gx, gy, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
+		gl.glPushMatrix();
+		gl.glTranslated(gx, gy, 0);
+		gl.glBegin(GL3.GL_QUADS);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
 
-		gl2.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
 
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2,  ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2,  ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
 
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
+		gl.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
+		gl.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
 
-		gl2.glEnd();
-		gl2.glPopMatrix();
+		gl.glEnd();
+		gl.glPopMatrix();
 
 		// belt from motors to plotter
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
-		gl2.glEnd();
+		gl.glBegin(GL3.GL_LINES);
+		gl.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
+		gl.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
+		gl.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
+		gl.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
+		gl.glEnd();
 	}
 
-	private void paintMotors(GL2 gl2,Plotter plotter) {
+	private void paintMotors(GL3 gl,Plotter plotter) {
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 
-		gl2.glPushMatrix();		gl2.glTranslated(left , top   , 0);		gl2.glRotated(270, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(right, top   , 0);		gl2.glRotated(180, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(right, bottom, 0);		gl2.glRotated( 90, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(left , bottom, 0);		gl2.glRotated(  0, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
+		gl.glPushMatrix();		gl.glTranslated(left , top   , 0);		gl.glRotated(270, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
+		gl.glPushMatrix();		gl.glTranslated(right, top   , 0);		gl.glRotated(180, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
+		gl.glPushMatrix();		gl.glTranslated(right, bottom, 0);		gl.glRotated( 90, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
+		gl.glPushMatrix();		gl.glTranslated(left , bottom, 0);		gl.glRotated(  0, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
 	}
 
-	private void paintOneMotor(GL2 gl2) {
+	private void paintOneMotor(GL3 gl) {
 		// frame
-		gl2.glColor3f(1, 0.8f, 0.5f);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(0                   , 0                   );
-		gl2.glVertex2d(0                   , ZAR_MOTOR_MOUNT_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, ZAR_MOTOR_MOUNT_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, 0                   );
-		gl2.glVertex2d(0                   , 0                   );
-		gl2.glEnd();
+		gl.glColor3f(1, 0.8f, 0.5f);
+		gl.glBegin(GL3.GL_TRIANGLE_FAN);
+		gl.glVertex2d(0                   , 0                   );
+		gl.glVertex2d(0                   , ZAR_MOTOR_MOUNT_SIZE);
+		gl.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, ZAR_MOTOR_MOUNT_SIZE);
+		gl.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, 0                   );
+		gl.glVertex2d(0                   , 0                   );
+		gl.glEnd();
 		
 		// motor
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(0                  , 0                  );
-		gl2.glVertex2d(0                  , ZAR_MOTOR_BODY_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_BODY_SIZE, 0                  );
-		gl2.glVertex2d(0                  , 0                  );
-		gl2.glEnd();
+		gl.glColor3f(0, 0, 0);
+		gl.glBegin(GL3.GL_QUADS);
+		gl.glVertex2d(0                  , 0                  );
+		gl.glVertex2d(0                  , ZAR_MOTOR_BODY_SIZE);
+		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
+		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, 0                  );
+		gl.glVertex2d(0                  , 0                  );
+		gl.glEnd();
 	}
 	
-	private void paintControlBox(GL2 gl2,Plotter plotter) {
+	private void paintControlBox(GL3 gl,Plotter plotter) {
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
-		gl2.glPushMatrix();
-		gl2.glTranslated(cx, cy, 0);
+		gl.glPushMatrix();
+		gl.glTranslated(cx, cy, 0);
 
-		gl2.glScaled(10, 10, 1);
+		gl.glScaled(10, 10, 1);
 		
 		// mounting plate for PCB
-		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
-		gl2.glEnd();
+		gl.glColor3f(1,0.8f,0.5f);
+		gl.glBegin(GL3.GL_QUADS);
+		gl.glVertex2d(-8, 5);
+		gl.glVertex2d(+8, 5);
+		gl.glVertex2d(+8, -5);
+		gl.glVertex2d(-8, -5);
+		gl.glEnd();
 		
 		// RUMBA in v3 (135mm*75mm)
 		float h = 7.5f/2;
 		float w = 13.5f/2;
-		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		gl.glColor3d(0.9,0.9,0.9);
+		gl.glBegin(GL3.GL_QUADS);
+		gl.glVertex2d(-w, h);
+		gl.glVertex2d(+w, h);
+		gl.glVertex2d(+w, -h);
+		gl.glVertex2d(-w, -h);
+		gl.glEnd();
 
-		gl2.glPopMatrix();
+		gl.glPopMatrix();
 	}
 /*
 	@Override

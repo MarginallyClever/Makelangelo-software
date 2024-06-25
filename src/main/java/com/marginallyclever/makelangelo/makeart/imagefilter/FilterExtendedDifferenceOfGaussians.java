@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,22 +45,22 @@ public class FilterExtendedDifferenceOfGaussians extends ImageFilter {
         TransformedImage result = new TransformedImage(imgA);
         BufferedImage rr = result.getSourceImage();
 
-        ColorRGB diff = new ColorRGB();
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                ColorRGB colorA  = new ColorRGB(aa.getRGB(x, y));
-                ColorRGB colorB = new ColorRGB(bb.getRGB(x, y));
-                diff.red   = modify(colorA.red,   colorB.red  );
-                diff.green = modify(colorA.green, colorB.green);
-                diff.blue  = modify(colorA.blue,  colorB.blue );
-                rr.setRGB(x, y, diff.toInt());
+                Color colorA  = new Color(aa.getRGB(x, y));
+                Color colorB = new Color(bb.getRGB(x, y));
+                Color diff = new Color(
+                    modify(colorA.getRed(),   colorB.getRed()  ),
+                    modify(colorA.getGreen(), colorB.getGreen()),
+                    modify(colorA.getBlue(),  colorB.getBlue() ));
+                rr.setRGB(x, y, diff.getRGB());
             }
         }
 
         return result;
     }
 
-    int modify(double a,double b) {
+    private int modify(double a,double b) {
         a/=255.0;
         b/=255.0;
         double v = (1.0+phi)*a - phi*b;

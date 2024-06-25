@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.imagefilter;
 
-import com.marginallyclever.convenience.ColorRGB;
 import com.marginallyclever.convenience.ResizableImagePanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,11 +34,9 @@ public class FilterInvert extends ImageFilter {
 
         for (y = 0; y < h; ++y) {
             for (x = 0; x < w; ++x) {
-                ColorRGB color = new ColorRGB(src.getRGB(x, y));
-                color.red = 255 - color.red;
-                color.green = 255 - color.green;
-                color.blue = 255 - color.blue;
-                afterBI.setRGB(x, y, color.toInt());
+                Color color = new Color(src.getRGB(x, y));
+                Color result = new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+                afterBI.setRGB(x, y, result.getRGB());
             }
         }
 
