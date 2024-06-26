@@ -7,6 +7,7 @@ import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.Packet;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -80,14 +81,14 @@ public class PathImageMask extends Node {
      * @param channelCutoff only put pen down when color below this amount.
      */
     private void scanLine(BufferedImage img, LineSegment2D segment, double stepSize, double channelCutoff) {
-        Point2D P0 = segment.start;
-        Point2D P1 = segment.end;
+        Point2d P0 = segment.start;
+        Point2d P1 = segment.end;
 
         LineCollection toKeep = new LineCollection();
 
         // clip line to image bounds because sampling outside limits causes exception.
-        Point2D rMin = new Point2D(0,0);
-        Point2D rMax = new Point2D(img.getWidth(),img.getHeight());
+        Point2d rMin = new Point2d(0,0);
+        Point2d rMax = new Point2d(img.getWidth(),img.getHeight());
         if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
             // entire line clipped
             return;
@@ -98,11 +99,11 @@ public class PathImageMask extends Node {
         double dy = P1.y - P0.y;
         double distance = Math.sqrt(dx*dx+dy*dy);
         double total = Math.min(1,Math.ceil(distance / stepSize));
-        Point2D a = P0;
+        Point2d a = P0;
 
         for( double i = 1; i <= total; ++i ) {
             double fraction = i / total;
-            Point2D b = new Point2D(dx * fraction + P0.x,dy * fraction + P0.y);
+            Point2d b = new Point2d(dx * fraction + P0.x,dy * fraction + P0.y);
             double sampleResult = sampleImageUnderStep(img,a,b);
             if(sampleResult < channelCutoff) {
                 listBelow.add(new LineSegment2D(a,b, Color.BLACK));
@@ -122,7 +123,7 @@ public class PathImageMask extends Node {
      * @param b one corner of the rectangle.
      * @return the average intensity of the image within the rectangle bounded by points <code>a</code> and <code>b</code>.
      */
-    private double sampleImageUnderStep(BufferedImage img, Point2D a, Point2D b) {
+    private double sampleImageUnderStep(BufferedImage img, Point2d a, Point2d b) {
         // find the top-left and bottom-right corners
         int left = (int)Math.floor(Math.min(a.x,b.x));
         int right = (int)Math.ceil(Math.max(a.x,b.x));

@@ -2,13 +2,13 @@ package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,18 +87,18 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 				LineCollection b = firstPass.get(j);
 				if(b.isEmpty()) continue;
 
-				if(a.getEnd().equalsEpsilon(b.getStart(),epsilon)) {
+				if(a.getEnd().epsilonEquals(b.getStart(),epsilon)) {
 					a.addAll(b);
 					b.clear();
-				} else if(a.getEnd().equalsEpsilon(b.getEnd(),epsilon)) {
+				} else if(a.getEnd().epsilonEquals(b.getEnd(),epsilon)) {
 					b.flip();
 					a.addAll(b);
 					b.clear();
-				} else if(a.getStart().equalsEpsilon(b.getStart(),epsilon)) {
+				} else if(a.getStart().epsilonEquals(b.getStart(),epsilon)) {
 					a.flip();
 					a.addAll(b);
 					b.clear();
-				} else if(a.getStart().equalsEpsilon(b.getEnd(),epsilon)) {
+				} else if(a.getStart().epsilonEquals(b.getEnd(),epsilon)) {
 					a.flip();
 					b.flip();
 					a.addAll(b);
@@ -127,7 +127,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 		}
 
 		// another greedy tour.
-		Point2D lastPosition = secondPass.get(0).getEnd();
+		Point2d lastPosition = secondPass.get(0).getEnd();
 		output.addAll(secondPass.remove(0));
 
 		while(!secondPass.isEmpty()) {
@@ -167,7 +167,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 
 		LineCollection orderedLines = new LineCollection();
 
-		Point2D lastPosition = uniqueLines.get(0).start;
+		Point2d lastPosition = uniqueLines.get(0).start;
 		
 		while(!uniqueLines.isEmpty()) {
 			double bestD = Double.MAX_VALUE;
@@ -261,7 +261,7 @@ public class ReorderTurtleAction extends TurtleModifierAction {
 	}
 
 	// assumes extPoint is a point which lies on the infinite extension of targetLine
- 	private void extendLine(LineSegment2D targetLine, Point2D extPoint) {
+ 	private void extendLine(LineSegment2D targetLine, Point2d extPoint) {
 		double newLengthA = targetLine.start.distanceSquared(extPoint);
 		double newLengthB = targetLine.end.distanceSquared(extPoint);
 		double currentLength = targetLine.lengthSquared();

@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -400,8 +401,8 @@ public class Turtle implements Cloneable {
 				case DRAW_LINE -> {
 					if (previousMovement != null) {
 						LineSegment2D line = new LineSegment2D(
-								new Point2D(previousMovement.x, previousMovement.y),
-								new Point2D(m.x, m.y),
+								new Point2d(previousMovement.x, previousMovement.y),
+								new Point2d(m.x, m.y),
 								color);
 						if (line.lengthSquared() > 0) {
 							lines.add(line);
@@ -460,7 +461,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private double distanceSquared(Point2D b) {
+	private double distanceSquared(Point2d b) {
 		double dx = px-b.x;
 		double dy = py-b.y;
 		return dx*dx + dy*dy; 

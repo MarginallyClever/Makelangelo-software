@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.paper;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class Paper implements PreviewListener {
 	}
 
 	@Override
-	public void render(GL3 gl) {
+	public void render(GL3 gl, ShaderProgram shaderProgram) {
 		// TODO gl.glTranslated(centerX, centerY, 0);
 		meshPaper.render(gl);
 		meshMargin.render(gl);

@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
@@ -267,9 +268,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	@Override
-	public void render(GL3 gl3) {
+	public void render(GL3 gl3, ShaderProgram shaderProgram) {
 		if( myConverter != null && myConverter instanceof PreviewListener ) {
-			((PreviewListener)myConverter).render(gl3);
+			((PreviewListener)myConverter).render(gl3,shaderProgram);
 		}
 	}
 

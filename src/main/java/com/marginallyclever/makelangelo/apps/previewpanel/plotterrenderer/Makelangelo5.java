@@ -2,12 +2,13 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
-
-import static com.marginallyclever.convenience.helpers.DrawingHelper.paintTexture;
 
 public class Makelangelo5 implements PlotterRenderer {
 	private final TextureWithMetadata textureMainBody = TextureFactory.loadTexture("/textures/makelangelo5.png");
@@ -17,12 +18,37 @@ public class Makelangelo5 implements PlotterRenderer {
 	private final TextureWithMetadata textureGondola = TextureFactory.loadTexture("/textures/phBody.png");
 	private final TextureWithMetadata textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
+	private final Mesh controlBox = new Mesh();
+
+	private void setupControlBoxMesh(PlotterSettings settings) {
+		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+
+		float scale = 650.0f / 811.0f; // machine is 650 motor-to-motor. texture is 811. scale accordingly.
+		float TW = 1024 * scale;
+		float TH = 1024 * scale;
+		float ox = left - 106 * scale; // 106 taken from offset in texture map
+		float oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
+
+		controlBox.clear();
+		controlBox.setRenderStyle(GL3.GL_QUADS);
+		controlBox.addTexCoord(0, 0);		controlBox.addVertex(ox, oy, 0);
+		controlBox.addTexCoord(1, 0);		controlBox.addVertex(ox + TW, oy, 0);
+		controlBox.addTexCoord(1, 1);		controlBox.addVertex(ox + TW, oy + TH, 0);
+		controlBox.addTexCoord(0, 1);		controlBox.addVertex(ox, oy + TH, 0);
+
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+	}
+
 	@Override
-	public void render(GL3 gl, Plotter robot) {
-		if (textureMainBody == null) {
-			paintControlBoxPlain(gl, robot);
-		} else {
-			paintControlBoxFancy(gl, robot, textureMainBody);
+	public void render(GL3 gl, Plotter robot, ShaderProgram shaderProgram) {
+
+		if (textureMainBody != null) {
+			shaderProgram.set1i(gl,"useTexture",1);
+			paintControlBoxFancy(gl, textureMainBody);
+			shaderProgram.set1i(gl,"useTexture",0);
 		}
 
 		Polargraph.paintSafeArea(gl, robot);
@@ -30,22 +56,20 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(gl, robot);
 
-		if (textureMotors == null) {
-			Polargraph.paintMotors(gl, robot);
-		} else {
-			paintControlBoxFancy(gl, robot, textureMotors);
+		if (textureMotors != null) {
+			shaderProgram.set1i(gl,"useTexture",1);
+			paintControlBoxFancy(gl, textureMotors);
+			shaderProgram.set1i(gl,"useTexture",0);
 		}
 
-		if (textureLogo == null) {
-			// paintLogo(gl,robot);
-		} else {
-			paintLogoFancy(gl, robot);
+		if (textureLogo != null) {
+			paintLogoFancy(gl, robot.getSettings());
 		}
 	}
 
 	@Override
 	public void updatePlotterSettings(PlotterSettings settings) {
-
+		setupControlBoxMesh(settings);
 	}
 
 	public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
@@ -118,17 +142,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	private void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
-		if(textureGondola!=null && textureArm!=null) {
-			paintGondolaFancy(gl,gx,gy,robot);
-			return;
-		}
-		Polargraph.drawCircle(gl, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
-		if (robot.getPenIsUp()) {
-			Polargraph.drawCircle(gl, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
-		}
-	}
-
-	private void paintGondolaFancy(GL3 gl, double gx, double gy,Plotter robot) {
+		if(textureGondola==null || textureArm==null) return;
 // TODO implement me
 /*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -163,213 +177,26 @@ public class Makelangelo5 implements PlotterRenderer {
 			Polargraph.paintCounterweight(gl,x,y);
 			return;
 		}
-		paintTexture(gl, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(gl, textureWeight, x-20, y-74, 40,80);
 	}
 
-	private void paintControlBoxFancy(GL3 gl, Plotter robot,TextureWithMetadata texture) {
-// TODO implement me
-/*
-		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
-		// double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
-
-		final double scale = 650.0 / 811.0; // machine is 650 motor-to-motor. texture is 811. scale accordingly.
-		final double TW = 1024 * scale;
-		final double TH = 1024 * scale;
-		final double ox = left - 106 * scale; // 106 taken from offset in texture map
-		final double oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
-
-		paintTexture(gl, texture, ox, oy, TW, TH);*/
+	private void paintControlBoxFancy(GL3 gl,TextureWithMetadata texture) {
+		texture.use(gl);
+		controlBox.render(gl);
 	}
 
 	/**
-	 * paint the Marginally Clever Logo
+	 * Paint the Marginally Clever Logo
 	 *
 	 * @param gl   the render context
-	 * @param robot the machine to draw.
+	 * @param settings the machine settings
 	 */
-	private void paintLogoFancy(GL3 gl, Plotter robot) {
+	private void paintLogoFancy(GL3 gl, PlotterSettings settings) {
 // TODO implement me
 /*
-		final double scale = 0.5;
-		final double TW = 128 * scale;
-		final double TH = 128 * scale;
-
-		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
-		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
-
-		paintTexture(gl, textureLogo, LOGO_X, LOGO_Y, TW, TH);*/
-	}
-
-	/**
-	 * paint the controller and the LCD panel
-	 *
-	 * @param gl   the render context
-	 * @param robot the machine to draw.
-	 */
-	private void paintControlBoxPlain(GL3 gl, Plotter robot) {
-// TODO implement me
-/*
-		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
-		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
-		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
-		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
-		double cx = 0;
-
-		gl.glPushMatrix();
-
-		drawSuctionCups(gl,left,right,top);
-		drawFrame(gl,left,right,top);
-		gl.glTranslated(cx, cy, 0);
-		drawWires(gl,left,right);
-		drawRUMBA(gl,left,right);
-		renderLCD(gl,left,right);
-		gl.glPopMatrix();*/
-	}
-
-	// RUMBA in v3 (135mm*75mm)
-	private void drawRUMBA(GL3 gl, double left, double right) {
-// TODO implement me
-/*
-		float h = 75f / 2;
-		float w = 135f / 2;
-		gl.glPushMatrix();
-		gl.glTranslated(right-650.0/2.0,0,0);
-
-		gl.glColor3d(0.9, 0.9, 0.9);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(-w, h);
-		gl.glVertex2d(+w, h);
-		gl.glVertex2d(+w, -h);
-		gl.glVertex2d(-w, -h);
-		gl.glEnd();
-		gl.glPopMatrix();*/
-	}
-
-	private void drawWires(GL3 gl, double left, double right) {
-// TODO implement me
-/*
-		// wires to each motor
-		gl.glBegin(GL3.GL_LINES);
-		final float SPACING = 2;
-		float y = SPACING * -1.5f;
-		gl.glColor3f(1, 0, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(left, y);
-		y += SPACING;
-		gl.glColor3f(0, 1, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(left, y);
-		y += SPACING;
-		gl.glColor3f(0, 0, 1);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(left, y);
-		y += SPACING;
-		gl.glColor3f(1, 1, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(left, y);
-		y += SPACING;
-
-		y = SPACING * -1.5f;
-		gl.glColor3f(1, 0, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(right, y);
-		y += SPACING;
-		gl.glColor3f(0, 1, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(right, y);
-		y += SPACING;
-		gl.glColor3f(0, 0, 1);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(right, y);
-		y += SPACING;
-		gl.glColor3f(1, 1, 0);
-		gl.glVertex2d(0, y);
-		gl.glVertex2d(right, y);
-		y += SPACING;
-		gl.glEnd();*/
-	}
-
-	private void drawFrame(GL3 gl, double left, double right, double top) {
-// TODO implement me
-/*
-		final float FRAME_SIZE = 50f; // mm
-		gl.glColor3d(1, 0.8f, 0.5f);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(left - FRAME_SIZE, top + FRAME_SIZE);
-		gl.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
-		gl.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
-		gl.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl.glEnd();*/
-	}
-
-	private void drawSuctionCups(GL3 gl,double left,double right,double top) {
-// TODO implement me
-/*
-		final float SUCTION_CUP_Y = 35f;
-		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
-		gl.glColor3f(1, 1f, 1f); // #color of suction cups
-		drawCircle(gl, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);*/
-	}
-
-	private void renderLCD(GL3 gl, double left, double right) {
-// TODO implement me
-/*
-		// position
-		gl.glPushMatrix();
-		gl.glTranslated(right-(650.0/2.0)-180,0,0);
-
-		// LCD red
-		float w = 150f / 2;
-		float h = 56f / 2;
-		gl.glColor3f(0.8f, 0.0f, 0.0f);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(-w, h);
-		gl.glVertex2d(+w, h);
-		gl.glVertex2d(+w, -h);
-		gl.glVertex2d(-w, -h);
-		gl.glEnd();
-
-		// LCD green
-		gl.glPushMatrix();
-		gl.glTranslated(-(2.6) / 2, -0.771, 0);
-
-		w = 98f / 2;
-		h = 60f / 2;
-		gl.glColor3f(0, 0.6f, 0.0f);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(-w, h);
-		gl.glVertex2d(+w, h);
-		gl.glVertex2d(+w, -h);
-		gl.glVertex2d(-w, -h);
-		gl.glEnd();
-
-		// LCD black
-		h = 40f / 2;
-		gl.glColor3f(0, 0, 0);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(-w, h);
-		gl.glVertex2d(+w, h);
-		gl.glVertex2d(+w, -h);
-		gl.glVertex2d(-w, -h);
-		gl.glEnd();
-
-		// LCD blue
-		h = 25f / 2;
-		w = 75f / 2;
-		gl.glColor3f(0, 0, 0.7f);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(-w, h);
-		gl.glVertex2d(+w, h);
-		gl.glVertex2d(+w, -h);
-		gl.glVertex2d(-w, -h);
-		gl.glEnd();
-
-		gl.glPopMatrix();
-
-		// clean up
-		gl.glPopMatrix();*/
+		// bottom left corner of safe area
+		final float LOGO_X = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT) - 65;
+		final float LOGO_Y = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
+		DrawingHelper.paintTexture(gl, textureLogo, LOGO_X, LOGO_Y, 64, 64);*/
 	}
 }

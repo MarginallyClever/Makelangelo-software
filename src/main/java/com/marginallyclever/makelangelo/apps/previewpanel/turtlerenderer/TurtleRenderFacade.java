@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
@@ -28,7 +29,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	private double penDiameter=0.8;
 
 	@Override
-	public void render(GL3 gl) {
+	public void render(GL3 gl, ShaderProgram shaderProgram) {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {

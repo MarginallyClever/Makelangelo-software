@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience;
 
+import javax.vecmath.Point2d;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -81,11 +82,11 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		simplifySection(0, size() - 1,distanceTolerance);
 		
 		LineCollection result = new LineCollection();
-		Point2D head = get(0).start;
+		Point2d head = get(0).start;
 		
 		for (int i = 0; i < size(); i++) {
 			if (usePt[i]) {
-				Point2D next = get(i).end;
+				Point2d next = get(i).end;
 				result.add(new LineSegment2D(head,next,get(i).color));
 				head=next;
 			}
@@ -119,11 +120,11 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		}
 	}
 
-	public Point2D getStart() {
+	public Point2d getStart() {
 		return get(0).start;
 	}
 
-	public Point2D getEnd() {
+	public Point2d getEnd() {
 		return get(size()-1).end;
 	}
 

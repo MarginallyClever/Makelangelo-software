@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -19,7 +20,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl,Plotter robot) {
+	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
 		PlotterSettings settings = robot.getSettings();
 
 		paintControlBox(gl,settings);

@@ -28,7 +28,8 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		
 	@Override
 	public void start(GL3 gl) {
-		this.gl =gl;
+		this.gl = gl;
+		points.clear();
 		showPenUp = GFXPreferences.getShowPenUp();
 		mesh.setRenderStyle(GL3.GL_LINES);
 	}
@@ -38,8 +39,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		drawPoints();
 		isDone=true;
 
-		// restore pen diameter
-		gl.glLineWidth(lineWidthBuf[0]);
+		mesh.render(gl);
 	}
 	
 	@Override
@@ -74,6 +74,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		if(isDone) return;
 
 		drawPoints();
+
 		if(!showPenUp) return;
 
 		float r = colorTravel.getRed() / 255.0f;

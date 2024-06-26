@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
@@ -324,8 +325,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         }
         // fast reject if truchet index too far apart
         if(Math.abs(head.ix-next.ix)>6 || Math.abs(head.iy-next.iy)>6) return false;
-        if(closeEnough(head.start,next.end)) return true;
-        if(closeEnough(head.start,next.start)) {
+        if(head.start.epsilonEquals(next.end,EPSILON)) return true;
+        if(head.start.epsilonEquals(next.start,EPSILON)) {
             // next is backwards
             next.flip();
             return true;
@@ -344,16 +345,12 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         }
         // fast reject if truchet index too far apart
         if(Math.abs(tail.ix-next.ix)>2 || Math.abs(tail.iy-next.iy)>2) return false;
-        if(closeEnough(tail.end,next.start)) return true;
-        if(closeEnough(tail.end,next.end)) {
+        if(tail.end.epsilonEquals(next.start,EPSILON)) return true;
+        if(tail.end.epsilonEquals(next.end,EPSILON)) {
             next.flip();
             return true;
         }
         return false;
-    }
-
-    boolean closeEnough(Point2D p0,Point2D p1) {
-        return p0.distanceSquared(p1)<EPSILON;
     }
 
     private void buildSegmentList(Turtle from) {
@@ -386,10 +383,10 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             segment.end.y - segment.start.y
         );
 
-        Point2D a = segment.start;
+        Point2d a = segment.start;
         for(int i=0;i<pieces-1;++i) {
             double t1 = (double)(i+1) / (double)pieces;
-            Point2D b = new Point2D(
+            Point2d b = new Point2d(
                     segment.start.x + diff.x * t1,
                     segment.start.y + diff.y * t1);
             addOneUnsortedSegment(a,b);
@@ -398,11 +395,11 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         addOneUnsortedSegment(a,segment.end);
     }
 
-    private void addOneUnsortedSegment(Point2D start, Point2D end) {
+    private void addOneUnsortedSegment(Point2d start, Point2d end) {
         unsorted.add(createLSW(start,end));
     }
 
-    private LineWeightSegment createLSW(Point2D start, Point2D end) {
+    private LineWeightSegment createLSW(Point2d start, Point2d end) {
         // sample image intensity here from 0...1
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;

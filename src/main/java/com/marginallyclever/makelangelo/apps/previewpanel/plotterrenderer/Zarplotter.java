@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -15,7 +16,7 @@ public class Zarplotter implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(GL3 gl,Plotter robot) {
+	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
 		paintMotors(gl,robot);
 		paintControlBox(gl,robot);
 		if(robot.getDidFindHome()) 

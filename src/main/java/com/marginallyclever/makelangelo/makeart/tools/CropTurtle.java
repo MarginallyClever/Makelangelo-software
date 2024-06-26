@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +20,13 @@ public class CropTurtle {
 
 		List<TurtleMove> newHistory = new ArrayList<>();
 		// limits we will need for rectangle
-		Point2D rMax = new Point2D(rectangle.getMaxX(),rectangle.getMaxY());
-		Point2D rMin = new Point2D(rectangle.getMinX(),rectangle.getMinY());
+		Point2d rMax = new Point2d(rectangle.getMaxX(),rectangle.getMaxY());
+		Point2d rMin = new Point2d(rectangle.getMinX(),rectangle.getMinY());
 		// working space for clipping
-		Point2D p0 = new Point2D();
-		Point2D p1 = new Point2D();
-		Point2D p0before = new Point2D();
-		Point2D p1before = new Point2D();
+		Point2d p0 = new Point2d();
+		Point2d p1 = new Point2d();
+		Point2d p0before = new Point2d();
+		Point2d p1before = new Point2d();
 
 		TurtleMove prev=null;
 		
@@ -42,8 +42,8 @@ public class CropTurtle {
 						p1before.set(p1);
 						if (Clipper2D.clipLineToRectangle(p0, p1, rMax, rMin)) {
 							// partial crop.  Which end(s)?
-							boolean startCropped = !p0before.equalsEpsilon(p0, 1e-8);
-							boolean endCropped = !p1before.equalsEpsilon(p1, 1e-8);
+							boolean startCropped = !p0before.epsilonEquals(p0, 1e-8);
+							boolean endCropped = !p1before.epsilonEquals(p1, 1e-8);
 
 							if (startCropped) {
 								// make a jump to the crop start

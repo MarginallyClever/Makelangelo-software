@@ -15,5 +15,5 @@ public interface PreviewListener extends EventListener {
 	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
 	 * @param gl the render context
 	 */
-	void render(GL3 gl3);
+	void render(GL3 gl3,ShaderProgram shaderProgram);
 }

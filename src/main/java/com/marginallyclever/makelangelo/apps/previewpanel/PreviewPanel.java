@@ -93,9 +93,9 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		addListener(paper);
 		addListener(myTurtleRenderer);
-		addListener((gl) -> {
+		addListener((gl,shaderProgram) -> {
 			if(myPlotterRenderer!=null) {
-				myPlotterRenderer.render(gl, myPlotter);
+				myPlotterRenderer.render(gl, myPlotter, shaderProgram);
 			}
 		});
 
@@ -219,6 +219,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		JButton buttonZoomToFit = new JButton(Translator.get("MenuView.zoomFit"));
 		//buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
+		buttonZoomToFit.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-to-extents-16.png"))));
 		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight()));
 		toolBar.add(buttonZoomToFit);
 
@@ -368,7 +369,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		var list = previewListeners.getListeners(PreviewListener.class);
 		ArrayUtils.reverse(list);
 		for( PreviewListener p : list ) {
-			p.render(gl3);
+			p.render(gl3,shader);
 		}
 	}
 
