@@ -247,6 +247,8 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     }
 
     protected void renderEdges(GL3 gl) {
+// TODO implement me
+/*
         gl.glColor3d(0.9, 0.9, 0.9);
 
         double cx = myPaper.getCenterX();
@@ -262,7 +264,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
             }
             gl.glEnd();
         }
-        gl.glPopMatrix();
+        gl.glPopMatrix();*/
     }
 
     public void setNumCells(int value) {

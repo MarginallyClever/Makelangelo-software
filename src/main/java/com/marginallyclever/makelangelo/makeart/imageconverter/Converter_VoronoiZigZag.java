@@ -81,7 +81,8 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void render(GL3 gl) {
 		super.render(gl);
 		if(getThread().getPaused()) return;
-
+// TODO implement me
+/*
 		gl.glPushMatrix();
 		gl.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
 
@@ -94,10 +95,12 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 			lock.unlock();
 		}
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	private void renderPoints(GL3 gl) {
+// TODO implement me
+/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
@@ -115,10 +118,12 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		}
 		finally {
 			lock.unlock();
-		}
+		}*/
 	}
 
 	private void drawTour(GL3 gl) {
+// TODO implement me
+/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
@@ -133,7 +138,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		}
 		finally {
 			lock.unlock();
-		}
+		}*/
 	}
 
 	private void optimizeTour() {

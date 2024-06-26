@@ -1,13 +1,10 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
-
-import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
 
 public class MakelangeloCustom implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
@@ -31,12 +28,19 @@ public class MakelangeloCustom implements PlotterRenderer {
 			paintPenHolderToCounterweights(gl,robot);
 	}
 
+	@Override
+	public void updatePlotterSettings(PlotterSettings settings) {
+
+	}
+
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl the render context
 	 * @param settings plottersettings of the robot
 	 */
 	private void paintControlBox(GL3 gl, PlotterSettings settings) {
+// TODO implement me
+/*
 		double cy = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -85,11 +89,13 @@ public class MakelangeloCustom implements PlotterRenderer {
 
 		renderLCD(gl, left);
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	// draw left & right motor
 	private void paintMotors(GL3 gl, PlotterSettings settings) {
+// TODO implement me
+/*
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
@@ -99,10 +105,12 @@ public class MakelangeloCustom implements PlotterRenderer {
 		drawRectangle(gl, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2);
 
 		// right motor
-		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2);
+		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2);*/
 	}
 	
 	private void renderLCD(GL3 gl, double left) {
+// TODO implement me
+/*
 		// position
 		float shiftX = (float) left / 2;
 		if (shiftX > -100) {
@@ -140,10 +148,12 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl.glPopMatrix();
 
 		// clean up
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	private void paintPenHolderToCounterweights(GL3 gl, Plotter robot ) {
+// TODO implement me
+/*
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
 		Point2D pos = robot.getPos();
@@ -212,12 +222,14 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl.glVertex2d(right+PULLEY_RADIUS+bottleCenter+COUNTERWEIGHT_W/2,top-right_b);
 		gl.glVertex2d(right+PULLEY_RADIUS+bottleCenter+COUNTERWEIGHT_W/2,top-right_b-COUNTERWEIGHT_H);
 		gl.glVertex2d(right+PULLEY_RADIUS+bottleCenter-COUNTERWEIGHT_W/2,top-right_b-COUNTERWEIGHT_H);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void paintPlotter(GL3 gl, float gx, float gy) {
+// TODO implement me
+/*
 		// plotter
 		gl.glColor3f(0, 0, 1);
-		drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_5);
+		drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_5);*/
 	}
 }

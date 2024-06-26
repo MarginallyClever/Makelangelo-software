@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -23,7 +22,14 @@ public class Zarplotter implements PlotterRenderer {
 			paintPenHolderToCounterweights(gl,robot);		
 	}
 
+	@Override
+	public void updatePlotterSettings(PlotterSettings settings) {
+
+	}
+
 	private void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+// TODO implement me
+/*
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
 		Point2D pos = robot.getPos();
@@ -72,10 +78,12 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
 		gl.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
 		gl.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void paintMotors(GL3 gl,Plotter plotter) {
+// TODO implement me
+/*
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -85,10 +93,12 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glPushMatrix();		gl.glTranslated(left , top   , 0);		gl.glRotated(270, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
 		gl.glPushMatrix();		gl.glTranslated(right, top   , 0);		gl.glRotated(180, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
 		gl.glPushMatrix();		gl.glTranslated(right, bottom, 0);		gl.glRotated( 90, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
-		gl.glPushMatrix();		gl.glTranslated(left , bottom, 0);		gl.glRotated(  0, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();
+		gl.glPushMatrix();		gl.glTranslated(left , bottom, 0);		gl.glRotated(  0, 0, 0, 1);		paintOneMotor(gl);		gl.glPopMatrix();*/
 	}
 
 	private void paintOneMotor(GL3 gl) {
+// TODO implement me
+/*
 		// frame
 		gl.glColor3f(1, 0.8f, 0.5f);
 		gl.glBegin(GL3.GL_TRIANGLE_FAN);
@@ -107,10 +117,12 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
 		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, 0                  );
 		gl.glVertex2d(0                  , 0                  );
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 	
 	private void paintControlBox(GL3 gl,Plotter plotter) {
+// TODO implement me
+/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 
@@ -139,7 +151,7 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glVertex2d(-w, -h);
 		gl.glEnd();
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 /*
 	@Override

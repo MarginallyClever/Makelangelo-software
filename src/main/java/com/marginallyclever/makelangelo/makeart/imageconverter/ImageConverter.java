@@ -63,6 +63,8 @@ public abstract class ImageConverter {
 			texture = AWTTextureIO.newTexture(gl.getGLProfile(), myImage.getSourceImage(), false);
 		}
 		if(texture!=null) {
+// TODO implement me
+/*
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
 			double h = myImage.getSourceImage().getHeight() * myImage.getScaleY();
 			gl.glEnable(GL3.GL_TEXTURE_2D);
@@ -80,7 +82,7 @@ public abstract class ImageConverter {
 			gl.glEnd();
 			gl.glDisable(GL3.GL_TEXTURE_2D);
 			gl.glDisable(GL3.GL_BLEND);
-			gl.glEnable(GL3.GL_COLOR);
+			gl.glEnable(GL3.GL_COLOR);*/
 		}	
 	}
 	

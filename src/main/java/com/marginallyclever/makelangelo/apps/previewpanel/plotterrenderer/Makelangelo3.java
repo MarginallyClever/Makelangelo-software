@@ -19,12 +19,19 @@ public class Makelangelo3 implements PlotterRenderer {
 			Polargraph.paintPenHolderToCounterweights(gl,robot);		
 	}
 
+	@Override
+	public void updatePlotterSettings(PlotterSettings settings) {
+
+	}
+
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl
 	 * @param plotter
 	 */
 	private void paintControlBox(GL3 gl,Plotter plotter) {
+// TODO implement me
+/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -73,10 +80,12 @@ public class Makelangelo3 implements PlotterRenderer {
 
 		renderLCD(gl);
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 	
 	private void renderLCD(GL3 gl) {
+// TODO implement me
+/*
 		// position
 		gl.glPushMatrix();
 		gl.glTranslated(-180, 0, 0);
@@ -141,6 +150,6 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl.glPopMatrix();
 
 		// clean up
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 }

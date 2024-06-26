@@ -7,6 +7,7 @@ in vec2 textureCoord;
 
 out vec4 finalColor;
 
+// material properties
 uniform vec4 specularColor = vec4(0.5, 0.5, 0.5,1);
 uniform vec4 ambientColor = vec4(0.2, 0.2, 0.2,1);
 uniform vec4 diffuseColor = vec4(1,1,1,1);
@@ -17,8 +18,10 @@ uniform int shininess = 32;
 uniform vec3 lightPos; // Light position in world space
 uniform vec3 cameraPos;  // Camera position in world space
 
+// the texture source
 uniform sampler2D diffuseTexture;
 
+// flags
 uniform bool useTexture;
 uniform bool useLighting;
 uniform bool useVertexColor;  // per-vertex color

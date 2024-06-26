@@ -14,8 +14,8 @@ public class Camera {
 	public static final double ZOOM_STEP_SIZE = 0.15;
 
 	// scale + position
-	private double offsetX = 0.0;
-	private double offsetY = 0.0;
+	private double px = 0.0;
+	private double py = 0.0;
 	private double zoom = 1.0;
 
 	// window size (for aspect ratio?)
@@ -30,13 +30,14 @@ public class Camera {
 	 */
 	public void moveRelative(double dx, double dy) {
 		double scale = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS).getInt("dragSpeed", 1);
-		offsetX += dx * scale / zoom;
-		offsetY += dy * scale / zoom;
+		// TODO moving camera with these scale factors is pretty close but could be better.
+		px += dx * scale * zoom/height;
+		py += dy * scale * zoom/height;
 	}
 
 	private void limitCameraZoom() {
-		if(zoom< CAMERA_ZOOM_MIN) zoom= CAMERA_ZOOM_MIN;
-		if(zoom> CAMERA_ZOOM_MAX) zoom= CAMERA_ZOOM_MAX;
+		if(zoom < CAMERA_ZOOM_MIN) zoom = CAMERA_ZOOM_MIN;
+		if(zoom > CAMERA_ZOOM_MAX) zoom = CAMERA_ZOOM_MAX;
 	}
 
 	// scale the picture of the robot to fake a zoom.
@@ -51,8 +52,9 @@ public class Camera {
 	 */
 	public Point2D screenToWorldSpace(Point2D input) {
 		Point2D output = new Point2D();
-		output.x = input.x/zoom + offsetX;
-		output.y = input.y/zoom + offsetY;
+		// TODO this is not quite right.
+		output.x = px + input.x * zoom/width;
+		output.y = py + input.y * zoom/width;
 		return output;
 	}
 
@@ -63,29 +65,32 @@ public class Camera {
 	 */
 	public void zoom(int amount, Point2D cursor) {
 		Point2D before = screenToWorldSpace(cursor);
-		zoom -= (double)amount * ZOOM_STEP_SIZE;
+		//zoom -= (double)amount * ZOOM_STEP_SIZE;
+		double zoomScale = (double)amount * ZOOM_STEP_SIZE;
+		zoom = zoom * (1.0 + zoomScale);
+
 		limitCameraZoom();
 		Point2D after = screenToWorldSpace(cursor);
 
-		offsetX -= after.x - before.x;
-		offsetY -= after.y - before.y;
+		px -= after.x - before.x;
+		py -= after.y - before.y;
 	}
 
 	// scale the picture of the robot to fake a zoom.
 	public void zoomToFit(double w,double h) {
-		offsetX = 0;
-		offsetY = 0;
-		zoom = Math.max(w/h, h/w);
+		px = 0;
+		py = 0;
+		zoom =  Math.max(w,h) * Math.cos(Math.toRadians(60))*2;
 
 		limitCameraZoom();
 	}
 
 	public double getX() {
-		return offsetX;
+		return px;
 	}
 
 	public double getY() {
-		return offsetY;
+		return py;
 	}
 
 	public double getZoom() {

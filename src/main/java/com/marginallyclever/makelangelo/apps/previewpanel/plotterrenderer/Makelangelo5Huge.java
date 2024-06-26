@@ -7,7 +7,6 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
-import static com.marginallyclever.convenience.helpers.DrawingHelper.drawCircle;
 import static com.marginallyclever.convenience.helpers.DrawingHelper.paintTexture;
 
 public class Makelangelo5Huge implements PlotterRenderer {
@@ -49,6 +48,11 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		} else {
 			paintLogoFancy(gl, robot);
 		}
+	}
+
+	@Override
+	public void updatePlotterSettings(PlotterSettings settings) {
+
 	}
 
 	private void paintControlBoxFancy(GL3 gl, Plotter robot,TextureWithMetadata texture) {
@@ -109,6 +113,8 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	}
 
 	private void drawBeltMinus10(GL3 gl, double cornerX, double cornerY, double penX, double penY) {
+// TODO implement me
+/*
 		double dx = penX - cornerX;
 		double dy = penY - cornerY;
 		double len = Math.sqrt(dx * dx + dy * dy);
@@ -119,14 +125,16 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glColor3d(0.2, 0.2, 0.2);
 		gl.glVertex2d(cornerX, cornerY);
 		gl.glVertex2d(penX, penY);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
+// TODO implement me
+/*
 		gl.glBegin(GL3.GL_LINES);
 		gl.glVertex2d(x , y);
 		gl.glVertex2d(x, y - length);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
@@ -141,6 +149,8 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	}
 
 	private void paintGondolaFancy(GL3 gl, double gx, double gy,Plotter robot) {
+// TODO implement me
+/*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -165,7 +175,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glPopMatrix();
 
 		// paint body last so it's on top
-		paintTexture(gl,textureGondola,gx-50,gy-50,100,100);
+		paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
 	}
 
 	private void paintCounterweight(GL3 gl,double x,double y) {
@@ -201,6 +211,8 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	 * @param robot the machine to draw.
 	 */
 	private void paintControlBoxPlain(GL3 gl, Plotter robot) {
+// TODO implement me
+/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -215,11 +227,13 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		drawWires(gl,left,right);
 		drawRUMBA(gl,left,right);
 		renderLCD(gl,left,right);
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	// RUMBA in v3 (135mm*75mm)
 	private void drawRUMBA(GL3 gl, double left, double right) {
+// TODO implement me
+/*
 		float h = 75f / 2;
 		float w = 135f / 2;
 		gl.glPushMatrix();
@@ -232,10 +246,12 @@ public class Makelangelo5Huge implements PlotterRenderer {
 			gl.glVertex2d(+w, -h);
 			gl.glVertex2d(-w, -h);
 			gl.glEnd();
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	private void drawWires(GL3 gl, double left, double right) {
+// TODO implement me
+/*
 		// wires to each motor
 		gl.glBegin(GL3.GL_LINES);
 		final float SPACING = 2;
@@ -274,10 +290,12 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glVertex2d(0, y);
 		gl.glVertex2d(right, y);
 		y += SPACING;
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void drawFrame(GL3 gl, double left, double right, double top) {
+// TODO implement me
+/*
 		final float FRAME_SIZE = 50f; // mm
 		gl.glColor3d(1, 0.8f, 0.5f);
 		gl.glBegin(GL3.GL_QUADS);
@@ -285,20 +303,24 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glVertex2d(right + FRAME_SIZE, top + FRAME_SIZE);
 		gl.glVertex2d(right + FRAME_SIZE, top - FRAME_SIZE);
 		gl.glVertex2d(left - FRAME_SIZE, top - FRAME_SIZE);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void drawSuctionCups(GL3 gl,double left,double right,double top) {
+// TODO implement me
+/*
 		final float SUCTION_CUP_Y = 35f;
 		final float SUCTION_CUP_RADIUS = 32.5f; /// mm
 		gl.glColor3f(1, 1f, 1f); // #color of suction cups
 		drawCircle(gl, (float) left - SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
 		drawCircle(gl, (float) left - SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
 		drawCircle(gl, (float) right + SUCTION_CUP_Y, (float) top - SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
-		drawCircle(gl, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);
+		drawCircle(gl, (float) right + SUCTION_CUP_Y, (float) top + SUCTION_CUP_Y, SUCTION_CUP_RADIUS);*/
 	}
 
 	private void renderLCD(GL3 gl, double left, double right) {
+// TODO implement me
+/*
 		// position
 		gl.glPushMatrix();
 		gl.glTranslated(right-(650.0/2.0)-180,0,0);
@@ -352,7 +374,6 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glPopMatrix();
 
 		// clean up
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
-
 }

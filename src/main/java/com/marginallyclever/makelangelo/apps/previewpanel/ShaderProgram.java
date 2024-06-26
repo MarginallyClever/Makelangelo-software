@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.convenience.helpers.OpenGLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

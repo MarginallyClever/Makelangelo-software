@@ -16,6 +16,8 @@ public class DrawingHelper {
      * @param radius radius
      */
     public static void drawCircle(GL3 gl, float x, float y, float radius) {
+// TODO implement me
+/*
         gl.glTranslatef(x, y, 0);
         gl.glBegin(GL3.GL_LINE_LOOP);
         for (float f = 0; f < 2.0 * Math.PI; f += 0.3f) {
@@ -24,7 +26,7 @@ public class DrawingHelper {
                     Math.sin(f) * radius);
         }
         gl.glEnd();
-        gl.glTranslatef(-x, -y, 0);
+        gl.glTranslatef(-x, -y, 0);*/
     }
 
     /**
@@ -37,6 +39,8 @@ public class DrawingHelper {
      * @param a2 end angle
      */
     public static void drawArc(GL3 gl, float x, float y, float radius, float a1, float a2) {
+// TODO implement me
+/*
         gl.glBegin(GL3.GL_LINE_STRIP);
         int steps = 10;
         float delta = (a2 - a1) / (float) steps;
@@ -47,7 +51,7 @@ public class DrawingHelper {
                     y + Math.sin(f) * radius);
             f += delta;
         }
-        gl.glEnd();
+        gl.glEnd();*/
     }
 
     /**
@@ -59,12 +63,14 @@ public class DrawingHelper {
      * @param left left coordinate
      */
     public static void drawRectangle(GL3 gl, double top, double right, double bottom, double left) {
+// TODO implement me
+/*
         gl.glBegin(GL3.GL_QUADS);
         gl.glVertex2d(left, top);
         gl.glVertex2d(right, top);
         gl.glVertex2d(right, bottom);
         gl.glVertex2d(left, bottom);
-        gl.glEnd();
+        gl.glEnd();*/
     }
 
     /**
@@ -76,6 +82,8 @@ public class DrawingHelper {
      * @param height height of the texture
      */
     public static void paintTexture(GL3 gl, TextureWithMetadata texture, double x, double y, double width, double height) {
+// TODO implement me
+/*
         texture.use(gl);
         gl.glColor4d(1, 1, 1, 1);
         gl.glEnable(GL3.GL_TEXTURE_2D);
@@ -89,6 +97,6 @@ public class DrawingHelper {
         gl.glTexCoord2d(0, 1);
         gl.glVertex2d(x, y + height);
         gl.glEnd();
-        gl.glDisable(GL3.GL_TEXTURE_2D);
+        gl.glDisable(GL3.GL_TEXTURE_2D);*/
     }
 }

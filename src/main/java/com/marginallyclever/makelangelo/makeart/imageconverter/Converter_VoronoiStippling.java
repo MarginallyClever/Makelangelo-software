@@ -61,6 +61,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	@Override
 	public void render(GL3 gl) {
 		super.render(gl);
+// TODO implement me
+/*
 
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;
@@ -78,10 +80,12 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			lock.unlock();
 		}
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	private void drawCircle(GL3 gl,double x, double y, double r) {
+// TODO implement me
+/*
 		if(r<=minDotSize) return;
 
 		gl.glBegin(GL3.GL_TRIANGLE_FAN);
@@ -90,10 +94,12 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 					x + r * cosTable[j],
 					y + r * sinTable[j] );
 		}
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void renderDots(GL3 gl) {
+// TODO implement me
+/*
 		int lpc = getLowpassCutoff();
 		double scale = (maxDotSize-minDotSize)/255.0;
 		double cx = myPaper.getCenterX();
@@ -106,7 +112,7 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			double y = c.center.y;
 			gl.glColor3f((float)c.change, 0, 0);
 			drawCircle(gl,x,y,r);
-		}
+		}*/
 	}
 
 	/**

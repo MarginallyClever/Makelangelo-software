@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -44,7 +45,9 @@ public class Paper implements PreviewListener {
 	private double centerX=0.0d;
 	private double centerY=0.0d;
 	private Color paperColor = Color.WHITE;
-	
+	private final Mesh meshPaper = new Mesh();
+	private final Mesh meshMargin = new Mesh();
+
 	public Paper() {
 		super();
 		setPaperSize(DEFAULT_WIDTH, DEFAULT_HEIGHT, 0, 0);
@@ -52,53 +55,9 @@ public class Paper implements PreviewListener {
 
 	@Override
 	public void render(GL3 gl) {
-		renderPaper(gl);
-		renderMargin(gl);
-	}
-
-	/**
-	 * Render the paper margin rectangle.
-	 * @param gl the render context
-	 */
-	private void renderMargin(GL3 gl) {
-		gl.glLineWidth(1);
-		gl.glColor3f(0.9f, 0.9f, 0.9f); // Paper margin line #color
-
-		Rectangle2D.Double rect = getMarginRectangle();
-		double yMin = rect.getMinY();
-		double yMax = rect.getMaxY();
-		double xMin = rect.getMinX();
-		double xMax = rect.getMaxX();
-
-		gl.glPushMatrix();
-		gl.glTranslated(centerX, centerY, 0);
-		gl.glBegin(GL3.GL_LINE_LOOP);
-		gl.glVertex2d(xMin, yMax);
-		gl.glVertex2d(xMax, yMax);
-		gl.glVertex2d(xMax, yMin);
-		gl.glVertex2d(xMin, yMin);
-		gl.glEnd();
-		gl.glPopMatrix();
-	}
-
-	/**
-	 * Draw paper as a rectangle.
-	 * @param gl
-	 */
-	private void renderPaper(GL3 gl) {
-		gl.glColor3d(
-				(double)paperColor.getRed() / 255.0,
-				(double)paperColor.getGreen() / 255.0,
-				(double)paperColor.getBlue() / 255.0);
-		gl.glPushMatrix();
-		gl.glTranslated(centerX, centerY, 0);
-		gl.glBegin(GL3.GL_TRIANGLE_FAN);
-		gl.glVertex2d(getPaperLeft(), getPaperTop());
-		gl.glVertex2d(getPaperRight(), getPaperTop());
-		gl.glVertex2d(getPaperRight(), getPaperBottom());
-		gl.glVertex2d(getPaperLeft(), getPaperBottom());
-		gl.glEnd();
-		gl.glPopMatrix();
+		// TODO gl.glTranslated(centerX, centerY, 0);
+		meshPaper.render(gl);
+		meshMargin.render(gl);
 	}
 
 	/**
@@ -150,7 +109,9 @@ public class Paper implements PreviewListener {
 		this.paperLeft = -width / 2;
 		this.paperRight = width / 2;
 		this.paperTop = height / 2;
-		this.paperBottom = -height / 2;		
+		this.paperBottom = -height / 2;
+
+		updateMeshes();
 	}
 
 	public Color getPaperColor() {
@@ -217,9 +178,37 @@ public class Paper implements PreviewListener {
 	 * @param paperMargin 0...1
 	 */
 	public void setPaperMargin(double paperMargin) {
-		if( paperMargin<0 ) paperMargin = 0;
-		if( paperMargin>1 ) paperMargin = 1;
+		if (paperMargin < 0) paperMargin = 0;
+		if (paperMargin > 1) paperMargin = 1;
 		this.paperMargin = paperMargin;
+		updateMeshes();
+	}
+
+	private void updateMeshes() {
+		meshPaper.clear();
+		meshPaper.setRenderStyle(GL3.GL_TRIANGLE_FAN);
+		var R = paperColor.getRed() / 255.0f;
+		var G = paperColor.getGreen() / 255.0f;
+		var B = paperColor.getBlue() / 255.0f;
+		var A = paperColor.getAlpha() / 255.0f;
+		meshPaper.addColor(R,G,B,A);  meshPaper.addVertex((float)paperLeft , (float)paperTop   ,0);
+		meshPaper.addColor(R,G,B,A);  meshPaper.addVertex((float)paperRight, (float)paperTop   ,0);
+		meshPaper.addColor(R,G,B,A);  meshPaper.addVertex((float)paperRight, (float)paperBottom,0);
+		meshPaper.addColor(R,G,B,A);  meshPaper.addVertex((float)paperLeft , (float)paperBottom,0);
+
+		meshMargin.clear();
+		meshMargin.setRenderStyle(GL3.GL_LINE_LOOP);
+
+		Rectangle2D.Double rect = getMarginRectangle();
+		float yMin = (float)rect.getMinY();
+		float yMax = (float)rect.getMaxY();
+		float xMin = (float)rect.getMinX();
+		float xMax = (float)rect.getMaxX();
+
+		meshMargin.addColor(0.9f,0.9f,0.9f,1.0f);	meshMargin.addVertex(xMin, yMax,0);
+		meshMargin.addColor(0.9f,0.9f,0.9f,1.0f);	meshMargin.addVertex(xMax, yMax,0);
+		meshMargin.addColor(0.9f,0.9f,0.9f,1.0f);	meshMargin.addVertex(xMax, yMin,0);
+		meshMargin.addColor(0.9f,0.9f,0.9f,1.0f);	meshMargin.addVertex(xMin, yMin,0);
 	}
 
 	/**

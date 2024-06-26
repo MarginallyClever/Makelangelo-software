@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -83,6 +82,8 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @param gl
 	 */
 	private void drawPhysicalLimits(GL3 gl,Plotter robot) {
+// TODO implement me
+/*
 		mesh.addColor(0.9f, 0.9f, 0.9f,1.0f); // #color
 
 		gl.glBegin(GL3.GL_LINE_LOOP);
@@ -91,10 +92,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_TOP));
 		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
 		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	static public void paintMotors(GL3 gl,Plotter robot) {
+// TODO implement me
+/*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -111,10 +114,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(right + MOTOR_SIZE, top + MOTOR_SIZE);
 		gl.glVertex2d(right + MOTOR_SIZE, top - MOTOR_SIZE);
 		gl.glVertex2d(right - MOTOR_SIZE, top - MOTOR_SIZE);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	private void paintControlBox(GL3 gl, Plotter robot) {
+// TODO implement me
+/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -157,10 +162,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(-40, -30);
 		gl.glEnd();
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
 	static public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+
+
 		Point2D pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -185,7 +192,8 @@ public abstract class Polargraph implements PlotterRenderer {
 		dx = gx - right;
 		double right_a = Math.sqrt(dx * dx + dy * dy);
 		double right_b = (beltLength - right_a) / 2 + 55;
-
+// TODO implement me
+/*
 		gl.glBegin(GL3.GL_LINES);
 		gl.glColor3d(0.2, 0.2, 0.2);
 
@@ -195,12 +203,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		// belt from motor to pen holder right
 		gl.glVertex2d(right, top);
 		gl.glVertex2d(gx, gy);
-/*
-		// belt from motor to counterweight left
-		paintBeltSide(gl,left,top,left_b);
-		// belt from motor to counterweight right
-		paintBeltSide(gl,right,top,right_b);
 */
+		// belt from motor to counterweight left
+		//paintBeltSide(gl,left,top,left_b);
+		// belt from motor to counterweight right
+		//paintBeltSide(gl,right,top,right_b);
+
 		paintGondola(gl,gx,gy,robot);
 
 		// left
@@ -210,10 +218,12 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
+// TODO implement me
+/*
 		gl.glVertex2d(x - 2, y);
 		gl.glVertex2d(x - 2, y - length);
 		gl.glVertex2d(x + 2, y);
-		gl.glVertex2d(x + 2, y - length);
+		gl.glVertex2d(x + 2, y - length);*/
 	}
 
 	private static void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
@@ -224,17 +234,20 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	static public void paintCounterweight(GL3 gl,double x,double y) {
+// TODO implement me
+/*
 		gl.glBegin(GL3.GL_LINE_LOOP);
 		gl.glColor3f(0, 0, 1);
 		gl.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y);
 		gl.glVertex2d(x + COUNTERWEIGHT_HALF_WIDTH, y);
 		gl.glVertex2d(x + COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
 		gl.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	static public void paintBottomClearanceArea(GL3 gl, Plotter machine) {
-
+// TODO implement me
+/*
 		// bottom clearance arcs
 		// right
 		double w = machine.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT) - machine.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) + 2.1;
@@ -263,11 +276,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		  double vi = (end-start)*v + start;
 		  gl.glVertex2d(gx+Math.cos(vi)*r, gy+Math.sin(vi)*r);
 		}
-		gl.glEnd();
-
+		gl.glEnd();*/
 	}
 
 	public static void drawCircle(GL3 gl, double gx, double gy, float penHolderRadius2, int steps) {
+// TODO implement me
+/*
 		gl.glBegin(GL3.GL_LINE_LOOP);
 		gl.glColor3f(0, 0, 1);
 		float f;
@@ -277,10 +291,12 @@ public abstract class Polargraph implements PlotterRenderer {
 					gx + Math.cos(f2) * PEN_HOLDER_RADIUS_2, 
 					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
 		}
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 
 	public static void paintSafeArea(GL3 gl, Plotter robot) {
+// TODO implement me
+/*
 		PlotterSettings settings = robot.getSettings();
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
@@ -295,6 +311,6 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(right + 70f, top + 70f);
 		gl.glVertex2d(right + 70f, bottom);
 		gl.glVertex2d(left - 70f, bottom);
-		gl.glEnd();
+		gl.glEnd();*/
 	}
 }

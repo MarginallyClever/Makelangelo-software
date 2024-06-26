@@ -370,7 +370,7 @@ public final class Makelangelo {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
 				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
 		if (result == JOptionPane.YES_OPTION) {
-			previewPanel.removeListener(myPlotter);
+			// TODO previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myPlotter.getSettings().save();
 			plotterSettingsManager.setLastSelectedProfile(myPlotter.getSettings().getUID());

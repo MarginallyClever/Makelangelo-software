@@ -4,8 +4,6 @@ import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
-import static com.marginallyclever.convenience.helpers.DrawingHelper.drawRectangle;
-
 public class Makelangelo3_3 implements PlotterRenderer {
 
 	@Override
@@ -15,13 +13,20 @@ public class Makelangelo3_3 implements PlotterRenderer {
 		if(robot.getDidFindHome()) 
 			Polargraph.paintPenHolderToCounterweights(gl,robot);		
 	}
-	
+
+	@Override
+	public void updatePlotterSettings(PlotterSettings settings) {
+
+	}
+
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl   the render context
 	 * @param robot the machine to draw.
 	 */
 	private void paintControlBox(GL3 gl,Plotter robot) {
+// TODO implement me
+/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -54,10 +59,12 @@ public class Makelangelo3_3 implements PlotterRenderer {
 
 		renderLCD(gl);
 
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 	
 	protected void renderLCD(GL3 gl) {
+// TODO implement me
+/*
 		// position
 		gl.glPushMatrix();
 		gl.glTranslated(-180, 0, 0);
@@ -97,6 +104,6 @@ public class Makelangelo3_3 implements PlotterRenderer {
 		gl.glPopMatrix();
 
 		// clean up
-		gl.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 }

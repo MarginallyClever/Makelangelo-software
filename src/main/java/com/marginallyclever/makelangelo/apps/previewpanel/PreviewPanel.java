@@ -69,6 +69,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	private int mouseLastZoomDirection = 0;
 
 	private final Plotter myPlotter;
+	private final Paper myPaper;
 	private PlotterRenderer myPlotterRenderer;
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private final DoubleRangeSlider rangeSlider = new DoubleRangeSlider();
@@ -84,6 +85,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	public PreviewPanel(Paper paper, Plotter plotter) {
 		super(new BorderLayout());
 		myPlotter = plotter;
+		myPaper = paper;
 
 		add(toolBar, BorderLayout.NORTH);
 		add(glCanvas, BorderLayout.CENTER);
@@ -214,12 +216,12 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
 		buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
 		toolBar.add(buttonZoomIn);
-/*
+
 		JButton buttonZoomToFit = new JButton(Translator.get("MenuView.zoomFit"));
 		//buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
-		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(app.getPaper().getPaperWidth(),app.getPaper().getPaperHeight()));
+		buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight()));
 		toolBar.add(buttonZoomToFit);
-*/
+
 		JCheckBox checkboxShowPenUpMoves = new JCheckBox(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
 		//checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
 		checkboxShowPenUpMoves.addActionListener((e) -> {
@@ -290,8 +292,8 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		try {
 			shader = new ShaderProgram(gl3,
-					ResourceHelper.readResource(this.getClass(), "/com/marginallyclever/ro3/apps/viewport/default.vert"),
-					ResourceHelper.readResource(this.getClass(), "/com/marginallyclever/ro3/apps/viewport/default.frag"));
+					ResourceHelper.readResource(this.getClass(), "default.vert"),
+					ResourceHelper.readResource(this.getClass(), "default.frag"));
 		} catch(Exception e) {
 			logger.error("Failed to load shader", e);
 		}
@@ -340,20 +342,25 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		// turn on blending
 		gl3.glEnable(GL3.GL_BLEND);
 		gl3.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
-		
+
+		gl3.glDisable(GL3.GL_CULL_FACE);
+		gl3.glDisable(GL3.GL_DEPTH_TEST);
+
 		paintBackground(gl3);
 
 		shader.use(gl3);
 		//shader.setVector3d(gl3,"lightPos",cameraWorldPos);  // Light position in world space
 		shader.setColor(gl3,"lightColor", Color.WHITE);
 		shader.setColor(gl3,"diffuseColor",Color.WHITE);
-		shader.setColor(gl3,"specularColor",Color.BLACK);
+		shader.setColor(gl3,"specularColor",Color.WHITE);
 		shader.setColor(gl3,"ambientColor",Color.BLACK);
-		shader.set1i(gl3,"useVertexColor",0);
+		shader.set1i(gl3,"useVertexColor",1);
 		shader.set1i(gl3,"useLighting",0);
 		shader.set1i(gl3,"diffuseTexture",0);
-		shader.set1i(gl3,"useTexture",1);
+		shader.set1i(gl3,"useTexture",0);
 
+		shader.setMatrix4d(gl3,"projectionMatrix", MatrixHelper.createIdentityMatrix4());
+		shader.setMatrix4d(gl3,"viewMatrix", MatrixHelper.createIdentityMatrix4());
 		shader.setMatrix4d(gl3,"modelMatrix", MatrixHelper.createIdentityMatrix4());
 
 		paintCamera(gl3);
@@ -366,26 +373,25 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	}
 
 	/**
-	 * Set up the correct modelview so the robot appears where it should.
+	 * Set up the correct model view so the robot appears where it should.
 	 *
 	 * @param gl3 OpenGL context
 	 */
 	private void paintCamera(GL3 gl3) {
-		//gl.glScaled(camera.getZoom(),camera.getZoom(),1);
-		//gl.glTranslated(-camera.getX(), camera.getY(),0);
-
-		Matrix4d inverseCamera = new Matrix4d();
-		inverseCamera.setIdentity();
-		// scale
-		inverseCamera.m00 = camera.getZoom();
-		inverseCamera.m11 = camera.getZoom();
+		Matrix4d inverseCamera = MatrixHelper.createIdentityMatrix4();
 		// translate
-		inverseCamera.setTranslation(new Vector3d(-camera.getX(),-camera.getY(),0));
+		//inverseCamera.setTranslation(new Vector3d(-camera.getX(),camera.getY(),5));
+		inverseCamera.setTranslation(new Vector3d(camera.getX(),-camera.getY(),camera.getZoom()));
+		inverseCamera.invert();
+		inverseCamera.transpose();
 
 		shader.setMatrix4d(gl3,"viewMatrix",inverseCamera);
-		shader.setMatrix4d(gl3,"projectionMatrix",getOrthographicMatrix(camera.getWidth(),camera.getHeight()));
-		Vector3d cameraWorldPos = new Vector3d(camera.getX(),-camera.getY(),0);
-		shader.setVector3d(gl3,"cameraPos",cameraWorldPos);  // Camera position in world space
+		//shader.setMatrix4d(gl3,"projectionMatrix",getOrthographicMatrix(camera.getWidth(),camera.getHeight()));
+		shader.setMatrix4d(gl3,"projectionMatrix",getPerspectiveFrustum(camera.getWidth(),camera.getHeight()));
+
+		// only needed with useLighting=1
+		//Vector3d cameraWorldPos = new Vector3d(-camera.getX(),camera.getY(),-5);
+		//shader.setVector3d(gl3,"cameraPos",cameraWorldPos);  // Camera position in world space
 	}
 
 	/**
@@ -394,7 +400,13 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	public Matrix4d getOrthographicMatrix(int width,int height) {
 		double h = 5.0;  // why 5?
 		double w = h * (double)width / (double)height;
-		return MatrixHelper.orthographicMatrix4d(-w,w,-h,h,0.001,10);
+		return MatrixHelper.orthographicMatrix4d(-w,w,-h,h,1,100);
+	}
+
+
+	public Matrix4d getPerspectiveFrustum(int width,int height) {
+		double aspect = (double)width / (double)height;
+		return MatrixHelper.perspectiveMatrix4d(60,aspect,1,1000);
 	}
 
 	/**
