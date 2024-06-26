@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -10,6 +9,8 @@ import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 
 
@@ -72,11 +73,11 @@ public class Converter_Pulse extends ImageConverter {
 		direction = value;
 	}
 	
-	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2D a, Point2D b) {
-		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
+	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2d a, Point2d b) {
+		Vector2d dir = new Vector2d(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1.0/len);
-		Point2D ortho = new Point2D(-dir.y,dir.x);
+		Vector2d ortho = new Vector2d(-dir.y,dir.x);
 
 		double cx = myPaper.getCenterX();
 		double cy = myPaper.getCenterY();
@@ -135,8 +136,8 @@ public class Converter_Pulse extends ImageConverter {
 		double x, y = 0;
 		int i=0;
 
-		Point2D a = new Point2D();
-		Point2D b = new Point2D();
+		Point2d a = new Point2d();
+		Point2d b = new Point2d();
 		
 		turtle = new Turtle();
 		

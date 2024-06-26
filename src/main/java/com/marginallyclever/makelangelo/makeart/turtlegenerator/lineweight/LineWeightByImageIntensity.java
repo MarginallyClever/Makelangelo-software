@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
@@ -173,11 +172,11 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // collect all the points, write them at the end.
         for(int pass=0; pass<=numPasses; ++pass) {
             double ratio = pass/numPasses;
-            List<Point2D> offsetLine = generateOneThickLinePass(line,start,ratio);
+            List<Point2d> offsetLine = generateOneThickLinePass(line,start,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
 
             // draw pass
-            for( Point2D p : offsetLine ) {
+            for( Point2d p : offsetLine ) {
                 if(first) {
                     turtle.jumpTo(p.x,p.y);
                     first=false;
@@ -187,15 +186,15 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         }
     }
 
-    private List<Point2D> generateOneThickLinePass(LineWeight line,LineWeightSegment start,double distance) {
-        List<Point2D> offsetSequence = new ArrayList<>();
+    private List<Point2d> generateOneThickLinePass(LineWeight line,LineWeightSegment start,double distance) {
+        List<Point2d> offsetSequence = new ArrayList<>();
 
         // add first point at start of line
         double [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
         Vector2d unit = line.segments.get(0).getUnit();
         unit.scale(distance);
-        offsetSequence.add(new Point2D(s0[0]-unit.x,s0[1]-unit.y));
+        offsetSequence.add(new Point2d(s0[0]-unit.x,s0[1]-unit.y));
 
         // add the middle points of the line
         for(int i=1;i<line.segments.size();++i) {
@@ -207,17 +206,17 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
                         s0[0],s0[1],s0[2],s0[3],
                         s1[0],s1[1],s1[2],s1[3]
                 );
-                offsetSequence.add(new Point2D(inter[0],inter[1]));
-                //offsetSequence.add(new Point2D(s1[0],s1[1]));
+                offsetSequence.add(new Point2d(inter[0],inter[1]));
+                //offsetSequence.add(new Point2d(s1[0],s1[1]));
             } else {
-                offsetSequence.add(new Point2D(s1[0], s1[1]));
+                offsetSequence.add(new Point2d(s1[0], s1[1]));
             }
             s0=s1;
         }
         // add the last point of the line
         unit = line.segments.get(line.segments.size()-1).getUnit();
         unit.scale(distance);
-        offsetSequence.add(new Point2D(s0[2]+unit.x,s0[3]+unit.y));
+        offsetSequence.add(new Point2d(s0[2]+unit.x,s0[3]+unit.y));
         return offsetSequence;
     }
 

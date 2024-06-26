@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience;
 
+import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public class QuadGraph {
     private static final int MAX_POINTS = 5;
     public final Rectangle2D bounds = new Rectangle2D.Double();
-    public final List<Point2D> sites = new ArrayList<>();
+    public final List<Point2d> sites = new ArrayList<>();
     public QuadGraph[] children = null;
 
     /**
@@ -42,13 +43,13 @@ public class QuadGraph {
 
     private void moveSitesIntoChildren() {
         // put all sites into the new children
-        for(Point2D c : sites) {
+        for(Point2d c : sites) {
             addCellToOneQuadrant(c);
         }
         sites.clear();
     }
 
-    public boolean insert(Point2D e) {
+    public boolean insert(Point2d e) {
         if(bounds.contains(e.x,e.y)) {
             if(sites.size()<MAX_POINTS && children == null) {
                 sites.add(e);
@@ -61,7 +62,7 @@ public class QuadGraph {
         return false;
     }
 
-    private boolean addCellToOneQuadrant(Point2D e) {
+    private boolean addCellToOneQuadrant(Point2d e) {
         for(int i=0;i<4;++i) {
             if(children[i].insert(e)) return true;
         }
@@ -69,15 +70,15 @@ public class QuadGraph {
     }
 
     // locate the cell under point x,y
-    public Point2D search(Point2D p) {
+    public Point2d search(Point2d p) {
         if(!bounds.contains(p.x,p.y)) return null;
 
-        Point2D bestFound = null;
+        Point2d bestFound = null;
         double bestD = Double.MAX_VALUE;
 
         if (!sites.isEmpty()) {
             // search me
-            for(Point2D c : sites) {
+            for(Point2d c : sites) {
                 double d = p.distanceSquared(c);
                 if(bestD > d) {
                     bestD = d;
@@ -89,7 +90,7 @@ public class QuadGraph {
         if(children != null) {
             for (int i = 0; i < 4; ++i) {
                 // look into the children
-                Point2D bestChildFound = children[i].search(p);
+                Point2d bestChildFound = children[i].search(p);
                 if (bestChildFound != null && bestFound == null) {
                     double d = p.distanceSquared(bestChildFound);
                     if(bestD > d) {

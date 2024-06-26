@@ -87,12 +87,10 @@
 	<string><key>ReportBug</key><value>Report an issue</value></string>
 	<string><key>MenuManual</key><value>Read the Friendly Manual</value></string>
 	<string><key>MenuAbout</key><value>About</value></string>
-	<string><key>MenuSettings</key><value>Settings</value></string>
 	<string><key>MenuOpenFile</key><value>Open File...</value></string>
 	<string><key>MenuImportFile</key><value>Import File...</value></string>
 	<string><key>MenuSaveFile</key><value>Save File...</value></string>
 	<string><key>MenuReopenFile</key><value>Reopen last file</value></string>
-	<string><key>MenuView</key><value>View</value></string>
 	<string><key>MenuView.zoomIn</key><value>Zoom +</value></string>
 	<string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
 	<string><key>MenuView.zoomFit</key><value>Zoom to fit</value></string>

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.Point2D;
 import org.junit.jupiter.api.Test;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -281,7 +281,7 @@ class TurtleTest {
         double d = turtle.getDrawDistance();
         assertEquals(1000,d);
         for(int i=0;i<=10;++i) {
-            assertTrue(new Point2D(i * 100, 0).distance(turtle.interpolate(d*(double)i/10.0)) < EPSILON);
+            assertTrue(new Point2d(i * 100, 0).distance(turtle.interpolate(d*(double)i/10.0)) < EPSILON);
         }
     }
 }

@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
@@ -249,8 +248,8 @@ public class Turtle implements Cloneable {
 	 * Calculate the limits of drawing lines in this turtle history
 	 **/
 	public Rectangle2D.Double getBounds() {
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
+		Point2d top = new Point2d();
+		Point2d bottom = new Point2d();
 		getBounds(top,bottom);
 		
 		Rectangle2D.Double r = new Rectangle.Double();
@@ -267,7 +266,7 @@ public class Turtle implements Cloneable {
 	 * @param top maximum limits
 	 * @param bottom minimum limits
 	 */
-	private void getBounds(Point2D top,Point2D bottom) {
+	private void getBounds(Point2d top,Point2d bottom) {
 		bottom.x=Float.MAX_VALUE;
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
@@ -299,7 +298,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private void getBoundsInternal(Point2D top,Point2D bottom,TurtleMove m) {
+	private void getBoundsInternal(Point2d top,Point2d bottom,TurtleMove m) {
 		if (top.x < m.x) top.x = m.x;
 		if (top.y < m.y) top.y = m.y;
 		if (bottom.x > m.x) bottom.x = m.x;
@@ -544,7 +543,7 @@ public class Turtle implements Cloneable {
 	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
 	 * @return a point along the drawn lines of this {@link Turtle}
 	 */
-	public Point2D interpolate(double t) {
+	public Point2d interpolate(double t) {
 		double d=0;
 		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
@@ -555,7 +554,7 @@ public class Turtle implements Cloneable {
 				if(d+change>=t) {  // d < t < d+change
 					double v = (t-d==0)? 0 : (t-d) / change;
 					v = Math.max(Math.min(v,1),0);
-					return new Point2D(
+					return new Point2d(
 							prev.x + dx * v,
 							prev.y + dy * v);
 				}
@@ -565,7 +564,7 @@ public class Turtle implements Cloneable {
 				prev = m;
 			}
 		}
-		return new Point2D(prev.x,prev.y);
+		return new Point2d(prev.x,prev.y);
 	}
 
 	@Override

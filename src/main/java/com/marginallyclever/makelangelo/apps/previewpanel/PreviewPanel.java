@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.apps.previewpanel;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.helpers.MatrixHelper;
 import com.marginallyclever.convenience.helpers.ResourceHelper;
 import com.marginallyclever.makelangelo.Camera;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 import javax.vecmath.Matrix4d;
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
@@ -125,7 +125,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				int notches = e.getWheelRotation();
 				if (notches == 0) return;
 
-				Point2D p = new Point2D(e.getPoint().x,e.getPoint().y);
+				Point2d p = new Point2d(e.getPoint().x,e.getPoint().y);
 				Rectangle r = me.getBounds();
 				p.x -= r.getCenterX();
 				p.y -= r.getCenterY();

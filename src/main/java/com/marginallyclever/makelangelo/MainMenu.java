@@ -433,39 +433,7 @@ public class MainMenu extends JMenuBar {
         dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
         dialog.setVisible(true);
     }
-/*
-    private JMenu createSettingsMenu() {
-        JMenu menu = new JMenu(Translator.get("MenuSettings"));
-        menu.setMnemonic('S');
 
-        JMenuItem bOpenPlotterSettings = new JMenuItem(Translator.get("OpenPlotterSettings"));
-        bOpenPlotterSettings.addActionListener((e)-> openPlotterSettings());
-        bOpenPlotterSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_CTRL));//"ctrl P"
-        menu.add(bOpenPlotterSettings);
-
-        return menu;
-    }
-
-    private void openPaperSettings() {
-        PaperSettingsPanel settings = new PaperSettingsPanel(app.getPaper());
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PaperSettings.Title"));
-        dialog.add(settings);
-        dialog.setMinimumSize(new Dimension(300,300));
-        dialog.pack();
-
-        app.enableMenuBar(false);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                settings.save();
-                app.enableMenuBar(true);
-            }
-        });
-
-        dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-        dialog.setVisible(true);
-    }
-*/
     public RecentFiles getRecentFiles() {
         return recentFiles;
     }

@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.tools;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
@@ -187,7 +186,7 @@ public class InfillTurtle {
 	 * TODO move this to com.marginallyclever.convenience.LineHelper?
 	 * @param alpha first line segment
 	 * @param beta second line segment
-	 * @return intersection {@link Point2D} or null
+	 * @return intersection {@link Point2d} or null
 	 */
 	private Point2d getIntersection(LineSegment2D alpha, LineSegment2D beta) {
 		double s1_x = alpha.end.x - alpha.start.x;

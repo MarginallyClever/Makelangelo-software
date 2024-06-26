@@ -13,8 +13,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.Random;
@@ -34,16 +34,12 @@ public class Converter_Wander extends ImageConverter {
 	private static final Random random = new Random();
 	
 	private static class Bucket {
-		public Point2D a,b;
-		public LinkedList<Point2D> unsortedPoints;
-		public LinkedList<Point2D> sortedPoints;
+		public final Point2d a = new Point2d();
+		public final Point2d b = new Point2d();
+		public final LinkedList<Point2d> unsortedPoints = new LinkedList<>();
+		public final LinkedList<Point2d> sortedPoints = new LinkedList<>();
 		
-		public Bucket() {
-			a = new Point2D.Double();
-			b = new Point2D.Double();
-			unsortedPoints = new LinkedList<>();
-			sortedPoints = new LinkedList<>();
-		}
+		public Bucket() {}
 	}
 
 	public Converter_Wander() {
@@ -116,15 +112,15 @@ public class Converter_Wander extends ImageConverter {
 		for(by=0;by<height;by+=hMod) {
 			for(bx=0;bx<width;bx+=wMod) {
 				Bucket b = new Bucket();
-				b.a.setLocation(xLeft+bx     , yBottom+by     );
-				b.b.setLocation(xLeft+bx+wMod, yBottom+by+hMod);
+				b.a.set(xLeft+bx     , yBottom+by     );
+				b.b.set(xLeft+bx+wMod, yBottom+by+hMod);
 				buckets.push(b);
 			}
 			by+=hMod;
 			for(bx=width-wMod;bx>=-1;bx-=wMod) {
 				Bucket b = new Bucket();
-				b.a.setLocation(xLeft+bx     , yBottom+by     );
-				b.b.setLocation(xLeft+bx+wMod, yBottom+by+hMod);
+				b.a.set(xLeft+bx     , yBottom+by     );
+				b.b.set(xLeft+bx+wMod, yBottom+by+hMod);
 				buckets.push(b);
 			}
 		}
@@ -148,7 +144,7 @@ public class Converter_Wander extends ImageConverter {
 				Bucket b = buckets.get(j);
 				if( b.a.getX()<=endPX && b.b.getX()>endPX && 
 				    b.a.getY()<=endPY && b.b.getY()>endPY ) {
-					b.unsortedPoints.addLast(new Point2D.Double(endPX,endPY));
+					b.unsortedPoints.addLast(new Point2d(endPX,endPY));
 					++actualPoints;
 					break;
 				}
@@ -161,14 +157,14 @@ public class Converter_Wander extends ImageConverter {
 			//logger.debug(j+" of "+buckets.size()+ " has "+buckets.get(j).unsortedPoints.size()+" points");
 
 			// assume we start at the center of the image, for those machines with no pen up option.
-			Point2D a = new Point2D.Double(0, 0);
+			Point2d a = new Point2d(0, 0);
 
 			if (!bucket.unsortedPoints.isEmpty()) {
 				while (!bucket.unsortedPoints.isEmpty()) {
 					double bestLen = Double.MAX_VALUE;
 					int bestI = 0;
 					for (int i = 0; i < bucket.unsortedPoints.size(); ++i) {
-						double len = a.distanceSq(bucket.unsortedPoints.get(i));
+						double len = a.distanceSquared(bucket.unsortedPoints.get(i));
 						if (bestLen > len) {
 							bestLen = len;
 							bestI = i;
@@ -187,7 +183,7 @@ public class Converter_Wander extends ImageConverter {
 
 		for (Bucket bucket : buckets) {
 			while (!bucket.sortedPoints.isEmpty()) {
-				Point2D a = bucket.sortedPoints.pop();
+				Point2d a = bucket.sortedPoints.pop();
 				turtle.moveTo(px+a.getX(), py+a.getY());
 				turtle.penDown();
 			}

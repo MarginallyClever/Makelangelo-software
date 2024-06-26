@@ -1,11 +1,13 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.Packet;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 
 /**
  * <p>(px,py) = path(index), where path(0) is the start and path(path.length) is the end.</p>
@@ -45,11 +47,11 @@ public class PointOnPath extends Node {
             double c0 = index.getValue().doubleValue();
             if (c0 > 0) {
                 double c1 = c0 + EPSILON;
-                Point2D p0 = myPath.interpolate(c0);
+                Point2d p0 = myPath.interpolate(c0);
                 px.send(new Packet<>(p0.x));
                 px.send(new Packet<>(p0.y));
 
-                Point2D p1;
+                Point2d p1;
                 if(c1>total) {
                     p1 = myPath.interpolate(total);
                     p0 = myPath.interpolate(total-EPSILON);
@@ -58,7 +60,7 @@ public class PointOnPath extends Node {
                 }
                 double dx = p1.x - p0.x;
                 double dy = p1.y - p0.y;
-                Point2D n = new Point2D(dx,dy);
+                Vector2d n = new Vector2d(dx,dy);
                 n.normalize();
                 nx.send(new Packet<>(n.x));
                 ny.send(new Packet<>(n.y));

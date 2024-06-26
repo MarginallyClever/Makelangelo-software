@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+
+import javax.vecmath.Point2d;
 
 /**
  * Common methods for drawing Polargraph machines.
@@ -25,7 +26,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @param beltR length of belt (mm)
 	 * @return cartesian coordinate 
 	 */
-	public Point2D FK(Plotter plotter,double beltL, double beltR) {
+	public Point2d FK(Plotter plotter,double beltL, double beltR) {
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -40,7 +41,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		double x = theta * a - b/2;
 		double y = top - Math.sqrt(1.0 - theta * theta) * a;
 
-		return new Point2D(x, y);
+		return new Point2d(x, y);
 	}
 		
 	/**
@@ -48,9 +49,9 @@ public abstract class Polargraph implements PlotterRenderer {
 	 * @param plotter the plotter
 	 * @param x cartesian x
 	 * @param y cartesian y
-	 * @return Point2D with x=belt left and y=belt right.
+	 * @return Point2d with x=belt left and y=belt right.
 	 */
-	public Point2D IK(Plotter plotter,double x,double y) {
+	public Point2d IK(Plotter plotter,double x,double y) {
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -61,7 +62,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		dx = right-x;
 		double b2 = Math.sqrt(dx*dx+dy*dy);
 		
-		return new Point2D(b1,b2);
+		return new Point2d(b1,b2);
 	}
 
 	@Override
@@ -169,7 +170,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	static public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
 
 
-		Point2D pos = robot.getPos();
+		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 

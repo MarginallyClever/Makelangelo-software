@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DockReceiving;
 import com.marginallyclever.nodegraphcore.DockShipping;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.Packet;
+
+import javax.vecmath.Point2d;
 
 public class PatternOnPath extends Node {
     private final DockReceiving<Turtle> pattern = new DockReceiving<>("pattern", Turtle.class, new Turtle());
@@ -40,7 +41,7 @@ public class PatternOnPath extends Node {
             }
             double n=0;
             for(int i=0;i<c;++i) {
-                Point2D p = myPath.interpolate(n);
+                Point2d p = myPath.interpolate(n);
                 n+=step;
                 Turtle stamp = new Turtle(myPattern);
                 stamp.translate(p.x,p.y);

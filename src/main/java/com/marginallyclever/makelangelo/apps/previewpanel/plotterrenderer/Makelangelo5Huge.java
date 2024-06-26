@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
+
+import javax.vecmath.Point2d;
 
 import static com.marginallyclever.convenience.helpers.DrawingHelper.paintTexture;
 
@@ -69,7 +70,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	}
 
 	public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
-		Point2D pos = robot.getPos();
+		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 

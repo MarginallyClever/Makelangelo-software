@@ -33,7 +33,7 @@ public class Zarplotter implements PlotterRenderer {
 /*
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
-		Point2D pos = robot.getPos();
+		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 
@@ -156,8 +156,8 @@ public class Zarplotter implements PlotterRenderer {
 	}
 /*
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
+	public Point2d getHome() {
+		return new Point2d(0,0);
 	}
 	
 	@Override

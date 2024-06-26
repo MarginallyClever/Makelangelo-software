@@ -157,7 +157,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 /*
 		PlotterSettings settings = robot.getSettings();
 		double dx,dy;
-		Point2D pos = robot.getPos();
+		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 		
