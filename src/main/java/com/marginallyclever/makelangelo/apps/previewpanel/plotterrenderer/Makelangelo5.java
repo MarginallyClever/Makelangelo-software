@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -44,12 +43,9 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl, Plotter robot, ShaderProgram shaderProgram) {
-
+	public void render(GL3 gl, Plotter robot) {
 		if (textureMainBody != null) {
-			shaderProgram.set1i(gl,"useTexture",1);
 			paintControlBoxFancy(gl, textureMainBody);
-			shaderProgram.set1i(gl,"useTexture",0);
 		}
 
 		Polargraph.paintSafeArea(gl, robot);
@@ -58,9 +54,7 @@ public class Makelangelo5 implements PlotterRenderer {
 			paintPenHolderToCounterweights(gl, robot);
 
 		if (textureMotors != null) {
-			shaderProgram.set1i(gl,"useTexture",1);
 			paintControlBoxFancy(gl, textureMotors);
-			shaderProgram.set1i(gl,"useTexture",0);
 		}
 
 		if (textureLogo != null) {
@@ -182,8 +176,10 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	private void paintControlBoxFancy(GL3 gl,TextureWithMetadata texture) {
+		//shaderProgram.set1i(gl,"useTexture",1);
 		texture.use(gl);
-		controlBox.render(gl);
+		//controlBox.render(gl);
+		//shaderProgram.set1i(gl,"useTexture",0);
 	}
 
 	/**

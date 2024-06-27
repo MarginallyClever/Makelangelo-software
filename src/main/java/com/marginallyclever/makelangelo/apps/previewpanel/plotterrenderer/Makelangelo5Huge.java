@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -20,7 +19,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	private static TextureWithMetadata textureArm;
 
 	@Override
-	public void render(GL3 gl, Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl, Plotter robot) {
 		if (textureMainBody == null) textureMainBody = TextureFactory.loadTexture("/textures/huge.png");
 		if (textureMotorMounts == null) textureMotorMounts = TextureFactory.loadTexture("/textures/huge-motors.png");
 		if (textureLogo == null) textureLogo = TextureFactory.loadTexture("/logo.png");

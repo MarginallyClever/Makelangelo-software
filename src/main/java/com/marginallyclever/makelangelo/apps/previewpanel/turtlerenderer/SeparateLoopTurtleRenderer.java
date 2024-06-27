@@ -17,10 +17,11 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	private GL3 gl;
 	
 	private Color colorTravel = Color.GREEN;
-	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter = 1;
 	private int moveCounter;
+	private Color colorDraw = Color.WHITE;
+	private boolean isPenUp;
 
 	private final Mesh mesh = new Mesh();
 	private boolean isDone = false;
@@ -30,8 +31,10 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 		this.gl=gl;
 		showPenUp = GFXPreferences.getShowPenUp();
 
-		mesh.setRenderStyle(GL3.GL_LINES);
+		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 		moveCounter=0;
+		isPenUp=true;
+		setDrawColor();
 	}
 
 	@Override
@@ -42,38 +45,34 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	
 	private void setDrawColor() {
 		switch(moveCounter%7) {
-		case 0 -> mesh.addColor(1,0,0,1);
-		case 1 -> mesh.addColor(0,0.4f,0,1);
-		case 2 -> mesh.addColor(0,0,1,1);
-		case 3 -> mesh.addColor(1,1,0,1);
-		case 4 -> mesh.addColor(1,0,1,1);
-		case 5 -> mesh.addColor(0,1,1,1);
-		case 6 -> mesh.addColor(0,0,0,1);
+			case 0 -> colorDraw = new Color(255,0,0,255);
+			case 1 -> colorDraw = new Color(0,127,0,255);
+			case 2 -> colorDraw = new Color(0,0,255,255);
+			case 3 -> colorDraw = new Color(255,255,0,255);
+			case 4 -> colorDraw = new Color(255,0,255,255);
+			case 5 -> colorDraw = new Color(0,255,255,255);
+			default -> colorDraw = new Color(0,0,0,255);
 		}
 	}
 	
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
 		if(isDone) return;
-		setDrawColor();  mesh.addVertex((float)p0.x, (float)p0.y,0);
-		setDrawColor();  mesh.addVertex((float)p1.x, (float)p1.y,0);
+		isPenUp = false;
+		setDrawColor();
+		Line2QuadHelper.thicken(mesh, p0, p1, colorDraw, penDiameter);
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		if(isDone) return;
 		if(showPenUp) {
-			float r = colorTravel.getRed() / 255.0f;
-			float g = colorTravel.getGreen() / 255.0f;
-			float b = colorTravel.getBlue() / 255.0f;
-			float a = colorTravel.getAlpha() / 255.0f;
-
-			mesh.addColor(r, g, b, a);
-			mesh.addVertex((float) p0.x, (float) p0.y, 0);
-			mesh.addColor(r, g, b, a);
-			mesh.addVertex((float) p1.x, (float) p1.y, 0);
+			Line2QuadHelper.thicken(mesh, p0, p1, colorTravel, penDiameter);
 		}
-		moveCounter++;
+		if(!isPenUp) {
+			moveCounter++;
+		}
+		isPenUp = true;
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 
 	@Override
 	public void setPenUpColor(Color color) {
-		colorTravel=(color);
+		colorTravel = color;
 	}
 
 	@Override

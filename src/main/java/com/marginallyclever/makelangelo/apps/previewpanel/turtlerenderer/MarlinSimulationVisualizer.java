@@ -43,16 +43,12 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private boolean showNominal=false;
 	private boolean showEntry=false;
 	private boolean showExit=true;
+	private float penDiameter = 1;
 
 	private final Mesh mesh = new Mesh();
 	
 	public MarlinSimulationVisualizer() {
-		mesh.setRenderStyle(GL3.GL_LINE_STRIP);
-	}
-
-	private void meshAdd(Vector3d color, Vector3d vertex) {
-		mesh.addColor((float)color.x,(float)color.y,(float)color.z,1);
-		mesh.addVertex((float)vertex.x, (float)vertex.y,0);
+		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 	}
 
 	private void recalculateBuffer(Turtle turtleToRender, final PlotterSettings settings) {
@@ -73,14 +69,13 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	}
 
 	private void renderAlternatingBlocks(MarlinSimulationBlock block) {
-		Vector3d c;
+		Color c =
 		switch(block.id % 3) {
-		case 0 : c=new Vector3d(1,0,0); break;
-		case 1 : c=new Vector3d(0,1,0); break;
-		default: c=new Vector3d(0,0,1); break;
-		}
-		meshAdd(c,block.start);
-		meshAdd(c,block.end);
+		case 0  -> new Color(255,  0,  0);
+		case 1  -> new Color(  0,255,  0);
+		default -> new Color(  0,  0,255);
+		};
+		Line2QuadHelper.thicken(mesh,block.start,block.end,c,penDiameter);
 	}
 
 	private void renderMinLength(MarlinSimulationBlock block) {
@@ -88,21 +83,20 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		d = Math.max(Math.min(d, 1), 0);
 		double g = d;
 		double r = 1-d;
-		meshAdd(new Vector3d(r,g,0),block.start);
-		meshAdd(new Vector3d(r,g,0),block.end);
+		Line2QuadHelper.thicken(mesh,block.start,block.end,new Color((int)(255*r),(int)(255*g),0),penDiameter);
 	}
 
 	private void renderAccelDecel(MarlinSimulationBlock block,PlotterSettings settings) {
-		double t,a,d;
+		double distance,accelerateUntil,decelerateAfter;
 		if(useDistance) {
-			t = block.distance;
-			a = block.accelerateUntilD;
-			d = block.decelerateAfterD;
+			distance = block.distance;
+			accelerateUntil = block.accelerateUntilD;
+			decelerateAfter = block.decelerateAfterD;
 		} else {
 			// use time
-			t = block.end_s;
-			a = block.accelerateUntilT;
-			d = block.decelerateAfterT;
+			distance = block.end_s;
+			accelerateUntil = block.accelerateUntilT;
+			decelerateAfter = block.decelerateAfterT;
 		}
 		//if(d>t) d=t;
 		//if(--limit<=0) return;
@@ -114,67 +108,76 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			ortho = new Vector3d(-block.normal.y,block.normal.x,0);
 			ortho.scale(150);
 		}
-		
+
 		if(showNominal) {
 			Vector3d o = new Vector3d(ortho);
 			double f = block.nominalSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
-			Vector3d black = new Vector3d(1-f,f,0);
-			meshAdd(black,block.start);
-			meshAdd(black,o);
-			meshAdd(black,block.start);
+			var c = new Color((int)(255*(1-f)),(int)(255*f),0);
+			Line2QuadHelper.thicken(mesh,block.start,o,c,penDiameter);
 		}
 		if(showEntry) {
 			Vector3d o = new Vector3d(ortho);
 			double f = block.entrySpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
-			Vector3d red = new Vector3d(1-f,0,f);
-			meshAdd(red,block.start);
-			meshAdd(red,o);
-			meshAdd(red,block.start);
+			var c = new Color((int)(255*(1-f)),0,(int)(255*f));
+			Line2QuadHelper.thicken(mesh,block.start,o,c,penDiameter);
 		}
 		if(showExit) {
 			Vector3d o = new Vector3d(ortho);
 			double f = block.exitSpeed / settings.getDouble(PlotterSettings.FEED_RATE_DRAW);
 			o.scale(f);
 			o.add(block.start);
-			Vector3d black = new Vector3d(0,1-f,f);
-			meshAdd(black,block.start);
-			meshAdd(black,o);
-			meshAdd(black,block.start);
+			var c = new Color(0,(int)(255*(1-f)),(int)(255*f));
+			Line2QuadHelper.thicken(mesh,block.start,o,c,penDiameter);
 		}
 
+		Color c0,c1;
+		Vector3d p0,p1;
+
 		// accel part of block
-		meshAdd(rainbow(block.entrySpeed / block.nominalSpeed),block.start);
+		p0 = block.start;
+		c0 = rainbow(block.entrySpeed / block.nominalSpeed);
 
-		if(a<d) {
-			// nominal part of block.  add point at start.
-			Vector3d p0 = new Vector3d(block.delta);
-			p0.scale(a/t);
-			p0.add(block.start);
-			meshAdd(rainbow(1),p0);
-
-			Vector3d p1 = new Vector3d(block.delta);
-			p1.scale(d/t);
+		if(accelerateUntil<decelerateAfter) {
+			// There is some nominal part of the block.  Add point at start.
+			p1 = new Vector3d(block.delta);
+			p1.scale(accelerateUntil/distance);
 			p1.add(block.start);
-			meshAdd(rainbow(1),p1);
+			c1 = rainbow(1);
+			Line2QuadHelper.thicken(mesh,p0,p1,c0,c1,penDiameter);
+			p0 = p1;
+			c0 = c1;
+
+			p1 = new Vector3d(block.delta);
+			p1.scale(decelerateAfter/distance);
+			p1.add(block.start);
+			c1 = rainbow(1);
+			Line2QuadHelper.thicken(mesh,p0,p1,c0,c1,penDiameter);
+			p0 = p1;
+			c0 = c1;
 		} else {
 			// not nominal, add a point anyhow for correct color
-			Vector3d p0 = new Vector3d(block.delta);
-			p0.scale(a/t);
-			p0.add(block.start);
+			p1 = new Vector3d(block.delta);
+			p1.scale(accelerateUntil/distance);
+			p1.add(block.start);
 			double peakSpeed = block.entrySpeed + block.acceleration * block.accelerateUntilT;
-			meshAdd(rainbow(peakSpeed / block.nominalSpeed),p0);
+			c1 = rainbow(peakSpeed / block.nominalSpeed);
+			Line2QuadHelper.thicken(mesh,p0,p1,c0,c1,penDiameter);
+			p0 = p1;
+			c0 = c1;
 		}
 
 		// decel part of block
-		meshAdd(rainbow(block.exitSpeed / block.nominalSpeed),block.end);
+		p1=block.end;
+		c1 = rainbow(block.exitSpeed / block.nominalSpeed);
+		Line2QuadHelper.thicken(mesh,p0,p1,c0,c1,penDiameter);
 	}
 
 	// return a color from red to blue to green
-	private Vector3d rainbow(double v) {
+	private Color rainbow(double v) {
 		v= Math.max(0,Math.min(1,v));
 		double r=0,g=0,b;
 		if(v<0.5) {
@@ -184,7 +187,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			g = (v-0.5)*2;
 			b = 1.0 - (v-0.5)*2;
 		}
-		return new Vector3d(r,g,b);
+		return new Color((int)(255*r),(int)(255*g),(int)(255*b));
 	}
 
 

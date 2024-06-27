@@ -17,10 +17,8 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	private GL3 gl;
 	private Color colorTravel = Color.GREEN;
 	private Color colorDraw = Color.BLACK;
-	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
-	private float penDiameter =1;
-	private boolean isPenUp = true;
+	private float penDiameter = 1;
 
 	private final Mesh mesh = new Mesh();
 	private boolean isDone = false;
@@ -29,9 +27,8 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void start(GL3 gl) {
 		this.gl = gl;
 		showPenUp = GFXPreferences.getShowPenUp();
-		isPenUp = true;
 
-		mesh.setRenderStyle(GL3.GL_LINES);
+		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 	}
 
 	@Override
@@ -44,30 +41,14 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
 		if(isDone) return;
-
-		isPenUp = false;
-
-		float r = colorDraw.getRed() / 255.0f;
-		float g = colorDraw.getGreen() / 255.0f;
-		float b = colorDraw.getBlue() / 255.0f;
-		float a = colorDraw.getAlpha() / 255.0f;
-
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p0.x, (float)p0.y,0);
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p1.x, (float)p1.y,0);
+		Line2QuadHelper.thicken(mesh, p0, p1, colorDraw, penDiameter);
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		if(isDone) return;
 		if(!showPenUp) return;
-
-		float r = colorTravel.getRed() / 255.0f;
-		float g = colorTravel.getGreen() / 255.0f;
-		float b = colorTravel.getBlue() / 255.0f;
-		float a = colorTravel.getAlpha() / 255.0f;
-
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p0.x, (float)p0.y,0);
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p1.x, (float)p1.y,0);
+		Line2QuadHelper.thicken(mesh, p0, p1, colorTravel, penDiameter);
 	}
 
 	@Override

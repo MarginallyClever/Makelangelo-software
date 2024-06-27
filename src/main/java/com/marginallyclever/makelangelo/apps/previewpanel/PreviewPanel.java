@@ -4,6 +4,7 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.helpers.MatrixHelper;
+import com.marginallyclever.convenience.helpers.OpenGLHelper;
 import com.marginallyclever.convenience.helpers.ResourceHelper;
 import com.marginallyclever.makelangelo.Camera;
 import com.marginallyclever.makelangelo.Translator;
@@ -76,7 +77,8 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 	// OpenGL stuff
 	private FPSAnimator animator;
-	private ShaderProgram shader;
+	private ShaderProgram shaderDefault;
+	private ShaderProgram shaderLine;
 
 	public PreviewPanel() {
 		this(new Paper(),new Plotter());
@@ -93,9 +95,9 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		addListener(paper);
 		addListener(myTurtleRenderer);
-		addListener((gl,shaderProgram) -> {
+		addListener((gl) -> {
 			if(myPlotterRenderer!=null) {
-				myPlotterRenderer.render(gl, myPlotter, shaderProgram);
+				myPlotterRenderer.render(gl, myPlotter);
 			}
 		});
 
@@ -117,7 +119,8 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		animator.start();
 	}
 
-	private void addMouseListeners() {		final JPanel me = this;
+	private void addMouseListeners() {
+		final JPanel me = this;
 		// scroll the mouse wheel to zoom
 		addMouseWheelListener(new MouseAdapter() {
 			@Override
@@ -164,7 +167,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				int y = e.getY();
 				mouseX = x;
 				mouseY = y;
-				setTipXY();
+				setToolTipXY();
 
 				if (buttonPressed == MouseEvent.BUTTON1) {
 					int dx = x - mouseOldX;
@@ -184,7 +187,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				mouseOldY = y;
 				mouseX = x;
 				mouseY = y;
-				setTipXY();
+				setToolTipXY();
 			}
 		});
 	}
@@ -277,7 +280,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 							-(camera.getY()+cursorInSpace.y));
 	}
 
-	private void setTipXY() {
+	private void setToolTipXY() {
 		Vector2d p = getMousePositionInWorld();
 		this.setToolTipText((int)p.x + ", " + (int)p.y);
 	}
@@ -292,12 +295,24 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		gl3.setSwapInterval(1);
 
 		try {
-			shader = new ShaderProgram(gl3,
+			shaderDefault = new ShaderProgram(gl3,
 					ResourceHelper.readResource(this.getClass(), "default.vert"),
 					ResourceHelper.readResource(this.getClass(), "default.frag"));
 		} catch(Exception e) {
-			logger.error("Failed to load shader", e);
+			logger.error("Failed to load default shader", e);
 		}
+
+		try {
+			shaderLine = new ShaderProgram(gl3,
+					ResourceHelper.readResource(this.getClass(), "line.vert"),
+					ResourceHelper.readResource(this.getClass(), "line.frag"));
+			OpenGLHelper.checkGLError(gl3,logger);
+		} catch(Exception e) {
+			OpenGLHelper.checkGLError(gl3,logger);
+			logger.error("Failed to load line shader", e);
+		}
+
+		myTurtleRenderer.setLineShader(shaderLine);
 	}
 
 	@Override
@@ -305,7 +320,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		logger.debug("dispose");
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		TextureFactory.unloadAll(gl);
-		shader.delete(gl);
+		shaderDefault.delete(gl);
 	}
 
 	/**
@@ -349,27 +364,31 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		paintBackground(gl3);
 
-		shader.use(gl3);
+		shaderDefault.use(gl3);
 		//shader.setVector3d(gl3,"lightPos",cameraWorldPos);  // Light position in world space
-		shader.setColor(gl3,"lightColor", Color.WHITE);
-		shader.setColor(gl3,"diffuseColor",Color.WHITE);
-		shader.setColor(gl3,"specularColor",Color.WHITE);
-		shader.setColor(gl3,"ambientColor",Color.BLACK);
-		shader.set1i(gl3,"useVertexColor",1);
-		shader.set1i(gl3,"useLighting",0);
-		shader.set1i(gl3,"diffuseTexture",0);
-		shader.set1i(gl3,"useTexture",0);
-
-		shader.setMatrix4d(gl3,"projectionMatrix", MatrixHelper.createIdentityMatrix4());
-		shader.setMatrix4d(gl3,"viewMatrix", MatrixHelper.createIdentityMatrix4());
-		shader.setMatrix4d(gl3,"modelMatrix", MatrixHelper.createIdentityMatrix4());
-
-		paintCamera(gl3);
+		shaderDefault.setColor(gl3,"lightColor", Color.WHITE);
+		shaderDefault.setColor(gl3,"diffuseColor",Color.WHITE);
+		shaderDefault.setColor(gl3,"specularColor",Color.WHITE);
+		shaderDefault.setColor(gl3,"ambientColor",Color.BLACK);
+		shaderDefault.set1i(gl3,"useVertexColor",1);
+		shaderDefault.set1i(gl3,"useLighting",0);
+		shaderDefault.set1i(gl3,"diffuseTexture",0);
+		shaderDefault.set1i(gl3,"useTexture",0);
 
 		var list = previewListeners.getListeners(PreviewListener.class);
 		ArrayUtils.reverse(list);
 		for( PreviewListener p : list ) {
-			p.render(gl3,shader);
+			if(p instanceof TurtleRenderFacade) {
+				shaderLine.use(gl3);
+				shaderLine.set1f(gl3,"viewportWidth",camera.getWidth());
+				shaderLine.set1f(gl3,"viewportHeight",camera.getHeight());
+				shaderLine.set1f(gl3,"zoom",Math.max(camera.getHeight(),camera.getWidth())/(float)(2f*camera.getZoom()));
+				paintCamera(gl3,shaderLine);
+			} else {
+				shaderDefault.use(gl3);
+				paintCamera(gl3, shaderDefault);
+			}
+			p.render(gl3);
 		}
 	}
 
@@ -378,17 +397,17 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	 *
 	 * @param gl3 OpenGL context
 	 */
-	private void paintCamera(GL3 gl3) {
+	private void paintCamera(GL3 gl3,ShaderProgram program) {
+		program.setMatrix4d(gl3,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+
 		Matrix4d inverseCamera = MatrixHelper.createIdentityMatrix4();
-		// translate
-		//inverseCamera.setTranslation(new Vector3d(-camera.getX(),camera.getY(),5));
 		inverseCamera.setTranslation(new Vector3d(camera.getX(),-camera.getY(),camera.getZoom()));
 		inverseCamera.invert();
 		inverseCamera.transpose();
+		program.setMatrix4d(gl3,"viewMatrix",inverseCamera);
 
-		shader.setMatrix4d(gl3,"viewMatrix",inverseCamera);
-		//shader.setMatrix4d(gl3,"projectionMatrix",getOrthographicMatrix(camera.getWidth(),camera.getHeight()));
-		shader.setMatrix4d(gl3,"projectionMatrix",getPerspectiveFrustum(camera.getWidth(),camera.getHeight()));
+		program.setMatrix4d(gl3,"projectionMatrix",getPerspectiveFrustum(camera.getWidth(),camera.getHeight()));
+		//program.setMatrix4d(gl3,"projectionMatrix",getOrthographicMatrix(camera.getWidth(),camera.getHeight()));
 
 		// only needed with useLighting=1
 		//Vector3d cameraWorldPos = new Vector3d(-camera.getX(),camera.getY(),-5);

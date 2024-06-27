@@ -20,7 +20,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl,Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
 		paintControlBox(gl,settings);

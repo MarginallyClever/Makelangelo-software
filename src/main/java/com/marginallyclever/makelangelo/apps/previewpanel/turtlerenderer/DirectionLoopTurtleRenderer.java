@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -18,10 +19,9 @@ import java.util.ArrayList;
 public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	private GL3 gl;
 	private Color colorTravel = Color.GREEN;
-	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
-	private float penDiameter = 1;
 	private final ArrayList<TurtleMove> points = new ArrayList<>();
+	private float penDiameter = 1;
 
 	private final Mesh mesh = new Mesh();
 	private boolean isDone = false;
@@ -31,7 +31,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		this.gl = gl;
 		points.clear();
 		showPenUp = GFXPreferences.getShowPenUp();
-		mesh.setRenderStyle(GL3.GL_LINES);
+		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 	}
 
 	@Override
@@ -54,16 +54,16 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 
 		if(!points.isEmpty()) {
 			int size = points.size();
-
 			for(int i=0;i<size;i+=2) {
 				TurtleMove p0 = points.get(i);
 				TurtleMove p1 = points.get(i+1);
-				float r = (float)i/(float)size;
-				float b = 1.0f - r;
-				mesh.addColor(r,0,b,1);
-				mesh.addVertex((float)p0.x, (float)p0.y,0);
-				mesh.addColor(r,0,b,1);
-				mesh.addVertex((float)p1.x, (float)p1.y,0);
+				float b0 = (float)i/(float)size;
+				float b1 = (float)(i+1)/(float)size;
+				var c0 = new Color(b0,0,1.0f - b0,1);
+				var c1 = new Color(b1,0,1.0f - b1,1);
+				Vector3d p0v = new Vector3d(p0.x,p0.y,0);
+				Vector3d p1v = new Vector3d(p1.x,p1.y,0);
+				Line2QuadHelper.thicken(mesh, p0v, p1v, c0, c1, penDiameter);
 			}
 			points.clear();
 		}
@@ -77,13 +77,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 
 		if(!showPenUp) return;
 
-		float r = colorTravel.getRed() / 255.0f;
-		float g = colorTravel.getGreen() / 255.0f;
-		float b = colorTravel.getBlue() / 255.0f;
-		float a = colorTravel.getAlpha() / 255.0f;
-
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p0.x, (float)p0.y,0);
-		mesh.addColor(r,g,b,a);  mesh.addVertex((float)p1.x, (float)p1.y,0);
+		Line2QuadHelper.thicken(mesh, p0, p1, colorTravel, penDiameter);
 	}
 
 	@Override

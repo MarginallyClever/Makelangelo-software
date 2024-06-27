@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -66,7 +65,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl, Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl, Plotter robot) {
 		mesh.clear();
 		mesh.setRenderStyle(GL3.GL_LINES);
 

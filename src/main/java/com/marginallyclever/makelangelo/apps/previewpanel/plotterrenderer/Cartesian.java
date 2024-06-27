@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -21,7 +20,7 @@ public class Cartesian implements PlotterRenderer {
 
 	
 	@Override
-	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl,Plotter robot) {
 		paintGantryAndHead(gl,robot);		
 		paintMotors(gl,robot);
 		paintControlBox(gl,robot);

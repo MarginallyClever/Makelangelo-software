@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
@@ -53,7 +52,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private static int rangeSliderMax = 255;
 
 	private ImageConverter myConverter;
-	
+
 	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
 		super(new GridBagLayout());
 		myPaper = paper;
@@ -268,9 +267,9 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	}
 
 	@Override
-	public void render(GL3 gl3, ShaderProgram shaderProgram) {
+	public void render(GL3 gl3) {
 		if( myConverter != null && myConverter instanceof PreviewListener ) {
-			((PreviewListener)myConverter).render(gl3,shaderProgram);
+			((PreviewListener)myConverter).render(gl3);
 		}
 	}
 

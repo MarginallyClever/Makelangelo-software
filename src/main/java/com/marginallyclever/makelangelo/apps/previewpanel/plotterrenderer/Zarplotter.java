@@ -16,7 +16,7 @@ public class Zarplotter implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl,Plotter robot) {
 		paintMotors(gl,robot);
 		paintControlBox(gl,robot);
 		if(robot.getDidFindHome()) 

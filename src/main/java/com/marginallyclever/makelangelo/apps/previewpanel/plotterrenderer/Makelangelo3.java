@@ -13,7 +13,7 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public void render(GL3 gl,Plotter robot, ShaderProgram shaderProgram) {
+	public void render(GL3 gl,Plotter robot) {
 		paintControlBox(gl,robot);
 		Polargraph.paintMotors(gl,robot);
 		if(robot.getDidFindHome()) 

@@ -5,7 +5,6 @@ import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -302,7 +301,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
      * @param gl the render context
      */
     @Override
-    public void render(GL3 gl, ShaderProgram shaderProgram) {
+    public void render(GL3 gl) {
         ImageConverterThread thread = getThread();
         if(thread==null || thread.getPaused()) return;
 
