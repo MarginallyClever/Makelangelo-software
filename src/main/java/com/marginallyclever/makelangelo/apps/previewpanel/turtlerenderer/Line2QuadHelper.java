@@ -43,10 +43,10 @@ public class Line2QuadHelper {    /**
         float b0 = c0.getBlue() / 255.0f;
         float a0 = c0.getAlpha() / 255.0f;
 
-        float r1 = c0.getRed() / 255.0f;
-        float g1 = c0.getGreen() / 255.0f;
-        float b1 = c0.getBlue() / 255.0f;
-        float a1 = c0.getAlpha() / 255.0f;
+        float r1 = c1.getRed() / 255.0f;
+        float g1 = c1.getGreen() / 255.0f;
+        float b1 = c1.getBlue() / 255.0f;
+        float a1 = c1.getAlpha() / 255.0f;
 
         // d is the line p0->p1 scaled to thickness/2
         Vector2d d = new Vector2d(p1.x-p0.x,p1.y-p0.y);
@@ -74,14 +74,12 @@ public class Line2QuadHelper {    /**
             mesh.addTexCoord((float)p1.x, (float)p1.y);
         }
 
-
         mesh.addColor(r0, g0, b0, a0);
         mesh.addColor(r1, g1, b1, a1);
-        mesh.addColor(r0, g0, b0, a0);
+        mesh.addColor(r1, g1, b1, a1);
 
         mesh.addColor(r1, g1, b1, a1);
-        mesh.addColor(r1, g1, b1, a1);
         mesh.addColor(r0, g0, b0, a0);
-
+        mesh.addColor(r0, g0, b0, a0);
     }
 }

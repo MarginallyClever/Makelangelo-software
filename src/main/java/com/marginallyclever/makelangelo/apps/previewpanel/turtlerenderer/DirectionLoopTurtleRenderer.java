@@ -59,8 +59,8 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 				TurtleMove p1 = points.get(i+1);
 				float b0 = (float)i/(float)size;
 				float b1 = (float)(i+1)/(float)size;
-				var c0 = new Color(b0,0,1.0f - b0,1);
-				var c1 = new Color(b1,0,1.0f - b1,1);
+				var c0 = new Color(b0,0,(int)(255f*(1.0f - b0)),255);
+				var c1 = new Color(b1,0,(int)(255f*(1.0f - b1)),255);
 				Vector3d p0v = new Vector3d(p0.x,p0.y,0);
 				Vector3d p1v = new Vector3d(p1.x,p1.y,0);
 				Line2QuadHelper.thicken(mesh, p0v, p1v, c0, c1, penDiameter);
