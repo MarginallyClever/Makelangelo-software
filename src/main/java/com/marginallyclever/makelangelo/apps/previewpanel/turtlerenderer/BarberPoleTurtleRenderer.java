@@ -31,6 +31,10 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 		moveCounter = 0;
+		if(!isDone) {
+			mesh.unload(gl);
+			mesh.clear();
+		}
 	}
 
 	@Override

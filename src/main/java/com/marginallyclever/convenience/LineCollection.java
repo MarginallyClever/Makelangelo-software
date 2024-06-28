@@ -74,13 +74,15 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	}
 
 	public LineCollection simplify(double distanceTolerance) {
+		// a record of which points to keep
 		usePt = new boolean[size()];
 		for (int i = 0; i < size(); i++) {
 			usePt[i] = true;
 		}
 		
 		simplifySection(0, size() - 1,distanceTolerance);
-		
+
+		// build the new collection from the points that are kept.
 		LineCollection result = new LineCollection();
 		Point2d head = get(0).start;
 		

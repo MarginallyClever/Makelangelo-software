@@ -107,7 +107,8 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(turtle!=null) size = turtle.history.size();
 		myTurtle = turtle;
 		if(myRenderer!=null) {
-			myRenderer.reset();
+			TurtleRenderFactory.resetAll();
+			//myRenderer.reset();
 		}
 
 		setFirst(0);

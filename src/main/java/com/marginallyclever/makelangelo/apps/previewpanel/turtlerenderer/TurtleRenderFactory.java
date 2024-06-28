@@ -38,4 +38,10 @@ public enum TurtleRenderFactory {
 				.findFirst()
 				.orElseThrow();
 	}
+
+	public static void resetAll() {
+		for(TurtleRenderFactory f : values()) {
+			f.getTurtleRenderer().reset();
+		}
+	}
 }

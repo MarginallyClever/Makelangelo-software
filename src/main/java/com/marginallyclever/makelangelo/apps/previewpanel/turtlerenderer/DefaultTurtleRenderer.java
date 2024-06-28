@@ -29,6 +29,10 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 		showPenUp = GFXPreferences.getShowPenUp();
 
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
+		if(!isDone) {
+			mesh.unload(gl);
+			mesh.clear();
+		}
 	}
 
 	@Override

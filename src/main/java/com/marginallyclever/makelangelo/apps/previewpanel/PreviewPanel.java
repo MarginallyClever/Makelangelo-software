@@ -231,6 +231,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		checkboxShowPenUpMoves.addActionListener((e) -> {
 			boolean b = GFXPreferences.getShowPenUp();
 			GFXPreferences.setShowPenUp(!b);
+			TurtleRenderFactory.resetAll();
 		});
 		GFXPreferences.addListener((e)->{
 			checkboxShowPenUpMoves.setSelected((boolean)e.getNewValue());

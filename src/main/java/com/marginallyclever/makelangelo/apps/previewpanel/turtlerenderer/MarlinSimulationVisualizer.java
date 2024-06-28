@@ -44,6 +44,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private boolean showEntry=false;
 	private boolean showExit=true;
 	private float penDiameter = 1;
+	private boolean isDone = false;
 
 	private final Mesh mesh = new Mesh();
 	
@@ -195,25 +196,32 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	public void start(GL3 gl) {
 		this.gl = gl;
 		myTurtle.history.clear();
+		if(!isDone) {
+			mesh.unload(gl);
+			mesh.clear();
+		}
 	}
 
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
+		if(isDone) return;
 		myTurtle.history.add(p1);
 		
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
+		if(isDone) return;
 		myTurtle.history.add(p1);
 	}
 
 	@Override
 	public void end() {
-		if(previousTurtle!=myTurtle) {
+		if(!isDone && previousTurtle!=myTurtle) {
 			recalculateBuffer(myTurtle,mySettings);
 			previousTurtle = myTurtle;
 		}
+		isDone=true;
 		mesh.render(gl);
 	}
 
@@ -243,5 +251,6 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	public void reset() {
 		previousTurtle=null;
 		mesh.clear();
+		isDone = false;
 	}
 }

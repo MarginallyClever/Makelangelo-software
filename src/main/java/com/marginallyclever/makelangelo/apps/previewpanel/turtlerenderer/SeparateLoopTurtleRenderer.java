@@ -35,6 +35,10 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 		moveCounter=0;
 		isPenUp=true;
 		setDrawColor();
+		if(!isDone) {
+			mesh.unload(gl);
+			mesh.clear();
+		}
 	}
 
 	@Override
