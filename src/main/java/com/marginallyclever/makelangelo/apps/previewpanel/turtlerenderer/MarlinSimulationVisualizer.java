@@ -232,7 +232,9 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	public void setPenUpColor(Color color) {}
 
 	@Override
-	public void setPenDiameter(double d) {}
+	public void setPenDiameter(double d) {
+		this.penDiameter = (float)penDiameter;
+	}
 
     @Override
     public String getTranslatedName() {

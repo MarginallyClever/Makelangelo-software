@@ -3,6 +3,7 @@ package com.marginallyclever.convenience;
 import javax.vecmath.Point2d;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class LineCollection extends ArrayList<LineSegment2D> {
 	private boolean[] usePt;
@@ -49,77 +50,59 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	 * A travel move is any moment in the collection where element (N).b != (N+1).a
 	 * @return the list of collections separated by color
 	 */
-	public ArrayList<LineCollection> splitByTravel() {
-		ArrayList<LineCollection> result = new ArrayList<LineCollection> ();
-		if(this.size()>0) {
-			LineSegment2D head = get(0);
-			
-			LineCollection c = new LineCollection();
-			result.add(c);
-			c.add(head);
-			
-			for(int i=1;i<size();++i) {
-				LineSegment2D next = get(i);
-				if(next.end.distanceSquared(head.start)<1e-6) {
-					c.add(next);
-				} else {
-					head = next;
-					c = new LineCollection();
-					result.add(c);
-					c.add(head);
-				}
+	public List<LineCollection> splitByTravel() {
+		List<LineCollection> result = new ArrayList<> ();
+		if(this.size()==0) return result;
+
+		LineSegment2D head = get(0);
+
+		LineCollection c = new LineCollection();
+		result.add(c);
+		c.add(head);
+
+		for(int i=1;i<size();++i) {
+			LineSegment2D next = get(i);
+			if(next.start.distanceSquared(head.end)>1e-6) {
+				c = new LineCollection();
+				result.add(c);
 			}
+			c.add(next);
+			head = next;
 		}
 		return result;
 	}
 
+	// remove all redundant points from the list
 	public LineCollection simplify(double distanceTolerance) {
-		// a record of which points to keep
-		usePt = new boolean[size()];
-		for (int i = 0; i < size(); i++) {
-			usePt[i] = true;
-		}
-		
-		simplifySection(0, size() - 1,distanceTolerance);
-
-		// build the new collection from the points that are kept.
 		LineCollection result = new LineCollection();
-		Point2d head = get(0).start;
-		
-		for (int i = 0; i < size(); i++) {
-			if (usePt[i]) {
-				Point2d next = get(i).end;
-				result.add(new LineSegment2D(head,next,get(i).color));
-				head=next;
-			}
+		if (size() < 3) { // If less than 3 points, just return the original collection
+			result.addAll(this);
+			return result;
 		}
-		
-		return result;
-	}
 
-	private void simplifySection(int i, int j,double distanceTolerance) {
-		if ((i + 1) == j) return;
-		LineSegment2D seg = new LineSegment2D(
-			get(i).start,
-			get(j).end,
-			get(i).color);
-		double maxDistance = -1.0;
-		int maxIndex = i;
-		for (int k = i + 1; k < j; k++) {
-			double distance = seg.ptLineDistSq(get(k).end);
-			if (distance > maxDistance) {
-				maxDistance = distance;
-				maxIndex = k;
+		Point2d head = get(0).start;
+		Point2d tail = get(0).end;
+
+		// get the first segment
+		LineSegment2D seg = new LineSegment2D(head,tail,get(0).color);
+
+		for(int i=1; i < size(); i++) {
+			LineSegment2D next = get(i);
+			if (seg.ptLineDistSq(next.end) > distanceTolerance) {
+				// the next point is far enough away from the line, so add the line to the result
+				result.add(new LineSegment2D(head,tail,get(i-1).color));
+				head = tail;
+				tail = next.end;
+				seg = new LineSegment2D(head,tail,get(i).color);
+			} else {
+				// the next point is close to the line, so extend the line
+				tail = next.end;
+				//seg = new LineSegment2D(head,tail,get(i).color);
 			}
 		}
-		if (maxDistance <= distanceTolerance) {
-			for (int k = i + 1; k < j; k++) {
-				usePt[k] = false;
-			}
-		} else {
-			simplifySection(i, maxIndex,distanceTolerance);
-			simplifySection(maxIndex, j,distanceTolerance);
-		}
+		result.add(new LineSegment2D(head,tail,get(size()-1).color));
+
+		return result;
 	}
 
 	public Point2d getStart() {

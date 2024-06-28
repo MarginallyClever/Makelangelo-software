@@ -7,7 +7,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Performs <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Douglas-Peucker
@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class SimplifyTurtleAction extends TurtleModifierAction {
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
-	private static double distanceTolerance = 1.6;
+	private static double distanceTolerance = 1e-4;
 	
 	public SimplifyTurtleAction() {
 		super(Translator.get("Simplify"));
@@ -32,7 +32,7 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 		int beforeCount = originalLines.size();
 		logger.debug("  Converted to {} lines.", beforeCount);
 
-		LineCollection longLines = removeColinearSegments(originalLines);
+		LineCollection longLines = removeCollinearSegments(originalLines);
 		int afterCount = longLines.size();
 		int change = beforeCount - afterCount;
 		logger.debug("  - {} shorts = {} lines.", change, afterCount);
@@ -52,12 +52,12 @@ public class SimplifyTurtleAction extends TurtleModifierAction {
 	 * @param originalLines the lines to simplify
 	 * @return the simplified lines
 	 */
-	private LineCollection removeColinearSegments(LineCollection originalLines) {
+	private LineCollection removeCollinearSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();
 
-		ArrayList<LineCollection> byColor = originalLines.splitByColor();
+		List<LineCollection> byColor = originalLines.splitByColor();
 		for(LineCollection c : byColor ) {
-			ArrayList<LineCollection> byTravel = c.splitByTravel();
+			List<LineCollection> byTravel = c.splitByTravel();
 			for(LineCollection t : byTravel ) {
 				LineCollection after = t.simplify(distanceTolerance);
 				result.addAll(after);

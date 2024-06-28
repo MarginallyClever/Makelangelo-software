@@ -41,11 +41,12 @@ public class TurtleRenderFacade implements PreviewListener {
 			int showCount = 0;
 			
 			try {
+				float r = (float)penDiameter/2f;
 				shaderLine.use(gl);
 				OpenGLHelper.checkGLError(gl,logger);
-				shaderLine.set1f(gl,"thickness", (float)penDiameter/2f);
+				shaderLine.set1f(gl,"thickness", r);
 				OpenGLHelper.checkGLError(gl,logger);
-				shaderLine.set1f(gl,"feather",0.05f);
+				shaderLine.set1f(gl,"feather",r * 0.05f);
 				OpenGLHelper.checkGLError(gl,logger);
 
 				myRenderer.setPenDiameter(penDiameter);

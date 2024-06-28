@@ -37,14 +37,6 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 			mesh.clear();
 		}
 	}
-
-	@Override
-	public void end() {
-		drawPoints();
-		isDone=true;
-
-		mesh.render(gl);
-	}
 	
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
@@ -53,35 +45,39 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 		points.add(p1);
 	}
 
-	private void drawPoints() {
-		if(isDone) return;
-
-		if(!points.isEmpty()) {
-			int size = points.size();
-			for(int i=0;i<size;i+=2) {
-				TurtleMove p0 = points.get(i);
-				TurtleMove p1 = points.get(i+1);
-				float b0 = (float)i/(float)size;
-				float b1 = (float)(i+1)/(float)size;
-				var c0 = new Color((int)(255f*b0),0,(int)(255f*(1.0f - b0)),255);
-				var c1 = new Color((int)(255f*b1),0,(int)(255f*(1.0f - b1)),255);
-				Vector3d p0v = new Vector3d(p0.x,p0.y,0);
-				Vector3d p1v = new Vector3d(p1.x,p1.y,0);
-				Line2QuadHelper.thicken(mesh, p0v, p1v, c0, c1, penDiameter);
-			}
-			points.clear();
-		}
-	}
-
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		if(isDone) return;
-
 		drawPoints();
-
 		if(!showPenUp) return;
-
 		Line2QuadHelper.thicken(mesh, p0, p1, colorTravel, penDiameter);
+	}
+
+	@Override
+	public void end() {
+		drawPoints();
+		isDone=true;
+		mesh.render(gl);
+	}
+
+	private void drawPoints() {
+		if(isDone) return;
+		if(points.isEmpty()) return;
+
+		int size = points.size()-1;
+		for(int i=0;i<size;i+=2) {
+			TurtleMove p0 = points.get(i  );
+			TurtleMove p1 = points.get(i+1);
+			int b0 = (int)( 255f * (float)(i  ) / (float)size );
+			int b1 = (int)( 255f * (float)(i+1) / (float)size );
+			Line2QuadHelper.thicken(mesh,
+					new Vector3d(p0.x,p0.y,0),
+					new Vector3d(p1.x,p1.y,0),
+					new Color(b0,0,255 - b0,255),
+					new Color(b1,0,255 - b1,255),
+					penDiameter);
+		}
+		points.clear();
 	}
 
 	@Override

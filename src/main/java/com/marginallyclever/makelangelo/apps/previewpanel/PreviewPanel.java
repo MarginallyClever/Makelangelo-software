@@ -383,7 +383,10 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				shaderLine.use(gl3);
 				shaderLine.set1f(gl3,"viewportWidth",camera.getWidth());
 				shaderLine.set1f(gl3,"viewportHeight",camera.getHeight());
-				shaderLine.set1f(gl3,"zoom",Math.max(camera.getHeight(),camera.getWidth())/(float)(2f*camera.getZoom()));
+				float height = camera.getHeight(); // Math.max(camera.getHeight(),camera.getWidth());
+				float zoom = height / (float)(camera.getZoom());
+				//zoom = Math.max(5.0f,zoom);
+				shaderLine.set1f(gl3,"zoom",zoom);
 				paintCamera(gl3,shaderLine);
 			} else {
 				shaderDefault.use(gl3);
