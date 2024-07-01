@@ -9,7 +9,7 @@ import javax.vecmath.Vector3d;
 import java.awt.*;
 
 /**
- * Helper class to add a quad to the mesh that represents a line between two points.
+ * Helper class to convert lines into quads.
  */
 public class Line2QuadHelper {    /**
      * Add a quad to the mesh that represents a line between two points.

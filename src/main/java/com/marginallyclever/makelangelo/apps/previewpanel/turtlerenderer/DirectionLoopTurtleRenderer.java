@@ -2,8 +2,10 @@ package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import javax.vecmath.Vector3d;
@@ -17,23 +19,23 @@ import java.util.ArrayList;
  * @since 7.48.0
  */
 public class DirectionLoopTurtleRenderer implements TurtleRenderer {
-	private GL3 gl;
+	private RenderContext context;
 	private Color colorTravel = Color.GREEN;
 	private boolean showPenUp = false;
 	private final ArrayList<TurtleMove> points = new ArrayList<>();
 	private float penDiameter = 1;
 
-	private final Mesh mesh = new Mesh();
+	private final Mesh mesh = MeshFactory.createMesh();
 	private boolean isDone = false;
 		
 	@Override
-	public void start(GL3 gl) {
-		this.gl = gl;
+	public void start(RenderContext context) {
+		this.context = context;
 		points.clear();
 		showPenUp = GFXPreferences.getShowPenUp();
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 		if(!isDone) {
-			mesh.unload(gl);
+			mesh.unload(context.gl);
 			mesh.clear();
 		}
 	}
@@ -57,7 +59,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	public void end() {
 		drawPoints();
 		isDone=true;
-		mesh.render(gl);
+		mesh.render(context.gl);
 	}
 
 	private void drawPoints() {

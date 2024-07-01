@@ -2,28 +2,43 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
 import javax.vecmath.Point2d;
 
 public class Cartesian implements PlotterRenderer {
-	public final double CARTESIAN_MOTOR_MOUNT_SIZE =45; //cm
-	public final double CARTESIAN_PLOTTER_SIZE=60; //cm
-	public final double CARTESIAN_PLOTTER_OUTER_SIZE=70; //cm
-	public final double CARTESIAN_PLOTTER_HOLE_SIZE=20; //cm
-	public final double CARTESIAN_MOTOR_BODY_SIZE =42; //cm
+	public static final int CARTESIAN_MOTOR_MOUNT_SIZE =45; //cm
+	public static final int CARTESIAN_PLOTTER_SIZE=60; //cm
+	public static final int CARTESIAN_PLOTTER_OUTER_SIZE=70; //cm
+	public static final int CARTESIAN_PLOTTER_HOLE_SIZE=20; //cm
+	public static final int NEMA17_SIZE = 42; //cm
 
-	public final Mesh meshMotor = new Mesh();
-	public final Mesh meshGantry = new Mesh();
-	public final Mesh meshControlBox = new Mesh();
+	public final Mesh meshQuad = MeshFactory.createMesh();
 
+	public Cartesian() {
+		setupMesh();
+	}
+
+	private void setupMesh() {
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addVertex(0, 0,0);
+		meshQuad.addVertex(0, 1,0);
+		meshQuad.addVertex(1, 1,0);
+		meshQuad.addVertex(1, 0,0);
+	}
 	
 	@Override
-	public void render(GL3 gl,Plotter robot) {
-		paintGantryAndHead(gl,robot);		
-		paintMotors(gl,robot);
-		paintControlBox(gl,robot);
+	public void render(RenderContext context, Plotter robot) {
+		paintGantryAndHead(context.gl,robot);
+		paintMotors(context.gl,robot);
+		paintControlBox(context.gl,robot);
 	}
 
 	@Override
@@ -98,19 +113,10 @@ public class Cartesian implements PlotterRenderer {
 	}
 
 	private void paintOneMotor(GL3 gl) {
-// TODO implement me
-/*
-		// motor
-		gl.glColor3f(0, 0, 0);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(0                        , 0                        );
-		gl.glVertex2d(0                        , CARTESIAN_MOTOR_BODY_SIZE);
-		gl.glVertex2d(CARTESIAN_MOTOR_BODY_SIZE, CARTESIAN_MOTOR_BODY_SIZE);
-		gl.glVertex2d(CARTESIAN_MOTOR_BODY_SIZE, 0                        );
-		gl.glVertex2d(0                        , 0                        );
-		gl.glEnd();*/
+		// TODO set color to black?  load NEMA17 motor picture?
+		meshQuad.render(gl);
 	}
-	
+
 	/**
 	 * paint the controller and the LCD panel
 	 * @param gl the render context

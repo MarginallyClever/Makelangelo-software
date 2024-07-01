@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
-import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.OpenGLHelper;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -31,7 +31,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	private ShaderProgram shaderLine;
 
 	@Override
-	public void render(GL3 gl) {
+	public void render(RenderContext context) {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
@@ -42,18 +42,18 @@ public class TurtleRenderFacade implements PreviewListener {
 			
 			try {
 				float r = (float)penDiameter/2f;
-				shaderLine.use(gl);
-				OpenGLHelper.checkGLError(gl,logger);
-				shaderLine.set1f(gl,"thickness", r);
-				OpenGLHelper.checkGLError(gl,logger);
-				shaderLine.set1f(gl,"feather",r * 0.05f);
-				OpenGLHelper.checkGLError(gl,logger);
+				shaderLine.use(context.gl);
+				OpenGLHelper.checkGLError(context.gl,logger);
+				shaderLine.set1f(context.gl,"thickness", r);
+				OpenGLHelper.checkGLError(context.gl,logger);
+				shaderLine.set1f(context.gl,"feather",r * 0.05f);
+				OpenGLHelper.checkGLError(context.gl,logger);
 
 				myRenderer.setPenDiameter(penDiameter);
 				myRenderer.setPenUpColor(penUpColor);
 				myRenderer.setPenDownColor(penDownColor);
 				myRenderer.setPenDiameter(penDiameter);
-				myRenderer.start(gl);
+				myRenderer.start(context);
 				showCount++;
 
 				for (TurtleMove m : myTurtle.history) {

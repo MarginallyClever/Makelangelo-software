@@ -2,7 +2,9 @@ package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,8 @@ public class Paper implements PreviewListener {
 	private double centerX=0.0d;
 	private double centerY=0.0d;
 	private Color paperColor = Color.WHITE;
-	private final Mesh meshPaper = new Mesh();
-	private final Mesh meshMargin = new Mesh();
+	private final Mesh meshPaper = MeshFactory.createMesh();
+	private final Mesh meshMargin = MeshFactory.createMesh();
 
 	public Paper() {
 		super();
@@ -54,10 +56,10 @@ public class Paper implements PreviewListener {
 	}
 
 	@Override
-	public void render(GL3 gl) {
+	public void render(RenderContext context) {
 		// TODO gl.glTranslated(centerX, centerY, 0);
-		meshPaper.render(gl);
-		meshMargin.render(gl);
+		meshPaper.render(context.gl);
+		meshMargin.render(context.gl);
 	}
 
 	/**

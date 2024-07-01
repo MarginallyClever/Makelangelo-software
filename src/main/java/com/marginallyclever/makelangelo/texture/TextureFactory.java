@@ -47,6 +47,5 @@ public class TextureFactory {
         for(TextureWithMetadata tex : textures) {
             tex.unload(gl);
         }
-        textures.clear();
     }
 }

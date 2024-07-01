@@ -2,8 +2,10 @@ package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -14,23 +16,23 @@ import java.awt.*;
  *
  */
 public class DefaultTurtleRenderer implements TurtleRenderer {
-	private GL3 gl;
+	private RenderContext context;
 	private Color colorTravel = Color.GREEN;
 	private Color colorDraw = Color.BLACK;
 	private boolean showPenUp = false;
 	private float penDiameter = 1;
 
-	private final Mesh mesh = new Mesh();
+	private final Mesh mesh = MeshFactory.createMesh();
 	private boolean isDone = false;
 	
 	@Override
-	public void start(GL3 gl) {
-		this.gl = gl;
+	public void start(RenderContext context) {
+		this.context = context;
 		showPenUp = GFXPreferences.getShowPenUp();
 
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
 		if(!isDone) {
-			mesh.unload(gl);
+			mesh.unload(context.gl);
 			mesh.clear();
 		}
 	}
@@ -39,7 +41,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void end() {
 		// end drawing lines
 		isDone=true;
-		mesh.render(gl);
+		mesh.render(context.gl);
 	}
 
 	@Override

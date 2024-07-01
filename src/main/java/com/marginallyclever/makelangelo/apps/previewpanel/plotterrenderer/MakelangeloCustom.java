@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -20,13 +20,13 @@ public class MakelangeloCustom implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl,Plotter robot) {
+	public void render(RenderContext context, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
-		paintControlBox(gl,settings);
-		paintMotors(gl,settings);
+		paintControlBox(context,settings);
+		paintMotors(context,settings);
 		if(robot.getDidFindHome())
-			paintPenHolderToCounterweights(gl,robot);
+			paintPenHolderToCounterweights(context,robot);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	 * @param gl the render context
 	 * @param settings plottersettings of the robot
 	 */
-	private void paintControlBox(GL3 gl, PlotterSettings settings) {
+	private void paintControlBox(RenderContext context, PlotterSettings settings) {
 // TODO implement me
 /*
 		double cy = settings.getDouble(PlotterSettings.LIMIT_TOP);
@@ -94,7 +94,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	}
 
 	// draw left & right motor
-	private void paintMotors(GL3 gl, PlotterSettings settings) {
+	private void paintMotors(RenderContext context, PlotterSettings settings) {
 // TODO implement me
 /*
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
@@ -152,7 +152,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl.glPopMatrix();*/
 	}
 
-	private void paintPenHolderToCounterweights(GL3 gl, Plotter robot ) {
+	private void paintPenHolderToCounterweights(RenderContext context, Plotter robot ) {
 // TODO implement me
 /*
 		PlotterSettings settings = robot.getSettings();

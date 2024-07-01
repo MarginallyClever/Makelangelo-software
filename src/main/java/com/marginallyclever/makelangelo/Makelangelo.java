@@ -443,10 +443,6 @@ public final class Makelangelo {
 		return myPlotter;
 	}
 
-	public PlotterSettingsManager getPlotterSettingsManager() {
-		return plotterSettingsManager;
-	}
-
 	public MainFrame getFrame() {
 		return mainFrame;
 	}

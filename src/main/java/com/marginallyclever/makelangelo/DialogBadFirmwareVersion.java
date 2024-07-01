@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo;
 
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 
-import java.awt.Component;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 
 @Deprecated
 public class DialogBadFirmwareVersion {

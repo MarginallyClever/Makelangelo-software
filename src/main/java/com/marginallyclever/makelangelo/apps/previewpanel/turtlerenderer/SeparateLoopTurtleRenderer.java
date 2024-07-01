@@ -2,8 +2,10 @@ package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -14,7 +16,7 @@ import java.awt.*;
  * @author Dan Royer
  */
 public class SeparateLoopTurtleRenderer implements TurtleRenderer {
-	private GL3 gl;
+	private RenderContext context;
 	
 	private Color colorTravel = Color.GREEN;
 	private boolean showPenUp = false;
@@ -23,12 +25,12 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	private Color colorDraw = Color.WHITE;
 	private boolean isPenUp;
 
-	private final Mesh mesh = new Mesh();
+	private final Mesh mesh = MeshFactory.createMesh();
 	private boolean isDone = false;
 		
 	@Override
-	public void start(GL3 gl) {
-		this.gl=gl;
+	public void start(RenderContext context) {
+		this.context = context;
 		showPenUp = GFXPreferences.getShowPenUp();
 
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
@@ -36,7 +38,7 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 		isPenUp=true;
 		setDrawColor();
 		if(!isDone) {
-			mesh.unload(gl);
+			mesh.unload(context.gl);
 			mesh.clear();
 		}
 	}
@@ -44,7 +46,7 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void end() {
 		isDone=true;
-		mesh.render(gl);
+		mesh.render(context.gl);
 	}
 	
 	private void setDrawColor() {

@@ -7,6 +7,7 @@ import com.marginallyclever.convenience.helpers.MatrixHelper;
 import com.marginallyclever.convenience.helpers.OpenGLHelper;
 import com.marginallyclever.convenience.helpers.ResourceHelper;
 import com.marginallyclever.makelangelo.Camera;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer.PlotterRenderer;
@@ -95,9 +96,9 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		addListener(paper);
 		addListener(myTurtleRenderer);
-		addListener((gl) -> {
+		addListener(context -> {
 			if(myPlotterRenderer!=null) {
-				myPlotterRenderer.render(gl, myPlotter);
+				myPlotterRenderer.render(context, myPlotter);
 			}
 		});
 
@@ -321,6 +322,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 		logger.debug("dispose");
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		TextureFactory.unloadAll(gl);
+		MeshFactory.unloadAll(gl);
 		shaderDefault.delete(gl);
 	}
 
@@ -392,7 +394,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 				shaderDefault.use(gl3);
 				paintCamera(gl3, shaderDefault);
 			}
-			p.render(gl3);
+			p.render(new RenderContext(gl3, shaderDefault));
 		}
 	}
 

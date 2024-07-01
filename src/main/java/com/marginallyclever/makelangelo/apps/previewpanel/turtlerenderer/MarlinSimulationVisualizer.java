@@ -2,7 +2,9 @@ package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
@@ -33,8 +35,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		}
 	};
 
-	//private Turtle previousTurtle=null;
-	private GL3 gl;
+	private RenderContext context;
 	private final Turtle myTurtle = new Turtle();
 	private Turtle previousTurtle=null;
 	private PlotterSettings mySettings;
@@ -46,7 +47,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	private float penDiameter = 1;
 	private boolean isDone = false;
 
-	private final Mesh mesh = new Mesh();
+	private final Mesh mesh = MeshFactory.createMesh();
 	
 	public MarlinSimulationVisualizer() {
 		mesh.setRenderStyle(GL3.GL_TRIANGLES);
@@ -193,11 +194,11 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 
 	@Override
-	public void start(GL3 gl) {
-		this.gl = gl;
+	public void start(RenderContext context) {
+		this.context = context;
 		myTurtle.history.clear();
 		if(!isDone) {
-			mesh.unload(gl);
+			mesh.unload(context.gl);
 			mesh.clear();
 		}
 	}
@@ -222,7 +223,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			previousTurtle = myTurtle;
 		}
 		isDone=true;
-		mesh.render(gl);
+		mesh.render(context.gl);
 	}
 
 	@Override

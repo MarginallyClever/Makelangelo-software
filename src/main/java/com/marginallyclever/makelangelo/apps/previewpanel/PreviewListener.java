@@ -1,7 +1,5 @@
 package com.marginallyclever.makelangelo.apps.previewpanel;
 
-import com.jogamp.opengl.GL3;
-
 import java.util.EventListener;
 
 /**
@@ -15,5 +13,5 @@ public interface PreviewListener extends EventListener {
 	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
 	 * @param gl the render context
 	 */
-	void render(GL3 gl3);
+	void render(RenderContext context);
 }

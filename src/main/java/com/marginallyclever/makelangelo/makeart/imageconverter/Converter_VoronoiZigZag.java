@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
@@ -78,8 +79,8 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void resume() {}
 
 	@Override
-	public void render(GL3 gl) {
-		super.render(gl);
+	public void render(RenderContext context) {
+		super.render(context.gl);
 		if(getThread().getPaused()) return;
 // TODO implement me
 /*

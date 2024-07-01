@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.turtlerenderer;
 
-import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.*;
  * {@link TurtleRenderer} draws a {@link com.marginallyclever.makelangelo.turtle.Turtle} in a specific style.
  */
 public interface TurtleRenderer {
-	void start(GL3 gl);
+	void start(RenderContext context);
 
 	void draw(TurtleMove p0, TurtleMove p1);
 	

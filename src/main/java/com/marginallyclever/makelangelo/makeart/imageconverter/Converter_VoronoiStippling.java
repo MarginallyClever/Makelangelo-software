@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -59,8 +60,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void render(GL3 gl) {
-		super.render(gl);
+	public void render(RenderContext context) {
+		super.render(context.gl);
 // TODO implement me
 /*
 

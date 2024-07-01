@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -13,11 +13,11 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public void render(GL3 gl,Plotter robot) {
-		paintControlBox(gl,robot);
-		Polargraph.paintMotors(gl,robot);
+	public void render(RenderContext context, Plotter robot) {
+		paintControlBox(context.gl,robot);
+		Polargraph.paintMotors(context,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(gl,robot);		
+			Polargraph.paintPenHolderToCounterweights(context,robot);
 	}
 
 	@Override

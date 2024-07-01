@@ -1,14 +1,14 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
 import javax.vecmath.Point2d;
-
-import static com.marginallyclever.convenience.helpers.DrawingHelper.paintTexture;
 
 public class Makelangelo5Huge implements PlotterRenderer {
 	private static TextureWithMetadata textureMainBody;
@@ -19,7 +19,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 	private static TextureWithMetadata textureArm;
 
 	@Override
-	public void render(GL3 gl, Plotter robot) {
+	public void render(RenderContext context, Plotter robot) {
 		if (textureMainBody == null) textureMainBody = TextureFactory.loadTexture("/textures/huge.png");
 		if (textureMotorMounts == null) textureMotorMounts = TextureFactory.loadTexture("/textures/huge-motors.png");
 		if (textureLogo == null) textureLogo = TextureFactory.loadTexture("/logo.png");
@@ -28,26 +28,26 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		if (textureArm == null) textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
 		if (textureMainBody == null) {
-			paintControlBoxPlain(gl, robot);
+			paintControlBoxPlain(context, robot);
 		} else {
-			paintControlBoxFancy(gl, robot, textureMainBody);
+			paintControlBoxFancy(context, robot, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(gl, robot);
+		Polargraph.paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
-			paintPenHolderToCounterweights(gl, robot);
+			paintPenHolderToCounterweights(context, robot);
 
 		if (textureMotorMounts == null) {
-			Polargraph.paintMotors(gl, robot);
+			Polargraph.paintMotors(context, robot);
 		} else {
-			paintControlBoxFancy(gl, robot, textureMotorMounts);
+			paintControlBoxFancy(context, robot, textureMotorMounts);
 		}
 
 		if (textureLogo == null) {
 			// paintLogo(gl,robot);
 		} else {
-			paintLogoFancy(gl, robot);
+			paintLogoFancy(context, robot);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 
 	}
 
-	private void paintControlBoxFancy(GL3 gl, Plotter robot,TextureWithMetadata texture) {
+	private void paintControlBoxFancy(RenderContext context, Plotter robot,TextureWithMetadata texture) {
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		final double scaleX = 1366 / 943.0; // machine is 1366 motor-to-motor. texture is 922. scaleX accordingly.
@@ -65,10 +65,10 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		final double ox = left - 51 * scaleX; // 106 taken from offset in texture map
 		final double oy = -280 * scaleX; // 109 taken from offset in texture map. TODO why -15 instead of top?
 
-		paintTexture(gl, texture, ox, oy, width, height);
+		DrawingHelper.paintTexture(context.gl, texture, ox, oy, width, height);
 	}
 
-	public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -96,21 +96,21 @@ public class Makelangelo5Huge implements PlotterRenderer {
 
 
 		// belt from motor to pen holder left
-		drawBeltMinus10(gl,left,top,gx,gy);
+		drawBeltMinus10(context.gl,left,top,gx,gy);
 		// belt from motor to pen holder right
-		drawBeltMinus10(gl,right,top,gx,gy);
+		drawBeltMinus10(context.gl,right,top,gx,gy);
 
 		// belt from motor to counterweight left
-		paintBeltSide(gl,left,top,left_b);
+		paintBeltSide(context.gl,left,top,left_b);
 		// belt from motor to counterweight right
-		paintBeltSide(gl,right,top,right_b);
+		paintBeltSide(context.gl,right,top,right_b);
 
-		paintGondola(gl,gx,gy,robot);
+		paintGondola(context.gl,gx,gy,robot);
 
 		// left
-		paintCounterweight(gl,left,top-left_b);
+		paintCounterweight(context,left,top-left_b);
 		// right
-		paintCounterweight(gl,right,top-right_b);
+		paintCounterweight(context,right,top-right_b);
 	}
 
 	private void drawBeltMinus10(GL3 gl, double cornerX, double cornerY, double penX, double penY) {
@@ -166,35 +166,35 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glPushMatrix();
 		gl.glTranslated(gx,gy,0);
 		gl.glRotated(Math.toDegrees(angleLeft)+90,0,0,1);
-		paintTexture(gl,textureArm,-100,-100,200,200);
+		DrawingHelper.paintTexture(gl,textureArm,-100,-100,200,200);
 		gl.glPopMatrix();
 
 		gl.glPushMatrix();
 		gl.glTranslated(gx,gy,0);
 		gl.glRotated(Math.toDegrees(angleRight)+90,0,0,1);
-		paintTexture(gl,textureArm,-100,-100,200,200);
+		DrawingHelper.paintTexture(gl,textureArm,-100,-100,200,200);
 		gl.glPopMatrix();
 
 		// paint body last so it's on top
-		paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
+		DrawingHelper.paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
 	}
 
-	private void paintCounterweight(GL3 gl,double x,double y) {
+	private void paintCounterweight(RenderContext context,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(gl,x,y);
+			Polargraph.paintCounterweight(context.gl,x,y);
 			return;
 		}
 
-		paintTexture(gl, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(context.gl, textureWeight, x-20, y-74, 40,80);
 	}
 
 	/**
 	 * paint the Marginally Clever Logo
 	 *
-	 * @param gl   the render context
+	 * @param context the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintLogoFancy(GL3 gl, Plotter robot) {
+	private void paintLogoFancy(RenderContext context, Plotter robot) {
 		final double scale = 0.5;
 		final double TW = 128 * scale;
 		final double TH = 128 * scale;
@@ -202,16 +202,16 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
-		paintTexture(gl, textureLogo, LOGO_X, LOGO_Y, TW, TH);
+		DrawingHelper.paintTexture(context.gl, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
 	 *
-	 * @param gl   the render context
+	 * @param context the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintControlBoxPlain(GL3 gl, Plotter robot) {
+	private void paintControlBoxPlain(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);

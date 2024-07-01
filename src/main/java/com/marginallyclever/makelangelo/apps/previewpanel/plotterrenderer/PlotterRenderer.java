@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
-import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -15,11 +15,12 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 public interface PlotterRenderer {
 	/**
 	 * Custom look and feel for each version
-	 * 
-	 * @param gl   the render context
-	 * @param robot the machine to draw.
+	 *
+	 * @param gl      the render context
+	 * @param context
+	 * @param robot   the machine to draw.
 	 */
-	void render(GL3 gl, Plotter robot);
+	void render(RenderContext context, Plotter robot);
 
 	/**
 	 * Update the settings for the plotter.

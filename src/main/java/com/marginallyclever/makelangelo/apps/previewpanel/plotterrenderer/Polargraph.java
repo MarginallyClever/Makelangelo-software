@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -12,12 +14,12 @@ import javax.vecmath.Point2d;
  * @author Dan Royer
  */
 public abstract class Polargraph implements PlotterRenderer {
-	public static final float PEN_HOLDER_RADIUS_2= 60f; // cm
-	public static final float MOTOR_SIZE= 21f; // cm
+	public static final float PEN_HOLDER_RADIUS_2 = 60f; // cm
+	public static final float MOTOR_SIZE = 21f; // cm
 	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
 	public static final float COUNTERWEIGHT_HEIGHT = 100;
 
-	public Mesh mesh = new Mesh();
+	public Mesh mesh = MeshFactory.createMesh();
 	
 	/**
 	 * convert from belt length mm to cartesian position.
@@ -65,24 +67,24 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl, Plotter robot) {
+	public void render(RenderContext context, Plotter robot) {
 		mesh.clear();
 		mesh.setRenderStyle(GL3.GL_LINES);
 
-		drawPhysicalLimits(gl,robot);
+		drawPhysicalLimits(context,robot);
 
-		paintMotors(gl, robot);
-		paintControlBox(gl, robot);
+		paintMotors(context, robot);
+		paintControlBox(context, robot);
 		if(robot.getDidFindHome()) {
-			paintPenHolderToCounterweights(gl, robot);
+			paintPenHolderToCounterweights(context, robot);
 		}
 	}
 
 	/**
 	 * Outline the drawing limits
-	 * @param gl
+	 * @param context the rendering context
 	 */
-	private void drawPhysicalLimits(GL3 gl,Plotter robot) {
+	private void drawPhysicalLimits(RenderContext context,Plotter robot) {
 // TODO implement me
 /*
 		mesh.addColor(0.9f, 0.9f, 0.9f,1.0f); // #color
@@ -96,7 +98,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	static public void paintMotors(GL3 gl,Plotter robot) {
+	static public void paintMotors(RenderContext context,Plotter robot) {
 // TODO implement me
 /*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -118,7 +120,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private void paintControlBox(GL3 gl, Plotter robot) {
+	private void paintControlBox(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -166,7 +168,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glPopMatrix();*/
 	}
 
-	static public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+	static public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 
 
 		Point2d pos = robot.getPos();
@@ -210,12 +212,12 @@ public abstract class Polargraph implements PlotterRenderer {
 		// belt from motor to counterweight right
 		//paintBeltSide(gl,right,top,right_b);
 
-		paintGondola(gl,gx,gy,robot);
+		paintGondola(context.gl,gx,gy,robot);
 
 		// left
-		paintCounterweight(gl,left,top-left_b);
+		paintCounterweight(context.gl,left,top-left_b);
 		// right
-		paintCounterweight(gl,right,top-right_b);
+		paintCounterweight(context.gl,right,top-right_b);
 	}
 
 	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
@@ -295,7 +297,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	public static void paintSafeArea(GL3 gl, Plotter robot) {
+	public static void paintSafeArea(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		PlotterSettings settings = robot.getSettings();

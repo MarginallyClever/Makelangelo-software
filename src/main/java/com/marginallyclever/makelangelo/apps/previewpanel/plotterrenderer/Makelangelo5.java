@@ -3,6 +3,8 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
@@ -18,7 +20,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	private final TextureWithMetadata textureGondola = TextureFactory.loadTexture("/textures/phBody.png");
 	private final TextureWithMetadata textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
-	private final Mesh controlBox = new Mesh();
+	private final Mesh controlBox = MeshFactory.createMesh();
 
 	private void setupControlBoxMesh(PlotterSettings settings) {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
@@ -43,22 +45,22 @@ public class Makelangelo5 implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(GL3 gl, Plotter robot) {
+	public void render(RenderContext context, Plotter robot) {
 		if (textureMainBody != null) {
-			paintControlBoxFancy(gl, textureMainBody);
+			paintControlBoxFancy(context, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(gl, robot);
+		Polargraph.paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
-			paintPenHolderToCounterweights(gl, robot);
+			paintPenHolderToCounterweights(context, robot);
 
 		if (textureMotors != null) {
-			paintControlBoxFancy(gl, textureMotors);
+			paintControlBoxFancy(context, textureMotors);
 		}
 
 		if (textureLogo != null) {
-			paintLogoFancy(gl, robot.getSettings());
+			paintLogoFancy(context, robot.getSettings());
 		}
 	}
 
@@ -67,7 +69,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		setupControlBoxMesh(settings);
 	}
 
-	public void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -94,21 +96,21 @@ public class Makelangelo5 implements PlotterRenderer {
 		double right_b = (beltLength - right_a) / 2 - 55;
 
 		// belt from motor to pen holder left
-		drawBeltMinus10(gl,left,top,gx,gy);
+		drawBeltMinus10(context.gl,left,top,gx,gy);
 		// belt from motor to pen holder right
-		drawBeltMinus10(gl,right,top,gx,gy);
+		drawBeltMinus10(context.gl,right,top,gx,gy);
 
 		// belt from motor to counterweight left
-		paintBeltSide(gl,left,top,left_b);
+		paintBeltSide(context.gl,left,top,left_b);
 		// belt from motor to counterweight right
-		paintBeltSide(gl,right,top,right_b);
+		paintBeltSide(context.gl,right,top,right_b);
 
-		paintGondola(gl,gx,gy,robot);
+		paintGondola(context.gl,gx,gy,robot);
 
 		// left
-		paintCounterweight(gl,left,top-left_b);
+		paintCounterweight(context.gl,left,top-left_b);
 		// right
-		paintCounterweight(gl,right,top-right_b);
+		paintCounterweight(context.gl,right,top-right_b);
 	}
 
 	private void drawBeltMinus10(GL3 gl, double cornerX, double cornerY, double penX, double penY) {
@@ -175,20 +177,20 @@ public class Makelangelo5 implements PlotterRenderer {
 		DrawingHelper.paintTexture(gl, textureWeight, x-20, y-74, 40,80);
 	}
 
-	private void paintControlBoxFancy(GL3 gl,TextureWithMetadata texture) {
-		//shaderProgram.set1i(gl,"useTexture",1);
-		texture.use(gl);
-		//controlBox.render(gl);
+	private void paintControlBoxFancy(RenderContext context,TextureWithMetadata texture) {
+		context.shader.set1i(context.gl,"useTexture",1);
+		texture.use(context.gl);
+		controlBox.render(context.gl);
 		//shaderProgram.set1i(gl,"useTexture",0);
 	}
 
 	/**
 	 * Paint the Marginally Clever Logo
 	 *
-	 * @param gl   the render context
+	 * @param context the render context
 	 * @param settings the machine settings
 	 */
-	private void paintLogoFancy(GL3 gl, PlotterSettings settings) {
+	private void paintLogoFancy(RenderContext context, PlotterSettings settings) {
 // TODO implement me
 /*
 		// bottom left corner of safe area

@@ -1,7 +1,9 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.makelangelo.apps.previewpanel.ShaderProgram;
+import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -9,18 +11,36 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
  * @author Dan Royer
  */
 public class Zarplotter implements PlotterRenderer {
-	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
-	final public double ZAR_PLOTTER_SIZE=60; //cm
-	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
-	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
-	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
-	
+	public static final int ZAR_MOTOR_MOUNT_SIZE=45; //cm
+	public static final int ZAR_PLOTTER_SIZE=60; //cm
+	public static final int ZAR_PLOTTER_OUTER_SIZE=70; //cm
+	public static final int ZAR_PLOTTER_HOLE_SIZE=20; //cm
+	public static final int NEMA17_SIZE = 42; //cm
+
+	public final Mesh meshQuad = MeshFactory.createMesh();
+
+	public Zarplotter() {
+		setupMesh();
+	}
+
+	private void setupMesh() {
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addColor(1,1,1, 1);
+		meshQuad.addVertex(0,0,0);
+		meshQuad.addVertex(0,1,0);
+		meshQuad.addVertex(1,1,0);
+		meshQuad.addVertex(1,0,0);
+	}
+
 	@Override
-	public void render(GL3 gl,Plotter robot) {
-		paintMotors(gl,robot);
-		paintControlBox(gl,robot);
+	public void render(RenderContext context, Plotter robot) {
+		paintMotors(context,robot);
+		paintControlBox(context,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(gl,robot);		
+			paintPenHolderToCounterweights(context,robot);
 	}
 
 	@Override
@@ -28,7 +48,7 @@ public class Zarplotter implements PlotterRenderer {
 
 	}
 
-	private void paintPenHolderToCounterweights(GL3 gl, Plotter robot) {
+	private void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		PlotterSettings settings = robot.getSettings();
@@ -82,7 +102,7 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private void paintMotors(GL3 gl,Plotter plotter) {
+	private void paintMotors(RenderContext context,Plotter plotter) {
 // TODO implement me
 /*
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -109,19 +129,13 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, 0                   );
 		gl.glVertex2d(0                   , 0                   );
 		gl.glEnd();
-		
-		// motor
-		gl.glColor3f(0, 0, 0);
-		gl.glBegin(GL3.GL_QUADS);
-		gl.glVertex2d(0                  , 0                  );
-		gl.glVertex2d(0                  , ZAR_MOTOR_BODY_SIZE);
-		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
-		gl.glVertex2d(ZAR_MOTOR_BODY_SIZE, 0                  );
-		gl.glVertex2d(0                  , 0                  );
-		gl.glEnd();*/
+		*/
+
+		// TODO set color to black?  load NEMA17 motor picture?
+		meshQuad.render(gl);
 	}
 	
-	private void paintControlBox(GL3 gl,Plotter plotter) {
+	private void paintControlBox(RenderContext context,Plotter plotter) {
 // TODO implement me
 /*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -154,79 +168,4 @@ public class Zarplotter implements PlotterRenderer {
 
 		gl.glPopMatrix();*/
 	}
-/*
-	@Override
-	public Point2d getHome() {
-		return new Point2d(0,0);
-	}
-	
-	@Override
-	public String getVersion() {
-		return "6";
-	}
-
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public float getWidth() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	@Override
-	public float getHeight() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	@Override
-	public float getFeedrateMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getFeedrateDefault() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getAccelerationMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getDouble(PlotterSettings.PEN_ANGLE_UP_TIME) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getZAngleOn() {
-		return 0;
-	}
-
-	@Override
-	public float getZAngleOff() {
-		return 90;
-	}*/
 }
