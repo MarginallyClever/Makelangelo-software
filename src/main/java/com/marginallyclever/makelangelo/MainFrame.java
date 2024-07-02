@@ -6,12 +6,14 @@ import ModernDocking.app.Docking;
 import ModernDocking.app.RootDockingPanel;
 import ModernDocking.exception.DockingLayoutException;
 import ModernDocking.ext.ui.DockingUI;
-import com.marginallyclever.makelangelo.apps.LogPanel;
 import com.marginallyclever.makelangelo.apps.AboutPanel;
+import com.marginallyclever.makelangelo.apps.LogPanel;
 import com.marginallyclever.makelangelo.apps.PaperSettingsPanel;
-import com.marginallyclever.makelangelo.apps.PlotterSettingsPanel;
+import com.marginallyclever.makelangelo.apps.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.apps.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
+import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.Plotter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,19 +32,20 @@ public class MainFrame extends JFrame {
     private final LogPanel logPanel;
     private final PreviewPanel previewPanel;
     private final PaperSettingsPanel paperSettingsPanel;
-    private final PlotterSettingsPanel plotterSettingsPanel;
+    private final PlotterSettingsManagerPanel plotterSettingsPanel;
     private final FirmwareUploaderPanel firmwareUploaderPanel;
 
-    public MainFrame() {
+    public MainFrame(Paper myPaper, Plotter myPlotter) {
         super();
 
         initDocking();
 
         logPanel = new LogPanel();
-        previewPanel = new PreviewPanel();
-        paperSettingsPanel = new PaperSettingsPanel();
-        plotterSettingsPanel = new PlotterSettingsPanel();
+        previewPanel = new PreviewPanel(myPaper,myPlotter);
+        paperSettingsPanel = new PaperSettingsPanel(myPaper);
+        plotterSettingsPanel = new PlotterSettingsManagerPanel();
         firmwareUploaderPanel = new FirmwareUploaderPanel();
+        plotterSettingsPanel.addListener(previewPanel::updatePlotterSettings);
 
         createDefaultLayout();
         saveAndRestoreLayout();

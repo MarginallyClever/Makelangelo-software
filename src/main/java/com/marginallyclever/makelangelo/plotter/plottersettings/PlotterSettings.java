@@ -386,6 +386,7 @@ public class PlotterSettings {
 		Preferences thisMachineNode = allMachinesNode.node(robotUID);
 
 		thisMachineNode.put("robotUID", robotUID);
+		thisMachineNode.put(STYLE, 							json.getString(STYLE));
 		thisMachineNode.putBoolean(IS_REGISTERED, 			json.getBoolean(IS_REGISTERED));
 		thisMachineNode.putBoolean(HANDLE_SMALL_SEGMENTS, 	json.getBoolean(HANDLE_SMALL_SEGMENTS));
 		thisMachineNode.putDouble(MIN_SEGMENT_LENGTH, 		json.getDouble(MIN_SEGMENT_LENGTH));
@@ -411,7 +412,6 @@ public class PlotterSettings {
 		thisMachineNode.put(ANCESTOR, 						json.getString(ANCESTOR));
 		thisMachineNode.put(USER_GENERAL_START_GCODE, 		json.getString(USER_GENERAL_START_GCODE));
 		thisMachineNode.put(USER_GENERAL_END_GCODE, 		json.getString(USER_GENERAL_END_GCODE));
-		thisMachineNode.put(STYLE, 							json.getString(STYLE));
 		thisMachineNode.putInt(PAPER_COLOR, 				json.getInt(PAPER_COLOR));
 		thisMachineNode.putInt(PEN_DOWN_COLOR_DEFAULT, 		json.getInt(PEN_DOWN_COLOR_DEFAULT));
 		thisMachineNode.putInt(PEN_DOWN_COLOR, 				json.getInt(PEN_DOWN_COLOR));

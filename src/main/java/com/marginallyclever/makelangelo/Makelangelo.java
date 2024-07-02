@@ -91,14 +91,15 @@ public final class Makelangelo {
 		super();
 
 		setLookAndFeel();
-		mainFrame = new MainFrame();
+
+		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
+		myPaper.loadConfig();
+
+		mainFrame = new MainFrame(myPaper, myPlotter);
 		mainFrame.setLocationByPlatform(true);
 		previewPanel = mainFrame.getPreviewPanel();
 
 		mainMenuBar = new MainMenu(this);
-
-		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
-		myPaper.loadConfig();
 
 		onPlotterSettingsUpdate(myPlotter.getSettings());
 	}

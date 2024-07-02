@@ -188,7 +188,7 @@ public class Paper implements PreviewListener {
 
 	private void updateMeshes() {
 		meshPaper.clear();
-		meshPaper.setRenderStyle(GL3.GL_TRIANGLE_FAN);
+		meshPaper.setRenderStyle(GL3.GL_QUADS);
 		var R = paperColor.getRed() / 255.0f;
 		var G = paperColor.getGreen() / 255.0f;
 		var B = paperColor.getBlue() / 255.0f;

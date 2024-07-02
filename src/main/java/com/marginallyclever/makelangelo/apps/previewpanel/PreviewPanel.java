@@ -485,8 +485,11 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	}
 
 	public void updatePlotterSettings(PlotterSettings settings) {
+		System.out.println("PreviewPanel.updatePlotterSettings");
 		try {
-			myPlotterRenderer = PlotterRendererFactory.valueOf(myPlotter.getSettings().getString(PlotterSettings.STYLE)).getPlotterRenderer();
+			myPlotter.getSettings().load(myPlotter.getSettings().getUID());
+			var style = myPlotter.getSettings().getString(PlotterSettings.STYLE);
+			myPlotterRenderer = PlotterRendererFactory.valueOf(style).getPlotterRenderer();
 		} catch (Exception e) {
 			logger.error("Failed to find plotter style {}", myPlotter.getSettings().getString(PlotterSettings.STYLE));
 			myPlotterRenderer = PlotterRendererFactory.MAKELANGELO_5.getPlotterRenderer();

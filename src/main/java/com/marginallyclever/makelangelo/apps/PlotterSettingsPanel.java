@@ -151,9 +151,9 @@ public class PlotterSettingsPanel extends JPanel {
 		machineHeight.setReadOnly(matches);
 	}
 
-	private void addToPanel(SelectPanel interior2, Select minPlannerSpeed) {
-		interior2.add(minPlannerSpeed);
-		minPlannerSpeed.addSelectListener((e)->{
+	private void addToPanel(SelectPanel panel, Select element) {
+		panel.add(element);
+		element.addSelectListener((e)->{
 			save();
 			fireSettingsChangedEvent();
 		});
