@@ -164,8 +164,6 @@ public class MainMenu extends JMenuBar {
         //buttonCheckForUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-update-16.png"))));
         menu.add(buttonCheckForUpdate);
 
-        menu.addSeparator();
-
         return menu;
     }
 
@@ -387,7 +385,7 @@ public class MainMenu extends JMenuBar {
             index++;
         }
 
-        menuWindows.add(new JSeparator());
+        menuWindows.addSeparator();
         menuWindows.add(new JMenuItem(new AbstractAction() {
             {
                 putValue(Action.NAME, "Reset default layout");

@@ -96,24 +96,32 @@ public class Makelangelo5 implements PlotterRenderer {
 		double right_b = (beltLength - right_a) / 2 - 55;
 
 		// belt from motor to pen holder left
-		drawBeltMinus10(context.gl,left,top,gx,gy);
+		drawBeltMinus10(context,left,top,gx,gy);
 		// belt from motor to pen holder right
-		drawBeltMinus10(context.gl,right,top,gx,gy);
+		drawBeltMinus10(context,right,top,gx,gy);
 
 		// belt from motor to counterweight left
-		paintBeltSide(context.gl,left,top,left_b);
+		paintBeltSide(context,left,top,left_b);
 		// belt from motor to counterweight right
-		paintBeltSide(context.gl,right,top,right_b);
+		paintBeltSide(context,right,top,right_b);
 
-		paintGondola(context.gl,gx,gy,robot);
+		paintGondola(context,gx,gy,robot);
 
 		// left
-		paintCounterweight(context.gl,left,top-left_b);
+		paintCounterweight(context,left,top-left_b);
 		// right
-		paintCounterweight(context.gl,right,top-right_b);
+		paintCounterweight(context,right,top-right_b);
 	}
 
-	private void drawBeltMinus10(GL3 gl, double cornerX, double cornerY, double penX, double penY) {
+	/**
+	 * draw belt from one corner to pen holder, minus 10cm for the length of the pen holder arms.
+	 * @param context the render context
+	 * @param cornerX the x coordinate of the corner
+	 * @param cornerY the y coordinate of the corner
+	 * @param penX the x coordinate of the pen holder
+	 * @param penY the y coordinate of the pen holder
+	 */
+	private void drawBeltMinus10(RenderContext context, double cornerX, double cornerY, double penX, double penY) {
 // TODO implement me
 /*
 		double dx = penX - cornerX;
@@ -129,7 +137,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
+	private static void paintBeltSide(RenderContext context,double x, double y, double length) {
 // TODO implement me
 /*
 		gl.glBegin(GL3.GL_LINES);
@@ -138,7 +146,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
+	private void paintGondola(RenderContext context, double gx, double gy,Plotter robot) {
 		if(textureGondola==null || textureArm==null) return;
 // TODO implement me
 /*
@@ -169,12 +177,12 @@ public class Makelangelo5 implements PlotterRenderer {
 		paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
 	}
 
-	private void paintCounterweight(GL3 gl,double x,double y) {
+	private void paintCounterweight(RenderContext context,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(gl,x,y);
+			Polargraph.paintCounterweight(context.gl,x,y);
 			return;
 		}
-		DrawingHelper.paintTexture(gl, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(context.gl, textureWeight, x-20, y-74, 40,80);
 	}
 
 	private void paintControlBoxFancy(RenderContext context,TextureWithMetadata texture) {
