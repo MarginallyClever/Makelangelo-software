@@ -1,26 +1,48 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.convenience.helpers.MatrixHelper;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
-public class MakelangeloCustom implements PlotterRenderer {
+import javax.vecmath.Matrix4d;
+import java.awt.*;
+
+public class MakelangeloCustom extends Polargraph implements PlotterRenderer {
 	public final static float PEN_HOLDER_RADIUS_5 = 25; // mm
 	public final static double COUNTERWEIGHT_W = 30;
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
-	public final static double MOTOR_WIDTH = 42;
+
 	private final TextureWithMetadata controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
+	private final Mesh wire = new Mesh();
+
+	public MakelangeloCustom() {
+		float SPACING = 2;
+
+		wire.setRenderStyle(GL3.GL_LINES);
+		float y=0;
+		wire.addColor(1,0,0,1);		wire.addVertex(0,0,0);
+		wire.addColor(1,0,0,1);		wire.addVertex(1,y,0);
+		y += SPACING;
+		wire.addColor(0,1,0,1);		wire.addVertex(0,0,0);
+		wire.addColor(0,1,0,1);		wire.addVertex(1,y,0);
+		y += SPACING;
+		wire.addColor(0,0,1,1);		wire.addVertex(0,0,0);
+		wire.addColor(0,0,1,1);		wire.addVertex(1,y,0);
+		y += SPACING;
+		wire.addColor(1,1,0,1);		wire.addVertex(0,0,0);
+		wire.addColor(1,1,0,1);		wire.addVertex(1,y,0);
+	}
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
-		PlotterSettings settings = robot.getSettings();
-
-		paintControlBox(context,settings);
-		paintMotors(context,settings);
+		paintControlBox(context,robot.getSettings());
+		paintMotors(context,robot);
 		if(robot.getDidFindHome())
 			paintPenHolderToCounterweights(context,robot);
 	}
@@ -32,80 +54,43 @@ public class MakelangeloCustom implements PlotterRenderer {
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param gl the render context
+	 * @param context the render context
 	 * @param settings plottersettings of the robot
 	 */
 	private void paintControlBox(RenderContext context, PlotterSettings settings) {
-// TODO implement me
-/*
-		double cy = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
-
-		gl.glPushMatrix();
+		double cy = top;
 
 		// mounting plate for PCB
-		gl.glColor3f(1,0.8f,0.5f);
-		// frame
-		drawRectangle(gl, top+35f, right+30f, top-35f, left-30f);
+		context.shader.setColor(context.gl,"diffuseColor", new Color(255,204,127,255));
+		drawRectangle(context, top+35f, right+30f, top-35f, left-30f);
 
-		gl.glTranslated(cx, cy, 0);
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 
 		// wires to each motor
-		gl.glBegin(GL3.GL_LINES);
-		final float SPACING=2;
-		float y=SPACING*-1.5f;
-		gl.glColor3f(1, 0, 0);		gl.glVertex2d(left, y);	gl.glVertex2d(right, y);  y+=SPACING;
-		gl.glColor3f(0, 1, 0);		gl.glVertex2d(left, y);	gl.glVertex2d(right, y);  y+=SPACING;
-		gl.glColor3f(0, 0, 1);		gl.glVertex2d(left, y);	gl.glVertex2d(right, y);  y+=SPACING;
-		gl.glColor3f(1, 1, 0);		gl.glVertex2d(left, y);	gl.glVertex2d(right, y);;
-		gl.glEnd();
-		
-		float shiftX = (float) right / 2;
-		if (controlBoard != null) {
-			final double scale = 0.1;
-			if (shiftX < 100) {
-				shiftX = 45;
-			}
-			paintTexture(gl, controlBoard, shiftX, -72, 1024 * scale, 1024 * scale);
-		} else {
-			if (shiftX < 100) {
-				shiftX = 85;
-			}
-			// RUMBA in v3 (135mm*75mm)
-			float w = 135f / 2;
-			float h = 75f / 2;
-			gl.glPushMatrix();
-			gl.glColor3d(0.9, 0.9, 0.9);
-			gl.glTranslated(shiftX, 0, 0);
-			drawRectangle(gl, h, w, -h, -w);
-			gl.glPopMatrix();
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.m22 = right-left;
+		m.setTranslation(new javax.vecmath.Vector3d(cx+left, cy, 0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
+		wire.render(context.gl);
+
+		float shiftX = (float)right / 2;
+		final double scale = 0.1;
+		if (shiftX < 100) {
+			shiftX = 45;
 		}
+		paintTexture(context, controlBoard, cx+shiftX, cy-21, 1024 * scale, 1024 * scale);
+		renderLCD(context, left, cx, cy);
 
-		renderLCD(gl, left);
-
-		gl.glPopMatrix();*/
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
 	}
 
-	// draw left & right motor
-	private void paintMotors(RenderContext context, PlotterSettings settings) {
-// TODO implement me
-/*
-		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
-		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
-		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
-
-		// left motor
-		gl.glColor3d(0.3,0.3,0.3);
-		drawRectangle(gl, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2);
-
-		// right motor
-		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2);*/
-	}
-	
-	private void renderLCD(GL3 gl, double left) {
+	private void renderLCD(RenderContext context, double left,double cx,double cy) {
 // TODO implement me
 /*
 		// position
@@ -148,7 +133,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl.glPopMatrix();*/
 	}
 
-	private void paintPenHolderToCounterweights(RenderContext context, Plotter robot ) {
+	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		PlotterSettings settings = robot.getSettings();

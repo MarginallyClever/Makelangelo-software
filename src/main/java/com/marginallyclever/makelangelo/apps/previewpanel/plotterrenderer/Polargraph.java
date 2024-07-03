@@ -22,6 +22,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	public static final float PEN_HOLDER_RADIUS_2 = 60f; // cm
 	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
 	public static final float COUNTERWEIGHT_HEIGHT = 100;
+	public static final float NEMA17_SIZE = 42;
 
 	private final Mesh meshQuad = MeshFactory.createMesh();
 	private final Mesh meshCircle = MeshFactory.createMesh();
@@ -186,6 +187,8 @@ public abstract class Polargraph implements PlotterRenderer {
 
 		// left motor
 		m.setIdentity();
+		m.m00 = NEMA17_SIZE/2;
+		m.m11 = NEMA17_SIZE/2;
 		m.setTranslation(new Vector3d(left,top,0));
 		m.transpose();
 		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
@@ -193,6 +196,8 @@ public abstract class Polargraph implements PlotterRenderer {
 
 		// right motor
 		m.setIdentity();
+		m.m00 = NEMA17_SIZE/2;
+		m.m11 = NEMA17_SIZE/2;
 		m.setTranslation(new Vector3d(right,top,0));
 		m.transpose();
 		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
@@ -202,7 +207,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 	}
 
-	private void paintControlBox(RenderContext context, Plotter robot) {
+	public void paintControlBox(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
