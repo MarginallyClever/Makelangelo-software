@@ -1,16 +1,15 @@
 package com.marginallyclever.makelangelo.apps;
 
-import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsListener;
 import com.marginallyclever.makelangelo.select.*;
-import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectDouble minPlannerSpeed;
 	private SelectOneOfMany zMotorType;
 
-	private PlotterSettingsListener listener;
+	private final EventListenerList listeners = new EventListenerList();
 
 	public PlotterSettingsPanel() {
 		this(new PlotterSettings());
@@ -118,16 +117,16 @@ public class PlotterSettingsPanel extends JPanel {
 			bottom.add(buttonSave);
 			bottom.add(buttonReset);
 		} else {
-			machineWidth.setReadOnly();
-			machineHeight.setReadOnly();
+			machineWidth.setReadOnly(true);
+			machineHeight.setReadOnly(true);
 		}
 
 		machineWidth.addSelectListener((e)->updateLengthNeeded());
 		machineHeight.addSelectListener((e)->updateLengthNeeded());
 
-		totalStepperNeeded.setReadOnly();
-		totalBeltNeeded.setReadOnly();
-		totalServoNeeded.setReadOnly();
+		totalStepperNeeded.setReadOnly(true);
+		totalBeltNeeded.setReadOnly(true);
+		totalServoNeeded.setReadOnly(true);
 		updateLengthNeeded();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -142,11 +141,14 @@ public class PlotterSettingsPanel extends JPanel {
 		this.repaint();
 
 		visualStyle.addSelectListener(e->updateSizeEditable());
+		updateSizeEditable();
 	}
 
 	private void updateSizeEditable() {
-		var matches = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
-		matches |= !settings.isMostAncestral();
+		var isCustom = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
+		var isAncestral = !settings.isMostAncestral();
+		var matches = isCustom | isAncestral;
+		System.out.println("updateSizeEditable matches="+matches+" isCustom="+isCustom+" isAncestral="+isAncestral);
 		machineWidth.setReadOnly(matches);
 		machineHeight.setReadOnly(matches);
 	}
@@ -241,35 +243,16 @@ public class PlotterSettingsPanel extends JPanel {
 	}
 
 	public void addListener(PlotterSettingsListener listener) {
-		this.listener = listener;
+		listeners.add(PlotterSettingsListener.class, listener);
+	}
+
+	public void removeListener(PlotterSettingsListener listener) {
+		listeners.remove(PlotterSettingsListener.class, listener);
 	}
 
 	private void fireSettingsChangedEvent() {
-		if(listener!=null) {
+		for(PlotterSettingsListener listener : listeners.getListeners(PlotterSettingsListener.class)) {
 			listener.settingsChangedEvent(settings);
 		}
-	}
-
-	/**
-	 * Start the PlotterSettingsPanel.
- 	 * @param args not used
-	 */
-	public static void main(String[] args) {
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) {
-			logger.warn("failed to set native look and feel.", ex);
-		}
-
-		PlotterSettings plotterSettings = new PlotterSettings();
-		JFrame frame = new JFrame(PlotterSettingsPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new PlotterSettingsPanel(plotterSettings));
-		frame.pack();
-		frame.setVisible(true);	
 	}
 }

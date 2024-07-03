@@ -38,27 +38,30 @@ public class PlotterSettingsManagerPanel extends JPanel {
 
 	public PlotterSettingsManagerPanel(PlotterSettingsManager plotterSettingsManager) {
 		super(new BorderLayout());
-		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		this.plotterSettingsManager = plotterSettingsManager;
 
 		model.addAll(plotterSettingsManager.getProfileNames());
 
-		Component topButtons = createTopButtons();
+		Component topButtons = createToolBar();
+
 		this.add(topButtons,BorderLayout.NORTH);
 		this.add(container,BorderLayout.CENTER);
+
 		container.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
-		configurationList.setName("configurationList");
-		configurationList.addActionListener((e)->changeProfile());
 		if(model.getSize()>0) {
 			PlotterSettings lastSelectedProfile = plotterSettingsManager.getLastSelectedProfile();
 			model.setSelectedItem(lastSelectedProfile.getUID());
 		}
 	}
 
-	private Component createTopButtons() {
-		JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	private Component createToolBar() {
+		JToolBar topButtons = new JToolBar();
+
 		topButtons.add(configurationList);
+		configurationList.setName("configurationList");
+		configurationList.addActionListener((e)->changeProfile((String)configurationList.getSelectedItem()));
+
 		JButton add = new JButton(new AbstractAction(Translator.get("PlotterSettingsManagerPanel.AddProfile")) {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -138,21 +141,19 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	/**
 	 * Swap the active profile.
 	 */
-	private void changeProfile() {
-		String name = (String)configurationList.getSelectedItem();
-		if(name!=null) {
-			logger.debug("changing profile to {}",name);
-			if(plotterSettingsPanel!=null) {
-				this.remove(plotterSettingsPanel);
-			}
-			plotterSettingsManager.setLastSelectedProfile(name);
-			PlotterSettings plotterSettings = new PlotterSettings(name);
-			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
-			container.add(plotterSettingsPanel,BorderLayout.CENTER);
-			this.revalidate();
-			plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
-			firePlotterSettingsChanged(plotterSettings);
+	private void changeProfile(String name) {
+		logger.debug("changing profile to {}",name);
+		if(plotterSettingsPanel!=null) {
+			plotterSettingsPanel.removeListener(this::firePlotterSettingsChanged);
+			container.remove(plotterSettingsPanel);
 		}
+		plotterSettingsManager.setLastSelectedProfile(name);
+		PlotterSettings plotterSettings = new PlotterSettings(name);
+		plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
+		plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
+		container.add(plotterSettingsPanel,BorderLayout.CENTER);
+		firePlotterSettingsChanged(plotterSettings);
+		container.revalidate();
 	}
 
 	/**
