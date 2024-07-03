@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience.helpers;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,16 +76,17 @@ public class DrawingHelper {
 
     /**
      * Paint a quad with the given texture
-     * @param gl the render context
+     * @param context the render context
      * @param x x center coordinate
      * @param y y center coordinate
      * @param width with of the texture
      * @param height height of the texture
      */
-    public static void paintTexture(GL3 gl, TextureWithMetadata texture, double x, double y, double width, double height) {
+    public static void paintTexture(RenderContext context, TextureWithMetadata texture, double x, double y, double width, double height) {
+        texture.use(context.gl);
+
 // TODO implement me
 /*
-        texture.use(gl);
         gl.glColor4d(1, 1, 1, 1);
         gl.glEnable(GL3.GL_TEXTURE_2D);
         gl.glBegin(GL3.GL_QUADS);
@@ -96,7 +98,6 @@ public class DrawingHelper {
         gl.glVertex2d(x + width, y + height);
         gl.glTexCoord2d(0, 1);
         gl.glVertex2d(x, y + height);
-        gl.glEnd();
-        gl.glDisable(GL3.GL_TEXTURE_2D);*/
+        gl.glEnd();*/
     }
 }

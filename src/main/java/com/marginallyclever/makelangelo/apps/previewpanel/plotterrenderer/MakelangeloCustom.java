@@ -13,11 +13,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
-	private final TextureWithMetadata controlBoard;
-
-	MakelangeloCustom() {
-		controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
-	}
+	private final TextureWithMetadata controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {

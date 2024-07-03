@@ -10,9 +10,10 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point2d;
 
-public class Makelangelo5 implements PlotterRenderer {
+public class Makelangelo5 extends Polargraph implements PlotterRenderer {
 	private final TextureWithMetadata textureMainBody = TextureFactory.loadTexture("/textures/makelangelo5.png");
 	private final TextureWithMetadata textureMotors = TextureFactory.loadTexture("/textures/makelangelo5-motors.png");
 	private final TextureWithMetadata textureLogo = TextureFactory.loadTexture("/logo.png");
@@ -50,7 +51,7 @@ public class Makelangelo5 implements PlotterRenderer {
 			paintControlBoxFancy(context, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(context, robot);
+		paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(context, robot);
@@ -148,8 +149,6 @@ public class Makelangelo5 implements PlotterRenderer {
 
 	private void paintGondola(RenderContext context, double gx, double gy,Plotter robot) {
 		if(textureGondola==null || textureArm==null) return;
-// TODO implement me
-/*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -161,35 +160,42 @@ public class Makelangelo5 implements PlotterRenderer {
 		dx = gx - right;
 		double angleRight = Math.atan2(dy, dx);
 
-		gl.glPushMatrix();
-		gl.glTranslated(gx,gy,0);
-		gl.glRotated(Math.toDegrees(angleLeft)+90,0,0,1);
-		paintTexture(gl,textureArm,-100,-100,200,200);
-		gl.glPopMatrix();
+		Matrix4d m = new Matrix4d();
+		m.rotZ(angleLeft + Math.toRadians(90));
+		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
+		DrawingHelper.paintTexture(context,textureArm,-100,-100,200,200);
 
-		gl.glPushMatrix();
-		gl.glTranslated(gx,gy,0);
-		gl.glRotated(Math.toDegrees(angleRight)+90,0,0,1);
-		paintTexture(gl,textureArm,-100,-100,200,200);
-		gl.glPopMatrix();
+		m.setIdentity();
+		m.rotZ(angleRight + Math.toRadians(90));
+		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
+		DrawingHelper.paintTexture(context,textureArm,-100,-100,200,200);
 
 		// paint body last so it's on top
-		paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
+		m.setIdentity();
+		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
+		DrawingHelper.paintTexture(context,textureGondola,-50,-50,100,100);
 	}
 
-	private void paintCounterweight(RenderContext context,double x,double y) {
+	@Override
+	public void paintCounterweight(RenderContext context,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(context.gl,x,y);
+			super.paintCounterweight(context,x,y);
 			return;
 		}
-		DrawingHelper.paintTexture(context.gl, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(context, textureWeight, x-20, y-74, 40,80);
 	}
 
 	private void paintControlBoxFancy(RenderContext context,TextureWithMetadata texture) {
 		context.shader.set1i(context.gl,"useTexture",1);
 		texture.use(context.gl);
 		controlBox.render(context.gl);
-		//shaderProgram.set1i(gl,"useTexture",0);
+		context.shader.set1i(context.gl,"useTexture",0);
 	}
 
 	/**

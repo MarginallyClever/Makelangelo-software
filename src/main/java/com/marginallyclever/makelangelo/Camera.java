@@ -10,7 +10,7 @@ import javax.vecmath.Point2d;
  *
  */
 public class Camera {
-	public static final float CAMERA_ZOOM_MAX = 1000.0f;
+	public static final float CAMERA_ZOOM_MAX = 1500.0f;
 	public static final float CAMERA_ZOOM_MIN = 0.25f;
 	public static final double ZOOM_STEP_SIZE = 0.15;
 

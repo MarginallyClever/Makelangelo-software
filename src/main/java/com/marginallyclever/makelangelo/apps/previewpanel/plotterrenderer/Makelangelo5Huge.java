@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
+import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
@@ -10,13 +12,37 @@ import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
 import javax.vecmath.Point2d;
 
-public class Makelangelo5Huge implements PlotterRenderer {
+public class Makelangelo5Huge extends Polargraph implements PlotterRenderer {
 	private static TextureWithMetadata textureMainBody;
 	private static TextureWithMetadata textureMotorMounts;
 	private static TextureWithMetadata textureLogo;
 	private static TextureWithMetadata textureWeight;
 	private static TextureWithMetadata textureGondola;
 	private static TextureWithMetadata textureArm;
+
+	private final Mesh controlBox = MeshFactory.createMesh();
+
+	private void setupControlBoxMesh(PlotterSettings settings) {
+		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+
+		final float scaleX = 1366f / 943.0f; // machine is 1366 motor-to-motor. texture is 922. scaleX accordingly.
+		final float TW = 1024f * scaleX;
+		final float TH = 1024f * scaleX;
+		final float ox = left - 51f * scaleX; // 51 taken from offset in texture map
+		final float oy = -280f * scaleX; // 280 taken from offset in texture map.
+
+		controlBox.clear();
+		controlBox.setRenderStyle(GL3.GL_QUADS);
+		controlBox.addTexCoord(0, 0);		controlBox.addVertex(ox, oy, 0);
+		controlBox.addTexCoord(1, 0);		controlBox.addVertex(ox + TW, oy, 0);
+		controlBox.addTexCoord(1, 1);		controlBox.addVertex(ox + TW, oy + TH, 0);
+		controlBox.addTexCoord(0, 1);		controlBox.addVertex(ox, oy + TH, 0);
+
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+		controlBox.addColor(1, 1, 1, 1);
+	}
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
@@ -33,13 +59,13 @@ public class Makelangelo5Huge implements PlotterRenderer {
 			paintControlBoxFancy(context, robot, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(context, robot);
+		paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(context, robot);
 
 		if (textureMotorMounts == null) {
-			Polargraph.paintMotors(context, robot);
+			paintMotors(context, robot);
 		} else {
 			paintControlBoxFancy(context, robot, textureMotorMounts);
 		}
@@ -53,21 +79,18 @@ public class Makelangelo5Huge implements PlotterRenderer {
 
 	@Override
 	public void updatePlotterSettings(PlotterSettings settings) {
-
+		setupControlBoxMesh(settings);
 	}
 
 	private void paintControlBoxFancy(RenderContext context, Plotter robot,TextureWithMetadata texture) {
-		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
-
-		final double scaleX = 1366 / 943.0; // machine is 1366 motor-to-motor. texture is 922. scaleX accordingly.
-		final double width = 1024 * scaleX;
-		final double height = 1024 * scaleX;
-		final double ox = left - 51 * scaleX; // 106 taken from offset in texture map
-		final double oy = -280 * scaleX; // 109 taken from offset in texture map. TODO why -15 instead of top?
-
-		DrawingHelper.paintTexture(context.gl, texture, ox, oy, width, height);
+		setupControlBoxMesh(robot.getSettings());
+		context.shader.set1i(context.gl,"useTexture",1);
+		texture.use(context.gl);
+		controlBox.render(context.gl);
+		context.shader.set1i(context.gl,"useTexture",0);
 	}
 
+	@Override
 	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 		Point2d pos = robot.getPos();
 		double gx = pos.x;
@@ -96,16 +119,16 @@ public class Makelangelo5Huge implements PlotterRenderer {
 
 
 		// belt from motor to pen holder left
-		drawBeltMinus10(context.gl,left,top,gx,gy);
+		drawBeltMinus10(context,left,top,gx,gy);
 		// belt from motor to pen holder right
-		drawBeltMinus10(context.gl,right,top,gx,gy);
+		drawBeltMinus10(context,right,top,gx,gy);
 
 		// belt from motor to counterweight left
-		paintBeltSide(context.gl,left,top,left_b);
+		paintBeltSide(context,left,top,left_b);
 		// belt from motor to counterweight right
-		paintBeltSide(context.gl,right,top,right_b);
+		paintBeltSide(context,right,top,right_b);
 
-		paintGondola(context.gl,gx,gy,robot);
+		paintGondola(context,gx,gy,robot);
 
 		// left
 		paintCounterweight(context,left,top-left_b);
@@ -113,7 +136,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		paintCounterweight(context,right,top-right_b);
 	}
 
-	private void drawBeltMinus10(GL3 gl, double cornerX, double cornerY, double penX, double penY) {
+	private void drawBeltMinus10(RenderContext context, double cornerX, double cornerY, double penX, double penY) {
 // TODO implement me
 /*
 		double dx = penX - cornerX;
@@ -129,7 +152,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
+	private static void paintBeltSide(RenderContext context,double x, double y, double length) {
 // TODO implement me
 /*
 		gl.glBegin(GL3.GL_LINES);
@@ -138,18 +161,18 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
+	private void paintGondola(RenderContext context, double gx, double gy,Plotter robot) {
 		if(textureGondola!=null && textureArm!=null) {
-			paintGondolaFancy(gl,gx,gy,robot);
+			paintGondolaFancy(context,gx,gy,robot);
 			return;
 		}
-		Polargraph.drawCircle(gl, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2, 20);
+		drawCircle(context, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2);
 		if (robot.getPenIsUp()) {
-			Polargraph.drawCircle(gl, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5, 20);
+			drawCircle(context, gx, gy, Polargraph.PEN_HOLDER_RADIUS_2 + 5);
 		}
 	}
 
-	private void paintGondolaFancy(GL3 gl, double gx, double gy,Plotter robot) {
+	private void paintGondolaFancy(RenderContext context, double gx, double gy,Plotter robot) {
 // TODO implement me
 /*
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
@@ -179,13 +202,14 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		DrawingHelper.paintTexture(gl,textureGondola,gx-50,gy-50,100,100);*/
 	}
 
-	private void paintCounterweight(RenderContext context,double x,double y) {
+	@Override
+	public void paintCounterweight(RenderContext context,double x,double y) {
 		if(textureWeight==null) {
-			Polargraph.paintCounterweight(context.gl,x,y);
+			super.paintCounterweight(context,x,y);
 			return;
 		}
 
-		DrawingHelper.paintTexture(context.gl, textureWeight, x-20, y-74, 40,80);
+		DrawingHelper.paintTexture(context, textureWeight, x-20, y-74, 40,80);
 	}
 
 	/**
@@ -202,7 +226,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
-		DrawingHelper.paintTexture(context.gl, textureLogo, LOGO_X, LOGO_Y, TW, TH);
+		DrawingHelper.paintTexture(context, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**

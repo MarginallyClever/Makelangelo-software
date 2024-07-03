@@ -1,13 +1,17 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.convenience.helpers.MatrixHelper;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point2d;
+import javax.vecmath.Vector3d;
+import java.awt.*;
 
 /**
  * Common methods for drawing Polargraph machines.
@@ -19,8 +23,23 @@ public abstract class Polargraph implements PlotterRenderer {
 	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
 	public static final float COUNTERWEIGHT_HEIGHT = 100;
 
-	public Mesh mesh = MeshFactory.createMesh();
-	
+	private final Mesh meshQuad = MeshFactory.createMesh();
+	private final Mesh meshCircle = MeshFactory.createMesh();
+
+	public Polargraph() {
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		meshQuad.addColor(1,1,1,1);	meshQuad.addTexCoord(0,0);	meshQuad.addVertex(-1,-1,0);
+		meshQuad.addColor(1,1,1,1);	meshQuad.addTexCoord(1,0);	meshQuad.addVertex( 1,-1,0);
+		meshQuad.addColor(1,1,1,1);	meshQuad.addTexCoord(1,1);	meshQuad.addVertex( 1, 1,0);
+		meshQuad.addColor(1,1,1,1);	meshQuad.addTexCoord(0,1);	meshQuad.addVertex(-1, 1,0);
+
+		meshCircle.setRenderStyle(GL3.GL_LINE_LOOP);
+		for(int i=0;i<60;++i) {
+			double angle = Math.toRadians(i);
+			meshCircle.addVertex((float)Math.cos(angle),(float)Math.sin(angle),0f);
+		}
+	}
+
 	/**
 	 * convert from belt length mm to cartesian position.
 	 * @param beltL length of belt (mm)
@@ -68,9 +87,6 @@ public abstract class Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
-		mesh.clear();
-		mesh.setRenderStyle(GL3.GL_LINES);
-
 		drawPhysicalLimits(context,robot);
 
 		paintMotors(context, robot);
@@ -98,26 +114,31 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	static public void paintMotors(RenderContext context,Plotter robot) {
-// TODO implement me
-/*
+	public void paintMotors(RenderContext context,Plotter robot) {
 		double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
-		gl.glColor3f(0, 0, 0);
-		gl.glBegin(GL3.GL_QUADS);
+		context.shader.setColor(context.gl,"diffuseColor", Color.BLACK);
+
+		Matrix4d m = new Matrix4d();
+
 		// left motor
-		gl.glVertex2d(left - MOTOR_SIZE, top + MOTOR_SIZE);
-		gl.glVertex2d(left + MOTOR_SIZE, top + MOTOR_SIZE);
-		gl.glVertex2d(left + MOTOR_SIZE, top - MOTOR_SIZE);
-		gl.glVertex2d(left - MOTOR_SIZE, top - MOTOR_SIZE);
+		m.setIdentity();
+		m.setTranslation(new Vector3d(left,top,0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.render(context.gl);
+
 		// right motor
-		gl.glVertex2d(right - MOTOR_SIZE, top + MOTOR_SIZE);
-		gl.glVertex2d(right + MOTOR_SIZE, top + MOTOR_SIZE);
-		gl.glVertex2d(right + MOTOR_SIZE, top - MOTOR_SIZE);
-		gl.glVertex2d(right - MOTOR_SIZE, top - MOTOR_SIZE);
-		gl.glEnd();*/
+		m.setIdentity();
+		m.setTranslation(new Vector3d(right,top,0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.render(context.gl);
+
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 	}
 
 	private void paintControlBox(RenderContext context, Plotter robot) {
@@ -168,9 +189,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glPopMatrix();*/
 	}
 
-	static public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
-
-
+	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -212,15 +231,15 @@ public abstract class Polargraph implements PlotterRenderer {
 		// belt from motor to counterweight right
 		//paintBeltSide(gl,right,top,right_b);
 
-		paintGondola(context.gl,gx,gy,robot);
+		paintGondola(context,gx,gy,robot);
 
 		// left
-		paintCounterweight(context.gl,left,top-left_b);
+		paintCounterweight(context,left,top-left_b);
 		// right
-		paintCounterweight(context.gl,right,top-right_b);
+		paintCounterweight(context,right,top-right_b);
 	}
 
-	private static void paintBeltSide(GL3 gl,double x, double y, double length) {
+	private void paintBeltSide(GL3 gl,double x, double y, double length) {
 // TODO implement me
 /*
 		gl.glVertex2d(x - 2, y);
@@ -229,14 +248,14 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(x + 2, y - length);*/
 	}
 
-	private static void paintGondola(GL3 gl, double gx, double gy,Plotter robot) {
-		drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2, 20);
+	private void paintGondola(RenderContext context, double gx, double gy,Plotter robot) {
+		drawCircle(context, gx, gy, PEN_HOLDER_RADIUS_2);
 		if (robot.getPenIsUp()) {
-			drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2 + 5, 20);
+			drawCircle(context, gx, gy, PEN_HOLDER_RADIUS_2 + 5);
 		}
 	}
 
-	static public void paintCounterweight(GL3 gl,double x,double y) {
+	public void paintCounterweight(RenderContext context,double x,double y) {
 // TODO implement me
 /*
 		gl.glBegin(GL3.GL_LINE_LOOP);
@@ -248,7 +267,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	static public void paintBottomClearanceArea(GL3 gl, Plotter machine) {
+	public void paintBottomClearanceArea(RenderContext context, Plotter machine) {
 // TODO implement me
 /*
 		// bottom clearance arcs
@@ -282,38 +301,37 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	public static void drawCircle(GL3 gl, double gx, double gy, float penHolderRadius2, int steps) {
-// TODO implement me
-/*
-		gl.glBegin(GL3.GL_LINE_LOOP);
-		gl.glColor3f(0, 0, 1);
-		float f;
-		for (f = 0; f < steps;++f) {
-			double f2 = Math.PI*2.0 * (double)f/(double)steps;
-			gl.glVertex2d(
-					gx + Math.cos(f2) * PEN_HOLDER_RADIUS_2, 
-					gy + Math.sin(f2) * PEN_HOLDER_RADIUS_2);
-		}
-		gl.glEnd();*/
+	public void drawCircle(RenderContext context, double gx, double gy, float radius) {
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.setScale(radius);
+		m.setTranslation(new Vector3d(gx,gy,0));
+		m.transpose();
+		context.shader.setColor(context.gl,"diffuseColor", Color.BLUE);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshCircle.render(context.gl);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 	}
 
-	public static void paintSafeArea(RenderContext context, Plotter robot) {
-// TODO implement me
-/*
+	public void paintSafeArea(RenderContext context, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
-		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP) + 70;
 		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
-		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
-		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT) - 70;
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT) + 70;
 
-		// gl.glColor4f(0.5f,0.5f,0.75f,0.75f); // #color Safe area
-		gl.glColor4f(1, 1, 1, 1); // #color Safe area
-
-		gl.glBegin(GL3.GL_LINE_LOOP);
-		gl.glVertex2d(left - 70f, top + 70f);
-		gl.glVertex2d(right + 70f, top + 70f);
-		gl.glVertex2d(right + 70f, bottom);
-		gl.glVertex2d(left - 70f, bottom);
-		gl.glEnd();*/
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.m00 = right-left;
+		m.m11 = top-bottom;
+		m.setTranslation(new Vector3d((left+right)/2,(top+bottom)/2,0));
+		m.transpose();
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.setRenderStyle(GL3.GL_LINE_LOOP);
+		meshQuad.render(context.gl);
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
 	}
 }

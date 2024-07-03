@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.paper;
 
 import com.jogamp.opengl.GL3;
+import com.marginallyclever.convenience.helpers.MatrixHelper;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
@@ -9,6 +10,7 @@ import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Matrix4d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.prefs.Preferences;
@@ -57,9 +59,16 @@ public class Paper implements PreviewListener {
 
 	@Override
 	public void render(RenderContext context) {
-		// TODO gl.glTranslated(centerX, centerY, 0);
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.setTranslation(new javax.vecmath.Vector3d(centerX, centerY, 0));
+		m.transpose();
+		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
+
 		meshPaper.render(context.gl);
 		meshMargin.render(context.gl);
+
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
 	}
 
 	/**

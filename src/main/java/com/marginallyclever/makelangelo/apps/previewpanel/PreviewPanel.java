@@ -432,7 +432,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 	public Matrix4d getPerspectiveFrustum(int width,int height) {
 		double aspect = (double)width / (double)height;
-		return MatrixHelper.perspectiveMatrix4d(60,aspect,1,1000);
+		return MatrixHelper.perspectiveMatrix4d(60,aspect,1,1600);
 	}
 
 	/**
@@ -485,7 +485,6 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 	}
 
 	public void updatePlotterSettings(PlotterSettings settings) {
-		System.out.println("PreviewPanel.updatePlotterSettings");
 		try {
 			myPlotter.getSettings().load(myPlotter.getSettings().getUID());
 			var style = myPlotter.getSettings().getString(PlotterSettings.STYLE);

@@ -10,14 +10,14 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
  * @author Dan Royer
  */
 @Deprecated
-public class Makelangelo3 implements PlotterRenderer {
+public class Makelangelo3 extends Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
 		paintControlBox(context.gl,robot);
-		Polargraph.paintMotors(context,robot);
+		paintMotors(context,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(context,robot);
+			paintPenHolderToCounterweights(context,robot);
 	}
 
 	@Override
