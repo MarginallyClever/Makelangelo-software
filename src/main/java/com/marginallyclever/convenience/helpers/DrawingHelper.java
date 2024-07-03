@@ -85,19 +85,15 @@ public class DrawingHelper {
     public static void paintTexture(RenderContext context, TextureWithMetadata texture, double x, double y, double width, double height) {
         texture.use(context.gl);
 
+        context.
 // TODO implement me
 /*
         gl.glColor4d(1, 1, 1, 1);
-        gl.glEnable(GL3.GL_TEXTURE_2D);
         gl.glBegin(GL3.GL_QUADS);
-        gl.glTexCoord2d(0, 0);
-        gl.glVertex2d(x, y);
-        gl.glTexCoord2d(1, 0);
-        gl.glVertex2d(x + width, y);
-        gl.glTexCoord2d(1, 1);
-        gl.glVertex2d(x + width, y + height);
-        gl.glTexCoord2d(0, 1);
-        gl.glVertex2d(x, y + height);
+        gl.glTexCoord2d(0, 0);        gl.glVertex2d(x, y);
+        gl.glTexCoord2d(1, 0);        gl.glVertex2d(x + width, y);
+        gl.glTexCoord2d(1, 1);        gl.glVertex2d(x + width, y + height);
+        gl.glTexCoord2d(0, 1);        gl.glVertex2d(x, y + height);
         gl.glEnd();*/
     }
 }
