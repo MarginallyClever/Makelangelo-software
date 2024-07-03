@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
@@ -47,22 +46,14 @@ public class Makelangelo5 extends Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
-		if (textureMainBody != null) {
-			paintControlBoxFancy(context, textureMainBody);
-		}
-
+		paintControlBoxFancy(context, textureMainBody);
 		paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(context, robot);
 
-		if (textureMotors != null) {
-			paintControlBoxFancy(context, textureMotors);
-		}
-
-		if (textureLogo != null) {
-			paintLogoFancy(context, robot.getSettings());
-		}
+		paintControlBoxFancy(context, textureMotors);
+		paintLogoFancy(context, robot.getSettings());
 	}
 
 	@Override
@@ -165,21 +156,21 @@ public class Makelangelo5 extends Polargraph implements PlotterRenderer {
 		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
 		m.transpose();
 		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
-		DrawingHelper.paintTexture(context,textureArm,-100,-100,200,200);
+		paintTexture(context,textureArm,-100,-100,200,200);
 
 		m.setIdentity();
 		m.rotZ(angleRight + Math.toRadians(90));
 		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
 		m.transpose();
 		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
-		DrawingHelper.paintTexture(context,textureArm,-100,-100,200,200);
+		paintTexture(context,textureArm,-100,-100,200,200);
 
 		// paint body last so it's on top
 		m.setIdentity();
 		m.setTranslation(new javax.vecmath.Vector3d(gx, gy, 0));
 		m.transpose();
 		context.shader.setMatrix4d(context.gl,"modelMatrix",m);
-		DrawingHelper.paintTexture(context,textureGondola,-50,-50,100,100);
+		paintTexture(context,textureGondola,-50,-50,100,100);
 	}
 
 	@Override
@@ -188,7 +179,7 @@ public class Makelangelo5 extends Polargraph implements PlotterRenderer {
 			super.paintCounterweight(context,x,y);
 			return;
 		}
-		DrawingHelper.paintTexture(context, textureWeight, x-20, y-74, 40,80);
+		paintTexture(context, textureWeight, x-20, y-74, 40,80);
 	}
 
 	private void paintControlBoxFancy(RenderContext context,TextureWithMetadata texture) {
@@ -205,11 +196,13 @@ public class Makelangelo5 extends Polargraph implements PlotterRenderer {
 	 * @param settings the machine settings
 	 */
 	private void paintLogoFancy(RenderContext context, PlotterSettings settings) {
-// TODO implement me
-/*
-		// bottom left corner of safe area
-		final float LOGO_X = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT) - 65;
+		final double scale = 0.5;
+		final double TW = 128 * scale;
+		final double TH = 128 * scale;
+
+		final float LOGO_X = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
-		DrawingHelper.paintTexture(gl, textureLogo, LOGO_X, LOGO_Y, 64, 64);*/
+
+		paintTexture(context, textureLogo, LOGO_X+TW/2, LOGO_Y+TH/2, TW, TH);
 	}
 }

@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.apps.previewpanel.plotterrenderer;
 
 import com.jogamp.opengl.GL3;
-import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
@@ -13,12 +12,12 @@ import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import javax.vecmath.Point2d;
 
 public class Makelangelo5Huge extends Polargraph implements PlotterRenderer {
-	private static TextureWithMetadata textureMainBody;
-	private static TextureWithMetadata textureMotorMounts;
-	private static TextureWithMetadata textureLogo;
-	private static TextureWithMetadata textureWeight;
-	private static TextureWithMetadata textureGondola;
-	private static TextureWithMetadata textureArm;
+	private static final TextureWithMetadata textureMainBody = TextureFactory.loadTexture("/textures/huge.png");
+	private static final TextureWithMetadata textureMotorMounts = TextureFactory.loadTexture("/textures/huge-motors.png");
+	private static final TextureWithMetadata textureLogo = TextureFactory.loadTexture("/logo.png");
+	private static final TextureWithMetadata textureWeight = TextureFactory.loadTexture("/textures/weight.png");
+	private static final TextureWithMetadata textureGondola = TextureFactory.loadTexture("/textures/phBody.png");
+	private static final TextureWithMetadata textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
 	private final Mesh controlBox = MeshFactory.createMesh();
 
@@ -46,35 +45,14 @@ public class Makelangelo5Huge extends Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
-		if (textureMainBody == null) textureMainBody = TextureFactory.loadTexture("/textures/huge.png");
-		if (textureMotorMounts == null) textureMotorMounts = TextureFactory.loadTexture("/textures/huge-motors.png");
-		if (textureLogo == null) textureLogo = TextureFactory.loadTexture("/logo.png");
-		if (textureWeight == null) textureWeight = TextureFactory.loadTexture("/textures/weight.png");
-		if (textureGondola == null) textureGondola = TextureFactory.loadTexture("/textures/phBody.png");
-		if (textureArm == null) textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
-
-		if (textureMainBody == null) {
-			paintControlBoxPlain(context, robot);
-		} else {
-			paintControlBoxFancy(context, robot, textureMainBody);
-		}
-
+		paintControlBoxFancy(context, robot, textureMainBody);
 		paintSafeArea(context, robot);
 
 		if (robot.getDidFindHome())
 			paintPenHolderToCounterweights(context, robot);
 
-		if (textureMotorMounts == null) {
-			paintMotors(context, robot);
-		} else {
-			paintControlBoxFancy(context, robot, textureMotorMounts);
-		}
-
-		if (textureLogo == null) {
-			// paintLogo(gl,robot);
-		} else {
-			paintLogoFancy(context, robot);
-		}
+		paintControlBoxFancy(context, robot, textureMotorMounts);
+		paintLogoFancy(context, robot.getSettings());
 	}
 
 	@Override
@@ -209,24 +187,24 @@ public class Makelangelo5Huge extends Polargraph implements PlotterRenderer {
 			return;
 		}
 
-		DrawingHelper.paintTexture(context, textureWeight, x-20, y-74, 40,80);
+		paintTexture(context, textureWeight, x-20, y-74, 40,80);
 	}
 
 	/**
 	 * paint the Marginally Clever Logo
 	 *
 	 * @param context the render context
-	 * @param robot the machine to draw.
+	 * @param settings the machine to draw.
 	 */
-	private void paintLogoFancy(RenderContext context, Plotter robot) {
+	private void paintLogoFancy(RenderContext context, PlotterSettings settings) {
 		final double scale = 0.5;
 		final double TW = 128 * scale;
 		final double TH = 128 * scale;
 
-		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
-		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
+		final float LOGO_X = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
+		final float LOGO_Y = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
-		DrawingHelper.paintTexture(context, textureLogo, LOGO_X, LOGO_Y, TW, TH);
+		paintTexture(context, textureLogo, LOGO_X+TW/2, LOGO_Y+TH/2, TW, TH);
 	}
 
 	/**

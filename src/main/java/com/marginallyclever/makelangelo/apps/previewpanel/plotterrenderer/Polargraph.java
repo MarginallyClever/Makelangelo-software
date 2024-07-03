@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.MeshFactory;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point2d;
@@ -19,7 +20,6 @@ import java.awt.*;
  */
 public abstract class Polargraph implements PlotterRenderer {
 	public static final float PEN_HOLDER_RADIUS_2 = 60f; // cm
-	public static final float MOTOR_SIZE = 21f; // cm
 	public static final float COUNTERWEIGHT_HALF_WIDTH = 15;
 	public static final float COUNTERWEIGHT_HEIGHT = 100;
 
@@ -38,6 +38,67 @@ public abstract class Polargraph implements PlotterRenderer {
 			double angle = Math.toRadians(i);
 			meshCircle.addVertex((float)Math.cos(angle),(float)Math.sin(angle),0f);
 		}
+	}
+
+	/**
+	 * Draw an arc
+	 * @param context the render context
+	 * @param x x center coordinate
+	 * @param y y center coordinate
+	 * @param radius radius
+	 * @param a1 start angle
+	 * @param a2 end angle
+	 */
+	public void drawArc(RenderContext context, float x, float y, float radius, float a1, float a2) {
+// TODO implement me
+/*
+		gl.glBegin(GL3.GL_LINE_STRIP);
+		int steps = 10;
+		float delta = (a2 - a1) / (float) steps;
+		float f = a1;
+		for (int i = 0; i <= steps; i++) {
+			gl.glVertex2d(
+					x + Math.cos(f) * radius,
+					y + Math.sin(f) * radius);
+			f += delta;
+		}
+		gl.glEnd();*/
+	}
+
+	/**
+	 * Draw a rectangle
+	 * @param context the render context
+	 * @param top top coordinate
+	 * @param right right coordinate
+	 * @param bottom bottom coordinate
+	 * @param left left coordinate
+	 */
+	public void drawRectangle(RenderContext context, double top, double right, double bottom, double left) {
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.m00 = (right-left)/2;
+		m.m11 = (top-bottom)/2;
+		m.setTranslation(new Vector3d((left+right)/2,(top+bottom)/2,0));
+		m.transpose();
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.render(context.gl);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+	}
+
+	/**
+	 * Paint a quad with the given texture
+	 * @param context the render context
+	 * @param x x center coordinate
+	 * @param y y center coordinate
+	 * @param width with of the texture
+	 * @param height height of the texture
+	 */
+	public void paintTexture(RenderContext context, TextureWithMetadata texture, double x, double y, double width, double height) {
+		texture.use(context.gl);
+		context.shader.set1i(context.gl,"useTexture",1);
+		drawRectangle(context, y+height/2, x+width/2, y-height/2, x-width/2);
+		context.shader.set1i(context.gl,"useTexture",0);
 	}
 
 	/**
@@ -265,6 +326,20 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glVertex2d(x + COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
 		gl.glVertex2d(x - COUNTERWEIGHT_HALF_WIDTH, y - COUNTERWEIGHT_HEIGHT);
 		gl.glEnd();*/
+
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.m00 = COUNTERWEIGHT_HALF_WIDTH;
+		m.m11 = COUNTERWEIGHT_HEIGHT/2;
+		m.setTranslation(new Vector3d(x,y,0));
+		m.transpose();
+		context.shader.setColor(context.gl,"diffuseColor", Color.BLUE);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.setRenderStyle(GL3.GL_LINE_LOOP);
+		meshQuad.render(context.gl);
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 	}
 
 	public void paintBottomClearanceArea(RenderContext context, Plotter machine) {
@@ -301,11 +376,18 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	public void drawCircle(RenderContext context, double gx, double gy, float radius) {
+	/**
+	 * Draw a circle
+	 * @param context the render context
+	 * @param cx x center coordinate
+	 * @param cy y center coordinate
+	 * @param radius radius
+	 */
+	public void drawCircle(RenderContext context, double cx, double cy, float radius) {
 		Matrix4d m = new Matrix4d();
 		m.setIdentity();
 		m.setScale(radius);
-		m.setTranslation(new Vector3d(gx,gy,0));
+		m.setTranslation(new Vector3d(cx,cy,0));
 		m.transpose();
 		context.shader.setColor(context.gl,"diffuseColor", Color.BLUE);
 		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
@@ -323,8 +405,8 @@ public abstract class Polargraph implements PlotterRenderer {
 
 		Matrix4d m = new Matrix4d();
 		m.setIdentity();
-		m.m00 = right-left;
-		m.m11 = top-bottom;
+		m.m00 = (right-left)/2;
+		m.m11 = (top-bottom)/2;
 		m.setTranslation(new Vector3d((left+right)/2,(top+bottom)/2,0));
 		m.transpose();
 		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);

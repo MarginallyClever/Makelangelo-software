@@ -81,10 +81,6 @@ public class Paper implements PreviewListener {
 				getPaperWidth(), getPaperHeight(), centerX, centerY, paperColor);
 	}
 
-	/** 
-	 * TODO control values consistency ?
-	 * TODO color hase RGB hex string value ?
-	 */
 	public void loadConfig() {
 		logger.debug("loading...");
 		paperLeft = Double.parseDouble(paperPreferenceNode.get(PREF_KEY_PAPER_LEFT, Double.toString(paperLeft)));
