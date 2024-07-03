@@ -1,13 +1,10 @@
 package com.marginallyclever.makelangelo.apps;
 
-import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsListener;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
-import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +110,7 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 */
 	private boolean copyAndRenameProfile(String oldUID, String newUID) {
 		plotterSettingsManager.saveAs(oldUID,newUID);
+		model.setSelectedItem(newUID);
 		// in with the new
 		model.addElement(newUID);
 		model.setSelectedItem(newUID);
@@ -172,29 +170,5 @@ public class PlotterSettingsManagerPanel extends JPanel {
 		if(listener!=null) {
 			listener.settingsChangedEvent(settings);
 		}
-	}
-
-	/**
-	 * Test the PlotterSettingsManagerPanel
-	 * @param args not used
-	 */
-	public static void main(String[] args) {
-		Log.start();
-		PreferencesHelper.start();
-		CommandLineOptions.setFromMain(args);
-		Translator.start();
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) {
-			logger.warn("failed to set native look and feel.", ex);
-		}
-
-		JFrame frame = new JFrame(PlotterSettingsManagerPanel.class.getSimpleName());
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.add(new PlotterSettingsManagerPanel());
-		frame.setMinimumSize(new Dimension(350,300));
-		frame.pack();
-		frame.setVisible(true);
 	}
 }

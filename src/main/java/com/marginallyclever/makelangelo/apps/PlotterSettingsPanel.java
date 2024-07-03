@@ -145,10 +145,9 @@ public class PlotterSettingsPanel extends JPanel {
 	}
 
 	private void updateSizeEditable() {
-		var isCustom = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
-		var isAncestral = !settings.isMostAncestral();
-		var matches = isCustom | isAncestral;
-		System.out.println("updateSizeEditable matches="+matches+" isCustom="+isCustom+" isAncestral="+isAncestral);
+		var isNotCustom = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
+		var isAncestral = settings.isMostAncestral();
+		var matches = isNotCustom | isAncestral;
 		machineWidth.setReadOnly(matches);
 		machineHeight.setReadOnly(matches);
 	}
