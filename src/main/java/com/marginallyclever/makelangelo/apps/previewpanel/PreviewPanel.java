@@ -113,6 +113,8 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 		buildToolBar();
 
+		camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
+
 		// start animation system
 		logger.debug("  starting animator...");
 		animator = new FPSAnimator(1);
