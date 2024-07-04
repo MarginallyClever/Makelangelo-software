@@ -117,16 +117,17 @@ public class PlotterSettingsPanel extends JPanel {
 			bottom.add(buttonSave);
 			bottom.add(buttonReset);
 		} else {
-			machineWidth.setReadOnly(true);
-			machineHeight.setReadOnly(true);
+			visualStyle.setEnabled(false);
+			machineWidth.setEditable(false);
+			machineHeight.setEditable(false);
 		}
 
 		machineWidth.addSelectListener((e)->updateLengthNeeded());
 		machineHeight.addSelectListener((e)->updateLengthNeeded());
 
-		totalStepperNeeded.setReadOnly(true);
-		totalBeltNeeded.setReadOnly(true);
-		totalServoNeeded.setReadOnly(true);
+		totalStepperNeeded.setEditable(false);
+		totalBeltNeeded.setEditable(false);
+		totalServoNeeded.setEditable(false);
 		updateLengthNeeded();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -140,16 +141,34 @@ public class PlotterSettingsPanel extends JPanel {
 		this.add(bottom,BorderLayout.SOUTH);
 		this.repaint();
 
-		visualStyle.addSelectListener(e->updateSizeEditable());
-		updateSizeEditable();
+		visualStyle.addSelectListener(e-> changeStyle());
+		changeStyle();
 	}
 
-	private void updateSizeEditable() {
+	/**
+	 * Change the visual style of the machine.
+	 * If the style is not custom, then the width and height should become locked.
+	 * If the style is locked and the visual style has a default value, then the width and height should be set to the default value.
+	 */
+	private void changeStyle() {
+		// make editable
 		var isNotCustom = !visualStyle.getSelectedItem().equals(PlotterRendererFactory.MAKELANGELO_CUSTOM.name());
 		var isAncestral = settings.isMostAncestral();
 		var matches = isNotCustom | isAncestral;
-		machineWidth.setReadOnly(matches);
-		machineHeight.setReadOnly(matches);
+
+		// do we have a default value?
+		if(matches) {
+			PlotterRendererFactory factory = PlotterRendererFactory.valueOf(visualStyle.getSelectedItem());
+			var fixedSize = factory.getFixedSize();
+			var hasFixed = (fixedSize!=null);
+			machineWidth.setEditable(!hasFixed);
+			machineHeight.setEditable(!hasFixed);
+			if(hasFixed) {
+				// update size
+				machineWidth.setValue(fixedSize.x);
+				machineHeight.setValue(fixedSize.y);
+			}
+		}
 	}
 
 	private void addToPanel(SelectPanel panel, Select element) {
@@ -255,3 +274,5 @@ public class PlotterSettingsPanel extends JPanel {
 		}
 	}
 }
+
+

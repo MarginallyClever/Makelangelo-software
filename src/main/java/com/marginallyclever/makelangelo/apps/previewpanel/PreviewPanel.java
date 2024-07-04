@@ -488,7 +488,7 @@ public class PreviewPanel extends JPanel implements GLEventListener {
 
 	public void updatePlotterSettings(PlotterSettings settings) {
 		try {
-			myPlotter.getSettings().load(myPlotter.getSettings().getUID());
+			myPlotter.getSettings().load(settings.getUID());
 			var style = myPlotter.getSettings().getString(PlotterSettings.STYLE);
 			myPlotterRenderer = PlotterRendererFactory.valueOf(style).getPlotterRenderer();
 		} catch (Exception e) {

@@ -35,6 +35,5 @@ public class SelectBoolean extends Select {
 
 	public void setSelected(boolean b) {
 		field.setSelected(b);
-	}	
-
+	}
 }

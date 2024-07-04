@@ -41,6 +41,7 @@ public class MakelangeloCustom extends Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
+		paintSafeArea(context,robot);
 		paintControlBox(context,robot.getSettings());
 		paintMotors(context,robot);
 		if(robot.getDidFindHome())
@@ -67,7 +68,6 @@ public class MakelangeloCustom extends Polargraph implements PlotterRenderer {
 		// mounting plate for PCB
 		context.shader.setColor(context.gl,"diffuseColor", new Color(255,204,127,255));
 		drawRectangle(context, top+35f, right+30f, top-35f, left-30f);
-
 		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 
 		// wires to each motor

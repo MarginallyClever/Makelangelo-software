@@ -81,7 +81,6 @@ public abstract class Polargraph implements PlotterRenderer {
 		m.m11 = (top-bottom)/2;
 		m.setTranslation(new Vector3d((left+right)/2,(top+bottom)/2,0));
 		m.transpose();
-		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
 		meshQuad.render(context.gl);
 		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
@@ -98,6 +97,7 @@ public abstract class Polargraph implements PlotterRenderer {
 	public void paintTexture(RenderContext context, TextureWithMetadata texture, double x, double y, double width, double height) {
 		texture.use(context.gl);
 		context.shader.set1i(context.gl,"useTexture",1);
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
 		drawRectangle(context, y+height/2, x+width/2, y-height/2, x-width/2);
 		context.shader.set1i(context.gl,"useTexture",0);
 	}
@@ -149,31 +149,12 @@ public abstract class Polargraph implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
-		drawPhysicalLimits(context,robot);
-
+		paintSafeArea(context,robot);
 		paintMotors(context, robot);
 		paintControlBox(context, robot);
 		if(robot.getDidFindHome()) {
 			paintPenHolderToCounterweights(context, robot);
 		}
-	}
-
-	/**
-	 * Outline the drawing limits
-	 * @param context the rendering context
-	 */
-	private void drawPhysicalLimits(RenderContext context,Plotter robot) {
-// TODO implement me
-/*
-		mesh.addColor(0.9f, 0.9f, 0.9f,1.0f); // #color
-
-		gl.glBegin(GL3.GL_LINE_LOOP);
-		var settings = robot.getSettings();
-		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_TOP));
-		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_TOP));
-		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
-		gl.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
-		gl.glEnd();*/
 	}
 
 	public void paintMotors(RenderContext context,Plotter robot) {

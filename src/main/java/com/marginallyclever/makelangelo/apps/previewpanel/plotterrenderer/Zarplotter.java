@@ -15,7 +15,7 @@ import java.awt.*;
 /**
  * @author Dan Royer
  */
-public class Zarplotter implements PlotterRenderer {
+public class Zarplotter extends Polargraph implements PlotterRenderer {
 	public static final int ZAR_MOTOR_MOUNT_SIZE=45; //cm
 	public static final int ZAR_PLOTTER_SIZE=60; //cm
 	public static final int ZAR_PLOTTER_OUTER_SIZE=70; //cm
@@ -43,6 +43,7 @@ public class Zarplotter implements PlotterRenderer {
 
 	@Override
 	public void render(RenderContext context, Plotter robot) {
+		paintSafeArea(context,robot);
 		paintMotors(context,robot);
 		paintControlBox(context,robot);
 		if(robot.getDidFindHome()) 
@@ -54,7 +55,8 @@ public class Zarplotter implements PlotterRenderer {
 
 	}
 
-	private void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
+	@Override
+	public void paintPenHolderToCounterweights(RenderContext context, Plotter robot) {
 // TODO implement me
 /*
 		PlotterSettings settings = robot.getSettings();
@@ -104,7 +106,8 @@ public class Zarplotter implements PlotterRenderer {
 		gl.glEnd();*/
 	}
 
-	private void paintMotors(RenderContext context,Plotter plotter) {
+	@Override
+	public void paintMotors(RenderContext context,Plotter plotter) {
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -157,8 +160,31 @@ public class Zarplotter implements PlotterRenderer {
 		context.shader.setColor(context.gl,"diffuseColor", Color.BLACK);
 		meshQuad.render(context.gl);
 	}
-	
-	private void paintControlBox(RenderContext context,Plotter plotter) {
+
+	@Override
+	public void paintSafeArea(RenderContext context, Plotter robot) {
+		PlotterSettings settings = robot.getSettings();
+		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
+		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+
+		Matrix4d m = new Matrix4d();
+		m.setIdentity();
+		m.m00 = (right-left);
+		m.m11 = (top-bottom);
+		m.setTranslation(new Vector3d(left,bottom,0));
+		m.transpose();
+		context.shader.setColor(context.gl,"diffuseColor", Color.WHITE);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", m);
+		meshQuad.setRenderStyle(GL3.GL_LINE_LOOP);
+		meshQuad.render(context.gl);
+		meshQuad.setRenderStyle(GL3.GL_QUADS);
+		context.shader.setMatrix4d(context.gl,"modelMatrix", MatrixHelper.createIdentityMatrix4());
+	}
+
+	@Override
+	public void paintControlBox(RenderContext context,Plotter plotter) {
 // TODO implement me
 /*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);

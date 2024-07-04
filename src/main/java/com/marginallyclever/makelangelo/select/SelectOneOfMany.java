@@ -45,10 +45,16 @@ public class SelectOneOfMany extends Select {
 		model.removeElement(s);
 	}
 	
-	public void setReadOnly() {
-		field.setEditable(false);
+	public void setEditable(boolean state) {
+		field.setEditable(state);
 	}
-	
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		field.setEnabled(enabled);
+	}
+
 	public String getSelectedItem() {
 		return (String)field.getSelectedItem();
 	}

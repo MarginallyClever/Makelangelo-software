@@ -98,8 +98,8 @@ public class SelectDouble extends Select {
 		this(internalName,"", Locale.getDefault(), 0);
 	}
 
-	public void setReadOnly(boolean state) {
-		field.setEditable(!state);
+	public void setEditable(boolean state) {
+		field.setEditable(state);
 	}
 
 	// @return last valid value typed into field
