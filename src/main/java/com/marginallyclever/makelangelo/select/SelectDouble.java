@@ -66,9 +66,12 @@ public class SelectDouble extends Select {
 						
 						if(timer!=null) timer.cancel();
 						timer = new Timer("Delayed response");
-						timer.schedule(new TimerTask() { 
+						timer.schedule(new TimerTask() {
 							public void run() {
-								fireSelectEvent(oldValue,newValue);
+								SwingUtilities.invokeLater(() -> {
+									fireSelectEvent(oldValue, newValue);
+									firePropertyChange("value", oldValue, newValue);
+								});
 							}
 						}, 100L); // brief delay in case someone is typing fast
 					}

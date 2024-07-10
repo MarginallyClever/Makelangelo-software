@@ -17,12 +17,14 @@ public class SelectColor extends Select {
 	 * @param labelValue
 	 * @param defaultValue
 	 */
-	public SelectColor(String internalName,String labelValue,Color defaultValue,final Component parentComponent) {
+	public SelectColor(String internalName, String labelValue, Color defaultValue, final Component parentComponent) {
 		super(internalName);
 
 		JLabel label = new JLabel(labelValue,JLabel.LEADING);
+		label.setName(internalName+".label");
 
 		chooseButton = new BackgroundPaintedButton("");
+		chooseButton.setName(internalName+".button");
 		chooseButton.setOpaque(true);
 		chooseButton.setMinimumSize(new Dimension(80,20));
 		chooseButton.setMaximumSize(chooseButton.getMinimumSize());
@@ -34,6 +36,7 @@ public class SelectColor extends Select {
 			Color c = JColorChooser.showDialog(parentComponent, label.getText(), chooseButton.getBackground());
 			if ( c != null ){
 				chooseButton.setBackground(c);
+				firePropertyChange("color",null,c);
 				fireSelectEvent(null,c);
 			}
 		});
