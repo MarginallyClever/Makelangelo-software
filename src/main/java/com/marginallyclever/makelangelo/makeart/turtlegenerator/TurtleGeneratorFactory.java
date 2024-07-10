@@ -44,6 +44,7 @@ public class TurtleGeneratorFactory {
 	public static TurtleGeneratorNode available = new TurtleGeneratorNode(Translator.get("MenuGenerate"),new TurtleGeneratorNode[]{
 			new TurtleGeneratorNode(new Generator_Border()),
 			new TurtleGeneratorNode(Translator.get("MenuGenerate.Fractals"), new TurtleGeneratorNode[]{
+					new TurtleGeneratorNode(new Generator_ApollonianGasket()),
                     new TurtleGeneratorNode(new Generator_Dragon()),
                     new TurtleGeneratorNode(new Generator_FibonacciSpiral()),
                     new TurtleGeneratorNode(new Generator_GosperCurve()),
