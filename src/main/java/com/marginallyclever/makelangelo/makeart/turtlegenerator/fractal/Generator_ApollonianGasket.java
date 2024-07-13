@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 
+import com.marginallyclever.convenience.ComplexNumber;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
@@ -19,67 +20,17 @@ import java.util.List;
 public class Generator_ApollonianGasket extends TurtleGenerator {
 	private static final double EPSILON = 1e-1;
 
-	public static class Complex {
-		public double real;
-		public double imag;
-
-		public Complex(double real, double imag) {
-			this.real = real;
-			this.imag = imag;
-		}
-
-		public Complex add(Complex b) {
-			return new Complex(this.real + b.real, this.imag + b.imag);
-		}
-
-		public Complex sub(Complex b) {
-			return new Complex(this.real - b.real, this.imag - b.imag);
-		}
-
-		public Complex multiply(Complex b) {
-			return new Complex(this.real * b.real - this.imag * b.imag, this.real * b.imag + this.imag * b.real);
-		}
-
-		public Complex divide(Complex b) {
-			Complex conjugate = new Complex(b.real, -b.imag);
-			Complex numerator = this.multiply(conjugate);
-			double denominator = b.multiply(conjugate).real;
-			return new Complex(numerator.real / denominator, numerator.imag / denominator);
-		}
-
-		public double magnitude() {
-			return Math.sqrt(real * real + imag * imag);
-		}
-
-		@Override
-		public String toString() {
-			return "(" + real + ", " + imag + ")";
-		}
-
-		public Complex scale(double k1) {
-			return new Complex(real * k1, imag * k1);
-		}
-
-		public Complex sqrt() {
-			double r = Math.sqrt(real * real + imag * imag);
-			double x = Math.sqrt((r + real) / 2.0);
-			double y = Math.sqrt((r - real) / 2.0);
-			if (imag < 0) y = -y;
-			return new Complex(x, y);
-		}
-	}
-
-	public static class Circle {
-		public final Complex center;
+	public static class ComplexCircle {
+		public final ComplexNumber center;
 		public double radius;
 		public double curvature;
-		public Circle(Complex center, double radius) {
+		public ComplexCircle(ComplexNumber center, double radius) {
 			this.center = center;
 			this.radius = Math.abs(radius);
 			this.curvature = 1.0 / radius;
 		}
 
-		public double distance(Circle other) {
+		public double distance(ComplexCircle other) {
 			double dx = center.real - other.center.real;
 			double dy = center.imag - other.center.imag;
 			return Math.sqrt(dx*dx + dy*dy);
@@ -87,8 +38,9 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	}
 
 	private static int minDiameter = 1;
-	private static int ratio = 1;
-	private final List<Circle> list = new ArrayList<>();
+	private static int ratio = 6;
+	private final List<ComplexCircle> list = new ArrayList<>();
+	private final List<ComplexCircle> queue = new ArrayList<>();
 
 	public Generator_ApollonianGasket() {
 		super();
@@ -118,14 +70,17 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	static public int getMinDiameter() {
 		return minDiameter;
 	}
+
 	static public void setMinDiameter(int arg0) {
 		if(arg0<1) arg0=1;
 		if(arg0>10) arg0=10;
 		Generator_ApollonianGasket.minDiameter = arg0;
 	}
+
 	static public int getRatio() {
 		return ratio;
 	}
+
 	static public void setRatio(int ratio) {
 		if(ratio<1) ratio=1;
 		if(ratio>10) ratio=10;
@@ -142,14 +97,19 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 
 		// add initial circles - one of maxDiameter and three that fit inside the first.
 		initializeBaseCircles(maxRadius);
-		createCircles(list.get(0),list.get(1),list.get(2));
+		while(!queue.isEmpty()) {
+			ComplexCircle a = queue.remove(0);
+			ComplexCircle b = queue.remove(0);
+			ComplexCircle c = queue.remove(0);
+			createCircles(a,b,c);
+		}
 		drawCircles();
 	}
 
 	private void drawCircles() {
 		Turtle turtle = new Turtle();
 
-		for (Circle circle : list) {
+		for (ComplexCircle circle : list) {
 			double r = circle.radius;
 			turtle.jumpTo(circle.center.real + r, circle.center.imag);
 
@@ -169,13 +129,18 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	private void initializeBaseCircles(double maxRadius) {
 		double r1 = maxRadius * ratio / 20.0;
 		double r2 = maxRadius - r1;
-		Circle a = new Circle(new Complex(0, 0), -maxRadius);
-		Circle b = new Circle(new Complex(-r2, 0), r1);
-		Circle c = new Circle(new Complex(r1, 0), r2);
-
+		ComplexCircle a = new ComplexCircle(new ComplexNumber(0, 0), -maxRadius);
 		list.add(a);
+
+		ComplexCircle b = new ComplexCircle(new ComplexNumber(-r2, 0), r1);
 		list.add(b);
+
+		ComplexCircle c = new ComplexCircle(new ComplexNumber(r1, 0), r2);
 		list.add(c);
+
+		queue.add(a);
+		queue.add(b);
+		queue.add(c);
 	}
 
 	/**
@@ -184,19 +149,27 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	 * @param b the second circle
 	 * @param c the third circle
 	 */
-	private void createCircles(Circle a, Circle b, Circle c) {
-		// decartes theorem
+	private void createCircles(ComplexCircle a, ComplexCircle b, ComplexCircle c) {
+		// Decartes' theorem
 		double sum = a.curvature + b.curvature + c.curvature;
 		double root = 2.0 * Math.sqrt(a.curvature*b.curvature + a.curvature*c.curvature + b.curvature*c.curvature);
 		double [] k4 = {sum + root, sum-root};
 
-		Circle [] found = calculateCenters(a, b, c, k4);
-		for( Circle d : found ) {
+		ComplexCircle[] found = calculateCenters(a, b, c, k4);
+		for( ComplexCircle d : found ) {
 			if(validateCircle(a,b,c,d)) {
 				list.add(d);
-				createCircles(a, b, d);
-				createCircles(a, c, d);
-				createCircles(b, c, d);
+				queue.add(a);
+				queue.add(b);
+				queue.add(d);
+
+				queue.add(a);
+				queue.add(c);
+				queue.add(d);
+
+				queue.add(b);
+				queue.add(c);
+				queue.add(d);
 			}
 		}
 	}
@@ -208,10 +181,10 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	 * @param d the fourth circle
 	 * @return true if d is not within any other circle and is tangent to a/b/c.
 	 */
-	private boolean validateCircle(Circle a,Circle b,Circle c,Circle d) {
+	private boolean validateCircle(ComplexCircle a, ComplexCircle b, ComplexCircle c, ComplexCircle d) {
 		if(d.radius *2 < minDiameter) return false;
 		
-		for(Circle other : list) {
+		for(ComplexCircle other : list) {
 			var dist = d.distance(other);
 			var r2 = Math.abs( d.radius - other.radius);
 			if(dist<EPSILON && r2 < EPSILON) return false;
@@ -223,7 +196,7 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 		return true;
 	}
 
-	private boolean isTangent(Circle c1, Circle c2) {
+	private boolean isTangent(ComplexCircle c1, ComplexCircle c2) {
 		double d = c1.distance(c2);
 		double r1 = c1.radius;
 		double r2 = c2.radius;
@@ -233,25 +206,25 @@ public class Generator_ApollonianGasket extends TurtleGenerator {
 	}
 
 	// return two centers
-	private Circle[] calculateCenters(Circle a, Circle b, Circle c, double [] k4) {
+	private ComplexCircle[] calculateCenters(ComplexCircle a, ComplexCircle b, ComplexCircle c, double [] k4) {
 		double k1 = a.curvature;
 		double k2 = b.curvature;
 		double k3 = c.curvature;
-		Complex z1 = a.center;
-		Complex z2 = b.center;
-		Complex z3 = c.center;
+		ComplexNumber z1 = a.center;
+		ComplexNumber z2 = b.center;
+		ComplexNumber z3 = c.center;
 
-		Complex a1 = z1.scale(k1);
-		Complex b2 = z2.scale(k2);
-		Complex c2 = z3.scale(k3);
+		ComplexNumber a1 = z1.scale(k1);
+		ComplexNumber b2 = z2.scale(k2);
+		ComplexNumber c2 = z3.scale(k3);
 		var sum = a1.add(b2).add(c2);
 		var root = a1.multiply(b2).add(b2.multiply(c2)).add(a1.multiply(c2));
 		root = root.sqrt().scale(2.0);
 
-		Circle d0 = new Circle(sum.add(root).scale(1.0/k4[0]), 1.0/k4[0]);
-		Circle d1 = new Circle(sum.sub(root).scale(1.0/k4[0]), 1.0/k4[0]);
-		Circle d2 = new Circle(sum.add(root).scale(1.0/k4[1]), 1.0/k4[1]);
-		Circle d3 = new Circle(sum.sub(root).scale(1.0/k4[1]), 1.0/k4[1]);
-		return new Circle[] { d0,d1,d2,d3 };
+		ComplexCircle d0 = new ComplexCircle(sum.add(root).scale(1.0/k4[0]), 1.0/k4[0]);
+		ComplexCircle d1 = new ComplexCircle(sum.sub(root).scale(1.0/k4[0]), 1.0/k4[0]);
+		ComplexCircle d2 = new ComplexCircle(sum.add(root).scale(1.0/k4[1]), 1.0/k4[1]);
+		ComplexCircle d3 = new ComplexCircle(sum.sub(root).scale(1.0/k4[1]), 1.0/k4[1]);
+		return new ComplexCircle[] { d0,d1,d2,d3 };
 	}
 }
