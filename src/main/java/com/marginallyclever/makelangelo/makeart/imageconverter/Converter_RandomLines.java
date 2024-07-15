@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -45,8 +46,8 @@ public class Converter_RandomLines extends ImageConverter {
 	}
 
 	@Override
-	public void start(Paper paper, TransformedImage image) {
-		super.start(paper, image);
+	public void start(Paper paper, Palette palette, TransformedImage image) {
+		super.start(paper, palette, image);
 
 		// The picture might be in color.  Smash it to 255 shades of grey.
 		FilterDesaturate bw = new FilterDesaturate(myImage);

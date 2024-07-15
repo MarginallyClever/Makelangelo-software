@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.tools.RemoveExtraColorChangesFromTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -58,8 +59,8 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	 * create horizontal lines across the image.  Raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void start(Paper paper, TransformedImage image) {
-		super.start(paper, image);
+	public void start(Paper paper, Palette palette, TransformedImage image) {
+		super.start(paper, palette, image);
 
 		FilterCMYK cmyk = new FilterCMYK(myImage);
 		cmyk.filter();

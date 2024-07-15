@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
 	public static final String COMMAND_TURTLE = "turtle";
 	private final Paper myPaper;
+	private final Palette myPalette;
 	private final JButton bChoose = new JButton(Translator.get("Open"));
 	private final OpenFileChooser openFileChooser = new OpenFileChooser(this);
 	private final JLabel selectedFilename = new JLabel();
@@ -30,11 +32,12 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private PreviewListener mySubPreviewListener;
 	private JDialog parent;
 
-	public LoadFilePanel(Paper paper,String filename) {
+	public LoadFilePanel(Paper paper, Palette palette, String filename) {
 		super(new BorderLayout());
-		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
 		myPaper = paper;
+		myPalette = palette;
+
+		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		selectedFilename.setBorder(BorderFactory.createEmptyBorder(0,5,0,0));
 
@@ -67,7 +70,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		try {
 			if (SelectImageConverterPanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
-				myConvertImage = new SelectImageConverterPanel(myPaper, image);
+				myConvertImage = new SelectImageConverterPanel(myPaper, myPalette, image);
 				myConvertImage.addActionListener(this::notifyListeners);
 
 				add(myConvertImage,BorderLayout.CENTER);

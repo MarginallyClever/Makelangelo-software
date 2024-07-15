@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -50,8 +51,8 @@ public class Converter_Spiral extends ImageConverter {
 	 * create a spiral across the image.  raise and lower the pen to darken the appropriate areas
 	 */
 	@Override
-	public void start(Paper paper, TransformedImage image) {
-		super.start(paper, image);
+	public void start(Paper paper, Palette palette, TransformedImage image) {
+		super.start(paper, palette, image);
 
 		turtle = new Turtle();
 

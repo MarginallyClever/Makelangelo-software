@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterExtendedDifferenceOfGaussians;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -80,8 +81,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	}
 	
 	@Override
-	public void start(Paper paper, TransformedImage image) {
-		super.start(paper, image);
+	public void start(Paper paper, Palette palette, TransformedImage image) {
+		super.start(paper, palette, image);
 
 		FilterDesaturate desaturates = new FilterDesaturate(myImage);
 		img = desaturates.filter();

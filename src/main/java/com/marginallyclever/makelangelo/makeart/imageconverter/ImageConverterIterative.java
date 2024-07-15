@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewListener;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,8 @@ public abstract class ImageConverterIterative extends ImageConverter implements 
 
 
     @Override
-    public void start(Paper paper, TransformedImage image) {
-        super.start(paper,image);
+    public void start(Paper paper, Palette palette, TransformedImage image) {
+        super.start(paper, palette, image);
         logger.debug("start()");
         if(imageConverterThread!=null) {
             logger.warn("called while thread is still running.");

@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -54,9 +55,9 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void start(Paper paper, TransformedImage image) {
+	public void start(Paper paper, Palette palette, TransformedImage image) {
 		turtle = new Turtle();
-		super.start(paper, image);
+		super.start(paper, palette, image);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.apps.previewpanel.RenderContext;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectToggleButton;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -51,11 +52,11 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	}
 
 	@Override
-	public void start(Paper paper, TransformedImage image) {
+	public void start(Paper paper, Palette palette, TransformedImage image) {
 		renderMode = 0;
 		lowNoise = false;
 		turtle = new Turtle();
-		super.start(paper, image);
+		super.start(paper, palette, image);
 	}
 
 	@Override

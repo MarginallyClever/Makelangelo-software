@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
@@ -42,6 +43,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 	
 	private final Paper myPaper;
+	private final Palette myPalette;
 	private final TransformedImage myImage;
 
 	private static JComboBox<String> styleNames;
@@ -53,9 +55,10 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 	private ImageConverter myConverter;
 
-	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
+	public SelectImageConverterPanel(Paper paper, Palette palette, TransformedImage image) {
 		super(new GridBagLayout());
 		myPaper = paper;
+		myPalette = palette;
 		myImage = image;
 
 		fillNames = getFillSelection();
@@ -239,7 +242,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 		FilterContrastAdjust filter = new FilterContrastAdjust(myImage,rangeSliderMin, rangeSliderMax);
 		TransformedImage result = filter.filter();
 
-		myConverter.start(myPaper,result);
+		myConverter.start(myPaper,myPalette,result);
 	}
 	
 	private void changeConverter(ImageConverter converter) {

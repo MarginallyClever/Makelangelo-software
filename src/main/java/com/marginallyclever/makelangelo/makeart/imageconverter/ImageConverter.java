@@ -7,6 +7,7 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public abstract class ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(ImageConverter.class);
 	protected TransformedImage myImage;
 	protected Paper myPaper;
+	protected Palette myPalette;
 	public Turtle turtle = new Turtle();
 
 	// for previewing the image
@@ -39,11 +41,14 @@ public abstract class ImageConverter {
 
 	/**
 	 * Start the conversion process.
-	 * @param paper the bounds of the final output.
-	 * @param img the {@code TransformedImage} this filter is using as source material.
+	 *
+	 * @param paper   the bounds of the final output.
+	 * @param palette the selection of pens to use.
+	 * @param img     the {@code TransformedImage} this filter is using as source material.
 	 */
-	public void start(Paper paper,TransformedImage img) {
+	public void start(Paper paper, Palette palette, TransformedImage img) {
 		myPaper = paper;
+		myPalette = palette;
 		myImage = img;
 		texture = null;
 	}

@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectInteger;
 import com.marginallyclever.makelangelo.select.SelectRandomSeed;
@@ -70,10 +71,10 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     }
 
     @Override
-    public void start(Paper paper, TransformedImage image) {
+    public void start(Paper paper, Palette palette, TransformedImage image) {
         // make black & white
         FilterDesaturate bw = new FilterDesaturate(image);
-        super.start(paper, bw.filter());
+        super.start(paper, palette, bw.filter());
 
         lock.lock();
         try {

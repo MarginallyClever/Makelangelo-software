@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.select.SelectDouble;
 import com.marginallyclever.makelangelo.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.select.SelectSlider;
@@ -132,8 +133,8 @@ public class Converter_PulseCMYK extends ImageConverter {
 	 * Converts images into zigzags in paper space instead of image space
 	 */
 	@Override
-	public void start(Paper paper, TransformedImage image) {
-		super.start(paper, image);
+	public void start(Paper paper, Palette palette, TransformedImage image) {
+		super.start(paper, palette, image);
 
 		FilterCMYK cmyk = new FilterCMYK(myImage);
 		cmyk.filter();
