@@ -13,6 +13,7 @@ import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
@@ -63,13 +64,13 @@ public final class Makelangelo {
 	private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
 	private final Plotter myPlotter = new Plotter();
 	private final Paper myPaper = new Paper();
+	private final Palette myPalette = new Palette();
 	private Turtle myTurtle = new Turtle();
 	
 	// GUI elements
 	private final MainFrame mainFrame;
 	private final MainMenu mainMenuBar;
 	private final PreviewPanel previewPanel;
-
 
 	public static void main(String[] args) {
 		Log.start();
@@ -95,7 +96,7 @@ public final class Makelangelo {
 		myPlotter.setSettings(plotterSettingsManager.getLastSelectedProfile());
 		myPaper.loadConfig();
 
-		mainFrame = new MainFrame(myPaper, myPlotter);
+		mainFrame = new MainFrame(myPaper, myPlotter, myPalette);
 		mainFrame.setLocationByPlatform(true);
 		previewPanel = mainFrame.getPreviewPanel();
 
@@ -178,7 +179,7 @@ public final class Makelangelo {
 
 	public void openFile(String filename) {
 		try {
-			LoadFilePanel loader = new LoadFilePanel(myPaper,filename);
+			LoadFilePanel loader = new LoadFilePanel(myPaper,myPalette,filename);
 			loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
 
 			if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
