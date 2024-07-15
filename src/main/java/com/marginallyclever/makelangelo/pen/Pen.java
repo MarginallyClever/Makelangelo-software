@@ -8,7 +8,7 @@ import java.awt.*;
 public class Pen {
     public String name;
     public Color color = new Color(0,0,0);
-    public double radius;
+    public double diameter = 0.8;
 
     public Pen() {
         this("Black");
@@ -21,6 +21,6 @@ public class Pen {
 
     @Override
     public String toString() {
-        return name + " " + radius + " "+color.getRed()+" "+color.getGreen()+" "+color.getBlue();
+        return name + " " + diameter + " "+color.getRed()+" "+color.getGreen()+" "+color.getBlue();
     }
 }

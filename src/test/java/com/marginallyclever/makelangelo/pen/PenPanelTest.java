@@ -67,7 +67,7 @@ public class PenPanelTest {
     public void testChangePenRadius() {
         JPanelFixture panel = window.panel(PenPanel.class.getSimpleName());
         panel.requireVisible();
-        pen.radius=0;
+        pen.diameter =0;
         // Assuming "SelectDouble" component for radius has a name set to "Pen.Radius"
         var f = panel.textBox("PenRadius.field");
         f.selectAll().enterText("1.5"); // Simulate changing the pen radius
@@ -79,6 +79,6 @@ public class PenPanelTest {
         }
         // Verify the radius change, assuming the change reflects immediately on the pen object
         double expectedRadius = 1.5; // Example expected radius, adjust as necessary
-        assert pen.radius == expectedRadius : "Pen radius should be updated";
+        assert pen.diameter == expectedRadius : "Pen radius should be updated";
     }
 }

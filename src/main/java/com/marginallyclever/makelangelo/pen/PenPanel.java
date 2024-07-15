@@ -25,11 +25,11 @@ public class PenPanel extends JPanel {
         SelectColor colorChoice = new SelectColor("PenColor","", pen.color, this);
         colorChoice.addPropertyChangeListener(e -> pen.color = colorChoice.getColor());
 
-        SelectDouble radiusChoice = new SelectDouble("PenRadius","",pen.radius);
-        radiusChoice.addPropertyChangeListener(e -> pen.radius = Math.abs(radiusChoice.getValue()));
+        SelectDouble diameterChoice = new SelectDouble("PenDiameter","",pen.diameter);
+        diameterChoice.addPropertyChangeListener(e -> pen.diameter = Math.abs(diameterChoice.getValue()));
 
         add(colorChoice);
-        add(radiusChoice);
+        add(diameterChoice);
         add(new JLabel("⌀ mm"));
 
         setPreferredSize(new Dimension(250,25));
