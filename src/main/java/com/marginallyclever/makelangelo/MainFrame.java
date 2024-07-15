@@ -13,6 +13,8 @@ import com.marginallyclever.makelangelo.apps.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.apps.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.apps.previewpanel.PreviewPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.pen.Palette;
+import com.marginallyclever.makelangelo.pen.PalettePanel;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,10 @@ public class MainFrame extends JFrame {
     private final PreviewPanel previewPanel;
     private final PaperSettingsPanel paperSettingsPanel;
     private final PlotterSettingsManagerPanel plotterSettingsPanel;
+    private final PalettePanel palettePanel;
     private final FirmwareUploaderPanel firmwareUploaderPanel;
 
-    public MainFrame(Paper myPaper, Plotter myPlotter) {
+    public MainFrame(Paper myPaper, Plotter myPlotter, Palette myPalette) {
         super();
 
         initDocking();
@@ -44,6 +47,7 @@ public class MainFrame extends JFrame {
         previewPanel = new PreviewPanel(myPaper,myPlotter);
         paperSettingsPanel = new PaperSettingsPanel(myPaper);
         plotterSettingsPanel = new PlotterSettingsManagerPanel();
+        palettePanel = new PalettePanel(myPalette);
         firmwareUploaderPanel = new FirmwareUploaderPanel();
         plotterSettingsPanel.addListener(previewPanel::updatePlotterSettings);
 
@@ -90,6 +94,10 @@ public class MainFrame extends JFrame {
         DockingPanel aboutView = new DockingPanel("976af87b-90f3-42ce-a5d6-e4ab663fbb15", Translator.get("MenuAbout"));
         aboutView.add(new AboutPanel(), BorderLayout.CENTER);
         windows.add(aboutView);
+
+        DockingPanel paletteView = new DockingPanel("273425d0-5684-4800-88d2-9815ccbe8f97", Translator.get("Palette"));
+        paletteView.add(palettePanel, BorderLayout.CENTER);
+        windows.add(paletteView);
 /*
         DockingPanel webcamView = new DockingPanel("1331fbb0-ceda-4c67-b343-6539d4f939a1", "USB Camera");
         webcamView.add(webCamPanel, BorderLayout.CENTER);
