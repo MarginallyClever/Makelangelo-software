@@ -446,4 +446,6 @@
 	<string><key>ApollonianGasket.name</key><value>Apollonian gasket</value></string>
 	<string><key>ApollonianGasket.minDiameter</key><value>minimum diameter</value></string>
 	<string><key>ApollonianGasket.ratio</key><value>ratio of first circles</value></string>
+
+	<string><key>Palette</key><value>Palette</value></string>
 </language>
