@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Calculate abs(a-b) for every pixel
+ * Calculate the absolute difference of two images.
  * @author Dan Royer
  * @since 7.46.0
  */
