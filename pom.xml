@@ -6,7 +6,7 @@
 
 	<groupId>com.marginallyclever</groupId>
 	<artifactId>Makelangelo</artifactId>
-	<version>7.55.6</version>
+	<version>7.55.7</version>
 	<name>Makelangelo</name>
 		<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
 It pairs really well with Marlin-polargraph, the code in the brain of the robot that receives instructions and moves the motors.</description>

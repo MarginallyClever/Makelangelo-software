@@ -91,6 +91,11 @@ public class LoadSVG implements TurtleLoader {
 		processElement(documentElement);
 	}
 
+	/**
+	 * Process the given element and all its children.
+	 * @param element the source of the elements
+	 * @throws Exception if the child elements have a problem.
+	 */
 	private void processElement(Element element) throws Exception {
 		if(setStrokeToElementColorBecomesNone(element)) return;
 
@@ -103,6 +108,7 @@ public class LoadSVG implements TurtleLoader {
 			case "rect" -> parseRectElement(element);
 			case "circle" -> parseCircleElement(element);
 			case "ellipse" -> parseEllipseElement(element);
+			case "g" -> parseGroupElement(element);
 			default -> logger.debug("Unknown element {}", element.getTagName());
 		}
 
@@ -114,6 +120,15 @@ public class LoadSVG implements TurtleLoader {
 				processElement((Element) child);
 			}
 		}
+	}
+
+	/**
+	 * Parse through all the SVG group elements and raster them to gcode.
+	 * @param element the source of the elements
+	 * @throws Exception if the child elements have a problem.
+	 */
+	private void parseGroupElement(Element element) throws Exception {
+		// do nothing, the children will be processed by processElement().
 	}
 
 	/**
@@ -149,7 +164,7 @@ public class LoadSVG implements TurtleLoader {
 		Color color = getStroke(element);
 		if(color==null) return false;  // none
 		if(color.getAlpha()==0) return false;  // transparent
-		if(color.equals(paperColor)) return true;
+		//if(color.equals(paperColor)) return true;
 
 		if(!color.equals(myTurtle.getColor())) {
 			logger.debug("Setting stroke color to {}",color);
@@ -176,6 +191,23 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private Color getStroke(Element element) {
+		Color strokeColor = null;
+		while (element != null) {
+			strokeColor = extractStrokeColor(element);
+			if (strokeColor != null) {
+				break;
+			}
+			Node parentNode = element.getParentNode();
+			if (parentNode instanceof Element) {
+				element = (Element) parentNode;
+			} else {
+				element = null;
+			}
+		}
+		return strokeColor;
+	}
+
+	private Color extractStrokeColor(Element element) {
 		Color c=null;
 		if(element.hasAttribute("style")) {
 			String style = element.getAttribute("style").toLowerCase().replace("\\s+","");
@@ -183,20 +215,30 @@ public class LoadSVG implements TurtleLoader {
 				// default SVG stroke is "none", which isn't even transparent - it's nothing!
 			} else {
 				int k = style.indexOf(LABEL_STROKE);
-				String strokeStyleName = style.substring(k + LABEL_STROKE.length());
-				c = stringToColor(strokeStyleName);
-				if(c!=null) {
-					k = style.indexOf("stroke-opacity:");
-					if (k >= 0) {
-						style = style.substring(k + 15, style.indexOf(";", k + 15));
-						c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(style) * 255.0));
+				if(k>=0) {
+					String strokeStyleName = style.substring(k + LABEL_STROKE.length());
+					// chop off the rest of the style string
+					if(strokeStyleName.contains(";")) {
+						strokeStyleName = strokeStyleName.substring(0, strokeStyleName.indexOf(";")).trim();
+					}
+					// extract the color
+					c = stringToColor(strokeStyleName);
+					if (c != null) {
+						final String STROKE_OPACITY = "stroke-opacity:";
+						k = style.indexOf(STROKE_OPACITY);
+						if (k >= 0) {
+							style = style.substring(k+STROKE_OPACITY.length());
+							if(style.contains(";")) {
+								style = style.substring(0, style.indexOf(";")).trim();
+							}
+							c = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (Double.parseDouble(style) * 255.0));
+						}
 					}
 				}
 			}
 		}
 		if(c==null) {
 			if (element.hasAttribute("stroke")) {
-
 				String strokeStyleName = element.getAttribute("stroke").toLowerCase().replace("\\s+", "");
 				c = stringToColor(strokeStyleName);
 			}
