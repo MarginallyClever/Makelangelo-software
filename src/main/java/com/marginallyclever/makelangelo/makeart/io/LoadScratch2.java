@@ -46,7 +46,7 @@ public class LoadScratch2 implements TurtleLoader {
 		}
 	};
 	
-	private FileNameExtensionFilter filter = new FileNameExtensionFilter("Scratch 2","SB2");
+	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Scratch 2","SB2");
 	private Turtle turtle;
 	private LinkedList<Scratch2Variable> scratchVariables;
 	private LinkedList<Scratch2List> scratchLists;

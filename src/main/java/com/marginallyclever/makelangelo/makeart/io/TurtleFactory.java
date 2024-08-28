@@ -17,6 +17,7 @@ import java.util.List;
 public class TurtleFactory {
 	private static final TurtleLoader [] loaders = {
 			new LoadDXF(),
+			new LoadFactorioMap(),
 			new LoadGCode(),
 			new LoadScratch2(),
 			new LoadScratch3(),

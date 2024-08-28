@@ -160,8 +160,8 @@ public class Turtle implements Cloneable {
 	
 	/**
 	 * Absolute position change, do not change current pen status
-	 * @param x relative x position
-	 * @param y relative y position
+	 * @param x absolute x position
+	 * @param y absolute y position
 	 */
 	public void moveTo(double x,double y) {
 		px=x;
@@ -241,6 +241,12 @@ public class Turtle implements Cloneable {
 		moveTo(
 			px + nx * distance,
 			py + ny * distance
+		);
+	}
+	public void strafe(double distance) {
+		moveTo(
+			px + ny * distance,
+			py - nx * distance
 		);
 	}
 

@@ -1,7 +1,9 @@
 package com.marginallyclever.convenience;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class LineCollection extends ArrayList<LineSegment2D> {
 	private boolean[] usePt;
@@ -20,27 +22,30 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	 * @return the list of collections separated by color
 	 */
 	public ArrayList<LineCollection> splitByColor() {
-		ArrayList<LineCollection> result = new ArrayList<LineCollection> ();
-		if(this.size()>0) {
-			LineSegment2D head = get(0);
-			
-			LineCollection c = new LineCollection();
-			result.add(c);
-			c.add(head);
-			
-			for(int i=1;i<size();++i) {
-				LineSegment2D next = get(i);
-				if(next.color.equals(head.color)) {
-					c.add(next);
+		var map = new HashMap<Color,LineCollection>();
+
+		if(this.isEmpty()) return new ArrayList<>();
+
+		LineSegment2D head = get(0);
+		LineCollection c = new LineCollection();
+		map.put(head.color,c);
+		c.add(head);
+
+		for(int i=1;i<size();++i) {
+			LineSegment2D next = get(i);
+			if(!next.color.equals(head.color)) {
+				head = next;
+				if(map.containsKey(next.color)) {
+					c = map.get(next.color);
 				} else {
-					head = next;
 					c = new LineCollection();
-					result.add(c);
-					c.add(head);
+					map.put(next.color, c);
 				}
 			}
+			c.add(next);
 		}
-		return result;
+
+        return new ArrayList<>(map.values());
 	}
 
 	/**
