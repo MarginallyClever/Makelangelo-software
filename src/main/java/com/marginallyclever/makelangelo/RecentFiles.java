@@ -9,16 +9,19 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
+/**
+ * A list of recent files displayed as a JMenu.  The list can be saved to and loaded from preferences.
+ */
 public final class RecentFiles extends JMenu {
 	private static final Logger logger = LoggerFactory.getLogger(RecentFiles.class);
 
 	public final int MAX_FILES = 10;
 
 	@SuppressWarnings("deprecation")
-	private Preferences prefs = PreferencesHelper
+	private final Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	private ArrayList<String> fileList = new ArrayList<>();
+	private final ArrayList<String> fileList = new ArrayList<>();
 	private ActionListener submenuListener;
 
 	// Load recent files from prefs
@@ -30,9 +33,9 @@ public final class RecentFiles extends JMenu {
 	}
 
 	/**
-	 * changes the order of the recent files list in the File submenu, saves the
-	 * updated prefs, and refreshes the menus.
-	 *
+	 * Adds a filename to the recent files list, saves the updated prefs, and refreshes the menus.
+	 * Changes the order of the recent files with the new item at the top.  If the item was already in the list
+	 * It is moved to the top.
 	 * @param filename the file to push to the top of the list.
 	 */
 	public void addFilename(String filename) {
@@ -47,7 +50,19 @@ public final class RecentFiles extends JMenu {
 		}
 		updateLists();
 	}
-	
+
+	/**
+	 * removes a filename from the recent files list, saves the updated prefs, and refreshes the menus.
+	 * @param filename
+	 */
+	public void removeFilename(String filename) {
+		int i = getIndexOf(filename);
+		if(i==-1) return;
+
+		fileList.remove(i);
+		updateLists();
+	}
+
 	private int getIndexOf(String filename) {
 		int i=0;
 		for( String j : fileList ) {
@@ -65,14 +80,6 @@ public final class RecentFiles extends JMenu {
 
 	public String getFile(int index) {
 		return fileList.get(index);
-	}
-
-	public void removeFilename(String filename) {
-		int i = getIndexOf(filename);
-		if(i==-1) return;
-		
-		fileList.remove(i);
-		updateLists();
 	}
 
 	private void updateLists() {
