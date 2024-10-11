@@ -51,8 +51,8 @@ class SaveGCodeTest {
             Plotter plotter = new Plotter();
             PlotterSettings settings = plotter.getSettings();
             settings.load("Makelangelo 5");
-            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
-            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setString(PlotterSettings.START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.END_GCODE,"M400\nM200");
             settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
             settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
@@ -89,8 +89,8 @@ class SaveGCodeTest {
             Plotter plotter = new Plotter();
             PlotterSettings settings = plotter.getSettings();
             settings.load("Makelangelo 5");
-            settings.setString(PlotterSettings.USER_GENERAL_START_GCODE,"M300\nM200");
-            settings.setString(PlotterSettings.USER_GENERAL_END_GCODE,"M400\nM200");
+            settings.setString(PlotterSettings.START_GCODE,"M300\nM200");
+            settings.setString(PlotterSettings.END_GCODE,"M400\nM200");
             settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
             settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 

@@ -22,7 +22,6 @@ import java.util.List;
 public class PlotterSettingsPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(PlotterSettingsPanel.class);
 	private final PlotterSettings settings;
-	private PlotterSettingsUserGcodePanel userGcodePanel;
 	private SelectOneOfMany visualStyle;
 	private SelectDouble machineWidth, machineHeight;
 	private SelectDouble totalBeltNeeded;
@@ -49,67 +48,36 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectDouble minPlannerSpeed;
 	private SelectOneOfMany zMotorType;
 
+	private SelectTextArea startGcode;
+	private SelectTextArea endGcode;
+	private SelectTextField findHomeGcode;
+
 	private PlotterSettingsListener listener;
 
 	public PlotterSettingsPanel(PlotterSettings settings) {
 		super(new BorderLayout());
+		setName("PlotterSettingsPanel");
 		this.settings = settings;
 		rebuildPanel();
 	}
 
 	private void rebuildPanel() {
 		this.removeAll();
-		userGcodePanel = new PlotterSettingsUserGcodePanel(settings);
 
-		JButton buttonSave = new JButton(Translator.get("Save"));
-		buttonSave.addActionListener((e)->save());
-
-		JButton buttonReset = new JButton(Translator.get("Reset"));
-		buttonReset.addActionListener((e)->reset());
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabEssential"),rebuildTabMachine());
+		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabPen"),rebuildTabPen());
+		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabSimulation"),rebuildTabSimulate());
+		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabGCode"),rebuildTabGCode());
 
 		JPanel bottom = new JPanel(new FlowLayout());
-
-		SelectPanel interior0 = new SelectPanel();
-		SelectPanel interior1 = new SelectPanel();
-		SelectPanel interior2 = new SelectPanel();
-
-		List<String> machineStyles = getMachineStyleNames();
-		String myStyle = settings.getString(PlotterSettings.STYLE);
-		int index = Math.max(0,machineStyles.indexOf(myStyle));
-
-		addToPanel(interior0,visualStyle         = new SelectOneOfMany("style",		 Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
-		addToPanel(interior0,machineWidth 		 = new SelectDouble("width",		 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getDouble(PlotterSettings.LIMIT_RIGHT) - settings.getDouble(PlotterSettings.LIMIT_LEFT)));
-		addToPanel(interior0,machineHeight 	     = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getDouble(PlotterSettings.LIMIT_TOP) - settings.getDouble(PlotterSettings.LIMIT_BOTTOM)));
-		addToPanel(interior0,totalStepperNeeded  = new SelectDouble("stepperLength", Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
-		addToPanel(interior0,totalBeltNeeded 	 = new SelectDouble("beltLength",	 Translator.get("PlotterSettingsPanel.BeltLengthNeeded"		),0));
-		addToPanel(interior0,totalServoNeeded 	 = new SelectDouble("servoLength",	 Translator.get("PlotterSettingsPanel.ServoLengthNeeded"	),0));
-
-		addToPanel(interior1,penDiameter 		 = new SelectDouble("diameter",		 Translator.get("PlotterSettingsPanel.penToolDiameter"		),settings.getDouble(PlotterSettings.DIAMETER)));
-	    addToPanel(interior1,travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	),settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL)));
-	    addToPanel(interior1,drawFeedRate 		 = new SelectDouble("speed",		 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDouble(PlotterSettings.FEED_RATE_DRAW)));
-	    addToPanel(interior1,acceleration 		 = new SelectDouble("acceleration",	 Translator.get("PlotterSettingsPanel.AdjustAcceleration"	),settings.getDouble(PlotterSettings.MAX_ACCELERATION)));
-		addToPanel(interior1,penRaiseRate        = new SelectDouble("liftSpeed",	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME)));
-		addToPanel(interior1,penLowerRate        = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
-	    addToPanel(interior1,penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
-	    addToPanel(interior1,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
-		addToPanel(interior1,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
-		addToPanel(interior1,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
-
-		addToPanel(interior1,zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
-				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
-				Translator.get("PlotterSettings.zMotorType.stepper"),  // PlotterSettings.Z_MOTOR_TYPE_STEPPER = 2
-		},settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)-1));
-
-		addToPanel(interior2,blockBufferSize     = new SelectInteger("blockBufferSize",     Translator.get("PlotterSettings.blockBufferSize"     ),settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)));
-		addToPanel(interior2,segmentsPerSecond   = new SelectInteger("segmentsPerSecond",   Translator.get("PlotterSettings.segmentsPerSecond"   ),settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND)));
-		addToPanel(interior2,minSegmentLength    = new SelectDouble ("minSegmentLength",    Translator.get("PlotterSettings.minSegmentLength"    ),settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)));
-		addToPanel(interior2,minSegTime          = new SelectInteger("minSegTime",          Translator.get("PlotterSettings.minSegTime"          ),settings.getInteger(PlotterSettings.MIN_SEG_TIME)));
-		addToPanel(interior2,handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.getBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS)));
-		addToPanel(interior2,minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getDouble(PlotterSettings.MIN_ACCELERATION)));
-		addToPanel(interior2,minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)));
-
 		if(!settings.isMostAncestral()) {
+			JButton buttonSave = new JButton(Translator.get("Save"));
+			buttonSave.addActionListener((e)->save());
 			bottom.add(buttonSave);
+
+			JButton buttonReset = new JButton(Translator.get("Reset"));
+			buttonReset.addActionListener((e)->reset());
 			bottom.add(buttonReset);
 		} else {
 			machineWidth.setReadOnly();
@@ -124,18 +92,72 @@ public class PlotterSettingsPanel extends JPanel {
 		totalServoNeeded.setReadOnly();
 		updateLengthNeeded();
 
-		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabEssential"),interior0);
-		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabPen"),interior1);
-		tabbedPane.addTab(Translator.get("PlotterSettingsPanel.TabSimulation"),interior2);
-		tabbedPane.addTab(Translator.get("PlotterSettingsUserGcodePanel.Title"),userGcodePanel);
-
 		// now assemble the dialog
 		this.add(tabbedPane,BorderLayout.CENTER);
 		this.add(bottom,BorderLayout.SOUTH);
 		this.repaint();
 
 		visualStyle.addSelectListener(e->updateSizeEditable());
+	}
+
+	private SelectPanel rebuildTabGCode() {
+		var panel = new SelectPanel();
+
+		addToPanel(panel,startGcode = new SelectTextArea("StartGcode", Translator.get("PlotterSettings.StartGcode"), settings.getString(PlotterSettings.START_GCODE)));
+		addToPanel(panel,endGcode = new SelectTextArea("EndGcode", Translator.get("PlotterSettings.EndGcode"), settings.getString(PlotterSettings.END_GCODE)));
+		addToPanel(panel,findHomeGcode = new SelectTextField("FindHomeGcode", Translator.get("PlotterSettings.FindHomeGcode"), settings.getFindHomeString()));
+
+		startGcode.setLineWrap(false);
+		endGcode.setLineWrap(false);
+
+		return panel;
+	}
+
+	private SelectPanel rebuildTabSimulate() {
+		var panel = new SelectPanel();
+		addToPanel(panel,blockBufferSize     = new SelectInteger("blockBufferSize",     Translator.get("PlotterSettings.blockBufferSize"     ),settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)));
+		addToPanel(panel,segmentsPerSecond   = new SelectInteger("segmentsPerSecond",   Translator.get("PlotterSettings.segmentsPerSecond"   ),settings.getInteger(PlotterSettings.SEGMENTS_PER_SECOND)));
+		addToPanel(panel,minSegmentLength    = new SelectDouble ("minSegmentLength",    Translator.get("PlotterSettings.minSegmentLength"    ),settings.getDouble(PlotterSettings.MIN_SEGMENT_LENGTH)));
+		addToPanel(panel,minSegTime          = new SelectInteger("minSegTime",          Translator.get("PlotterSettings.minSegTime"          ),settings.getInteger(PlotterSettings.MIN_SEG_TIME)));
+		addToPanel(panel,handleSmallSegments = new SelectBoolean("handleSmallSegments", Translator.get("PlotterSettings.handleSmallSegments" ),settings.getBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS)));
+		addToPanel(panel,minAcceleration     = new SelectDouble ("minAcceleration",     Translator.get("PlotterSettings.minAcceleration"     ),settings.getDouble(PlotterSettings.MIN_ACCELERATION)));
+		addToPanel(panel,minPlannerSpeed     = new SelectDouble ("minPlannerSpeed",     Translator.get("PlotterSettings.minimumPlannerSpeed" ),settings.getDouble(PlotterSettings.MINIMUM_PLANNER_SPEED)));
+		return panel;
+	}
+
+	private SelectPanel rebuildTabPen() {
+		var panel = new SelectPanel();
+		addToPanel(panel,penDiameter 		 = new SelectDouble("diameter",		 Translator.get("PlotterSettingsPanel.penToolDiameter"		),settings.getDouble(PlotterSettings.DIAMETER)));
+		addToPanel(panel,travelFeedRate 	 = new SelectDouble("feedrate",		 Translator.get("PlotterSettingsPanel.penToolMaxFeedRate"	),settings.getDouble(PlotterSettings.FEED_RATE_TRAVEL)));
+		addToPanel(panel,drawFeedRate 		 = new SelectDouble("speed",		 Translator.get("PlotterSettingsPanel.Speed"				),settings.getDouble(PlotterSettings.FEED_RATE_DRAW)));
+		addToPanel(panel,acceleration 		 = new SelectDouble("acceleration",	 Translator.get("PlotterSettingsPanel.AdjustAcceleration"	),settings.getDouble(PlotterSettings.MAX_ACCELERATION)));
+		addToPanel(panel,penRaiseRate        = new SelectDouble("liftSpeed",	 Translator.get("PlotterSettingsPanel.penToolLiftSpeed"		),settings.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME)));
+		addToPanel(panel,penLowerRate        = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
+		addToPanel(panel,penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
+		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
+		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
+		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
+		addToPanel(panel,zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
+				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
+				Translator.get("PlotterSettings.zMotorType.stepper"),  // PlotterSettings.Z_MOTOR_TYPE_STEPPER = 2
+		},settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)-1));
+
+		return panel;
+	}
+
+	private SelectPanel rebuildTabMachine() {
+		var panel = new SelectPanel();
+
+		List<String> machineStyles = getMachineStyleNames();
+		String myStyle = settings.getString(PlotterSettings.STYLE);
+		int index = Math.max(0,machineStyles.indexOf(myStyle));
+		addToPanel(panel,visualStyle         = new SelectOneOfMany("style",		 Translator.get("RobotMenu.RobotStyle"						), machineStyles.toArray(new String[0]), index));
+		addToPanel(panel,machineWidth 		 = new SelectDouble("width",		 Translator.get("PlotterSettingsPanel.MachineWidth"			),settings.getDouble(PlotterSettings.LIMIT_RIGHT) - settings.getDouble(PlotterSettings.LIMIT_LEFT)));
+		addToPanel(panel,machineHeight 	     = new SelectDouble("height",		 Translator.get("PlotterSettingsPanel.MachineHeight"		),settings.getDouble(PlotterSettings.LIMIT_TOP) - settings.getDouble(PlotterSettings.LIMIT_BOTTOM)));
+		addToPanel(panel,totalStepperNeeded  = new SelectDouble("stepperLength", Translator.get("PlotterSettingsPanel.StepperLengthNeeded"	),0));
+		addToPanel(panel,totalBeltNeeded 	 = new SelectDouble("beltLength",	 Translator.get("PlotterSettingsPanel.BeltLengthNeeded"		),0));
+		addToPanel(panel,totalServoNeeded 	 = new SelectDouble("servoLength",	 Translator.get("PlotterSettingsPanel.ServoLengthNeeded"	),0));
+		return panel;
 	}
 
 	private void updateSizeEditable() {
@@ -145,9 +167,9 @@ public class PlotterSettingsPanel extends JPanel {
 		machineHeight.setReadOnly(matches);
 	}
 
-	private void addToPanel(SelectPanel interior2, Select minPlannerSpeed) {
-		interior2.add(minPlannerSpeed);
-		minPlannerSpeed.addSelectListener((e)->{
+	private void addToPanel(SelectPanel container, Select element) {
+		container.add(element);
+		element.addSelectListener((e)->{
 			save();
 			fireSettingsChangedEvent();
 		});
@@ -164,8 +186,9 @@ public class PlotterSettingsPanel extends JPanel {
 			return;
 		}
 
-		userGcodePanel.save();
-		
+		List<String> machineStyles = getMachineStyleNames();
+		settings.setString(PlotterSettings.STYLE,machineStyles.get(visualStyle.getSelectedIndex()));
+
 		settings.setMachineSize(mwf, mhf);
 		settings.setDouble(PlotterSettings.MAX_ACCELERATION,accel);
 	
@@ -177,11 +200,11 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,penLowerRate.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_UP,penUpAngle.getValue());
 		settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN,penDownAngle.getValue());
-
 		settings.setColor(PlotterSettings.PAPER_COLOR,Color.WHITE);
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_UP_COLOR,selectPenUpColor.getColor());
+		settings.setInteger(PlotterSettings.Z_MOTOR_TYPE,zMotorType.getSelectedIndex()+1);
 		
 		settings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,blockBufferSize.getValue());
 		settings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,segmentsPerSecond.getValue());
@@ -190,10 +213,10 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setBoolean(PlotterSettings.HANDLE_SMALL_SEGMENTS,handleSmallSegments.isSelected());
 		settings.setDouble(PlotterSettings.MIN_ACCELERATION,minAcceleration.getValue());
 		settings.setDouble(PlotterSettings.MINIMUM_PLANNER_SPEED,minPlannerSpeed.getValue());
-		settings.setInteger(PlotterSettings.Z_MOTOR_TYPE,zMotorType.getSelectedIndex()+1);
 
-		List<String> machineStyles = getMachineStyleNames();
-		settings.setString(PlotterSettings.STYLE,machineStyles.get(visualStyle.getSelectedIndex()));
+		settings.setString(PlotterSettings.START_GCODE,startGcode.getText());
+		settings.setString(PlotterSettings.END_GCODE,endGcode.getText());
+		settings.setString(PlotterSettings.FIND_HOME_GCODE,findHomeGcode.getText());
 
 		settings.save();
 	}
@@ -208,7 +231,6 @@ public class PlotterSettingsPanel extends JPanel {
 
 	private void reset() {
 		settings.reset();
-		userGcodePanel.reset();
 		rebuildPanel();
 		fireSettingsChangedEvent();
 	}

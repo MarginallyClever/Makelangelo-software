@@ -2299,17 +2299,17 @@
         <hint>[Name cannot be blank. Try again!]</hint>
     </string>
     <string>
-        <key>PlotterSettings.userGeneralStartGcode</key>
+        <key>PlotterSettings.StartGcode</key>
         <value>GCode für den Start</value>
         <hint>[Start GCode]</hint>
     </string>
     <string>
-        <key>PlotterSettings.userGeneralEndGcode</key>
+        <key>PlotterSettings.EndGcode</key>
         <value>GCode für das Ende</value>
         <hint>[End GCode]</hint>
     </string>
     <string>
-        <key>PlotterSettingsUserGcodePanel.Title</key>
+        <key>PlotterSettingsPanel.TabGCode</key>
         <value>Benutzer spezifischer GCode</value>
         <hint>[Custom GCode]</hint>
     </string>

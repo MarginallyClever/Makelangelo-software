@@ -284,13 +284,13 @@
     <string><key>Generator_GridFit.margin</key><value>الحد الأدنى للهامش على كل جانب (mm)</value></string>
     <string><key>Generator_GridFit.cellsWide</key><value>خلايا أفقية</value></string>
     <string><key>Generator_GridFit.cellsHigh</key><value>خلايا عمودية</value></string>
-    <string><key>PlotterSettingsUserGcodePanel.Title</key><value>مخصص GCode</value></string>
+    <string><key>PlotterSettingsPanel.TabGCode</key><value>مخصص GCode</value></string>
 
     <string><key>PlotterSettings.zMotorType</key><value>نوع محور Z</value></string>
     <string><key>PlotterSettings.zMotorType.servo</key><value>تكرار</value></string>
     <string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
-    <string><key>PlotterSettings.userGeneralStartGcode</key><value>بدء GCode</value></string>
-    <string><key>PlotterSettings.userGeneralEndGcode</key><value>إنهاء GCode</value></string>
+    <string><key>PlotterSettings.StartGcode</key><value>بدء GCode</value></string>
+    <string><key>PlotterSettings.EndGcode</key><value>إنهاء GCode</value></string>
     <string><key>PlotterSettings.minimumPlannerSpeed</key><value>ادنى سرعة تخطيط (mm/s)</value></string>
     <string><key>PlotterSettings.blockBufferSize</key><value>موازنة حجم الكتلة</value></string>
     <string><key>PlotterSettings.segmentsPerSecond</key><value>عدد الأجزاء في الثانية</value></string>

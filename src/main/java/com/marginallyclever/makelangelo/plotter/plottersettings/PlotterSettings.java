@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.convenience.W3CColorNames;
+import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
@@ -131,11 +133,11 @@ public class PlotterSettings {
 	/**
 	 * String
 	 */
-	public static final String USER_GENERAL_END_GCODE = "userGeneralEndGcode";
+	public static final String END_GCODE = "userGeneralEndGcode";
 	/**
 	 * String
 	 */
-	public static final String USER_GENERAL_START_GCODE = "userGeneralStartGcode";
+	public static final String START_GCODE = "userGeneralStartGcode";
 	/**
 	 * integer
 	 */
@@ -147,6 +149,9 @@ public class PlotterSettings {
 
 	public static final int Z_MOTOR_TYPE_SERVO = 1;
 	public static final int Z_MOTOR_TYPE_STEPPER = 2;
+
+	public static final String FIND_HOME_GCODE = "FIND_HOME";
+	public static final String DEFAULT_FIND_HOME_GCODE = "G28 X Y";
 
 	private final JSONObject json = new JSONObject();
 	private String robotUID = "0";
@@ -180,9 +185,10 @@ public class PlotterSettings {
 		json.put(STARTING_POS_INDEX, 		4);
 		json.put(Z_MOTOR_TYPE, 				PlotterSettings.Z_MOTOR_TYPE_SERVO);
 		json.put(ANCESTOR,					"");
-		json.put(USER_GENERAL_START_GCODE, 	"");
-		json.put(USER_GENERAL_END_GCODE, 	"");
-		json.put(STYLE,         			 PlotterRendererFactory.MAKELANGELO_5.getName());
+		json.put(START_GCODE, 				"");
+		json.put(END_GCODE, 				"");
+		json.put(FIND_HOME_GCODE, 			DEFAULT_FIND_HOME_GCODE);
+		json.put(STYLE,         			PlotterRendererFactory.MAKELANGELO_5.getName());
 		json.put(PAPER_COLOR,		 		(Color.WHITE.hashCode()));
 		json.put(PEN_DOWN_COLOR_DEFAULT, 	(Color.BLACK.hashCode()));
 		json.put(PEN_DOWN_COLOR, 			(Color.BLACK.hashCode()));
@@ -367,8 +373,9 @@ public class PlotterSettings {
 		json.put(STARTING_POS_INDEX, 		thisMachineNode.getInt(STARTING_POS_INDEX,4));
 		json.put(Z_MOTOR_TYPE, 				thisMachineNode.getInt(Z_MOTOR_TYPE,PlotterSettings.Z_MOTOR_TYPE_SERVO));
 		json.put(ANCESTOR,					thisMachineNode.get(ANCESTOR,""));
-		json.put(USER_GENERAL_START_GCODE, 	thisMachineNode.get(USER_GENERAL_START_GCODE,""));
-		json.put(USER_GENERAL_END_GCODE, 	thisMachineNode.get(USER_GENERAL_END_GCODE,""));
+		json.put(START_GCODE, 				thisMachineNode.get(START_GCODE,""));
+		json.put(END_GCODE, 				thisMachineNode.get(END_GCODE,""));
+		json.put(FIND_HOME_GCODE, 			thisMachineNode.get(FIND_HOME_GCODE, DEFAULT_FIND_HOME_GCODE));
 		json.put(STYLE,         			thisMachineNode.get(STYLE, PlotterRendererFactory.MAKELANGELO_5.getName()));
 		json.put(PAPER_COLOR,		 		thisMachineNode.getInt(PAPER_COLOR,(Color.WHITE.hashCode())));
 		json.put(PEN_DOWN_COLOR_DEFAULT, 	thisMachineNode.getInt(PEN_DOWN_COLOR_DEFAULT,(Color.BLACK.hashCode())));
@@ -409,8 +416,9 @@ public class PlotterSettings {
 		thisMachineNode.putInt(STARTING_POS_INDEX, 			json.getInt(STARTING_POS_INDEX));
 		thisMachineNode.putInt(Z_MOTOR_TYPE, 				json.getInt(Z_MOTOR_TYPE));
 		thisMachineNode.put(ANCESTOR, 						json.getString(ANCESTOR));
-		thisMachineNode.put(USER_GENERAL_START_GCODE, 		json.getString(USER_GENERAL_START_GCODE));
-		thisMachineNode.put(USER_GENERAL_END_GCODE, 		json.getString(USER_GENERAL_END_GCODE));
+		thisMachineNode.put(START_GCODE, 					json.getString(START_GCODE));
+		thisMachineNode.put(END_GCODE, 						json.getString(END_GCODE));
+		thisMachineNode.put(FIND_HOME_GCODE, 				json.getString(FIND_HOME_GCODE));
 		thisMachineNode.put(STYLE, 							json.getString(STYLE));
 		thisMachineNode.putInt(PAPER_COLOR, 				json.getInt(PAPER_COLOR));
 		thisMachineNode.putInt(PEN_DOWN_COLOR_DEFAULT, 		json.getInt(PEN_DOWN_COLOR_DEFAULT));
@@ -472,5 +480,70 @@ public class PlotterSettings {
 	public boolean isMostAncestral() {
 		String ancestorName = getString(ANCESTOR);
 		return ancestorName==null || ancestorName.isEmpty();
+	}
+
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public String getTravelToString(double x, double y) {
+		return "G0 " + getPosition(x, y)
+				+ " F" + getDouble(FEED_RATE_TRAVEL);
+	}
+
+	/**
+	 * <a href="https://marlinfw.org/docs/gcode/G000-G001.html">By convention, most G-code generators use G0 for non-extrusion movements</a>
+	 * @param x destination point
+	 * @param y destination point
+	 * @return the formatted string
+	 */
+	public String getDrawToString(double x, double y) {
+		return "G1 " + getPosition(x, y)
+				+ " F" + getDouble(FEED_RATE_DRAW);
+	}
+
+	private static String getPosition(double x, double y) {
+		return "X" + StringHelper.formatDouble(x)
+				+ " Y" + StringHelper.formatDouble(y);
+	}
+
+	public String getPenUpString() {
+		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)getDouble(PEN_ANGLE_UP)
+					+ " T" + (int)getDouble(PEN_ANGLE_UP_TIME);
+		} else {
+			return "G0 Z" + (int)getDouble(PEN_ANGLE_UP);
+		}
+	}
+
+	public String getPenDownString() {
+		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
+			return "M280 P0"
+					+ " S" + (int)getDouble(PEN_ANGLE_DOWN)
+					+ " T" + (int)getDouble(PEN_ANGLE_DOWN_TIME);
+		} else {
+			return "G1 Z" + (int)getDouble(PEN_ANGLE_DOWN);
+		}
+	}
+
+	public String getToolChangeString(int toolNumber) {
+		String colorName = getColorName(toolNumber & 0xFFFFFF);
+		return "M0 Ready " + colorName + " and click";
+	}
+
+	private static String getColorName(int toolNumber) {
+		String name = W3CColorNames.get(new Color(toolNumber));
+		if(name==null) name = "0x" + StringHelper.paddedHex(toolNumber); // display unknown RGB value as hex
+		return name;
+	}
+
+	/**
+	 * @return the string to send to the plotter to find home.
+	 */
+	public String getFindHomeString() {
+		return getString(FIND_HOME_GCODE);
 	}
 }

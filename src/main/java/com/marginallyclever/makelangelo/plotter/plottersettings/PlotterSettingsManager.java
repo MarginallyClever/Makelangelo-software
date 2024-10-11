@@ -67,8 +67,8 @@ public class PlotterSettingsManager {
         profile.setInteger(PlotterSettings.STARTING_POS_INDEX, 4);
         profile.setInteger(PlotterSettings.Z_MOTOR_TYPE, PlotterSettings.Z_MOTOR_TYPE_SERVO);
 
-        profile.setString(PlotterSettings.USER_GENERAL_START_GCODE, "");
-        profile.setString(PlotterSettings.USER_GENERAL_END_GCODE, "");
+        profile.setString(PlotterSettings.START_GCODE, "");
+        profile.setString(PlotterSettings.END_GCODE, "");
         profile.setString(PlotterSettings.STYLE, PlotterRendererFactory.MAKELANGELO_5.getName());
 
         profile.setColor(PlotterSettings.PAPER_COLOR, Color.WHITE);

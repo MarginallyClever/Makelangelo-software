@@ -64,7 +64,7 @@ public class Makelangelo5 implements PlotterRenderer {
 
 		double mw = right - left;
 		double mh = top - bottom;
-		double beltLength = Math.sqrt(mw * mw + mh * mh) + 50;  // TODO replace with robot.getBeltLength()
+		double beltLength = Math.sqrt(mw * mw + mh * mh) + 50;  // TODO replace with robot.getBeltLength()?
 
 		double dx = gx - left;
 		double dy = gy - top;

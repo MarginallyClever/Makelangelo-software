@@ -244,7 +244,7 @@
 
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
 	<string><key>LoadScratch3.foreverNotAllowed</key><value>Forever loops are forever forbidden.</value></string>
-	<string><key>PlotterSettingsUserGcodePanel.Title</key><value>Custom GCode</value></string>
+	<string><key>PlotterSettingsPanel.TabGCode</key><value>Custom GCode</value></string>
 
 	<string><key>SaveGCode.splitGCodeTitle</key><value>Many colors detected</value></string>
 	<string><key>SaveGCode.splitGCodeQuestion</key><value>There are %1 tool changes in this drawing.  Split into separate files?</value></string>
@@ -340,8 +340,10 @@
 	<string><key>PlotterSettings.zMotorType</key><value>Z axis type</value></string>
 	<string><key>PlotterSettings.zMotorType.servo</key><value>Servo</value></string>
 	<string><key>PlotterSettings.zMotorType.stepper</key><value>Stepper</value></string>
-	<string><key>PlotterSettings.userGeneralStartGcode</key><value>Start GCode</value></string>
-	<string><key>PlotterSettings.userGeneralEndGcode</key><value>End GCode</value></string>
+	<string><key>PlotterSettings.StartGcode</key><value>Start GCode</value></string>
+	<string><key>PlotterSettings.EndGcode</key><value>End GCode</value></string>
+	<string><key>PlotterSettings.FindHomeGcode</key><value>Find Home GCode</value></string>
+
 	<string><key>PlotterSettings.minimumPlannerSpeed</key><value>Min Planner Speed (mm/s)</value></string>
 	<string><key>PlotterSettings.blockBufferSize</key><value>Block Buffer Size</value></string>
 	<string><key>PlotterSettings.segmentsPerSecond</key><value>Segments Per Second</value></string>

@@ -2012,17 +2012,17 @@
         <hint>Menu item</hint>
     </string>
     <string>
-        <key>PlotterSettingsUserGcodePanel.Title</key>
+        <key>PlotterSettingsPanel.TabGCode</key>
         <value>Paramètres du traceur - GCode début/fin</value>
         <hint>Dialog title</hint>
     </string>
     <string>
-        <key>PlotterSettings.userGeneralStartGcode</key>
+        <key>PlotterSettings.StartGcode</key>
         <value>GCode début</value>
         <hint>TextArea Label</hint>
     </string>
     <string>
-        <key>PlotterSettings.userGeneralEndGcode</key>
+        <key>PlotterSettings.EndGcode</key>
         <value>GCode fin</value>
         <hint>TextArea Label</hint>
     </string>
