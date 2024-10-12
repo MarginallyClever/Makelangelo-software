@@ -22,9 +22,11 @@ public class TurtleFactory {
 			new LoadScratch2(),
 			new LoadScratch3(),
 			new LoadSVG(),
+			new LoadTHR()
 	};
 	
 	private static final TurtleSaver [] savers = {
+			new SaveTHR(),
 			new SaveDXF(),
 			new SaveSVG(),
 			new SaveGCode(),
