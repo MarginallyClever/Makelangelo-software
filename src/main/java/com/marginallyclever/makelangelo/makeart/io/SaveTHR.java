@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
+ * Save {@link Turtle} into a THR file for sand plotters.
  * @author Dan Royer
- * See <a href="https://www.w3.org/TR/SVG/paths.html">...</a>
+ * See <a href="https://sisyphus-industries.com/wp-content/uploads/wpforo/default_attachments/1568584503-sisyphus-table-programming-logic3.pdf">THR</a>
  */
 public class SaveTHR implements TurtleSaver {
 	private static final Logger logger = LoggerFactory.getLogger(SaveTHR.class);
@@ -39,10 +41,21 @@ public class SaveTHR implements TurtleSaver {
 		// header
 		out.write("# Makelangelo "+ MakelangeloVersion.VERSION + "\n");
 
+		double previousTheta = 0;
+
 		for( var t : turtle.history) {
-			double rho = Math.sqrt(t.x * t.x + t.y * t.y) / diameter;
-			double theta = Math.atan2(t.y,t.x);
-			out.write(String.format("%.2f %.2f\n",theta,rho));
+			if(t.type== MovementType.TOOL_CHANGE) continue;
+			if(t.type== MovementType.TRAVEL) continue;
+
+			// turn x,y to theta,rho
+			double rho = Math.sqrt(t.x * t.x + t.y * t.y) / radius;
+			double theta = Math.PI/2 - Math.atan2(t.y,t.x);
+			// handle the case where the angle wraps around.
+			if(theta<previousTheta-Math.PI) theta += Math.PI*2;
+			if(theta>previousTheta+Math.PI) theta -= Math.PI*2;
+			previousTheta = theta;
+
+			out.write(String.format("%.5f %.5f\n",theta,rho));
 		}
 
 		out.flush();

@@ -49,7 +49,7 @@ public class LoadTHR implements TurtleLoader {
 		// plotter coordinates are inverted in Y so flip the image.
 		myTurtle.scale(1, -1);
 
-		var w2=100.0;
+		var w2=200.0;
 
 		// read one line at a time
 		myTurtle.penUp();
