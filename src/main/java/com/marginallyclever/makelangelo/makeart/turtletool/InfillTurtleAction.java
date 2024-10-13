@@ -1,12 +1,11 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InfillTurtleAction extends TurtleModifierAction {
+public class InfillTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(InfillTurtleAction.class);
 
 	public InfillTurtleAction() {

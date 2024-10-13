@@ -1,11 +1,8 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-import java.io.Serial;
-
-public class FlipTurtleAction extends TurtleModifierAction {
+public class FlipTurtleAction extends TurtleTool {
 	private final double scaleX,scaleY;
 	
 	public FlipTurtleAction(double x,double y,String name) {

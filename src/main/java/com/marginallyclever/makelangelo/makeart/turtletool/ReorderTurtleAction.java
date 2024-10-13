@@ -1,10 +1,9 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author Dan Royer
  *
  */
-public class ReorderTurtleAction extends TurtleModifierAction {
+public class ReorderTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(ReorderTurtleAction.class);
 	
 	public ReorderTurtleAction() {

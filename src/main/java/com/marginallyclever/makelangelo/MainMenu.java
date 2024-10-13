@@ -5,9 +5,9 @@ import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
+import com.marginallyclever.makelangelo.makeart.turtletool.TurtleTool;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
-import com.marginallyclever.makelangelo.makeart.tools.*;
+import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
@@ -366,13 +366,13 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        TurtleModifierAction a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
+        TurtleTool a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
         a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
         a4.setSource(app);
         a4.addModifierListener(app::setTurtle);
         menu.add(a4);
 
-        TurtleModifierAction a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
+        TurtleTool a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
         a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
         a5.setSource(app);
         a5.addModifierListener(app::setTurtle);
@@ -380,23 +380,27 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        TurtleModifierAction a1 = createModifier(new SimplifyTurtleAction(),null);
+        TurtleTool a1 = createModifier(new SimplifyTurtleAction(),null);
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
         //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
         menu.add(a1);
 
-        TurtleModifierAction a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
+        TurtleTool a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
         menu.add(a2);
 
-        TurtleModifierAction a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
+        TurtleTool a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
         menu.add(a3);
+
+        LeastHopsTurtleAction a4 = createModifier(new LeastHopsTurtleAction(),"/com/marginallyclever/makelangelo/icons8-kangaroo-16.png");
+        a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
+        menu.add(a4);
 
         return menu;
     }
 
-    private TurtleModifierAction createModifier(TurtleModifierAction action, String resource) {
+    private TurtleTool createModifier(TurtleTool action, String resource) {
         if(resource!=null) {
             action.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource(resource))));
         }
@@ -413,7 +417,7 @@ public class MainMenu extends JMenuBar {
         return menuItem;
     }
 
-    private TurtleModifierAction createActionMenuItem(TurtleModifierAction action) {
+    private TurtleTool createActionMenuItem(TurtleTool action) {
         action.setSource(app);
         action.addModifierListener(app::setTurtle);
         return action;

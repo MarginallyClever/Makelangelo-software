@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.tools.InfillTurtle;
+import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;

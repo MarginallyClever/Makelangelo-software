@@ -1,6 +1,7 @@
-package com.marginallyclever.makelangelo.makeart;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.makeart.TurtleModifierListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.*;
@@ -8,20 +9,20 @@ import javax.swing.event.EventListenerList;
 import java.awt.event.ActionEvent;
 
 /**
- * {@link TurtleModifierAction} is the base class for all Actions which modify a {@link Turtle}.
+ * {@link TurtleTool} is the base class for all Actions which modify a {@link Turtle}.
  * Some examples might be scale, flip, rotate, reorder, etc.
  * @author Dan Royer
  * @since 7.31.0
  */
-public abstract class TurtleModifierAction extends AbstractAction {
+public abstract class TurtleTool extends AbstractAction {
 	private final EventListenerList listeners = new EventListenerList();
 	private Makelangelo myMakelangelo;
 	
-	public TurtleModifierAction(String string) {
+	public TurtleTool(String string) {
 		super(string);
 	}
 	
-	public TurtleModifierAction(String string,Icon icon) {
+	public TurtleTool(String string, Icon icon) {
 		super(string,icon);
 	}
 

@@ -33,7 +33,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo;
     exports com.marginallyclever.makelangelo.makeart;
     exports com.marginallyclever.makelangelo.makeart.imagefilter;
-    exports com.marginallyclever.makelangelo.makeart.tools;
+    exports com.marginallyclever.makelangelo.makeart.turtletool;
     exports com.marginallyclever.makelangelo.paper;
     exports com.marginallyclever.makelangelo.plotter.plottersettings;
     exports com.marginallyclever.makelangelo.turtle;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -11,18 +11,26 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
-public class RotateTurtlePanel extends JPanel {
-	private static final Logger logger = LoggerFactory.getLogger(RotateTurtlePanel.class);
+public class TranslateTurtlePanel extends JPanel {
+	private static final Logger logger = LoggerFactory.getLogger(TranslateTurtlePanel.class);
+
 	private final Turtle turtleToChange;
 	private final Turtle turtleOriginal;
-	private final JSpinner degrees = new JSpinner(new SpinnerNumberModel(0, -360, 360, 1));
+	private final JSpinner dx;
+	private final JSpinner dy;
+	private final Rectangle2D.Double myOriginalBounds;
 
-	public RotateTurtlePanel(Turtle t) {
+	public TranslateTurtlePanel(Turtle t) {
 		super();
 		turtleToChange = t;
 		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
+		myOriginalBounds = turtleToChange.getBounds();
+		dx = new JSpinner(new SpinnerNumberModel(myOriginalBounds.x,null,null,1));
+		dy = new JSpinner(new SpinnerNumberModel(myOriginalBounds.y,null,null,1));
+		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets=new Insets(10,10,3,10);
@@ -30,37 +38,37 @@ public class RotateTurtlePanel extends JPanel {
 		c.gridx=0;
 		c.gridy=0;
 		c.weightx=1;
-		c.gridheight=1;
-		c.anchor=GridBagConstants.CENTER;
-		add(degrees,c);
+		c.anchor=GridBagConstants.NORTHWEST;
+		add(new JLabel("X"),c);
+		
+		c.gridx=0;
+		c.gridy=1;
+		c.anchor=GridBagConstants.NORTHWEST;
+		add(new JLabel("Y"),c);
 		
 		c.gridx=1;
 		c.gridy=0;
-		c.gridheight=2;
-		c.anchor=GridBagConstants.CENTER;
-		add(new JLabel("°"),c);
+		c.anchor=GridBagConstants.NORTHWEST;
+		c.fill=GridBagConstants.HORIZONTAL;
+		add(dx,c);
 
-		degrees.addChangeListener(this::onAngleChange);
+		c.gridx=1;
+		c.gridy=1;
+		c.anchor=GridBagConstants.NORTHWEST;
+		c.fill=GridBagConstants.HORIZONTAL;
+		add(dy,c);
+		
+		dx.addChangeListener(this::onChange);
+		dy.addChangeListener(this::onChange);
 	}
-	
-	private void updateMinimumWidth(JSpinner spinner) {
-		JComponent field = spinner.getEditor();
-	    Dimension prefSize = field.getPreferredSize();
-	    prefSize = new Dimension(80, prefSize.height);
-	    field.setPreferredSize(prefSize);
-	}
 
-	private void onAngleChange(ChangeEvent e) {
-		double angle = 0;
-		try {
-			angle = Double.parseDouble(degrees.getValue().toString());
-		} catch(NumberFormatException err) {
-			logger.error("Failed to parse angle", err);
-		}
+	private void onChange(ChangeEvent e) {
+		double dx2 = (Double) dx.getValue() - myOriginalBounds.x;
+		double dy2 = (Double) dy.getValue() - myOriginalBounds.y;
 
-		logger.debug("rotate {}", angle);
+		logger.debug("move {}x{}", dx2, dy2);
 		revertOriginalTurtle();
-		turtleToChange.rotate(angle);
+		turtleToChange.translate(dx2, dy2);
 	}
 
 	private void revertOriginalTurtle() {
@@ -73,9 +81,9 @@ public class RotateTurtlePanel extends JPanel {
 	}
 
 	public static void runAsDialog(Window parent,Turtle t) {
-		RotateTurtlePanel panel = new RotateTurtlePanel(t);
+		TranslateTurtlePanel panel = new TranslateTurtlePanel(t);
 
-		JDialog dialog = new JDialog(parent,Translator.get("Rotate"));
+		JDialog dialog = new JDialog(parent,Translator.get("Translate"));
 
 		JButton okButton = new JButton(Translator.get("OK"));
 		JButton cancelButton = new JButton(Translator.get("Cancel"));
@@ -117,7 +125,7 @@ public class RotateTurtlePanel extends JPanel {
 		PreferencesHelper.start();
 		Translator.start();
 
-		JFrame frame = new JFrame(RotateTurtlePanel.class.getSimpleName());
+		JFrame frame = new JFrame(TranslateTurtlePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);

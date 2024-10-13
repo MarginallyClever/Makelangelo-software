@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.ResizeTurtleToPaperAction;
+import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 

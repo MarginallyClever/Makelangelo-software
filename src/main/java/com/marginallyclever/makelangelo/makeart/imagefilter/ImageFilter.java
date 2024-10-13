@@ -45,7 +45,7 @@ public abstract class ImageFilter {
 	 * @param alpha 0-255
 	 * @return RGB color
 	 */
-	protected static int encode32bit(int red,int green,int blue,int alpha) {
+	public static int encode32bit(int red,int green,int blue,int alpha) {
 		red &= 0xff;
 		green &= 0xff;
 		blue &= 0xff;
@@ -57,7 +57,7 @@ public abstract class ImageFilter {
 	 * @param greyscale 0-255
 	 * @return RGB fully opaque
 	 */
-	protected static int encode32bit(int greyscale) {
+	public static int encode32bit(int greyscale) {
 		greyscale &= 0xff;
 		return encode32bit(greyscale,greyscale,greyscale,0xff);
 	}

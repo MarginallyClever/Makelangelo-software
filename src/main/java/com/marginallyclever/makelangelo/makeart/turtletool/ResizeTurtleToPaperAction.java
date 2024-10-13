@@ -1,6 +1,5 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -10,7 +9,7 @@ import java.awt.geom.Rectangle2D;
  * Scale the input {@link Turtle} to fit the margins of the {@link Paper} provided.
  * @author Dan Royer
  */
-public class ResizeTurtleToPaperAction extends TurtleModifierAction {
+public class ResizeTurtleToPaperAction extends TurtleTool {
 	private final Paper myPaper;
 	private final boolean fillPage;
 	

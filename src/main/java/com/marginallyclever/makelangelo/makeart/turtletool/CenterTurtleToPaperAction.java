@@ -1,6 +1,5 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;
@@ -9,7 +8,7 @@ import java.awt.geom.Rectangle2D;
  * Center the input {@link Turtle} to the origin.
  * @author Dan Royer
  */
-public class CenterTurtleToPaperAction extends TurtleModifierAction {
+public class CenterTurtleToPaperAction extends TurtleTool {
 
 	public CenterTurtleToPaperAction(String name) {
 		super(name);

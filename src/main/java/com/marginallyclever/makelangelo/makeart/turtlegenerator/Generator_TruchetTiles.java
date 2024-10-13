@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.CropTurtle;
+import com.marginallyclever.makelangelo.makeart.turtletool.CropTurtle;
 import com.marginallyclever.makelangelo.makeart.truchet.*;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectRandomSeed;

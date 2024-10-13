@@ -1,8 +1,7 @@
-package com.marginallyclever.makelangelo.makeart.tools;
+package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.TurtleModifierAction;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
  * @author Dan Royer
  * @since 7.31.0
  */
-public class SimplifyTurtleAction extends TurtleModifierAction {
+public class SimplifyTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
 	private static double distanceTolerance = 1.6;
 	

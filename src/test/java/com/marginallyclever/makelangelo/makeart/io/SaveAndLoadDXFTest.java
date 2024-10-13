@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.makeart.tools.ReorderTurtleAction;
-import com.marginallyclever.makelangelo.makeart.tools.SimplifyTurtleAction;
+import com.marginallyclever.makelangelo.makeart.turtletool.ReorderTurtleAction;
+import com.marginallyclever.makelangelo.makeart.turtletool.SimplifyTurtleAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.Generator_TruchetTiles;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
