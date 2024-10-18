@@ -380,22 +380,17 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        var a1 = createModifier(new SimplifyTurtleAction(),null);
+        var a1 = createModifier(new SimplifyTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
-        //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
         menu.add(a1);
 
-        var a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
+        var a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-kangaroo-16.png");
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
         menu.add(a2);
 
         var a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
         menu.add(a3);
-
-        var a6 = createModifier(new LeastHops(),"/com/marginallyclever/makelangelo/icons8-kangaroo-16.png");
-        a6.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
-        menu.add(a6);
 
         return menu;
     }
