@@ -15,7 +15,7 @@ public abstract class Generator_Maze extends TurtleGenerator {
     protected final List<MazeCell> cells = new ArrayList<>();
     protected final List<MazeWall> walls = new ArrayList<>();
     private static int seed = 0;
-    private static final Random random = new Random();
+    private static final Random random = new Random(0);
 
     public Generator_Maze() {
         super();
@@ -36,6 +36,7 @@ public abstract class Generator_Maze extends TurtleGenerator {
      */
     @Override
     public void generate() {
+        random.setSeed(seed);
         buildCells();
         buildWalls();
         buildMaze();

@@ -366,13 +366,13 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        TurtleTool a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
+        var a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
         a4.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-horizontal-16.png"))));
         a4.setSource(app);
         a4.addModifierListener(app::setTurtle);
         menu.add(a4);
 
-        TurtleTool a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
+        var a5 = new FlipTurtleAction(-1,1,Translator.get("FlipH"));
         a5.putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-flip-vertical-16.png"))));
         a5.setSource(app);
         a5.addModifierListener(app::setTurtle);
@@ -380,22 +380,17 @@ public class MainMenu extends JMenuBar {
 
         menu.addSeparator();
 
-        TurtleTool a1 = createModifier(new SimplifyTurtleAction(),null);
+        var a1 = createModifier(new SimplifyTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
         a1.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, SHORTCUT_CTRL));//"ctrl Y"
-        //a1.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-simplify-16.png"))));
         menu.add(a1);
 
-        TurtleTool a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-sort-16.png");
+        var a2 = createModifier(new ReorderTurtleAction(),"/com/marginallyclever/makelangelo/icons8-kangaroo-16.png");
         a2.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, SHORTCUT_CTRL));//"ctrl R"
         menu.add(a2);
 
-        TurtleTool a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
+        var a3 = createModifier(new InfillTurtleAction(), "/com/marginallyclever/makelangelo/icons8-fill-color-16.png");
         a3.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, SHORTCUT_CTRL));//"ctrl I"
         menu.add(a3);
-
-        LeastHopsTurtleAction a4 = createModifier(new LeastHopsTurtleAction(),"/com/marginallyclever/makelangelo/icons8-kangaroo-16.png");
-        a4.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_H, SHORTCUT_CTRL));//"ctrl H"
-        menu.add(a4);
 
         return menu;
     }
