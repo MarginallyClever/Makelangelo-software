@@ -7,7 +7,6 @@
             <author>Zainab Abdul Kareem Dinar - github.com/ZainabAKD</author>
         </authors>
     </meta>
-
     <string><key>BorderName</key><value>ورقة التخطيط</value></string>
     <string><key>Generator_TruchetTiles.Name</key><value>مربعات الألواح</value></string>
     <string><key>Generator_TruchetTiles.LineSpacing</key><value>المسافة بين الخطوط (ملم)</value></string>
@@ -120,9 +119,6 @@
     <string><key>Flap</key><value>حجم الحواف</value></string>
     <string><key>Model</key><value>نموذج</value></string>
     <string><key>Length</key><value>طول</value></string>
-    <string><key>MazeName</key><value>متاهة</value></string>
-    <string><key>MazeRows</key><value>صفوف المتاهة</value></string>
-    <string><key>MazeColumns</key><value>أعمدة المتاهة</value></string>
     <string><key>PulseLineName</key><value>خطوط الدقة</value></string>
     <string><key>YourMsgHereName</key><value>أكتب رسالتك هنا</value></string>
     <string><key>SpiralName</key><value>حلزوني</value></string>
@@ -390,5 +386,4 @@
     <string><key>Converter_QuadTreeInstant.maxDepth</key><value>أقصى عمق</value></string>
     <string><key>Converter_QuadTreeInstant.baseCutOff</key><value>Base cut-off</value></string>
     <string><key>Converter_QuadTreeInstant.cutOffIncrement</key><value>Cut-off increment</value></string>
-
 </language>
