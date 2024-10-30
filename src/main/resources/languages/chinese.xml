@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+    <!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
     <meta>
         <name>Chinese</name> <!-- zh-CN -->
         <authors>
@@ -136,40 +137,40 @@
     <string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>v%VERSION%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value></string>
     <string><key>TextSize</key><value>尺寸</value></string>
     <string><key>TextMessage</key><value>信息</value></string>
-    <string><key>CaptureImageTitle</key><value>获取相机图像</value></string>
-    <string><key>CaptureImage</key><value>获取</value></string>
-    <string><key>UseCapture</key><value>使用</value></string>
-    <string><key>CancelCapture</key><value>取消</value></string>
-    <string><key>AWB</key><value>自动白平衡</value></string>
-    <string><key>DRC</key><value>动态范围</value></string>
-    <string><key>Exposure</key><value>曝光</value></string>
-    <string><key>Contrast</key><value>对比度</value></string>
-    <string><key>Quality</key><value>画质</value></string>
-    <string><key>Sharpness</key><value>锐度</value></string>
-    <string><key>Off</key><value>关闭</value></string>
-    <string><key>Auto</key><value>自动</value></string>
-    <string><key>Sun</key><value>阳光</value></string>
-    <string><key>Cloud</key><value>多云</value></string>
-    <string><key>Shade</key><value>阴影</value></string>
-    <string><key>Tungsten</key><value>钨丝灯</value></string>
-    <string><key>Fluorescent</key><value>荧光灯</value></string>
-    <string><key>Incandescent</key><value>白炽灯</value></string>
-    <string><key>Flash</key><value>闪光灯</value></string>
-    <string><key>Horizon</key><value>水平线</value></string>
-    <string><key>High</key><value>高</value></string>
-    <string><key>Medium</key><value>中</value></string>
-    <string><key>Low</key><value>低</value></string>
-    <string><key>Antishake</key><value>防抖</value></string>
-    <string><key>Backlight</key><value>背光灯</value></string>
-    <string><key>Beach</key><value>海滩</value></string>
-    <string><key>Fireworks</key><value>烟花</value></string>
-    <string><key>FixedFPS</key><value>固定FPS</value></string>
-    <string><key>Night</key><value>夜晚</value></string>
-    <string><key>NightPreview</key><value>黄昏</value></string>
-    <string><key>Snow</key><value>雪景</value></string>
-    <string><key>Sports</key><value>运动</value></string>
-    <string><key>Spotlight</key><value>聚光灯</value></string>
-    <string><key>Verylong</key><value>长时间</value></string>
+    <string><key>PiCaptureAction.CaptureImageTitle</key><value>获取相机图像</value></string>
+    <string><key>PiCaptureAction.CaptureImage</key><value>获取</value></string>
+    <string><key>PiCaptureAction.UseCapture</key><value>使用</value></string>
+    <string><key>PiCaptureAction.CancelCapture</key><value>取消</value></string>
+    <string><key>PiCaptureAction.AWB</key><value>自动白平衡</value></string>
+    <string><key>PiCaptureAction.DRC</key><value>动态范围</value></string>
+    <string><key>PiCaptureAction.Exposure</key><value>曝光</value></string>
+    <string><key>PiCaptureAction.Contrast</key><value>对比度</value></string>
+    <string><key>PiCaptureAction.Quality</key><value>画质</value></string>
+    <string><key>PiCaptureAction.Sharpness</key><value>锐度</value></string>
+    <string><key>PiCaptureAction.Off</key><value>关闭</value></string>
+    <string><key>PiCaptureAction.Auto</key><value>自动</value></string>
+    <string><key>PiCaptureAction.Sun</key><value>阳光</value></string>
+    <string><key>PiCaptureAction.Cloud</key><value>多云</value></string>
+    <string><key>PiCaptureAction.Shade</key><value>阴影</value></string>
+    <string><key>PiCaptureAction.Tungsten</key><value>钨丝灯</value></string>
+    <string><key>PiCaptureAction.Fluorescent</key><value>荧光灯</value></string>
+    <string><key>PiCaptureAction.Incandescent</key><value>白炽灯</value></string>
+    <string><key>PiCaptureAction.Flash</key><value>闪光灯</value></string>
+    <string><key>PiCaptureAction.Horizon</key><value>水平线</value></string>
+    <string><key>PiCaptureAction.High</key><value>高</value></string>
+    <string><key>PiCaptureAction.Medium</key><value>中</value></string>
+    <string><key>PiCaptureAction.Low</key><value>低</value></string>
+    <string><key>PiCaptureAction.Antishake</key><value>防抖</value></string>
+    <string><key>PiCaptureAction.Backlight</key><value>背光灯</value></string>
+    <string><key>PiCaptureAction.Beach</key><value>海滩</value></string>
+    <string><key>PiCaptureAction.Fireworks</key><value>烟花</value></string>
+    <string><key>PiCaptureAction.FixedFPS</key><value>固定FPS</value></string>
+    <string><key>PiCaptureAction.Night</key><value>夜晚</value></string>
+    <string><key>PiCaptureAction.NightPreview</key><value>黄昏</value></string>
+    <string><key>PiCaptureAction.Snow</key><value>雪景</value></string>
+    <string><key>PiCaptureAction.Sports</key><value>运动</value></string>
+    <string><key>PiCaptureAction.Spotlight</key><value>聚光灯</value></string>
+    <string><key>PiCaptureAction.Verylong</key><value>长时间</value></string>
     <string><key>Import</key><value>导入</value></string>
     <string><key>Export</key><value>导出</value></string>
     <string><key>Reset</key><value>重置</value></string>

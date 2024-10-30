@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
+    <!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
     <meta>
         <name>Arabic</name>
         <authors>
@@ -158,40 +159,40 @@
     <string><key>TextSize</key><value>الحجم</value></string>
     <string><key>FontFace</key><value>نوع الخط</value></string>
     <string><key>TextMessage</key><value>رسالة</value></string>
-    <string><key>CaptureImageTitle</key><value>التقاط صورة الكاميرا</value></string>
-    <string><key>CaptureImage</key><value>التقاط</value></string>
-    <string><key>UseCapture</key><value>أستخدام</value></string>
-    <string><key>CancelCapture</key><value>إلغاء</value></string>
-    <string><key>AWB</key><value>موازنة تلقائية للون الأبيض</value></string>
-    <string><key>DRC</key><value>المدى الديناميكي</value></string>
-    <string><key>Exposure</key><value>التعرض</value></string>
-    <string><key>Contrast</key><value>التباين</value></string>
-    <string><key>Quality</key><value>الجودة</value></string>
-    <string><key>Sharpness</key><value>الوضوح</value></string>
-    <string><key>Off</key><value>إطفاء</value></string>
-    <string><key>Auto</key><value>تلقائي</value></string>
-    <string><key>Sun</key><value>مشمس</value></string>
-    <string><key>Cloud</key><value>غائم</value></string>
-    <string><key>Shade</key><value>ظل</value></string>
-    <string><key>Tungsten</key><value>أضاءة صفراء</value></string>
-    <string><key>Fluorescent</key><value>أضاءة فلورسنت</value></string>
-    <string><key>Incandescent</key><value>سطوع</value></string>
-    <string><key>Flash</key><value>فلاش</value></string>
-    <string><key>Horizon</key><value>الأفق</value></string>
-    <string><key>High</key><value>عالي</value></string>
-    <string><key>Medium</key><value>متوسط</value></string>
-    <string><key>Low</key><value>منخفض</value></string>
-    <string><key>Antishake</key><value>منع الأهتزاز</value></string>
-    <string><key>Backlight</key><value>ضوء خلفي</value></string>
-    <string><key>Beach</key><value>شاطئ</value></string>
-    <string><key>Fireworks</key><value>ألعاب نارية</value></string>
-    <string><key>FixedFPS</key><value>تثبيت عدد الاطارات</value></string>
-    <string><key>Night</key><value>الوضع الليلي</value></string>
-    <string><key>NightPreview</key><value>عرض في الوضع الليلي</value></string>
-    <string><key>Snow</key><value>مثلج</value></string>
-    <string><key>Sports</key><value>رياضي</value></string>
-    <string><key>Spotlight</key><value>تركيز</value></string>
-    <string><key>Verylong</key><value>Verylong</value></string>
+    <string><key>PiCaptureAction.CaptureImageTitle</key><value>التقاط صورة الكاميرا</value></string>
+    <string><key>PiCaptureAction.CaptureImage</key><value>التقاط</value></string>
+    <string><key>PiCaptureAction.UseCapture</key><value>أستخدام</value></string>
+    <string><key>PiCaptureAction.CancelCapture</key><value>إلغاء</value></string>
+    <string><key>PiCaptureAction.AWB</key><value>موازنة تلقائية للون الأبيض</value></string>
+    <string><key>PiCaptureAction.DRC</key><value>المدى الديناميكي</value></string>
+    <string><key>PiCaptureAction.Exposure</key><value>التعرض</value></string>
+    <string><key>PiCaptureAction.Contrast</key><value>التباين</value></string>
+    <string><key>PiCaptureAction.Quality</key><value>الجودة</value></string>
+    <string><key>PiCaptureAction.Sharpness</key><value>الوضوح</value></string>
+    <string><key>PiCaptureAction.Off</key><value>إطفاء</value></string>
+    <string><key>PiCaptureAction.Auto</key><value>تلقائي</value></string>
+    <string><key>PiCaptureAction.Sun</key><value>مشمس</value></string>
+    <string><key>PiCaptureAction.Cloud</key><value>غائم</value></string>
+    <string><key>PiCaptureAction.Shade</key><value>ظل</value></string>
+    <string><key>PiCaptureAction.Tungsten</key><value>أضاءة صفراء</value></string>
+    <string><key>PiCaptureAction.Fluorescent</key><value>أضاءة فلورسنت</value></string>
+    <string><key>PiCaptureAction.Incandescent</key><value>سطوع</value></string>
+    <string><key>PiCaptureAction.Flash</key><value>فلاش</value></string>
+    <string><key>PiCaptureAction.Horizon</key><value>الأفق</value></string>
+    <string><key>PiCaptureAction.High</key><value>عالي</value></string>
+    <string><key>PiCaptureAction.Medium</key><value>متوسط</value></string>
+    <string><key>PiCaptureAction.Low</key><value>منخفض</value></string>
+    <string><key>PiCaptureAction.Antishake</key><value>منع الأهتزاز</value></string>
+    <string><key>PiCaptureAction.Backlight</key><value>ضوء خلفي</value></string>
+    <string><key>PiCaptureAction.Beach</key><value>شاطئ</value></string>
+    <string><key>PiCaptureAction.Fireworks</key><value>ألعاب نارية</value></string>
+    <string><key>PiCaptureAction.FixedFPS</key><value>تثبيت عدد الاطارات</value></string>
+    <string><key>PiCaptureAction.Night</key><value>الوضع الليلي</value></string>
+    <string><key>PiCaptureAction.NightPreview</key><value>عرض في الوضع الليلي</value></string>
+    <string><key>PiCaptureAction.Snow</key><value>مثلج</value></string>
+    <string><key>PiCaptureAction.Sports</key><value>رياضي</value></string>
+    <string><key>PiCaptureAction.Spotlight</key><value>تركيز</value></string>
+    <string><key>PiCaptureAction.Verylong</key><value>Verylong</value></string>
     <string><key>Import</key><value>إستيراد</value></string>
     <string><key>Export</key><value>تصدير</value></string>
     <string><key>Reset</key><value>إعادة ضبط</value></string>

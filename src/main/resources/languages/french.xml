@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
+    <!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
     <meta>
         <name>Français (fr_FR)</name>
         <authors>
             <author>https://github.com/PPAC37</author>
         </authors>
     </meta>
-    <string><key>AWB</key><value>Balance des blancs automatique</value></string>
-    <string><key>Antishake</key><value>Anti-vibrations</value></string>
+
     <string><key>ApplicationSettings.title</key><value>Préférences</value></string>
     <string><key>Art Pipeline</key><value>Outils</value></string>
-    <string><key>Auto</key><value>Auto</value></string>
-    <string><key>Backlight</key><value>Rétroéclairage</value></string>
-    <string><key>Beach</key><value>plage</value></string>
     <string><key>BorderName</key><value>Contour marges</value></string>
     <string><key>BoxGeneratorCutoff</key><value>Couper</value></string>
     <string><key>BoxGeneratorMaxSize</key><value>taille max</value></string>
     <string><key>BoxGeneratorName</key><value>Boxxy</value></string>
     <string><key>Cancel</key><value>Annuler</value></string>
-    <string><key>CancelCapture</key><value>Annuler</value></string>
-    <string><key>CaptureImage</key><value>Capturer</value></string>
-    <string><key>CaptureImageTitle</key><value>Capturer l'image de la caméra</value></string>
     <string><key>CartesianButtons.buttonCenter</key><value></value></string>
     <string><key>ClickAndDrag</key><value>Cliquez et faites glisser</value></string>
-    <string><key>Cloud</key><value>Nuage</value></string>
     <string><key>ConfirmQuitQuestion</key><value>Êtes-vous sûr de vouloir quitter?</value></string>
     <string><key>ConfirmQuitTitle</key><value>Sortir</value></string>
-    <string><key>Contrast</key><value>Contraste</value></string>
     <string><key>ConversationHistory.Clear</key><value>Effacer</value></string>
     <string><key>ConversationHistory.Save</key><value>Sauvegarder</value></string>
     <string><key>ConversionFill</key><value>Remplir</value></string>
@@ -48,25 +40,19 @@
     <string><key>Converter_VoronoiStippling.DrawBorders</key><value>Dessiner des frontières ?</value></string>
     <string><key>Converter_VoronoiStippling.Name</key><value>Pointillés de Voronoï</value></string>
     <string><key>Crosshatch</key><value>Hachure</value></string>
-    <string><key>DRC</key><value>Plage dynamique</value></string>
     <string><key>DialogAbout.AboutHTML</key><value>    &lt;html&gt; &lt;body&gt; &lt;h1&gt;Makelangelo %VERSION% &lt;span style="font-size: small; font-weight: normal"&gt;%DETAILED_VERSION%&lt;/span&gt; &lt;/h1&gt; &lt;h3&gt;&lt;a href='http://www.makelangelo.com/'&gt;http://www.makelangelo.com/&lt;/a &gt; &lt;/h3&gt; &lt;p&gt;Pour obtenir la dernière version, veuillez visiter&lt;br&gt; &lt;a href='https://www.marginallyclever.com/product/makelangelo-software/'&gt;https://www.marginallyclever.com /product/makelangelo-software/&lt;/a&gt;&lt;/p&gt; &lt;p&gt;Créé par &lt;a href="mailto:dan@marginallyclever.com"&gt;Dan Royer&lt;/a&gt;.&lt;/p&gt; &lt;p&gt;Logiciel supplémentaire et les contributions matérielles de&lt;br&gt; Joseph Cottam, &lt;a href='https://github.com/virtuoushub'&gt;Peter Colapietro&lt;a/&gt;, Miguel Sánchez&lt;br&gt; Mark Raynsford et &lt;a href='https://ca.linkedin.com/in/kington-chu-219923123'&gt;Kington Chu&lt;/a&gt;.&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</value></string>
     <string><key>Direction</key><value>Direction</value></string>
     <string><key>DragonName</key><value>Courbe du dragon</value></string>
     <string><key>ErrorTitle</key><value>Erreur</value></string>
     <string><key>EstimatedTimeIs</key><value>Le temps estimé est %1</value></string>
     <string><key>Export</key><value>Exportation</value></string>
-    <string><key>Exposure</key><value>Exposition</value></string>
     <string><key>FibonacciSpiralName</key><value>Spirale de Fibonacci</value></string>
     <string><key>FileTypeScratch3</key><value>Grattez 3</value></string>
     <string><key>FillPageName</key><value>Remplir la page</value></string>
-    <string><key>Fireworks</key><value>Les feux d'artifices</value></string>
     <string><key>FirmwareUpdate</key><value>Mise à jour du firmware</value></string>
-    <string><key>FixedFPS</key><value>FixedFPS</value></string>
     <string><key>Flap</key><value>Rabat</value></string>
-    <string><key>Flash</key><value>Éclat</value></string>
     <string><key>FlipH</key><value>Retourner horizontalement</value></string>
     <string><key>FlipV</key><value>Retourner verticalement</value></string>
-    <string><key>Fluorescent</key><value>Fluorescent</value></string>
     <string><key>FontFace</key><value>Police de caractères</value></string>
     <string><key>GFXPreferences.Title</key><value>Graphique</value></string>
     <string><key>GFXPreferences.antialias</key><value>Lignes d'anticrénelage</value></string>
@@ -78,13 +64,10 @@
     <string><key>GraphPaperName</key><value>Papier millimétré</value></string>
     <string><key>Height</key><value>Hauteur</value></string>
     <string><key>Help</key><value>Aide</value></string>
-    <string><key>High</key><value>Haut</value></string>
     <string><key>HilbertCurveName</key><value>Courbe de Hilbert</value></string>
     <string><key>HilbertCurveOrder</key><value>Ordre</value></string>
     <string><key>HilbertCurveSize</key><value>Taille</value></string>
-    <string><key>Horizon</key><value>Horizon</value></string>
     <string><key>Import</key><value>Importer</value></string>
-    <string><key>Incandescent</key><value>Incandescent</value></string>
     <string><key>InfillTurtleAction.title</key><value>Remplir les boucles fermées</value></string>
     <string><key>InfoTitle</key><value>Information</value></string>
     <string><key>JogInterface.DisengageMotors</key><value>Dé-engager les moteurs</value></string>
@@ -109,8 +92,6 @@
     <string><key>LogPanel.CopyClipboard</key><value>Copier dans le presse-papier</value></string>
     <string><key>LogPanel.LogFiles</key><value>Fichiers de logs</value></string>
     <string><key>LogPanel.Title</key><value>Log</value></string>
-    <string><key>Low</key><value>Meugler</value></string>
-    <string><key>Medium</key><value>Moyen</value></string>
     <string><key>MenuAbout</key><value>À propos de Makelangelo</value></string>
     <string><key>MenuCaptureImage</key><value>Capturer depuis l'appareil photo</value></string>
     <string><key>MenuForums</key><value>Forums d'aide en ligne</value></string>
@@ -134,10 +115,7 @@
     <string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value>&lt;html&gt;&lt;body&gt;Est-ce que Marginally Clever Robots, Ltd. peut collecter des statistiques d'utilisation anonymes sur cette application ?&lt;br&gt;&lt;br&gt;Vous pouvez mettre à jour cela à tout moment dans &lt;i&gt;Makelangelo &amp;gt; Préférences &amp;gt; Métriques&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value></string>
     <string><key>Model</key><value>Modèle</value></string>
     <string><key>MoireName</key><value>Moiré</value></string>
-    <string><key>Night</key><value>Nuit</value></string>
-    <string><key>NightPreview</key><value>NuitAperçu</value></string>
     <string><key>OK</key><value>d'accord</value></string>
-    <string><key>Off</key><value>Désactivé</value></string>
     <string><key>Open</key><value>Fichier ouvert...</value></string>
     <string><key>OpenFileChooser.AllSupportedFiles</key><value>Tous les fichiers pris en charge</value></string>
     <string><key>OpenFileChooser.FileTypeImage</key><value>Image (%1)</value></string>
@@ -154,6 +132,40 @@
     <string><key>PaperSettings.ShiftX</key><value>Décalage à gauche ( Axe X )</value></string>
     <string><key>PaperSettings.ShiftY</key><value>Décalage vers le haut ( Axe Y )</value></string>
     <string><key>PaperSettings.Title</key><value>Paramètres papier</value></string>
+    <string><key>PiCaptureAction.AWB</key><value>Balance des blancs automatique</value></string>
+    <string><key>PiCaptureAction.Antishake</key><value>Anti-vibrations</value></string>
+    <string><key>PiCaptureAction.Auto</key><value>Auto</value></string>
+    <string><key>PiCaptureAction.Backlight</key><value>Rétroéclairage</value></string>
+    <string><key>PiCaptureAction.Beach</key><value>plage</value></string>
+    <string><key>PiCaptureAction.CancelCapture</key><value>Annuler</value></string>
+    <string><key>PiCaptureAction.CaptureImage</key><value>Capturer</value></string>
+    <string><key>PiCaptureAction.CaptureImageTitle</key><value>Capturer l'image de la caméra</value></string>
+    <string><key>PiCaptureAction.Cloud</key><value>Nuage</value></string>
+    <string><key>PiCaptureAction.Contrast</key><value>Contraste</value></string>
+    <string><key>PiCaptureAction.DRC</key><value>Plage dynamique</value></string>
+    <string><key>PiCaptureAction.Exposure</key><value>Exposition</value></string>
+    <string><key>PiCaptureAction.Fireworks</key><value>Les feux d'artifices</value></string>
+    <string><key>PiCaptureAction.FixedFPS</key><value>FixedFPS</value></string>
+    <string><key>PiCaptureAction.Flash</key><value>Éclat</value></string>
+    <string><key>PiCaptureAction.Fluorescent</key><value>Fluorescent</value></string>
+    <string><key>PiCaptureAction.High</key><value>Haut</value></string>
+    <string><key>PiCaptureAction.Horizon</key><value>Horizon</value></string>
+    <string><key>PiCaptureAction.Incandescent</key><value>Incandescent</value></string>
+    <string><key>PiCaptureAction.Low</key><value>Meugler</value></string>
+    <string><key>PiCaptureAction.Medium</key><value>Moyen</value></string>
+    <string><key>PiCaptureAction.Night</key><value>Nuit</value></string>
+    <string><key>PiCaptureAction.NightPreview</key><value>NuitAperçu</value></string>
+    <string><key>PiCaptureAction.Off</key><value>Désactivé</value></string>
+    <string><key>PiCaptureAction.Quality</key><value>Qualité</value></string>
+    <string><key>PiCaptureAction.Shade</key><value>Ombre</value></string>
+    <string><key>PiCaptureAction.Sharpness</key><value>Acuité</value></string>
+    <string><key>PiCaptureAction.Snow</key><value>Neige</value></string>
+    <string><key>PiCaptureAction.Sports</key><value>Des sports</value></string>
+    <string><key>PiCaptureAction.Spotlight</key><value>Projecteur</value></string>
+    <string><key>PiCaptureAction.Sun</key><value>soleil</value></string>
+    <string><key>PiCaptureAction.Tungsten</key><value>Tungstène</value></string>
+    <string><key>PiCaptureAction.UseCapture</key><value>Utiliser</value></string>
+    <string><key>PiCaptureAction.Verylong</key><value>Très long</value></string>
     <string><key>PlotterControls.AdvancedControls</key><value>Contrôles avancés</value></string>
     <string><key>PlotterControls.ConnectControls</key><value>Connecter</value></string>
     <string><key>PlotterControls.DrawControls</key><value>Contrôles de dessin</value></string>
@@ -182,7 +194,6 @@
     <string><key>Polyeder</key><value>Paper craft 3D Polyèdre</value></string>
     <string><key>Port</key><value>Port</value></string>
     <string><key>PulseLineName</key><value>Ligne d'impulsion</value></string>
-    <string><key>Quality</key><value>Qualité</value></string>
     <string><key>QuestionTitle</key><value>Question</value></string>
     <string><key>Reorder</key><value>Réorganiser</value></string>
     <string><key>Reset</key><value>Réinitialiser</value></string>
@@ -198,14 +209,11 @@
     <string><key>Save</key><value>Enregistrer</value></string>
     <string><key>SaveError</key><value>Impossible d'enregistrer le fichier :</value></string>
     <string><key>Scale</key><value>Échelle</value></string>
-    <string><key>Shade</key><value>Ombre</value></string>
     <string><key>SharePromo</key><value>Essayez la balise de médias sociaux #plotter</value></string>
-    <string><key>Sharpness</key><value>Acuité</value></string>
     <string><key>ShowLog</key><value>Afficher le journal</value></string>
     <string><key>SierpinskiTriangleName</key><value>Triangle de Sierpiński</value></string>
     <string><key>Simplify</key><value>Simplifier</value></string>
     <string><key>Size</key><value>Taille</value></string>
-    <string><key>Snow</key><value>Neige</value></string>
     <string><key>SoundPreferences.Connect</key><value>Connexion</value></string>
     <string><key>SoundPreferences.Disconnect</key><value>Déconnexion</value></string>
     <string><key>SoundPreferences.FinishConvert</key><value>Fin de conversion</value></string>
@@ -223,23 +231,17 @@
     <string><key>SpirographName</key><value>Spirographe</value></string>
     <string><key>SpirographNumSamples</key><value>Échantillons (qualité)</value></string>
     <string><key>SpirographPScale</key><value>Échelle (p)</value></string>
-    <string><key>Sports</key><value>Des sports</value></string>
-    <string><key>Spotlight</key><value>Projecteur</value></string>
     <string><key>StartAt</key><value>Commencer à</value></string>
     <string><key>StartAtAddPenDown</key><value>Ajouter la commande "pen down" ici</value></string>
     <string><key>StartAtExactly</key><value>Ne rien faire de spécial</value></string>
     <string><key>StartAtLastPenDown</key><value>Remonter jusqu'au dernier "pen down"</value></string>
-    <string><key>Sun</key><value>soleil</value></string>
     <string><key>TextMessage</key><value>Message</value></string>
     <string><key>TextSize</key><value>Taille</value></string>
     <string><key>TitlePrefix</key><value>Makelangelo</value></string>
-    <string><key>Tungsten</key><value>Tungstène</value></string>
     <string><key>TurtleGenerators.LearnMore.Link.Text</key><value>En savoir plus</value></string>
     <string><key>UpToDate</key><value>Ce logiciel est à jour.</value></string>
     <string><key>UpdateCheckFailed</key><value>Désolé, j'ai échoué. Veuillez visiter http://www.marginallyclever.com/ pour vérifier par vous-même.</value></string>
     <string><key>UpdateNotice</key><value>&lt;html&gt;&lt;body&gt;Une nouvelle version de ce logiciel est disponible.&lt;br/&gt;Veuillez visiter &lt;a href="https://www.marginallyclever.com/product/makelangelo-software/"&gt;https://www. marginallyclever.com/product/makelangelo-software/&lt;/a&gt; pour de bonnes surprises.&lt;/html&gt;&lt;/body&gt;</value></string>
-    <string><key>UseCapture</key><value>Utiliser</value></string>
-    <string><key>Verylong</key><value>Très long</value></string>
     <string><key>VoronoiZigZagName</key><value>zigzag de Voronoï</value></string>
     <string><key>Width</key><value>Largeur</value></string>
     <string><key>YourMsgHereName</key><value>Votre message ici</value></string>

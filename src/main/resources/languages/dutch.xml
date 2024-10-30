@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
-<language>       
-    <!--
-<?xml version="1.0" encoding="UTF-8"?>
-<language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-    -->
+<language>
+	<!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
 	<meta>
 		<name>Nederlands</name>
 		<authors>

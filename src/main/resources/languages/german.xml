@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
+    <!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
     <meta>
         <name>Deutsch (de)</name>
         <authors>
@@ -15,30 +16,21 @@
 	<string><key>PlotterControls.didNotFind</key><value>Fehler in der Kommunikation mit dem Plotter</value></string>
 	<string><key>SelectImageConverterPanel.Contrast</key><value>Kontastkorrektur</value></string>
 	<string><key>VoronoiZigZag.optimizePath</key><value>Optimierter Pfad</value></string>
-    <string><key>AWB</key><value>Automatischer Weißabgleich</value></string>
-    <string><key>Antishake</key><value>Stabilisierung</value></string>
+
     <string><key>ApplicationSettings.title</key><value>Einstellungen</value></string>
     <string><key>Art Pipeline</key><value>Werkzeuge</value></string>
-    <string><key>Auto</key><value>Auto</value></string>
-    <string><key>Backlight</key><value>Hintergrundbeleuchtung</value></string>
     <string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
-    <string><key>Beach</key><value>Strand</value></string>
     <string><key>BorderName</key><value>Papier umrahmen</value></string>
     <string><key>BoxGeneratorCutoff</key><value>Grenze</value></string>
     <string><key>BoxGeneratorMaxSize</key><value>Max Größe</value></string>
     <string><key>BoxGeneratorName</key><value>Boxxy</value></string>
     <string><key>Cancel</key><value>Abbrechen</value></string>
-    <string><key>CancelCapture</key><value>Abbruch</value></string>
-    <string><key>CaptureImage</key><value>Aufnehmen</value></string>
-    <string><key>CaptureImageTitle</key><value>Kamerabild aufnehmen</value></string>
     <string><key>CartesianButtons.buttonCenter</key><value> </value></string>
     <string><key>ChooseConnection.ButtonConnect</key><value>Verbinden</value></string>
     <string><key>ChooseConnection.ButtonDisconnect</key><value>Trennen</value></string>
     <string><key>ClickAndDrag</key><value>Klicke &amp; ziehe</value></string>
-    <string><key>Cloud</key><value>Wolken</value></string>
     <string><key>ConfirmQuitQuestion</key><value>Bist du sicher, dass du beenden willst?</value></string>
     <string><key>ConfirmQuitTitle</key><value>Beenden</value></string>
-    <string><key>Contrast</key><value>Kontrast</value></string>
     <string><key>ConversationHistory.Clear</key><value>Löschen</value></string>
     <string><key>ConversationHistory.Copy</key><value>Kopieren</value></string>
     <string><key>ConversationHistory.Save</key><value>Speichern</value></string>
@@ -85,7 +77,6 @@
     <string><key>Converter_VoronoiStippling.DrawBorders</key><value>Rand zeichnen?</value></string>
     <string><key>Converter_VoronoiStippling.Name</key><value>Voronoi Punkte</value></string>
     <string><key>Crosshatch</key><value>Kreuzschraffur</value></string>
-    <string><key>DRC</key><value>Dynamikbereich</value></string>
     <string><key>DefaultTurtleRenderer.name</key><value>Default</value></string>
     <string><key>DialogAbout.AboutHTML</key><value>    &lt;html&gt;      &lt;body&gt;        &lt;h1&gt;Makelangelo %VERSION% &lt;span style="font-size: small; font-weight: normal"&gt;%DETAILED_VERSION%&lt;/span&gt;&lt;/h1&gt;      &lt;h3&gt;&lt;a href='http://www.makelangelo.com/'&gt;http://www.makelangelo.com/&lt;/a&gt;      &lt;/h3&gt;        &lt;p&gt;Um die aktuellste Version zu bekommen besuche&lt;br&gt;          &lt;a href='https://www.marginallyclever.com/product/makelangelo-software/'&gt;https://www.marginallyclever.com/product/makelangelo-software/&lt;/a&gt;&lt;/p&gt;        &lt;p&gt;Erstellt von &lt;a href=mailto:dan@marginallyclever.com&gt;Dan Royer&lt;/a&gt;.&lt;/p&gt;        &lt;p&gt;Zusätzliche Software- und Hardwarebeiträge von&lt;br&gt;        Joseph Cottam, &lt;a href='https://github.com/virtuoushub'&gt;Peter Colapietro&lt;a/&gt;, Miguel Sánchez&lt;br&gt;        Mark Raynsford, and &lt;a href='https://ca.linkedin.com/in/kington-chu-219923123'&gt;Kington Chu&lt;/a&gt;.&lt;/p&gt;      &lt;/body&gt;    &lt;/html&gt;    		</value></string>
     <string><key>Direction</key><value>Richtung</value></string>
@@ -94,11 +85,9 @@
     <string><key>ErrorTitle</key><value>Fehler</value></string>
     <string><key>EstimatedTimeIs</key><value>Geschätzte Zeit ist %1</value></string>
     <string><key>Export</key><value>Exportiere</value></string>
-    <string><key>Exposure</key><value>Belichtung</value></string>
     <string><key>FibonacciSpiralName</key><value>Fibonacci Spiralenfraktal</value></string>
     <string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
     <string><key>FillPageName</key><value>Seite füllen</value></string>
-    <string><key>Fireworks</key><value>Feuerwerk</value></string>
     <string><key>FirmwareUpdate</key><value>Firmwareupdate</value></string>
     <string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
     <string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude wurde nicht heruntergeladen.</value></string>
@@ -110,12 +99,9 @@
     <string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>
     <string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
     <string><key>FirmwareUploaderPanel.status</key><value>Firmware-Upload Status</value></string>
-    <string><key>FixedFPS</key><value>Feste Framerate</value></string>
     <string><key>Flap</key><value>Klappe</value></string>
-    <string><key>Flash</key><value>Blitz</value></string>
     <string><key>FlipH</key><value>Horizontal umkehren</value></string>
     <string><key>FlipV</key><value>Vertikal umkehren</value></string>
-    <string><key>Fluorescent</key><value>Leuchtstoffröhre</value></string>
     <string><key>FontFace</key><value>Schrifttype</value></string>
     <string><key>GFXPreferences.Title</key><value>Grafik</value></string>
     <string><key>GFXPreferences.antialias</key><value>Linien glätten</value></string>
@@ -157,13 +143,10 @@
     <string><key>GraphPaperName</key><value>Millimeterpapier</value></string>
     <string><key>Height</key><value>Höhe</value></string>
     <string><key>Help</key><value>Hilfe</value></string>
-    <string><key>High</key><value>Hoch</value></string>
     <string><key>HilbertCurveName</key><value>Hilbert Kurvenfraktal</value></string>
     <string><key>HilbertCurveOrder</key><value>Reihenfolge</value></string>
     <string><key>HilbertCurveSize</key><value>Größe</value></string>
-    <string><key>Horizon</key><value>Horizont</value></string>
     <string><key>Import</key><value>Importiere</value></string>
-    <string><key>Incandescent</key><value>Glühlampe</value></string>
     <string><key>InfillTurtleAction.title</key><value>Fülle geschlossene Bereiche</value></string>
     <string><key>InfoTitle</key><value>Information</value></string>
     <string><key>JogInterface.DisengageMotors</key><value>Motoren deaktivieren</value></string>
@@ -192,9 +175,7 @@
     <string><key>LogPanel.CopyClipboard</key><value>Kopieren</value></string>
     <string><key>LogPanel.LogFiles</key><value>Protokoll Dateien</value></string>
     <string><key>LogPanel.Title</key><value>Protokoll</value></string>
-    <string><key>Low</key><value>Niedrig</value></string>
     <string><key>MarlinSimulationVisualizer.name</key><value>Marlin Simulation</value></string>
-    <string><key>Medium</key><value>Mittel</value></string>
     <string><key>MenuAbout</key><value>Über</value></string>
     <string><key>MenuCaptureImage</key><value>Von Kamera aufnehmen</value></string>
     <string><key>MenuForums</key><value>Online Hilfeforum</value></string>
@@ -224,10 +205,7 @@
     <string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value>&lt;html&gt;&lt;body&gt;Darf Marginally Clever Robots, Ltd. anonyme Metriken über diese app sammeln?&lt;br&gt;&lt;br&gt;Du kannst dies jederzeit unter &lt;i&gt;Makelangelo &amp;gt; Einstellungen &amp;gt; Metriken ändern&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value></string>
     <string><key>Model</key><value>Modell</value></string>
     <string><key>MoireName</key><value>Moiré</value></string>
-    <string><key>Night</key><value>Nacht</value></string>
-    <string><key>NightPreview</key><value>Nachtvorschau</value></string>
     <string><key>OK</key><value>OK</value></string>
-    <string><key>Off</key><value>Aus</value></string>
     <string><key>Open</key><value>Datei öffnen...</value></string>
     <string><key>OpenFileChooser.AllSupportedFiles</key><value>Alle unterstützte Formate</value></string>
     <string><key>OpenFileChooser.FileTypeImage</key><value>Bild (%1)</value></string>
@@ -245,6 +223,40 @@
     <string><key>PaperSettings.ShiftX</key><value>Verschiebung links</value></string>
     <string><key>PaperSettings.ShiftY</key><value>Verschiebung hoch</value></string>
     <string><key>PaperSettings.Title</key><value>Papiereinstellungen</value></string>
+    <string><key>PiCaptureAction.AWB</key><value>Automatischer Weißabgleich</value></string>
+    <string><key>PiCaptureAction.Antishake</key><value>Stabilisierung</value></string>
+    <string><key>PiCaptureAction.Auto</key><value>Auto</value></string>
+    <string><key>PiCaptureAction.Backlight</key><value>Hintergrundbeleuchtung</value></string>
+    <string><key>PiCaptureAction.Beach</key><value>Strand</value></string>
+    <string><key>PiCaptureAction.CancelCapture</key><value>Abbruch</value></string>
+    <string><key>PiCaptureAction.CaptureImage</key><value>Aufnehmen</value></string>
+    <string><key>PiCaptureAction.CaptureImageTitle</key><value>Kamerabild aufnehmen</value></string>
+    <string><key>PiCaptureAction.Cloud</key><value>Wolken</value></string>
+    <string><key>PiCaptureAction.Contrast</key><value>Kontrast</value></string>
+    <string><key>PiCaptureAction.DRC</key><value>Dynamikbereich</value></string>
+    <string><key>PiCaptureAction.Exposure</key><value>Belichtung</value></string>
+    <string><key>PiCaptureAction.Fireworks</key><value>Feuerwerk</value></string>
+    <string><key>PiCaptureAction.FixedFPS</key><value>Feste Framerate</value></string>
+    <string><key>PiCaptureAction.Flash</key><value>Blitz</value></string>
+    <string><key>PiCaptureAction.Fluorescent</key><value>Leuchtstoffröhre</value></string>
+    <string><key>PiCaptureAction.High</key><value>Hoch</value></string>
+    <string><key>PiCaptureAction.Horizon</key><value>Horizont</value></string>
+    <string><key>PiCaptureAction.Incandescent</key><value>Glühlampe</value></string>
+    <string><key>PiCaptureAction.Low</key><value>Niedrig</value></string>
+    <string><key>PiCaptureAction.Medium</key><value>Mittel</value></string>
+    <string><key>PiCaptureAction.Night</key><value>Nacht</value></string>
+    <string><key>PiCaptureAction.NightPreview</key><value>Nachtvorschau</value></string>
+    <string><key>PiCaptureAction.Off</key><value>Aus</value></string>
+    <string><key>PiCaptureAction.Quality</key><value>Qualität</value></string>
+    <string><key>PiCaptureAction.Shade</key><value>Schattierung</value></string>
+    <string><key>PiCaptureAction.Sharpness</key><value>Schärfe</value></string>
+    <string><key>PiCaptureAction.Snow</key><value>Schnee</value></string>
+    <string><key>PiCaptureAction.Sports</key><value>Sport</value></string>
+    <string><key>PiCaptureAction.Spotlight</key><value>Spotlicht</value></string>
+    <string><key>PiCaptureAction.Sun</key><value>Sonne</value></string>
+    <string><key>PiCaptureAction.Tungsten</key><value>Kunstlicht</value></string>
+    <string><key>PiCaptureAction.UseCapture</key><value>Benutze</value></string>
+    <string><key>PiCaptureAction.Verylong</key><value>Langzeit</value></string>
     <string><key>PlotterControls.AdvancedControls</key><value>Erweiterte Steuerung</value></string>
     <string><key>PlotterControls.ConnectControls</key><value>Verbinden</value></string>
     <string><key>PlotterControls.DrawControls</key><value>Plottersteuerung</value></string>
@@ -302,7 +314,6 @@
     <string><key>Polyeder</key><value>Papier Polyeder</value></string>
     <string><key>Port</key><value>Port</value></string>
     <string><key>PulseLineName</key><value>Pulslinie</value></string>
-    <string><key>Quality</key><value>Qualität</value></string>
     <string><key>QuestionTitle</key><value>Frage</value></string>
     <string><key>Reorder</key><value>Neu sortieren</value></string>
     <string><key>ReportBug</key><value>Ein Problem melden</value></string>
@@ -323,14 +334,11 @@
     <string><key>SaveGCode.splitGCodeTitle</key><value>Mehrere Farben entdeckt</value></string>
     <string><key>Scale</key><value>Skalierung</value></string>
     <string><key>SeparateLoopTurtleRenderer.name</key><value>Separate Schleifen</value></string>
-    <string><key>Shade</key><value>Schattierung</value></string>
     <string><key>SharePromo</key><value>Verwende Hashtag #makelangelo</value></string>
-    <string><key>Sharpness</key><value>Schärfe</value></string>
     <string><key>ShowLog</key><value>Zeige Protokoll</value></string>
     <string><key>SierpinskiTriangleName</key><value>Sierpinski Dreieck Fraktal</value></string>
     <string><key>Simplify</key><value>Vereinfachen</value></string>
     <string><key>Size</key><value>Größe</value></string>
-    <string><key>Snow</key><value>Schnee</value></string>
     <string><key>SoundPreferences.Connect</key><value>Verbinden</value></string>
     <string><key>SoundPreferences.Disconnect</key><value>Trennen</value></string>
     <string><key>SoundPreferences.FinishConvert</key><value>Umwandlung fertig</value></string>
@@ -348,32 +356,26 @@
     <string><key>SpirographName</key><value>Spirograph</value></string>
     <string><key>SpirographNumSamples</key><value>Zwischenwerte (qualität)</value></string>
     <string><key>SpirographPScale</key><value>Skalierung (p)</value></string>
-    <string><key>Sports</key><value>Sport</value></string>
-    <string><key>Spotlight</key><value>Spotlicht</value></string>
     <string><key>StartAt</key><value>Starte bei</value></string>
     <string><key>StartAtAddPenDown</key><value>Füge Stift runter hier ein</value></string>
     <string><key>StartAtExactly</key><value>Mache nichts spezielles</value></string>
     <string><key>StartAtLastPenDown</key><value>Fahre zum letzten Stift hoch</value></string>
-    <string><key>Sun</key><value>Sonne</value></string>
     <string><key>TextMessage</key><value>Text</value></string>
     <string><key>TextSize</key><value>Größe</value></string>
     <string><key>TitlePrefix</key><value>Makelangelo</value></string>
     <string><key>Translate</key><value>Verschieben</value></string>
-    <string><key>Tungsten</key><value>Kunstlicht</value></string>
     <string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Weitere Informationen...</value></string>
     <string><key>UpToDate</key><value>Diese Software ist aktuell.</value></string>
     <string><key>UpdateCheckFailed</key><value>Tut mir leid es hat nicht funktioniert. Bitte besuche http://www.marginallyclever.com/ um selbst zu suchen.</value></string>
     <string><key>UpdateNotice</key><value>&lt;html&gt;&lt;body&gt;Eine neuere Version dieser Software ist verfügbar.&lt;br/&gt;Bitte besuche &lt;a href=https://www.marginallyclever.com/product/makelangelo-software/&gt;https://www.marginallyclever.com/product/makelangelo-software/&lt;/a&gt; um die neue Version zu bekommen.&lt;/html&gt;&lt;/body&gt;</value></string>
-    <string><key>UseCapture</key><value>Benutze</value></string>
-    <string><key>Verylong</key><value>Langzeit</value></string>
     <string><key>VoronoiZigZagName</key><value>Voronoi Zickzack</value></string>
     <string><key>Width</key><value>Breite</value></string>
     <string><key>YourMsgHereName</key><value>Text für Schriftzug eingeben</value></string>
     <string><key>bottom left</key><value>Unten links</value></string>
     <string><key>bottom right</key><value>Unten rechts</value></string>
     <string><key>center</key><value>Mitte</value></string>
-    <string><key>firmwareVersionBadTitle</key><value>Firmware-Update</value></string>
     <string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>Die Firmware (Code im Gehirn Ihres Roboters) ist nicht die erwartete Version. Ich habe <strong>%1%</strong> gefunden.<br/>Bitte besuchen Sie <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>für die neueste Firmware.<br>Bitte besuchen Sie <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> für die neueste Software.</body></html>]]></value></string>
+    <string><key>firmwareVersionBadTitle</key><value>Firmware-Update</value></string>
     <string><key>horizontal</key><value>Horizontal</value></string>
     <string><key>pass15</key><value>Durchgang 15</value></string>
     <string><key>pass45</key><value>Durchgang 45</value></string>

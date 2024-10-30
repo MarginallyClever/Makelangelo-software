@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
-	<!--
-        To facilitate the validation and avoid duplicated or empty key  (//language/string/key) ,
-        please try to get language_no_dup_key.xsd from https://github.com/MarginallyClever/Makelangelo-software/blob/b1f418fc63d70f24288d490dccadc97d97a775e9/src/test/resources/translator/language_no_dup_key.xsd
-            and change the begining of the file with :
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="language_no_dup_key.xsd" >
-    -->
-	<!-- please help crowd source translations at https://crowdin.com/project/marginallyclevermakelangelo-so/ -->
+	<!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
 	<meta>
 		<name>English</name>
 		<authors>
@@ -17,30 +9,20 @@
 		</authors>
 	</meta>
 
-	<string><key>AWB</key><value>Automatic White Balance</value></string>
-	<string><key>Antishake</key><value>Antishake</value></string>
 	<string><key>ApplicationSettings.title</key><value>Preferences</value></string>
 	<string><key>Art Pipeline</key><value>Tools</value></string>
-	<string><key>Auto</key><value>Auto</value></string>
-	<string><key>Backlight</key><value>Backlight</value></string>
 	<string><key>BarberPoleTurtleRenderer.name</key><value>Barber pole</value></string>
-	<string><key>Beach</key><value>Beach</value></string>
 	<string><key>BorderName</key><value>Outline paper</value></string>
 	<string><key>BoxGeneratorCutoff</key><value>Cutoff</value></string>
 	<string><key>BoxGeneratorMaxSize</key><value>Max size</value></string>
 	<string><key>BoxGeneratorName</key><value>Boxxy</value></string>
 	<string><key>Cancel</key><value>Cancel</value></string>
-	<string><key>CancelCapture</key><value>Cancel</value></string>
-	<string><key>CaptureImage</key><value>Capture</value></string>
-	<string><key>CaptureImageTitle</key><value>Capture Camera Image</value></string>
 	<string><key>CartesianButtons.buttonCenter</key><value> </value></string>
 	<string><key>ChooseConnection.ButtonConnect</key><value>Connect</value></string>
 	<string><key>ChooseConnection.ButtonDisconnect</key><value>Disconnect</value></string>
 	<string><key>ClickAndDrag</key><value>Click &amp; Drag</value></string>
-	<string><key>Cloud</key><value>Cloud</value></string>
 	<string><key>ConfirmQuitQuestion</key><value>Are you sure you want to quit?</value></string>
 	<string><key>ConfirmQuitTitle</key><value>Exit</value></string>
-	<string><key>Contrast</key><value>Contrast</value></string>
 	<string><key>ConversationHistory.Clear</key><value>Clear</value></string>
 	<string><key>ConversationHistory.Copy</key><value>Copy</value></string>
 	<string><key>ConversationHistory.Save</key><value>Save</value></string>
@@ -91,7 +73,6 @@
 	<string><key>Converter_VoronoiStippling.DrawBorders</key><value>Draw borders?</value></string>
 	<string><key>Converter_VoronoiStippling.Name</key><value>Voronoi stipples</value></string>
 	<string><key>Crosshatch</key><value>Crosshatch</value></string>
-	<string><key>DRC</key><value>Dynamic Range</value></string>
 	<string><key>DefaultTurtleRenderer.name</key><value>Default</value></string>
 	<string><key>DialogAbout.AboutHTML</key><value><![CDATA[<html><body><h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1><h3><a href='http://www.makelangelo.com/'>http://www.makelangelo.com/</a></h3><p>To get the latest version please visit<br><a href='https://www.marginallyclever.com/product/makelangelo-software/'>https://www.marginallyclever.com/product/makelangelo-software/</a></p><p>Created by <a href="mailto:dan@marginallyclever.com">Dan Royer</a>.</p><p>Additional contributions by<br>Joseph Cottam, <a href='https://github.com/virtuoushub'>Peter Colapietro<a/>, Miguel Sánchez<br>Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p></body></html>]]></value></string>
 	<string><key>Direction</key><value>Direction</value></string>
@@ -100,11 +81,9 @@
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
 	<string><key>Export</key><value>Export</value></string>
-	<string><key>Exposure</key><value>Exposure</value></string>
 	<string><key>FibonacciSpiralName</key><value>Fibonacci Spiral</value></string>
 	<string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
 	<string><key>FillPageName</key><value>Fill page</value></string>
-	<string><key>Fireworks</key><value>Fireworks</value></string>
 	<string><key>FirmwareUpdate</key><value>Update firmware</value></string>
 	<string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
 	<string><key>FirmwareUploaderPanel.avrdudeNotDownloaded</key><value>AVRDude not downloaded.</value></string>
@@ -116,12 +95,9 @@
 	<string><key>FirmwareUploaderPanel.startHuge</key><value>Huge</value></string>
 	<string><key>FirmwareUploaderPanel.startM5</key><value>M5</value></string>
 	<string><key>FirmwareUploaderPanel.status</key><value>Firmware upload status</value></string>
-	<string><key>FixedFPS</key><value>FixedFPS</value></string>
 	<string><key>Flap</key><value>Flap</value></string>
-	<string><key>Flash</key><value>Flash</value></string>
 	<string><key>FlipH</key><value>Flip horizontal</value></string>
 	<string><key>FlipV</key><value>Flip vertical</value></string>
-	<string><key>Fluorescent</key><value>Fluorescent</value></string>
 	<string><key>FontFace</key><value>Typeface</value></string>
 	<string><key>GFXPreferences.Title</key><value>Graphics</value></string>
 	<string><key>GFXPreferences.antialias</key><value>Antialias lines</value></string>
@@ -163,13 +139,10 @@
 	<string><key>GraphPaperName</key><value>Graph Paper</value></string>
 	<string><key>Height</key><value>Height</value></string>
 	<string><key>Help</key><value>Help</value></string>
-	<string><key>High</key><value>High</value></string>
 	<string><key>HilbertCurveName</key><value>Hilbert Curve</value></string>
 	<string><key>HilbertCurveOrder</key><value>Order</value></string>
 	<string><key>HilbertCurveSize</key><value>Size</value></string>
-	<string><key>Horizon</key><value>Horizon</value></string>
 	<string><key>Import</key><value>Import</value></string>
-	<string><key>Incandescent</key><value>Incandescent</value></string>
 	<string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
 	<string><key>InfoTitle</key><value>Information</value></string>
 	<string><key>JogInterface.DisengageMotors</key><value>Disengage</value></string>
@@ -198,9 +171,7 @@
 	<string><key>LogPanel.CopyClipboard</key><value>Copy</value></string>
 	<string><key>LogPanel.LogFiles</key><value>Log files</value></string>
 	<string><key>LogPanel.Title</key><value>Log</value></string>
-	<string><key>Low</key><value>Low</value></string>
 	<string><key>MarlinSimulationVisualizer.name</key><value>Marlin simulation</value></string>
-	<string><key>Medium</key><value>Medium</value></string>
 	<string><key>MenuAbout</key><value>About</value></string>
 	<string><key>MenuCaptureImage</key><value>Capture From Camera</value></string>
 	<string><key>MenuForums</key><value>Online help forums</value></string>
@@ -230,10 +201,7 @@
 	<string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></body></html>]]></value></string>
 	<string><key>Model</key><value>Model</value></string>
 	<string><key>MoireName</key><value>Moire</value></string>
-	<string><key>Night</key><value>Night</value></string>
-	<string><key>NightPreview</key><value>NightPreview</value></string>
 	<string><key>OK</key><value>OK</value></string>
-	<string><key>Off</key><value>Off</value></string>
 	<string><key>Open</key><value>Open file...</value></string>
 	<string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
 	<string><key>OpenFileChooser.FileTypeImage</key><value>Image (%1)</value></string>
@@ -251,6 +219,40 @@
 	<string><key>PaperSettings.ShiftX</key><value>Shift left</value></string>
 	<string><key>PaperSettings.ShiftY</key><value>Shift up</value></string>
 	<string><key>PaperSettings.Title</key><value>Paper settings</value></string>
+	<string><key>PiCaptureAction.AWB</key><value>Automatic White Balance</value></string>
+	<string><key>PiCaptureAction.Antishake</key><value>Antishake</value></string>
+	<string><key>PiCaptureAction.Auto</key><value>Auto</value></string>
+	<string><key>PiCaptureAction.Backlight</key><value>Backlight</value></string>
+	<string><key>PiCaptureAction.Beach</key><value>Beach</value></string>
+	<string><key>PiCaptureAction.CancelCapture</key><value>Cancel</value></string>
+	<string><key>PiCaptureAction.CaptureImage</key><value>Capture</value></string>
+	<string><key>PiCaptureAction.CaptureImageTitle</key><value>Capture Camera Image</value></string>
+	<string><key>PiCaptureAction.Cloud</key><value>Cloud</value></string>
+	<string><key>PiCaptureAction.Contrast</key><value>Contrast</value></string>
+	<string><key>PiCaptureAction.DRC</key><value>Dynamic Range</value></string>
+	<string><key>PiCaptureAction.Exposure</key><value>Exposure</value></string>
+	<string><key>PiCaptureAction.Fireworks</key><value>Fireworks</value></string>
+	<string><key>PiCaptureAction.FixedFPS</key><value>FixedFPS</value></string>
+	<string><key>PiCaptureAction.Flash</key><value>Flash</value></string>
+	<string><key>PiCaptureAction.Fluorescent</key><value>Fluorescent</value></string>
+	<string><key>PiCaptureAction.High</key><value>High</value></string>
+	<string><key>PiCaptureAction.Horizon</key><value>Horizon</value></string>
+	<string><key>PiCaptureAction.Incandescent</key><value>Incandescent</value></string>
+	<string><key>PiCaptureAction.Low</key><value>Low</value></string>
+	<string><key>PiCaptureAction.Medium</key><value>Medium</value></string>
+	<string><key>PiCaptureAction.Night</key><value>Night</value></string>
+	<string><key>PiCaptureAction.NightPreview</key><value>NightPreview</value></string>
+	<string><key>PiCaptureAction.Off</key><value>Off</value></string>
+	<string><key>PiCaptureAction.Quality</key><value>Quality</value></string>
+	<string><key>PiCaptureAction.Shade</key><value>Shade</value></string>
+	<string><key>PiCaptureAction.Sharpness</key><value>Sharpness</value></string>
+	<string><key>PiCaptureAction.Snow</key><value>Snow</value></string>
+	<string><key>PiCaptureAction.Sports</key><value>Sports</value></string>
+	<string><key>PiCaptureAction.Spotlight</key><value>Spotlight</value></string>
+	<string><key>PiCaptureAction.Sun</key><value>Sun</value></string>
+	<string><key>PiCaptureAction.Tungsten</key><value>Tungsten</value></string>
+	<string><key>PiCaptureAction.UseCapture</key><value>Use</value></string>
+	<string><key>PiCaptureAction.Verylong</key><value>Verylong</value></string>
 	<string><key>PlotterControls.AdvancedControls</key><value>Advanced controls</value></string>
 	<string><key>PlotterControls.ConnectControls</key><value>Connect</value></string>
 	<string><key>PlotterControls.DrawControls</key><value>Draw controls</value></string>
@@ -309,7 +311,6 @@
 	<string><key>Polyeder</key><value>Papercraft Polyhedron</value></string>
 	<string><key>Port</key><value>Port</value></string>
 	<string><key>PulseLineName</key><value>Pulse Line</value></string>
-	<string><key>Quality</key><value>Quality</value></string>
 	<string><key>QuestionTitle</key><value>Question</value></string>
 	<string><key>Reorder</key><value>Reorder</value></string>
 	<string><key>ReportBug</key><value>Report an issue</value></string>
@@ -331,14 +332,11 @@
 	<string><key>Scale</key><value>Scale</value></string>
 	<string><key>SelectImageConverterPanel.Contrast</key><value>Contrast adjust</value></string>
 	<string><key>SeparateLoopTurtleRenderer.name</key><value>Separate loops</value></string>
-	<string><key>Shade</key><value>Shade</value></string>
 	<string><key>SharePromo</key><value>Try social media tag #plotter</value></string>
-	<string><key>Sharpness</key><value>Sharpness</value></string>
 	<string><key>ShowLog</key><value>Show Log</value></string>
 	<string><key>SierpinskiTriangleName</key><value>Sierpinski triangle</value></string>
 	<string><key>Simplify</key><value>Simplify</value></string>
 	<string><key>Size</key><value>Size</value></string>
-	<string><key>Snow</key><value>Snow</value></string>
 	<string><key>SoundPreferences.Connect</key><value>Connect</value></string>
 	<string><key>SoundPreferences.Disconnect</key><value>Disconnect</value></string>
 	<string><key>SoundPreferences.FinishConvert</key><value>Finish converting</value></string>
@@ -356,24 +354,18 @@
 	<string><key>SpirographName</key><value>Spirograph</value></string>
 	<string><key>SpirographNumSamples</key><value>Samples (quality)</value></string>
 	<string><key>SpirographPScale</key><value>Scale (p)</value></string>
-	<string><key>Sports</key><value>Sports</value></string>
-	<string><key>Spotlight</key><value>Spotlight</value></string>
 	<string><key>StartAt</key><value>Start at</value></string>
 	<string><key>StartAtAddPenDown</key><value>Add pen down command here</value></string>
 	<string><key>StartAtExactly</key><value>Do nothing special</value></string>
 	<string><key>StartAtLastPenDown</key><value>Back up to last pen down</value></string>
-	<string><key>Sun</key><value>Sun</value></string>
 	<string><key>TextMessage</key><value>Message</value></string>
 	<string><key>TextSize</key><value>Size</value></string>
 	<string><key>TitlePrefix</key><value>Makelangelo</value></string>
 	<string><key>Translate</key><value>Translate</value></string>
-	<string><key>Tungsten</key><value>Tungsten</value></string>
 	<string><key>TurtleGenerators.LearnMore.Link.Text</key><value>Learn more</value></string>
 	<string><key>UpToDate</key><value>This software is up to date.</value></string>
 	<string><key>UpdateCheckFailed</key><value>Sorry, I failed. Please visit http://www.marginallyclever.com/ to check yourself.</value></string>
 	<string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</body></html>]]></value></string>
-	<string><key>UseCapture</key><value>Use</value></string>
-	<string><key>Verylong</key><value>Verylong</value></string>
 	<string><key>VoronoiZigZag.optimizePath</key><value>Optimize path</value></string>
 	<string><key>VoronoiZigZagName</key><value>Voronoi zigzag</value></string>
 	<string><key>Width</key><value>Width</value></string>
