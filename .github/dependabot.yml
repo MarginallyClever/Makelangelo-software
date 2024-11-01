@@ -5,7 +5,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/" # Location in the repository where dependabot should check for updates
     schedule:
-      interval: "daily" # Options: daily, weekly, monthly
+      interval: "weekly" # Options: daily, weekly, monthly
     commit-message:
       prefix: "chore" # Customize commit message prefix (e.g., "chore", "build")
       prefix-development: "chore" # Optional, prefix for development dependencies
