@@ -1,0 +1,18 @@
+# .github/dependabot.yml
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location in the repository where dependabot should check for updates
+    schedule:
+      interval: "weekly" # Options: daily, weekly, monthly
+    commit-message:
+      prefix: "chore" # Customize commit message prefix (e.g., "chore", "build")
+      prefix-development: "chore" # Optional, prefix for development dependencies
+    reviewers:
+      - "your-reviewer-username" # Optional, replace with GitHub usernames for PR review requests
+    labels:
+      - "dependencies" # Optional, labels to add to PRs (e.g., "dependencies", "github-actions")
+    ignore:
+      - dependency-name: "actions/checkout" # Optional, ignore updates for specific actions
+        versions: ["2.x"] # Optional, ignore specific versions
