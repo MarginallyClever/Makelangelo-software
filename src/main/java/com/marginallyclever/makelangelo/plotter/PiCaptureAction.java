@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Raspi camera capture to file for image processing
@@ -111,7 +112,7 @@ public class PiCaptureAction {
                 Translator.get("PiCaptureAction.High"),
                 Translator.get("PiCaptureAction.Medium"),
                 Translator.get("PiCaptureAction.Low") };
-		final JComboBox<String> drcComboBox = new JComboBox<String>(drcComboBoxChoices);
+		final JComboBox<String> drcComboBox = new JComboBox<>(drcComboBoxChoices);
 		drcComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		drcComboBox.setSelectedIndex(drc);
 		panel.add(drcComboBox, cMain);
@@ -193,9 +194,9 @@ public class PiCaptureAction {
 						mainFrame.getLocationOnScreen().y + 100,
 						captureW,
 						captureH);
-				piCamera.setAWB(AWB.valueOf(((String)awbComboBox.getSelectedItem()).toUpperCase()));
-				piCamera.setDRC(DRC.valueOf(((String)drcComboBox.getSelectedItem()).toUpperCase()));
-				piCamera.setExposure(Exposure.valueOf(((String)expComboBox.getSelectedItem()).toUpperCase()));
+				piCamera.setAWB(AWB.valueOf(((String) Objects.requireNonNull(awbComboBox.getSelectedItem())).toUpperCase()));
+				piCamera.setDRC(DRC.valueOf(((String) Objects.requireNonNull(drcComboBox.getSelectedItem())).toUpperCase()));
+				piCamera.setExposure(Exposure.valueOf(((String) Objects.requireNonNull(expComboBox.getSelectedItem())).toUpperCase()));
 				piCamera.setEncoding(Encoding.JPG);
 				piCamera.setWidth(captureW);
 				piCamera.setHeight(captureH);
