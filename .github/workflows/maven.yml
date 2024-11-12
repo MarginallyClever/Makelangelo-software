@@ -68,7 +68,7 @@ jobs:
 
     - name: Deploy universal release
       if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-      uses: WebFreak001/deploy-nightly@v3.1.0
+      uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
@@ -129,7 +129,7 @@ jobs:
     - name: Deploy installation release
 #      if: github.repository == 'MarginallyClever/Makelangelo-software'
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-      uses: WebFreak001/deploy-nightly@v3.1.0
+      uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
         upload_url: ${{ env.UPLOAD_URL }}
