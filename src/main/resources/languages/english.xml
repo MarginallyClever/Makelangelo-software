@@ -182,6 +182,7 @@
 	<string><key>MenuGenerate</key><value>Generate art</value></string>
 	<string><key>MenuImportFile</key><value>Import File...</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
+	<string><key>MenuItemTranslate</key><value>Help Translate</value></string>
 	<string><key>MenuMakelangelo</key><value>File</value></string>
 	<string><key>MenuManual</key><value>Read the Friendly Manual</value></string>
 	<string><key>MenuNewFile</key><value>New</value></string>
