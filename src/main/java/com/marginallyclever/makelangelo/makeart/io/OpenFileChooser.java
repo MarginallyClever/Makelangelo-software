@@ -16,7 +16,7 @@ import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
 /**
- * Takes care about configuring the file chooser with all the extensions the app supports
+ * Configuring a {@link JFileChooser} with all the extensions the app supports
  */
 public class OpenFileChooser {
     private static final Logger logger = LoggerFactory.getLogger(OpenFileChooser.class);

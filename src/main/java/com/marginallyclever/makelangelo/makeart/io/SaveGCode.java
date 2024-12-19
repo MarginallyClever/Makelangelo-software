@@ -66,10 +66,11 @@ public class SaveGCode implements TurtleSaver {
 	}
 
 	/**
-	 * remove trimHead commands from the start of the turtle history.
-	 * remove trimTail commands from the end of the turtle history.
-	 * Returns the {@link Turtle} with the trimmed history.
+	 * <p>Remove trimHead number of commands from the start of the turtle history.</p>
+	 * <p>Remove trimTail number of commands from the end of the turtle history.</p>
 	 * @param turtle the source turtle.
+	 * @param trimHead the number of commands to remove from the start of the turtle history.
+	 * @param trimTail the number of commands to remove from the end of the turtle history.
 	 * @return the {@link Turtle} with the trimmed history.
 	 */
 	protected Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
