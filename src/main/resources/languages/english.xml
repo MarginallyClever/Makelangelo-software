@@ -238,6 +238,7 @@
 	<string><key>InfoTitle</key><value>Information</value></string>
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
+	<string><key>MenuItemTranslate</key><value>Help Translate</value></string>
 
 	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
 	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>

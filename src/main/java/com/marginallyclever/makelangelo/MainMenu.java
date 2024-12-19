@@ -212,9 +212,13 @@ public class MainMenu extends JMenuBar {
         JMenuItem buttonDonation = createMenuItemBrowse(Translator.get("MenuItemPayPalDonation"), "https://www.marginallyclever.com/products/makelangelo-software/");
         menu.add(buttonDonation);
 
+        JMenuItem buttonTranslate = createMenuItemBrowse(Translator.get("MenuItemTranslate"), "https://crowdin.com/project/makelangelo");
+        buttonTranslate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-translate-16.png"))));
+        menu.add(buttonTranslate);
+
         JMenuItem buttonCheckForUpdate = new JMenuItem(Translator.get("MenuUpdate"));
         buttonCheckForUpdate.addActionListener((e) -> app.checkForUpdate(true));
-        //buttonCheckForUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-update-16.png"))));
+        buttonCheckForUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-update-16.png"))));
         menu.add(buttonCheckForUpdate);
 
         menu.addSeparator();
