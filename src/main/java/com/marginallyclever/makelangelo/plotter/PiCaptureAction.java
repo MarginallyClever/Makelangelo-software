@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Raspi camera capture to file for image processing
@@ -52,7 +53,7 @@ public class PiCaptureAction {
 		final int captureH = 650;
         final int captureW = (int) ((double) captureH * aspectRatio);
 
-		final JDialog dialog = new JDialog(mainFrame,Translator.get("CaptureImageTitle"), true);
+		final JDialog dialog = new JDialog(mainFrame,Translator.get("PiCaptureAction.CaptureImageTitle"), true);
         dialog.setLocation(mainFrame.getLocation());
 
         JPanel panel = new JPanel();
@@ -79,62 +80,62 @@ public class PiCaptureAction {
         // all controls to the right
 		cMain.gridx++;
 
-		JLabel label = new JLabel(Translator.get("AWB"));
+		JLabel label = new JLabel(Translator.get("PiCaptureAction.AWB"));
 		label.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(label, cMain);
 		cMain.gridy++;
 
 		String[] awbComboBoxChoices = {
-		        Translator.get("Off"),
-                Translator.get("Auto"),
-                Translator.get("Sun"),
-                Translator.get("Cloud"),
-                Translator.get("Shade"),
-                Translator.get("Tungsten"),
-                Translator.get("Fluorescent"),
-                Translator.get("Incandescent"),
-                Translator.get("Flash"),
-                Translator.get("Horizon") };
+		        Translator.get("PiCaptureAction.Off"),
+                Translator.get("PiCaptureAction.Auto"),
+                Translator.get("PiCaptureAction.Sun"),
+                Translator.get("PiCaptureAction.Cloud"),
+                Translator.get("PiCaptureAction.Shade"),
+                Translator.get("PiCaptureAction.Tungsten"),
+                Translator.get("PiCaptureAction.Fluorescent"),
+                Translator.get("PiCaptureAction.Incandescent"),
+                Translator.get("PiCaptureAction.Flash"),
+                Translator.get("PiCaptureAction.Horizon") };
 		final JComboBox<String> awbComboBox = new JComboBox<String>(awbComboBoxChoices);
 		awbComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		awbComboBox.setSelectedIndex(awb);
 		panel.add(awbComboBox, cMain);
 		cMain.gridy++;
 
-		JLabel lblNewLabel = new JLabel(Translator.get("DRC"));
+		JLabel lblNewLabel = new JLabel(Translator.get("PiCaptureAction.DRC"));
 		lblNewLabel.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(lblNewLabel, cMain);
 		cMain.gridy++;
 
 		String[] drcComboBoxChoices = {
-                Translator.get("Off"),
-                Translator.get("High"),
-                Translator.get("Medium"),
-                Translator.get("Low") };
-		final JComboBox<String> drcComboBox = new JComboBox<String>(drcComboBoxChoices);
+                Translator.get("PiCaptureAction.Off"),
+                Translator.get("PiCaptureAction.High"),
+                Translator.get("PiCaptureAction.Medium"),
+                Translator.get("PiCaptureAction.Low") };
+		final JComboBox<String> drcComboBox = new JComboBox<>(drcComboBoxChoices);
 		drcComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		drcComboBox.setSelectedIndex(drc);
 		panel.add(drcComboBox, cMain);
 		cMain.gridy++;
 
-		JLabel label_1 = new JLabel(Translator.get("Exposure"));
+		JLabel label_1 = new JLabel(Translator.get("PiCaptureAction.Exposure"));
 		label_1.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(label_1, cMain);
 		cMain.gridy++;
 
 		String[] expComboBoxChoices = {
-                Translator.get("Antishake"),
-                Translator.get("Auto"),
-                Translator.get("Backlight"),
-                Translator.get("Beach"),
-                Translator.get("Fireworks"),
-                Translator.get("FixedFPS"),
-                Translator.get("Night"),
-                Translator.get("NightPreview"),
-                Translator.get("Snow"),
-                Translator.get("Sports"),
-                Translator.get("Spotlight"),
-                Translator.get("Verylong") };
+                Translator.get("PiCaptureAction.Antishake"),
+                Translator.get("PiCaptureAction.Auto"),
+                Translator.get("PiCaptureAction.Backlight"),
+                Translator.get("PiCaptureAction.Beach"),
+                Translator.get("PiCaptureAction.Fireworks"),
+                Translator.get("PiCaptureAction.FixedFPS"),
+                Translator.get("PiCaptureAction.Night"),
+                Translator.get("PiCaptureAction.NightPreview"),
+                Translator.get("PiCaptureAction.Snow"),
+                Translator.get("PiCaptureAction.Sports"),
+                Translator.get("PiCaptureAction.Spotlight"),
+                Translator.get("PiCaptureAction.Verylong") };
 		final JComboBox<String> expComboBox = new JComboBox<String>(expComboBoxChoices);
 //		expComboBox.setBounds(584, 362, 90, 20);
 		expComboBox.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
@@ -142,7 +143,7 @@ public class PiCaptureAction {
 		panel.add(expComboBox, cMain);
 		cMain.gridy++;
 
-		JLabel lblContrast = new JLabel(Translator.get("Contrast"));
+		JLabel lblContrast = new JLabel(Translator.get("PiCaptureAction.Contrast"));
 //		lblContrast.setBounds(588, 393, 67, 14);
 		lblContrast.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(lblContrast, cMain);
@@ -155,7 +156,7 @@ public class PiCaptureAction {
 		panel.add(contrastSlider, cMain);
 		cMain.gridy++;
 
-		JLabel lblQuality = new JLabel(Translator.get("Quality"));
+		JLabel lblQuality = new JLabel(Translator.get("PiCaptureAction.Quality"));
 //		lblQuality.setBounds(588, 452, 46, 14);
 		lblQuality.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(lblQuality, cMain);
@@ -167,7 +168,7 @@ public class PiCaptureAction {
 		panel.add(qualitySlider, cMain);
 		cMain.gridy++;
 
-		JLabel lblSharpness = new JLabel(Translator.get("Sharpness"));
+		JLabel lblSharpness = new JLabel(Translator.get("PiCaptureAction.Sharpness"));
 //		lblSharpness.setBounds(585, 517, 66, 14);
 		lblSharpness.setPreferredSize(new Dimension(100,BUTTON_HEIGHT));
 		panel.add(lblSharpness, cMain);
@@ -185,7 +186,7 @@ public class PiCaptureAction {
         // a little space between everything else
         cMain.insets = new Insets(10,0,0,0);  //top padding
 
-        buttonCaptureImage = new JButton(Translator.get("CaptureImage"));
+        buttonCaptureImage = new JButton(Translator.get("PiCaptureAction.CaptureImage"));
 		buttonCaptureImage.addActionListener((arg0)->{
 			try {
 				piCamera.turnOnPreview(
@@ -193,9 +194,9 @@ public class PiCaptureAction {
 						mainFrame.getLocationOnScreen().y + 100,
 						captureW,
 						captureH);
-				piCamera.setAWB(AWB.valueOf(((String)awbComboBox.getSelectedItem()).toUpperCase()));
-				piCamera.setDRC(DRC.valueOf(((String)drcComboBox.getSelectedItem()).toUpperCase()));
-				piCamera.setExposure(Exposure.valueOf(((String)expComboBox.getSelectedItem()).toUpperCase()));
+				piCamera.setAWB(AWB.valueOf(((String) Objects.requireNonNull(awbComboBox.getSelectedItem())).toUpperCase()));
+				piCamera.setDRC(DRC.valueOf(((String) Objects.requireNonNull(drcComboBox.getSelectedItem())).toUpperCase()));
+				piCamera.setExposure(Exposure.valueOf(((String) Objects.requireNonNull(expComboBox.getSelectedItem())).toUpperCase()));
 				piCamera.setEncoding(Encoding.JPG);
 				piCamera.setWidth(captureW);
 				piCamera.setHeight(captureH);
@@ -218,7 +219,7 @@ public class PiCaptureAction {
 		cMain.gridy++;
         cMain.insets = new Insets(2,0,0,0);  //top padding
 
-		buttonUseCapture = new JButton(Translator.get("UseCapture"));
+		buttonUseCapture = new JButton(Translator.get("PiCaptureAction.UseCapture"));
 		buttonUseCapture.addActionListener(new ActionListener() {
         	@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -246,7 +247,7 @@ public class PiCaptureAction {
 		panel.add(buttonUseCapture, cMain);
 		cMain.gridy++;
 
-		buttonCancelCapture = new JButton(Translator.get("CancelCapture"));
+		buttonCancelCapture = new JButton(Translator.get("PiCaptureAction.CancelCapture"));
 		buttonCancelCapture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();

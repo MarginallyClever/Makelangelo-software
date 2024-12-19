@@ -163,40 +163,40 @@
 	<string><key>TextSize</key><value>Size</value></string>
 	<string><key>FontFace</key><value>Typeface</value></string>
 	<string><key>TextMessage</key><value>Message</value></string>
-	<string><key>CaptureImageTitle</key><value>Capture Camera Image</value></string>
-	<string><key>CaptureImage</key><value>Capture</value></string>
-	<string><key>UseCapture</key><value>Use</value></string>
-	<string><key>CancelCapture</key><value>Cancel</value></string>
-	<string><key>AWB</key><value>Automatic White Balance</value></string>
-	<string><key>DRC</key><value>Dynamic Range</value></string>
-	<string><key>Exposure</key><value>Exposure</value></string>
-	<string><key>Contrast</key><value>Contrast</value></string>
-	<string><key>Quality</key><value>Quality</value></string>
-	<string><key>Sharpness</key><value>Sharpness</value></string>
-	<string><key>Off</key><value>Off</value></string>
-	<string><key>Auto</key><value>Auto</value></string>
-	<string><key>Sun</key><value>Sun</value></string>
-	<string><key>Cloud</key><value>Cloud</value></string>
-	<string><key>Shade</key><value>Shade</value></string>
-	<string><key>Tungsten</key><value>Tungsten</value></string>
-	<string><key>Fluorescent</key><value>Fluorescent</value></string>
-	<string><key>Incandescent</key><value>Incandescent</value></string>
-	<string><key>Flash</key><value>Flash</value></string>
-	<string><key>Horizon</key><value>Horizon</value></string>
-	<string><key>High</key><value>High</value></string>
-	<string><key>Medium</key><value>Medium</value></string>
-	<string><key>Low</key><value>Low</value></string>
-	<string><key>Antishake</key><value>Antishake</value></string>
-	<string><key>Backlight</key><value>Backlight</value></string>
-	<string><key>Beach</key><value>Beach</value></string>
-	<string><key>Fireworks</key><value>Fireworks</value></string>
-	<string><key>FixedFPS</key><value>FixedFPS</value></string>
-	<string><key>Night</key><value>Night</value></string>
-	<string><key>NightPreview</key><value>NightPreview</value></string>
-	<string><key>Snow</key><value>Snow</value></string>
-	<string><key>Sports</key><value>Sports</value></string>
-	<string><key>Spotlight</key><value>Spotlight</value></string>
-	<string><key>Verylong</key><value>Verylong</value></string>
+	<string><key>PiCaptureAction.CaptureImageTitle</key><value>Capture Camera Image</value></string>
+	<string><key>PiCaptureAction.CaptureImage</key><value>Capture</value></string>
+	<string><key>PiCaptureAction.UseCapture</key><value>Use</value></string>
+	<string><key>PiCaptureAction.CancelCapture</key><value>Cancel</value></string>
+	<string><key>PiCaptureAction.AWB</key><value>Automatic White Balance</value></string>
+	<string><key>PiCaptureAction.DRC</key><value>Dynamic Range</value></string>
+	<string><key>PiCaptureAction.Exposure</key><value>Exposure</value></string>
+	<string><key>PiCaptureAction.Contrast</key><value>Contrast</value></string>
+	<string><key>PiCaptureAction.Quality</key><value>Quality</value></string>
+	<string><key>PiCaptureAction.Sharpness</key><value>Sharpness</value></string>
+	<string><key>PiCaptureAction.Off</key><value>Off</value></string>
+	<string><key>PiCaptureAction.Auto</key><value>Auto</value></string>
+	<string><key>PiCaptureAction.Sun</key><value>Sun</value></string>
+	<string><key>PiCaptureAction.Cloud</key><value>Cloud</value></string>
+	<string><key>PiCaptureAction.Shade</key><value>Shade</value></string>
+	<string><key>PiCaptureAction.Tungsten</key><value>Tungsten</value></string>
+	<string><key>PiCaptureAction.Fluorescent</key><value>Fluorescent</value></string>
+	<string><key>PiCaptureAction.Incandescent</key><value>Incandescent</value></string>
+	<string><key>PiCaptureAction.Flash</key><value>Flash</value></string>
+	<string><key>PiCaptureAction.Horizon</key><value>Horizon</value></string>
+	<string><key>PiCaptureAction.High</key><value>High</value></string>
+	<string><key>PiCaptureAction.Medium</key><value>Medium</value></string>
+	<string><key>PiCaptureAction.Low</key><value>Low</value></string>
+	<string><key>PiCaptureAction.Antishake</key><value>Antishake</value></string>
+	<string><key>PiCaptureAction.Backlight</key><value>Backlight</value></string>
+	<string><key>PiCaptureAction.Beach</key><value>Beach</value></string>
+	<string><key>PiCaptureAction.Fireworks</key><value>Fireworks</value></string>
+	<string><key>PiCaptureAction.FixedFPS</key><value>FixedFPS</value></string>
+	<string><key>PiCaptureAction.Night</key><value>Night</value></string>
+	<string><key>PiCaptureAction.NightPreview</key><value>NightPreview</value></string>
+	<string><key>PiCaptureAction.Snow</key><value>Snow</value></string>
+	<string><key>PiCaptureAction.Sports</key><value>Sports</value></string>
+	<string><key>PiCaptureAction.Spotlight</key><value>Spotlight</value></string>
+	<string><key>PiCaptureAction.Verylong</key><value>Verylong</value></string>
 	<string><key>Import</key><value>Import</value></string>
 	<string><key>Export</key><value>Export</value></string>
 	<string><key>Reset</key><value>Reset</value></string>
@@ -238,6 +238,7 @@
 	<string><key>InfoTitle</key><value>Information</value></string>
 	<string><key>ErrorTitle</key><value>Error</value></string>
 	<string><key>MenuItemPayPalDonation</key><value>PayPal donation</value></string>
+	<string><key>MenuItemTranslate</key><value>Help Translate</value></string>
 
 	<string><key>EstimatedTimeIs</key><value>Estimated time is %1</value></string>
 	<string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>%1%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</body></html>]]></value></string>
