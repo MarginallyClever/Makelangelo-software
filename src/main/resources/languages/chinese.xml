@@ -1,1129 +1,109 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE language>
 <language>
-	<meta>
-		<name>Chinese</name> <!-- zh-CN -->
-		<authors>
-			<author>Kmimax(kmimax2016@gmail.com)</author>
-		</authors>
-	</meta>
-
-	<string>
-		<key>BorderName</key>
-		<value>纸轮廓</value>
-		<hint>Border generator</hint>
-	</string>
-
-	<string>
-		<key>LissajousName</key>
-		<value>Lissajous</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousA</key>
-		<value>A (&gt;0)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousB</key>
-		<value>B (&gt;0)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-	<string>
-		<key>LissajousDelta</key>
-		<value>Delta (0...1)</value>
-		<hint>Lissajous generator</hint>
-	</string>
-
-	<string>
-		<key>SpirographName</key>
-		<value>螺旋图</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographMajorRadius</key>
-		<value>大半径(R)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographMinorRadius</key>
-		<value>小半径(r)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographPScale</key>
-		<value>单位 (p)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographNumSamples</key>
-		<value>样本(数)</value>
-		<hint>Spirograph generator</hint>
-	</string>
-	<string>
-		<key>SpirographEpitrochoid</key>
-		<value>是流行的</value>
-		<hint>Spirograph generator</hint>
-	</string>
-
-	<string>
-		<key>ConverterRandomLinesName</key>
-		<value>随机线</value>
-		<hint>Random Lines generator</hint>
-	</string>
-	<string>
-		<key>ConverterRandomLinesCount</key>
-		<value>线数</value>
-		<hint>Random Lines generator</hint>
-	</string>
-
-	<string>
-		<key>StartAtLastPenDown</key>
-		<value>备份到最后落笔</value>
-		<hint>Start At option</hint>
-	</string>
-	<string>
-		<key>StartAtAddPenDown</key>
-		<value>在此处添加落笔命令</value>
-		<hint>Start At option</hint>
-	</string>
-	<string>
-		<key>StartAtExactly</key>
-		<value>无特殊处理</value>
-		<hint>Start At option</hint>
-	</string>
-
-
-
-	<string>
-		<key>ConfirmQuitQuestion</key>
-		<value>确定要退出吗?</value>
-		<hint>confirm quit dialog question</hint>
-	</string>
-	<string>
-		<key>ConfirmQuitTitle</key>
-		<value>退出</value>
-		<hint>confirm quit dialog title</hint>
-	</string>
-
-	<string>
-		<key>ConvertImagePaperOriginal</key>
-		<value>原始尺寸</value>
-		<hint>Converter hint</hint>
-	</string>
-	<string>
-		<key>ConvertImagePaperFill</key>
-		<value>填满整张纸</value>
-		<hint>Converter hint</hint>
-	</string>
-	<string>
-		<key>ConvertImagePaperFit</key>
-		<value>使图像适合纸张</value>
-		<hint>Converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKName</key>
-		<value>CMYK（专色）</value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKPasses</key>
-		<value>多线</value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>ConverterCMYKNote</key>
-		<value><![CDATA[先黄，青，洋红色，然后再黑色.]]></value>
-		<hint>CMYK converter hint</hint>
-	</string>
-
-	<string>
-		<key>DXFScaleOnLoad</key>
-		<value>缩放图像以适合纸张</value>
-		<hint>DXF load option</hint>
-	</string>
-
-	<string>
-		<key>DXFInfillOnLoad</key>
-		<value>填充封闭区</value>
-		<hint>DXF load option</hint>
-	</string>
-
-	<string>
-		<key>DXFOptimizeOnLoad</key>
-		<value>提高绘制效率</value>
-		<hint>DXF load option</hint>
-	</string>
-
-
-	<string>
-		<key>TempFolderLabel</key>
-		<value>临时文件位置:</value>
-		<hint>Where to save temporary files used in gcode management.</hint>
-	</string>
-
-	<string>
-		<key>Cancel</key>
-		<value>取消</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Save</key>
-		<value>保存</value>
-		<hint>used in many places</hint>
-	</string>
-
-	<string>
-		<key>Load</key>
-		<value>加载</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>CouldNotFind</key>
-		<value>未发现</value>
-		<hint>as in, "could not find FILEX". keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>MachineWidth</key>
-		<value>机器宽度</value>
-		<hint>Machine settings</hint>
-	</string>
-	<string>
-		<key>MachineHeight</key>
-		<value>机器高度</value>
-		<hint>Machine settings</hint>
-	</string>
-
-	<string>
-		<key>PaperSettings.PaperWidth</key>
-		<value>绘图纸宽度</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>PaperSettings.PaperHeight</key>
-		<value>绘图纸高度</value>
-		<hint>Paper settings panel</hint>
-	</string>
-	<string>
-		<key>isLandscape</key>
-		<value>是全幅?</value>
-		<hint>Paper settings dialog</hint>
-	</string>
-
-	<string>
-		<key>InvertLeft</key>
-		<value>左翻转</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
-		<key>InvertRight</key>
-		<value>右翻转</value>
-		<hint>jog motor control panel</hint>
-	</string>
-	<string>
-		<key>ToolType</key>
-		<value>工具类型</value>
-		<hint>tool settings</hint>
-	</string>
-
-	<string>
-		<key>PaperSize</key>
-		<value>绘图纸尺寸</value>
-		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>AdjustPulleySize</key>
-		<value>皮带轮直径</value>
-		<hint>machine size control panel</hint>
-	</string>
-	<string>
-		<key>AdjustAcceleration</key>
-		<value>加速</value>
-		<hint>machine size control panel</hint>
-	</string>
-
-	<string>
-		<key>Left</key>
-		<value>左</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Right</key>
-		<value>右</value>
-		<hint>used in many places</hint>
-	</string>
-	<string>
-		<key>Millimeters</key>
-		<value>mm</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>ConnectingTo</key>
-		<value>连接到</value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>PortNotConfigured</key>
-		<value>无法配置端口: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>PortOpened</key>
-		<value>端口已打开.</value>
-		<hint>status message</hint>
-	</string>
-	<string>
-		<key>TitlePrefix</key>
-		<value>Makelangelo</value>
-		<hint>window title</hint>
-	</string>
-	<string>
-		<key>TitlePostfix</key>
-		<value>已连接</value>
-		<hint>window title</hint>
-	</string>
-
-	<string>
-		<key>LineSegments</key>
-		<value>线段.</value>
-		<hint>status message</hint>
-	</string>
-	<string>
-		<key>Centimeters</key>
-		<value>cm</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>EstimatedTime</key>
-		<value>预计绘图时间: </value>
-		<hint>status message. keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>LoadError</key>
-		<value>无法加载文件:</value>
-		<hint>status message.</hint>
-	</string>
-
-	<string>
-		<key>SaveError</key>
-		<value>无法保存文件:</value>
-		<hint>status message.</hint>
-	</string>
-
-	<string>
-		<key>ConversionOptions</key>
-		<value>转换选项</value>
-		<hint>dialog title</hint>
-	</string>
-
-	<string>
-		<key>FlipForGlass</key>
-		<value>翻转玻璃</value>
-		<hint>conversion options</hint>
-	</string>
-
-
-	<string>
-		<key>FlipNone</key>
-		<value>没有翻转</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>FlipH</key>
-		<value>水平翻转</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>FlipV</key>
-		<value>垂直翻转</value>
-		<hint>conversion options</hint>
-	</string>
-
-	<string>
-		<key>Start</key>
-		<value>开始</value>
-		<hint>As in "start drawing"</hint>
-	</string>
-
-	<string>
-		<key>PaperMargin</key>
-		<value>纸边界余量 (%)</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>Converting</key>
-		<value>转换中</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Finished</key>
-		<value>已完成</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Cancelled</key>
-		<value>取消</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>Failed</key>
-		<value>失败: </value>
-		<hint>status update. keep the space at the end.</hint>
-	</string>
-
-	<string>
-		<key>ConversionStyle</key>
-		<value>样式</value>
-		<hint>conversion options</hint>
-	</string>
-	<string>
-		<key>ConversionFill</key>
-		<value>填充</value>
-		<hint>conversion options</hint>
-	</string>
-
-	<string>
-		<key>OpeningFile</key>
-		<value>打开 </value>
-		<hint>status update. keep the space at the end.</hint>
-	</string>
-	<string>
-		<key>UnknownFileType</key>
-		<value>未知文件类型</value>
-		<hint>status update</hint>
-	</string>
-	<string>
-		<key>SetPaperSize</key>
-		<value>请在导入图像之前设置纸张尺寸.</value>
-		<hint>warning message</hint>
-	</string>
-
-	<string>
-		<key>OpenFileChooser.FileTypeImage</key>
-		<value>图像 (%1)</value>
-		<hint>file open dialog</hint>
-	</string>
-	<string><!-- translation value to review-->
-		<key>OpenFileChooser.AllSupportedFiles</key>
-		<value>All supported files</value>
-		<hint>file open dialog</hint>
-	</string>
-
-	<string>
-		<key>pen up color</key>
-		<value>抬笔色</value>
-		<hint>Pen settings</hint>
-	</string>
-	<string>
-		<key>pen down color</key>
-		<value>落笔色</value>
-		<hint>Pen settings</hint>
-	</string>
-
-	<string>
-		<key>MenuAxisDriveControls</key>
-		<value>手动</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuCommonDriveControls</key>
-		<value>通用驱动命令</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuCreativeControl</key>
-		<value>创意控制</value>
-		<hint>context sensitive menu</hint>
-	</string>
-	<string>
-		<key>MenuAnimate</key>
-		<value>绘图控制</value>
-		<hint>context sensitive menu</hint>
-	</string>
-
-	<string>
-		<key>MenuFileTitle</key>
-		<value>填充</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MetricsPreferences.Title</key>
-		<value>指标</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MetricsPreferences.collectAnonymousMetrics</key>
-		<value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key>
-		<value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>SoundPreferences.Title</key>
-		<value>声音</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>SoundPreferences.Connect</key>
-		<value>连接</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>SoundPreferences.Disconnect</key>
-		<value>断开</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>SoundPreferences.FinishConvert</key>
-		<value>完成转换</value>
-		<hint>sound settings dialog</hint>
-	</string>
-	<string>
-		<key>SoundPreferences.FinishDraw</key>
-		<value>完成绘制</value>
-		<hint>sound settings dialog</hint>
-	</string>
-
-	<string>
-		<key>GFXPreferences.Title</key>
-		<value>图形</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.showPenUp</key>
-		<value>显示抬笔移动</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.antialias</key>
-		<value>Antialias lines</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.speedVSQuality</key>
-		<value>速度vs质量</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>GFXPreferences.showAllWhileDrawing</key>
-		<value>绘图时显示整个图像</value>
-		<hint>graphics settings dialog</hint>
-	</string>
-	<string>
-		<key>LanguagePreferences.Title</key>
-		<value>语言</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>InvalidTool</key>
-		<value>无效工具#</value>
-		<hint>warning message</hint>
-	</string>
-	<string>
-		<key>ChangeToolTitle</key>
-		<value>换笔</value>
-		<hint>tool change prompt.</hint>
-	</string>
-	<string>
-		<key>ChangeToolMessage</key>
-		<value>请更换笔以匹配此颜色.</value>
-		<hint>tool change prompt.</hint>
-	</string>
-
-	<string>
-		<key>StartAt</key>
-		<value>开始于</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>StartAtLine</key>
-		<value>从行开始#</value>
-		<hint>start at dialog</hint>
-	</string>
-
-	<string>
-		<key>PlotterControls.Pause</key>
-		<value>暂停</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>Robot</key>
-		<value>Makelangelo</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>RobotMenu.OpenControls</key>
-		<value>Open Controls</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Rewind</key>
-		<value>Rewind</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>PlotterControls.Play</key>
-		<value>Draw</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>GoPaperBorder</key>
-		<value>边界</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>Top</key>
-		<value>上部</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Bottom</key>
-		<value>底部</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.PenUp</key>
-		<value>抬笔</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.PenDown</key>
-		<value>落笔</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>Set</key>
-		<value>设置</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Speed</key>
-		<value>绘制速度</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>Rate</key>
-		<value>mm/s</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>RateDeg</key>
-		<value>deg/s</value>
-		<hint>manual driving dialog</hint>
-	</string>
-	<string>
-		<key>RateAccel</key>
-		<value>mm/s2</value>
-		<hint>manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>JogMotors</key>
-		<value>电机</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>JogIn</key>
-		<value>进入</value>
-		<hint>jog motors dialog</hint>
-	</string>
-	<string>
-		<key>JogOut</key>
-		<value>退出</value>
-		<hint>jog motors dialog</hint>
-	</string>
-	<string>
-		<key>Invert</key>
-		<value>翻转</value>
-		<hint>jog motors dialog</hint>
-	</string>
-
-	<string>
-		<key>UpdateNotice</key>
-		<value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value>
-		<hint>check for update dialog</hint>
-	</string>
-	<string>
-		<key>UpToDate</key>
-		<value>该软件是最新的.</value>
-		<hint>check for update dialog</hint>
-	</string>
-	<string>
-		<key>UpdateCheckFailed</key>
-		<value>对不起，失败了。 请访问http://www.marginallyclever.com/
-检查自己.</value>
-		<hint>check for update dialog</hint>
-	</string>
-
-	<string>
-		<key>Send</key>
-		<value>发送</value>
-		<hint>drive manually dialog</hint>
-	</string>
-	<string>
-		<key>TitleNotConnected</key>
-		<value>未连接</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuMakelangelo</key>
-		<value>Makelangelo</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>ApplicationSettings.title</key>
-		<value>首选项</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuLog</key>
-		<value>日志</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuUpdate</key>
-		<value>检查更新</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuQuit</key>
-		<value>退出</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuConnect</key>
-		<value>连接</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuHelp</key>
-		<value>帮助</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuForums</key>
-		<value>在线帮助论坛</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAbout</key>
-		<value>关于</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>ButtonConnect</key>
-		<value>连接</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>ButtonDisconnect</key>
-		<value>断开</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuRescan</key>
-		<value>重新扫描</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuDisconnect</key>
-		<value>断开</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuLoadMachineConfig</key>
-		<value>加载配置...</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuSettings</key>
-		<value>设置</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuSettingsMachine</key>
-		<value>机器</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustPaper</key>
-		<value>绘图纸</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustPulleys</key>
-		<value>皮带轮尺寸</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuJogMotors</key>
-		<value>电机点动</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuSelectTool</key>
-		<value>选择活动工具</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuAdjustTool</key>
-		<value>笔</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuGCODE</key>
-		<value>转换</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuTextToGCODE</key>
-		<value>您的留言在这里</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuConvertImage</key>
-		<value>最近打开...</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuOpenFile</key>
-		<value>打开文件...</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>MenuReopenFile</key>
-		<value>重新打开最后一个文件</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>RobotMenu.SaveGCode</key>
-		<value>保存到文件/ SD卡</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuDraw</key>
-		<value>绘制</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>Halt</key>
-		<value>停止</value>
-		<hint>menu or dialog title</hint>
-	</string>
-
-	<string>
-		<key>MenuView</key>
-		<value>查看</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomIn</key>
-		<value>放大 +</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomOut</key>
-		<value>缩小 -</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>MenuView.zoomFit</key>
-		<value>适度缩放</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>ShowLog</key>
-		<value>显示日志</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>HideLog</key>
-		<value>隐藏日志</value>
-		<hint>menu or dialog title</hint>
-	</string>
-	<string>
-		<key>mmNotice</key>
-		<value>所有值均以毫米为单位.</value>
-		<hint>Machine size</hint>
-	</string>
-
-	<string>
-		<key>penToolAdjust</key>
-		<value>笔</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolDiameter</key>
-		<value>直径</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolMaxFeedRate</key>
-		<value>最大速度</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolUp</key>
-		<value>抬笔</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolDown</key>
-		<value>落笔</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolLiftSpeed</key>
-		<value><!-- needs update -->提升速度</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-	<string>
-		<key>penToolTest</key>
-		<value>测试</value>
-		<hint>Adjust pen tool</hint>
-	</string>
-
-
-	<string>
-		<key>spraypaintToolTest</key>
-		<value>喷涂</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolDiameter</key>
-		<value>点大小</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolMaxFeedRate</key>
-		<value>最大速度</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolUp</key>
-		<value>关闭</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolDown</key>
-		<value>打开</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>spraypaintToolLiftSpeed</key>
-		<value>开/关速度</value>
-		<hint>Spraypaint tool</hint>
-	</string>
-	<string>
-		<key>SierpinskiTriangleName</key>
-		<value>Sierpinski三角形形</value>
-		<hint>name of generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.Name</key>
-		<value>Voronoi点画</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>VoronoiZigZagName</key>
-		<value>Voronoi之形</value>
-		<hint>voronoi zigzag generator</hint>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.CellCount</key>
-		<value>单元数</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.GenCount</key>
-		<value>叠代数</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.DotMax</key>
-		<value>最大点尺寸</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-	<string>
-		<key>Converter_VoronoiStippling.DotMin</key>
-		<value>最小点尺寸</value>
-		<hint>voronoi stippling generator</hint>
-	</string>
-
-	<string>
-		<key>BoxGeneratorName</key>
-		<value>小盒</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorMaxSize</key>
-		<value>最大尺寸</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorCutoff</key>
-		<value>切断</value>
-		<hint>Boxxy generator</hint>
-	</string>
-	<string>
-		<key>BoxGeneratorMaxSizeNote</key>
-		<value>最大尺寸大于或等于1 0...1</value>
-		<hint>Boxxy generator</hint>
-	</string>
-
-	<string>
-		<key>CrosshatchName</key>
-		<value>交叉影线</value>
-		<hint>Crosshatch generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveName</key>
-		<value>Hilbert曲线形</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveSize</key>
-		<value>尺寸</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>HilbertCurveOrder</key>
-		<value>次序</value>
-		<hint>Hilbert Curve generator</hint>
-	</string>
-	<string>
-		<key>LSystemBranches</key>
-		<value>分支</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>LSystemOrderScale</key>
-		<value>比例</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>LSystemAngle</key>
-		<value>角度跨度</value>
-		<hint>LSystem generator</hint>
-	</string>
-	<string>
-		<key>MazeName</key>
-		<value>迷宫</value>
-		<hint>Maze generator</hint>
-	</string>
-	<string>
-		<key>MazeRows</key>
-		<value>行</value>
-		<hint>Maze generator</hint>
-	</string>
-	<string>
-		<key>MazeColumns</key>
-		<value>列</value>
-		<hint>Maze generator</hint>
-	</string>
-
-	<string>
-		<key>PulseLineName</key>
-		<value>脉冲线</value>
-		<hint>Pulse Line generator</hint>
-	</string>
-	<string>
-		<key>ZigZagName</key>
-		<value>之字形</value>
-		<hint>Zig Zag generator</hint>
-	</string>
-	<string>
-		<key>YourMsgHereName</key>
-		<value>您的留言在这里</value>
-		<hint>Your message here generator</hint>
-	</string>
-	<string>
-		<key>SpiralName</key>
-		<value>螺旋</value>
-		<hint>Spiral generator</hint>
-	</string>
-	<string>
-		<key>SpiralCMYKName</key>
-		<value>螺旋CMYK</value>
-		<hint>Spiral generator</hint>
-	</string>
-
-	<string>
-		<key>SpiralPulseName</key>
-		<value>脉冲螺旋</value>
-		<hint>Spiral Pulse generator</hint>
-	</string>
-	<string>
-		<key>ScanlineName</key>
-		<value>扫描线</value>
-		<hint>Scanline generator</hint>
-	</string>
-	<string>
-		<key>RGBName</key>
-		<value>RGB(红绿蓝)</value>
-		<hint>RGB generator</hint>
-	</string>
-
-	<string>
-		<key>SharePromo</key>
-		<value>试用社交媒体标签#绘图仪</value>
-		<hint>Your drawing is finished. Share it</hint>
-	</string>
-
-	<string>
-		<key>StatusSoFar</key>
-		<value>运行时间: </value>
-		<hint>time machine has been drawing</hint>
-	</string>
-
-	<string>
-		<key>StatusRemaining</key>
-		<value>预计剩余时间: </value>
-		<hint>time machine will be drawing</hint>
-	</string>
-
-	<string>
-		<key>JogInterface.DisengageMotors</key>
-		<value>关闭</value>
-		<hint>Manual driving dialog</hint>
-	</string>
-	<string>
-		<key>JogInterface.EngageMotors</key>
-		<value>启用</value>
-		<hint>Manual driving dialog</hint>
-	</string>
-
-	<string>
-		<key>DialogAbout.AboutHTML</key>
-		<value><![CDATA[
+    <!-- please help crowd source translations at https://crowdin.com/project/makelangelo-software -->
+    <meta>
+        <name>Chinese</name> <!-- zh-CN -->
+        <authors>
+            <author>Kmimax(kmimax2016@gmail.com)</author>
+        </authors>
+    </meta>
+    <string><key>BorderName</key><value>纸轮廓</value></string>
+    <string><key>LissajousName</key><value>Lissajous</value></string>
+    <string><key>LissajousA</key><value>A (&gt;0)</value></string>
+    <string><key>LissajousB</key><value>B (&gt;0)</value></string>
+    <string><key>LissajousDelta</key><value>Delta (0...1)</value></string>
+    <string><key>SpirographName</key><value>螺旋图</value></string>
+    <string><key>SpirographMajorRadius</key><value>大半径(R)</value></string>
+    <string><key>SpirographMinorRadius</key><value>小半径(r)</value></string>
+    <string><key>SpirographPScale</key><value>单位 (p)</value></string>
+    <string><key>SpirographNumSamples</key><value>样本(数)</value></string>
+    <string><key>SpirographEpitrochoid</key><value>是流行的</value></string>
+    <string><key>ConverterRandomLinesName</key><value>随机线</value></string>
+    <string><key>ConverterRandomLinesCount</key><value>线数</value></string>
+    <string><key>StartAtLastPenDown</key><value>备份到最后落笔</value></string>
+    <string><key>StartAtAddPenDown</key><value>在此处添加落笔命令</value></string>
+    <string><key>StartAtExactly</key><value>无特殊处理</value></string>
+    <string><key>ConfirmQuitQuestion</key><value>确定要退出吗?</value></string>
+    <string><key>ConfirmQuitTitle</key><value>退出</value></string>
+    <string><key>ConvertImagePaperFill</key><value>填满整张纸</value></string>
+    <string><key>ConvertImagePaperFit</key><value>使图像适合纸张</value></string>
+    <string><key>Cancel</key><value>取消</value></string>
+    <string><key>Save</key><value>保存</value></string>
+    <string><key>PaperSettings.PaperWidth</key><value>绘图纸宽度</value></string>
+    <string><key>PaperSettings.PaperHeight</key><value>绘图纸高度</value></string>
+    <string><key>TitlePrefix</key><value>Makelangelo</value></string>
+    <string><key>LoadError</key><value>无法加载文件:</value></string>
+    <string><key>SaveError</key><value>无法保存文件:</value></string>
+    <string><key>FlipH</key><value>水平翻转</value></string>
+    <string><key>FlipV</key><value>垂直翻转</value></string>
+    <string><key>ConversionStyle</key><value>样式</value></string>
+    <string><key>ConversionFill</key><value>填充</value></string>
+    <string><key>OpenFileChooser.FileTypeImage</key><value>图像 (%1)</value></string>
+    <string><key>OpenFileChooser.AllSupportedFiles</key><value>All supported files</value></string>
+    <string><key>MetricsPreferences.Title</key><value>指标</value></string>
+    <string><key>MetricsPreferences.collectAnonymousMetrics</key><value><![CDATA[<html><body>I consent to sharing anonymous usage data<br>with Marginally Clever Robots, Limited.</html></body>]]></value></string>
+    <string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value><![CDATA[<html><body>May Marginally Clever Robots, Ltd. collect anonymous usage metrics about this app?<br><br>You can update this any time in <i>Makelangelo &gt; Preferences &gt; Metrics</i></html></body>]]></value></string>
+    <string><key>SoundPreferences.Title</key><value>声音</value></string>
+    <string><key>SoundPreferences.Connect</key><value>连接</value></string>
+    <string><key>SoundPreferences.Disconnect</key><value>断开</value></string>
+    <string><key>SoundPreferences.FinishConvert</key><value>完成转换</value></string>
+    <string><key>SoundPreferences.FinishDraw</key><value>完成绘制</value></string>
+    <string><key>GFXPreferences.Title</key><value>图形</value></string>
+    <string><key>GFXPreferences.showPenUp</key><value>显示抬笔移动</value></string>
+    <string><key>GFXPreferences.antialias</key><value>Antialias lines</value></string>
+    <string><key>GFXPreferences.speedVSQuality</key><value>速度vs质量</value></string>
+    <string><key>GFXPreferences.showAllWhileDrawing</key><value>绘图时显示整个图像</value></string>
+    <string><key>LanguagePreferences.Title</key><value>语言</value></string>
+    <string><key>StartAt</key><value>开始于</value></string>
+    <string><key>PlotterControls.Pause</key><value>暂停</value></string>
+    <string><key>Robot</key><value>Makelangelo</value></string>
+    <string><key>RobotMenu.OpenControls</key><value>Open Controls</value></string>
+    <string><key>PlotterControls.Rewind</key><value>Rewind</value></string>
+    <string><key>PlotterControls.Play</key><value>Draw</value></string>
+    <string><key>JogInterface.PenUp</key><value>抬笔</value></string>
+    <string><key>JogInterface.PenDown</key><value>落笔</value></string>
+    <string><key>UpdateNotice</key><value><![CDATA[<html><body>A new version of this software is available.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> to get the new hotness.</html></body>]]></value></string>
+    <string><key>UpToDate</key><value>该软件是最新的.</value></string>
+    <string><key>UpdateCheckFailed</key><value>对不起，失败了。 请访问https://www.marginallyclever.com/ 检查自己.</value></string>
+    <string><key>MenuMakelangelo</key><value>Makelangelo</value></string>
+    <string><key>ApplicationSettings.title</key><value>首选项</value></string>
+    <string><key>MenuUpdate</key><value>检查更新</value></string>
+    <string><key>MenuQuit</key><value>退出</value></string>
+    <string><key>MenuForums</key><value>在线帮助论坛</value></string>
+    <string><key>MenuAbout</key><value>关于</value></string>
+    <string><key>MenuSettings</key><value>设置</value></string>
+    <string><key>MenuOpenFile</key><value>打开文件...</value></string>
+    <string><key>MenuReopenFile</key><value>重新打开最后一个文件</value></string>
+    <string><key>RobotMenu.SaveGCode</key><value>保存到文件/ SD卡</value></string>
+    <string><key>MenuView</key><value>查看</value></string>
+    <string><key>MenuView.zoomIn</key><value>放大 +</value></string>
+    <string><key>MenuView.zoomOut</key><value>缩小 -</value></string>
+    <string><key>MenuView.zoomFit</key><value>适度缩放</value></string>
+    <string><key>ShowLog</key><value>显示日志</value></string>
+    <string><key>SierpinskiTriangleName</key><value>Sierpinski三角形形</value></string>
+    <string><key>Converter_VoronoiStippling.Name</key><value>Voronoi点画</value></string>
+    <string><key>VoronoiZigZagName</key><value>Voronoi之形</value></string>
+    <string><key>Converter_VoronoiStippling.CellCount</key><value>单元数</value></string>
+    <string><key>Converter_VoronoiStippling.DotMax</key><value>最大点尺寸</value></string>
+    <string><key>Converter_VoronoiStippling.DotMin</key><value>最小点尺寸</value></string>
+    <string><key>BoxGeneratorName</key><value>小盒</value></string>
+    <string><key>BoxGeneratorMaxSize</key><value>最大尺寸</value></string>
+    <string><key>BoxGeneratorCutoff</key><value>切断</value></string>
+    <string><key>HilbertCurveName</key><value>Hilbert曲线形</value></string>
+    <string><key>HilbertCurveSize</key><value>尺寸</value></string>
+    <string><key>HilbertCurveOrder</key><value>次序</value></string>
+    <string><key>LSystemBranches</key><value>分支</value></string>
+    <string><key>LSystemOrderScale</key><value>比例</value></string>
+    <string><key>LSystemAngle</key><value>角度跨度</value></string>
+    <string><key>PulseLineName</key><value>脉冲线</value></string>
+    <string><key>YourMsgHereName</key><value>您的留言在这里</value></string>
+    <string><key>SpiralName</key><value>螺旋</value></string>
+    <string><key>SpiralPulseName</key><value>脉冲螺旋</value></string>
+    <string><key>SharePromo</key><value>试用社交媒体标签#绘图仪</value></string>
+    <string><key>JogInterface.DisengageMotors</key><value>关闭</value></string>
+    <string><key>JogInterface.EngageMotors</key><value>启用</value></string>
+    <string><key>DialogAbout.AboutHTML</key><value><![CDATA[
     <html>
       <body>
         <h1>Makelangelo %VERSION% <span style="font-size: small; font-weight: normal">%DETAILED_VERSION%</span></h1>
@@ -1138,523 +118,82 @@
         Mark Raynsford, and <a href='https://ca.linkedin.com/in/kington-chu-219923123'>Kington Chu</a>.</p>
       </body>
     </html>
-    ]]>
-		</value>
-		<hint>HTML for About Dialog</hint>
-	</string>
-
-	<string>
-		<key>MenuSettingsRegister</key>
-		<value>注册</value>
-		<hint>Machine Configuration > Register tab title</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegister</key>
-		<value><![CDATA[<p>使用用户帐户注册您的机器人以解锁功能并显示您的支持.</p>]]></value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterCreateAccountButton</key>
-		<value>创建一个帐户</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterUsername</key>
-		<value>用户名</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>PleaseRegisterPassword</key>
-		<value>密码</value>
-		<hint>Machine Configuration > Register robot</hint>
-	</string>
-
-	<string>
-		<key>MachineNumber</key>
-		<value>机器号 #</value>
-		<hint>Prepare image panel</hint>
-	</string>
-
-	<string>
-		<key>MenuResetMachinePreferencesWarning</key>
-		<value>确定要删除所有参数吗?</value>
-		<hint>Makelangelo > preferences > reset preferences</hint>
-	</string>
-
-	<string>
-		<key>MenuGenerate</key>
-		<value>产生艺术</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>MenuNewFile</key>
-		<value>新建</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>MenuCaptureImage</key>
-		<value>从相机捕捉</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>LSystemTreeName</key>
-		<value>L系统树形</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>LimitTestName</key>
-		<value>限位测试</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>KochTreeName</key>
-		<value>Koch曲线形</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>FibonacciSpiralName</key>
-		<value>Fibonacci螺旋形</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>DragonName</key>
-		<value>龙形</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>ClickAndDrag</key>
-		<value>点击＆拖动</value>
-		<hint>live drawing panel</hint>
-	</string>
-	<string>
-		<key>configureMachine</key>
-		<value>设置</value>
-		<hint>open machine settings dialog</hint>
-	</string>
-	<string>
-		<key>MenuResetMachinePreferences</key>
-		<value>重置首选项</value>
-		<hint>Preferences menu</hint>
-	</string>
-	<string>
-		<key>ServoLengthNeeded</key>
-		<value>伺服电机线长:</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>StepperLengthNeeded</key>
-		<value>步进电机线长(每个):</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>BeltLengthNeeded</key>
-		<value>同步带长度(每根):</value>
-		<hint>settings > machine > measurement calculations</hint>
-	</string>
-	<string>
-		<key>ConverterWanderName</key>
-		<value>漫游</value>
-		<hint>name of Wander converter style</hint>
-	</string>
-	<string>
-		<key>ConverterWanderLineCount</key>
-		<value># 线数</value>
-		<hint>Wander converter style parameter</hint>
-	</string>
-
-	<string>
-		<key>ConverterMultipassName</key>
-		<value>多线段</value>
-		<hint>name of Multipass converter style</hint>
-	</string>
-	<string>
-		<key>ConverterMultipassAngle</key>
-		<value>角(度)</value>
-		<hint>Multipass converter option</hint>
-	</string>
-	<string>
-		<key>ConverterMultipassLevels</key>
-		<value>层</value>
-		<hint>Multipass converter option</hint>
-	</string>
-
-	<string>
-		<key>firmwareVersionBadTitle</key>
-		<value>固件升级</value>
-		<hint>Software is too new for firmware</hint>
-	</string>
-
-	<string>
-		<key>HardwareVersion</key>
-		<value>模式: </value>
-		<hint>What is the hardware model of this robot?</hint>
-	</string>
-
-	<string>
-		<key>firmwareVersionBadMessage</key>
-		<value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>v%VERSION%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>
-		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value>
-		<hint>Software is too new for firmware</hint>
-	</string>
-
-	<string>
-		<key>TextSize</key>
-		<value>尺寸</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>TextFont</key>
-		<value>字体</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>TextMessage</key>
-		<value>信息</value>
-		<hint>Generator_Text_Panel</hint>
-	</string>
-	<string>
-		<key>CaptureImageTitle</key>
-		<value>获取相机图像</value>
-		<hint>Capture Image from host camera</hint>
-	</string>
-	<string>
-		<key>CaptureImage</key>
-		<value>获取</value>
-		<hint>Capture Image from host camera</hint>
-	</string>
-	<string>
-		<key>UseCapture</key>
-		<value>使用</value>
-		<hint>Use Image for processing</hint>
-	</string>
-	<string>
-		<key>CancelCapture</key>
-		<value>取消</value>
-		<hint>Cancel Capture. Don't process.</hint>
-	</string>
-	<string>
-		<key>AWB</key>
-		<value>自动白平衡</value>
-		<hint>Image Automatic White Balance setting</hint>
-	</string>
-	<string>
-		<key>DRC</key>
-		<value>动态范围</value>
-		<hint>Image Dynamic Range Setting</hint>
-	</string>
-	<string>
-		<key>Exposure</key>
-		<value>曝光</value>
-		<hint>Image Exposure Setting</hint>
-	</string>
-	<string>
-		<key>Contrast</key>
-		<value>对比度</value>
-		<hint>Image Contrast Setting</hint>
-	</string>
-	<string>
-		<key>Quality</key>
-		<value>画质</value>
-		<hint>Image Quality Setting</hint>
-	</string>
-	<string>
-		<key>Sharpness</key>
-		<value>锐度</value>
-		<hint>Image Sharpness Setting</hint>
-	</string>
-	<string>
-		<key>Off</key>
-		<value>关闭</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Auto</key>
-		<value>自动</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Sun</key>
-		<value>阳光</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Cloud</key>
-		<value>多云</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Shade</key>
-		<value>阴影</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Tungsten</key>
-		<value>钨丝灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Fluorescent</key>
-		<value>荧光灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Incandescent</key>
-		<value>白炽灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Flash</key>
-		<value>闪光灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Horizon</key>
-		<value>水平线</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>High</key>
-		<value>高</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Medium</key>
-		<value>中</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Low</key>
-		<value>低</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Antishake</key>
-		<value>防抖</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Backlight</key>
-		<value>背光灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Beach</key>
-		<value>海滩</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Fireworks</key>
-		<value>烟花</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>FixedFPS</key>
-		<value>固定FPS</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Night</key>
-		<value>夜晚</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>NightPreview</key>
-		<value>黄昏</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Snow</key>
-		<value>雪景</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Sports</key>
-		<value>运动</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Spotlight</key>
-		<value>聚光灯</value>
-		<hint></hint>
-	</string>
-	<string>
-		<key>Verylong</key>
-		<value>长时间</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Choose</key>
-		<value>选择</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Import</key>
-		<value>导入</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Export</key>
-		<value>导出</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Reset</key>
-		<value>重置</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Help</key>
-		<value>帮助</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Art Pipeline</key>
-		<value>艺术途径</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>PaperSettings.PaperColor</key>
-		<value>纸张颜色</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Crosshatch</key>
-		<value>交叉影线</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>MoireName</key>
-		<value>云纹</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>horizontal</key>
-		<value>水平</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>vertical</key>
-		<value>垂直</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>SandyNoble.title</key>
-		<value>Sandy风格</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>ConverterIntensity</key>
-		<value>强度</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>top right</key>
-		<value>右上</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>top left</key>
-		<value>左上方</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>bottom right</key>
-		<value>右下</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>bottom left</key>
-		<value>左下方</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>center</key>
-		<value>中心</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Spiral.toCorners</key>
-		<value>螺旋到角落</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>SpiralPulse.spacing</key>
-		<value>环间隙</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>SpiralPulse.height</key>
-		<value>脉冲高度</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.Cutoff</key>
-		<value>低通截止</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>Converter_VoronoiStippling.DrawBorders</key>
-		<value>画边框?</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>ConverterWanderCMYK</key>
-		<value>CMYK?</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>FillPageName</key>
-		<value>填充页面</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>GosperCurveName</key>
-		<value>Gosper曲线</value>
-		<hint></hint>
-	</string>
-
-	<string>
-		<key>GosperCurveOrder</key>
-		<value>次序</value>
-		<hint></hint>
-	</string>
-
+    ]]></value></string>
+    <string><key>MenuResetMachinePreferencesWarning</key><value>确定要删除所有参数吗?</value></string>
+    <string><key>MenuGenerate</key><value>产生艺术</value></string>
+    <string><key>MenuNewFile</key><value>新建</value></string>
+    <string><key>MenuCaptureImage</key><value>从相机捕捉</value></string>
+    <string><key>LSystemTreeName</key><value>L系统树形</value></string>
+    <string><key>KochTreeName</key><value>Koch曲线形</value></string>
+    <string><key>FibonacciSpiralName</key><value>Fibonacci螺旋形</value></string>
+    <string><key>DragonName</key><value>龙形</value></string>
+    <string><key>ClickAndDrag</key><value>点击＆拖动</value></string>
+    <string><key>ConverterWanderName</key><value>漫游</value></string>
+    <string><key>ConverterWanderLineCount</key><value># 线数</value></string>
+    <string><key>ConverterMultipassName</key><value>多线段</value></string>
+    <string><key>ConverterMultipassAngle</key><value>角(度)</value></string>
+    <string><key>ConverterMultipassLevels</key><value>层</value></string>
+    <string><key>firmwareVersionBadTitle</key><value>固件升级</value></string>
+    <string><key>firmwareVersionBadMessage</key><value><![CDATA[<html><body>The firmware (code in the brain of your robot) is not the version I expect. I found <strong>v%VERSION%</strong>.<br/>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-firmware/">https://www.marginallyclever.com/product/makelangelo-firmware/</a><br>		   for the latest firmware.<br>Please visit <a href="https://www.marginallyclever.com/product/makelangelo-software/">https://www.marginallyclever.com/product/makelangelo-software/</a> for the latest software.</html></body>]]></value></string>
+    <string><key>TextSize</key><value>尺寸</value></string>
+    <string><key>TextMessage</key><value>信息</value></string>
+    <string><key>PiCaptureAction.CaptureImageTitle</key><value>获取相机图像</value></string>
+    <string><key>PiCaptureAction.CaptureImage</key><value>获取</value></string>
+    <string><key>PiCaptureAction.UseCapture</key><value>使用</value></string>
+    <string><key>PiCaptureAction.CancelCapture</key><value>取消</value></string>
+    <string><key>PiCaptureAction.AWB</key><value>自动白平衡</value></string>
+    <string><key>PiCaptureAction.DRC</key><value>动态范围</value></string>
+    <string><key>PiCaptureAction.Exposure</key><value>曝光</value></string>
+    <string><key>PiCaptureAction.Contrast</key><value>对比度</value></string>
+    <string><key>PiCaptureAction.Quality</key><value>画质</value></string>
+    <string><key>PiCaptureAction.Sharpness</key><value>锐度</value></string>
+    <string><key>PiCaptureAction.Off</key><value>关闭</value></string>
+    <string><key>PiCaptureAction.Auto</key><value>自动</value></string>
+    <string><key>PiCaptureAction.Sun</key><value>阳光</value></string>
+    <string><key>PiCaptureAction.Cloud</key><value>多云</value></string>
+    <string><key>PiCaptureAction.Shade</key><value>阴影</value></string>
+    <string><key>PiCaptureAction.Tungsten</key><value>钨丝灯</value></string>
+    <string><key>PiCaptureAction.Fluorescent</key><value>荧光灯</value></string>
+    <string><key>PiCaptureAction.Incandescent</key><value>白炽灯</value></string>
+    <string><key>PiCaptureAction.Flash</key><value>闪光灯</value></string>
+    <string><key>PiCaptureAction.Horizon</key><value>水平线</value></string>
+    <string><key>PiCaptureAction.High</key><value>高</value></string>
+    <string><key>PiCaptureAction.Medium</key><value>中</value></string>
+    <string><key>PiCaptureAction.Low</key><value>低</value></string>
+    <string><key>PiCaptureAction.Antishake</key><value>防抖</value></string>
+    <string><key>PiCaptureAction.Backlight</key><value>背光灯</value></string>
+    <string><key>PiCaptureAction.Beach</key><value>海滩</value></string>
+    <string><key>PiCaptureAction.Fireworks</key><value>烟花</value></string>
+    <string><key>PiCaptureAction.FixedFPS</key><value>固定FPS</value></string>
+    <string><key>PiCaptureAction.Night</key><value>夜晚</value></string>
+    <string><key>PiCaptureAction.NightPreview</key><value>黄昏</value></string>
+    <string><key>PiCaptureAction.Snow</key><value>雪景</value></string>
+    <string><key>PiCaptureAction.Sports</key><value>运动</value></string>
+    <string><key>PiCaptureAction.Spotlight</key><value>聚光灯</value></string>
+    <string><key>PiCaptureAction.Verylong</key><value>长时间</value></string>
+    <string><key>Import</key><value>导入</value></string>
+    <string><key>Export</key><value>导出</value></string>
+    <string><key>Reset</key><value>重置</value></string>
+    <string><key>Help</key><value>帮助</value></string>
+    <string><key>Art Pipeline</key><value>艺术途径</value></string>
+    <string><key>PaperSettings.PaperColor</key><value>纸张颜色</value></string>
+    <string><key>Crosshatch</key><value>交叉影线</value></string>
+    <string><key>MoireName</key><value>云纹</value></string>
+    <string><key>horizontal</key><value>水平</value></string>
+    <string><key>vertical</key><value>垂直</value></string>
+    <string><key>SandyNoble.title</key><value>Sandy风格</value></string>
+    <string><key>ConverterIntensity</key><value>强度</value></string>
+    <string><key>top right</key><value>右上</value></string>
+    <string><key>top left</key><value>左上方</value></string>
+    <string><key>bottom right</key><value>右下</value></string>
+    <string><key>bottom left</key><value>左下方</value></string>
+    <string><key>center</key><value>中心</value></string>
+    <string><key>Spiral.toCorners</key><value>螺旋到角落</value></string>
+    <string><key>SpiralPulse.spacing</key><value>环间隙</value></string>
+    <string><key>SpiralPulse.height</key><value>脉冲高度</value></string>
+    <string><key>Converter_VoronoiStippling.Cutoff</key><value>低通截止</value></string>
+    <string><key>Converter_VoronoiStippling.DrawBorders</key><value>画边框?</value></string>
+    <string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
+    <string><key>FillPageName</key><value>填充页面</value></string>
+    <string><key>GosperCurveName</key><value>Gosper曲线</value></string>
 </language>

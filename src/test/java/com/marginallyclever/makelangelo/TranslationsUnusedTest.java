@@ -27,20 +27,26 @@ public class TranslationsUnusedTest {
 
     @Test
     public void findUnusedTranslations() throws Exception {
-        TranslatorLanguage english = new TranslatorLanguage();
-        english.loadFromInputStream(getInputStream("target/classes/languages/english.xml"));
-        Set<String> keys = english.getKeys();
+        // check every file in target/classes/languages.
+        File folder = new File("target/classes/languages");
+        File[] files = folder.listFiles();
+        for(File file : files) {
+            if(file.isFile()) {
+                findUnusedTranslations(file.getAbsolutePath());
+            }
+        }
+    }
+
+    private void findUnusedTranslations(String filename) throws Exception {
+        System.out.println("testing "+filename);
+        TranslatorLanguage set = new TranslatorLanguage();
+        set.loadFromInputStream(getInputStream(filename));
+        Set<String> keys = set.getKeys();
         Set<String> found = new HashSet<>();
 
         TranslationsMissingTest search = new TranslationsMissingTest();
-        search.searchAllSourceFiles((e)->{
-            found.add(e.key);
-        });
+        search.searchAllSourceFiles((e)->found.add(e.key));
         keys.removeAll(found);
-        System.out.println("Unused translations:");
-        for(String key : keys) {
-            System.out.println(key);
-        }
-        Assertions.assertEquals(0,keys.size(),"Unused translations found: "+ keys);
+        Assertions.assertTrue(keys.isEmpty(),"Unused translations: "+keys);
     }
 }

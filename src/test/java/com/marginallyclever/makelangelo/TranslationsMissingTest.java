@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -158,5 +157,47 @@ public class TranslationsMissingTest {
                     .collect(Collectors.toList());
         }
         return result;
+    }
+
+    /**
+     * Compare all translation files in target/classes/languages with the english.xml file.  Display a list of all missing translations.
+     * Fail if any translations are missing.
+     */
+    @Test
+    public void findMissingTranslationsInAllLanguages() {
+        // check every file in target/classes/languages.
+        File english = new File("target/classes/languages/english.xml");
+
+        boolean perfect = true;
+        File folder = new File("target/classes/languages");
+        File[] files = folder.listFiles();
+        for(File file : files) {
+            if(file.isFile() && !file.equals(english)) {
+                // compare xml keys in file to english
+                perfect |= compareTranslations(english, file);
+            }
+        }
+        assertTrue(perfect, "Some translations are missing, see previous logs for details");
+    }
+
+    private boolean compareTranslations(File english, File file) {
+        TranslatorLanguage englishSet = new TranslatorLanguage();
+        TranslatorLanguage otherSet = new TranslatorLanguage();
+        try {
+            englishSet.loadFromInputStream(new FileInputStream(english));
+            otherSet.loadFromInputStream(new FileInputStream(file));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Set<String> englishKeys = englishSet.getKeys();
+        Set<String> otherKeys = otherSet.getKeys();
+        Set<String> missingKeys = new HashSet<>(englishKeys);
+        missingKeys.removeAll(otherKeys);
+
+        if (!missingKeys.isEmpty()) {
+            logger.info("translations missing in {}: {}", file, missingKeys);
+        }
+        return missingKeys.isEmpty();
     }
 }

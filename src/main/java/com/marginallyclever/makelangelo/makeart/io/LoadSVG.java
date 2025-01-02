@@ -34,12 +34,12 @@ public class LoadSVG implements TurtleLoader {
 
 	private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Scaleable Vector Graphics 1.1", "svg");
 	private Turtle myTurtle;
+	private final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
 
 	private boolean isNewPath;  // for cubic paths
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
-	private final Color paperColor = new Color(255,255,255);
-	private final SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName());
+	private final Matrix3d viewBoxMatrix = new Matrix3d();
 
 	public LoadSVG() {
 		super();
@@ -87,8 +87,38 @@ public class LoadSVG implements TurtleLoader {
 	}
 
 	private void parseAll(Document document) throws Exception {
-		SVGOMSVGElement documentElement = (SVGOMSVGElement)document.getDocumentElement();
-		processElement(documentElement);
+		SVGOMSVGElement svgElement = (SVGOMSVGElement)document.getDocumentElement();
+
+		// Handle viewBox transformation
+		viewBoxMatrix.setIdentity();
+		if (svgElement.hasAttribute("viewBox")) {
+			String[] viewBoxValues = svgElement.getAttribute("viewBox").split("\\s+");
+			if (viewBoxValues.length == 4) {
+				double viewBoxX = Double.parseDouble(viewBoxValues[0]);
+				double viewBoxY = Double.parseDouble(viewBoxValues[1]);
+				double viewBoxWidth = Double.parseDouble(viewBoxValues[2]);
+				double viewBoxHeight = Double.parseDouble(viewBoxValues[3]);
+
+				double svgWidth = svgElement.getWidth().getBaseVal().getValue();
+				double svgHeight = svgElement.getHeight().getBaseVal().getValue();
+
+				double scaleX = svgWidth / viewBoxWidth;
+				double scaleY = svgHeight / viewBoxHeight;
+
+				viewBoxMatrix.m00 = scaleX;
+				viewBoxMatrix.m11 = scaleY;
+				// display with original offset.
+				viewBoxMatrix.m02 = -viewBoxX * scaleX;
+				viewBoxMatrix.m12 = -viewBoxY * scaleY;
+				// center image to 0,0
+				//viewBoxMatrix.m02 = (viewBoxWidth * scaleX) / 2 ;
+				//viewBoxMatrix.m12 = (viewBoxHeight * scaleY) / 2 ;
+
+				viewBoxMatrix.invert();
+			}
+		}
+
+		processElement(svgElement);
 	}
 
 	/**
@@ -164,7 +194,6 @@ public class LoadSVG implements TurtleLoader {
 		Color color = getStroke(element);
 		if(color==null) return false;  // none
 		if(color.getAlpha()==0) return false;  // transparent
-		//if(color.equals(paperColor)) return true;
 
 		if(!color.equals(myTurtle.getColor())) {
 			logger.debug("Setting stroke color to {}",color);
@@ -551,22 +580,22 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private Matrix3d getMatrixFromElement(Element element) {
 		Matrix3d m = new Matrix3d();
+		m.setIdentity();
 
-		if(!(element instanceof SVGGraphicsElement)) {
-			m.setIdentity();
-			return m;
+		if(element instanceof SVGGraphicsElement svgGE) {
+			try {
+				SVGMatrix svgMatrix = svgGE.getCTM();
+				m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
+				m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
+				m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
+			}
+			catch(Exception e) {
+				m.setIdentity();
+			}
 		}
 
-		try {
-			SVGGraphicsElement svgge = (SVGGraphicsElement)element;
-			SVGMatrix svgMatrix = svgge.getCTM();
-			m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
-			m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
-			m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
-		}
-		catch(Exception e) {
-			m.setIdentity();
-		}
+		m.mul(viewBoxMatrix, m);
+
 		return m;
 	}
 
