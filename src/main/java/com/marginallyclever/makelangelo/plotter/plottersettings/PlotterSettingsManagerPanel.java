@@ -132,19 +132,20 @@ public class PlotterSettingsManagerPanel extends JPanel {
 	 */
 	private void changeProfile() {
 		String name = (String)configurationList.getSelectedItem();
-		if(name!=null) {
-			logger.debug("changing profile to {}",name);
-			if(plotterSettingsPanel!=null) {
-				this.remove(plotterSettingsPanel);
-			}
-			plotterSettingsManager.setLastSelectedProfile(name);
-			PlotterSettings plotterSettings = new PlotterSettings(name);
-			plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
-			container.add(plotterSettingsPanel,BorderLayout.CENTER);
-			this.revalidate();
-			plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
-			firePlotterSettingsChanged(plotterSettings);
+		if(name==null) return;
+
+		logger.debug("changing profile to {}",name);
+		if(plotterSettingsPanel!=null) {
+			this.remove(plotterSettingsPanel);
 		}
+		plotterSettingsManager.setLastSelectedProfile(name);
+		PlotterSettings plotterSettings = new PlotterSettings(name);
+		plotterSettingsPanel = new PlotterSettingsPanel(plotterSettings);
+		container.removeAll();
+		container.add(plotterSettingsPanel,BorderLayout.CENTER);
+		this.revalidate();
+		plotterSettingsPanel.addListener(this::firePlotterSettingsChanged);
+		firePlotterSettingsChanged(plotterSettings);
 	}
 
 	/**
