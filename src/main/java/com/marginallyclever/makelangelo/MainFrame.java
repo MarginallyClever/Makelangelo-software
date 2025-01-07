@@ -1,79 +1,78 @@
 package com.marginallyclever.makelangelo;
 
+import ModernDocking.DockingRegion;
+import ModernDocking.app.AppState;
+import ModernDocking.app.Docking;
+import ModernDocking.app.RootDockingPanel;
+import ModernDocking.exception.DockingLayoutException;
+import ModernDocking.ext.ui.DockingUI;
+import com.marginallyclever.convenience.FileAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.prefs.Preferences;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A JFrame that remembers its size and position.
  */
 public class MainFrame extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(MainFrame.class);
-    private final Preferences prefs;
-    private static final String KEY_IS_FULLSCREEN = "isFullscreen";
-    private static final String KEY_WINDOW_WIDTH = "windowWidth";
-    private static final String KEY_WINDOW_HEIGHT = "windowHeight";
-    private static final String KEY_WINDOW_X = "windowX";
-    private static final String KEY_WINDOW_Y = "windowY";
+    private final List<DockingPanel> windows = new ArrayList<>();
 
-    public MainFrame(String title, Preferences prefs) {
-        super(title);
-        this.prefs = prefs;
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                saveWindowSizeAndPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                saveWindowSizeAndPosition();
-            }
-        });
+    public MainFrame() {
+        super();
+        setLocationByPlatform(true);
+        initDocking();
     }
 
-    public void setWindowSizeAndPosition() {
-        // set the normal window size and position
-        Dimension frameSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int windowW = prefs.getInt(KEY_WINDOW_WIDTH, frameSize.width);
-        int windowH = prefs.getInt(KEY_WINDOW_HEIGHT, frameSize.height);
-        int windowX = prefs.getInt(KEY_WINDOW_X, (frameSize.width - windowW)/2);
-        int windowY = prefs.getInt(KEY_WINDOW_Y, (frameSize.height - windowH)/2);
-        logger.info("Set window size and position "+windowW+"x"+windowH+" pos="+windowX+","+windowY);
-        this.setBounds(windowX, windowY,windowW, windowH);
+    private void initDocking() {
+        Docking.initialize(this);
+        DockingUI.initialize();
+        ModernDocking.settings.Settings.setAlwaysDisplayTabMode(true);
+        ModernDocking.settings.Settings.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        // create root panel
+        RootDockingPanel root = new RootDockingPanel(this);
+        add(root, BorderLayout.CENTER);
+    }
 
-        if(prefs.getBoolean(KEY_IS_FULLSCREEN,false)) {
-            // if we were in fullscreen mode, maximize the window.
-            // this way the "go fullscreen" button will return the window to "normal" size.
-            this.setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    public void addDockingPanel(String persistentID,String tabText,Component component) {
+        DockingPanel panel = new DockingPanel(persistentID,tabText);
+        panel.add(component);
+        windows.add(panel);
+    }
+
+    /**
+     * Reset the default layout.  These depend on the order of creation in createDefaultLayout().
+     */
+    public void resetDefaultLayout() {
+        logger.info("Resetting layout to default.");
+        setSize(1000, 750);
+
+        for (DockingPanel w : windows) {
+            Docking.undock(w);
         }
+        var previewPanel = windows.get(0);
+        var donatelloPanel = windows.get(1);
+        Docking.dock(previewPanel, this, DockingRegion.CENTER);
+        Docking.dock(donatelloPanel, previewPanel, DockingRegion.SOUTH);
+        logger.debug("done.");
     }
 
-    // remember window location for next time.
-    private void saveWindowSizeAndPosition() {
-        int state = getExtendedState();
-        boolean isFullscreen = ((state & JFrame.MAXIMIZED_BOTH)!=0);
+    public void saveAndRestoreLayout() {
+        // now that the main frame is set up with the defaults, we can restore the layout
+        var layoutPath = FileAccess.getHomeDirectory()+ File.separator+".makelangelo"+File.separator+"makelangelo.layout";
+        logger.debug("layout file={}",layoutPath);
+        AppState.setPersistFile(new File(layoutPath));
+        AppState.setAutoPersist(true);
 
-        prefs.putBoolean(KEY_IS_FULLSCREEN, isFullscreen);
-        if(!isFullscreen) {
-            Dimension frameSize = this.getSize();
-            Point p = this.getLocation();
-            prefs.putInt(KEY_WINDOW_WIDTH, frameSize.width);
-            prefs.putInt(KEY_WINDOW_HEIGHT, frameSize.height);
-            prefs.putInt(KEY_WINDOW_X, p.x);
-            prefs.putInt(KEY_WINDOW_Y, p.y);
+        try {
+            AppState.restore();
+        } catch (DockingLayoutException e) {
+            logger.error("Failed to restore docking layout.", e);
         }
-    }
-
-    public static void main(String[] args) {
-        MainFrame frame = new MainFrame("Test",Preferences.userRoot().node("com/marginallyclever/makelangelo"));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setWindowSizeAndPosition();
-        frame.setVisible(true);
     }
 }

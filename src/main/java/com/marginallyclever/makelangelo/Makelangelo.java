@@ -5,6 +5,9 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.donatello.Donatello;
+import com.marginallyclever.donatello.FileHelper;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
@@ -24,6 +27,9 @@ import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVi
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFacade;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
+import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
+import com.marginallyclever.nodegraphcore.NodeFactory;
+import com.marginallyclever.nodegraphcore.ServiceLoaderHelper;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +39,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.dnd.DropTarget;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -334,15 +339,72 @@ public final class Makelangelo {
 		contentPane.add(previewPanel, BorderLayout.CENTER);
 		contentPane.add(rangeSlider, BorderLayout.SOUTH);
 
+		JToolBar toolBar = createToolBar();
+		contentPane.add(toolBar, BorderLayout.NORTH);
+
 		return contentPane;
 	}
+
+	private JToolBar createToolBar() {
+		var bar = new JToolBar();
+
+		var buttonZoomOut = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoom(1);
+			}
+		};
+		buttonZoomOut.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomOut"));
+		buttonZoomOut.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomOut.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
+		bar.add(buttonZoomOut);
+
+		var buttonZoomIn = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoom(-1);
+			}
+		};
+		buttonZoomIn.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomIn"));
+		buttonZoomIn.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomIn.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
+		bar.add(buttonZoomIn);
+
+		var buttonZoomToFit = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camera.zoomToFit(myPaper.getPaperWidth(),myPaper.getPaperHeight());
+			}
+		};
+		buttonZoomToFit.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomFit"));
+		buttonZoomToFit.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
+		buttonZoomToFit.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-to-fit-16.png"))));
+		bar.add(buttonZoomToFit);
+
+		Action toggleAction = new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean b = GFXPreferences.getShowPenUp();
+				GFXPreferences.setShowPenUp(!b);
+			}
+		};
+		var checkboxShowPenUpMoves = new JToggleButton(toggleAction);
+		toggleAction.putValue(Action.SHORT_DESCRIPTION,Translator.get("GFXPreferences.showPenUp"));
+		toggleAction.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));//"ctrl M"
+		toggleAction.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
+		checkboxShowPenUpMoves.setSelected(GFXPreferences.getShowPenUp());
+		GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
+		bar.add(checkboxShowPenUpMoves);
+
+		return bar;
+	}
+
 
 	//  For thread safety this method should be invoked from the event-dispatching thread.
 	private void createAppWindow() {
 		logger.debug("Creating GUI...");
 
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
-		mainFrame = new MainFrame("",preferences);
+		mainFrame = new MainFrame();
 		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setupDropTarget();
@@ -363,10 +425,12 @@ public final class Makelangelo {
 		}
 
 		mainFrame.setJMenuBar(mainMenuBar);
-		mainFrame.setContentPane(createContentPane());
+		mainFrame.addDockingPanel("Preview","Preview",createContentPane());
+		mainFrame.addDockingPanel("Donatello","Donatello",new Donatello());
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
-		mainFrame.setWindowSizeAndPosition();
+		mainFrame.resetDefaultLayout();
+		mainFrame.saveAndRestoreLayout();
 
 		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 
@@ -454,6 +518,17 @@ public final class Makelangelo {
 	public static void main(String[] args) {
 		Log.start();
 		logger = LoggerFactory.getLogger(Makelangelo.class);
+
+		FileHelper.createDirectoryIfMissing(FileHelper.getExtensionPath());
+		ServiceLoaderHelper.addAllPathFiles(FileHelper.getExtensionPath());
+		try {
+			NodeFactory.loadRegistries();
+		}
+		catch (Exception e) {
+			logger.error("Failed to load node factories", e);
+			return;
+		}
+		DAO4JSONFactory.loadRegistries();
 
 		PreferencesHelper.start();
 		CommandLineOptions.setFromMain(args);

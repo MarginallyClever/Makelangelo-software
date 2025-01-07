@@ -526,6 +526,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>flatlaf</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.github.weisj/jsvg -->
+		<dependency>
+			<groupId>com.github.weisj</groupId>
+			<artifactId>jsvg</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 
 		<!-- for voronoi -->
 		<!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts -->
@@ -544,6 +550,34 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>reflections</artifactId>
 			<version>0.10.2</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.marginallyclever</groupId>
+			<artifactId>donatello</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.marginallyclever</groupId>
+			<artifactId>nodegraphcore</artifactId>
+			<version>1.0.21</version>
+		</dependency>
+
+		<!-- dockable windows -->
+		<dependency>
+			<groupId>io.github.andrewauclair</groupId>
+			<artifactId>modern-docking-api</artifactId>
+			<version>0.11.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.andrewauclair</groupId>
+			<artifactId>modern-docking-single-app</artifactId>
+			<version>0.11.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.andrewauclair</groupId>
+			<artifactId>modern-docking-ui</artifactId>
+			<version>0.11.6</version>
 		</dependency>
     </dependencies>
 

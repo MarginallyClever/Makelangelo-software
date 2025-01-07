@@ -4,15 +4,13 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeart.turtletool.TurtleTool;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
-import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
-import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
@@ -63,7 +61,6 @@ public class MainMenu extends JMenuBar {
         if ((os.contains("mac")) || (os.contains("darwin"))) {
             isMacOS=true;
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            SHORTCUT_CTRL = InputEvent.META_DOWN_MASK;
             SHORTCUT_ALT = InputEvent.META_DOWN_MASK;
         }
     }
@@ -148,35 +145,6 @@ public class MainMenu extends JMenuBar {
     private JMenu createViewMenu() {
         JMenu menu = new JMenu(Translator.get("MenuView"));
         menu.setMnemonic('V');
-
-        JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
-        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-        buttonZoomOut.addActionListener((e) -> app.getCamera().zoom(1));
-        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
-        menu.add(buttonZoomOut);
-
-        JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
-        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-        buttonZoomIn.addActionListener((e) -> app.getCamera().zoom(-1));
-        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
-        menu.add(buttonZoomIn);
-
-        JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
-        buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
-        buttonZoomToFit.addActionListener((e) -> app.getCamera().zoomToFit(app.getPaper().getPaperWidth(),app.getPaper().getPaperHeight()));
-        menu.add(buttonZoomToFit);
-
-        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
-        checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
-        checkboxShowPenUpMoves.addActionListener((e) -> {
-            boolean b = GFXPreferences.getShowPenUp();
-            GFXPreferences.setShowPenUp(!b);
-        });
-        GFXPreferences.addListener((e)->{
-            checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
-        });
-        checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
-        menu.add(checkboxShowPenUpMoves);
 
         menu.add(createRenderStyleMenu());
 
