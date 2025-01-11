@@ -1,95 +1,72 @@
-package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
+package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectFile;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeight;
+import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightSegment;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.nodegraphcore.port.Input;
+import com.marginallyclever.nodegraphcore.port.Output;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.vecmath.Vector2d;
-import java.awt.geom.Rectangle2D;
-import java.io.FileInputStream;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LineWeightByImageIntensity extends TurtleGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
+/**
+ * Use an image to mask a path.  Lay the path over the image and modulate the width of the line by the intensity of the
+ * image at the same location.  The fine grain resolution (and the amount of testing) is controlled by the stepSize.
+ * @author Dan Royer
+ * @since 2025-01-07
+ */
+public class LineWeightByImage extends Node {
+    private static final Logger logger = LoggerFactory.getLogger(LineWeightByImage.class);
 
-    private final double EPSILON = 0.001;
+    private static final double EPSILON = 0.0001;
 
-    /**
-     * must be greater than zero.
-     */
-    private static double stepSize = 5;
-
-    /**
-     * maximum thickness of the new line. must be greater than zero.
-     */
-    private static double thickness = 1.0;
-
-    private static String imageName = null;
-    private TransformedImage sourceImage;
+    private final Input<BufferedImage> image = new Input<>("image", BufferedImage.class,new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB));
+    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
+    private final Input<Number> stepSize = new Input<>("stepSize", Number.class, 5);
+    private final Input<Number> thickness = new Input<>("thickness", Number.class, 5);
+    private final Output<Turtle> result = new Output<>("result", Turtle.class,new Turtle());
 
     private static final LinkedList<LineWeightSegment> unsorted = new LinkedList<>();
 
     // segments sorted for drawing efficiency
     private static final List<LineWeight> sortedLines = new ArrayList<>();
+    private TransformedImage sourceImage = null;
 
-    public LineWeightByImageIntensity() {
-        super();
-
-        SelectDouble selectThickness = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"),thickness);
-        add(selectThickness);
-        selectThickness.addSelectListener(e->{
-            thickness = selectThickness.getValue();
-            generate();
-        });
-
-        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName);
-        add(selectFile);
-        selectFile.addSelectListener(e->{
-            imageName = selectFile.getText();
-            generate();
-        });
+    public LineWeightByImage() {
+        super("LineWeightByImage");
+        addVariable(image);
+        addVariable(turtle);
+        addVariable(stepSize);
+        addVariable(result);
+        addVariable(thickness);
     }
 
     @Override
-    public String getName() {
-        return Translator.get("LineWeightByImageIntensity.name");
-    }
+    public void update() {
+        Turtle myTurtle = turtle.getValue();
+        if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
-    @Override
-    public void generate() {
-        try {
-            FileInputStream stream = new FileInputStream(imageName);
-            sourceImage = new TransformedImage(ImageIO.read(stream));
-        } catch(Exception e) {
-            logger.error("generate {}",e.getMessage(),e);
-            setTurtle(previousTurtle);
-            return;
-        }
-        scaleImage(1);  // fill paper
-
+        sourceImage = new TransformedImage(image.getValue());
+        sourceImage.setScale(1,1);
+        sourceImage.setTranslation(0,0);
         Turtle turtle = new Turtle();
-        List<Turtle> colors = previousTurtle.splitByToolChange();
+        List<Turtle> colors = myTurtle.splitByToolChange();
         for( Turtle t2 : colors ) {
             turtle.add(calculate(t2));
         }
 
-        sourceImage = null;
-
-        turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
-
-        notifyListeners(turtle);
+        result.send(turtle);
     }
 
     private Turtle calculate(Turtle from) {
@@ -121,32 +98,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
                 turtle.moveTo(w.end.x, w.end.y);
             }
         }
-    }
-
-    /**
-     * mode 0 = fill paper
-     * mode 1 = fit paper
-     * @param mode the mode to scale the image
-     */
-    private void scaleImage(int mode) {
-        Rectangle2D.Double rect = myPaper.getMarginRectangle();
-        double width  = rect.getWidth();
-        double height = rect.getHeight();
-
-        boolean test;
-        if (mode == 0) {
-            test = width < height;  // fill paper
-        } else {
-            test = width > height;  // fit paper
-        }
-
-        float f;
-        if( test ) {
-            f = (float)( width / (double)sourceImage.getSourceImage().getWidth() );
-        } else {
-            f = (float)( height / (double)sourceImage.getSourceImage().getHeight() );
-        }
-        sourceImage.setScale(f,-f);
     }
 
     private void generateThickLines(Turtle turtle) {
@@ -374,15 +325,15 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
      */
     private void maybeSplitLine(LineSegment2D segment) {
         double beforeLen = Math.sqrt(segment.lengthSquared());
-        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize));
+        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize.getValue().doubleValue()));
         if(pieces==1) {
             addOneUnsortedSegment(segment.start,segment.end);
             return;
         }
 
         Vector2d diff = new Vector2d(
-            segment.end.x - segment.start.x,
-            segment.end.y - segment.start.y
+                segment.end.x - segment.start.x,
+                segment.end.y - segment.start.y
         );
 
         Point2D a = segment.start;
@@ -405,12 +356,12 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // sample image intensity here from 0...1
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;
-
-        double intensity = 1.0-(sourceImage.sample(mx,my,stepSize/2)/255.0);
-        LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness);
+        var s = stepSize.getValue().doubleValue();
+        double intensity = 1.0-(sourceImage.sample(mx,my,s/2)/255.0);
+        LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness.getValue().doubleValue());
         // make a fast search index
-        a.ix = (int)Math.floor(mx / stepSize);
-        a.iy = (int)Math.floor(my / stepSize);
+        a.ix = (int)Math.floor(mx / s);
+        a.iy = (int)Math.floor(my / s);
         return a;
     }
 }

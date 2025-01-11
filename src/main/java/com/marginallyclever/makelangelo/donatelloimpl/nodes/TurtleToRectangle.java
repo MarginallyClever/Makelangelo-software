@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.dock.Input;
-import com.marginallyclever.nodegraphcore.dock.Output;
+import com.marginallyclever.nodegraphcore.port.Input;
+import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

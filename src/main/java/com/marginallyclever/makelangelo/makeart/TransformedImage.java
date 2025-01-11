@@ -221,6 +221,10 @@ public class TransformedImage {
 		scaleY = y;
 	}
 
+	public void setTranslation(float x,float y) {
+		translateX = x;
+		translateY = y;
+	}
 
 	public void setRGB(float x, float y, int c) {
 		sourceImage.setRGB(getTransformedX(x), getTransformedY(y), c);

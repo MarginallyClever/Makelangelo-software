@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 import java.util.Collections;
 import java.util.LinkedList;
 
-class LineWeight {
+public class LineWeight {
     public LinkedList<LineWeightSegment> segments = new LinkedList<>();
 
     public void flip() {

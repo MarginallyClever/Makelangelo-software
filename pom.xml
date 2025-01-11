@@ -555,12 +555,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.1</version>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.0.21</version>
+			<version>1.0.22</version>
 		</dependency>
 
 		<!-- dockable windows -->

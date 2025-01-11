@@ -1,15 +1,17 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.nodegraphcore.dock.Input;
-import com.marginallyclever.nodegraphcore.dock.Output;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
+import com.marginallyclever.nodegraphcore.port.Input;
+import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
 
 public class PrintTurtle extends Node implements PrintWithGraphics {
+    //private static final Logger logger = LoggerFactory.getLogger(PrintTurtle.class);
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Input<Number> px = new Input<>("X",Number.class,0);
     private final Input<Number> py = new Input<>("Y",Number.class,0);
@@ -31,9 +33,12 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
+        Graphics2D g2 = (Graphics2D)g.create();
+        GraphViewPanel.setHints(g2);
+
         int dx=px.getValue().intValue();
         int dy=py.getValue().intValue();
-        g.translate(dx,dy);
+        g2.translate(dx,dy);
 
         // where we're at in the drawing (to check if we're between first & last)
         boolean showPenUp = showTravel.getValue();
@@ -56,8 +61,8 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                     case TRAVEL -> {
                         if (inShow && previousMove != null) {
                             if (showPenUp) {
-                                g.setColor(upColor);
-                                g.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
+                                g2.setColor(upColor);
+                                g2.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
                             }
                         }
                         count++;
@@ -65,23 +70,21 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                     }
                     case DRAW_LINE -> {
                         if (inShow && previousMove != null) {
-                            g.setColor(downColor);
-                            g.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
+                            g2.setColor(downColor);
+                            g2.drawLine((int) previousMove.x, (int)previousMove.y, (int) m.x, (int) m.y);
                         }
                         count++;
                         previousMove = m;
                     }
                     case TOOL_CHANGE -> {
                         downColor = m.getColor();
-                        ((Graphics2D) g).setStroke(new BasicStroke((int) m.getDiameter()));
+                        g2.setStroke(new BasicStroke((int) m.getDiameter()));
                     }
                 }
             }
         }
         catch(Exception e) {
-            //Log.error(e.getMessage());
+            //logger.error(e.getMessage());
         }
-
-        g.translate(-dx,-dy);
     }
 }

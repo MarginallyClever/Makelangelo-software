@@ -42,6 +42,7 @@ public class DonatelloRegistry implements DAORegistry, NodeRegistry {
         NodeFactory.registerNode(AddTurtles.class);
         NodeFactory.registerNode(ColorTurtle.class);
         NodeFactory.registerNode(LoadTurtle.class);
+        NodeFactory.registerNode(LineWeightByImage.class);
         NodeFactory.registerNode(PathImageMask.class);
         NodeFactory.registerNode(PatternOnPath.class);
         NodeFactory.registerNode(PointOnPath.class);

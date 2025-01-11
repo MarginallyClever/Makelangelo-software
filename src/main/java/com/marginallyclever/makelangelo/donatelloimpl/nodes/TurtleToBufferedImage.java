@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.nodegraphcore.dock.Input;
-import com.marginallyclever.nodegraphcore.dock.Output;
+import com.marginallyclever.nodegraphcore.port.Input;
+import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
 
@@ -16,7 +16,7 @@ public class TurtleToBufferedImage extends Node {
     private final Output<BufferedImage> output = new Output<>("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
 
     public TurtleToBufferedImage() {
-        super("TurtleToImage");
+        super("TurtleToBufferedImage");
         addVariable(turtle);
         addVariable(output);
     }
@@ -29,7 +29,12 @@ public class TurtleToBufferedImage extends Node {
             int h = (int)Math.ceil(r.getHeight());
             int w = (int)Math.ceil(r.getWidth());
             BufferedImage img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = img.createGraphics();
+            Graphics2D g = (Graphics2D)img.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_PURE);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
             g.translate(-r.getX(),-r.getY());
 
             TurtleMove previousMove = null;

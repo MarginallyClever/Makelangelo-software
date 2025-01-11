@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.dock.Input;
-import com.marginallyclever.nodegraphcore.dock.Output;
+import com.marginallyclever.nodegraphcore.port.Input;
+import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
 import org.slf4j.Logger;

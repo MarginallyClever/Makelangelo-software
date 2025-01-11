@@ -8,7 +8,7 @@ import javax.vecmath.Vector2d;
  * Many segments make up a {@link LineWeight}.
  * @author Dan Royer
  */
-class LineWeightSegment {
+public class LineWeightSegment {
     public Point2D start, end;
     public int ix, iy;  // index for faster search
     public double weight;
