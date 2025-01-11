@@ -37,4 +37,9 @@ module com.marginallyclever.makelangelo {
 
     provides com.marginallyclever.nodegraphcore.DAORegistry with
             com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
+
+    opens com.marginallyclever.convenience;
+    opens com.marginallyclever.makelangelo.turtle;
+    opens com.marginallyclever.makelangelo;
+    opens com.marginallyclever.makelangelo.makeart.io;
 }
