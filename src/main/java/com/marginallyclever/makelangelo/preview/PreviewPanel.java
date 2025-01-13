@@ -30,6 +30,7 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 	private static final boolean DEBUG_GL_ON = false;
 	private static final boolean TRACE_GL_ON = false;
 	private GLJPanel glCanvas;
+	private int canvasWidth,canvasHeight;
 
 	private final List<PreviewListener> previewListeners = new ArrayList<>();
 	
@@ -177,18 +178,8 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 	@Override
 	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
 		System.out.println("reshape "+width+"x"+height);
-
-		GL2 gl2 = glautodrawable.getGL().getGL2();
-		
-		camera.setWidth(width);
-		camera.setHeight(height);
-
-		gl2.glMatrixMode(GL2.GL_PROJECTION);
-		gl2.glLoadIdentity();
-		// orthographic projection
-		float w2 = width/2.0f;
-		float h2 = height/2.0f;
-		glu.gluOrtho2D(-w2, w2, -h2, h2);
+		canvasWidth = width;
+		canvasHeight = height;
 	}
 
 	public Vector2d getMousePositionInWorld() {
@@ -211,6 +202,7 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 	 */
 	@Override
 	public void init(GLAutoDrawable glautodrawable) {
+		logger.debug("init");
 		GL gl = glautodrawable.getGL();
 
 		if (DEBUG_GL_ON) {
@@ -246,6 +238,7 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 
 	@Override
 	public void dispose(GLAutoDrawable glautodrawable) {
+		logger.info("dispose");
 		TextureFactory.dispose(glautodrawable.getGL());
 	}
 
@@ -256,6 +249,9 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 	public void display(GLAutoDrawable glautodrawable) {
 		// draw the world
 		GL2 gl2 = glautodrawable.getGL().getGL2();
+
+		camera.setWidth(canvasWidth);
+		camera.setHeight(canvasHeight);
 
 		// set some render quality options
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
@@ -290,6 +286,13 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 	 * @param gl2 OpenGL context
 	 */
 	private void paintCamera(GL2 gl2) {
+		gl2.glMatrixMode(GL2.GL_PROJECTION);
+		gl2.glLoadIdentity();
+		// orthographic projection
+		float w2 = canvasWidth/2.0f;
+		float h2 = canvasHeight/2.0f;
+		glu.gluOrtho2D(-w2, w2, -h2, h2);
+
 		gl2.glMatrixMode(GL2.GL_MODELVIEW);
 		gl2.glLoadIdentity();
 		gl2.glScaled(camera.getZoom(),camera.getZoom(),1);
@@ -308,6 +311,7 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 				(float)backgroundColor.getGreen()/255.0f,
 				(float)backgroundColor.getBlue()/255.0f,
 				0.0f);
+
 		gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 	}
 
