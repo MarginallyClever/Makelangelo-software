@@ -5,6 +5,7 @@ import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.vecmath.Vector2d;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -24,12 +23,13 @@ import java.util.prefs.Preferences;
  * @author Dan Royer
  *
  */
-public class PreviewPanel extends GLJPanel implements GLEventListener {
+public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelListener, MouseListener, MouseMotionListener {
 	private static final Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
 	
 	// Use debug pipeline?
 	private static final boolean DEBUG_GL_ON = false;
 	private static final boolean TRACE_GL_ON = false;
+	private GLJPanel glCanvas;
 
 	private final List<PreviewListener> previewListeners = new ArrayList<>();
 	
@@ -58,102 +58,109 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	private FPSAnimator animator;
 
 	public PreviewPanel() {
-		super();
+		super(new BorderLayout());
 		
 		try {
-			logger.debug("  get GL capabilities...");
-			GLProfile glProfile = GLProfile.getDefault();
-			GLCapabilities caps = new GLCapabilities(glProfile);
-			// caps.setSampleBuffers(true);
-			// caps.setHardwareAccelerated(true);
-			// caps.setNumSamples(4);
-			setRequestedGLCapabilities(caps);
+			logger.info("availability="+ GLProfile.glAvailabilityToString());
+			GLCapabilities capabilities = getCapabilities();
+			logger.info("create canvas");
+			glCanvas = new GLJPanel(capabilities);
 		} catch(GLException e) {
 			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
 			System.exit(1);
 		}
 
-		addGLEventListener(this);
+		add(glCanvas, BorderLayout.CENTER);
 
-		final JPanel me = this;
-
-		// scroll the mouse wheel to zoom
-		addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				int notches = e.getWheelRotation();
-				if (notches == 0) return;
-
-				Point2D p = new Point2D(e.getPoint().x,e.getPoint().y);
-				Rectangle r = me.getBounds();
-				p.x -= r.getCenterX();
-				p.y -= r.getCenterY();
-
-				if (notches < 0) {
-					if (mouseLastZoomDirection == -1) camera.zoom(-1,p);
-					mouseLastZoomDirection = -1;
-				} else {
-					if (mouseLastZoomDirection == 1) camera.zoom(1,p);
-					mouseLastZoomDirection = 1;
-				}
-				repaint();
-			}
-		});
-		
-		// remember button states for when we need them.
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				buttonPressed = e.getButton();
-				mouseOldX = e.getX();
-				mouseOldY = e.getY();
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				buttonPressed = MouseEvent.NOBUTTON;
-			}
-		});
-		
-		
-		// left click + drag to move the camera around.
-		addMouseMotionListener(new MouseAdapter() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				int x = e.getX();
-				int y = e.getY();
-				mouseX = x;
-				mouseY = y;
-				setTipXY();
-
-				if (buttonPressed == MouseEvent.BUTTON1) {
-					int dx = x - mouseOldX;
-					int dy = y - mouseOldY;
-					mouseOldX = x;
-					mouseOldY = y;
-					camera.moveRelative(-dx, -dy);
-					repaint();
-				}
-			}
-
-			@Override
-			public void mouseMoved(MouseEvent e) {
-				int x = e.getX();
-				int y = e.getY();
-				mouseOldX = x;
-				mouseOldY = y;
-				mouseX = x;
-				mouseY = y;
-				setTipXY();
-			}
-		});
-		
 		// start animation system
 		logger.debug("  starting animator...");
 		animator = new FPSAnimator(1);
-		animator.add(this);
+		animator.add(glCanvas);
 		animator.start();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		buttonPressed = e.getButton();
+		mouseOldX = e.getX();
+		mouseOldY = e.getY();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		buttonPressed = MouseEvent.NOBUTTON;
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		mouseX = x;
+		mouseY = y;
+		setTipXY();
+
+		if (buttonPressed == MouseEvent.BUTTON1) {
+			int dx = x - mouseOldX;
+			int dy = y - mouseOldY;
+			mouseOldX = x;
+			mouseOldY = y;
+			camera.moveRelative(-dx, -dy);
+			repaint();
+		}
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		int notches = e.getWheelRotation();
+		if (notches == 0) return;
+
+		Point2D p = new Point2D(e.getPoint().x,e.getPoint().y);
+		Rectangle r = this.getBounds();
+		p.x -= r.getCenterX();
+		p.y -= r.getCenterY();
+
+		if (notches < 0) {
+			if (mouseLastZoomDirection == -1) camera.zoom(-1,p);
+			mouseLastZoomDirection = -1;
+		} else {
+			if (mouseLastZoomDirection == 1) camera.zoom(1,p);
+			mouseLastZoomDirection = 1;
+		}
+		repaint();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		mouseOldX = x;
+		mouseOldY = y;
+		mouseX = x;
+		mouseY = y;
+		setTipXY();
+	}
+
+	private GLCapabilities getCapabilities() {
+		GLProfile profile = GLProfile.getMaxProgrammable(true);
+		GLCapabilities capabilities = new GLCapabilities(profile);
+		capabilities.setHardwareAccelerated(true);
+		capabilities.setBackgroundOpaque(true);
+		capabilities.setDoubleBuffered(true);
+		capabilities.setStencilBits(8);
+		capabilities.setDepthBits(32);  // 32 bit depth buffer is floating point
+		StringBuilder sb = new StringBuilder();
+		capabilities.toString(sb);
+		logger.info("capabilities="+sb);
+		return capabilities;
 	}
 
 	public void addListener(PreviewListener arg0) {
@@ -169,6 +176,8 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 	 */
 	@Override
 	public void reshape(GLAutoDrawable glautodrawable, int x, int y, int width, int height) {
+		System.out.println("reshape "+width+"x"+height);
+
 		GL2 gl2 = glautodrawable.getGL().getGL2();
 		
 		camera.setWidth(width);
@@ -224,10 +233,21 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		}
 		
 		glu = GLU.createGLU(gl);
+
+		// turn on vsync
+		gl.setSwapInterval(1);
+
+		// make things pretty
+		gl.glEnable(GL3.GL_LINE_SMOOTH);
+		gl.glEnable(GL3.GL_POLYGON_SMOOTH);
+		gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
+		gl.glEnable(GL3.GL_MULTISAMPLE);
 	}
 
 	@Override
-	public void dispose(GLAutoDrawable glautodrawable) {}
+	public void dispose(GLAutoDrawable glautodrawable) {
+		TextureFactory.dispose(glautodrawable.getGL());
+	}
 
 	/**
 	 * Refresh the image in the view.  This is where drawing begins.
@@ -263,6 +283,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 		}
 	}
 
+
 	/**
 	 * Set up the correct modelview so the robot appears where it should.
 	 *
@@ -287,16 +308,7 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 				(float)backgroundColor.getGreen()/255.0f,
 				(float)backgroundColor.getBlue()/255.0f,
 				0.0f);
-
-		// Special handling for the case where the GLJPanel is translucent
-		// and wants to be composited with other Java 2D content
-		if (GLProfile.isAWTAvailable()
-				&& !isOpaque()
-				&& shouldPreserveColorBufferIfTranslucent()) {
-			gl2.glClear(GL2.GL_DEPTH_BUFFER_BIT);
-		} else {
-			gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-		}
+		gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 	}
 
 	public void stop() {
@@ -305,5 +317,23 @@ public class PreviewPanel extends GLJPanel implements GLEventListener {
 
 	public void setCamera(Camera camera) {
 		this.camera = camera;
+	}
+
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		glCanvas.addGLEventListener(this);
+		glCanvas.addMouseListener(this);
+		glCanvas.addMouseMotionListener(this);
+		glCanvas.addMouseWheelListener(this);
+	}
+
+	@Override
+	public void removeNotify() {
+		super.removeNotify();
+		glCanvas.removeGLEventListener(this);
+		glCanvas.removeMouseListener(this);
+		glCanvas.removeMouseMotionListener(this);
+		glCanvas.removeMouseWheelListener(this);
 	}
 }

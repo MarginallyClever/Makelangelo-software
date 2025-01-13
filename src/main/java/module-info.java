@@ -35,6 +35,7 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.makelangelo.turtle;
     opens com.marginallyclever.makelangelo;
     opens com.marginallyclever.makelangelo.makeart.io;
+    opens com.marginallyclever.makelangelo.texture;
 
     // A Java module that wants to implement a service interface from a service interface module must:
     // - Require the service interface module in its own module descriptor.

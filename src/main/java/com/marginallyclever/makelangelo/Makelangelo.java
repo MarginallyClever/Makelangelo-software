@@ -150,8 +150,8 @@ public final class Makelangelo {
 
 	private static void setSystemLookAndFeel() {
 		if(!CommandLineOptions.hasOption("-nolf")) {
+			FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
 			try {
-				FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
 				UIManager.setLookAndFeel( new FlatLightLaf() );
 			} catch( Exception e ) {
 				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);
