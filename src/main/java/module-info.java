@@ -29,17 +29,24 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes to com.marginallyclever.nodegraphcore;
-
     exports com.marginallyclever.convenience.log to ch.qos.logback.core;
-
-    provides com.marginallyclever.nodegraphcore.NodeRegistry with
-            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
-
-    provides com.marginallyclever.nodegraphcore.DAORegistry with
-            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
 
     opens com.marginallyclever.convenience;
     opens com.marginallyclever.makelangelo.turtle;
     opens com.marginallyclever.makelangelo;
     opens com.marginallyclever.makelangelo.makeart.io;
+
+    // A Java module that wants to implement a service interface from a service interface module must:
+    // - Require the service interface module in its own module descriptor.
+    // - Implement the service interface with a Java class.
+    // - Declare the service interface implementation in its module descriptor.
+    // In order to use the service, the client module must declare in its module descriptor that it uses the service.
+    // http://tutorials.jenkov.com/java/modules.html
+    uses com.marginallyclever.nodegraphcore.NodeRegistry;
+    provides com.marginallyclever.nodegraphcore.NodeRegistry with
+            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
+
+    uses com.marginallyclever.nodegraphcore.DAORegistry;
+    provides com.marginallyclever.nodegraphcore.DAORegistry with
+            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
 }
