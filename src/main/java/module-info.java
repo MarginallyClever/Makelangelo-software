@@ -20,4 +20,12 @@ module com.marginallyclever.makelangelo {
     requires org.locationtech.jts;
     requires org.apache.httpcomponents.httpclient;
     requires org.apache.httpcomponents.httpcore;
+
+    opens com.marginallyclever.convenience;
+    opens com.marginallyclever.convenience.voronoi;
+    opens com.marginallyclever.makelangelo.makeart.io;
+    opens com.marginallyclever.makelangelo.plotter.plottercontrols;
+    opens com.marginallyclever.makelangelo.turtle;
+    opens com.marginallyclever.convenience.noise;
+    opens com.marginallyclever.convenience.helpers;
 }
