@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.makeart.turtletool.RemoveExtraColorChangesFromTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -23,7 +24,8 @@ import java.awt.geom.Rectangle2D;
  */
 public class Converter_CMYK_Circles extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Circles.class);
-	static protected int maxCircleRadius =5;
+	protected static int maxCircleRadius =5;
+	protected static boolean fillCircles = false;
 
 	public Converter_CMYK_Circles() {
 		super();
@@ -34,6 +36,12 @@ public class Converter_CMYK_Circles extends ImageConverter {
 			fireRestart();
 		});
 		add(maxCircleSize);
+		SelectBoolean fillCircles = new SelectBoolean("fillCircles",Translator.get("Converter_CMYK_Circles.fillCircles"),this.fillCircles);
+		fillCircles.addSelectListener((evt)->{
+			Converter_CMYK_Circles.fillCircles = (boolean)evt.getNewValue();
+			fireRestart();
+		});
+		add(fillCircles);
 
 		add(new SelectReadOnlyText("note",Translator.get("Converter_CMYK_Crosshatch.Note")));
 	}
@@ -162,13 +170,15 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		}
 		t.moveTo(x+r,y+0);
 
-		try {
-			InfillTurtle filler = new InfillTurtle();
-			filler.setPenDiameter(t.getDiameter());
-			Turtle t2 = filler.run(t);
-			turtle.add(t2);
-		} catch(Exception e) {
-			// shape was not closed, do nothing.
+		if(fillCircles) {
+			try {
+				InfillTurtle filler = new InfillTurtle();
+				filler.setPenDiameter(t.getDiameter());
+				Turtle t2 = filler.run(t);
+				turtle.add(t2);
+			} catch (Exception e) {
+				// shape was not closed, do nothing.
+			}
 		}
 
 		turtle.add(t);
