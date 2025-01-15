@@ -50,7 +50,7 @@ public class TestNodeGraphMakelangelo {
         Input<?> a = new Input<>(myClass.getSimpleName(),myClass,instA);
         Input<?> b = new Input<>(myClass.getSimpleName(),myClass,instB);
 
-        b.parseJSON(a.toJSON());
+        b.fromJSON(a.toJSON());
         assertEquals(a.toString(),b.toString());
         assertEquals(a.getValue(),b.getValue());
     }
