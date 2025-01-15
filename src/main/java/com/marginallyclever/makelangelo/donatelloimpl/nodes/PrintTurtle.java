@@ -15,14 +15,16 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Input<Number> px = new Input<>("X",Number.class,0);
     private final Input<Number> py = new Input<>("Y",Number.class,0);
-    private final Input<Color> travelColor = new Input<>("travel color",Color.class,Color.GREEN);
     private final Output<Boolean> showTravel = new Output<>("show travel",Boolean.class,false);
+    private final Input<Color> travelColor = new Input<>("travel color",Color.class,Color.GREEN);
 
     public PrintTurtle() {
         super("PrintTurtle");
         addVariable(turtle);
         addVariable(px);
         addVariable(py);
+        addVariable(showTravel);
+        addVariable(travelColor);
     }
 
     @Override
