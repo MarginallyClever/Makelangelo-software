@@ -227,12 +227,16 @@ public class LineWeightByImage extends Node {
     private void sortSegmentsIntoLines() {
         logger.debug("sortSegmentsIntoLines");
 
-        while(!unsorted.isEmpty()) {
-            LineWeight activeLine = new LineWeight();
-            activeLine.segments.add(unsorted.removeFirst());
-            sortedLines.add(activeLine);
+        try {
+            while (!unsorted.isEmpty()) {
+                LineWeight activeLine = new LineWeight();
+                activeLine.segments.add(unsorted.removeFirst());
+                sortedLines.add(activeLine);
 
-            growActiveLine(activeLine);
+                growActiveLine(activeLine);
+            }
+        } catch(Exception e) {
+            logger.error("sortSegmentsIntoLines",e);
         }
 
         logger.debug("sortedLines="+sortedLines.size());
