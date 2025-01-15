@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Use an image to mask a path.  Lay the path over the image and modulate the width of the line by the intensity of the
- * image at the same location.  The fine grain resolution (and the amount of testing) is controlled by the stepSize.
+ * Lay the path over the image and change the width of the line by the intensity of the image at the same
+ * location.  The fine grain resolution (and the amount of testing) is controlled by the stepSize.
  * @author Dan Royer
  * @since 2025-01-07
  */
