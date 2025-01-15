@@ -5,7 +5,6 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 /**
  * TransformedImage is a {@link BufferedImage}, with a transformation matrix on top.
@@ -43,6 +42,12 @@ public class TransformedImage {
 		scaleY = copy.scaleY;
 	}
 
+	/**
+	 * Can the image be sampled at this location?
+	 * @param x pre-transform x
+	 * @param y pre-transform y
+	 * @return true if the image can be sampled at this location
+	 */
 	public boolean canSampleAt(double x, double y) {
 		int sampleX = getTransformedX(x);
 		int sampleY = getTransformedY(y);
@@ -91,81 +96,51 @@ public class TransformedImage {
 	}
 	
 	/**
-	 * Sample the image, taking into account fractions of pixels. left must be less than right, bottom must be less than top.
+	 * Sample the image, taking into account fractions of pixels.
 	 * @param x0 left
 	 * @param y0 top
 	 * @param x1 right
 	 * @param y1 bottom
-	 * @return greyscale intensity in this region. [0...255]v
+	 * @return greyscale intensity in this region. [0...255]
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
+		int left = getTransformedX(x0);
+		int bottom = getTransformedY(y0);
+		int right = getTransformedX(x1);
+		int top = getTransformedY(y1);
+		if(left>right) {
+			int temp = left;
+			left = right;
+			right = temp;
+		}
+		if(bottom>top) {
+			int temp = bottom;
+			bottom = top;
+			top = temp;
+		}
+
+		var raster = sourceImage.getRaster();
+		var componentCount = sourceImage.getColorModel().getNumComponents();
+		var pixel = new double[componentCount];
+		var w = sourceImage.getWidth();
+		var h = sourceImage.getHeight();
+
 		double sampleValue = 0;
-		double weightedSum = 0;
-
-		int left   = (int)Math.floor(x0);
-		int right  = (int)Math.ceil (x1);
-		int bottom = (int)Math.floor(y0);
-		int top    = (int)Math.ceil (y1);
-
-		// calculate the weight matrix
-		int w = Math.max(1,right-left);
-		int h = Math.max(1,top-bottom);
-		if(w==1 && h==1) {
-			if (canSampleAt(left, bottom)) {
-				return sample1x1Unchecked(left, bottom);
-			} else {
-				return 0;
-			}
-		}
-		
-		double [] m = new double[w*h];
-		Arrays.fill(m, 1);
-
-		// bottom edge
-		if(bottom<y0) {
-			double yWeightStart = y0-bottom;
-			for(int i=0;i<w;++i) {
-				m[i]*=yWeightStart;
-			}
-		}
-		// top edge
-		if(top>y1) {
-			double yWeightEnd = top-y1;
-			for(int i=0;i<w;++i) {
-				m[m.length-w+i]*=yWeightEnd;
-			}
-		}
-		// left edge
-		if(left<x0) {
-			double xWeightStart = x0-left;
-			for(int i=0;i<h;++i) {
-				m[i*w]*=xWeightStart;
-			}
-		}
-		// right edge
-		if(right>x1) {
-			double xWeightEnd = right-x1;
-			for(int i=0;i<h;++i) {
-				m[(i+1)*w-1]*=xWeightEnd;
-			}
-		}
-		
-		int i=0;
+		int count = 0;
 		for(int y=bottom;y<top;++y) {
 			for(int x=left;x<right;++x) {
-				double s = m[i++];
-				if (canSampleAt(x, y)) {
-					sampleValue += sample1x1Unchecked(x,y) * s;
-					weightedSum += s;
+				if (x>=0 && x<w && y>=0 && y<h) {
+					raster.getPixel(x, y, pixel);
+					var intensity = (pixel[0]+pixel[1]+pixel[2])/3.0;
+					sampleValue += intensity;
+					count++;
 				}
 			}
 		}
 
-		if (weightedSum == 0)
-			return 255;
+		if(count==0) return 255;
 
-		double result = sampleValue / weightedSum;
-		
+		double result = sampleValue/(double)count;
 		return (int)Math.min( Math.max(result, 0), 255 );
 	}
 
@@ -183,7 +158,7 @@ public class TransformedImage {
 	}
 
 	/**
-	 * Sample a pixel of the source image without a safety check.
+	 * Transforms x,y to the local space and samples the source image without a safety check.
 	 * @param x paper-space coordinates of the image
 	 * @param y paper-space coordinates of the image
 	 * @return 255 if the image cannot be sampled.  The intensity of the color channel [0...255].  the color channel is selected with
@@ -195,26 +170,6 @@ public class TransformedImage {
 		int c2 = sourceImage.getRGB(sampleX, sampleY);
 		return ImageFilter.decode32bit(c2) & 0xFF;
 	}
-
-	// sample the pixels from x0,y0 (top left) to x1,y1 (bottom right)
-	public int sampleArea(int x0, int y0, int x1, int y1) {
-		int value = 0;
-		int sum = 0;
-
-		for (int y = y0; y < y1; ++y) {
-			for (int x = x0; x < x1; ++x) {
-				if (canSampleAt(x, y)) {
-					value += sample1x1Unchecked(x, y);
-					++sum;
-				}
-			}
-		}
-
-		if (sum == 0)
-			return 255;
-
-		return value / sum;
-	}	
 
 	public void setScale(float x,float y) {
 		scaleX = x;
