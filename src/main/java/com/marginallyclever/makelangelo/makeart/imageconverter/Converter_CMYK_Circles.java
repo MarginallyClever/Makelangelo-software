@@ -139,10 +139,10 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		double b;
 		for( b = 0; b <= distance; b+= maxCircleRadius*2) {
 			n = b / distance;
-			x = dx * n + P0.x;
+			x = dx * n + P0.x + halfStep;
 			y = dy * n + P0.y;
 
-			v = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+			v = img.sample( x, y, halfStep);
 
 			drawCircle(cx + x, cy + y, maxCircleRadius * ((255.0-v)/255.0));
 		}

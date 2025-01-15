@@ -90,7 +90,7 @@ public class Converter_Pulse extends ImageConverter {
 			double x = a.x + dir.x * p; 
 			double y = a.y + dir.y * p; 
 			// read a block of the image and find the average intensity in this block
-			double z = 255.0f - img.sample( x - zigZagSpacing, y - halfStep, x + zigZagSpacing, y + halfStep);
+			double z = 255.0f - img.sample( x, y, halfStep);
 			// scale the intensity value
 			double scale_z = (z) / 255.0f;
 			//scale_z *= scale_z;  // quadratic curve

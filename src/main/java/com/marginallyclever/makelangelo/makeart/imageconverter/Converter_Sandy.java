@@ -123,6 +123,7 @@ public class Converter_Sandy extends ImageConverter {
 		double t,t_step;
 		double flipSum;
 		double pulseSize = rStep*0.5 - 0.5;//r_step * 0.6 * scale_z;
+		double sampleSize = pulseSize/2.0;
 
 		turtle = new Turtle();
 		logger.debug("Sandy started.");
@@ -155,7 +156,7 @@ public class Converter_Sandy extends ImageConverter {
 					last_x=x;
 					last_y=y;
 					// read a block of the image and find the average intensity in this block
-					z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
+					z = img.sample( x,y, sampleSize );
 					// scale the intensity value
 					if(z<0) z=0;
 					if(z>255) z=255;

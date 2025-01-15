@@ -111,7 +111,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 			double x = a.x + normal.x * p;
 			double y = a.y + normal.y * p;
 			// read a block of the image and find the average intensity in this block
-			double z = (255.0f - img.sample( x - sampleRate, y - sampleRate, x + sampleRate, y + sampleRate));
+			double z = (255.0f - img.sample( x, y, sampleRate));
 
 			// if the is too high, the sum will refuse to update.
 			if(z<cutOff) {
