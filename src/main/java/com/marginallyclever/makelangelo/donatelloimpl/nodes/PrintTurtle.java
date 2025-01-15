@@ -6,7 +6,6 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
 
@@ -15,7 +14,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Input<Number> px = new Input<>("X",Number.class,0);
     private final Input<Number> py = new Input<>("Y",Number.class,0);
-    private final Output<Boolean> showTravel = new Output<>("show travel",Boolean.class,false);
+    private final Input<Boolean> showTravel = new Input<>("show travel",Boolean.class,false);
     private final Input<Color> travelColor = new Input<>("travel color",Color.class,Color.GREEN);
 
     public PrintTurtle() {
