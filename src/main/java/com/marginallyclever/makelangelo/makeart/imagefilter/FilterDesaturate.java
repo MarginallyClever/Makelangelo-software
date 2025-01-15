@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 /**
  * Converts an image to greyscale.
@@ -28,20 +29,32 @@ public class FilterDesaturate extends ImageFilter {
 		BufferedImage bi = img.getSourceImage();
 		TransformedImage after = new TransformedImage(img);
 		BufferedImage afterBI = after.getSourceImage();
+		var raster = bi.getRaster();
+		var afterRaster = afterBI.getRaster();
 
-		int x, y;
-		for (y = 0; y < h; ++y) {
-			for (x = 0; x < w; ++x) {
-				double pixel = decode32bit(bi.getRGB(x, y));
-				//double v2 = sRGBtoLinear(pixel);
-				double v2 = toneControl(pixel);
-				int rgb = (int) Math.min(255, Math.max(0, v2));
-				afterBI.setRGB(x, y, ImageFilter.encode32bit(rgb));
+		var count = bi.getColorModel().getNumComponents();
+		// Temporary array to hold pixel components
+
+		IntStream.range(0, h).parallel().forEach(y -> {
+			int[] pixel = new int[count];
+			for (int x = 0; x < w; ++x) {
+				raster.getPixel(x, y, pixel);
+				double average = (pixel[0]+pixel[1]+pixel[2])/3.0;
+				int toned = (int)toneControl(average);
+				pixel[0] = toned;
+				pixel[1] = toned;
+				pixel[2] = toned;
+				afterRaster.setPixel(x,y,pixel);
 			}
-		}
+		});
 		return after;
 	}
 
+	/**
+	 * Convert a single pixel from sRGB to linear.
+	 * @param b a number between 0 and 255, inclusive.
+	 * @return a number between 0 and 255, inclusive.
+	 */
 	private double sRGBtoLinear(double b) {
 		b /= 255.0;
 		if (b <= 0.04045) b /= 12.92;
@@ -50,7 +63,9 @@ public class FilterDesaturate extends ImageFilter {
 	}
 
 	/**
-	 * accepts and returns a number between 0 and 255, inclusive.
+	 * Non-linear tone control.  Mostly brightens highlights while leaving midtones and shadows alone.
+	 * @param b a number between 0 and 255, inclusive.
+	 * @return a number between 0 and 255, inclusive.
  	 */
 	private double toneControl(double b) {
 		b /= 255.0;
