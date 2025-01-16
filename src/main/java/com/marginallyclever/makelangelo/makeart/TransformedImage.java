@@ -104,41 +104,44 @@ public class TransformedImage {
 	 * @return greyscale intensity in this region. [0...255]
 	 */
 	public int sample(double x0, double y0, double x1, double y1) {
+		// transform the corners
 		int left = getTransformedX(x0);
 		int bottom = getTransformedY(y0);
 		int right = getTransformedX(x1);
 		int top = getTransformedY(y1);
-		if(left>right) {
+		// in case of flip, make sure the left is less than the right, etc.
+		if (left > right) {
 			int temp = left;
 			left = right;
 			right = temp;
 		}
-		if(bottom>top) {
+		if (bottom > top) {
 			int temp = bottom;
 			bottom = top;
 			top = temp;
 		}
+		// find the bounds of the image once, instead of inside the loops.
+		bottom = Math.max(Math.min(bottom, sourceImage.getHeight()), 0);
+		top = Math.max(Math.min(top, sourceImage.getHeight()), 0);
+		left = Math.max(Math.min(left, sourceImage.getWidth()), 0);
+		right = Math.max(Math.min(right, sourceImage.getWidth()), 0);
+
+		// now sample the entire area to average the intensity
+		int count = (top-bottom) * (right-left);
+		// if no hits, return white
+		if(count==0) return 255;
 
 		var raster = sourceImage.getRaster();
 		var componentCount = sourceImage.getColorModel().getNumComponents();
 		var pixel = new double[componentCount];
-		var w = sourceImage.getWidth();
-		var h = sourceImage.getHeight();
-
 		double sampleValue = 0;
-		int count = 0;
 		for(int y=bottom;y<top;++y) {
 			for(int x=left;x<right;++x) {
-				if (x>=0 && x<w && y>=0 && y<h) {
-					raster.getPixel(x, y, pixel);
-					var intensity = (pixel[0]+pixel[1]+pixel[2])/3.0;
-					sampleValue += intensity;
-					count++;
-				}
+				raster.getPixel(x, y, pixel);
+				var intensity = (pixel[0]+pixel[1]+pixel[2])/3.0;
+				sampleValue += intensity;
 			}
 		}
-
-		if(count==0) return 255;
 
 		double result = sampleValue/(double)count;
 		return (int)Math.min( Math.max(result, 0), 255 );

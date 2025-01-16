@@ -32,10 +32,10 @@ public class FilterDifference extends ImageFilter {
         var rasterA = aa.getRaster();
         var rasterB = bb.getRaster();
         var rasterR = rr.getRaster();
-        var cm = aa.getColorModel();
+        var cm = aa.getColorModel().getNumComponents();
         // Temporary array to hold pixel components
-        int[] pixelA = new int[cm.getNumComponents()];
-        int[] pixelB = new int[cm.getNumComponents()];
+        int[] pixelA = new int[cm];
+        int[] pixelB = new int[cm];
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
