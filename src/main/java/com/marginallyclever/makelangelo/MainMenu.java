@@ -504,7 +504,7 @@ public class MainMenu extends JMenuBar {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),Translator.get("PlotterSettingsPanel.Title"));
         dialog.add(plotterSettingsPanel);
         dialog.setMinimumSize(new Dimension(350,300));
-        dialog.setResizable(false);
+        dialog.setResizable(true);
         dialog.pack();
 
         app.enableMenuBar(false);

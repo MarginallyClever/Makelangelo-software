@@ -124,7 +124,7 @@ public class PlotterSettingsManager {
             profileNames.remove(robotUID);
         }
         catch (Exception e) {
-            logger.error("Failed to delete profile {}. {}", robotUID, e);
+            logger.error("Failed to delete profile {}. ", robotUID, e);
             return true;
         }
         return false;

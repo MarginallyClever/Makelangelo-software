@@ -20,7 +20,7 @@ jobs:
     - uses: actions/setup-java@v4.5.0
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
         cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
@@ -79,7 +79,7 @@ jobs:
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
     - name: Upload artifact for package
-      uses: actions/upload-artifact@v4.4.3
+      uses: actions/upload-artifact@v4.6.0
       with:
         name: jar
         retention-days: 1
@@ -103,7 +103,7 @@ jobs:
     - uses: actions/setup-java@v4.5.0
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
 
     - uses: actions/download-artifact@v4.1.8
       with:
@@ -141,7 +141,7 @@ jobs:
 
     - name: Upload artifact for testing purpose
 #      if: github.repository == 'MarginallyClever/Makelangelo-software' || github.ref != 'refs/heads/master'
-      uses: actions/upload-artifact@v4.4.3
+      uses: actions/upload-artifact@v4.6.0
       with:
         name: ${{ env.BINARY }}
         retention-days: 2
