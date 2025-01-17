@@ -105,7 +105,10 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
     @Override
     public boolean iterate() {
+        turtle.history.clear();
+
         iterations++;
+
         lock.lock();
         try {
             double noiseLevel = evolveCells();
@@ -239,14 +242,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     @Override
     public void stop() {
         super.stop();
-        lock.lock();
-        try {
-            writeOutCells();
-        }
-        finally {
-            lock.unlock();
-        }
-        fireConversionFinished();
+        writeOutCells();
     }
 
     protected void renderEdges(GL2 gl2) {
@@ -284,8 +280,13 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
     @Override
     public void generateOutput() {
-        writeOutCells();
-
+        lock.lock();
+        try {
+            writeOutCells();
+        }
+        finally {
+            lock.unlock();
+        }
         fireConversionFinished();
     }
 
