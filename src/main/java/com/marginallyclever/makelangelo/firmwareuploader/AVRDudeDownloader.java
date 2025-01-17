@@ -109,16 +109,25 @@ public class AVRDudeDownloader {
     }
 
     /**
-     * Search the arduinoPackage for element with name=avrdude.  the last item is the latest release.
+     * Search the arduinoPackage for element with name=avrdude.  Compare element version values to get the latest.
+     * Versions may be in the format "6.3.0-avrdude9" or "6.3.0-avrdude18" so we need to extract the numeric version.
      * @param arduinoPackage the package to search
      * @return the last item in the tools list with name=avrdude
      */
     private static JSONObject getLastToolNamedAVRDude(JSONObject arduinoPackage) {
         JSONArray tools = arduinoPackage.getJSONArray("tools");
         JSONObject avrdudeTool = null;
+
+        int bestVersion = -1;
         for (int i = 0; i < tools.length(); i++) {
             JSONObject toolObject = tools.getJSONObject(i);
-            if (toolObject.getString("name").equals("avrdude")) {
+            if (!toolObject.getString("name").equals("avrdude")) continue;
+            var version = toolObject.getString("version");
+            logger.info("found avrdude tool at index {} with version {}", i, version);
+            int v = Integer.parseInt(version.replaceAll("\\D", ""));
+            if(v > bestVersion) {
+                logger.info("new best version: {}", v);
+                bestVersion = v;
                 avrdudeTool = toolObject;
             }
         }
