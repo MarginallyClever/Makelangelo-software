@@ -16,6 +16,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final Input<Number> py = new Input<>("Y",Number.class,0);
     private final Input<Boolean> showTravel = new Input<>("show travel",Boolean.class,false);
     private final Input<Color> travelColor = new Input<>("travel color",Color.class,Color.GREEN);
+    private final Input<Number> lineThickness = new Input<>("line thickness",Number.class,1);
 
     public PrintTurtle() {
         super("PrintTurtle");
@@ -24,6 +25,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         addVariable(py);
         addVariable(showTravel);
         addVariable(travelColor);
+        addVariable(lineThickness);
     }
 
     @Override
@@ -36,10 +38,12 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int dx=px.getValue().intValue();
         int dy=py.getValue().intValue();
         g2.translate(dx,dy);
+        var lineThickness = this.lineThickness.getValue().floatValue();
 
         // where we're at in the drawing (to check if we're between first & last)
         boolean showPenUp = showTravel.getValue();
@@ -79,7 +83,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                     }
                     case TOOL_CHANGE -> {
                         downColor = m.getColor();
-                        g2.setStroke(new BasicStroke((int) m.getDiameter()));
+                        g2.setStroke(new BasicStroke((float)(m.getDiameter() * lineThickness)));
                     }
                 }
             }
