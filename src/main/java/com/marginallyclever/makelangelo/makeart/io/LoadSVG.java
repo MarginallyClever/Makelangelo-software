@@ -306,17 +306,16 @@ public class LoadSVG implements TurtleLoader {
 				int a = Integer.parseInt(strokeName.substring(6,8),16);
 				return new Color(r,g,b,a);
 			}
-		} else if(strokeName.startsWith("rgb(")) {
-			// isolate the portion between the ()
+		} else if(strokeName.startsWith("rgb(") && strokeName.endsWith(")")) {
+			// isolate the portion between the parentheses
 			strokeName = strokeName.substring(4,strokeName.length()-1);
-			strokeName = strokeName.substring(0,strokeName.indexOf(")"));
 			if(strokeName.contains("%")) {
 				// convert from percent to 0-255
 				strokeName = strokeName.replace("%","");
 				String [] parts = strokeName.split(",");
-				int r = (int)(Integer.parseInt(parts[0])*255.0/100.0);
-				int g = (int)(Integer.parseInt(parts[1])*255.0/100.0);
-				int b = (int)(Integer.parseInt(parts[2])*255.0/100.0);
+				int r = Integer.parseInt(parts[0]) * 255 / 100;
+				int g = Integer.parseInt(parts[1]) * 255 / 100;
+				int b = Integer.parseInt(parts[2]) * 255 / 100;
 				return new Color(r,g,b);
 			} else {
 				// already in 0-255
