@@ -29,11 +29,11 @@ public class FirmwareUploader {
 	}
 
 	/**
-	 * Search the tree starting at avrdudePath for the given filename.
+	 * Search the tree starting at the install path for the given filename.
 	 * @param target the name of the file to find.
 	 * @return the file if found, null otherwise.
 	 */
-	public File findFile(String target) {
+	public File findFileRecursively(String target) {
 		logger.info("Searching for "+target+" starting in "+installPath);
 		Path startPath = Paths.get(installPath);
 		try {
@@ -50,16 +50,16 @@ public class FirmwareUploader {
 	public boolean findAVRDude() {
 		String path = "avrdude";
 		if( OSHelper.isWindows()) path+=".exe";
-		File f = findFile(path);
-		if(!f.exists()) return false;
+		File f = findFileRecursively(path);
+		if(f==null || !f.exists()) return false;
 		avrdudePath = f.getAbsolutePath();
 		return true;
 	}
 
 	// find avrdude.conf
 	public boolean findConf() {
-		File f = findFile(CONF);
-		if(!f.exists()) return false;
+		File f = findFileRecursively(CONF);
+		if(f==null || !f.exists()) return false;
 		confPath = f.getAbsolutePath();
 		return true;
 	}
@@ -147,13 +147,21 @@ public class FirmwareUploader {
 		hexPath = s;
 	}
 
-    public void setAVRDude(String avrDudePath) {
-		logger.debug("setting avrdude to {}",avrDudePath);
-		avrdudePath = avrDudePath;
+	/**
+	 * Set the path to the avrdude executable.
+	 * @param path the path to the avrdude executable.
+	 */
+    public void setAVRDude(String path) {
+		logger.debug("setting avrdude to {}",path);
+		avrdudePath = path;
     }
 
-	public void setInstallPath(String avrDudePath) {
-		logger.debug("setting install path to {}",avrDudePath);
-		installPath = avrDudePath;
+	/**
+	 * Set the path to the install directory, which should be something like ~/.makelangelo/avrdude
+	 * @param path the path to the install directory.
+	 */
+	public void setInstallPath(String path) {
+		logger.debug("setting install path to {}",path);
+		this.installPath = path;
 	}
 }
