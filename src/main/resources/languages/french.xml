@@ -30,7 +30,7 @@
     <string><key>ConverterMultipassName</key><value>Multipasse</value></string>
     <string><key>ConverterRandomLinesCount</key><value>Nombre de lignes</value></string>
     <string><key>ConverterRandomLinesName</key><value>Lignes aléatoires</value></string>
-    <string><key>ConverterWanderCMYK</key><value>CMJN ?</value></string>
+    <string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
     <string><key>ConverterWanderLineCount</key><value># Lignes</value></string>
     <string><key>ConverterWanderName</key><value>Errer</value></string>
     <string><key>Converter_VoronoiStippling.CellCount</key><value>Nombre de cellules</value></string>

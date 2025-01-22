@@ -48,8 +48,9 @@
     <string><key>ConverterWanderCMYK</key><value>CMYK?</value></string>
     <string><key>ConverterWanderLineCount</key><value># Linien</value></string>
     <string><key>ConverterWanderName</key><value>Schweifen</value></string>
-    <string><key>Converter_CMYK_Circles.maxCircleSize</key><value>Maximaler Kreisdurchmesser</value></string>
     <string><key>Converter_CMYK_Circles.name</key><value>CMYK Kreise</value></string>
+    <string><key>Converter_CMYK_Circles.maxCircleSize</key><value>Maximaler Kreisdurchmesser</value></string>
+    <string><key>Converter_CMYK_Circles.fillCircles</key><value>Kreise füllen</value></string>
     <string><key>Converter_CMYK_Crosshatch.Name</key><value>CMYK</value></string>
     <string><key>Converter_CMYK_Crosshatch.Note</key><value><![CDATA[Zeichnet Gelb, Cyan, Magenta, und Schwarz.]]></value></string>
     <string><key>Converter_CMYK_Crosshatch.Passes</key><value>Durchgänge</value></string>
