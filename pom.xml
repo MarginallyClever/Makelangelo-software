@@ -448,6 +448,11 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>logback-classic</artifactId>
 			<version>1.5.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.1.8</version>
+		</dependency>
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
