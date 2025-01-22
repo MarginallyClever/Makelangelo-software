@@ -28,4 +28,6 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.makelangelo.turtle;
     opens com.marginallyclever.convenience.noise;
     opens com.marginallyclever.convenience.helpers;
+
+    opens com.marginallyclever.convenience.log to ch.qos.logback.core;
 }
