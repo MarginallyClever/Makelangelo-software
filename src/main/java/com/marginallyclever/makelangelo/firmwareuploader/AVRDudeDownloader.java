@@ -37,7 +37,8 @@ public class AVRDudeDownloader {
 
     /**
      * Download AVRDude for the current OS architecture.
-     * @return the path to the extracted avrdude executable.
+     * @return the path to the first folder.  If the target is c:\a\b\ and the extracted files are in c:\a\b\c\d\
+     *         then this will return c:\a\b\c
      * @throws IOException if the download fails.
      */
     public static String downloadAVRDude() throws IOException {
@@ -52,22 +53,20 @@ public class AVRDudeDownloader {
      */
     public static String downloadAVRDude(String arch) throws IOException {
         String url = getURLforOS(arch);
-        if (url != null) {
-            try {
-                return downloadAndExtract(url);
-            } catch (IOException e) {
-                logger.error("Error downloading avrdude", e);
-                throw e;
-            }
+        if (url == null) return null;
+
+        try {
+            return downloadAndExtract(url);
+        } catch (IOException e) {
+            logger.error("Error downloading avrdude", e);
+            throw e;
         }
-        return null;
     }
 
     public static String getArch() {
-        String arch = LINUX;
-        if (OSHelper.isWindows()) arch = WINDOWS;
-        if (OSHelper.isOSX()) arch = MACOS;
-        return arch;
+        if (OSHelper.isWindows()) return WINDOWS;
+        if (OSHelper.isOSX()) return MACOS;
+        return LINUX;
     }
 
     /**
@@ -160,7 +159,7 @@ public class AVRDudeDownloader {
     public static String downloadAndExtract(String urlStr) throws IOException {
         File toDeleteLater = downloadFileToTemp(urlStr);
         String path = extractFile(toDeleteLater, urlStr);
-        logger.info("new path: "+path);
+        logger.info("new path: {}", path);
         makeExecutable(path);
 
         return path;
@@ -210,6 +209,13 @@ public class AVRDudeDownloader {
         return toDeleteLater;
     }
 
+    /**
+     * Extract the downloaded file to ~/.makelangelo
+     * @param toDeleteLater the file to delete after extraction
+     * @param urlStr the URL of the file
+     * @return the path to the extracted file, which should be ~/.makelangelo/firstSubDirectory
+     * @throws IOException if the extraction fails
+     */
     private static String extractFile(File toDeleteLater, String urlStr) throws IOException {
         String targetDirStr = System.getProperty("user.home") + File.separator + ".makelangelo" + File.separator;
         String newFolderName = "";
@@ -225,11 +231,12 @@ public class AVRDudeDownloader {
             newFolderName = extractBz2File(toDeleteLater, targetDirStr);
         }
 
-        if(!newFolderName.isEmpty()) {
-            newFolderName = targetDirStr + newFolderName;
+        // sometimes the path returned might be /a/b/... and we only want /a/
+        if(newFolderName.contains("/")) {
+            newFolderName = newFolderName.split("/")[0];
         }
 
-        return newFolderName;
+        return targetDirStr + newFolderName;
     }
 
     private static String getFileExtension(String fileName) {
@@ -237,6 +244,13 @@ public class AVRDudeDownloader {
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex);
     }
 
+    /**
+     * Extract a zip file to the target directory.
+     * @param file the zip file
+     * @param targetDirStr the target directory
+     * @return the name of the first directory in the zip file
+     * @throws IOException if the extraction fails
+     */
     private static String extractZipFile(File file, String targetDirStr) throws IOException {
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipIn.getNextEntry();
@@ -245,6 +259,10 @@ public class AVRDudeDownloader {
                 Path filePath = Paths.get(targetDirStr, entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(filePath);
+                    // the first directory is the one we want to return
+                    if (newFolderName.isEmpty()) {
+                        newFolderName = entry.getName();
+                    }
                 } else {
                     Files.createDirectories(filePath.getParent());
                     try (OutputStream outputStream = new FileOutputStream(filePath.toFile())) {
@@ -256,15 +274,19 @@ public class AVRDudeDownloader {
                     }
                 }
                 zipIn.closeEntry();
-                if (newFolderName.isEmpty() && entry.isDirectory()) {
-                    newFolderName = entry.getName();
-                }
                 entry = zipIn.getNextEntry();
             }
             return newFolderName;
         }
     }
 
+    /**
+     * Extract a bz2 file to the target directory.
+     * @param file the zip file
+     * @param targetDirStr the target directory
+     * @return the name of the first directory in the bz2 file
+     * @throws IOException if the extraction fails
+     */
     private static String extractBz2File(File file, String targetDirStr) throws IOException {
         try (BZip2CompressorInputStream bzIn = new BZip2CompressorInputStream(new FileInputStream(file))) {
             Path targetFilePath = Paths.get(targetDirStr, file.getName().replace(".bz2", ""));
@@ -280,15 +302,25 @@ public class AVRDudeDownloader {
         }
     }
 
+    /**
+     * Extract a .tar.bz2 file to the target directory.
+     * @param file the zip file
+     * @param targetDirStr the target directory
+     * @return the name of the first directory in the bz2 file
+     * @throws IOException if the extraction fails
+     */
     private static String extractTarBz2File(File file, String targetDirStr) throws IOException {
         try (BZip2CompressorInputStream bzIn = new BZip2CompressorInputStream(new FileInputStream(file));
              TarArchiveInputStream tarIn = new TarArchiveInputStream(bzIn)) {
             TarArchiveEntry entry;
             String newFolderName = "";
-            while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
+            while ((entry = tarIn.getNextEntry()) != null) {
                 Path filePath = Paths.get(targetDirStr, entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(filePath);
+                    if (newFolderName.isEmpty()) {
+                        newFolderName = getFolderNameFromEntry(entry.getName());
+                    }
                 } else {
                     Files.createDirectories(filePath.getParent());
                     try (OutputStream outputStream = new FileOutputStream(filePath.toFile())) {
@@ -298,9 +330,6 @@ public class AVRDudeDownloader {
                             outputStream.write(buffer, 0, len);
                         }
                     }
-                }
-                if (newFolderName.isEmpty()) {
-                    newFolderName = getFolderNameFromEntry(entry.getName());
                 }
             }
             return newFolderName;

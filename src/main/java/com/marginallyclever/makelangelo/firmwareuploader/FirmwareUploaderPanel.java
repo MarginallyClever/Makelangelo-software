@@ -80,10 +80,16 @@ public class FirmwareUploaderPanel extends JPanel {
 	private void run(ActionEvent evt, String name) {
 		String title = Translator.get("FirmwareUploaderPanel.status");
 
+		logger.debug("setup...");
+		if(port.getSelectedIndex()==-1) {
+			JOptionPane.showMessageDialog(this, Translator.get("FirmwareUploaderPanel.noPortSelected"), title, JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		logger.debug("maybe downloading avrdude...");
 		try {
-			String AVRDudePath = AVRDudeDownloader.downloadAVRDude();
-			firmwareUploader.setInstallPath(AVRDudePath);
+			String installPath = AVRDudeDownloader.downloadAVRDude();
+			firmwareUploader.setInstallPath(installPath);
 		} catch(Exception e) {
 			JOptionPane.showMessageDialog(this,Translator.get("FirmwareUploaderPanel.avrdudeNotDownloaded"),title,JOptionPane.ERROR_MESSAGE);
 			return;
@@ -107,11 +113,6 @@ public class FirmwareUploaderPanel extends JPanel {
 			return;
 		}
 
-		logger.debug("setup...");
-		if(port.getSelectedIndex()==-1) {
-			JOptionPane.showMessageDialog(this, Translator.get("FirmwareUploaderPanel.noPortSelected"), title, JOptionPane.ERROR_MESSAGE);
-			return;
-		}
 		firmwareUploader.setHexPath(firmwareDownloader.getDownloadPath(name));
 		startM5.setEnabled(false);
 		startHuge.setEnabled(false);
