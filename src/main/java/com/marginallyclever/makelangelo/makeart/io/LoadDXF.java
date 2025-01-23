@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,8 +28,7 @@ public class LoadDXF implements TurtleLoader {
 	private final Parser parser = ParserBuilder.createDefaultParser();
 	private double previousX,previousY;
 	private Turtle myTurtle;
-	
-	
+
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
 		return filter;
@@ -36,8 +36,8 @@ public class LoadDXF implements TurtleLoader {
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return (ext.equalsIgnoreCase(".dxf"));
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
+		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 
 	@Override

@@ -237,7 +237,6 @@
     <string><key>Port</key><value>منفذ</value></string>
     <string><key>OpenPaperSettings</key><value>إعدادات الورقة</value></string>
     <string><key>OpenPlotterSettings</key><value>إعدادات الرسام</value></string>
-    <string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
     <string><key>Open</key><value>فتح ملف</value></string>
     <string><key>InfillTurtleAction.title</key><value>Fill in closed loops</value></string>
     <string><key>LogPanel.LogFiles</key><value>سجل الدخول</value></string>
