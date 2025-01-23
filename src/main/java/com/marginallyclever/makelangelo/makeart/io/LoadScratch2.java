@@ -60,8 +60,8 @@ public class LoadScratch2 implements TurtleLoader {
 
 	@Override
 	public boolean canLoad(String filename) {
-		String filenameExtension = filename.substring(filename.lastIndexOf('.')).toUpperCase();;
-		return filenameExtension.equalsIgnoreCase(".SB2");
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
+		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 	
 	@Override

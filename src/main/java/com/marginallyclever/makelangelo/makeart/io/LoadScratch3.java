@@ -89,7 +89,7 @@ public class LoadScratch3 implements TurtleLoader {
 		}
 	}
 	
-	private FileNameExtensionFilter filter;
+	private FileNameExtensionFilter filter = new FileNameExtensionFilter("Scratch 3","SB3");
 	
 	private Scratch3Variables scratchGlobalVariables;
 	private final Stack<Scratch3Variables> myStack = new Stack<>();
@@ -107,15 +107,13 @@ public class LoadScratch3 implements TurtleLoader {
 
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
-		// prevent get() before start()
-		if(filter==null) filter = new FileNameExtensionFilter(Translator.get("FileTypeScratch3"),"SB3");
 		return filter;
 	}
 
 	@Override
 	public boolean canLoad(String filename) {
-		String filenameExtension = filename.substring(filename.lastIndexOf('.')).toUpperCase();
-		return filenameExtension.equalsIgnoreCase(".SB3");
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
+		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 	
 	@Override

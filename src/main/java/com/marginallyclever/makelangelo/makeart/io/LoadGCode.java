@@ -7,13 +7,14 @@ import org.slf4j.LoggerFactory;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class LoadGCode implements TurtleLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoadGCode.class);
 
-	private final FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode");
+	private final FileNameExtensionFilter filter = new FileNameExtensionFilter("GCode", "gcode","ngc");
 	
 	@Override
 	public FileNameExtensionFilter getFileNameFilter() {
@@ -22,8 +23,8 @@ public class LoadGCode implements TurtleLoader {
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return ext.equalsIgnoreCase(".gcode");
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
+		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 	
 	// search all tokens for one that starts with key and return it.

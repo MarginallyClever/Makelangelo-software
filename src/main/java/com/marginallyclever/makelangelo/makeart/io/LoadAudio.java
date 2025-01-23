@@ -39,7 +39,7 @@ public class LoadAudio implements TurtleLoader {
     public boolean canLoad(String filename) {
         // get the filename extension
         String ext = filename.substring(filename.lastIndexOf('.')+1);
-        return Arrays.stream(filter.getExtensions()).anyMatch(e -> e.equalsIgnoreCase(ext));
+        return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
     }
 
     @Override
