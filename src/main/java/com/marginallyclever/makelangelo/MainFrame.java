@@ -75,4 +75,8 @@ public class MainFrame extends JFrame {
             logger.error("Failed to restore docking layout.", e);
         }
     }
+
+    public List<DockingPanel> getDockingPanels() {
+        return windows;
+    }
 }

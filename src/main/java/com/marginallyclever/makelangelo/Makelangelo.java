@@ -73,10 +73,11 @@ public final class Makelangelo {
 	private Turtle myTurtle = new Turtle();
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private PlotterRenderer myPlotterRenderer;
-	
+	private final Donatello donatello = new Donatello();
+
 	// GUI elements
 	private MainFrame mainFrame;
-	private final MainMenu mainMenuBar = new MainMenu(this);
+	private MainMenu mainMenuBar;
 	private PreviewPanel previewPanel;
 	private final MakeleangeloRangeSlider rangeSlider = new MakeleangeloRangeSlider();
 
@@ -141,7 +142,7 @@ public final class Makelangelo {
 	}
 
 	public void run() {
-		createAppWindow();		
+		createAppWindow();
 		//checkSharingPermission();
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
@@ -424,13 +425,15 @@ public final class Makelangelo {
 			logger.warn("Can't load icon", e);
 		}
 
-		mainFrame.setJMenuBar(mainMenuBar);
 		mainFrame.addDockingPanel("Preview","Preview",createContentPane());
-		mainFrame.addDockingPanel("Donatello","Donatello",new Donatello());
+		mainFrame.addDockingPanel("Donatello","Donatello",donatello);
 		logger.debug("  make visible...");
 		mainFrame.setVisible(true);
 		mainFrame.resetDefaultLayout();
 		mainFrame.saveAndRestoreLayout();
+
+		mainMenuBar = new MainMenu(this,mainFrame);
+		mainFrame.setJMenuBar(mainMenuBar);
 
 		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
 

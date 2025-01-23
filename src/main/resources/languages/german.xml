@@ -201,6 +201,7 @@
     <string><key>MenuView.zoomIn</key><value>Zoom +</value></string>
     <string><key>MenuView.zoomOut</key><value>Zoom -</value></string>
     <string><key>MenuView</key><value>Ansicht</value></string>
+    <string><key>MenuWindows</key><value>Fenster</value></string>
     <string><key>MetricsPreferences.Title</key><value>Maße</value></string>
     <string><key>MetricsPreferences.collectAnonymousMetrics</key><value>&lt;html&gt;&lt;body&gt;Ich stimme zu, anonyme Benutzungsdaten mit&lt;br&gt;Marginally Clever Robots, Limited zu teilen.&lt;/html&gt;&lt;/body&gt;</value></string>
     <string><key>MetricsPreferences.collectAnonymousMetricsOnUpdate</key><value>&lt;html&gt;&lt;body&gt;Darf Marginally Clever Robots, Ltd. anonyme Metriken über diese app sammeln?&lt;br&gt;&lt;br&gt;Du kannst dies jederzeit unter &lt;i&gt;Makelangelo &amp;gt; Einstellungen &amp;gt; Metriken ändern&lt;/i&gt;&lt;/html&gt;&lt;/body&gt;</value></string>
