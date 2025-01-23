@@ -31,7 +31,7 @@ public class LoadTHR implements TurtleLoader {
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
 		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 

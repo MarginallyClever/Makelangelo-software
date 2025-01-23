@@ -10,12 +10,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * Loads a Factorio map exported from <a href='https://github.com/FUE5BASE/FUE5-Exporter'>FUE5 Exporter</a>
  */
 public class LoadFactorioMap implements TurtleLoader {
     private static final Logger logger = LoggerFactory.getLogger(LoadFactorioMap.class);
+    private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Factorio Export","json");
 
     static final Color BELT = Color.ORANGE;
     static final Color PIPE = Color.BLUE;
@@ -24,13 +26,13 @@ public class LoadFactorioMap implements TurtleLoader {
 
     @Override
     public FileNameExtensionFilter getFileNameFilter() {
-        return new FileNameExtensionFilter("FUE5 export","json");
+        return filter;
     }
 
     @Override
     public boolean canLoad(String filename) {
-        String ext = filename.substring(filename.lastIndexOf('.'));
-        return (ext.equalsIgnoreCase(".json"));
+        String ext = filename.substring(filename.lastIndexOf('.')+1);
+        return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
     }
 
     /**

@@ -21,6 +21,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,8 +53,8 @@ public class LoadSVG implements TurtleLoader {
 
 	@Override
 	public boolean canLoad(String filename) {
-		String ext = filename.substring(filename.lastIndexOf('.'));
-		return ext.equalsIgnoreCase(".svg");
+		String ext = filename.substring(filename.lastIndexOf('.')+1);
+		return Arrays.stream(filter.getExtensions()).anyMatch(ext::equalsIgnoreCase);
 	}
 
 	@Override

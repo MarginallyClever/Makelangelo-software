@@ -22,7 +22,8 @@ public class TurtleFactory {
 			new LoadScratch2(),
 			new LoadScratch3(),
 			new LoadSVG(),
-			new LoadTHR()
+			new LoadTHR(),
+			new LoadAudio()
 	};
 	
 	private static final TurtleSaver [] savers = {
