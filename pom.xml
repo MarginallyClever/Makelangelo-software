@@ -581,12 +581,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 
 		<!-- donatello -->
 		<dependency>
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
 			<version>1.0.28</version>
 		</dependency>
 		<dependency>
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
 			<version>1.2.8</version>
 		</dependency>
