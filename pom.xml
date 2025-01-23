@@ -550,6 +550,12 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>0.10.2</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- read audio files -->
+		<dependency>
+			<groupId>com.github.umjammer</groupId>
+			<artifactId>mp3spi</artifactId>
+			<version>1.9.17</version>
+		</dependency>
     </dependencies>
 
 	<properties>
