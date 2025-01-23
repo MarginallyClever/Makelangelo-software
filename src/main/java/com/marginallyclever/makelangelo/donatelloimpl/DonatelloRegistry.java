@@ -1,10 +1,6 @@
 package com.marginallyclever.makelangelo.donatelloimpl;
 
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.*;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes.Circle;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes.Line;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes.NGon;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes.Rectangle;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
 import com.marginallyclever.nodegraphcore.DAORegistry;
@@ -34,25 +30,6 @@ public class DonatelloRegistry implements DAORegistry, NodeRegistry {
     @Override
     public void registerNodes() {
         logger.info("Registering makelangelo-software nodes");
-        //NodeFactory.registerAllNodesInPackage("com.marginallyclever.makelangelo.donatelloimpl");
-
-        NodeFactory.registerNode(AddTurtles.class);
-        NodeFactory.registerNode(Circle.class);
-        NodeFactory.registerNode(ColorTurtle.class);
-        NodeFactory.registerNode(GradientNoise.class);
-        NodeFactory.registerNode(Line.class);
-        NodeFactory.registerNode(LineWeightByImage.class);
-        NodeFactory.registerNode(LoadTurtle.class);
-        NodeFactory.registerNode(NGon.class);
-        NodeFactory.registerNode(PathImageMask.class);
-        NodeFactory.registerNode(PatternOnPath.class);
-        NodeFactory.registerNode(PointOnPath.class);
-        NodeFactory.registerNode(PrintTurtle.class);
-        NodeFactory.registerNode(Rectangle.class);
-        NodeFactory.registerNode(SaveTurtle.class);
-        NodeFactory.registerNode(TransformTurtle.class);
-        NodeFactory.registerNode(TruchetTiles.class);
-        NodeFactory.registerNode(TurtleToBufferedImage.class);
-        NodeFactory.registerNode(TurtleToRectangle.class);
+        NodeFactory.registerAllNodesInPackage("com.marginallyclever.makelangelo.donatelloimpl");
     }
 }
