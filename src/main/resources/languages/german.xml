@@ -86,7 +86,6 @@
     <string><key>EstimatedTimeIs</key><value>Geschätzte Zeit ist %1</value></string>
     <string><key>Export</key><value>Exportiere</value></string>
     <string><key>FibonacciSpiralName</key><value>Fibonacci Spiralenfraktal</value></string>
-    <string><key>FileTypeScratch3</key><value>Scratch 3</value></string>
     <string><key>FillPageName</key><value>Seite füllen</value></string>
     <string><key>FirmwareUpdate</key><value>Firmwareupdate</value></string>
     <string><key>FirmwareUploader.help</key><value><![CDATA[<html><body><a href="https://mcr.dozuki.com/Guide/How+To+Update+Makelangelo+Firmware/42?lang=en">help</body></html>]]></value></string>
