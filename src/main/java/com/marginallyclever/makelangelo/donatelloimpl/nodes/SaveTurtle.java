@@ -10,6 +10,9 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Save a {@link Turtle} to a file.
+ */
 public class SaveTurtle extends Node {
 
     private static final Logger logger = LoggerFactory.getLogger(SaveTurtle.class);

@@ -5,6 +5,9 @@ import com.marginallyclever.nodegraphcore.port.Input;
 import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
+/**
+ * Add two {@link Turtle}s together.
+ */
 public class AddTurtles extends Node {
     private final Input<Turtle> turtleA = new Input<>("A", Turtle.class, new Turtle());
     private final Input<Turtle> turtleB = new Input<>("B", Turtle.class, new Turtle());

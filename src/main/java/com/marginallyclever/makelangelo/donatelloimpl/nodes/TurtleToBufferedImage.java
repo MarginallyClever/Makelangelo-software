@@ -11,6 +11,9 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+/**
+ * Convert a {@link Turtle} to a {@link BufferedImage}.
+ */
 public class TurtleToBufferedImage extends Node {
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Output<BufferedImage> output = new Output<>("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));

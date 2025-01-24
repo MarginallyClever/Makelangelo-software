@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Create a basic Truchet tile pattern from an image.  the intensity of the image decides the tile type.
+ */
 public class TruchetTiles extends Node {
     Input<BufferedImage> source = new Input<>("Source", BufferedImage.class, new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
     Input<Number> spaceBetweenLines = new Input<>("Spacing", Number.class, 10);

@@ -9,6 +9,9 @@ import com.marginallyclever.nodegraphcore.Node;
 
 import java.awt.*;
 
+/**
+ * Change the color of a {@link Turtle}.
+ */
 public class ColorTurtle extends Node {
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Input<Number> red   = new Input<>("red",Number.class,0);

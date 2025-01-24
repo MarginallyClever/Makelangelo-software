@@ -6,7 +6,9 @@ import com.marginallyclever.nodegraphcore.port.Input;
 import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
-
+/**
+ * Place a pattern on a path.
+ */
 public class PatternOnPath extends Node {
     private final Input<Turtle> pattern = new Input<>("pattern", Turtle.class, new Turtle());
     private final Input<Turtle> path = new Input<>("path", Turtle.class, new Turtle());
@@ -29,15 +31,11 @@ public class PatternOnPath extends Node {
         int c = count.getValue().intValue();
         if(c>0) {
             double pDistance = myPath.getDrawDistance();
-            double step = pDistance/(double)c;
-            if(pDistance==0) {
-                pDistance=c;
-                step=1;
-            }
-            double n=0;
-            for(int i=0;i<c;++i) {
+            double step = (pDistance==0) ? 1 : pDistance/(double)c;
+            double n = 0;
+            for(int i = 0; i < c; ++i) {
                 Point2D p = myPath.interpolate(n);
-                n+=step;
+                n += step;
                 Turtle stamp = new Turtle(myPattern);
                 stamp.translate(p.x,p.y);
                 sum.add(stamp);

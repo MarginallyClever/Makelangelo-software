@@ -5,7 +5,9 @@ import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
-
+/**
+ * Transform a {@link Turtle} by scaling, rotating, and translating it.
+ */
 public class TransformTurtle extends Node {
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
     private final Input<Number> sx = new Input<>("scale x",Number.class,1);

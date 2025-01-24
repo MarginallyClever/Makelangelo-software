@@ -9,6 +9,9 @@ import com.marginallyclever.nodegraphcore.port.Input;
 
 import java.awt.*;
 
+/**
+ * Print the {@link Turtle}'s path behind the {@link Node}s.
+ */
 public class PrintTurtle extends Node implements PrintWithGraphics {
     //private static final Logger logger = LoggerFactory.getLogger(PrintTurtle.class);
     private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());

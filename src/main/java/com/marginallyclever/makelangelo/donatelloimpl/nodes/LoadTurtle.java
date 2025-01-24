@@ -10,6 +10,9 @@ import com.marginallyclever.nodegraphcore.Node;
 
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Load a {@link Turtle} from a file.
+ */
 public class LoadTurtle extends Node {
     private final Input<Filename> filename = new Input<>("filename",Filename.class,new Filename(""));
     private final Output<Turtle> contents = new Output<>("contents", Turtle.class, new Turtle());

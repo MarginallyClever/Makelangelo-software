@@ -8,6 +8,9 @@ import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Generate a 2D gradient noise image.
+ */
 public class GradientNoise extends Node {
     private final Input<Number> width = new Input<>("width", Number.class, 256);
     private final Input<Number> height = new Input<>("height", Number.class, 256);
