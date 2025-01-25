@@ -550,25 +550,24 @@ public class Turtle implements Cloneable {
 	 * @return a point along the drawn lines of this {@link Turtle}
 	 */
 	public Point2D interpolate(double t) {
-		double d=0;
+		double segmentDistanceSum=0;
 		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
 		for( TurtleMove m : history) {
 			if(m.type == MovementType.DRAW_LINE) {
 				double dx = m.x-prev.x;
 				double dy = m.y-prev.y;
-				double change = Math.sqrt(dx*dx+dy*dy);
-				if(d+change>=t) {  // d < t < d+change
-					double v = (t-d==0)? 0 : (t-d) / change;
-					v = Math.max(Math.min(v,1),0);
+				double segmentDistance = Math.sqrt(dx*dx+dy*dy);
+				if(segmentDistanceSum+segmentDistance>=t) {  // currentDistance < t < currentDistance+segmentDistance
+					double ratio = Math.max(Math.min((t-segmentDistanceSum) / segmentDistance,1),0);
 					return new Point2D(
-							prev.x + dx * v,
-							prev.y + dy * v);
+							prev.x + dx * ratio,
+							prev.y + dy * ratio);
 				}
-				d += change;
+				segmentDistanceSum += segmentDistance;
 				prev = m;
 			} else if(m.type == MovementType.TRAVEL) {
 				prev = m;
-			}
+			} // else tool change, ignore.
 		}
 		return new Point2D(prev.x,prev.y);
 	}
