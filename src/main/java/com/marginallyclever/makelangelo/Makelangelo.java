@@ -8,6 +8,7 @@ import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.FileHelper;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
@@ -21,6 +22,7 @@ import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererF
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.preview.Camera;
+import com.marginallyclever.makelangelo.preview.PreviewDropTarget;
 import com.marginallyclever.makelangelo.preview.PreviewPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.MarlinSimulationVisualizer;
@@ -95,6 +97,7 @@ public final class Makelangelo {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
 		}
+		new DropTarget(donatello, new DonatelloDropTarget(donatello));
 
 		rangeSlider.addChangeListener(e->{
 			myTurtleRenderer.setFirst(rangeSlider.getBottom());
@@ -458,7 +461,7 @@ public final class Makelangelo {
 	
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		new DropTarget(mainFrame, new MakelangeloDropTarget(this));
+		new DropTarget(previewPanel, new PreviewDropTarget(this));
 	}
 
 	private boolean confirmClose() {
