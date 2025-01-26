@@ -4,6 +4,7 @@ import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.Filename;
 import com.marginallyclever.donatello.nodes.images.LoadImage;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.LoadTurtle;
+import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.port.Input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,13 @@ public class DonatelloDropTarget extends DropTargetAdapter {
                     if (o instanceof List<?> list && !list.isEmpty()) {
                         o = list.getFirst();
                         if (o instanceof File file) {
-                            loadFile(file.getAbsolutePath());
+                            Node n = loadFile(file.getAbsolutePath());
+                            if(n != null) {
+                                var sp = donatello.getPaintArea().getMousePosition();
+                                // convert the mouse position to donatello view coordinates.
+                                var wp = donatello.getPaintArea().transformScreenToWorldPoint(sp);
+                                n.setPosition(wp);
+                            }
 
                             dtde.dropComplete(true);
                             return;
@@ -58,25 +65,24 @@ public class DonatelloDropTarget extends DropTargetAdapter {
         }
     }
 
-    private void loadFile(String absolutePath) {
+    private Node loadFile(String absolutePath) {
         // determine if the file is an image or a turtle
         try {
             // Load the file and if it doesn't fail then it's probably an image.
             // If it's stupid and it works... it's not that stupid.
             if (ImageIO.read(new File(absolutePath)) != null) {
-                loadImage(absolutePath);
-                return;
+                return loadImage(absolutePath);
             }
         } catch (Exception ignored) {}
 
-        loadTurtle(absolutePath);
+        return loadTurtle(absolutePath);
     }
 
     /**
      * In Donatello add a {@link LoadImage} with the given file.  Assumes {@link LoadImage} can load the file.
      * @param absPath The absolute path to the file.
      */
-    private void loadImage(String absPath) {
+    private Node loadImage(String absPath) {
         LoadImage loadImage = new LoadImage();
         var first = loadImage.getVariable(0);
         if(!(first instanceof Input<?> inputFile)) throw new IllegalStateException("First variable is not an Input");
@@ -84,13 +90,14 @@ public class DonatelloDropTarget extends DropTargetAdapter {
         donatello.getGraph().add(loadImage);
         inputFile.setValue(new Filename(absPath));
         donatello.submit(loadImage);
+        return loadImage;
     }
 
     /**
      * In Donatello add a {@link LoadTurtle} with the given file.  Assumes {@link LoadTurtle} can load the file.
      * @param absPath The absolute path to the file.
      */
-    private void loadTurtle(String absPath) {
+    private Node loadTurtle(String absPath) {
         LoadTurtle loadTurtle = new LoadTurtle();
         var first = loadTurtle.getVariable(0);
         if(!(first instanceof Input<?> inputFile)) throw new IllegalStateException("First variable is not an Input");
@@ -98,5 +105,6 @@ public class DonatelloDropTarget extends DropTargetAdapter {
         donatello.getGraph().add(loadTurtle);
         inputFile.setValue(new Filename(absPath));
         donatello.submit(loadTurtle);
+        return loadTurtle;
     }
 }
