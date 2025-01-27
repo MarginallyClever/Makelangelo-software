@@ -57,7 +57,8 @@ public class GradientNoise extends Node {
 
         for(int y=0;y<h;++y) {
             for(int x=0;x<w;++x) {
-                int c = (int)(noise.noise(x*sx+tx,y*sy+ty) * 255.0);
+                double n = noise.noise(x*sx+tx,y*sy+ty);
+                int c = (int)Math.max(0,Math.min(255, (1.0+n) * 255.0/2.0));
                 pixels[0] = c;
                 pixels[1] = c;
                 pixels[2] = c;
