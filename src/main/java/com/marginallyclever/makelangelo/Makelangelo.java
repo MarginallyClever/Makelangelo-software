@@ -97,7 +97,6 @@ public final class Makelangelo {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
 		}
-		new DropTarget(donatello, new DonatelloDropTarget(donatello));
 
 		rangeSlider.addChangeListener(e->{
 			myTurtleRenderer.setFirst(rangeSlider.getBottom());
@@ -462,6 +461,7 @@ public final class Makelangelo {
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
 		new DropTarget(previewPanel, new PreviewDropTarget(this));
+		new DropTarget(donatello, new DonatelloDropTarget(donatello));
 	}
 
 	private boolean confirmClose() {
