@@ -19,6 +19,12 @@ import java.util.Random;
  */
 public class CellularNoise implements Noise {
     /**
+     * The maximum distance that a point can be from another point.
+     */
+    private final double MAX_DIST = Math.sqrt(3.0)/2.0;
+    private final Random random = new Random();
+
+    /**
      * Represents a point in three dimensional space.
      *
      * @author saybur
@@ -64,6 +70,11 @@ public class CellularNoise implements Noise {
     }
 
     @Override
+    public void setSeed(int seed) {
+        random.setSeed(seed);
+    }
+
+    @Override
     public double noise(double xin) {
         return noise(xin,0,0);
     }
@@ -71,6 +82,22 @@ public class CellularNoise implements Noise {
     @Override
     public double noise(double xin, double yin) {
         return noise(xin,yin,0);
+    }
+
+    /**
+     * Gets the noise value at the provided location.
+     *
+     * @param x
+     *            the x coordinate.
+     * @param y
+     *            the y coordinate.
+     * @param z
+     *            the z coordinate.
+     * @return the noise value at the coordinate.
+     */
+    public double noise(double x, double y, double z)
+    {
+        return (minimumDistance(random, new Point(x, y, z)) / MAX_DIST)*2.0-1.0;
     }
 
     private int floor(double n) {
@@ -197,21 +224,5 @@ public class CellularNoise implements Noise {
 
     private double square(double n) {
         return n * n;
-    }
-
-    /**
-     * Gets the noise value at the provided location.
-     *
-     * @param x
-     *            the x coordinate.
-     * @param y
-     *            the y coordinate.
-     * @param z
-     *            the z coordinate.
-     * @return the noise value at the coordinate.
-     */
-    public double noise(double x, double y, double z)
-    {
-        return minimumDistance(new Random(), new Point(x, y, z));
     }
 }

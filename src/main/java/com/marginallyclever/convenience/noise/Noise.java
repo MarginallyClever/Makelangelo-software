@@ -1,10 +1,12 @@
 package com.marginallyclever.convenience.noise;
 
 public interface Noise {
+    void setSeed(int seed);
+
     /**
      * 1D noise
      * @param xin a double
-     * @return a double [0...1]
+     * @return a double [-1...1]
      */
     double noise(double xin);
 
@@ -12,7 +14,7 @@ public interface Noise {
      * 2D noise
      * @param xin a double
      * @param yin a double
-     * @return a double [0...1]
+     * @return a double [-1...1]
      */
     double noise(double xin, double yin);
 
@@ -21,7 +23,7 @@ public interface Noise {
      * @param xin a double
      * @param yin a double
      * @param zin a double
-     * @return a double [0...1]
+     * @return a double [-1...1]
      */
     double noise(double xin, double yin,double zin);
 }
