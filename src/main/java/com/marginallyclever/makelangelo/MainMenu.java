@@ -347,7 +347,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createToolsMenu() {
-        JMenu menu = new JMenu(Translator.get("Art Pipeline"));
+        JMenu menu = new JMenu(Translator.get("ArtPipeline"));
         menu.setMnemonic('T');
 
         try {

@@ -22,10 +22,10 @@ public class Converter_Sandy extends ImageConverter {
 	private static int blockScale=150;
 	private static int direction=0;
 	private final String [] directionChoices = new String[] {
-		Translator.get("top right"),
-		Translator.get("top left"), 
-		Translator.get("bottom left"), 
-		Translator.get("bottom right"), 
+		Translator.get("topRight"),
+		Translator.get("topLeft"),
+		Translator.get("bottomLeft"),
+		Translator.get("bottomRight"),
 		Translator.get("center")
 	};
 

@@ -26,6 +26,12 @@ module com.marginallyclever.makelangelo {
     requires com.marginallyclever.donatello;
     requires com.marginallyclever.nodegraphcore;
 
+    exports com.marginallyclever.communications;
+    exports com.marginallyclever.makelangelo.select;
+    exports com.marginallyclever.makelangelo.makeart;
+    exports com.marginallyclever.makelangelo.makeart.imagefilter;
+    exports com.marginallyclever.makelangelo.makeart.turtletool;
+    exports com.marginallyclever.makelangelo.paper;
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes to com.marginallyclever.nodegraphcore;
