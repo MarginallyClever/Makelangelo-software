@@ -62,10 +62,13 @@ public class LineWeightByImage extends Node {
         sourceImage.setTranslation(0,0);
         Turtle turtle = new Turtle();
         List<Turtle> colors = myTurtle.splitByToolChange();
+        setComplete(0);
         for( Turtle t2 : colors ) {
+            setComplete((int)(100.0*colors.indexOf(t2)/colors.size()));
             turtle.add(calculate(t2));
         }
 
+        setComplete(100);
         result.send(turtle);
     }
 

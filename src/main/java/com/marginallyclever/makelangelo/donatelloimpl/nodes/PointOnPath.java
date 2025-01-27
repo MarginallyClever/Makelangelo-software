@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.port.Input;
 import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
@@ -38,33 +39,30 @@ public class PointOnPath extends Node {
     public void update() {
         Turtle myPath = path.getValue();
         double total = myPath.getDrawDistance();
-        if(total!=0) {
-            double c0 = index.getValue().doubleValue();
-            if (c0 > 0) {
-                double c1 = c0 + EPSILON;
-                Point2D p0 = myPath.interpolate(c0);
-                px.send(p0.x);
-                px.send(p0.y);
-
-                Point2D p1;
-                if(c1>total) {
-                    p1 = myPath.interpolate(total);
-                    p0 = myPath.interpolate(total-EPSILON);
-                } else {
-                    p1 = myPath.interpolate(c1);
-                }
-                double dx = p1.x - p0.x;
-                double dy = p1.y - p0.y;
-                Point2D n = new Point2D(dx,dy);
-                n.normalize();
-                nx.send(n.x);
-                ny.send(n.y);
-            }
-        } else {
+        double c0 = index.getValue().doubleValue();
+        if(total==0 || c0 <= 0) {
             px.send(0);
             px.send(0);
             nx.send(1);
             ny.send(0);
+            return;
         }
+
+        double c1 = c0 + EPSILON;
+        if(c1>total) {
+            c1 = total;
+            c0 = total - EPSILON;
+        }
+        TurtlePathWalker walker = new TurtlePathWalker(myPath);
+        Point2D p0 = walker.walk(c0);
+        Point2D p1 = walker.walk(c1-c0);
+        double dx = p1.x - p0.x;
+        double dy = p1.y - p0.y;
+        Point2D n = new Point2D(dx,dy);
+        n.normalize();
+        px.send(p0.x);
+        px.send(p0.y);
+        nx.send(n.x);
+        ny.send(n.y);
     }
 }

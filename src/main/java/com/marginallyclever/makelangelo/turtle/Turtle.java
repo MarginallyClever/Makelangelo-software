@@ -548,7 +548,9 @@ public class Turtle implements Cloneable {
 	 * Returns a point along the drawn lines of this {@link Turtle}
 	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
 	 * @return a point along the drawn lines of this {@link Turtle}
+	 * @deprecated since 7.63.0 use {@link TurtlePathWalker} instead.
 	 */
+	@Deprecated(since="7.63.0")
 	public Point2D interpolate(double t) {
 		double segmentDistanceSum=0;
 		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);

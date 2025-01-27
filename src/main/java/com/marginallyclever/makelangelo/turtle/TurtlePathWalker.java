@@ -11,7 +11,7 @@ public class TurtlePathWalker {
     private final Iterator<TurtleMove> iterator;
     private TurtleMove prev;
     private TurtleMove m;
-    private final double totalDistance;
+    private final double drawDistance;
     private double tSum;
     private double segmentDistance;
     private double segmentDistanceSum;
@@ -19,7 +19,7 @@ public class TurtlePathWalker {
     public TurtlePathWalker(Turtle turtle) {
         iterator = turtle.history.iterator();
         prev = new TurtleMove(0, 0, MovementType.TRAVEL);
-        totalDistance = turtle.getDrawDistance();
+        drawDistance = turtle.getDrawDistance();
         tSum = 0;
         segmentDistanceSum = 0;
         advance();
@@ -46,13 +46,16 @@ public class TurtlePathWalker {
     }
 
     /**
-     * Walk the turtle along the path by the given distance.
-     * @param distance the distance to walk
+     * Advance along the drawn portion of the {@link Turtle} path by the given relative distance.
+     * @param distance the relative distance to move
      * @return the new position of the turtle
+     * @throws IllegalArgumentException if distance is negative.
      */
     public Point2D walk(double distance) {
+        if(distance<0) throw new IllegalArgumentException("distance must be positive");
+
         tSum+=distance;
-        while (segmentDistanceSum < tSum ) {
+        while (segmentDistanceSum <= tSum ) {
             if (segmentDistanceSum+segmentDistance>=tSum) {
                 double dx = m.x - prev.x;
                 double dy = m.y - prev.y;
@@ -71,10 +74,20 @@ public class TurtlePathWalker {
     }
 
     public boolean isDone() {
-        return totalDistance <= tSum;
+        return drawDistance <= tSum;
     }
 
+    /**
+     * @return the distanced travelled so far.
+     */
     public double getTSum() {
         return tSum;
+    }
+
+    /**
+     * @return the total distance of the path.
+     */
+    public double getDrawDistance() {
+        return drawDistance;
     }
 }

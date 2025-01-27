@@ -44,7 +44,6 @@ public class Generator_FlowField extends TurtleGenerator {
 		add(selectRandomSeed);
 		selectRandomSeed.addSelectListener((evt)->{
 			seed = (int)evt.getNewValue();
-			random.setSeed(seed);
 			generate();
 		});
 
@@ -120,6 +119,8 @@ public class Generator_FlowField extends TurtleGenerator {
 
 	@Override
 	public void generate() {
+		random.setSeed(seed);
+		noiseMaker.setSeed(seed);
 		Turtle turtle = new Turtle();
 
 		if (fromEdge) {

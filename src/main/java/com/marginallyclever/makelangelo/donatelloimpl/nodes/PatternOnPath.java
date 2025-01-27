@@ -2,9 +2,10 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
+import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.port.Input;
 import com.marginallyclever.nodegraphcore.port.Output;
-import com.marginallyclever.nodegraphcore.Node;
 
 /**
  * Place a pattern on a path.
@@ -30,17 +31,18 @@ public class PatternOnPath extends Node {
         Turtle myPath = path.getValue();
         int c = count.getValue().intValue();
         if(c>0) {
-            double pDistance = myPath.getDrawDistance();
+            TurtlePathWalker walker = new TurtlePathWalker(myPath);
+            double pDistance = walker.getDrawDistance();
             double step = (pDistance==0) ? 1 : pDistance/(double)c;
-            double n = 0;
-            for(int i = 0; i < c; ++i) {
-                Point2D p = myPath.interpolate(n);
-                n += step;
+            while(!walker.isDone()) {
+                Point2D p = walker.walk(step);
                 Turtle stamp = new Turtle(myPattern);
                 stamp.translate(p.x,p.y);
                 sum.add(stamp);
+                setComplete((int)(100*walker.getTSum()/pDistance));
             }
         }
+        setComplete(100);
         output.send(sum);
     }
 }
