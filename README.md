@@ -43,3 +43,4 @@ Makelangelo is derived from the work of Paul Fisher. It is largely inspired by [
 - Icons from [Famfamfam silk icons](http://www.famfamfam.com/lab/icons/silk/), Creative Commons Attribution 3.0 License
 - App icons provided by http://icons8.com.
 - Ramps v1.4 drawing from [Reprap](Wikihttps://reprap.org/wiki/File:Rampsv14_wiring_psu.png), GPL v2
+- Inspiration from [Kinogaki](https://app.kinogaki.com/)
