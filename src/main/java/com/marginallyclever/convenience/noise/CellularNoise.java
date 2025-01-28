@@ -209,7 +209,8 @@ public class CellularNoise implements Noise {
      */
     private double processVoxel(Random r, Point p, double s, int x, int y, int z) {
         // reset random number generator for the voxel
-        r.setSeed(x + y + z);
+        long seed = x * 73856093L ^ y * 19349663L ^ z * 83492791L;
+        r.setSeed(seed);
         // each voxel always has one point
         Point created = new Point(
                 x + r.nextDouble(),
