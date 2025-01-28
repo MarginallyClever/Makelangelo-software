@@ -18,6 +18,7 @@ public class FlowField extends Node {
     private final Input<Number> spacingValue = new Input<>("spacing",Number.class,10);
     private final Input<Number> stepValue = new Input<>("step size",Number.class,3);
     private final Input<Number> numStepsValue = new Input<>("step count",Number.class,3);
+    private final Input<Number> startAngle = new Input<>("start angle",Number.class,0);
     private final Output<Turtle> result = new Output<>("result",Turtle.class,new Turtle());
 
     public FlowField() {
@@ -26,30 +27,28 @@ public class FlowField extends Node {
         addVariable(spacingValue);
         addVariable(stepValue);
         addVariable(numStepsValue);
+        addVariable(startAngle);
         addVariable(result);
     }
 
     @Override
     public void update() {
         var img = inputImage.getValue();
-        ColorModel cm = img.getColorModel();
-        var raster = img.getRaster();
-        int numComponents = cm.getNumComponents();
-        int [] pixel = new int[numComponents];
-
-        int spacing = Math.max(1,spacingValue.getValue().intValue());
+        var turtle = new Turtle();
         int step = Math.max(1,stepValue.getValue().intValue());
         int numSteps = Math.max(1,numStepsValue.getValue().intValue());
-        var turtle = new Turtle();
+        double angle = startAngle.getValue().doubleValue();
+        FlowDrawer drawer = new FlowDrawer(img, turtle, step, angle);
 
         // move in a grid over the image and generate a flow field
+        int spacing = Math.max(1,spacingValue.getValue().intValue());
         var w = img.getWidth();
         var h = img.getHeight();
-        var size = w*h;
+
         setComplete(0);
-        for (int y = 0; y < h; y+=spacing) {
-            for (int x = 0; x < w; x+=spacing) {
-                drawFlowField(raster, numComponents, pixel, step, turtle, x, y,numSteps);
+        for (int y = 0; y <= h; y+=spacing) {
+            for (int x = 0; x <= w; x+=spacing) {
+                drawer.draw(x, y, numSteps);
             }
             setComplete(100*y/h);
         }
@@ -58,23 +57,67 @@ public class FlowField extends Node {
         result.send(turtle);
     }
 
-    private void drawFlowField(WritableRaster raster, int numComponents, int[] pixel, int step, Turtle turtle, int x, int y, int numSteps) {
-        turtle.jumpTo(x, y);
-        for(int i=0;i<numSteps;++i) {
-            drawFlowFieldStep(raster, numComponents, pixel, step, turtle);
-        }
-    }
+    /**
+     * Uses a {@link Turtle} to draws one flow line of a flow field based on the intensity of a {@link BufferedImage}.
+     */
+    static class FlowDrawer {
+        private final Turtle turtle;
+        private final int [] pixel;
+        private final double strideLength;
+        private final WritableRaster raster;
+        private final double startDegrees;
 
-    private void drawFlowFieldStep(WritableRaster raster, int numComponents, int[] pixel, int step, Turtle turtle) {
-        int x = (int)turtle.getX();
-        int y = (int)turtle.getY();
-        if(!raster.getBounds().contains(x,y)) return;
-        raster.getPixel(x, y, pixel);
-        // get intensity of image at x,y
-        double intensity = (double) Arrays.stream(pixel).sum() / numComponents;
-        // get angle of flow field as intensity * 180 / 255
-        double radians = intensity * 180.0/255.0;
-        turtle.setAngle(radians);
-        turtle.forward(step);
+        /**
+         * @param img the image to read
+         * @param turtle the turtle to draw with
+         * @param strideLength the distance to move each step
+         * @param startDegrees the starting angle offset
+         */
+        public FlowDrawer(BufferedImage img, Turtle turtle, double strideLength, double startDegrees) {
+            this.turtle = turtle;
+            this.strideLength = strideLength;
+            this.startDegrees = startDegrees;
+
+            ColorModel cm = img.getColorModel();
+            raster = img.getRaster();
+
+            int numComponents = cm.getNumComponents();
+            pixel = new int[numComponents];
+        }
+
+        /**
+         * Draw a flow line starting at x,y
+         * @param x the x coordinate
+         * @param y the y coordinate
+         * @param numSteps the number of steps to draw
+         */
+        public void draw(double x, double y, int numSteps) {
+            turtle.jumpTo(x, y);
+            for(int i=0;i<numSteps;++i) {
+                drawStep();
+            }
+        }
+
+        private void drawStep() {
+            int x = (int) turtle.getX();
+            int y = (int) turtle.getY();
+            if (!raster.getBounds().contains(x, y)) return;
+            raster.getPixel(x, y, pixel);
+            // get intensity of image at x,y
+            double intensity = (double) Arrays.stream(pixel).sum() / pixel.length;
+            // get angle of flow field as intensity * 180 / 255
+            double degrees = startDegrees + intensity * 180.0 / 255.0;
+            turtle.setAngle(degrees);
+            var h = turtle.getHeading();
+            var x2 = x + h.x;
+            var y2 = y + h.y;
+            // lift the pen if we are off the image.
+            if (!raster.getBounds().contains(x2, y2)) {
+                turtle.penUp();
+            } else {
+                turtle.penDown();
+            }
+            turtle.forward(strideLength);
+        }
     }
 }
