@@ -3,8 +3,10 @@ package com.marginallyclever.makelangelo.applicationsettings;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.select.SelectBoolean;
 import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 
+import javax.swing.text.JTextComponent;
 import java.util.prefs.Preferences;
 
 public class MetricsPreferences {
@@ -15,11 +17,15 @@ public class MetricsPreferences {
 
 	static public SelectPanel buildPanel() {
 		panel = new SelectPanel();
+
+		var aboutHtml = Translator.get("MetricsPreferences.collectAnonymousMetrics");
+		final JTextComponent bottomText = SelectReadOnlyText.createJEditorPaneWithHyperlinkListenerAndToolTipsForDesktopBrowse(aboutHtml);
+
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.METRICS);
-		collectAnonymousMetricsCheckbox = new SelectBoolean("collect",
-				Translator.get("MetricsPreferences.collectAnonymousMetrics"),
+		collectAnonymousMetricsCheckbox = new SelectBoolean("collect", "",
 				prefs.getBoolean(COLLECT_ANONYMOUS_METRICS_LABEL, false));
 
+		panel.add(bottomText);
 		panel.add(collectAnonymousMetricsCheckbox);
 
 		return panel;
