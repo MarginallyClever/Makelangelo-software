@@ -31,10 +31,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
      * A poly line to draw.
      */
     static class Polyline {
-        public final int[] x;
-        public final int[] y;
-        public final int n;
-        public Color color;
+        private final int[] x;
+        private final int[] y;
+        private final int n;
+        private final Color color;
 
         public Polyline(int[] x, int[] y, int n, Color color) {
             if(x.length!=y.length) throw new IllegalArgumentException("x and y must be the same length");
@@ -89,8 +89,14 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
             n++;
         }
 
-        public Polyline build(Color color) {
-            return build(color,10);
+        /**
+         * Build a {@link Polyline} with the given color.  This is the same as calling {@link #compile(Color, int)}
+         * with a deviation of 10 degrees.
+         * @param color the color of the line.
+         * @return a {@link Polyline} with the given color.
+         */
+        public Polyline compile(Color color) {
+            return compile(color,10);
         }
 
         /**
@@ -99,7 +105,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
          * @param deviationDegrees the maximum deviation in degrees between two lines to be considered a straight line.
          * @return a {@link Polyline} with the given color.
          */
-        public Polyline build(Color color, int deviationDegrees) {
+        public Polyline compile(Color color, int deviationDegrees) {
             if(n<3) {
                 return new Polyline(x.clone(), y.clone(), n, color);
             }
@@ -113,12 +119,13 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
             ny[j] = y[0];
             j++;
 
-            var maxDeviation = Math.toRadians(10);
+            var maxDeviation = Math.toRadians(deviationDegrees);
             var x0 = x[0];
             var y0 = y[0];
             var x1 = x[1];
             var y1 = y[1];
             for(int i=2;i<n;i++) {
+                // compare line 0-1 with line 1-2
                 var x2 = x[i];
                 var y2 = y[i];
                 var dx1 = x1-x0;
@@ -130,13 +137,16 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                 var len2 = Math.sqrt(dx2*dx2 + dy2*dy2);
                 var len = len1*len2;
                 var angle = len==0? 0 : Math.acos(dot/len);  // no divide by zero
+                // if the angle is less than the deviation, skip point 1.
                 if(angle>maxDeviation) {
+                    // otherwise save point 1
                     nx[j] = x1;
                     ny[j] = y1;
                     j++;
                     x0 = x1;
                     y0 = y1;
                 }
+                // move on to the next point.
                 x1 = x2;
                 y1 = y2;
             }
@@ -186,7 +196,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         g2.translate(dx,dy);
         var lineThickness = this.lineThickness.getValue().floatValue();
         g2.setStroke(new BasicStroke(lineThickness));
-        polylines.stream().forEach(p -> p.draw(g2));
+        polylines.forEach(p -> p.draw(g2));
     }
 
     private void generatePolylines(Turtle myTurtle) {
@@ -212,7 +222,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                 }
                 if ( previousMove != null) {
                     if( previousMove.type != m.type ) {
-                        polylines.add(builder.build(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
+                        polylines.add(builder.compile(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
                         builder.clear();
                         builder.add((int) previousMove.x, (int) previousMove.y);
                     }
@@ -224,7 +234,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                 setComplete((int) (100.0 * count++ / size));
             }
             if(builder.n>0 && previousMove!=null) {
-                polylines.add(builder.build(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
+                polylines.add(builder.compile(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
             }
         }
         catch(Exception ignored) {}
