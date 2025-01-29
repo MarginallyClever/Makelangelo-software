@@ -34,18 +34,29 @@ public class PerlinNoise implements Noise {
         }
     }
 
+    /**
+     * 1D Perlin noise.
+     * @param x
+     * @return value from -1 to 1.
+     */
     @Override
     public double noise(double x) {
         return noise(x,0,0);
     }
 
+    /**
+     * 2D Perlin noise.
+     * @param x
+     * @param y
+     * @return value from -1 to 1.
+     */
     @Override
     public double noise(double x, double y) {
         return noise(x,y,0);
     }
 
     /**
-     * 2D Perlin noise. Returns value from -1 to 1.
+     * 3D Perlin noise.
      * @param x
      * @param y
      * @param z
@@ -89,5 +100,10 @@ public class PerlinNoise implements Noise {
         double u = h<8 ? x : y,
                v = h<4 ? y : h==12||h==14 ? x : z;
         return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+    }
+
+    @Override
+    public void setSeed(int seed) {
+        // not used
     }
 }

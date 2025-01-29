@@ -69,7 +69,7 @@ public class Converter_TruchetFromImage extends ImageConverter {
 
         for(double y=miny;y<maxy;y+=tileSize) {
             for(double x=minx;x<maxx;x+=tileSize) {
-                int intensity = result.sample(x,y,x+tileSize,y+tileSize);
+                int intensity = result.sample(x,y,tileSize);
                 if(intensity>128) truchet.tileA(px+x,py+y);
                 else              truchet.tileB(px+x,py+y);
             }

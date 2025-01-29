@@ -136,9 +136,7 @@ public class Converter_Wander extends ImageConverter {
 			do {
 				endPX = xLeft   + (random.nextDouble() * width)+0.5; 
 				endPY = yBottom + (random.nextDouble() * height)+0.5; 
-				v = img.sample(
-						endPX - halfStep, endPY - halfStep, 
-						endPX + halfStep, endPY + halfStep);
+				v = img.sample(endPX, endPY, halfStep);
 				++tries;
 			} while(v>cutoff && tries<1000);
 			if(tries==1000) break;  // ran out of points to try?

@@ -1,5 +1,6 @@
-package com.marginallyclever.makelangelo;
+package com.marginallyclever.makelangelo.preview;
 
+import com.marginallyclever.makelangelo.Makelangelo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,11 +12,14 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
 
-public class MakelangeloDropTarget extends DropTargetAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(MakelangeloDropTarget.class);
+/**
+ * Allows the user to drag and drop a file onto the {@link PreviewPanel}.
+ */
+public class PreviewDropTarget extends DropTargetAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(PreviewDropTarget.class);
     private final Makelangelo app;
 
-    public MakelangeloDropTarget(Makelangelo app) {
+    public PreviewDropTarget(Makelangelo app) {
         super();
         this.app = app;
     }
@@ -30,15 +34,12 @@ public class MakelangeloDropTarget extends DropTargetAdapter {
                 if (flavor.isFlavorJavaFileListType()) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
                     Object o = tr.getTransferData(flavor);
-                    if (o instanceof List<?>) {
-                        List<?> list = (List<?>) o;
-                        if (list.size() > 0) {
-                            o = list.get(0);
-                            if (o instanceof File) {
-                                app.openFile(((File) o).getAbsolutePath());
-                                dtde.dropComplete(true);
-                                return;
-                            }
+                    if (o instanceof List<?> list && !list.isEmpty()) {
+                        o = list.getFirst();
+                        if (o instanceof File file) {
+                            app.openFile(file.getAbsolutePath());
+                            dtde.dropComplete(true);
+                            return;
                         }
                     }
                 }

@@ -111,7 +111,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 				fy = Math.sin(f) * r2;
 				// clip to paper boundaries
 				if( rect.contains(fx, fy) ) {
-					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
+					z = img.sample( fx, fy, halfStep);
 					scale_z = (255.0f - z) / 255.0f;
 					pulse_size = halfStep * scale_z;
 					nx = (halfStep+pulse_size*n) * fx / r2;

@@ -360,4 +360,9 @@ public class SimplexNoise implements Noise {  // Simplex noise in 2D, 3D and 4D
         // Sum up and scale the result to cover the range [-1,1]
         return 27.0 * (n0 + n1 + n2 + n3 + n4);
     }
+
+    @Override
+    public void setSeed(int seed) {
+        // not used
+    }
 }

@@ -24,10 +24,11 @@ public class TranslatorTest {
 	@Test
 	public void loadLanguageTest() {
 		String [] available = Translator.getLanguageList();
+		assertTrue(available.length > 1, "More than one language needed to complete test.");
 		int current = Translator.getCurrentLanguageIndex();
 		assertNotNull(available[current]);
 	}
-	
+
 	@Test
 	public void changeLanguageTest() {
 		String[] available = Translator.getLanguageList();

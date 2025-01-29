@@ -92,9 +92,9 @@ public class Converter_Boxxy extends ImageConverter {
 			++i;
 			if ((i % 2) == 0) {
 				// every even line move left to right
-				for (x = xLeft; x < xRight; x += fullStep) {
+				for (x = xLeft + halfStep; x < xRight; x += fullStep) {
 					// read a block of the image and find the average intensity in this block
-					z = img.sample( x, y - halfStep, x + fullStep, y + halfStep );
+					z = img.sample( x, y, halfStep );
 					// scale the intensity value
 					double scaleZ =  (255.0f - z) / 255.0;
 					if (scaleZ > lowpass) {
@@ -104,9 +104,9 @@ public class Converter_Boxxy extends ImageConverter {
 				}
 			} else {
 				// every odd line move right to left
-				for (x = xRight; x > xLeft; x -= fullStep) {
+				for (x = xRight + halfStep; x > xLeft; x -= fullStep) {
 					// read a block of the image and find the average intensity in this block
-					z = img.sample( x - halfStep, y - halfStep, x + halfStep, y + halfStep);
+					z = img.sample( x, y, halfStep);
 					// scale the intensity value
 					double scaleZ = (255.0f - z) / 255.0f;
 					if (scaleZ > lowpass) {

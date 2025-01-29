@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 
 /**
  * Dithering using a particle system.
@@ -154,19 +157,20 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		int lpc = getLowpassCutoff();
 		int size = cells.size();
 
+		// cannot run in parallel one thread might change the list while another is reading it.
 		for (int start = 0; start < size - 2 && !isThreadCancelled(); ++start) {
 			VoronoiCell a = cells.get(ti(start  ));
 			VoronoiCell b = cells.get(ti(start+1));
 			if(a.weight<lpc || b.weight<lpc) break;
 
-			double dAB = calculateLengthSq(a,b);
-			int bestIndex = -1;
-			double bestDiff = 0;
+			double dAB = calculateLengthSq(a, b);
+			AtomicReference<Double> bestDiff = new AtomicReference<>(0.0);
+			AtomicInteger bestIndex = new AtomicInteger(-1);
 
-			for (int end = start + 2; end < size && !isThreadCancelled(); ++end) {
+			IntStream.range(start + 2, size).parallel().forEach(end -> {
 				VoronoiCell c = cells.get(ti(end-1));
 				VoronoiCell d = cells.get(ti(end  ));
-				if(c.weight<lpc || d.weight<lpc) break;
+				if(c.weight<lpc || d.weight<lpc) return;
 
 				double dOriginal = dAB + calculateLengthSq(c, d);
 				double dAC = calculateLengthSq(a, c);
@@ -174,14 +178,14 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 				double dFlipped = dAC+dBD;
 
 				double diff = dOriginal - dFlipped;
-				if (bestDiff < diff) {
-					bestDiff = diff;
-					bestIndex = end;
+				if (bestDiff.get() < diff) {
+					bestDiff.set(diff);
+					bestIndex.set(end);
 				}
-			}
+			});
 
-			if (bestIndex != -1 && !isThreadCancelled()) {
-				flipAllBetween(start+1,bestIndex);
+			if (bestIndex.get() != -1 && !isThreadCancelled()) {
+				flipAllBetween(start+1,bestIndex.get());
 			}
 		}
 	}

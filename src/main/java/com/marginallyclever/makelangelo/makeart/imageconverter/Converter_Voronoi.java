@@ -21,6 +21,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.stream.IntStream;
 
 /**
  * Shared methods for Voronoi converters
@@ -103,7 +105,10 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
     @Override
     public boolean iterate() {
+        turtle.history.clear();
+
         iterations++;
+
         lock.lock();
         try {
             double noiseLevel = evolveCells();
@@ -133,10 +138,11 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     }
 
     private double adjustCenters(TransformedImage image) {
-        double change=0;
         GeometryFactory factory = new GeometryFactory();
 
-        for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
+        DoubleAdder change = new DoubleAdder();
+
+        IntStream.range(0,voronoiDiagram.getNumHulls()).parallel().forEach(i -> {
             Polygon poly = voronoiDiagram.getHull(i);
             PreparedPolygon hull = new PreparedPolygon(poly);
             VoronoiCell cell = cells.get(i);
@@ -179,11 +185,12 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
                 double dx = wx - cell.center.x;
                 double dy = wy - cell.center.y;
                 cell.change = (dx*dx+dy*dy);
-                change += cell.change;
+                change.add(cell.change);
                 cell.set(wx,wy);
             }
-        }
-        return change;
+        });
+
+        return change.sum();
     }
 
     private double getStepSize(double maxy, double miny, double xDiff) {
@@ -235,14 +242,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     @Override
     public void stop() {
         super.stop();
-        lock.lock();
-        try {
-            writeOutCells();
-        }
-        finally {
-            lock.unlock();
-        }
-        fireConversionFinished();
+        writeOutCells();
     }
 
     protected void renderEdges(GL2 gl2) {
@@ -280,8 +280,13 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
     @Override
     public void generateOutput() {
-        writeOutCells();
-
+        lock.lock();
+        try {
+            writeOutCells();
+        }
+        finally {
+            lock.unlock();
+        }
         fireConversionFinished();
     }
 

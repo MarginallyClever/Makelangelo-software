@@ -25,7 +25,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
     private final double EPSILON = 0.001;
-    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(15));
 
     /**
      * must be greater than zero.

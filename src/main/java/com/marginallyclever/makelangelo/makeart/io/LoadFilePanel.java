@@ -62,6 +62,10 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 
 	public boolean onNewFilenameChosen(String filename) {
 		stopExistingImageConverter();
+		if(filename.startsWith("\"") && filename.endsWith("\"")) {
+			// probably copy/pasted from a windows explorer window, which adds quotes around the filename.
+			filename = filename.substring(1,filename.length()-1);
+		}
 		selectedFilename.setText(filename);
 
 		try {

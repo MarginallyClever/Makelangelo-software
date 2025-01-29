@@ -6,17 +6,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,7 +60,7 @@ public class TranslationsMissingTest {
             }
         });
 
-        if (results.size() != 0) {
+        if (!results.isEmpty()) {
             logger.info("translations missing:");
             for (String result: results) {
                 logger.info("  {}", result);
@@ -70,15 +70,20 @@ public class TranslationsMissingTest {
     }
 
     public void searchAllSourceFiles(Consumer<TranslationFileSearcher> consumer) throws IOException {
-        File srcDir = new File("src" + File.separator + "main" + File.separator + "java");
-        List<File> files = listFiles(srcDir.toPath(), ".java");
-        files.forEach(file -> {
-            try {
-                searchInAFile(file, consumer);
-            } catch (IOException e) {
-                logger.warn("Can read file {}", file, e);
-            }
-        });
+        Path srcDir = Paths.get("src", "main", "java");
+        try (Stream<Path> paths = Files.walk(srcDir)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    //.filter(Files::isRegularFile)
+                    //.filter(Files::isReadable)
+                    .forEach(path -> {
+                        try {
+                            searchInAFile(path.toFile(), consumer);
+                        } catch (IOException e) {
+                            logger.warn("Can read file {}", path, e);
+                        }
+                    });
+        }
     }
 
     @Test
@@ -131,73 +136,36 @@ public class TranslationsMissingTest {
         }
     }
 
-
     /**
-     * List all files and sub files in this path. Using
-     * <code>Files.walk(path)</code> (so this take care of recursive path
-     * exploration ) And applying filter ( RegularFile and ReadableFile ) and
-     * filtering FileName ...
-     *
-     * @param path where to look.
-     * @param fileNameEndsWithSuffix use ".java" to get only ... ( this is not a
-     * regexp so no '.' despecialization required ) can be set to
-     * <code>""</code> to get all files.
-     * @return a list of files (may be empty if nothing is found) or null if
-     * something is wrong.
-     * @throws IOException
-     */
-    public static List<File> listFiles(Path path, String fileNameEndsWithSuffix) throws IOException {
-        List<File> result;
-        try ( Stream<Path> walk = Files.walk(path)) {
-            result = walk
-                    .filter(Files::isRegularFile)
-                    .filter(Files::isReadable)
-                    .map(Path::toFile)
-                    .filter(f -> f.getName().endsWith(fileNameEndsWithSuffix))
-                    .collect(Collectors.toList());
-        }
-        return result;
-    }
-
-    /**
-     * Compare all translation files in target/classes/languages with the english.xml file.  Display a list of all missing translations.
+     * Compare all translations to the english version.
+     * Display a list of all missing translations.
      * Fail if any translations are missing.
      */
     @Test
-    public void findMissingTranslationsInAllLanguages() {
-        // check every file in target/classes/languages.
-        File english = new File("target/classes/languages/english.xml");
+    public void findMissingAndExtraTranslationsInAllLanguages() {
+        // load resource bundle for english
+        ResourceBundle english = ResourceBundle.getBundle("messages",Locale.forLanguageTag("en"));
+        // find all other languages in the same bundle.
+        String[] availableLocales = Translator.getLanguageList();
 
+        // compare all other languages to english
         boolean perfect = true;
-        File folder = new File("target/classes/languages");
-        File[] files = folder.listFiles();
-        for(File file : files) {
-            if(file.isFile() && !file.equals(english)) {
-                // compare xml keys in file to english
-                perfect |= compareTranslations(english, file);
+        for(String locale : availableLocales) {
+            if(locale.equals("en")) continue;
+            ResourceBundle other = ResourceBundle.getBundle("messages",Locale.forLanguageTag(locale));
+            Set<String> missingKeys = new HashSet<>(english.keySet());
+            missingKeys.removeAll(other.keySet());
+            if (!missingKeys.isEmpty()) {
+                logger.info("translations missing in {}: {}", locale, missingKeys);
             }
+            Set<String> extraKeys = new HashSet<>(other.keySet());
+            extraKeys.removeAll(english.keySet());
+            if (!extraKeys.isEmpty()) {
+                logger.info("translations not in english in {}: {}", locale, extraKeys);
+            }
+            perfect &= missingKeys.isEmpty();
         }
+
         assertTrue(perfect, "Some translations are missing, see previous logs for details");
-    }
-
-    private boolean compareTranslations(File english, File file) {
-        TranslatorLanguage englishSet = new TranslatorLanguage();
-        TranslatorLanguage otherSet = new TranslatorLanguage();
-        try {
-            englishSet.loadFromInputStream(new FileInputStream(english));
-            otherSet.loadFromInputStream(new FileInputStream(file));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        Set<String> englishKeys = englishSet.getKeys();
-        Set<String> otherKeys = otherSet.getKeys();
-        Set<String> missingKeys = new HashSet<>(englishKeys);
-        missingKeys.removeAll(otherKeys);
-
-        if (!missingKeys.isEmpty()) {
-            logger.info("translations missing in {}: {}", file, missingKeys);
-        }
-        return missingKeys.isEmpty();
     }
 }

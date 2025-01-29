@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.texture.TextureFactory;
+import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
@@ -14,7 +15,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	public final static double COUNTERWEIGHT_H = 60;
 	public final static double PULLEY_RADIUS = 1.27;
 	public final static double MOTOR_WIDTH = 42;
-	private static Texture controlBoard;
+	private static TextureWithMetadata controlBoard;
 
 	@Override
 	public void render(GL2 gl2,Plotter robot) {
@@ -58,7 +59,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		gl2.glEnd();
 		
 		float shiftX = (float) right / 2;
-		if (controlBoard == null) controlBoard = loadTexture("/textures/rampsv14.png");
+		if (controlBoard == null) controlBoard = TextureFactory.loadTexture("/textures/rampsv14.png");
 		if (controlBoard != null) {
 			final double scale = 0.1;
 			if (shiftX < 100) {

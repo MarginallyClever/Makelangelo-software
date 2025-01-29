@@ -47,10 +47,12 @@ public class TurtleFactory {
 			if(isValidExtension(filename,loader.getFileNameFilter())) {
 				try(FileInputStream in = new FileInputStream(filename)) {
 					return loader.load(in);
+				} catch(Exception e) {
+					throw new Exception("TurtleFactory could not load '" + filename + "'.", e);
 				}
 			}
 		}
-		throw new IllegalStateException("TurtleFactory could not load '"+filename+"'.");
+		throw new IllegalStateException("TurtleFactory doesn't recognize the format of '"+filename+"'.");
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {

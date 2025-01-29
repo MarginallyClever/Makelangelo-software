@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imagefilter;
 
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -30,16 +29,22 @@ public class FilterDifference extends ImageFilter {
         }
 
         BufferedImage rr = result.getSourceImage();
+        var rasterA = aa.getRaster();
+        var rasterB = bb.getRaster();
+        var rasterR = rr.getRaster();
+        var cm = aa.getColorModel().getNumComponents();
+        // Temporary array to hold pixel components
+        int[] pixelA = new int[cm];
+        int[] pixelB = new int[cm];
 
         for (int y = 0; y < h; ++y) {
             for (int x = 0; x < w; ++x) {
-                Color diff = new Color(aa.getRGB(x, y));
-                Color other = new Color(bb.getRGB(x, y));
-                var diff2 = new Color(
-                        modify(diff.getRed()  , other.getRed()  ),
-                        modify(diff.getGreen(), other.getGreen()),
-                        modify(diff.getBlue() , other.getBlue() ) );
-                rr.setRGB(x, y, diff2.hashCode());
+                rasterA.getPixel(x, y, pixelA);
+                rasterB.getPixel(x, y, pixelB);
+                pixelA[0] = modify(pixelA[0],pixelB[0]);
+                pixelA[1] = modify(pixelA[1],pixelB[1]);
+                pixelA[2] = modify(pixelA[2],pixelB[2]);
+                rasterR.setPixel(x, y, pixelA);
             }
         }
 

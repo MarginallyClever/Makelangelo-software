@@ -1,29 +1,31 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.texture.TextureFactory;
+import com.marginallyclever.makelangelo.texture.TextureWithMetadata;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 
-import static com.marginallyclever.convenience.helpers.DrawingHelper.*;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.drawCircle;
+import static com.marginallyclever.convenience.helpers.DrawingHelper.paintTexture;
 
 public class Makelangelo5Huge implements PlotterRenderer {
-	private static Texture textureMainBody;
-	private static Texture textureMotorMounts;
-	private static Texture textureLogo;
-	private static Texture textureWeight;
-	private static Texture textureGondola;
-	private static Texture textureArm;
+	private static TextureWithMetadata textureMainBody;
+	private static TextureWithMetadata textureMotorMounts;
+	private static TextureWithMetadata textureLogo;
+	private static TextureWithMetadata textureWeight;
+	private static TextureWithMetadata textureGondola;
+	private static TextureWithMetadata textureArm;
 
 	@Override
 	public void render(GL2 gl2, Plotter robot) {
-		if (textureMainBody == null) textureMainBody = loadTexture("/textures/huge.png");
-		if (textureMotorMounts == null) textureMotorMounts = loadTexture("/textures/huge-motors.png");
-		if (textureLogo == null) textureLogo = loadTexture("/logo.png");
-		if (textureWeight == null) textureWeight = loadTexture("/textures/weight.png");
-		if (textureGondola == null) textureGondola = loadTexture("/textures/phBody.png");
-		if (textureArm == null) textureArm = loadTexture("/textures/phArm2.png");
+		if (textureMainBody == null) textureMainBody = TextureFactory.loadTexture("/textures/huge.png");
+		if (textureMotorMounts == null) textureMotorMounts = TextureFactory.loadTexture("/textures/huge-motors.png");
+		if (textureLogo == null) textureLogo = TextureFactory.loadTexture("/logo.png");
+		if (textureWeight == null) textureWeight = TextureFactory.loadTexture("/textures/weight.png");
+		if (textureGondola == null) textureGondola = TextureFactory.loadTexture("/textures/phBody.png");
+		if (textureArm == null) textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
 		if (textureMainBody == null) {
 			paintControlBoxPlain(gl2, robot);
@@ -49,7 +51,7 @@ public class Makelangelo5Huge implements PlotterRenderer {
 		}
 	}
 
-	private void paintControlBoxFancy(GL2 gl2, Plotter robot,Texture texture) {
+	private void paintControlBoxFancy(GL2 gl2, Plotter robot,TextureWithMetadata texture) {
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
 		final double scaleX = 1366 / 943.0; // machine is 1366 motor-to-motor. texture is 922. scaleX accordingly.

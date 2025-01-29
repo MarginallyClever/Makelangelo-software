@@ -1,18 +1,17 @@
 package com.marginallyclever.makelangelo;
 
+import ModernDocking.app.DockableMenuItem;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
+import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeart.turtletool.TurtleTool;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
-import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
-import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.makeart.turtletool.*;
 import com.marginallyclever.makelangelo.paper.PaperSettingsPanel;
 import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
@@ -38,24 +37,26 @@ public class MainMenu extends JMenuBar {
     private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
     private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
     private final Makelangelo app;
+    private final MainFrame frame;
     private final SaveDialog saveDialog = new SaveDialog();
     private RecentFiles recentFiles;
     private final ApplicationSettings myPreferencesPanel = new ApplicationSettings();
     private boolean isMacOS = false;
 
-    public MainMenu(Makelangelo app) {
+    public MainMenu(Makelangelo app, MainFrame frame) {
         super();
         this.app = app;
+        this.frame = frame;
         setSystemLookAndFeelForMacos();
         add(createFileMenu());
         add(createSettingsMenu());
         add(createGenerateMenu());
         add(createToolsMenu());
         add(createViewMenu());
+        add(createWindowsMenu());
         add(createRobotMenu());
         add(createHelpMenu());
         updateUI();
-
     }
 
     private void setSystemLookAndFeelForMacos() {
@@ -63,7 +64,6 @@ public class MainMenu extends JMenuBar {
         if ((os.contains("mac")) || (os.contains("darwin"))) {
             isMacOS=true;
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            SHORTCUT_CTRL = InputEvent.META_DOWN_MASK;
             SHORTCUT_ALT = InputEvent.META_DOWN_MASK;
         }
     }
@@ -149,38 +149,40 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu(Translator.get("MenuView"));
         menu.setMnemonic('V');
 
-        JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
-        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-        buttonZoomOut.addActionListener((e) -> app.getCamera().zoom(1));
-        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
-        menu.add(buttonZoomOut);
-
-        JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
-        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-        buttonZoomIn.addActionListener((e) -> app.getCamera().zoom(-1));
-        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
-        menu.add(buttonZoomIn);
-
-        JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
-        buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
-        buttonZoomToFit.addActionListener((e) -> app.getCamera().zoomToFit(app.getPaper().getPaperWidth(),app.getPaper().getPaperHeight()));
-        menu.add(buttonZoomToFit);
-
-        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
-        checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
-        checkboxShowPenUpMoves.addActionListener((e) -> {
-            boolean b = GFXPreferences.getShowPenUp();
-            GFXPreferences.setShowPenUp(!b);
-        });
-        GFXPreferences.addListener((e)->{
-            checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
-        });
-        checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
-        menu.add(checkboxShowPenUpMoves);
-
         menu.add(createRenderStyleMenu());
+        menu.addSeparator();
 
         return menu;
+    }
+
+    private JMenu createWindowsMenu() {
+        JMenu menuWindows = new JMenu(Translator.get("MenuWindows"));
+        // add each panel to the windows menu with a checkbox if the current panel is visible.
+        int index=0;
+        for(DockingPanel w : frame.getDockingPanels()) {
+            DockableMenuItem item = new DockableMenuItem(w.getPersistentID(),w.getTabText());
+            menuWindows.add(item);
+            if(index<12) {
+                item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1 + index, InputEvent.SHIFT_DOWN_MASK));
+            }
+            index++;
+        }
+
+        menuWindows.add(new JSeparator());
+        menuWindows.add(new JMenuItem(new AbstractAction() {
+            {
+                putValue(Action.NAME, "Reset default layout");
+                // no accelerator key.
+                putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("icons8-reset-16.png"))));
+                putValue(Action.SHORT_DESCRIPTION, "Reset the layout to the default.");
+            }
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                frame.resetDefaultLayout();
+            }
+        }));
+        return menuWindows;
     }
 
     private JMenu createHelpMenu() {
@@ -345,7 +347,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private JMenu createToolsMenu() {
-        JMenu menu = new JMenu(Translator.get("Art Pipeline"));
+        JMenu menu = new JMenu(Translator.get("ArtPipeline"));
         menu.setMnemonic('T');
 
         try {
