@@ -21,6 +21,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Generate a drawing where the thickness of the line is determined by the intensity of the image at that point.
+ * @deprecated since 7.62.0 to be replaced with Donatello nodes.
+ */
+@Deprecated(since="7.62.0")
 public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
@@ -54,7 +59,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             generate();
         });
 
-        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName);
+        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
         add(selectFile);
         selectFile.addSelectListener(e->{
             imageName = selectFile.getText();
