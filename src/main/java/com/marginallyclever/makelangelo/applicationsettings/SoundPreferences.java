@@ -23,10 +23,10 @@ public class SoundPreferences {
 
 		panel = new SelectPanel();
 		
-		panel.add(sound_connect = new SelectFile("connect",Translator.get("SoundPreferences.Connect"),prefs.get("sound_connect", "")));
-		panel.add(sound_disconnect = new SelectFile("disconnect",Translator.get("SoundPreferences.Disconnect"),prefs.get("sound_disconnect", "")));
-		panel.add(sound_conversion_finished = new SelectFile("convert",Translator.get("SoundPreferences.FinishConvert"),prefs.get("sound_conversion_finished", "")));
-		panel.add(sound_drawing_finished = new SelectFile("finish",Translator.get("SoundPreferences.FinishDraw"),prefs.get("sound_drawing_finished", "")));
+		panel.add(sound_connect = new SelectFile("connect",Translator.get("SoundPreferences.Connect"),prefs.get("sound_connect", ""),panel));
+		panel.add(sound_disconnect = new SelectFile("disconnect",Translator.get("SoundPreferences.Disconnect"),prefs.get("sound_disconnect", ""),panel));
+		panel.add(sound_conversion_finished = new SelectFile("convert",Translator.get("SoundPreferences.FinishConvert"),prefs.get("sound_conversion_finished", ""),panel));
+		panel.add(sound_drawing_finished = new SelectFile("finish",Translator.get("SoundPreferences.FinishDraw"),prefs.get("sound_drawing_finished", ""),panel));
 		return panel;
 	}
 	
