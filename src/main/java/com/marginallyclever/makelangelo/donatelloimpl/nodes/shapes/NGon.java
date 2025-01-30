@@ -26,13 +26,13 @@ public class NGon extends Node {
     public void update() {
         try {
             Turtle t = new Turtle();
-            double r = radius.getValue().doubleValue();
-            int s = steps.getValue().intValue();
+            double r = radius.getValue();
+            double s = steps.getValue();
 
-            t.jumpTo(r,0);
-            for(int i=1;i<=s;++i) {
-                double v = ( 2.0*Math.PI*(double)i ) / (double)s;
-                t.moveTo(Math.cos(v), Math.sin(v));
+            for(int i=0;i<=s;++i) {
+                double v = 2.0*Math.PI * (double)i / s;
+                t.moveTo(Math.cos(v)*r, Math.sin(v)*r);
+                t.penDown();
             }
             t.penUp();
             contents.send(t);
