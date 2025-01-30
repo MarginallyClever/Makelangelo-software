@@ -32,7 +32,7 @@ public class TruchetTileFactory {
      * @param linesPerTileCount the number of lines per tile
      * @return a new Truchet tile
      */
-    public static TruchetTile getTile(int index, Turtle turtle, double spaceBetweenLines, double linesPerTileCount) {
+    public static TruchetTile getTile(int index, Turtle turtle, double spaceBetweenLines, int linesPerTileCount) {
         return switch (index) {
             case 0 -> new TruchetDiagonalRising(turtle, spaceBetweenLines, linesPerTileCount);
             case 1 -> new TruchetDiagonalFalling(turtle, spaceBetweenLines, linesPerTileCount);
