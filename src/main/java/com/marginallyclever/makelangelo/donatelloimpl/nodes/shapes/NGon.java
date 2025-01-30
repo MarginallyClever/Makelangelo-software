@@ -8,6 +8,9 @@ import com.marginallyclever.nodegraphcore.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Draw a regular polygon.  A polygon with equal sides and angles.
+ */
 public class NGon extends Node {
     private static final Logger logger = LoggerFactory.getLogger(NGon.class);
 
