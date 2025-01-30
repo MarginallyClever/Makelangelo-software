@@ -30,7 +30,7 @@ public class PatternOnPath extends Node {
         Turtle sum = new Turtle();
         Turtle myPattern = pattern.getValue();
         Turtle myPath = path.getValue();
-        int c = count.getValue().intValue();
+        int c = count.getValue();
         if(c>0) {
             TurtlePathWalker walker = new TurtlePathWalker(myPath);
             double pDistance = walker.getDrawDistance();
