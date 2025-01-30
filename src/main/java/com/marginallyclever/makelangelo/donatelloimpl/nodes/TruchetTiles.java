@@ -1,13 +1,14 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputImage;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetTile;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetTileFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +16,10 @@ import java.util.List;
  * Create a basic Truchet tile pattern from an image.  the intensity of the image decides the tile type.
  */
 public class TruchetTiles extends Node {
-    Input<BufferedImage> source = new Input<>("Source", BufferedImage.class, new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
-    Input<Number> spaceBetweenLines = new Input<>("Spacing", Number.class, 10);
-    Input<Number> linesPerTileCount = new Input<>("Qty", Number.class, 10);
-    Output<Turtle> output = new Output<>("Output", Turtle.class, new Turtle());
+    private final InputImage source = new InputImage("Source");
+    private final InputDouble spaceBetweenLines = new InputDouble("Spacing", 10d);
+    private final InputInt linesPerTileCount = new InputInt("Qty", 10);
+    private final OutputTurtle output = new OutputTurtle("Output");
 
     public TruchetTiles() {
         super("TruchetTiles");
@@ -31,9 +32,9 @@ public class TruchetTiles extends Node {
     @Override
     public void update() {
         var img = source.getValue();
-        int space = Math.max(1,spaceBetweenLines.getValue().intValue());
-        int lines = Math.max(1,linesPerTileCount.getValue().intValue());
-        int tileSize = space * lines;
+        var space = Math.max(1,spaceBetweenLines.getValue());
+        var lines = Math.max(1,linesPerTileCount.getValue());
+        double tileSize = space * lines;
 
         try {
             var c = img.getColorModel().getNumComponents();
@@ -43,9 +44,9 @@ public class TruchetTiles extends Node {
             Turtle turtle = new Turtle();
             List<TruchetTile> ttgList = new ArrayList<>();
 
-            for(int y=0;y<img.getHeight();y += tileSize) {
-                for(int x=0;x<img.getWidth();x += tileSize) {
-                    raster.getPixel(x,y,pixels);
+            for(double y=0;y<img.getHeight();y += tileSize) {
+                for(double x=0;x<img.getWidth();x += tileSize) {
+                    raster.getPixel((int)x,(int)y,pixels);
                     double avg = (pixels[0]+pixels[1]+pixels[2])/3.0;
                     ttgList.add(TruchetTileFactory.getTile(avg>128?0:1,turtle,space,lines));
                 }
@@ -53,9 +54,9 @@ public class TruchetTiles extends Node {
 
             if(!ttgList.isEmpty()) {
                 var i = ttgList.iterator();
-                for(int y=0;y<img.getHeight();y += tileSize) {
-                    for(int x=0;x<img.getWidth();x += tileSize) {
-                        i.next().drawTile(x,y);
+                for(double y=0;y<img.getHeight();y += tileSize) {
+                    for(double x=0;x<img.getWidth();x += tileSize) {
+                        i.next().drawTile((int)x,(int)y);
                     }
                 }
             }

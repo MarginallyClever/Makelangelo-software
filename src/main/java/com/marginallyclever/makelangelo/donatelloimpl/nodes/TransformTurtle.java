@@ -1,21 +1,22 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
-import com.marginallyclever.nodegraphcore.Node;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Node;
 
 /**
  * Transform a {@link Turtle} by scaling, rotating, and translating it.
  */
 public class TransformTurtle extends Node {
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
-    private final Input<Number> sx = new Input<>("scale x",Number.class,1);
-    private final Input<Number> sy = new Input<>("scale y",Number.class,1);
-    private final Input<Number> rotate = new Input<>("rotate degrees",Number.class,0);
-    private final Input<Number> tx = new Input<>("translate x",Number.class,0);
-    private final Input<Number> ty = new Input<>("translate y",Number.class,0);
-    private final Output<Turtle> output = new Output<>("output", Turtle.class,new Turtle());
+    private final InputTurtle turtle = new InputTurtle("turtle");
+    private final InputDouble sx = new InputDouble("scale x", 1d);
+    private final InputDouble sy = new InputDouble("scale y", 1d);
+    private final InputDouble rotate = new InputDouble("rotate degrees", 0d);
+    private final InputDouble tx = new InputDouble("translate x", 0d);
+    private final InputDouble ty = new InputDouble("translate y", 0d);
+    private final OutputTurtle output = new OutputTurtle("output");
 
     public TransformTurtle() {
         super("TransformTurtle");

@@ -1,11 +1,15 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.convenience.*;
+import com.marginallyclever.convenience.Clipper2D;
+import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputImage;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
-
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,12 +21,12 @@ import java.awt.image.BufferedImage;
  * @since 2022-03-08
  */
 public class PathImageMask extends Node {
-    private final Input<BufferedImage> image = new Input<>("image", BufferedImage.class,new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB));
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
-    private final Input<Number> stepSize = new Input<>("stepSize", Number.class, 5);
-    private final Input<Number> threshold = new Input<>("threshold", Number.class, 128);
-    private final Output<Turtle> outputAbove = new Output<>("above", Turtle.class,new Turtle());
-    private final Output<Turtle> outputBelow = new Output<>("below", Turtle.class,new Turtle());
+    private final InputImage image = new InputImage("image");
+    private final InputTurtle turtle = new InputTurtle("turtle");
+    private final InputInt stepSize = new InputInt("stepSize", 5);
+    private final InputInt threshold = new InputInt("threshold", 128);
+    private final OutputTurtle outputAbove = new OutputTurtle("above");
+    private final OutputTurtle outputBelow = new OutputTurtle("below");
 
     private final LineCollection listAbove = new LineCollection();
     private final LineCollection listBelow = new LineCollection();

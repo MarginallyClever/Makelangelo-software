@@ -1,19 +1,19 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NGon extends Node {
     private static final Logger logger = LoggerFactory.getLogger(NGon.class);
 
-    private final Input<Number> radius = new Input<>("radius", Number.class, 10);
-    private final Input<Number> steps = new Input<>("steps", Number.class, 4);
-    private final Output<Turtle> contents = new Output<>("contents", Turtle.class, new Turtle());
+    private final InputDouble radius = new InputDouble("radius", 10.0);
+    private final InputInt steps = new InputInt("steps", 4);
+    private final OutputTurtle contents = new OutputTurtle("contents");
 
     public NGon() {
         super("NGon");

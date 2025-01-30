@@ -1,9 +1,11 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputImage;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -14,12 +16,12 @@ import java.util.Arrays;
  * Use a bitmap intensity to control the flow field.
  */
 public class FlowField extends Node {
-    private final Input<BufferedImage> inputImage = new Input<>("inputImage",BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
-    private final Input<Number> spacingValue = new Input<>("spacing",Number.class,10);
-    private final Input<Number> stepValue = new Input<>("step size",Number.class,3);
-    private final Input<Number> numStepsValue = new Input<>("step count",Number.class,3);
-    private final Input<Number> startAngle = new Input<>("start angle",Number.class,0);
-    private final Output<Turtle> result = new Output<>("result",Turtle.class,new Turtle());
+    private final InputImage inputImage = new InputImage("inputImage");
+    private final InputDouble spacingValue = new InputDouble("spacing", 10d);
+    private final InputInt stepValue = new InputInt("step size", 3);
+    private final InputInt numStepsValue = new InputInt("step count", 3);
+    private final InputDouble startAngle = new InputDouble("start angle", 0d);
+    private final OutputTurtle result = new OutputTurtle("result");
 
     public FlowField() {
         super("FlowField");

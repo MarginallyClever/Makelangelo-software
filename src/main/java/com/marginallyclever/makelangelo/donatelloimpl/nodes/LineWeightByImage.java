@@ -3,18 +3,19 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputImage;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeight;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightSegment;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Vector2d;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -31,11 +32,11 @@ public class LineWeightByImage extends Node {
 
     private static final double EPSILON = 0.0001;
 
-    private final Input<BufferedImage> image = new Input<>("image", BufferedImage.class,new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB));
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
-    private final Input<Number> stepSize = new Input<>("stepSize", Number.class, 5);
-    private final Input<Number> thickness = new Input<>("thickness", Number.class, 5);
-    private final Output<Turtle> result = new Output<>("result", Turtle.class,new Turtle());
+    private final InputImage image = new InputImage("image");
+    private final InputTurtle turtle = new InputTurtle("turtle");
+    private final InputDouble stepSize = new InputDouble("stepSize", 5d);
+    private final InputDouble thickness = new InputDouble("thickness", 5d);
+    private final OutputTurtle result = new OutputTurtle("result");
 
     private static final LinkedList<LineWeightSegment> unsorted = new LinkedList<>();
 

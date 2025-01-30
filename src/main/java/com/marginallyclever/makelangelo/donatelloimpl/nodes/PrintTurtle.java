@@ -1,16 +1,19 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.donatello.graphview.GraphViewPanel;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputBoolean;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputColor;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
-import com.marginallyclever.nodegraphcore.port.Input;
 
 import java.awt.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Print the {@link Turtle}'s path behind the {@link Node}s.</p>
@@ -19,12 +22,13 @@ import java.util.ArrayList;
  */
 public class PrintTurtle extends Node implements PrintWithGraphics {
     //private static final Logger logger = LoggerFactory.getLogger(PrintTurtle.class);
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
-    private final Input<Number> px = new Input<>("X",Number.class,0);
-    private final Input<Number> py = new Input<>("Y",Number.class,0);
-    private final Input<Boolean> showTravel = new Input<>("show travel",Boolean.class,false);
-    private final Input<Color> travelColor = new Input<>("travel color",Color.class,Color.GREEN);
-    private final Input<Number> lineThickness = new Input<>("line thickness",Number.class,1);
+    private final InputTurtle turtle = new InputTurtle("turtle");
+    private final InputInt px = new InputInt("X",0);
+    private final InputInt py = new InputInt("Y",0);
+    private final InputBoolean showTravel = new InputBoolean("show travel",false);
+    private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
+    private final InputInt lineThickness = new InputInt("line thickness",1);
+
     private final List<Polyline> polylines = new ArrayList<>();
 
     /**
@@ -37,7 +41,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         private final Color color;
 
         public Polyline(int[] x, int[] y, int n, Color color) {
-            if(x.length!=y.length) throw new IllegalArgumentException("x and y must be the same length");
+            if(x==null || y==null) throw new IllegalArgumentException("x and y must not be null");
             if(n<x.length) {
                 // trim the buffers to the correct size.
                 int[] newX = new int[n];

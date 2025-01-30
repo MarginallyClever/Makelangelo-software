@@ -1,19 +1,18 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Rectangle extends Node {
     private static final Logger logger = LoggerFactory.getLogger(Rectangle.class);
 
-    private final Input<Number> w = new Input<>("width", Number.class, 100);
-    private final Input<Number> h = new Input<>("height", Number.class, 100);
-    private final Output<Turtle> contents = new Output<>("contents", Turtle.class, new Turtle());
+    private final InputDouble w = new InputDouble("width", 100.0);
+    private final InputDouble h = new InputDouble("height", 100.0);
+    private final OutputTurtle contents = new OutputTurtle("contents");
 
     public Rectangle() {
         super("Rectangle");

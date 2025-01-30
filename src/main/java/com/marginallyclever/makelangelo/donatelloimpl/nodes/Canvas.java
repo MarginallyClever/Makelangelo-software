@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputColor;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputInt;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
 
@@ -11,13 +12,13 @@ import java.awt.*;
  * A node that creates a canvas with a given size and color.
  */
 public class Canvas extends Node implements PrintWithGraphics {
-    private final Input<Number> width = new Input<>("width", Number.class,1);
-    private final Input<Number> height = new Input<>("height", Number.class,1);
-    private final Input<Color> color = new Input<>("color", Color.class,Color.WHITE);
-    private final Output<Number> outx = new Output<>("x", Number.class,0);
-    private final Output<Number> outy = new Output<>("y", Number.class,0);
-    private final Output<Number> outw = new Output<>("width", Number.class,width.getValue());
-    private final Output<Number> outh = new Output<>("height", Number.class,height.getValue());
+    private final InputInt width = new InputInt("width", 1);
+    private final InputInt height = new InputInt("height", 1);
+    private final InputColor color = new InputColor("color", Color.WHITE);
+    private final OutputInt outx = new OutputInt("x",0);
+    private final OutputInt outy = new OutputInt("y",0);
+    private final OutputInt outw = new OutputInt("width",width.getValue());
+    private final OutputInt outh = new OutputInt("height",height.getValue());
 
     public Canvas() {
         super("Canvas");

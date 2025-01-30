@@ -1,20 +1,20 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.*;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
+import com.marginallyclever.nodegraphcore.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Line extends Node {
     private static final Logger logger = LoggerFactory.getLogger(Line.class);
 
-    private final Input<Number> x0 = new Input<>("x0", Number.class, 0);
-    private final Input<Number> y0 = new Input<>("y0", Number.class, 0);
-    private final Input<Number> x1 = new Input<>("x1", Number.class, 1);
-    private final Input<Number> y1 = new Input<>("y1", Number.class, 0);
-    private final Output<Turtle> contents = new Output<>("contents", Turtle.class, new Turtle());
+    private final InputDouble x0 = new InputDouble("x0", 0.0);
+    private final InputDouble y0 = new InputDouble("y0", 0.0);
+    private final InputDouble x1 = new InputDouble("x1", 1.0);
+    private final InputDouble y1 = new InputDouble("y1", 0.0);
+    private final OutputTurtle contents = new OutputTurtle("contents");
 
     public Line() {
         super("Line");

@@ -2,9 +2,10 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputImage;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.image.BufferedImage;
 
@@ -12,15 +13,15 @@ import java.awt.image.BufferedImage;
  * Generate a 2D gradient noise image.
  */
 public class GradientNoise extends Node {
-    private final Input<Number> width = new Input<>("width", Number.class, 256);
-    private final Input<Number> height = new Input<>("height", Number.class, 256);
-    private final Input<Number> style = new Input<>("style", Number.class, 0);
-    private final Input<Number> seed = new Input<>("seed", Number.class, 0);
-    private final Input<Number> scaleX = new Input<>("scale x", Number.class, 0.05);
-    private final Input<Number> scaleY = new Input<>("scale y", Number.class, 0.05);
-    private final Input<Number> translateX = new Input<>("translate x", Number.class, 0);
-    private final Input<Number> translateY = new Input<>("translate y", Number.class, 0);
-    private final Output<BufferedImage> output = new Output<>("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
+    private final InputInt width = new InputInt("width", 256);
+    private final InputInt height = new InputInt("height", 256);
+    private final InputInt style = new InputInt("style", 0);
+    private final InputInt seed = new InputInt("seed", 0);
+    private final InputDouble scaleX = new InputDouble("scale x", 0.05d);
+    private final InputDouble scaleY = new InputDouble("scale y", 0.05d);
+    private final InputDouble translateX = new InputDouble("translate x", 0d);
+    private final InputDouble translateY = new InputDouble("translate y", 0d);
+    private final OutputImage output = new OutputImage("output");
 
     public GradientNoise() {
         super("GradientNoise");

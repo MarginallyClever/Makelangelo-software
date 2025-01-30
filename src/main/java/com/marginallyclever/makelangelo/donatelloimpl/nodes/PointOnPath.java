@@ -1,10 +1,11 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
 
@@ -17,12 +18,12 @@ import com.marginallyclever.nodegraphcore.Node;
  * <p>path.length can be obtained from LoadTurtle.</p>
  */
 public class PointOnPath extends Node {
-    private final Input<Turtle> path = new Input<>("path", Turtle.class, new Turtle());
-    private final Input<Number> index = new Input<>("index", Number.class, 0);
-    private final Output<Number> px = new Output<>("px", Number.class, 0);
-    private final Output<Number> py = new Output<>("py", Number.class, 0);
-    private final Output<Number> nx = new Output<>("nx", Number.class, 0);
-    private final Output<Number> ny = new Output<>("ny", Number.class, 0);
+    private final InputTurtle path = new InputTurtle("path");
+    private final InputInt index = new InputInt("index", 0);
+    private final OutputDouble px = new OutputDouble("px", 0d);
+    private final OutputDouble py = new OutputDouble("py", 0d);
+    private final OutputDouble nx = new OutputDouble("nx", 0d);
+    private final OutputDouble ny = new OutputDouble("ny", 0d);
 
     public PointOnPath() {
         super("PointOnPath");
@@ -41,10 +42,10 @@ public class PointOnPath extends Node {
         double total = myPath.getDrawDistance();
         double c0 = index.getValue().doubleValue();
         if(total==0 || c0 <= 0) {
-            px.send(0);
-            px.send(0);
-            nx.send(1);
-            ny.send(0);
+            px.send(0d);
+            px.send(0d);
+            nx.send(1d);
+            ny.send(0d);
             return;
         }
 
@@ -61,7 +62,7 @@ public class PointOnPath extends Node {
         Point2D n = new Point2D(dx,dy);
         n.normalize();
         px.send(p0.x);
-        px.send(p0.y);
+        py.send(p0.y);
         nx.send(n.x);
         ny.send(n.y);
     }

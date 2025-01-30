@@ -17,8 +17,7 @@ public class TurtleDAO4JSON implements DAO4JSON<Turtle> {
     @Override
     public Turtle fromJSON(Object object) throws JSONException {
         JSONObject json = (JSONObject)object;
-        Turtle turtle = new Turtle();
         // for a complete snapshot, restore all the instance details, too.
-        return turtle;
+        return new Turtle();
     }
 }

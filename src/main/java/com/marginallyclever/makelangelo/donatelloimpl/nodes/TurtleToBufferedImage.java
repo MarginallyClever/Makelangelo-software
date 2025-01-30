@@ -1,11 +1,10 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputImage;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
-
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -15,8 +14,8 @@ import java.awt.image.BufferedImage;
  * Convert a {@link Turtle} to a {@link BufferedImage}.
  */
 public class TurtleToBufferedImage extends Node {
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
-    private final Output<BufferedImage> output = new Output<>("output", BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));
+    private final InputTurtle turtle = new InputTurtle("turtle");
+    private final OutputImage output = new OutputImage("output");
 
     public TurtleToBufferedImage() {
         super("TurtleToBufferedImage");

@@ -1,20 +1,21 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 /**
  * Warp an existing path into a spiral.
  */
 public class Spiral extends Node {
-    private final Input<Turtle> source = new Input<>("turtle", Turtle.class, new Turtle());
-    private final Input<Number> r0 = new Input<>("r0", Number.class, 1);
-    private final Input<Number> dr = new Input<>("dr", Number.class, 1);
-    private final Input<Number> stepSize = new Input<>("stepSize", Number.class, 1);
-    private final Output<Turtle> output = new Output<>("output", Turtle.class, new Turtle());
+    private final InputTurtle source = new InputTurtle("turtle");
+    private final InputDouble r0 = new InputDouble("r0", 1d);
+    private final InputDouble dr = new InputDouble("dr", 1d);
+    private final InputDouble stepSize = new InputDouble("stepSize", 1d);
+    private final OutputTurtle output = new OutputTurtle("output");
 
     public Spiral() {
         super("Spiral");
@@ -28,12 +29,12 @@ public class Spiral extends Node {
     @Override
     public void update() {
         try {
-            var r0Value = r0.getValue().doubleValue();
-            var drValue = dr.getValue().doubleValue();
+            var r0Value = r0.getValue();
+            var drValue = dr.getValue();
             var turtle = source.getValue();
             TurtlePathWalker pathWalker = new TurtlePathWalker(turtle);
             double dist = turtle.getBounds().width;
-            var pace = Math.max(0.0001, stepSize.getValue().doubleValue());
+            var pace = Math.max(0.1, stepSize.getValue());
 
             double curveSum = 0;
             double px,py;

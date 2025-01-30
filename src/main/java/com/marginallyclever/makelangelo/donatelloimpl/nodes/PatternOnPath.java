@@ -1,20 +1,21 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 
 /**
  * Place a pattern on a path.
  */
 public class PatternOnPath extends Node {
-    private final Input<Turtle> pattern = new Input<>("pattern", Turtle.class, new Turtle());
-    private final Input<Turtle> path = new Input<>("path", Turtle.class, new Turtle());
-    private final Input<Number> count = new Input<>("count", Number.class, 10);
-    private final Output<Turtle> output = new Output<>("output", Turtle.class, new Turtle());
+    private final InputTurtle pattern = new InputTurtle("pattern");
+    private final InputTurtle path = new InputTurtle("path");
+    private final InputInt count = new InputInt("count", 10);
+    private final OutputTurtle output = new OutputTurtle("output");
 
     public PatternOnPath() {
         super("PatternOnPath");

@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import com.marginallyclever.nodegraphcore.port.Input;
 import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
@@ -14,7 +14,7 @@ import java.awt.geom.Rectangle2D;
  * @since 2022-04-14
  */
 public class TurtleToRectangle extends Node {
-    private final Input<Turtle> turtle = new Input<>("turtle", Turtle.class,new Turtle());
+    private final InputTurtle turtle = new InputTurtle("turtle");
     private final Output<Rectangle2D> output = new Output<>("output", Rectangle2D.class, new Rectangle(0,0,0,0));
 
     public TurtleToRectangle() {

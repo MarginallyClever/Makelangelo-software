@@ -1,17 +1,17 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.port.Input;
-import com.marginallyclever.nodegraphcore.port.Output;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
  * Add two {@link Turtle}s together.
  */
 public class AddTurtles extends Node {
-    private final Input<Turtle> turtleA = new Input<>("A", Turtle.class, new Turtle());
-    private final Input<Turtle> turtleB = new Input<>("B", Turtle.class, new Turtle());
-    private final Output<Turtle> output = new Output<>("output", Turtle.class, new Turtle());
+    private final InputTurtle turtleA = new InputTurtle("A");
+    private final InputTurtle turtleB = new InputTurtle("B");
+    private final OutputTurtle output = new OutputTurtle("output");
 
     public AddTurtles() {
         super("AddTurtles");
