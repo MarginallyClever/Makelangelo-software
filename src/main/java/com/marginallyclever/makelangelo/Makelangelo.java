@@ -5,16 +5,18 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.convenience.log.Log;
+import com.marginallyclever.donatello.AddNodePanel;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.FileHelper;
+import com.marginallyclever.donatello.actions.undoable.NodeAddAction;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
+import com.marginallyclever.makelangelo.applicationsettings.LanguagePreferences;
+import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
-import com.marginallyclever.makelangelo.applicationsettings.LanguagePreferences;
-import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRenderer;
@@ -66,8 +68,10 @@ import java.util.prefs.Preferences;
  * @since 1.00 2012/2/28
  */
 public final class Makelangelo {
+	private static final Logger logger = LoggerFactory.getLogger(Makelangelo.class);
+
 	private static final String PREFERENCE_SAVE_PATH = "savePath";
-	private static Logger logger;
+
 	private final Camera camera;
 	private final PlotterSettingsManager plotterSettingsManager = new PlotterSettingsManager();
 	private final Plotter myPlotter = new Plotter();
@@ -76,6 +80,7 @@ public final class Makelangelo {
 	private final TurtleRenderFacade myTurtleRenderer = new TurtleRenderFacade();
 	private PlotterRenderer myPlotterRenderer;
 	private final Donatello donatello = new Donatello();
+	private final AddNodePanel addNodePanel = new AddNodePanel();
 
 	// GUI elements
 	private MainFrame mainFrame;
@@ -97,6 +102,10 @@ public final class Makelangelo {
 			previewPanel.addListener(myPlotter);
 			addPlotterRendererToPreviewPanel();
 		}
+		addNodePanel.addAddNodeListener(e->{
+			NodeAddAction action = new NodeAddAction("Add",donatello);
+			action.commitAdd(e,donatello.getPaintArea().getCameraPosition());
+		});
 
 		rangeSlider.addChangeListener(e->{
 			myTurtleRenderer.setFirst(rangeSlider.getBottom());
@@ -149,20 +158,19 @@ public final class Makelangelo {
 
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
+
+		logger.debug("  make visible...");
+		mainFrame.setVisible(true);
 	}
 
 	private static void setSystemLookAndFeel() {
 		if(!CommandLineOptions.hasOption("-nolf")) {
-			FlatLaf.registerCustomDefaultsSource( "com.marginallyclever.makelangelo" );
+			FlatLaf.registerCustomDefaultsSource(Makelangelo.class.getPackageName());
 			try {
 				UIManager.setLookAndFeel( new FlatLightLaf() );
+				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch( Exception e ) {
-				logger.warn("failed to set flat look and feel. falling back to default native lnf", e);
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (Exception ex) {
-					logger.warn("failed to set native look and feel.", ex);
-				}
+				logger.debug("System look and feel could not be set.",e);
 			}
 		}
 	}
@@ -427,10 +435,8 @@ public final class Makelangelo {
 			logger.warn("Can't load icon", e);
 		}
 
-		mainFrame.addDockingPanel("Preview","Preview",createContentPane());
-		mainFrame.addDockingPanel("Donatello","Donatello",donatello);
-		logger.debug("  make visible...");
-		mainFrame.setVisible(true);
+		createDefaultLayout();
+
 		mainFrame.resetDefaultLayout();
 		mainFrame.saveAndRestoreLayout();
 
@@ -457,7 +463,13 @@ public final class Makelangelo {
 			}
 		}
 	}
-	
+
+	private void createDefaultLayout() {
+		mainFrame.addDockingPanel("Preview","Preview",createContentPane());
+		mainFrame.addDockingPanel("Donatello","Donatello",donatello);
+		mainFrame.addDockingPanel("AddNode","Add Node",addNodePanel);
+	}
+
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
 		new DropTarget(previewPanel, new PreviewDropTarget(this));
@@ -523,17 +535,10 @@ public final class Makelangelo {
 
 	public static void main(String[] args) {
 		Log.start();
-		logger = LoggerFactory.getLogger(Makelangelo.class);
 
 		FileHelper.createDirectoryIfMissing(FileHelper.getExtensionPath());
 		ServiceLoaderHelper.addAllPathFiles(FileHelper.getExtensionPath());
-		try {
-			NodeFactory.loadRegistries();
-		}
-		catch (Exception e) {
-			logger.error("Failed to load node factories", e);
-			return;
-		}
+		NodeFactory.loadRegistries();
 		DAO4JSONFactory.loadRegistries();
 
 		PreferencesHelper.start();
@@ -589,4 +594,8 @@ public final class Makelangelo {
 	public PlotterSettingsManager getPlotterSettingsManager() {
 		return plotterSettingsManager;
 	}
+
+    public Donatello getDonatello() {
+		return donatello;
+    }
 }
