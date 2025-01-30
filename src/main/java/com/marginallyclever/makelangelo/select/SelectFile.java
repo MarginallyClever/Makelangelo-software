@@ -5,8 +5,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
@@ -18,9 +16,11 @@ public class SelectFile extends Select {
 	private final JTextField field;
 	private FileFilter filter = null;
 	private final JFileChooser choose = new JFileChooser();
+	private final Component parentComponent;
 	
-	public SelectFile(String internalName,String labelValue,String defaultValue) {
+	public SelectFile(String internalName,String labelValue,String defaultValue,Component parentComponent) {
 		super(internalName);
+		this.parentComponent = parentComponent;
 
 		JLabel label = new JLabel(labelValue, JLabel.LEADING);
 
@@ -48,12 +48,7 @@ public class SelectFile extends Select {
 		//field.setBorder(new LineBorder(Color.BLACK));
 
 		JButton chooseButton = new JButton("...");
-		chooseButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				field.setText(selectFile(field.getText()));
-			}
-		});
+		chooseButton.addActionListener(e -> field.setText(selectFile(field.getText())));
 		
 		JPanel panel2 = new JPanel(new BorderLayout());
 		panel2.add(field,BorderLayout.LINE_END);
@@ -70,7 +65,7 @@ public class SelectFile extends Select {
 	private String selectFile(String cancelValue) {
 		choose.setFileFilter(filter);
 		choose.setCurrentDirectory(new File(cancelValue));
-		int returnVal = choose.showOpenDialog(null);
+		int returnVal = choose.showOpenDialog(parentComponent);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = choose.getSelectedFile();
 			return file.getAbsolutePath();
