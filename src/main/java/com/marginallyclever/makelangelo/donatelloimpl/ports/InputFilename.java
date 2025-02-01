@@ -6,6 +6,9 @@ import com.marginallyclever.makelangelo.select.SelectFile;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * A port that accepts a filename.
+ */
 public class InputFilename extends InputString implements SwingProvider {
     private SelectFile selectFile;
     private JFileChooser fileChooser;

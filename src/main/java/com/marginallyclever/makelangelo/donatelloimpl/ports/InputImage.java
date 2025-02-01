@@ -4,6 +4,9 @@ import com.marginallyclever.nodegraphcore.port.Input;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * An input port that accepts a {@link BufferedImage}.
+ */
 public class InputImage extends Input<BufferedImage> {
     public InputImage(String name) throws IllegalArgumentException {
         super(name, BufferedImage.class, new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB));

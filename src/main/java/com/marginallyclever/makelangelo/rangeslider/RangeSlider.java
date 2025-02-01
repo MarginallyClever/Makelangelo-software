@@ -3,16 +3,17 @@ package com.marginallyclever.makelangelo.rangeslider;
 import javax.swing.JSlider;
 
 /**
- * An extension of JSlider to select a range of values using two thumb controls.
+ * An extension of {@link JSlider} to select a range of values using two thumb controls.
  * The thumb controls are used to select the lower and upper value of a range
  * with predetermined minimum and maximum values.
  * 
- * <p>Note that RangeSlider makes use of the default BoundedRangeModel, which 
+ * <p>Note that {@link RangeSlider} makes use of the default {@link javax.swing.BoundedRangeModel}, which
  * supports an inner range defined by a value and an extent.  The upper value
- * returned by RangeSlider is simply the lower value plus the extent.</p>
- * 
- * see https://ernienotes.wordpress.com/2010/12/27/creating-a-java-swing-range-slider/
- * @author Ernest Yu 
+ * returned by {@link RangeSlider} is simply the lower value plus the extent.</p>
+ *
+ * <p>MIT license. See <a href="https://ernienotes.wordpress.com/2010/12/27/creating-a-java-swing-range-slider/">Creating
+ * a Java Swing Range Slider</a></p>
+ * @author Ernest Yu
  */
 public class RangeSlider extends JSlider {
 	/**
