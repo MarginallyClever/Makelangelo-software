@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 public class OpenFileChooser {
     private static final Logger logger = LoggerFactory.getLogger(OpenFileChooser.class);
     public static final String KEY_PREFERENCE_LOAD_PATH = "loadPath";
-    private final JFileChooser jFileChooser = new JFileChooser();
-    private final JLabel previewLabel = new JLabel();
+    private final JFileChooser fileChooser = new JFileChooser();
+    private final JPanel previewPanel = new JPanel();
     private final Component parent;
     private OpenListener openListener;
 
@@ -40,43 +40,40 @@ public class OpenFileChooser {
                 Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS.clone())
         ).toArray(String[]::new);
 
-        jFileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), allSupportedTypes));
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), allSupportedTypes));
 
         // add vector formats
         for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
-            jFileChooser.addChoosableFileFilter(ff);
+            fileChooser.addChoosableFileFilter(ff);
         }
 
-        // merge SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS into a string separated by /
-        String names = String.join(", ",SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         // add image formats
+        String names = String.join(", ",SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage",new String[]{names}), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
-        jFileChooser.addChoosableFileFilter(images);
+        fileChooser.addChoosableFileFilter(images);
 
         // no wild card filter, please.
-        jFileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
         // display a preview
-        jFileChooser.addPropertyChangeListener(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, (evt) ->{
+        fileChooser.addPropertyChangeListener(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, (evt) ->{
             // no file selected.
-            previewLabel.setIcon(null);
+            previewPanel.removeAll();
 
             File file = (File) evt.getNewValue();
             if (file != null && file.isFile()) {
                 // ImageIcon may silently fail to load the image.  That's ok.
                 ImageIcon icon = new ImageIcon(file.getAbsolutePath());
                 // Scale the image to fit the label
-                Image scaledImage = icon.getImage().getScaledInstance(previewLabel.getWidth(), previewLabel.getHeight(), Image.SCALE_DEFAULT);
-                previewLabel.setIcon(new ImageIcon(scaledImage));
+                Image scaledImage = icon.getImage().getScaledInstance(previewPanel.getWidth(), previewPanel.getHeight(), Image.SCALE_DEFAULT);
+                previewPanel.add(new JLabel(new ImageIcon(scaledImage)));
             }
         });
 
         // Set a preferred size for the preview image
-        previewLabel.setPreferredSize(new Dimension(200, 200));
+        previewPanel.setPreferredSize(new Dimension(200, 200));
         // glue the preview image to the right side of the dialog
-        JPanel previewPanel = new JPanel();
-        previewPanel.add(previewLabel);
-        jFileChooser.setAccessory(previewPanel);
+        fileChooser.setAccessory(previewPanel);
     }
 
     public void setOpenListener(OpenListener openListener) {
@@ -86,11 +83,11 @@ public class OpenFileChooser {
     public void chooseFile() {
         Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
         String lastPath = preferences.get(KEY_PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory());
-        jFileChooser.setCurrentDirectory(new File(lastPath));
+        fileChooser.setCurrentDirectory(new File(lastPath));
 
-        if (jFileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-            String filename = jFileChooser.getSelectedFile().getAbsolutePath();
-            preferences.put(KEY_PREFERENCE_LOAD_PATH, jFileChooser.getCurrentDirectory().toString());
+        if (fileChooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+            String filename = fileChooser.getSelectedFile().getAbsolutePath();
+            preferences.put(KEY_PREFERENCE_LOAD_PATH, fileChooser.getCurrentDirectory().toString());
             logger.debug("File selected by user: {}", filename);
             openListener.openFile(filename);
         }
