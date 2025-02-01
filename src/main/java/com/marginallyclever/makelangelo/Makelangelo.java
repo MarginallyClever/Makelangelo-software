@@ -115,6 +115,12 @@ public final class Makelangelo {
 		
 		logger.debug("Starting virtual camera...");
 		camera = new Camera();
+
+		createAppWindow();
+		//checkSharingPermission();
+
+		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
+		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
 	}
 
 	private void updatePlotterRenderer() {
@@ -149,17 +155,6 @@ public final class Makelangelo {
 				myPlotterRenderer.render(gl2, myPlotter);
 			}
 		});
-	}
-
-	public void run() {
-		createAppWindow();
-		//checkSharingPermission();
-
-		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-		if (preferences.getBoolean("Check for updates", false)) checkForUpdate(true);
-
-		logger.debug("  make visible...");
-		mainFrame.setVisible(true);
 	}
 
 	private static void setSystemLookAndFeel() {
@@ -431,7 +426,6 @@ public final class Makelangelo {
 		}
 
 		createDefaultLayout();
-
 		mainFrame.resetDefaultLayout();
 		mainFrame.saveAndRestoreLayout();
 
@@ -473,7 +467,7 @@ public final class Makelangelo {
 
 	private boolean confirmClose() {
 		int result = JOptionPane.showConfirmDialog(mainFrame, Translator.get("ConfirmQuitQuestion"),
-				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION);
+				Translator.get("ConfirmQuitTitle"), JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.YES_OPTION) {
 			previewPanel.removeListener(myPlotter);
 			mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -547,8 +541,7 @@ public final class Makelangelo {
 		setSystemLookAndFeel();
 
 		javax.swing.SwingUtilities.invokeLater(()->{
-			Makelangelo makelangeloProgram = new Makelangelo();
-			makelangeloProgram.run();
+			(new Makelangelo()).mainFrame.setVisible(true);
 		});
 	}
 
