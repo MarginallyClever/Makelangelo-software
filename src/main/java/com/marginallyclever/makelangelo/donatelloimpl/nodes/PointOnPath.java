@@ -12,7 +12,9 @@ import com.marginallyclever.nodegraphcore.Node;
 /**
  * <p>(px,py) = path(index), where path(0) is the start and path(path.length) is the end.</p>
  * <p>(nx,ny) = the approximate normal at path(index).  This is approximated by finding</p>
- * <pre>normalize(path(index+epsilon) - path(index))</pre>
+ * <pre>{@code
+ * normalize(path(index+epsilon) - path(index))
+ * }</pre>
  * <p>for some very small epsilon, and taking into account the start and end of the path.</p>
  * <p>If the path is of zero-length then (0,0) will be generated.</p>
  * <p>path.length can be obtained from LoadTurtle.</p>
