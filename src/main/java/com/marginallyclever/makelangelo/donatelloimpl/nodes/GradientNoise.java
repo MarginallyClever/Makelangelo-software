@@ -38,13 +38,13 @@ public class GradientNoise extends Node {
 
     @Override
     public void update() {
-        int w = Math.max(1,width.getValue().intValue());
-        int h = Math.max(1,height.getValue().intValue());
-        int noiseStyle = Math.min(NoiseFactory.getNames().length-1,Math.max(0,style.getValue().intValue()));
-        double tx = translateX.getValue().doubleValue();
-        double ty = translateY.getValue().doubleValue();
-        double sx = scaleX.getValue().doubleValue();
-        double sy = scaleY.getValue().doubleValue();
+        int w = Math.max(1,width.getValue());
+        int h = Math.max(1,height.getValue());
+        int noiseStyle = Math.min(NoiseFactory.getNames().length-1,Math.max(0,style.getValue()));
+        double tx = translateX.getValue();
+        double ty = translateY.getValue();
+        double sx = scaleX.getValue();
+        double sy = scaleY.getValue();
 
         Noise noise = NoiseFactory.getNoise(noiseStyle);
         assert(noise!=null);

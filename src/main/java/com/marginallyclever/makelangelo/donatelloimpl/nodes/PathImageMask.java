@@ -52,8 +52,8 @@ public class PathImageMask extends Node {
         listAbove.clear();
         listBelow.clear();
         
-        double s = Math.max(1, stepSize.getValue().doubleValue());
-        double c = Math.max(0,Math.min(255, threshold.getValue().doubleValue()));
+        double s = Math.max(1, stepSize.getValue());
+        double c = Math.max(0,Math.min(255, threshold.getValue()));
 
         for(LineSegment2D line : lines) {
             scanLine(src,line,s,c);

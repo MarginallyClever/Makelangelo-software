@@ -195,8 +195,8 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         GraphViewPanel.setHints(g2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int dx=px.getValue().intValue();
-        int dy=py.getValue().intValue();
+        int dx=px.getValue();
+        int dy=py.getValue();
         g2.translate(dx,dy);
         var lineThickness = this.lineThickness.getValue().floatValue();
         g2.setStroke(new BasicStroke(lineThickness));

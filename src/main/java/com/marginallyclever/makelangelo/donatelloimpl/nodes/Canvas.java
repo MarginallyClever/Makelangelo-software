@@ -33,8 +33,8 @@ public class Canvas extends Node implements PrintWithGraphics {
 
     @Override
     public void update() {
-        var w = Math.max(1,width.getValue().intValue());
-        var h = Math.max(1,height.getValue().intValue());
+        var w = Math.max(1,width.getValue());
+        var h = Math.max(1,height.getValue());
         outx.send(0);
         outy.send(0);
         outw.send(w);
@@ -44,8 +44,8 @@ public class Canvas extends Node implements PrintWithGraphics {
 
     @Override
     public void print(Graphics g) {
-        var w = Math.max(1,width.getValue().intValue());
-        var h = Math.max(1,height.getValue().intValue());
+        var w = Math.max(1,width.getValue());
+        var h = Math.max(1,height.getValue());
         g.setColor(color.getValue());
         g.fillRect(0,0,w,h);
     }

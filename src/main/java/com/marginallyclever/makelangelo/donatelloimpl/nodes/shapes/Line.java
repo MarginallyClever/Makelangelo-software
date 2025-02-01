@@ -29,8 +29,8 @@ public class Line extends Node {
     public void update() {
         try {
             Turtle t = new Turtle();
-            t.jumpTo(x0.getValue().doubleValue(),y0.getValue().doubleValue());
-            t.moveTo(x1.getValue().doubleValue(),y1.getValue().doubleValue());
+            t.jumpTo(x0.getValue(),y0.getValue());
+            t.moveTo(x1.getValue(),y1.getValue());
             t.penUp();
             contents.send(t);
         } catch (Exception e) {

@@ -333,7 +333,7 @@ public class LineWeightByImage extends Node {
      */
     private void maybeSplitLine(LineSegment2D segment) {
         double beforeLen = Math.sqrt(segment.lengthSquared());
-        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize.getValue().doubleValue()));
+        int pieces = (int)Math.max(1,Math.ceil(beforeLen / stepSize.getValue()));
         if(pieces==1) {
             addOneUnsortedSegment(segment.start,segment.end);
             return;
@@ -364,9 +364,9 @@ public class LineWeightByImage extends Node {
         // sample image intensity here from 0...1
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;
-        var s = stepSize.getValue().doubleValue();
+        var s = stepSize.getValue();
         double intensity = 1.0-(sourceImage.sample(mx,my,s/2)/255.0);
-        LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness.getValue().doubleValue());
+        LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness.getValue());
         // make a fast search index
         a.ix = (int)Math.floor(mx / s);
         a.iy = (int)Math.floor(my / s);

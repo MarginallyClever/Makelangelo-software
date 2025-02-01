@@ -25,8 +25,8 @@ public class Rectangle extends Node {
     public void update() {
         try {
             Turtle t = new Turtle();
-            double ww = w.getValue().doubleValue()/2.0;
-            double hh = h.getValue().doubleValue()/2.0;
+            double ww = w.getValue()/2.0;
+            double hh = h.getValue()/2.0;
             t.jumpTo(-ww,-hh);
             t.moveTo( ww,-hh);
             t.moveTo( ww, hh);

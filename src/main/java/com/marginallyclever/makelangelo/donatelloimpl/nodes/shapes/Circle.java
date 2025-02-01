@@ -23,7 +23,7 @@ public class Circle extends Node {
     public void update() {
         try {
             Turtle t = new Turtle();
-            double r = radius.getValue().doubleValue()/2.0;
+            double r = radius.getValue()/2.0;
             double circumference = Math.ceil(Math.PI*r*2.0);
             t.jumpTo(r,0);
             for(int i=0;i<circumference;++i) {

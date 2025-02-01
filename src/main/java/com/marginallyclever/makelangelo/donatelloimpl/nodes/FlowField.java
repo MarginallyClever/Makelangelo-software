@@ -37,22 +37,22 @@ public class FlowField extends Node {
     public void update() {
         var img = inputImage.getValue();
         var turtle = new Turtle();
-        int step = Math.max(1,stepValue.getValue().intValue());
-        int numSteps = Math.max(1,numStepsValue.getValue().intValue());
-        double angle = startAngle.getValue().doubleValue();
+        int step = Math.max(1,stepValue.getValue());
+        int numSteps = Math.max(1,numStepsValue.getValue());
+        double angle = startAngle.getValue();
         FlowDrawer drawer = new FlowDrawer(img, turtle, step, angle);
 
         // move in a grid over the image and generate a flow field
-        int spacing = Math.max(1,spacingValue.getValue().intValue());
+        var spacing = Math.max(1,spacingValue.getValue());
         var w = img.getWidth();
         var h = img.getHeight();
 
         setComplete(0);
-        for (int y = 0; y <= h; y+=spacing) {
-            for (int x = 0; x <= w; x+=spacing) {
-                drawer.draw(x, y, numSteps);
+        for (double y = 0; y <= h; y+=spacing) {
+            for (double x = 0; x <= w; x+=spacing) {
+                drawer.draw((int)x, (int)y, numSteps);
             }
-            setComplete(100*y/h);
+            setComplete((int)(100*y/h));
         }
 
         setComplete(100);
