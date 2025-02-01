@@ -31,7 +31,7 @@ public class TurtleToBufferedImage extends Node {
             int h = (int)Math.ceil(r.getHeight());
             int w = (int)Math.ceil(r.getWidth());
             BufferedImage img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = (Graphics2D)img.createGraphics();
+            Graphics2D g = img.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_PURE);
@@ -46,9 +46,7 @@ public class TurtleToBufferedImage extends Node {
                 if (m == null) throw new NullPointerException();
 
                 switch (m.type) {
-                    case TRAVEL -> {
-                        previousMove = m;
-                    }
+                    case TRAVEL -> previousMove = m;
                     case DRAW_LINE -> {
                         if (previousMove != null) {
                             g.setColor(downColor);
