@@ -17,17 +17,15 @@ public class LanguagePreferences {
 	static private final SelectPanel panel = new SelectPanel();
 	static private final String[] languageList = Translator.getLanguageList();
 	static private SelectOneOfMany languageOptions;
-	
-	
+
 	static SelectPanel buildPanel() {
 		int currentIndex = Translator.getCurrentLanguageIndex();
 		languageOptions = new SelectOneOfMany("language","Language",languageList,currentIndex);
-		
+
+		panel.clear();
 		panel.add(languageOptions);
 		panel.add(new SelectReadOnlyText("learnMore",
-				"<![CDATA[<html><body>"
-						+"<a href=\"https://www.marginallyclever.com/2020/06/how-to-translate-makelangelo-software/\">Add translations</a>"
-						+"</body></html>]]>"));
+				"<![CDATA[<html><body><a href=\"https://crowdin.com/project/makelangelo\">Add translations</a></body></html>]]>"));
 
 		return panel;
 	}

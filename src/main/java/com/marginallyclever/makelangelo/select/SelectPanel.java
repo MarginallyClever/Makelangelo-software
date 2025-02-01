@@ -23,4 +23,8 @@ public class SelectPanel extends JPanel {
 	public void add(JComponent c) {
 		interiorPanel.add(c);
 	}
+
+	public void clear() {
+		interiorPanel.removeAll();
+	}
 }
