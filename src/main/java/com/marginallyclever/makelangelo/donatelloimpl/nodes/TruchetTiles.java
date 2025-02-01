@@ -44,11 +44,11 @@ public class TruchetTiles extends Node {
             Turtle turtle = new Turtle();
             List<TruchetTile> ttgList = new ArrayList<>();
 
-            for(double y=0;y<img.getHeight();y += tileSize) {
-                for(double x=0;x<img.getWidth();x += tileSize) {
-                    raster.getPixel((int)x,(int)y,pixels);
-                    double avg = (pixels[0]+pixels[1]+pixels[2])/3.0;
-                    ttgList.add(TruchetTileFactory.getTile(avg>128?0:1,turtle,space,lines));
+            for (double y = 0; y < img.getHeight(); y += tileSize) {
+                for (double x = 0; x < img.getWidth(); x += tileSize) {
+                    raster.getPixel((int) x, (int) y, pixels);
+                    double avg = (pixels[0] + pixels[1] + pixels[2]) / 3.0;
+                    ttgList.add(TruchetTileFactory.getTile(avg > 128 ? 0 : 1, turtle, space, lines));
                 }
             }
 
