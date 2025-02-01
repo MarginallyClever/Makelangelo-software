@@ -15,7 +15,7 @@ import java.io.File;
 public class SelectFile extends Select {
 	private final JTextField field;
 	private FileFilter filter = null;
-	private final JFileChooser choose = new JFileChooser();
+	private JFileChooser choose = new JFileChooser();
 	private final Component parentComponent;
 	
 	public SelectFile(String internalName,String labelValue,String defaultValue,Component parentComponent) {
@@ -80,7 +80,7 @@ public class SelectFile extends Select {
 
 	/**
 	 * Will notify observers that the value has changed.
-	 * @param string
+	 * @param string the new value
 	 */
 	public void setText(String string) {
 		field.setText(string);
@@ -92,5 +92,10 @@ public class SelectFile extends Select {
 	
 	public void setFileOnly() {
 		choose.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	}
+
+	public void setFileChooser(JFileChooser fileChooser) {
+		if(fileChooser==null) throw new NullPointerException("fileChooser cannot be null");
+		choose = fileChooser;
 	}
 }

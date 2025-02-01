@@ -26,8 +26,10 @@ public class LoadAudio implements TurtleLoader {
         for( var t : audioFileTypes ) {
             list[i++] = t.getExtension();
         }
-        logger.info("audio formats: {}", Arrays.toString(list));
-        filter = new FileNameExtensionFilter("Audio Files", list);
+        Arrays.sort(list);
+        String exts = String.join(", ", list);
+        logger.info("audio formats: {}", exts);
+        filter = new FileNameExtensionFilter("Audio Files ("+exts+")", list);
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.io.InputStream;
  */
 public interface TurtleLoader {		
 	/**
-	 * @return returns a FileNameExtensionFilter with the extensions supported by this filter.
+	 * @return returns a Swing {@link FileNameExtensionFilter} with the extensions supported by this filter.
 	 */
 	FileNameExtensionFilter getFileNameFilter();
 

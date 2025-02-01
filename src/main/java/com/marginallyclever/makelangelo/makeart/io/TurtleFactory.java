@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,6 +40,22 @@ public class TurtleFactory {
 			new SaveBitmap("tif",false),
 			new SaveBitmap("webp",true),
 	};
+
+	private static JFileChooser fileChooser = null;
+
+	public static JFileChooser getFileChooser() {
+		if(fileChooser==null) {
+			fileChooser = new JFileChooser();
+
+			// add vector formats
+			for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
+				fileChooser.addChoosableFileFilter(ff);
+			}
+			// no wild card filter, please.
+			fileChooser.setAcceptAllFileFilterUsed(false);
+		}
+		return fileChooser;
+	}
 	
 	public static Turtle load(String filename) throws Exception {
 		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
@@ -48,11 +65,11 @@ public class TurtleFactory {
 				try(FileInputStream in = new FileInputStream(filename)) {
 					return loader.load(in);
 				} catch(Exception e) {
-					throw new Exception("TurtleFactory could not load '" + filename + "'.", e);
+					throw new Exception("could not load '" + filename + "'.", e);
 				}
 			}
 		}
-		throw new IllegalStateException("TurtleFactory doesn't recognize the format of '"+filename+"'.");
+		throw new Exception("unrecognized format '"+filename+"'.");
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {

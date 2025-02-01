@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.dnd.DropTarget;
 import java.awt.event.*;
@@ -248,24 +247,20 @@ public final class Makelangelo {
 	 * Load a vector and add it to the existing {@link Turtle}.
 	 */
 	public void importFile() {
-		JFileChooser jFileChooser = new JFileChooser();
-
-		// add vector formats
-		for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
-			jFileChooser.addChoosableFileFilter(ff);
-		}
-
-		// no wild card filter, please.
-		jFileChooser.setAcceptAllFileFilterUsed(false);
-
+		JFileChooser fileChooser = TurtleFactory.getFileChooser();
+		// load the last path from preferences
 		Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
 		String lastPath = preferences.get(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory());
-		jFileChooser.setCurrentDirectory(new File(lastPath));
+		fileChooser.setCurrentDirectory(new File(lastPath));
 
-		if (jFileChooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
-			String filename = jFileChooser.getSelectedFile().getAbsolutePath();
-			preferences.put(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, jFileChooser.getCurrentDirectory().toString());
+		if (fileChooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+			String filename = fileChooser.getSelectedFile().getAbsolutePath();
 			logger.debug("File selected by user: {}", filename);
+
+			// save the path to preferences
+			preferences.put(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, fileChooser.getCurrentDirectory().toString());
+
+			// commit the load
 			try {
 				Turtle t = TurtleFactory.load(filename);
 				myTurtle.add(t);

@@ -19,13 +19,14 @@ public class LoadTurtle extends Node {
     private final OutputDouble h = new OutputDouble("height", 0d);
     private final OutputDouble length = new OutputDouble("length", 0d);
 
-
     public LoadTurtle() {
         super("LoadTurtle");
         addVariable(filename);
         addVariable(contents);
         addVariable(w);
         addVariable(h);
+
+        filename.setFileChooser(TurtleFactory.getFileChooser());
     }
 
     @Override

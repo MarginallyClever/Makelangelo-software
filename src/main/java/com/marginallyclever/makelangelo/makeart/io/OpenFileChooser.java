@@ -32,7 +32,7 @@ public class OpenFileChooser {
         this.parent = parent;
 
         // add all supported type
-        String[] extensions = Stream.concat(
+        String[] allSupportedTypes = Stream.concat(
                 TurtleFactory.getLoadExtensions().stream()
                         .map(FileNameExtensionFilter::getExtensions)
                         .flatMap(Stream::of)
@@ -40,7 +40,7 @@ public class OpenFileChooser {
                 Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS.clone())
         ).toArray(String[]::new);
 
-        jFileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), extensions));
+        jFileChooser.addChoosableFileFilter(new FileNameExtensionFilter(Translator.get("OpenFileChooser.AllSupportedFiles"), allSupportedTypes));
 
         // add vector formats
         for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
@@ -48,9 +48,7 @@ public class OpenFileChooser {
         }
 
         // merge SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS into a string separated by /
-        String names = Arrays.stream(SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS)
-                .reduce((a, b) -> a + "/" + b)
-                .orElse("");
+        String names = String.join(", ",SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         // add image formats
         FileNameExtensionFilter images = new FileNameExtensionFilter(Translator.get("OpenFileChooser.FileTypeImage",new String[]{names}), SelectImageConverterPanel.IMAGE_FILE_EXTENSIONS);
         jFileChooser.addChoosableFileFilter(images);
