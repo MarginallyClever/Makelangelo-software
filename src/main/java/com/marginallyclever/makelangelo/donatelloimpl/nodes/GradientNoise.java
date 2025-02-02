@@ -4,6 +4,7 @@ import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputOneOfMany;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputImage;
 import com.marginallyclever.nodegraphcore.Node;
 
@@ -15,7 +16,7 @@ import java.awt.image.BufferedImage;
 public class GradientNoise extends Node {
     private final InputInt width = new InputInt("width", 256);
     private final InputInt height = new InputInt("height", 256);
-    private final InputInt style = new InputInt("style", 0);
+    private final InputOneOfMany style = new InputOneOfMany("style", 0);
     private final InputInt seed = new InputInt("seed", 0);
     private final InputDouble scaleX = new InputDouble("scale x", 0.05d);
     private final InputDouble scaleY = new InputDouble("scale y", 0.05d);
@@ -25,6 +26,9 @@ public class GradientNoise extends Node {
 
     public GradientNoise() {
         super("GradientNoise");
+
+        style.setOptions(NoiseFactory.getNames());
+
         addVariable(width);
         addVariable(height);
         addVariable(style);
@@ -68,5 +72,7 @@ public class GradientNoise extends Node {
         }
 
         output.send(img);
+
+        this.updateBounds();
     }
 }

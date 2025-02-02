@@ -8,6 +8,7 @@ import java.awt.*;
 
 public class InputInt extends Input<Integer> implements SwingProvider {
     private SelectInteger selectInteger;
+
     public InputInt(String name, Integer startingValue) throws IllegalArgumentException {
         super(name, Integer.class, startingValue);
     }
@@ -16,9 +17,7 @@ public class InputInt extends Input<Integer> implements SwingProvider {
     public Component getSwingComponent(Component parent) {
         if(selectInteger==null) {
             selectInteger = new SelectInteger(name,name,this.value);
-            selectInteger.addSelectListener( evt -> {
-                setValue(evt.getNewValue());
-            });
+            selectInteger.addSelectListener( evt -> setValue(evt.getNewValue()) );
         }
         return selectInteger;
     }
