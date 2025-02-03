@@ -193,26 +193,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 				<version>3.2.0</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/package</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/package</directory>
-									<includes>
-										<include>avrdude.*</include>
-										<include>firmware.hex</include>
-									</includes>
-									<filtering>false</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
 						<id>copy-fat-jar</id>
 						<phase>package</phase>
 						<goals>
@@ -587,7 +567,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>1.0.30</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.marginallyclever</groupId>
+			<groupId>com.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
 			<version>1.4.1</version>
 		</dependency>
