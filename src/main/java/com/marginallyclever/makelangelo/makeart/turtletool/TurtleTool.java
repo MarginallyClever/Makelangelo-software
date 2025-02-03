@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MainFrame;
 import com.marginallyclever.makelangelo.makeart.TurtleModifierListener;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
  */
 public abstract class TurtleTool extends AbstractAction {
 	private final EventListenerList listeners = new EventListenerList();
-	private Makelangelo myMakelangelo;
+	private MainFrame frame;
 	
 	public TurtleTool(String string) {
 		super(string);
@@ -26,8 +26,8 @@ public abstract class TurtleTool extends AbstractAction {
 		super(string,icon);
 	}
 
-	public void setSource(Makelangelo m) {
-		myMakelangelo = m;
+	public void setSource(MainFrame frame) {
+		this.frame = frame;
 	}
 	
 	public void addModifierListener(TurtleModifierListener arg0) {
@@ -46,7 +46,7 @@ public abstract class TurtleTool extends AbstractAction {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		fireModificationEvent( run( myMakelangelo.getTurtle() ) );
+		fireModificationEvent( run( frame.getTurtle() ) );
 	}
 
 	/**

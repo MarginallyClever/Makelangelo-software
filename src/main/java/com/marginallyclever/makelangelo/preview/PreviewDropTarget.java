@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.preview;
 
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MainFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class PreviewDropTarget extends DropTargetAdapter {
     private static final Logger logger = LoggerFactory.getLogger(PreviewDropTarget.class);
-    private final Makelangelo app;
+    private final MainFrame frame;
 
-    public PreviewDropTarget(Makelangelo app) {
+    public PreviewDropTarget(MainFrame frame) {
         super();
-        this.app = app;
+        this.frame = frame;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class PreviewDropTarget extends DropTargetAdapter {
                     if (o instanceof List<?> list && !list.isEmpty()) {
                         o = list.getFirst();
                         if (o instanceof File file) {
-                            app.openFile(file.getAbsolutePath());
+                            frame.openFile(file.getAbsolutePath());
                             dtde.dropComplete(true);
                             return;
                         }
