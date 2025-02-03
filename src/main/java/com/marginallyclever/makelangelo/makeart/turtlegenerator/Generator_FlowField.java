@@ -3,8 +3,9 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.convenience.noise.PerlinNoise;
+import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.*;
+
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;

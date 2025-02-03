@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.select.SelectRandomSeed;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectRandomSeed;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.util.ArrayList;

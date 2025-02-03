@@ -2,10 +2,10 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputOneOfMany;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputImage;
+import com.marginallyclever.donatello.ports.InputDouble;
+import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputOneOfMany;
+import com.marginallyclever.donatello.ports.OutputImage;
 import com.marginallyclever.nodegraphcore.Node;
 
 import java.awt.image.BufferedImage;

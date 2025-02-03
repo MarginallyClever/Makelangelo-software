@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectPanel;
 
 /**
  * All {@link TurtleGenerator} have a {@link TurtleGeneratorPanel}.

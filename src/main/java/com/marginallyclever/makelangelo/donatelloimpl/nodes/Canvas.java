@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputColor;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputInt;
+import com.marginallyclever.donatello.ports.InputColor;
+import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.OutputInt;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 

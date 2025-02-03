@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**

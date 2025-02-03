@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectFile;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectFile;
+import com.marginallyclever.donatello.select.SelectPanel;
 import com.marginallyclever.util.PreferencesHelper;
 
 import java.util.prefs.Preferences;

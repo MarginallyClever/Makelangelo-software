@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputDouble;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputImage;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputDouble;
+import com.marginallyclever.donatello.ports.InputImage;
+import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetTile;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetTileFactory;

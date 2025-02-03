@@ -408,7 +408,6 @@ public final class Makelangelo {
 		mainFrame = new MainFrame();
 		setMainTitle("");
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setupDropTarget();
 
 		mainFrame.addWindowListener(new WindowAdapter() {
 			// when someone tries to close the app, confirm it.
@@ -433,6 +432,8 @@ public final class Makelangelo {
 		mainFrame.setJMenuBar(mainMenuBar);
 
 		camera.zoomToFit( Paper.DEFAULT_WIDTH, Paper.DEFAULT_HEIGHT);
+
+		setupDropTarget();
 
 		loadPaths();
 
@@ -461,8 +462,8 @@ public final class Makelangelo {
 
 	private void setupDropTarget() {
 		logger.debug("adding drag & drop support...");
-		new DropTarget(previewPanel, new PreviewDropTarget(this));
 		new DropTarget(donatello, new DonatelloDropTarget(donatello));
+		new DropTarget(previewPanel, new PreviewDropTarget(this));
 	}
 
 	private boolean confirmClose() {

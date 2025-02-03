@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
+import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.util.PreferencesHelper;
 

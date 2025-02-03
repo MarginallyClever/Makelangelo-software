@@ -340,4 +340,8 @@ public class PreviewPanel extends JPanel implements GLEventListener, MouseWheelL
 		glCanvas.removeMouseMotionListener(this);
 		glCanvas.removeMouseWheelListener(this);
 	}
+
+	public Component getCanvas() {
+		return glCanvas;
+	}
 }

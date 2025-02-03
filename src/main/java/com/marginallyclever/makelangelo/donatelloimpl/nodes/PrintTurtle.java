@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.donatello.graphview.GraphViewPanel;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputBoolean;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputColor;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputBoolean;
+import com.marginallyclever.donatello.ports.InputColor;
+import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;

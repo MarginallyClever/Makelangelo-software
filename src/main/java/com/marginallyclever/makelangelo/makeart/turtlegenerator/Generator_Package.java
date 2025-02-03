@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 /**

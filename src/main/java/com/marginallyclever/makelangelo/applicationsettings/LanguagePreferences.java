@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

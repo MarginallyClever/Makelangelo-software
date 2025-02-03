@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputImage;
+import com.marginallyclever.donatello.ports.OutputImage;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;

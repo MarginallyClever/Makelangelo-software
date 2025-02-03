@@ -3,8 +3,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator.fractal;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtletool.ResizeTurtleToPaperAction;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.select.SelectToggleButton;
+import com.marginallyclever.donatello.select.SelectToggleButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

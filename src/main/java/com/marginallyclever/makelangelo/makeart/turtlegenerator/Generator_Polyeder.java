@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.Select;
+import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.swing.event.EventListenerList;

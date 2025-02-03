@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

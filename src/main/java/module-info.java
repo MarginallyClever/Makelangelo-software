@@ -27,7 +27,6 @@ module com.marginallyclever.makelangelo {
     requires com.marginallyclever.nodegraphcore;
 
     exports com.marginallyclever.communications;
-    exports com.marginallyclever.makelangelo.select;
     exports com.marginallyclever.makelangelo.makeart;
     exports com.marginallyclever.makelangelo.makeart.imagefilter;
     exports com.marginallyclever.makelangelo.makeart.turtletool;

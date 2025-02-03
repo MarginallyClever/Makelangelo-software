@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
 import com.marginallyclever.convenience.Point2D;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
-import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputDouble;
+import com.marginallyclever.donatello.ports.OutputDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;

@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectSpinner;
+import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.donatello.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectSpinner;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.event.EventListenerList;

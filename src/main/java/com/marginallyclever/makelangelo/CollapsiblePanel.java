@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.select.*;
+import com.marginallyclever.donatello.select.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

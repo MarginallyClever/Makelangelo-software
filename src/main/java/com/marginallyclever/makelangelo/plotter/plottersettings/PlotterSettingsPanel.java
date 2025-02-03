@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
-import com.marginallyclever.makelangelo.select.*;
+
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
