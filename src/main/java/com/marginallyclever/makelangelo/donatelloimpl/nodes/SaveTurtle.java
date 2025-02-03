@@ -27,11 +27,11 @@ public class SaveTurtle extends Node {
 
     @Override
     public void update() {
-        if(filename.getValue().isEmpty()) return;
+        if(filename.getValue().get().isEmpty()) return;
 
         try {
             PlotterSettings settings = PlotterSettingsManager.buildMakelangelo5();
-            TurtleFactory.save(turtle.getValue(),filename.getValue(),settings);
+            TurtleFactory.save(turtle.getValue(),filename.getValue().get(),settings);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

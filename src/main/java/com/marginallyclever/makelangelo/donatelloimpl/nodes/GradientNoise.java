@@ -72,7 +72,6 @@ public class GradientNoise extends Node {
         }
 
         output.send(img);
-
         this.updateBounds();
     }
 }

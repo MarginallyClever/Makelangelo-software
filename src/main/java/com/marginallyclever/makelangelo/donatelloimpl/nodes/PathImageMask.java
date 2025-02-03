@@ -66,6 +66,7 @@ public class PathImageMask extends Node {
         Turtle resultBelow = new Turtle();
         resultBelow.addLineSegments(listBelow);
         outputBelow.send(resultBelow);
+        this.updateBounds();
     }
 
     /**

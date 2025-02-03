@@ -32,7 +32,7 @@ public class LoadTurtle extends Node {
     @Override
     public void update() {
         try {
-            Turtle t = TurtleFactory.load(filename.getValue());
+            Turtle t = TurtleFactory.load(filename.getValue().get());
             contents.send(t);
             Rectangle2D r = t.getBounds();
             w.send(r.getWidth());

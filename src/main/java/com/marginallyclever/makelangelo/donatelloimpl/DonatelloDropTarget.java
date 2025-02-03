@@ -4,6 +4,7 @@ import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.Filename;
 import com.marginallyclever.donatello.nodes.images.LoadImage;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.LoadTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.ports.InputFilename;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.port.Input;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class DonatelloDropTarget extends DropTargetAdapter {
     }
 
     private Node loadFile(String absolutePath) {
-        // determine if the file is an image or a turtle
+        // determine if the file is an image or a vector
         try {
             // Load the file and if it doesn't fail then it's probably an image.
             // If it's stupid and it works... it's not that stupid.
@@ -75,7 +76,7 @@ public class DonatelloDropTarget extends DropTargetAdapter {
             }
         } catch (Exception ignored) {}
 
-        return loadTurtle(absolutePath);
+        return loadVector(absolutePath);
     }
 
     /**
@@ -90,6 +91,7 @@ public class DonatelloDropTarget extends DropTargetAdapter {
         donatello.getGraph().add(loadImage);
         inputFile.setValue(new Filename(absPath));
         donatello.submit(loadImage);
+        loadImage.updateBounds();
         return loadImage;
     }
 
@@ -97,14 +99,15 @@ public class DonatelloDropTarget extends DropTargetAdapter {
      * In Donatello add a {@link LoadTurtle} with the given file.  Assumes {@link LoadTurtle} can load the file.
      * @param absPath The absolute path to the file.
      */
-    private Node loadTurtle(String absPath) {
+    private Node loadVector(String absPath) {
         LoadTurtle loadTurtle = new LoadTurtle();
         var first = loadTurtle.getVariable(0);
-        if(!(first instanceof Input<?> inputFile)) throw new IllegalStateException("First variable is not an Input");
-        if(!(inputFile.getValue() instanceof Filename)) throw new IllegalStateException("Input value is not a Filename");
+        if(!(first instanceof InputFilename inputFile)) throw new IllegalStateException("First variable is not an Input");
+        if(inputFile.getValue() == null) throw new IllegalStateException("Input value is not a Filename");
         donatello.getGraph().add(loadTurtle);
         inputFile.setValue(new Filename(absPath));
         donatello.submit(loadTurtle);
+        loadTurtle.updateBounds();
         return loadTurtle;
     }
 }
