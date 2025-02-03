@@ -1,3 +1,5 @@
+import com.marginallyclever.makelangelo.donatelloimpl.MakelangeloRegistry;
+
 module com.marginallyclever.makelangelo {
     requires org.slf4j;
     requires jssc;
@@ -55,9 +57,9 @@ module com.marginallyclever.makelangelo {
     // http://tutorials.jenkov.com/java/modules.html
     uses com.marginallyclever.nodegraphcore.NodeRegistry;
     provides com.marginallyclever.nodegraphcore.NodeRegistry with
-            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
+            MakelangeloRegistry;
 
     uses com.marginallyclever.nodegraphcore.DAORegistry;
     provides com.marginallyclever.nodegraphcore.DAORegistry with
-            com.marginallyclever.makelangelo.donatelloimpl.DonatelloRegistry;
+            MakelangeloRegistry;
 }

@@ -91,22 +91,23 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	</repositories>
 
 	<build>
-		<!-- See: http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html
-			and http://stackoverflow.com/a/3697482 -->
 		<resources>
+			<!-- General (non-filtered) resources -->
 			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
-				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering> <!-- Default, no filtering -->
 				<excludes>
-					<exclude>**/*.properties</exclude>
+					<exclude>makelangelo.properties</exclude> <!-- Exclude this file from unfiltered resources -->
 				</excludes>
+			</resource>
+
+			<!-- Filter only makelangelo.properties -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering> <!-- Enable filtering for selected files -->
+				<includes>
+					<include>makelangelo.properties</include> <!-- Only this file -->
+				</includes>
 			</resource>
 		</resources>
 
@@ -588,7 +589,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.4.0</version>
+			<version>1.4.1</version>
 		</dependency>
 
 		<!-- read audio files -->
