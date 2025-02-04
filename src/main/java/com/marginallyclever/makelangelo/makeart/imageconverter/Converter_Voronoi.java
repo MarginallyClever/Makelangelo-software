@@ -11,6 +11,7 @@ import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
@@ -298,7 +299,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     abstract void writeOutCells();
 
     /**
-     * Callback from {@link com.marginallyclever.makelangelo.preview.PreviewPanel} that it is time to render to the WYSIWYG display.
+     * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
      *
      * @param gl2 the render context
      */

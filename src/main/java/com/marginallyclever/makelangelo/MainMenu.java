@@ -496,16 +496,15 @@ public class MainMenu extends JMenuBar {
 
         ButtonGroup group = new ButtonGroup();
 
-        Arrays.stream(TurtleRenderFactory.values())
-                .forEach(iter -> {
-                    TurtleRenderer renderer = iter.getTurtleRenderer();
-                    String name = iter.getName();
-                    JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
-                    if (frame.getTurtleRenderer() == renderer) button.setSelected(true);
-                    button.addActionListener((e)-> onTurtleRenderChange(name));
-                    menu.add(button);
-                    group.add(button);
-                });
+        Arrays.stream(TurtleRenderFactory.values()).forEach(iter -> {
+                TurtleRenderer renderer = iter.getTurtleRenderer();
+                String name = iter.getName();
+                JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
+                if (frame.getTurtleRenderer() == renderer) button.setSelected(true);
+                button.addActionListener((e)-> onTurtleRenderChange(name));
+                menu.add(button);
+                group.add(button);
+        });
 
         return menu;
     }

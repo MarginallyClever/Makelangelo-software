@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.preview.PreviewPanel;
+import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.security.InvalidParameterException;
@@ -171,7 +171,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	}
 	
 	/**
-	 * Callback from {@link PreviewPanel} that it is time to render to the WYSIWYG display.
+	 * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
 	 * @param gl2 the render context
 	 */
 	@Override
