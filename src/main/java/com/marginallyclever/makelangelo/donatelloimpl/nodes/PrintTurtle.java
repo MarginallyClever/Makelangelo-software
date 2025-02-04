@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>Print the {@link Turtle}'s path behind the {@link Node}s.</p>
@@ -32,6 +34,8 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     private final List<Polyline> polylines = new ArrayList<>();
 
+    private final Lock lock = new ReentrantLock();
+
     public PrintTurtle() {
         super("PrintTurtle");
         addVariable(turtle);
@@ -44,11 +48,16 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     @Override
     public void update() {
-        polylines.clear();
-        Turtle myTurtle = turtle.getValue();
-        if(myTurtle==null || myTurtle.history.isEmpty()) return;
+        lock.lock();
+        try {
+            polylines.clear();
+            Turtle myTurtle = turtle.getValue();
+            if (myTurtle == null || myTurtle.history.isEmpty()) return;
 
-        generatePolylines(myTurtle);
+            generatePolylines(myTurtle);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -66,7 +75,12 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         g2.translate(dx,dy);
         var lineThickness = this.lineThickness.getValue().floatValue();
         g2.setStroke(new BasicStroke(lineThickness));
-        polylines.forEach(p -> p.draw(g2));
+        lock.lock();
+        try {
+            polylines.forEach(p -> p.draw(g2));
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void generatePolylines(Turtle myTurtle) {
