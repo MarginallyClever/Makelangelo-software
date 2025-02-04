@@ -8,17 +8,17 @@ import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * Warp an existing path into a spiral.
+ * Twist an existing path into a spiral.
  */
-public class Spiral extends Node {
+public class Twist extends Node {
     private final InputTurtle source = new InputTurtle("turtle");
     private final InputDouble r0 = new InputDouble("r0", 1d);
     private final InputDouble dr = new InputDouble("dr", 1d);
     private final InputDouble stepSize = new InputDouble("stepSize", 1d);
     private final OutputTurtle output = new OutputTurtle("output");
 
-    public Spiral() {
-        super("Spiral");
+    public Twist() {
+        super("Twist");
         addVariable(source);
         addVariable(r0);
         addVariable(dr);
