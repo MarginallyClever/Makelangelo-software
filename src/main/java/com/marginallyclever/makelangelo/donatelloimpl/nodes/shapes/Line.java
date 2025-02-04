@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.shapes;
 
+import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.donatello.ports.InputDouble;
+import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
@@ -14,6 +16,7 @@ public class Line extends Node {
     private final InputDouble y0 = new InputDouble("y0", 0.0);
     private final InputDouble x1 = new InputDouble("x1", 1.0);
     private final InputDouble y1 = new InputDouble("y1", 0.0);
+    private final InputInt steps = new InputInt("subdivisions", 1);
     private final OutputTurtle contents = new OutputTurtle("contents");
 
     public Line() {
@@ -27,14 +30,21 @@ public class Line extends Node {
 
     @Override
     public void update() {
-        try {
-            Turtle t = new Turtle();
-            t.jumpTo(x0.getValue(),y0.getValue());
-            t.moveTo(x1.getValue(),y1.getValue());
-            t.penUp();
-            contents.send(t);
-        } catch (Exception e) {
-            logger.warn("Failed to update, ignoring", e);
+        double count = Math.max(1,steps.getValue());
+        double px0 = x0.getValue();
+        double py0 = y0.getValue();
+        double px1 = x1.getValue();
+        double py1 = y1.getValue();
+
+        Turtle turtle = new Turtle();
+        turtle.jumpTo(px0,py0);
+        for (int i = 1; i < count; i++) {
+            var x = MathHelper.lerp(i/count,px0,px1);
+            var y = MathHelper.lerp(i/count,py0,py1);
+            turtle.moveTo(x,y);
+            turtle.penDown();
         }
+        turtle.moveTo(px1,py1);
+        contents.send(turtle);
     }
 }
