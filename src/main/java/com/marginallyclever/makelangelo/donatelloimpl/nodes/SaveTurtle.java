@@ -21,8 +21,12 @@ public class SaveTurtle extends Node {
 
     public SaveTurtle() {
         super("SaveTurtle");
+
         addVariable(filename);
         addVariable(turtle);
+
+        filename.setFileChooser(TurtleFactory.getSaveFileChooser());
+        filename.setDialogType(true);
     }
 
     @Override

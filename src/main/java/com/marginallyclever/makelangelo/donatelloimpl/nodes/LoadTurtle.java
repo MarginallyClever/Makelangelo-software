@@ -26,7 +26,7 @@ public class LoadTurtle extends Node {
         addVariable(w);
         addVariable(h);
 
-        filename.setFileChooser(TurtleFactory.getFileChooser());
+        filename.setFileChooser(TurtleFactory.getLoadFileChooser());
     }
 
     @Override
