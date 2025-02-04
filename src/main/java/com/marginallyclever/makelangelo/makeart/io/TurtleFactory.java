@@ -17,21 +17,17 @@ import java.util.List;
  */
 public class TurtleFactory {
 	private static final TurtleLoader [] loaders = {
+			new LoadAudio(),
 			new LoadDXF(),
 			new LoadFactorioMap(),
 			new LoadGCode(),
 			new LoadScratch2(),
 			new LoadScratch3(),
 			new LoadSVG(),
-			new LoadTHR(),
-			new LoadAudio()
+			new LoadTHR()
 	};
 	
 	private static final TurtleSaver [] savers = {
-			new SaveTHR(),
-			new SaveDXF(),
-			new SaveSVG(),
-			new SaveGCode(),
 			new SaveBitmap("bmp",false),
 			new SaveBitmap("gif",false),
 			new SaveBitmap("jpg",false),
@@ -39,22 +35,39 @@ public class TurtleFactory {
 			new SaveBitmap("png",true),
 			new SaveBitmap("tif",false),
 			new SaveBitmap("webp",true),
+			new SaveDXF(),
+			new SaveGCode(),
+			new SaveSVG(),
+			new SaveTHR(),
 	};
 
-	private static JFileChooser fileChooser = null;
+	private static JFileChooser fileChooserLoad = null;
+	private static JFileChooser fileChooserSave = null;
 
-	public static JFileChooser getFileChooser() {
-		if(fileChooser==null) {
-			fileChooser = new JFileChooser();
-
-			// add vector formats
+	public static JFileChooser getLoadFileChooser() {
+		if(fileChooserLoad ==null) {
+			fileChooserLoad = new JFileChooser();
+			// add formats
 			for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
-				fileChooser.addChoosableFileFilter(ff);
+				fileChooserLoad.addChoosableFileFilter(ff);
 			}
 			// no wild card filter, please.
-			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooserLoad.setAcceptAllFileFilterUsed(false);
 		}
-		return fileChooser;
+		return fileChooserLoad;
+	}
+
+	public static JFileChooser getSaveFileChooser() {
+		if(fileChooserSave ==null) {
+			fileChooserSave = new JFileChooser();
+			// add formats
+			for (FileNameExtensionFilter ff : TurtleFactory.getSaveExtensions()) {
+				fileChooserSave.addChoosableFileFilter(ff);
+			}
+			// no wild card filter, please.
+			fileChooserSave.setAcceptAllFileFilterUsed(false);
+		}
+		return fileChooserSave;
 	}
 	
 	public static Turtle load(String filename) throws Exception {
