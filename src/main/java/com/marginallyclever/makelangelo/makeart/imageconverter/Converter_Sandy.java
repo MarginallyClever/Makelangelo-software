@@ -4,8 +4,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +22,10 @@ public class Converter_Sandy extends ImageConverter {
 	private static int blockScale=150;
 	private static int direction=0;
 	private final String [] directionChoices = new String[] {
-		Translator.get("top right"),
-		Translator.get("top left"), 
-		Translator.get("bottom left"), 
-		Translator.get("bottom right"), 
+		Translator.get("topRight"),
+		Translator.get("topLeft"),
+		Translator.get("bottomLeft"),
+		Translator.get("bottomRight"),
 		Translator.get("center")
 	};
 
@@ -123,6 +123,7 @@ public class Converter_Sandy extends ImageConverter {
 		double t,t_step;
 		double flipSum;
 		double pulseSize = rStep*0.5 - 0.5;//r_step * 0.6 * scale_z;
+		double sampleSize = pulseSize/2.0;
 
 		turtle = new Turtle();
 		logger.debug("Sandy started.");
@@ -155,7 +156,7 @@ public class Converter_Sandy extends ImageConverter {
 					last_x=x;
 					last_y=y;
 					// read a block of the image and find the average intensity in this block
-					z = img.sample( x-pulseSize/2.0, y-pulseSize/2.0,x+pulseSize/2.0,y +pulseSize/2.0 );
+					z = img.sample( x,y, sampleSize );
 					// scale the intensity value
 					if(z<0) z=0;
 					if(z>255) z=255;

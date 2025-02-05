@@ -8,7 +8,7 @@ import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.Select;
+import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

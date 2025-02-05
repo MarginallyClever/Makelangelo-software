@@ -66,3 +66,4 @@ avrdude.exe
 *.deb
 
 saved.png
+graphViewSettings.json

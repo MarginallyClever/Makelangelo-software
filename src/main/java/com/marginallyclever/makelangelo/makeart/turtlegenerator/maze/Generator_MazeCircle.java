@@ -1,8 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.maze;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;

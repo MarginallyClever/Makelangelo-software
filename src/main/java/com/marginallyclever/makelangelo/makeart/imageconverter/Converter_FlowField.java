@@ -4,12 +4,13 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.convenience.noise.PerlinNoise;
+import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.*;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 
 import javax.vecmath.Vector2d;
 import java.awt.*;
@@ -58,7 +59,6 @@ public class Converter_FlowField extends ImageConverter {
 		add(fieldRandomSeed);
 		fieldRandomSeed.addSelectListener(evt->{
 			seed = (int)evt.getNewValue();
-			random.setSeed(seed);
 			fireRestart();
 		});
 
@@ -225,10 +225,11 @@ public class Converter_FlowField extends ImageConverter {
 		double len = line.getDrawDistance();
 		int numSamples = (int)(len/samplingRate);
 		SampleAt [] samples = new SampleAt[numSamples];
+		TurtlePathWalker walker = new TurtlePathWalker(line);
 
-		Point2D p = line.interpolate(0.0);
+		Point2D p = walker.walk(0);
 		for(int i=0;i<numSamples;i++) {
-			Point2D p2 = line.interpolate((double)(i+1)* samplingRate);
+			Point2D p2 = walker.walk(samplingRate);
 
 			double value = 255.0 - (img.sample(p2.x, p2.y, 5.0));
 			value = Math.max(0,Math.min(255,value));

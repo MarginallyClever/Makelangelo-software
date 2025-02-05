@@ -6,8 +6,8 @@ import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectFile;
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectFile;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Generate a drawing where the thickness of the line is determined by the intensity of the image at that point.
+ * @deprecated since 7.62.0 to be replaced with Donatello nodes.
+ */
+@Deprecated(since="7.62.0")
 public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
     private final double EPSILON = 0.001;
-    private final double CORNER_THRESHOLD = Math.cos(Math.toRadians(15));
 
     /**
      * must be greater than zero.
@@ -55,7 +59,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             generate();
         });
 
-        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName);
+        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
         add(selectFile);
         selectFile.addSelectListener(e->{
             imageName = selectFile.getText();

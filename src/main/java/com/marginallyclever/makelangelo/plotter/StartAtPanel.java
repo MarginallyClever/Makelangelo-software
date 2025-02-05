@@ -1,9 +1,9 @@
 package com.marginallyclever.makelangelo.plotter;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectPanel;
 
 import javax.swing.*;
 import java.awt.*;

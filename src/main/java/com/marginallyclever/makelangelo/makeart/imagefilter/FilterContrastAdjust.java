@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.stream.IntStream;
 
 /**
  * Adjusts the top and bottom of the constrast curve.
@@ -41,17 +42,21 @@ public class FilterContrastAdjust extends ImageFilter {
 		TransformedImage after = new TransformedImage(img);
 		BufferedImage afterBI = after.getSourceImage();
 
-		for (int y = 0; y < h; ++y) {
-			for (int x = 0; x < w; ++x) {
-				int color = bi.getRGB(x, y);
-				int red = adjust(red32(color));
-				int green = adjust(green32(color));
-				int blue = adjust(blue32(color));
-				int alpha = alpha32(color);
+		var raster = bi.getRaster();
+		var afterRaster = afterBI.getRaster();
+		var count = bi.getColorModel().getNumComponents();
+		// Temporary array to hold pixel components
 
-				afterBI.setRGB(x, y, ImageFilter.encode32bit(red,green,blue,alpha));
+		IntStream.range(0, h).parallel().forEach(y -> {
+			int[] pixel = new int[count];
+			for (int x = 0; x < w; ++x) {
+				raster.getPixel(x, y, pixel);
+				pixel[0] = adjust(pixel[0]);
+				pixel[1] = adjust(pixel[1]);
+				pixel[2] = adjust(pixel[2]);
+				afterRaster.setPixel(x, y, pixel);
 			}
-		}
+		});
 
 		return after;
 	}

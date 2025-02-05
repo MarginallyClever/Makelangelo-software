@@ -5,7 +5,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetDiagonal;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;
@@ -69,7 +69,7 @@ public class Converter_TruchetFromImage extends ImageConverter {
 
         for(double y=miny;y<maxy;y+=tileSize) {
             for(double x=minx;x<maxx;x+=tileSize) {
-                int intensity = result.sample(x,y,x+tileSize,y+tileSize);
+                int intensity = result.sample(x,y,tileSize);
                 if(intensity>128) truchet.tileA(px+x,py+y);
                 else              truchet.tileB(px+x,py+y);
             }

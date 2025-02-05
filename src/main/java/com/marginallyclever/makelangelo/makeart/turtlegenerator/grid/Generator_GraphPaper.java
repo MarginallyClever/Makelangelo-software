@@ -4,7 +4,7 @@ import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.*;

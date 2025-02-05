@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo;
 
-import com.marginallyclever.makelangelo.select.*;
+import com.marginallyclever.donatello.select.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -195,7 +195,7 @@ public class CollapsiblePanel extends JPanel {
 
         SelectButton b = new SelectButton("B", "B");
         SelectColor c = new SelectColor("C", "CCCCCC", Color.BLACK, frame);
-        SelectFile d = new SelectFile("D", "D", null);
+        SelectFile d = new SelectFile("D", "D", null,cpanel);
         SelectDouble e = new SelectDouble("E", "E", 0.0f);
         SelectInteger f = new SelectInteger("F", "FFF", 0);
         String[] list = {"cars", "trains", "planes", "boats", "rockets"};

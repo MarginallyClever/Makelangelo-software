@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
+import com.marginallyclever.donatello.select.*;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
-import com.marginallyclever.makelangelo.select.*;
+
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,8 +136,8 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(panel,penLowerRate        = new SelectDouble("lowerSpeed",	 Translator.get("PlotterSettingsPanel.penToolLowerSpeed"	),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME)));
 		addToPanel(panel,penUpAngle 		 = new SelectDouble("up",			 Translator.get("PlotterSettingsPanel.penToolUp"			),settings.getDouble(PlotterSettings.PEN_ANGLE_UP)));
 		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
-		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.pen up color"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
-		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.pen down color"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
+		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.penUpColor"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
+		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.penDownColor"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
 		addToPanel(panel,zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
 				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
 				Translator.get("PlotterSettings.zMotorType.stepper"),  // PlotterSettings.Z_MOTOR_TYPE_STEPPER = 2

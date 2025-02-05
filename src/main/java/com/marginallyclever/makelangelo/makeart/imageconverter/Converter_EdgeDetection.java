@@ -7,8 +7,8 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterExtendedDifferenceOfGaussians;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;

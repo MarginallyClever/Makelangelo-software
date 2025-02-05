@@ -6,9 +6,9 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectBoolean;
-import com.marginallyclever.makelangelo.select.SelectInteger;
-import com.marginallyclever.makelangelo.select.SelectRandomSeed;
+import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,9 +136,7 @@ public class Converter_Wander extends ImageConverter {
 			do {
 				endPX = xLeft   + (random.nextDouble() * width)+0.5; 
 				endPY = yBottom + (random.nextDouble() * height)+0.5; 
-				v = img.sample(
-						endPX - halfStep, endPY - halfStep, 
-						endPX + halfStep, endPY + halfStep);
+				v = img.sample(endPX, endPY, halfStep);
 				++tries;
 			} while(v>cutoff && tries<1000);
 			if(tries==1000) break;  // ran out of points to try?

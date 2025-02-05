@@ -335,13 +335,13 @@ public class LoadSVG implements TurtleLoader {
  	/**
 	 * Draw rectangles that may have rounded corners.
 	 * given corners
-	 * <pre>
+	 * <pre>{@code
 	 *    x0 x1 x2 x3
 	 * y0    a  b
 	 * y1 c        d
 	 * y2 e        f
 	 * y3    g  h
-	 * </pre>
+	 * }</pre>
 	 * draw a-b-d-f-h-g-e-c-a.
 	 * See <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">mozilla</a>
 	 * @param element the source of the elements
@@ -571,10 +571,10 @@ public class LoadSVG implements TurtleLoader {
 
 	/**
 	 * Get the transformation matrix from the given element.  The {@link SVGGraphicsElement} matrix is
-	 * <pre>
+	 * <pre>{@code
 	 * [ a c e ]
 	 * [ b d f ]
-	 * [ 0 0 1 ]</pre>
+	 * [ 0 0 1 ]}</pre>
 	 * @param element the source of the matrix
 	 * @return the matrix
 	 */

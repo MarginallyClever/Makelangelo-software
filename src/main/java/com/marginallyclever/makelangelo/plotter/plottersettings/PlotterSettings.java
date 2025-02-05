@@ -101,13 +101,10 @@ public class PlotterSettings {
 	public static final String SEGMENTS_PER_SECOND = "segmentsPerSecond";
 	/**
 	 * integer.
-	 * <pre>
-	 * {
-	 * 	&#64;code
+	 * <pre>{@code
 	 * 	private String[] startingStrings = { "Top Left", "Top Center", "Top Right", "Left", "Center", "Right",
 	 * 			"Bottom Left", "Bottom Center", "Bottom Right" };
-	 * }
-	 * </pre>
+	 * }</pre>
 	 */
 	public static final String STARTING_POS_INDEX = "startingPosIndex";
 	/**

@@ -7,8 +7,8 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;

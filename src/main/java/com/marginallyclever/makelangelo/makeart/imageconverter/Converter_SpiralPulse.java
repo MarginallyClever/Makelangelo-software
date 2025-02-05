@@ -4,7 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +111,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 				fy = Math.sin(f) * r2;
 				// clip to paper boundaries
 				if( rect.contains(fx, fy) ) {
-					z = img.sample( fx - zigZagSpacing, fy - halfStep, fx + zigZagSpacing, fy + halfStep);
+					z = img.sample( fx, fy, halfStep);
 					scale_z = (255.0f - z) / 255.0f;
 					pulse_size = halfStep * scale_z;
 					nx = (halfStep+pulse_size*n) * fx / r2;

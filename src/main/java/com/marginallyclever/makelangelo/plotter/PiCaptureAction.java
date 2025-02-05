@@ -6,7 +6,7 @@ import com.hopding.jrpicam.enums.DRC;
 import com.hopding.jrpicam.enums.Encoding;
 import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
-import com.marginallyclever.makelangelo.Makelangelo;
+import com.marginallyclever.makelangelo.MainFrame;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.paper.Paper;
 import org.slf4j.Logger;
@@ -28,11 +28,9 @@ import java.util.Objects;
 public class PiCaptureAction {
     private static final int BUTTON_HEIGHT = 25;
 	private static final Logger logger = LoggerFactory.getLogger(PiCaptureAction.class);
-	private RPiCamera piCamera = new RPiCamera("/home/pi/Pictures");
+	private final RPiCamera piCamera = new RPiCamera("/home/pi/Pictures");
 	
 	// picam controls
-	private JButton	buttonCaptureImage, buttonUseCapture, buttonCancelCapture;
-	private Makelangelo makelangeloApp;
 	private BufferedImage buffImg;
 	private boolean useImage;
 	private int awb=1;
@@ -46,7 +44,7 @@ public class PiCaptureAction {
 		super();
 	}
 	
-	public void run(Frame mainFrame, Paper myPaper) {
+	public void run(MainFrame mainFrame, Paper myPaper) {
         // let's make the image the correct width and height for the paper
 		useImage = false;
         double aspectRatio = myPaper.getPaperWidth() / myPaper.getPaperHeight();
@@ -186,7 +184,9 @@ public class PiCaptureAction {
         // a little space between everything else
         cMain.insets = new Insets(10,0,0,0);  //top padding
 
-        buttonCaptureImage = new JButton(Translator.get("PiCaptureAction.CaptureImage"));
+		JButton buttonCaptureImage = new JButton(Translator.get("PiCaptureAction.CaptureImage"));
+		JButton buttonUseCapture = new JButton(Translator.get("PiCaptureAction.UseCapture"));
+
 		buttonCaptureImage.addActionListener((arg0)->{
 			try {
 				piCamera.turnOnPreview(
@@ -219,7 +219,6 @@ public class PiCaptureAction {
 		cMain.gridy++;
         cMain.insets = new Insets(2,0,0,0);  //top padding
 
-		buttonUseCapture = new JButton(Translator.get("PiCaptureAction.UseCapture"));
 		buttonUseCapture.addActionListener(new ActionListener() {
         	@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -247,7 +246,7 @@ public class PiCaptureAction {
 		panel.add(buttonUseCapture, cMain);
 		cMain.gridy++;
 
-		buttonCancelCapture = new JButton(Translator.get("PiCaptureAction.CancelCapture"));
+		JButton buttonCancelCapture = new JButton(Translator.get("PiCaptureAction.CancelCapture"));
 		buttonCancelCapture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();
@@ -281,8 +280,7 @@ public class PiCaptureAction {
 
 		if (useImage) {
 			// process the image
-			makelangeloApp.openFile("/home/pi/Pictures/capture.jpg");
+			mainFrame.openFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
-
 }

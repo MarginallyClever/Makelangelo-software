@@ -12,11 +12,11 @@ import java.awt.image.Kernel;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-
 /**
- * Converts an image to N shades of grey.
- *
- * @author Dan
+ * The {@link FilterGaussianBlur} class applies a Gaussian blur effect to an image.
+ * This filter uses a convolution operation with a Gaussian kernel to blur the image.
+ * The blurring can be controlled by specifying a radius, which determines the size
+ * and intensity of the blur effect.
  */
 public class FilterGaussianBlur extends ImageFilter {
 	private final TransformedImage img;

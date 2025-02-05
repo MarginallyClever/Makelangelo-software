@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.applicationsettings;
 
 import com.marginallyclever.convenience.CommandLineOptions;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectPanel;
-import com.marginallyclever.makelangelo.select.SelectReadOnlyText;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectPanel;
+import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +17,15 @@ public class LanguagePreferences {
 	static private final SelectPanel panel = new SelectPanel();
 	static private final String[] languageList = Translator.getLanguageList();
 	static private SelectOneOfMany languageOptions;
-	
-	
+
 	static SelectPanel buildPanel() {
 		int currentIndex = Translator.getCurrentLanguageIndex();
 		languageOptions = new SelectOneOfMany("language","Language",languageList,currentIndex);
-		
+
+		panel.clear();
 		panel.add(languageOptions);
 		panel.add(new SelectReadOnlyText("learnMore",
-				"<![CDATA[<html><body>"
-						+"<a href=\"https://www.marginallyclever.com/2020/06/how-to-translate-makelangelo-software/\">Add translations</a>"
-						+"</body></html>]]>"));
+				"<![CDATA[<html><body><a href=\"https://crowdin.com/project/makelangelo\">Add translations</a></body></html>]]>"));
 
 		return panel;
 	}

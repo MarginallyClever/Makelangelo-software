@@ -5,9 +5,9 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.makelangelo.select.SelectDouble;
-import com.marginallyclever.makelangelo.select.SelectOneOfMany;
-import com.marginallyclever.makelangelo.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.*;
@@ -111,7 +111,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 			double x = a.x + normal.x * p;
 			double y = a.y + normal.y * p;
 			// read a block of the image and find the average intensity in this block
-			double z = (255.0f - img.sample( x - sampleRate, y - sampleRate, x + sampleRate, y + sampleRate));
+			double z = (255.0f - img.sample( x, y, sampleRate));
 
 			// if the is too high, the sum will refuse to update.
 			if(z<cutOff) {

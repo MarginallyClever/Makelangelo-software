@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.select;
 
+import com.marginallyclever.donatello.select.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -82,9 +83,9 @@ public class SelectGUITest {
     @Test
     public void testFile() {
         // test contructor(s)
-        SelectFile b = new SelectFile("test", "test", null);
+        SelectFile b = new SelectFile("test", "test", null,null);
         assertTrue(b.getText().isEmpty());
-        b = new SelectFile("test2", "test2", "something");
+        b = new SelectFile("test2", "test2", "something",null);
         assertEquals("something", b.getText());
 
         panel.add(b);
