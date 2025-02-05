@@ -26,8 +26,6 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private static final Logger logger = LoggerFactory.getLogger(PrintTurtle.class);
 
     private final InputTurtle turtle = new InputTurtle("turtle");
-    private final InputInt px = new InputInt("X",0);
-    private final InputInt py = new InputInt("Y",0);
     private final InputBoolean showTravel = new InputBoolean("show travel",false);
     private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
     private final InputInt lineThickness = new InputInt("line thickness",1);
@@ -39,8 +37,6 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     public PrintTurtle() {
         super("PrintTurtle");
         addVariable(turtle);
-        addVariable(px);
-        addVariable(py);
         addVariable(showTravel);
         addVariable(travelColor);
         addVariable(lineThickness);
@@ -69,12 +65,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        int dx=px.getValue();
-        int dy=py.getValue();
-        g2.translate(dx,dy);
-        var lineThickness = this.lineThickness.getValue().floatValue();
-        g2.setStroke(new BasicStroke(lineThickness));
+        g2.setStroke(new BasicStroke(lineThickness.getValue()));
         lock.lock();
         try {
             polylines.forEach(p -> p.draw(g2));
