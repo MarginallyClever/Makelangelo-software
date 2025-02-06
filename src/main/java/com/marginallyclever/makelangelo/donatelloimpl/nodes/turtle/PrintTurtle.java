@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.donatelloimpl.nodes;
+package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.donatello.ports.InputBoolean;

@@ -1,4 +1,4 @@
-package com.marginallyclever.makelangelo.donatelloimpl.nodes;
+package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
