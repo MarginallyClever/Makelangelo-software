@@ -7,8 +7,8 @@ import ModernDocking.app.RootDockingPanel;
 import ModernDocking.exception.DockingLayoutException;
 import ModernDocking.ext.ui.DockingUI;
 import com.marginallyclever.convenience.FileAccess;
-import com.marginallyclever.donatello.AddNodePanel;
 import com.marginallyclever.donatello.Donatello;
+import com.marginallyclever.donatello.NodeFactoryPanel;
 import com.marginallyclever.donatello.actions.undoable.NodeAddAction;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
@@ -49,14 +49,15 @@ import java.util.prefs.Preferences;
  */
 public class MainFrame extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(MainFrame.class);
+
+    private static final String PREFERENCE_SAVE_PATH = "savePath";
+
     private final List<DockingPanel> windows = new ArrayList<>();
 
     private final PreviewPanel previewPanel = new PreviewPanel();
     private final Donatello donatello = new Donatello();
-    private final AddNodePanel addNodePanel = new AddNodePanel();
     private final AboutPanel aboutPanel = new AboutPanel(MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
-
-    private static final String PREFERENCE_SAVE_PATH = "savePath";
+    private final NodeFactoryPanel nodeFactoryPanel = new NodeFactoryPanel();
 
     private Turtle myTurtle = new Turtle();
 
@@ -84,10 +85,17 @@ public class MainFrame extends JFrame {
         setJMenuBar(mainMenuBar);
 
         setupDropTarget();
+        connectFactoryToPreview();
+    }
 
-        addNodePanel.addAddNodeListener(e->{
-            NodeAddAction action = new NodeAddAction("Add",donatello);
-            action.commitAdd(e,donatello.getPaintArea().getCameraPosition());
+    private void connectFactoryToPreview() {
+        nodeFactoryPanel.addListener(e->{
+            var p = donatello.getPopupPoint();
+            if(p!=null) p = donatello.getPaintArea().transformScreenToWorldPoint(p);
+            else p = donatello.getPaintArea().getCameraPosition();
+
+            var add = new NodeAddAction("Add",donatello,nodeFactoryPanel);
+            add.commitAdd(e,p);
         });
     }
 
@@ -354,7 +362,7 @@ public class MainFrame extends JFrame {
     public void createDefaultLayout() {
         addDockingPanel("Preview","Preview", previewPanel);
         addDockingPanel("Donatello","Donatello",donatello);
-        addDockingPanel("AddNode","Add Node",addNodePanel);
+        addDockingPanel("AddNode","Add Node", nodeFactoryPanel);
         addDockingPanel("About","About",aboutPanel);
     }
 

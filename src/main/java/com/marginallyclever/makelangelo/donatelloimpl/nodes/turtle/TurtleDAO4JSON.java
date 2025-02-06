@@ -1,11 +1,15 @@
-package com.marginallyclever.makelangelo.donatelloimpl.nodes;
+package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.nodegraphcore.DAO4JSON;
+import com.marginallyclever.nodegraphcore.AbstractDAO4JSON;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TurtleDAO4JSON implements DAO4JSON<Turtle> {
+public class TurtleDAO4JSON extends AbstractDAO4JSON<Turtle> {
+    public TurtleDAO4JSON() {
+        super(Turtle.class);
+    }
+
     @Override
     public Object toJSON(Object object) throws JSONException {
         JSONObject json = new JSONObject();
