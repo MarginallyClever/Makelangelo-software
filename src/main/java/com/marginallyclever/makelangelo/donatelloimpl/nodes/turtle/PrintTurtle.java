@@ -29,6 +29,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputBoolean showTravel = new InputBoolean("show travel",false);
     private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
     private final InputInt lineThickness = new InputInt("line thickness",1);
+    private final InputInt layer = new InputInt("layer",5);
 
     private final List<Polyline> polylines = new ArrayList<>();
 
@@ -119,5 +120,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
             logger.error("Failed to generate polylines", e);
         }
         setComplete(100);
+    }
+
+    @Override
+    public int getLayer() {
+        return layer.getValue();
     }
 }

@@ -15,6 +15,7 @@ public class Canvas extends Node implements PrintWithGraphics {
     private final InputInt width = new InputInt("width", 1);
     private final InputInt height = new InputInt("height", 1);
     private final InputColor color = new InputColor("color", Color.WHITE);
+    private final InputInt layer = new InputInt("layer",5);
     private final OutputInt outx = new OutputInt("x",0);
     private final OutputInt outy = new OutputInt("y",0);
     private final OutputInt outw = new OutputInt("width",width.getValue());
@@ -48,5 +49,10 @@ public class Canvas extends Node implements PrintWithGraphics {
         var h = Math.max(1,height.getValue());
         g.setColor(color.getValue());
         g.fillRect(0,0,w,h);
+    }
+
+    @Override
+    public int getLayer() {
+        return layer.getValue();
     }
 }
