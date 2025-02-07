@@ -23,6 +23,7 @@ public class NGon extends Node {
         super("NGon");
         addVariable(radius);
         addVariable(steps);
+        addVariable(angle);
         addVariable(contents);
     }
 
