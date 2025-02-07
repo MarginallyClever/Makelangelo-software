@@ -15,6 +15,8 @@ public class TurtleDAO4JSON extends AbstractDAO4JSON<Turtle> {
         JSONObject json = new JSONObject();
         Turtle turtle = (Turtle)object;
         // for a complete snapshot, capture all the instance details, too.
+        // TODO save turtle to JSON.
+
         return json;
     }
 
@@ -22,6 +24,8 @@ public class TurtleDAO4JSON extends AbstractDAO4JSON<Turtle> {
     public Turtle fromJSON(Object object) throws JSONException {
         JSONObject json = (JSONObject)object;
         // for a complete snapshot, restore all the instance details, too.
-        return new Turtle();
+        Turtle turtle = new Turtle();
+        // TODO load turtle from JSON
+        return turtle;
     }
 }
