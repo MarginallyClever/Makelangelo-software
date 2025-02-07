@@ -39,20 +39,21 @@ public class PrintPoints extends Node implements PrintWithGraphics {
     @Override
     public void print(Graphics g) {
         if(list==null || list.isEmpty()) return;
+
+        Graphics2D g2 = (Graphics2D)g.create();
+        GraphViewPanel.setHints(g2);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setStroke(new BasicStroke(radius.getValue()));
+        g2.setColor(color.getValue());
+
         lock.lock();
         try {
-
-            Graphics2D g2 = (Graphics2D)g.create();
-            GraphViewPanel.setHints(g2);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setStroke(new BasicStroke(radius.getValue()));
-            g2.setColor(color.getValue());
-
             list.stream().parallel().forEach(p -> {
                 g2.drawLine((int)p.x, (int)p.y, (int)p.x, (int)p.y);
             });
         } finally {
             lock.unlock();
         }
+        g2.dispose();
     }
 }

@@ -72,6 +72,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         } finally {
             lock.unlock();
         }
+        g2.dispose();
     }
 
     private void generatePolylines(Turtle myTurtle) {
