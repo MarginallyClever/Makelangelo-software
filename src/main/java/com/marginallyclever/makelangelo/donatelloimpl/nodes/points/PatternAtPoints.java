@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.points;
 
+import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
@@ -16,6 +17,8 @@ public class PatternAtPoints extends Node {
     private final InputTurtle pattern = new InputTurtle("pattern");
     private final InputPoints listOfPoints = new InputPoints("points");
     private final InputImage inputImage = new InputImage("image");
+    private final InputDouble min = new InputDouble("min", 0.1);
+    private final InputDouble max = new InputDouble("max", 1.0);
     private final OutputTurtle output = new OutputTurtle("output");
 
     public PatternAtPoints() {
@@ -23,6 +26,8 @@ public class PatternAtPoints extends Node {
         addVariable(pattern);
         addVariable(listOfPoints);
         addVariable(inputImage);
+        addVariable(min);
+        addVariable(max);
         addVariable(output);
     }
 
@@ -41,8 +46,8 @@ public class PatternAtPoints extends Node {
             return;
         }
 
-        double min = 0.1;
-        double max = 2.0;
+        double bottom = min.getValue();
+        double diff = max.getValue() - min.getValue();
 
         setComplete(0);
         int total = points.size();
@@ -53,8 +58,9 @@ public class PatternAtPoints extends Node {
                 // inside image
                 var c = new Color(image.getRGB((int)p.x,(int)p.y));
                 // get intensity of c as a value 0....1
-                var intensity = 1.0-(c.getBlue()+c.getGreen()+c.getRed())/(3.0*255.0);
-                var i2 = min + intensity * (max-min);
+                var intensity = (c.getBlue()+c.getGreen()+c.getRed())/(3.0*255.0);
+                var capped = Math.max(0,Math.min(1,intensity));
+                var i2 = bottom + capped * diff;
                 stamp.scale(i2,i2);
             }
             stamp.translate(p.x,p.y);
