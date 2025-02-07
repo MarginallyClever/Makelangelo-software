@@ -9,7 +9,6 @@ import ModernDocking.ext.ui.DockingUI;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.NodeFactoryPanel;
-import com.marginallyclever.donatello.actions.undoable.NodeAddAction;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
@@ -85,18 +84,7 @@ public class MainFrame extends JFrame {
         setJMenuBar(mainMenuBar);
 
         setupDropTarget();
-        connectFactoryToPreview();
-    }
-
-    private void connectFactoryToPreview() {
-        nodeFactoryPanel.addListener(e->{
-            var p = donatello.getPopupPoint();
-            if(p!=null) p = donatello.getPaintArea().transformScreenToWorldPoint(p);
-            else p = donatello.getPaintArea().getCameraPosition();
-
-            var add = new NodeAddAction("Add",donatello,nodeFactoryPanel);
-            add.commitAdd(e,p);
-        });
+        donatello.connectNodeFactory(nodeFactoryPanel);
     }
 
     private void initDocking() {
