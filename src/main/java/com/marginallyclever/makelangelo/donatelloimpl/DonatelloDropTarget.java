@@ -85,7 +85,7 @@ public class DonatelloDropTarget extends DropTargetAdapter {
      */
     private Node loadImage(String absPath) {
         LoadImage loadImage = new LoadImage();
-        var first = loadImage.getVariable(0);
+        var first = loadImage.getPort(0);
         if(!(first instanceof Input<?> inputFile)) throw new IllegalStateException("First variable is not an Input");
         if(!(inputFile.getValue() instanceof Filename)) throw new IllegalStateException("Input value is not a Filename");
         donatello.getGraph().add(loadImage);
@@ -101,7 +101,7 @@ public class DonatelloDropTarget extends DropTargetAdapter {
      */
     private Node loadVector(String absPath) {
         LoadTurtle loadTurtle = new LoadTurtle();
-        var first = loadTurtle.getVariable(0);
+        var first = loadTurtle.getPort(0);
         if(!(first instanceof InputFilename inputFile)) throw new IllegalStateException("First variable is not an Input");
         if(inputFile.getValue() == null) throw new IllegalStateException("Input value is not a Filename");
         donatello.getGraph().add(loadTurtle);
