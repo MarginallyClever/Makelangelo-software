@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class SaveTurtle extends Node {
     private static final Logger logger = LoggerFactory.getLogger(SaveTurtle.class);
 
-    private final InputFilename filename = new InputFilename("filename","");
+    private final InputFilename filename = new InputFilename("filename");
     private final InputTurtle turtle = new InputTurtle("turtle");
 
     public SaveTurtle() {
@@ -31,13 +31,14 @@ public class SaveTurtle extends Node {
 
     @Override
     public void update() {
-        if(filename.getValue().get().isEmpty()) return;
+        String filenameValue = filename.getValue().get();
+        if(filenameValue==null || filenameValue.isEmpty())  return;
 
         try {
             PlotterSettings settings = PlotterSettingsManager.buildMakelangelo5();
-            TurtleFactory.save(turtle.getValue(),filename.getValue().get(),settings);
+            TurtleFactory.save(turtle.getValue(),filenameValue,settings);
         } catch (Exception e) {
-            logger.warn("Failed to update, ignoring", e);
+            logger.warn("Failed to save", e);
         }
     }
 }
