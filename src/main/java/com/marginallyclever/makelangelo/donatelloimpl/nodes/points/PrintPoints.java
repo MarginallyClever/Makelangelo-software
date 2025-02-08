@@ -16,7 +16,7 @@ public class PrintPoints extends Node implements PrintWithGraphics {
     private final InputPoints input = new InputPoints("points");
     private final InputInt radius = new InputInt("radius",5);
     private final InputColor color = new InputColor("color",Color.WHITE);
-    private final InputInt layer = new InputInt("layer",5);
+    private final InputInt layer = new InputInt("layer",4);
     private final ReentrantLock lock = new ReentrantLock();
     private ListOfPoints list;
 
