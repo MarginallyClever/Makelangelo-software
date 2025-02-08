@@ -19,11 +19,11 @@ public class Twist extends Node {
 
     public Twist() {
         super("Twist");
-        addVariable(source);
-        addVariable(r0);
-        addVariable(dr);
-        addVariable(stepSize);
-        addVariable(output);
+        addPort(source);
+        addPort(r0);
+        addPort(dr);
+        addPort(stepSize);
+        addPort(output);
     }
 
     @Override

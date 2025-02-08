@@ -23,10 +23,10 @@ public class TruchetTiles extends Node {
 
     public TruchetTiles() {
         super("TruchetTiles");
-        addVariable(source);
-        addVariable(spaceBetweenLines);
-        addVariable(linesPerTileCount);
-        addVariable(output);
+        addPort(source);
+        addPort(spaceBetweenLines);
+        addPort(linesPerTileCount);
+        addPort(output);
     }
 
     @Override

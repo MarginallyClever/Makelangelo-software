@@ -15,9 +15,9 @@ public class AddTurtles extends Node {
 
     public AddTurtles() {
         super("AddTurtles");
-        addVariable(turtleA);
-        addVariable(turtleB);
-        addVariable(output);
+        addPort(turtleA);
+        addPort(turtleB);
+        addPort(output);
     }
 
     @Override

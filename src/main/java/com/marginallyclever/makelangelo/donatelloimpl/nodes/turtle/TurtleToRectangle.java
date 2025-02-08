@@ -19,8 +19,8 @@ public class TurtleToRectangle extends Node {
 
     public TurtleToRectangle() {
         super("TurtleToRectangle");
-        addVariable(turtle);
-        addVariable(output);
+        addPort(turtle);
+        addPort(output);
     }
 
     @Override

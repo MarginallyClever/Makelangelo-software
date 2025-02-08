@@ -15,8 +15,8 @@ public class TurtleToPoints extends Node {
 
     public TurtleToPoints() {
         super("TurtleToPoints");
-        addVariable(turtle);
-        addVariable(points);
+        addPort(turtle);
+        addPort(points);
     }
 
     @Override

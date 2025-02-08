@@ -19,10 +19,10 @@ public class PatternOnPath extends Node {
 
     public PatternOnPath() {
         super("PatternOnPath");
-        addVariable(pattern);
-        addVariable(path);
-        addVariable(count);
-        addVariable(output);
+        addPort(pattern);
+        addPort(path);
+        addPort(count);
+        addPort(output);
     }
 
     @Override

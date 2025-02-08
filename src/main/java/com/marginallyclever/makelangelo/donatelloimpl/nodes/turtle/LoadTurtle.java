@@ -21,10 +21,10 @@ public class LoadTurtle extends Node {
 
     public LoadTurtle() {
         super("LoadTurtle");
-        addVariable(filename);
-        addVariable(contents);
-        addVariable(w);
-        addVariable(h);
+        addPort(filename);
+        addPort(contents);
+        addPort(w);
+        addPort(h);
 
         filename.setFileChooser(TurtleFactory.getLoadFileChooser());
     }

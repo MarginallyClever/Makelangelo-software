@@ -23,13 +23,13 @@ public class Canvas extends Node implements PrintWithGraphics {
 
     public Canvas() {
         super("Canvas");
-        addVariable(width);
-        addVariable(height);
-        addVariable(color);
-        addVariable(outx);
-        addVariable(outy);
-        addVariable(outw);
-        addVariable(outh);
+        addPort(width);
+        addPort(height);
+        addPort(color);
+        addPort(outx);
+        addPort(outy);
+        addPort(outw);
+        addPort(outh);
     }
 
     @Override

@@ -46,11 +46,11 @@ public class LineWeightByImage extends Node {
 
     public LineWeightByImage() {
         super("LineWeightByImage");
-        addVariable(image);
-        addVariable(turtle);
-        addVariable(stepSize);
-        addVariable(result);
-        addVariable(thickness);
+        addPort(image);
+        addPort(turtle);
+        addPort(stepSize);
+        addPort(result);
+        addPort(thickness);
     }
 
     @Override

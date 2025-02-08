@@ -23,12 +23,12 @@ public class PatternAtPoints extends Node {
 
     public PatternAtPoints() {
         super("PatternAtPoints");
-        addVariable(pattern);
-        addVariable(listOfPoints);
-        addVariable(inputImage);
-        addVariable(min);
-        addVariable(max);
-        addVariable(output);
+        addPort(pattern);
+        addPort(listOfPoints);
+        addPort(inputImage);
+        addPort(min);
+        addPort(max);
+        addPort(output);
     }
 
     @Override

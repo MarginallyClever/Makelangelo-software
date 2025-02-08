@@ -33,12 +33,12 @@ public class PathImageMask extends Node {
 
     public PathImageMask() {
         super("PathImageMask");
-        addVariable(image);
-        addVariable(turtle);
-        addVariable(stepSize);
-        addVariable(threshold);
-        addVariable(outputAbove);
-        addVariable(outputBelow);
+        addPort(image);
+        addPort(turtle);
+        addPort(stepSize);
+        addPort(threshold);
+        addPort(outputAbove);
+        addPort(outputBelow);
     }
 
     @Override

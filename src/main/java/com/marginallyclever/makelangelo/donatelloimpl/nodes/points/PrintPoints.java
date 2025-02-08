@@ -22,10 +22,10 @@ public class PrintPoints extends Node implements PrintWithGraphics {
 
     public PrintPoints() {
         super("PrintPoints");
-        addVariable(input);
-        addVariable(radius);
-        addVariable(color);
-        addVariable(layer);
+        addPort(input);
+        addPort(radius);
+        addPort(color);
+        addPort(layer);
     }
 
     @Override

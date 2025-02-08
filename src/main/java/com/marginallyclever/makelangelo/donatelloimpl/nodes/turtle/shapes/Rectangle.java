@@ -16,9 +16,9 @@ public class Rectangle extends Node {
 
     public Rectangle() {
         super("Rectangle");
-        addVariable(w);
-        addVariable(h);
-        addVariable(contents);
+        addPort(w);
+        addPort(h);
+        addPort(contents);
     }
 
     @Override

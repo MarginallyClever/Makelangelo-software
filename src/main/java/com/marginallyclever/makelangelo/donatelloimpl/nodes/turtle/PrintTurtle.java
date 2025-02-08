@@ -37,10 +37,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
 
     public PrintTurtle() {
         super("PrintTurtle");
-        addVariable(turtle);
-        addVariable(showTravel);
-        addVariable(travelColor);
-        addVariable(lineThickness);
+        addPort(turtle);
+        addPort(showTravel);
+        addPort(travelColor);
+        addPort(lineThickness);
     }
 
     @Override

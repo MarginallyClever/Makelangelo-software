@@ -24,9 +24,9 @@ public class DetectEdges extends Node {
 
     public DetectEdges() {
         super("DetectEdges");
-        addVariable(src);
-        addVariable(cutoff);
-        addVariable(output);
+        addPort(src);
+        addPort(cutoff);
+        addPort(output);
     }
 
     @Override

@@ -21,11 +21,11 @@ public class Line extends Node {
 
     public Line() {
         super("Line");
-        addVariable(x0);
-        addVariable(y0);
-        addVariable(x1);
-        addVariable(y1);
-        addVariable(contents);
+        addPort(x0);
+        addPort(y0);
+        addPort(x1);
+        addPort(y1);
+        addPort(contents);
     }
 
     @Override

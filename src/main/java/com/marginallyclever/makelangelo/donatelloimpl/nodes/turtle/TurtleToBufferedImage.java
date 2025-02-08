@@ -19,8 +19,8 @@ public class TurtleToBufferedImage extends Node {
 
     public TurtleToBufferedImage() {
         super("TurtleToBufferedImage");
-        addVariable(turtle);
-        addVariable(output);
+        addPort(turtle);
+        addPort(output);
     }
 
     @Override

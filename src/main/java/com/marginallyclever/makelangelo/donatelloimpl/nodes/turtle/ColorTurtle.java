@@ -20,9 +20,9 @@ public class ColorTurtle extends Node {
 
     public ColorTurtle() {
         super("ColorTurtle");
-        addVariable(turtle);
-        addVariable(color);
-        addVariable(output);
+        addPort(turtle);
+        addPort(color);
+        addPort(output);
     }
 
     @Override

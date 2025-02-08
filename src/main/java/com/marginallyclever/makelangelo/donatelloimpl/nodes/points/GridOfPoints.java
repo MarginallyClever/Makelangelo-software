@@ -20,12 +20,12 @@ public class GridOfPoints extends Node {
 
     public GridOfPoints() {
         super("GridOfPoints");
-        addVariable(Xa);
-        addVariable(Xb);
-        addVariable(Ya);
-        addVariable(Yb);
-        addVariable(style);
-        addVariable(output);
+        addPort(Xa);
+        addPort(Xb);
+        addPort(Ya);
+        addPort(Yb);
+        addPort(style);
+        addPort(output);
 
         style.setOptions(new String[]{"a * b","b / (a count)","b / (a distance)"});
     }

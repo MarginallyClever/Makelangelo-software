@@ -20,13 +20,13 @@ public class TransformTurtle extends Node {
 
     public TransformTurtle() {
         super("TransformTurtle");
-        addVariable(turtle);
-        addVariable(sx);
-        addVariable(sy);
-        addVariable(rotate);
-        addVariable(tx);
-        addVariable(ty);
-        addVariable(output);
+        addPort(turtle);
+        addPort(sx);
+        addPort(sy);
+        addPort(rotate);
+        addPort(tx);
+        addPort(ty);
+        addPort(output);
     }
 
     @Override

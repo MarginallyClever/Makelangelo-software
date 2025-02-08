@@ -21,10 +21,10 @@ public class NGon extends Node {
 
     public NGon() {
         super("NGon");
-        addVariable(radius);
-        addVariable(steps);
-        addVariable(angle);
-        addVariable(contents);
+        addPort(radius);
+        addPort(steps);
+        addPort(angle);
+        addPort(contents);
     }
 
     @Override

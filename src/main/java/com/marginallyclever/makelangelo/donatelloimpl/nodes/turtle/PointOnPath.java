@@ -29,11 +29,11 @@ public class PointOnPath extends Node {
 
     public PointOnPath() {
         super("PointOnPath");
-        addVariable(path);
-        addVariable(px);
-        addVariable(py);
-        addVariable(nx);
-        addVariable(ny);
+        addPort(path);
+        addPort(px);
+        addPort(py);
+        addPort(nx);
+        addPort(ny);
     }
 
     private static final double EPSILON=0.00001;

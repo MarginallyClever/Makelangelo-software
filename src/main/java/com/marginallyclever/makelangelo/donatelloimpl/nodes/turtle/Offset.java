@@ -26,9 +26,9 @@ public class Offset extends Node {
 
     public Offset() {
         super("Offset");
-        addVariable(turtleA);
-        addVariable(offset);
-        addVariable(output);
+        addPort(turtleA);
+        addPort(offset);
+        addPort(output);
     }
 
     @Override
