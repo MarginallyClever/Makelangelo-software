@@ -1,10 +1,13 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.points;
 
+import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputNumber;
 import com.marginallyclever.donatello.ports.InputOneOfMany;
 import com.marginallyclever.nodegraphcore.Node;
 
+import javax.vecmath.Matrix3d;
 import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
 import java.util.stream.IntStream;
 
 /**
@@ -16,6 +19,7 @@ public class GridOfPoints extends Node {
     private final InputNumber Ya = new InputNumber("Ya",10);
     private final InputNumber Yb = new InputNumber("Yb",10d);
     private final InputOneOfMany style = new InputOneOfMany("style");
+    private final InputDouble angle = new InputDouble("angle");
     private final OutputPoints output = new OutputPoints("output");
 
     public GridOfPoints() {
@@ -25,6 +29,7 @@ public class GridOfPoints extends Node {
         addPort(Ya);
         addPort(Yb);
         addPort(style);
+        addPort(angle);
         addPort(output);
 
         style.setOptions(new String[]{"a * b","b / (a count)","b / (a distance)"});
@@ -67,10 +72,17 @@ public class GridOfPoints extends Node {
             }
         }
 
+        double halfX = (nx*dx) / 2;
+        double halfY = (ny*dy) / 2;
+        Matrix3d transform = new Matrix3d();
+        transform.rotZ(Math.toRadians(angle.getValue()));
+
         // now make the grid
-        IntStream.range(0, ny).forEach(y -> {
-            IntStream.range(0, nx).forEach(x -> {
-                list.add(new Point2d(x * dx, y * dy));
+        IntStream.range(0,ny).forEach(y -> {
+            IntStream.range(0,nx).forEach(x -> {
+                var p = new Point3d(x * dx - halfX, y * dy - halfY,0d);
+                transform.transform(p);
+                list.add(new Point2d(p.x, p.y));
             });
         });
         output.send(list);
