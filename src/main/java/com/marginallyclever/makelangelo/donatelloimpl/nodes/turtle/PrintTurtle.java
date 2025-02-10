@@ -41,6 +41,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         addPort(showTravel);
         addPort(travelColor);
         addPort(lineThickness);
+        addPort(layer);
     }
 
     @Override
