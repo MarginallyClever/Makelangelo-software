@@ -46,6 +46,8 @@ public class PathImageMask extends Node {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
 
+        setComplete(0);
+
         LineCollection lines  = myTurtle.getAsLineSegments();
         BufferedImage src = image.getValue();
         
@@ -54,9 +56,12 @@ public class PathImageMask extends Node {
         
         double s = Math.max(1, stepSize.getValue());
         double c = Math.max(0,Math.min(255, threshold.getValue()));
+        int size = lines.size();
+        int i=0;
 
-        for(LineSegment2D line : lines) {
-            scanLine(src,line,s,c);
+        for (LineSegment2D line : lines) {
+            scanLine(src, line, s, c);
+            setComplete(i++ * 100 / size);
         }
 
         Turtle resultAbove = new Turtle();
@@ -65,8 +70,8 @@ public class PathImageMask extends Node {
 
         Turtle resultBelow = new Turtle();
         resultBelow.addLineSegments(listBelow);
+        setComplete(100);
         outputBelow.send(resultBelow);
-        this.updateBounds();
     }
 
     /**
@@ -83,35 +88,38 @@ public class PathImageMask extends Node {
         Point2D P0 = segment.start;
         Point2D P1 = segment.end;
 
-        LineCollection toKeep = new LineCollection();
-
         // clip line to image bounds because sampling outside limits causes exception.
-        Point2D rMin = new Point2D(0,0);
-        Point2D rMax = new Point2D(img.getWidth(),img.getHeight());
+        int w2 = img.getWidth()/2;
+        int h2 = img.getHeight()/2;
+        Point2D rMin = new Point2D(-w2,-h2);
+        Point2D rMax = new Point2D(w2,h2);
         if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
             // entire line clipped
             return;
         }
+        // now we know all points in the line are inside the rectangle.
 
         // walk the line
         double dx = P1.x - P0.x;
         double dy = P1.y - P0.y;
         double distance = Math.sqrt(dx*dx+dy*dy);
-        double total = Math.min(1,Math.ceil(distance / stepSize));
-        Point2D a = P0;
+        double total = Math.max(1,Math.ceil(distance / stepSize));
+        Point2D a = new Point2D(P0);
+        Point2D b = new Point2D();
 
         for( double i = 1; i <= total; ++i ) {
             double fraction = i / total;
-            Point2D b = new Point2D(dx * fraction + P0.x,dy * fraction + P0.y);
-            double sampleResult = sampleImageUnderStep(img,a,b);
-            if(sampleResult < channelCutoff) {
+            b.set(P0.x + dx * fraction,
+                  P0.y + dy * fraction);
+            var test = sampleImageUnderStep(img,a,b);
+            if(test < channelCutoff) {
                 listBelow.add(new LineSegment2D(a,b, Color.BLACK));
             } else {
                 listAbove.add(new LineSegment2D(a,b, Color.BLACK));
             }
-            a = b;
+            a.set(b);
         }
-        
+
         // TODO run a mini-merge to reduce the number of new segments?
     }
 
@@ -124,16 +132,21 @@ public class PathImageMask extends Node {
      */
     private double sampleImageUnderStep(BufferedImage img, Point2D a, Point2D b) {
         // find the top-left and bottom-right corners
-        int left = (int)Math.floor(Math.min(a.x,b.x));
-        int right = (int)Math.ceil(Math.max(a.x,b.x));
-        int bottom = (int)Math.floor(Math.min(a.y,b.y));
-        int top = (int)Math.ceil(Math.max(a.y,b.y));
-        double total = Math.max(1,(right-left) * (top-bottom));
+        int left = (int)Math.min(a.x,b.x);
+        int right = (int)Math.max(a.x,b.x);
+        int bottom = (int)Math.min(a.y,b.y);
+        int top = (int)Math.max(a.y,b.y);
+        int w2 = img.getWidth()/2;
+        int h2 = img.getHeight()/2;
+
         // get the average of the intensities
         double sum = 0;
-        for(int y=bottom; y<top; ++y) {
-            for(int x=left; x<right; ++x) {
-                sum += intensity(img.getRGB(x,y));
+        int total = 0;
+        for(int y=bottom+h2; y<=top+h2; ++y) {
+            for(int x=left+w2; x<=right+w2; ++x) {
+                if(x<0 || x>=img.getWidth() || y<0 || y>=img.getHeight()) continue;
+                sum += intensity(img.getRGB(x, y));
+                total++;
             }
         }
         return Math.max(0,Math.min(255, sum / total ));
