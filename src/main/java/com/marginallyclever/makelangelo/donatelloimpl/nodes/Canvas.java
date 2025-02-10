@@ -30,14 +30,15 @@ public class Canvas extends Node implements PrintWithGraphics {
         addPort(outy);
         addPort(outw);
         addPort(outh);
+        addPort(layer);
     }
 
     @Override
     public void update() {
         var w = Math.max(1,width.getValue());
         var h = Math.max(1,height.getValue());
-        outx.send(0);
-        outy.send(0);
+        outx.send(-w/2);
+        outy.send(-h/2);
         outw.send(w);
         outh.send(h);
     }
@@ -45,10 +46,12 @@ public class Canvas extends Node implements PrintWithGraphics {
 
     @Override
     public void print(Graphics g) {
+        var x = outx.getValue();
+        var y = outy.getValue();
         var w = Math.max(1,width.getValue());
         var h = Math.max(1,height.getValue());
         g.setColor(color.getValue());
-        g.fillRect(0,0,w,h);
+        g.fillRect(x,y,w,h);
     }
 
     @Override
