@@ -36,6 +36,6 @@ public class TransformTurtle extends Node {
         moved.scale(sx.getValue(),sy.getValue());
         moved.rotate(rotate.getValue());
         moved.translate(tx.getValue(),ty.getValue());
-        output.send(moved);
+        output.setValue(moved);
     }
 }

@@ -44,6 +44,6 @@ public class PatternOnPath extends Node {
             }
         }
         setComplete(100);
-        output.send(sum);
+        output.setValue(sum);
     }
 }

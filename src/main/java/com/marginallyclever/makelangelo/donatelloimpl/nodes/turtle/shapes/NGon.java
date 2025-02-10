@@ -42,7 +42,7 @@ public class NGon extends Node {
             }
             t.moveTo(Math.cos(startAngle)*r, Math.sin(startAngle)*r);
             t.penUp();
-            contents.send(t);
+            contents.setValue(t);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

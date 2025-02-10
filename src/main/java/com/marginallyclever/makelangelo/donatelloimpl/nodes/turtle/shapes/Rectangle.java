@@ -33,7 +33,7 @@ public class Rectangle extends Node {
             t.moveTo(-ww, hh);
             t.moveTo(-ww,-hh);
             t.penUp();
-            contents.send(t);
+            contents.setValue(t);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

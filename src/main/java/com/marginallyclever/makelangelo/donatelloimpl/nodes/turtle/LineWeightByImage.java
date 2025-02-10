@@ -70,7 +70,7 @@ public class LineWeightByImage extends Node {
         }
 
         setComplete(100);
-        result.send(turtle);
+        result.setValue(turtle);
     }
 
     private Turtle calculate(Turtle from) {

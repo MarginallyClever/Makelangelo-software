@@ -44,7 +44,7 @@ public class DetectEdges extends Node {
         FilterExtendedDifferenceOfGaussians dog = new FilterExtendedDifferenceOfGaussians(img3,img4,20);
         var img5 = dog.filter();
 
-        output.send(marchingSquares(img5.getSourceImage(),edge));
+        output.setValue(marchingSquares(img5.getSourceImage(),edge));
     }
 
     Turtle marchingSquares(BufferedImage img,int edge) {

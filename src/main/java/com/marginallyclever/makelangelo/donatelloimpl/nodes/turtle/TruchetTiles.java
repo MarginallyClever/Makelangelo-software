@@ -61,7 +61,7 @@ public class TruchetTiles extends Node {
                 }
             }
 
-            output.send(turtle);
+            output.setValue(turtle);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -45,6 +45,6 @@ public class Line extends Node {
             turtle.penDown();
         }
         turtle.moveTo(px1,py1);
-        contents.send(turtle);
+        contents.setValue(turtle);
     }
 }

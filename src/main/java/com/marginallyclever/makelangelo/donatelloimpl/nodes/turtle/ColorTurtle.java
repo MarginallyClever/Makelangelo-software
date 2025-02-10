@@ -38,6 +38,6 @@ public class ColorTurtle extends Node {
             }
         }
         // TODO could have redundant tool changes that should be removed.
-        output.send(moved);
+        output.setValue(moved);
     }
 }

@@ -60,7 +60,7 @@ public class TurtleToBufferedImage extends Node {
                     }
                 }
             }
-            output.send(img);
+            output.setValue(img);
         }
     }
 }

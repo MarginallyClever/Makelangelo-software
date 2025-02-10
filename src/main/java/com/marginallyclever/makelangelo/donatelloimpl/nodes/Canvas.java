@@ -37,10 +37,10 @@ public class Canvas extends Node implements PrintWithGraphics {
     public void update() {
         var w = Math.max(1,width.getValue());
         var h = Math.max(1,height.getValue());
-        outx.send(-w/2);
-        outy.send(-h/2);
-        outw.send(w);
-        outh.send(h);
+        outx.setValue(-w/2);
+        outy.setValue(-h/2);
+        outw.setValue(w);
+        outh.setValue(h);
     }
 
 

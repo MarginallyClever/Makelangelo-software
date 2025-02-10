@@ -30,6 +30,6 @@ public class TurtleToPoints extends Node {
             }
         }
 
-        points.send(out);
+        points.setValue(out);
     }
 }

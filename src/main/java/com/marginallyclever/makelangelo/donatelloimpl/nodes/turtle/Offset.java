@@ -74,7 +74,7 @@ public class Offset extends Node {
             e.printStackTrace();
         }
         setComplete(100);
-        output.send(result);
+        output.setValue(result);
     }
 
     private Turtle offsetList(ArrayList<Coordinate> list, double offsetValue,Color lastColor) {

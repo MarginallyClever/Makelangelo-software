@@ -69,7 +69,7 @@ public class Twist extends Node {
                 setComplete((int) (t / dist * 100));
             }
             setComplete(100);
-            output.send(result);
+            output.setValue(result);
         } catch (Exception e) {
             e.printStackTrace();
         }

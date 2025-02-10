@@ -85,6 +85,6 @@ public class GridOfPoints extends Node {
                 list.add(new Point2d(p.x, p.y));
             });
         });
-        output.send(list);
+        output.setValue(list);
     }
 }

@@ -53,6 +53,6 @@ public class Perturb extends Node {
         }
 
         setComplete(100);
-        turtleOut.send(out);
+        turtleOut.setValue(out);
     }
 }

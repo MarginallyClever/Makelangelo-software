@@ -27,7 +27,7 @@ public class TurtleToRectangle extends Node {
     public void update() {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null ) {
-            output.send(myTurtle.getBounds());
+            output.setValue(myTurtle.getBounds());
         }
     }
 }

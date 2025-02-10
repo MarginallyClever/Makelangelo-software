@@ -56,7 +56,7 @@ public class FlowField extends Node {
         }
 
         setComplete(100);
-        result.send(turtle);
+        result.setValue(turtle);
     }
 
     /**

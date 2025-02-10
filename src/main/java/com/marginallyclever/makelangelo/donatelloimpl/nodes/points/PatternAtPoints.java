@@ -43,7 +43,7 @@ public class PatternAtPoints extends Node {
 
         if(points.isEmpty()) {
             setComplete(100);
-            output.send(result);
+            output.setValue(result);
             return;
         }
 
@@ -80,6 +80,6 @@ public class PatternAtPoints extends Node {
             e.printStackTrace();
         }
         setComplete(100);
-        output.send(result);
+        output.setValue(result);
     }
 }

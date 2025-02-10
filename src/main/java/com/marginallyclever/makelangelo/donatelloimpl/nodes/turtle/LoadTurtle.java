@@ -33,11 +33,11 @@ public class LoadTurtle extends Node {
     public void update() {
         try {
             Turtle t = TurtleFactory.load(filename.getValue().get());
-            contents.send(t);
+            contents.setValue(t);
             Rectangle2D r = t.getBounds();
-            w.send(r.getWidth());
-            h.send(r.getHeight());
-            length.send(t.getDrawDistance());
+            w.setValue(r.getWidth());
+            h.setValue(r.getHeight());
+            length.setValue(t.getDrawDistance());
         } catch (Exception e) {
             e.printStackTrace();
         }

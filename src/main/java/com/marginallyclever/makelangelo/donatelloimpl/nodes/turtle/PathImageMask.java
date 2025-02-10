@@ -66,12 +66,12 @@ public class PathImageMask extends Node {
 
         Turtle resultAbove = new Turtle();
         resultAbove.addLineSegments(listAbove);
-        outputAbove.send(resultAbove);
+        outputAbove.setValue(resultAbove);
 
         Turtle resultBelow = new Turtle();
         resultBelow.addLineSegments(listBelow);
         setComplete(100);
-        outputBelow.send(resultBelow);
+        outputBelow.setValue(resultBelow);
     }
 
     /**

@@ -36,6 +36,6 @@ public class CropToRectangle extends Node {
         var height = h.getValue();
         Rectangle2D.Double rectangle = new Rectangle2D.Double(0, 0, width, height);
         CropTurtle.run(result, rectangle);
-        output.send(result);
+        output.setValue(result);
     }
 }

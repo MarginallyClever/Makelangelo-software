@@ -26,6 +26,6 @@ public class AddTurtles extends Node {
         Turtle b = turtleB.getValue();
         Turtle sum = new Turtle(a);
         sum.add(b);
-        output.send(sum);
+        output.setValue(sum);
     }
 }
