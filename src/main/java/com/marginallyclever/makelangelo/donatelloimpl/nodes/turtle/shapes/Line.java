@@ -25,6 +25,7 @@ public class Line extends Node {
         addPort(y0);
         addPort(x1);
         addPort(y1);
+        addPort(steps);
         addPort(contents);
     }
 
