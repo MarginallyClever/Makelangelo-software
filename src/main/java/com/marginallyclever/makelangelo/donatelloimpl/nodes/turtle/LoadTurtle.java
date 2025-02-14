@@ -32,6 +32,9 @@ public class LoadTurtle extends Node {
     @Override
     public void update() {
         try {
+            var sourceFile = filename.getValue().get();
+            if(sourceFile==null || sourceFile.isEmpty()) return;
+
             Turtle t = TurtleFactory.load(filename.getValue().get());
             contents.setValue(t);
             Rectangle2D r = t.getBounds();
