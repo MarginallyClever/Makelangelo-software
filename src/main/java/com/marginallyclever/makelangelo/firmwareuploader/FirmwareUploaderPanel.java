@@ -35,13 +35,6 @@ public class FirmwareUploaderPanel extends JPanel {
 
 		updateCOMPortList();
 
-		JPanel connectTo = new JPanel(new BorderLayout());
-		connectTo.add(port,BorderLayout.CENTER);
-
-        SelectButton refreshButton = new SelectButton("refresh", "⟳");
-		refreshButton.addActionListener(e -> updateCOMPortList());
-        connectTo.add(refreshButton,BorderLayout.EAST);
-
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=0;
@@ -49,19 +42,15 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.weightx=1;
 		c.weighty=0;
 
+        SelectButton refreshButton = new SelectButton("refresh", "⟳");
+		refreshButton.addActionListener(e -> updateCOMPortList());
+
         SelectReadOnlyText help = new SelectReadOnlyText("help", Translator.get("FirmwareUploader.help"));
-        add(help,c);
-		c.gridy++;
-		c.gridwidth=2;
-		add(connectTo,c);
-		c.gridy++;
-		c.gridwidth=1;
-		c.weightx=1;
-		c.weighty=1;
-		c.anchor = GridBagConstraints.PAGE_END;
-		add(startM5,c);
-		c.gridx++;
-		add(startHuge,c);
+        help.attach(this,c);  c.gridy++;
+		port.attach(this,c);  c.gridy++;
+		refreshButton.attach(this,c);  c.gridy++;
+		startM5.attach(this,c);  c.gridy++;
+		startHuge.attach(this,c);  c.gridy++;
 
 		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
 		startHuge.addActionListener(e -> run(e,"firmware-huge.hex"));
