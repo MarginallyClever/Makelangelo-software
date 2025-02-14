@@ -61,7 +61,7 @@ public class PathImageMask extends Node {
 
         for (LineSegment2D line : lines) {
             scanLine(src, line, s, c);
-            setComplete(i++ * 100 / size);
+            setComplete(i++ * 99 / size);
         }
 
         Turtle resultAbove = new Turtle();

@@ -53,6 +53,8 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
             if (myTurtle == null || myTurtle.history.isEmpty()) return;
 
             generatePolylines(myTurtle);
+        } catch(Exception e) {
+            logger.error("Failed to update", e);
         } finally {
             lock.unlock();
         }
@@ -68,12 +70,14 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         GraphViewPanel.setHints(g2);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setStroke(new BasicStroke(lineThickness.getValue()));
+
         lock.lock();
         try {
             polylines.forEach(p -> p.draw(g2));
         } finally {
             lock.unlock();
         }
+
         g2.dispose();
     }
 
