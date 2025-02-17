@@ -34,6 +34,7 @@ public class DetectEdges extends Node {
         BufferedImage img = src.getValue();
         var edge = cutoff.getValue();
 
+        setComplete(0);
         FilterDesaturate desaturates = new FilterDesaturate(new TransformedImage(img));
         var img2 = desaturates.filter();
 
@@ -45,6 +46,7 @@ public class DetectEdges extends Node {
         var img5 = dog.filter();
 
         output.setValue(marchingSquares(img5.getSourceImage(),edge));
+        setComplete(100);
     }
 
     Turtle marchingSquares(BufferedImage img,int edge) {
@@ -52,11 +54,19 @@ public class DetectEdges extends Node {
         int height  = img.getHeight();
         int width   = img.getWidth();
 
+        int size=width*height;
+        int i=0;
         for(int y=0;y<height-1;++y) {
             for(int x=0;x<width-1;++x) {
                 marchSquare(img,turtle,edge,x, y);
+                setComplete((int)(i * 100.0/size));
             }
         }
+
+        var x0 = -width/2;
+        var y0 = -height/2;
+        turtle.translate(x0,y0);
+
         return turtle;
     }
 
