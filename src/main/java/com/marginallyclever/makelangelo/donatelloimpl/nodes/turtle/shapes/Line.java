@@ -21,11 +21,12 @@ public class Line extends Node {
 
     public Line() {
         super("Line");
-        addVariable(x0);
-        addVariable(y0);
-        addVariable(x1);
-        addVariable(y1);
-        addVariable(contents);
+        addPort(x0);
+        addPort(y0);
+        addPort(x1);
+        addPort(y1);
+        addPort(steps);
+        addPort(contents);
     }
 
     @Override
@@ -45,6 +46,6 @@ public class Line extends Node {
             turtle.penDown();
         }
         turtle.moveTo(px1,py1);
-        contents.send(turtle);
+        contents.setValue(turtle);
     }
 }

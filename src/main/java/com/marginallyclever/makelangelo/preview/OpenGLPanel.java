@@ -129,7 +129,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		p.x -= r.getCenterX();
 		p.y -= r.getCenterY();
 
-		if (notches < 0) {
+		if (notches > 0) {
 			if (mouseLastZoomDirection == -1) camera.zoom(-1,p);
 			mouseLastZoomDirection = -1;
 		} else {

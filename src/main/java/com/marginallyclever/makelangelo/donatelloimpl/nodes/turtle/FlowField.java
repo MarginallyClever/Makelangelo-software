@@ -25,12 +25,12 @@ public class FlowField extends Node {
 
     public FlowField() {
         super("FlowField");
-        addVariable(inputImage);
-        addVariable(spacingValue);
-        addVariable(stepValue);
-        addVariable(numStepsValue);
-        addVariable(startAngle);
-        addVariable(result);
+        addPort(inputImage);
+        addPort(spacingValue);
+        addPort(stepValue);
+        addPort(numStepsValue);
+        addPort(startAngle);
+        addPort(result);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FlowField extends Node {
         }
 
         setComplete(100);
-        result.send(turtle);
+        result.setValue(turtle);
     }
 
     /**

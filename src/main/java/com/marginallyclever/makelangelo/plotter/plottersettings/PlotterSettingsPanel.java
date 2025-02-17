@@ -81,16 +81,16 @@ public class PlotterSettingsPanel extends JPanel {
 			buttonReset.addActionListener((e)->reset());
 			bottom.add(buttonReset);
 		} else {
-			machineWidth.setReadOnly();
-			machineHeight.setReadOnly();
+			machineWidth.setReadOnly(true);
+			machineHeight.setReadOnly(true);
 		}
 
 		machineWidth.addSelectListener((e)->updateLengthNeeded());
 		machineHeight.addSelectListener((e)->updateLengthNeeded());
 
-		totalStepperNeeded.setReadOnly();
-		totalBeltNeeded.setReadOnly();
-		totalServoNeeded.setReadOnly();
+		totalStepperNeeded.setReadOnly(true);
+		totalBeltNeeded.setReadOnly(true);
+		totalServoNeeded.setReadOnly(true);
 		updateLengthNeeded();
 
 		// now assemble the dialog

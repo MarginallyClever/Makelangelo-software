@@ -16,13 +16,15 @@ public class NGon extends Node {
 
     private final InputDouble radius = new InputDouble("radius", 10.0);
     private final InputInt steps = new InputInt("subdivisions", 4);
+    private final InputDouble angle = new InputDouble("angle", 45.0);
     private final OutputTurtle contents = new OutputTurtle("contents");
 
     public NGon() {
         super("NGon");
-        addVariable(radius);
-        addVariable(steps);
-        addVariable(contents);
+        addPort(radius);
+        addPort(steps);
+        addPort(angle);
+        addPort(contents);
     }
 
     @Override
@@ -31,15 +33,16 @@ public class NGon extends Node {
             Turtle t = new Turtle();
             double r = radius.getValue();
             double s = Math.max(3,steps.getValue());
+            double startAngle = Math.toRadians(angle.getValue());
 
             for(int i=0;i<s;++i) {
-                double v = 2.0*Math.PI * (double)i / s;
+                double v = startAngle + 2.0*Math.PI * (double)i / s;
                 t.moveTo(Math.cos(v)*r, Math.sin(v)*r);
                 t.penDown();
             }
-            t.moveTo(Math.cos(0)*r, Math.sin(0)*r);
+            t.moveTo(Math.cos(startAngle)*r, Math.sin(startAngle)*r);
             t.penUp();
-            contents.send(t);
+            contents.setValue(t);
         } catch (Exception e) {
             logger.warn("Failed to update, ignoring", e);
         }

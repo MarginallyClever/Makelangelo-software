@@ -21,9 +21,9 @@ public class Perturb extends Node {
     
     public Perturb() {
         super("Perturb");
-        addVariable(turtleIn);
-        addVariable(maxDistance);
-        addVariable(turtleOut);
+        addPort(turtleIn);
+        addPort(maxDistance);
+        addPort(turtleOut);
     }
     
     @Override
@@ -53,6 +53,6 @@ public class Perturb extends Node {
         }
 
         setComplete(100);
-        turtleOut.send(out);
+        turtleOut.setValue(out);
     }
 }

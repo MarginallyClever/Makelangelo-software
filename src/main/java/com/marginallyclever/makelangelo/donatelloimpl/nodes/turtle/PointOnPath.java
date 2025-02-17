@@ -29,11 +29,11 @@ public class PointOnPath extends Node {
 
     public PointOnPath() {
         super("PointOnPath");
-        addVariable(path);
-        addVariable(px);
-        addVariable(py);
-        addVariable(nx);
-        addVariable(ny);
+        addPort(path);
+        addPort(px);
+        addPort(py);
+        addPort(nx);
+        addPort(ny);
     }
 
     private static final double EPSILON=0.00001;
@@ -44,10 +44,10 @@ public class PointOnPath extends Node {
         double total = myPath.getDrawDistance();
         double c0 = index.getValue().doubleValue();
         if(total==0 || c0 <= 0) {
-            px.send(0d);
-            px.send(0d);
-            nx.send(1d);
-            ny.send(0d);
+            px.setValue(0d);
+            px.setValue(0d);
+            nx.setValue(1d);
+            ny.setValue(0d);
             return;
         }
 
@@ -63,9 +63,9 @@ public class PointOnPath extends Node {
         double dy = p1.y - p0.y;
         Point2D n = new Point2D(dx,dy);
         n.normalize();
-        px.send(p0.x);
-        py.send(p0.y);
-        nx.send(n.x);
-        ny.send(n.y);
+        px.setValue(p0.x);
+        py.setValue(p0.y);
+        nx.setValue(n.x);
+        ny.setValue(n.y);
     }
 }

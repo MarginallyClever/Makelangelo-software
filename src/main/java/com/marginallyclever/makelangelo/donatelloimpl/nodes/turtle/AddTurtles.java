@@ -15,9 +15,9 @@ public class AddTurtles extends Node {
 
     public AddTurtles() {
         super("AddTurtles");
-        addVariable(turtleA);
-        addVariable(turtleB);
-        addVariable(output);
+        addPort(turtleA);
+        addPort(turtleB);
+        addPort(output);
     }
 
     @Override
@@ -26,6 +26,6 @@ public class AddTurtles extends Node {
         Turtle b = turtleB.getValue();
         Turtle sum = new Turtle(a);
         sum.add(b);
-        output.send(sum);
+        output.setValue(sum);
     }
 }

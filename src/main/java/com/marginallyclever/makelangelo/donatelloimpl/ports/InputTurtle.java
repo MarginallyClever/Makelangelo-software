@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.donatelloimpl.ports;
 
 import com.marginallyclever.donatello.SwingProvider;
+import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.port.Input;
 
@@ -12,7 +13,7 @@ public class InputTurtle extends Input<Turtle> implements SwingProvider {
     }
 
     @Override
-    public Component getSwingComponent(Component parent) {
+    public Select getSwingComponent(Component parent) {
         return null;
     }
 }

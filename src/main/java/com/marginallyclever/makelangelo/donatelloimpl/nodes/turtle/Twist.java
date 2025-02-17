@@ -19,11 +19,11 @@ public class Twist extends Node {
 
     public Twist() {
         super("Twist");
-        addVariable(source);
-        addVariable(r0);
-        addVariable(dr);
-        addVariable(stepSize);
-        addVariable(output);
+        addPort(source);
+        addPort(r0);
+        addPort(dr);
+        addPort(stepSize);
+        addPort(output);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class Twist extends Node {
                 setComplete((int) (t / dist * 100));
             }
             setComplete(100);
-            output.send(result);
+            output.setValue(result);
         } catch (Exception e) {
             e.printStackTrace();
         }

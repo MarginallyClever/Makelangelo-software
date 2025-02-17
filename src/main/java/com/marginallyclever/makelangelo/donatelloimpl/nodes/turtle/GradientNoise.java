@@ -29,15 +29,15 @@ public class GradientNoise extends Node {
 
         style.setOptions(NoiseFactory.getNames());
 
-        addVariable(width);
-        addVariable(height);
-        addVariable(style);
-        addVariable(seed);
-        addVariable(scaleX);
-        addVariable(scaleY);
-        addVariable(translateX);
-        addVariable(translateY);
-        addVariable(output);
+        addPort(width);
+        addPort(height);
+        addPort(style);
+        addPort(seed);
+        addPort(scaleX);
+        addPort(scaleY);
+        addPort(translateX);
+        addPort(translateY);
+        addPort(output);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class GradientNoise extends Node {
             }
         }
 
-        output.send(img);
+        output.setValue(img);
         this.updateBounds();
     }
 }

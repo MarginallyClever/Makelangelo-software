@@ -15,6 +15,7 @@ public class Canvas extends Node implements PrintWithGraphics {
     private final InputInt width = new InputInt("width", 1);
     private final InputInt height = new InputInt("height", 1);
     private final InputColor color = new InputColor("color", Color.WHITE);
+    private final InputInt layer = new InputInt("layer",5);
     private final OutputInt outx = new OutputInt("x",0);
     private final OutputInt outy = new OutputInt("y",0);
     private final OutputInt outw = new OutputInt("width",width.getValue());
@@ -22,31 +23,39 @@ public class Canvas extends Node implements PrintWithGraphics {
 
     public Canvas() {
         super("Canvas");
-        addVariable(width);
-        addVariable(height);
-        addVariable(color);
-        addVariable(outx);
-        addVariable(outy);
-        addVariable(outw);
-        addVariable(outh);
+        addPort(width);
+        addPort(height);
+        addPort(color);
+        addPort(outx);
+        addPort(outy);
+        addPort(outw);
+        addPort(outh);
+        addPort(layer);
     }
 
     @Override
     public void update() {
         var w = Math.max(1,width.getValue());
         var h = Math.max(1,height.getValue());
-        outx.send(0);
-        outy.send(0);
-        outw.send(w);
-        outh.send(h);
+        outx.setValue(-w/2);
+        outy.setValue(-h/2);
+        outw.setValue(w);
+        outh.setValue(h);
     }
 
 
     @Override
     public void print(Graphics g) {
+        var x = outx.getValue();
+        var y = outy.getValue();
         var w = Math.max(1,width.getValue());
         var h = Math.max(1,height.getValue());
         g.setColor(color.getValue());
-        g.fillRect(0,0,w,h);
+        g.fillRect(x,y,w,h);
+    }
+
+    @Override
+    public int getLayer() {
+        return layer.getValue();
     }
 }

@@ -21,10 +21,10 @@ public class LoadTurtle extends Node {
 
     public LoadTurtle() {
         super("LoadTurtle");
-        addVariable(filename);
-        addVariable(contents);
-        addVariable(w);
-        addVariable(h);
+        addPort(filename);
+        addPort(contents);
+        addPort(w);
+        addPort(h);
 
         filename.setFileChooser(TurtleFactory.getLoadFileChooser());
     }
@@ -32,12 +32,15 @@ public class LoadTurtle extends Node {
     @Override
     public void update() {
         try {
+            var sourceFile = filename.getValue().get();
+            if(sourceFile==null || sourceFile.isEmpty()) return;
+
             Turtle t = TurtleFactory.load(filename.getValue().get());
-            contents.send(t);
+            contents.setValue(t);
             Rectangle2D r = t.getBounds();
-            w.send(r.getWidth());
-            h.send(r.getHeight());
-            length.send(t.getDrawDistance());
+            w.setValue(r.getWidth());
+            h.setValue(r.getHeight());
+            length.setValue(t.getDrawDistance());
         } catch (Exception e) {
             e.printStackTrace();
         }

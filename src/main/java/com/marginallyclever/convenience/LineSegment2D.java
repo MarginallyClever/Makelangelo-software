@@ -15,8 +15,8 @@ public class LineSegment2D {
 
 	public LineSegment2D(Point2D start, Point2D end, Color color) {
 		super();
-		this.start = start;
-		this.end = end;
+		this.start = new Point2D(start);
+		this.end = new Point2D(end);
 		this.color = color;
 	}
 	

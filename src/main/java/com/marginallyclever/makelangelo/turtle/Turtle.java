@@ -439,30 +439,35 @@ public class Turtle implements Cloneable {
 	 */
 	public void addLineSegments(LineCollection segments, double minimumJumpSize, double minDrawDistance) {
 		if(segments.isEmpty()) return;
-		
-		LineSegment2D first = segments.get(0);
-		jumpTo(first.start.x,first.start.y);
-		moveTo(first.end.x,first.end.y);
-		
-		double minJumpSquared = minimumJumpSize*minimumJumpSize;
-		double minDrawSquared = minDrawDistance*minDrawDistance;
-		
-		for( LineSegment2D line : segments ) {
-			// change color if needed
-			if(line.color !=getColor()) {
-				setColor(line.color);
-			}
 
-			double d = distanceSquared(line.start);
-			if(d > minJumpSquared) {
-				// The previous line ends too far from the start point of this line,
-				// need to make a travel with the pen up to the start point of this line.
-				jumpTo(line.start.x,line.start.y);
-			} else if(d>minDrawSquared) {
-				moveTo(line.start.x,line.start.y);
+		lock();
+		try {
+			LineSegment2D first = segments.get(0);
+			jumpTo(first.start.x, first.start.y);
+			moveTo(first.end.x, first.end.y);
+
+			double minJumpSquared = minimumJumpSize * minimumJumpSize;
+			double minDrawSquared = minDrawDistance * minDrawDistance;
+
+			for (LineSegment2D line : segments) {
+				// change color if needed
+				if (line.color != getColor()) {
+					setColor(line.color);
+				}
+
+				double d = distanceSquared(line.start);
+				if (d > minJumpSquared) {
+					// The previous line ends too far from the start point of this line,
+					// need to make a travel with the pen up to the start point of this line.
+					jumpTo(line.start.x, line.start.y);
+				} else if (d > minDrawSquared) {
+					moveTo(line.start.x, line.start.y);
+				}
+				// Make a pen down move to the end of this line
+				moveTo(line.end.x, line.end.y);
 			}
-			// Make a pen down move to the end of this line
-			moveTo(line.end.x,line.end.y);
+		} finally {
+			unlock();
 		}
 	}
 

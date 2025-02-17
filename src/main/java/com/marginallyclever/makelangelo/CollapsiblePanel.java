@@ -185,14 +185,12 @@ public class CollapsiblePanel extends JPanel {
         JFrame frame = new JFrame("Collapsible Panel");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BorderLayout());
-        SelectBoolean a = new SelectBoolean("A", "AAAAAAAAAAA", false);
-        jPanel.add(a, BorderLayout.NORTH);
+        JPanel jPanel = new JPanel(new GridBagLayout());
 
         CollapsiblePanel cpanel = new CollapsiblePanel(frame, "lot of buttons", 400, true);
         jPanel.add(cpanel, BorderLayout.CENTER);
 
+        SelectBoolean a = new SelectBoolean("A", "AAAAAAAAAAA", false);
         SelectButton b = new SelectButton("B", "B");
         SelectColor c = new SelectColor("C", "CCCCCC", Color.BLACK, frame);
         SelectFile d = new SelectFile("D", "D", null,cpanel);
@@ -205,15 +203,19 @@ public class CollapsiblePanel extends JPanel {
         SelectSlider i = new SelectSlider("I", "I", 200, 0, 100);
         SelectTextArea j = new SelectTextArea("J", "J", ipsum);
 
-        cpanel.add(b);
-        cpanel.add(c);
-        cpanel.add(d);
-        cpanel.add(e);
-        cpanel.add(f);
-        cpanel.add(g);
-        cpanel.add(h);
-        cpanel.add(i);
-        cpanel.add(j);
+        var inner = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        a.attach(inner, gbc);  gbc.gridy++;
+        b.attach(inner,gbc);  gbc.gridy++;
+        c.attach(inner,gbc);  gbc.gridy++;
+        d.attach(inner,gbc);  gbc.gridy++;
+        e.attach(inner,gbc);  gbc.gridy++;
+        f.attach(inner,gbc);  gbc.gridy++;
+        g.attach(inner,gbc);  gbc.gridy++;
+        h.attach(inner,gbc);  gbc.gridy++;
+        i.attach(inner,gbc);  gbc.gridy++;
+        j.attach(inner,gbc);  gbc.gridy++;
+        cpanel.add(inner);
 
         frame.setPreferredSize(new Dimension(600, 90));
         frame.add(jPanel);

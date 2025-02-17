@@ -19,48 +19,62 @@ public class TurtleToBufferedImage extends Node {
 
     public TurtleToBufferedImage() {
         super("TurtleToBufferedImage");
-        addVariable(turtle);
-        addVariable(output);
+        addPort(turtle);
+        addPort(output);
     }
 
     @Override
     public void update() {
-        Turtle myTurtle = turtle.getValue();
-        if(myTurtle!=null && !myTurtle.history.isEmpty()) {
-            Rectangle2D r = myTurtle.getBounds();
-            int h = (int)Math.ceil(r.getHeight());
-            int w = (int)Math.ceil(r.getWidth());
-            BufferedImage img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = img.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_PURE);
-            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-            g.translate(-r.getX(),-r.getY());
+        Turtle source = turtle.getValue();
+        output.setValue(generateImage(source,this));
+    }
 
-            TurtleMove previousMove = null;
-            Color downColor = Color.BLACK;
+    public static BufferedImage generateImage(Turtle source,Node node) {
+        if(source==null || source.history.isEmpty()) {
+            return new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+        }
 
-            for (TurtleMove m : myTurtle.history) {
-                if (m == null) throw new NullPointerException();
+        int size = source.history.size();
 
-                switch (m.type) {
-                    case TRAVEL -> previousMove = m;
-                    case DRAW_LINE -> {
-                        if (previousMove != null) {
-                            g.setColor(downColor);
-                            g.drawLine((int) previousMove.x, (int) previousMove.y, (int) m.x, (int) m.y);
-                        }
-                        previousMove = m;
+        node.setComplete(0);
+        Rectangle2D r = source.getBounds();
+        int h = (int) Math.ceil(r.getHeight());
+        int w = (int) Math.ceil(r.getWidth());
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.translate(-r.getX(), -r.getY());
+
+        TurtleMove previousMove = null;
+        Color downColor = Color.BLACK;
+
+        int i=0;
+        for (TurtleMove m : source.history) {
+            if (m == null) throw new NullPointerException();
+
+            switch (m.type) {
+                case TRAVEL -> previousMove = m;
+                case DRAW_LINE -> {
+                    if (previousMove != null) {
+                        g.setColor(downColor);
+                        g.drawLine((int) previousMove.x, (int) previousMove.y, (int) m.x, (int) m.y);
                     }
-                    case TOOL_CHANGE -> {
-                        downColor = m.getColor();
-                        g.setStroke(new BasicStroke((int) m.getDiameter()));
-                    }
+                    previousMove = m;
+                }
+                case TOOL_CHANGE -> {
+                    downColor = m.getColor();
+                    g.setStroke(new BasicStroke((int) m.getDiameter()));
                 }
             }
-            output.send(img);
+            node.setComplete((int) (i++ * 100.0 / size));
         }
+
+        node.setComplete(100);
+
+        return img;
     }
 }

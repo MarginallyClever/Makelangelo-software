@@ -26,9 +26,9 @@ public class Offset extends Node {
 
     public Offset() {
         super("Offset");
-        addVariable(turtleA);
-        addVariable(offset);
-        addVariable(output);
+        addPort(turtleA);
+        addPort(offset);
+        addPort(output);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class Offset extends Node {
             e.printStackTrace();
         }
         setComplete(100);
-        output.send(result);
+        output.setValue(result);
     }
 
     private Turtle offsetList(ArrayList<Coordinate> list, double offsetValue,Color lastColor) {

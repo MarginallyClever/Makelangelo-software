@@ -159,7 +159,6 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	private void drawCircle(double x,double y,double r) {
 		double circumference = Math.ceil(Math.PI*r*2.0);
 		Turtle t = new Turtle();
-		t.history.clear();
 		t.setColor(turtle.getColor());
 		t.jumpTo(x+r,y+0);
 		for(int i=0;i<circumference;++i) {

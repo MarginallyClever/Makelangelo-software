@@ -19,15 +19,15 @@ public class TurtleToRectangle extends Node {
 
     public TurtleToRectangle() {
         super("TurtleToRectangle");
-        addVariable(turtle);
-        addVariable(output);
+        addPort(turtle);
+        addPort(output);
     }
 
     @Override
     public void update() {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle!=null ) {
-            output.send(myTurtle.getBounds());
+            output.setValue(myTurtle.getBounds());
         }
     }
 }

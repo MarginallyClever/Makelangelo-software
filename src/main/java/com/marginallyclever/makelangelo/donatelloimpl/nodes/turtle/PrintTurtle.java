@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -29,31 +30,39 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputBoolean showTravel = new InputBoolean("show travel",false);
     private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
     private final InputInt lineThickness = new InputInt("line thickness",1);
+    private final InputInt layer = new InputInt("layer",5);
 
-    private final List<Polyline> polylines = new ArrayList<>();
-
+    private BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
     private final Lock lock = new ReentrantLock();
 
     public PrintTurtle() {
         super("PrintTurtle");
-        addVariable(turtle);
-        addVariable(showTravel);
-        addVariable(travelColor);
-        addVariable(lineThickness);
+        addPort(turtle);
+        addPort(showTravel);
+        addPort(travelColor);
+        addPort(lineThickness);
+        addPort(layer);
     }
 
     @Override
     public void update() {
         lock.lock();
         try {
-            polylines.clear();
+            setComplete(0);
             Turtle myTurtle = turtle.getValue();
-            if (myTurtle == null || myTurtle.history.isEmpty()) return;
-
-            generatePolylines(myTurtle);
+            image = TurtleToBufferedImage.generateImage(myTurtle,this);
+            //generatePolylines(myTurtle);
+            setComplete(100);
+        } catch(Exception e) {
+            logger.error("Failed to update", e);
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public int getLayer() {
+        return layer.getValue();
     }
 
     @Override
@@ -61,20 +70,16 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         if(getComplete()<100) return;
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
-
-        Graphics2D g2 = (Graphics2D)g.create();
-        GraphViewPanel.setHints(g2);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setStroke(new BasicStroke(lineThickness.getValue()));
-        lock.lock();
-        try {
-            polylines.forEach(p -> p.draw(g2));
-        } finally {
-            lock.unlock();
-        }
+        //drawPolyglines(g);
+        g.drawImage(image,-image.getWidth()/2,-image.getHeight()/2,null);
     }
 
+    private final List<Polyline> polylines = new ArrayList<>();
+
     private void generatePolylines(Turtle myTurtle) {
+        polylines.clear();
+        if (myTurtle == null || myTurtle.history.isEmpty()) return;
+
         int size = myTurtle.history.size();
         int count = 0;
 
@@ -118,5 +123,21 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
             logger.error("Failed to generate polylines", e);
         }
         setComplete(100);
+    }
+
+    private void drawPolylines(Graphics g) {
+        Graphics2D g2 = (Graphics2D)g.create();
+        GraphViewPanel.setHints(g2);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setStroke(new BasicStroke(lineThickness.getValue()));
+
+        lock.lock();
+        try {
+            polylines.forEach(p -> p.draw(g2));
+        } finally {
+            lock.unlock();
+        }
+
+        g2.dispose();
     }
 }

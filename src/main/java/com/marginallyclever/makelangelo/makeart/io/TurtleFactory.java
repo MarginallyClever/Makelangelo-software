@@ -71,7 +71,9 @@ public class TurtleFactory {
 	}
 	
 	public static Turtle load(String filename) throws Exception {
-		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
+		if(filename == null || filename.trim().isEmpty()) {
+			throw new InvalidParameterException("filename cannot be empty");
+		}
 
 		for( TurtleLoader loader : loaders ) {
 			if(isValidExtension(filename,loader.getFileNameFilter())) {
