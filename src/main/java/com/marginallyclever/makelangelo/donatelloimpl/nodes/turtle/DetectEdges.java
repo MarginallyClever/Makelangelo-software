@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.donatello.ports.InputImage;
-import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputRange;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -19,7 +19,7 @@ import java.awt.image.BufferedImage;
  */
 public class DetectEdges extends Node {
     private final InputImage src = new InputImage("image");
-    private final InputInt cutoff = new InputInt("cutoff",128);
+    private final InputRange cutoff = new InputRange("cutoff",128,255,0);
     private final OutputTurtle output = new OutputTurtle("turtle");
 
     public DetectEdges() {
