@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.LineSegment2D;
 import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputRange;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -24,7 +25,7 @@ public class PathImageMask extends Node {
     private final InputImage image = new InputImage("image");
     private final InputTurtle turtle = new InputTurtle("turtle");
     private final InputInt stepSize = new InputInt("stepSize", 5);
-    private final InputInt threshold = new InputInt("threshold", 128);
+    private final InputRange threshold = new InputRange("threshold",128,255,0);
     private final OutputTurtle outputAbove = new OutputTurtle("above");
     private final OutputTurtle outputBelow = new OutputTurtle("below");
 
