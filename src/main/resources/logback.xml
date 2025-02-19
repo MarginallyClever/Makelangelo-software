@@ -6,7 +6,7 @@
         <then>
             <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
                 <encoder>
-                    <pattern>%d %-5level %logger{35} - %msg %n</pattern>
+                    <pattern>%d %boldCyan(%-5level) %boldGreen(%-15.-15logger{0}) - %msg %n</pattern>
                 </encoder>
             </appender>
 
