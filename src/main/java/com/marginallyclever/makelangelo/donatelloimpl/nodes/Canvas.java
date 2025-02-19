@@ -18,8 +18,8 @@ public class Canvas extends Node implements PrintWithGraphics {
     private final InputInt layer = new InputInt("layer",5);
     private final OutputInt outx = new OutputInt("x",0);
     private final OutputInt outy = new OutputInt("y",0);
-    private final OutputInt outw = new OutputInt("width",width.getValue());
-    private final OutputInt outh = new OutputInt("height",height.getValue());
+    private final OutputInt outw = new OutputInt("width out",width.getValue());
+    private final OutputInt outh = new OutputInt("height out",height.getValue());
 
     public Canvas() {
         super("Canvas");
