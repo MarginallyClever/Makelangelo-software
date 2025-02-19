@@ -33,6 +33,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputInt layer = new InputInt("layer",5);
 
     private BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+    private Point topLeft = new Point(0,0);
     private final Lock lock = new ReentrantLock();
 
     public PrintTurtle() {
@@ -50,7 +51,15 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         try {
             setComplete(0);
             Turtle myTurtle = turtle.getValue();
+            if(myTurtle==null || myTurtle.history.isEmpty()) {
+                image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+                topLeft.setLocation(0,0);
+                setComplete(100);
+                return;
+            }
             image = TurtleToBufferedImage.generateImage(myTurtle,this);
+            var r = myTurtle.getBounds();
+            topLeft.setLocation(r.x,r.y);
             //generatePolylines(myTurtle);
             setComplete(100);
         } catch(Exception e) {
@@ -71,7 +80,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || myTurtle.history.isEmpty()) return;
         //drawPolyglines(g);
-        g.drawImage(image,-image.getWidth()/2,-image.getHeight()/2,null);
+        g.drawImage(image,topLeft.x,topLeft.y,null);
     }
 
     private final List<Polyline> polylines = new ArrayList<>();

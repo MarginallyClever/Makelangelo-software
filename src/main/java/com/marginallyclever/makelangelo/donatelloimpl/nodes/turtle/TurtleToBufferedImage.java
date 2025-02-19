@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
+import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.donatello.ports.OutputImage;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -26,33 +27,68 @@ public class TurtleToBufferedImage extends Node {
     @Override
     public void update() {
         Turtle source = turtle.getValue();
-        output.setValue(generateImage(source,this));
+        output.setValue(generateImage(source,this,(int)getRectangle().getWidth()));
     }
 
-    public static BufferedImage generateImage(Turtle source,Node node) {
-        if(source==null || source.history.isEmpty()) {
-            return new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+    public static BufferedImage generateImage(Turtle source,Node node,int minimumSize) {
+        if (source == null || source.history.isEmpty()) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         }
 
-        int size = source.history.size();
-
-        node.setComplete(0);
         Rectangle2D r = source.getBounds();
         int h = (int) Math.ceil(r.getHeight());
         int w = (int) Math.ceil(r.getWidth());
+        if (w == 0 || h == 0) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
+        int newW = w;
+        int newH = h;
+        if(newW<minimumSize) {
+            newH = (int) (h * minimumSize / (double) w);
+            newW = minimumSize;
+        }
+
+        BufferedImage img = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        GraphViewPanel.setHints(g);
+        g.scale(newW / (double)w, newH / (double)h);
+        g.translate(-r.getX(), -r.getY());
+        paintTurtle(g,source,node);
+        g.dispose();
+
+        return img;
+    }
+
+    public static BufferedImage generateImage(Turtle source,Node node) {
+        if (source == null || source.history.isEmpty()) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        Rectangle2D r = source.getBounds();
+        int h = (int) Math.ceil(r.getHeight());
+        int w = (int) Math.ceil(r.getWidth());
+        if (w == 0 || h == 0) {
+            return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        }
+
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        GraphViewPanel.setHints(g);
         g.translate(-r.getX(), -r.getY());
+        paintTurtle(g,source,node);
+        g.dispose();
 
+        return img;
+    }
+
+    public static void paintTurtle(Graphics2D g,Turtle source, Node node) {
         TurtleMove previousMove = null;
         Color downColor = Color.BLACK;
 
+        if(node!=null) node.setComplete(0);
         int i=0;
+        int size = source.history.size();
+
         for (TurtleMove m : source.history) {
             if (m == null) throw new NullPointerException();
 
@@ -70,11 +106,9 @@ public class TurtleToBufferedImage extends Node {
                     g.setStroke(new BasicStroke((int) m.getDiameter()));
                 }
             }
-            node.setComplete((int) (i++ * 100.0 / size));
+            if(node!=null) node.setComplete((int) (i++ * 100.0 / size));
         }
 
-        node.setComplete(100);
-
-        return img;
+        if(node!=null) node.setComplete(100);
     }
 }
