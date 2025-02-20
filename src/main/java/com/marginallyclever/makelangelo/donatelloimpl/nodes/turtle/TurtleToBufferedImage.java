@@ -58,7 +58,7 @@ public class TurtleToBufferedImage extends Node {
         BufferedImage img = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
         GraphViewPanel.setHints(g);
-        g.scale(newW / (double)w, newH / (double)h);
+        g.scale((newW+1) / (double)w, (newH+1) / (double)h);
         g.translate(-r.getX(), -r.getY());
         paintTurtle(g,source,node);
         g.dispose();
@@ -78,7 +78,7 @@ public class TurtleToBufferedImage extends Node {
             return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         }
 
-        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(w+1, h+1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
         GraphViewPanel.setHints(g);
         g.translate(-r.getX(), -r.getY());
