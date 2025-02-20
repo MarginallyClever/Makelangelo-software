@@ -150,11 +150,9 @@ public class Generator_Text extends TurtleGenerator {
 	}
 
 	
-	private Turtle writeBeautifulMessage(String fontName,int fontSize, String message) {
+	public static Turtle writeBeautifulMessage(String fontName,int fontSize, String message) {
 		Turtle turtle = new Turtle();
-		if(message.length()<=0) {
-			return turtle;
-		}
+		if(message.isEmpty()) return turtle;
 		
 		String[] messagePieces=message.split("\n");
 		logger.debug("lines of text={}", messagePieces.length);
@@ -168,11 +166,11 @@ public class Generator_Text extends TurtleGenerator {
 		int p;
 		for(p=0;p<messagePieces.length;++p) {
 			String piece = messagePieces[p];
-			if(piece==null || piece.length()==0) piece="\n";
+			if(piece==null || piece.isEmpty()) piece="\n";
 			TextLayout textLayout = new TextLayout(piece,font,frc);
 			Shape s = textLayout.getOutline(null);
 			Rectangle bounds = s.getBounds();
-			yTotal += bounds.getHeight();
+			yTotal += (float) bounds.getHeight();
 			if(yFirstStep==0) yFirstStep = (float)bounds.getHeight();
 			if(xMax < bounds.getWidth()) xMax = (float)bounds.getWidth();
 		}
@@ -191,7 +189,7 @@ public class Generator_Text extends TurtleGenerator {
 
 		for(p=0;p<messagePieces.length;++p) {
 			String piece = messagePieces[p];
-			if(piece==null || piece.length()==0) piece="\n";
+			if(piece==null || piece.isEmpty()) piece="\n";
 			//TextLayout textLayout = new TextLayout(piece,font,frc);
 			//Shape s = textLayout.getOutline(null);
 			//Rectangle bounds = s.getBounds();
@@ -202,18 +200,18 @@ public class Generator_Text extends TurtleGenerator {
 		}
 		return turtle;
 	}
-	
-	private void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,float dx, float dy) { 
+
+	private static void writeBeautifulString(Turtle turtle,Font font, FontRenderContext frc,String text,float dx, float dy) {
 		TextLayout textLayout = new TextLayout(text,font,frc);
-		Shape s = textLayout.getOutline(null);		
+		Shape s = textLayout.getOutline(null);
 		PathIterator pi = s.getPathIterator(null);
-		
+
 		float [] coords = new float[6];
 		float [] coords2 = new float[6];
 		float [] start = new float[6];
 		float n,i;
 		n = 5;
-		
+
 		while(!pi.isDone()) {
 			int type = pi.currentSegment(coords);
 			switch (type) {
@@ -324,7 +322,7 @@ public class Generator_Text extends TurtleGenerator {
 
 
 	public void textFindCharsPerLine(double width) {
-		charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (float) (letterWidth + kerning));
+		charsPerLine = (int) Math.floor((float) (width * 10.0f - padding * 2.0f) / (letterWidth + kerning));
 		//logger.debug("MAX="+chars_per_line);
 	}
 
@@ -531,7 +529,7 @@ public class Generator_Text extends TurtleGenerator {
 
 					String b;
 					while ((b = in.readLine()) != null) {
-						if (b.trim().length() == 0)
+						if (b.trim().isEmpty())
 							continue;
 						switch (b) {
 							case "UP" -> turtle.penUp();
