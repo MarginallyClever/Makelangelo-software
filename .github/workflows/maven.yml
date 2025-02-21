@@ -31,23 +31,38 @@ jobs:
     - name: Package with Maven
       run: ./mvnw -B clean package -DskipTests
 
-    - name: Check files 1
-      run: ls -l src/main/package/
+#    - name: Check files 1
+#      run: ls -l src/main/package/
 
-    - name: Prepare universal package
-      shell: bash
-      run: |
-        mkdir -p target/universal-package &&
-        cp src/main/package/*.bat target/universal-package/ &&
-        cp src/main/package/start* target/universal-package/ &&
-        cp src/main/package/thankyou.* target/universal-package/ &&
-        cp CONTRIBUTING.md target/universal-package/ &&
-        cp LICENSE target/universal-package/ &&
-        cp README.md target/universal-package/ &&
-        cp target/Makelangelo-*-with-dependencies.jar target/universal-package/ &&
-        cd target/universal-package/ &&
-        7z a -tzip Makelangelo.zip . &&
-        mv Makelangelo.zip ../.. 
+#    - name: Prepare universal package
+#      shell: bash
+#      run: |
+#        mkdir -p target/universal-package &&
+#        cp src/main/package/*.bat target/universal-package/ &&
+#        cp src/main/package/start* target/universal-package/ &&
+#        cp src/main/package/thankyou.* target/universal-package/ &&
+#        cp CONTRIBUTING.md target/universal-package/ &&
+#        cp LICENSE target/universal-package/ &&
+#        cp README.md target/universal-package/ &&
+#        cp target/Makelangelo-*-with-dependencies.jar target/universal-package/ &&
+#        cd target/universal-package/ &&
+#        7z a -tzip Makelangelo.zip . &&
+#        mv Makelangelo.zip ../..
+
+#    - name: Check files 2a
+#      run: ls -l target/universal-package/
+
+#     - name: Deploy universal release
+#       if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+#       uses: WebFreak001/deploy-nightly@v3.2.0
+#       with:
+#         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+#         upload_url: ${{ env.UPLOAD_URL }}
+#         release_id: ${{ env.RELEASE_ID }}
+#         asset_path: Makelangelo.zip # path to archive to upload
+#         asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
+#         asset_content_type: application/zip # required by GitHub API
+#         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
     - name: Prepare target/package for upload
       shell: bash
@@ -60,23 +75,8 @@ jobs:
         cp LICENSE target/package/ &&
         cp README.md target/package/ 
 
-    - name: Check files 2a
-      run: ls -l target/universal-package/
-
-    - name: Check files 2b
-      run: ls -l target/package/
-
-    - name: Deploy universal release
-      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
-      uses: WebFreak001/deploy-nightly@v3.2.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-        upload_url: ${{ env.UPLOAD_URL }}
-        release_id: ${{ env.RELEASE_ID }}
-        asset_path: Makelangelo.zip # path to archive to upload
-        asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
-        asset_content_type: application/zip # required by GitHub API
-        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
+      #    - name: Check files 2b
+      #      run: ls -l target/package/
 
     - name: Upload artifact for package
       uses: actions/upload-artifact@v4.6.0
@@ -90,8 +90,8 @@ jobs:
           README
           target/package/*
 
-    - name: Check files 3
-      run: ls -l target/universal-package/
+#    - name: Check files 3
+#      run: ls -l target/universal-package/
 
   package:
     needs: build
@@ -109,8 +109,8 @@ jobs:
       with:
         name: jar
         
-    - name: Check files 4
-      run: ls -l target/package/
+#    - name: Check files 4
+#      run: ls -l target/package/
 
     - name: Build installation package
       shell: bash
