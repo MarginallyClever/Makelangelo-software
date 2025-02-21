@@ -582,7 +582,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.6.1</version>
+			<version>1.6.2</version>
 		</dependency>
 
 		<!-- read audio files -->
