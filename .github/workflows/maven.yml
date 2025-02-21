@@ -126,9 +126,8 @@ jobs:
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
-    - name: Deploy installation release
-#      if: github.repository == 'MarginallyClever/Makelangelo-software'
-#      if: github.repository == 'MarginallyClever/Makelangelo-software' && github.ref == 'refs/heads/master'
+    - name: Deploy installation package
+#      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
@@ -139,10 +138,10 @@ jobs:
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
-    - name: Upload artifact for testing purpose
-#      if: github.repository == 'MarginallyClever/Makelangelo-software' || github.ref != 'refs/heads/master'
-      uses: actions/upload-artifact@v4.6.0
-      with:
-        name: ${{ env.BINARY }}
-        retention-days: 2
-        path: ${{ env.BINARY }}
+#    - name: Upload artifact for testing purpose
+##      if: github.ref != 'refs/heads/master'
+#      uses: actions/upload-artifact@v4.6.0
+#      with:
+#        name: ${{ env.BINARY }}
+#        retention-days: 2
+#        path: ${{ env.BINARY }}
