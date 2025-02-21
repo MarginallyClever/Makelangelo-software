@@ -115,15 +115,18 @@ public class TurtleFactory {
 	public static void save(Turtle turtle,String filename, PlotterSettings settings) throws Exception {
 		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
+		String extension = filename.substring(filename.lastIndexOf("."));
+		if(extension.isEmpty()) throw new InvalidParameterException("filename must have an extension");
+
 		for (TurtleSaver saver : savers) {
 			if(isValidExtension(filename,saver.getFileNameFilter())) {
 				try (FileOutputStream out = new FileOutputStream(filename)) {
 					saver.save(out, turtle,settings);
+					return;
 				}
-				return;
 			}
 		}
-		String extension = filename.substring(filename.lastIndexOf("."));
+
 		throw new Exception("TurtleFactory could not save '"+filename+"' : invalid file format '" + extension + "'");
 	}
 }
