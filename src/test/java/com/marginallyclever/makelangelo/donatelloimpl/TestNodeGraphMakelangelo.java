@@ -1,16 +1,22 @@
 package com.marginallyclever.makelangelo.donatelloimpl;
 
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.LoadTurtle;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.SaveTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.TurtleDAO4JSON;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.nodegraphcore.Connection;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
-import com.marginallyclever.nodegraphcore.port.*;
 import com.marginallyclever.nodegraphcore.Graph;
 import com.marginallyclever.nodegraphcore.NodeFactory;
+import com.marginallyclever.nodegraphcore.port.Input;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestNodeGraphMakelangelo {
     private static final Logger logger = LoggerFactory.getLogger(TestNodeGraphMakelangelo.class);
 
-    private static Graph model = new Graph();
+    private static final Graph model = new Graph();
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -80,5 +86,39 @@ public class TestNodeGraphMakelangelo {
         Turtle r1 = new Turtle();
         Turtle r2=dao.fromJSON(dao.toJSON(r1));
         assertEquals(r1,r2);
+    }
+
+    /**
+     * Create a donatello panel;
+     * connect a LoadTurtle node and a SaveTurtle node;
+     * load a test file;
+     * save the test file;
+     * confirm the test file was saved.
+     */
+    @Test
+    public void testLoadAndSaveTurtle() throws IOException {
+        Graph graph = new Graph();
+
+        // Create and connect LoadTurtle and SaveTurtle nodes
+        LoadTurtle loadNode = new LoadTurtle();
+        SaveTurtle saveNode = new SaveTurtle();
+        graph.add(loadNode);
+        graph.add(saveNode);
+        graph.add(new Connection(loadNode,1, saveNode,1));
+
+        // get a filename for a non-existent temporary file
+        File tempFile = File.createTempFile("testTurtle", ".dxf");
+        tempFile.deleteOnExit();
+        String tempFilename = tempFile.getAbsolutePath();
+
+        // Load a test file
+        loadNode.getPort("filename").setValue("src/test/resources/dxf/circle.dxf");
+        saveNode.getPort("filename").setValue(tempFilename);
+        loadNode.update();
+        saveNode.update();
+
+        // confirm the file saved.
+        assertTrue(tempFile.exists());
+        assert(tempFile.length()>0);
     }
 }
