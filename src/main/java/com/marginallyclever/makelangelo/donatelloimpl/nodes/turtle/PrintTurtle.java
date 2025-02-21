@@ -51,7 +51,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         try {
             setComplete(0);
             Turtle myTurtle = turtle.getValue();
-            if(myTurtle==null || myTurtle.history.isEmpty()) {
+            if(myTurtle==null || !myTurtle.hasDrawing()) {
                 image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
                 topLeft.setLocation(0,0);
                 setComplete(100);

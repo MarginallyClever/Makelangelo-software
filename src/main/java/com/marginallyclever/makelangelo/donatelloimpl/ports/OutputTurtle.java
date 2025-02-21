@@ -8,6 +8,9 @@ import com.marginallyclever.nodegraphcore.port.Output;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * An {@link Output} that also displays the {@link Turtle}'s drawing as an image.
+ */
 public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
     private BufferedImage img = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 
@@ -19,17 +22,21 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
     public void setValue(Object value) {
         super.setValue(value);
         if(!(value instanceof Turtle turtle)) return;
-        img = TurtleToBufferedImage.generateImage(turtle,null,DEFAULT_WIDTH);
+        if(turtle.hasDrawing()) {
+            img = TurtleToBufferedImage.generateImage(turtle, null, DEFAULT_WIDTH);
+        } else {
+            img = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
+        }
     }
 
     @Override
     public Rectangle getRectangle() {
         double w = img.getWidth();
-        double h = img.getHeight();
+        double h = img.getHeight();/*
         if(w<rectangle.width) {
             h = h/w * rectangle.width;
             w = rectangle.width;
-        }
+        }*/
         if(h<DEFAULT_HEIGHT) {
             rectangle.setBounds(rectangle.x,rectangle.y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
             return rectangle;
@@ -38,7 +45,7 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
         var newHeight = (double)rectangle.width * ratio;
         rectangle.setSize(rectangle.width,(int)Math.max(newHeight,DEFAULT_HEIGHT));
 
-        return super.getRectangle();
+        return rectangle;
     }
 
     @Override

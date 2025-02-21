@@ -24,6 +24,10 @@ public class AddTurtles extends Node {
     public void update() {
         Turtle a = turtleA.getValue();
         Turtle b = turtleB.getValue();
+        if(!a.hasDrawing() || !b.hasDrawing()) {
+            // no drawing to add
+            return;
+        }
         Turtle sum = new Turtle(a);
         sum.add(b);
         output.setValue(sum);

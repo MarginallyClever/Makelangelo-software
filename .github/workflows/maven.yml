@@ -9,6 +9,9 @@ env:
 
 on:
   push:
+    branches:
+      - master
+      - main
   pull_request:
 
 jobs:
@@ -122,12 +125,11 @@ jobs:
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{matrix.os}}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,," | head -1) &&
-        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-$$.\2/') &&
+        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-${{ github.run_id }}.\2/') &&
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
-    - name: Deploy installation release
-#      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    - name: Deploy installation package
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
@@ -138,10 +140,10 @@ jobs:
         asset_content_type: application/zip # required by GitHub API
         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
 
-    - name: Upload artifact for testing purpose
-#      if: github.ref != 'refs/heads/master'
-      uses: actions/upload-artifact@v4.6.0
-      with:
-        name: ${{ env.BINARY }}
-        retention-days: 2
-        path: ${{ env.BINARY }}
+#    - name: Upload artifact for testing purpose
+##      if: github.ref != 'refs/heads/master'
+#      uses: actions/upload-artifact@v4.6.0
+#      with:
+#        name: ${{ env.BINARY }}
+#        retention-days: 2
+#        path: ${{ env.BINARY }}

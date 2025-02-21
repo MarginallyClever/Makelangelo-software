@@ -625,4 +625,14 @@ public class Turtle implements Cloneable {
 		}
 		return sum;
 	}
+
+	/**
+	 * @return true if the turtle has any drawing moves.
+	 */
+	public boolean hasDrawing() {
+		for( TurtleMove m : history) {
+			if(m.type==MovementType.DRAW_LINE) return true;
+		}
+		return false;
+	}
 }
