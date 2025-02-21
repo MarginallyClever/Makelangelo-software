@@ -9,7 +9,13 @@ env:
 
 on:
   push:
+    branches:
+      - master
+      - main
   pull_request:
+    branches-ignore:
+      - master
+      - main
 
 jobs:
   build:
@@ -122,12 +128,11 @@ jobs:
         jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{matrix.os}}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
         ls &&
         BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,," | head -1) &&
-        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-$$.\2/') &&
+        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-${{ github.run_id }}.\2/') &&
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
     - name: Deploy installation package
-#      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
