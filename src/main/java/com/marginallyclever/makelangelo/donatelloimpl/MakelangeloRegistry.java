@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.donatelloimpl;
 
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.points.PointsDAO4JSON;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.TurtleDAO4JSON;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
 import com.marginallyclever.nodegraphcore.DAORegistry;
 import com.marginallyclever.nodegraphcore.NodeFactory;
@@ -11,8 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Register custom {@link com.marginallyclever.nodegraphcore.Node}s for {@link Turtle}s in the {@link NodeFactory}.
- * Register the types with the JSON DAO factory.
+ * <p>Registers Swing {@link com.marginallyclever.nodegraphcore.Node}s to the {@link NodeFactory}.
+ * Registers Swing types with the JSON DAO factory.</p>
+ * <p>Do not instantiate this class or call these directly.  Instead call <code>NodeFactory.loadRegistries()</code> and <code>DAO4JSONFactory.loadRegistries()</code></p>
  * @author Dan Royer
  * @since 2022-02-01
  */

@@ -10,6 +10,7 @@ import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.donatello.Donatello;
 import com.marginallyclever.donatello.NodeFactoryPanel;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
+import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
@@ -57,6 +58,7 @@ public class MainFrame extends JFrame {
     private final Donatello donatello = new Donatello();
     private final AboutPanel aboutPanel = new AboutPanel(MakelangeloVersion.VERSION, MakelangeloVersion.DETAILED_VERSION);
     private final NodeFactoryPanel nodeFactoryPanel = new NodeFactoryPanel();
+    private final DockableEditNodePanel editNodePanel = new DockableEditNodePanel();
 
     private Turtle myTurtle = new Turtle();
 
@@ -83,8 +85,15 @@ public class MainFrame extends JFrame {
         mainMenuBar = new MainMenu(this);
         setJMenuBar(mainMenuBar);
 
+        selectionChangesEditNodePanel();
         setupDropTarget();
         donatello.connectNodeFactory(nodeFactoryPanel);
+    }
+
+    private void selectionChangesEditNodePanel() {
+        donatello.addSelectionListener((selected)->{
+            editNodePanel.setNodeAndGraph(selected.getSelectedNodes(),selected.getGraph());
+        });
     }
 
     private void initDocking() {
@@ -352,6 +361,7 @@ public class MainFrame extends JFrame {
         addDockingPanel("Donatello","Donatello",donatello);
         addDockingPanel("AddNode","Add Node", nodeFactoryPanel);
         addDockingPanel("About","About",aboutPanel);
+        addDockingPanel("EditNode","Edit Node",editNodePanel);
     }
 
     private void setupDropTarget() {
