@@ -443,6 +443,9 @@ public class Turtle implements Cloneable {
 		lock();
 		try {
 			LineSegment2D first = segments.getFirst();
+			if(first == null) {
+				return;
+			}
 			jumpTo(first.start.x, first.start.y);
 			moveTo(first.end.x, first.end.y);
 
