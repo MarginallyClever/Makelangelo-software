@@ -82,7 +82,7 @@ jobs:
       #      run: ls -l target/package/
 
     - name: Upload artifact for package
-      uses: actions/upload-artifact@v4.6.0
+      uses: actions/upload-artifact@v4.6.1
       with:
         name: jar
         retention-days: 1
@@ -142,7 +142,7 @@ jobs:
 
 #    - name: Upload artifact for testing purpose
 ##      if: github.ref != 'refs/heads/master'
-#      uses: actions/upload-artifact@v4.6.0
+#      uses: actions/upload-artifact@v4.6.1
 #      with:
 #        name: ${{ env.BINARY }}
 #        retention-days: 2
