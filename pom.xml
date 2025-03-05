@@ -568,7 +568,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			Github/Jitpack/etc can find the copy published by Jitpack.
 			I have to do this dance every time.
 			-->
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
 			<version>1.4.1</version>
 		</dependency>
@@ -580,7 +580,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			Github/Jitpack/etc can find the copy published by Jitpack.
 			I have to do this dance every time.
 			-->
-			<groupId>com.marginallyclever</groupId>
+			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
 			<version>1.8.0</version>
 		</dependency>
