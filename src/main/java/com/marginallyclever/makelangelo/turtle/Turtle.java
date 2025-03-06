@@ -549,36 +549,6 @@ public class Turtle implements Cloneable {
 		return d;
     }
 
-	/**
-	 * Returns a point along the drawn lines of this {@link Turtle}
-	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
-	 * @return a point along the drawn lines of this {@link Turtle}
-	 * @deprecated since 7.63.0 use {@link TurtlePathWalker} instead.
-	 */
-	@Deprecated(since="7.63.0")
-	public Point2D interpolate(double t) {
-		double segmentDistanceSum=0;
-		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
-		for( TurtleMove m : history) {
-			if(m.type == MovementType.DRAW_LINE) {
-				double dx = m.x-prev.x;
-				double dy = m.y-prev.y;
-				double segmentDistance = Math.sqrt(dx*dx+dy*dy);
-				if(segmentDistanceSum+segmentDistance>=t) {  // currentDistance < t < currentDistance+segmentDistance
-					double ratio = Math.max(Math.min((t-segmentDistanceSum) / segmentDistance,1),0);
-					return new Point2D(
-							prev.x + dx * ratio,
-							prev.y + dy * ratio);
-				}
-				segmentDistanceSum += segmentDistance;
-				prev = m;
-			} else if(m.type == MovementType.TRAVEL) {
-				prev = m;
-			} // else tool change, ignore.
-		}
-		return new Point2D(prev.x,prev.y);
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -5,7 +5,7 @@ import com.marginallyclever.convenience.Point2D;
 import java.util.Iterator;
 
 /**
- * Walks a turtle along a path more efficiently than using {@link Turtle#interpolate(double)}.
+ * Walks the path of a {@link Turtle} more efficiently than the old <code>interpolate(double)</code> method.
  */
 public class TurtlePathWalker {
     private final Iterator<TurtleMove> iterator;
