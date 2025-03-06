@@ -4,6 +4,7 @@ import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.donatello.ports.InputBoolean;
 import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputOneOfMany;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.*;
 import com.marginallyclever.nodegraphcore.Node;
@@ -31,6 +32,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
     private final InputInt lineThickness = new InputInt("line thickness",1);
     private final InputInt layer = new InputInt("layer",5);
+    private final InputOneOfMany style = new InputOneOfMany("style");
 
     private BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
     private Point topLeft = new Point(0,0);
@@ -42,7 +44,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         addPort(showTravel);
         addPort(travelColor);
         addPort(lineThickness);
+        addPort(style);
         addPort(layer);
+
+        style.setOptions(new String[]{"Default","Barber pole","Separate loops","Direction loops"});
     }
 
     @Override
@@ -83,8 +88,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         g.drawImage(image,topLeft.x,topLeft.y,null);
     }
 
+    @Deprecated
     private final List<Polyline> polylines = new ArrayList<>();
 
+    @Deprecated
     private void generatePolylines(Turtle myTurtle) {
         polylines.clear();
         if (myTurtle == null || myTurtle.history.isEmpty()) return;
@@ -134,6 +141,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         setComplete(100);
     }
 
+    @Deprecated
     private void drawPolylines(Graphics g) {
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
@@ -148,5 +156,13 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         }
 
         g2.dispose();
+    }
+
+    public boolean showTravel() {
+        return showTravel.getValue();
+    }
+
+    public Color travelColor() {
+        return travelColor.getValue();
     }
 }

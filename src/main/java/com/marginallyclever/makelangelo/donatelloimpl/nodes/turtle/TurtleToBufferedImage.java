@@ -66,7 +66,7 @@ public class TurtleToBufferedImage extends Node {
         return img;
     }
 
-    public static BufferedImage generateImage(Turtle source,Node node) {
+    public static BufferedImage generateImage(Turtle source,PrintTurtle node) {
         if (source == null || !source.hasDrawing()) {
             return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         }
@@ -91,6 +91,13 @@ public class TurtleToBufferedImage extends Node {
     public static void paintTurtle(Graphics2D g,Turtle source, Node node) {
         TurtleMove previousMove = null;
         Color downColor = Color.BLACK;
+        Color upColor = Color.GREEN;
+        boolean showTravel = false;
+
+        if(node instanceof PrintTurtle pt)  {
+            upColor = pt.travelColor();
+            showTravel = pt.showTravel();
+        }
 
         if(node!=null) node.setComplete(0);
         int i=0;
@@ -100,7 +107,13 @@ public class TurtleToBufferedImage extends Node {
             if (m == null) throw new NullPointerException();
 
             switch (m.type) {
-                case TRAVEL -> previousMove = m;
+                case TRAVEL -> {
+                    if (previousMove != null && showTravel) {
+                        g.setColor(upColor);
+                        g.drawLine((int) previousMove.x, (int) previousMove.y, (int) m.x, (int) m.y);
+                    }
+                    previousMove = m;
+                }
                 case DRAW_LINE -> {
                     if (previousMove != null) {
                         g.setColor(downColor);
