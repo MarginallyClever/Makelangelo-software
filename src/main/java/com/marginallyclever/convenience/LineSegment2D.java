@@ -10,8 +10,6 @@ import java.awt.*;
 public class LineSegment2D {
 	public Point2D start, end;
 	public Color color;
-	// used while processing line segments.
-	public boolean flag;
 
 	public LineSegment2D(Point2D start, Point2D end, Color color) {
 		super();
@@ -23,7 +21,7 @@ public class LineSegment2D {
 	public void flip() {
 		Point2D temp= end;
 		end = start;
-		start =temp;
+		start = temp;
 	}
 	
 	public String toString() {
