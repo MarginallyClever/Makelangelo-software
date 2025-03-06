@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 
 import javax.vecmath.Vector2d;

@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
 
 import com.marginallyclever.donatello.ports.InputImage;

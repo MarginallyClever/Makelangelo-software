@@ -52,6 +52,7 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.convenience.helpers;
     opens com.marginallyclever.convenience.log to ch.qos.logback.core;
     opens com.marginallyclever.makelangelo.preview;
+    opens com.marginallyclever.convenience.linecollection;
 
     // A Java module that wants to implement a service interface from a service interface module must:
     // - Require the service interface module in its own module descriptor.

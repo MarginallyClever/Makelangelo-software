@@ -1,14 +1,16 @@
-package com.marginallyclever.convenience;
+package com.marginallyclever.convenience.linecollection;
+
+import com.marginallyclever.convenience.LineSegment2D;
 
 import javax.vecmath.Point2d;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
+/**
+ * A collection of 2D line segments and their colors.  Utilities for splitting and simplifying the collection.
+ */
 public class LineCollection extends ArrayList<LineSegment2D> {
-	private boolean[] usePt;
-
 	public LineCollection() {
 		super();
 	}
@@ -22,7 +24,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	 * Splits this collection by color.  Does not affect the original list.  Does not deep copy.
 	 * @return the list of collections separated by color
 	 */
-	public ArrayList<LineCollection> splitByColor() {
+	public List<LineCollection> splitByColor() {
 		var map = new HashMap<Color,LineCollection>();
 
 		if(this.isEmpty()) return new ArrayList<>();
@@ -54,8 +56,8 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	 * A travel move is any moment in the collection where element (N).b != (N+1).a
 	 * @return the list of collections separated by color
 	 */
-	public ArrayList<LineCollection> splitByTravel() {
-		ArrayList<LineCollection> result = new ArrayList<LineCollection> ();
+	public List<LineCollection> splitByTravel() {
+		List<LineCollection> result = new ArrayList<> ();
 		if(this.size()>0) {
 			LineSegment2D head = get(0);
 			
@@ -78,18 +80,22 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		return result;
 	}
 
+	/**
+	 * Simplify the line collection by removing points that are within distanceTolerance of the line between their neighbors.
+	 * @param distanceTolerance the distance tolerance
+	 * @return the simplified line collection
+	 */
 	public LineCollection simplify(double distanceTolerance) {
-		usePt = new boolean[size()];
-		for (int i = 0; i < size(); i++) {
-			usePt[i] = true;
-		}
+		var len = size();
+		boolean[] usePt = new boolean[len];
+        Arrays.fill(usePt, true);
 		
-		simplifySection(0, size() - 1,distanceTolerance);
+		simplifySection(0, len - 1,distanceTolerance,usePt);
 		
 		LineCollection result = new LineCollection();
 		Point2d head = get(0).start;
 		
-		for (int i = 0; i < size(); i++) {
+		for (int i = 0; i < len; i++) {
 			if (usePt[i]) {
 				Point2d next = get(i).end;
 				result.add(new LineSegment2D(head,next,get(i).color));
@@ -100,7 +106,16 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		return result;
 	}
 
-	private void simplifySection(int i, int j,double distanceTolerance) {
+	/**
+	 * Simplify the line collection by removing points that are within distanceTolerance of the line between their neighbors.
+	 * The strategy is to split the work at the point that is farthest from the line between the start and end points,
+	 * then try to simplify the two halves.
+	 * @param i the start index
+	 * @param j the end index
+	 * @param distanceTolerance the distance tolerance
+	 * @param usePt the array of booleans that indicates whether a point should be retained after simplification
+	 */
+	private void simplifySection(int i, int j,double distanceTolerance,boolean[] usePt) {
 		if ((i + 1) == j) return;
 		LineSegment2D seg = new LineSegment2D(
 			get(i).start,
@@ -120,8 +135,8 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 				usePt[k] = false;
 			}
 		} else {
-			simplifySection(i, maxIndex,distanceTolerance);
-			simplifySection(maxIndex, j,distanceTolerance);
+			simplifySection(i, maxIndex,distanceTolerance,usePt);
+			simplifySection(maxIndex, j,distanceTolerance,usePt);
 		}
 	}
 
