@@ -1,32 +1,34 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
+	private static final double EPSILON = 1e-8;
 	
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
 		logger.debug("crop start @ {}", turtle.history.size());
 
 		List<TurtleMove> newHistory = new ArrayList<>();
 		// limits we will need for rectangle
-		Point2D rMax = new Point2D(rectangle.getMaxX(),rectangle.getMaxY());
-		Point2D rMin = new Point2D(rectangle.getMinX(),rectangle.getMinY());
+		Point2d rMax = new Point2d(rectangle.getMaxX(),rectangle.getMaxY());
+		Point2d rMin = new Point2d(rectangle.getMinX(),rectangle.getMinY());
 		// working space for clipping
-		Point2D p0 = new Point2D();
-		Point2D p1 = new Point2D();
-		Point2D p0before = new Point2D();
-		Point2D p1before = new Point2D();
+		Point2d p0 = new Point2d();
+		Point2d p1 = new Point2d();
+		Point2d p0before = new Point2d();
+		Point2d p1before = new Point2d();
 
 		TurtleMove prev=null;
 		
@@ -42,15 +44,14 @@ public class CropTurtle {
 						p1before.set(p1);
 						if (Clipper2D.clipLineToRectangle(p0, p1, rMax, rMin)) {
 							// partial crop.  Which end(s)?
-							boolean startCropped = !p0before.equalsEpsilon(p0, 1e-8);
-							boolean endCropped = !p1before.equalsEpsilon(p1, 1e-8);
-
-							if (startCropped) {
+							// is start cropped?
+							if (p0before.distance(p0) >= EPSILON) {
 								// make a jump to the crop start
 								newHistory.add(new TurtleMove(p0.x, p0.y, MovementType.TRAVEL));
 							}
 
-							if(endCropped) {
+							// is end cropped?
+							if(p1before.distance(p1) >= EPSILON) {
 								// draw to the crop end
 								newHistory.add(new TurtleMove(p1.x, p1.y, m.type));
 							} else {

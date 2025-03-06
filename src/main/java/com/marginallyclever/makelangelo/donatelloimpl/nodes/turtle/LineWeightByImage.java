@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
@@ -15,6 +15,7 @@ import com.marginallyclever.nodegraphcore.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -126,11 +127,11 @@ public class LineWeightByImage extends Node {
         // collect all the points, write them at the end.
         for(int pass=0; pass<=numPasses; ++pass) {
             double ratio = pass/numPasses;
-            List<Point2D> offsetLine = generateOneThickLinePass(line,start,ratio);
+            List<Point2d> offsetLine = generateOneThickLinePass(line,start,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
 
             // draw pass
-            for( Point2D p : offsetLine ) {
+            for( Point2d p : offsetLine ) {
                 if(first) {
                     turtle.jumpTo(p.x,p.y);
                     first=false;
@@ -140,15 +141,15 @@ public class LineWeightByImage extends Node {
         }
     }
 
-    private List<Point2D> generateOneThickLinePass(LineWeight line,LineWeightSegment start,double distance) {
-        List<Point2D> offsetSequence = new ArrayList<>();
+    private List<Point2d> generateOneThickLinePass(LineWeight line, LineWeightSegment start, double distance) {
+        List<Point2d> offsetSequence = new ArrayList<>();
 
         // add first point at start of line
         double [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
         Vector2d unit = line.segments.get(0).getUnit();
         unit.scale(distance);
-        offsetSequence.add(new Point2D(s0[0]-unit.x,s0[1]-unit.y));
+        offsetSequence.add(new Point2d(s0[0]-unit.x,s0[1]-unit.y));
 
         // add the middle points of the line
         for(int i=1;i<line.segments.size();++i) {
@@ -160,17 +161,17 @@ public class LineWeightByImage extends Node {
                         s0[0],s0[1],s0[2],s0[3],
                         s1[0],s1[1],s1[2],s1[3]
                 );
-                offsetSequence.add(new Point2D(inter[0],inter[1]));
-                //offsetSequence.add(new Point2D(s1[0],s1[1]));
+                offsetSequence.add(new Point2d(inter[0],inter[1]));
+                //offsetSequence.add(new Point2d(s1[0],s1[1]));
             } else {
-                offsetSequence.add(new Point2D(s1[0], s1[1]));
+                offsetSequence.add(new Point2d(s1[0], s1[1]));
             }
             s0=s1;
         }
         // add the last point of the line
         unit = line.segments.get(line.segments.size()-1).getUnit();
         unit.scale(distance);
-        offsetSequence.add(new Point2D(s0[2]+unit.x,s0[3]+unit.y));
+        offsetSequence.add(new Point2d(s0[2]+unit.x,s0[3]+unit.y));
         return offsetSequence;
     }
 
@@ -310,7 +311,7 @@ public class LineWeightByImage extends Node {
         return false;
     }
 
-    boolean closeEnough(Point2D p0,Point2D p1) {
+    boolean closeEnough(Point2d p0,Point2d p1) {
         return p0.distanceSquared(p1)<EPSILON;
     }
 
@@ -344,10 +345,10 @@ public class LineWeightByImage extends Node {
                 segment.end.y - segment.start.y
         );
 
-        Point2D a = segment.start;
+        Point2d a = segment.start;
         for(int i=0;i<pieces-1;++i) {
             double t1 = (double)(i+1) / (double)pieces;
-            Point2D b = new Point2D(
+            Point2d b = new Point2d(
                     segment.start.x + diff.x * t1,
                     segment.start.y + diff.y * t1);
             addOneUnsortedSegment(a,b);
@@ -356,11 +357,11 @@ public class LineWeightByImage extends Node {
         addOneUnsortedSegment(a,segment.end);
     }
 
-    private void addOneUnsortedSegment(Point2D start, Point2D end) {
+    private void addOneUnsortedSegment(Point2d start, Point2d end) {
         unsorted.add(createLSW(start,end));
     }
 
-    private LineWeightSegment createLSW(Point2D start, Point2D end) {
+    private LineWeightSegment createLSW(Point2d start, Point2d end) {
         // sample image intensity here from 0...1
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;

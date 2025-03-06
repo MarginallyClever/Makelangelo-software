@@ -3,7 +3,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.donatello.ports.InputRange;
@@ -12,6 +12,7 @@ import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -86,14 +87,14 @@ public class PathImageMask extends Node {
      * @param channelCutoff only put pen down when color below this amount.
      */
     private void scanLine(BufferedImage img, LineSegment2D segment, double stepSize, double channelCutoff) {
-        Point2D P0 = segment.start;
-        Point2D P1 = segment.end;
+        Point2d P0 = segment.start;
+        Point2d P1 = segment.end;
 
         // clip line to image bounds because sampling outside limits causes exception.
         int w2 = img.getWidth()/2;
         int h2 = img.getHeight()/2;
-        Point2D rMin = new Point2D(-w2,-h2);
-        Point2D rMax = new Point2D(w2,h2);
+        Point2d rMin = new Point2d(-w2,-h2);
+        Point2d rMax = new Point2d(w2,h2);
         if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
             // entire line clipped
             return;
@@ -105,8 +106,8 @@ public class PathImageMask extends Node {
         double dy = P1.y - P0.y;
         double distance = Math.sqrt(dx*dx+dy*dy);
         double total = Math.max(1,Math.ceil(distance / stepSize));
-        Point2D a = new Point2D(P0);
-        Point2D b = new Point2D();
+        Point2d a = new Point2d(P0);
+        Point2d b = new Point2d();
 
         for( double i = 1; i <= total; ++i ) {
             double fraction = i / total;
@@ -131,7 +132,7 @@ public class PathImageMask extends Node {
      * @param b one corner of the rectangle.
      * @return the average intensity of the image within the rectangle bounded by points <code>a</code> and <code>b</code>.
      */
-    private double sampleImageUnderStep(BufferedImage img, Point2D a, Point2D b) {
+    private double sampleImageUnderStep(BufferedImage img, Point2d a, Point2d b) {
         // find the top-left and bottom-right corners
         int left = (int)Math.min(a.x,b.x);
         int right = (int)Math.max(a.x,b.x);

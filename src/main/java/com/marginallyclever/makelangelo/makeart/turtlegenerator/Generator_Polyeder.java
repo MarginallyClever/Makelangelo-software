@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectOneOfMany;
@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.util.ArrayList;
 
 /**
@@ -39,21 +40,21 @@ public class Generator_Polyeder extends TurtleGenerator {
 	 * @since 7.24.0
 	 */
 	public static class Transform {
-		public Point2D org;
+		public Point2d org;
 		public double x_x,x_y,y_x,y_y;
 		
 		public Transform()
 		{
-			org = new Point2D();
+			org = new Point2d();
 			org.x=0;
 			org.y=0;
 			x_x=y_y=1;
 			x_y=y_x=0;
 		}
 
-		public Point2D trans(Point2D pt)
+		public Point2d trans(Point2d pt)
 		{
-			Point2D a=new Point2D();
+			Point2d a=new Point2d();
 			a.x=org.x+pt.x*x_x+pt.y*y_x;
 			a.y=org.y+pt.x*x_y+pt.y*y_y;
 			return a;
@@ -71,7 +72,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 			return t1;
 		}
 		
-		public void walk(Point2D d)
+		public void walk(Point2d d)
 		{
 			org.x += d.x*x_x + d.y*y_x;
 			org.y += d.x*x_y + d.y*y_y;
@@ -189,8 +190,8 @@ public class Generator_Polyeder extends TurtleGenerator {
 		if(code == 1)
 		{
 			// draw a flap
-			Point2D pos=new Point2D();
-			Point2D abspos;
+			Point2d pos=new Point2d();
+			Point2d abspos;
 
 			pos.x=0;
 			pos.y=size/2f;
@@ -220,16 +221,16 @@ public class Generator_Polyeder extends TurtleGenerator {
 		{
 			// polygon with `code` number of points.
 			
-			t.walk(new Point2D(-size/(2*Math.tan(Math.PI/code)),0));
+			t.walk(new Point2d(-size/(2*Math.tan(Math.PI/code)),0));
 			double r=size/(2*Math.sin(Math.PI/code));
 			for(i=0;i<=code;i++)
 			{
 				double ang=2*Math.PI*(i-0.5)/(double)code;
-				Point2D pos=new Point2D();
+				Point2d pos=new Point2d();
 				pos.x=r*Math.cos(ang);
 				pos.y=r*Math.sin(ang);
 
-				Point2D abspos=t.trans(pos);
+				Point2d abspos=t.trans(pos);
 				turtle.moveTo(abspos.x,abspos.y);
 				if(i == 0) turtle.penDown();
 			}
@@ -241,7 +242,7 @@ public class Generator_Polyeder extends TurtleGenerator {
 				logger.debug("turn {}", i);
 				Transform t1=t.dup();
 				t1.rotate(2*Math.PI*i/(double)code);
-				t1.walk(new Point2D(size/(2*Math.tan(Math.PI/code)),0));
+				t1.walk(new Point2d(size/(2*Math.tan(Math.PI/code)),0));
 				t1.rotate(Math.PI);
 				// recursion.
 				geneneratePolygonStep(turtle,t1);

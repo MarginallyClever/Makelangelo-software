@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.convenience.noise.Noise;
 import com.marginallyclever.convenience.noise.NoiseFactory;
 import com.marginallyclever.convenience.noise.PerlinNoise;
@@ -12,6 +12,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -179,11 +180,11 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private static class SampleAt {
-		public Point2D p;
-		public Point2D n;
+		public Point2d p;
+		public Vector2d n;
 		public double value;
 
-		public SampleAt(Point2D p, Point2D n,double value) {
+		public SampleAt(Point2d p, Vector2d n,double value) {
 			this.p = p;
 			this.n = n;
 			this.value = value;
@@ -206,7 +207,7 @@ public class Converter_FlowField extends ImageConverter {
 			double offset = (double)j-halfPasses;
 			for(SampleAt sample : samples) {
 				// move to the adjusted point
-				Point2D p3 = new Point2D(sample.n);
+				Point2d p3 = new Point2d(sample.n);
 				p3.scale(offset*sample.value);
 				p3.add(sample.p);
 				if(first) {
@@ -227,14 +228,14 @@ public class Converter_FlowField extends ImageConverter {
 		SampleAt [] samples = new SampleAt[numSamples];
 		TurtlePathWalker walker = new TurtlePathWalker(line);
 
-		Point2D p = walker.walk(0);
+		Point2d p = walker.walk(0);
 		for(int i=0;i<numSamples;i++) {
-			Point2D p2 = walker.walk(samplingRate);
+			Point2d p2 = walker.walk(samplingRate);
 
 			double value = 255.0 - (img.sample(p2.x, p2.y, 5.0));
 			value = Math.max(0,Math.min(255,value));
 
-			Point2D n = new Point2D(p2.y-p.y,-(p2.x-p.x));
+			var n = new Vector2d(p2.y-p.y,-(p2.x-p.x));
 			n.normalize();
 
 			samples[i] = new SampleAt(p, n, value);

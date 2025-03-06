@@ -1,9 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+
+import javax.vecmath.Point2d;
 
 public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
@@ -21,7 +23,7 @@ public class Cartesian implements PlotterRenderer {
 	
 	private void paintGantryAndHead(GL2 gl2, Plotter plotter) {
 		//double dx, dy;
-		Point2D pos = plotter.getPos();
+		Point2d pos = plotter.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 		double gz = (plotter.getPenIsUp() ? plotter.getSettings().getDouble(PlotterSettings.PEN_ANGLE_UP) : plotter.getSettings().getDouble(PlotterSettings.PEN_ANGLE_DOWN))/10;

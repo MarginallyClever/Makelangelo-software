@@ -2,9 +2,9 @@ package com.marginallyclever.makelangelo.turtle;
 
 import com.marginallyclever.convenience.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 
 import javax.vecmath.Vector2d;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
@@ -254,8 +254,8 @@ public class Turtle implements Cloneable {
 	 * Calculate the limits of drawing lines in this turtle history
 	 **/
 	public Rectangle2D.Double getBounds() {
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
+		Point2d top = new Point2d();
+		Point2d bottom = new Point2d();
 		getBounds(top,bottom);
 		
 		Rectangle2D.Double r = new Rectangle.Double();
@@ -272,7 +272,7 @@ public class Turtle implements Cloneable {
 	 * @param top maximum limits
 	 * @param bottom minimum limits
 	 */
-	private void getBounds(Point2D top,Point2D bottom) {
+	private void getBounds(Point2d top,Point2d bottom) {
 		bottom.x=Float.MAX_VALUE;
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
@@ -304,7 +304,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private void getBoundsInternal(Point2D top,Point2D bottom,TurtleMove m) {
+	private void getBoundsInternal(Point2d top,Point2d bottom,TurtleMove m) {
 		if (top.x < m.x) top.x = m.x;
 		if (top.y < m.y) top.y = m.y;
 		if (bottom.x > m.x) bottom.x = m.x;
@@ -406,8 +406,8 @@ public class Turtle implements Cloneable {
 				case DRAW_LINE -> {
 					if (previousMovement != null) {
 						LineSegment2D line = new LineSegment2D(
-								new Point2D(previousMovement.x, previousMovement.y),
-								new Point2D(m.x, m.y),
+								new Point2d(previousMovement.x, previousMovement.y),
+								new Point2d(m.x, m.y),
 								color);
 						if (line.lengthSquared() > 0) {
 							lines.add(line);
@@ -471,7 +471,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private double distanceSquared(Point2D b) {
+	private double distanceSquared(Point2d b) {
 		double dx = px-b.x;
 		double dy = py-b.y;
 		return dx*dx + dy*dy; 

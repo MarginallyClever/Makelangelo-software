@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.convenience.LineInterpolator;
 import com.marginallyclever.convenience.LineInterpolatorSinCurve;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -11,6 +10,8 @@ import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -72,7 +73,7 @@ public class Converter_Moire extends ImageConverter {
 		direction = value;
 	}
 
-	protected void convertLine(TransformedImage img, double spaceBetweenLines, double halfStep, Point2D a, Point2D b) {
+	protected void convertLine(TransformedImage img, double spaceBetweenLines, double halfStep, Point2d a, Point2d b) {
 		LineInterpolatorSinCurve line = new LineInterpolatorSinCurve(a,b);
 		line.setAmplitude(0.4);
 		
@@ -82,8 +83,8 @@ public class Converter_Moire extends ImageConverter {
 		// examine the line once.  all Z values will be in the range 0...1
 		ArrayList<Double> zList = new ArrayList<>();
 		
-		Point2D p = new Point2D();
-		//Point2D n = new Point2D();
+		Point2d p = new Point2d();
+		//Point2d n = new Point2d();
 		double maxPixel=0;
 		
 		
@@ -180,8 +181,8 @@ public class Converter_Moire extends ImageConverter {
 	
 	protected void lineInternal(double maxPulseNow,double z,LineInterpolator line,double t) {
 		double pulseSize = maxPulseNow * z;
-		Point2D p = new Point2D();
-		Point2D n = new Point2D();
+		Point2d p = new Point2d();
+		Vector2d n = new Vector2d();
 		line.getPoint(t, p);
 		line.getNormal(t, n);
 		double x=myPaper.getCenterX()+p.x + n.x*pulseSize;
@@ -210,8 +211,8 @@ public class Converter_Moire extends ImageConverter {
 		double spaceBetweenLines = blockScale;
 
 		// from top to bottom of the image...
-		Point2D a = new Point2D();
-		Point2D b = new Point2D();
+		Point2d a = new Point2d();
+		Point2d b = new Point2d();
 		
 		turtle = new Turtle();
 

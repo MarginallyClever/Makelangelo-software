@@ -1,7 +1,8 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.Point2D;
 
+
+import javax.vecmath.Point2d;
 import java.util.Iterator;
 
 /**
@@ -51,7 +52,7 @@ public class TurtlePathWalker {
      * @return the new position of the turtle
      * @throws IllegalArgumentException if distance is negative.
      */
-    public Point2D walk(double distance) {
+    public Point2d walk(double distance) {
         if(distance<0) throw new IllegalArgumentException("distance must be positive");
 
         tSum+=distance;
@@ -62,7 +63,7 @@ public class TurtlePathWalker {
                 double ratio = Math.max(Math.min((tSum - segmentDistanceSum) / segmentDistance,1),0);
                 double newX = prev.x + ratio * dx;
                 double newY = prev.y + ratio * dy;
-                return new Point2D(newX, newY);
+                return new Point2d(newX, newY);
             } else {
                 segmentDistanceSum += segmentDistance;
                 prev = m;
@@ -70,7 +71,7 @@ public class TurtlePathWalker {
                 if(m==null) break;
             }
         }
-        return new Point2D(prev.x, prev.y);
+        return new Point2d(prev.x, prev.y);
     }
 
     public boolean isDone() {

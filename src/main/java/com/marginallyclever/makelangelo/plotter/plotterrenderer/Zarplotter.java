@@ -1,9 +1,11 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+
+import javax.vecmath.Point2d;
 
 /**
  * @author Dan Royer
@@ -26,7 +28,7 @@ public class Zarplotter implements PlotterRenderer {
 	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
-		Point2D pos = robot.getPos();
+		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
 
@@ -143,8 +145,8 @@ public class Zarplotter implements PlotterRenderer {
 	}
 /*
 	@Override
-	public Point2D getHome() {
-		return new Point2D(0,0);
+	public Point2d getHome() {
+		return new Point2d(0,0);
 	}
 	
 	@Override

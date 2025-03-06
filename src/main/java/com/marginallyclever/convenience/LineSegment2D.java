@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 
 /**
@@ -8,18 +9,18 @@ import java.awt.*;
  *
  */
 public class LineSegment2D {
-	public Point2D start, end;
+	public Point2d start, end;
 	public Color color;
 
-	public LineSegment2D(Point2D start, Point2D end, Color color) {
+	public LineSegment2D(Point2d start, Point2d end, Color color) {
 		super();
-		this.start = new Point2D(start);
-		this.end = new Point2D(end);
+		this.start = new Point2d(start);
+		this.end = new Point2d(end);
 		this.color = color;
 	}
 	
 	public void flip() {
-		Point2D temp= end;
+		Point2d temp= end;
 		end = start;
 		start = temp;
 	}
@@ -36,13 +37,13 @@ public class LineSegment2D {
 
 	// The distance measured is the distance between the specified point,
 	// and the closest point between the start and end points of line a. 
-	public double ptSegDistSq(Point2D point) {
+	public double ptSegDistSq(Point2d point) {
 		return java.awt.geom.Line2D.ptSegDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
 
 	// The distance measured is the distance between the specified point
 	// and the closest point on the infinite extension of line a.
-	public double ptLineDistSq(Point2D point) {
+	public double ptLineDistSq(Point2d point) {
 		return java.awt.geom.Line2D.ptLineDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
 }
