@@ -21,15 +21,14 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	}
 	
 	/**
-	 * Splits this collection by color.  Does not affect the original list.  Does not deep copy.
+	 * <p>Splits this collection by color.  Does not affect the original list.  Does not deep copy.</p>
 	 * @return the list of collections separated by color
 	 */
 	public List<LineCollection> splitByColor() {
-		var map = new HashMap<Color,LineCollection>();
-
 		if(this.isEmpty()) return new ArrayList<>();
 
-		LineSegment2D head = get(0);
+		var map = new HashMap<Color,LineCollection>();
+		LineSegment2D head = getFirst();
 		LineCollection c = new LineCollection();
 		map.put(head.color,c);
 		c.add(head);
@@ -53,91 +52,39 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 
 	/**
 	 * Splits this collection by travel moves.  Does not affect the original list.  Does not deep copy.
-	 * A travel move is any moment in the collection where element (N).b != (N+1).a
+	 * A travel move is any moment in the collection where element (N).end != (N+1).start
 	 * @return the list of collections separated by color
 	 */
 	public List<LineCollection> splitByTravel() {
-		List<LineCollection> result = new ArrayList<> ();
-		if(this.size()>0) {
-			LineSegment2D head = get(0);
-			
-			LineCollection c = new LineCollection();
-			result.add(c);
-			c.add(head);
-			
-			for(int i=1;i<size();++i) {
-				LineSegment2D next = get(i);
-				if(next.end.distanceSquared(head.start)<1e-6) {
-					c.add(next);
-				} else {
-					head = next;
-					c = new LineCollection();
-					result.add(c);
-					c.add(head);
-				}
+		List<LineCollection> result = new ArrayList<>();
+		if(this.isEmpty()) return result;
+
+		LineSegment2D head = getFirst();
+		LineCollection c = new LineCollection();
+		result.add(c);
+		c.add(head);
+
+		for(int i=1;i<size();++i) {
+			LineSegment2D next = get(i);
+			if(next.start == head.end || next.start.distanceSquared(head.end)<1e-6) {
+				c.add(next);
+			} else {
+				head = next;
+				c = new LineCollection();
+				result.add(c);
+				c.add(head);
 			}
 		}
 		return result;
 	}
 
 	/**
-	 * Simplify the line collection by removing points that are within distanceTolerance of the line between their neighbors.
+	 * Simplify the line collection using the <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Ramer-Douglas-Peucker algorithm</a>.
 	 * @param distanceTolerance the distance tolerance
 	 * @return the simplified line collection
 	 */
 	public LineCollection simplify(double distanceTolerance) {
-		var len = size();
-		boolean[] usePt = new boolean[len];
-        Arrays.fill(usePt, true);
-		
-		simplifySection(0, len - 1,distanceTolerance,usePt);
-		
-		LineCollection result = new LineCollection();
-		Point2d head = get(0).start;
-		
-		for (int i = 0; i < len; i++) {
-			if (usePt[i]) {
-				Point2d next = get(i).end;
-				result.add(new LineSegment2D(head,next,get(i).color));
-				head=next;
-			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * Simplify the line collection by removing points that are within distanceTolerance of the line between their neighbors.
-	 * The strategy is to split the work at the point that is farthest from the line between the start and end points,
-	 * then try to simplify the two halves.
-	 * @param i the start index
-	 * @param j the end index
-	 * @param distanceTolerance the distance tolerance
-	 * @param usePt the array of booleans that indicates whether a point should be retained after simplification
-	 */
-	private void simplifySection(int i, int j,double distanceTolerance,boolean[] usePt) {
-		if ((i + 1) == j) return;
-		LineSegment2D seg = new LineSegment2D(
-			get(i).start,
-			get(j).end,
-			get(i).color);
-		double maxDistance = -1.0;
-		int maxIndex = i;
-		for (int k = i + 1; k < j; k++) {
-			double distance = seg.ptLineDistSq(get(k).end);
-			if (distance > maxDistance) {
-				maxDistance = distance;
-				maxIndex = k;
-			}
-		}
-		if (maxDistance <= distanceTolerance) {
-			for (int k = i + 1; k < j; k++) {
-				usePt[k] = false;
-			}
-		} else {
-			simplifySection(i, maxIndex,distanceTolerance,usePt);
-			simplifySection(maxIndex, j,distanceTolerance,usePt);
-		}
+		return new RamerDouglasPeuckerRecursive(this).simplify(distanceTolerance);
 	}
 
 	public Point2d getStart() {

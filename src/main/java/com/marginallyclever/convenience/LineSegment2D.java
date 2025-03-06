@@ -1,5 +1,7 @@
 package com.marginallyclever.convenience;
 
+import org.jetbrains.annotations.Contract;
+
 import javax.vecmath.Point2d;
 import java.awt.*;
 
@@ -24,25 +26,34 @@ public class LineSegment2D {
 		end = start;
 		start = temp;
 	}
-	
+
+	@Contract(pure = true)
 	public String toString() {
 		return "("+ start.x+","+ start.y+")-("+ end.x+","+ end.y+")";
 	}
-	
+
+	@Contract(pure = true)
 	public double lengthSquared() {
 		double dx= start.x- end.x;
 		double dy= start.y- end.y;
 		return dx*dx + dy*dy;
 	}
 
-	// The distance measured is the distance between the specified point,
-	// and the closest point between the start and end points of line a. 
+	/**
+	 * @param point the specified point
+	 * @return the distance between the specified point and the closest point on the line segment.
+	 */
+	@Contract(pure = true)
 	public double ptSegDistSq(Point2d point) {
 		return java.awt.geom.Line2D.ptSegDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
 
-	// The distance measured is the distance between the specified point
-	// and the closest point on the infinite extension of line a.
+	/**
+	 * @param point the specified point
+	 * @return the distance between the specified point and the closest point on the line.  If the point is on
+	 * 			the line the distance is 0, even if it is not between the two ends.
+	 */
+	@Contract(pure = true)
 	public double ptLineDistSq(Point2d point) {
 		return java.awt.geom.Line2D.ptLineDistSq(start.x, start.y, end.x, end.y, point.x, point.y);
 	}
