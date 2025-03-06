@@ -4,6 +4,7 @@ import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
+import com.marginallyclever.makelangelo.turtle.ListOfPoints;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
@@ -41,7 +42,7 @@ public class PatternAtPoints extends Node {
         var w = image.getWidth();
         var h = image.getHeight();
 
-        if(points.isEmpty()) {
+        if(points.hasNoPoints()) {
             setComplete(100);
             output.setValue(result);
             return;
@@ -56,9 +57,9 @@ public class PatternAtPoints extends Node {
 
         setComplete(0);
         try {
-            int total = points.size();
+            int total = points.getAllPoints().size();
             int i = 0;
-            for (var p : points) {
+            for (var p : points.getAllPoints()) {
                 if (rectangle.contains(p.x, p.y)) {
                     // inside image
                     var c = new Color(image.getRGB((int) (p.x + w2), (int) (p.y + h2)));

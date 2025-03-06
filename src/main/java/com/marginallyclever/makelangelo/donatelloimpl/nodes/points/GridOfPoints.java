@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.points;
 import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputNumber;
 import com.marginallyclever.donatello.ports.InputOneOfMany;
+import com.marginallyclever.makelangelo.turtle.ConcreteListOfPoints;
 import com.marginallyclever.nodegraphcore.Node;
 
 import javax.vecmath.Matrix3d;
@@ -41,7 +42,7 @@ public class GridOfPoints extends Node {
         int nx,ny;
         double dx, dy;
 
-        var list = new ListOfPoints();
+        var list = new ConcreteListOfPoints();
         switch(style.getValue()) {
             case 2: {
                 // d = a
