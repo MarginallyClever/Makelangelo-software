@@ -7,6 +7,7 @@ import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.donatello.ports.InputOneOfMany;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.*;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,7 +37,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputOneOfMany style = new InputOneOfMany("style");
 
     private BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
-    private Point topLeft = new Point(0,0);
+    private final Point topLeft = new Point(0,0);
     private final Lock lock = new ReentrantLock();
 
     public PrintTurtle() {
@@ -47,7 +49,9 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         addPort(style);
         addPort(layer);
 
-        style.setOptions(new String[]{"Default","Barber pole","Separate loops","Direction loops"});
+        ArrayList<String> names = new ArrayList<>();
+        Arrays.stream(TurtleRenderFactory.values()).forEach(f-> names.add(f.getName()));
+        style.setOptions(names.toArray(new String[0]));
     }
 
     @Override
@@ -62,7 +66,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                 setComplete(100);
                 return;
             }
-            image = TurtleToBufferedImage.generateImage(myTurtle,this);
+            image = TurtleToBufferedImageHelper.generateImage(myTurtle,this);
             var r = myTurtle.getBounds();
             topLeft.setLocation(r.x,r.y);
             //generatePolylines(myTurtle);
