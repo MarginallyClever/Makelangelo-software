@@ -60,22 +60,21 @@ public class PatternAtPoints extends Node {
             int total = points.getAllPoints().size();
             int i = 0;
             for (var p : points.getAllPoints()) {
-                if (rectangle.contains(p.x, p.y)) {
-                    // inside image
-                    var c = new Color(image.getRGB((int) (p.x + w2), (int) (p.y + h2)));
-                    // get intensity of c as a value 0....1
-                    var intensity = (c.getBlue() + c.getGreen() + c.getRed()) / (3.0 * 255.0);
-                    var capped = Math.max(0, Math.min(1, intensity));
-                    var i2 = bottom + capped * diff;
-
-                    if(capped!=0) {
-                        Turtle stamp = new Turtle(myPattern);
-                        stamp.scale(i2, i2);
-                        stamp.translate(p.x, p.y);
-                        result.add(stamp);
-                    }
-                }
                 setComplete((100 * i++ / total));
+                if (!rectangle.contains(p.x, p.y)) continue;
+
+                // inside image
+                var c = new Color(image.getRGB((int) (p.x + w2), (int) (p.y + h2)));
+                // get intensity of c as a value 0....1
+                double intensity = (c.getBlue() + c.getGreen() + c.getRed()) / (3.0 * 255.0);
+                double capped = Math.max(0, Math.min(1, intensity));
+                if(capped!=0) {
+                    double i2 = bottom + capped * diff;
+                    Turtle stamp = new Turtle(myPattern);
+                    stamp.scale(i2, i2);
+                    stamp.translate(p.x, p.y);
+                    result.add(stamp);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
