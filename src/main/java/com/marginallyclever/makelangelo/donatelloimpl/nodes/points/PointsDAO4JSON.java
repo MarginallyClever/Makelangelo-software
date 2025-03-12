@@ -11,7 +11,7 @@ import javax.vecmath.Point2d;
 import java.util.stream.IntStream;
 
 /**
- * DAO for ListOfPoints
+ * Data Access Object for {@link ListOfPoints}
  */
 public class PointsDAO4JSON extends AbstractDAO4JSON<ListOfPoints> {
     public PointsDAO4JSON() {
