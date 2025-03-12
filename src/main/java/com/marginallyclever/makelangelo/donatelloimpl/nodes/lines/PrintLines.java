@@ -52,9 +52,9 @@ public class PrintLines extends Node implements PrintWithGraphics {
 
         lock.lock();
         try {
-            list.getAllLines().stream().parallel().forEach(p -> {
-                var points = p.getAllPoints();
-                if(points.isEmpty()) return;
+            list.getAllLines().stream().parallel().forEach(line -> {
+                var points = line.getAllPoints();
+                if(points.size()<2) return;
                 Point2d prev = points.getFirst();
                 for (int i = 1; i < points.size(); i++) {
                     Point2d next = points.get(i);

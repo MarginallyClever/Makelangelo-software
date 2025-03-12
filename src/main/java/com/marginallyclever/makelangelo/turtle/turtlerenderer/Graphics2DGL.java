@@ -8,10 +8,11 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import java.io.Closeable;
-import java.io.IOException;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ import java.util.Map;
  * <p>Assumes gl is already in orthographic projection and only drawing in the xy plane.</p>
  * <p>Don't forget to {@link #dispose()} when you're done.</p>
  */
-public class Graphics2DGL extends Graphics2D implements Closeable {
+public class Graphics2DGL extends Graphics2D {
     private final GL2 gl2;
     private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
@@ -434,12 +435,12 @@ public class Graphics2DGL extends Graphics2D implements Closeable {
 
     @Override
     public void setRenderingHints(Map<?, ?> hints) {
-        // OpenGL does not handle rendering hints directly
+        hints.forEach((a,b)->this.setRenderingHint((RenderingHints.Key) a,b));
     }
 
     @Override
     public void addRenderingHints(Map<?, ?> hints) {
-        // OpenGL does not handle rendering hints directly
+        hints.forEach((a,b)->this.setRenderingHint((RenderingHints.Key) a,b));
     }
 
     @Override
@@ -492,10 +493,5 @@ public class Graphics2DGL extends Graphics2D implements Closeable {
         gl2.glLineWidth(lineWidthBuf[0]);
         // restore the transformation matrix
         gl2.glPopMatrix();
-    }
-
-    @Override
-    public void close() throws IOException {
-        dispose();
     }
 }
