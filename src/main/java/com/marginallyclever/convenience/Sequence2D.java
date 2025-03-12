@@ -1,5 +1,7 @@
 package com.marginallyclever.convenience;
 
+import com.marginallyclever.convenience.linecollection.LineCollection;
+
 /**
  * A sequence of 2D lines forming a polyline.
  * The end of lines.get(n).b should match lines.get(n+1).a.

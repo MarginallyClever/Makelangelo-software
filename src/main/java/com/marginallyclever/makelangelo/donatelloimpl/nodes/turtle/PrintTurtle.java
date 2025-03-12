@@ -4,8 +4,10 @@ import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.donatello.ports.InputBoolean;
 import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.donatello.ports.InputOneOfMany;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.turtle.*;
+import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -31,9 +34,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     private final InputColor travelColor = new InputColor("travel color",Color.GREEN);
     private final InputInt lineThickness = new InputInt("line thickness",1);
     private final InputInt layer = new InputInt("layer",5);
+    private final InputOneOfMany style = new InputOneOfMany("style");
 
     private BufferedImage image = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
-    private Point topLeft = new Point(0,0);
+    private final Point topLeft = new Point(0,0);
     private final Lock lock = new ReentrantLock();
 
     public PrintTurtle() {
@@ -42,7 +46,12 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         addPort(showTravel);
         addPort(travelColor);
         addPort(lineThickness);
+        addPort(style);
         addPort(layer);
+
+        ArrayList<String> names = new ArrayList<>();
+        Arrays.stream(TurtleRenderFactory.values()).forEach(f-> names.add(f.getName()));
+        style.setOptions(names.toArray(new String[0]));
     }
 
     @Override
@@ -57,7 +66,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
                 setComplete(100);
                 return;
             }
-            image = TurtleToBufferedImage.generateImage(myTurtle,this);
+            image = TurtleToBufferedImageHelper.generateImage(myTurtle,this);
             var r = myTurtle.getBounds();
             topLeft.setLocation(r.x,r.y);
             //generatePolylines(myTurtle);
@@ -83,8 +92,10 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         g.drawImage(image,topLeft.x,topLeft.y,null);
     }
 
+    @Deprecated
     private final List<Polyline> polylines = new ArrayList<>();
 
+    @Deprecated
     private void generatePolylines(Turtle myTurtle) {
         polylines.clear();
         if (myTurtle == null || myTurtle.history.isEmpty()) return;
@@ -134,6 +145,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         setComplete(100);
     }
 
+    @Deprecated
     private void drawPolylines(Graphics g) {
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
@@ -148,5 +160,13 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         }
 
         g2.dispose();
+    }
+
+    public boolean showTravel() {
+        return showTravel.getValue();
+    }
+
+    public Color travelColor() {
+        return travelColor.getValue();
     }
 }

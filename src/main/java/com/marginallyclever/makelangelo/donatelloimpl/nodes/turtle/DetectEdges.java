@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.donatello.ports.InputRange;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
@@ -11,6 +11,7 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
+import javax.vecmath.Point2d;
 import java.awt.image.BufferedImage;
 
 /**
@@ -102,7 +103,7 @@ public class DetectEdges extends Node {
         return a + (b - a) * v;
     }
 
-    Point2D lerpEdge(BufferedImage img,int edge,int x0, int y0, int x1, int y1) {
+    Point2d lerpEdge(BufferedImage img, int edge, int x0, int y0, int x1, int y1) {
         float in0 = brightness(img.getRGB(x0,y0));
         float in1 = brightness(img.getRGB(x1,y1));
 
@@ -110,10 +111,10 @@ public class DetectEdges extends Node {
         v=Math.max(0,Math.min(1,v));
         float x3 = lerp((float)x0,(float)x1,v);
         float y3 = lerp((float)y0,(float)y1,v);
-        return new Point2D(x3,y3);
+        return new Point2d(x3,y3);
     }
 
-    void line(Turtle turtle,Point2D a,Point2D b) {
+    void line(Turtle turtle,Point2d a,Point2d b) {
         turtle.jumpTo(a.x,a.y);
         turtle.moveTo(b.x,b.y);
     }
@@ -121,16 +122,16 @@ public class DetectEdges extends Node {
     void case1(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x0,y0,x0,y1);
-        Point2D b = lerpEdge(img,edge,x0,y0,x1,y0);
+        Point2d a = lerpEdge(img,edge,x0,y0,x0,y1);
+        Point2d b = lerpEdge(img,edge,x0,y0,x1,y0);
         line(turtle,a,b);
     }
 
     void case2(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x1,y0,x0,y0);
-        Point2D b = lerpEdge(img,edge,x1,y0,x1,y1);
+        Point2d a = lerpEdge(img,edge,x1,y0,x0,y0);
+        Point2d b = lerpEdge(img,edge,x1,y0,x1,y1);
         line(turtle,a,b);
     }
 
@@ -138,16 +139,16 @@ public class DetectEdges extends Node {
     void case3(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x0,y0,x0,y1);
-        Point2D b = lerpEdge(img,edge,x1,y0,x1,y1);
+        Point2d a = lerpEdge(img,edge,x0,y0,x0,y1);
+        Point2d b = lerpEdge(img,edge,x1,y0,x1,y1);
         line(turtle,a,b);
     }
 
     void case4(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x1,y1,x0,y1);
-        Point2D b = lerpEdge(img,edge,x1,y1,x1,y0);
+        Point2d a = lerpEdge(img,edge,x1,y1,x0,y1);
+        Point2d b = lerpEdge(img,edge,x1,y1,x1,y0);
         line(turtle,a,b);
     }
 
@@ -161,8 +162,8 @@ public class DetectEdges extends Node {
     void case6(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x0,y0,x1,y0);
-        Point2D b = lerpEdge(img,edge,x0,y1,x1,y1);
+        Point2d a = lerpEdge(img,edge,x0,y0,x1,y0);
+        Point2d b = lerpEdge(img,edge,x0,y1,x1,y1);
         line(turtle,a,b);
     }
 
@@ -170,8 +171,8 @@ public class DetectEdges extends Node {
     void case7(BufferedImage img,Turtle turtle,int edge,int x0,int y0) {
         int x1 = x0+1;
         int y1 = y0+1;
-        Point2D a = lerpEdge(img,edge,x0,y1,x0,y0);
-        Point2D b = lerpEdge(img,edge,x0,y1,x1,y1);
+        Point2d a = lerpEdge(img,edge,x0,y1,x0,y0);
+        Point2d b = lerpEdge(img,edge,x0,y1,x1,y1);
         line(turtle,a,b);
     }
 }

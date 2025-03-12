@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.points;
 import com.marginallyclever.donatello.graphview.GraphViewPanel;
 import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.donatello.ports.InputInt;
+import com.marginallyclever.makelangelo.turtle.ListOfPoints;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 
@@ -40,7 +41,7 @@ public class PrintPoints extends Node implements PrintWithGraphics {
 
     @Override
     public void print(Graphics g) {
-        if(list==null || list.isEmpty()) return;
+        if(list==null || list.hasNoPoints()) return;
 
         Graphics2D g2 = (Graphics2D)g.create();
         GraphViewPanel.setHints(g2);
@@ -48,10 +49,9 @@ public class PrintPoints extends Node implements PrintWithGraphics {
         g2.setStroke(new BasicStroke(radius.getValue(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
         g2.setColor(color.getValue());
 
-
         lock.lock();
         try {
-            list.stream().parallel().forEach(p -> {
+            list.getAllPoints().stream().parallel().forEach(p -> {
                 g2.drawLine((int)p.x, (int)p.y, (int)p.x, (int)p.y);
             });
         } finally {

@@ -1,12 +1,14 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;
+
+import javax.vecmath.Point2d;
 
 /**
  * Place a pattern on a path.
@@ -36,7 +38,7 @@ public class PatternOnPath extends Node {
             double pDistance = walker.getDrawDistance();
             double step = (pDistance==0) ? 1 : pDistance/(double)c;
             while(!walker.isDone()) {
-                Point2D p = walker.walk(step);
+                Point2d p = walker.walk(step);
                 Turtle stamp = new Turtle(myPattern);
                 stamp.translate(p.x,p.y);
                 sum.add(stamp);

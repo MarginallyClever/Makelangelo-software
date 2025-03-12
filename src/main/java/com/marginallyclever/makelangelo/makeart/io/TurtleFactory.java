@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -48,9 +49,7 @@ public class TurtleFactory {
 		if(fileChooserLoad ==null) {
 			fileChooserLoad = new JFileChooser();
 			// add formats
-			for (FileNameExtensionFilter ff : TurtleFactory.getLoadExtensions()) {
-				fileChooserLoad.addChoosableFileFilter(ff);
-			}
+			TurtleFactory.getLoadExtensions().forEach(fileChooserLoad::addChoosableFileFilter);
 			// no wild card filter, please.
 			fileChooserLoad.setAcceptAllFileFilterUsed(false);
 		}
@@ -58,18 +57,27 @@ public class TurtleFactory {
 	}
 
 	public static JFileChooser getSaveFileChooser() {
-		if(fileChooserSave ==null) {
+		if(fileChooserSave == null) {
 			fileChooserSave = new JFileChooser();
 			// add formats
-			for (FileNameExtensionFilter ff : TurtleFactory.getSaveExtensions()) {
-				fileChooserSave.addChoosableFileFilter(ff);
-			}
+			TurtleFactory.getSaveExtensions().forEach(fileChooserSave::addChoosableFileFilter);
 			// no wild card filter, please.
 			fileChooserSave.setAcceptAllFileFilterUsed(false);
+
+			fileChooserSave.addActionListener(e-> {
+				if (!JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) return;
+
+				FileNameExtensionFilter filter = (FileNameExtensionFilter) fileChooserSave.getFileFilter();
+				String extension = filter.getExtensions()[0];
+				String filename = fileChooserSave.getSelectedFile().getName();
+				if (!FilenameUtils.getExtension(filename).equalsIgnoreCase(extension)) {
+					fileChooserSave.setSelectedFile(new java.io.File(fileChooserSave.getSelectedFile() + "." + extension));
+				}
+			});
 		}
 		return fileChooserSave;
 	}
-	
+
 	public static Turtle load(String filename) throws Exception {
 		if(filename == null || filename.trim().isEmpty()) {
 			throw new InvalidParameterException("filename cannot be empty");
@@ -115,6 +123,7 @@ public class TurtleFactory {
 	public static void save(Turtle turtle,String filename, PlotterSettings settings) throws Exception {
 		if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
+		if(filename.lastIndexOf(".")==-1) throw new InvalidParameterException("filename must have an extension");
 		String extension = filename.substring(filename.lastIndexOf("."));
 		if(extension.isEmpty()) throw new InvalidParameterException("filename must have an extension");
 

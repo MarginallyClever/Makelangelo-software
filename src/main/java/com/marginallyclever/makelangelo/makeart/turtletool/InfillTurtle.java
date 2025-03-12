@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class InfillTurtle {
 		LineCollection convertedPath = input.getAsLineSegments();
 
 		// working variable
-		LineSegment2D line = new LineSegment2D(new Point2D(), new Point2D(), input.getColor());
+		LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), input.getColor());
 
 		double size = Math.max(bounds.getHeight(), bounds.getWidth());
 		Vector2d majorDir = new Vector2d(Math.cos(Math.toRadians(angle   )), Math.sin(Math.toRadians(angle   )));
@@ -119,10 +119,10 @@ public class InfillTurtle {
 	 * @return a list of remaining {@link LineSegment2D}.
 	 */
 	private LineCollection trimLineToPath(LineSegment2D line, LineCollection convertedPath) {
-		List<Point2D> intersections = new ArrayList<>();
+		List<Point2d> intersections = new ArrayList<>();
 
 		for (LineSegment2D s : convertedPath) {
-			Point2D p = getIntersection(line, s);
+			Point2d p = getIntersection(line, s);
 			if (p != null) intersections.add(p);
 		}
 
@@ -146,9 +146,9 @@ public class InfillTurtle {
 	 * @return return Intersections sorted by ascending x value. If x values match,
 	 *         sort by ascending y value.
 	 */
-	private LineCollection sortIntersectionsIntoSegments(List<Point2D> intersections, Color color) {
-		Point2D first = intersections.get(0);
-		Point2D second = intersections.get(1);
+	private LineCollection sortIntersectionsIntoSegments(List<Point2d> intersections, Color color) {
+		Point2d first = intersections.get(0);
+		Point2d second = intersections.get(1);
 		if (Double.compare(first.x, second.x) == 0) {
 			intersections.sort(new ComparePointsByY());
 		} else {
@@ -165,16 +165,16 @@ public class InfillTurtle {
 		return results;
 	}
 
-	static class ComparePointsByY implements Comparator<Point2D> {
+	static class ComparePointsByY implements Comparator<Point2d> {
 		@Override
-		public int compare(Point2D o1, Point2D o2) {
+		public int compare(Point2d o1, Point2d o2) {
 			return Double.compare(o1.y, o2.y);
 		}
 	}
 
-	static class ComparePointsByX implements Comparator<Point2D> {
+	static class ComparePointsByX implements Comparator<Point2d> {
 		@Override
-		public int compare(Point2D o1, Point2D o2) {
+		public int compare(Point2d o1, Point2d o2) {
 			return Double.compare(o1.x, o2.x);
 		}
 	}
@@ -185,9 +185,9 @@ public class InfillTurtle {
 	 * TODO move this to com.marginallyclever.convenience.LineHelper?
 	 * @param alpha first line segment
 	 * @param beta second line segment
-	 * @return intersection {@link Point2D} or null
+	 * @return intersection {@link Point2d} or null
 	 */
-	private Point2D getIntersection(LineSegment2D alpha, LineSegment2D beta) {
+	private Point2d getIntersection(LineSegment2D alpha, LineSegment2D beta) {
 		double s1_x = alpha.end.x - alpha.start.x;
 		double s1_y = alpha.end.y - alpha.start.y;
 		double s2_x = beta.end.x - beta.start.x;
@@ -199,7 +199,7 @@ public class InfillTurtle {
 
 		if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
 			// hit!
-			return new Point2D(alpha.start.x + (t * s1_x), alpha.start.y + (t * s1_y));
+			return new Point2d(alpha.start.x + (t * s1_x), alpha.start.y + (t * s1_y));
 		}
 		return null;
 	}

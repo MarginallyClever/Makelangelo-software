@@ -1,12 +1,15 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.donatello.ports.OutputDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 import com.marginallyclever.nodegraphcore.Node;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 
 
 /**
@@ -57,11 +60,11 @@ public class PointOnPath extends Node {
             c0 = total - EPSILON;
         }
         TurtlePathWalker walker = new TurtlePathWalker(myPath);
-        Point2D p0 = walker.walk(c0);
-        Point2D p1 = walker.walk(c1-c0);
+        Point2d p0 = walker.walk(c0);
+        Point2d p1 = walker.walk(c1-c0);
         double dx = p1.x - p0.x;
         double dy = p1.y - p0.y;
-        Point2D n = new Point2D(dx,dy);
+        var n = new Vector2d(dx,dy);
         n.normalize();
         px.setValue(p0.x);
         py.setValue(p0.y);

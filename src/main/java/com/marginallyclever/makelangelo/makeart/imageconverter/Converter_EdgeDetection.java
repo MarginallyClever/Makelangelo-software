@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -11,6 +11,7 @@ import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -171,7 +172,7 @@ public class Converter_EdgeDetection extends ImageConverter {
 		return a + (b - a) * v;
 	}
 	
-	Point2D lerpEdge(int x0, int y0, int x1, int y1) {
+	Point2d lerpEdge(int x0, int y0, int x1, int y1) {
 		float in0 = brightness(img.sample(x0,y0,sampleSize));
 		float in1 = brightness(img.sample(x1,y1,sampleSize));
 
@@ -179,10 +180,10 @@ public class Converter_EdgeDetection extends ImageConverter {
 		v=Math.max(0,Math.min(1,v));
 		float x3 = lerp((float)x0,(float)x1,v);
 		float y3 = lerp((float)y0,(float)y1,v);
-		return new Point2D(x3,y3);
+		return new Point2d(x3,y3);
 	}
 
-	void line(Point2D a,Point2D b) {
+	void line(Point2d a,Point2d b) {
 		turtle.jumpTo(px+a.x,py+a.y);
 		turtle.moveTo(px+b.x,py+b.y);
 	}
@@ -190,16 +191,16 @@ public class Converter_EdgeDetection extends ImageConverter {
 	void case1(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x0,y0,x0,y1);
-		Point2D b = lerpEdge(x0,y0,x1,y0);
+		Point2d a = lerpEdge(x0,y0,x0,y1);
+		Point2d b = lerpEdge(x0,y0,x1,y0);
 		line(a,b);
 	}
 
 	void case2(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x1,y0,x0,y0);
-		Point2D b = lerpEdge(x1,y0,x1,y1);
+		Point2d a = lerpEdge(x1,y0,x0,y0);
+		Point2d b = lerpEdge(x1,y0,x1,y1);
 		line(a,b);
 	}
 
@@ -207,16 +208,16 @@ public class Converter_EdgeDetection extends ImageConverter {
 	void case3(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x0,y0,x0,y1);
-		Point2D b = lerpEdge(x1,y0,x1,y1);
+		Point2d a = lerpEdge(x0,y0,x0,y1);
+		Point2d b = lerpEdge(x1,y0,x1,y1);
 		line(a,b);
 	}
 
 	void case4(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x1,y1,x0,y1);
-		Point2D b = lerpEdge(x1,y1,x1,y0);
+		Point2d a = lerpEdge(x1,y1,x0,y1);
+		Point2d b = lerpEdge(x1,y1,x1,y0);
 		line(a,b);
 	}
 
@@ -230,8 +231,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	void case6(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x0,y0,x1,y0);
-		Point2D b = lerpEdge(x0,y1,x1,y1);
+		Point2d a = lerpEdge(x0,y0,x1,y0);
+		Point2d b = lerpEdge(x0,y1,x1,y1);
 		line(a,b);
 	}
 
@@ -239,8 +240,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 	void case7(int x0,int y0) {
 		int x1 = x0+stepSize;
 		int y1 = y0+stepSize;
-		Point2D a = lerpEdge(x0,y1,x0,y0);
-		Point2D b = lerpEdge(x0,y1,x1,y1);
+		Point2d a = lerpEdge(x0,y1,x0,y0);
+		Point2d b = lerpEdge(x0,y1,x1,y1);
 		line(a,b);
 	}
 

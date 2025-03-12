@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
@@ -333,8 +334,8 @@ public class PlotterSettings {
 		setString(key,Arrays.toString(values));
 	}
 
-	public Point2D getHome() {
-		return new Point2D(0,0);
+	public Point2d getHome() {
+		return new Point2d();
 	}
 
 	/**

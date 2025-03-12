@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
@@ -15,6 +15,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -125,12 +126,12 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	}
 
 	private void circlesAlongLine(double x1, double y1, double x0, double y0, TransformedImage img) {
-		Point2D P0 = new Point2D(x0,y0);
-		Point2D P1 = new Point2D(x1,y1);
+		Point2d P0 = new Point2d(x0,y0);
+		Point2d P1 = new Point2d(x1,y1);
 
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
-		Point2D rMax = new Point2D(rect.getMaxX(),rect.getMaxY());
-		Point2D rMin = new Point2D(rect.getMinX(),rect.getMinY());
+		Point2d rMax = new Point2d(rect.getMaxX(),rect.getMaxY());
+		Point2d rMin = new Point2d(rect.getMinX(),rect.getMinY());
 		if(!Clipper2D.clipLineToRectangle(P0, P1, rMax, rMin)) {
 			// entire line clipped
 			return;

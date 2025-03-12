@@ -1,5 +1,7 @@
 package com.marginallyclever.convenience;
 
+import javax.vecmath.Point2d;
+
 /**
  * Convenience methods for clipping shapes in 2D
  * @author Dan Royer
@@ -15,7 +17,7 @@ public class Clipper2D {
 	 * @param rMin minimum extent of rectangle
 	 * @return true if some of the line remains, false if the entire line is cut.
 	 */
-	public static boolean clipLineToRectangle(Point2D P0,Point2D P1,Point2D rMax,Point2D rMin) {
+	public static boolean clipLineToRectangle(Point2d P0, Point2d P1, Point2d rMax, Point2d rMin) {
 		double xLeft   = rMin.x;
 		double xRight  = rMax.x;
 		double yBottom = rMin.y;
@@ -70,7 +72,7 @@ public class Clipper2D {
 		return true;  // partially in
 	}
 	
-	private static int outCodes(Point2D P,double xLeft,double xRight,double yTop,double yBottom) {
+	private static int outCodes(Point2d P,double xLeft,double xRight,double yTop,double yBottom) {
 		int code = 0;
 		     if(P.y > yTop   ) code += 1; // code for above
 		else if(P.y < yBottom) code += 2; // code for below

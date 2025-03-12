@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 /**
@@ -15,30 +15,25 @@ import java.util.ArrayList;
  * @since 7.48.0
  */
 public class DirectionLoopTurtleRenderer implements TurtleRenderer {
-	private GL2 gl2;
+	private Graphics2D gl2;
 	private Color colorTravel = Color.GREEN;
-	private final float[] lineWidthBuf = new float[1];
 	private boolean showPenUp = false;
 	private float penDiameter = 1;
 	private final ArrayList<TurtleMove> points = new ArrayList<>();
+	private final Line2D line = new Line2D.Double();
 		
 	@Override
-	public void start(GL2 gl2) {
-		this.gl2=gl2;
+	public void start(Graphics2D gl2) {
+		this.gl2 = gl2;
 		showPenUp = GFXPreferences.getShowPenUp();
 
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		gl2.glLineWidth(penDiameter);
-
-		gl2.glBegin(GL2.GL_LINES);
+		// set pen diameter
+		gl2.setStroke(new BasicStroke(penDiameter));
 	}
 
 	@Override
 	public void end() {
 		drawPoints();
-		gl2.glEnd();
-		// restore pen diameter
-		gl2.glLineWidth(lineWidthBuf[0]);
 	}
 	
 	@Override
@@ -56,9 +51,9 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 				TurtleMove p1 = points.get(i+1);
 				double r = (double)i/(double)size;
 				double b = 1.0 - r;
-				gl2.glColor3d(r,0,b);
-				gl2.glVertex2d(p0.x, p0.y);
-				gl2.glVertex2d(p1.x, p1.y);
+				gl2.setColor(new Color((int)(r*255),0,(int)(b*255)));
+				line.setLine(p0.x, p0.y, p1.x, p1.y);
+				gl2.draw(line);
 			}
 			points.clear();
 		}
@@ -68,12 +63,9 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		drawPoints();
 		if(showPenUp) {		
-			gl2.glColor3d(
-					colorTravel.getRed() / 255.0,
-					colorTravel.getGreen() / 255.0,
-					colorTravel.getBlue() / 255.0);
-			gl2.glVertex2d(p0.x, p0.y);
-			gl2.glVertex2d(p1.x, p1.y);
+			gl2.setColor(colorTravel);
+			line.setLine(p0.x, p0.y, p1.x, p1.y);
+			gl2.draw(line);
 		}
 	}
 

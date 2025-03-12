@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -9,7 +8,7 @@ import java.awt.*;
  * {@link TurtleRenderer} draws a {@link com.marginallyclever.makelangelo.turtle.Turtle} in a specific style.
  */
 public interface TurtleRenderer {
-	void start(GL2 gl2);
+	void start(Graphics2D gl2);
 
 	void draw(TurtleMove p0, TurtleMove p1);
 	

@@ -1,5 +1,6 @@
 package com.marginallyclever.convenience;
 
+import javax.vecmath.Point2d;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,15 +34,15 @@ public class Bezier {
 	
 	// Based on https://github.com/pelson/antigrain/blob/master/agg-2.4/src/agg_curves.cpp
 	// and https://github.com/mattdesl/adaptive-bezier-curve
-	public List<Point2D> generateCurvePoints(double distanceTolerance) {
-		ArrayList<Point2D> points = new ArrayList<Point2D>();
-		points.add(new Point2D(x0,y0));
+	public List<Point2d> generateCurvePoints(double distanceTolerance) {
+		ArrayList<Point2d> points = new ArrayList<Point2d>();
+		points.add(new Point2d(x0,y0));
 		recursive(x0,y0,x1,y1,x2,y2,x3,y3,points,distanceTolerance*distanceTolerance,0);
-		points.add(new Point2D(x3,y3));
+		points.add(new Point2d(x3,y3));
 		return points;
 	}
 	
-	private void recursive(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4,ArrayList<Point2D> points, double distanceTolerance,int level) {
+	private void recursive(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4,ArrayList<Point2d> points, double distanceTolerance,int level) {
         if(level > recursionLimit) 
             return;
 
@@ -74,7 +75,7 @@ public class Bezier {
                 if((d2 + d3)*(d2 + d3) <= distanceTolerance * (dx*dx + dy*dy)) {
                     // If the curvature doesn't exceed the distanceTolerance value we tend to finish subdivisions.
                     if(angleTolerance < curveAngleToleranceEpsilon) {
-                        points.add(new Point2D(x1234, y1234));
+                        points.add(new Point2d(x1234, y1234));
                         return;
                     }
 
@@ -87,17 +88,17 @@ public class Bezier {
 
                     if(da1 + da2 < angleTolerance) {
                         // Finally we can stop the recursion
-                        points.add(new Point2D(x1234, y1234));
+                        points.add(new Point2d(x1234, y1234));
                         return;
                     }
 
                     if(cuspLimit != 0.0) {
                         if(da1 > cuspLimit) {
-                            points.add(new Point2D(x2, y2));
+                            points.add(new Point2d(x2, y2));
                             return;
                         }
                         if(da2 > cuspLimit) {
-                            points.add(new Point2D(x3, y3));
+                            points.add(new Point2d(x3, y3));
                             return;
                         }
                     }
@@ -107,7 +108,7 @@ public class Bezier {
                     // p1,p3,p4 are co-linear, p2 is considerable
                     if(d2 * d2 <= distanceTolerance * (dx*dx + dy*dy)) {
                         if(angleTolerance < curveAngleToleranceEpsilon) {
-                            points.add(new Point2D(x1234, y1234));
+                            points.add(new Point2d(x1234, y1234));
                             return;
                         }
 
@@ -116,14 +117,14 @@ public class Bezier {
                         if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
 
                         if(da1 < angleTolerance) {
-                            points.add(new Point2D(x2, y2));
-                            points.add(new Point2D(x3, y3));
+                            points.add(new Point2d(x2, y2));
+                            points.add(new Point2d(x3, y3));
                             return;
                         }
 
                         if(cuspLimit != 0.0) {
                             if(da1 > cuspLimit) {
-                                points.add(new Point2D(x2, y2));
+                                points.add(new Point2d(x2, y2));
                                 return;
                             }
                         }
@@ -132,7 +133,7 @@ public class Bezier {
                     // p1,p2,p4 are co-linear, p3 is considerable
                     if(d3 * d3 <= distanceTolerance * (dx*dx + dy*dy)) {
                         if(angleTolerance < curveAngleToleranceEpsilon) {
-                            points.add(new Point2D(x1234, y1234));
+                            points.add(new Point2d(x1234, y1234));
                             return;
                         }
 
@@ -141,14 +142,14 @@ public class Bezier {
                         if(da1 >= Math.PI) da1 = 2.0*Math.PI - da1;
 
                         if(da1 < angleTolerance) {
-                            points.add(new Point2D(x2, y2));
-                            points.add(new Point2D(x3, y3));
+                            points.add(new Point2d(x2, y2));
+                            points.add(new Point2d(x3, y3));
                             return;
                         }
 
                         if(cuspLimit != 0.0) {
                             if(da1 > cuspLimit) {
-                                points.add(new Point2D(x3, y3));
+                                points.add(new Point2d(x3, y3));
                                 return;
                             }
                         }
@@ -158,7 +159,7 @@ public class Bezier {
                     dx = x1234 - (x1 + x4) / 2.0;
                     dy = y1234 - (y1 + y4) / 2.0;
                     if(dx*dx + dy*dy <= distanceTolerance) {
-                        points.add(new Point2D(x1234, y1234));
+                        points.add(new Point2d(x1234, y1234));
                         return;
                     }
                 }
@@ -170,9 +171,9 @@ public class Bezier {
         recursive(x1234, y1234, x234, y234, x34, y34, x4, y4, points, distanceTolerance, level + 1);
 	}
 	
-	protected ArrayList<Point2D> generateCurvePointsOld() {
-		ArrayList<Point2D> list = new ArrayList<Point2D>();
-		list.add(new Point2D(x0,y0));
+	protected ArrayList<Point2d> generateCurvePointsOld() {
+		ArrayList<Point2d> list = new ArrayList<Point2d>();
+		list.add(new Point2d(x0,y0));
 		
 		double steps=25;
 		for(double k=1;k<steps;k++) {
@@ -199,9 +200,9 @@ public class Bezier {
 			double yabc = getYAt(j);
 	        //*/
 			
-	        list.add(new Point2D(xabc,yabc));
+	        list.add(new Point2d(xabc,yabc));
 		}
-		list.add(new Point2D(x3,y3));
+		list.add(new Point2d(x3,y3));
 		
 		return list;
 	}

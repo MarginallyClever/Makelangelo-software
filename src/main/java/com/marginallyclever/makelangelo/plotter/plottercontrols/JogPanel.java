@@ -2,7 +2,7 @@ package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.convenience.ButtonIcon;
 import com.marginallyclever.convenience.CommandLineOptions;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -62,7 +63,7 @@ public class JogPanel extends JPanel {
 	    		y/=10;
 	    	}
 	    	logger.debug("Move {},{}", x, y);
-	    	Point2D p = plotter.getPos();
+	    	Point2d p = plotter.getPos();
 	    	p.x+=x;
 	    	p.y+=y;
 	    	plotter.setPos(p.x,p.y);

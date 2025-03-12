@@ -31,11 +31,12 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.communications;
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
+    exports com.marginallyclever.makelangelo.donatelloimpl.nodes.lines to com.marginallyclever.nodegraphcore;
+    exports com.marginallyclever.makelangelo.donatelloimpl.nodes.points to com.marginallyclever.nodegraphcore;
+    exports com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.fractals to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.shapes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.ports to com.marginallyclever.nodegraphcore;
-    exports com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle to com.marginallyclever.nodegraphcore;
-    exports com.marginallyclever.makelangelo.donatelloimpl.nodes.points to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.convenience.log to ch.qos.logback.core;
     exports com.marginallyclever.makelangelo.makeart;
     exports com.marginallyclever.makelangelo.makeart.imagefilter;
@@ -52,6 +53,7 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.convenience.helpers;
     opens com.marginallyclever.convenience.log to ch.qos.logback.core;
     opens com.marginallyclever.makelangelo.preview;
+    opens com.marginallyclever.convenience.linecollection;
 
     // A Java module that wants to implement a service interface from a service interface module must:
     // - Require the service interface module in its own module descriptor.

@@ -306,7 +306,7 @@ public class MainFrame extends JFrame {
      */
     private void savePaths() {
         Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-        preferences.put(PREFERENCE_SAVE_PATH, SaveDialog.getLastPath() );
+        preferences.put(PREFERENCE_SAVE_PATH, TurtleFactory.getSaveFileChooser().getCurrentDirectory().getAbsolutePath() );
     }
 
     /**
@@ -314,7 +314,7 @@ public class MainFrame extends JFrame {
      */
     private void loadPaths() {
         Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-        SaveDialog.setLastPath( preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() ) );
+        TurtleFactory.getSaveFileChooser().setCurrentDirectory(new File(preferences.get(PREFERENCE_SAVE_PATH, FileAccess.getWorkingDirectory() )));
     }
 
     public void setMainTitle(String title) {
@@ -405,6 +405,10 @@ public class MainFrame extends JFrame {
             logger.error("Error while exporting the gcode", e);
             JOptionPane.showMessageDialog(this, Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public PreviewPanel getPreviewPanel() {
+        return previewPanel;
     }
 
     public Plotter getPlotter() {

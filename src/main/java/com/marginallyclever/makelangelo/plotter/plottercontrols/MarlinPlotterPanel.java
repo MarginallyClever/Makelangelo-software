@@ -1,13 +1,15 @@
 package com.marginallyclever.makelangelo.plotter.plottercontrols;
 
 import com.marginallyclever.communications.NetworkSessionEvent;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.vecmath.Point2d;
 
 /**
  * {@link MarlinPlotterPanel} is a {@link MarlinPanel} with extra
@@ -84,7 +86,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 	}
 
 	private void sendGoto() {
-		Point2D p = myPlotter.getPos();
+		Point2d p = myPlotter.getPos();
 		String msg = myPlotter.getPenIsUp()
 				? myPlotter.getSettings().getTravelToString(p.x, p.y)
 				: myPlotter.getSettings().getDrawToString(p.x, p.y);
@@ -147,7 +149,7 @@ public class MarlinPlotterPanel extends MarlinPanel {
 		try {
 			String position = message.substring(0, message.indexOf("Count"));
 			String[] majorParts = position.split("\s");
-			Point2D pos = myPlotter.getPos();
+			Point2d pos = myPlotter.getPos();
 
 			for (String s : majorParts) {
 				String[] minorParts = s.split(":");

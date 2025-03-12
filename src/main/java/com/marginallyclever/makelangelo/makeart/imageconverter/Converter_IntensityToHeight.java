@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -8,6 +8,8 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,10 +92,10 @@ public class Converter_IntensityToHeight extends ImageConverter {
 	 * @param sampleRadius how far to move the turtle in the y-axis
 	 * @return a list of points
 	 */
-	protected List<Point2D> convertLine(TransformedImage img, Point2D a, Point2D b, int numSamples, double sampleRadius) {
-		List<Point2D> points = new ArrayList<>();
+	protected List<Point2d> convertLine(TransformedImage img, Point2d a, Point2d b, int numSamples, double sampleRadius) {
+		List<Point2d> points = new ArrayList<>();
 
-		Point2D dir = new Point2D(b.x-a.x,b.y-a.y);
+		var dir = new Vector2d(b.x-a.x,b.y-a.y);
 		double len = dir.length();
 		dir.scale(1.0/len);
 
@@ -106,7 +108,7 @@ public class Converter_IntensityToHeight extends ImageConverter {
 			double z = 1.0 - img.sample( x, y, sampleRadius ) / 255.0f;
 			//z *= z;  // quadratic curve
 			double py = y + waveIntensity * z - waveIntensity/2.0f;
-			points.add(new Point2D(x,py));
+			points.add(new Point2d(x,py));
 		}
 		return points;
 	}
@@ -131,8 +133,8 @@ public class Converter_IntensityToHeight extends ImageConverter {
 
 		// from bottom to top of the image...
 		int i=0;
-		Point2D lineStart = new Point2D();
-		Point2D lineEnd = new Point2D();
+		Point2d lineStart = new Point2d();
+		Point2d lineEnd = new Point2d();
 		
 		turtle = new Turtle();
 
@@ -157,12 +159,12 @@ public class Converter_IntensityToHeight extends ImageConverter {
 			Collections.reverse(heights);
 
 			// sample the image along the line
-			List<Point2D> points = convertLine(img,lineStart,lineEnd,numSamples,sampleRate);
+			List<Point2d> points = convertLine(img,lineStart,lineEnd,numSamples,sampleRate);
 
 			boolean first=true;
 			// mask the line using the heights values and update heights as we go
 			for(int j=0;j<=numSamples;++j) {
-				Point2D p = points.get(j);
+				Point2d p = points.get(j);
 				double x = p.x;
 				double heightNew = p.y;
 				double heightOld = heights.get(j);
