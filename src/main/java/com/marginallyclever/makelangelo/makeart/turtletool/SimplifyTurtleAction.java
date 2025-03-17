@@ -1,12 +1,10 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 /**
  * Performs <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Douglas-Peucker
@@ -54,9 +52,9 @@ public class SimplifyTurtleAction extends TurtleTool {
 	private LineCollection removeColinearSegments(LineCollection originalLines) {
 		LineCollection result = new LineCollection();
 
-		ArrayList<LineCollection> byColor = originalLines.splitByColor();
+		var byColor = originalLines.splitByColor();
 		for(LineCollection c : byColor ) {
-			ArrayList<LineCollection> byTravel = c.splitByTravel();
+			var byTravel = c.splitByTravel();
 			for(LineCollection t : byTravel ) {
 				LineCollection after = t.simplify(distanceTolerance);
 				result.addAll(after);

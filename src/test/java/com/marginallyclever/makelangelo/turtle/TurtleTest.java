@@ -1,8 +1,9 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.Point2D;
+
 import org.junit.jupiter.api.Test;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -281,7 +282,35 @@ class TurtleTest {
         double d = turtle.getDrawDistance();
         assertEquals(1000,d);
         for(int i=0;i<=10;++i) {
-            assertTrue(new Point2D(i * 100, 0).distance(turtle.interpolate(d*(double)i/10.0)) < EPSILON);
+            assertTrue(new Point2d(i * 100, 0).distance(interpolate(turtle,d*(double)i/10.0)) < EPSILON);
         }
+    }
+
+    /**
+     * Returns a point along the drawn lines of this {@link Turtle}
+     * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
+     * @return a point along the drawn lines of this {@link Turtle}
+     */
+    public static Point2d interpolate(Turtle turtle, double t) {
+        double segmentDistanceSum=0;
+        TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
+        for( TurtleMove m : turtle.history) {
+            if(m.type == MovementType.DRAW_LINE) {
+                double dx = m.x-prev.x;
+                double dy = m.y-prev.y;
+                double segmentDistance = Math.sqrt(dx*dx+dy*dy);
+                if(segmentDistanceSum+segmentDistance>=t) {  // currentDistance < t < currentDistance+segmentDistance
+                    double ratio = Math.max(Math.min((t-segmentDistanceSum) / segmentDistance,1),0);
+                    return new Point2d(
+                            prev.x + dx * ratio,
+                            prev.y + dy * ratio);
+                }
+                segmentDistanceSum += segmentDistance;
+                prev = m;
+            } else if(m.type == MovementType.TRAVEL) {
+                prev = m;
+            } // else tool change, ignore.
+        }
+        return new Point2d(prev.x,prev.y);
     }
 }

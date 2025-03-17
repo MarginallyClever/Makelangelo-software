@@ -1,7 +1,9 @@
 package com.marginallyclever.makelangelo.preview;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.util.PreferencesHelper;
+
+import javax.vecmath.Point2d;
 
 /**
  * All information about the position and zoom level of the virtual eye looking through the PreviewPanel at the robot/art
@@ -41,7 +43,7 @@ public class Camera {
 
 	// scale the picture of the robot to fake a zoom.
 	public void zoom(int amount) {
-		zoom(amount, new Point2D());
+		zoom(amount, new Point2d());
 	}
 
 	/**
@@ -49,8 +51,8 @@ public class Camera {
 	 * @param input a point relative to the center of the camera view.
 	 * @return the input converted to world-space coordinates.
 	 */
-	public Point2D screenToWorldSpace(Point2D input) {
-		Point2D output = new Point2D();
+	public Point2d screenToWorldSpace(Point2d input) {
+		Point2d output = new Point2d();
 		output.x = input.x/zoom + offsetX;
 		output.y = input.y/zoom + offsetY;
 		return output;
@@ -61,11 +63,11 @@ public class Camera {
 	 * @param amount amount to zoom
 	 * @param cursor center of zoom, relative to camera.
 	 */
-	public void zoom(int amount, Point2D cursor) {
-		Point2D before = screenToWorldSpace(cursor);
+	public void zoom(int amount, Point2d cursor) {
+		Point2d before = screenToWorldSpace(cursor);
 		zoom -= (double)amount * ZOOM_STEP_SIZE;
 		limitCameraZoom();
-		Point2D after = screenToWorldSpace(cursor);
+		Point2d after = screenToWorldSpace(cursor);
 
 		offsetX -= after.x - before.x;
 		offsetY -= after.y - before.y;

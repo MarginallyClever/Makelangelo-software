@@ -1,6 +1,8 @@
 package com.marginallyclever.convenience;
 
 
+import javax.vecmath.Point2d;
+
 /**
  * Given a line segment as the X axis and an amplitude, this class will generate a sin curve along the line.
  */
@@ -12,15 +14,15 @@ public class LineInterpolatorSinCurve extends LineInterpolator {
 		super();
 	}
 	
-	public LineInterpolatorSinCurve(Point2D a,Point2D b) {
+	public LineInterpolatorSinCurve(Point2d a, Point2d b) {
 		super(a,b);
 	}
 	
 	@Override
-	public void getPoint(double t, Point2D c) {
+	public void getPoint(double t, Point2d c) {
 		// line b-a (bitTan) is the tangent of the overall curve, and bigNorm is orthogonal to bigTan.
-		Point2D bigTan = new Point2D();
-		Point2D bigNorm = new Point2D();
+		Point2d bigTan = new Point2d();
+		Point2d bigNorm = new Point2d();
 		
 		bigTan.x = end.x- start.x;
 		bigTan.y = end.y- start.y;

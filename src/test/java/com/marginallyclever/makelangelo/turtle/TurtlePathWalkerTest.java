@@ -17,9 +17,9 @@ public class TurtlePathWalkerTest {
         int maxIter = 5000;
         for( double i=pace; i<dist && maxIter>0; i+=pace ) {
             maxIter--;
-            var p1 = t0.interpolate(i);
+            var p1 = TurtleTest.interpolate(t0,i);
             var p2 = walker.walk(pace);
-            System.out.println("i="+i+" d="+walker.getTSum()+" p1="+p1.x+","+p1.y+" p2="+p2.x+","+p2.y);
+            //System.out.println("i="+i+" d="+walker.getTSum()+" p1="+p1.x+","+p1.y+" p2="+p2.x+","+p2.y);
             Assertions.assertEquals(p1.x,p2.x, 1e-1,"i="+i);
             Assertions.assertEquals(p1.y,p2.y, 1e-1,"i="+i);
         }

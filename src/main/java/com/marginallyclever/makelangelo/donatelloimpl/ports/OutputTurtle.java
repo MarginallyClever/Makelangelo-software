@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl.ports;
 
 import com.marginallyclever.donatello.graphview.GraphViewProvider;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.TurtleToBufferedImage;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import com.marginallyclever.makelangelo.turtle.TurtleToBufferedImageHelper;
 import com.marginallyclever.nodegraphcore.port.Output;
 
 import java.awt.*;
@@ -23,7 +23,7 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
         super.setValue(value);
         if(!(value instanceof Turtle turtle)) return;
         if(turtle.hasDrawing()) {
-            img = TurtleToBufferedImage.generateImage(turtle, null, DEFAULT_WIDTH);
+            img = TurtleToBufferedImageHelper.generateImage(turtle, null, DEFAULT_WIDTH);
         } else {
             img = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
         }

@@ -40,7 +40,6 @@ class SaveGCodeTest {
         verifySavedFile(multiColorsMoves(), "/gcode/save_multi_colors.gcode");
     }
 
-    @Test
     private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
         // given
         SaveGCode saveGCode = new SaveGCode();
@@ -71,7 +70,7 @@ class SaveGCodeTest {
                 new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
                         .useDelimiter("\\A")
                         .next());
-        actual.forEach(System.out::println);
+        //actual.forEach(System.out::println);
         assertIterableEquals(expected, actual);
     }
 

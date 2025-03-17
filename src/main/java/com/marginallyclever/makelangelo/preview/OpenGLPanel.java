@@ -4,13 +4,14 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.event.*;
@@ -124,7 +125,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		int notches = e.getWheelRotation();
 		if (notches == 0) return;
 
-		Point2D p = new Point2D(e.getPoint().x,e.getPoint().y);
+		Point2d p = new Point2d(e.getPoint().x,e.getPoint().y);
 		Rectangle r = this.getBounds();
 		p.x -= r.getCenterX();
 		p.y -= r.getCenterY();

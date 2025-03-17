@@ -1,10 +1,10 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.LineCollection;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-import com.marginallyclever.convenience.Point2D;
 
 import javax.vecmath.Vector2d;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
@@ -254,8 +254,8 @@ public class Turtle implements Cloneable {
 	 * Calculate the limits of drawing lines in this turtle history
 	 **/
 	public Rectangle2D.Double getBounds() {
-		Point2D top = new Point2D();
-		Point2D bottom = new Point2D();
+		Point2d top = new Point2d();
+		Point2d bottom = new Point2d();
 		getBounds(top,bottom);
 		
 		Rectangle2D.Double r = new Rectangle.Double();
@@ -272,7 +272,7 @@ public class Turtle implements Cloneable {
 	 * @param top maximum limits
 	 * @param bottom minimum limits
 	 */
-	private void getBounds(Point2D top,Point2D bottom) {
+	private void getBounds(Point2d top,Point2d bottom) {
 		bottom.x=Float.MAX_VALUE;
 		bottom.y=Float.MAX_VALUE;
 		top.x=-Float.MAX_VALUE;
@@ -304,7 +304,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private void getBoundsInternal(Point2D top,Point2D bottom,TurtleMove m) {
+	private void getBoundsInternal(Point2d top,Point2d bottom,TurtleMove m) {
 		if (top.x < m.x) top.x = m.x;
 		if (top.y < m.y) top.y = m.y;
 		if (bottom.x > m.x) bottom.x = m.x;
@@ -406,8 +406,8 @@ public class Turtle implements Cloneable {
 				case DRAW_LINE -> {
 					if (previousMovement != null) {
 						LineSegment2D line = new LineSegment2D(
-								new Point2D(previousMovement.x, previousMovement.y),
-								new Point2D(m.x, m.y),
+								new Point2d(previousMovement.x, previousMovement.y),
+								new Point2d(m.x, m.y),
 								color);
 						if (line.lengthSquared() > 0) {
 							lines.add(line);
@@ -474,7 +474,7 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	private double distanceSquared(Point2D b) {
+	private double distanceSquared(Point2d b) {
 		double dx = px-b.x;
 		double dy = py-b.y;
 		return dx*dx + dy*dy; 
@@ -551,36 +551,6 @@ public class Turtle implements Cloneable {
 		}
 		return d;
     }
-
-	/**
-	 * Returns a point along the drawn lines of this {@link Turtle}
-	 * @param t a value from 0...{@link Turtle#getDrawDistance()}, inclusive.
-	 * @return a point along the drawn lines of this {@link Turtle}
-	 * @deprecated since 7.63.0 use {@link TurtlePathWalker} instead.
-	 */
-	@Deprecated(since="7.63.0")
-	public Point2D interpolate(double t) {
-		double segmentDistanceSum=0;
-		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
-		for( TurtleMove m : history) {
-			if(m.type == MovementType.DRAW_LINE) {
-				double dx = m.x-prev.x;
-				double dy = m.y-prev.y;
-				double segmentDistance = Math.sqrt(dx*dx+dy*dy);
-				if(segmentDistanceSum+segmentDistance>=t) {  // currentDistance < t < currentDistance+segmentDistance
-					double ratio = Math.max(Math.min((t-segmentDistanceSum) / segmentDistance,1),0);
-					return new Point2D(
-							prev.x + dx * ratio,
-							prev.y + dy * ratio);
-				}
-				segmentDistanceSum += segmentDistance;
-				prev = m;
-			} else if(m.type == MovementType.TRAVEL) {
-				prev = m;
-			} // else tool change, ignore.
-		}
-		return new Point2D(prev.x,prev.y);
-	}
 
 	@Override
 	public boolean equals(Object o) {
