@@ -70,23 +70,22 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 
 	<repositories>
 		<repository>
+			<id>jogamp</id>
+			<name>JogAmp Repository</name>
+			<url>https://jogamp.org/deployment/maven/</url>
+		</repository>
+		<repository>
+			<id>maven_central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2/</url>
+		</repository>
+		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
 		<repository>
 			<id>my-local-repo</id>
 			<url>file://${project.basedir}/java/local-maven-repo</url>
-		</repository>
-		<repository>
-			<id>jogamp-remote</id>
-			<name>jogamp test mirror</name>
-			<url>https://www.jogamp.org/deployment/maven/</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>maven_central</id>
-			<name>Maven Central</name>
-			<url>https://repo.maven.apache.org/maven2/</url>
 		</repository>
 	</repositories>
 
@@ -376,16 +375,19 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>2.9.5</version>
 		</dependency>
 		<!-- opengl graphics -->
+		<!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt-main -->
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
 			<version>2.5.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
 			<artifactId>jogl-all-main</artifactId>
 			<version>2.5.0</version>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -570,7 +572,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.4.1</version>
+			<version>1.5.0</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -582,7 +584,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.8.0</version>
+			<version>1.8.3</version>
 		</dependency>
 
 		<!-- read audio files -->
@@ -596,7 +598,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.8.1</minimum.maven.version>
-		<minimum.java.version>21</minimum.java.version>
+		<minimum.java.version>22</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
