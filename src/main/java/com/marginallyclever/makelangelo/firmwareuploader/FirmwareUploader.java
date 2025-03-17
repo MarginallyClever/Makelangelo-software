@@ -83,7 +83,8 @@ public class FirmwareUploader {
 		String [] options = new String[] {
 				avrdudePath,
 	    		"-C"+confPath,
-	    		"-v","-V",
+				//"-v",
+	    		"-V",
 	    		"-patmega2560",
 	    		"-cwiring",
 	    		"-P"+portName,
@@ -91,8 +92,9 @@ public class FirmwareUploader {
 	    		"-D",
 				"-Uflash:w:"+hexPath+":i"
 		    };
-	    int result = runCommand(options);
+		int result = runCommand(options);
 		logger.debug("update finished");
+
 		return result;
 	}
 
