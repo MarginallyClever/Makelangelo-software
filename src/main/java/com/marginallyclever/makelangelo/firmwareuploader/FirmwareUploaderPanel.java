@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.OutputStream;
@@ -77,8 +78,8 @@ public class FirmwareUploaderPanel extends JPanel {
 		c.gridwidth=3;
 
 		var scroll = new JScrollPane(console);
-		scroll.setPreferredSize(new Dimension(300, 100));
-		scroll.setMinimumSize(new Dimension(300, 100));
+		scroll.setPreferredSize(new Dimension(300, 220));
+		scroll.setMinimumSize(new Dimension(300, 220));
 		this.add(scroll,c);
 
 		startM5.addActionListener(e -> run(e,"firmware-m5.hex"));
@@ -187,6 +188,12 @@ public class FirmwareUploaderPanel extends JPanel {
 				startM5.setEnabled(true);
 				startHuge.setEnabled(true);
 				System.setOut(out);
+                try {
+					String result = console.getDocument().getText(0, console.getDocument().getLength());
+					logger.info("avrDude result: {}", result);
+                } catch (BadLocationException e) {
+                    logger.error("failed to log console: ",e);
+                }
 			}
 		};
 
