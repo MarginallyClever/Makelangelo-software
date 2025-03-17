@@ -224,6 +224,9 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 					<parallel>methods</parallel>
 					<threadCount>10</threadCount>
 					<!--<argLine>-Djava.awt.headless=true</argLine>-->
+					<additionalClasspathElements>
+						<additionalClasspathElement>${project.build.outputDirectory}</additionalClasspathElement>
+					</additionalClasspathElements>
 				</configuration>
 			</plugin>
 
@@ -483,19 +486,19 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>qoi-java</artifactId>
 			<version>1.2.1</version>
 		</dependency>
-		<!-- webp image format support -->
-		<dependency>
-			<groupId>org.sejda.imageio</groupId>
-			<artifactId>webp-imageio</artifactId>
-			<version>0.1.6</version>
-		</dependency>
 		<!-- Also add this, if you want to use QOI with ImageIO -->
 		<dependency>
 			<groupId>me.saharnooby</groupId>
 			<artifactId>qoi-java-awt</artifactId>
 			<version>1.2.1</version>
 		</dependency>
-
+		<!-- webp image format support -->
+		<dependency>
+			<groupId>org.sejda.imageio</groupId>
+			<artifactId>webp-imageio</artifactId>
+			<version>0.1.6</version>
+		</dependency>
+		<!-- flatlaf look and feel -->
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
@@ -515,6 +518,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>jts-core</artifactId>
 			<version>1.20.0</version>
 		</dependency>
+		<!-- for Reflections -->
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
@@ -543,6 +547,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>modern-docking-ui</artifactId>
 			<version>0.11.6</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.github.sarxos</groupId>
 			<artifactId>webcam-capture</artifactId>
@@ -560,7 +565,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.5.0</version>
+			<version>1.5.4</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -572,7 +577,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.8.3</version>
+			<version>1.8.4</version>
 		</dependency>
 
 		<!-- read audio files -->
