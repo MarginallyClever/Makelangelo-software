@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	private Graphics2D gl2;
 	private Color colorTravel = Color.GREEN;
-	private boolean showPenUp = false;
+	private boolean showTravel = false;
 	private float penDiameter = 1;
 	private final ArrayList<TurtleMove> points = new ArrayList<>();
 	private final Line2D line = new Line2D.Double();
@@ -25,7 +24,6 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
-		showPenUp = GFXPreferences.getShowPenUp();
 
 		// set pen diameter
 		gl2.setStroke(new BasicStroke(penDiameter));
@@ -62,7 +60,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		drawPoints();
-		if(showPenUp) {		
+		if(showTravel) {
 			gl2.setColor(colorTravel);
 			line.setLine(p0.x, p0.y, p1.x, p1.y);
 			gl2.draw(line);
@@ -93,4 +91,9 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	 */
 	@Override
 	public void reset() {}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
+	}
 }

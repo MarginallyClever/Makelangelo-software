@@ -141,6 +141,7 @@ public class PreviewPanel extends JPanel {
         }
         myTurtleRenderer.setUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
         myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
+        myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
         // myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 
         updatePlotterRenderer();

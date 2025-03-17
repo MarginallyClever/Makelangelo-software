@@ -251,4 +251,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	public void reset() {
 		previousTurtle=null;
 	}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {}
 }

@@ -91,6 +91,7 @@ public class TurtleToBufferedImageHelper {
             trf.setRenderer(TurtleRenderFactory.findByName(names.get(nameIndex)).getTurtleRenderer());
             trf.setPenDiameter((int)pt.getPort("line thickness").getValue());
             trf.setUpColor((Color)pt.getPort("travel color").getValue());
+            trf.setShowTravel((boolean)pt.getPort("show travel").getValue());
         }
         if(node!=null) node.setComplete(0);
         trf.setTurtle(source);

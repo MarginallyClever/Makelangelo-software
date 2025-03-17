@@ -32,4 +32,6 @@ public interface TurtleRenderer {
 	 * up when the turtle is changed.
 	 */
 	void reset();
+
+	void setShowTravel(boolean showTravel);
 }

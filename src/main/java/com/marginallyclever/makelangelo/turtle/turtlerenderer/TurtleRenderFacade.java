@@ -28,6 +28,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	private Color penDownColor = Color.BLACK;
 	private Color penUpColor = Color.GREEN;
 	private double penDiameter=0.8;
+	private boolean showTravel;
 
 	@Override
 	public void render(GL2 gl2) {
@@ -50,6 +51,7 @@ public class TurtleRenderFacade implements PreviewListener {
 			myRenderer.setPenDiameter(penDiameter);
 			myRenderer.setPenUpColor(penUpColor);
 			myRenderer.setPenDownColor(penDownColor);
+			myRenderer.setShowTravel(showTravel);
 			myRenderer.start(g2d);
 			showCount++;
 
@@ -148,5 +150,9 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter = penDiameter;
+	}
+
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
 	}
 }

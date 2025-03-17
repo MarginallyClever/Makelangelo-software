@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -16,7 +15,7 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	private Graphics2D gl2;
 	
 	private Color colorTravel = Color.GREEN;
-	private boolean showPenUp = false;
+	private boolean showTravel = false;
 	private float penDiameter =1;
 	private int moveCounter;
 	private final Line2D line = new Line2D.Double();
@@ -24,7 +23,6 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
-		showPenUp = GFXPreferences.getShowPenUp();
 
 		// set pen diameter
 		gl2.setStroke(new BasicStroke(penDiameter));
@@ -50,7 +48,7 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
-		if(!showPenUp) return;
+		if(!showTravel) return;
 		
 		gl2.setColor(colorTravel);
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
@@ -81,4 +79,9 @@ public class BarberPoleTurtleRenderer implements TurtleRenderer {
 	 */
 	@Override
 	public void reset() {}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
+	}
 }

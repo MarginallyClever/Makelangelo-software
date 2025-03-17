@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
@@ -16,7 +15,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	private Graphics2D gl2;
 	private Color colorTravel = Color.GREEN;
 	private Color colorDraw = Color.BLACK;
-	private boolean showPenUp = false;
+	private boolean showTravel = false;
 	private float penDiameter = 1;
 	private boolean isPenUp = true;
 	private final Line2D line = new Line2D.Double();
@@ -27,9 +26,10 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 
 		// set pen diameter
 		gl2.setStroke(new BasicStroke(penDiameter));
-
-		showPenUp = GFXPreferences.getShowPenUp();
 		isPenUp = true;
+
+		// set pen diameter
+		gl2.setStroke(new BasicStroke(penDiameter));
 	}
 
 	@Override
@@ -50,11 +50,11 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void travel(TurtleMove p0, TurtleMove p1) {
 		if(!isPenUp) {
 			isPenUp = true;
-			if(showPenUp) {
+			if(showTravel) {
 				gl2.setColor(colorTravel);
 			}
 		}
-		if(!showPenUp) return;
+		if(!showTravel) return;
 
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
 		gl2.draw(line);
@@ -86,4 +86,9 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	 */
 	@Override
 	public void reset() {}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
+	}
 }
