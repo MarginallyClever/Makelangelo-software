@@ -23,7 +23,7 @@ jobs:
     - uses: actions/setup-java@v4.7.0
       with:
         distribution: 'temurin'
-        java-version: '21'
+        java-version: '22'
         cache: 'maven'
 
     # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
@@ -106,7 +106,7 @@ jobs:
     - uses: actions/setup-java@v4.7.0
       with:
         distribution: 'temurin'
-        java-version: '21'
+        java-version: '22'
 
     - uses: actions/download-artifact@v4.1.9
       with:
