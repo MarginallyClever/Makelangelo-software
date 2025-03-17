@@ -570,7 +570,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.3.4</version>
+			<version>1.5.0</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -580,9 +580,9 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			Github/Jitpack/etc can find the copy published by Jitpack.
 			I have to do this dance every time.
 			-->
-			<groupId>com.github.marginallyclever</groupId>
+			<groupId>com.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.6.2</version>
+			<version>1.8.2</version>
 		</dependency>
 
 		<!-- read audio files -->
@@ -596,7 +596,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.8.1</minimum.maven.version>
-		<minimum.java.version>21</minimum.java.version>
+		<minimum.java.version>22</minimum.java.version>
 		<jogl.version>2.4.0-rc-20200307</jogl.version>
 		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
