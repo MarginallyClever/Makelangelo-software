@@ -41,7 +41,10 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.makeart;
     exports com.marginallyclever.makelangelo.makeart.imagefilter;
     exports com.marginallyclever.makelangelo.makeart.turtletool;
+    exports com.marginallyclever.makelangelo.makeart.turtlegenerator;
     exports com.marginallyclever.makelangelo.paper;
+    exports com.marginallyclever.makelangelo.plotter.plottersettings;
+    exports com.marginallyclever.makelangelo.plotter.plottercontrols;
     exports com.marginallyclever.makelangelo.turtle;
 
     opens com.marginallyclever.convenience;
@@ -54,6 +57,7 @@ module com.marginallyclever.makelangelo {
     opens com.marginallyclever.convenience.log to ch.qos.logback.core;
     opens com.marginallyclever.makelangelo.preview;
     opens com.marginallyclever.convenience.linecollection;
+    opens com.marginallyclever.makelangelo.donatelloimpl.nodes to org.reflections;
 
     // A Java module that wants to implement a service interface from a service interface module must:
     // - Require the service interface module in its own module descriptor.
