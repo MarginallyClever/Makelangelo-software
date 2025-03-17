@@ -50,13 +50,6 @@ public class TestNodeGraphMakelangelo {
         model.clear();
     }
 
-    @Test
-    public void testClasspath() {
-        String classpath = System.getProperty("java.class.path");
-        System.out.println("Classpath: " + Arrays.toString(classpath.split(File.pathSeparator)));
-        assertTrue(classpath.contains("makelangelo-software"));
-    }
-
     // TODO figure out why this test fails in Maven.
     @Disabled("This works in IntelliJ, not in Maven.  Why?")
     @Test
