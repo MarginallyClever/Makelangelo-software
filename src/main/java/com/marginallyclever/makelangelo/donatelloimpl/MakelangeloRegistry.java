@@ -1,5 +1,8 @@
 package com.marginallyclever.makelangelo.donatelloimpl;
 
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.lines.LinesDAO4JSON;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.points.PointsDAO4JSON;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.TurtleDAO4JSON;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
 import com.marginallyclever.nodegraphcore.DAORegistry;
 import com.marginallyclever.nodegraphcore.NodeFactory;
