@@ -15,6 +15,7 @@ import com.marginallyclever.nodegraphcore.Node;
 import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Use an image to mask a path.  Lay the path over the image and remove all parts of the path where the image is brighter
@@ -30,6 +31,7 @@ public class PathImageMask extends Node {
     private final OutputTurtle outputAbove = new OutputTurtle("above");
     private final OutputTurtle outputBelow = new OutputTurtle("below");
 
+    private final ReentrantLock lock = new ReentrantLock();
     private final LineCollection listAbove = new LineCollection();
     private final LineCollection listBelow = new LineCollection();
 
@@ -46,34 +48,40 @@ public class PathImageMask extends Node {
     @Override
     public void update() {
         Turtle myTurtle = turtle.getValue();
-        if(myTurtle==null || myTurtle.history.isEmpty()) return;
+        if(myTurtle==null || !myTurtle.hasDrawing()) return;
+        lock.lock();
+        try {
+            setComplete(0);
+            LineCollection lines  = myTurtle.getAsLineSegments();
+            BufferedImage src = image.getValue();
 
-        setComplete(0);
+            listAbove.clear();
+            listBelow.clear();
 
-        LineCollection lines  = myTurtle.getAsLineSegments();
-        BufferedImage src = image.getValue();
-        
-        listAbove.clear();
-        listBelow.clear();
-        
-        double s = Math.max(1, stepSize.getValue());
-        double c = Math.max(0,Math.min(255, threshold.getValue()));
-        int size = lines.size();
-        int i=0;
+            double s = Math.max(1, stepSize.getValue());
+            double c = Math.max(0,Math.min(255, threshold.getValue()));
+            int size = lines.size();
+            int i=0;
 
-        for (LineSegment2D line : lines) {
-            scanLine(src, line, s, c);
-            setComplete(i++ * 99 / size);
+            for (LineSegment2D line : lines) {
+                scanLine(src, line, s, c);
+                setComplete(i++ * 99 / size);
+            }
+
+            try {
+                Turtle resultAbove = new Turtle();
+                resultAbove.addLineSegments(listAbove);
+                outputAbove.setValue(resultAbove);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            Turtle resultBelow = new Turtle();
+            resultBelow.addLineSegments(listBelow);
+            outputBelow.setValue(resultBelow);
+            setComplete(100);
+        } finally {
+            lock.unlock();
         }
-
-        Turtle resultAbove = new Turtle();
-        resultAbove.addLineSegments(listAbove);
-        outputAbove.setValue(resultAbove);
-
-        Turtle resultBelow = new Turtle();
-        resultBelow.addLineSegments(listBelow);
-        setComplete(100);
-        outputBelow.setValue(resultBelow);
     }
 
     /**
