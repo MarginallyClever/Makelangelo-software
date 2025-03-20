@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
  * @author Dan Royer
  * @since 2016-12-12
  */
+@Deprecated(since = "7.68.0")
 public class Generator_SierpinskiTriangle extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
 

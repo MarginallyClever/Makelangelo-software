@@ -16,6 +16,7 @@ import java.util.Stack;
  * @author dan royer
  *
  */
+@Deprecated(since = "7.68.0")
 public class Generator_FibonacciSpiral extends TurtleGenerator {
 	private static final Logger logger = LoggerFactory.getLogger(Generator_FibonacciSpiral.class);
 

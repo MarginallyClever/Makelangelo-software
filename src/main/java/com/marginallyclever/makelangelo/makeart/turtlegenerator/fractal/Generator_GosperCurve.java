@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
  * Gosper curve fractal.
  * @author Dan Royer
  */
+@Deprecated(since = "7.68.0")
 public class Generator_GosperCurve extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
 

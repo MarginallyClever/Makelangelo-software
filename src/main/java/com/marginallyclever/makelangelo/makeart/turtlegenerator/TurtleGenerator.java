@@ -47,6 +47,7 @@ public abstract class TurtleGenerator {
 	// OBSERVER PATTERN
 
 	private final EventListenerList listeners = new EventListenerList();
+
 	public void addListener(TurtleGeneratorListener a) {
 		listeners.add(TurtleGeneratorListener.class, a);
 	}
