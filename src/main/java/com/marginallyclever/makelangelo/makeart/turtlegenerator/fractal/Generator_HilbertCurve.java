@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
  * Hilbert Curve fractal.
  * @author Dan Royer
  */
+@Deprecated(since = "7.68.0")
 public class Generator_HilbertCurve extends TurtleGenerator {
 	private float turtleStep = 10.0f;
 	private static int order = 4; // controls complexity of curve
