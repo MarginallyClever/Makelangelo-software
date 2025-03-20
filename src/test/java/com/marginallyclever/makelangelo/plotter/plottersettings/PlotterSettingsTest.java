@@ -12,7 +12,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class PlotterSettingsTest {
-    private static final String ROBOT_TEST_UID = "123456";
+    public static final String ROBOT_TEST_UID = "123456";
 
     @BeforeAll
     public static void beforeAll() {
@@ -95,5 +95,32 @@ public class PlotterSettingsTest {
                 uniqueMachinePreferencesNode.removeNode();
             } catch (BackingStoreException ignored) {}
         }
+    }
+
+    /**
+     * Generate a temporary machine profile like Makelangelo 5, but with stepper motor for Z axis.
+     * Confirm that the gcode lines that start with `G0 Z` also contain the `F` feed rate matching the
+     * `PEN_ANGLE_UP_TIME` or `PEN_ANGLE_DOWN_TIME`.
+     */
+    @Test
+    public void confirmStepperZFeedrate() {
+        // given
+        PlotterSettings settingsBefore = new PlotterSettings(PlotterSettingsTest.ROBOT_TEST_UID);
+        settingsBefore.setString(PlotterSettings.ANCESTOR,"Makelangelo 5");
+        settingsBefore.setInteger(PlotterSettings.Z_MOTOR_TYPE,PlotterSettings.Z_MOTOR_TYPE_STEPPER);
+        settingsBefore.save();
+        // when
+        PlotterSettings settingsAfter = new PlotterSettings(PlotterSettingsTest.ROBOT_TEST_UID);
+        // then
+        Assertions.assertEquals(PlotterSettings.Z_MOTOR_TYPE_STEPPER,settingsAfter.getInteger(PlotterSettings.Z_MOTOR_TYPE));
+        var up = settingsAfter.getPenUpString();
+        Assertions.assertTrue(up.contains("G0 Z"));
+        var fup = Double.parseDouble(up.substring(up.indexOf('F')+1));
+        Assertions.assertEquals(fup,settingsAfter.getDouble(PlotterSettings.PEN_ANGLE_UP_TIME),0.01);
+
+        var down = settingsAfter.getPenDownString();
+        Assertions.assertTrue(up.contains("G0 Z"));
+        var fdown = Double.parseDouble(down.substring(down.indexOf('F')+1));
+        Assertions.assertEquals(fdown,settingsAfter.getDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME),0.01);
     }
 }

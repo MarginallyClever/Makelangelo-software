@@ -510,20 +510,22 @@ public class PlotterSettings {
 	public String getPenUpString() {
 		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
-					+ " S" + (int)getDouble(PEN_ANGLE_UP)
-					+ " T" + (int)getDouble(PEN_ANGLE_UP_TIME);
+					+ " S" + getInteger(PEN_ANGLE_UP)
+					+ " T" + getInteger(PEN_ANGLE_UP_TIME);
 		} else {
-			return "G0 Z" + (int)getDouble(PEN_ANGLE_UP);
+			return "G0 Z" + getInteger(PEN_ANGLE_UP)
+					+ " F" + getInteger(PEN_ANGLE_UP_TIME);
 		}
 	}
 
 	public String getPenDownString() {
 		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
-					+ " S" + (int)getDouble(PEN_ANGLE_DOWN)
-					+ " T" + (int)getDouble(PEN_ANGLE_DOWN_TIME);
+					+ " S" + getInteger(PEN_ANGLE_DOWN)
+					+ " T" + getInteger(PEN_ANGLE_DOWN_TIME);
 		} else {
-			return "G1 Z" + (int)getDouble(PEN_ANGLE_DOWN);
+			return "G1 Z" + getInteger(PEN_ANGLE_DOWN)
+					+ " F" + getInteger(PEN_ANGLE_DOWN_TIME);
 		}
 	}
 
