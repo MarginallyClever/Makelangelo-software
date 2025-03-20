@@ -129,6 +129,20 @@ jobs:
         echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
         echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
 
+    - name: Delete old nightly releases
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { owner, repo } = context.repo;
+          const releases = await github.rest.repos.listReleases({ owner, repo });
+          for (const release of releases.data) {
+            if (release.name.includes("nightly") && !release.draft) {
+              await github.rest.repos.deleteRelease({ owner, repo, release_id: release.id });
+              console.log(`Deleted old release: ${release.name}`);
+            }
+          }
+
     - name: Deploy installation package
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
