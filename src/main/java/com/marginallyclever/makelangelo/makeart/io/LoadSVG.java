@@ -198,7 +198,7 @@ public class LoadSVG implements TurtleLoader {
 		if(color.getAlpha()==0) return false;  // transparent
 
 		if(!color.equals(myTurtle.getColor())) {
-			logger.debug("Setting stroke color to {}",color);
+			//logger.debug("Setting stroke color to {}",color);
 			myTurtle.setColor(color);
 		}
 		return false;
