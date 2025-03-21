@@ -121,7 +121,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: installers
 
       - name: List downloaded files
         run: |
@@ -131,7 +131,7 @@ jobs:
       - name: Flatten installer paths
         run: |
           mkdir flat
-          find artifacts -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
+          find installers -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
           ls -lh flat
 
       - name: Upload each platform installer
