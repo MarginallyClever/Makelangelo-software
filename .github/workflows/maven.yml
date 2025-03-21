@@ -87,56 +87,57 @@ jobs:
           name: installer-${{ matrix.os }}
           retention-days: 1
           path: ${{ env.INSTALLER }}
-upload:
-  needs: package
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/download-artifact@v4
-      with:
-        path: artifacts
 
-    - name: Flatten installer paths
-      run: |
-        mkdir flat
-        find artifacts -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
-        ls -lh flat
+  upload:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
-    - name: Upload each platform installer
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require('fs');
-          const path = require('path');
-          const { owner, repo } = context.repo;
-          const release_id = process.env.RELEASE_ID;
+      - name: Flatten installer paths
+        run: |
+          mkdir flat
+          find artifacts -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
+          ls -lh flat
 
-          const uploadFile = async (filePath) => {
-            const fileName = path.basename(filePath);
-            const contentType = 'application/octet-stream';
-            const data = fs.readFileSync(filePath);
-
-            await github.rest.repos.uploadReleaseAsset({
-              owner,
-              repo,
-              release_id,
-              name: fileName,
-              data,
-              headers: {
-                'content-type': contentType,
-                'content-length': data.length
-              }
-            });
-
-            console.log(`Uploaded ${fileName}`);
-          };
-
-          const files = fs.readdirSync('./flat');
-          for (const file of files) {
-            await uploadFile(path.join('./flat', file));
-          }
-      env:
-        RELEASE_ID: ${{ env.RELEASE_ID }}
+      - name: Upload each platform installer
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const { owner, repo } = context.repo;
+            const release_id = process.env.RELEASE_ID;
+  
+            const uploadFile = async (filePath) => {
+              const fileName = path.basename(filePath);
+              const contentType = 'application/octet-stream';
+              const data = fs.readFileSync(filePath);
+  
+              await github.rest.repos.uploadReleaseAsset({
+                owner,
+                repo,
+                release_id,
+                name: fileName,
+                data,
+                headers: {
+                  'content-type': contentType,
+                  'content-length': data.length
+                }
+              });
+  
+              console.log(`Uploaded ${fileName}`);
+            };
+  
+            const files = fs.readdirSync('./flat');
+            for (const file of files) {
+              await uploadFile(path.join('./flat', file));
+            }
+        env:
+          RELEASE_ID: ${{ env.RELEASE_ID }}
 
   cleanup-nightlies:
     needs: upload
