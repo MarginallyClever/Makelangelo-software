@@ -77,7 +77,7 @@ jobs:
           sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
           jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.os }}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar"
           INSTALLER=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,,")
-          NIGHTLY_NAME=$(echo $INSTALLER | sed "s/[Mm]akelangelo\(.*\)\.\(.*\)/Makelangelo-nightly-${{ github.run_id }}.\2/")
+          NIGHTLY_NAME=$(echo $INSTALLER | sed "s/[Mm]akelangelo\(.*\)\.\(.*\)/Makelangelo-nightly-$(date +%Y%m%d).\2/")
           echo "INSTALLER=$INSTALLER" >> $GITHUB_ENV
           echo "NIGHTLY_NAME=$NIGHTLY_NAME" >> $GITHUB_ENV
 
@@ -150,9 +150,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const release_id = 54908875;
-            const currentRunID = "${{ github.run_id }}";
-  
+            const release_id = process.env.RELEASE_ID;
+            
+            // Extract today's date in YYYYMMDD from commit timestamp
+            const today = new Date(process.env.TODAY).toISOString().slice(0,10).replace(/-/g, '');
+            console.log(`Today is ${today}`);
+          
+          
             const assets = await github.rest.repos.listReleaseAssets({ owner, repo, release_id });
             console.log("=== Assets in release ===");
   
@@ -160,12 +164,10 @@ jobs:
               const name = asset.name;
               console.log(`Found asset: ${name}`);
   
-              const match = name.match(/^Makelangelo-nightly-(\d+)\.(deb|msi|dmg)$/i);
+              const match = name.match(/^Makelangelo-nightly-(\d{8})\.(deb|msi|dmg)$/i);
               if (match) {
-                const assetRunID = match[1];
-                const assetExt = match[2];
-  
-                if (assetRunID !== currentRunID) {
+                const assetRunID = match[1];            
+                if (assetDate !== today) {
                   console.log(`Deleting old asset: ${name}`);
                   await github.rest.repos.deleteReleaseAsset({
                     owner,
@@ -173,7 +175,7 @@ jobs:
                     asset_id: asset.id,
                   });
                 } else {
-                  console.log(`Keeping current asset: ${name}`);
+                  console.log(`Keeping asset: ${name}`);
                 }
               } else {
                 console.log(`Ignoring unrelated asset: ${name}`);
