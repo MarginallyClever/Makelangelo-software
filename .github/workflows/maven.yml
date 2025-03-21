@@ -119,6 +119,11 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
+      - name: List downloaded files
+        run: |
+          echo "=== File tree ==="
+          find installers
+ 
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
