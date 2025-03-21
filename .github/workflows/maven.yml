@@ -1,11 +1,8 @@
 name: Java CI with Maven
 
 env:
-  # find out this value by opening https://api.github.com/repos/<owner>/<repo>/releases
-  # in your browser and copy the full "upload_url" value including the {?name,label} part
   UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-  RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
-
+  RELEASE_ID: 54908875
 
 on:
   push:
@@ -18,83 +15,41 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4.7.0
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+          cache: 'maven'
 
-    - uses: actions/setup-java@v4.7.0
-      with:
-        distribution: 'temurin'
-        java-version: '22'
-        cache: 'maven'
+      - name: Build and Test with Maven
+        run: ./mvnw -B test -Djava.awt.headless=true
 
-    # from https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-    - name: Build and Test with Maven
-      timeout-minutes: 15
-      run: ./mvnw -B test -Djava.awt.headless=true
+      - name: Package with Maven
+        run: ./mvnw -B clean package -DskipTests
 
-    - name: Package with Maven
-      run: ./mvnw -B clean package -DskipTests
+      - name: Prepare target/package for upload
+        shell: bash
+        run: |
+          mkdir -p target/package &&
+          cp src/main/package/*.bat target/package/ &&
+          cp src/main/package/start* target/package/ &&
+          cp src/main/package/thankyou.* target/package/ &&
+          cp CONTRIBUTING.md target/package/ &&
+          cp LICENSE target/package/ &&
+          cp README.md target/package/
 
-#    - name: Check files 1
-#      run: ls -l src/main/package/
-
-#    - name: Prepare universal package
-#      shell: bash
-#      run: |
-#        mkdir -p target/universal-package &&
-#        cp src/main/package/*.bat target/universal-package/ &&
-#        cp src/main/package/start* target/universal-package/ &&
-#        cp src/main/package/thankyou.* target/universal-package/ &&
-#        cp CONTRIBUTING.md target/universal-package/ &&
-#        cp LICENSE target/universal-package/ &&
-#        cp README.md target/universal-package/ &&
-#        cp target/Makelangelo-*-with-dependencies.jar target/universal-package/ &&
-#        cd target/universal-package/ &&
-#        7z a -tzip Makelangelo.zip . &&
-#        mv Makelangelo.zip ../..
-
-#    - name: Check files 2a
-#      run: ls -l target/universal-package/
-
-#     - name: Deploy universal release
-#       if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
-#       uses: WebFreak001/deploy-nightly@v3.2.0
-#       with:
-#         token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-#         upload_url: ${{ env.UPLOAD_URL }}
-#         release_id: ${{ env.RELEASE_ID }}
-#         asset_path: Makelangelo.zip # path to archive to upload
-#         asset_name: Makelangelo-nightly-$$.zip # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
-#         asset_content_type: application/zip # required by GitHub API
-#         max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
-
-    - name: Prepare target/package for upload
-      shell: bash
-      run: |
-        mkdir -p target/package &&
-        cp src/main/package/*.bat target/package/ &&
-        cp src/main/package/start* target/package/ &&
-        cp src/main/package/thankyou.* target/package/ &&
-        cp CONTRIBUTING.md target/package/ &&
-        cp LICENSE target/package/ &&
-        cp README.md target/package/ 
-
-      #    - name: Check files 2b
-      #      run: ls -l target/package/
-
-    - name: Upload artifact for package
-      uses: actions/upload-artifact@v4.6.1
-      with:
-        name: jar
-        retention-days: 1
-        path: |
-          src/main/package/jpackage*
-          src/main/package/logo*
-          LICENSE
-          README
-          target/package/*
-
-#    - name: Check files 3
-#      run: ls -l target/universal-package/
+      - name: Upload common files
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared
+          retention-days: 1
+          path: |
+            src/main/package/jpackage*
+            src/main/package/logo*
+            LICENSE
+            README
+            target/package/*
 
   package:
     needs: build
@@ -102,62 +57,78 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
-    - uses: actions/setup-java@v4.7.0
-      with:
-        distribution: 'temurin'
-        java-version: '22'
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4.7.0
+        with:
+          distribution: 'temurin'
+          java-version: '22'
 
-    - uses: actions/download-artifact@v4.1.9
-      with:
-        name: jar
-        
-#    - name: Check files 4
-#      run: ls -l target/package/
+      - uses: actions/download-artifact@v4
+        with:
+          name: shared
 
-    - name: Build installation package
-      shell: bash
-      run: |
-        set -x
-        set -o pipefail
-        APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/") &&
-        sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg &&
-        jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{matrix.os}}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" &&
-        ls &&
-        BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,," | head -1) &&
-        BINARY_NIGHTLY=$(echo $BINARY | sed 's/[Mm]akelangelo\(.*\)\.\(.*\)/\Makelangelo-nightly-${{ github.run_id }}.\2/') &&
-        echo "BINARY=$BINARY" | tee -a $GITHUB_ENV &&
-        echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" | tee -a $GITHUB_ENV
+      - name: Build platform-specific installer
+        shell: bash
+        run: |
+          set -x
+          APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/")
+          sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
+          jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.os }}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar"
+          INSTALLER=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,,")
+          NIGHTLY_NAME=$(echo $INSTALLER | sed "s/[Mm]akelangelo\(.*\)\.\(.*\)/Makelangelo-nightly-${{ github.run_id }}.\2/")
+          echo "INSTALLER=$INSTALLER" >> $GITHUB_ENV
+          echo "NIGHTLY_NAME=$NIGHTLY_NAME" >> $GITHUB_ENV
 
-    - name: Delete old nightly releases
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const { owner, repo } = context.repo;
-          const releases = await github.rest.repos.listReleases({ owner, repo });
-          for (const release of releases.data) {
-            if (release.name.includes("nightly") && !release.draft) {
-              await github.rest.repos.deleteRelease({ owner, repo, release_id: release.id });
-              console.log(`Deleted old release: ${release.name}`);
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          retention-days: 1
+          path: ${{ env.INSTALLER }}
+
+  upload:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten installer paths
+        run: |
+          mkdir flat
+          find artifacts -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
+          ls -lh flat
+
+      - name: Upload all platform installers
+        uses: WebFreak001/deploy-nightly@v3.2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ env.UPLOAD_URL }}
+          release_id: ${{ env.RELEASE_ID }}
+          asset_path: flat
+          asset_name: Makelangelo-nightly-$$
+          asset_content_type: application/octet-stream
+          max_releases: 1
+
+  cleanup-nightlies:
+    needs: upload
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Delete old nightly releases
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const releases = await github.rest.repos.listReleases({ owner, repo });
+            const nightlies = releases.data
+              .filter(r => r.name.includes("nightly") && !r.draft)
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            for (let i = 1; i < nightlies.length; i++) {
+              await github.rest.repos.deleteRelease({ owner, repo, release_id: nightlies[i].id });
+              console.log(`Deleted old nightly release: ${nightlies[i].name}`);
             }
-          }
-
-    - name: Deploy installation package
-      uses: WebFreak001/deploy-nightly@v3.2.0
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-        upload_url: ${{ env.UPLOAD_URL }}
-        release_id: ${{ env.RELEASE_ID }}
-        asset_path: ${{ env.BINARY }} # path to archive to upload
-        asset_name: ${{ env.BINARY_NIGHTLY }} # name to upload the release as, use $$ to insert date (YYYYMMDD) and 6 letter commit hash
-        asset_content_type: application/zip # required by GitHub API
-        max_releases: 1 # optional, if there are more releases than this matching the asset_name, the oldest ones are going to be deleted
-
-#    - name: Upload artifact for testing purpose
-##      if: github.ref != 'refs/heads/master'
-#      uses: actions/upload-artifact@v4.6.1
-#      with:
-#        name: ${{ env.BINARY }}
-#        retention-days: 2
-#        path: ${{ env.BINARY }}
