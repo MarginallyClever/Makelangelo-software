@@ -152,9 +152,23 @@ jobs:
             const { owner, repo } = context.repo;
             const releases = await github.rest.repos.listReleases({ owner, repo });
             const nightlies = releases.data
-              .filter(r => r.name.includes("nightly") && !r.draft)
+              .filter(r => r.name.toLowerCase().includes("nightly") && !r.draft)
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+            console.log("=== Nightly releases found ===");
+            nightlies.forEach((r, index) => {
+              console.log(`${index === 0 ? '[KEEP]' : '[DELETE]'} ${r.name} (ID: ${r.id}) Created: ${r.created_at}`);
+            });
+  
             for (let i = 1; i < nightlies.length; i++) {
-              await github.rest.repos.deleteRelease({ owner, repo, release_id: nightlies[i].id });
-              console.log(`Deleted old nightly release: ${nightlies[i].name}`);
+              try {
+                console.log(`Deleting: ${nightlies[i].name} (ID: ${nightlies[i].id})`);
+                await github.rest.repos.deleteRelease({ owner, repo, release_id: nightlies[i].id });
+              } catch (err) {
+                console.error(`Failed to delete release ${nightlies[i].id}:`, err.message);
+              }
+            }
+  
+            if (nightlies.length <= 1) {
+              console.log("No old nightlies to delete.");
             }
