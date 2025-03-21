@@ -52,6 +52,7 @@ jobs:
             target/package/*
 
   delete-nightly-assets:
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     steps:
@@ -78,7 +79,7 @@ jobs:
             }
 
   package:
-    needs: build
+    needs: delete-nightly-assets
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
