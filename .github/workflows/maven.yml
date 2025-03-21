@@ -51,6 +51,32 @@ jobs:
             README
             target/package/*
 
+  delete-nightly-assets:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Delete all assets from Nightly Builds release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const release_id = 54908875; // Nightly Builds release
+            const assets = await github.rest.repos.listReleaseAssets({ owner, repo, release_id });
+  
+            if (assets.data.length === 0) {
+              console.log("No assets to delete.");
+            }
+  
+            for (const asset of assets.data) {
+              console.log(`Deleting asset: ${asset.name}`);
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: asset.id,
+              });
+            }
+
   package:
     needs: build
     runs-on: ${{ matrix.os }}
@@ -138,48 +164,3 @@ jobs:
             }
         env:
           RELEASE_ID: ${{ env.RELEASE_ID }}
-
-  cleanup-nightlies:
-    needs: upload
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    steps:
-      - name: Delete old nightly assets
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { owner, repo } = context.repo;
-            const release_id = process.env.RELEASE_ID;
-            
-            // Extract today's date in YYYYMMDD from commit timestamp
-            const now = new Date();
-            const pad = (n) => n.toString().padStart(2, '0');
-            const today = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-            console.log(`Today is ${today}`);
-          
-          
-            const assets = await github.rest.repos.listReleaseAssets({ owner, repo, release_id });
-            console.log("=== Assets in release ===");
-  
-            for (const asset of assets.data) {
-              const name = asset.name;
-              console.log(`Found asset: ${name}`);
-  
-              const match = name.match(/^Makelangelo-nightly-(\d{8})\.(deb|msi|dmg)$/i);
-              if (match) {
-                const assetRunID = match[1];            
-                if (assetDate !== today) {
-                  console.log(`Deleting old asset: ${name}`);
-                  await github.rest.repos.deleteReleaseAsset({
-                    owner,
-                    repo,
-                    asset_id: asset.id,
-                  });
-                } else {
-                  console.log(`Keeping asset: ${name}`);
-                }
-              } else {
-                console.log(`Ignoring unrelated asset: ${name}`);
-              }
-            }
