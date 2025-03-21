@@ -144,31 +144,38 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     steps:
-      - name: Delete old nightly releases
+      - name: Delete old nightly assets
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const releases = await github.rest.repos.listReleases({ owner, repo });
-            const nightlies = releases.data
-              .filter(r => r.name.toLowerCase().includes("nightly") && !r.draft)
-              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const release_id = 54908875;
+            const currentRunID = "${{ github.run_id }}";
   
-            console.log("=== Nightly releases found ===");
-            nightlies.forEach((r, index) => {
-              console.log(`${index === 0 ? '[KEEP]' : '[DELETE]'} ${r.name} (ID: ${r.id}) Created: ${r.created_at}`);
-            });
+            const assets = await github.rest.repos.listReleaseAssets({ owner, repo, release_id });
+            console.log("=== Assets in release ===");
   
-            for (let i = 1; i < nightlies.length; i++) {
-              try {
-                console.log(`Deleting: ${nightlies[i].name} (ID: ${nightlies[i].id})`);
-                await github.rest.repos.deleteRelease({ owner, repo, release_id: nightlies[i].id });
-              } catch (err) {
-                console.error(`Failed to delete release ${nightlies[i].id}:`, err.message);
+            for (const asset of assets.data) {
+              const name = asset.name;
+              console.log(`Found asset: ${name}`);
+  
+              const match = name.match(/^Makelangelo-nightly-(\d+)\.(deb|msi|dmg)$/i);
+              if (match) {
+                const assetRunID = match[1];
+                const assetExt = match[2];
+  
+                if (assetRunID !== currentRunID) {
+                  console.log(`Deleting old asset: ${name}`);
+                  await github.rest.repos.deleteReleaseAsset({
+                    owner,
+                    repo,
+                    asset_id: asset.id,
+                  });
+                } else {
+                  console.log(`Keeping current asset: ${name}`);
+                }
+              } else {
+                console.log(`Ignoring unrelated asset: ${name}`);
               }
-            }
-  
-            if (nightlies.length <= 1) {
-              console.log("No old nightlies to delete.");
             }
