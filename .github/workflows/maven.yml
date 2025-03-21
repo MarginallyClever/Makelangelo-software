@@ -6,9 +6,7 @@ env:
 
 on:
   push:
-    branches:
-      - master
-      - main
+    branches: [master, main]
   pull_request:
 
 jobs:
@@ -43,7 +41,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: shared
-          retention-days: 1
           path: |
             src/main/package/jpackage*
             src/main/package/logo*
@@ -96,77 +93,27 @@ jobs:
         with:
           name: shared
 
-      - name: Build platform-specific installer
+      - name: Build installer and rename
         shell: bash
         run: |
           set -x
+          set -o pipefail
           APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/")
           sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
           jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.os }}.cfg" --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar"
-          INSTALLER=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '(msi$|dmg$|deb$)' | sed "s,./,,")
-          NIGHTLY_NAME=$(echo $INSTALLER | sed "s/[Mm]akelangelo\(.*\)\.\(.*\)/Makelangelo-nightly-$(date +%Y%m%d).\2/")
-          echo "INSTALLER=$INSTALLER" >> $GITHUB_ENV
-          echo "NIGHTLY_NAME=$NIGHTLY_NAME" >> $GITHUB_ENV
+          BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '\.msi$|\.deb$|\.dmg$')
+          EXT="${BINARY##*.}"
+          DATE=$(date +%Y%m%d)
+          BINARY_NIGHTLY="Makelangelo-nightly-$DATE.$EXT"
+          mv "$BINARY" "$BINARY_NIGHTLY"
+          echo "BINARY_NIGHTLY=$BINARY_NIGHTLY" >> $GITHUB_ENV
 
-      - name: Upload artifact for deployment
-        uses: actions/upload-artifact@v4
+      - name: Upload to Nightly Builds
+        uses: WebFreak001/deploy-nightly@v3.2.0
         with:
-          name: installer-${{ matrix.os }}
-          retention-days: 1
-          path: ${{ env.INSTALLER }}
-
-  upload:
-    needs: package
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: installers
-
-      - name: List downloaded files
-        run: |
-          echo "=== File tree ==="
-          find installers
-
-      - name: Flatten installer paths
-        run: |
-          mkdir flat
-          find installers -type f -name "Makelangelo-nightly-*" -exec cp {} flat/ \;
-          ls -lh flat
-
-      - name: Upload each platform installer
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            const { owner, repo } = context.repo;
-            const release_id = process.env.RELEASE_ID;
-  
-            const uploadFile = async (filePath) => {
-              const fileName = path.basename(filePath);
-              const contentType = 'application/octet-stream';
-              const data = fs.readFileSync(filePath);
-  
-              await github.rest.repos.uploadReleaseAsset({
-                owner,
-                repo,
-                release_id,
-                name: fileName,
-                data,
-                headers: {
-                  'content-type': contentType,
-                  'content-length': data.length
-                }
-              });
-  
-              console.log(`Uploaded ${fileName}`);
-            };
-  
-            const files = fs.readdirSync('./flat');
-            for (const file of files) {
-              await uploadFile(path.join('./flat', file));
-            }
-        env:
-          RELEASE_ID: ${{ env.RELEASE_ID }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ env.UPLOAD_URL }}
+          release_id: ${{ env.RELEASE_ID }}
+          asset_path: ${{ env.BINARY_NIGHTLY }}
+          asset_name: ${{ env.BINARY_NIGHTLY }}
+          asset_content_type: application/octet-stream
