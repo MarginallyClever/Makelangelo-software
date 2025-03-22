@@ -35,9 +35,6 @@ public class SaveBitmap implements TurtleSaver {
 		return filter;
 	}
 
-	/**
-	 * see http://paulbourke.net/dataformats/dxf/min3d.html for details
-	 */
 	@Override
 	public boolean save(OutputStream outputStream, Turtle myTurtle, PlotterSettings settings) throws Exception {
 		logger.debug("saving {}...",extension);
