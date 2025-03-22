@@ -30,6 +30,7 @@ public class TestCornerClipping {
             System.out.println("No hands thickened.");
             return;
         }
+        // save file
         try {
             TurtleFactory.save(result, "corners.svg", PlotterSettingsManager.buildMakelangelo5());
         } catch (Exception e) {
@@ -42,11 +43,11 @@ public class TestCornerClipping {
     private static void thickenClockHands(Turtle hands,Turtle result) {
         var paper = new Paper();
         paper.setPaperSize(100,100,0,0);
-        paper.setPaperMargin(1.0);
+        paper.setPaperMargin(1);
 
         var calculator = new LineWeightByImageIntensity();
         calculator.setPaper(paper);
-        calculator.setTurtle(new Turtle());
+        calculator.setTurtle(hands);
         calculator.setMaxLineWidth(5);
         calculator.setImageName("src/test/resources/com/marginallyclever/makelangelo/makeart/turtlegenerator/lineweight/black-dot-100.png");
         calculator.addListener(thick->{
@@ -59,7 +60,6 @@ public class TestCornerClipping {
             }
             result.add(thick);
         });
-        calculator.setTurtle(hands);
         calculator.generate();
     }
 }
