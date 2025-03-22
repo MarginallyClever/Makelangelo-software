@@ -1,13 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 
-import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
-
+import com.marginallyclever.convenience.linecollection.LineCollection;
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectFile;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
-import com.marginallyclever.donatello.select.SelectDouble;
-import com.marginallyclever.donatello.select.SelectFile;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,9 @@ import java.util.List;
 public class LineWeightByImageIntensity extends TurtleGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineWeightByImageIntensity.class);
 
+    private final SelectDouble selectMaxLineWidth = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"), maxLineWidth);
+    private final SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
+
     private final double EPSILON = 0.001;
 
     /**
@@ -40,7 +42,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     /**
      * maximum thickness of the new line. must be greater than zero.
      */
-    private static double thickness = 1.0;
+    private static double maxLineWidth = 1.0;
 
     private static String imageName = null;
     private TransformedImage sourceImage;
@@ -53,14 +55,13 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     public LineWeightByImageIntensity() {
         super();
 
-        SelectDouble selectThickness = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"),thickness);
-        add(selectThickness);
-        selectThickness.addSelectListener(e->{
-            thickness = selectThickness.getValue();
+        // maxLineWidth is the maximum width of the line, regardless of pen diameter.
+        add(selectMaxLineWidth);
+        selectMaxLineWidth.addSelectListener(e->{
+            maxLineWidth = selectMaxLineWidth.getValue();
             generate();
         });
 
-        SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
         add(selectFile);
         selectFile.addSelectListener(e->{
             imageName = selectFile.getText();
@@ -75,19 +76,24 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     @Override
     public void generate() {
-        try {
-            FileInputStream stream = new FileInputStream(imageName);
+        if(imageName==null || imageName.trim().isEmpty()) {
+            return;
+        }
+
+        // load intensity image
+        try (FileInputStream stream = new FileInputStream(imageName)) {
             sourceImage = new TransformedImage(ImageIO.read(stream));
         } catch(Exception e) {
-            logger.error("generate {}",e.getMessage(),e);
-            setTurtle(previousTurtle);
+            logger.error("failed to load intensity image. ",e);
             return;
         }
         scaleImage(1);  // fill paper
 
+        // for each color,
         Turtle turtle = new Turtle();
-        List<Turtle> colors = previousTurtle.splitByToolChange();
+        List<Turtle> colors = myTurtle.splitByToolChange();
         for( Turtle t2 : colors ) {
+            // generate the thick lines
             turtle.add(calculate(t2));
         }
 
@@ -99,11 +105,10 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     private Turtle calculate(Turtle from) {
-        Turtle turtle = new Turtle();
         buildSegmentList(from);
         sortSegmentsIntoLines();
-        generateThickLines(turtle);
-        //generateThinLines(turtle);
+        Turtle turtle = generateThickLines();
+        //Turtle turtle = generateThinLines(turtle);
 
         // clean up
         unsorted.clear();
@@ -155,28 +160,44 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         sourceImage.setScale(f,-f);
     }
 
-    private void generateThickLines(Turtle turtle) {
+    /**
+     * Generate the thick lines
+     * @return a turtle of the thick lines
+     */
+    private Turtle generateThickLines() {
+        Turtle turtle = new Turtle();
+
         logger.debug("generateThickLines");
         for(LineWeight i : sortedLines) {
             if(i.segments.isEmpty()) continue;
-            generateOneThickLine(turtle,i);
+            Turtle t = generateOneThickLine(i);
+            turtle.add(t);
         }
+        return turtle;
     }
 
-    private void generateOneThickLine(Turtle turtle, LineWeight line) {
-        // find the thickest part of the line, which tells us how many cycles we'll have to make.
+    /**
+     * A line that gets thicker where the segment weight goes up.  This is done by drawing the line multiple times
+     * along the entire length of the line.
+     * @param line the line to draw
+     * @return a turtle of the offset line.
+     */
+    private Turtle generateOneThickLine(LineWeight line) {
+        Turtle turtle = new Turtle();
+        // find the thickest part of the line, which tells us how many passes we'll have to make.
         double numPasses=0;
         for(LineWeightSegment s : line.segments) {
             numPasses = Math.max(numPasses,s.weight);
         }
         numPasses = Math.max(1,Math.ceil(numPasses));
 
-        LineWeightSegment start = line.segments.get(0);
+        LineWeightSegment start = line.segments.getFirst();
 
-        boolean first=true;
+        boolean first = true;
         // collect all the points, write them at the end.
         for(int pass=0; pass<=numPasses; ++pass) {
             double ratio = pass/numPasses;
+            // collect all the points
             List<Point2d> offsetLine = generateOneThickLinePass(line,start,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
 
@@ -189,6 +210,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
                 turtle.moveTo(p.x,p.y);
             }
         }
+        return turtle;
     }
 
     private List<Point2d> generateOneThickLinePass(LineWeight line, LineWeightSegment start, double distance) {
@@ -197,7 +219,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // add first point at start of line
         double [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
-        Vector2d unit = line.segments.get(0).getUnit();
+        Vector2d unit = line.segments.getFirst().getUnit();
         unit.scale(distance);
         offsetSequence.add(new Point2d(s0[0]-unit.x,s0[1]-unit.y));
 
@@ -205,6 +227,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         for(int i=1;i<line.segments.size();++i) {
             LineWeightSegment seg = line.segments.get(i);
             double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
+
             if(Math.abs(dotProduct(s0,s1))<Math.cos(Math.toRadians(75))) {
                 // this is a corner.  add a point at the intersection of the two lines.
                 double [] inter = findIntersection(
@@ -219,7 +242,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             s0=s1;
         }
         // add the last point of the line
-        unit = line.segments.get(line.segments.size()-1).getUnit();
+        unit = line.segments.getLast().getUnit();
         unit.scale(distance);
         offsetSequence.add(new Point2d(s0[2]+unit.x,s0[3]+unit.y));
         return offsetSequence;
@@ -255,6 +278,13 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return new double[] { ix, iy };
     }
 
+    /**
+     * The offset of the line is the distance from the center of the line to the center of the new line.
+     * A ratio of 0.0 is offset by -weight/2.0, and 1.0 is offset by +weight/2.0.
+     * @param weight the weight of the line
+     * @param ratio the ratio of the line
+     * @return the adjusted offset
+     */
     private double adjustedOffset(double weight,double ratio) {
         return weight*ratio - weight/2.0;
     }
@@ -276,8 +306,9 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     /**
-     * Search through all unsorted segments for adjacent segments.  Start from a random segment and then
-     * Find any segment that touches the head or the tail of this segment.  Track the head and tail as we go.
+     * <p>Search through all unsorted segments for adjacent segments.  Start from a random segment and then
+     * find any segment that touches the head or the tail of this segment.  Track the head and tail as we go.</p>
+     * <p>Worst case is O(n<sup>2</sup>)</p>
      */
     private void sortSegmentsIntoLines() {
         logger.debug("sortSegmentsIntoLines");
@@ -293,29 +324,32 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         logger.debug("sortedLines="+sortedLines.size());
     }
 
+    /**
+     * <p>Grow the active line by finding the next segment that is adjacent to the head or tail of the line.
+     * @param activeLine the line to grow
+     */
     private void growActiveLine(LineWeight activeLine) {
-        LineWeightSegment head = activeLine.segments.get(0);
+        LineWeightSegment head = activeLine.segments.getFirst();
         LineWeightSegment tail = head;
 
-        boolean found;
+        LineWeightSegment toRemove;
         do {
-            found=false;
+            toRemove = null;
             for (LineWeightSegment s : unsorted) {
                 if (closeEnoughToHead(head, s)) {  // try to match with head of line
                     activeLine.segments.addFirst(s);
                     head = s;
-                    unsorted.remove(s);
-                    found = true;
+                    toRemove = s;
                     break;
                 } else if (closeEnoughToTail(tail, s)) {  // try to match with tail of line
                     activeLine.segments.addLast(s);
                     tail = s;
-                    unsorted.remove(s);
-                    found = true;
+                    toRemove = s;
                     break;
                 }
             }
-        } while(found);
+            if(toRemove!=null) unsorted.remove(toRemove);
+        } while(toRemove!=null);
     }
 
     /**
@@ -361,6 +395,10 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return p0.distanceSquared(p1)<EPSILON;
     }
 
+    /**
+     * Split the turtle into segments of a certain length.
+     * @param from the turtle to split
+     */
     private void buildSegmentList(Turtle from) {
         logger.debug("buildSegmentList before={}",from.countLoops());
 
@@ -413,10 +451,21 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         double my = (start.y+end.y)/2.0;
 
         double intensity = 1.0-(sourceImage.sample(mx,my,stepSize/2)/255.0);
-        LineWeightSegment a = new LineWeightSegment(start,end,intensity*thickness);
+
+        LineWeightSegment a = new LineWeightSegment(start,end,intensity * maxLineWidth);
         // make a fast search index
         a.ix = (int)Math.floor(mx / stepSize);
         a.iy = (int)Math.floor(my / stepSize);
         return a;
+    }
+
+    public void setMaxLineWidth(double maxLineWidth) {
+        //selectMaxLineWidth.setValue(maxLineWidth);
+        LineWeightByImageIntensity.maxLineWidth = maxLineWidth;
+    }
+
+    public void setImageName(String imageName) {
+        //selectFile.setText(imageName);
+        LineWeightByImageIntensity.imageName = imageName;
     }
 }
