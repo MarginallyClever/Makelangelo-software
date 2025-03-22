@@ -15,7 +15,7 @@ public class GenerateClockHands {
      * @param minute 0-59
      * @return a {@link Turtle} that draws the clock hands.
      */
-    public static Turtle generateClockHands(int hour, int minute, int radius) {
+    public static Turtle generateClockHands(int hour, int minute, double radius) {
         Turtle result = new Turtle();
 
         // move to the end of the hour hand
@@ -29,8 +29,6 @@ public class GenerateClockHands {
         var m = getClockHandEnd(minute);
         result.moveTo(m.x*radius,m.y*radius);
         result.penUp();
-
-        result.translate(radius,radius);
 
         return result;
     }

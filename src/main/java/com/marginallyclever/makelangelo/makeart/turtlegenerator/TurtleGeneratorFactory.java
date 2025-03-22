@@ -70,6 +70,7 @@ public class TurtleGeneratorFactory {
 					new TurtleGeneratorNode(new Generator_MazeRectangle()),
 			}),
 			new TurtleGeneratorNode(new LineWeightByImageIntensity()),
+			new TurtleGeneratorNode(new Generator_AnalogClock()),
 			new TurtleGeneratorNode(new Generator_Lissajous()),
 			new TurtleGeneratorNode(new Generator_Package()),
 			new TurtleGeneratorNode(new Generator_Polyeder()),
