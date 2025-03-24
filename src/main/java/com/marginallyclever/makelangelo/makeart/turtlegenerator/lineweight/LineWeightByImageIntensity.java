@@ -5,6 +5,7 @@ import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectFile;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.DetectEdges;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -14,7 +15,10 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,8 +111,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private Turtle calculate(Turtle from) {
         buildSegmentList(from);
         sortSegmentsIntoLines();
-        Turtle turtle = generateThickLines();
-        //Turtle turtle = generateThinLines(turtle);
+        Turtle turtle = generateThickOutLines(from);
 
         // clean up
         unsorted.clear();
@@ -116,23 +119,75 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return turtle;
     }
 
-    /**
-     * Generate thin lines for debugging
-     * @param turtle the turtle to draw with
-     */
-    private void generateThinLines(Turtle turtle) {
-        logger.debug("generateThinLines {}",sortedLines.size());
-        for(LineWeight line : sortedLines) {
-            boolean first=true;
-            for(LineWeightSegment w : line.segments) {
-                if (first) {
-                    turtle.jumpTo(w.start.x, w.start.y);
-                    first = false;
-                }
-                turtle.moveTo(w.end.x, w.end.y);
-            }
+    private Turtle generateThickOutLines(Turtle from) {
+        Turtle turtle = new Turtle();
+
+        var bounds = from.getBounds();
+
+        logger.debug("generateThickLines");
+        for(LineWeight i : sortedLines) {
+            if(i.segments.isEmpty()) continue;
+            Turtle t = generateOneThickOutLine2(bounds,i);
+            turtle.add(t);
         }
+        return turtle;
     }
+
+    private static int fileNumber = 0;
+
+    private Turtle generateOneThickOutLine2(Rectangle2D.Double bounds, LineWeight line) {
+        // get the max line weight
+        double weight = 1;
+        for(LineWeightSegment s : line.segments) {
+            weight = Math.max(weight,s.weight);
+        }
+        // make a canvas that is big enough to hold the weighted line
+        var w = (int)Math.ceil(bounds.getWidth()+weight*2);
+        var h = (int)Math.ceil(bounds.getHeight()+weight*2);
+        var canvas = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+        // get the drawing tool
+        Graphics2D g = (Graphics2D)canvas.getGraphics();
+        // clear the image
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g.setColor(java.awt.Color.WHITE);
+        g.fillRect(0,0,w,h);
+
+        // paint every line segment, where the stroke weight is the intensity of the line segment
+        g.setColor(java.awt.Color.BLACK);
+        g.translate(weight/2,weight/2);
+        for(LineWeightSegment s : line.segments) {
+            var x0 = (int)(s.start.x - bounds.x + weight/2 );
+            var y0 = (int)(s.start.y - bounds.y + weight/2 );
+            var x1 = (int)(s.end.x - bounds.x + weight/2 );
+            var y1 = (int)(s.end.y - bounds.y + weight/2 );
+            g.setStroke(new BasicStroke((float)s.weight,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
+            g.drawLine(x0,y0,x1,y1);
+        }
+        // clean up the tool
+        g.dispose();
+
+        // save bitmap to file
+        try {
+            ImageIO.write(canvas, "png", new File("line-"+fileNumber+".png"));
+            fileNumber++;
+        } catch(Exception e) {
+            logger.error("failed to save image",e);
+        }
+
+        // trace the image to generate the outline
+        var de = new DetectEdges();
+        de.getPort("image").setValue(canvas);
+        de.getPort("cutoff").setValue(16);
+        de.update();
+        var t = (Turtle)de.getPort("turtle").getValue();
+
+        // TODO split the outline along the original to get two halves.
+        return t;
+    }
+
 
     /**
      * mode 0 = fill paper
@@ -185,11 +240,10 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private Turtle generateOneThickLine(LineWeight line) {
         Turtle turtle = new Turtle();
         // find the thickest part of the line, which tells us how many passes we'll have to make.
-        double numPasses=0;
+        double numPasses=1;
         for(LineWeightSegment s : line.segments) {
             numPasses = Math.max(numPasses,s.weight);
         }
-        numPasses = Math.max(1,Math.ceil(numPasses));
 
         LineWeightSegment start = line.segments.getFirst();
 
@@ -219,32 +273,20 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // add first point at start of line
         double [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
-        Vector2d unit = line.segments.getFirst().getUnit();
-        unit.scale(distance);
-        offsetSequence.add(new Point2d(s0[0]-unit.x,s0[1]-unit.y));
+        offsetSequence.add(new Point2d(s0[0],s0[1]));
 
         // add the middle points of the line
-        for(int i=1;i<line.segments.size();++i) {
-            LineWeightSegment seg = line.segments.get(i);
+        for( var seg : line.segments ) {
             double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
-
+/*
             if(Math.abs(dotProduct(s0,s1))<Math.cos(Math.toRadians(75))) {
-                // this is a corner.  add a point at the intersection of the two lines.
-                double [] inter = findIntersection(
-                        s0[0],s0[1],s0[2],s0[3],
-                        s1[0],s1[1],s1[2],s1[3]
-                );
-                offsetSequence.add(new Point2d(inter[0],inter[1]));
-                //offsetSequence.add(new Point2d(s1[0],s1[1]));
-            } else {
-                offsetSequence.add(new Point2d(s1[0], s1[1]));
-            }
+            } else {*/
+                offsetSequence.add(new Point2d(s1[2], s1[3]));
+            //}
             s0=s1;
         }
-        // add the last point of the line
-        unit = line.segments.getLast().getUnit();
-        unit.scale(distance);
-        offsetSequence.add(new Point2d(s0[2]+unit.x,s0[3]+unit.y));
+
+        offsetSequence.add(new Point2d(s0[2],s0[3]));
         return offsetSequence;
     }
 
@@ -290,18 +332,14 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     double[] getOffsetLine(LineWeightSegment line,double distance) {
-        // get normal of each line, then scale by distance.
-        double nx = line.end.y - line.start.y;
-        double ny = line.start.x - line.end.x;
-        double nd = Math.sqrt(nx*nx + ny*ny);
-        if(nd==0) nd=1;
-        nx *= distance / nd;
-        ny *= distance / nd;
+        var n = line.getNormal();
+        n.normalize();
+        n.scale(distance);
 
         // offset from the original line
         return new double[] {
-                line.start.x+nx, line.start.y+ny,
-                line.end.x  +nx, line.end.y  +ny
+                line.start.x+n.x, line.start.y+n.y,
+                line.end.x  +n.x, line.end.y  +n.y
         };
     }
 
