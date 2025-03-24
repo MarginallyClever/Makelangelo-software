@@ -21,7 +21,7 @@ public class GenerateClockHands {
         // move to the end of the hour hand
         var h = getClockHandEnd(hour*5 + minute/12);
         result.setColor(Color.BLACK);
-        result.jumpTo(h.x*radius,h.y*radius);
+        result.jumpTo(h.x*radius*0.75,h.y*radius*0.75);
         // draw to center
         result.penDown();
         result.moveTo(0,0);
