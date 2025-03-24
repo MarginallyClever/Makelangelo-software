@@ -51,7 +51,7 @@ jobs:
   delete-nightly-assets:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    #if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev'
     steps:
       - name: Delete all assets from Nightly Builds release
         uses: actions/github-script@v6
