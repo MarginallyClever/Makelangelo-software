@@ -2,6 +2,8 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -22,15 +24,19 @@ import java.util.Map;
  * <p>Don't forget to {@link #dispose()} when you're done.</p>
  */
 public class Graphics2DGL extends Graphics2D {
+    private static final Logger logger = LoggerFactory.getLogger(Graphics2DGL.class);
+
     private final GL2 gl2;
     private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
+    private boolean isDisposed = false;
 
     public Graphics2DGL(GL2 gl2) {
         this.gl2 = gl2;
 
         // save the transformation matrix
         gl2.glPushMatrix();
+
         // save the line width
         gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
 
@@ -487,6 +493,9 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void dispose() {
+        if(isDisposed) return;  // already disposed.
+        isDisposed = true;
+
         // end drawing lines
         gl2.glEnd();
         // restore pen diameter
