@@ -31,6 +31,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     private final SelectDouble selectMaxLineWidth = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"), maxLineWidth);
     private final SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
+    private final SelectDouble selectPenDiameter = new SelectDouble("pen diameter", Translator.get("penDiameter"), penDiameter);
 
     private final double EPSILON = 0.001;
 
@@ -43,8 +44,9 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
      * maximum thickness of the new line. must be greater than zero.
      */
     private static double maxLineWidth = 1.0;
-
     private static String imageName = null;
+    private static double penDiameter = 0.8;
+
     private TransformedImage sourceImage;
 
     private static final LinkedList<LineWeightSegment> unsorted = new LinkedList<>();
@@ -59,6 +61,12 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         add(selectMaxLineWidth);
         selectMaxLineWidth.addSelectListener(e->{
             maxLineWidth = selectMaxLineWidth.getValue();
+            generate();
+        });
+
+        add(selectPenDiameter);
+        selectPenDiameter.addSelectListener(e->{
+            penDiameter = selectPenDiameter.getValue();
             generate();
         });
 
@@ -107,7 +115,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private Turtle calculate(Turtle from) {
         buildSegmentList(from);
         sortSegmentsIntoLines();
-        Turtle turtle = generateThickLines();
+        Turtle turtle = generateAllThickLines();
 
         // clean up
         unsorted.clear();
@@ -145,7 +153,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
      * Generate the thick lines
      * @return a turtle of the thick lines
      */
-    private Turtle generateThickLines() {
+    private Turtle generateAllThickLines() {
         Turtle turtle = new Turtle();
 
         logger.debug("generateThickLines");
@@ -166,10 +174,11 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private Turtle generateOneThickLine(LineWeight line) {
         Turtle turtle = new Turtle();
         // find the thickest part of the line, which tells us how many passes we'll have to make.
-        double numPasses=1;
+        double maxWeight=1;
         for(LineWeightSegment s : line.segments) {
-            numPasses = Math.max(numPasses,s.weight);
+            maxWeight = Math.max(maxWeight,s.weight);
         }
+        double numPasses = Math.max(1,maxWeight / penDiameter);
 
         LineWeightSegment start = line.segments.getFirst();
 
