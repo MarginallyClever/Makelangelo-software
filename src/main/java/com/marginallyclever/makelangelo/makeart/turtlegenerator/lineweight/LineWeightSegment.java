@@ -31,4 +31,9 @@ public class LineWeightSegment {
         n.normalize();
         return n;
     }
+
+    public Vector2d getNormal() {
+        Vector2d n = getUnit();
+        return new Vector2d(-n.y,n.x);
+    }
 }
