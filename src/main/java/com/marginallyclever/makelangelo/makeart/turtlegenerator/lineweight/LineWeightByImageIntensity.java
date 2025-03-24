@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -32,20 +33,18 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private final SelectDouble selectMaxLineWidth = new SelectDouble("thickness", Translator.get("LineWeightByImageIntensity.thickness"), maxLineWidth);
     private final SelectFile selectFile = new SelectFile("image", Translator.get("LineWeightByImageIntensity.image"),imageName,null);
     private final SelectDouble selectPenDiameter = new SelectDouble("pen diameter", Translator.get("penDiameter"), penDiameter);
+    private final SelectDouble selectStepSize = new SelectDouble("step size", Translator.get("Converter_EdgeDetection.stepSize"), stepSize);
 
     private final double EPSILON = 0.001;
 
-    /**
-     * must be greater than zero.
-     */
+    // refinement of lines for sampling.  must be greater than zero.
     private static double stepSize = 5;
-
-    /**
-     * maximum thickness of the new line. must be greater than zero.
-     */
+    // maximum thickness of the new line. must be greater than zero.
     private static double maxLineWidth = 1.0;
-    private static String imageName = null;
+    // the pen diameter, controls spacing between passes.
     private static double penDiameter = 0.8;
+    // source of weight image
+    private static String imageName = null;
 
     private TransformedImage sourceImage;
 
@@ -60,13 +59,19 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         // maxLineWidth is the maximum width of the line, regardless of pen diameter.
         add(selectMaxLineWidth);
         selectMaxLineWidth.addSelectListener(e->{
-            maxLineWidth = selectMaxLineWidth.getValue();
+            maxLineWidth = Math.max(0.1,selectMaxLineWidth.getValue());
             generate();
         });
 
         add(selectPenDiameter);
         selectPenDiameter.addSelectListener(e->{
-            penDiameter = selectPenDiameter.getValue();
+            penDiameter = Math.max(0.05,selectPenDiameter.getValue());
+            generate();
+        });
+
+        add(selectStepSize);
+        selectStepSize.addSelectListener(e->{
+            stepSize = Math.max(0.1,selectStepSize.getValue());
             generate();
         });
 
@@ -191,6 +196,12 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return turtle;
     }
 
+    /**
+     * Draw the points in the offset line.
+     * @param turtle the turtle to draw with
+     * @param offsetLine the line to draw
+     * @param first true if the turtle should jump to the first point
+     */
     private void drawPoints(Turtle turtle, List<Point2d> offsetLine, boolean first) {
         // draw pass
         for( Point2d p : offsetLine ) {
@@ -203,7 +214,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     }
 
     /**
-     * Guranteed to return at least 1 pass.
+     * Guaranteed to return at least 1 pass.
      * @param line the line to draw
      * @return the number of passes needed to draw the line
      */
@@ -220,23 +231,19 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         List<Point2d> offsetSequence = new ArrayList<>();
 
         // add first point at start of line
-        Point2d [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
+        var s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
-        offsetSequence.add(s0[0]);
+        offsetSequence.add(new Point2d(s0.getX1(),s0.getY1()));
 
         // add the middle points of the line
         for( var seg : line.segments ) {
-            Point2d [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
-
-/*
-            if(Math.abs(dotProduct(s0,s1))<Math.cos(Math.toRadians(75))) {
-            } else {*/
-                offsetSequence.add(s1[1]);
-            //}
+            var s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
+            var intersection = findIntersection(s0,s1);
+            offsetSequence.add((intersection != null) ? intersection : new Point2d(s1.getX1(), s1.getY1()));
             s0=s1;
         }
 
-        offsetSequence.add(s0[1]);
+        offsetSequence.add(new Point2d(s0.getX2(),s0.getY2()));
         return offsetSequence;
     }
 
@@ -253,21 +260,35 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return dx0*dx1 + dy0*dy1;
     }
 
-    private double [] findIntersection(double x1,double y1,double x2,double y2,double x3,double y3,double x4,double y4) {
-        double d = ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4));
-        if(Math.abs(d)<0.01) {
-            // lines are colinear (infinite solutions) or parallel (no solutions).
-            double ix = (x4+x1)/2;
-            double iy = (y4+y1)/2;
-            return new double [] { ix, iy };
+    /**
+     * Find the intersection of two line segments.
+     * @param a the first line
+     * @param b the second line
+     * @return the intersection point or null if the lines do not intersect.
+     */
+    private Point2d findIntersection(Line2D a, Line2D b) {
+        double x1 = a.getX1(), y1 = a.getY1();
+        double x2 = a.getX2(), y2 = a.getY2();
+        double x3 = b.getX1(), y3 = b.getY1();
+        double x4 = b.getX2(), y4 = b.getY2();
+
+        double denom = ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4));
+        if(Math.abs(denom)<1e-6) {
+            // parallel or colinear.
+            return null;
         }
 
-        double t = ((x1-x3)*(y3-y4) - (y1-y3)*(x3-x4)) / d;
-        //double u = ((x1-x2)*(y1-y3) - (y1-y2)*(x1-x3)) / d;
+        double ua = ((x4 - x3)*(y1 - y3) - (y4 - y3)*(x1 - x3)) / denom;
+        double ub = ((x2 - x1)*(y1 - y3) - (y2 - y1)*(x1 - x3)) / denom;
 
-        double ix = x1+t*(x2-x1);
-        double iy = y1+t*(y2-y1);
-        return new double[] { ix, iy };
+        if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
+            // intersection point is within both segments
+            double x = x1 + ua * (x2 - x1);
+            double y = y1 + ua * (y2 - y1);
+            return new Point2d(x, y);
+        }
+
+        return null; // intersection point is outside the segments
     }
 
     /**
@@ -281,16 +302,15 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return weight*ratio - weight/2.0;
     }
 
-    Point2d [] getOffsetLine(LineWeightSegment line,double distance) {
+    Line2D getOffsetLine(LineWeightSegment line, double distance) {
         var n = line.getNormal();
         n.normalize();
         n.scale(distance);
 
         // offset from the original line
-        return new Point2d[] {
-                new Point2d(line.start.x+n.x, line.start.y+n.y),
-                new Point2d(line.end.x  +n.x, line.end.y  +n.y)
-        };
+        return new Line2D.Double(
+                line.start.x+n.x, line.start.y+n.y,
+                line.end.x  +n.x, line.end.y  +n.y);
     }
 
     /**
