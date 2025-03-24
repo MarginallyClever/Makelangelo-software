@@ -173,12 +173,8 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
      */
     private Turtle generateOneThickLine(LineWeight line) {
         Turtle turtle = new Turtle();
-        // find the thickest part of the line, which tells us how many passes we'll have to make.
-        double maxWeight=1;
-        for(LineWeightSegment s : line.segments) {
-            maxWeight = Math.max(maxWeight,s.weight);
-        }
-        double numPasses = Math.max(1,maxWeight / penDiameter);
+
+        double numPasses = getNumberOfPasses(line);
 
         LineWeightSegment start = line.segments.getFirst();
 
@@ -189,39 +185,58 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             // collect all the points
             List<Point2d> offsetLine = generateOneThickLinePass(line,start,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
-
-            // draw pass
-            for( Point2d p : offsetLine ) {
-                if(first) {
-                    turtle.jumpTo(p.x,p.y);
-                    first=false;
-                }
-                turtle.moveTo(p.x,p.y);
-            }
+            drawPoints(turtle,offsetLine,first);
+            first=false;
         }
         return turtle;
+    }
+
+    private void drawPoints(Turtle turtle, List<Point2d> offsetLine, boolean first) {
+        // draw pass
+        for( Point2d p : offsetLine ) {
+            if(first) {
+                turtle.jumpTo(p.x,p.y);
+                first=false;
+            }
+            turtle.moveTo(p.x,p.y);
+        }
+    }
+
+    /**
+     * Guranteed to return at least 1 pass.
+     * @param line the line to draw
+     * @return the number of passes needed to draw the line
+     */
+    private int getNumberOfPasses(LineWeight line) {
+        // find the thickest part of the line, which tells us how many passes we'll have to make.
+        double maxWeight=1;
+        for(LineWeightSegment s : line.segments) {
+            maxWeight = Math.max(maxWeight,s.weight);
+        }
+        return (int)Math.max(1,Math.ceil(maxWeight / penDiameter));
     }
 
     private List<Point2d> generateOneThickLinePass(LineWeight line, LineWeightSegment start, double distance) {
         List<Point2d> offsetSequence = new ArrayList<>();
 
         // add first point at start of line
-        double [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
+        Point2d [] s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
 
-        offsetSequence.add(new Point2d(s0[0],s0[1]));
+        offsetSequence.add(s0[0]);
 
         // add the middle points of the line
         for( var seg : line.segments ) {
-            double [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
+            Point2d [] s1 = getOffsetLine(seg, adjustedOffset(seg.weight,distance));
+
 /*
             if(Math.abs(dotProduct(s0,s1))<Math.cos(Math.toRadians(75))) {
             } else {*/
-                offsetSequence.add(new Point2d(s1[2], s1[3]));
+                offsetSequence.add(s1[1]);
             //}
             s0=s1;
         }
 
-        offsetSequence.add(new Point2d(s0[2],s0[3]));
+        offsetSequence.add(s0[1]);
         return offsetSequence;
     }
 
@@ -266,15 +281,15 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         return weight*ratio - weight/2.0;
     }
 
-    double[] getOffsetLine(LineWeightSegment line,double distance) {
+    Point2d [] getOffsetLine(LineWeightSegment line,double distance) {
         var n = line.getNormal();
         n.normalize();
         n.scale(distance);
 
         // offset from the original line
-        return new double[] {
-                line.start.x+n.x, line.start.y+n.y,
-                line.end.x  +n.x, line.end.y  +n.y
+        return new Point2d[] {
+                new Point2d(line.start.x+n.x, line.start.y+n.y),
+                new Point2d(line.end.x  +n.x, line.end.y  +n.y)
         };
     }
 
