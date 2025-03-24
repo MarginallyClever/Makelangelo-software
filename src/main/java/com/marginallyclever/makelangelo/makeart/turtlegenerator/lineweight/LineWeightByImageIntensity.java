@@ -5,7 +5,6 @@ import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectFile;
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.DetectEdges;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -15,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,83 +107,13 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private Turtle calculate(Turtle from) {
         buildSegmentList(from);
         sortSegmentsIntoLines();
-        Turtle turtle = generateThickOutLines(from);
+        Turtle turtle = generateThickLines();
 
         // clean up
         unsorted.clear();
         sortedLines.clear();
         return turtle;
     }
-
-    private Turtle generateThickOutLines(Turtle from) {
-        Turtle turtle = new Turtle();
-
-        var bounds = from.getBounds();
-
-        logger.debug("generateThickLines");
-        for(LineWeight i : sortedLines) {
-            if(i.segments.isEmpty()) continue;
-            Turtle t = generateOneThickOutLine2(bounds,i);
-            turtle.add(t);
-        }
-        return turtle;
-    }
-
-    private static int fileNumber = 0;
-
-    private Turtle generateOneThickOutLine2(Rectangle2D.Double bounds, LineWeight line) {
-        // get the max line weight
-        double weight = 1;
-        for(LineWeightSegment s : line.segments) {
-            weight = Math.max(weight,s.weight);
-        }
-        // make a canvas that is big enough to hold the weighted line
-        var w = (int)Math.ceil(bounds.getWidth()+weight*2);
-        var h = (int)Math.ceil(bounds.getHeight()+weight*2);
-        var canvas = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-        // get the drawing tool
-        Graphics2D g = (Graphics2D)canvas.getGraphics();
-        // clear the image
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        g.setColor(java.awt.Color.WHITE);
-        g.fillRect(0,0,w,h);
-
-        // paint every line segment, where the stroke weight is the intensity of the line segment
-        g.setColor(java.awt.Color.BLACK);
-        g.translate(weight/2,weight/2);
-        for(LineWeightSegment s : line.segments) {
-            var x0 = (int)(s.start.x - bounds.x + weight/2 );
-            var y0 = (int)(s.start.y - bounds.y + weight/2 );
-            var x1 = (int)(s.end.x - bounds.x + weight/2 );
-            var y1 = (int)(s.end.y - bounds.y + weight/2 );
-            g.setStroke(new BasicStroke((float)s.weight,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
-            g.drawLine(x0,y0,x1,y1);
-        }
-        // clean up the tool
-        g.dispose();
-
-        // save bitmap to file
-        try {
-            ImageIO.write(canvas, "png", new File("line-"+fileNumber+".png"));
-            fileNumber++;
-        } catch(Exception e) {
-            logger.error("failed to save image",e);
-        }
-
-        // trace the image to generate the outline
-        var de = new DetectEdges();
-        de.getPort("image").setValue(canvas);
-        de.getPort("cutoff").setValue(16);
-        de.update();
-        var t = (Turtle)de.getPort("turtle").getValue();
-
-        // TODO split the outline along the original to get two halves.
-        return t;
-    }
-
 
     /**
      * mode 0 = fill paper
