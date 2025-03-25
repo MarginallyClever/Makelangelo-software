@@ -192,16 +192,8 @@ public class MainMenu extends JMenuBar {
         buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(paper.getPaperWidth(),paper.getPaperHeight()));
         menu.add(buttonZoomToFit);
 
-        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(Translator.get("GFXPreferences.showPenUp"), GFXPreferences.getShowPenUp());
-        checkboxShowPenUpMoves.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, SHORTCUT_CTRL));//"ctrl M"
-        checkboxShowPenUpMoves.addActionListener((e) -> {
-            boolean b = GFXPreferences.getShowPenUp();
-            GFXPreferences.setShowPenUp(!b);
-        });
-        GFXPreferences.addListener((e)->{
-            checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue());
-        });
-        checkboxShowPenUpMoves.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
+        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
+        GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
         menu.add(checkboxShowPenUpMoves);
 
         return menu;
