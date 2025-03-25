@@ -17,6 +17,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>A very limited {@link Graphics2D} implementation for OpenGL 2.0.</p>
@@ -29,7 +30,7 @@ public class Graphics2DGL extends Graphics2D {
     private final GL2 gl2;
     private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
-    private boolean isDisposed = false;
+    private AtomicBoolean isDisposed = new AtomicBoolean(false);
 
     public Graphics2DGL(GL2 gl2) {
         this.gl2 = gl2;
@@ -493,8 +494,7 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void dispose() {
-        if(isDisposed) return;  // already disposed.
-        isDisposed = true;
+        if(isDisposed.getAndSet(true)) return;  // already disposed.
 
         // end drawing lines
         gl2.glEnd();
