@@ -230,10 +230,17 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private List<Point2d> generateOneThickLinePass(LineWeight line, LineWeightSegment start, double distance) {
         List<Point2d> offsetSequence = new ArrayList<>();
 
-        // add first point at start of line
+        // add first point at start of line.  include the end cap offset.
         var s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
+        double dx = s0.getX2()-s0.getX1();
+        double dy = s0.getY2()-s0.getY1();
+        double len = Math.sqrt(dx*dx+dy*dy);
+        if(len>0) {
+            dx/=len;
+            dy/=len;
+        }
 
-        offsetSequence.add(new Point2d(s0.getX1(),s0.getY1()));
+        offsetSequence.add(new Point2d(s0.getX1()-dx*maxLineWidth/2,s0.getY1()-dy*maxLineWidth/2));
 
         // add the middle points of the line
         for( var seg : line.segments ) {
@@ -243,7 +250,17 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
             s0=s1;
         }
 
-        offsetSequence.add(new Point2d(s0.getX2(),s0.getY2()));
+        // add last point at start of line.  include the end cap offset.
+        dx = s0.getX2()-s0.getX1();
+        dy = s0.getY2()-s0.getY1();
+        len = Math.sqrt(dx*dx+dy*dy);
+        if(len>0) {
+            dx/=len;
+            dy/=len;
+        }
+        offsetSequence.add(new Point2d(s0.getX2()+dx*maxLineWidth/2,s0.getY2()+dy*maxLineWidth/2));
+
+        // done!
         return offsetSequence;
     }
 
