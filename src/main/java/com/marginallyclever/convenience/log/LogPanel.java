@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Objects;
 
 public class LogPanel extends JPanel {
 	private static final Logger logger = LoggerFactory.getLogger(LogPanel.class);
@@ -29,7 +30,7 @@ public class LogPanel extends JPanel {
 		JPanel innerPanel = new JPanel(new BorderLayout());
 		this.add(innerPanel);
 
-		Arrays.stream(Log.logDir.listFiles((dir1, name) -> name.matches(Log.LOG_FILE_NAME_PATTERN)))
+		Arrays.stream(Objects.requireNonNull(Log.logDir.listFiles((dir1, name) -> name.matches(Log.LOG_FILE_NAME_PATTERN))))
 				.sorted(Comparator.reverseOrder())
 				.forEach(logFile -> {
 					if (logFile.exists() && logFile.isFile()) {
@@ -66,7 +67,7 @@ public class LogPanel extends JPanel {
 		try (BufferedReader br = new BufferedReader(new FileReader(log))) {
 			String b;
 			while ((b = br.readLine()) != null) {
-				if (b.trim().length() == 0)
+				if (b.trim().isEmpty())
 					continue;
 				logArea.append(b);
 				logArea.append(System.lineSeparator());
