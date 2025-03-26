@@ -5,15 +5,11 @@ import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Draw a regular polygon.  A polygon with equal sides and angles.
  */
 public class NGon extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(NGon.class);
-
     private final InputDouble radius = new InputDouble("radius", 10.0);
     private final InputInt steps = new InputInt("subdivisions", 4);
     private final InputDouble angle = new InputDouble("angle", 45.0);
@@ -29,22 +25,18 @@ public class NGon extends Node {
 
     @Override
     public void update() {
-        try {
-            Turtle t = new Turtle();
-            double r = radius.getValue();
-            double s = Math.max(3,steps.getValue());
-            double startAngle = Math.toRadians(angle.getValue());
+        Turtle t = new Turtle();
+        double r = radius.getValue();
+        double s = Math.max(3,steps.getValue());
+        double startAngle = Math.toRadians(angle.getValue());
 
-            for(int i=0;i<s;++i) {
-                double v = startAngle + 2.0*Math.PI * (double)i / s;
-                t.moveTo(Math.cos(v)*r, Math.sin(v)*r);
-                t.penDown();
-            }
-            t.moveTo(Math.cos(startAngle)*r, Math.sin(startAngle)*r);
-            t.penUp();
-            contents.setValue(t);
-        } catch (Exception e) {
-            logger.warn("Failed to update, ignoring", e);
+        for(int i=0;i<s;++i) {
+            double v = startAngle + 2.0*Math.PI * (double)i / s;
+            t.moveTo(Math.cos(v)*r, Math.sin(v)*r);
+            t.penDown();
         }
+        t.moveTo(Math.cos(startAngle)*r, Math.sin(startAngle)*r);
+        t.penUp();
+        contents.setValue(t);
     }
 }
