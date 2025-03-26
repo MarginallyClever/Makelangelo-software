@@ -35,12 +35,12 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private final SelectDouble selectPenDiameter = new SelectDouble("pen diameter", Translator.get("penDiameter"), penDiameter);
     private final SelectDouble selectStepSize = new SelectDouble("step size", Translator.get("Converter_EdgeDetection.stepSize"), stepSize);
 
-    private final double EPSILON = 0.001;
+    private final double EPSILON = 1e-3;
 
     // refinement of lines for sampling.  must be greater than zero.
     private static double stepSize = 5;
     // maximum thickness of the new line. must be greater than zero.
-    private static double maxLineWidth = 1.0;
+    private static double maxLineWidth = 3.0;
     // the pen diameter, controls spacing between passes.
     private static double penDiameter = 0.8;
     // source of weight image
