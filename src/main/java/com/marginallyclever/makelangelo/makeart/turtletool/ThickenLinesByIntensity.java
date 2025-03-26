@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Generate a drawing where the thickness of the line is determined by the intensity of the image at that point.
+ * Take a turtle line and thicken it by the intensity of the image.
  */
 public class ThickenLinesByIntensity {
     private static final Logger logger = LoggerFactory.getLogger(ThickenLinesByIntensity.class);
