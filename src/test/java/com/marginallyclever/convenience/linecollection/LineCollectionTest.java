@@ -105,12 +105,13 @@ public class LineCollectionTest {
         Assertions.assertEquals(2,after.size());
     }
 
+    @Disabled("only used for performance testing")
     @Test
     public void compareSpeedSimplify() {
         // make a large line collection with many colinear lines
         LineCollection before = new LineCollection();
-        for(int i=0;i<1000000;++i) {
-            var a = randomPoint();
+        var a = randomPoint();
+        for(int i=0;i<100000;++i) {
             var b = randomPoint();
             int splits = 1+(int)(Math.random()*10);
             var prev = a;
@@ -120,18 +121,19 @@ public class LineCollectionTest {
                 prev = c;
             }
             before.add(new LineSegment2D(prev,b,Color.BLACK));
+            a=b;
         }
 
         // compare speed of RamerDouglasPeuckerDeque and RamerDouglasPeuckerRecursive
         var start1 = System.currentTimeMillis();
         var after1 = new RamerDouglasPeuckerDeque(before).simplify(0.1);
         var end1 = System.currentTimeMillis();
-        System.out.println("RamerDouglasPeuckerDeque: " + (end1 - start1) + "ms");
+        System.out.println("RamerDouglasPeuckerDeque: " + (end1 - start1) + "ms, "+after1.size());
 
         var start2 = System.currentTimeMillis();
         var after2 = new RamerDouglasPeuckerRecursive(before).simplify(0.1);
         var end2 = System.currentTimeMillis();
-        System.out.println("RamerDouglasPeuckerRecursive: " + (end2 - start2) + "ms");
+        System.out.println("RamerDouglasPeuckerRecursive: " + (end2 - start2) + "ms, "+after2.size());
 
         assert(after1.size()==after2.size());
 

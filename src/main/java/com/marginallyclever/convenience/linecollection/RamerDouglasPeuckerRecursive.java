@@ -53,6 +53,7 @@ public class RamerDouglasPeuckerRecursive implements LineSimplifier {
                 int furthestIndex = getFurthestPointFromStart();
                 // if the furthest point is the first or last point, we can't simplify.
                 if(furthestIndex!=0 && furthestIndex!=len-1) {
+                    keep[furthestIndex] = true;
                     simplifySection(0,furthestIndex);
                     simplifySection(furthestIndex,len-1);
                 }
@@ -89,7 +90,7 @@ public class RamerDouglasPeuckerRecursive implements LineSimplifier {
         var head = points.getFirst();
 
         var len = points.size();
-        for (int i = 0; i < len; i++) {
+        for (int i = 1; i < len; i++) {
             if (keep[i]) {
                 var next = points.get(i);
                 result.add(new LineSegment2D(head, next, c));
