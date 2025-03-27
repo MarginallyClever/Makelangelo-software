@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience.linecollection;
 
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.makelangelo.makeart.io.LoadHelper;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class LineCollectionTest {
     @Test
@@ -148,7 +150,7 @@ public class LineCollectionTest {
     @Test
     void testSplitByTravel() throws Exception {
         // load java/test/resources/svg/corners.svg
-        Turtle turtle = TurtleFactory.load("src/test/resources/svg/corners.svg");
+        Turtle turtle = TurtleFactory.load(Objects.requireNonNull(LoadHelper.class.getResource("/svg/corners.svg")).getPath());
         LineCollection before = turtle.getAsLineSegments();
         List<LineCollection> after = before.splitByTravel();
         Assertions.assertEquals(13,after.size());
