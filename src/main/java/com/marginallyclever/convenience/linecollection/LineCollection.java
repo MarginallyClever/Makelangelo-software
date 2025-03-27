@@ -81,15 +81,6 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 		return result;
 	}
 
-	/**
-	 * Simplify the line collection using the <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Ramer-Douglas-Peucker algorithm</a>.
-	 * @param distanceTolerance the distance tolerance
-	 * @return the simplified line collection
-	 */
-	public LineCollection simplify(double distanceTolerance) {
-		return new RamerDouglasPeuckerRecursive(this).simplify(distanceTolerance);
-	}
-
 	public Point2d getStart() {
 		return get(0).start;
 	}

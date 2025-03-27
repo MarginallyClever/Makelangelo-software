@@ -82,7 +82,7 @@ public class LineCollectionTest {
             before.add(new LineSegment2D(list[i],list[i+1],Color.BLACK));
         }
 
-        LineCollection after = before.simplify(0.01);
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.01);
         Assertions.assertEquals(1,after.size());
     }
 
@@ -101,7 +101,7 @@ public class LineCollectionTest {
         for(int i=0;i<list.length-1;++i) {
             before.add(new LineSegment2D(list[i],list[i+1],Color.BLACK));
         }
-        LineCollection after = before.simplify(0.01);
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.01);
         Assertions.assertEquals(2,after.size());
     }
 
