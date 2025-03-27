@@ -24,6 +24,7 @@ public class Gosper extends Node {
         int count = Math.max(1,order.getValue());
 
         Turtle turtle = new Turtle();
+        turtle.jumpTo(0,0);
         turtle.penDown();
         gosperA(turtle,count);
 

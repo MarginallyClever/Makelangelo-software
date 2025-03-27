@@ -43,6 +43,7 @@ public class Dragon extends Node {
         int i=0;
         // move to starting position
         Turtle turtle = new Turtle();
+        turtle.jumpTo(0,0);
         turtle.penDown();
         // draw the fractal
         for (Integer turn : sequence) {
