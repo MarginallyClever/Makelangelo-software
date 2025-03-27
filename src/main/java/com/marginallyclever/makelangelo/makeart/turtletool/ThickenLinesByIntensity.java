@@ -97,21 +97,18 @@ public class ThickenLinesByIntensity {
      */
     private Turtle generateOneThickLine(LineWeight line) {
         Turtle turtle = new Turtle();
-
         double numPasses = getNumberOfPasses(line);
-
-        LineWeightSegment start = line.segments.getFirst();
-
         boolean first = true;
         // collect all the points, write them at the end.
         for(int pass=0; pass<=numPasses; ++pass) {
             double ratio = pass/numPasses;
             // collect all the points
-            List<Point2d> offsetLine = generateOneThickLinePass(line,start,ratio);
+            List<Point2d> offsetLine = generateOneThickLinePass(line,ratio);
             if((pass%2)==1) Collections.reverse(offsetLine);
             drawPoints(turtle,offsetLine,first);
             first=false;
         }
+
         return turtle;
     }
 
@@ -146,20 +143,16 @@ public class ThickenLinesByIntensity {
         return (int)Math.max(1,Math.ceil(maxWeight / penDiameter));
     }
 
-    private List<Point2d> generateOneThickLinePass(LineWeight line, LineWeightSegment start, double distance) {
+    private List<Point2d> generateOneThickLinePass(LineWeight line, double distance) {
         List<Point2d> offsetSequence = new ArrayList<>();
+
+        LineWeightSegment start = line.segments.getFirst();
 
         // add first point at start of line.  include the end cap offset.
         var s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
-        double dx = s0.getX2()-s0.getX1();
-        double dy = s0.getY2()-s0.getY1();
-        double len = Math.sqrt(dx*dx+dy*dy);
-        if(len>0) {
-            dx/=len;
-            dy/=len;
-        }
-
-        offsetSequence.add(new Point2d(s0.getX1()-dx*maxLineWidth/2,s0.getY1()-dy*maxLineWidth/2));
+        Vector2d u = getUnitVector(s0);
+        u.scale(start.weight/2);
+        offsetSequence.add(new Point2d(s0.getX1()-u.x,s0.getY1()-u.y));
 
         // add the middle points of the line
         for( var seg : line.segments ) {
@@ -170,17 +163,20 @@ public class ThickenLinesByIntensity {
         }
 
         // add last point at start of line.  include the end cap offset.
-        dx = s0.getX2()-s0.getX1();
-        dy = s0.getY2()-s0.getY1();
-        len = Math.sqrt(dx*dx+dy*dy);
-        if(len>0) {
-            dx/=len;
-            dy/=len;
-        }
-        offsetSequence.add(new Point2d(s0.getX2()+dx*maxLineWidth/2,s0.getY2()+dy*maxLineWidth/2));
+        u = getUnitVector(s0);
+        u.scale(line.segments.getLast().weight/2);
+        offsetSequence.add(new Point2d(s0.getX2()+u.x,s0.getY2()+u.y));
 
         // done!
         return offsetSequence;
+    }
+
+    private Vector2d getUnitVector(Line2D s0) {
+        double dx = s0.getX2()-s0.getX1();
+        double dy = s0.getY2()-s0.getY1();
+        Vector2d u = new Vector2d(dx,dy);
+        u.normalize();
+        return u;
     }
 
     /**
