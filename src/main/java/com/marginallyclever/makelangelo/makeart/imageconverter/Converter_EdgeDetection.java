@@ -29,7 +29,6 @@ public class Converter_EdgeDetection extends ImageConverter {
 	private TransformedImage img;
 	private double px,py;
 
-
 	public Converter_EdgeDetection() {
 		super();
 		SelectSlider selectPasses     = new SelectSlider("passes", Translator.get("Converter_EdgeDetection.passes"), 20, 1, (int) (getPasses()));

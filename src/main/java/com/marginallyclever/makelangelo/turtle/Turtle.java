@@ -520,7 +520,12 @@ public class Turtle implements Cloneable {
 	}
 
 	public void add(Turtle t) {
-		this.history.addAll(t.history);
+		lock.lock();
+		try {
+			this.history.addAll(t.history);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public Color getFirstColor() {

@@ -38,7 +38,7 @@ public class Simplify extends Node {
 
     /**
      * Split the collection by color, then by travel moves to get contiguous blocks in a single color.
-     * simplify these blocks using Douglas-Peucker method.
+     * Simplify these blocks to remove redundancy.
      * @param originalLines the lines to simplify
      * @return the simplified lines
      */

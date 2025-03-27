@@ -27,6 +27,7 @@ public class Fibonacci extends Node {
         var sequence = buildFibonacciSequence(count);
 
         Turtle turtle = new Turtle();
+        turtle.jumpTo(0,0);
         turtle.penDown();
 
         // do the curve, one square at a time.

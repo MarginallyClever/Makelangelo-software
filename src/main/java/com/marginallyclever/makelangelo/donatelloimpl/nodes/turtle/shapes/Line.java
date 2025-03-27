@@ -6,12 +6,8 @@ import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Line extends Node {
-    private static final Logger logger = LoggerFactory.getLogger(Line.class);
-
     private final InputDouble x0 = new InputDouble("x0", 0.0);
     private final InputDouble y0 = new InputDouble("y0", 0.0);
     private final InputDouble x1 = new InputDouble("x1", 1.0);

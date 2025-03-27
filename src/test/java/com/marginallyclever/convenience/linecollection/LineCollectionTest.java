@@ -1,6 +1,8 @@
 package com.marginallyclever.convenience.linecollection;
 
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class LineCollectionTest {
     @Test
@@ -80,7 +83,7 @@ public class LineCollectionTest {
             before.add(new LineSegment2D(list[i],list[i+1],Color.BLACK));
         }
 
-        LineCollection after = before.simplify(0.01);
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.01);
         Assertions.assertEquals(1,after.size());
     }
 
@@ -99,16 +102,17 @@ public class LineCollectionTest {
         for(int i=0;i<list.length-1;++i) {
             before.add(new LineSegment2D(list[i],list[i+1],Color.BLACK));
         }
-        LineCollection after = before.simplify(0.01);
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.01);
         Assertions.assertEquals(2,after.size());
     }
 
+    @Disabled("only used for performance testing")
     @Test
     public void compareSpeedSimplify() {
         // make a large line collection with many colinear lines
         LineCollection before = new LineCollection();
-        for(int i=0;i<1000000;++i) {
-            var a = randomPoint();
+        var a = randomPoint();
+        for(int i=0;i<100000;++i) {
             var b = randomPoint();
             int splits = 1+(int)(Math.random()*10);
             var prev = a;
@@ -118,18 +122,19 @@ public class LineCollectionTest {
                 prev = c;
             }
             before.add(new LineSegment2D(prev,b,Color.BLACK));
+            a=b;
         }
 
         // compare speed of RamerDouglasPeuckerDeque and RamerDouglasPeuckerRecursive
         var start1 = System.currentTimeMillis();
         var after1 = new RamerDouglasPeuckerDeque(before).simplify(0.1);
         var end1 = System.currentTimeMillis();
-        System.out.println("RamerDouglasPeuckerDeque: " + (end1 - start1) + "ms");
+        System.out.println("RamerDouglasPeuckerDeque: " + (end1 - start1) + "ms, "+after1.size());
 
         var start2 = System.currentTimeMillis();
         var after2 = new RamerDouglasPeuckerRecursive(before).simplify(0.1);
         var end2 = System.currentTimeMillis();
-        System.out.println("RamerDouglasPeuckerRecursive: " + (end2 - start2) + "ms");
+        System.out.println("RamerDouglasPeuckerRecursive: " + (end2 - start2) + "ms, "+after2.size());
 
         assert(after1.size()==after2.size());
 
@@ -139,5 +144,25 @@ public class LineCollectionTest {
         return new Point2d(
                 a.x*(1-t)+b.x*t,
                 a.y*(1-t)+b.y*t);
+    }
+
+    @Test
+    void testSplitByTravel() throws Exception {
+        // load java/test/resources/svg/corners.svg
+        Turtle turtle = TurtleFactory.load(Objects.requireNonNull(LineCollectionTest.class.getResource("corners.svg")).getPath());
+        LineCollection before = turtle.getAsLineSegments();
+        List<LineCollection> after = before.splitByTravel();
+        Assertions.assertEquals(13,after.size());
+    }
+
+    @Test
+    void testClosedLoop() {
+        LineCollection before = new LineCollection();
+        before.add(new LineSegment2D(new Point2d(0,0),new Point2d(1,0),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(1,0),new Point2d(1,1),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(1,1),new Point2d(0,1),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(0,1),new Point2d(0,0),Color.BLACK));
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.1);
+        Assertions.assertEquals(4,after.size());
     }
 }

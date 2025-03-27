@@ -4,46 +4,83 @@ import com.marginallyclever.convenience.LineSegment2D;
 import org.jetbrains.annotations.NotNull;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * {@link RamerDouglasPeuckerDeque} simplifies a {@link LineCollection} using the Ramer-Douglas-Peucker algorithm
  * with a deque.  Tested to be slower than {@link RamerDouglasPeuckerRecursive}.
  */
 public class RamerDouglasPeuckerDeque implements LineSimplifier {
-    LineCollection original;
+    private final double CONTIGUOUS_TOLERANCE = 1e-4;
+
+    private final List<Point2d> points = new ArrayList<>();
+    private final boolean[] keep;
+    private final Color c;
 
     public RamerDouglasPeuckerDeque(@NotNull LineCollection lineCollection) {
-        original = lineCollection;
+        testSegmentsAreContiguousAndSameColor(lineCollection);
+
+        c = lineCollection.getFirst().color;
+        points.add(lineCollection.getFirst().start);
+        for (var line : lineCollection) {
+            points.add(line.end);
+        }
+        keep = new boolean[points.size()];
+    }
+
+    /**
+     * Test that the segments are contiguous.
+     * @throws IllegalArgumentException if the segments are not contiguous
+     */
+    private void testSegmentsAreContiguousAndSameColor(LineCollection list) throws IllegalArgumentException {
+        var len = list.size();
+        if(len<2) return;
+
+        var first = list.getFirst();
+        Color firstColor = first.color;
+        // test that the end of each original line is the start of the next
+        for (int i = 0; i < len-1; i++) {
+            var next = list.get(i+1);
+            if( first.end.distanceSquared(next.start) > CONTIGUOUS_TOLERANCE ) {
+                throw new IllegalArgumentException("Line segments must be contiguous.");
+            }
+            if( !firstColor.equals(next.color) ) {
+                throw new IllegalArgumentException("Line segments must be the same color.");
+            }
+            first = next;
+        }
     }
 
     @Override
     public @NotNull LineCollection simplify(double distanceTolerance) {
-        int len = original.size();
-        if (len <= 2) return original;
+        var len = points.size();
+        keep[0] = true;
+        keep[len-1] = true;
 
-        boolean[] usePt = new boolean[len];
-        usePt[len - 1] = true;
+        var distanceToleranceSq = distanceTolerance * distanceTolerance;
 
         Deque<int[]> stack = new ArrayDeque<>();
         stack.push(new int[]{0, len - 1});
 
         while (!stack.isEmpty()) {
             int[] range = stack.pop();
-            int i = range[0];
-            int j = range[1];
+            int start = range[0];
+            int end = range[1];
 
-            if (i + 1 == j) continue;
+            if (start + 1 == end) continue;
 
-            LineSegment2D seg = new LineSegment2D(
-                    original.get(i).start,
-                    original.get(j).end, original.get(i).color);
+            var a = points.get(start);
+            var b = points.get(end);
             double maxDistance = 0;
-            int maxIndex = i;
+            int maxIndex = start;
 
-            for (int k = i + 1; k < j; k++) {
-                double distance = seg.ptLineDistSq(original.get(k).end);
+            for (int k = start + 1; k < end; k++) {
+                var p = points.get(k);
+                double distance =  java.awt.geom.Line2D.ptLineDistSq(a.x,a.y, b.x,b.y, p.x,p.y);
                 if (distance > maxDistance) {
                     maxDistance = distance;
                     maxIndex = k;
@@ -51,19 +88,24 @@ public class RamerDouglasPeuckerDeque implements LineSimplifier {
             }
 
             if (maxDistance > distanceTolerance) {
-                usePt[maxIndex] = true;
-                stack.push(new int[]{i, maxIndex});
-                stack.push(new int[]{maxIndex+1, j});
+                keep[maxIndex] = true;
+                stack.push(new int[]{start, maxIndex});
+                stack.push(new int[]{maxIndex, end});
             }
         }
 
-        LineCollection result = new LineCollection();
-        Point2d head = original.getFirst().start;
+        return assembleResult();
+    }
 
-        for (int i = 0; i < len; i++) {
-            if (usePt[i]) {
-                Point2d next = original.get(i).end;
-                result.add(new LineSegment2D(head, next, original.get(i).color));
+    private @NotNull LineCollection assembleResult() {
+        LineCollection result = new LineCollection();
+        var head = points.getFirst();
+
+        var len = points.size();
+        for (int i = 1; i < len; i++) {
+            if (keep[i]) {
+                var next = points.get(i);
+                result.add(new LineSegment2D(head, next, c));
                 head = next;
             }
         }

@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.convenience.linecollection.LineCollection;
+import com.marginallyclever.convenience.linecollection.RamerDouglasPeuckerRecursive;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimplifyTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
-	private static double distanceTolerance = 1.6;
+	private static double distanceTolerance = 0.1;
 	
 	public SimplifyTurtleAction() {
 		super(Translator.get("Simplify"));
@@ -56,7 +57,7 @@ public class SimplifyTurtleAction extends TurtleTool {
 		for(LineCollection c : byColor ) {
 			var byTravel = c.splitByTravel();
 			for(LineCollection t : byTravel ) {
-				LineCollection after = t.simplify(distanceTolerance);
+				LineCollection after = (new RamerDouglasPeuckerRecursive(t)).simplify(distanceTolerance);
 				result.addAll(after);
 			}
 		}

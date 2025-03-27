@@ -8,7 +8,8 @@ import java.util.*;
 import java.util.List;
 
 /**
- * A collection of 2D line segments and their colors.  Utilities for splitting and simplifying the collection.
+ * <p>An array of 2D line segments and their colors.</p>
+ * <p>Utilities for splitting and simplifying the collection.</p>
  */
 public class LineCollection extends ArrayList<LineSegment2D> {
 	public LineCollection() {
@@ -51,8 +52,9 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 	}
 
 	/**
-	 * Splits this collection by travel moves.  Does not affect the original list.  Does not deep copy.
-	 * A travel move is any moment in the collection where element (N).end != (N+1).start
+	 * <p>Splits this collection by travel moves.  Assumes the list is already well sorted.
+	 * A travel move is any moment in the collection where element (N).end != (N+1).start.</p>
+	 * <p>Does not affect the original list.  Does not deep copy.</p>
 	 * @return the list of collections separated by color
 	 */
 	public List<LineCollection> splitByTravel() {
@@ -68,6 +70,7 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			LineSegment2D next = get(i);
 			if(next.start == head.end || next.start.distanceSquared(head.end)<1e-6) {
 				c.add(next);
+				head = next;
 			} else {
 				head = next;
 				c = new LineCollection();
@@ -76,15 +79,6 @@ public class LineCollection extends ArrayList<LineSegment2D> {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Simplify the line collection using the <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Ramer-Douglas-Peucker algorithm</a>.
-	 * @param distanceTolerance the distance tolerance
-	 * @return the simplified line collection
-	 */
-	public LineCollection simplify(double distanceTolerance) {
-		return new RamerDouglasPeuckerRecursive(this).simplify(distanceTolerance);
 	}
 
 	public Point2d getStart() {
