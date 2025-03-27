@@ -41,10 +41,30 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     public LineWeightByImageIntensity() {
         super();
 
-        add(selectMaxLineWidth);    selectMaxLineWidth.addSelectListener(e->generate());
-        add(selectPenDiameter);     selectPenDiameter.addSelectListener(e->generate());
-        add(selectStepSize);        selectStepSize.addSelectListener(e->generate());
-        add(selectFile);            selectFile.addSelectListener(e->generate());
+        add(selectMaxLineWidth);
+        selectMaxLineWidth.addSelectListener(e->{
+            maxLineWidth = Math.max(0.1,selectMaxLineWidth.getValue());
+            generate();
+        });
+
+        add(selectPenDiameter);
+        selectPenDiameter.addSelectListener(e->{
+            penDiameter = Math.max(0.05,selectPenDiameter.getValue());
+            generate();
+        });
+
+        add(selectStepSize);
+        selectStepSize.addSelectListener(e->{
+            stepSize = Math.max(0.1,selectStepSize.getValue());
+            generate();
+        });
+
+        add(selectFile);
+        selectFile.addSelectListener(e->{
+            imageName = selectFile.getText();
+            generate();
+        });
+
     }
 
     @Override
@@ -54,11 +74,6 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
 
     @Override
     public void generate() {
-        maxLineWidth = Math.max(0.1,selectMaxLineWidth.getValue());
-        penDiameter = Math.max(0.05,selectPenDiameter.getValue());
-        stepSize = Math.max(0.1,selectStepSize.getValue());
-        imageName = selectFile.getText();
-
         if(imageName==null || imageName.trim().isEmpty()) {
             return;
         }
