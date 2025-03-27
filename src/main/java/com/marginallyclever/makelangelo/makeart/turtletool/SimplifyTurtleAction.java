@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimplifyTurtleAction extends TurtleTool {
 	private static final Logger logger = LoggerFactory.getLogger(SimplifyTurtleAction.class);
-	private static double distanceTolerance = 1.6;
+	private static double distanceTolerance = 0.1;
 	
 	public SimplifyTurtleAction() {
 		super(Translator.get("Simplify"));
