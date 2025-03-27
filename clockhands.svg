@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <path fill='none' stroke='#000000' d='M 0.000 -37.500 L 0.000 -0.000 0.000 -50.000 '/>
+  <path fill='none' stroke='#000000' d='M 120.000 -37.500 L 120.000 -0.000 145.000 -43.301 '/>
+  <path fill='none' stroke='#000000' d='M 240.000 -37.500 L 240.000 -0.000 283.301 -25.000 '/>
+  <path fill='none' stroke='#000000' d='M 3.920 82.705 L 0.000 120.000 50.000 120.000 '/>
+  <path fill='none' stroke='#000000' d='M 123.920 82.705 L 120.000 120.000 163.301 145.000 '/>
+  <path fill='none' stroke='#000000' d='M 247.797 83.319 L 240.000 120.000 265.000 163.301 '/>
+  <path fill='none' stroke='#000000' d='M 7.797 203.319 L 0.000 240.000 0.000 290.000 '/>
+  <path fill='none' stroke='#000000' d='M 127.797 203.319 L 120.000 240.000 95.000 283.301 '/>
+  <path fill='none' stroke='#000000' d='M 251.588 204.335 L 240.000 240.000 196.699 265.000 '/>
+  <path fill='none' stroke='#000000' d='M 11.588 324.335 L 0.000 360.000 -50.000 360.000 '/>
+  <path fill='none' stroke='#000000' d='M 135.253 325.742 L 120.000 360.000 76.699 335.000 '/>
+  <path fill='none' stroke='#000000' d='M 255.253 325.742 L 240.000 360.000 215.000 316.699 '/>
+  <path fill='none' stroke='#000000' d='M 18.750 447.524 L 0.000 480.000 -0.000 430.000 '/>
+</svg>

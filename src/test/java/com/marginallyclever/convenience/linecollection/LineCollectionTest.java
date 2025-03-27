@@ -1,6 +1,8 @@
 package com.marginallyclever.convenience.linecollection;
 
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
+import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -139,5 +141,14 @@ public class LineCollectionTest {
         return new Point2d(
                 a.x*(1-t)+b.x*t,
                 a.y*(1-t)+b.y*t);
+    }
+
+    @Test
+    void testSplitByTravel() throws Exception {
+        // load java/test/resources/svg/corners.svg
+        Turtle turtle = TurtleFactory.load("src/test/resources/svg/corners.svg");
+        LineCollection before = turtle.getAsLineSegments();
+        List<LineCollection> after = before.splitByTravel();
+        Assertions.assertEquals(13,after.size());
     }
 }
