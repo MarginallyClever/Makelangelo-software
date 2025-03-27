@@ -151,4 +151,15 @@ public class LineCollectionTest {
         List<LineCollection> after = before.splitByTravel();
         Assertions.assertEquals(13,after.size());
     }
+
+    @Test
+    void testClosedLoop() {
+        LineCollection before = new LineCollection();
+        before.add(new LineSegment2D(new Point2d(0,0),new Point2d(1,0),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(1,0),new Point2d(1,1),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(1,1),new Point2d(0,1),Color.BLACK));
+        before.add(new LineSegment2D(new Point2d(0,1),new Point2d(0,0),Color.BLACK));
+        LineCollection after = (new RamerDouglasPeuckerRecursive(before)).simplify(0.1);
+        Assertions.assertEquals(4,after.size());
+    }
 }
