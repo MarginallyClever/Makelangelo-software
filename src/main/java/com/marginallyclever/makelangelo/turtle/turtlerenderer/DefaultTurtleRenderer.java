@@ -26,6 +26,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 
 		// set pen diameter
 		gl2.setStroke(new BasicStroke(penDiameter));
+
 		isPenUp = true;
 
 		// set pen diameter
