@@ -44,7 +44,7 @@ public class LineWeightByImage extends Node {
         setComplete(0);
 
         var tool = new ThickenLinesByIntensity();
-        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize.getValue(),thickness.getValue(),penDiameter.getValue());
+        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize.getValue(),thickness.getValue()-penDiameter.getValue(),penDiameter.getValue());
 
         setComplete(100);
         result.setValue(turtle);
