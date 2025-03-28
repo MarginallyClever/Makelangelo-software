@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.plotter.plottersettings;
 
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.plotter.plotterrenderer.PlotterRendererFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.json.JSONObject;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
@@ -333,8 +334,8 @@ public class PlotterSettings {
 		setString(key,Arrays.toString(values));
 	}
 
-	public Point2D getHome() {
-		return new Point2D(0,0);
+	public Point2d getHome() {
+		return new Point2d();
 	}
 
 	/**
@@ -509,20 +510,22 @@ public class PlotterSettings {
 	public String getPenUpString() {
 		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
-					+ " S" + (int)getDouble(PEN_ANGLE_UP)
-					+ " T" + (int)getDouble(PEN_ANGLE_UP_TIME);
+					+ " S" + getInteger(PEN_ANGLE_UP)
+					+ " T" + getInteger(PEN_ANGLE_UP_TIME);
 		} else {
-			return "G0 Z" + (int)getDouble(PEN_ANGLE_UP);
+			return "G0 Z" + getInteger(PEN_ANGLE_UP)
+					+ " F" + getInteger(PEN_ANGLE_UP_TIME);
 		}
 	}
 
 	public String getPenDownString() {
 		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
 			return "M280 P0"
-					+ " S" + (int)getDouble(PEN_ANGLE_DOWN)
-					+ " T" + (int)getDouble(PEN_ANGLE_DOWN_TIME);
+					+ " S" + getInteger(PEN_ANGLE_DOWN)
+					+ " T" + getInteger(PEN_ANGLE_DOWN_TIME);
 		} else {
-			return "G1 Z" + (int)getDouble(PEN_ANGLE_DOWN);
+			return "G1 Z" + getInteger(PEN_ANGLE_DOWN)
+					+ " F" + getInteger(PEN_ANGLE_DOWN_TIME);
 		}
 	}
 

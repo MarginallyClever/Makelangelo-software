@@ -6,6 +6,7 @@ import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
 import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
 import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
@@ -169,6 +170,31 @@ public class MainMenu extends JMenuBar {
 
         menu.add(createRenderStyleMenu());
         menu.addSeparator();
+
+        var app = frame.getPreviewPanel();
+        var camera = app.getCamera();
+        var paper = app.getPaper();
+
+        JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
+        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
+        buttonZoomOut.addActionListener((e) -> camera.zoom(1));
+        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
+        menu.add(buttonZoomOut);
+
+        JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
+        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
+        buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
+        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
+        menu.add(buttonZoomIn);
+
+        JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
+        buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
+        buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(paper.getPaperWidth(),paper.getPaperHeight()));
+        menu.add(buttonZoomToFit);
+
+        JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
+        GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
+        menu.add(checkboxShowPenUpMoves);
 
         return menu;
     }

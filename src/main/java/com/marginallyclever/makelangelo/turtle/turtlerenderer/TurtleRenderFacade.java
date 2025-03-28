@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 
 /**
- * Facade for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a {@link TurtleRenderer}.
- * TODO explain reason for facade?
+ * <p>{@link TurtleRenderFacade} for rendering a {@link com.marginallyclever.makelangelo.turtle.Turtle} using a
+ * {@link TurtleRenderer}.</p>
+ * <p>The Facade helps to manage the complexity of the rendering process and provides a clean and simple interface
+ * for the client code to interact with.</p>
  * @author Dan Royer
  */
 public class TurtleRenderFacade implements PreviewListener {
@@ -26,9 +28,19 @@ public class TurtleRenderFacade implements PreviewListener {
 	private Color penDownColor = Color.BLACK;
 	private Color penUpColor = Color.GREEN;
 	private double penDiameter=0.8;
+	private boolean showTravel;
 
 	@Override
 	public void render(GL2 gl2) {
+		Graphics2DGL g2gl = new Graphics2DGL(gl2);
+		try {
+			render(g2gl);
+		} finally {
+			g2gl.dispose();
+		}
+	}
+
+	public void render(Graphics2D g2d) {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
@@ -36,51 +48,44 @@ public class TurtleRenderFacade implements PreviewListener {
 			
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
-			
-			try {
-				myRenderer.setPenDiameter(penDiameter);
-				myRenderer.setPenUpColor(penUpColor);
-				myRenderer.setPenDownColor(penDownColor);
-				myRenderer.start(gl2);
-				showCount++;
+			myRenderer.setPenDiameter(penDiameter);
+			myRenderer.setPenUpColor(penUpColor);
+			myRenderer.setPenDownColor(penDownColor);
+			myRenderer.setShowTravel(showTravel);
+			myRenderer.start(g2d);
+			showCount++;
 
-				for (TurtleMove m : myTurtle.history) {
-					if(m==null) throw new NullPointerException();
-					
-					boolean inShow = (showCount >= first && showCount < last);
-					switch (m.type) {
-					case TRAVEL:
-						if (inShow) {
-							myRenderer.travel(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case DRAW_LINE:
-						if (inShow) {
-							myRenderer.draw(previousMove, m);
-						}
-						showCount++;
-						previousMove = m;
-						break;
-					case TOOL_CHANGE:
-						myRenderer.setPenDownColor(m.getColor());
-						myRenderer.setPenDiameter(m.getDiameter());
-						break;
+			for (TurtleMove m : myTurtle.history) {
+				if(m==null) throw new NullPointerException();
+
+				boolean inShow = (showCount >= first && showCount < last);
+				switch (m.type) {
+				case TRAVEL:
+					if (inShow) {
+						myRenderer.travel(previousMove, m);
 					}
+					showCount++;
+					previousMove = m;
+					break;
+				case DRAW_LINE:
+					if (inShow) {
+						myRenderer.draw(previousMove, m);
+					}
+					showCount++;
+					previousMove = m;
+					break;
+				case TOOL_CHANGE:
+					myRenderer.setPenDownColor(m.getColor());
+					myRenderer.setPenDiameter(m.getDiameter());
+					break;
 				}
-			}
-			catch(Exception e) {
-				//Log.error(e.getMessage());
-			}
-			finally {
-				myRenderer.end();
 			}
 		}
 		catch(Exception e) {
 			logger.error("Failed to render the turtle", e);
 		}
 		finally {
+			myRenderer.end();
 			if(myTurtle.isLocked()) {
 				myTurtle.unlock();
 			}
@@ -145,5 +150,9 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public void setPenDiameter(double penDiameter) {
 		this.penDiameter = penDiameter;
+	}
+
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
 	}
 }

@@ -1,7 +1,8 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight;
 
-import com.marginallyclever.convenience.Point2D;
 
+
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 
 /**
@@ -9,18 +10,18 @@ import javax.vecmath.Vector2d;
  * @author Dan Royer
  */
 public class LineWeightSegment {
-    public Point2D start, end;
+    public Point2d start, end;
     public int ix, iy;  // index for faster search
     public double weight;
 
-    public LineWeightSegment(Point2D start, Point2D end, double weight) {
+    public LineWeightSegment(Point2d start, Point2d end, double weight) {
         this.start = start;
         this.end = end;
         this.weight = weight;
     }
 
     public void flip() {
-        Point2D temp = end;
+        Point2d temp = end;
         end = start;
         start = temp;
     }
@@ -29,5 +30,10 @@ public class LineWeightSegment {
         Vector2d n = new Vector2d(end.x - start.x, end.y - start.y);
         n.normalize();
         return n;
+    }
+
+    public Vector2d getNormal() {
+        Vector2d n = getUnit();
+        return new Vector2d(-n.y,n.x);
     }
 }

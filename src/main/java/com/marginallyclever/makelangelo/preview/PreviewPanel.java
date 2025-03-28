@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.preview;
 
+import com.marginallyclever.makelangelo.ActionShowPenUpMoves;
 import com.marginallyclever.makelangelo.MakeleangeloRangeSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
@@ -104,20 +105,13 @@ public class PreviewPanel extends JPanel {
         buttonZoomToFit.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-to-fit-16.png"))));
         bar.add(buttonZoomToFit);
 
-        Action toggleAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean b = GFXPreferences.getShowPenUp();
-                GFXPreferences.setShowPenUp(!b);
-            }
-        };
-        var checkboxShowPenUpMoves = new JToggleButton(toggleAction);
-        toggleAction.putValue(Action.SHORT_DESCRIPTION,Translator.get("GFXPreferences.showPenUp"));
-        toggleAction.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));//"ctrl M"
-        toggleAction.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-plane-16.png"))));
+        var checkboxShowPenUpMoves = new JToggleButton(new ActionShowPenUpMoves());
+
         checkboxShowPenUpMoves.setSelected(GFXPreferences.getShowPenUp());
         GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
+
         bar.add(checkboxShowPenUpMoves);
+        checkboxShowPenUpMoves.setName("");
 
         return bar;
     }
@@ -141,6 +135,7 @@ public class PreviewPanel extends JPanel {
         }
         myTurtleRenderer.setUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
         myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
+        myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
         // myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 
         updatePlotterRenderer();
@@ -151,6 +146,7 @@ public class PreviewPanel extends JPanel {
     private void addPlotterRendererToPreviewPanel() {
         openGLPanel.addListener((gl2)->{
             if(myPlotterRenderer!=null) {
+                myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
                 myPlotterRenderer.render(gl2, myPlotter);
             }
         });

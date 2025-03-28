@@ -119,7 +119,7 @@ public class MarlinPlotterInterfaceTest {
     @Test
     public void testZAxisGcode() {
         testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T150");
-        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_STEPPER,"G1 Z45","G0 Z90");
+        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_STEPPER,"G1 Z45 F50","G0 Z90 F150");
     }
 
     private void testZAxisGcode(int type,String matchDown,String matchUp) {

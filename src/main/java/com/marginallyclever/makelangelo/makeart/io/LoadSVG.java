@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.Bezier;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
@@ -18,6 +18,7 @@ import org.w3c.dom.svg.*;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Matrix3d;
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.io.InputStream;
@@ -197,7 +198,7 @@ public class LoadSVG implements TurtleLoader {
 		if(color.getAlpha()==0) return false;  // transparent
 
 		if(!color.equals(myTurtle.getColor())) {
-			logger.debug("Setting stroke color to {}",color);
+			//logger.debug("Setting stroke color to {}",color);
 			myTurtle.setColor(color);
 		}
 		return false;
@@ -512,8 +513,8 @@ public class LoadSVG implements TurtleLoader {
 				p1.x,p1.y,
 				p2.x,p2.y,
 				p3.x,p3.y);
-		List<Point2D> points = b.generateCurvePoints(0.1);
-		for(Point2D p : points) myTurtle.moveTo(p.x,p.y);
+		List<Point2d> points = b.generateCurvePoints(0.1);
+		for(Point2d p : points) myTurtle.moveTo(p.x,p.y);
 		pathPoint.set(p3);
 		isNewPath=true;
 	}

@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 
 /**
  * Draw {@link com.marginallyclever.makelangelo.turtle.Turtle} with a new color every time the pen is lowered.
@@ -13,61 +13,53 @@ import java.awt.*;
  * @author Dan Royer
  */
 public class SeparateLoopTurtleRenderer implements TurtleRenderer {
-	private GL2 gl2;
+	private Graphics2D gl2;
 	
 	private Color colorTravel = Color.GREEN;
-	private final float[] lineWidthBuf = new float[1];
-	private boolean showPenUp = false;
+	private boolean showTravel = false;
 	private float penDiameter = 1;
 	private int moveCounter;
+	private final Line2D line = new Line2D.Double();
 		
 	@Override
-	public void start(GL2 gl2) {
+	public void start(Graphics2D gl2) {
 		this.gl2=gl2;
-		showPenUp = GFXPreferences.getShowPenUp();
+		showTravel = GFXPreferences.getShowPenUp();
 
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
-		gl2.glLineWidth(penDiameter);
+		// set pen diameter
+		gl2.setStroke(new BasicStroke(penDiameter));
 
-		gl2.glBegin(GL2.GL_LINES);
 		moveCounter=0;
 	}
 
 	@Override
-	public void end() {
-		gl2.glEnd();
-		// restore pen diameter
-		gl2.glLineWidth(lineWidthBuf[0]);
-	}
+	public void end() {}
 	
 	private void setDrawColor() {
 		switch(moveCounter%7) {
-		case 0 -> gl2.glColor3d(1,0,0);
-		case 1 -> gl2.glColor3d(0,0.4,0);
-		case 2 -> gl2.glColor3d(0,0,1);
-		case 3 -> gl2.glColor3d(1,1,0);
-		case 4 -> gl2.glColor3d(1,0,1);
-		case 5 -> gl2.glColor3d(0,1,1);
-		case 6 -> gl2.glColor3d(0,0,0);
+		case 0 -> gl2.setColor(new Color(255,   0,   0));
+		case 1 -> gl2.setColor(new Color(  0, 102,   0));  // 255*0.4 = 102
+		case 2 -> gl2.setColor(new Color(  0,   0, 255));
+		case 3 -> gl2.setColor(new Color(255, 255,   0));
+		case 4 -> gl2.setColor(new Color(255,   0, 255));
+		case 5 -> gl2.setColor(new Color(  0, 255, 255));
+		case 6 -> gl2.setColor(new Color(  0,   0,   0));
 		}
 		moveCounter++;
 	}
 	
 	@Override
 	public void draw(TurtleMove p0, TurtleMove p1) {
-		gl2.glVertex2d(p0.x, p0.y);
-		gl2.glVertex2d(p1.x, p1.y);
+		line.setLine(p0.x, p0.y, p1.x, p1.y);
+		gl2.draw(line);
 	}
 
 	@Override
 	public void travel(TurtleMove p0, TurtleMove p1) {
-		if(showPenUp) {		
-			gl2.glColor3d(
-					colorTravel.getRed() / 255.0,
-					colorTravel.getGreen() / 255.0,
-					colorTravel.getBlue() / 255.0);
-			gl2.glVertex2d(p0.x, p0.y);
-			gl2.glVertex2d(p1.x, p1.y);
+		if(showTravel) {
+			gl2.setColor(colorTravel);
+			line.setLine(p0.x, p0.y, p1.x, p1.y);
+			gl2.draw(line);
 		}
 		setDrawColor();
 	}
@@ -96,4 +88,9 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	 */
 	@Override
 	public void reset() {}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {
+		this.showTravel = showTravel;
+	}
 }

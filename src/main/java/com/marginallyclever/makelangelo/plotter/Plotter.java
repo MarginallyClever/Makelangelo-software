@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.plotter;
 
 import com.jogamp.opengl.GL2;
-import com.marginallyclever.convenience.Point2D;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Point2d;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
@@ -27,13 +27,13 @@ public class Plotter implements PreviewListener, Cloneable {
 	// if pen is "up" then it is not drawing.
 	private boolean penIsUp = false;
 	// current pen position
-	private Point2D pos = new Point2D(0,0);
+	private Point2d pos = new Point2d(0,0);
 	
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		Plotter b = (Plotter)super.clone();
 		b.listeners = new ArrayList<PlotterEventListener>();
-		b.pos = new Point2D();
+		b.pos = new Point2d();
 		b.pos.set(this.pos);
 		return b;
 	}
@@ -125,7 +125,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	/**
 	 * @return the current pen holder position.
 	 */
-	public Point2D getPos() {
+	public Point2d getPos() {
 		return pos;
 	}
 

@@ -15,6 +15,7 @@ import java.util.List;
  * Dragon fractal
  * @author Dan Royer
  */
+@Deprecated(since = "7.68.0")
 public class Generator_Dragon extends TurtleGenerator {
 	private static int order = 12; // controls complexity of curve
 	private final SelectSlider fieldOrder;

@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator.grid;
 
 import com.marginallyclever.convenience.Clipper2D;
-import com.marginallyclever.convenience.Point2D;
+
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -72,11 +73,11 @@ public class Generator_GraphPaper extends TurtleGenerator {
 		double dx = (xMax - xMin)/2;
 		double radius = Math.sqrt(dx*dx+dy*dy);
 
-		Point2D P0=new Point2D();
-		Point2D P1=new Point2D();
+		Point2d P0=new Point2d();
+		Point2d P1=new Point2d();
 
-		Point2D rMax = new Point2D(xMax,yMax);
-		Point2D rMin = new Point2D(xMin,yMin);
+		Point2d rMax = new Point2d(xMax,yMax);
+		Point2d rMin = new Point2d(xMin,yMin);
 		
 		int i=0;
 		for(double a = -radius;a<radius;a+=stepSize_mm) {

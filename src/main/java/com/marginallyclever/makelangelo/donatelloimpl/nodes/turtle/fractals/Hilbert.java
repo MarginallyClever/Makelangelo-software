@@ -25,8 +25,8 @@ public class Hilbert extends Node {
         int count = Math.max(1,order.getValue());
 
         Turtle turtle = new Turtle();
+        turtle.jumpTo(0,0);
         turtle.penDown();
-        
         hilbert(turtle,count);
 
         // center the turtle
@@ -36,7 +36,6 @@ public class Hilbert extends Node {
         output.setValue(turtle);
         setComplete(100);
     }
-
 
     // Hilbert curve A = -BF+AFA+FB-
     private void hilbert(Turtle turtle,int n) {
@@ -54,8 +53,7 @@ public class Hilbert extends Node {
         turtle.turn(90);
     }
 
-
-    // evruc trebliH B = +AF-BFB-FA+
+    // Hilbert curve reverse B = +AF-BFB-FA+
     public void treblih(Turtle turtle,int n) {
         if (n == 0) return;
         turtle.turn(-90);

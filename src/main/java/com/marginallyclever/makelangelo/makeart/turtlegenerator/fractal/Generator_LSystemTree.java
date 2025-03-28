@@ -15,6 +15,7 @@ import java.util.Random;
  * L System fractal
  * @author Dan Royer
  */
+@Deprecated(since = "7.68.0")
 public class Generator_LSystemTree extends TurtleGenerator {
 	private static int order = 4; // controls complexity of curve
 	private static double angleSpan = 120;

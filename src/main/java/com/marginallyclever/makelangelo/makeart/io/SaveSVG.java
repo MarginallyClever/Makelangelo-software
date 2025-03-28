@@ -46,9 +46,11 @@ public class SaveSVG implements TurtleSaver {
 		out.write("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n"); // viewbox would go in svg tag
 
 		boolean isUp=true;
-		double x0 = turtle.history.get(0).x;
-		double y0 = turtle.history.get(0).y;
+		double x0 = turtle.history.getFirst().x;
+		double y0 = turtle.history.getFirst().y;
 		boolean hasStarted=false;
+		StringBuilder b = new StringBuilder();
+		int moveCount=0;
 		for( TurtleMove m : turtle.history ) {
 			switch(m.type) {
 			case TRAVEL:
@@ -59,29 +61,36 @@ public class SaveSVG implements TurtleSaver {
 			case DRAW_LINE:
 				if(isUp) {
 					isUp=false;
-					out.write("M ");
-					out.write(StringHelper.formatDouble(x0)+" ");
-					out.write(StringHelper.formatDouble(-y0)+" ");
-					out.write("L ");
+					b.append("M ")
+							.append(StringHelper.formatDouble(x0)).append(" ")
+							.append(StringHelper.formatDouble(-y0)).append(" ")
+							.append("L ");
 				}
-				out.write(StringHelper.formatDouble(m.x)+" ");
-				out.write(StringHelper.formatDouble(-m.y)+" ");
+				b.append(StringHelper.formatDouble(m.x)).append(" ")
+						.append(StringHelper.formatDouble(-m.y)).append(" ");
+				moveCount++;
 				x0=m.x;
 				y0=m.y;
 				
 				break;
 			case TOOL_CHANGE:
-				if(hasStarted) {
-					out.write("'/>\n");
+				if(hasStarted && moveCount>0) {
+					b.append("'/>\n");
+					out.write(b.toString());
 				}
-				out.write("  <path fill='none' stroke='"+ ColorPalette.getHexCode(m.getColor())+"' d='");
+				b = new StringBuilder();
+				moveCount=0;
+				b.append("  <path fill='none' stroke='")
+						.append(ColorPalette.getHexCode(m.getColor()))
+						.append("' d='");
 				isUp=true;
 				hasStarted=true;
 				break;
 			}
 		}
-		if(hasStarted) {
-			out.write("'/>\n");
+		if(hasStarted && moveCount>0) {
+			b.append("'/>\n");
+			out.write(b.toString());
 		}
 
 		out.write("</svg>");

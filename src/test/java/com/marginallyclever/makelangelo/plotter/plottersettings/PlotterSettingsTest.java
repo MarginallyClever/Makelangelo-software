@@ -12,7 +12,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class PlotterSettingsTest {
-    private static final String ROBOT_TEST_UID = "123456";
+    public static final String ROBOT_TEST_UID = "123456";
 
     @BeforeAll
     public static void beforeAll() {

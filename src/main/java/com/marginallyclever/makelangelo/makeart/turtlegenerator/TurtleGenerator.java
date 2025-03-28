@@ -15,7 +15,7 @@ import java.util.List;
  */
 public abstract class TurtleGenerator {
 	protected Paper myPaper;
-	protected Turtle previousTurtle;
+	protected Turtle myTurtle;
 
 	private final List<Select> panelElements = new ArrayList<>();
 	
@@ -47,6 +47,7 @@ public abstract class TurtleGenerator {
 	// OBSERVER PATTERN
 
 	private final EventListenerList listeners = new EventListenerList();
+
 	public void addListener(TurtleGeneratorListener a) {
 		listeners.add(TurtleGeneratorListener.class, a);
 	}
@@ -62,6 +63,6 @@ public abstract class TurtleGenerator {
 	}
 
 	public void setTurtle(Turtle turtle) {
-		previousTurtle = turtle;
+		myTurtle = turtle;
 	}
 }

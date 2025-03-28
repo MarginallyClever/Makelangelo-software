@@ -2,6 +2,11 @@
 <!DOCTYPE configuration>
 <configuration>
 
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.OnFileStatusListener">
+        <file>${user.home}/.makelangelo/logback-status.log</file>
+    </statusListener>
+
     <if condition='property("DEV").equals("true")'>
         <then>
             <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -10,7 +15,7 @@
                 </encoder>
             </appender>
 
-            <logger name="com.marginallyclever.convenience.log.Log" level="error" />
+            <logger name="com.marginallyclever.convenience.log.Log" level="info" />
             <logger name="com.marginallyclever.makelangelo.Makelangelo" level="info" />
             <logger name="com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPanel" level="trace" />
             <root>

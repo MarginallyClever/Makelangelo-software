@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.donatelloimpl;
 
+import com.marginallyclever.makelangelo.donatelloimpl.nodes.lines.LinesDAO4JSON;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.points.PointsDAO4JSON;
 import com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.TurtleDAO4JSON;
 import com.marginallyclever.nodegraphcore.DAO4JSONFactory;
@@ -32,7 +33,9 @@ public class MakelangeloRegistry implements DAORegistry, NodeRegistry {
     @Override
     public void registerDAO() {
         logger.info("Registering makelangelo-software DAOs");
+        DAO4JSONFactory.registerAllDAOInPackage("com.marginallyclever.makelangelo.donatelloimpl.nodes");
         DAO4JSONFactory.registerDAO(new TurtleDAO4JSON());
         DAO4JSONFactory.registerDAO(new PointsDAO4JSON());
+        DAO4JSONFactory.registerDAO(new LinesDAO4JSON());
     }
 }

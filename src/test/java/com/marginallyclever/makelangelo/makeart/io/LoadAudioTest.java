@@ -13,18 +13,13 @@ public class LoadAudioTest {
     }
 
     @Test
-    public void testLoadAudio() {
+    public void testLoadAudio() throws Exception{
         String testPath = "com/marginallyclever/makelangelo/makeart/io/file_example_MP3_1MG.mp3";
 
         LoadAudio loadAudio = new LoadAudio();
         assert(null!=loadAudio.getFileNameFilter());
         assert(loadAudio.canLoad(testPath));
-        try {
-            var turtle = loadAudio.load(getClass().getClassLoader().getResourceAsStream(testPath));
-            assert(turtle.history.size()>1e6);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        var turtle = loadAudio.load(getClass().getClassLoader().getResourceAsStream(testPath));
+        assert(turtle.history.size()>1e6);
     }
 }

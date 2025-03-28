@@ -1,6 +1,5 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
@@ -10,6 +9,7 @@ import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
 import javax.vecmath.Vector3d;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 /**
@@ -34,30 +34,35 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	};
 
 	//private Turtle previousTurtle=null;
-	private GL2 gl2;
+	private Graphics2D gl2;
 	private final Turtle myTurtle = new Turtle();
-	private Turtle previousTurtle=null;
+	private Turtle previousTurtle = null;
 	private PlotterSettings mySettings;
 	private int renderMode = 0;
-	private boolean useDistance=true;
-	private boolean showNominal=false;
-	private boolean showEntry=false;
-	private boolean showExit=true;
+	private boolean useDistance = true;
+	private boolean showNominal = false;
+	private boolean showEntry = false;
+	private boolean showExit = true;
 	private final ArrayList<ColorPoint> buffer = new ArrayList<>();
+	private final Line2D line = new Line2D.Double();
 	
 	public MarlinSimulationVisualizer() {}
-	
-	private void drawBufferedTurtle(GL2 gl2) {
-		gl2.glPushMatrix();
-		gl2.glBegin(GL2.GL_LINE_STRIP);
 
-		for( ColorPoint a : buffer ) {
-			gl2.glColor3d(a.c.x, a.c.y, a.c.z);
-			gl2.glVertex2d(a.p.x, a.p.y);
+	private void drawBufferedTurtle() {
+		for (int i = 0; i < buffer.size() - 1; i++) {
+			ColorPoint a = buffer.get(i);
+			ColorPoint b = buffer.get(i + 1);
+
+			GradientPaint gradient = new GradientPaint(
+					0,0, new Color((float)a.c.x, (float)a.c.y, (float)a.c.z),
+					0,0, new Color((float)b.c.x, (float)b.c.y, (float)b.c.z)
+			);
+
+			gl2.setPaint(gradient);
+			line.setLine(a.p.x, a.p.y, b.p.x, b.p.y);
+			gl2.draw(line);
 		}
-		
-		gl2.glEnd();
-		gl2.glPopMatrix();
+
 	}
 
 	private void recalculateBuffer(Turtle turtleToRender, final PlotterSettings settings) {
@@ -165,7 +170,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			p1.scale(d/t);
 			p1.add(block.start);
 			buffer.add(new ColorPoint(rainbow(1),p1));
-		} else {
+		} else if(a<t) {
 			// not nominal, add a point anyhow for correct color
 			Vector3d p0 = new Vector3d(block.delta);
 			p0.scale(a/t);
@@ -194,7 +199,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 
 
 	@Override
-	public void start(GL2 gl2) {
+	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
 		myTurtle.history.clear();
 	}
@@ -217,7 +222,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 			previousTurtle = myTurtle;
 		}
 		
-		drawBufferedTurtle(gl2);
+		drawBufferedTurtle();
 	}
 
 	@Override
@@ -246,4 +251,7 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	public void reset() {
 		previousTurtle=null;
 	}
+
+	@Override
+	public void setShowTravel(boolean showTravel) {}
 }
