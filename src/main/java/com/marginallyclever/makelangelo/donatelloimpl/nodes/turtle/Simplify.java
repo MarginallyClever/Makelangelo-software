@@ -12,7 +12,7 @@ import com.marginallyclever.nodegraphcore.Node;
 public class Simplify extends Node {
     private final InputTurtle inputTurtle = new InputTurtle("input");
     private final OutputTurtle outputTurtle = new OutputTurtle("output");
-    private final InputDouble distanceTolerance = new InputDouble("distanceTolerance", 1.6);
+    private final InputDouble distanceTolerance = new InputDouble("distanceTolerance", 0.1);
 
     public Simplify() {
         super("Simplify");
