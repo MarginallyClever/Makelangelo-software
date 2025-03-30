@@ -4,7 +4,7 @@
 
     <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
     <statusListener class="ch.qos.logback.core.status.OnFileStatusListener">
-        <file>${user.home}/.makelangelo/logback-status.log</file>
+        <filename>${user.home}/.makelangelo/logback-status.log</filename>
     </statusListener>
 
     <if condition='property("DEV").equals("true")'>
