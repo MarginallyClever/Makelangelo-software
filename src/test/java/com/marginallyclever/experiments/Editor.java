@@ -4,7 +4,7 @@ import ModernDocking.DockingRegion;
 import ModernDocking.app.Docking;
 import ModernDocking.app.RootDockingPanel;
 import ModernDocking.ext.ui.DockingUI;
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.marginallyclever.makelangelo.DockingPanel;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ import java.awt.*;
  */
 public class Editor extends JFrame {
     public static void main(String[] args) {
-        FlatDarkLaf.setup();
+        FlatLightLaf.setup();
         SwingUtilities.invokeLater(()->(new Editor()).setVisible(true));
     }
 
@@ -51,6 +51,9 @@ public class Editor extends JFrame {
         // create the text editor panels
         for (int i = 0; i < list.length; ++i) {
             DockingPanel editor = new DockingPanel("File " + i,"File " + i);
+            var textArea = new JTextArea();
+            textArea.setText("This is the text editor panel " + i + ".\nIt is editable.\n");
+            editor.add(new JScrollPane(textArea));
             list[i] = editor;
             if(i==0) Docking.dock(editor, this, DockingRegion.EAST,0.8);
             else Docking.dock(editor, list[0], DockingRegion.CENTER);
@@ -58,6 +61,11 @@ public class Editor extends JFrame {
 
         // create the output panel
         DockingPanel output = new DockingPanel("Output","Output");
+        var outText = new JTextArea();
+        outText.setEditable(false);
+        outText.setLineWrap(false);
+        outText.setText("This is the output panel.\nIt is not editable.\n");
+        output.add(new JScrollPane(outText));
         Docking.dock(output, this, DockingRegion.SOUTH);
     }
 }
