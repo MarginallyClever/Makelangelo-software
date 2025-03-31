@@ -28,7 +28,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
     private final SelectDouble selectStepSize = new SelectDouble("step size", Translator.get("Converter_EdgeDetection.stepSize"), stepSize);
 
     // refinement of lines for sampling.  must be greater than zero.
-    private static double stepSize = 5;
+    private static double stepSize = 1;
     // maximum thickness of the new line. must be greater than zero.
     private static double maxLineWidth = 3.0;
     // the pen diameter, controls spacing between passes.
@@ -88,7 +88,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         scaleImage(1);  // fill paper
 
         var tool = new ThickenLinesByIntensity();
-        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize,maxLineWidth,penDiameter);
+        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize,maxLineWidth-penDiameter,penDiameter);
         turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
         notifyListeners(turtle);
