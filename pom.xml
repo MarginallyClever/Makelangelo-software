@@ -233,7 +233,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
-					<ignoreNonCompile>${maven-dependency-plugin.ignoreNonCompile}</ignoreNonCompile>
+					<ignoreNonCompile>true</ignoreNonCompile>
 				</configuration>
 			</plugin>
 
@@ -554,6 +554,13 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>0.3.12</version>
 		</dependency>
 
+		<!-- read audio files -->
+		<dependency>
+			<groupId>com.github.umjammer</groupId>
+			<artifactId>mp3spi</artifactId>
+			<version>1.9.17</version>
+		</dependency>
+
 		<!-- donatello -->
 		<dependency>
 			<!--
@@ -565,7 +572,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.5.4</version>
+			<version>1.5.5</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -577,14 +584,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.8.4</version>
-		</dependency>
-
-		<!-- read audio files -->
-		<dependency>
-			<groupId>com.github.umjammer</groupId>
-			<artifactId>mp3spi</artifactId>
-			<version>1.9.17</version>
+			<version>1.8.5</version>
 		</dependency>
 	</dependencies>
 
@@ -592,8 +592,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minimum.maven.version>3.8.1</minimum.maven.version>
 		<minimum.java.version>22</minimum.java.version>
-		<jogl.version>2.4.0-rc-20200307</jogl.version>
-		<maven-dependency-plugin.ignoreNonCompile>true</maven-dependency-plugin.ignoreNonCompile>
 		<maven.compiler.source>${minimum.java.version}</maven.compiler.source>
 		<maven.compiler.target>${minimum.java.version}</maven.compiler.target>
 		<maven.compiler.release>${minimum.java.version}</maven.compiler.release>

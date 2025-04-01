@@ -11,13 +11,14 @@ import com.marginallyclever.nodegraphcore.Node;
 
 /**
  * Lay the path over the image and change the width of the line by the intensity of the image at the same
- * location.  The fine grain resolution (and the amount of testing) is controlled by the stepSize.
+ * location.  The image must be a bitmap, not a vector.  The fine grain resolution (and the amount of testing) is
+ * controlled by the stepSize.
  * @author Dan Royer
  * @since 2025-01-07
  */
 public class LineWeightByImage extends Node {
-    private final InputImage image = new InputImage("image");
     private final InputTurtle turtle = new InputTurtle("turtle");
+    private final InputImage image = new InputImage("image");
     private final InputDouble stepSize = new InputDouble("stepSize", 5d);
     private final InputDouble thickness = new InputDouble("thickness", 5d);
     private final InputDouble penDiameter = new InputDouble("pen diameter", 0.8);

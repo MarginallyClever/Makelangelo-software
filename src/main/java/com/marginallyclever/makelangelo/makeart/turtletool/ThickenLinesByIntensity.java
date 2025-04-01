@@ -73,6 +73,7 @@ public class ThickenLinesByIntensity {
         sortedLines.clear();
         return turtle;
     }
+
     /**
      * Generate the thick lines
      * @return a turtle of the thick lines
@@ -130,12 +131,12 @@ public class ThickenLinesByIntensity {
     }
 
     /**
-     * Guaranteed to return at least 1 pass.
+     * Find the thickest part of the line, which tells us how many passes we'll have to make.  Guaranteed to return at
+     * least 1 pass.
      * @param line the line to draw
      * @return the number of passes needed to draw the line
      */
     private int getNumberOfPasses(LineWeight line) {
-        // find the thickest part of the line, which tells us how many passes we'll have to make.
         double maxWeight=1;
         for(LineWeightSegment s : line.segments) {
             maxWeight = Math.max(maxWeight,s.weight);
