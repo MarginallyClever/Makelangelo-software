@@ -12,8 +12,6 @@ import com.marginallyclever.donatello.NodeFactoryPanel;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;
-import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
-import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.io.SaveGCode;
 import com.marginallyclever.makelangelo.makeart.io.TurtleFactory;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -38,7 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -141,74 +138,7 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public void openFile(String filename) {
-        try {
-            LoadFilePanel loader = new LoadFilePanel(previewPanel.getPaper(),filename);
-            loader.addActionListener((e)-> setTurtle((Turtle)(e).getSource()));
 
-            if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
-
-            if (loader.onNewFilenameChosen(filename)) {
-                previewPanel.addListener(loader);
-                JDialog dialog = new JDialog(this, Translator.get("LoadFilePanel.title"));
-                dialog.add(loader);
-                dialog.setMinimumSize(new Dimension(500,500));
-                dialog.pack();
-                dialog.setLocationRelativeTo(this);
-                loader.setParent(dialog);
-
-                enableMenuBar(false);
-                dialog.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        loader.loadingFinished();
-                        enableMenuBar(true);
-                        previewPanel.removeListener(loader);
-                        mainMenuBar.getRecentFiles().addFilename(filename);
-                    }
-                });
-
-                dialog.setVisible(true);
-            } else {
-                mainMenuBar.getRecentFiles().addFilename(filename);
-            }
-
-            setMainTitle(new File(filename).getName());
-        } catch(Exception e) {
-            logger.error("Error while loading the file {}", filename, e);
-            JOptionPane.showMessageDialog(this, Translator.get("LoadError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-            mainMenuBar.getRecentFiles().removeFilename(filename);
-        }
-    }
-
-    /**
-     * Load a vector and add it to the existing {@link Turtle}.
-     */
-    public void importFile() {
-        JFileChooser fileChooser = TurtleFactory.getLoadFileChooser();
-        // load the last path from preferences
-        Preferences preferences = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.FILE);
-        String lastPath = preferences.get(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, FileAccess.getWorkingDirectory());
-        fileChooser.setCurrentDirectory(new File(lastPath));
-
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            String filename = fileChooser.getSelectedFile().getAbsolutePath();
-            logger.debug("File selected by user: {}", filename);
-
-            // save the path to preferences
-            preferences.put(OpenFileChooser.KEY_PREFERENCE_LOAD_PATH, fileChooser.getCurrentDirectory().toString());
-
-            // commit the load
-            try {
-                Turtle t = TurtleFactory.load(filename);
-                myTurtle.add(t);
-                setTurtle(myTurtle);
-            } catch(Exception e) {
-                logger.error("Failed to load {}", filename, e);
-                JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
 
     /**
      * Parse <a href="https://github.com/MarginallyClever/Makelangelo/releases/latest">https://github.com/MarginallyClever/Makelangelo/releases/latest</a>

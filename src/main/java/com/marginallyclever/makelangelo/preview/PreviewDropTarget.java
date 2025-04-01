@@ -1,6 +1,8 @@
 package com.marginallyclever.makelangelo.preview;
 
 import com.marginallyclever.makelangelo.MainFrame;
+import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.actions.LoadFileAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +39,7 @@ public class PreviewDropTarget extends DropTargetAdapter {
                     if (o instanceof List<?> list && !list.isEmpty()) {
                         o = list.getFirst();
                         if (o instanceof File file) {
-                            frame.openFile(file.getAbsolutePath());
+                            (new LoadFileAction(Translator.get("MenuOpenFile"),frame,null)).openFile(file.getAbsolutePath());
                             dtde.dropComplete(true);
                             return;
                         }

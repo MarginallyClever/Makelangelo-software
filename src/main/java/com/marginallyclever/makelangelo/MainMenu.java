@@ -5,10 +5,8 @@ import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.convenience.log.Log;
 import com.marginallyclever.convenience.log.LogPanel;
-import com.marginallyclever.makelangelo.applicationsettings.ApplicationSettings;
+import com.marginallyclever.makelangelo.actions.*;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
-import com.marginallyclever.makelangelo.firmwareuploader.FirmwareUploaderPanel;
-import com.marginallyclever.makelangelo.makeart.io.OpenFileChooser;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGenerator;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorFactory;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.TurtleGeneratorPanel;
@@ -18,7 +16,6 @@ import com.marginallyclever.makelangelo.plotter.PiCaptureAction;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManagerPanel;
-import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import org.slf4j.Logger;
@@ -35,12 +32,12 @@ import java.util.Objects;
 
 public class MainMenu extends JMenuBar {
     private static final Logger logger = LoggerFactory.getLogger(MainMenu.class);
-    private static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
-    private static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
+
+    public static int SHORTCUT_CTRL = InputEvent.CTRL_DOWN_MASK;
+    public static int SHORTCUT_ALT = InputEvent.ALT_DOWN_MASK;
+
     private final MainFrame frame;
-    private final SaveDialog saveDialog = new SaveDialog();
     private RecentFiles recentFiles;
-    private final ApplicationSettings myPreferencesPanel = new ApplicationSettings();
     private boolean isMacOS = false;
 
     public MainMenu(MainFrame frame) {
@@ -71,49 +68,16 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu(Translator.get("MenuMakelangelo"));
         menu.setMnemonic('f');
 
-        JMenuItem buttonNewFile = new JMenuItem(Translator.get("MenuNewFile"));
-        buttonNewFile.addActionListener((e) -> newFile());
-        buttonNewFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, SHORTCUT_CTRL));//"ctrl N"
-        buttonNewFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-new-16.png"))));
-        menu.add(buttonNewFile);
+        recentFiles = new RecentFiles(Translator.get("MenuReopenFile"),frame);
 
-        JMenuItem buttonOpenFile = new JMenuItem(Translator.get("MenuOpenFile"));
-        buttonOpenFile.addActionListener((e) -> openLoadFile());
-        buttonOpenFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, SHORTCUT_CTRL));//"ctrl O"
-        buttonOpenFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-load-16.png"))));
-        menu.add(buttonOpenFile);
-
-        recentFiles = new RecentFiles(Translator.get("MenuReopenFile"));
-        recentFiles.addSubmenuListener((e) -> frame.openFile(((JMenuItem) e.getSource()).getText()));
+        menu.add(new NewFileAction(Translator.get("MenuNewFile"),frame));
+        menu.add(new LoadFileAction(Translator.get("MenuOpenFile"),frame,recentFiles));
         menu.add(recentFiles);
-
-        JMenuItem buttonImportFile = new JMenuItem(Translator.get("MenuImportFile"));
-        buttonImportFile.addActionListener((e) -> frame.importFile());
-        buttonImportFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-import-16.png"))));
-        menu.add(buttonImportFile);
-
-        JMenuItem buttonSaveFile = new JMenuItem(Translator.get("MenuSaveFile"));
-        buttonSaveFile.addActionListener((e) -> saveFile());
-        buttonSaveFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, SHORTCUT_CTRL));//"ctrl S"
-        buttonSaveFile.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-save-16.png"))));
-        menu.add(buttonSaveFile);
-
+        menu.add(new ImportFileAction(Translator.get("MenuImportFile"),frame));
+        menu.add(new SaveFileAction(Translator.get("MenuSaveFile"),frame));
         menu.addSeparator();
-
-        JMenuItem buttonAdjustPreferences = new JMenuItem(Translator.get("ApplicationSettings.title"));
-        buttonAdjustPreferences.addActionListener((e) -> myPreferencesPanel.run(SwingUtilities.getWindowAncestor(this)));
-        if (isMacOS) {
-            buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, SHORTCUT_CTRL));//"cmd ,"
-        } else {
-            buttonAdjustPreferences.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, SHORTCUT_ALT));//"alt P"
-        }
-        buttonAdjustPreferences.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-settings-16.png"))));
-        menu.add(buttonAdjustPreferences);
-
-        JMenuItem buttonFirmwareUpdate = new JMenuItem(Translator.get("FirmwareUpdate"));
-        buttonFirmwareUpdate.addActionListener((e) -> runFirmwareUpdate());
-        buttonFirmwareUpdate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-install-16.png"))));
-        menu.add(buttonFirmwareUpdate);
+        menu.add(new AdjustPreferencesAction(Translator.get("ApplicationSettings.title"),frame));
+        menu.add(new UpdateFirmwareAction(Translator.get("FirmwareUpdate"),frame));
 
         addQuit(menu);
 
@@ -122,10 +86,11 @@ public class MainMenu extends JMenuBar {
 
     private void addQuit(JMenu menu) {
         boolean added=false;
+
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
-                added=true;
+                added = true;
                 desktop.setQuitHandler((evt, res) -> {
                     if (frame.confirmClose()) {
                         res.performQuit();
@@ -138,30 +103,8 @@ public class MainMenu extends JMenuBar {
 
         if(!added) {
             menu.addSeparator();
-
-            JMenuItem buttonExit = new JMenuItem(Translator.get("MenuQuit"));
-            buttonExit.addActionListener((e) -> {
-                WindowEvent windowClosing = new WindowEvent(SwingUtilities.getWindowAncestor(this), WindowEvent.WINDOW_CLOSING);
-                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
-            });
-            buttonExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, SHORTCUT_CTRL));//"ctrl Q"
-            buttonExit.setMnemonic('Q');
-            buttonExit.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-stop-16.png"))));
-            menu.add(buttonExit);
+            menu.add(new QuitAction(Translator.get("MenuQuit"),frame));
         }
-    }
-
-    private void newFile() {
-        frame.setTurtle(new Turtle());
-        frame.setMainTitle("");
-    }
-
-    public void openLoadFile() {
-        logger.debug("Open file...");
-
-        OpenFileChooser openFileChooser = new OpenFileChooser(SwingUtilities.getWindowAncestor(this));
-        openFileChooser.setOpenListener(frame::openFile);
-        openFileChooser.chooseFile();
     }
 
     private JMenu createViewMenu() {
@@ -175,22 +118,9 @@ public class MainMenu extends JMenuBar {
         var camera = app.getCamera();
         var paper = app.getPaper();
 
-        JMenuItem buttonZoomOut = new JMenuItem(Translator.get("MenuView.zoomOut"), KeyEvent.VK_MINUS);
-        buttonZoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_CTRL));
-        buttonZoomOut.addActionListener((e) -> camera.zoom(1));
-        buttonZoomOut.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
-        menu.add(buttonZoomOut);
-
-        JMenuItem buttonZoomIn = new JMenuItem(Translator.get("MenuView.zoomIn"), KeyEvent.VK_EQUALS);
-        buttonZoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, SHORTCUT_CTRL));
-        buttonZoomIn.addActionListener((e) -> camera.zoom(-1));
-        buttonZoomIn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
-        menu.add(buttonZoomIn);
-
-        JMenuItem buttonZoomToFit = new JMenuItem(Translator.get("MenuView.zoomFit"), KeyEvent.VK_0);
-        buttonZoomToFit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, SHORTCUT_CTRL));
-        buttonZoomToFit.addActionListener((e) -> camera.zoomToFit(paper.getPaperWidth(),paper.getPaperHeight()));
-        menu.add(buttonZoomToFit);
+        menu.add(new ZoomOutAction(Translator.get("MenuView.zoomOut"),camera));
+        menu.add(new ZoomInAction(Translator.get("MenuView.zoomIn"),camera));
+        menu.add(new ZoomToFitAction(Translator.get("MenuView.zoomFit"),camera,paper));
 
         JCheckBoxMenuItem checkboxShowPenUpMoves = new JCheckBoxMenuItem(new ActionShowPenUpMoves());
         GFXPreferences.addListener((e)->checkboxShowPenUpMoves.setSelected ((boolean)e.getNewValue()));
@@ -213,19 +143,8 @@ public class MainMenu extends JMenuBar {
         }
 
         menuWindows.add(new JSeparator());
-        menuWindows.add(new JMenuItem(new AbstractAction() {
-            {
-                putValue(Action.NAME, "Reset default layout");
-                // no accelerator key.
-                putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("icons8-reset-16.png"))));
-                putValue(Action.SHORT_DESCRIPTION, "Reset the layout to the default.");
-            }
+        menuWindows.add(new ResetLayoutAction(Translator.get("ResetLayout"),frame));
 
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                frame.resetDefaultLayout();
-            }
-        }));
         return menuWindows;
     }
 
@@ -322,33 +241,6 @@ public class MainMenu extends JMenuBar {
 
     private void runLogPanel() {
         LogPanel.runAsDialog(SwingUtilities.getWindowAncestor(this));
-    }
-
-    private void saveFile() {
-        logger.debug("Saving vector file...");
-        try {
-            saveDialog.run(frame.getTurtle(), SwingUtilities.getWindowAncestor(this),frame.getPlotter().getSettings());
-        } catch(Exception e) {
-            logger.error("Error while saving the vector file", e);
-            JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), Translator.get("SaveError") + e.getLocalizedMessage(), Translator.get("ErrorTitle"), JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void runFirmwareUpdate() {
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),"Firmware Update");
-        dialog.add(new FirmwareUploaderPanel());
-        dialog.pack();
-        dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-
-        frame.enableMenuBar(false);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                frame.enableMenuBar(true);
-            }
-        });
-
-        dialog.setVisible(true);
     }
 
     private JMenu createGenerateMenu() {

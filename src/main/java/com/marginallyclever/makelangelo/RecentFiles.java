@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo;
 
+import com.marginallyclever.makelangelo.actions.LoadFileAction;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -21,13 +22,13 @@ public final class RecentFiles extends JMenu {
 	private final Preferences prefs = PreferencesHelper
 			.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.LEGACY_MAKELANGELO_ROOT);
 
-	private final ArrayList<String> fileList = new ArrayList<>();
-	private ActionListener submenuListener;
+	private final List<String> fileList = new ArrayList<>();
+	private final MainFrame frame;
 
 	// Load recent files from prefs
-	public RecentFiles(String label) {
+	public RecentFiles(String label,MainFrame frame) {
 		super(label);
-		
+		this.frame = frame;
 		loadFromStorage();
 		updateLists();
 	}
@@ -43,10 +44,10 @@ public final class RecentFiles extends JMenu {
 		
 		int i = getIndexOf(filename);
 		if(i==-1) {
-			fileList.add(0,filename);
+			fileList.addFirst(filename);
 		} else {
 			// bump to the head of the list
-			fileList.add(0,fileList.remove(i));
+			fileList.addFirst(fileList.remove(i));
 		}
 		updateLists();
 	}
@@ -92,13 +93,10 @@ public final class RecentFiles extends JMenu {
 		int i=0;
 		for( String f : fileList ) {
 			prefs.put(getNodeName(i++), f);
-			JMenuItem item = new JMenuItem(f);
-			this.add(item);
-			item.addActionListener(submenuListener);
+			this.add(new LoadFileAction(f,frame,this));
 		}
-		
 	}
-		
+
 	private void loadFromStorage() {
 		logger.debug("loading recent files");
 		for (int i=0; i<MAX_FILES; ++i) {
@@ -110,13 +108,8 @@ public final class RecentFiles extends JMenu {
 			}
 		}
 	}
-	
+
 	private String getNodeName(int i) {
 		return "recent-files-"+i;
-	}
-
-	public void addSubmenuListener(ActionListener object) {
-		submenuListener = object;
-		updateLists();
 	}
 }

@@ -80,7 +80,7 @@ public class PreviewPanel extends JPanel {
         };
         buttonZoomOut.putValue(Action.SHORT_DESCRIPTION, Translator.get("MenuView.zoomOut"));
         buttonZoomOut.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
-        buttonZoomOut.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-out-16.png"))));
+        buttonZoomOut.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/actions/icons8-zoom-out-16.png"))));
         bar.add(buttonZoomOut);
 
         var buttonZoomIn = new AbstractAction() {
@@ -91,7 +91,7 @@ public class PreviewPanel extends JPanel {
         };
         buttonZoomIn.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomIn"));
         buttonZoomIn.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
-        buttonZoomIn.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-in-16.png"))));
+        buttonZoomIn.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/actions/icons8-zoom-in-16.png"))));
         bar.add(buttonZoomIn);
 
         var buttonZoomToFit = new AbstractAction() {
@@ -102,7 +102,7 @@ public class PreviewPanel extends JPanel {
         };
         buttonZoomToFit.putValue(Action.SHORT_DESCRIPTION,Translator.get("MenuView.zoomFit"));
         buttonZoomToFit.putValue(Action.ACCELERATOR_KEY,KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
-        buttonZoomToFit.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/icons8-zoom-to-fit-16.png"))));
+        buttonZoomToFit.putValue(Action.SMALL_ICON,new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/actions/icons8-zoom-to-fit-16.png"))));
         bar.add(buttonZoomToFit);
 
         var checkboxShowPenUpMoves = new JToggleButton(new ActionShowPenUpMoves());

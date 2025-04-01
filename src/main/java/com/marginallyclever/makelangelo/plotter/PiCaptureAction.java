@@ -8,6 +8,7 @@ import com.hopding.jrpicam.enums.Exposure;
 import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
 import com.marginallyclever.makelangelo.MainFrame;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.actions.LoadFileAction;
 import com.marginallyclever.makelangelo.paper.Paper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,7 +281,7 @@ public class PiCaptureAction {
 
 		if (useImage) {
 			// process the image
-			mainFrame.openFile("/home/pi/Pictures/capture.jpg");
+			(new LoadFileAction(Translator.get("MenuOpenFile"),mainFrame,null)).openFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
 }

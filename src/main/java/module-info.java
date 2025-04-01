@@ -27,6 +27,7 @@ module com.marginallyclever.makelangelo {
     requires com.github.weisj.jsvg;
     requires com.marginallyclever.donatello;
     requires com.marginallyclever.nodegraphcore;
+    requires jsr305;
 
     exports com.marginallyclever.communications;
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;

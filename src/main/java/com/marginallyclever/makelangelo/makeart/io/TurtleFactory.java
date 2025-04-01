@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;
@@ -78,7 +79,7 @@ public class TurtleFactory {
 		return fileChooserSave;
 	}
 
-	public static Turtle load(String filename) throws Exception {
+	public static @Nonnull Turtle load(String filename) throws Exception {
 		if(filename == null || filename.trim().isEmpty()) {
 			throw new InvalidParameterException("filename cannot be empty");
 		}
