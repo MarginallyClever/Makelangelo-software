@@ -1,8 +1,10 @@
 name: Java CI with Maven
 
 env:
+  # find out this value by opening `https://api.github.com/repos/<owner>/<repo>/releases`.  then find the correct release.
+  # in your browser and copy the full "upload_url" value including the {?name,label} part.
   UPLOAD_URL: https://uploads.github.com/repos/MarginallyClever/Makelangelo-software/releases/54908875/assets{?name,label}
-  RELEASE_ID: 54908875
+  RELEASE_ID: 54908875 # same as above (id can just be taken out the upload_url, it's used to find old releases)
 
 on:
   push:
@@ -14,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-
       - uses: actions/setup-java@v4.7.0
         with:
           distribution: 'temurin'
