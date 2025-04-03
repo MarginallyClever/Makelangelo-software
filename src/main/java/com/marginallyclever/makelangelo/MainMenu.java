@@ -143,7 +143,7 @@ public class MainMenu extends JMenuBar {
         }
 
         menuWindows.add(new JSeparator());
-        menuWindows.add(new ResetLayoutAction(Translator.get("ResetLayout"),frame));
+        menuWindows.add(new ResetLayoutAction(Translator.get("MenuWindows.ResetLayout"),frame));
 
         return menuWindows;
     }
