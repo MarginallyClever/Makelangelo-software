@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.vecmath.Vector2d;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -273,7 +273,7 @@ public class LoadFactorioMap implements TurtleLoader {
         turtle.moveTo(x, y);
         turtle.setAngle(90+dir * 45);
         turtle.forward(w/2d+2);
-        Vector2d start = turtle.getPosition();
+        Point2d start = turtle.getPosition();
         double angle = turtle.getAngle();
 
         if(variant.equals("R")) {

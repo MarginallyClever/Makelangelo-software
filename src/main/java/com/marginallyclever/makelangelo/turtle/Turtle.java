@@ -31,16 +31,17 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 7.0?
  */
 public class Turtle implements Cloneable {
+	//public final List<ColorLayer> colorLayers = new ArrayList<>();
 	public final List<TurtleMove> history = new ArrayList<>();
 	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
-	private double px, py;
-	private double nx, ny;  // normal of angle. aka sin() and cos() of angle.
+	private final Point2d p = new Point2d();
+	private final Vector2d n = new Vector2d();  // normal of angle. aka sin() and cos() of angle.
 	private double angle;
 	private boolean isUp;
 	private Color color;
-	private double diameter=1;
+	private double diameter = 1;
 
 	public Turtle() {
 		super();
@@ -49,14 +50,12 @@ public class Turtle implements Cloneable {
 	
 	public Turtle(Turtle t) {
 		this();
-		this.px = t.px;
-		this.py = t.py;
-		this.nx = t.nx;
-		this.ny = t.ny;
+		this.p.set(t.p);
+		this.n.set(t.n);
 		this.angle = t.angle;
 		this.isUp = t.isUp;
-		this.color=t.color;
-		this.diameter = t.diameter; 
+		this.color = t.color;
+		this.diameter = t.diameter;
 		// deep copy
 		history.clear();
 		for( TurtleMove m : t.history ) {
@@ -82,10 +81,8 @@ public class Turtle implements Cloneable {
 	public String toString() {
 		return "Turtle{" +
 				"history=" + history.size() +
-				", px=" + px +
-				", py=" + py +
-				", nx=" + nx +
-				", ny=" + ny +
+				", p=" + p +
+				", n=" + n +
 				", angle=" + angle +
 				", isUp=" + isUp +
 				", color=" + color +
@@ -98,8 +95,7 @@ public class Turtle implements Cloneable {
 	 * @param c The starting color for this {@link Turtle}.
 	 */
 	private void reset(Color c) {
-		px = 0;
-		py = 0;
+		p.set(0,0);
 		setAngle(0);
 		penUp();
 		history.clear();
@@ -123,14 +119,20 @@ public class Turtle implements Cloneable {
 		}
 	}
 
+	/**
+	 * Set the color of the pen.  This will add a new {@link TurtleMove} to the history.
+	 * @param c the new color
+	 */
 	public void setColor(Color c) {
 		if(color!=null) {
 			if(color.getRed()==c.getRed() &&
 				color.getGreen()==c.getGreen() &&
 				color.getBlue()==c.getBlue()) return;
 		}
-		color = c;
-		history.add( new TurtleMove(color.hashCode(),diameter,MovementType.TOOL_CHANGE) );
+		if(color!=c) {
+			color = c;
+			history.add(new TurtleMove(color.hashCode(), diameter, MovementType.TOOL_CHANGE));
+		}
 	}
 	
 	public Color getColor() {
@@ -164,45 +166,39 @@ public class Turtle implements Cloneable {
 	 * @param y absolute y position
 	 */
 	public void moveTo(double x,double y) {
-		px=x;
-		py=y;
+		p.set(x,y);
 		history.add( new TurtleMove(x, y, isUp ? MovementType.TRAVEL : MovementType.DRAW_LINE) );
 	}
-		
+
 	/**
-	 * Absolute position
-	 * @param arg0 x axis
+	 * @return the current x position of the turtle
 	 */
-	public void setX(double arg0) {
-		moveTo(arg0,py);
-	}
-	
-	/**
-	 * Absolute position
-	 * @param arg0 y axis
-	 */
-	public void setY(double arg0) {
-		moveTo(px,arg0);
-	}
-	
 	public double getX() {
-		return px;
+		return p.x;
 	}
-	
+
+	/**
+	 * @return the current y position of the turtle
+	 */
 	public double getY() {
-		return py;
+		return p.y;
 	}
-	
+
+	/**
+	 * Changes the pen status to up.  Does not add to history.
+	 */
 	public void penUp() {
 		isUp=true;
 	}
-	
+
+	/**
+	 * Changes the pen status to down.  Does not add to history.
+	 */
 	public void penDown() {
 		isUp=false;
 	}
 	
 	/**
-	 * Returns true if pen is up.
 	 * @return true if pen is up
 	 */
 	public boolean isUp() {
@@ -229,8 +225,7 @@ public class Turtle implements Cloneable {
 	public void setAngle(double degrees) {
 		angle=degrees;
 		double radians=Math.toRadians(angle);
-		nx = Math.cos(radians);
-		ny = Math.sin(radians);
+		n.set(Math.cos(radians), Math.sin(radians));
 	}
 
 	/**
@@ -239,14 +234,14 @@ public class Turtle implements Cloneable {
 	 */
 	public void forward(double distance) {
 		moveTo(
-			px + nx * distance,
-			py + ny * distance
+			p.x + n.x * distance,
+			p.y + n.y * distance
 		);
 	}
 	public void strafe(double distance) {
 		moveTo(
-			px + ny * distance,
-			py - nx * distance
+			p.x + n.y * distance,
+			p.y - n.x * distance
 		);
 	}
 
@@ -475,8 +470,8 @@ public class Turtle implements Cloneable {
 	}
 
 	private double distanceSquared(Point2d b) {
-		double dx = px-b.x;
-		double dy = py-b.y;
+		double dx = p.x - b.x;
+		double dy = p.y - b.y;
 		return dx*dx + dy*dy; 
 	}
 	
@@ -562,10 +557,10 @@ public class Turtle implements Cloneable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Turtle turtle = (Turtle) o;
-		return Double.compare(turtle.px, px) == 0 &&
-				Double.compare(turtle.py, py) == 0 &&
-				Double.compare(turtle.nx, nx) == 0 &&
-				Double.compare(turtle.ny, ny) == 0 &&
+		return  Double.compare(turtle.p.x, p.x) == 0 &&
+				Double.compare(turtle.p.y, p.y) == 0 &&
+				Double.compare(turtle.n.x, n.x) == 0 &&
+				Double.compare(turtle.n.y, n.y) == 0 &&
 				Double.compare(turtle.angle, angle) == 0 &&
 				isUp == turtle.isUp &&
 				Double.compare(turtle.diameter, diameter) == 0 &&
@@ -575,15 +570,15 @@ public class Turtle implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
+		return Objects.hash(history, p.x, p.y, n.x, n.y, angle, isUp, color, diameter);
 	}
 
 	public Vector2d getHeading() {
-		return new Vector2d(nx,ny);
+		return new Vector2d(n);
 	}
 
-	public Vector2d getPosition() {
-		return new Vector2d(px,py);
+	public Point2d getPosition() {
+		return new Point2d(p);
 	}
 
 
