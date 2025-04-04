@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	private Color colorTravel = Color.GREEN;
 	private boolean showTravel = false;
 	private float penDiameter = 1;
-	private final ArrayList<TurtleMove> points = new ArrayList<>();
+	private final ArrayList<Point2d> points = new ArrayList<>();
 	private final Line2D line = new Line2D.Double();
 		
 	@Override
@@ -35,7 +35,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	}
 	
 	@Override
-	public void draw(TurtleMove p0, TurtleMove p1) {
+	public void draw(Point2d p0, Point2d p1) {
 		points.add(p0);
 		points.add(p1);
 	}
@@ -45,8 +45,8 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 			int size = points.size();
 
 			for(int i=0;i<size;i+=2) {
-				TurtleMove p0 = points.get(i);
-				TurtleMove p1 = points.get(i+1);
+				Point2d p0 = points.get(i);
+				Point2d p1 = points.get(i+1);
 				double r = (double)i/(double)size;
 				double b = 1.0 - r;
 				gl2.setColor(new Color((int)(r*255),0,(int)(b*255)));
@@ -58,7 +58,7 @@ public class DirectionLoopTurtleRenderer implements TurtleRenderer {
 	}
 
 	@Override
-	public void travel(TurtleMove p0, TurtleMove p1) {
+	public void travel(Point2d p0, Point2d p1) {
 		drawPoints();
 		if(showTravel) {
 			gl2.setColor(colorTravel);

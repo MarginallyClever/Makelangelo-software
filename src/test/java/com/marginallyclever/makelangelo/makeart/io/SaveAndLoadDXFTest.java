@@ -62,7 +62,7 @@ public class SaveAndLoadDXFTest {
             Turtle after = load.load(input);
             input.close();
 
-            Assertions.assertEquals(before.history.toString(),after.history.toString(),"Different history");
+            Assertions.assertEquals(before.generateHistory(),after.generateHistory(),"Different history");
         } finally {
             fileTemp.delete();
         }

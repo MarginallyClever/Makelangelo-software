@@ -3,7 +3,6 @@ package com.marginallyclever.makelangelo.plotter.marlinsimulation;
 
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -537,33 +536,22 @@ public class MarlinSimulation {
 		double ly=home.y;
 		poseNow.set(lx,ly,upAngle);
 		queue.clear();
-				
-		for(TurtleMove m : t.history) {			
-			switch(m.type) {
-			case DRAW_LINE:
-				if(isUp) {
-					isUp=false;
-					bufferLine(new Vector3d(lx,ly,downAngle),penLiftTime,maxAcceleration);
+
+		for( var layer : t.strokeLayers ) {
+			for( var line : layer.getAllLines() ) {
+				if(line.isEmpty()) continue;
+				var iter = line.iterator();
+				Point2d p = iter.next();
+				bufferLine(new Vector3d(p.x,p.y,upAngle),penLiftTime,maxAcceleration);
+				bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
+				while(iter.hasNext()) {
+					p = iter.next();
+					bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
 				}
-				bufferLine(new Vector3d(m.x,m.y,downAngle),drawFeedRate,maxAcceleration);
-				lx=m.x;
-				ly=m.y;
-				break;
-			case TRAVEL:
-				if(!isUp) {
-					isUp=true;
-					bufferLine(new Vector3d(lx,ly,upAngle),penLiftTime,maxAcceleration);
-				}
-				bufferLine(new Vector3d(m.x,m.y,upAngle),travelFeedrate,maxAcceleration);
-				lx=m.x;
-				ly=m.y;
-				break;
-			default:
-				break;
 			}
-			while(queue.size()>settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)) consumer.run(queue.remove(0));
+			while(queue.size()>settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)) consumer.run(queue.removeFirst());
 		}
-		while(!queue.isEmpty()) consumer.run(queue.remove(0));
+		while(!queue.isEmpty()) consumer.run(queue.removeFirst());
 	}
 	
 	// @return time in seconds to run sequence.

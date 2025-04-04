@@ -64,8 +64,8 @@ public class LoadDXFTest {
             Turtle turtle = loader.load(LoadDXFTest.class.getResourceAsStream(filenameToTest));
 
             assertNotNull(turtle);
-            assertNotNull(turtle.history);
-            assertEquals(readFile(fileExpected), turtle.history.toString());
+            assert(turtle.hasDrawing());
+            assertEquals(readFile(fileExpected), turtle.generateHistory());
         } catch( Exception e) {
             fail(e);
         }

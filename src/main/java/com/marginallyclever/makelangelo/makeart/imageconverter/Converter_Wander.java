@@ -181,7 +181,7 @@ public class Converter_Wander extends ImageConverter {
 		
 		// draw the sorted list of points.
 		logger.debug("Drawing points...");	
-		turtle.setColor(newColor);
+		turtle.setStroke(newColor);
 
 		for (Bucket bucket : buckets) {
 			while (!bucket.sortedPoints.isEmpty()) {

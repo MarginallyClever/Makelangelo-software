@@ -70,22 +70,22 @@ public class LoadSVG implements TurtleLoader {
 		initSVGDOM(document);
 
 		myTurtle = new Turtle();
-		myTurtle.setColor(Color.BLACK);  // initial pen color
+		myTurtle.setStroke(Color.BLACK);  // initial pen color
 		parseAll(document);
 
 		// plotter coordinates are inverted in Y so flip the image.
 		myTurtle.scale(1, -1);
 
-		Turtle t2 = new Turtle();
-		t2.history.clear();
+		Turtle result = new Turtle();
+		result.strokeLayers.clear();
 
 		// remove tool changes for zero-length moves.
 		List<Turtle> list = myTurtle.splitByToolChange();
 		for(Turtle t : list) {
 			if(t.getDrawDistance()>0)
-				t2.add(t);
+				result.add(t);
 		}
-		return t2;
+		return result;
 	}
 
 	private void parseAll(Document document) throws Exception {
@@ -199,7 +199,7 @@ public class LoadSVG implements TurtleLoader {
 
 		if(!color.equals(myTurtle.getColor())) {
 			//logger.debug("Setting stroke color to {}",color);
-			myTurtle.setColor(color);
+			myTurtle.setStroke(color);
 		}
 		return false;
 	}

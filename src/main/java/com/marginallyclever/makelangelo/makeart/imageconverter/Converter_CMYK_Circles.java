@@ -75,7 +75,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
-		turtle.history.clear();
+		turtle.strokeLayers.clear();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 ,Color.YELLOW);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,Color.CYAN);
@@ -98,7 +98,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
 		
-		turtle.setColor(newColor);
+		turtle.setStroke(newColor);
 
 		// from top to bottom of the margin area...
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
@@ -160,7 +160,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	private void drawCircle(double x,double y,double r) {
 		double circumference = Math.ceil(Math.PI*r*2.0);
 		Turtle t = new Turtle();
-		t.setColor(turtle.getColor());
+		t.setStroke(turtle.getColor());
 		t.jumpTo(x+r,y+0);
 		for(int i=0;i<circumference;++i) {
 			double v = 2.0*Math.PI * (double)i/circumference;

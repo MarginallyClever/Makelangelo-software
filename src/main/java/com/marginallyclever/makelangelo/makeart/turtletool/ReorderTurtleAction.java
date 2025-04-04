@@ -21,12 +21,12 @@ public class ReorderTurtleAction extends TurtleTool {
 	}
 	
 	public Turtle run(Turtle input) {
-		if(input.history.isEmpty()) return input;
+		if(input.strokeLayers.isEmpty()) return input;
 		
-		logger.debug("reorder() start @ {} instructions.", input.history.size());
+		logger.debug("reorder() start @ {} loops.", input.countLoops());
 
 		var output = (new ReorderHelper()).splitAndReorderTurtle(input);
-		logger.debug("reorder() end @ {} instructions.", output.history.size());
+		logger.debug("reorder() end @ {} loops.", output.countLoops());
 		return output;
 	}
 }

@@ -5,6 +5,7 @@ import com.marginallyclever.convenience.helpers.StringHelper;
 import java.awt.*;
 import java.util.Objects;
 
+@Deprecated(since="7.70.0", forRemoval=true)
 public class TurtleMove {
 	public MovementType type;
 	public double x,y;  // destination

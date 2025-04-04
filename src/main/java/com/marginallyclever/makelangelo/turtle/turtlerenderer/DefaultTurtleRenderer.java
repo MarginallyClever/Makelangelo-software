@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Line2D;
 
@@ -37,7 +37,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	public void end() {}
 
 	@Override
-	public void draw(TurtleMove p0, TurtleMove p1) {
+	public void draw(Point2d p0, Point2d p1) {
 		if(isPenUp) {
 			gl2.setColor(colorDraw);
 			isPenUp = false;
@@ -48,7 +48,7 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	}
 
 	@Override
-	public void travel(TurtleMove p0, TurtleMove p1) {
+	public void travel(Point2d p0, Point2d p1) {
 		if(!isPenUp) {
 			isPenUp = true;
 			if(showTravel) {

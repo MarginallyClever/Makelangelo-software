@@ -255,8 +255,7 @@ public class Converter_FlowField extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
-		turtle.history.clear();
-
+		turtle.strokeLayers.clear();
 
 		if(fromEdge) {
 			// get all the flow lines.
@@ -330,7 +329,6 @@ public class Converter_FlowField extends ImageConverter {
 	}
 
 	private void asGrid(TransformedImage img) {
-
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		double xMin = rect.getMinX();
 		double xMax = rect.getMaxX();

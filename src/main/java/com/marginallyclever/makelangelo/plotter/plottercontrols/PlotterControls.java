@@ -10,16 +10,13 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.PlotterEvent;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * {@link PlotterControls} brings together three separate panels and wraps all
@@ -274,22 +271,18 @@ public class PlotterControls extends JPanel {
 
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
-		List<TurtleMove> history = myTurtle.history;
-		int total = history.size();
-		int x = startAtLine;
-		if (x >= total)
-			x = total - 1;
-		if (x < 0)
-			return 0;
-
-		while (x > 1) {
-			TurtleMove m = history.get(x);
-			if (m.type == MovementType.TRAVEL)
-				return x;
-			--x;
+		int sum=0;
+		for( var strokeLayer : myTurtle.strokeLayers ) {
+			for (var line : strokeLayer.getAllLines()) {
+				int size = line.getAllPoints().size();
+				if (sum <= startAtLine && startAtLine < sum + size) {
+					// the start of this line (sum) is the right value.
+					return sum;
+				}
+			}
 		}
-
-		return x;
+		// all layers are empty?
+		return 0;
 	}
 
 	private void addUserStartGCODE() {

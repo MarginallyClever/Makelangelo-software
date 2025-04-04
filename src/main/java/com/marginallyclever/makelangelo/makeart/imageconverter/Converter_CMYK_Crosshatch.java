@@ -62,7 +62,7 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
-		turtle.history.clear();
+		turtle.strokeLayers.clear();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 , Color.YELLOW);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15, Color.CYAN);
@@ -77,7 +77,7 @@ public class Converter_CMYK_Crosshatch extends ImageConverter {
 		double dy = Math.sin(Math.toRadians(angle));
 		double [] channelCutoff = {0,153,51,102,204};
 		
-		turtle.setColor(newColor);
+		turtle.setStroke(newColor);
 
 		// figure out how many lines we're going to have on this image.
 		double stepSize = passes;

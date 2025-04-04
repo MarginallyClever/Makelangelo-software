@@ -3,12 +3,12 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.helpers.MathHelper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
@@ -28,10 +28,41 @@ public class SaveDXF implements TurtleSaver {
 	@Override
 	public boolean save(OutputStream outputStream,Turtle turtle, PlotterSettings settings) throws Exception {
 		logger.debug("saving...");
-		
-		Rectangle2D.Double box = turtle.getBounds();
+
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
-		// header
+		outputHeader(out,turtle.getBounds());
+
+		for( var layer : turtle.strokeLayers ) {
+			// TODO write out color change using layer.getColor()
+			for( var line : layer.getAllLines() ) {
+				if(line.isEmpty()) continue;
+				var iter = line.getAllPoints().iterator();
+				var p0 = iter.next();
+				while(iter.hasNext()) {
+					var p1 = iter.next();
+					out.write("0\nLINE\n");
+					out.write("8\n1\n");  // layer 1
+					out.write("10\n"+MathHelper.roundOff3(p0.x)+"\n");
+					out.write("20\n"+MathHelper.roundOff3(p0.y)+"\n");
+					out.write("11\n"+MathHelper.roundOff3(p1.x)+"\n");
+					out.write("21\n"+MathHelper.roundOff3(p1.y)+"\n");
+					p0=p1;
+				}
+			}
+		}
+		outputFooter(out);
+		logger.debug("done.");
+		return true;
+	}
+
+	private void outputFooter(OutputStreamWriter out) throws IOException{
+		// wrap it up
+		out.write("0\nENDSEC\n");
+		out.write("0\nEOF\n");
+		out.flush();
+	}
+
+	private void outputHeader(OutputStreamWriter out,Rectangle2D.Double box) throws IOException {		// header
 		out.write("999\nDXF created by Makelangelo software (http://makelangelo.com)\n");
 		out.write("0\nSECTION\n");
 		out.write("2\nHEADER\n");
@@ -94,42 +125,6 @@ public class SaveDXF implements TurtleSaver {
 		// now the lines
 		out.write("0\nSECTION\n");
 		out.write("2\nENTITIES\n");
-
-		boolean isUp=true;
-		double x0 = turtle.history.get(0).x;
-		double y0 = turtle.history.get(0).y;
-				
-		for( TurtleMove m : turtle.history ) {
-			switch(m.type) {
-			case TRAVEL:
-				isUp=true;
-				x0=m.x;
-				y0=m.y;
-				break;
-			case DRAW_LINE:
-				if(isUp) isUp=false;
-				out.write("0\nLINE\n");
-				out.write("8\n1\n");  // layer 1
-				out.write("10\n"+MathHelper.roundOff3(x0)+"\n");
-				out.write("20\n"+MathHelper.roundOff3(y0)+"\n");
-				out.write("11\n"+MathHelper.roundOff3(m.x)+"\n");
-				out.write("21\n"+MathHelper.roundOff3(m.y)+"\n");
-				x0=m.x;
-				y0=m.y;
-				
-				break;
-			case TOOL_CHANGE:
-				// TODO write out DXF layer using  m.getColor()
-				break;
-			}
-		}
-		// wrap it up
-		out.write("0\nENDSEC\n");
-		out.write("0\nEOF\n");
-		out.flush();
-		
-		logger.debug("done.");
-		return true;
 	}
 
 }

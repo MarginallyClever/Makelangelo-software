@@ -37,7 +37,7 @@ public class LineWeightByImage extends Node {
     @Override
     public void update() {
         Turtle myTurtle = turtle.getValue();
-        if(myTurtle==null || myTurtle.history.isEmpty()) return;
+        if(myTurtle==null || !myTurtle.hasDrawing()) return;
 
         TransformedImage sourceImage = new TransformedImage(image.getValue());
         sourceImage.setScale(1,1);

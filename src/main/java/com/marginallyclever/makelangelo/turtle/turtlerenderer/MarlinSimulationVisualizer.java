@@ -4,9 +4,10 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulation;
 import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulationBlock;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.turtle.Line2d;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -197,22 +198,21 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 		return new Vector3d(r,g,b);
 	}
 
-
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
-		myTurtle.history.clear();
+		myTurtle.strokeLayers.clear();
 	}
 
 	@Override
-	public void draw(TurtleMove p0, TurtleMove p1) {
-		myTurtle.history.add(p1);
-		
+	public void draw(Point2d p0, Point2d p1) {
+		myTurtle.strokeLayers.getLast().getAllPoints().add(p0);
 	}
 
 	@Override
-	public void travel(TurtleMove p0, TurtleMove p1) {
-		myTurtle.history.add(p1);
+	public void travel(Point2d p0, Point2d p1) {
+		myTurtle.strokeLayers.getLast().add(new Line2d());
+		myTurtle.strokeLayers.getLast().getAllPoints().add(p0);
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class LoadDXF implements TurtleLoader {
 			Iterator<?> entityTypeItr = layer.getDXFEntityTypeIterator();
 			if(entityTypeItr.hasNext()) {
 				// ignore the color index, DXF is dumb.
-				myTurtle.setColor(Color.BLACK);
+				myTurtle.setStroke(Color.BLACK);
 
 				parseLayer(layer);
 			}

@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,32 +49,25 @@ public class SaveBitmap implements TurtleSaver {
 		}
 		g.translate(-r.getX(),-r.getY());
 
-		TurtleMove previousMove = null;
-		Color downColor = Color.BLACK;
-
-		for (TurtleMove m : myTurtle.history) {
-			if (m == null) throw new NullPointerException();
-
-			switch (m.type) {
-				case TRAVEL -> {
-					previousMove = m;
-				}
-				case DRAW_LINE -> {
-					if (previousMove != null) {
-						g.setColor(downColor);
-						g.drawLine((int) previousMove.x, (int) -previousMove.y, (int) m.x, (int) -m.y);
-					}
-					previousMove = m;
-				}
-				case TOOL_CHANGE -> {
-					downColor = m.getColor();
-					g.setStroke(new BasicStroke((int) m.getDiameter()));
+		for( var layer : myTurtle.strokeLayers ) {
+			if(layer.isEmpty()) continue;
+			g.setColor(layer.getColor());
+			g.setStroke(new BasicStroke((int)layer.getDiameter()));
+			for (var line : layer.getAllLines()) {
+				if(line.size()<2) continue;
+				var iter = line.getAllPoints().iterator();
+				var prev = iter.next();
+				while(iter.hasNext()) {
+					var next = iter.next();
+					g.drawLine((int)prev.x,(int)-prev.y,
+							(int)next.x,(int)-next.y);
+					prev = next;
 				}
 			}
 		}
 
 		ImageIO.write(img, extension, outputStream);
-		// webp requires a flush or there will be a zero-length file.
+		// flush to ensure all data is written
 		outputStream.flush();
 
 		logger.debug("done.");

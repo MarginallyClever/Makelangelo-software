@@ -65,7 +65,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
-		turtle.history.clear();
+		turtle.strokeLayers.clear();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),Color.YELLOW,45    ,separation);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),Color.CYAN,45+ 90,separation);
@@ -78,7 +78,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 	protected void outputChannel(TransformedImage img, Color newColor, double angle, double separation) {
 		double cx = Math.cos(Math.toRadians(angle))*separation;
 		double cy = Math.sin(Math.toRadians(angle))*separation;
-		turtle.setColor(newColor);
+		turtle.setStroke(newColor);
 		
 		double maxr;
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();

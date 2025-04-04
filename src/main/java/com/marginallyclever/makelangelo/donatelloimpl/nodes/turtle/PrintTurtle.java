@@ -87,7 +87,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     public void print(Graphics g) {
         if(getComplete()<100) return;
         Turtle myTurtle = turtle.getValue();
-        if(myTurtle==null || myTurtle.history.isEmpty()) return;
+        if(myTurtle==null || !myTurtle.hasDrawing()) return;
         //drawPolyglines(g);
         g.drawImage(image,topLeft.x,topLeft.y,null);
     }
@@ -98,45 +98,28 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
     @Deprecated
     private void generatePolylines(Turtle myTurtle) {
         polylines.clear();
-        if (myTurtle == null || myTurtle.history.isEmpty()) return;
+        if (myTurtle == null || !myTurtle.hasDrawing()) return;
 
-        int size = myTurtle.history.size();
+        int size = myTurtle.countPoints()+1;
         int count = 0;
 
         setComplete(0);
 
-        // where we're at in the drawing (to check if we're between first & last)
-        boolean showPenUp = showTravel.getValue();
-        TurtleMove previousMove = null;
+        // TODO trim to first & last?
 
-        Color upColor = travelColor.getValue();
-        Color downColor = Color.BLACK;
         PolylineBuilder builder = new PolylineBuilder();
         builder.add(0,0);
         try {
-            for (TurtleMove move : myTurtle.history) {
-                if(move==null) throw new NullPointerException();
-                if(move.type == MovementType.TOOL_CHANGE) {
-                    downColor = move.getColor();
-                    count++;
-                    continue;
-                }
-
-                if ( previousMove != null) {
-                    if( previousMove.type != move.type ) {
-                        polylines.add(builder.compile(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
-                        builder.clear();
-                        builder.add((int) previousMove.x, (int) previousMove.y);
+            for( var layer : myTurtle.strokeLayers ) {
+                if(layer.isEmpty()) continue;
+                for (var line : layer.getAllLines()) {
+                    if(line.isEmpty()) continue;
+                    builder.clear();
+                    for( var p : line.getAllPoints() ) {
+                        builder.add((int) p.x, (int) p.y);
                     }
-                    if((move.type == MovementType.TRAVEL && showPenUp) || move.type == MovementType.DRAW_LINE) {
-                        builder.add((int) move.x, (int) move.y);
-                    }
+                    polylines.add(builder.compile(layer.getColor()));
                 }
-                previousMove = move;
-                setComplete((int) (100.0 * count++ / size));
-            }
-            if(builder.getSize()>0 && previousMove!=null) {
-                polylines.add(builder.compile(previousMove.type == MovementType.TRAVEL ? upColor : downColor));
             }
         }
         catch(Exception e) {

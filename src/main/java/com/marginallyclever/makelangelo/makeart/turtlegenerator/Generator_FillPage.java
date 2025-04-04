@@ -7,6 +7,7 @@ import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -55,7 +56,7 @@ public class Generator_FillPage extends TurtleGenerator {
 		double radius = Math.sqrt(width*width+height*height)/2;
 
 		Turtle turtle = new Turtle();
-		turtle.setDiameter(penDiameter);
+		turtle.setStroke(Color.BLACK,penDiameter);
 		Point2d P0=new Point2d();
 		Point2d P1=new Point2d();
 

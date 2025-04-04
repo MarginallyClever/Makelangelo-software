@@ -12,6 +12,15 @@ import java.util.List;
  * The trouble is keeping the two lists in sync.</p>
  */
 public class ListOfLines extends ArrayList<Line2d> implements ListOfPoints {
+    public ListOfLines() {}
+
+    public ListOfLines(ListOfLines arg0) {
+        // deep copy of lines
+        for(Line2d line : arg0) {
+            this.add(new Line2d(line));
+        }
+    }
+
     @NotNull
     public List<Line2d> getAllLines() {
         return this;

@@ -326,10 +326,10 @@ public class MainFrame extends JFrame {
     public void saveGCode() {
         logger.debug("Saving to gcode...");
 
-        SaveGCode save = new SaveGCode();
         try {
             int head = previewPanel.getRangeBottom();
             int tail = previewPanel.getRangeTop();
+            SaveGCode save = new SaveGCode();
             save.run(getTurtle(), previewPanel.getPlotter(), this, head, tail);
         } catch(Exception e) {
             logger.error("Error while exporting the gcode", e);

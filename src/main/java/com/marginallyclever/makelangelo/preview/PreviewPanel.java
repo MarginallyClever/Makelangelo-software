@@ -185,7 +185,7 @@ public class PreviewPanel extends JPanel {
 
     public void setTurtle(Turtle turtle) {
         myTurtleRenderer.setTurtle(turtle);
-        rangeSlider.setLimits(0,turtle.history.size());
+        rangeSlider.setLimits(0,turtle.countPoints());
     }
 
     public int getRangeBottom() {
