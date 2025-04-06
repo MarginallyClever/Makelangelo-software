@@ -59,7 +59,8 @@ class SaveDXFTest {
             // compare content of both files
             var resource = Objects.requireNonNull(getClass().getResource(expectedFilename)).toURI();
             Assertions.assertEquals(Files.readString(fileTemp.toPath()).replace("\n","\r\n"),
-                    Files.readString(new File(resource).toPath()) );
+                    Files.readString(new File(resource).toPath()),
+                    "mismatch with "+expectedFilename );
         } finally {
             fileTemp.delete();
         }
