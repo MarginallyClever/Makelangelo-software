@@ -57,8 +57,9 @@ class SaveDXFTest {
             fileOutputStream.close();
 
             // compare content of both files
+            var resource = Objects.requireNonNull(getClass().getResource(expectedFilename)).toURI();
             Assertions.assertEquals(Files.readString(fileTemp.toPath()).replace("\n","\r\n"),
-                    Files.readString(new File(Objects.requireNonNull(SaveDXFTest.class.getResource(expectedFilename)).toURI()).toPath()) );
+                    Files.readString(new File(resource).toPath()) );
         } finally {
             fileTemp.delete();
         }
