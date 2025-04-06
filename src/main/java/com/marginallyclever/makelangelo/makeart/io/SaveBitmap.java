@@ -49,7 +49,7 @@ public class SaveBitmap implements TurtleSaver {
 		}
 		g.translate(-r.getX(),-r.getY());
 
-		for( var layer : myTurtle.strokeLayers ) {
+		for( var layer : myTurtle.getLayers() ) {
 			if(layer.isEmpty()) continue;
 			g.setColor(layer.getColor());
 			g.setStroke(new BasicStroke((int)layer.getDiameter()));

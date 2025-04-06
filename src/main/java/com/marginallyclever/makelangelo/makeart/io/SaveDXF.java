@@ -32,7 +32,7 @@ public class SaveDXF implements TurtleSaver {
 		OutputStreamWriter out = new OutputStreamWriter(outputStream);
 		outputHeader(out,turtle.getBounds());
 
-		for( var layer : turtle.strokeLayers ) {
+		for( var layer : turtle.getLayers() ) {
 			// TODO write out color change using layer.getColor()
 			for( var line : layer.getAllLines() ) {
 				if(line.isEmpty()) continue;

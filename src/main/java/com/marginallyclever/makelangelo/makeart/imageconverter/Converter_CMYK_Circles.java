@@ -75,7 +75,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
-		turtle.strokeLayers.clear();
+		turtle.getLayers().clear();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),0 ,Color.YELLOW);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),15,Color.CYAN);

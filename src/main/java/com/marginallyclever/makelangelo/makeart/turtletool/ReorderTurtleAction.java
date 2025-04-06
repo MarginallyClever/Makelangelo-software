@@ -21,7 +21,7 @@ public class ReorderTurtleAction extends TurtleTool {
 	}
 	
 	public Turtle run(Turtle input) {
-		if(input.strokeLayers.isEmpty()) return input;
+		if(input.getLayers().isEmpty()) return input;
 		
 		logger.debug("reorder() start @ {} loops.", input.countLoops());
 

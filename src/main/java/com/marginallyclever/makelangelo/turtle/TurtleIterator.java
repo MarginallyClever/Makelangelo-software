@@ -29,8 +29,9 @@ public class TurtleIterator implements Iterator<Point2d> {
 
     @Override
     public Point2d next() {
-        while (layerIndex < turtle.strokeLayers.size()) {
-            var layer = turtle.strokeLayers.get(layerIndex);
+        var allLayers = turtle.getLayers();
+        while (layerIndex < allLayers.size()) {
+            var layer = allLayers.get(layerIndex);
             while(lineIndex < layer.getAllLines().size()) {
                 var line = layer.getAllLines().get(lineIndex);
                 if(pointIndex < line.getAllPoints().size()) {
@@ -56,7 +57,7 @@ public class TurtleIterator implements Iterator<Point2d> {
     }
 
     public StrokeLayer getLayer() {
-        return turtle.strokeLayers.get(layerIndex);
+        return turtle.getLayers().get(layerIndex);
     }
 
     public Line2d getLine() {

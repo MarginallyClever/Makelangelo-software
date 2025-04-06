@@ -65,7 +65,7 @@ public class Converter_CMYK_Spiral extends ImageConverter {
 
 		turtle = new Turtle();
 		// remove extra change color at the start of the turtle
-		turtle.strokeLayers.clear();
+		turtle.getLayers().clear();
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),Color.YELLOW,45    ,separation);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),Color.CYAN,45+ 90,separation);

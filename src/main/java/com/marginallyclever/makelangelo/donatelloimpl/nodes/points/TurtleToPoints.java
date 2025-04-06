@@ -24,7 +24,7 @@ public class TurtleToPoints extends Node {
         var in = turtle.getValue();
         var out = new ConcreteListOfPoints();
 
-        for( var layer : in.strokeLayers ) {
+        for( var layer : in.getLayers() ) {
             for( var line : layer.getAllLines() ) {
                 for( var point : line.getAllPoints()) {
                     out.add(new Point2d(point.x,point.y));

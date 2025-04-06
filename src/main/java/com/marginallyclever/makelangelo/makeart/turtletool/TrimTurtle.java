@@ -38,7 +38,7 @@ public class TrimTurtle {
         StrokeLayer iLayer = null;
         Line2d iLine = null;
 
-        var skinnyLayer = skinny.strokeLayers.getFirst();
+        var skinnyLayer = skinny.getLayers().getFirst();
         skinnyLayer.setColor(iter.getLayer().getColor());
         skinnyLayer.setDiameter(iter.getLayer().getDiameter());
 

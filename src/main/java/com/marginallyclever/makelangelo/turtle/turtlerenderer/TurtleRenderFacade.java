@@ -52,7 +52,7 @@ public class TurtleRenderFacade implements PreviewListener {
 
 			Point2d prev = new Point2d(0,0);
 
-			for( var layer : myTurtle.strokeLayers ) {
+			for( var layer : myTurtle.getLayers() ) {
 				if(layer.isEmpty()) continue;
 				myRenderer.setPenDownColor(layer.getColor());
 				myRenderer.setPenDiameter(layer.getDiameter());

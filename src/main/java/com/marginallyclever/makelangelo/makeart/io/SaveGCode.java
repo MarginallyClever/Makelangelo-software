@@ -115,7 +115,7 @@ public class SaveGCode implements TurtleSaver {
 	}
 
 	private int countTurtleToolChanges(Turtle turtle) {
-		return turtle.strokeLayers.size();
+		return turtle.getLayers().size();
 	}
 
 	private String addExtension(String name, String [] extensions) {
@@ -153,7 +153,7 @@ public class SaveGCode implements TurtleSaver {
 			writeHeader(out,settings,turtle.getBounds());
 			out.write(settings.getPenUpString() + "\n");
 
-			for( var layer : turtle.strokeLayers ) {
+			for( var layer : turtle.getLayers() ) {
 				if(layer.isEmpty()) continue;
 				out.write(settings.getToolChangeString(layer.getColor().hashCode()) + "\n");
 

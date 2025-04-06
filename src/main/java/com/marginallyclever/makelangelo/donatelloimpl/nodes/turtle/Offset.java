@@ -40,9 +40,9 @@ public class Offset extends Node {
         int size = input.countPoints()+1;
         int count = 0;
         try {
-            for (var cl : input.strokeLayers) {
-                for (var line : cl.getAllLines()) {
-                    for( var p : line.getAllPoints()) {
+            for (var cl : input.getLayers() ) {
+                for (var line : cl.getAllLines() ) {
+                    for( var p : line.getAllPoints() ) {
                         list.add(new Coordinate(p.x, p.y));
                         setComplete((int) (100.0 * count++ / size));
                     }

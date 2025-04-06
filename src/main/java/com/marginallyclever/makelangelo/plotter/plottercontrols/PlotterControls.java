@@ -272,7 +272,7 @@ public class PlotterControls extends JPanel {
 	@SuppressWarnings("unused")
 	private int findLastPenUpBefore(int startAtLine) {
 		int sum=0;
-		for( var strokeLayer : myTurtle.strokeLayers ) {
+		for( var strokeLayer : myTurtle.getLayers() ) {
 			for (var line : strokeLayer.getAllLines()) {
 				int size = line.getAllPoints().size();
 				if (sum <= startAtLine && startAtLine < sum + size) {

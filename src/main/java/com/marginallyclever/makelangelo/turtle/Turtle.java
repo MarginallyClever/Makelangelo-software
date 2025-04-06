@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Turtle implements Cloneable {
 	public static final double DEFAULT_DIAMETER = 1.0;
 
-	public final List<StrokeLayer> strokeLayers = new ArrayList<>();
+	private final List<StrokeLayer> strokeLayers = new ArrayList<>();
 
 	private final transient ReentrantLock lock = new ReentrantLock();
 
@@ -620,5 +620,9 @@ public class Turtle implements Cloneable {
 		}
 
 		return "[" + sb + "]";
+	}
+
+	public List<StrokeLayer> getLayers() {
+		return strokeLayers;
 	}
 }

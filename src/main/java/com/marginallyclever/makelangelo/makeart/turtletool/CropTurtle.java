@@ -18,10 +18,10 @@ public class CropTurtle {
 		logger.debug("crop start @ {}", turtle.countPoints());
 
 		Turtle result = new Turtle();
-		for( var layer : turtle.strokeLayers ) {
+		for( var layer : turtle.getLayers() ) {
 			StrokeLayer croppedLayer = cropLayer(rectangle,layer);
 			if(!croppedLayer.isEmpty()) {
-				result.strokeLayers.add(croppedLayer);
+				result.getLayers().add(croppedLayer);
 			}
 		}
 

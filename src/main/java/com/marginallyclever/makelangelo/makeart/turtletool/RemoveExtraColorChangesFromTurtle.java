@@ -11,17 +11,18 @@ public class RemoveExtraColorChangesFromTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(RemoveExtraColorChangesFromTurtle.class);
 	
 	public static void run(Turtle turtle) {
-		logger.debug("start @ {}", turtle.strokeLayers.size());
+		var allLayers = turtle.getLayers();
+		logger.debug("start @ {}", allLayers.size());
 
 		// if adjacent StrokeLayer has the same color, remove the color change by merging the two layers.
-		for( int i=0; i<turtle.strokeLayers.size()-1; i++) {
-			if(turtle.strokeLayers.get(i).getColor().equals(turtle.strokeLayers.get(i+1).getColor())) {
-				turtle.strokeLayers.get(i).addAll(turtle.strokeLayers.get(i+1));
-				turtle.strokeLayers.remove(i+1);
+		for( int i=0; i<allLayers.size()-1; i++) {
+			if(allLayers.get(i).getColor().equals(allLayers.get(i+1).getColor())) {
+				allLayers.get(i).addAll(allLayers.get(i+1));
+				allLayers.remove(i+1);
 				i--;
 			}
 		}
 
-		logger.debug("end @ {}", turtle.strokeLayers.size());
+		logger.debug("end @ {}", allLayers.size());
 	}
 }

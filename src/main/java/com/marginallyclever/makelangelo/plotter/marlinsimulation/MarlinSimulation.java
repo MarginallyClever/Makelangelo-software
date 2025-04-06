@@ -537,7 +537,7 @@ public class MarlinSimulation {
 		poseNow.set(lx,ly,upAngle);
 		queue.clear();
 
-		for( var layer : t.strokeLayers ) {
+		for( var layer : t.getLayers() ) {
 			for( var line : layer.getAllLines() ) {
 				if(line.isEmpty()) continue;
 				var iter = line.iterator();

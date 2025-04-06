@@ -255,7 +255,7 @@ public class Converter_FlowField extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
-		turtle.strokeLayers.clear();
+		turtle.getLayers().clear();
 
 		if(fromEdge) {
 			// get all the flow lines.

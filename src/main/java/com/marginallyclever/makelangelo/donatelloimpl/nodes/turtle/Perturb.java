@@ -33,7 +33,7 @@ public class Perturb extends Node {
         float size = in.countPoints()+1;
         int i=0;
         setComplete(0);
-        for( var layer : in.strokeLayers ) {
+        for( var layer : in.getLayers() ) {
             for( var line : layer.getAllLines() ) {
                 for( var point : line.getAllPoints() ) {
                     var radian = (Math.random() * Math.PI * 2.0);

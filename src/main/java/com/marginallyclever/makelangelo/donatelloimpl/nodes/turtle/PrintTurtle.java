@@ -110,7 +110,7 @@ public class PrintTurtle extends Node implements PrintWithGraphics {
         PolylineBuilder builder = new PolylineBuilder();
         builder.add(0,0);
         try {
-            for( var layer : myTurtle.strokeLayers ) {
+            for( var layer : myTurtle.getLayers() ) {
                 if(layer.isEmpty()) continue;
                 for (var line : layer.getAllLines()) {
                     if(line.isEmpty()) continue;

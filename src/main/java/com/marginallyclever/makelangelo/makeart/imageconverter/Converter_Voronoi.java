@@ -106,7 +106,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
     @Override
     public boolean iterate() {
-        turtle.strokeLayers.clear();
+        turtle.getLayers().clear();
 
         iterations++;
 

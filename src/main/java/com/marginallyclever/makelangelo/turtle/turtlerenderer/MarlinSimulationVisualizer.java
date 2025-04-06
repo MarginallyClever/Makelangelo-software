@@ -201,18 +201,18 @@ public class MarlinSimulationVisualizer implements TurtleRenderer {
 	@Override
 	public void start(Graphics2D gl2) {
 		this.gl2 = gl2;
-		myTurtle.strokeLayers.clear();
+		myTurtle.getLayers().clear();
 	}
 
 	@Override
 	public void draw(Point2d p0, Point2d p1) {
-		myTurtle.strokeLayers.getLast().getAllPoints().add(p0);
+		myTurtle.getLayers().getLast().getAllPoints().add(p0);
 	}
 
 	@Override
 	public void travel(Point2d p0, Point2d p1) {
-		myTurtle.strokeLayers.getLast().add(new Line2d());
-		myTurtle.strokeLayers.getLast().getAllPoints().add(p0);
+		myTurtle.getLayers().getLast().add(new Line2d());
+		myTurtle.getLayers().getLast().getAllPoints().add(p0);
 	}
 
 	@Override

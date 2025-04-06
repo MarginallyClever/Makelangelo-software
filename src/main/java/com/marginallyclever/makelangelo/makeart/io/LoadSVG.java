@@ -77,7 +77,7 @@ public class LoadSVG implements TurtleLoader {
 		myTurtle.scale(1, -1);
 
 		Turtle result = new Turtle();
-		result.strokeLayers.clear();
+		result.getLayers().clear();
 
 		// remove tool changes for zero-length moves.
 		List<Turtle> list = myTurtle.splitByToolChange();
