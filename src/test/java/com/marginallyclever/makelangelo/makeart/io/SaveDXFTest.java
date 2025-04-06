@@ -4,15 +4,17 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.util.Objects;
 
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -43,7 +45,6 @@ class SaveDXFTest {
         verifySavedFile(multiColorsMoves(), "/dxf/save_multi_colors.dxf");
     }
 
-    @Test
     private void verifySavedFile(Turtle turtle, String expectedFilename) throws Exception {
         // given
         File fileTemp = File.createTempFile("unit", null);
@@ -57,7 +58,9 @@ class SaveDXFTest {
             fileOutputStream.close();
 
             // then
-            assertThat(fileTemp).hasSameTextualContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
+            var resource = Objects.requireNonNull(getClass().getResource(expectedFilename)).toURI();
+            Assertions.assertEquals(Files.readString(fileTemp.toPath()).replace("\n", "\r\n"),
+                    Files.readString(new File(resource).toPath()));
         } finally {
             fileTemp.delete();
         }
