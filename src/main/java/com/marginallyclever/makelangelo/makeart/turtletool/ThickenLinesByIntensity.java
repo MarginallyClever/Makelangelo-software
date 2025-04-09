@@ -383,10 +383,10 @@ public class ThickenLinesByIntensity {
     }
 
     private void addOneUnsortedSegment(Point2d start, Point2d end) {
-        unsorted.add(createLSW(start,end));
+        unsorted.add(createLineWeightSegment(start,end));
     }
 
-    private LineWeightSegment createLSW(Point2d start, Point2d end) {
+    private LineWeightSegment createLineWeightSegment(Point2d start, Point2d end) {
         // sample image intensity here from 0...1
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;
