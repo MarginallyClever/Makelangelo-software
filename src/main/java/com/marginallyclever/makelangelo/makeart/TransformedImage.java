@@ -19,11 +19,11 @@ public class TransformedImage {
 	private float translateX, translateY;
 
 	public TransformedImage(BufferedImage src) {
-		sourceImage = src;
+		sourceImage = deepCopy(src);
 		translateX = -src.getWidth() / 2.0f;
 		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
-		scaleY = -1;
+		scaleY = 1;
 	}
 
 	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
