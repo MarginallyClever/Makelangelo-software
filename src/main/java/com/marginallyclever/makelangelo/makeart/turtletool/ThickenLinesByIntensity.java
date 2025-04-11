@@ -6,8 +6,6 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeight;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightSegment;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
@@ -21,8 +19,6 @@ import java.util.List;
  * Take a turtle line and thicken it by the intensity of the image.
  */
 public class ThickenLinesByIntensity {
-    private static final Logger logger = LoggerFactory.getLogger(ThickenLinesByIntensity.class);
-
     private final double EPSILON = 1e-3;
 
     // refinement of lines for sampling.  must be greater than zero.
@@ -81,12 +77,11 @@ public class ThickenLinesByIntensity {
     private Turtle generateAllThickLines() {
         Turtle turtle = new Turtle();
 
-        logger.debug("generateThickLines");
         for(LineWeight i : sortedLines) {
             if(i.segments.isEmpty()) continue;
-            Turtle t = generateOneThickLine(i);
-            turtle.add(t);
+            turtle.add(generateOneThickLine(i));
         }
+
         return turtle;
     }
 
@@ -252,27 +247,22 @@ public class ThickenLinesByIntensity {
      * <p>Worst case is O(n<sup>2</sup>)</p>
      */
     private void sortSegmentsIntoLines() {
-        logger.debug("sortSegmentsIntoLines");
-
         while(!unsorted.isEmpty()) {
-            LineWeight activeLine = new LineWeight();
-            activeLine.segments.add(unsorted.removeFirst());
-            sortedLines.add(activeLine);
-
-            growActiveLine(activeLine);
+            growActiveLine();
         }
-
-        logger.debug("sortedLines="+sortedLines.size());
     }
 
     /**
      * <p>Grow the active line by finding the next segment that is adjacent to the head or tail of the line.
-     * @param activeLine the line to grow
+     * The worst case would be O(n^2/2) but in practice lines arrive already pretty well sorted.</p>
      */
-    private void growActiveLine(LineWeight activeLine) {
+    private void growActiveLine() {
+        LineWeight activeLine = new LineWeight();
+        activeLine.segments.add(unsorted.removeFirst());
+        sortedLines.add(activeLine);
+
         LineWeightSegment head = activeLine.segments.getFirst();
         LineWeightSegment tail = head;
-
         LineWeightSegment toRemove;
         do {
             toRemove = null;
@@ -341,16 +331,10 @@ public class ThickenLinesByIntensity {
      * @param from the turtle to split
      */
     private void buildSegmentList(Turtle from) {
-        logger.debug("buildSegmentList before={}",from.countLoops());
-
         LineCollection originalLines = from.getAsLineSegments();
-        logger.debug("originalLines={}",originalLines.size());
-
         for(LineSegment2D before : originalLines) {
             maybeSplitLine(before);
         }
-
-        logger.debug("unsorted={}",unsorted.size());
     }
 
     /**
