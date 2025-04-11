@@ -17,7 +17,6 @@ import com.marginallyclever.makelangelo.plotter.marlinsimulation.MarlinSimulatio
 import com.marginallyclever.makelangelo.plotter.plottercontrols.PlotterControls;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManagerPanel;
 import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderFactory;
-import com.marginallyclever.makelangelo.turtle.turtlerenderer.TurtleRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -414,22 +412,27 @@ public class MainMenu extends JMenuBar {
 
         ButtonGroup group = new ButtonGroup();
 
-        Arrays.stream(TurtleRenderFactory.values()).forEach(iter -> {
-                TurtleRenderer renderer = iter.getTurtleRenderer();
-                String name = iter.getName();
-                JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
-                if (frame.getTurtleRenderer() == renderer) button.setSelected(true);
-                button.addActionListener((e)-> onTurtleRenderChange(name));
-                menu.add(button);
-                group.add(button);
-        });
+        var names = TurtleRenderFactory.getNames();
+        for(int i=0;i<names.length;++i) {
+            var renderer = TurtleRenderFactory.getTurtleRenderer(i);
+            JRadioButtonMenuItem button = new JRadioButtonMenuItem(renderer.getTranslatedName());
+            if (frame.getTurtleRenderer() == renderer) button.setSelected(true);
+            final var index = i;
+            button.addActionListener((e)-> onTurtleRenderChange(index));
+            menu.add(button);
+            group.add(button);
+        }
 
         return menu;
     }
 
-    private void onTurtleRenderChange(String name) {
-        logger.debug("Switching to render style '{}'", name);
-        TurtleRenderer renderer = TurtleRenderFactory.findByName(name).getTurtleRenderer();
+    /**
+     * Called when the user selects a new render style.
+     * @param index index into the {@link TurtleRenderFactory} array
+     */
+    private void onTurtleRenderChange(int index) {
+        var renderer = TurtleRenderFactory.getTurtleRenderer(index);
+        logger.debug("Switching to render style '{}'", renderer.getTranslatedName());
         frame.setTurtleRenderer(renderer);
     }
 
