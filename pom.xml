@@ -572,7 +572,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.5.5</version>
+			<version>1.5.14</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -584,7 +584,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.8.6</version>
+			<version>1.8.12</version>
 		</dependency>
 	</dependencies>
 
