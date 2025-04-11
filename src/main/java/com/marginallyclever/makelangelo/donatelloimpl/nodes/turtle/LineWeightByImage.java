@@ -39,15 +39,14 @@ public class LineWeightByImage extends Node {
         Turtle myTurtle = turtle.getValue();
         if(myTurtle==null || !myTurtle.hasDrawing()) return;
 
-        TransformedImage sourceImage = new TransformedImage(image.getValue());
-        sourceImage.setScale(1,1);
-        sourceImage.setTranslation(0,0);
         setComplete(0);
 
+        var sourceImage = new TransformedImage(image.getValue());
         var tool = new ThickenLinesByIntensity();
-        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize.getValue(),thickness.getValue()-penDiameter.getValue(),penDiameter.getValue());
+        Turtle turtle = tool.execute(myTurtle, sourceImage, stepSize.getValue(), thickness.getValue(), penDiameter.getValue());
+
+        result.setValue(turtle);
 
         setComplete(100);
-        result.setValue(turtle);
     }
 }
