@@ -1,25 +1,23 @@
 package com.marginallyclever.makelangelo.turtle;
 
-
-
+import javax.annotation.Nonnull;
 import javax.vecmath.Point2d;
-import java.util.Iterator;
 
 /**
  * Walks the path of a {@link Turtle} more efficiently than the old <code>interpolate(double)</code> method.
  */
 public class TurtlePathWalker {
-    private final Iterator<TurtleMove> iterator;
-    private TurtleMove prev;
-    private TurtleMove m;
+    private final TurtleIterator iter;
+    private Point2d prev = new Point2d(0,0);
+    private Point2d m;
     private final double drawDistance;
     private double tSum;
     private double segmentDistance;
     private double segmentDistanceSum;
 
-    public TurtlePathWalker(Turtle turtle) {
-        iterator = turtle.history.iterator();
-        prev = new TurtleMove(0, 0, MovementType.TRAVEL);
+    public TurtlePathWalker(@Nonnull Turtle turtle) {
+        if (turtle == null) throw new IllegalArgumentException("Turtle cannot be null");
+        this.iter = turtle.getIterator();
         drawDistance = turtle.getDrawDistance();
         tSum = 0;
         segmentDistanceSum = 0;
@@ -30,20 +28,19 @@ public class TurtlePathWalker {
      * Advance to the next movement that is a draw command.
      */
     private void advance() {
-        while (iterator.hasNext()) {
-            m = iterator.next();
-            if (m.type == MovementType.DRAW_LINE) {
-                double dx = m.x - prev.x;
-                double dy = m.y - prev.y;
-                segmentDistance = Math.sqrt(dx*dx+dy*dy);
-                return;
-            } else if(m.type == MovementType.TRAVEL) {
-                prev = m;
-            }
+        if(!iter.hasNext()) {
+            m = null;
+            // No more points
+            segmentDistance = 0;
+            return;
         }
-        // in case we run out of moves
-        m = null;
-        segmentDistance = 0;
+
+        m = iter.next();
+        if (m != null) {
+            double dx = m.x - prev.x;
+            double dy = m.y - prev.y;
+            segmentDistance = Math.sqrt(dx * dx + dy * dy);
+        }
     }
 
     /**
@@ -53,11 +50,11 @@ public class TurtlePathWalker {
      * @throws IllegalArgumentException if distance is negative.
      */
     public Point2d walk(double distance) {
-        if(distance<0) throw new IllegalArgumentException("distance must be positive");
+        if( distance < 0) throw new IllegalArgumentException("distance must be positive");
 
-        tSum+=distance;
+        tSum += distance;
         while (segmentDistanceSum <= tSum ) {
-            if (segmentDistanceSum+segmentDistance>=tSum) {
+            if (segmentDistanceSum + segmentDistance >= tSum) {
                 double dx = m.x - prev.x;
                 double dy = m.y - prev.y;
                 double ratio = Math.max(Math.min((tSum - segmentDistanceSum) / segmentDistance,1),0);
@@ -68,7 +65,7 @@ public class TurtlePathWalker {
                 segmentDistanceSum += segmentDistance;
                 prev = m;
                 advance();
-                if(m==null) break;
+                if(m == null) break;
             }
         }
         return new Point2d(prev.x, prev.y);

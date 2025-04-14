@@ -21,7 +21,7 @@ public class ReorderHelper {
      */
     public Turtle splitAndReorderTurtle(Turtle turtle) {
         Turtle output = new Turtle();
-        output.history.clear();
+        output.getLayers().clear();
 
         // history is made of changes, travels, and draws
         List<Turtle> colors = turtle.splitByToolChange();

@@ -3,12 +3,10 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;
-import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.buffer.BufferOp;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
@@ -34,42 +32,23 @@ public class Offset extends Node {
     @Override
     public void update() {
         var input = turtleA.getValue();
-        Color lastColor = Color.BLACK;
         var list = new ArrayList<Coordinate>();
         double offsetValue = offset.getValue();
         Turtle result = new Turtle();
-        TurtleMove previousMove = null;
 
         setComplete(0);
-        int size = input.history.size();
+        int size = input.countPoints()+1;
         int count = 0;
         try {
-            for (TurtleMove move : input.history) {
-                if (move == null) throw new NullPointerException();
-                if (move.type == MovementType.TOOL_CHANGE) {
-                    lastColor = move.getColor();
-                    count++;
-                    continue;
-                }
-
-                if (previousMove != null) {
-                    if (previousMove.type != move.type) {
-                        // pen has lifted, polyline ends
-                        result.add(offsetList(list, offsetValue, lastColor));
-
-                        if (previousMove.type == MovementType.TRAVEL)
-                            list.add(new Coordinate(previousMove.x, previousMove.y));
+            for (var cl : input.getLayers() ) {
+                for (var line : cl.getAllLines() ) {
+                    for( var p : line.getAllPoints() ) {
+                        list.add(new Coordinate(p.x, p.y));
+                        setComplete((int) (100.0 * count++ / size));
                     }
-                    if (move.type == MovementType.DRAW_LINE) {
-                        list.add(new Coordinate(move.x, move.y));
-                    }
+                    result.add(offsetList(list, offsetValue, cl.getColor()));
                 }
-                previousMove = move;
-                setComplete((int) (100.0 * count++ / size));
             }
-
-            // in case there's a line on the go.
-            result.add(offsetList(list, offsetValue, lastColor));
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -111,7 +90,7 @@ public class Offset extends Node {
         if(offsetLine != null) {
             //var offsetLine = line.buffer(offsetValue).getBoundary();
             // turn them into a turtle
-            turtle.setColor(lastColor);
+            turtle.setStroke(lastColor);
             turtle.penUp();
             for (var p : offsetLine) {
                 turtle.moveTo(p.x, p.y);

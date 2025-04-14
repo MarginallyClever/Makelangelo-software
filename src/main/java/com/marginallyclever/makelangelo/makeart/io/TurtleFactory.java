@@ -93,7 +93,7 @@ public class TurtleFactory {
 				}
 			}
 		}
-		throw new Exception("unrecognized format '"+filename+"'.");
+		throw new Exception("unrecognized format '" + filename + "'.");
 	}
 	
 	private static boolean isValidExtension(String filename, FileNameExtensionFilter filter) {

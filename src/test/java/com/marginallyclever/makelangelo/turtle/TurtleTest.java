@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.turtle;
 
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.vecmath.Point2d;
@@ -16,9 +17,8 @@ class TurtleTest {
     public void empty() {
         // given
         Turtle turtle = new Turtle();
-
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000]", turtle.history.toString());
+        assertEquals("[]", turtle.generateHistory());
     }
 
     @Test
@@ -32,7 +32,7 @@ class TurtleTest {
         turtle.moveTo(2, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X10.000 Y12.000, TRAVEL X2.000 Y3.000]", turtle.history.toString());
+        assertEquals("[]", turtle.generateHistory());
         assertFalse(turtle.getHasAnyDrawingMoves());
     }
 
@@ -50,7 +50,7 @@ class TurtleTest {
         turtle.penUp();
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y12.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y12.000]", turtle.generateHistory());
     }
 
     @Test
@@ -64,7 +64,7 @@ class TurtleTest {
         turtle.moveTo(10, 15);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000]", turtle.generateHistory());
         assertTrue(turtle.getHasAnyDrawingMoves());
     }
 
@@ -74,6 +74,7 @@ class TurtleTest {
         Turtle turtle = new Turtle();
 
         // when
+        turtle.penDown();
         turtle.setAngle(0);
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
@@ -82,8 +83,8 @@ class TurtleTest {
         turtle.jumpTo(-15, -7);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TRAVEL X11.414 Y13.586, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
-        assertFalse(turtle.getHasAnyDrawingMoves());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, DRAW_LINE X11.414 Y13.586, TRAVEL X-15.000 Y-7.000]", turtle.generateHistory());
+        assert(turtle.getHasAnyDrawingMoves());
     }
 
     @Test
@@ -94,11 +95,11 @@ class TurtleTest {
         // when
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
-        turtle.setColor(new Color(4, 5, 6));
+        turtle.setStroke(new Color(4, 5, 6));
         turtle.jumpTo(-15, -7);
 
         // then
-        assertEquals("[TOOL R1 G2 B3 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R4 G5 B6 A255 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.history.toString());
+        assertEquals("[TOOL R4 G5 B6 A255 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.generateHistory());
         assertEquals(new Color(1,2,3), turtle.getFirstColor());
     }
 
@@ -106,23 +107,24 @@ class TurtleTest {
     public void firstColor() {
         // given
         Turtle turtle = new Turtle(new Color(1,2,3));
-
+        Assertions.assertEquals(new Color(1,2,3),turtle.getColor());
+        Assertions.assertEquals(1.0,turtle.getDiameter());
         // then
-        assertEquals("[TOOL R1 G2 B3 A255 D1.000]", turtle.history.toString());
+        assertEquals("[]", turtle.generateHistory());
     }
 
     @Test
     public void toolChange() {
         // given
         Turtle turtle = new Turtle(new Color(1,2,3));
-
-        // when
+        turtle.penDown();
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
-        turtle.setDiameter(10);
+        turtle.setStroke(turtle.getColor(),10);
+        turtle.moveTo(20, 30);
 
         // then
-        assertEquals("[TOOL R1 G2 B3 A255 D1.000, TRAVEL X20.000 Y30.000, TRAVEL X10.000 Y15.000, TOOL R1 G2 B3 A255 D10.000]", turtle.history.toString());
+        assertEquals("[TOOL R1 G2 B3 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TOOL R1 G2 B3 A255 D10.000, TRAVEL X20.000 Y30.000]", turtle.generateHistory());
     }
 
     @Test
@@ -163,7 +165,7 @@ class TurtleTest {
         turtle.scale(2, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X40.000 Y90.000, DRAW_LINE X20.000 Y45.000, TRAVEL X-30.000 Y-21.000, DRAW_LINE X6.000 Y12.000, TRAVEL X24.000 Y54.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X40.000 Y90.000, DRAW_LINE X20.000 Y45.000, TRAVEL X-30.000 Y-21.000, DRAW_LINE X6.000 Y12.000, TRAVEL X24.000 Y54.000]", turtle.generateHistory());
     }
 
     @Test
@@ -182,7 +184,7 @@ class TurtleTest {
         turtle.translate(-10, 3);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X10.000 Y33.000, DRAW_LINE X0.000 Y18.000, TRAVEL X-25.000 Y-4.000, DRAW_LINE X-7.000 Y7.000, TRAVEL X2.000 Y21.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X-10.000 Y3.000, DRAW_LINE X10.000 Y33.000, DRAW_LINE X0.000 Y18.000, TRAVEL X-25.000 Y-4.000, DRAW_LINE X-7.000 Y7.000, TRAVEL X2.000 Y21.000]", turtle.generateHistory());
     }
 
     @Test
@@ -197,7 +199,7 @@ class TurtleTest {
         turtle.jumpTo(-15, -7);
         turtle.moveTo(3, 4);
         turtle.jumpTo(12, 18);
-        turtle.setDiameter(2);
+        turtle.setStroke(turtle.getColor(),2);
         turtle.jumpTo(-8, 4);
         turtle.moveTo(1, 6);
 
@@ -205,8 +207,8 @@ class TurtleTest {
         List<Turtle> turtles = turtle.splitByToolChange();
         assertNotNull(turtles);
         assertEquals(2, turtles.size());
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TRAVEL X12.000 Y18.000]", turtles.get(0).history.toString());
-        assertEquals("[TOOL R0 G0 B0 A255 D2.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtles.get(1).history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TRAVEL X12.000 Y18.000]", turtles.get(0).generateHistory());
+        assertEquals("[TOOL R0 G0 B0 A255 D2.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtles.get(1).generateHistory());
     }
 
     @Test
@@ -228,7 +230,7 @@ class TurtleTest {
         turtle.add(turtle2);
 
         // then
-        assertEquals("[TOOL R0 G0 B0 A255 D1.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TOOL R6 G7 B8 A255 D1.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtle.history.toString());
+        assertEquals("[TOOL R0 G0 B0 A255 D1.000, TRAVEL X0.000 Y0.000, DRAW_LINE X20.000 Y30.000, DRAW_LINE X10.000 Y15.000, TRAVEL X-15.000 Y-7.000, DRAW_LINE X3.000 Y4.000, TOOL R6 G7 B8 A255 D1.000, TRAVEL X-8.000 Y4.000, DRAW_LINE X1.000 Y6.000]", turtle.generateHistory());
     }
 
     @Test
@@ -292,10 +294,14 @@ class TurtleTest {
      * @return a point along the drawn lines of this {@link Turtle}
      */
     public static Point2d interpolate(Turtle turtle, double t) {
+        if(!turtle.hasDrawing()) return new Point2d();
+
         double segmentDistanceSum=0;
-        TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
-        for( TurtleMove m : turtle.history) {
-            if(m.type == MovementType.DRAW_LINE) {
+        var iter = turtle.getIterator();
+        var prev = iter.next();
+        while(iter.hasNext()) {
+            var m = iter.next();
+            if(!iter.isTravel()) {
                 double dx = m.x-prev.x;
                 double dy = m.y-prev.y;
                 double segmentDistance = Math.sqrt(dx*dx+dy*dy);
@@ -306,10 +312,8 @@ class TurtleTest {
                             prev.y + dy * ratio);
                 }
                 segmentDistanceSum += segmentDistance;
-                prev = m;
-            } else if(m.type == MovementType.TRAVEL) {
-                prev = m;
-            } // else tool change, ignore.
+            }
+            prev = m;
         }
         return new Point2d(prev.x,prev.y);
     }

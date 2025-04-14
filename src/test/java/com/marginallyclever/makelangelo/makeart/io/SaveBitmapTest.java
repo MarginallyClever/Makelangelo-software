@@ -85,7 +85,7 @@ public class SaveBitmapTest {
 
     private void verifySavedFile(Turtle turtle, String extension, boolean supportAlpha,String expectedFilename) throws Exception {
         // given
-        File fileTemp = File.createTempFile("unit", null);
+        File fileTemp = File.createTempFile("unit", "."+extension);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);

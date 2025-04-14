@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,19 +42,20 @@ public class SaveTHR implements TurtleSaver {
 
 		double previousTheta = 0;
 
-		for( var t : turtle.history) {
-			if(t.type== MovementType.TOOL_CHANGE) continue;
-			if(t.type== MovementType.TRAVEL) continue;
+		for( var layer : turtle.getLayers() ) {
+			for( var line : layer.getAllLines() ) {
+				for( var p : line.getAllPoints() ) {
+					// turn x,y to theta,rho
+					double rho = Math.sqrt(p.x * p.x + p.y * p.y) / radius;
+					double theta = Math.PI/2 - Math.atan2(p.y,p.x);
+					// handle the case where the angle wraps around.
+					if(theta<previousTheta-Math.PI) theta += Math.PI*2;
+					if(theta>previousTheta+Math.PI) theta -= Math.PI*2;
+					previousTheta = theta;
 
-			// turn x,y to theta,rho
-			double rho = Math.sqrt(t.x * t.x + t.y * t.y) / radius;
-			double theta = Math.PI/2 - Math.atan2(t.y,t.x);
-			// handle the case where the angle wraps around.
-			if(theta<previousTheta-Math.PI) theta += Math.PI*2;
-			if(theta>previousTheta+Math.PI) theta -= Math.PI*2;
-			previousTheta = theta;
-
-			out.write(String.format("%.5f %.5f\n",theta,rho));
+					out.write(String.format("%.5f %.5f\n",theta,rho));
+				}
+			}
 		}
 
 		out.flush();

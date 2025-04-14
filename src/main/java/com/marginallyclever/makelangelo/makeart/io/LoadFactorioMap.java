@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.vecmath.Vector2d;
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -72,33 +72,33 @@ public class LoadFactorioMap implements TurtleLoader {
             int dir = obj.getInt("direction");
 
             if(name.endsWith("pipe")) {
-                turtle.setColor(PIPE);
+                turtle.setStroke(PIPE);
                 drawPipe(turtle, x, y, w, h, dir,obj.getString("variant"));
             } else if(name.endsWith("pipe-to-ground")) {
-                turtle.setColor(PIPE);
+                turtle.setStroke(PIPE);
                 drawPipeToGround(turtle, x, y, w, h, dir);
             } else if(name.endsWith("pump")) {
-                turtle.setColor(PIPE);
+                turtle.setStroke(PIPE);
                 drawPump(turtle, x, y, w, h, dir);
             } else if(name.endsWith("transport-belt")) {
-                turtle.setColor(BELT);
+                turtle.setStroke(BELT);
                 drawBelt(turtle, x, y, w, h, dir, obj.getString("variant"));
             } else if(name.endsWith("underground-belt")) {
-                turtle.setColor(BELT);
+                turtle.setStroke(BELT);
                 drawUndergroundBelt(turtle, x, y, w, h, dir);
             } else if(name.endsWith("straight-rail")) {
-                turtle.setColor(RAIL);
+                turtle.setStroke(RAIL);
                 drawStraightRail(turtle, x, y, w, h, dir, obj.getString("variant"));
             } else if(name.endsWith("curved-rail")) {
-                turtle.setColor(RAIL);
+                turtle.setStroke(RAIL);
                 drawCurvedRail(turtle, x, y, w, h, dir, obj.getString("variant"));
             } else if(name.endsWith("tree")) {
-                turtle.setColor(Color.GREEN);
+                turtle.setStroke(Color.GREEN);
                 drawRectangleWithRotation(turtle, x, y, w, h, dir);
             } else if(name.endsWith("splitter")) {
                 drawSplitter(turtle, x, y, w, h, dir);
             } else {
-                turtle.setColor(Color.RED);
+                turtle.setStroke(Color.RED);
                 drawRectangleWithRotation(turtle, x, y, w, h, dir);
             }
         });
@@ -108,7 +108,7 @@ public class LoadFactorioMap implements TurtleLoader {
     }
 
     private void drawSplitter(Turtle turtle, double x, double y, int w, int h, int dir) {
-        turtle.setColor(BELT);
+        turtle.setStroke(BELT);
 
         turtle.penUp();
         turtle.moveTo(x, y);
@@ -273,7 +273,7 @@ public class LoadFactorioMap implements TurtleLoader {
         turtle.moveTo(x, y);
         turtle.setAngle(90+dir * 45);
         turtle.forward(w/2d+2);
-        Vector2d start = turtle.getPosition();
+        Point2d start = turtle.getPosition();
         double angle = turtle.getAngle();
 
         if(variant.equals("R")) {

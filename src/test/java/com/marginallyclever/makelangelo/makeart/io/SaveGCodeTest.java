@@ -1,16 +1,18 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtletool.TrimTurtle;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +22,6 @@ import java.util.stream.Collectors;
 import static com.marginallyclever.makelangelo.makeart.io.LoadHelper.readFile;
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class SaveGCodeTest {
 
@@ -64,14 +65,18 @@ class SaveGCodeTest {
         }
     }
 
-    private void compareExpectedToActual(String expectedFilename, File fileTemp) throws FileNotFoundException {
-        List<String> expected = splitAndFilterForTest(readFile(expectedFilename));
-        List<String> actual = splitAndFilterForTest(
+    private void compareExpectedToActual(String expectedFilename, File fileTemp) throws IOException {
+        List<String> expected1 = splitAndFilterForTest(readFile(expectedFilename));
+        List<String> actual1 = splitAndFilterForTest(
                 new Scanner(new FileInputStream(fileTemp), StandardCharsets.UTF_8)
                         .useDelimiter("\\A")
                         .next());
         //actual.forEach(System.out::println);
-        assertIterableEquals(expected, actual);
+        //assertIterableEquals(expected, actual);*/
+        // merge contents of expected1 into a single string
+        String actual = String.join("\n", actual1);
+        String expected = String.join("\n", expected1);
+        Assertions.assertEquals(expected,actual);
     }
 
     @Test
@@ -110,25 +115,25 @@ class SaveGCodeTest {
 
     private List<String> splitAndFilterForTest(String fileContent) {
         return Arrays.stream(fileContent.split("\\r?\\n"))
-                .filter(line -> !line.matches("; 20.* at ..:.*") && !line.matches(";Generated with.*"))
+                .filter(line -> !line.matches("; 2.* at ..:.*") && !line.matches(";Generated with.*"))
                 .collect(Collectors.toList());
     }
 
     @Test
     public void testSaveSubsectionOfFile() throws Exception {
         // given
-        Turtle turtle = multiColorsMoves();
+        Turtle before = multiColorsMoves();
 
         SaveGCode saveGCode = new SaveGCode();
-        turtle = saveGCode.trimTurtle(turtle, 10, 20);
+        var after = TrimTurtle.run(before, 9, 20);
 
-        File fileTemp = File.createTempFile("unit", null);
+        File fileTemp = File.createTempFile("unit", ".gcode");
         Plotter plotter = new Plotter();
         PlotterSettings settings = plotter.getSettings();
         settings.setDouble(PlotterSettings.PEN_ANGLE_UP_TIME,50);
         settings.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);
 
-        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), turtle, plotter);
+        saveGCode.saveOneFile(fileTemp.getAbsolutePath(), after, plotter);
         compareExpectedToActual("/gcode/save_subsection.gcode", fileTemp);
     }
 }

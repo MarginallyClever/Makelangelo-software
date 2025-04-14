@@ -24,7 +24,7 @@ public class SaveHelper {
         turtle.jumpTo(5, 2);
         turtle.moveTo(6, 10);
 
-        turtle.setColor(new Color(0x00, 0x44, 0xff));
+        turtle.setStroke(new Color(0x00, 0x44, 0xff));
         turtle.jumpTo(-15, -7);
         turtle.moveTo(20, 30);
         turtle.jumpTo(-4, -8);

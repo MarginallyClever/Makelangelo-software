@@ -23,8 +23,7 @@ public class SimplifyTurtleAction extends TurtleTool {
 	
 	@Override
 	public Turtle run(Turtle turtle) {
-		int os = turtle.history.size();
-		logger.debug("begin @ {}", os);
+		logger.debug("begin @ {}", turtle.countPoints());
 		
 		LineCollection originalLines = new LineCollection(turtle.getAsLineSegments());
 		int beforeCount = originalLines.size();
@@ -37,11 +36,11 @@ public class SimplifyTurtleAction extends TurtleTool {
 		if(change<=0) {
 			return turtle;
 		}
-		Turtle t = new Turtle();
-		t.addLineSegments(longLines);
-		int ns = t.history.size();
-		logger.debug("end @ {}", ns);
-		return t;
+		Turtle result = new Turtle();
+		result.addLineSegments(longLines);
+
+		logger.debug("end @ {}", result.countPoints());
+		return result;
 	}
 
 	/**

@@ -111,7 +111,7 @@ public class Generator_Voronoi extends TurtleGenerator {
 
 	private void drawCellCenters(Turtle turtle, List<VoronoiCell> points) {
 		// draw all the cell centers
-		turtle.setColor(Color.BLUE);
+		turtle.setStroke(Color.BLUE);
 
 		for( VoronoiCell p : points ) {
 			// jump to corner

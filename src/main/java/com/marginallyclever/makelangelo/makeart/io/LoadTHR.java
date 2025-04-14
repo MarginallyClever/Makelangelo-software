@@ -44,7 +44,7 @@ public class LoadTHR implements TurtleLoader {
 		logger.debug("Loading...");
 
 		myTurtle = new Turtle();
-		myTurtle.setColor(Color.BLACK);  // initial pen color
+		myTurtle.setStroke(Color.BLACK);  // initial pen color
 
 		// plotter coordinates are inverted in Y so flip the image.
 		myTurtle.scale(1, -1);

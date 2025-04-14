@@ -3,19 +3,21 @@ package com.marginallyclever.makelangelo.makeart.io;
 import com.marginallyclever.convenience.helpers.StringHelper;
 import com.marginallyclever.makelangelo.MakelangeloVersion;
 import com.marginallyclever.makelangelo.Translator;
+import com.marginallyclever.makelangelo.makeart.turtletool.TrimTurtle;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPlotterPanel;
 import com.marginallyclever.makelangelo.plotter.plottercontrols.ProgramPanel;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.turtle.MovementType;
+import com.marginallyclever.makelangelo.turtle.Line2d;
+import com.marginallyclever.makelangelo.turtle.StrokeLayer;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -46,15 +48,15 @@ public class SaveGCode implements TurtleSaver {
 		fc.setCurrentDirectory((lastDir==null?null : new File(lastDir)));
 	}
 
+	// TODO why is this dialog all the way down in the SaveGCode class?
+	// it should be in SaveFileAction, maybe.
 	public void run(Turtle turtle, Plotter plotter, JFrame parent, int trimHead, int trimTail) throws Exception {
 		if (fc.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			String selectedFile = fc.getSelectedFile().getAbsolutePath();
 			String fileWithExtension = addExtension(selectedFile,((FileNameExtensionFilter)fc.getFileFilter()).getExtensions());
 			logger.debug("File selected by user: {}", fileWithExtension);
 
-			logger.debug("turtle.history.size={} trimHead={} trimTail={}", turtle.history.size(), trimHead, trimTail);			
-			Turtle skinnyTurtle = trimTurtle(turtle, trimHead, trimTail);
-			logger.debug("skinnyTurtle.history.size={} ?=(trimTail-trimHead)={}", skinnyTurtle.history.size(),trimTail-trimHead);
+			Turtle skinnyTurtle = TrimTurtle.run(turtle, trimHead, trimTail);
 
 			int count = countTurtleToolChanges(skinnyTurtle);
 			if(count>1) {
@@ -64,43 +66,6 @@ public class SaveGCode implements TurtleSaver {
 			}
 		}
 	}
-
-	/**
-	 * <p>Remove trimHead number of commands from the start of the turtle history.</p>
-	 * <p>Remove trimTail number of commands from the end of the turtle history.</p>
-	 * @param turtle the source turtle.
-	 * @param trimHead the number of commands to remove from the start of the turtle history.
-	 * @param trimTail the number of commands to remove from the end of the turtle history.
-	 * @return the {@link Turtle} with the trimmed history.
-	 */
-	protected Turtle trimTurtle(Turtle turtle, int trimHead, int trimTail) {
-		Turtle skinny = new Turtle();
-		skinny.history.clear();
-
-		TurtleMove lastTC = null;
-
-		int i=0;
-		for( TurtleMove m : turtle.history ) {
-			if(i<trimHead && m.type == MovementType.TOOL_CHANGE) {
-				// watch for the last tool change
-				lastTC = m;
-			}
-			if(i==trimHead && m.type != MovementType.TOOL_CHANGE) {
-				// we've reached the trimHead point, so start adding commands, starting with the last tool change.
-				skinny.history.add(lastTC);
-			}
-			if(i>=trimHead && i<trimTail) {
-				// between trimHead and trimTail, add all commands.
-				skinny.history.add(m);
-			}
-			++i;
-		}
-		// insurance?
-		skinny.penUp();
-
-		return skinny;
-	}
-
 
 	/**
 	 * Offer to split the gcode file into one file per tool change, which is probably one per color.
@@ -150,11 +115,7 @@ public class SaveGCode implements TurtleSaver {
 	}
 
 	private int countTurtleToolChanges(Turtle turtle) {
-		int i=0;
-		for( TurtleMove m : turtle.history ) {
-			if(m.type == MovementType.TOOL_CHANGE) ++i;
-		}
-		return i;
+		return turtle.getLayers().size();
 	}
 
 	private String addExtension(String name, String [] extensions) {
@@ -189,62 +150,90 @@ public class SaveGCode implements TurtleSaver {
 	@Override
 	public boolean save(OutputStream outputStream, Turtle turtle, PlotterSettings settings) throws Exception {
 		try (Writer out = new OutputStreamWriter(outputStream)) {
-			out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
-			out.write(";FLAVOR:Marlin-polargraph\n");
-			Rectangle2D.Double bounds = turtle.getBounds();
-			out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
-			out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
-			//out.write(";MINZ:0.000\n");
-			out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
-			out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
-			//out.write(";MAXZ:0.000\n");
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-			Date date = new Date(System.currentTimeMillis());
-			out.write("; " + formatter.format(date) + "\n");
-			out.write(";Start of user gcode\n");
-			out.write(settings.getString(PlotterSettings.START_GCODE));
-			out.write("\n;End of user gcode\n");
-			out.write(settings.getFindHomeString() + "\n");  // go home
+			writeHeader(out,settings,turtle.getBounds());
+			out.write(settings.getPenUpString() + "\n");
 
-			boolean isUp = true;
+			for( var layer : turtle.getLayers() ) {
+				if(layer.isEmpty()) continue;
+				out.write(settings.getToolChangeString(layer.getColor().hashCode()) + "\n");
 
-			TurtleMove previousMovement = null;
-			for (int i = 0; i < turtle.history.size(); ++i) {
-				TurtleMove m = turtle.history.get(i);
-
-				switch (m.type) {
-					case TRAVEL -> {
-						if (!isUp) {
-							// lift pen up
-							out.write(settings.getPenUpString() + "\n");
-							isUp = true;
-						}
-						previousMovement = m;
-					}
-					case DRAW_LINE -> {
-						if (isUp) {
-							// go to m and put pen down
-							if (previousMovement == null) previousMovement = m;
-							out.write(settings.getTravelToString(previousMovement.x, previousMovement.y) + "\n");
-							out.write(settings.getPenDownString() + "\n");
-							isUp = false;
-						}
-						out.write(settings.getDrawToString(m.x, m.y) + "\n");
-						previousMovement = m;
-					}
-					case TOOL_CHANGE -> {
-						out.write(settings.getPenUpString() + "\n");
-						out.write(settings.getToolChangeString(m.getColor().hashCode()) + "\n");
-					}
-				}
+				StringBuilder sb = new StringBuilder();
+				int count = saveLayer(sb,layer,settings);
+				if(count>0) out.write(sb.toString());
 			}
-			if (!isUp) out.write(settings.getPenUpString() + "\n");
-			out.write(";Start of user gcode\n");
-			out.write(settings.getString(PlotterSettings.END_GCODE));
-			out.write("\n;End of user gcode\n");
-			out.write(";End of Gcode\n");
-			out.flush();
+			writeFooter(out,settings);
 			return true;
 		}
+	}
+
+	/**
+	 * Save a {@link Turtle} layer to a string builder
+	 * @param sb the string builder to append to
+	 * @param layer the layer to save
+	 * @param settings the plotter settings
+	 * @return the number of points in the layer
+	 */
+	private int saveLayer(StringBuilder sb, StrokeLayer layer, PlotterSettings settings) {
+		int count = 0;
+		for( var line : layer.getAllLines() ) {
+			StringBuilder sb2 = new StringBuilder();
+			int c2 = saveLine(sb2, line, settings);
+			if(c2>0) {
+				sb.append(sb2);
+				count += c2;
+			}
+		}
+		return count;
+	}
+
+	/**
+	 * Save a line to a string builder
+	 * @param sb the string builder to append to
+	 * @param line the line to save
+	 * @param settings the plotter settings
+	 * @return the number of points in the line
+	 */
+	private int saveLine(StringBuilder sb, Line2d line, PlotterSettings settings) {
+		if(line.isEmpty()) return 0;
+
+		int count=0;
+		var iter = line.iterator();
+		Point2d p0 = iter.next();
+		sb.append(settings.getTravelToString(p0.x, p0.y)).append("\n")
+		  .append(settings.getPenDownString()).append("\n");
+		while(iter.hasNext()) {
+			var p = iter.next();
+			sb.append(settings.getDrawToString(p.x, p.y)).append("\n");
+			count++;
+		}
+		sb.append(settings.getPenUpString()).append("\n");
+		return count;
+	}
+
+	private void writeFooter(Writer out, PlotterSettings settings) throws IOException{
+		out.write(";Start of user gcode\n");
+		out.write(settings.getString(PlotterSettings.END_GCODE));
+		out.write("\n;End of user gcode\n");
+		out.write(";End of Gcode\n");
+		out.flush();
+	}
+
+	private void writeHeader(Writer out, PlotterSettings settings,Rectangle2D.Double bounds) throws IOException{
+		out.write(";Generated with " + MakelangeloVersion.getFullOrLiteVersionStringRelativeToSysEnvDevValue() + "\n");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+		Date date = new Date(System.currentTimeMillis());
+		out.write("; " + formatter.format(date) + "\n");
+
+		out.write(";FLAVOR:Marlin-polargraph\n");
+		out.write(";MINX:" + StringHelper.formatDouble(bounds.x) + "\n");
+		out.write(";MINY:" + StringHelper.formatDouble(bounds.y) + "\n");
+		//out.write(";MINZ:0.000\n");
+		out.write(";MAXX:" + StringHelper.formatDouble(bounds.width + bounds.x) + "\n");
+		out.write(";MAXY:" + StringHelper.formatDouble(bounds.height + bounds.y) + "\n");
+		//out.write(";MAXZ:0.000\n");
+		out.write(";Start of user gcode\n");
+		out.write(settings.getString(PlotterSettings.START_GCODE));
+		out.write("\n;End of user gcode\n");
+		out.write(settings.getFindHomeString() + "\n");  // go home
 	}
 }
