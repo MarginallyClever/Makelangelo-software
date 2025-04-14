@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-java@v4.7.0
+      - uses: actions/setup-java@v4.7.1
         with:
           distribution: 'temurin'
           java-version: '22'
@@ -86,7 +86,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-java@v4.7.0
+      - uses: actions/setup-java@v4.7.1
         with:
           distribution: 'temurin'
           java-version: '22'
