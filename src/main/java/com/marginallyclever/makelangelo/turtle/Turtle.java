@@ -1,10 +1,12 @@
 package com.marginallyclever.makelangelo.turtle;
 
-import com.marginallyclever.convenience.linecollection.LineCollection;
 import com.marginallyclever.convenience.LineSegment2D;
+import com.marginallyclever.convenience.helpers.StringHelper;
+import com.marginallyclever.convenience.linecollection.LineCollection;
 
-import javax.vecmath.Vector2d;
+import javax.annotation.Nonnull;
 import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.security.InvalidParameterException;
@@ -31,61 +33,66 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 7.0?
  */
 public class Turtle implements Cloneable {
-	public final List<TurtleMove> history = new ArrayList<>();
+	public static final double DEFAULT_DIAMETER = 1.0;
+
+	private final List<StrokeLayer> strokeLayers = new ArrayList<>();
+
 	private final transient ReentrantLock lock = new ReentrantLock();
 
 	// current state
-	private double px, py;
-	private double nx, ny;  // normal of angle. aka sin() and cos() of angle.
+	private final Point2d p = new Point2d();
+	private final Vector2d n = new Vector2d();  // normal of angle. aka sin() and cos() of angle.
 	private double angle;
 	private boolean isUp;
 	private Color color;
-	private double diameter=1;
+	private double diameter = 1;
 
 	public Turtle() {
 		super();
-		reset(Color.BLACK);
+		reset(Color.BLACK,DEFAULT_DIAMETER);
 	}
 	
 	public Turtle(Turtle t) {
 		this();
-		this.px = t.px;
-		this.py = t.py;
-		this.nx = t.nx;
-		this.ny = t.ny;
+		set(t);
+	}
+
+	public void set(Turtle t) {
+		this.p.set(t.p);
+		this.n.set(t.n);
 		this.angle = t.angle;
 		this.isUp = t.isUp;
-		this.color=t.color;
-		this.diameter = t.diameter; 
-		// deep copy
-		history.clear();
-		for( TurtleMove m : t.history ) {
-			this.history.add(new TurtleMove(m));
-		}
+		this.color = t.color;
+		this.diameter = t.diameter;
+
+		deepCopyStrokeLayers(t);
 	}
 	
 	public Turtle(Color firstColor) {
 		super();
-		reset(firstColor);
+		reset(firstColor,DEFAULT_DIAMETER);
 	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		Turtle t = (Turtle)super.clone();
-		for( TurtleMove m : history ) {
-			t.history.add(new TurtleMove(m));
-		}
+		deepCopyStrokeLayers(t);
 		return t;
+	}
+
+	private void deepCopyStrokeLayers(Turtle t) {
+		this.strokeLayers.clear();
+		for( StrokeLayer cl : t.strokeLayers) {
+			this.strokeLayers.add(new StrokeLayer(cl));
+		}
 	}
 
 	@Override
 	public String toString() {
 		return "Turtle{" +
-				"history=" + history.size() +
-				", px=" + px +
-				", py=" + py +
-				", nx=" + nx +
-				", ny=" + ny +
+				"history=" + countPoints() +
+				", p=" + p +
+				", n=" + n +
 				", angle=" + angle +
 				", isUp=" + isUp +
 				", color=" + color +
@@ -93,17 +100,26 @@ public class Turtle implements Cloneable {
 				'}';
 	}
 
+	public int countPoints() {
+		int sum = 0;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				sum += line.size();
+			}
+		}
+		return sum;
+	}
+
 	/**
 	 * Returns this {@link Turtle} to mint condition.  Erases history and resets all parameters.  Called by constructor.
 	 * @param c The starting color for this {@link Turtle}.
+	 * @param d The starting diameter for this {@link Turtle}.
 	 */
-	private void reset(Color c) {
-		px = 0;
-		py = 0;
+	private void reset(Color c,double d) {
+		p.set(0,0);
 		setAngle(0);
 		penUp();
-		history.clear();
-		setColor(c);
+		setStroke(c,d);
 	}
 	
 	// multithreading lock safety
@@ -123,26 +139,32 @@ public class Turtle implements Cloneable {
 		}
 	}
 
-	public void setColor(Color c) {
-		if(color!=null) {
-			if(color.getRed()==c.getRed() &&
-				color.getGreen()==c.getGreen() &&
-				color.getBlue()==c.getBlue()) return;
-		}
-		color = c;
-		history.add( new TurtleMove(color.hashCode(),diameter,MovementType.TOOL_CHANGE) );
+	/**
+	 * Set the color of the pen.  Creates a new {@link StrokeLayer} if needed.
+	 *
+	 * @param color        the new color
+	 * @param diameter the new diameter
+	 */
+	public void setStroke(@Nonnull Color color, double diameter) {
+		if(this.color != null && this.color.equals(color) && this.diameter == diameter ) return;
+		this.color = color;
+		this.diameter = diameter;
+		strokeLayers.add(new StrokeLayer(this.color, this.diameter));
+		if(!isUp) penDown();
+	}
+
+	/**
+	 * Change the color without altering the diameter.
+	 * @param color the new color
+	 */
+	public void setStroke(Color color) {
+		setStroke(color,diameter);
 	}
 	
 	public Color getColor() {
 		return color;
 	}
-	
-	public void setDiameter(double d) {
-		if(diameter==d) return;
-		diameter=d;
-		history.add( new TurtleMove(color.hashCode(),diameter,MovementType.TOOL_CHANGE) );
-	}
-	
+
 	public double getDiameter() {
 		return diameter;
 	}
@@ -164,45 +186,49 @@ public class Turtle implements Cloneable {
 	 * @param y absolute y position
 	 */
 	public void moveTo(double x,double y) {
-		px=x;
-		py=y;
-		history.add( new TurtleMove(x, y, isUp ? MovementType.TRAVEL : MovementType.DRAW_LINE) );
+		p.set(x,y);
+		if(!isUp) {
+			var layer = strokeLayers.getLast();
+			if(layer.isEmpty()) {
+				layer.add(new Line2d());
+			}
+			layer.getLast().add(new Point2d(x,y));
+		}
 	}
-		
+
 	/**
-	 * Absolute position
-	 * @param arg0 x axis
+	 * @return the current x position of the turtle
 	 */
-	public void setX(double arg0) {
-		moveTo(arg0,py);
-	}
-	
-	/**
-	 * Absolute position
-	 * @param arg0 y axis
-	 */
-	public void setY(double arg0) {
-		moveTo(px,arg0);
-	}
-	
 	public double getX() {
-		return px;
+		return p.x;
 	}
-	
+
+	/**
+	 * @return the current y position of the turtle
+	 */
 	public double getY() {
-		return py;
+		return p.y;
 	}
-	
+
+	/**
+	 * Changes the pen status to up.  Does not add to history.
+	 */
 	public void penUp() {
 		isUp=true;
 	}
-	
+
+	/**
+	 * Changes the pen status to down.  Does not add to history.
+	 */
 	public void penDown() {
-		isUp=false;
+		if(isUp) {
+			isUp = false;
+			strokeLayers.getLast().add(new Line2d());
+			strokeLayers.getLast().getLast().add(new Point2d(p.x, p.y));
+		}
 	}
 	
 	/**
-	 * Returns true if pen is up.
 	 * @return true if pen is up
 	 */
 	public boolean isUp() {
@@ -229,8 +255,7 @@ public class Turtle implements Cloneable {
 	public void setAngle(double degrees) {
 		angle=degrees;
 		double radians=Math.toRadians(angle);
-		nx = Math.cos(radians);
-		ny = Math.sin(radians);
+		n.set(Math.cos(radians), Math.sin(radians));
 	}
 
 	/**
@@ -239,14 +264,14 @@ public class Turtle implements Cloneable {
 	 */
 	public void forward(double distance) {
 		moveTo(
-			px + nx * distance,
-			py + ny * distance
+			p.x + n.x * distance,
+			p.y + n.y * distance
 		);
 	}
 	public void strafe(double distance) {
 		moveTo(
-			px + ny * distance,
-			py - nx * distance
+			p.x + n.y * distance,
+			p.y - n.x * distance
 		);
 	}
 
@@ -254,76 +279,41 @@ public class Turtle implements Cloneable {
 	 * Calculate the limits of drawing lines in this turtle history
 	 **/
 	public Rectangle2D.Double getBounds() {
-		Point2d top = new Point2d();
-		Point2d bottom = new Point2d();
-		getBounds(top,bottom);
-		
-		Rectangle2D.Double r = new Rectangle.Double();
-		r.x=bottom.x;
-		r.y=bottom.y;
-		r.width=top.x-bottom.x;
-		r.height=top.y-bottom.y;
-		
-		return r;
-	}
-        
-	/**
-	 * Calculate the limits of drawing lines in this turtle history
-	 * @param top maximum limits
-	 * @param bottom minimum limits
-	 */
-	private void getBounds(Point2d top,Point2d bottom) {
-		bottom.x=Float.MAX_VALUE;
-		bottom.y=Float.MAX_VALUE;
-		top.x=-Float.MAX_VALUE;
-		top.y=-Float.MAX_VALUE;
-		TurtleMove lastTravelMove=null;
-		
-		int hits=0;
+		Point2d top = new Point2d(-Double.MAX_VALUE, -Double.MAX_VALUE);
+		Point2d bottom = new Point2d(Double.MAX_VALUE, Double.MAX_VALUE);
 
-		for( TurtleMove m : history ) {
-			switch(m.type) {
-				case TRAVEL -> {
-					lastTravelMove = m;
-				}
-				case DRAW_LINE -> {
-					if (lastTravelMove != null) {
-						hits++;
-						getBoundsInternal(top,bottom,lastTravelMove);
-						lastTravelMove = null;
-					}
+		int hits = 0;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				for (var point : line.getAllPoints()) {
 					hits++;
-					getBoundsInternal(top,bottom,m);
+					if (top.x < point.x) top.x = point.x;
+					if (top.y < point.y) top.y = point.y;
+					if (bottom.x > point.x) bottom.x = point.x;
+					if (bottom.y > point.y) bottom.y = point.y;
 				}
 			}
 		}
-		
-		if(hits==0) {
-			bottom.set(0,0);
-			top.set(0,0);
-		}
-	}
 
-	private void getBoundsInternal(Point2d top,Point2d bottom,TurtleMove m) {
-		if (top.x < m.x) top.x = m.x;
-		if (top.y < m.y) top.y = m.y;
-		if (bottom.x > m.x) bottom.x = m.x;
-		if (bottom.y > m.y) bottom.y = m.y;
+		if (hits == 0) {
+			bottom.set(0, 0);
+			top.set(0, 0);
+		}
+
+		return new Rectangle2D.Double(bottom.x, bottom.y, top.x - bottom.x, top.y - bottom.y);
 	}
 
 	/**
 	 * Scale all draw and move segments by the given amounts
-	 * @param sx the x axis scale factor.
-	 * @param sy the y axis scale factor.
+	 * @param sx the x-axis scale factor.
+	 * @param sy the y-axis scale factor.
 	 */
 	public void scale(double sx, double sy) {
-		for( TurtleMove m : history ) {
-			switch (m.type) {
-				case DRAW_LINE, TRAVEL -> {
-					m.x *= sx;
-					m.y *= sy;
-				}
-				default -> {
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				for (var point : line.getAllPoints()) {
+					point.x *= sx;
+					point.y *= sy;
 				}
 			}
 		}
@@ -335,13 +325,12 @@ public class Turtle implements Cloneable {
 	 * @param dy relative move y
 	 */
 	public void translate(double dx, double dy) {
-		for( TurtleMove m : history ) {
-			switch (m.type) {
-				case DRAW_LINE, TRAVEL -> {
-					m.x += dx;
-					m.y += dy;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				for (var point : line.getAllPoints()) {
+					point.x += dx;
+					point.y += dy;
 				}
-				default -> {}
 			}
 		}
 	}
@@ -355,15 +344,14 @@ public class Turtle implements Cloneable {
 		double c = Math.cos(r);
 		double s = Math.sin(r);
 
-		for( TurtleMove m : history ) {
-			switch (m.type) {
-				case DRAW_LINE, TRAVEL -> {
-					double ox=m.x;
-					double oy=m.y;
-					m.x = ox * c + oy * -s;
-					m.y = ox * s + oy *  c;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				for (var point : line.getAllPoints()) {
+					double ox = point.x;
+					double oy = point.y;
+					point.x = ox * c + oy * -s;
+					point.y = ox * s + oy * c;
 				}
-				default -> {}
 			}
 		}
 	}
@@ -392,35 +380,31 @@ public class Turtle implements Cloneable {
 	}
 
 	/**
-	 * @return a list of all the pen-down lines while remembering their color.
+	 * @return a list of all the pen down lines while remembering their color.
  	 */
 	public LineCollection getAsLineSegments() {
-		LineCollection lines = new LineCollection();
-		TurtleMove previousMovement=null;
-		Color color = Color.BLACK;
+		LineCollection result = new LineCollection();
 
-		//logger.debug("  Found {} instructions.", history.size());
-		
-		for( TurtleMove m : history ) {
-			switch (m.type) {
-				case DRAW_LINE -> {
-					if (previousMovement != null) {
-						LineSegment2D line = new LineSegment2D(
-								new Point2d(previousMovement.x, previousMovement.y),
-								new Point2d(m.x, m.y),
-								color);
-						if (line.lengthSquared() > 0) {
-							lines.add(line);
-						}
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				if(line.size()<2) continue;
+				var iter = line.iterator();
+				Point2d prev = iter.next();
+				while(iter.hasNext()) {
+					Point2d next = iter.next();
+					LineSegment2D segment = new LineSegment2D(
+							new Point2d(prev.x, prev.y),
+							new Point2d(next.x, next.y),
+							cl.getColor());
+					if (segment.lengthSquared() > 0) {
+						result.add(segment);
 					}
-					previousMovement = m;
+					prev = next;
 				}
-				case TRAVEL -> previousMovement = m;
-				case TOOL_CHANGE -> color = m.getColor();
 			}
 		}
 
-		return lines;
+		return result;
 	}
 
 	/**
@@ -455,13 +439,13 @@ public class Turtle implements Cloneable {
 			for (LineSegment2D line : segments) {
 				// change color if needed
 				if (line.color != getColor()) {
-					setColor(line.color);
+					setStroke(line.color,DEFAULT_DIAMETER);
 				}
 
 				double d = distanceSquared(line.start);
 				if (d > minJumpSquared) {
 					// The previous line ends too far from the start point of this line,
-					// need to make a travel with the pen up to the start point of this line.
+					// need to make a travel move with the pen up to the start point of this line.
 					jumpTo(line.start.x, line.start.y);
 				} else if (d > minDrawSquared) {
 					moveTo(line.start.x, line.start.y);
@@ -475,46 +459,34 @@ public class Turtle implements Cloneable {
 	}
 
 	private double distanceSquared(Point2d b) {
-		double dx = px-b.x;
-		double dy = py-b.y;
+		double dx = p.x - b.x;
+		double dy = p.y - b.y;
 		return dx*dx + dy*dy; 
 	}
 	
 	public List<Turtle> splitByToolChange() {
-		List<Turtle> list = new ArrayList<>();
-		Turtle t = new Turtle();
-		list.add(t);
-		TurtleMove lastToolChange = null;
-		
-		for( TurtleMove m : history) {
-			if(m.type==MovementType.TOOL_CHANGE) {
-				if(lastToolChange==null
-						|| !lastToolChange.getColor().equals(m.getColor())
-						|| lastToolChange.getDiameter() != m.getDiameter() ) {
-					t = new Turtle();
-					t.history.clear();
-					list.add(t);
-					lastToolChange = m;
-				}
-			}
-			t.history.add(m);
-		}
-		//logger.debug("Turtle.splitByToolChange() into {} sections.", list.size());
+		List<Turtle> result = new ArrayList<>();
 
-		List<Turtle> notEmptyList = new ArrayList<>();
-		for( Turtle t2 : list ) {
-			if(t2.getHasAnyDrawingMoves()) {
-				notEmptyList.add(t2);
-			}
+		for (var cl : strokeLayers) {
+			if(cl.isEmpty()) continue;
+			Turtle t = new Turtle();
+			t.strokeLayers.add(cl);
+			t.color = cl.getColor();
+			result.add(t);
 		}
-		//logger.debug("Turtle.splitByToolChange() {} not-empty sections.", notEmptyList.size());
+
+		//logger.debug("Turtle.splitByToolChange() {} not-empty sections.", result.size());
 		
-		return notEmptyList;
+		return result;
 	}
 	
 	public boolean getHasAnyDrawingMoves() {
-		for( TurtleMove m : history) {
-			if(m.type==MovementType.DRAW_LINE) return true;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				if(!line.isEmpty()) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -522,39 +494,43 @@ public class Turtle implements Cloneable {
 	public void add(Turtle t) {
 		lock.lock();
 		try {
-			this.history.addAll(t.history);
+			// add all the lines from the other turtle
+			for (var cl : t.strokeLayers) {
+				StrokeLayer newLayer = new StrokeLayer(cl);
+				strokeLayers.add(newLayer);
+			}
 		} finally {
 			lock.unlock();
 		}
 	}
 
 	public Color getFirstColor() {
-		for( TurtleMove m : history) {
-			if(m.type==MovementType.TOOL_CHANGE)
-				return m.getColor();
-		}
-		
-		return Color.BLACK;
+		if(strokeLayers.isEmpty()) return Color.BLACK;
+		StrokeLayer cl = strokeLayers.getFirst();
+		return cl.getColor();
 	}
 
 	/**
-	 * Returns the total distance of all pen-down moves within this {@link Turtle}.
-	 * @return the total distance of all pen-down moves within this {@link Turtle}.
+	 * Returns the total distance of all pen down moves within this {@link Turtle}.
+	 * @return the total distance of all pen down moves within this {@link Turtle}.
 	 */
     public double getDrawDistance() {
-		double d=0;
-		TurtleMove prev = new TurtleMove(0,0,MovementType.TRAVEL);
-		for( TurtleMove m : history) {
-			if(m.type == MovementType.DRAW_LINE) {
-				double dx = m.x-prev.x;
-				double dy = m.y-prev.y;
-				d += Math.sqrt(dx*dx+dy*dy);
-				prev = m;
-			} else if(m.type == MovementType.TRAVEL) {
-				prev = m;
+		double sum = 0;
+		for (var cl : strokeLayers) {
+			for (var line : cl.getAllLines()) {
+				if(line.size()<2) continue;
+				var iter = line.iterator();
+				Point2d prev = iter.next();
+				while(iter.hasNext()) {
+					Point2d next = iter.next();
+					double dx = next.x - prev.x;
+					double dy = next.y - prev.y;
+					sum += Math.sqrt(dx*dx+dy*dy);
+					prev = next;
+				}
 			}
 		}
-		return d;
+		return sum;
     }
 
 	@Override
@@ -562,28 +538,28 @@ public class Turtle implements Cloneable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Turtle turtle = (Turtle) o;
-		return Double.compare(turtle.px, px) == 0 &&
-				Double.compare(turtle.py, py) == 0 &&
-				Double.compare(turtle.nx, nx) == 0 &&
-				Double.compare(turtle.ny, ny) == 0 &&
+		return  Double.compare(turtle.p.x, p.x) == 0 &&
+				Double.compare(turtle.p.y, p.y) == 0 &&
+				Double.compare(turtle.n.x, n.x) == 0 &&
+				Double.compare(turtle.n.y, n.y) == 0 &&
 				Double.compare(turtle.angle, angle) == 0 &&
 				isUp == turtle.isUp &&
 				Double.compare(turtle.diameter, diameter) == 0 &&
-				history.equals(turtle.history) &&
+				strokeLayers.equals(turtle.strokeLayers) &&
 				Objects.equals(color, turtle.color);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(history, px, py, nx, ny, angle, isUp, color, diameter);
+		return Objects.hash(strokeLayers, p.x, p.y, n.x, n.y, angle, isUp, color, diameter);
 	}
 
 	public Vector2d getHeading() {
-		return new Vector2d(nx,ny);
+		return new Vector2d(n);
 	}
 
-	public Vector2d getPosition() {
-		return new Vector2d(px,py);
+	public Point2d getPosition() {
+		return new Point2d(p);
 	}
 
 
@@ -591,16 +567,12 @@ public class Turtle implements Cloneable {
 	 * @return the number of times the pen is lowered to draw a line.
 	 */
 	public int countLoops() {
-		int sum=0;
-		MovementType before = MovementType.TRAVEL;
+		int sum = 0;
 
-		for( TurtleMove m : history) {
-			if(m.type==before) continue;
-			if(m.type==MovementType.DRAW_LINE && before==MovementType.TRAVEL) {
-				sum++;
-			}
-			before = m.type;
+		for (var cl : strokeLayers) {
+			sum += cl.getAllLines().size();
 		}
+
 		return sum;
 	}
 
@@ -608,9 +580,49 @@ public class Turtle implements Cloneable {
 	 * @return true if the turtle has any drawing moves.
 	 */
 	public boolean hasDrawing() {
-		for( TurtleMove m : history) {
-			if(m.type==MovementType.DRAW_LINE) return true;
+		for (var cl : strokeLayers) {
+			if(!cl.getAllLines().isEmpty()) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @return a new {@link TurtleIterator} which can be used to iterate over the drawing moves in this {@link Turtle}.
+	 */
+	public TurtleIterator getIterator() {
+		return new TurtleIterator(this);
+	}
+
+	public String generateHistory() {
+		StringBuilder sb = new StringBuilder();
+		TurtleIterator iter = getIterator();
+		String add ="";
+		while(iter.hasNext()) {
+			Point2d p = iter.next();
+
+			if(iter.isToolChange()) {
+				sb.append(add);
+				add = ", ";
+				Color c = iter.getLayer().getColor();
+				sb.append("TOOL")
+						.append(" R").append(c.getRed())
+						.append(" G").append(c.getGreen())
+						.append(" B").append(c.getBlue())
+						.append(" A").append(c.getAlpha())
+						.append(" D").append(StringHelper.formatDouble(iter.getLayer().getDiameter()));
+			}
+
+			sb.append(add);
+			add = ", ";
+			sb.append(iter.isTravel() ? "TRAVEL" : "DRAW_LINE")
+			  .append(" X").append(StringHelper.formatDouble(p.x))
+			  .append(" Y").append(StringHelper.formatDouble(p.y));
+		}
+
+		return "[" + sb + "]";
+	}
+
+	public List<StrokeLayer> getLayers() {
+		return strokeLayers;
 	}
 }

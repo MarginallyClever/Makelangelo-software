@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
-
+import javax.vecmath.Point2d;
 import java.awt.*;
 
 /**
@@ -10,9 +9,9 @@ import java.awt.*;
 public interface TurtleRenderer {
 	void start(Graphics2D gl2);
 
-	void draw(TurtleMove p0, TurtleMove p1);
+	void draw(Point2d p0, Point2d p1);
 	
-	void travel(TurtleMove p0, TurtleMove p1);
+	void travel(Point2d p0, Point2d p1);
 
 	void end();
 

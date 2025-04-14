@@ -494,7 +494,7 @@ public class LoadScratch3 implements TurtleLoader {
 		Color c = new Color((int)resolveValue(findInputInBlock(currentBlock,"COLOR")));
 		if ( !ignoreDoSetPenColor ){
 			logger.trace("SET COLOR {}",c);
-			myTurtle.setColor(c);
+			myTurtle.setStroke(c);
 		}else{
 			logger.trace("SET COLOR {} ignored",c);
 		}

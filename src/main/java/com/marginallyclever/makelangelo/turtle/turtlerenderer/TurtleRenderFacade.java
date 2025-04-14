@@ -2,12 +2,11 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 
 /**
@@ -44,40 +43,31 @@ public class TurtleRenderFacade implements PreviewListener {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
-			TurtleMove previousMove = new TurtleMove(0,0, MovementType.TRAVEL);
-			
 			// where we're at in the drawing (to check if we're between first & last)
 			int showCount = 0;
-			myRenderer.setPenDiameter(penDiameter);
 			myRenderer.setPenUpColor(penUpColor);
 			myRenderer.setPenDownColor(penDownColor);
 			myRenderer.setShowTravel(showTravel);
 			myRenderer.start(g2d);
-			showCount++;
 
-			for (TurtleMove m : myTurtle.history) {
-				if(m==null) throw new NullPointerException();
+			Point2d prev = new Point2d(0,0);
 
-				boolean inShow = (showCount >= first && showCount < last);
-				switch (m.type) {
-				case TRAVEL:
-					if (inShow) {
-						myRenderer.travel(previousMove, m);
+			for( var layer : myTurtle.getLayers() ) {
+				if(layer.isEmpty()) continue;
+				myRenderer.setPenDownColor(layer.getColor());
+				myRenderer.setPenDiameter(layer.getDiameter());
+				for( var line : layer.getAllLines() ) {
+					if(line.isEmpty()) continue;
+					boolean start = true;
+					for( var next : line.getAllPoints() ) {
+						if(showCount >= first && showCount < last) {
+							if(start) myRenderer.travel(prev,next);
+							else myRenderer.draw(prev, next);
+							start=false;
+						}
+						prev = next;
+						showCount++;
 					}
-					showCount++;
-					previousMove = m;
-					break;
-				case DRAW_LINE:
-					if (inShow) {
-						myRenderer.draw(previousMove, m);
-					}
-					showCount++;
-					previousMove = m;
-					break;
-				case TOOL_CHANGE:
-					myRenderer.setPenDownColor(m.getColor());
-					myRenderer.setPenDiameter(m.getDiameter());
-					break;
 				}
 			}
 		}
@@ -98,7 +88,7 @@ public class TurtleRenderFacade implements PreviewListener {
 
 	public void setTurtle(Turtle turtle) {
 		int size=0;
-		if(turtle!=null) size = turtle.history.size();
+		if(turtle!=null) size = turtle.countPoints();
 		myTurtle = turtle;
 		if(myRenderer!=null) {
 			myRenderer.reset();
@@ -115,12 +105,13 @@ public class TurtleRenderFacade implements PreviewListener {
 	public TurtleRenderer getRenderer() {
 		return myRenderer;
 	}
-	
-	public void setFirst(int arg0) {
-		int size = 0;
-		if(myTurtle!=null) size = myTurtle.history.size();
 
-		first=(int)Math.min(Math.max(arg0, 0),size);
+	private int getMax() {
+		return (myTurtle==null) ? 0 : myTurtle.countPoints();
+	}
+
+	public void setFirst(int arg0) {
+		first = Math.min(Math.max(arg0, 0), getMax());
 		if(last<first) setLast(first);
 	}
 	
@@ -129,10 +120,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	}
 	
 	public void setLast(int arg0) {
-		int size = 0;
-		if(myTurtle!=null) size = myTurtle.history.size();
-
-		last = (int)Math.min(Math.max(arg0, 0), size);
+		last = Math.min(Math.max(arg0, 0), getMax());
 		if(first>last) setFirst(last);
 	}
 

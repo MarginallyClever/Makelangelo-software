@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
 import org.slf4j.Logger;
@@ -135,12 +134,7 @@ public class ScaleTurtlePanel extends JPanel {
 	}
 
 	private void revertOriginalTurtle() {
-		// reset original turtle to original scale.
-		turtleToChange.history.clear();
-		// deep copy
-		for(TurtleMove m : turtleOriginal.history) {
-			turtleToChange.history.add(new TurtleMove(m));
-		}
+		turtleToChange.set(turtleOriginal);
 	}
 	
 	private void onUnitChange(ActionEvent e) {

@@ -5,6 +5,7 @@ import com.marginallyclever.convenience.helpers.StringHelper;
 import java.awt.*;
 import java.util.Objects;
 
+@Deprecated(since="7.70.0", forRemoval=true)
 public class TurtleMove {
 	public MovementType type;
 	public double x,y;  // destination
@@ -37,15 +38,23 @@ public class TurtleMove {
 	}
 
 	public String toString() {
-		switch(type) {
-		case TOOL_CHANGE:
-			Color c = new Color((int)x,true);
-			return "TOOL R"+c.getRed()+" G"+c.getGreen()+" B"+c.getBlue()+" A"+c.getAlpha()+" D"+StringHelper.formatDouble(y);
-		case TRAVEL:
-			return "TRAVEL X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
-		default:
-			return "DRAW_LINE X"+StringHelper.formatDouble(x)+" Y"+StringHelper.formatDouble(y);
-		}
+        return switch (type) {
+            case TOOL_CHANGE -> {
+                Color c = new Color((int) x, true);
+                yield "TOOL"
+						+ " R" + c.getRed()
+						+ " G" + c.getGreen()
+						+ " B" + c.getBlue()
+						+ " A" + c.getAlpha()
+						+ " D" + StringHelper.formatDouble(y);
+            }
+            case TRAVEL -> "TRAVEL"
+					+ " X" + StringHelper.formatDouble(x)
+					+ " Y" + StringHelper.formatDouble(y);
+            default -> "DRAW_LINE"
+					+ " X" + StringHelper.formatDouble(x)
+					+ " Y" + StringHelper.formatDouble(y);
+        };
 	}
 
 	@Override

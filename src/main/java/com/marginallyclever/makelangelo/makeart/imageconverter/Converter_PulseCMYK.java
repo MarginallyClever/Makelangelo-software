@@ -167,7 +167,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
 
-		turtle.setColor(channel);
+		turtle.setStroke(channel);
 		
 		if (direction == 0) {
 			// horizontal

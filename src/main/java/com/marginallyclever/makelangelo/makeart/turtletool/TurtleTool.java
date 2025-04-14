@@ -18,12 +18,12 @@ public abstract class TurtleTool extends AbstractAction {
 	private final EventListenerList listeners = new EventListenerList();
 	private MainFrame frame;
 	
-	public TurtleTool(String string) {
-		super(string);
+	public TurtleTool(String label) {
+		super(label);
 	}
 	
-	public TurtleTool(String string, Icon icon) {
-		super(string,icon);
+	public TurtleTool(String label, Icon icon) {
+		super(label,icon);
 	}
 
 	public void setSource(MainFrame frame) {

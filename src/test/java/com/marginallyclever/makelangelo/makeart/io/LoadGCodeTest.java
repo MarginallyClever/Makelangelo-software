@@ -55,17 +55,13 @@ public class LoadGCodeTest {
 
     private void verifyLoadGCode(String filenameToTest, String fileExpected) {
         try {
-
             // given
             TurtleLoader loader = new LoadGCode();
-
-            // when
             Turtle turtle = loader.load(LoadGCodeTest.class.getResourceAsStream(filenameToTest));
-
             // then
             assertNotNull(turtle);
-            assertNotNull(turtle.history);
-            assertEquals(readFile(fileExpected), turtle.history.toString());
+            assert(turtle.hasDrawing());
+            assertEquals(readFile(fileExpected), turtle.generateHistory());
         } catch( Exception e) {
             fail(e);
         }

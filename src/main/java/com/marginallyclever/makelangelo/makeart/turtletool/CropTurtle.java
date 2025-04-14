@@ -1,76 +1,91 @@
 package com.marginallyclever.makelangelo.makeart.turtletool;
 
-import com.marginallyclever.convenience.Clipper2D;
-
-import com.marginallyclever.makelangelo.turtle.MovementType;
+import com.marginallyclever.makelangelo.turtle.Line2d;
+import com.marginallyclever.makelangelo.turtle.StrokeLayer;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import org.locationtech.jts.geom.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Point2d;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CropTurtle {
 	private static final Logger logger = LoggerFactory.getLogger(CropTurtle.class);
 	private static final double EPSILON = 1e-8;
 	
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
-		logger.debug("crop start @ {}", turtle.history.size());
+		logger.debug("crop start @ {}", turtle.countPoints());
 
-		List<TurtleMove> newHistory = new ArrayList<>();
-		// limits we will need for rectangle
-		Point2d rMax = new Point2d(rectangle.getMaxX(),rectangle.getMaxY());
-		Point2d rMin = new Point2d(rectangle.getMinX(),rectangle.getMinY());
-		// working space for clipping
-		Point2d p0 = new Point2d();
-		Point2d p1 = new Point2d();
-		Point2d p0before = new Point2d();
-		Point2d p1before = new Point2d();
-
-		TurtleMove prev=null;
-		
-		for (TurtleMove m : turtle.history ) {
-			switch (m.type) {
-				case DRAW_LINE, TRAVEL -> {
-					if(prev==null) {
-						newHistory.add(m);
-					} else {
-						p0.set(prev.x, prev.y);
-						p1.set(m.x, m.y);
-						p0before.set(p0);
-						p1before.set(p1);
-						if (Clipper2D.clipLineToRectangle(p0, p1, rMax, rMin)) {
-							// partial crop.  Which end(s)?
-							// is start cropped?
-							if (p0before.distance(p0) >= EPSILON) {
-								// make a jump to the crop start
-								newHistory.add(new TurtleMove(p0.x, p0.y, MovementType.TRAVEL));
-							}
-
-							// is end cropped?
-							if(p1before.distance(p1) >= EPSILON) {
-								// draw to the crop end
-								newHistory.add(new TurtleMove(p1.x, p1.y, m.type));
-							} else {
-								// draw to the original end
-								newHistory.add(m);
-							}
-						}
-					}
-					prev = m;
-				}
-				default -> newHistory.add(m);
+		Turtle result = new Turtle();
+		for( var layer : turtle.getLayers() ) {
+			StrokeLayer croppedLayer = cropLayer(rectangle,layer);
+			if(!croppedLayer.isEmpty()) {
+				result.getLayers().add(croppedLayer);
 			}
 		}
 
-		turtle.history.clear();
-		turtle.history.addAll(newHistory);
-		
-		// There may be some dumb travel moves left. (several travels in a row.)
-	
-		logger.debug("crop end @ {}", turtle.history.size());
+		turtle.set(result);
+
+		logger.debug("crop end @ {}", turtle.countPoints());
+	}
+
+	/**
+	 * Use JTS to crop a layer of the turtle.
+	 * @param rectangle the rectangle to crop to
+	 * @param layer the layer to crop
+	 * @return a new turtle with the cropped layer
+	 */
+	private static StrokeLayer cropLayer(Rectangle2D.Double rectangle, StrokeLayer layer) {
+		StrokeLayer newLayer = new StrokeLayer(layer.getColor(),layer.getDiameter());
+
+		GeometryFactory gf = new GeometryFactory();
+		// limits we will need for rectangle
+		Geometry rectanglePolygon = gf.toGeometry(new Envelope(
+				rectangle.getMinX(), rectangle.getMaxX(),
+				rectangle.getMinY(), rectangle.getMaxY()));
+
+		for( var line : layer.getAllLines()) {
+			LineString lineString = createLineStringFromLine2d(gf,line);
+			Geometry intersection = lineString.intersection(rectanglePolygon);
+			if (!intersection.isEmpty()) {
+				addIntersectionToLayer(intersection,newLayer);
+			}
+		}
+		return newLayer;
+	}
+
+	private static void addIntersectionToLayer(Geometry intersection, StrokeLayer newLayer) {
+		// merge the results into the new layer.
+		if (intersection instanceof LineString lineIntersection) {
+			// create a new line from the coordinates
+			newLayer.add(coordinatesToLine2d(lineIntersection.getCoordinates()));
+		} else if (intersection instanceof MultiLineString multiLine) {
+			for (int i = 0; i < multiLine.getNumGeometries(); i++) {
+				Geometry geom = multiLine.getGeometryN(i);
+				if (geom instanceof LineString) {
+					// create a new line from the coordinates
+					newLayer.add(coordinatesToLine2d(geom.getCoordinates()));
+				}
+			}
+		}
+	}
+
+	private static LineString createLineStringFromLine2d(GeometryFactory gf, Line2d line) {
+		// convert line to jts format
+		Coordinate[] list = new Coordinate[line.size()];
+		for(int i=0;i<line.size();++i) {
+			var p = line.get(i);
+			list[i] = new Coordinate(p.x, p.y);
+		}
+		return gf.createLineString(list);
+	}
+
+	private static Line2d coordinatesToLine2d(Coordinate[] coords) {
+		Line2d line = new Line2d();
+		for (Coordinate coord : coords) {
+			line.add(new Point2d(coord.x, coord.y));
+		}
+		return line;
 	}
 }

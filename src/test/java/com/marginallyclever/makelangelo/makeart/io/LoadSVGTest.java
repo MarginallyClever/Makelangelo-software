@@ -52,17 +52,13 @@ public class LoadSVGTest {
 
     private void verifyLoadSvg(String filenameToTest, String fileExpected) {
         try {
-
             // given
             TurtleLoader loader = new LoadSVG();
-
-            // when
             Turtle turtle = loader.load(LoadSVGTest.class.getResourceAsStream(filenameToTest));
-
             // then
             assertNotNull(turtle);
-            assertNotNull(turtle.history);
-            assertEquals(readFile(fileExpected), turtle.history.toString());
+            assert(turtle.hasDrawing());
+            assertEquals(readFile(fileExpected), turtle.generateHistory());
         } catch (Exception e) {
             fail(e);
         }

@@ -112,10 +112,10 @@ public abstract class ImageConverter {
 
 		double cx = myPaper.getCenterX();
 		double cy = myPaper.getCenterY();
-		
-		double ox=turtle.getX()-P0.x;
-		double oy=turtle.getY()-P0.y;
-		boolean firstJump = MathHelper.lengthSquared(ox, oy)>2;
+
+		var o = turtle.getPosition();
+		o.sub(P0);
+		boolean firstJump = MathHelper.lengthSquared(o.x, o.y)>2;
 		if(firstJump) turtle.jumpTo(cx+P0.x,cy+P0.y);
 			
 		double b;

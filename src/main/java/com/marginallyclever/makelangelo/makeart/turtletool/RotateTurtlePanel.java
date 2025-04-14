@@ -2,7 +2,6 @@ package com.marginallyclever.makelangelo.makeart.turtletool;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.util.PreferencesHelper;
 import org.apache.batik.ext.swing.GridBagConstants;
 import org.slf4j.Logger;
@@ -21,7 +20,7 @@ public class RotateTurtlePanel extends JPanel {
 	public RotateTurtlePanel(Turtle t) {
 		super();
 		turtleToChange = t;
-		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
+		turtleOriginal = new Turtle(t);  // make a deep copy of the original.
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -64,12 +63,7 @@ public class RotateTurtlePanel extends JPanel {
 	}
 
 	private void revertOriginalTurtle() {
-		// reset original turtle to original scale.
-		turtleToChange.history.clear();
-		// deep copy
-		for(TurtleMove m : turtleOriginal.history) {
-			turtleToChange.history.add(new TurtleMove(m));
-		}
+		turtleToChange.set(turtleOriginal);
 	}
 
 	public static void runAsDialog(Window parent,Turtle t) {

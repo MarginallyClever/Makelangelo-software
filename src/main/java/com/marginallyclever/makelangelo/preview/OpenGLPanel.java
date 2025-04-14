@@ -57,7 +57,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 
 	// OpenGL stuff
 	private GLU glu;
-	private FPSAnimator animator;
+	private final FPSAnimator animator = new FPSAnimator(1);
 
 	public OpenGLPanel() {
 		super(new BorderLayout());
@@ -76,7 +76,6 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 
 		// start animation system
 		logger.debug("  starting animator...");
-		animator = new FPSAnimator(1);
 		animator.add(glCanvas);
 		animator.start();
 	}

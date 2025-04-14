@@ -20,6 +20,6 @@ public class LoadAudioTest {
         assert(null!=loadAudio.getFileNameFilter());
         assert(loadAudio.canLoad(testPath));
         var turtle = loadAudio.load(getClass().getClassLoader().getResourceAsStream(testPath));
-        assert(turtle.history.size()>1e6);
+        assert(turtle.getDrawDistance()>1e6);
     }
 }

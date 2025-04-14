@@ -13,23 +13,23 @@ import java.util.List;
  */
 @Deprecated
 public class ColorPalette {
-
     /**
      * List of colors in the form of red, green, and blue data values.
      * <p>
      * See ColorRGB
      */
+    @Deprecated(forRemoval = true)
     protected List<Color> colors = new ArrayList<>();
 
 
-    public ColorPalette() {
-    }
+    public ColorPalette() {}
 
     /**
      * add a color to the palette.  Does not check for duplicates.
      *
      * @param c color
      */
+    @Deprecated(forRemoval = true)
     public void addColor(Color c) {
         colors.add(c);
     }
@@ -40,6 +40,7 @@ public class ColorPalette {
      * @param c color to remove.
      *          See <a href="http://stackoverflow.com/a/223929">Iterating through a list, avoiding ConcurrentModificationException when removing in loop</a>
      */
+    @Deprecated(forRemoval = true)
     public void removeColor(Color c) {
         for (final Iterator<Color> colorsIterator = colors.iterator(); colorsIterator.hasNext(); ) {
             final Color nextColor = colorsIterator.next();
@@ -53,6 +54,7 @@ public class ColorPalette {
     /**
      * @return the number of colors in this palette
      */
+    @Deprecated(forRemoval = true)
     public int numColors() {
         return colors.size();
     }
@@ -64,6 +66,7 @@ public class ColorPalette {
      * @param index
      * @return color for a given index
      */
+    @Deprecated(forRemoval = true)
     public Color getColor(int index) throws IndexOutOfBoundsException {
         return colors.get(index);
     }
@@ -75,6 +78,7 @@ public class ColorPalette {
      * @param c the color to match
      * @return the closest match
      */
+    @Deprecated(forRemoval = true)
     public Color quantize(Color c) {
         int i = quantizeIndex(c);
 
@@ -88,6 +92,7 @@ public class ColorPalette {
      * @param c the color to match
      * @return the index into the color palette of the closest match
      */
+    @Deprecated(forRemoval = true)
     public int quantizeIndex(Color c) {
         Iterator<Color> i = colors.iterator();
         assert (i.hasNext());
@@ -108,6 +113,7 @@ public class ColorPalette {
         return nearestIndex;
     }
 
+    @Deprecated(forRemoval = true)
     private int diffSquared(Color a, Color b) {
         return Math.abs(a.getRed() - b.getRed())
                 + Math.abs(a.getGreen() - b.getGreen())
@@ -129,6 +135,7 @@ public class ColorPalette {
      * @param g in the range 0...255
      * @param b in the range 0...255
      */
+    @Deprecated(forRemoval = true)
     public double[] convertRGBtoCMYK(double r, double g, double b) {
         r /= 255;
         g /= 255;
@@ -157,6 +164,7 @@ public class ColorPalette {
      * @param y
      * @param k
      */
+    @Deprecated(forRemoval = true)
     public double[] convertCMYKtoRGB(double c, double m, double y, double k) {
         double r = 255 * (1 - c) * (1 - k);
         double g = 255 * (1 - m) * (1 - k);

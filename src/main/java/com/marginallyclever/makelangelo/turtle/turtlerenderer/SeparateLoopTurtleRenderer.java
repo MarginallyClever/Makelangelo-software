@@ -2,8 +2,8 @@ package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.applicationsettings.GFXPreferences;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Line2D;
 
@@ -49,13 +49,13 @@ public class SeparateLoopTurtleRenderer implements TurtleRenderer {
 	}
 	
 	@Override
-	public void draw(TurtleMove p0, TurtleMove p1) {
+	public void draw(Point2d p0, Point2d p1) {
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
 		gl2.draw(line);
 	}
 
 	@Override
-	public void travel(TurtleMove p0, TurtleMove p1) {
+	public void travel(Point2d p0, Point2d p1) {
 		if(showTravel) {
 			gl2.setColor(colorTravel);
 			line.setLine(p0.x, p0.y, p1.x, p1.y);
