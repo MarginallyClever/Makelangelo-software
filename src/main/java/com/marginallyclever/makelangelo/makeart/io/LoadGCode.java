@@ -88,7 +88,7 @@ public class LoadGCode implements TurtleLoader {
 						// tool change
 						String color = tokenExists("T",tokens);
 						Color penDownColor = new Color(Integer.parseInt(color.substring(1)));
-						turtle.setColor(penDownColor);
+						turtle.setStroke(penDownColor);
 						break;
 					case 280:
 						// z move

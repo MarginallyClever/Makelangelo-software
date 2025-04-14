@@ -3,9 +3,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
-import com.marginallyclever.makelangelo.turtle.MovementType;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
@@ -32,26 +30,20 @@ public class Perturb extends Node {
         Turtle in = turtleIn.getValue();
         Turtle out = new Turtle();
 
-        float maxLen = in.history.size();
+        float size = in.countPoints()+1;
         int i=0;
         setComplete(0);
-        for (TurtleMove move : in.history) {
-            TurtleMove newMove;
-            if (move.type == MovementType.TOOL_CHANGE) {
-                newMove = new TurtleMove(move);
-            } else {
-                newMove = new TurtleMove(move);
-                var radian = (Math.random() * Math.PI * 2.0);
-                var randomD = Math.random() * d;
-                var dx = Math.cos(radian) * randomD;
-                var dy = Math.sin(radian) * randomD;
-                newMove.x += dx;
-                newMove.y += dy;
+        for( var layer : in.getLayers() ) {
+            for( var line : layer.getAllLines() ) {
+                for( var point : line.getAllPoints() ) {
+                    var radian = (Math.random() * Math.PI * 2.0);
+                    var randomD = Math.random() * d;
+                    point.x += Math.cos(radian) * randomD;
+                    point.y += Math.sin(radian) * randomD;
+                    setComplete((int)(i++ * 100f / size));
+                }
             }
-            out.history.add(newMove);
-            setComplete((int)(i++ * 100f / maxLen));
         }
-
         setComplete(100);
         turtleOut.setValue(out);
     }

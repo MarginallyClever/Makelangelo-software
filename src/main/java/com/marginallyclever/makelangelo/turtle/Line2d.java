@@ -6,6 +6,14 @@ import org.jetbrains.annotations.Contract;
  * A {@link Line2d} is a series of connected 2D points with double precision.
  */
 public class Line2d extends ConcreteListOfPoints {
+    public Line2d() {
+        super();
+    }
+
+    public Line2d(Line2d arg0) {
+        super(arg0);
+    }
+
     @Contract(pure = true)
     public boolean isClosed(double epsilon) {
         var points = getAllPoints();

@@ -3,9 +3,8 @@ package com.marginallyclever.makelangelo.plotter;
 import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
-import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
+import com.marginallyclever.makelangelo.preview.PreviewListener;
 
 import javax.vecmath.Point2d;
 import java.security.InvalidParameterException;
@@ -89,7 +88,7 @@ public class Plotter implements PreviewListener, Cloneable {
 		return penIsUp;
 	}
 	
-	private void requestUserChangeTool(int toolNumber) {
+	public void requestUserChangeTool(int toolNumber) {
 		firePlotterEvent(new PlotterEvent(PlotterEvent.TOOL_CHANGE, this, toolNumber));
 	}
 	
@@ -198,25 +197,5 @@ public class Plotter implements PreviewListener, Cloneable {
 		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_RIGHT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
 		gl2.glVertex2d(settings.getDouble(PlotterSettings.LIMIT_LEFT), settings.getDouble(PlotterSettings.LIMIT_BOTTOM));
 		gl2.glEnd();
-	}
-
-	/**
-	 * Instruct the {@link Plotter} to move.
-	 * @param move a {@link TurtleMove} with instructions.
-	 */
-	public void turtleMove(TurtleMove move) {
-		switch(move.type) {
-		case TRAVEL:
-			if(!penIsUp) raisePen();
-			setPos(move.x,move.y);
-			break;
-		case DRAW_LINE:
-			if(penIsUp) lowerPen();
-			setPos(move.x,move.y);
-			break;
-		case TOOL_CHANGE:
-			requestUserChangeTool((int)move.x);
-			break;
-		}
 	}
 }

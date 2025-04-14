@@ -46,10 +46,10 @@ public class Generator_GraphPaper extends TurtleGenerator {
 	@Override
 	public void generate() {
 		Turtle turtle = new Turtle();
-		turtle.setColor(Color.RED);
+		turtle.setStroke(Color.RED);
 		lines(turtle,10,0);
 		lines(turtle,10,90);
-		turtle.setColor(Color.BLACK);
+		turtle.setStroke(Color.BLACK);
 		lines(turtle,100,0);
 		lines(turtle,100,90);
 

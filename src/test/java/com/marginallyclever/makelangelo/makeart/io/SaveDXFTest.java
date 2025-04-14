@@ -4,17 +4,15 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsManager;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.util.Objects;
 
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.multiColorsMoves;
 import static com.marginallyclever.makelangelo.makeart.io.SaveHelper.simpleMoves;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Arrays.array;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -51,16 +49,17 @@ class SaveDXFTest {
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(fileTemp);
-
             // when
             SaveDXF save = new SaveDXF();
             save.save(fileOutputStream, turtle, PlotterSettingsManager.buildMakelangelo5());
             fileOutputStream.close();
-
-            // then
+            // compare content of both files
+/*
             var resource = Objects.requireNonNull(getClass().getResource(expectedFilename)).toURI();
-            Assertions.assertEquals(Files.readString(fileTemp.toPath()).replace("\n", "\r\n"),
-                    Files.readString(new File(resource).toPath()));
+            Assertions.assertEquals(Files.readString(fileTemp.toPath()).replace("\n","\r\n"),
+                    Files.readString(new File(resource).toPath()),
+                    "mismatch with "+expectedFilename );*/
+            assertThat(fileTemp).hasSameTextualContentAs(new File(SaveDXFTest.class.getResource(expectedFilename).toURI()));
         } finally {
             fileTemp.delete();
         }

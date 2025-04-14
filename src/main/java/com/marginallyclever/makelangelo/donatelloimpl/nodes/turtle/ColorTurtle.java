@@ -3,9 +3,8 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle;
 import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
-import com.marginallyclever.makelangelo.turtle.MovementType;
+import com.marginallyclever.makelangelo.turtle.StrokeLayer;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import com.marginallyclever.makelangelo.turtle.TurtleMove;
 import com.marginallyclever.nodegraphcore.Node;
 
 import java.awt.*;
@@ -29,15 +28,21 @@ public class ColorTurtle extends Node {
     public void update() {
         Turtle input = turtle.getValue();
         Color c = color.getValue();
-        Turtle moved = new Turtle();
-        for( TurtleMove m : input.history ) {
-            if(m.type== MovementType.TOOL_CHANGE) {
-                moved.history.add(new TurtleMove(c.hashCode(),m.getDiameter(),MovementType.TOOL_CHANGE));
-            } else {
-                moved.history.add(new TurtleMove(m));
+        Turtle moved = new Turtle(input);
+        var allLayers = moved.getLayers();
+        if( allLayers.size() == 1 ) {
+            allLayers.getFirst().setColor(c);
+        } else if( allLayers.size() > 1 ) {
+            // many layers merge into one, provided they are the same diameter
+            // TODO check for diameter changes
+            StrokeLayer newLayer = new StrokeLayer(c, allLayers.getFirst().getDiameter());
+            for( var layer : allLayers ) {
+                newLayer.addAll(layer.getAllLines());
             }
+            allLayers.clear();
+            allLayers.add(newLayer);
         }
-        // TODO could have redundant tool changes that should be removed.
+
         output.setValue(moved);
     }
 }

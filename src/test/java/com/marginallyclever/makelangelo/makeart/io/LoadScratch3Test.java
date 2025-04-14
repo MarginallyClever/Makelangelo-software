@@ -63,8 +63,8 @@ public class LoadScratch3Test {
 
             // then
             assertNotNull(turtle);
-            assertNotNull(turtle.history);
-            assertEquals(readFile(fileExpected), turtle.history.toString());
+            assert(turtle.hasDrawing());
+            assertEquals(readFile(fileExpected), turtle.generateHistory());
         } catch( Exception e) {
             fail(e);
         }

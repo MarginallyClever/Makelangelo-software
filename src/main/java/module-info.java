@@ -30,6 +30,7 @@ module com.marginallyclever.makelangelo {
     requires jsr305;
 
     exports com.marginallyclever.communications;
+    exports com.marginallyclever.convenience.linecollection;
     exports com.marginallyclever.makelangelo.donatelloimpl to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes to com.marginallyclever.nodegraphcore;
     exports com.marginallyclever.makelangelo.donatelloimpl.nodes.lines to com.marginallyclever.nodegraphcore;
@@ -44,6 +45,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.makeart.turtletool;
     exports com.marginallyclever.makelangelo.makeart.turtlegenerator;
     exports com.marginallyclever.makelangelo.paper;
+    exports com.marginallyclever.makelangelo.plotter;
     exports com.marginallyclever.makelangelo.plotter.plottersettings;
     exports com.marginallyclever.makelangelo.plotter.plottercontrols;
     exports com.marginallyclever.makelangelo.turtle;

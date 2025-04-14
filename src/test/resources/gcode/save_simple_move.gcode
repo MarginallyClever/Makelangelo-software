@@ -1,8 +1,8 @@
 ;FLAVOR:Marlin-polargraph
 ;MINX:-15.000
 ;MINY:-7.000
-;MAXX:7.000
-;MAXY:8.000
+;MAXX:12.000
+;MAXY:18.000
 ;Start of user gcode
 M300
 M200
