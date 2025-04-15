@@ -43,7 +43,7 @@ public class TurtleToBufferedImageHelper {
             newH = (int) (h * desiredWidth / (double) w);
             newW = desiredWidth;
         }
-        logger.debug("thumbnail {}x{} @ {},{}", newW, newH, r.getX(), r.getY());
+        logger.debug("full size {}x{} @ {},{}", newW, newH, r.getX(), r.getY());
         // create a new image with the minimum size
         BufferedImage img = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
@@ -54,13 +54,36 @@ public class TurtleToBufferedImageHelper {
 
         // resize to thumbnail
         int desiredHeight = (int) Math.ceil(r.getHeight() * desiredWidth / (double)w);
-        logger.debug("shrink {}x{}", desiredWidth, desiredHeight);
-        BufferedImage img2 = new BufferedImage(desiredWidth, desiredHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = img2.createGraphics();
-        GraphViewPanel.setHints(g2);
-        g2.drawImage(img, 0, 0, desiredWidth, desiredHeight, null);
+        return getScaledImage(img,desiredWidth,desiredHeight);
+    }
 
-        return img2;
+    private BufferedImage getScaledImage(BufferedImage img, int targetWidth, int targetHeight) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+
+        BufferedImage scaledImg = img;
+
+        // Scale down in multiple passes
+        while (width > targetWidth || height > targetHeight) {
+            int newWidth = Math.max(targetWidth, width / 2);
+            int newHeight = Math.max(targetHeight, height / 2);
+
+            BufferedImage temp = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = temp.createGraphics();
+            GraphViewPanel.setHints(g2);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.drawImage(scaledImg, 0, 0, newWidth, newHeight, null);
+            g2.dispose();
+
+            scaledImg = temp;
+            width = newWidth;
+            height = newHeight;
+        }
+
+        return scaledImg;
     }
 
     /**
