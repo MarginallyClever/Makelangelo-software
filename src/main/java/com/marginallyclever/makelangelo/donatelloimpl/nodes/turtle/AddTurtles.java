@@ -6,7 +6,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * Add two {@link Turtle}s together.
+ * Add two {@link Turtle}s together.  Only activates when both inputs are connected.
  */
 public class AddTurtles extends Node {
     private final InputTurtle turtleA = new InputTurtle("A");
@@ -31,5 +31,11 @@ public class AddTurtles extends Node {
         Turtle sum = new Turtle(a);
         sum.add(b);
         output.setValue(sum);
+    }
+
+    @Override
+    public boolean isDirty() {
+        return turtleA.hasConnection() && turtleA.isDirty()
+            && turtleB.hasConnection() && turtleB.isDirty();
     }
 }
