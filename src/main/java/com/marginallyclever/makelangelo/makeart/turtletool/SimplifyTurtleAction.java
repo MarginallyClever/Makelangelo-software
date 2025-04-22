@@ -25,7 +25,7 @@ public class SimplifyTurtleAction extends TurtleTool {
 	public Turtle run(Turtle turtle) {
 		logger.debug("begin @ {}", turtle.countPoints());
 		
-		LineCollection originalLines = new LineCollection(turtle.getAsLineSegments());
+		LineCollection originalLines = new LineCollection(turtle.getAsLineCollection());
 		int beforeCount = originalLines.size();
 		logger.debug("  Converted to {} lines.", beforeCount);
 

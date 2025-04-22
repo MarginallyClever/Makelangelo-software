@@ -52,7 +52,7 @@ public class PathImageMask extends Node {
         lock.lock();
         try {
             setComplete(0);
-            LineCollection lines  = myTurtle.getAsLineSegments();
+            LineCollection lines  = myTurtle.getAsLineCollection();
             BufferedImage src = image.getValue();
 
             listAbove.clear();

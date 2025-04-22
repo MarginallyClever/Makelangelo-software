@@ -40,7 +40,7 @@ public class ReorderHelper {
      * @return a new {@link Turtle} with the same colors but reordered.
      */
     private Turtle reorderTurtle(Turtle turtle) {
-        LineCollection originalLines = turtle.getAsLineSegments();
+        LineCollection originalLines = turtle.getAsLineCollection();
         int originalCount = originalLines.size();
         Color c = turtle.getFirstColor();
         logger.debug("  {} converted to {} lines.", c.hashCode(), originalCount);
