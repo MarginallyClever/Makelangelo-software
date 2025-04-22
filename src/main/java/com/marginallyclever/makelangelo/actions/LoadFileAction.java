@@ -22,22 +22,42 @@ import java.util.Objects;
 
 public class LoadFileAction extends AbstractAction {
     private static final Logger logger = LoggerFactory.getLogger(LoadFileAction.class);
-
+    private final String filePath;
     private final MainFrame frame;
     private final RecentFiles recentFiles;
 
-    public LoadFileAction(String name, @Nonnull MainFrame frame, @Nullable RecentFiles recentFiles) {
-        super(name);
+    /**
+     * Action for loading new files or from the recent files menu.
+     * @param filePath the path to the file to load.  If null or empty, the action will be named "Load..."
+     * @param frame the MainFrame that this action is attached to.
+     * @param recentFiles the RecentFiles that this action is attached to.  If null, the action will not add the file to the recent files list.
+     */
+    public LoadFileAction(String filePath, @Nonnull MainFrame frame, @Nullable RecentFiles recentFiles) {
+        super();
+        this.filePath = filePath;
         this.frame = frame;
         this.recentFiles = recentFiles;
 
+        if (filePath == null || filePath.isEmpty()) {
+            putValue(Action.NAME, Translator.get("MenuOpenFile"));
+        } else {
+            int maxLength = 60;
+            String shortName = filePath.length() > maxLength
+                    ? "..." + filePath.substring(Math.max(0,filePath.length() - maxLength - 3))
+                    : filePath;
+            putValue(Action.NAME, shortName);
+        }
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control O"));
         putValue(Action.SMALL_ICON, new ImageIcon(Objects.requireNonNull(getClass().getResource("/com/marginallyclever/makelangelo/actions/icons8-load-16.png"))));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        OpenFileChooser openFileChooser = new OpenFileChooser(SwingUtilities.getWindowAncestor(frame));
+        if(filePath != null && !filePath.isEmpty()) {
+            openFile(filePath);
+            return;
+        }
+        OpenFileChooser openFileChooser = new OpenFileChooser(SwingUtilities.getWindowAncestor((Component)e.getSource()));
         openFileChooser.setOpenListener(this::openFile);
         openFileChooser.chooseFile();
     }

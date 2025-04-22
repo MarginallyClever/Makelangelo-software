@@ -281,7 +281,7 @@ public class PiCaptureAction {
 
 		if (useImage) {
 			// process the image
-			(new LoadFileAction(Translator.get("MenuOpenFile"),mainFrame,null)).openFile("/home/pi/Pictures/capture.jpg");
+			(new LoadFileAction(null,mainFrame,null)).openFile("/home/pi/Pictures/capture.jpg");
 		}
 	}
 }
