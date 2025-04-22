@@ -15,7 +15,7 @@ public class TurtleIterator implements Iterator<Point2d> {
     private int pointIndex = 0;
     private final int max;
     private int sum = 0;
-    private Point2d lastPoint=null;
+    private Point2d lastPoint = null;
 
     public TurtleIterator(@Nonnull Turtle turtle) {
         this.turtle = turtle;

@@ -10,16 +10,23 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * Lay the path over the image and change the width of the line by the intensity of the image at the same
+ * <p>Lay the path over the image and change the width of the line by the intensity of the image at the same
  * location.  The image must be a bitmap, not a vector.  The fine grain resolution (and the amount of testing) is
- * controlled by the stepSize.
- * @author Dan Royer
- * @since 2025-01-07
+ * controlled by the stepSize.</p>
+ * <h4>Ports</h4>
+ * <ul>
+ *     <li>turtle - the turtle to modify</li>
+ *     <li>image - the image to use for line width</li>
+ *     <li>stepSize - the distance between each pixel in the image</li>
+ *     <li>thickness - the maximum line width</li>
+ *     <li>pen diameter - the diameter of the pen</li>
+ *     <li>result - the resulting turtle</li>
+ * </ul>
  */
 public class LineWeightByImage extends Node {
     private final InputTurtle turtle = new InputTurtle("turtle");
     private final InputImage image = new InputImage("image");
-    private final InputDouble stepSize = new InputDouble("stepSize", 5d);
+    private final InputDouble stepSize = new InputDouble("stepSize", 1d);
     private final InputDouble thickness = new InputDouble("thickness", 5d);
     private final InputDouble penDiameter = new InputDouble("pen diameter", 0.8);
     private final OutputTurtle result = new OutputTurtle("result");
