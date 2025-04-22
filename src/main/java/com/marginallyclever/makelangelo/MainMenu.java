@@ -71,7 +71,7 @@ public class MainMenu extends JMenuBar {
         recentFiles = new RecentFiles(Translator.get("MenuReopenFile"),frame);
 
         menu.add(new NewFileAction(Translator.get("MenuNewFile"),frame));
-        menu.add(new LoadFileAction(Translator.get("MenuOpenFile"),frame,recentFiles));
+        menu.add(new LoadFileAction(null,frame,recentFiles));
         menu.add(recentFiles);
         menu.add(new ImportFileAction(Translator.get("MenuImportFile"),frame));
         menu.add(new SaveFileAction(Translator.get("MenuSaveFile"),frame));
