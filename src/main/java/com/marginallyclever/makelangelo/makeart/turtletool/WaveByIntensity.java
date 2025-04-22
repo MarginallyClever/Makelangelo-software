@@ -59,6 +59,12 @@ public class WaveByIntensity {
         return turtle;
     }
 
+    /**
+     * Calculate the point on the wave based on the intensity of the image.
+     * @param a the point on the line
+     * @param orthogonal the orthogonal vector to the line (the x-axis of the cos function)
+     * @param d the point on the wave
+     */
     private void calculatePoint(Point2d a, Vector2d orthogonal, Point2d d) {
         // read a block of the image and find the average intensity in this block
         double z = (255.0f - img.sample( a.x, a.y, halfLineHeight));
