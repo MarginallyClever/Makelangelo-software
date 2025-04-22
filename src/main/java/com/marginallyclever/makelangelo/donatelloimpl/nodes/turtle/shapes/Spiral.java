@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.donatelloimpl.nodes.turtle.shapes;
 import com.marginallyclever.donatello.ports.InputDouble;
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.donatello.ports.InputOneOfMany;
+import com.marginallyclever.donatello.ports.InputRange;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
@@ -15,6 +16,7 @@ public class Spiral extends Node {
     private final InputDouble radiusValue = new InputDouble("radius",500.0);
     private final InputDouble spacingValue = new InputDouble("spacing",5.0);
     private final InputInt countValue = new InputInt("count",50);
+    private final InputRange resolution = new InputRange("resolution",360,360,3);
     private final OutputTurtle output = new OutputTurtle("output");
 
     public Spiral() {
@@ -23,6 +25,7 @@ public class Spiral extends Node {
         addPort(radiusValue);
         addPort(countValue);
         addPort(spacingValue);
+        addPort(resolution);
         addPort(output);
 
         style.setOptions(new String[]{"count * spacing","radius / count","radius / spacing"});
@@ -56,11 +59,13 @@ public class Spiral extends Node {
 
         int i;
 
+        int maxRes = resolution.getValue();
+
         double r = radius;
         double fx, fy;
         while (r > spacing/2) {
             // find circumference of current circle
-            double c1 = Math.floor((2.0f * r - spacing) * Math.PI);
+            double c1 = Math.max(maxRes,Math.min(3,Math.floor((2.0f * r - spacing) * Math.PI)));
 
             for (i = 0; i < c1; ++i) {
                 double p = (double)i / c1;
