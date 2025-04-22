@@ -4,6 +4,7 @@ import com.marginallyclever.donatello.graphview.GraphViewProvider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleToBufferedImageHelper;
 import com.marginallyclever.nodegraphcore.port.Output;
+import com.marginallyclever.nodegraphcore.port.Port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +44,13 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
             h = h/w * rectangle.width;
             w = rectangle.width;
         }*/
-        if(h<DEFAULT_HEIGHT) {
-            rectangle.setBounds(rectangle.x,rectangle.y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
+        if(h<Port.DEFAULT_HEIGHT) {
+            rectangle.setBounds(rectangle.x,rectangle.y,Port.DEFAULT_WIDTH,Port.DEFAULT_HEIGHT);
             return rectangle;
         }
         double ratio = h/w;
         var newHeight = (double)rectangle.width * ratio;
-        rectangle.setSize(rectangle.width,(int)Math.max(newHeight,DEFAULT_HEIGHT));
+        rectangle.setSize(rectangle.width,(int)Math.max(newHeight, Port.DEFAULT_HEIGHT));
 
         return rectangle;
     }
