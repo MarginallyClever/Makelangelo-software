@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class LoadFactorioMap implements TurtleLoader {
     private static final Logger logger = LoggerFactory.getLogger(LoadFactorioMap.class);
-    private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("Factorio Export","json");
+    private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("FUE5 Factorio blueprint export (json)","json");
 
     static final Color BELT = Color.ORANGE;
     static final Color PIPE = Color.BLUE;
@@ -56,6 +56,7 @@ public class LoadFactorioMap implements TurtleLoader {
         Turtle turtle = new Turtle();
 
         logger.debug("Loading...");
+
         // parse json
         JSONObject tree = new JSONObject(new JSONTokener(inputStream));
 

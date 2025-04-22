@@ -128,7 +128,7 @@ public class PreviewPanel extends JPanel {
     public void onPlotterSettingsUpdate(PlotterSettings settings) {
         myPlotter.setSettings(settings);
 
-        TurtleRenderer turtleRenderer = TurtleRenderFactory.MARLIN_SIM.getTurtleRenderer();
+        TurtleRenderer turtleRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.MARLIN_SIMULATION);
         if(turtleRenderer instanceof MarlinSimulationVisualizer msv) {
             msv.setSettings(settings);
             msv.reset();
@@ -136,7 +136,6 @@ public class PreviewPanel extends JPanel {
         myTurtleRenderer.setUpColor(settings.getColor(PlotterSettings.PEN_UP_COLOR));
         myTurtleRenderer.setPenDiameter(settings.getDouble(PlotterSettings.DIAMETER));
         myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
-        // myTurtleRenderer.setDownColor() would be meaningless, the down color is stored in each Turtle.
 
         updatePlotterRenderer();
 

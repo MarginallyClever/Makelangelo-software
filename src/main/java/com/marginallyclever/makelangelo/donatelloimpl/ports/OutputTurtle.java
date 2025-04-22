@@ -4,6 +4,9 @@ import com.marginallyclever.donatello.graphview.GraphViewProvider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtleToBufferedImageHelper;
 import com.marginallyclever.nodegraphcore.port.Output;
+import com.marginallyclever.nodegraphcore.port.Port;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,6 +15,8 @@ import java.awt.image.BufferedImage;
  * An {@link Output} that also displays the {@link Turtle}'s drawing as an image.
  */
 public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
+    private static final Logger logger = LoggerFactory.getLogger(OutputTurtle.class);
+
     private BufferedImage img = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 
     public OutputTurtle(String _name) throws IllegalArgumentException {
@@ -22,8 +27,10 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
     public void setValue(Object value) {
         super.setValue(value);
         if(!(value instanceof Turtle turtle)) return;
+
         if(turtle.hasDrawing()) {
-            img = TurtleToBufferedImageHelper.generateImage(turtle, null, DEFAULT_WIDTH);
+            var helper = new TurtleToBufferedImageHelper();
+            img = helper.generateThumbnail(turtle, null, DEFAULT_WIDTH);
         } else {
             img = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
         }
@@ -37,13 +44,13 @@ public class OutputTurtle extends Output<Turtle> implements GraphViewProvider {
             h = h/w * rectangle.width;
             w = rectangle.width;
         }*/
-        if(h<DEFAULT_HEIGHT) {
-            rectangle.setBounds(rectangle.x,rectangle.y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
+        if(h<Port.DEFAULT_HEIGHT) {
+            rectangle.setBounds(rectangle.x,rectangle.y,Port.DEFAULT_WIDTH,Port.DEFAULT_HEIGHT);
             return rectangle;
         }
         double ratio = h/w;
         var newHeight = (double)rectangle.width * ratio;
-        rectangle.setSize(rectangle.width,(int)Math.max(newHeight,DEFAULT_HEIGHT));
+        rectangle.setSize(rectangle.width,(int)Math.max(newHeight, Port.DEFAULT_HEIGHT));
 
         return rectangle;
     }

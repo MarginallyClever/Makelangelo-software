@@ -17,13 +17,15 @@ public class TransformedImage {
 	private final BufferedImage sourceImage;
 	private float scaleX, scaleY;
 	private float translateX, translateY;
+	private WritableRaster raster;
 
 	public TransformedImage(BufferedImage src) {
-		sourceImage = src;
+		sourceImage = deepCopy(src);
+		raster = sourceImage.getRaster();
 		translateX = -src.getWidth() / 2.0f;
 		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
-		scaleY = -1;
+		scaleY = 1;
 	}
 
 	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
@@ -36,6 +38,7 @@ public class TransformedImage {
   
 	public TransformedImage(TransformedImage copy) {
 		sourceImage = deepCopy(copy.sourceImage);
+		raster = sourceImage.getRaster();
 		translateX = copy.translateX;
 		translateY = copy.translateY;
 		scaleX = copy.scaleX;
@@ -55,13 +58,6 @@ public class TransformedImage {
 		if (sampleX < 0 || sampleX >= sourceImage.getWidth ()) return false;
 		if (sampleY < 0 || sampleY >= sourceImage.getHeight()) return false;
 		return true;
-	}
-
-	public void copySettingsFrom(TransformedImage other) {
-		scaleX = other.scaleX;
-		scaleY = other.scaleY;
-		translateX = other.translateX;
-		translateY = other.translateY;
 	}
 
 	public float getScaleX() {
@@ -122,28 +118,26 @@ public class TransformedImage {
 		}
 		// find the bounds of the image once, instead of inside the loops.
 		bottom = Math.max(Math.min(bottom, sourceImage.getHeight()), 0);
-		top = Math.max(Math.min(top, sourceImage.getHeight()), 0);
+		top = Math.max(Math.min(top, sourceImage.getHeight()-1), 0);
 		left = Math.max(Math.min(left, sourceImage.getWidth()), 0);
-		right = Math.max(Math.min(right, sourceImage.getWidth()), 0);
+		right = Math.max(Math.min(right, sourceImage.getWidth()-1), 0);
 
 		// now sample the entire area to average the intensity
-		int count = (top-bottom) * (right-left);
-		// if no hits, return white
-		if(count==0) return 255;
-
-		var raster = sourceImage.getRaster();
+		int count = 0;
 		var componentCount = sourceImage.getColorModel().getNumComponents();
 		var pixel = new double[componentCount];
 		double sampleValue = 0;
-		for(int y=bottom;y<top;++y) {
-			for(int x=left;x<right;++x) {
+		for(int y=bottom;y<=top;++y) {
+			for(int x=left;x<=right;++x) {
 				raster.getPixel(x, y, pixel);
 				var intensity = (pixel[0]+pixel[1]+pixel[2])/3.0;
 				sampleValue += intensity;
+				count++;
 			}
 		}
-
-		double result = sampleValue/(double)count;
+		if(count==0) return 255;
+		// average the intensity
+		double result = sampleValue / (double)count;
 		return (int)Math.min( Math.max(result, 0), 255 );
 	}
 

@@ -24,6 +24,10 @@ public class TurtleToBufferedImage extends Node {
     @Override
     public void update() {
         Turtle source = turtle.getValue();
-        output.setValue(TurtleToBufferedImageHelper.generateImage(source,this,(int)getRectangle().getWidth()));
+
+        setComplete(0);
+        var helper = new TurtleToBufferedImageHelper();
+        output.setValue(helper.generateThumbnail(source,this,(int)getRectangle().getWidth()));
+        setComplete(100);
     }
 }

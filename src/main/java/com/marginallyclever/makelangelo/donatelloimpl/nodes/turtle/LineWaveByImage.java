@@ -5,14 +5,13 @@ import com.marginallyclever.donatello.ports.InputImage;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.InputTurtle;
 import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
-import com.marginallyclever.makelangelo.makeart.turtletool.ThickenLinesByIntensity;
+import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * <p>Lay the path over the image and change the width of the line by the intensity of the image at the same
- * location.  The image must be a bitmap, not a vector.  The fine grain resolution (and the amount of testing) is
- * controlled by the stepSize.</p>
+ * <p>Lay the path over the image and replace the line with a wave, such that the amplitude and frequency are
+ * controlled by the intensity of the image at the same point</p>
  * <h4>Ports</h4>
  * <ul>
  *     <li>turtle - the turtle to modify</li>
@@ -23,7 +22,7 @@ import com.marginallyclever.nodegraphcore.Node;
  *     <li>result - the resulting turtle</li>
  * </ul>
  */
-public class LineWeightByImage extends Node {
+public class LineWaveByImage extends Node {
     private final InputTurtle turtle = new InputTurtle("turtle");
     private final InputImage image = new InputImage("image");
     private final InputDouble stepSize = new InputDouble("stepSize", 1d);
@@ -31,8 +30,8 @@ public class LineWeightByImage extends Node {
     private final InputDouble penDiameter = new InputDouble("pen diameter", 0.8);
     private final OutputTurtle result = new OutputTurtle("result");
 
-    public LineWeightByImage() {
-        super("LineWeightByImage");
+    public LineWaveByImage() {
+        super("LineWaveByImage");
         addPort(image);
         addPort(turtle);
         addPort(stepSize);
@@ -49,10 +48,8 @@ public class LineWeightByImage extends Node {
         setComplete(0);
 
         var sourceImage = new TransformedImage(image.getValue());
-        var tool = new ThickenLinesByIntensity();
-        Turtle turtle = tool.execute(myTurtle, sourceImage, stepSize.getValue(), thickness.getValue(), penDiameter.getValue());
-
-        result.setValue(turtle);
+        var tool = new WaveByIntensity(sourceImage, thickness.getValue()/2.0, stepSize.getValue());
+        result.setValue(tool.turtleToWave(myTurtle));
 
         setComplete(100);
     }

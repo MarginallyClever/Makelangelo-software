@@ -12,7 +12,7 @@ import java.awt.geom.Line2D;
  *
  */
 public class DefaultTurtleRenderer implements TurtleRenderer {
-	private Graphics2D gl2;
+	private Graphics2D g2;
 	private Color colorTravel = Color.GREEN;
 	private Color colorDraw = Color.BLACK;
 	private boolean showTravel = false;
@@ -21,16 +21,16 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	private final Line2D line = new Line2D.Double();
 	
 	@Override
-	public void start(Graphics2D gl2) {
-		this.gl2 = gl2;
+	public void start(Graphics2D g2) {
+		this.g2 = g2;
 
 		// set pen diameter
-		gl2.setStroke(new BasicStroke(penDiameter));
+		g2.setStroke(new BasicStroke(penDiameter));
 
 		isPenUp = true;
 
 		// set pen diameter
-		gl2.setStroke(new BasicStroke(penDiameter));
+		g2.setStroke(new BasicStroke(penDiameter));
 	}
 
 	@Override
@@ -39,12 +39,12 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 	@Override
 	public void draw(Point2d p0, Point2d p1) {
 		if(isPenUp) {
-			gl2.setColor(colorDraw);
+			g2.setColor(colorDraw);
 			isPenUp = false;
 		}
 
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
-		gl2.draw(line);
+		g2.draw(line);
 	}
 
 	@Override
@@ -52,13 +52,13 @@ public class DefaultTurtleRenderer implements TurtleRenderer {
 		if(!isPenUp) {
 			isPenUp = true;
 			if(showTravel) {
-				gl2.setColor(colorTravel);
+				g2.setColor(colorTravel);
 			}
 		}
 		if(!showTravel) return;
 
 		line.setLine(p0.x, p0.y, p1.x, p1.y);
-		gl2.draw(line);
+		g2.draw(line);
 	}
 
 	@Override

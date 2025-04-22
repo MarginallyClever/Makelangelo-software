@@ -6,6 +6,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.vecmath.Point2d;
 import java.awt.*;
 
@@ -19,8 +20,7 @@ import java.awt.*;
 public class TurtleRenderFacade implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(TurtleRenderFacade.class);
 
-	private final TurtleRenderer defaultRenderer = TurtleRenderFactory.DEFAULT.getTurtleRenderer();
-	private TurtleRenderer myRenderer = defaultRenderer;
+	private TurtleRenderer myRenderer = TurtleRenderFactory.getTurtleRenderer(TurtleRenderFactory.DEFAULT);
 	private Turtle myTurtle = new Turtle();
 	private int first=0;
 	private int last;
@@ -30,7 +30,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	private boolean showTravel;
 
 	@Override
-	public void render(GL2 gl2) {
+	public void render(@Nonnull GL2 gl2) {
 		Graphics2DGL g2gl = new Graphics2DGL(gl2);
 		try {
 			render(g2gl);
@@ -39,31 +39,42 @@ public class TurtleRenderFacade implements PreviewListener {
 		}
 	}
 
-	public void render(Graphics2D g2d) {
+	public void render(@Nonnull Graphics2D g2d) {
 		if(myTurtle.isLocked()) return;
 		myTurtle.lock();
 		try {
-			// where we're at in the drawing (to check if we're between first & last)
-			int showCount = 0;
-			myRenderer.setPenUpColor(penUpColor);
-			myRenderer.setPenDownColor(penDownColor);
-			myRenderer.setShowTravel(showTravel);
-			myRenderer.start(g2d);
+			renderLockedTurtle(g2d);
+		}
+		finally {
+			myTurtle.unlock();
+		}
+	}
 
-			Point2d prev = new Point2d(0,0);
+	private void renderLockedTurtle(Graphics2D g2d) {
+		// where we're at in the drawing (to check if we're between first & last)
+		int showCount = 0;
+		myRenderer.setPenUpColor(penUpColor);
+		myRenderer.setPenDownColor(penDownColor);
+		myRenderer.setShowTravel(showTravel);
+		myRenderer.start(g2d);
+		try {
+			Point2d prev = new Point2d(0, 0);
 
-			for( var layer : myTurtle.getLayers() ) {
-				if(layer.isEmpty()) continue;
+			for (var layer : myTurtle.getLayers()) {
+				if (layer.isEmpty()) continue;
 				myRenderer.setPenDownColor(layer.getColor());
 				myRenderer.setPenDiameter(layer.getDiameter());
-				for( var line : layer.getAllLines() ) {
-					if(line.isEmpty()) continue;
+				for (var line : layer.getAllLines()) {
+					if (line.isEmpty()) continue;
 					boolean start = true;
-					for( var next : line.getAllPoints() ) {
-						if(showCount >= first && showCount < last) {
-							if(start) myRenderer.travel(prev,next);
-							else myRenderer.draw(prev, next);
-							start=false;
+					for (var next : line.getAllPoints()) {
+						if (showCount >= first && showCount < last) {
+							if (start) {
+								myRenderer.travel(prev, next);
+								start = false;
+							} else {
+								myRenderer.draw(prev, next);
+							}
 						}
 						prev = next;
 						showCount++;
@@ -76,9 +87,6 @@ public class TurtleRenderFacade implements PreviewListener {
 		}
 		finally {
 			myRenderer.end();
-			if(myTurtle.isLocked()) {
-				myTurtle.unlock();
-			}
 		}
 	}
 
@@ -98,11 +106,11 @@ public class TurtleRenderFacade implements PreviewListener {
 		setLast(size);
 	}
 
-	public void setRenderer(TurtleRenderer render) {
+	public void setRenderer(@Nonnull TurtleRenderer render) {
 		myRenderer = render;
 	}
 
-	public TurtleRenderer getRenderer() {
+	public @Nonnull TurtleRenderer getRenderer() {
 		return myRenderer;
 	}
 

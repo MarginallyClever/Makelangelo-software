@@ -88,7 +88,7 @@ public class LineWeightByImageIntensity extends TurtleGenerator {
         scaleImage(1);  // fill paper
 
         var tool = new ThickenLinesByIntensity();
-        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize,maxLineWidth-penDiameter,penDiameter);
+        Turtle turtle = tool.execute(myTurtle,sourceImage,stepSize,maxLineWidth,penDiameter);
         turtle.translate(myPaper.getCenterX(),myPaper.getCenterY());
 
         notifyListeners(turtle);

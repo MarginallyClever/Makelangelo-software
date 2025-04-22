@@ -150,7 +150,7 @@ public class LineCollectionTest {
     void testSplitByTravel() throws Exception {
         // load java/test/resources/svg/corners.svg
         Turtle turtle = TurtleFactory.load(Objects.requireNonNull(LineCollectionTest.class.getResource("corners.svg")).getPath());
-        LineCollection before = turtle.getAsLineSegments();
+        LineCollection before = turtle.getAsLineCollection();
         List<LineCollection> after = before.splitByTravel();
         Assertions.assertEquals(13,after.size());
     }

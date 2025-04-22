@@ -58,7 +58,7 @@ public class InfillTurtle {
 		LineCollection results = new LineCollection();
 
 		// do this once here instead of once per line.
-		LineCollection convertedPath = input.getAsLineSegments();
+		LineCollection convertedPath = input.getAsLineCollection();
 
 		// working variable
 		LineSegment2D line = new LineSegment2D(new Point2d(), new Point2d(), input.getColor());

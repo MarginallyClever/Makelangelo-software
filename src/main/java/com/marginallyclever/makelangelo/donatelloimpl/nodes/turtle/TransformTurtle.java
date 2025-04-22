@@ -32,6 +32,10 @@ public class TransformTurtle extends Node {
     @Override
     public void update() {
         Turtle input = turtle.getValue();
+        if(!input.hasDrawing()) {
+            output.setValue(input);
+            return;
+        }
         Turtle moved = new Turtle(input);
         moved.scale(sx.getValue(),sy.getValue());
         moved.rotate(rotate.getValue());

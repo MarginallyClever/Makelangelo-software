@@ -6,8 +6,6 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeight;
 import com.marginallyclever.makelangelo.makeart.turtlegenerator.lineweight.LineWeightSegment;
 import com.marginallyclever.makelangelo.turtle.Turtle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
@@ -21,8 +19,6 @@ import java.util.List;
  * Take a turtle line and thicken it by the intensity of the image.
  */
 public class ThickenLinesByIntensity {
-    private static final Logger logger = LoggerFactory.getLogger(ThickenLinesByIntensity.class);
-
     private final double EPSILON = 1e-3;
 
     // refinement of lines for sampling.  must be greater than zero.
@@ -49,7 +45,7 @@ public class ThickenLinesByIntensity {
     public Turtle execute(Turtle turtle,TransformedImage image, double stepSize, double maxLineWidth, double penDiameter) {
         this.image = image;
         this.stepSize = stepSize;
-        this.maxLineWidth = maxLineWidth;
+        this.maxLineWidth = maxLineWidth-penDiameter;
         this.penDiameter = penDiameter;
 
         // for each color,
@@ -81,12 +77,11 @@ public class ThickenLinesByIntensity {
     private Turtle generateAllThickLines() {
         Turtle turtle = new Turtle();
 
-        logger.debug("generateThickLines");
         for(LineWeight i : sortedLines) {
             if(i.segments.isEmpty()) continue;
-            Turtle t = generateOneThickLine(i);
-            turtle.add(t);
+            turtle.add(generateOneThickLine(i));
         }
+
         return turtle;
     }
 
@@ -136,7 +131,7 @@ public class ThickenLinesByIntensity {
      * @param line the line to draw
      * @return the number of passes needed to draw the line
      */
-    private int getNumberOfPasses(LineWeight line) {
+    int getNumberOfPasses(LineWeight line) {
         double maxWeight=1;
         for(LineWeightSegment s : line.segments) {
             maxWeight = Math.max(maxWeight,s.weight);
@@ -151,9 +146,9 @@ public class ThickenLinesByIntensity {
 
         // add first point at start of line.  include the end cap offset.
         var s0 = getOffsetLine(start, adjustedOffset(start.weight,distance));
-        Vector2d u = getUnitVector(s0);
-        u.scale(start.weight/2);
-        offsetSequence.add(new Point2d(s0.getX1()-u.x,s0.getY1()-u.y));
+        Vector2d uStart = getUnitVector(s0);
+        uStart.scale(start.weight/2);
+        offsetSequence.add(new Point2d(s0.getX1()-uStart.x,s0.getY1()-uStart.y));
 
         // add the middle points of the line
         for( var seg : line.segments ) {
@@ -164,9 +159,9 @@ public class ThickenLinesByIntensity {
         }
 
         // add last point at start of line.  include the end cap offset.
-        u = getUnitVector(s0);
-        u.scale(line.segments.getLast().weight/2);
-        offsetSequence.add(new Point2d(s0.getX2()+u.x,s0.getY2()+u.y));
+        Vector2d uEnd = getUnitVector(s0);
+        uEnd.scale(line.segments.getLast().weight/2);
+        offsetSequence.add(new Point2d(s0.getX2()+uEnd.x,s0.getY2()+uEnd.y));
 
         // done!
         return offsetSequence;
@@ -178,19 +173,6 @@ public class ThickenLinesByIntensity {
         Vector2d u = new Vector2d(dx,dy);
         u.normalize();
         return u;
-    }
-
-    /**
-     * @param s0 the first line segment
-     * @param s1 the second line
-     * @return the dot product of the two lines
-     */
-    private double dotProduct(double[] s0, double[] s1) {
-        double dx0 = s0[2]-s0[0];
-        double dy0 = s0[3]-s0[1];
-        double dx1 = s1[2]-s1[0];
-        double dy1 = s1[3]-s1[1];
-        return dx0*dx1 + dy0*dy1;
     }
 
     /**
@@ -231,8 +213,9 @@ public class ThickenLinesByIntensity {
      * @param ratio the ratio of the line
      * @return the adjusted offset
      */
-    private double adjustedOffset(double weight,double ratio) {
-        return weight*ratio - weight/2.0;
+    double adjustedOffset(double weight,double ratio) {
+        //return weight*ratio - weight/2.0;
+        return (weight / 2.0) * (2 * ratio - 1);
     }
 
     Line2D getOffsetLine(LineWeightSegment line, double distance) {
@@ -252,27 +235,22 @@ public class ThickenLinesByIntensity {
      * <p>Worst case is O(n<sup>2</sup>)</p>
      */
     private void sortSegmentsIntoLines() {
-        logger.debug("sortSegmentsIntoLines");
-
         while(!unsorted.isEmpty()) {
-            LineWeight activeLine = new LineWeight();
-            activeLine.segments.add(unsorted.removeFirst());
-            sortedLines.add(activeLine);
-
-            growActiveLine(activeLine);
+            growActiveLine();
         }
-
-        logger.debug("sortedLines="+sortedLines.size());
     }
 
     /**
      * <p>Grow the active line by finding the next segment that is adjacent to the head or tail of the line.
-     * @param activeLine the line to grow
+     * The worst case would be O(n^2/2) but in practice lines arrive already pretty well sorted.</p>
      */
-    private void growActiveLine(LineWeight activeLine) {
+    private void growActiveLine() {
+        LineWeight activeLine = new LineWeight();
+        activeLine.segments.add(unsorted.removeFirst());
+        sortedLines.add(activeLine);
+
         LineWeightSegment head = activeLine.segments.getFirst();
         LineWeightSegment tail = head;
-
         LineWeightSegment toRemove;
         do {
             toRemove = null;
@@ -303,7 +281,7 @@ public class ThickenLinesByIntensity {
             throw new IllegalArgumentException("next is null");
         }
         // fast reject if truchet index too far apart
-        if(Math.abs(head.ix-next.ix)>6 || Math.abs(head.iy-next.iy)>6) return false;
+        if(Math.abs(head.ix-next.ix)>2 || Math.abs(head.iy-next.iy)>2) return false;
         if(closeEnough(head.start,next.end)) return true;
         if(closeEnough(head.start,next.start)) {
             // next is backwards
@@ -341,16 +319,10 @@ public class ThickenLinesByIntensity {
      * @param from the turtle to split
      */
     private void buildSegmentList(Turtle from) {
-        logger.debug("buildSegmentList before={}",from.countLoops());
-
-        LineCollection originalLines = from.getAsLineSegments();
-        logger.debug("originalLines={}",originalLines.size());
-
+        LineCollection originalLines = from.getAsLineCollection();
         for(LineSegment2D before : originalLines) {
             maybeSplitLine(before);
         }
-
-        logger.debug("unsorted={}",unsorted.size());
     }
 
     /**
@@ -391,7 +363,7 @@ public class ThickenLinesByIntensity {
         double mx = (start.x+end.x)/2.0;
         double my = (start.y+end.y)/2.0;
 
-        double intensity = 1.0-(image.sample(mx,my,stepSize/2)/255.0);
+        double intensity = 1.0-(image.sample(mx,my,stepSize/2.0)/255.0);
 
         LineWeightSegment a = new LineWeightSegment(start,end,intensity * maxLineWidth);
         // make a fast search index
