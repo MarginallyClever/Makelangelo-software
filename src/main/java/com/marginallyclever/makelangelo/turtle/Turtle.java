@@ -382,7 +382,7 @@ public class Turtle implements Cloneable {
 	/**
 	 * @return a list of all the pen down lines while remembering their color.
  	 */
-	public LineCollection getAsLineSegments() {
+	public LineCollection getAsLineCollection() {
 		LineCollection result = new LineCollection();
 
 		for (var cl : strokeLayers) {

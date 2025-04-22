@@ -30,6 +30,7 @@ public class ColorTurtle extends Node {
         Color c = color.getValue();
         Turtle moved = new Turtle(input);
         var allLayers = moved.getLayers();
+        setComplete(0);
         if( allLayers.size() == 1 ) {
             allLayers.getFirst().setColor(c);
         } else if( allLayers.size() > 1 ) {
@@ -44,5 +45,6 @@ public class ColorTurtle extends Node {
         }
 
         output.setValue(moved);
+        setComplete(100);
     }
 }

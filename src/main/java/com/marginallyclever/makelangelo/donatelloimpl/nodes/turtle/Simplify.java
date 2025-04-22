@@ -27,7 +27,7 @@ public class Simplify extends Node {
         if(before==null || !before.hasDrawing()) return;
         setComplete(0);
 
-        LineCollection beforeLines = before.getAsLineSegments();
+        LineCollection beforeLines = before.getAsLineCollection();
         LineCollection afterLines = removeColinearSegments(beforeLines);
 
         Turtle t = new Turtle();

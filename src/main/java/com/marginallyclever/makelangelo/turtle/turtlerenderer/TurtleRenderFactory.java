@@ -1,41 +1,36 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import java.util.Arrays;
-
 /**
  * {@link TurtleRenderFactory} is a Factory pattern for {@link TurtleRenderer} instances, written
  * as an enum so that it does extra checks at compile time.
  * 
  * @author Dan Royer
  */
-public enum TurtleRenderFactory {
-	DEFAULT("Default", new DefaultTurtleRenderer()),
-	BARBER_POLE("Barber pole", new BarberPoleTurtleRenderer()),
-	SEPARATE_LOOP("Separate loops",new SeparateLoopTurtleRenderer()),
-	DIRECTION_LOOP("Direction loops",new DirectionLoopTurtleRenderer()),
-	MARLIN_SIM("Marlin simulation",new MarlinSimulationVisualizer());
+public class TurtleRenderFactory {
+	public static final int DEFAULT = 0;
+	public static final int BARBER_POLE = 1;
+	public static final int SEPARATE_LOOPS = 2;
+	public static final int DIRECTION_LOOPS = 3;
+	public static final int MARLIN_SIMULATION = 4;
+	public static final int NUM_RENDERERS = 5;
 
-	private final TurtleRenderer turtleRenderer;
-
-	private final String name;
-
-	TurtleRenderFactory(String name, TurtleRenderer turtleRenderer) {
-		this.name = name;
-		this.turtleRenderer = turtleRenderer;
+	public static String [] getNames() {
+		return new String [] {
+				"Default",
+				"Barber pole",
+				"Separate loops",
+				"Direction loops",
+				"Marlin simulation"
+		};
 	}
 
-	public TurtleRenderer getTurtleRenderer() {
-		return turtleRenderer;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public static TurtleRenderFactory findByName(String name) {
-		return Arrays.stream(values())
-				.filter(enumValue -> enumValue.getName().contains(name))
-				.findFirst()
-				.orElseThrow();
+	public static TurtleRenderer getTurtleRenderer(int index) {
+		return switch(index) {
+			case 1 -> new BarberPoleTurtleRenderer();
+			case 2 -> new SeparateLoopTurtleRenderer();
+			case 3 -> new DirectionLoopTurtleRenderer();
+			case 4 -> new MarlinSimulationVisualizer();
+			default -> new DefaultTurtleRenderer();
+		};
 	}
 }

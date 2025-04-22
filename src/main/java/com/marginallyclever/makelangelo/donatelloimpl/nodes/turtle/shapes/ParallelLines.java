@@ -7,7 +7,15 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * ParallelLines is a class that represents a shape made of parallel lines.
+ * <p>ParallelLines is a class that represents a shape made of parallel lines.</p>
+ * <h4>Ports</h4>
+ * <ul>
+ *     <li>numLines - number of lines to generate</li>
+ *     <li>length - length of each line on the x axis</li>
+ *     <li>spacing - distance between lines</li>
+ *     <li>angle - degrees CCW rotation of the entire set</li>
+ *     <li>output - where the resulting {@link Turtle} will appear</li>
+ * </ul>
  */
 public class ParallelLines extends Node {
     private final InputInt numLines = new InputInt("numLines", 50);
