@@ -48,7 +48,6 @@ public class WaveByIntensity {
         calculatePoint(a,orthogonal,offset);
         turtle.jumpTo(offset.x,offset.y);
 
-        double stepSize = 0.1;
         for (double p = 0; p <= len; p += this.stepSize) {
             wavePosition += this.stepSize;
             interpolated.set(

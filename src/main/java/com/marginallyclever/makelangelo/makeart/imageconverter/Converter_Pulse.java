@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
+import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.donatello.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.donatello.select.SelectDouble;
-import com.marginallyclever.donatello.select.SelectOneOfMany;
-import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
@@ -30,11 +30,9 @@ public class Converter_Pulse extends ImageConverter {
 
 		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
 		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
-		SelectSlider    selectCutoff = new SelectSlider("cutoff",Translator.get("Converter_VoronoiStippling.Cutoff"),255,0,getCutoff());
 
 		add(selectSize);
 		add(selectDirection);
-		add(selectCutoff);
 
 		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
@@ -42,10 +40,6 @@ public class Converter_Pulse extends ImageConverter {
 		});
 		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int) evt.getNewValue());
-			fireRestart();
-		});
-		selectCutoff.addSelectListener(evt->{
-			setCutoff((int) evt.getNewValue());
 			fireRestart();
 		});
 	}
@@ -80,12 +74,8 @@ public class Converter_Pulse extends ImageConverter {
 		dir.scale(1.0/len);
 		Point2d ortho = new Point2d(-dir.y,dir.x);
 
-		double cx = myPaper.getCenterX();
-		double cy = myPaper.getCenterY();
-		turtle.jumpTo(
-				cx+a.x + ortho.x*halfStep,
-				cy+a.y + ortho.y*halfStep
-		);
+		turtle.jumpTo(a.x,a.y);
+
 
 		int n=1;
 		for (double p = 0; p <= len; p += zigZagSpacing) {
@@ -94,14 +84,14 @@ public class Converter_Pulse extends ImageConverter {
 			// read a block of the image and find the average intensity in this block
 			double z = 255.0f - img.sample( x, y, halfStep);
 			// scale the intensity value
-			double scale_z = (z) / 255.0f;
+			double scale_z = z / 255.0;
 			//scale_z *= scale_z;  // quadratic curve
 			double pulseSize = halfStep * scale_z;
 
 			double px=x + ortho.x * pulseSize * n;
 			double py=y + ortho.y * pulseSize * n;
-			if(z>cutOff) turtle.moveTo(cx+px,cy+py);
-			else turtle.jumpTo(cx+px,cy+py);
+			if(z>cutOff) turtle.moveTo(px,py);
+			else turtle.jumpTo(px,py);
 			n = -n;
 		}
 	}
@@ -130,8 +120,6 @@ public class Converter_Pulse extends ImageConverter {
 		
 		// figure out how many lines we're going to have on this image.
 		double stepSize = blockScale;
-		double halfStep = stepSize / 2.0f;
-		double zigZagSpacing = 1;
 
 		// from top to bottom of the image...
 		double x, y = 0;
@@ -141,36 +129,34 @@ public class Converter_Pulse extends ImageConverter {
 		Point2d b = new Point2d();
 		
 		turtle = new Turtle();
-		
+
+		var wave = new WaveByIntensity(img,blockScale/2,1);
+
 		if (direction == 0) {
 			// horizontal
-			for (y = yBottom; y < yTop; y += stepSize) {
+			for (y = yBottom; y < yTop; y += blockScale) {
 				++i;
-
 				if ((i % 2) == 0) {
 					a.set(xLeft,y);
 					b.set(xRight,y);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
 				} else {
 					a.set(xRight,y);
 					b.set(xLeft,y);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
 				}
+				turtle.add(wave.lineToWave(a,b));
 			}
 		} else {
 			// vertical
-			for (x = xLeft; x < xRight; x += stepSize) {
+			for (x = xLeft; x < xRight; x += blockScale) {
 				++i;
-
 				if ((i % 2) == 0) {
 					a.set(x,yBottom);
 					b.set(x,yTop);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
 				} else {
 					a.set(x,yTop);
 					b.set(x,yBottom);
-					convertLine(img,zigZagSpacing,halfStep,a,b);
 				}
+				turtle.add(wave.lineToWave(a,b));
 			}
 		}
 	}
