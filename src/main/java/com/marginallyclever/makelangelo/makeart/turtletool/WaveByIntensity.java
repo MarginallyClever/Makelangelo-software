@@ -29,6 +29,25 @@ public class WaveByIntensity {
         this.img = img;
     }
 
+    public Turtle turtleToWave(@Nonnull Turtle turtle) {
+        Turtle result = new Turtle();
+        TurtleIterator it = turtle.getIterator();
+        Point2d prev = null;
+        while (it.hasNext()) {
+            var next = it.next();
+            if(it.isTravel()) {
+                prev = next;
+                continue;
+            }
+            assert prev != null;
+            var wave = lineToWave(prev, next);
+            result.add(wave);
+            prev = next;
+        }
+
+        return result;
+    }
+
     /**
      * Convert a line to a wave based on the intensity of the image.
      * @param a the start of the line
@@ -72,24 +91,5 @@ public class WaveByIntensity {
         var h = (z<=1) ? 0 : Math.cos(wavePosition) * halfLineHeight*(z/255.0);
         d.x = a.x + orthogonal.x * h;
         d.y = a.y + orthogonal.y * h;
-    }
-
-    public Turtle turtleToWave(@Nonnull Turtle turtle) {
-        Turtle result = new Turtle();
-        TurtleIterator it = turtle.getIterator();
-        Point2d prev = null;
-        while (it.hasNext()) {
-            var next = it.next();
-            if(it.isTravel()) {
-                prev = next;
-                continue;
-            }
-            assert prev != null;
-            var wave = lineToWave(prev, next);
-            result.add(wave);
-            prev = next;
-        }
-
-        return result;
     }
 }
