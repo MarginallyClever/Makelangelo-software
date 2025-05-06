@@ -466,7 +466,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-all</artifactId>
-			<version>1.18</version>
+			<version>1.19</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>

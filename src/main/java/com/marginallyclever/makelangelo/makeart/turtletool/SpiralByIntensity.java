@@ -9,10 +9,10 @@ import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
 
 /**
- * Compare a line to a bitmap image and replace the line with a wave, such that the amplitude and frequency are
+ * Compare a line to a bitmap image and replace the line with a spiral, such that the amplitude and frequency are
  * controlled by the intensity of the image at the same point.
  */
-public class WaveByIntensity {
+public class SpiralByIntensity {
     private final TransformedImage img;
     private final double halfLineHeight;
     private final double stepSize;
@@ -23,13 +23,13 @@ public class WaveByIntensity {
      * @param halfLineHeight the width of the pulse line.
      * @param stepSize the speed at which to walk the line.
      */
-    public WaveByIntensity(@Nonnull TransformedImage img, double halfLineHeight, double stepSize) {
+    public SpiralByIntensity(@Nonnull TransformedImage img, double halfLineHeight, double stepSize) {
         this.halfLineHeight = halfLineHeight;
         this.stepSize = stepSize;
         this.img = img;
     }
 
-    public Turtle turtleToWave(@Nonnull Turtle turtle) {
+    public Turtle turtleToSpiral(@Nonnull Turtle turtle) {
         Turtle result = new Turtle();
         TurtleIterator it = turtle.getIterator();
         Point2d prev = null;
@@ -40,7 +40,7 @@ public class WaveByIntensity {
                 continue;
             }
             assert prev != null;
-            var wave = lineToWave(prev, next);
+            var wave = lineToSpiral(prev, next);
             result.add(wave);
             prev = next;
         }
@@ -53,7 +53,7 @@ public class WaveByIntensity {
      * @param a the start of the line
      * @param b the end of the line
      */
-    public Turtle lineToWave(Point2d a, Point2d b) {
+    private Turtle lineToSpiral(Point2d a, Point2d b) {
         Turtle turtle = new Turtle();
         // find the length of the line and the unit vector
         var unitVector = new Vector2d(b.x - a.x,b.y - a.y);
@@ -64,7 +64,7 @@ public class WaveByIntensity {
 
         Point2d interpolated = new Point2d();
         Point2d offset = new Point2d();
-        calculatePoint(a,orthogonal,offset);
+        calculatePoint(a,orthogonal,unitVector,offset);
         turtle.jumpTo(offset.x,offset.y);
 
         for (double p = 0; p <= len; p += this.stepSize) {
@@ -72,7 +72,7 @@ public class WaveByIntensity {
             interpolated.set(
                     a.x + unitVector.x * p,
                     a.y + unitVector.y * p);
-            calculatePoint(interpolated,orthogonal,offset);
+            calculatePoint(interpolated,orthogonal,unitVector,offset);
             turtle.moveTo(offset.x,offset.y);
         }
         return turtle;
@@ -82,14 +82,17 @@ public class WaveByIntensity {
      * Calculate the point on the wave based on the intensity of the image.
      * @param a the point on the line
      * @param orthogonal the orthogonal vector to the line (the x-axis of the cos function)
+     * @param unitVector the unit vector of the line (the y-axis of the cos function)
      * @param d the point on the wave
      */
-    private void calculatePoint(Point2d a, Vector2d orthogonal, Point2d d) {
+    private void calculatePoint(Point2d a, Vector2d orthogonal, Vector2d unitVector, Point2d d) {
         // read a block of the image and find the average intensity in this block
         double z = (255.0f - img.sample( a.x, a.y, halfLineHeight));
+        double hAdj = halfLineHeight*(z/255.0);
         // the sum controls the height of the pulse.
-        var h = (z<=1) ? 0 : Math.cos(wavePosition) * halfLineHeight*(z/255.0);
-        d.x = a.x + orthogonal.x * h;
-        d.y = a.y + orthogonal.y * h;
+        var h = (z<=1) ? 0 : Math.cos(wavePosition) * hAdj;
+        var w = (z<=1) ? 0 : Math.sin(wavePosition) * hAdj;
+        d.x = a.x + orthogonal.x * h + unitVector.x * w;
+        d.y = a.y + orthogonal.y * h + unitVector.y * w;
     }
 }
