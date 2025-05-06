@@ -147,14 +147,14 @@ public class ProgramPanel extends JPanel {
 			moveToCoordinates(move.substring(7));
 			myPlotter.lowerPen();
 		} else if(move.startsWith("DRAW_LINE")) {
-			moveToCoordinates(move.substring(9));
+			moveToCoordinates(move.substring(10));
 		} else if(move.startsWith("TOOL")) {
 			String color = move.substring(5);
 			String [] parts = color.split(" ");
-			int r = Integer.parseInt(parts[0].substring(2));
-			int g = Integer.parseInt(parts[1].substring(2));
-			int b = Integer.parseInt(parts[2].substring(2));
-			int a = Integer.parseInt(parts[3].substring(2));
+			int r = Integer.parseInt(parts[0].substring(1));
+			int g = Integer.parseInt(parts[1].substring(1));
+			int b = Integer.parseInt(parts[2].substring(1));
+			int a = Integer.parseInt(parts[3].substring(1));
 			// ignore diameter
 			myPlotter.requestUserChangeTool(new Color(r, g, b, a).getRGB());
 		}
@@ -170,8 +170,8 @@ public class ProgramPanel extends JPanel {
 
 	private void moveToCoordinates(String coordinates) {
 		String [] parts = coordinates.split(" ");
-		double x = Double.parseDouble(parts[0].substring(2));
-		double y = Double.parseDouble(parts[1].substring(2));
+		double x = Double.parseDouble(parts[0].substring(1));
+		double y = Double.parseDouble(parts[1].substring(1));
 		myPlotter.setPos(x,y);
 	}
 
