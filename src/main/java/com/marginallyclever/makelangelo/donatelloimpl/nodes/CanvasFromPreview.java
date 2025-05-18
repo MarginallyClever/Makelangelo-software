@@ -50,7 +50,7 @@ public class CanvasFromPreview extends Node implements PrintWithGraphics {
     }
 
     public CanvasFromPreview() {
-        super("Canvas");
+        super("CanvasFromPreview");
 
         readConfig();
 
