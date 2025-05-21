@@ -41,7 +41,7 @@ public class TurtleToPreview extends Node implements PrintWithGraphics {
     private final InputInt layer = new InputInt("layer",5);
     private final InputOneOfMany style = new InputOneOfMany("style");
 
-    private PreviewPanel previewPanel;
+    private MainFrame mainFrame;
 
     public TurtleToPreview() {
         super("TurtleToPreview");
@@ -65,8 +65,7 @@ public class TurtleToPreview extends Node implements PrintWithGraphics {
     public void update() {
         setComplete(0);
 
-        MainFrame frame = (MainFrame)SwingUtilities.getRoot(getActiveJFrame());
-        previewPanel = frame.getPreviewPanel();
+        mainFrame = (MainFrame)SwingUtilities.getRoot(getActiveJFrame());
 
         setComplete(100);
     }
@@ -81,8 +80,8 @@ public class TurtleToPreview extends Node implements PrintWithGraphics {
 
         Turtle turtle1 = this.turtle.getValue();
 
-        if(previewPanel != null && turtle1 != null) {
-            previewPanel.setTurtle(turtle1);
+        if(mainFrame != null && turtle1 != null) {
+            mainFrame.setTurtle(turtle1);
 
         } else {
             logger.debug("Invalid turtle or preview panel");
