@@ -35,8 +35,8 @@ public class Graphics2DGL extends Graphics2D {
     private Paint paint = null;
     private AtomicBoolean isDisposed = new AtomicBoolean(false);
     private Color currentColor = Color.BLACK;
-    private Mesh mesh = new Mesh();
-    private Matrix4d matrix = new Matrix4d();
+    private final Mesh mesh = new Mesh();
+    private final Matrix4d matrix = new Matrix4d();
     private double thetaSum = 0;
 
     public Graphics2DGL(GL3 gl2) {
