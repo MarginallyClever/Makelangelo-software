@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.turtlegenerator;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.Select;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -42,7 +42,7 @@ public abstract class TurtleGenerator {
 	 * live preview as the system is generating.
 	 * draw the results as the calculation is being performed.
 	 */
-	public void render(GL2 gl2) {}
+	public void render(GL3 gl2) {}
 	
 	// OBSERVER PATTERN
 

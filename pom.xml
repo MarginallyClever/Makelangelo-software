@@ -422,17 +422,11 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<version>1.5.16</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.janino</groupId>
-			<artifactId>janino</artifactId>
-			<version>3.1.8</version>
-		</dependency>
-		<!-- logging -->
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>2.0.16</version>
 		</dependency>
-
+		<!-- vector math -->
 		<dependency>
 			<groupId>javax.vecmath</groupId>
 			<artifactId>vecmath</artifactId>
@@ -547,20 +541,24 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<artifactId>modern-docking-ui</artifactId>
 			<version>0.11.6</version>
 		</dependency>
-
+		<!-- webcam capture -->
 		<dependency>
 			<groupId>com.github.sarxos</groupId>
 			<artifactId>webcam-capture</artifactId>
 			<version>0.3.12</version>
 		</dependency>
-
 		<!-- read audio files -->
 		<dependency>
 			<groupId>com.github.umjammer</groupId>
 			<artifactId>mp3spi</artifactId>
 			<version>1.9.17</version>
 		</dependency>
-
+		<!-- java parsing? -->
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.1.8</version>
+		</dependency>
 		<!-- donatello -->
 		<dependency>
 			<!--

@@ -1,6 +1,7 @@
 package com.marginallyclever.convenience;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.Mesh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class ConvexHull {
     private static final Logger logger = LoggerFactory.getLogger(ConvexHull.class);
     private final ArrayList<Vector2d> points = new ArrayList<>();
+    private final Mesh mesh = new Mesh();
 
     public ConvexHull() {}
 
@@ -39,6 +41,7 @@ public class ConvexHull {
 
     public void clear() {
         points.clear();
+        mesh.clear();
     }
 
     public Rectangle2D getBounds() {
@@ -173,16 +176,18 @@ public class ConvexHull {
         return new Vector2d(d.y,-d.x);
     }
 
-    public void renderAsFan(GL2 gl2) {
-        gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
-        gl2.glEnd();
+    public void renderAsFan(GL3 gl2) {
+        throw new RuntimeException("Not implemented");
+        //gl2.glBegin(GL3.GL_TRIANGLE_FAN);
+        //for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
+        //gl2.glEnd();
     }
 
-    public void renderAsLineLoop(GL2 gl2) {
-        gl2.glBegin(GL2.GL_LINE_LOOP);
-        for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
-        gl2.glEnd();
+    public void renderAsLineLoop(GL3 gl2) {
+        throw new RuntimeException("Not implemented");
+        //gl2.glBegin(GL3.GL_LINE_LOOP);
+        //for( Vector2d p : points) gl2.glVertex2d(p.x,p.y);
+        //gl2.glEnd();
     }
 
     @Override

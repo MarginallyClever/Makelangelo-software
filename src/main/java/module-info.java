@@ -45,6 +45,7 @@ module com.marginallyclever.makelangelo {
     exports com.marginallyclever.makelangelo.makeart.turtletool;
     exports com.marginallyclever.makelangelo.makeart.turtlegenerator;
     exports com.marginallyclever.makelangelo.paper;
+    exports com.marginallyclever.makelangelo.preview;
     exports com.marginallyclever.makelangelo.plotter;
     exports com.marginallyclever.makelangelo.plotter.plottersettings;
     exports com.marginallyclever.makelangelo.plotter.plottercontrols;

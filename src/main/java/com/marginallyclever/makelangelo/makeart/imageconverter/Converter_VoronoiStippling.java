@@ -1,13 +1,16 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+
+import java.awt.*;
 
 /**
  * Voronoi graph based stippling.
@@ -20,17 +23,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	private static double maxDotSize = 3.5;
 	private static double minDotSize = 0.5;
 
-	private final int TABLE_SIZE=10;
-	private final double [] cosTable = new double[TABLE_SIZE+1];
-	private final double [] sinTable = new double[TABLE_SIZE+1];
-
 	public Converter_VoronoiStippling() {
 		super();
-
-		for(int i=0;i<=TABLE_SIZE;++i) {
-			cosTable[i] = Math.cos(i*2.0*Math.PI/TABLE_SIZE);
-			sinTable[i] = Math.sin(i*2.0*Math.PI/TABLE_SIZE);
-		}
 
 		SelectSlider selectMax = new SelectSlider("max", Translator.get("Converter_VoronoiStippling.DotMax"), 50,1, (int)(getMaxDotSize()*10));
 		add(selectMax);
@@ -59,53 +53,36 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void render(GL2 gl2) {
-		super.render(gl2);
+	public void render(ShaderProgram shader) {
+		super.render(shader);
 
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;
 
-		double cx = myPaper.getCenterX();
-		double cy = myPaper.getCenterY();
-		gl2.glPushMatrix();
-		gl2.glTranslated(cx,cy,0);
+		float cx = (float)myPaper.getCenterX();
+		float cy = (float)myPaper.getCenterY();
 
 		lock.lock();
 		try {
-			renderDots(gl2);
+			renderDots(shader,cx,cy);
 		}
 		finally {
 			lock.unlock();
 		}
-
-		gl2.glPopMatrix();
 	}
 
-	private void drawCircle(GL2 gl2,double x, double y, double r) {
-		if(r<=minDotSize) return;
-
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		for (int j = 0; j <= TABLE_SIZE; ++j) {
-			gl2.glVertex2d(
-					x + r * cosTable[j],
-					y + r * sinTable[j] );
-		}
-		gl2.glEnd();
-	}
-
-	private void renderDots(GL2 gl2) {
+	private void renderDots(ShaderProgram shader,float sx,float sy) {
 		int lpc = getLowpassCutoff();
-		double scale = (maxDotSize-minDotSize)/255.0;
-		double cx = myPaper.getCenterX();
-		double cy = myPaper.getCenterY();
+		float scale = (float)(maxDotSize-minDotSize)/255.0f;
+		float cx = (float)myPaper.getCenterX()+sx;
+		float cy = (float)myPaper.getCenterY()+sy;
 
 		for( VoronoiCell c : cells ) {
 			if(c.weight<lpc) continue;
-			double r = (c.weight-lpc) * scale;
-			double x = c.center.x;
-			double y = c.center.y;
-			gl2.glColor3f((float)c.change, 0, 0);
-			drawCircle(gl2,x,y,r);
+			float r = (float)(c.weight-lpc) * scale;
+			float x = (float)c.center.x;
+			float y = (float)c.center.y;
+			DrawingHelper.drawCircle(shader.getContext(), cx+x, cy+y, r, new Color((float)c.change,0,0));
 		}
 	}
 

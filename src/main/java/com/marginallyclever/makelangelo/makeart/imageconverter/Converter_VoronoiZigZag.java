@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectToggleButton;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,31 +82,31 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void resume() {}
 
 	@Override
-	public void render(GL2 gl2) {
-		super.render(gl2);
+	public void render(ShaderProgram shader) {
+		super.render(shader);/*
 		if(getThread().getPaused()) return;
 
-		gl2.glPushMatrix();
-		gl2.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
+		gl.glPushMatrix();
+		gl.glTranslated(myPaper.getCenterX(),myPaper.getCenterY(),0);
 
 		lock.lock();
 		try {
-			if (renderMode == 0) renderPoints(gl2);
-			if (renderMode == 1 && cells != null) drawTour(gl2);
+			if (renderMode == 0) renderPoints(gl);
+			if (renderMode == 1 && cells != null) drawTour(gl);
 		}
 		finally {
 			lock.unlock();
 		}
 
-		gl2.glPopMatrix();
+		gl.glPopMatrix();*/
 	}
 
-	private void renderPoints(GL2 gl2) {
+	private void renderPoints(GL3 gl2) {/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
 		try {
-			gl2.glBegin(GL2.GL_POINTS);
+			gl2.glBegin(GL3.GL_POINTS);
 			for( VoronoiCell c : cells ) {
 				if(c.weight<lpc) {
 					gl2.glColor3f(1, 0, 0);
@@ -118,16 +119,16 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		}
 		finally {
 			lock.unlock();
-		}
+		}*/
 	}
 
-	private void drawTour(GL2 gl2) {
+	private void drawTour(GL3 gl2) {/*
 		int lpc = getLowpassCutoff();
 
 		lock.lock();
 		try {
 			gl2.glColor3f(0, 0, 0);
-			gl2.glBegin(GL2.GL_LINE_STRIP);
+			gl2.glBegin(GL3.GL_LINE_STRIP);
 			for (VoronoiCell c : cells) {
 				if (c.weight < lpc) break;
 				gl2.glVertex2d(c.center.x, c.center.y);
@@ -136,7 +137,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		}
 		finally {
 			lock.unlock();
-		}
+		}*/
 	}
 
 	private void optimizeTour() {

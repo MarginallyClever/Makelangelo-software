@@ -1,10 +1,13 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.Mesh;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Matrix4d;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -20,49 +23,63 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * <p>A very limited {@link Graphics2D} implementation for OpenGL 2.0.</p>
+ * <p>A very limited {@link Graphics2D} implementation for OpenGL 3.0.</p>
  * <p>Assumes gl is already in orthographic projection and only drawing in the xy plane.</p>
  * <p>Don't forget to {@link #dispose()} when you're done.</p>
  */
 public class Graphics2DGL extends Graphics2D {
     private static final Logger logger = LoggerFactory.getLogger(Graphics2DGL.class);
 
-    private final GL2 gl2;
+    private final GL3 gl;
     private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
     private AtomicBoolean isDisposed = new AtomicBoolean(false);
+    private Color currentColor = Color.BLACK;
+    private Mesh mesh = new Mesh();
+    private Matrix4d matrix = new Matrix4d();
+    private double thetaSum = 0;
 
-    public Graphics2DGL(GL2 gl2) {
-        this.gl2 = gl2;
-
-        // save the transformation matrix
-        gl2.glPushMatrix();
+    public Graphics2DGL(GL3 gl2) {
+        this.gl = gl2;
 
         // save the line width
-        gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidthBuf, 0);
+        gl2.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
 
         // start drawing lines
-        gl2.glBegin(GL2.GL_LINES);
+        mesh.clear();
+        mesh.setRenderStyle(GL3.GL_LINES);
+
+        matrix.setIdentity();
+        thetaSum=0;
     }
 
     @Override
     public Graphics create() {
-        return new Graphics2DGL(gl2);
+        return new Graphics2DGL(gl);
     }
 
     @Override
     public void translate(int x, int y) {
-        gl2.glTranslatef(x, y, 0);
+        matrix.m03+=x;
+        matrix.m13+=y;
     }
 
     @Override
-    public void translate(double tx, double ty) {
-        gl2.glTranslated(tx, ty, 0);
+    public void translate(double x, double y) {
+        matrix.m03+=x;
+        matrix.m13+=y;
     }
 
     @Override
     public void rotate(double theta) {
-        gl2.glRotated(Math.toDegrees(theta), 0, 0, 1);
+        thetaSum += theta;
+        double x = matrix.m03;
+        double y = matrix.m13;
+        Matrix3d m3 = new Matrix3d();
+        m3.rotZ(thetaSum);
+        matrix.set(m3);
+        matrix.m03 = x; // restore translation
+        matrix.m13 = y; // restore translation
     }
 
     @Override
@@ -74,39 +91,35 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void scale(double sx, double sy) {
-        gl2.glScaled(sx, sy, 1);
+        matrix.m00= sx;
+        matrix.m11= sy;
     }
 
     @Override
     public void shear(double shx, double shy) {
-        // OpenGL does not have a direct equivalent to shear, so we use a transformation matrix
-        gl2.glMultMatrixd(new double[]{
-                1, shy, 0, 0,
-                shx, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-        }, 0);
+        matrix.m10= shx;
+        matrix.m01= shy;
     }
 
     @Override
     public void transform(AffineTransform Tx) {
-        double[] matrix = new double[16];
+        Matrix4d m2 = new Matrix4d();
         double[] flatMatrix = new double[6];
         Tx.getMatrix(flatMatrix);
-        matrix[0] = flatMatrix[0];
-        matrix[1] = flatMatrix[1];
-        matrix[4] = flatMatrix[2];
-        matrix[5] = flatMatrix[3];
-        matrix[12] = flatMatrix[4];
-        matrix[13] = flatMatrix[5];
-        matrix[10] = 1;
-        matrix[15] = 1;
-        gl2.glMultMatrixd(matrix, 0);
+        m2.m00 = flatMatrix[0];
+        m2.m01 = flatMatrix[1];
+        m2.m10 = flatMatrix[2];
+        m2.m11 = flatMatrix[3];
+        m2.m30 = flatMatrix[4];
+        m2.m31 = flatMatrix[5];
+        m2.m22 = 1;
+        m2.m33 = 1;
+        matrix.mul(m2);
     }
 
     @Override
     public void setTransform(AffineTransform Tx) {
-        gl2.glLoadIdentity();
+        matrix.setIdentity();
         transform(Tx);
     }
 
@@ -130,13 +143,13 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void setBackground(Color color) {
-        gl2.glClearColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
+        gl.glClearColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
     }
 
     @Override
     public Color getBackground() {
         float[] color = new float[4];
-        gl2.glGetFloatv(GL2.GL_COLOR_CLEAR_VALUE, color, 0);
+        gl.glGetFloatv(GL3.GL_COLOR_CLEAR_VALUE, color, 0);
         return new Color(color[0], color[1], color[2], color[3]);
     }
 
@@ -159,19 +172,13 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public Color getColor() {
-        float[] color = new float[4];
-        gl2.glGetFloatv(GL2.GL_CURRENT_COLOR, color, 0);
-        return new Color(color[0], color[1], color[2], color[3]);
+        return new Color(currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue(), currentColor.getAlpha());
     }
 
     @Override
     public void setColor(Color c) {
         paint = null;
-        gl2.glColor4f(
-                c.getRed() / 255.0f,
-                c.getGreen() / 255.0f,
-                c.getBlue() / 255.0f,
-                c.getAlpha() / 255.0f);
+        currentColor = new Color(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
     @Override
@@ -209,8 +216,8 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void clipRect(int x, int y, int width, int height) {
-        gl2.glScissor(x, y, width, height);
-        gl2.glEnable(GL2.GL_SCISSOR_TEST);
+        gl.glScissor(x, y, width, height);
+        gl.glEnable(GL3.GL_SCISSOR_TEST);
     }
 
     @Override
@@ -238,21 +245,30 @@ public class Graphics2DGL extends Graphics2D {
     public void drawLine(int x1, int y1, int x2, int y2) {
         if(paint instanceof GradientPaint gp) {
             var c1 = gp.getColor1();
-            gl2.glColor3d(c1.getRed()/255.0, c1.getGreen()/255.0, c1.getBlue()/255.0);
-            gl2.glVertex2i(x1, y1);
+            mesh.addColor(c1.getRed()/255.0f, c1.getGreen()/255.0f, c1.getBlue()/255.0f,1);
+            addVertex(x1, y1);
             var c2 = gp.getColor2();
-            gl2.glColor3d(c2.getRed()/255.0, c2.getGreen()/255.0, c2.getBlue()/255.0);
-            gl2.glVertex2i(x2, y2);
+            mesh.addColor(c2.getRed()/255.0f, c2.getGreen()/255.0f, c2.getBlue()/255.0f,1);
+            addVertex(x2, y2);
         } else {
-            gl2.glVertex2i(x1, y1);
-            gl2.glVertex2i(x2, y2);
+            mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
+            addVertex(x1, y1);
+            mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
+            addVertex(x2, y2);
         }
+    }
+
+    private void addVertex(float x,float y) {
+        //Point3d p = new Point3d(x, y, 0);
+        //matrix.transform(p);
+        //mesh.addVertex((float)p.x, (float)p.y, 0);
+        mesh.addVertex(x,y,0);
     }
 
     @Override
     public void fillRect(int x, int y, int width, int height) {
         /*
-        gl2.glBegin(GL2.GL_QUADS);
+        gl2.glBegin(GL3.GL_QUADS);
         gl2.glVertex2i(x, y);
         gl2.glVertex2i(x + width, y);
         gl2.glVertex2i(x + width, y + height);
@@ -262,7 +278,7 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void clearRect(int x, int y, int width, int height) {
-        gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
     }
 
     @Override
@@ -297,7 +313,7 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {/*
-        gl2.glBegin(GL2.GL_LINE_STRIP);
+        gl2.glBegin(GL3.GL_LINE_STRIP);
         for (int i = 0; i < nPoints; i++) {
             gl2.glVertex2i(xPoints[i], yPoints[i]);
         }
@@ -306,7 +322,7 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {/*
-        gl2.glBegin(GL2.GL_LINE_LOOP);
+        gl2.glBegin(GL3.GL_LINE_LOOP);
         for (int i = 0; i < nPoints; i++) {
             gl2.glVertex2i(xPoints[i], yPoints[i]);
         }
@@ -315,7 +331,7 @@ public class Graphics2DGL extends Graphics2D {
 
     @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {/*
-        gl2.glBegin(GL2.GL_POLYGON);
+        gl2.glBegin(GL3.GL_POLYGON);
         for (int i = 0; i < nPoints; i++) {
             gl2.glVertex2i(xPoints[i], yPoints[i]);
         }
@@ -328,14 +344,16 @@ public class Graphics2DGL extends Graphics2D {
         if(s instanceof Line2D line) {
             if(paint instanceof GradientPaint gp) {
                 var c1 = gp.getColor1();
-                gl2.glColor3d(c1.getRed()/255.0, c1.getGreen()/255.0, c1.getBlue()/255.0);
-                gl2.glVertex2d(line.getX1(), line.getY1());
+                mesh.addColor(c1.getRed()/255.0f, c1.getGreen()/255.0f, c1.getBlue()/255.0f,1);
+                addVertex((float)line.getX1(), (float)line.getY1());
                 var c2 = gp.getColor2();
-                gl2.glColor3d(c2.getRed()/255.0, c2.getGreen()/255.0, c2.getBlue()/255.0);
-                gl2.glVertex2d(line.getX2(), line.getY2());
+                mesh.addColor(c2.getRed()/255.0f, c2.getGreen()/255.0f, c2.getBlue()/255.0f,1);
+                addVertex((float)line.getX2(), (float)line.getY2());
             } else {
-                gl2.glVertex2d(line.getX1(), line.getY1());
-                gl2.glVertex2d(line.getX2(), line.getY2());
+                mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
+                addVertex((float)line.getX1(), (float)line.getY1());
+                mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
+                addVertex((float)line.getX2(), (float)line.getY2());
             }
         }
     }
@@ -418,7 +436,7 @@ public class Graphics2DGL extends Graphics2D {
     public void setStroke(Stroke s) {
         // OpenGL does not handle Stroke directly
         if(s instanceof BasicStroke bs) {
-            gl2.glLineWidth(bs.getLineWidth());
+            gl.glLineWidth(bs.getLineWidth());
         }
     }
 
@@ -427,9 +445,9 @@ public class Graphics2DGL extends Graphics2D {
         // OpenGL does not handle rendering hints directly
         if(hintKey == RenderingHints.KEY_ANTIALIASING) {
             if(hintValue == RenderingHints.VALUE_ANTIALIAS_ON) {
-                gl2.glEnable(GL2.GL_LINE_SMOOTH);
+                gl.glEnable(GL3.GL_LINE_SMOOTH);
             } else if(hintValue == RenderingHints.VALUE_ANTIALIAS_OFF) {
-                gl2.glDisable(GL2.GL_LINE_SMOOTH);
+                gl.glDisable(GL3.GL_LINE_SMOOTH);
             }
         }
     }
@@ -497,10 +515,8 @@ public class Graphics2DGL extends Graphics2D {
         if(isDisposed.getAndSet(true)) return;  // already disposed.
 
         // end drawing lines
-        gl2.glEnd();
+        mesh.render(gl);
         // restore pen diameter
-        gl2.glLineWidth(lineWidthBuf[0]);
-        // restore the transformation matrix
-        gl2.glPopMatrix();
+        gl.glLineWidth(lineWidthBuf[0]);
     }
 }

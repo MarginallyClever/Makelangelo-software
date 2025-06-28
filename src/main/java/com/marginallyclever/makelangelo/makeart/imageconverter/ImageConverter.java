@@ -1,11 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.marginallyclever.convenience.Clipper2D;
 import com.marginallyclever.convenience.helpers.MathHelper;
 
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.Select;
@@ -59,29 +60,29 @@ public abstract class ImageConverter {
 	 * Live preview as the system is converting pictures.
 	 * draw the results as the calculation is being performed.
 	 */
-	protected void render(GL2 gl2) {
+	protected void render(GL3 gl) {
 		if( texture==null && myImage!=null) {
-			texture = AWTTextureIO.newTexture(gl2.getGLProfile(), myImage.getSourceImage(), false);
+			texture = AWTTextureIO.newTexture(gl.getGLProfile(), myImage.getSourceImage(), false);
 		}
 		if(texture!=null) {
 			double w = myImage.getSourceImage().getWidth() * myImage.getScaleX();
 			double h = myImage.getSourceImage().getHeight() * myImage.getScaleY();
-			gl2.glEnable(GL2.GL_TEXTURE_2D);
-			gl2.glEnable(GL2.GL_BLEND);
-			gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-			gl2.glDisable(GL2.GL_COLOR);
-			gl2.glColor4f(1, 1, 1,0.5f);
-			gl2.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE, GL2.GL_MODULATE);
-			texture.bind(gl2);
-			gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-			gl2.glTexCoord2d(0, 0);	gl2.glVertex2d(-w/2, -h/2 );
-			gl2.glTexCoord2d(1, 0);	gl2.glVertex2d( w/2, -h/2 );
-			gl2.glTexCoord2d(1, 1);	gl2.glVertex2d( w/2, h/2);
-			gl2.glTexCoord2d(0, 1);	gl2.glVertex2d(-w/2, h/2);
-			gl2.glEnd();
-			gl2.glDisable(GL2.GL_TEXTURE_2D);
-			gl2.glDisable(GL2.GL_BLEND);
-			gl2.glEnable(GL2.GL_COLOR);
+			gl.glEnable(GL3.GL_TEXTURE_2D);
+			gl.glEnable(GL3.GL_BLEND);
+			gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glDisable(GL3.GL_COLOR);
+			texture.bind(gl);
+			Mesh mesh = new Mesh();
+			mesh.setRenderStyle(GL3.GL_TRIANGLE_FAN);
+			mesh.addColor(1, 1, 1,0.5f);
+			mesh.addTexCoord(0, 0);	mesh.addVertex((float)-w/2, (float)-h/2,0);
+			mesh.addTexCoord(1, 0);	mesh.addVertex((float) w/2, (float)-h/2,0);
+			mesh.addTexCoord(1, 1);	mesh.addVertex((float) w/2, (float) h/2,0);
+			mesh.addTexCoord(0, 1);	mesh.addVertex((float)-w/2, (float) h/2,0);
+			mesh.render(gl);
+			gl.glDisable(GL3.GL_TEXTURE_2D);
+			gl.glDisable(GL3.GL_BLEND);
+			gl.glEnable(GL3.GL_COLOR);
 		}	
 	}
 	

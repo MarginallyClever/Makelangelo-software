@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +26,12 @@ public class TurtleRenderFacade implements PreviewListener {
 	private int last;
 	private Color penDownColor = Color.BLACK;
 	private Color penUpColor = Color.GREEN;
-	private double penDiameter=0.8;
+	private double penDiameter = 0.8;
 	private boolean showTravel;
 
 	@Override
-	public void render(@Nonnull GL2 gl2) {
-		Graphics2DGL g2gl = new Graphics2DGL(gl2);
+	public void render(@Nonnull ShaderProgram shader) {
+		Graphics2DGL g2gl = new Graphics2DGL(shader.getContext());
 		try {
 			render(g2gl);
 		} finally {
