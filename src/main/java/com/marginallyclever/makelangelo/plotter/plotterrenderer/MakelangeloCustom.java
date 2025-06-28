@@ -72,7 +72,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 
 		paintTexture(shader, controlBoard, cx+shiftX, cy-72, 1024 * scale, 1024 * scale);
 
-        renderLCD(gl, left);
+        renderLCD(shader, settings);
 	}
 
 	// draw left & right motor
@@ -88,33 +88,39 @@ public class MakelangeloCustom implements PlotterRenderer {
 		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2, c);
 	}
 	
-	private void renderLCD(GL3 gl2, double left) {
+	private void renderLCD(ShaderProgram shader, PlotterSettings settings) {
+		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
+
 		// position
 		float shiftX = (float) left / 2;
 		if (shiftX > -100) {
 			shiftX = -75;
 		}
 
+		var gl = shader.getContext();
+
 		// LCD red
 		float w = 150f/2;
 		float h = 56f/2;
-		drawRectangle(gl2, h, shiftX+w, -h, shiftX-w, new Color(1,0.8f,0.5f));
+		drawRectangle(gl, top+h, shiftX+w, top-h, shiftX-w, new Color(1,0.8f,0.5f));
 
 		// LCD green
 		shiftX += -2.6f/2;
 		float shiftY = -0.771f;
 		w = 98f/2;
 		h = 60f/2;
-		drawRectangle(gl2, shiftY+h, shiftX+w, shiftY-h, shiftX-w, new Color(0,0.6f,0.0f));
+		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0.6f,0.0f));
 
 		// LCD black
 		h = 40f/2;
-		drawRectangle(gl2, shiftY+h, shiftX+w, shiftY-h, shiftX-w, new Color(0,0,0));
+		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0));
 
 		// LCD blue
 		h = 25f/2;
 		w = 75f/2;
-		drawRectangle(gl2, shiftY+h, shiftX+w, shiftY-h, shiftX-w, new Color(0,0,0.7f));
+		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0.7f));
 	}
 
 	private void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot ) {
