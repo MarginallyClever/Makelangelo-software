@@ -232,14 +232,16 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	}
 
 	private void activatePipelines(GLAutoDrawable glautodrawable) {
+		GL3 gl = glautodrawable.getGL().getGL3();
 		if (DEBUG_GL_ON) {
 			logger.info("Activating debug pipeline");
-			glautodrawable.setGL(new DebugGL3(glautodrawable.getGL().getGL3()));
+			gl = new DebugGL3(gl);
 		}
 		if (TRACE_GL_ON) {
 			logger.info("Activating trace pipeline");
-			glautodrawable.setGL(new TraceGL3(glautodrawable.getGL().getGL3(), new PrintStream(System.out) ));
+			gl = new TraceGL3(gl, new PrintStream(System.out));
 		}
+		glautodrawable.setGL(gl);
 	}
 
 	@Override
