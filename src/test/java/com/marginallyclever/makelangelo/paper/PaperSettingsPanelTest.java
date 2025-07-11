@@ -7,6 +7,7 @@ import org.assertj.swing.core.Robot;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JPanelFixture;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
@@ -49,11 +50,11 @@ public class PaperSettingsPanelTest {
 		JPanelFixture panel = window.panel(PaperSettingsPanel.class.getSimpleName());
 		panel.requireVisible();
 		panel.comboBox("size.field").selectItem(1);
-		assert(Double.parseDouble(panel.textBox("width.field").text()) == 1682.0);
-		assert(Double.parseDouble(panel.textBox("height.field").text()) == 2378.0);
+		Assertions.assertEquals("1682.000", panel.textBox("width.field").text());
+		Assertions.assertEquals("2378.000", panel.textBox("height.field").text());
 		panel.comboBox("size.field").selectItem(1);
 		panel.checkBox("landscape.field").click();
-		assert(Double.parseDouble(panel.textBox("width.field").text()) == 2378.0);
-		assert(Double.parseDouble(panel.textBox("height.field").text()) == 1682.0);
+		Assertions.assertEquals("2378.000", panel.textBox("width.field").text());
+		Assertions.assertEquals("1682.000", panel.textBox("height.field").text());
 	}
 }
