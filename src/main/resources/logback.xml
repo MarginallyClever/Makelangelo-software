@@ -7,42 +7,47 @@
         <filename>${user.home}/.makelangelo/logback-status.log</filename>
     </statusListener>
 
-    <!--<if condition='property("DEV").equals("true")'>
-        <then>-->
+    <if condition='property("DEV").equals("true")'>
+        <then>
             <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
                 <encoder>
                     <pattern>%d %boldCyan(%-5level) %boldGreen(%-15.-15logger{0}) - %msg %n</pattern>
                 </encoder>
             </appender>
-<!--
-            <logger name="com.marginallyclever.convenience.log.Log" level="info" />
-            <logger name="com.marginallyclever.makelangelo.Makelangelo" level="info" />
-            <logger name="com.marginallyclever.makelangelo.plotter.plottercontrols.MarlinPanel" level="trace" />
+
             <root>
                 <appender-ref ref="STDOUT" />
             </root>
         </then>
-    </if>-->
+    </if>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${user.home}/.makelangelo/makelangelo.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${user.home}/.makelangelo/makelangelo.%i.log</fileNamePattern>
-            <minIndex>1</minIndex>
-            <maxIndex>1</maxIndex>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${user.home}/.makelangelo/makelangelo.%d{yyyy-MM-dd_HHmm}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
         </rollingPolicy>
 
-        <triggeringPolicy class="com.marginallyclever.convenience.log.RollOncePerSessionTriggeringPolicy"/>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
         <immediateFlush>true</immediateFlush>
     </appender>
 
-    <logger name="com.marginallyclever" level="debug" />
+    <logger name="com.marginallyclever" level="info" />
 
-    <root level="info">
-        <appender-ref ref="FILE" />
-    </root>
+    <if condition='property("ENV").equals("dev")'>
+        <then>
+            <root level="DEBUG">
+                <appender-ref ref="FILE" />
+            </root>
+        </then>
+        <else>
+            <root level="INFO">
+                <appender-ref ref="FILE" />
+            </root>
+        </else>
+    </if>
 
 </configuration>
