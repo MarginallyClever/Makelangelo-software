@@ -228,6 +228,10 @@ public class PlotterSettings {
 		return json.getInt(key);
 	}
 
+	public float getFloat(String key) throws NullPointerException, IllegalStateException {
+		return (float) json.getDouble(key);
+	}
+
 	/**
 	 * @param key the key to look up
 	 * @return the value of the key
@@ -513,7 +517,7 @@ public class PlotterSettings {
 					+ " S" + getInteger(PEN_ANGLE_UP)
 					+ " T" + getInteger(PEN_ANGLE_UP_TIME);
 		} else {
-			return "G0 Z" + getInteger(PEN_ANGLE_UP)
+			return "G0 Z" + getFloat(PEN_ANGLE_UP)
 					+ " F" + getInteger(PEN_ANGLE_UP_TIME);
 		}
 	}
@@ -524,7 +528,7 @@ public class PlotterSettings {
 					+ " S" + getInteger(PEN_ANGLE_DOWN)
 					+ " T" + getInteger(PEN_ANGLE_DOWN_TIME);
 		} else {
-			return "G1 Z" + getInteger(PEN_ANGLE_DOWN)
+			return "G1 Z" + getFloat(PEN_ANGLE_DOWN)
 					+ " F" + getInteger(PEN_ANGLE_DOWN_TIME);
 		}
 	}
