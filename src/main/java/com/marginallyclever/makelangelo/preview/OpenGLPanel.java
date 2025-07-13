@@ -250,6 +250,9 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		var gl = glautodrawable.getGL().getGL3();
 		TextureFactory.dispose(gl);
 		shaderProgram.delete(gl);
+		for( PreviewListener p : previewListeners ) {
+			p.dispose();
+		}
 	}
 
 	/**

@@ -15,4 +15,5 @@ public interface PreviewListener {
 	 * @param shader the render context
 	 */
 	void render(ShaderProgram shader);
+	default void dispose() {}
 }
