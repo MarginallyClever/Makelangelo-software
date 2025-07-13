@@ -102,7 +102,6 @@ public abstract class ImageConverter {
 	protected void convertAlongLine(double x0,double y0,double x1,double y1,double stepSize,double channelCutoff,TransformedImage img) {
 		Point2d P0 = new Point2d(x0,y0);
 		Point2d P1 = new Point2d(x1,y1);
-
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
 		Point2d rMax = new Point2d(rect.getMaxX(),rect.getMaxY());
 		Point2d rMin = new Point2d(rect.getMinX(),rect.getMinY());
@@ -113,18 +112,16 @@ public abstract class ImageConverter {
 
 		double cx = myPaper.getCenterX();
 		double cy = myPaper.getCenterY();
-
 		var o = turtle.getPosition();
 		o.sub(P0);
 		boolean firstJump = MathHelper.lengthSquared(o.x, o.y)>2;
 		if(firstJump) turtle.jumpTo(cx+P0.x,cy+P0.y);
-			
+
 		double b;
 		double dx=P1.x-P0.x;
 		double dy=P1.y-P0.y;
 		double halfStep = stepSize/2.0;
 		double distance = Math.sqrt(dx*dx+dy*dy);
-
 		double n,x,y,v;
 		
 		for( b = 0; b <= distance; b+=stepSize ) {
@@ -134,8 +131,8 @@ public abstract class ImageConverter {
 			
 			v = img.sample( x, y , halfStep);
 
-			x+=cx;
-			y+=cy;
+			x += cx;
+			y += cy;
 			if(v<channelCutoff) turtle.moveTo(x,y);
 			else turtle.jumpTo(x,y);
 		}
