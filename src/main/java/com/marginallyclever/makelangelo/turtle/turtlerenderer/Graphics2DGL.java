@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Graphics2DGL extends Graphics2D {
     private static final Logger logger = LoggerFactory.getLogger(Graphics2DGL.class);
 
-    private final GL3 gl;
+    private GL3 gl;
     private final float[] lineWidthBuf = new float[1];
     private Paint paint = null;
     private AtomicBoolean isDisposed = new AtomicBoolean(false);
@@ -39,7 +39,9 @@ public class Graphics2DGL extends Graphics2D {
     private final Matrix4d matrix = new Matrix4d();
     private double thetaSum = 0;
 
-    public Graphics2DGL(GL3 gl2) {
+    public Graphics2DGL() {}
+
+    public void renderBegin(GL3 gl2) {
         this.gl = gl2;
 
         // save the line width
@@ -53,9 +55,16 @@ public class Graphics2DGL extends Graphics2D {
         thetaSum=0;
     }
 
+    public void renderFinish() {
+        // end drawing lines
+        mesh.render(gl);
+        // restore pen diameter
+        gl.glLineWidth(lineWidthBuf[0]);
+    }
+
     @Override
     public Graphics create() {
-        return new Graphics2DGL(gl);
+        return new Graphics2DGL();
     }
 
     @Override
@@ -342,19 +351,25 @@ public class Graphics2DGL extends Graphics2D {
     public void draw(Shape s) {
         // OpenGL does not handle shapes directly
         if(s instanceof Line2D line) {
-            if(paint instanceof GradientPaint gp) {
-                var c1 = gp.getColor1();
-                mesh.addColor(c1.getRed()/255.0f, c1.getGreen()/255.0f, c1.getBlue()/255.0f,1);
-                addVertex((float)line.getX1(), (float)line.getY1());
-                var c2 = gp.getColor2();
-                mesh.addColor(c2.getRed()/255.0f, c2.getGreen()/255.0f, c2.getBlue()/255.0f,1);
-                addVertex((float)line.getX2(), (float)line.getY2());
-            } else {
-                mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
-                addVertex((float)line.getX1(), (float)line.getY1());
-                mesh.addColor(currentColor.getRed()/255.0f, currentColor.getGreen()/255.0f, currentColor.getBlue()/255.0f, currentColor.getAlpha()/255.0f);
-                addVertex((float)line.getX2(), (float)line.getY2());
-            }
+            drawLine(line);
+        } else {
+            throw new RuntimeException("Unsupported shape type: " + s.getClass().getName());
+        }
+    }
+
+    private void drawLine(Line2D line) {
+        if (paint instanceof GradientPaint gp) {
+            var c1 = gp.getColor1();
+            mesh.addColor(c1.getRed() / 255.0f, c1.getGreen() / 255.0f, c1.getBlue() / 255.0f, 1);
+            addVertex((float) line.getX1(), (float) line.getY1());
+            var c2 = gp.getColor2();
+            mesh.addColor(c2.getRed() / 255.0f, c2.getGreen() / 255.0f, c2.getBlue() / 255.0f, 1);
+            addVertex((float) line.getX2(), (float) line.getY2());
+        } else {
+            mesh.addColor(currentColor.getRed() / 255.0f, currentColor.getGreen() / 255.0f, currentColor.getBlue() / 255.0f, currentColor.getAlpha() / 255.0f);
+            addVertex((float) line.getX1(), (float) line.getY1());
+            mesh.addColor(currentColor.getRed() / 255.0f, currentColor.getGreen() / 255.0f, currentColor.getBlue() / 255.0f, currentColor.getAlpha() / 255.0f);
+            addVertex((float) line.getX2(), (float) line.getY2());
         }
     }
 
@@ -513,10 +528,9 @@ public class Graphics2DGL extends Graphics2D {
     @Override
     public void dispose() {
         if(isDisposed.getAndSet(true)) return;  // already disposed.
+    }
 
-        // end drawing lines
-        mesh.render(gl);
-        // restore pen diameter
-        gl.glLineWidth(lineWidthBuf[0]);
+    public void setContext(GL3 context) {
+        gl = context;
     }
 }
