@@ -34,7 +34,6 @@ public class InfillTurtle {
 		// confirmTurtleIsClosedLoop(input);
 
 		Turtle result = new Turtle();
-		result.getLayers().clear();
 
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
