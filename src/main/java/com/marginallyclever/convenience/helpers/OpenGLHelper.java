@@ -1,46 +1,51 @@
 package com.marginallyclever.convenience.helpers;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.glu.GLU;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
- * A collection of static functions to help with OpenGL.
- * @author Dan Royer
- * @since 7.30.0
+ * A collection of static methods to help with OpenGL.
+ *
  */
 public class OpenGLHelper {
-	static public int drawAtopEverythingStart(GL2 gl2) {
-		IntBuffer depthFunc = IntBuffer.allocate(1);
-		gl2.glGetIntegerv(GL2.GL_DEPTH_FUNC, depthFunc);
-		gl2.glDepthFunc(GL2.GL_ALWAYS);
+	private static final IntBuffer depthFunc = IntBuffer.allocate(1);
+	private static final FloatBuffer lineWidth = FloatBuffer.allocate(1);
+
+	public static int drawAtopEverythingStart(GL3 gl) {
+		gl.glGetIntegerv(GL3.GL_DEPTH_FUNC, depthFunc);
+		gl.glDepthFunc(GL3.GL_ALWAYS);
 		return depthFunc.get();
 	}
-	
-	static public void drawAtopEverythingEnd(GL2 gl2, int previousState) {
-		gl2.glDepthFunc(previousState);
-	}
-	
-	static public boolean disableLightingStart(GL2 gl2) {
-		boolean lightWasOn = gl2.glIsEnabled(GL2.GL_LIGHTING);
-		gl2.glDisable(GL2.GL_LIGHTING);
-		return lightWasOn;
-	}
-	static public void disableLightingEnd(GL2 gl2,boolean lightWasOn) {
-		if(lightWasOn) gl2.glEnable(GL2.GL_LIGHTING);
+
+	public static void checkGLError(GL3 gl3,org.slf4j.Logger logger) {
+		int err = gl3.glGetError();
+		if(err != GL.GL_NO_ERROR) {
+			GLU glu = GLU.createGLU(gl3);
+			logger.error("GL error {}: {}", err, glu.gluErrorString(err));
+		}
 	}
 
-	static public float setLineWidth(GL2 gl2,float newWidth) {
-		FloatBuffer lineWidth = FloatBuffer.allocate(1);
-		gl2.glGetFloatv(GL2.GL_LINE_WIDTH, lineWidth);
-		gl2.glLineWidth(newWidth);
+	public static void drawAtopEverythingEnd(GL3 gl, int previousState) {
+		gl.glDepthFunc(previousState);
+	}
+
+	public static float setLineWidth(GL3 gl,float newWidth) {
+		gl.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidth);
+		gl.glLineWidth(newWidth);
 		return lineWidth.get(0);
 	}
+
+	public static boolean disableTextureStart(GL3 gl) {
+		boolean b = gl.glIsEnabled(GL3.GL_TEXTURE_2D);
+		gl.glDisable(GL3.GL_TEXTURE_2D);
+		return b;
+	}
 	
-	static public double [] getCurrentColor(GL2 gl2) {
-		double [] rgba = new double[4];
-		gl2.glGetDoublev(GL2.GL_CURRENT_COLOR, rgba, 0);
-		return rgba;
+	public static void disableTextureEnd(GL3 gl,boolean oldState) {
+		if(oldState) gl.glEnable(GL3.GL_TEXTURE_2D);
 	}
 }

@@ -1,17 +1,19 @@
 package com.marginallyclever.makelangelo.preview;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 
 /**
  * {@link PreviewListener} instances can register to the {@link OpenGLPanel}.
  * {@link OpenGLPanel} will call {@code render()} on all PreviewListeners in the order
- * they are registered, and pass to the listeners an OpenGL {@link GL2} render context.
+ * they are registered, and pass to the listeners an OpenGL {@link GL3} render context.
  * @author Dan Royer
  */
 public interface PreviewListener {
 	/**
 	 * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
-	 * @param gl2 the render context
+	 *
+	 * @param shader the render context
 	 */
-	void render(GL2 gl2);
+	void render(ShaderProgram shader);
+	default void dispose() {}
 }

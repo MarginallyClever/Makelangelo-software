@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 /**
  * Each {@link PlotterRenderer} renders a {@link Plotter} with custom graphics.  That is to say it draws the machine,
@@ -15,9 +15,9 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 public interface PlotterRenderer {
 	/**
 	 * Custom look and feel for each version
-	 * 
-	 * @param gl2   the render context
-	 * @param robot the machine to draw.
+	 *
+	 * @param shader the render context
+	 * @param robot  the machine to draw.
 	 */
-	void render(GL2 gl2, Plotter robot);
+	void render(ShaderProgram shader, Plotter robot);
 }

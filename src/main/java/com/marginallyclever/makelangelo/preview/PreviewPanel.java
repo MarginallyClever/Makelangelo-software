@@ -143,10 +143,10 @@ public class PreviewPanel extends JPanel {
     }
 
     private void addPlotterRendererToPreviewPanel() {
-        openGLPanel.addListener((gl2)->{
+        openGLPanel.addListener((shader)->{
             if(myPlotterRenderer!=null) {
                 myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
-                myPlotterRenderer.render(gl2, myPlotter);
+                myPlotterRenderer.render(shader, myPlotter);
             }
         });
     }

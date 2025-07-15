@@ -4,25 +4,27 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
-
+import com.marginallyclever.convenience.helpers.ResourceHelper;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.vecmath.Matrix4d;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
+import javax.vecmath.Vector3d;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
  * OpenGL hardware accelerated WYSIWYG view.
- * @author Dan Royer
- *
  */
 public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelListener, MouseListener, MouseMotionListener {
 	private static final Logger logger = LoggerFactory.getLogger(OpenGLPanel.class);
@@ -38,6 +40,8 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	private Camera camera;
 
 	public Color backgroundColor = new Color(255-67,255-67,255-67);
+
+	private ShaderProgram shaderProgram;
 
 	/**
 	 * button state tracking
@@ -201,29 +205,12 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	 * Startup OpenGL.  Turn on debug pipeline(s) if needed.
 	 */
 	@Override
-	public void init(GLAutoDrawable glautodrawable) {
+	public void init(GLAutoDrawable glAutoDrawable) {
 		logger.debug("init");
-		GL gl = glautodrawable.getGL();
 
-		if (DEBUG_GL_ON) {
-			try {
-				// Debug ..
-				gl = gl.getContext().setGL(GLPipelineFactory.create("com.jogamp.opengl.Debug", null, gl, null));
-			} catch (Exception e) {
-				logger.error("Failed to init OpenGL debug pipeline", e);
-			}
-		}
+		activatePipelines(glAutoDrawable);
 
-		if (TRACE_GL_ON) {
-			try {
-				// Trace ..
-				gl = gl.getContext().setGL(
-						GLPipelineFactory.create("com.jogamp.opengl.Trace", null, gl, new Object[] { System.err }));
-			} catch (Exception e) {
-				logger.error("Failed to init OpenGL trace", e);
-			}
-		}
-		
+		var gl = glAutoDrawable.getGL().getGL3();
 		glu = GLU.createGLU(gl);
 
 		// turn on vsync
@@ -234,21 +221,47 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		gl.glEnable(GL3.GL_POLYGON_SMOOTH);
 		gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
 		gl.glEnable(GL3.GL_MULTISAMPLE);
+
+		try {
+			shaderProgram = new ShaderProgram(gl,
+					ResourceHelper.readResource(this.getClass(), "default.vert"),
+					ResourceHelper.readResource(this.getClass(), "default.frag"));
+		} catch(Exception e) {
+			logger.error("Failed to load shader", e);
+		}
+	}
+
+	private void activatePipelines(GLAutoDrawable glautodrawable) {
+		GL3 gl = glautodrawable.getGL().getGL3();
+		if (DEBUG_GL_ON) {
+			logger.info("Activating debug pipeline");
+			gl = new DebugGL3(gl);
+		}
+		if (TRACE_GL_ON) {
+			logger.info("Activating trace pipeline");
+			gl = new TraceGL3(gl, new PrintStream(System.out));
+		}
+		glautodrawable.setGL(gl);
 	}
 
 	@Override
 	public void dispose(GLAutoDrawable glautodrawable) {
 		logger.info("dispose");
-		TextureFactory.dispose(glautodrawable.getGL());
+		var gl = glautodrawable.getGL().getGL3();
+		TextureFactory.dispose(gl);
+		shaderProgram.delete(gl);
+		for( PreviewListener p : previewListeners ) {
+			p.dispose();
+		}
 	}
 
 	/**
 	 * Refresh the image in the view.  This is where drawing begins.
 	 */
 	@Override
-	public void display(GLAutoDrawable glautodrawable) {
+	public void display(GLAutoDrawable glAutoDrawable) {
 		// draw the world
-		GL2 gl2 = glautodrawable.getGL().getGL2();
+		var gl = glAutoDrawable.getGL().getGL3();
 
 		camera.setWidth(canvasWidth);
 		camera.setHeight(canvasHeight);
@@ -256,63 +269,83 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		// set some render quality options
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		if(prefs != null && prefs.getBoolean("antialias", true)) {
-			gl2.glEnable(GL2.GL_LINE_SMOOTH);
-			gl2.glEnable(GL2.GL_POLYGON_SMOOTH);
-			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_NICEST);
+			gl.glEnable(GL3.GL_LINE_SMOOTH);
+			gl.glEnable(GL3.GL_POLYGON_SMOOTH);
+			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
 		} else {
-			gl2.glDisable(GL2.GL_LINE_SMOOTH);
-			gl2.glDisable(GL2.GL_POLYGON_SMOOTH);
-			gl2.glHint(GL2.GL_POLYGON_SMOOTH_HINT, GL2.GL_FASTEST);
+			gl.glDisable(GL3.GL_LINE_SMOOTH);
+			gl.glDisable(GL3.GL_POLYGON_SMOOTH);
+			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_FASTEST);
 		}
 		
 		// turn on blending
-		gl2.glEnable(GL2.GL_BLEND);
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glEnable(GL3.GL_BLEND);
+		gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
 		
-		paintBackground(gl2);
-		paintCamera(gl2);
+		paintBackground(gl);
+
+		gl.glDisable(GL3.GL_DEPTH_TEST);
+		paintCamera(gl);
 
 		for( PreviewListener p : previewListeners ) {
-			gl2.glPushMatrix();
-			p.render(gl2);
-			gl2.glPopMatrix();
+			p.render(shaderProgram);
 		}
+
+		//renderTestTriangle(gl);
+
+		gl.glEnable(GL3.GL_DEPTH_TEST);
 	}
 
+	private void renderTestTriangle(GL3 gl) {
+		float d = 150f;
+		Mesh triangleMesh = new Mesh();
+		triangleMesh.setRenderStyle(GL3.GL_TRIANGLES);
+		triangleMesh.addColor(1.0f, 0.0f, 0.0f, 1.0f);  triangleMesh.addVertex(0.0f, d, 0.0f);
+		triangleMesh.addColor(0.0f, 1.0f, 0.0f, 1.0f);  triangleMesh.addVertex(-d, -d, 0.0f);
+		triangleMesh.addColor(0.0f, 0.0f, 1.0f, 1.0f);  triangleMesh.addVertex(d, -d, 0.0f);
+		triangleMesh.render(gl);
+	}
 
 	/**
 	 * Set up the correct modelview so the robot appears where it should.
-	 *
-	 * @param gl2 OpenGL context
+	 * @param gl OpenGL context
 	 */
-	private void paintCamera(GL2 gl2) {
-		gl2.glMatrixMode(GL2.GL_PROJECTION);
-		gl2.glLoadIdentity();
-		// orthographic projection
-		float w2 = canvasWidth/2.0f;
-		float h2 = canvasHeight/2.0f;
-		glu.gluOrtho2D(-w2, w2, -h2, h2);
+	private void paintCamera(GL3 gl) {
+		shaderProgram.use(gl);
+		var projectionMatrix = camera.getOrthographicMatrix(canvasWidth,canvasHeight);
+		shaderProgram.setMatrix4d(gl,"projectionMatrix", projectionMatrix);
 
-		gl2.glMatrixMode(GL2.GL_MODELVIEW);
-		gl2.glLoadIdentity();
-		gl2.glScaled(camera.getZoom(),camera.getZoom(),1);
-		gl2.glTranslated(-camera.getX(), camera.getY(),0);
+		var m = camera.getViewMatrix();
+		shaderProgram.setVector3d(gl,"cameraPos", new Vector3d(m.m03,m.m13,m.m23));
+		shaderProgram.setMatrix4d(gl,"viewMatrix", m);
+
+		var identity = new Matrix4d();
+		identity.setIdentity();
+		shaderProgram.setMatrix4d(gl,"modelMatrix", identity);
+
+		shaderProgram.setColor(gl, "lightColor", Color.WHITE);
+		shaderProgram.setColor(gl, "diffuseColor", Color.WHITE);
+		shaderProgram.setColor(gl, "specularColor", Color.WHITE);
+		shaderProgram.setColor(gl,"ambientColor",Color.BLACK);
+		shaderProgram.set1i(gl,"useTexture",0);
+		shaderProgram.set1i(gl,"useLighting",0);
+		shaderProgram.set1i(gl,"useVertexColor",1);
 	}
 
 	/**
 	 * Clear the panel
 	 *
-	 * @param gl2 OpenGL context
+	 * @param gl OpenGL context
 	 */
-	private void paintBackground(GL2 gl2) {
+	private void paintBackground(GL3 gl) {
 		// Clear The Screen And The Depth Buffer
-		gl2.glClearColor(
+		gl.glClearColor(
 				(float)backgroundColor.getRed()/255.0f,
 				(float)backgroundColor.getGreen()/255.0f,
 				(float)backgroundColor.getBlue()/255.0f,
 				0.0f);
 
-		gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 	}
 
 	public void stop() {

@@ -1,6 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
 import com.marginallyclever.makelangelo.Translator;
@@ -12,6 +12,7 @@ import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
@@ -246,23 +247,25 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
         writeOutCells();
     }
 
-    protected void renderEdges(GL2 gl2) {
-        gl2.glColor3d(0.9, 0.9, 0.9);
+    protected void renderEdges(GL3 gl) {
+/*
+        gl.glColor3d(0.9, 0.9, 0.9);
 
         double cx = myPaper.getCenterX();
         double cy = myPaper.getCenterY();
-        gl2.glPushMatrix();
-        gl2.glTranslated(cx, cy, 0);
+        gl.glPushMatrix();
+        gl.glTranslated(cx, cy, 0);
 
         for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
             Polygon poly = voronoiDiagram.getHull(i);
-            gl2.glBegin(GL2.GL_LINE_LOOP);
+            gl.glBegin(GL3.GL_LINE_LOOP);
             for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
-                gl2.glVertex2d(p.x, p.y);
+                gl.glVertex2d(p.x, p.y);
             }
-            gl2.glEnd();
+            gl.glEnd();
         }
-        gl2.glPopMatrix();
+        gl.glPopMatrix();
+        */
     }
 
     public void setNumCells(int value) {
@@ -301,10 +304,10 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     /**
      * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
      *
-     * @param gl2 the render context
+     * @param shader the render context
      */
     @Override
-    public void render(GL2 gl2) {
+    public void render(ShaderProgram shader) {/*
         ImageConverterThread thread = getThread();
         if(thread==null || thread.getPaused()) return;
 
@@ -312,11 +315,11 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
 
         lock.lock();
         try {
-            renderEdges(gl2);
+            renderEdges(gl);
         }
         finally {
             lock.unlock();
-        }
+        }*/
     }
 
     public int getLowpassCutoff() {

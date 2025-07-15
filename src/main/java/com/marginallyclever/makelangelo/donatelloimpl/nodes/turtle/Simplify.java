@@ -9,6 +9,10 @@ import com.marginallyclever.makelangelo.donatelloimpl.ports.OutputTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
+/**
+ * Decimate a line collection to remove redundant points.
+ * Uses the <a href="https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm">Ramer-Douglas-Peucker algorithm</a>.
+ */
 public class Simplify extends Node {
     private final InputTurtle inputTurtle = new InputTurtle("input");
     private final OutputTurtle outputTurtle = new OutputTurtle("output");

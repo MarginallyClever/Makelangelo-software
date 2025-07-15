@@ -223,8 +223,9 @@ public class Turtle implements Cloneable {
 	public void penDown() {
 		if(isUp) {
 			isUp = false;
-			strokeLayers.getLast().add(new Line2d());
-			strokeLayers.getLast().getLast().add(new Point2d(p.x, p.y));
+			var layer = strokeLayers.getLast();
+			layer.add(new Line2d());
+			layer.getLast().add(new Point2d(p.x, p.y));
 		}
 	}
 	

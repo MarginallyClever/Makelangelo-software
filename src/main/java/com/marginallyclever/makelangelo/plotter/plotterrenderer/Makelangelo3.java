@@ -1,8 +1,8 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.plotter.Plotter;
-import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 /**
  * Deprecated because it cannot find home.
@@ -12,19 +12,19 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 public class Makelangelo3 implements PlotterRenderer {
 
 	@Override
-	public void render(GL2 gl2,Plotter robot) {
-		paintControlBox(gl2,robot);
-		Polargraph.paintMotors(gl2,robot);
+	public void render(ShaderProgram shader, Plotter robot) {
+		paintControlBox(shader,robot);
+		Polargraph.paintMotors(shader,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(gl2,robot);		
+			Polargraph.paintPenHolderToCounterweights(shader,robot);
 	}
 
 	/**
 	 * paint the controller and the LCD panel
-	 * @param gl2
-	 * @param plotter
+	 * @param shader the shader to use for rendering
+	 * @param plotter the plotter to render
 	 */
-	private void paintControlBox(GL2 gl2,Plotter plotter) {
+	private void paintControlBox(ShaderProgram shader,Plotter plotter) {/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -37,7 +37,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glColor3f(1,0.8f,0.5f);
 		float w =80;
 		float h = 50;
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -45,7 +45,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glEnd();
 
 		// wires to each motor
-		gl2.glBegin(GL2.GL_LINES);
+		gl2.glBegin(GL3.GL_LINES);
 		float SPACING=2f;
 		float y=SPACING*-1.5f;
 		gl2.glColor3f(1, 0, 0);		gl2.glVertex2d(0, y);	gl2.glVertex2d(left, y);  y+=SPACING;
@@ -64,7 +64,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		h = 75f/2;
 		w = 135f/2;
 		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -73,10 +73,10 @@ public class Makelangelo3 implements PlotterRenderer {
 
 		renderLCD(gl2);
 
-		gl2.glPopMatrix();
+		gl2.glPopMatrix();*/
 	}
 	
-	private void renderLCD(GL2 gl2) {
+	private void renderLCD(GL3 gl2) {/*
 		// position
 		gl2.glPushMatrix();
 		gl2.glTranslated(-180, 0, 0);
@@ -85,7 +85,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		float w = 80f;
 		float h = 50f;
 		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -96,7 +96,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		w = 150f/2;
 		h = 56f/2;
 		gl2.glColor3f(0.8f,0.0f,0.0f);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -110,7 +110,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		w = 98f/2;
 		h = 60f/2;
 		gl2.glColor3f(0,0.6f,0.0f);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -120,7 +120,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		// LCD black
 		h = 40f/2;
 		gl2.glColor3f(0,0,0);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -131,7 +131,7 @@ public class Makelangelo3 implements PlotterRenderer {
 		h = 25f/2;
 		w = 75f/2;
 		gl2.glColor3f(0,0,0.7f);
-		gl2.glBegin(GL2.GL_QUADS);
+		gl2.glBegin(GL3.GL_QUADS);
 		gl2.glVertex2d(-w, h);
 		gl2.glVertex2d(+w, h);
 		gl2.glVertex2d(+w, -h);
@@ -141,6 +141,6 @@ public class Makelangelo3 implements PlotterRenderer {
 		gl2.glPopMatrix();
 
 		// clean up
-		gl2.glPopMatrix();
+		gl2.glPopMatrix();*/
 	}
 }
