@@ -14,8 +14,21 @@
 			<useProjectArtifact>true</useProjectArtifact>
 			<scope>runtime</scope>
 			<unpack>true</unpack>
+			<excludes>
+				<exclude>logback.xml</exclude>
+				<exclude>**/logback.xml</exclude>
+			</excludes>
 		</dependencySet>
 	</dependencySets>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<outputDirectory>/</outputDirectory>
+			<includes>
+				<include>logback.xml</include>
+			</includes>
+		</fileSet>
+	</fileSets>
 	<containerDescriptorHandlers>
 		<containerDescriptorHandler>
 			<handlerName>metaInf-services</handlerName>
