@@ -1,12 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.donatello.select.SelectToggleButton;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +86,9 @@ public abstract class ImageConverterIterative extends ImageConverter implements 
 
     /**
      * Callback from {@link OpenGLPanel} that it is time to render to the WYSIWYG display.
-     * @param gl2 the render context
+     *
+     * @param shader the render context
      */
     @Override
-    public void render(GL2 gl2) {}
+    public void render(ShaderProgram shader) {}
 }

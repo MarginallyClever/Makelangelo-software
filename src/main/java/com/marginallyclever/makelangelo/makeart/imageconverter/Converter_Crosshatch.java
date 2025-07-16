@@ -1,57 +1,69 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Crosshatch is a technique for creating a shading effect by drawing intersecting lines.
+ * This converter applies multiple passes of crosshatch lines at different angles and intensities.
+ * Adaptive intensities idea by Twitch user Harkish.
+ */
 public class Converter_Crosshatch extends ImageConverter {
-	private static double intensity=2.0f;
-	private static double pass90=16.0f;
-	private static double pass75=32.0f;
-	private static double pass15=64.0f;
-	private static double pass45=192.0f;
+	public static class CrosshatchPass {
+		public double angle; // 0...360
+		public double cutoff;  // 0...255
+		public double intensity;  // 1...100
+
+		public CrosshatchPass(double angle, double cutoff, double intensity) {
+			this.angle = angle;
+			this.cutoff = cutoff;
+			this.intensity = intensity;
+		}
+	}
+	private static final List<CrosshatchPass> passes = new ArrayList<CrosshatchPass>();
 
 	public Converter_Crosshatch() {
 		super();
-		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 100, 1, (int) (getIntensity() * 10.0));
+
+		if(passes.isEmpty()) {
+			passes.add(new CrosshatchPass(90,16, 16.0/10.0));
+			passes.add(new CrosshatchPass(75,32, 32.0/10.0));
+			passes.add(new CrosshatchPass(15,64, 64.0/10.0));
+			passes.add(new CrosshatchPass(45,192, 192.0/10.0));
+		}
+
+		for(int i=0;i<passes.size();++i) {
+			CrosshatchPass pass = passes.get(i);
+			addPassUI(pass,i==0);
+		}
+	}
+
+	private void addPassUI(CrosshatchPass pass,boolean isFirst) {
+		if(!isFirst) {
+			// add a separator between passes
+		}
+
+		SelectSlider selectIntesity = new SelectSlider("intensity", Translator.get("ConverterIntensity"), 25, 1, (int) (pass.intensity));
 		selectIntesity.addSelectListener(evt->{
-			setIntensity((float)((int)evt.getNewValue())/10.0f);
+			pass.intensity = (int)evt.getNewValue();
 			fireRestart();
 		});
 		add(selectIntesity);
 
-		SelectSlider selectPass90 = new SelectSlider("pass90", Translator.get("pass90"), 256, 0, (int) getPass90());
-		selectPass90.addSelectListener((evt)-> {
-			setPass90((int)evt.getNewValue());
+		SelectSlider selectCutoff = new SelectSlider("cutoff", Translator.get("Converter_VoronoiStippling.Cutoff"), 255, 0, (int) pass.cutoff);
+		selectCutoff.addSelectListener(evt->{
+			pass.cutoff = (int)evt.getNewValue();
 			fireRestart();
 		});
-		add(selectPass90);
-
-		SelectSlider selectPass75 = new SelectSlider("pass75",Translator.get("pass75"),256,0,(int)getPass75());
-		selectPass75.addSelectListener((evt)-> {
-			setPass75((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(selectPass75);
-
-		SelectSlider selectPass45 = new SelectSlider("pass45",Translator.get("pass45"),256,0,(int)getPass45());
-		selectPass45.addSelectListener((evt)-> {
-			setPass45((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(selectPass45);
-
-		SelectSlider selectPass15 = new SelectSlider("pass15",Translator.get("pass15"),256,0,(int)getPass15());
-		selectPass15.addSelectListener((evt)-> {
-			setPass15((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(selectPass15);
+		add(selectCutoff);
 	}
 
 	@Override
@@ -59,30 +71,6 @@ public class Converter_Crosshatch extends ImageConverter {
 		return Translator.get("Crosshatch");
 	}
 
-	public void setIntensity(double arg0) {
-		intensity=arg0;
-	}
-	
-	public double getIntensity() {
-		return intensity;
-	}
-	
-	public double getPass90() {
-		return pass90;
-	}
-
-	public double getPass75() {
-		return pass75;
-	}
-
-	public double getPass15() {
-		return pass15;
-	}
-
-	public double getPass45() {
-		return pass45;
-	} 
-	
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
@@ -91,21 +79,22 @@ public class Converter_Crosshatch extends ImageConverter {
 		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
-		finishPass(new int[]{(int)pass90},90,img);
-		finishPass(new int[]{(int)pass75},75,img);
-		finishPass(new int[]{(int)pass15},15,img);
-		finishPass(new int[]{(int)pass45},45,img);
+        for (CrosshatchPass pass : passes) {
+            finishPass(new int[]{(int) pass.cutoff}, pass, img);
+        }
 
 		fireConversionFinished();
 	}
 	
-	private void finishPass(int [] passes,double angleDeg,TransformedImage img) {
-		double dx = Math.cos(Math.toRadians(angleDeg));
-		double dy = Math.sin(Math.toRadians(angleDeg));
+	private void finishPass(int [] passes,CrosshatchPass pass,TransformedImage img) {
+		double dx = Math.cos(Math.toRadians(pass.angle));
+		double dy = Math.sin(Math.toRadians(pass.angle));
 
 		// figure out how many lines we're going to have on this image.
-		double stepSize = intensity/2.0;
+		double stepSize = pass.intensity/2.0;
 		if (stepSize < 1) stepSize = 1;
+
+		int stepSize2 = Math.max(1,(int)(stepSize/2));
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
@@ -132,13 +121,13 @@ public class Converter_Crosshatch extends ImageConverter {
 			double x1 = px + dy * maxLen;
 			double y1 = py - dx * maxLen;
 		
-			double l2 = passes[(i % passes.length)];
+			double cutoff = passes[(i % passes.length)];
 			if ((i % 2) == 0) {
-				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(x0, y0, x1, y1, stepSize2, cutoff, img);
+				else convertAlongLineErrorTerms(x0,y0,x1,y1,stepSize2,cutoff,error0,error1,img);
 			} else {
-				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize, l2, img);
-				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize,l2,error0,error1,img);
+				if(!useError) convertAlongLine(x1, y1, x0, y0, stepSize2, cutoff, img);
+				else convertAlongLineErrorTerms(x1,y1,x0,y0,stepSize2,cutoff,error0,error1,img);
 			}
 			for(int j=0;j<error0.length;++j) {
 				error0[j]=error1[error0.length-1-j];
@@ -146,21 +135,5 @@ public class Converter_Crosshatch extends ImageConverter {
 			}
 			++i;
 		}
-	}
-
-	public void setPass90(int newValue) {
-		Converter_Crosshatch.pass90 = newValue;
-	}
-
-	public void setPass75(int newValue) {
-		Converter_Crosshatch.pass75 = newValue;
-	}
-
-	public void setPass15(int newValue) {
-		Converter_Crosshatch.pass15 = newValue;
-	}
-
-	public void setPass45(int newValue) {
-		Converter_Crosshatch.pass45 = newValue;
 	}
 }

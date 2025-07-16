@@ -1,9 +1,10 @@
 package com.marginallyclever.makelangelo.plotter.plotterrenderer;
 
-import com.jogamp.opengl.GL2;
-
+import com.jogamp.opengl.GL3;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.plotter.Plotter;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 
 import javax.vecmath.Point2d;
 
@@ -11,211 +12,123 @@ import javax.vecmath.Point2d;
  * @author Dan Royer
  */
 public class Zarplotter implements PlotterRenderer {
-	final public double ZAR_MOTOR_MOUNT_SIZE=45; //cm
-	final public double ZAR_PLOTTER_SIZE=60; //cm
-	final public double ZAR_PLOTTER_OUTER_SIZE=70; //cm
-	final public double ZAR_PLOTTER_HOLE_SIZE=20; //cm
-	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
+	final public float ZAR_MOTOR_MOUNT_SIZE=45; //cm
+	final public float ZAR_PLOTTER_SIZE=60; //cm
+	final public float ZAR_PLOTTER_OUTER_SIZE=70; //cm
+	final public float ZAR_PLOTTER_HOLE_SIZE=20; //cm
+	final public float ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(GL2 gl2,Plotter robot) {
-		paintMotors(gl2,robot);
-		paintControlBox(gl2,robot);
+	public void render(ShaderProgram shader, Plotter robot) {
+		paintMotors(shader,robot);
+		paintControlBox(shader,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(gl2,robot);		
+			paintPenHolderToCounterweights(shader,robot);
 	}
 
-	private void paintPenHolderToCounterweights(GL2 gl2, Plotter robot) {
+	private void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
 		Point2d pos = robot.getPos();
-		double gx = pos.x;
-		double gy = pos.y;
+		float gx = (float)pos.x;
+		float gy = (float)pos.y;
 
-		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
-		double bottom = settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
-		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
-		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
+		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
+		float bottom = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM);
+		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
+		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		gl2.glEnable(GL2.GL_BLEND);
-		gl2.glBlendFunc(GL2.GL_SRC_ALPHA,GL2.GL_ONE_MINUS_SRC_ALPHA);
-		
-		gl2.glColor4d(0, 0, 0,0.5);
+		var gl = shader.getContext();
+		gl.glEnable(GL3.GL_BLEND);
+		gl.glBlendFunc(GL3.GL_SRC_ALPHA,GL3.GL_ONE_MINUS_SRC_ALPHA);
+
 		// plotter
-		gl2.glPushMatrix();
-		gl2.glTranslated(gx, gy, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_OUTER_SIZE/2);
+		Mesh plotter = new Mesh();
+		plotter.setRenderStyle(GL3.GL_QUADS);
+		plotter.addColor(0,0,0,0.5f);
 
-		gl2.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d( ZAR_PLOTTER_HOLE_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2,  ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_HOLE_SIZE/2, -ZAR_PLOTTER_HOLE_SIZE/2);
-
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
-		gl2.glVertex2d(-ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_OUTER_SIZE/2);
-		gl2.glVertex2d(+ZAR_PLOTTER_OUTER_SIZE/2, +ZAR_PLOTTER_HOLE_SIZE/2);
-
-		gl2.glEnd();
-		gl2.glPopMatrix();
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_OUTER_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_OUTER_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_HOLE_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_HOLE_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_HOLE_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_HOLE_SIZE/2, gy-ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.addVertex(gx-ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_OUTER_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_OUTER_SIZE/2, 0);
+		plotter.addVertex(gx+ZAR_PLOTTER_OUTER_SIZE/2, gy+ZAR_PLOTTER_HOLE_SIZE/2, 0);
+		plotter.render(gl);
 
 		// belt from motors to plotter
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, top   -ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(left +ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
-		gl2.glVertex2d(right-ZAR_MOTOR_MOUNT_SIZE, bottom+ZAR_MOTOR_MOUNT_SIZE);	gl2.glVertex2d(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2);
-		gl2.glEnd();
+		Mesh belt = new Mesh();
+		belt.setRenderStyle(GL3.GL_LINES);
+
+		belt.addVertex(gx+left +ZAR_MOTOR_MOUNT_SIZE, gy+top   -ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx-ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2,0);
+		belt.addVertex(gx+right-ZAR_MOTOR_MOUNT_SIZE, gy+top   -ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx+ZAR_PLOTTER_SIZE/2, gy+ZAR_PLOTTER_SIZE/2,0);
+		belt.addVertex(gx+left +ZAR_MOTOR_MOUNT_SIZE, gy+bottom+ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx-ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2,0);
+		belt.addVertex(gx+right-ZAR_MOTOR_MOUNT_SIZE, gy+bottom+ZAR_MOTOR_MOUNT_SIZE,0);	belt.addVertex(gx+ZAR_PLOTTER_SIZE/2, gy-ZAR_PLOTTER_SIZE/2,0);
+		belt.render(gl);
 	}
 
-	private void paintMotors(GL2 gl2,Plotter plotter) {
-		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
-		double bottom = plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
-		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
-		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
+	private void paintMotors(ShaderProgram shader,Plotter plotter) {
+		/*
+		float top = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		float bottom = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
+		float right = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
+		float left = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 
-
-		gl2.glPushMatrix();		gl2.glTranslated(left , top   , 0);		gl2.glRotated(270, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(right, top   , 0);		gl2.glRotated(180, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(right, bottom, 0);		gl2.glRotated( 90, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
-		gl2.glPushMatrix();		gl2.glTranslated(left , bottom, 0);		gl2.glRotated(  0, 0, 0, 1);		paintOneMotor(gl2);		gl2.glPopMatrix();
+		gl2.glTranslated(left , top   , 0);  gl2.glRotated(270, 0, 0, 1);  paintOneMotor(gl2);
+		gl2.glTranslated(right, top   , 0);  gl2.glRotated(180, 0, 0, 1);  paintOneMotor(gl2);
+		gl2.glTranslated(right, bottom, 0);  gl2.glRotated( 90, 0, 0, 1);  paintOneMotor(gl2);
+		gl2.glTranslated(left , bottom, 0);  gl2.glRotated(  0, 0, 0, 1);  paintOneMotor(gl2);
+		*/
 	}
 
-	private void paintOneMotor(GL2 gl2) {
+	private void paintOneMotor(GL3 gl) {
 		// frame
-		gl2.glColor3f(1, 0.8f, 0.5f);
-		gl2.glBegin(GL2.GL_TRIANGLE_FAN);
-		gl2.glVertex2d(0                   , 0                   );
-		gl2.glVertex2d(0                   , ZAR_MOTOR_MOUNT_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, ZAR_MOTOR_MOUNT_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_MOUNT_SIZE, 0                   );
-		gl2.glVertex2d(0                   , 0                   );
-		gl2.glEnd();
-		
+		Mesh frame = new Mesh();
+		frame.setRenderStyle(GL3.GL_TRIANGLE_FAN);
+		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , 0                   ,0);
+		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , ZAR_MOTOR_MOUNT_SIZE,0);
+		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(ZAR_MOTOR_MOUNT_SIZE, ZAR_MOTOR_MOUNT_SIZE,0);
+		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(ZAR_MOTOR_MOUNT_SIZE, 0                   ,0);
+		frame.addColor(1, 0.8f, 0.5f,1.0f);  frame.addVertex(0                   , 0                   ,0);
+		frame.render(gl);
+
 		// motor
-		gl2.glColor3f(0, 0, 0);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(0                  , 0                  );
-		gl2.glVertex2d(0                  , ZAR_MOTOR_BODY_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE);
-		gl2.glVertex2d(ZAR_MOTOR_BODY_SIZE, 0                  );
-		gl2.glVertex2d(0                  , 0                  );
-		gl2.glEnd();
+		Mesh motor = new Mesh();
+		motor.setRenderStyle(GL3.GL_QUADS);
+		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , 0                  ,0);
+		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , ZAR_MOTOR_BODY_SIZE,0);
+		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(ZAR_MOTOR_BODY_SIZE, ZAR_MOTOR_BODY_SIZE,0);
+		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(ZAR_MOTOR_BODY_SIZE, 0                  ,0);
+		motor.addColor(0, 0, 0, 1.0f);  motor.addVertex(0                  , 0                  ,0);
+		motor.render(gl);
 	}
 	
-	private void paintControlBox(GL2 gl2,Plotter plotter) {
-		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
-		double cx = 0;
+	private void paintControlBox(ShaderProgram shader,Plotter plotter) {
+		float cy = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
+		float cx = 0;
 
-		gl2.glPushMatrix();
-		gl2.glTranslated(cx, cy, 0);
-
-		gl2.glScaled(10, 10, 1);
-		
+		Mesh mesh = new Mesh();
+		mesh.setRenderStyle(GL3.GL_QUADS);
 		// mounting plate for PCB
-		gl2.glColor3f(1,0.8f,0.5f);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-8, 5);
-		gl2.glVertex2d(+8, 5);
-		gl2.glVertex2d(+8, -5);
-		gl2.glVertex2d(-8, -5);
-		gl2.glEnd();
-		
+		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx-80, cy+50,0);
+		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx+80, cy+50,0);
+		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx+80, cy-50,0);
+		mesh.addColor(1,0.8f,0.5f,1.0f);  mesh.addVertex(cx-80, cy-50,0);
 		// RUMBA in v3 (135mm*75mm)
-		float h = 7.5f/2;
-		float w = 13.5f/2;
-		gl2.glColor3d(0.9,0.9,0.9);
-		gl2.glBegin(GL2.GL_QUADS);
-		gl2.glVertex2d(-w, h);
-		gl2.glVertex2d(+w, h);
-		gl2.glVertex2d(+w, -h);
-		gl2.glVertex2d(-w, -h);
-		gl2.glEnd();
+		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx-67.5f, cy+37.5f, 0);
+		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx+67.5f, cy+37.5f, 0);
+		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx+67.5f, cy-37.5f, 0);
+		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx-67.5f, cy-37.5f, 0);
 
-		gl2.glPopMatrix();
+		mesh.render(shader.getContext());
 	}
-/*
-	@Override
-	public Point2d getHome() {
-		return new Point2d(0,0);
-	}
-	
-	@Override
-	public String getVersion() {
-		return "6";
-	}
-
-	@Override
-	public boolean canAutoHome() {
-		return false;
-	}
-
-	@Override
-	public boolean canChangeMachineSize() {
-		return true;
-	}
-
-	@Override
-	public boolean canAccelerate() {
-		return true;
-	}
-
-	@Override
-	public boolean canChangeHome() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public float getWidth() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	@Override
-	public float getHeight() {
-		return 3 * 12 * 25.4f;  // 3'
-	}
-
-	@Override
-	public float getFeedrateMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getFeedrateDefault() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getAccelerationMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getDouble(PlotterSettings.PEN_ANGLE_UP_TIME) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public float getZAngleOn() {
-		return 0;
-	}
-
-	@Override
-	public float getZAngleOff() {
-		return 90;
-	}*/
 }

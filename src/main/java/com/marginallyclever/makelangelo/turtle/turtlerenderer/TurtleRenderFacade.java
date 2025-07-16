@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
-import com.jogamp.opengl.GL2;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
+import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +26,26 @@ public class TurtleRenderFacade implements PreviewListener {
 	private int last;
 	private Color penDownColor = Color.BLACK;
 	private Color penUpColor = Color.GREEN;
-	private double penDiameter=0.8;
+	private double penDiameter = 0.8;
 	private boolean showTravel;
+	private final Graphics2DGL g2gl = new Graphics2DGL();
+	private int turtleHash = 0;
 
 	@Override
-	public void render(@Nonnull GL2 gl2) {
-		Graphics2DGL g2gl = new Graphics2DGL(gl2);
-		try {
+	public void render(@Nonnull ShaderProgram shader) {
+		if(turtleHash != myTurtle.hashCode()) {
+			turtleHash = myTurtle.hashCode();
+			g2gl.renderBegin(shader.getContext());
 			render(g2gl);
-		} finally {
-			g2gl.dispose();
 		}
+
+		g2gl.renderFinish();
+	}
+
+	@Override
+	public void dispose() {
+		PreviewListener.super.dispose();
+		g2gl.dispose();
 	}
 
 	public void render(@Nonnull Graphics2D g2d) {
@@ -137,18 +146,26 @@ public class TurtleRenderFacade implements PreviewListener {
 	}
 
 	public void setDownColor(Color penDownColor) {
-		this.penDownColor=penDownColor;
+		if(this.penDownColor == penDownColor) return; // no change
+		this.penDownColor = penDownColor;
+		turtleHash = 0;
 	}
 
 	public void setUpColor(Color penUpColor) {
-		this.penUpColor=penUpColor;
+		if(this.penUpColor == penUpColor) return; // no change
+		this.penUpColor = penUpColor;
+		turtleHash = 0;
 	}
 
 	public void setPenDiameter(double penDiameter) {
+		if(this.penDiameter == penDiameter) return; // no change
 		this.penDiameter = penDiameter;
+		turtleHash = 0;
 	}
 
 	public void setShowTravel(boolean showTravel) {
+		if(this.showTravel == showTravel) return; // no change
 		this.showTravel = showTravel;
+		turtleHash = 0;
 	}
 }

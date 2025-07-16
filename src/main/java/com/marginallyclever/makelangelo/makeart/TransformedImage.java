@@ -5,7 +5,6 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 /**
  * TransformedImage is a {@link BufferedImage}, with a transformation matrix on top.
@@ -130,7 +129,11 @@ public class TransformedImage {
 		for(int y=bottom;y<=top;++y) {
 			for(int x=left;x<=right;++x) {
 				raster.getPixel(x, y, pixel);
-				double intensity = Arrays.stream(pixel).sum() / componentCount;
+				double sum = 0;
+				for(int i=0;i<componentCount;++i) {
+					sum += pixel[i];
+				}
+				double intensity = sum / componentCount;
 				sampleValue += intensity;
 				count++;
 			}

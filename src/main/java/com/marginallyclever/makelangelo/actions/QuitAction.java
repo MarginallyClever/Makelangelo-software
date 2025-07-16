@@ -22,7 +22,7 @@ public class QuitAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        WindowEvent windowClosing = new WindowEvent(SwingUtilities.getWindowAncestor(frame), WindowEvent.WINDOW_CLOSING);
+        WindowEvent windowClosing = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
         Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(windowClosing);
     }
 }

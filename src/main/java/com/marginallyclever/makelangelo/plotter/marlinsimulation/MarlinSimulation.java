@@ -536,6 +536,7 @@ public class MarlinSimulation {
 		double ly=home.y;
 		poseNow.set(lx,ly,upAngle);
 		queue.clear();
+		int bufferSize = settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE);
 
 		for( var layer : t.getLayers() ) {
 			for( var line : layer.getAllLines() ) {
@@ -548,8 +549,8 @@ public class MarlinSimulation {
 					p = iter.next();
 					bufferLine(new Vector3d(p.x,p.y,downAngle),drawFeedRate,maxAcceleration);
 				}
+				while( queue.size() >= bufferSize ) consumer.run(queue.removeFirst());
 			}
-			while(queue.size()>settings.getInteger(PlotterSettings.BLOCK_BUFFER_SIZE)) consumer.run(queue.removeFirst());
 		}
 		while(!queue.isEmpty()) consumer.run(queue.removeFirst());
 	}
