@@ -6,7 +6,7 @@
 
 	<groupId>com.marginallyclever</groupId>
 	<artifactId>Makelangelo</artifactId>
-	<version>7.71.1</version>
+	<version>7.71.4</version>
 	<name>Makelangelo</name>
 	<description>Makelangelo Software is a Java program that prepares art for CNC plotters.  It is especially designed for the Makelangelo Robot.
 It pairs really well with Marlin-polargraph, the code in the brain of the robot that receives instructions and moves the motors.</description>
@@ -143,15 +143,14 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 				<executions>
 					<execution>
 						<id>make-assembly</id>
-						<!-- this is used for inheritance merges -->
 						<phase>package</phase>
-						<!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.3.1</version>
@@ -188,7 +187,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.1</version>
 				<executions>
 					<execution>
 						<id>copy-fat-jar</id>
@@ -204,6 +203,10 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 									<includes>
 										<include>Makelangelo*-with-dependencies.jar</include>
 									</includes>
+									<excludes>
+										<exclude>**/logback.xml</exclude>
+										<exclude>logback.xml</exclude>
+									</excludes>
 									<filtering>false</filtering>
 								</resource>
 							</resources>
@@ -354,6 +357,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 	</build>
 
 	<dependencies>
+		<!-- misc -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -414,17 +418,6 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			<groupId>org.kabeja</groupId>
 			<artifactId>kabeja</artifactId>
 			<version>0.4</version>
-		</dependency>
-		<!-- logging -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.5.16</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>2.0.16</version>
 		</dependency>
 		<!-- vector math -->
 		<dependency>
@@ -570,7 +563,7 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>nodegraphcore</artifactId>
-			<version>1.6.0</version>
+			<version>1.6.2</version>
 		</dependency>
 		<dependency>
 			<!--
@@ -582,7 +575,23 @@ It pairs really well with Marlin-polargraph, the code in the brain of the robot 
 			-->
 			<groupId>com.github.marginallyclever</groupId>
 			<artifactId>donatello</artifactId>
-			<version>1.9.0</version>
+			<version>1.9.2</version>
+		</dependency>
+		<!-- logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.17</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.5.18</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.5.18</version>
 		</dependency>
 	</dependencies>
 

@@ -21,9 +21,9 @@ public class TurtleGeneratorTest {
         }
     }
 
-    public void testNothingMissingInTreeNode(TurtleGeneratorFactory.TurtleGeneratorNode node) {
+    public void testNothingMissingInTreeNode(TurtleGeneratorFactory.TurtleGeneratorLeaf node) {
         JMenu menu = new JMenu(node.getName());
-        for (TurtleGeneratorFactory.TurtleGeneratorNode child : node.getChildren()) {
+        for (TurtleGeneratorFactory.TurtleGeneratorLeaf child : node.getChildren()) {
             if (child.getChildren().isEmpty()) {
                 new TurtleGeneratorPanel(child.getGenerator());
             } else {

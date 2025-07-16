@@ -245,9 +245,9 @@ public class MainMenu extends JMenuBar {
         return createGeneratorMenuFromTree(TurtleGeneratorFactory.available);
     }
 
-    private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorNode root) {
+    private JMenu createGeneratorMenuFromTree(TurtleGeneratorFactory.TurtleGeneratorLeaf root) {
         JMenu menu = new JMenu(root.getName());
-        for (TurtleGeneratorFactory.TurtleGeneratorNode child : root.getChildren()) {
+        for (TurtleGeneratorFactory.TurtleGeneratorLeaf child : root.getChildren()) {
             if (child.getChildren().isEmpty()) {
                 JMenuItem menuItem = new JMenuItem(child.getName());
                 menu.add(menuItem);
