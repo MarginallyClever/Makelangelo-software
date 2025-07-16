@@ -2,10 +2,10 @@ import com.marginallyclever.makelangelo.donatelloimpl.MakelangeloRegistry;
 
 module com.marginallyclever.makelangelo {
     requires org.slf4j;
+    requires ch.qos.logback.core;
     requires jssc;
     requires java.desktop;
     requires jogl.all;
-    requires ch.qos.logback.core;
     requires org.json;
     requires org.apache.commons.io;
     requires org.apache.commons.compress;
