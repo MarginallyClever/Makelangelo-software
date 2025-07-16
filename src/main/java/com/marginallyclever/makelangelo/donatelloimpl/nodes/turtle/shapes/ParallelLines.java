@@ -7,7 +7,8 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.nodegraphcore.Node;
 
 /**
- * <p>ParallelLines is a class that represents a shape made of parallel lines.</p>
+ * <p>ParallelLines draws parallel lines.  The lines are laid out in an alternating S pattern, with all odd number
+ * lines going one way and all even number lines going the other.</p>
  * <h4>Ports</h4>
  * <ul>
  *     <li>numLines - number of lines to generate</li>
