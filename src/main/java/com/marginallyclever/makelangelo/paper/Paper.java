@@ -18,15 +18,15 @@ public class Paper implements PreviewListener {
 	public static final int DEFAULT_WIDTH = 420; // mm
 	public static final int DEFAULT_HEIGHT = 594; // mm
 
-	private static final String PREF_KEY_ROTATION = "rotation";
-	private static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
-	private static final String PREF_KEY_PAPER_BOTTOM = "paper_bottom";
-	private static final String PREF_KEY_PAPER_TOP = "paper_top";
-	private static final String PREF_KEY_PAPER_RIGHT = "paper_right";
-	private static final String PREF_KEY_PAPER_LEFT = "paper_left";
-	private static final String PREF_KEY_PAPER_COLOR = "paper_color";
-	private static final String PREF_KEY_PAPER_CENTER_X = "paper_center_X";
-	private static final String PREF_KEY_PAPER_CENTER_Y = "paper_center_Y";
+	public static final String PREF_KEY_ROTATION = "rotation";
+	public static final String PREF_KEY_PAPER_MARGIN = "paper_margin";
+	public static final String PREF_KEY_PAPER_BOTTOM = "paper_bottom";
+	public static final String PREF_KEY_PAPER_TOP = "paper_top";
+	public static final String PREF_KEY_PAPER_RIGHT = "paper_right";
+	public static final String PREF_KEY_PAPER_LEFT = "paper_left";
+	public static final String PREF_KEY_PAPER_COLOR = "paper_color";
+	public static final String PREF_KEY_PAPER_CENTER_X = "paper_center_X";
+	public static final String PREF_KEY_PAPER_CENTER_Y = "paper_center_Y";
 
 	private static final Preferences paperPreferenceNode
 		= PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.PAPER);
