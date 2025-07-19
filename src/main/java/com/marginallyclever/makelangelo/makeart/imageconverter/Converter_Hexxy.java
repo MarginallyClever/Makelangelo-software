@@ -45,7 +45,7 @@ public class Converter_Hexxy extends ImageConverter {
 	public int getBoxMasSize() {
 		return boxMaxSize;
 	}
-	
+
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
