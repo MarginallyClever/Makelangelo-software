@@ -19,7 +19,6 @@ import java.awt.geom.Rectangle2D;
  */
 public class Converter_Hexxy extends ImageConverter {
 	public static int boxMaxSize=4; // 0.8*5
-	public static int cutoff=127;
 	private double majorRadius;
 	private double minorRadius;
 
@@ -32,13 +31,6 @@ public class Converter_Hexxy extends ImageConverter {
 			fireRestart();
 		});
 		add(size);
-
-		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,getCutoff());
-		cutoff.addSelectListener((evt)->{
-			setCutoff((int)evt.getNewValue());
-			fireRestart();
-		});
-		add(cutoff);
 	}
 
 	@Override
@@ -54,13 +46,6 @@ public class Converter_Hexxy extends ImageConverter {
 		return boxMaxSize;
 	}
 	
-	public void setCutoff(int arg0) {
-		cutoff = arg0; 
-	}
-	public int getCutoff() {
-		return cutoff;
-	}
-
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		super.start(paper, image);
