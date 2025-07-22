@@ -20,12 +20,12 @@ public class Generator_MazeRectangle extends Generator_Maze {
 		SelectSlider field_rows;
 		SelectSlider field_columns;
 
-		add(field_rows = new SelectSlider("rows",Translator.get("Generator_MazeRectangle.rows"),100,1,getRows()));
+		add(field_rows = new SelectSlider("rows",Translator.get("Generator_MazeRectangle.rows"),200,1,getRows()));
 		field_rows.addSelectListener(evt->{
 			setRows(field_rows.getValue());
 			generate();
 		});
-		add(field_columns = new SelectSlider("columns",Translator.get("Generator_MazeRectangle.columns"),100,1,getCols()));
+		add(field_columns = new SelectSlider("columns",Translator.get("Generator_MazeRectangle.columns"),200,1,getCols()));
 		field_columns.addSelectListener(evt->{
 			setCols(field_columns.getValue());
 			generate();

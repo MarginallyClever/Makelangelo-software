@@ -5,10 +5,12 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectDouble;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -94,6 +96,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		double r2,scale_z,pulse_size,nx,ny;
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		double px = myPaper.getCenterX();
 		double py = myPaper.getCenterY();
 		

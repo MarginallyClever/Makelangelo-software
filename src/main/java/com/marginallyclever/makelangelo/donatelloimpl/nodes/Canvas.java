@@ -1,12 +1,15 @@
 package com.marginallyclever.makelangelo.donatelloimpl.nodes;
 
+import com.marginallyclever.donatello.nodes.Calculate;
 import com.marginallyclever.donatello.ports.InputColor;
 import com.marginallyclever.donatello.ports.InputInt;
 import com.marginallyclever.donatello.ports.OutputInt;
 import com.marginallyclever.nodegraphcore.Node;
 import com.marginallyclever.nodegraphcore.PrintWithGraphics;
 
+import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * A node that creates a canvas with a given size and color.
@@ -57,5 +60,11 @@ public class Canvas extends Node implements PrintWithGraphics {
     @Override
     public int getLayer() {
         return layer.getValue();
+    }
+
+
+    @Override
+    public Icon getIcon() {
+        return new ImageIcon(Objects.requireNonNull(Canvas.class.getResource("icons8-aspect-ratio-48.png")));
     }
 }

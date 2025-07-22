@@ -8,10 +8,12 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 
@@ -129,6 +131,7 @@ public class Converter_Pulse extends ImageConverter {
 		Point2d b = new Point2d();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		var wave = new WaveByIntensity(img,blockScale/2,1);
 

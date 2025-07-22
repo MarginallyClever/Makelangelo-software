@@ -6,9 +6,11 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -97,6 +99,7 @@ public class Converter_QuadTreeInstant extends ImageConverter{
         img = bw.filter();
 
         turtle = new Turtle();
+        turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
         Rectangle2D.Double rect = myPaper.getMarginRectangle();
         Point2d topLeftP = new Point2d(rect.getMaxX(),rect.getMaxY());

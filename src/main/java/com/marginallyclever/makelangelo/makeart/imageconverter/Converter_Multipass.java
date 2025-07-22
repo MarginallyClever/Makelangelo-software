@@ -6,8 +6,10 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 
@@ -94,6 +96,7 @@ public class Converter_Multipass extends ImageConverter {
 		double [] error1 = new double[(int)Math.ceil(maxLen)];
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		
 		boolean useError=false;
 		

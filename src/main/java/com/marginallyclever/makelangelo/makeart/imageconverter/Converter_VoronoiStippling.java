@@ -7,6 +7,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -43,12 +44,14 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	@Override
 	public void resume() {
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		fireConversionFinished();
 	}
 
 	@Override
 	public void start(Paper paper, TransformedImage image) {
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		super.start(paper, image);
 	}
 
@@ -114,6 +117,7 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 		double r2 = r-0.5;
 
 		Turtle circle = new Turtle();
+		circle.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 		for(int j = 0; j <= detail; ++j) {
 			double v = (double)j * 2.0 * Math.PI / (double)detail;
 			double newX = x + r2 * Math.cos(v);

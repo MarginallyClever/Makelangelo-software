@@ -5,6 +5,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterContrastAdjust;
 import com.marginallyclever.makelangelo.makeart.io.LoadFilePanel;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.rangeslider.RangeSlider;
@@ -50,13 +51,15 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 	private final RangeSlider rangeSlider = new RangeSlider();
 	private static int rangeSliderMin = 0;
 	private static int rangeSliderMax = 255;
+	private final PlotterSettings myPlotterSettings;
 
 	private ImageConverter myConverter;
 	
-	public SelectImageConverterPanel(Paper paper, TransformedImage image) {
+	public SelectImageConverterPanel(Paper paper, PlotterSettings plotterSettings, TransformedImage image) {
 		super(new GridBagLayout());
 		myPaper = paper;
 		myImage = image;
+		myPlotterSettings = plotterSettings;
 
 		fillNames = getFillSelection();
 		styleNames = getStyleSelection();
@@ -250,6 +253,7 @@ public class SelectImageConverterPanel extends JPanel implements PreviewListener
 
 		if(myConverter != null) myConverter.removeImageConverterListener(this);
 		myConverter = converter;
+		myConverter.setPlotterSettings(myPlotterSettings);
 		myConverter.addImageConverterListener(this);
 
 		startConversion();

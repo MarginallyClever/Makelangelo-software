@@ -33,3 +33,4 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 - Ramps v1.4 drawing from [Reprap](Wikihttps://reprap.org/wiki/File:Rampsv14_wiring_psu.png), GPL v2
 - Inspiration from [Kinogaki](https://app.kinogaki.com/)
 - Makelangelo is derived from the work of Paul Fisher. It is largely inspired by [Hektor](http://hektor.ch/) by Jürg Lehni and Uli Franke.
+- some test suite resources from [file-examples.com](https://file-examples.com/)

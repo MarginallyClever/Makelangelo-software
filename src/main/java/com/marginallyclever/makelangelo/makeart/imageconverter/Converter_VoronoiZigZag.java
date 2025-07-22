@@ -6,11 +6,13 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectToggleButton;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,6 +60,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 		renderMode = 0;
 		lowNoise = false;
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		super.start(paper, image);
 	}
 
@@ -282,6 +285,7 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void writeOutCells() {
 		int lpc = getLowpassCutoff();
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		double cx = myPaper.getCenterX();
 		double cy = myPaper.getCenterY();

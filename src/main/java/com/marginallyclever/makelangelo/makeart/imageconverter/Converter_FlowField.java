@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.makelangelo.turtle.TurtlePathWalker;
 
@@ -255,8 +256,6 @@ public class Converter_FlowField extends ImageConverter {
 		FilterDesaturate bw = new FilterDesaturate(myImage);
 		TransformedImage img = bw.filter();
 
-		turtle.getLayers().clear();
-
 		if(fromEdge) {
 			// get all the flow lines.
 			List<Turtle> list = fromEdge();
@@ -268,6 +267,7 @@ public class Converter_FlowField extends ImageConverter {
 
 			// make the line thicc.
 			turtle = new Turtle();
+			turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 			for (Turtle t : list) {
 				convertLine(img, t);
 			}
@@ -304,6 +304,7 @@ public class Converter_FlowField extends ImageConverter {
 
 	private Turtle makeLine(Rectangle r, double x, double y) {
 		Turtle line = new Turtle();
+		line.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 		line.jumpTo(x,y);
 		// if the first step at this position would be outside the rectangle, reverse the direction.
 		double v = noiseMaker.noise(line.getX() * scaleX + offsetX, line.getY() * scaleY + offsetY, 0);

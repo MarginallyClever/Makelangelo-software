@@ -10,6 +10,7 @@ import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.Select;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,17 @@ public abstract class ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(ImageConverter.class);
 	protected TransformedImage myImage;
 	protected Paper myPaper;
-	public Turtle turtle = new Turtle();
+	protected PlotterSettings settings;
+	protected Turtle turtle = new Turtle();
 
 	// for previewing the image
 	private Texture texture = null;
 
 	private final List<Select> panelElements = new ArrayList<>();
+
+	public void setPlotterSettings(PlotterSettings arg0) {
+		settings = arg0;
+	}
 
 	/**
 	 * @return the translated name.
@@ -228,5 +234,15 @@ public abstract class ImageConverter {
 	}
 	public List<Select> getPanelElements() {
 		return panelElements;
+	}
+
+	/**
+	 * @return the plotter settings for this converter.
+	 */
+	public PlotterSettings getPlotterSettings() {
+		if(settings == null) {
+			throw new RuntimeException("PlotterSettings is null.  Did you forget to call setPlotterSettings()?");
+		}
+		return settings;
 	}
 }

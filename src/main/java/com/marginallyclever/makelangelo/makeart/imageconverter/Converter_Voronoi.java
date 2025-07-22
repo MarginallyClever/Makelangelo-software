@@ -11,14 +11,18 @@ import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.OpenGLPanel;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +85,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
         lock.lock();
         try {
             turtle = new Turtle();
+            turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
             iterations=0;
 
