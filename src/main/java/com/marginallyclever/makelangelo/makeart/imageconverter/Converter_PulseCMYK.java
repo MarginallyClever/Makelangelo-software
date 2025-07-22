@@ -8,6 +8,7 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterCMYK;
 import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
@@ -89,6 +90,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 		cmyk.filter();
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		outputChannel(cmyk.getY(),Color.YELLOW);
 		outputChannel(cmyk.getC(),Color.CYAN);
@@ -113,6 +115,7 @@ public class Converter_PulseCMYK extends ImageConverter {
 		Point2d b = new Point2d();
 
 		Turtle newTurtle = new Turtle();
+		newTurtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		var wave = new WaveByIntensity(img,blockScale/2,sampleRate);
 		

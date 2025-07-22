@@ -11,6 +11,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,8 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		cmyk.filter();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+
 		// remove extra change color at the start of the turtle
 		turtle.getLayers().clear();
 		
@@ -87,14 +90,6 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		fireConversionFinished();
 	}
 
-	/**
-	 * Remove any color changes that are not needed.
-	 * TODO could be used on every Turtle generated.
-	 * @param turtle the turtle to clean up
-	 */
-	private void removeRedundantColorChanges(Turtle turtle) {
-	}
-	
 	protected void outputChannel(TransformedImage img, float angle, Color newColor) {
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
@@ -161,7 +156,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	private void drawCircle(double x,double y,double r) {
 		double circumference = Math.ceil(Math.PI*r*2.0);
 		Turtle t = new Turtle();
-		t.setStroke(turtle.getColor());
+		t.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 		t.jumpTo(x+r,y+0);
 		for(int i=0;i<circumference;++i) {
 			double v = 2.0*Math.PI * (double)i/circumference;

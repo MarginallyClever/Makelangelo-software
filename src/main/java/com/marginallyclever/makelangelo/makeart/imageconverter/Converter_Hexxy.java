@@ -7,9 +7,11 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Vector2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -25,7 +27,7 @@ public class Converter_Hexxy extends ImageConverter {
 	public Converter_Hexxy() {
 		super();
 
-		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,2,getBoxMasSize());
+		SelectSlider size = new SelectSlider("size",Translator.get("Converter_Hexxy.MaxSize"),40,2,getBoxMasSize());
 		size.addSelectListener((evt)->{
 			setBoxMaxSize((int)evt.getNewValue());
 			fireRestart();
@@ -35,7 +37,7 @@ public class Converter_Hexxy extends ImageConverter {
 
 	@Override
 	public String getName() {
-		return Translator.get("HexGeneratorName");
+		return Translator.get("Converter_Hexxy.Name");
 	}
 
 	public void setBoxMaxSize(int arg0) {
@@ -60,6 +62,7 @@ public class Converter_Hexxy extends ImageConverter {
 		double xMax = rect.getMaxX();
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		majorRadius = boxMaxSize;
 		minorRadius = majorRadius*Math.sqrt(3);
@@ -90,6 +93,7 @@ public class Converter_Hexxy extends ImageConverter {
 				if(intensity<2.0/255.0) continue;
 
 				Turtle cell = new Turtle();
+				cell.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 				drawHexagon(cell,p,intensity);
 				try {
 					turtle.add(cell);

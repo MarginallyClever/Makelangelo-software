@@ -9,9 +9,11 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterGaussianBlur;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -94,6 +96,7 @@ public class Converter_EdgeDetection extends ImageConverter {
 		img = dog.filter();
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		px = myPaper.getCenterX();
 		py = myPaper.getCenterY();
 

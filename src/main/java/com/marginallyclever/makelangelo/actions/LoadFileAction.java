@@ -66,7 +66,7 @@ public class LoadFileAction extends AbstractAction {
         if(filename == null || filename.trim().isEmpty()) throw new InvalidParameterException("filename cannot be empty");
 
         try {
-            LoadFilePanel loader = new LoadFilePanel(frame.getPaper(),filename);
+            LoadFilePanel loader = new LoadFilePanel(frame.getPaper(),frame.getPlotter().getSettings(), filename);
             loader.addActionListener(e -> frame.setTurtle((Turtle)(e.getSource())));
 
             if (loader.onNewFilenameChosen(filename)) {

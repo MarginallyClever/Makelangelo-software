@@ -1,10 +1,12 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 	private static final Logger logger = LoggerFactory.getLogger(ImageConverterThread.class);
@@ -43,6 +45,7 @@ public class ImageConverterThread extends SwingWorker<Turtle, Void> {
 		logger.debug("doInBackground() start {}", name);
 		
 		Turtle turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,myConverter.getPlotterSettings().getDouble(PlotterSettings.DIAMETER));
 
 		int iterations = 0;
 		int pauseCount=-1;

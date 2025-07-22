@@ -8,8 +8,10 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -91,6 +93,7 @@ public class Converter_Boxxy extends ImageConverter {
 		if (steps < 1) steps = 1;
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 
 		double lowpass = cutoff/255.0;
@@ -126,6 +129,7 @@ public class Converter_Boxxy extends ImageConverter {
 			double ratio = (scaleZ-lowpass)/(1.0-lowpass);
 
 			Turtle t2 = new Turtle();
+			t2.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 			drawBox(t2, cx+x,cy+y,ratio,halfStep);
 
