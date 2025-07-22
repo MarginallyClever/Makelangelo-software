@@ -6,8 +6,10 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.makeart.truchet.TruchetDiagonal;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -53,6 +55,7 @@ public class Converter_TruchetFromImage extends ImageConverter {
         TransformedImage result = desaturate.filter();
 
         turtle = new Turtle();
+        turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
         TruchetDiagonal truchet = new TruchetDiagonal(turtle,spaceBetweenLines,linesPerTile);
         double tileSize = spaceBetweenLines * linesPerTile;

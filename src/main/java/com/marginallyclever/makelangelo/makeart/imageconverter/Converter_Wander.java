@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,6 +198,7 @@ public class Converter_Wander extends ImageConverter {
 		cmyk.filter();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		
 		logger.debug("Yellow...");		outputChannel(cmyk.getY(),Color.YELLOW,numLines,255.0*3.0/4.0);
 		logger.debug("Cyan...");		outputChannel(cmyk.getC(),Color.CYAN,numLines,128.0);
@@ -211,6 +213,7 @@ public class Converter_Wander extends ImageConverter {
 		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		
 		outputChannel(img,Color.BLACK,numLines,255.0/4.0);
 	}

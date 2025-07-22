@@ -11,6 +11,7 @@ import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.donatello.select.SelectReadOnlyText;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import java.awt.geom.Rectangle2D;
 public class Converter_CMYK_Circles extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Circles.class);
 	protected static int maxCircleRadius =5;
-	protected static boolean fillCircles = false;
+	protected static boolean fillShapes = false;
 
 	public Converter_CMYK_Circles() {
 		super();
@@ -37,12 +38,13 @@ public class Converter_CMYK_Circles extends ImageConverter {
 			fireRestart();
 		});
 		add(maxCircleSize);
-		SelectBoolean fillCircles = new SelectBoolean("fillCircles",Translator.get("Converter_CMYK_Circles.fillCircles"),this.fillCircles);
-		fillCircles.addSelectListener((evt)->{
-			Converter_CMYK_Circles.fillCircles = (boolean)evt.getNewValue();
+
+		SelectBoolean fillShape = new SelectBoolean("fillShape",Translator.get("Converter_CMYK_Circles.fillCircles"),this.fillShapes);
+		fillShape.addSelectListener((evt)->{
+			Converter_CMYK_Circles.fillShapes = (boolean)evt.getNewValue();
 			fireRestart();
 		});
-		add(fillCircles);
+		add(fillShape);
 
 		add(new SelectReadOnlyText("note",Translator.get("Converter_CMYK_Crosshatch.Note")));
 	}
@@ -74,6 +76,8 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		cmyk.filter();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+
 		// remove extra change color at the start of the turtle
 		turtle.getLayers().clear();
 		
@@ -86,14 +90,6 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		fireConversionFinished();
 	}
 
-	/**
-	 * Remove any color changes that are not needed.
-	 * TODO could be used on every Turtle generated.
-	 * @param turtle the turtle to clean up
-	 */
-	private void removeRedundantColorChanges(Turtle turtle) {
-	}
-	
 	protected void outputChannel(TransformedImage img, float angle, Color newColor) {
 		double dx = Math.cos(Math.toRadians(angle));
 		double dy = Math.sin(Math.toRadians(angle));
@@ -160,7 +156,7 @@ public class Converter_CMYK_Circles extends ImageConverter {
 	private void drawCircle(double x,double y,double r) {
 		double circumference = Math.ceil(Math.PI*r*2.0);
 		Turtle t = new Turtle();
-		t.setStroke(turtle.getColor());
+		t.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 		t.jumpTo(x+r,y+0);
 		for(int i=0;i<circumference;++i) {
 			double v = 2.0*Math.PI * (double)i/circumference;
@@ -170,15 +166,13 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		}
 		t.moveTo(x+r,y+0);
 
-		if(fillCircles) {
+		if(fillShapes) {
 			try {
 				InfillTurtle filler = new InfillTurtle();
 				filler.setPenDiameter(t.getDiameter());
 				Turtle t2 = filler.run(t);
 				turtle.add(t2);
-			} catch (Exception e) {
-				// shape was not closed, do nothing.
-			}
+			} catch (Exception ignore) {}
 		}
 
 		turtle.add(t);

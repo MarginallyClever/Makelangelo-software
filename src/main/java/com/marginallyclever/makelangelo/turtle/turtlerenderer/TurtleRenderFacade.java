@@ -130,6 +130,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	public void setFirst(int arg0) {
 		first = Math.min(Math.max(arg0, 0), getMax());
 		if(last<first) setLast(first);
+		turtleHash = 0;
 	}
 	
 	public int getFirst() {
@@ -139,6 +140,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	public void setLast(int arg0) {
 		last = Math.min(Math.max(arg0, 0), getMax());
 		if(first>last) setFirst(last);
+		turtleHash = 0;
 	}
 
 	public int getLast() {

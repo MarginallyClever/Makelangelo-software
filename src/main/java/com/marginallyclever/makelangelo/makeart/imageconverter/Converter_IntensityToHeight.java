@@ -6,10 +6,12 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector2d;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,6 +139,7 @@ public class Converter_IntensityToHeight extends ImageConverter {
 		Point2d lineEnd = new Point2d();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		heights.clear();
 		// heights should contain (xRight-xLeft) / sampleRate values

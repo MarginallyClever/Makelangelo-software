@@ -6,8 +6,10 @@ import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.donatello.select.SelectRandomSeed;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
@@ -70,6 +72,7 @@ public class Converter_RandomLines extends ImageConverter {
 		double dx = xRight - xLeft-1;
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 		turtle.moveTo(0, yTop);
 
 		double startPX = 0; 

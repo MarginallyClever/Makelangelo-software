@@ -8,7 +8,7 @@ import ModernDocking.exception.DockingLayoutException;
 import ModernDocking.ext.ui.DockingUI;
 import com.marginallyclever.convenience.FileAccess;
 import com.marginallyclever.donatello.Donatello;
-import com.marginallyclever.donatello.NodeFactoryPanel;
+import com.marginallyclever.donatello.nodefactorypanel.NodeFactoryPanel;
 import com.marginallyclever.makelangelo.applicationsettings.MetricsPreferences;
 import com.marginallyclever.makelangelo.donatelloimpl.DockableEditNodePanel;
 import com.marginallyclever.makelangelo.donatelloimpl.DonatelloDropTarget;

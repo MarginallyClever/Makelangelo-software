@@ -5,10 +5,12 @@ import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -54,6 +56,7 @@ public class Converter_Spiral extends ImageConverter {
 		super.start(paper, image);
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 		double cx = paper.getCenterX();
 		double cy = paper.getCenterY();

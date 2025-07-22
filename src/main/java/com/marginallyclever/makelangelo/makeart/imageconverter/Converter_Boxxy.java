@@ -1,13 +1,17 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
+import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -16,30 +20,38 @@ import java.awt.geom.Rectangle2D;
  *
  */
 public class Converter_Boxxy extends ImageConverter {
-	public static int boxMaxSize=4; // 0.8*5
-	public static int cutoff=127;
+	protected static int boxMaxSize=4; // 0.8*5
+	protected static int cutoff=127;
+	protected static boolean fillShapes = false;
 
 	public Converter_Boxxy() {
 		super();
 
-		SelectSlider size = new SelectSlider("size",Translator.get("BoxGeneratorMaxSize"),40,2,getBoxMasSize());
+		SelectSlider size = new SelectSlider("size",Translator.get("Converter_Boxxy.MaxSize"),40,2,getBoxMasSize());
 		size.addSelectListener((evt)->{
 			setBoxMaxSize((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(size);
 
-		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("BoxGeneratorCutoff"),255,0,getCutoff());
+		SelectSlider cutoff = new SelectSlider("cutoff",Translator.get("Converter_Boxxy.Cutoff"),255,0,getCutoff());
 		cutoff.addSelectListener((evt)->{
 			setCutoff((int)evt.getNewValue());
 			fireRestart();
 		});
 		add(cutoff);
+
+		SelectBoolean fillShape = new SelectBoolean("fillShape",Translator.get("Converter_Boxxy.fill"),Converter_Boxxy.fillShapes);
+		fillShape.addSelectListener((evt)->{
+			Converter_Boxxy.fillShapes = (boolean)evt.getNewValue();
+			fireRestart();
+		});
+		add(fillShape);
 	}
 
 	@Override
 	public String getName() {
-		return Translator.get("BoxGeneratorName");
+		return Translator.get("Converter_Boxxy.Name");
 	}
 
 	public void setBoxMaxSize(int arg0) {
@@ -81,6 +93,7 @@ public class Converter_Boxxy extends ImageConverter {
 		if (steps < 1) steps = 1;
 
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
 
 		double lowpass = cutoff/255.0;
@@ -93,26 +106,12 @@ public class Converter_Boxxy extends ImageConverter {
 			if ((i % 2) == 0) {
 				// every even line move left to right
 				for (x = xLeft + halfStep; x < xRight; x += fullStep) {
-					// read a block of the image and find the average intensity in this block
-					z = img.sample( x, y, halfStep );
-					// scale the intensity value
-					double scaleZ =  (255.0f - z) / 255.0;
-					if (scaleZ > lowpass) {
-						double ratio = (scaleZ-lowpass)/(1.0-lowpass);
-						drawBox(cx+x,cy+y,ratio,halfStep);
-					}
+					addBox(img,x,y,halfStep,lowpass,cx,cy);
 				}
 			} else {
 				// every odd line move right to left
 				for (x = xRight + halfStep; x > xLeft; x -= fullStep) {
-					// read a block of the image and find the average intensity in this block
-					z = img.sample( x, y, halfStep);
-					// scale the intensity value
-					double scaleZ = (255.0f - z) / 255.0f;
-					if (scaleZ > lowpass) {
-						double ratio = (scaleZ-lowpass)/(1.0-lowpass);
-						drawBox(cx+x,cy+y,ratio,halfStep);
-					}
+					addBox(img,x,y,halfStep,lowpass,cx,cy);
 				}
 			}
 		}
@@ -120,23 +119,43 @@ public class Converter_Boxxy extends ImageConverter {
 		fireConversionFinished();
 	}
 
-	private void drawBox(double x,double y,double ratio,double halfStep) {
+	private void addBox(TransformedImage img, double x, double y, double halfStep, double lowpass,double cx,double cy) {
+		// read a block of the image and find the average intensity in this block
+		var z = img.sample( x, y, halfStep);
+
+		// scale the intensity value
+		double scaleZ = (255.0f - z) / 255.0f;
+		if (scaleZ > lowpass) {
+			double ratio = (scaleZ-lowpass)/(1.0-lowpass);
+
+			Turtle t2 = new Turtle();
+			t2.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+
+			drawBox(t2, cx+x,cy+y,ratio,halfStep);
+
+			if(fillShapes) {
+				InfillTurtle filler = new InfillTurtle();
+				filler.setPenDiameter(turtle.getDiameter());
+				try {
+					var t3 = filler.run(t2);
+					turtle.add(t3);
+				} catch(Exception ignore) {}
+			}
+			turtle.add(t2);
+		}
+	}
+
+	private void drawBox(Turtle t2,double x,double y,double ratio,double halfStep) {
 		double pulseSize = (halfStep - 0.5f) * ratio;
 		double xmin = x - halfStep - pulseSize;
 		double xmax = x - halfStep + pulseSize;
 		double ymin = y + halfStep - pulseSize;
 		double ymax = y + halfStep + pulseSize;
 		// draw a square.  the diameter is relative to the intensity.
-		turtle.jumpTo(xmin, ymin);
-		turtle.moveTo(xmax, ymin);
-		turtle.moveTo(xmax, ymax);
-		turtle.moveTo(xmin, ymax);
-		turtle.moveTo(xmin, ymin);
-		// fill in the square
-		boolean flip = false;
-		for(double yy=ymin;yy<ymax;yy+=boxMaxSize) {
-			turtle.moveTo(flip?xmin:xmax,yy);
-			flip = !flip;
-		}
+		t2.jumpTo(xmin, ymin);
+		t2.moveTo(xmax, ymin);
+		t2.moveTo(xmax, ymax);
+		t2.moveTo(xmin, ymax);
+		t2.moveTo(xmin, ymin);
 	}
 }

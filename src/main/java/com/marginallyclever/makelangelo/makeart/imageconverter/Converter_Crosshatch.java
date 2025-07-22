@@ -5,8 +5,10 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,8 @@ public class Converter_Crosshatch extends ImageConverter {
 		TransformedImage img = bw.filter();
 		
 		turtle = new Turtle();
+		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
+
         for (CrosshatchPass pass : passes) {
             finishPass(new int[]{(int) pass.cutoff}, pass, img);
         }

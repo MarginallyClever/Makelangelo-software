@@ -4,6 +4,7 @@ import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imageconverter.SelectImageConverterPanel;
 import com.marginallyclever.makelangelo.paper.Paper;
+import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -23,6 +24,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private static final Logger logger = LoggerFactory.getLogger(LoadFilePanel.class);
 	public static final String COMMAND_TURTLE = "turtle";
 	private final Paper myPaper;
+	private final PlotterSettings myPlotterSettings;
 	private final JButton bChoose = new JButton(Translator.get("Open"));
 	private final OpenFileChooser openFileChooser = new OpenFileChooser(this);
 	private final JLabel selectedFilename = new JLabel();
@@ -30,11 +32,18 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 	private PreviewListener mySubPreviewListener;
 	private JDialog parent;
 
-	public LoadFilePanel(Paper paper,String filename) {
+	/**
+	 * Create a panel that allows the user to select a file to load.
+	 * @param paper the paper to use for the turtle.
+	 * @param settings the plotter settings to use for the turtle.
+	 * @param filename the filename to pre-select in the file chooser.
+	 */
+	public LoadFilePanel(Paper paper,PlotterSettings settings,String filename) {
 		super(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 		myPaper = paper;
+		myPlotterSettings = settings;
 		add(getFileSelectionPanel(filename),BorderLayout.NORTH);
 		selectedFilename.setBorder(BorderFactory.createEmptyBorder(0,5,0,0));
 
@@ -71,7 +80,7 @@ public class LoadFilePanel extends JPanel implements PreviewListener {
 		try {
 			if (SelectImageConverterPanel.isFilenameForAnImage(filename)) {
 				TransformedImage image = new TransformedImage( ImageIO.read(new FileInputStream(filename)) );
-				myConvertImage = new SelectImageConverterPanel(myPaper, image);
+				myConvertImage = new SelectImageConverterPanel(myPaper, myPlotterSettings, image);
 				myConvertImage.addActionListener(this::notifyListeners);
 
 				add(myConvertImage,BorderLayout.CENTER);

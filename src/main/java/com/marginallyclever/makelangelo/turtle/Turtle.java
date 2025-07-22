@@ -168,6 +168,10 @@ public class Turtle implements Cloneable {
 	public double getDiameter() {
 		return diameter;
 	}
+
+	public void setDiameter(double diameter) {
+		setStroke(this.color,diameter);
+	}
 	
 	/**
 	 * Absolute position change. Raise the pen before move and lower pen after move.
