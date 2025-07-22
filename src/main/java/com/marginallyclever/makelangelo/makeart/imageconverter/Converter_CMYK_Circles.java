@@ -26,7 +26,7 @@ import java.awt.geom.Rectangle2D;
 public class Converter_CMYK_Circles extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_CMYK_Circles.class);
 	protected static int maxCircleRadius =5;
-	protected static boolean fillCircles = false;
+	protected static boolean fillShapes = false;
 
 	public Converter_CMYK_Circles() {
 		super();
@@ -37,12 +37,13 @@ public class Converter_CMYK_Circles extends ImageConverter {
 			fireRestart();
 		});
 		add(maxCircleSize);
-		SelectBoolean fillCircles = new SelectBoolean("fillCircles",Translator.get("Converter_CMYK_Circles.fillCircles"),this.fillCircles);
-		fillCircles.addSelectListener((evt)->{
-			Converter_CMYK_Circles.fillCircles = (boolean)evt.getNewValue();
+
+		SelectBoolean fillShape = new SelectBoolean("fillShape",Translator.get("Converter_CMYK_Circles.fillCircles"),this.fillShapes);
+		fillShape.addSelectListener((evt)->{
+			Converter_CMYK_Circles.fillShapes = (boolean)evt.getNewValue();
 			fireRestart();
 		});
-		add(fillCircles);
+		add(fillShape);
 
 		add(new SelectReadOnlyText("note",Translator.get("Converter_CMYK_Crosshatch.Note")));
 	}
@@ -170,15 +171,13 @@ public class Converter_CMYK_Circles extends ImageConverter {
 		}
 		t.moveTo(x+r,y+0);
 
-		if(fillCircles) {
+		if(fillShapes) {
 			try {
 				InfillTurtle filler = new InfillTurtle();
 				filler.setPenDiameter(t.getDiameter());
 				Turtle t2 = filler.run(t);
 				turtle.add(t2);
-			} catch (Exception e) {
-				// shape was not closed, do nothing.
-			}
+			} catch (Exception ignore) {}
 		}
 
 		turtle.add(t);
