@@ -92,15 +92,18 @@ class TurtleTest {
         // given
         Turtle turtle = new Turtle(new Color(1,2,3));
 
-        // when
+        // when a bunch of non-drawing moves happen
         turtle.moveTo(20, 30);
         turtle.moveTo(10, 15);
+        // and then a color change
         turtle.setStroke(new Color(4, 5, 6));
+        // and then a jump (which puts the pen down, causing a drawing move)
         turtle.jumpTo(-15, -7);
 
-        // then
+        // then the gcode should omit all of the non-drawing moves and non-drawing color changes
         assertEquals("[TOOL R4 G5 B6 A255 D1.000, TRAVEL X-15.000 Y-7.000]", turtle.generateHistory());
-        assertEquals(new Color(1,2,3), turtle.getFirstColor());
+        // then the first color is the one that was at the first drawing move
+        assertEquals(new Color(4,5,6), turtle.getFirstColor());
     }
 
     @Test

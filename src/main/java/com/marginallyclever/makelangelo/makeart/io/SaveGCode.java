@@ -153,13 +153,20 @@ public class SaveGCode implements TurtleSaver {
 			writeHeader(out,settings,turtle.getBounds());
 			out.write(settings.getPenUpString() + "\n");
 
-			for( var layer : turtle.getLayers() ) {
-				if(layer.isEmpty()) continue;
-				out.write(settings.getToolChangeString(layer.getColor().hashCode()) + "\n");
+			StrokeLayer previousLayer = null;
+			for (var layer : turtle.getLayers()) {
+				if (layer.isEmpty()) continue;
+				if(previousLayer == null
+						|| !previousLayer.getColor().equals(layer.getColor())
+						|| previousLayer.getDiameter() != layer.getDiameter()) {
+					// this layer is a different color or diameter than the previous layer.
+					out.write(settings.getToolChangeString(layer.getColor().hashCode()) + "\n");
+					previousLayer = layer;
+				}
 
 				StringBuilder sb = new StringBuilder();
-				int count = saveLayer(sb,layer,settings);
-				if(count>0) out.write(sb.toString());
+				int count = saveLayer(sb, layer, settings);
+				if (count > 0) out.write(sb.toString());
 			}
 			writeFooter(out,settings);
 			return true;

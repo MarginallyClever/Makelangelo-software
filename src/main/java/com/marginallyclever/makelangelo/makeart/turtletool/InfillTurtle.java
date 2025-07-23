@@ -38,6 +38,7 @@ public class InfillTurtle {
 		List<Turtle> list = input.splitByToolChange();
 		for(Turtle t : list) {
 			LineCollection segments = infillFromTurtle(t);
+			result.setStroke(t.getColor(), t.getDiameter());
 			result.addLineSegments(segments);
 		}
 
