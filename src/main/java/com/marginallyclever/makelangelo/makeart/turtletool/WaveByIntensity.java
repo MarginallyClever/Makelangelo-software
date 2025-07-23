@@ -88,7 +88,7 @@ public class WaveByIntensity {
         // read a block of the image and find the average intensity in this block
         double z = (255.0f - img.sample( a.x, a.y, halfLineHeight));
         // the sum controls the height of the pulse.
-        var h = (z<=1) ? 0 : Math.cos(wavePosition) * halfLineHeight*(z/255.0);
+        var h = (z<=1) ? 0 : Math.cos(wavePosition*2.0) * halfLineHeight*(z/255.0);
         d.x = a.x + orthogonal.x * h;
         d.y = a.y + orthogonal.y * h;
     }

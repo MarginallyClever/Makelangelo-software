@@ -12,7 +12,6 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
-import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -26,22 +25,29 @@ public class Converter_Pulse extends ImageConverter {
 	private static int direction = 0;
 	private final String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
+	private double sampleRate = 0.2;
 
 	public Converter_Pulse() {
 		super();
 
 		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
-		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
-
 		add(selectSize);
-		add(selectDirection);
-
 		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
+
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
+		add(selectDirection);
 		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int) evt.getNewValue());
+			fireRestart();
+		});
+
+		SelectDouble    selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
+		add(selectSampleRate);
+		selectSampleRate.addSelectListener(evt->{
+			sampleRate = (double) evt.getNewValue();
 			fireRestart();
 		});
 	}
@@ -68,34 +74,6 @@ public class Converter_Pulse extends ImageConverter {
 		if(value<0) value=0;
 		if(value>=directionChoices.length) value=directionChoices.length-1;
 		direction = value;
-	}
-	
-	protected void convertLine(TransformedImage img, double zigZagSpacing, double halfStep, Point2d a, Point2d b) {
-		var dir = new Vector2d(b.x-a.x,b.y-a.y);
-		double len = dir.length();
-		dir.scale(1.0/len);
-		Point2d ortho = new Point2d(-dir.y,dir.x);
-
-		turtle.jumpTo(a.x,a.y);
-
-
-		int n=1;
-		for (double p = 0; p <= len; p += zigZagSpacing) {
-			double x = a.x + dir.x * p; 
-			double y = a.y + dir.y * p; 
-			// read a block of the image and find the average intensity in this block
-			double z = 255.0f - img.sample( x, y, halfStep);
-			// scale the intensity value
-			double scale_z = z / 255.0;
-			//scale_z *= scale_z;  // quadratic curve
-			double pulseSize = halfStep * scale_z;
-
-			double px=x + ortho.x * pulseSize * n;
-			double py=y + ortho.y * pulseSize * n;
-			if(z>cutOff) turtle.moveTo(px,py);
-			else turtle.jumpTo(px,py);
-			n = -n;
-		}
 	}
 
 	/**
@@ -133,7 +111,7 @@ public class Converter_Pulse extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		var wave = new WaveByIntensity(img,blockScale/2,1);
+		var wave = new WaveByIntensity(img,blockScale/2,sampleRate);
 
 		if (direction == 0) {
 			// horizontal

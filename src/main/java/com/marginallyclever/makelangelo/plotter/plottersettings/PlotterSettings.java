@@ -137,19 +137,18 @@ public class PlotterSettings {
 	 */
 	public static final String START_GCODE = "userGeneralStartGcode";
 	/**
-	 * integer
-	 */
-	public static final String Z_MOTOR_TYPE = "zMotorType";
-	/**
 	 * String
 	 */
 	public static final String STYLE = "style";
 
-	public static final int Z_MOTOR_TYPE_SERVO = 1;
-	public static final int Z_MOTOR_TYPE_STEPPER = 2;
-
 	public static final String FIND_HOME_GCODE = "FIND_HOME";
 	public static final String DEFAULT_FIND_HOME_GCODE = "G28 X Y";
+
+	public static final String PEN_UP_GCODE = "PEN_UP";
+	public static final String DEFAULT_PEN_UP_GCODE = "M280 P0 S%1 T%2";
+
+	public static final String PEN_DOWN_GCODE = "PEN_DOWN";
+	public static final String DEFAULT_PEN_DOWN_GCODE = "M280 P0 S%1 T%2";
 
 	private final JSONObject json = new JSONObject();
 	private String robotUID = "0";
@@ -181,7 +180,6 @@ public class PlotterSettings {
 		json.put(SEGMENTS_PER_SECOND, 		5);
 		json.put(MIN_SEG_TIME, 				20000);		// us
 		json.put(STARTING_POS_INDEX, 		4);
-		json.put(Z_MOTOR_TYPE, 				PlotterSettings.Z_MOTOR_TYPE_SERVO);
 		json.put(ANCESTOR,					"");
 		json.put(START_GCODE, 				"");
 		json.put(END_GCODE, 				"");
@@ -192,6 +190,8 @@ public class PlotterSettings {
 		json.put(PEN_DOWN_COLOR, 			(Color.BLACK.hashCode()));
 		json.put(PEN_UP_COLOR, 				(Color.GREEN.hashCode()));
 		json.put(MAX_JERK,           		"[10,10,3]");
+		json.put(PEN_UP_GCODE, 				DEFAULT_PEN_UP_GCODE);
+		json.put(PEN_DOWN_GCODE, 			DEFAULT_PEN_DOWN_GCODE);
 	}
 
 	public PlotterSettings(String UID) {
@@ -364,8 +364,8 @@ public class PlotterSettings {
 		json.put(LIMIT_TOP, 				thisMachineNode.getDouble(LIMIT_TOP,500));		// mm
 		json.put(DIAMETER, 					thisMachineNode.getDouble(DIAMETER,0.8));	// mm, >0
 		json.put(PEN_ANGLE_UP, 				thisMachineNode.getDouble(PEN_ANGLE_UP,90));	// servo angle (degrees,0...180)
-		json.put(PEN_ANGLE_DOWN, 			thisMachineNode.getDouble(PEN_ANGLE_DOWN,25));	// servo angle (degrees,0...180)
 		json.put(PEN_ANGLE_UP_TIME, 		thisMachineNode.getDouble(PEN_ANGLE_UP_TIME,250));
+		json.put(PEN_ANGLE_DOWN, 			thisMachineNode.getDouble(PEN_ANGLE_DOWN,25));	// servo angle (degrees,0...180)
 		json.put(PEN_ANGLE_DOWN_TIME, 		thisMachineNode.getDouble(PEN_ANGLE_DOWN_TIME,150));
 		json.put(FEED_RATE_TRAVEL, 			thisMachineNode.getDouble(FEED_RATE_TRAVEL,3000));	// mm/min.  3000 = 50 mm/s
 		json.put(FEED_RATE_DRAW, 			thisMachineNode.getDouble(FEED_RATE_DRAW,3000));	// mm/min.  3000 = 50 mm/s
@@ -373,7 +373,6 @@ public class PlotterSettings {
 		json.put(SEGMENTS_PER_SECOND, 		thisMachineNode.getInt(SEGMENTS_PER_SECOND,5));
 		json.put(MIN_SEG_TIME, 				thisMachineNode.getInt(MIN_SEG_TIME,20000));		// us
 		json.put(STARTING_POS_INDEX, 		thisMachineNode.getInt(STARTING_POS_INDEX,4));
-		json.put(Z_MOTOR_TYPE, 				thisMachineNode.getInt(Z_MOTOR_TYPE,PlotterSettings.Z_MOTOR_TYPE_SERVO));
 		json.put(ANCESTOR,					thisMachineNode.get(ANCESTOR,""));
 		json.put(START_GCODE, 				thisMachineNode.get(START_GCODE,""));
 		json.put(END_GCODE, 				thisMachineNode.get(END_GCODE,""));
@@ -384,6 +383,8 @@ public class PlotterSettings {
 		json.put(PEN_DOWN_COLOR, 			thisMachineNode.getInt(PEN_DOWN_COLOR,(Color.BLACK.hashCode())));
 		json.put(PEN_UP_COLOR, 				thisMachineNode.getInt(PEN_UP_COLOR,(Color.GREEN.hashCode())));
 		json.put(MAX_JERK,           		thisMachineNode.get(MAX_JERK,"[10,10,3]"));
+		json.put(PEN_UP_GCODE, 				thisMachineNode.get(PEN_UP_GCODE, DEFAULT_PEN_UP_GCODE));
+		json.put(PEN_DOWN_GCODE, 			thisMachineNode.get(PEN_DOWN_GCODE, DEFAULT_PEN_DOWN_GCODE));
 	}
 
 	/**
@@ -416,7 +417,6 @@ public class PlotterSettings {
 		thisMachineNode.putInt(SEGMENTS_PER_SECOND, 		json.getInt(SEGMENTS_PER_SECOND));
 		thisMachineNode.putInt(MIN_SEG_TIME, 				json.getInt(MIN_SEG_TIME));
 		thisMachineNode.putInt(STARTING_POS_INDEX, 			json.getInt(STARTING_POS_INDEX));
-		thisMachineNode.putInt(Z_MOTOR_TYPE, 				json.getInt(Z_MOTOR_TYPE));
 		thisMachineNode.put(ANCESTOR, 						json.getString(ANCESTOR));
 		thisMachineNode.put(START_GCODE, 					json.getString(START_GCODE));
 		thisMachineNode.put(END_GCODE, 						json.getString(END_GCODE));
@@ -427,6 +427,8 @@ public class PlotterSettings {
 		thisMachineNode.putInt(PEN_DOWN_COLOR, 				json.getInt(PEN_DOWN_COLOR));
 		thisMachineNode.putInt(PEN_UP_COLOR, 				json.getInt(PEN_UP_COLOR));
 		thisMachineNode.put(MAX_JERK, 						json.getString(MAX_JERK));
+		thisMachineNode.put(PEN_UP_GCODE, 					json.getString(PEN_UP_GCODE));
+		thisMachineNode.put(PEN_DOWN_GCODE, 				json.getString(PEN_DOWN_GCODE));
 	}
 
 	/**
@@ -512,25 +514,33 @@ public class PlotterSettings {
 	}
 
 	public String getPenUpString() {
-		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0"
-					+ " S" + getInteger(PEN_ANGLE_UP)
-					+ " T" + getInteger(PEN_ANGLE_UP_TIME);
-		} else {
-			return "G0 Z" + getFloat(PEN_ANGLE_UP)
-					+ " F" + getInteger(PEN_ANGLE_UP_TIME);
-		}
+		return getString2(PEN_UP_GCODE,new String[] {
+				String.valueOf(getDouble(PEN_ANGLE_UP)),
+				String.valueOf(getDouble(PEN_ANGLE_UP_TIME))
+		});
 	}
 
 	public String getPenDownString() {
-		if(getInteger(Z_MOTOR_TYPE) == Z_MOTOR_TYPE_SERVO) {
-			return "M280 P0"
-					+ " S" + getInteger(PEN_ANGLE_DOWN)
-					+ " T" + getInteger(PEN_ANGLE_DOWN_TIME);
-		} else {
-			return "G1 Z" + getFloat(PEN_ANGLE_DOWN)
-					+ " F" + getInteger(PEN_ANGLE_DOWN_TIME);
+		return getString2(PEN_DOWN_GCODE,new String[] {
+				String.valueOf(getDouble(PEN_ANGLE_DOWN)),
+				String.valueOf(getDouble(PEN_ANGLE_DOWN_TIME))
+		});
+	}
+
+	/**
+	 * Get a string with parameters replaced.
+	 * @param key the key to look up
+	 * @param params the parameters to replace in the string
+	 * @return the formatted string
+	 */
+	private String getString2(String key,String [] params) {
+		String modified = getString(key);
+		int n=1;
+		for(String p : params) {
+			modified = modified.replaceAll("%"+n, p);
+			++n;
 		}
+		return modified;
 	}
 
 	public String getToolChangeString(int toolNumber) {
