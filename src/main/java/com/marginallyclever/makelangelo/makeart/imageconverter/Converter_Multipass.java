@@ -1,11 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.marginallyclever.donatello.select.SelectInteger;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
 import com.marginallyclever.makelangelo.paper.Paper;
-import com.marginallyclever.donatello.select.SelectDouble;
-import com.marginallyclever.donatello.select.SelectInteger;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
@@ -18,20 +18,20 @@ import java.awt.geom.Rectangle2D;
  * @author Dan Royer
  */
 public class Converter_Multipass extends ImageConverter {
-	static private double angle=0;
+	static private int angle=0;
 	static private int passes=4;
 
 	public Converter_Multipass() {
 		super();
 
-		SelectDouble  selectAngle = new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),getAngle());
+		SelectSlider selectAngle = new SelectSlider("angle",Translator.get("ConverterMultipassAngle"),90,0,getAngle());
 		SelectInteger selectLevel = new SelectInteger("level",Translator.get("ConverterMultipassLevels"),getPasses());
 
 		add(selectAngle);
 		add(selectLevel);
 
 		selectAngle.addSelectListener(evt->{
-			setAngle((double)evt.getNewValue());
+			setAngle((int)evt.getNewValue());
 			fireRestart();
 		});
 
@@ -46,11 +46,11 @@ public class Converter_Multipass extends ImageConverter {
 		return Translator.get("ConverterMultipassName");
 	}
 
-	public double getAngle() {
+	public int getAngle() {
 		return angle;
 	}
 	
-	public void setAngle(double value) {
+	public void setAngle(int value) {
 		angle = value;
 	}
 	
@@ -81,7 +81,7 @@ public class Converter_Multipass extends ImageConverter {
 
 		// Color values are from 0...255 inclusive.  255 is white, 0 is black.
 		// Lift the pen any time the color value is > level (128 or more).
-		double level = 255.0 / (double)(passes+1);
+		double level = 255.0 / (double)(passes);
 
 		// from top to bottom of the margin area...
 		Rectangle2D.Double rect = myPaper.getMarginRectangle();
