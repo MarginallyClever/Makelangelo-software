@@ -52,6 +52,8 @@ public class PlotterSettingsPanel extends JPanel {
 	private SelectTextArea startGcode;
 	private SelectTextArea endGcode;
 	private SelectTextField findHomeGcode;
+	private SelectTextField penUpGcode;
+	private SelectTextField penDownGcode;
 
 	private PlotterSettingsListener listener;
 
@@ -107,6 +109,8 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(panel,startGcode = new SelectTextArea("StartGcode", Translator.get("PlotterSettings.StartGcode"), settings.getString(PlotterSettings.START_GCODE)));
 		addToPanel(panel,endGcode = new SelectTextArea("EndGcode", Translator.get("PlotterSettings.EndGcode"), settings.getString(PlotterSettings.END_GCODE)));
 		addToPanel(panel,findHomeGcode = new SelectTextField("FindHomeGcode", Translator.get("PlotterSettings.FindHomeGcode"), settings.getFindHomeString()));
+		addToPanel(panel,penUpGcode = new SelectTextField("PenUpGcode", Translator.get("PlotterSettings.PenUpGcode"), settings.getString(PlotterSettings.PEN_UP_GCODE)));
+		addToPanel(panel,penDownGcode = new SelectTextField("PenDownGcode", Translator.get("PlotterSettings.PenDownGcode"), settings.getString(PlotterSettings.PEN_DOWN_GCODE)));
 
 		startGcode.setLineWrap(false);
 		endGcode.setLineWrap(false);
@@ -138,10 +142,6 @@ public class PlotterSettingsPanel extends JPanel {
 		addToPanel(panel,penDownAngle 		 = new SelectDouble("down",			 Translator.get("PlotterSettingsPanel.penToolDown"			),settings.getDouble(PlotterSettings.PEN_ANGLE_DOWN)));
 		addToPanel(panel,selectPenUpColor 	 = new SelectColor("colorUp",		 Translator.get("PlotterSettingsPanel.penUpColor"			),settings.getColor(PlotterSettings.PEN_UP_COLOR),this));
 		addToPanel(panel,selectPenDownColor  = new SelectColor("colorDown",		 Translator.get("PlotterSettingsPanel.penDownColor"		),settings.getColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT),this));
-		addToPanel(panel,zMotorType          = new SelectOneOfMany("zMotorType",Translator.get("PlotterSettings.zMotorType"),new String[]{
-				Translator.get("PlotterSettings.zMotorType.servo"),  // PlotterSettings.Z_MOTOR_TYPE_SERVO = 1
-				Translator.get("PlotterSettings.zMotorType.stepper"),  // PlotterSettings.Z_MOTOR_TYPE_STEPPER = 2
-		},settings.getInteger(PlotterSettings.Z_MOTOR_TYPE)-1));
 
 		return panel;
 	}
@@ -205,7 +205,6 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,selectPenDownColor.getColor());
 		settings.setColor(PlotterSettings.PEN_UP_COLOR,selectPenUpColor.getColor());
-		settings.setInteger(PlotterSettings.Z_MOTOR_TYPE,zMotorType.getSelectedIndex()+1);
 		
 		settings.setInteger(PlotterSettings.BLOCK_BUFFER_SIZE,blockBufferSize.getValue());
 		settings.setInteger(PlotterSettings.SEGMENTS_PER_SECOND,segmentsPerSecond.getValue());
@@ -218,6 +217,8 @@ public class PlotterSettingsPanel extends JPanel {
 		settings.setString(PlotterSettings.START_GCODE,startGcode.getText());
 		settings.setString(PlotterSettings.END_GCODE,endGcode.getText());
 		settings.setString(PlotterSettings.FIND_HOME_GCODE,findHomeGcode.getText());
+		settings.setString(PlotterSettings.PEN_UP_GCODE,penUpGcode.getText());
+		settings.setString(PlotterSettings.PEN_DOWN_GCODE,penDownGcode.getText());
 
 		settings.save();
 	}

@@ -65,7 +65,6 @@ public class PlotterSettingsManager {
         profile.setInteger(PlotterSettings.SEGMENTS_PER_SECOND, 5);
         profile.setInteger(PlotterSettings.MIN_SEG_TIME, 20000);		// us
         profile.setInteger(PlotterSettings.STARTING_POS_INDEX, 4);
-        profile.setInteger(PlotterSettings.Z_MOTOR_TYPE, PlotterSettings.Z_MOTOR_TYPE_SERVO);
 
         profile.setString(PlotterSettings.START_GCODE, "");
         profile.setString(PlotterSettings.END_GCODE, "");
@@ -75,6 +74,8 @@ public class PlotterSettingsManager {
         profile.setColor(PlotterSettings.PEN_DOWN_COLOR_DEFAULT,Color.BLACK);
         profile.setColor(PlotterSettings.PEN_DOWN_COLOR,Color.BLACK);
         profile.setColor(PlotterSettings.PEN_UP_COLOR,Color.GREEN);
+        profile.setString(PlotterSettings.PEN_UP_GCODE,PlotterSettings.DEFAULT_PEN_UP_GCODE);
+        profile.setString(PlotterSettings.PEN_DOWN_GCODE,PlotterSettings.DEFAULT_PEN_DOWN_GCODE);
 
         profile.setDoubleArray(PlotterSettings.MAX_JERK,new double []{ 10, 10, 0.3 });
         return profile;

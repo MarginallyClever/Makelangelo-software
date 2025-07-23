@@ -118,14 +118,15 @@ public class MarlinPlotterInterfaceTest {
     }
     @Test
     public void testZAxisGcode() {
-        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_SERVO,"M280 P0 S45 T50","M280 P0 S90 T150");
-        testZAxisGcode(PlotterSettings.Z_MOTOR_TYPE_STEPPER,"G1 Z45.0 F50","G0 Z90.0 F150");
+        testZAxisGcode("M280 P0 S%1 T%2","M280 P0 S%1 T%2","M280 P0 S45.0 T50.0","M280 P0 S90.0 T150.0");
+        testZAxisGcode("G1 Z%1 F%2","G0 Z%1 F%2","G1 Z45.0 F50.0","G0 Z90.0 F150.0");
     }
 
-    private void testZAxisGcode(int type,String matchDown,String matchUp) {
+    private void testZAxisGcode(String setDown,String setUp,String matchDown,String matchUp) {
         Plotter plotter = new Plotter();
         PlotterSettings ps = plotter.getSettings();
-        ps.setInteger(PlotterSettings.Z_MOTOR_TYPE,type);
+        ps.setString(PlotterSettings.PEN_UP_GCODE,setUp);
+        ps.setString(PlotterSettings.PEN_DOWN_GCODE,setDown);
         ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN,45);
         ps.setDouble(PlotterSettings.PEN_ANGLE_UP,90);
         ps.setDouble(PlotterSettings.PEN_ANGLE_DOWN_TIME,50);

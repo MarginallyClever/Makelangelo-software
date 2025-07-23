@@ -66,22 +66,23 @@ public class PlotterSettingsTest {
 
     @Test
     public void saveAndLoadZAxis() {
-        saveAndLoadZAxis(PlotterSettings.Z_MOTOR_TYPE_SERVO);
-        saveAndLoadZAxis(PlotterSettings.Z_MOTOR_TYPE_STEPPER);
+        saveAndLoadZAxis("A %2 %1","B %1 %2");
+        saveAndLoadZAxis("C %1 %2","D %2 %1");
     }
 
-    public void saveAndLoadZAxis(int type) {
+    public void saveAndLoadZAxis(String up,String down) {
         // given
         PlotterSettings plotterSettings = new PlotterSettings();
         plotterSettings.setRobotUID(ROBOT_TEST_UID);
-        plotterSettings.setInteger(PlotterSettings.Z_MOTOR_TYPE,type);
-
+        plotterSettings.setString(PlotterSettings.PEN_UP_GCODE, up);
+        plotterSettings.setString(PlotterSettings.PEN_DOWN_GCODE, down);
         plotterSettings.save();
 
         // then
         PlotterSettings plotterSettingsRead = new PlotterSettings();
         plotterSettingsRead.load(ROBOT_TEST_UID);
-        Assertions.assertEquals(plotterSettings.getInteger(PlotterSettings.Z_MOTOR_TYPE),plotterSettingsRead.getInteger(PlotterSettings.Z_MOTOR_TYPE));
+        Assertions.assertEquals(plotterSettings.getString(PlotterSettings.PEN_UP_GCODE),plotterSettingsRead.getString(PlotterSettings.PEN_UP_GCODE));
+        Assertions.assertEquals(plotterSettings.getString(PlotterSettings.PEN_DOWN_GCODE),plotterSettingsRead.getString(PlotterSettings.PEN_DOWN_GCODE));
 
     }
 
