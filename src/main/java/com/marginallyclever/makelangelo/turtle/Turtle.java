@@ -47,11 +47,6 @@ public class Turtle implements Cloneable {
 	private Color color;
 	private double diameter = 1;
 
-	public Turtle() {
-		super();
-		reset(Color.BLACK,DEFAULT_DIAMETER);
-	}
-	
 	public Turtle(Turtle t) {
 		this();
 		set(t);
@@ -67,10 +62,18 @@ public class Turtle implements Cloneable {
 
 		deepCopyStrokeLayers(t);
 	}
+
+	public Turtle(Color firstColor, double firstDiameter) {
+		super();
+		reset(firstColor,firstDiameter);
+	}
 	
 	public Turtle(Color firstColor) {
-		super();
-		reset(firstColor,DEFAULT_DIAMETER);
+		this(firstColor,DEFAULT_DIAMETER);
+	}
+
+	public Turtle() {
+		this(Color.BLACK,DEFAULT_DIAMETER);
 	}
 
 	@Override
@@ -146,7 +149,13 @@ public class Turtle implements Cloneable {
 	 * @param diameter the new diameter
 	 */
 	public void setStroke(@Nonnull Color color, double diameter) {
-		if(this.color != null && this.color.equals(color) && this.diameter == diameter ) return;
+		if(this.color != null && this.color.equals(color) && this.diameter == diameter ) return;  // no change
+		if(!strokeLayers.isEmpty()) {
+			// if the last strokelayer is empty, remove it.
+			if(strokeLayers.getLast().isEmpty()) {
+				strokeLayers.removeLast();
+			}
+		}
 		this.color = color;
 		this.diameter = diameter;
 		strokeLayers.add(new StrokeLayer(this.color, this.diameter));
@@ -472,11 +481,13 @@ public class Turtle implements Cloneable {
 	public List<Turtle> splitByToolChange() {
 		List<Turtle> result = new ArrayList<>();
 
-		for (var cl : strokeLayers) {
-			if(cl.isEmpty()) continue;
+		for (var layer : strokeLayers) {
+			if(layer.isEmpty()) continue;
 			Turtle t = new Turtle();
-			t.strokeLayers.add(cl);
-			t.color = cl.getColor();
+			t.strokeLayers.clear();
+			t.strokeLayers.add(layer);
+			t.color = layer.getColor();
+			t.diameter = layer.getDiameter();
 			result.add(t);
 		}
 
@@ -500,9 +511,20 @@ public class Turtle implements Cloneable {
 		lock.lock();
 		try {
 			// add all the lines from the other turtle
-			for (var cl : t.strokeLayers) {
-				StrokeLayer newLayer = new StrokeLayer(cl);
-				strokeLayers.add(newLayer);
+			var previousLayer = strokeLayers.isEmpty() ? null : strokeLayers.getLast();
+			for (var layer : t.strokeLayers) {
+				if(layer.isEmpty()) continue; // skip empty layers
+
+				if(previousLayer!=null && previousLayer.getDiameter() == layer.getDiameter() && previousLayer.getColor().equals(layer.getColor())) {
+					// if the last layer is the same color and diameter, add to it
+					List<Line2d> list = new ArrayList<>(layer.getAllLines());
+					previousLayer.addAll(list);
+				} else {
+					// otherwise create a new layer
+					StrokeLayer newLayer = new StrokeLayer(layer);
+					strokeLayers.add(newLayer);
+					previousLayer = newLayer;
+				}
 			}
 		} finally {
 			lock.unlock();
