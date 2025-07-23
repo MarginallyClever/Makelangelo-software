@@ -30,21 +30,21 @@ public class Converter_PulseCMYK extends ImageConverter {
 		super();
 
 		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
-		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
-		SelectDouble    selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
-
 		add(selectSize);
-		add(selectDirection);
-		add(selectSampleRate);
-
 		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
+
+		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
+		add(selectDirection);
 		selectDirection.addSelectListener(evt->{
 			setDirectionIndex((int) evt.getNewValue());
 			fireRestart();
 		});
+
+		SelectDouble    selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
+		add(selectSampleRate);
 		selectSampleRate.addSelectListener(evt->{
 			sampleRate = (double) evt.getNewValue();
 			fireRestart();
