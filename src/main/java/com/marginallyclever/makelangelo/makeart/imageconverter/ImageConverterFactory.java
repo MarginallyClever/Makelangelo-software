@@ -15,7 +15,7 @@ public class ImageConverterFactory {
 					new Converter_CMYK_Crosshatch(),
 					new Converter_CMYK_Spiral(),
 					new Converter_CMYK_Circles(),
-					new Converter_ContourMap(),
+					new Converter_Mickymoe1992(),
 					new Converter_Crosshatch(),
 					new Converter_EdgeDetection(),
 					new Converter_FlowField(),

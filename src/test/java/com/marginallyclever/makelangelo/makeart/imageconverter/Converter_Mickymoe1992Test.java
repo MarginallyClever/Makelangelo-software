@@ -16,7 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class Converter_ContourMapTest {
+public class Converter_Mickymoe1992Test {
     @BeforeAll
     public static void beforeAll() {
         PreferencesHelper.start();
@@ -31,7 +31,7 @@ public class Converter_ContourMapTest {
         // load src/test/resources/mandrill.png as a TransformedImage
         TransformedImage src = new TransformedImage(ImageIO.read(new FileInputStream("src/test/resources/mandrill.png")));
 
-        Converter_ContourMap converter = new Converter_ContourMap();
+        Converter_Mickymoe1992 converter = new Converter_Mickymoe1992();
         converter.setPlotterSettings(plotterSettings);
         converter.addImageConverterListener(new ImageConverterListener() {
             @Override
