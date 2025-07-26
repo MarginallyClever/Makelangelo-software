@@ -2,6 +2,7 @@ package com.marginallyclever.makelangelo.makeart;
 
 import com.marginallyclever.makelangelo.makeart.imagefilter.ImageFilter;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -26,20 +27,20 @@ public class TransformedImage {
 		scaleY = 1;
 	}
 
-	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
-	protected BufferedImage deepCopy(BufferedImage bi) {
-		ColorModel cm = bi.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = bi.copyData(null);
-		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
-  
 	public TransformedImage(TransformedImage copy) {
 		sourceImage = deepCopy(copy.sourceImage);
 		translateX = copy.translateX;
 		translateY = copy.translateY;
 		scaleX = copy.scaleX;
 		scaleY = copy.scaleY;
+	}
+
+	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+	protected BufferedImage deepCopy(BufferedImage bi) {
+		ColorModel cm = bi.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = bi.copyData(null);
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
 	/**
@@ -77,6 +78,42 @@ public class TransformedImage {
 		return (int) ((y / scaleY) - translateY);
 	}
 
+	class Box {
+		public double left, top, right, bottom;
+
+		public Box(double left, double top, double right, double bottom) {
+			this.left = left;
+			this.top = top;
+			this.right = right;
+			this.bottom = bottom;
+		}
+
+		public void transform() {
+			// transform the corners
+			left   = getTransformedX(left);
+			bottom = getTransformedY(bottom);
+			right  = getTransformedX(right);
+			top    = getTransformedY(top);
+			// make sure left <= right
+			if(left > right) {
+				double temp = left;
+				left = right;
+				right = temp;
+			}
+			// make sure bottom <= top
+			if(bottom > top) {
+				double temp = bottom;
+				bottom = top;
+				top = temp;
+			}
+			// find the bounds of the image once, instead of inside the loops.
+			bottom = Math.max(Math.min(bottom,sourceImage.getHeight()  ),0);
+			top    = Math.max(Math.min(top   ,sourceImage.getHeight()-1),0);
+			left   = Math.max(Math.min(left  ,sourceImage.getWidth()  ),0);
+			right  = Math.max(Math.min(right ,sourceImage.getWidth()-1),0);
+		}
+	}
+
 	/**
 	 * Returns the greyscale intensity [0...255]
 	 * @param cx center of the sample area
@@ -85,49 +122,25 @@ public class TransformedImage {
 	 * @return the greyscale intensity [0...255]
 	 */
 	public int sample(double cx, double cy, double radius) {
-		return sample(cx-radius,cy-radius,cx+radius,cy+radius);
+		return sample(new Box(cx-radius,cy-radius,cx+radius,cy+radius));
 	}
 	
 	/**
 	 * Sample the image, taking into account fractions of pixels.
-	 * @param x0 left
-	 * @param y0 top
-	 * @param x1 right
-	 * @param y1 bottom
+	 * @param Box box the area to sample
 	 * @return greyscale intensity in this region. [0...255]
 	 */
-	public int sample(double x0, double y0, double x1, double y1) {
-		// transform the corners
-		int left = getTransformedX(x0);
-		int bottom = getTransformedY(y0);
-		int right = getTransformedX(x1);
-		int top = getTransformedY(y1);
-		// in case of flip, make sure the left is less than the right, etc.
-		if (left > right) {
-			int temp = left;
-			left = right;
-			right = temp;
-		}
-		if (bottom > top) {
-			int temp = bottom;
-			bottom = top;
-			top = temp;
-		}
-		// find the bounds of the image once, instead of inside the loops.
-		bottom = Math.max(Math.min(bottom, sourceImage.getHeight()), 0);
-		top = Math.max(Math.min(top, sourceImage.getHeight()-1), 0);
-		left = Math.max(Math.min(left, sourceImage.getWidth()), 0);
-		right = Math.max(Math.min(right, sourceImage.getWidth()-1), 0);
+	private int sample(Box box) {
+		box.transform();
 
 		// now sample the entire area to average the intensity
 		int count = 0;
 		var componentCount = sourceImage.getColorModel().getNumComponents();
 		var pixel = new double[componentCount];
-
 		var raster = sourceImage.getRaster();
 		double sampleValue = 0;
-		for(int y=bottom;y<=top;++y) {
-			for(int x=left;x<=right;++x) {
+		for(int y = (int)box.bottom; y <= (int)box.top; ++y) {
+			for(int x = (int)box.left; x <= (int)box.right; ++x) {
 				raster.getPixel(x, y, pixel);
 				double sum = 0;
 				for(int i=0;i<componentCount;++i) {
@@ -142,6 +155,54 @@ public class TransformedImage {
 		// average the intensity
 		double result = sampleValue / (double)count;
 		return (int)Math.min( Math.max(result, 0), 255 );
+	}
+
+	/**
+	 * @param cx center of the sample area
+	 * @param cy center of the sample area
+	 * @param radius radius of the sample area
+	 * @return the average color in this region.
+	 */
+	public Color sampleColor(double cx, double cy, double radius) {
+		return sampleColor(new Box(cx-radius,cy-radius,cx+radius,cy+radius));
+	}
+
+	/**
+	 * Sample the image, taking into account fractions of pixels.
+	 * @param Box box the area to sample
+	 * @return the average color in this region.
+	 */
+	private Color sampleColor(Box box) {
+		box.transform();
+
+		// now sample the entire area to average the intensity
+		int count = 0;
+		var componentCount = sourceImage.getColorModel().getNumComponents();
+		var pixel = new double[componentCount];
+		var raster = sourceImage.getRaster();
+		var sum = new double[componentCount];
+		for(int y = (int)box.bottom; y <= (int)box.top; ++y) {
+			for(int x = (int)box.left; x <= (int)box.right; ++x) {
+				raster.getPixel(x, y, pixel);
+				for(int i=0;i<componentCount;++i) {
+					sum[i] += pixel[i];
+				}
+				count++;
+			}
+		}
+		if(count==0) return Color.WHITE;
+
+		// average the intensity
+		for(int i=0;i<componentCount;++i) {
+			int j = (int)(sum[i]/count);
+			sum[i] = Math.min(Math.max(j, 0), 255);
+		}
+		return new Color(
+				(int)sum[0], // red
+				(int)sum[1], // green
+				(int)sum[2], // blue
+				componentCount > 3 ? (int)sum[3] : 255 // alpha
+		);
 	}
 
 	/**
