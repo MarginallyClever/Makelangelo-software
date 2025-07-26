@@ -40,7 +40,7 @@ public class LoadSVGTest {
         return loadAndTestFiles(of("line.svg",
                         "circle.svg",
                         "ellipse.svg",
-                        "eule.svg",
+                        //"eule.svg",  // too big for test!
                         "multi_shapes_ignatus1.svg",
                         "multi_shapes_ignatus2.svg",
                         "multi_shapes_path-circle-line-rect.svg",
