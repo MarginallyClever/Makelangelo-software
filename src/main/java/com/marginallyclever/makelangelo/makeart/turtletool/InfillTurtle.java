@@ -30,7 +30,7 @@ public class InfillTurtle {
 
 	public InfillTurtle() {}
 
-	public Turtle run(Turtle input) throws Exception {
+	public Turtle run(Turtle input) {
 		// confirmTurtleIsClosedLoop(input);
 
 		Turtle result = new Turtle();

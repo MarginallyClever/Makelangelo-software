@@ -58,11 +58,10 @@ public class FilterCMYK extends ImageFilter {
      */
     @Override
     public TransformedImage filter() {
-        int h = img.getSourceImage().getHeight();
-        int w = img.getSourceImage().getWidth();
-        int px, py;
-
         BufferedImage bi = img.getSourceImage();
+        int h = bi.getHeight();
+        int w = bi.getWidth();
+
         channelCyan = new TransformedImage(img);
         channelMagenta = new TransformedImage(img);
         channelYellow = new TransformedImage(img);
@@ -72,27 +71,26 @@ public class FilterCMYK extends ImageFilter {
         BufferedImage cm = channelMagenta.getSourceImage();
         BufferedImage cy = channelYellow.getSourceImage();
         BufferedImage ck = channelBlack.getSourceImage();
-        double r, g, b, k, ik, c, m, y;
-        int pixel;
 
-        for (py = 0; py < h; ++py) {
-            for (px = 0; px < w; ++px) {
-                pixel = bi.getRGB(px, py);
+        for (int py = 0; py < h; ++py) {
+            for (int px = 0; px < w; ++px) {
+                int pixel = bi.getRGB(px, py);
                 //double a = 255-((pixel>>24) & 0xff);
-                r = 1.0 - (double) ((pixel >> 16) & 0xff) / 255.0;
-                g = 1.0 - (double) ((pixel >> 8) & 0xff) / 255.0;
-                b = 1.0 - (double) ((pixel) & 0xff) / 255.0;
+                double r = 1.0 - (double) ((pixel >> 16) & 0xff) / 255.0;
+                double g = 1.0 - (double) ((pixel >> 8) & 0xff) / 255.0;
+                double b = 1.0 - (double) ((pixel) & 0xff) / 255.0;
                 // now convert to cmyk
-                k = Math.min(Math.min(r, g), b);   // should be Math.max(Math.max(r,g),b) but colors are inverted.
-                ik = 1.0 - k;
+                double k = Math.min(Math.min(r, g), b);   // should be Math.max(Math.max(r,g),b) but colors are inverted.
+                double ik = 1.0 - k;
 
-                //if(ik<1.0/255.0) {
-                //	c1=m1=y1=0;
-                //} else {
-                c = (r - k) / ik;
-                m = (g - k) / ik;
-                y = (b - k) / ik;
-                //}
+                double c, m, y;
+                if(ik<1.0/255.0) {
+                	c=m=y=0;
+                } else {
+                    c = (r - k) / ik;
+                    m = (g - k) / ik;
+                    y = (b - k) / ik;
+                }
                 cc.setRGB(px, py, ImageFilter.encode32bit(255 - (int) (c * 255.0)));
                 cm.setRGB(px, py, ImageFilter.encode32bit(255 - (int) (m * 255.0)));
                 cy.setRGB(px, py, ImageFilter.encode32bit(255 - (int) (y * 255.0)));

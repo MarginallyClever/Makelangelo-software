@@ -30,7 +30,7 @@ public class Converter_Crosshatch extends ImageConverter {
 			this.intensity = intensity;
 		}
 	}
-	private static final List<CrosshatchPass> passes = new ArrayList<CrosshatchPass>();
+	private static final List<CrosshatchPass> passes = new ArrayList<>();
 
 	public Converter_Crosshatch() {
 		super();
