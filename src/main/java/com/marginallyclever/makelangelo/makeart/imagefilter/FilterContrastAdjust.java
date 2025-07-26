@@ -51,9 +51,9 @@ public class FilterContrastAdjust extends ImageFilter {
 			int[] pixel = new int[count];
 			for (int x = 0; x < w; ++x) {
 				raster.getPixel(x, y, pixel);
-				pixel[0] = adjust(pixel[0]);
-				pixel[1] = adjust(pixel[1]);
-				pixel[2] = adjust(pixel[2]);
+				for(int i = 0; i < count; ++i) {
+					pixel[i] = adjust(pixel[i]);
+				}
 				afterRaster.setPixel(x, y, pixel);
 			}
 		});
