@@ -156,7 +156,7 @@ public class Converter_EdgeDetection extends ImageConverter {
 		int code = in0 | in1 | in2 | in3;
 
 		// 15 is a mirror of 1 and so on.
-		if(code>7) code = 15-code;
+		if(code > 7) code = 15 - code;
 
 		switch(code) {
 			case 0:  break;
