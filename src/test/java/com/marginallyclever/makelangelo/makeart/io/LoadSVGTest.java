@@ -41,6 +41,7 @@ public class LoadSVGTest {
                         "circle.svg",
                         "ellipse.svg",
                         //"eule.svg",  // too big for test!
+                        "hersheyTest.svg",
                         "multi_shapes_ignatus1.svg",
                         "multi_shapes_ignatus2.svg",
                         "multi_shapes_path-circle-line-rect.svg",
