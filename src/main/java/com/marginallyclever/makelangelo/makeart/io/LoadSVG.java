@@ -1,13 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.Bezier;
-
 import com.marginallyclever.convenience.W3CColorNames;
 import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SVGItem;
+import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,9 @@ public class LoadSVG implements TurtleLoader {
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
 	private final Matrix3d viewBoxMatrix = new Matrix3d();
+
+	private BridgeContext bridgeContext;
+	private GraphicsNode rootNode;
 
 	public LoadSVG() {
 		super();
@@ -517,6 +521,7 @@ public class LoadSVG implements TurtleLoader {
 		SVGPathSegList pathList = element.getNormalizedPathSegList();
 		for(int i=0; i<pathList.getNumberOfItems(); i++) {
 			SVGPathSeg item = pathList.getItem(i);
+
 			switch( item.getPathSegType() ) {
 				case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m,t);  	// M
 				case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m,t);  		// m
@@ -629,7 +634,7 @@ public class LoadSVG implements TurtleLoader {
 		// Check fill attribute
 		if (element.hasAttribute("fill")) {
 			String fillValue = element.getAttribute("fill").toLowerCase().trim();
-			if (!fillValue.equals("none") && !fillValue.equals("") && !fillValue.equals("transparent")) {
+			if (!fillValue.equals("none") && !fillValue.isEmpty() && !fillValue.equals("transparent")) {
 				return true;
 			}
 		}
@@ -647,17 +652,16 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private Matrix3d getMatrixFromElement(Element element) {
 		Matrix3d m = new Matrix3d();
-		m.setIdentity();
+		//m.setIdentity();
 
-		if(element instanceof SVGGraphicsElement svgGE) {
-			try {
-				SVGMatrix svgMatrix = svgGE.getCTM();
-				m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
-				m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
+		GraphicsNode gn = bridgeContext.getGraphicsNode(element);
+		if(gn!=null) {
+			// Get the global transform of the graphics node
+			AffineTransform at = gn.getGlobalTransform();
+			if(at!=null) {
+				m.m00 = at.getScaleX();	m.m01 = at.getShearY();	m.m02 = at.getTranslateX();
+				m.m10 = at.getShearX();	m.m11 = at.getScaleY();	m.m12 = at.getTranslateY();
 				m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
-			}
-			catch(Exception e) {
-				m.setIdentity();
 			}
 		}
 
@@ -675,11 +679,31 @@ public class LoadSVG implements TurtleLoader {
 	private void initSVGDOM(Document document) {
 		UserAgent userAgent = new UserAgentAdapter();
 		DocumentLoader loader = new DocumentLoader(userAgent);
-		BridgeContext bridgeContext = new BridgeContext(userAgent, loader);
-		bridgeContext.setDynamicState(BridgeContext.STATIC);
+		bridgeContext = new BridgeContext(userAgent, loader);
+		bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
 
 		// Enable CSS- and SVG-specific enhancements.
-		(new GVTBuilder()).build(bridgeContext, document);
+		GVTBuilder builder = new GVTBuilder();
+		rootNode = builder.build(bridgeContext, document);
+		countGraphicsNodes(document);
+	}
+
+	private void countGraphicsNodes(Document document) {
+		// walk all elements, count them, and count how many have a GraphicsNode.
+		NodeList nodeList = document.getElementsByTagName("*");
+		int count = 0;
+		int gvtCount = 0;
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node instanceof Element element) {
+				count++;
+				GraphicsNode graphicsNode = bridgeContext.getGraphicsNode(element);
+				if (graphicsNode != null) {
+					gvtCount++;
+				}
+			}
+		}
+		logger.debug("gvtCount=" + gvtCount + " count=" + count);
 	}
 
 	private SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {
