@@ -73,7 +73,7 @@ public class FilterDesaturate extends ImageFilter {
  	 */
 	private double toneControl(double b) {
 		b /= 255.0;
-		b = 0.017 * Math.exp(3.29 * b) + 0.005 * Math.exp(7.27 * b);
+		//b = 0.017 * Math.exp(3.29 * b) + 0.005 * Math.exp(7.27 * b);
 		return Math.min(1, Math.max(0, b)) * 255.0;
 	}
 
