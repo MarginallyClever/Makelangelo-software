@@ -1,12 +1,13 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
 import com.marginallyclever.convenience.Bezier;
-
 import com.marginallyclever.convenience.W3CColorNames;
+import com.marginallyclever.makelangelo.makeart.turtletool.InfillTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.apache.batik.anim.dom.*;
 import org.apache.batik.bridge.*;
 import org.apache.batik.dom.svg.SVGItem;
+import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector3d;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +44,9 @@ public class LoadSVG implements TurtleLoader {
 	private final Vector3d pathFirstPoint = new Vector3d();
 	private final Vector3d pathPoint = new Vector3d();
 	private final Matrix3d viewBoxMatrix = new Matrix3d();
+
+	private BridgeContext bridgeContext;
+	private GraphicsNode rootNode;
 
 	public LoadSVG() {
 		super();
@@ -69,18 +74,21 @@ public class LoadSVG implements TurtleLoader {
 		Document document = newDocumentFromInputStream(in);
 		initSVGDOM(document);
 
-		myTurtle = new Turtle();
-		myTurtle.setStroke(Color.BLACK);  // initial pen color
+		myTurtle = new Turtle(Color.BLACK);  // initial pen color
 		parseAll(document);
 
 		// plotter coordinates are inverted in Y so flip the image.
 		myTurtle.scale(1, -1);
 
+		return removeEmptyLayers(myTurtle);
+	}
+
+	// remove tool changes for zero-length moves.
+	private Turtle removeEmptyLayers(Turtle before) {
 		Turtle result = new Turtle();
 		result.getLayers().clear();
 
-		// remove tool changes for zero-length moves.
-		List<Turtle> list = myTurtle.splitByToolChange();
+		List<Turtle> list = before.splitByToolChange();
 		for(Turtle t : list) {
 			if(t.getDrawDistance()>0)
 				result.add(t);
@@ -169,21 +177,28 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private void parsePolylineElement(Element pathNodes) {
 		SVGPointShapeElement element = (SVGPointShapeElement)pathNodes;
-
 		Matrix3d m = getMatrixFromElement(element);
-
 		SVGPointList pointList = element.getAnimatedPoints();
 		int numPoints = pointList.getNumberOfItems();
-		//logger.debug("New Node has "+pathObjects+" elements.");
 
+		//logger.debug("New Node has "+pathObjects+" elements.");
 		SVGPoint item = pointList.getItem(0);
 		Vector3d v2 = transform(item.getX(),item.getY(),m);
-		myTurtle.jumpTo(v2.x,v2.y);
+
+		var t = new Turtle(myTurtle.getColor(), myTurtle.getDiameter());
+		t.jumpTo(v2.x,v2.y);
 
 		for( int i=1; i<numPoints; ++i ) {
 			item = pointList.getItem(i);
 			v2 = transform(item.getX(),item.getY(),m);
-			myTurtle.moveTo(v2.x,v2.y);
+			t.moveTo(v2.x,v2.y);
+		}
+
+		myTurtle.add(t);
+		if(isFilled(element)) {
+			var filler = new InfillTurtle();
+			filler.setPenDiameter(myTurtle.getDiameter());
+			myTurtle.add(filler.run(t));
 		}
 	}
 
@@ -379,12 +394,19 @@ public class LoadSVG implements TurtleLoader {
 		double y2=y+h-ry;
 		//double y3=y+h;
 
+		Turtle t = new Turtle(myTurtle.getColor(), myTurtle.getDiameter());
 		Vector3d v2 = transform(x1,y0,m);
-		myTurtle.jumpTo(v2.x,v2.y);
-		arcTurtle(myTurtle, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m);
-		arcTurtle(myTurtle, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
-		arcTurtle(myTurtle, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
-		arcTurtle(myTurtle, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
+		t.jumpTo(v2.x,v2.y);
+		arcTurtle(t, x2,y1, rx,ry, Math.PI * -0.5,Math.PI *  0.0,m);
+		arcTurtle(t, x2,y2, rx,ry, Math.PI *  0.0,Math.PI *  0.5,m);
+		arcTurtle(t, x1,y2, rx,ry, Math.PI * -1.5,Math.PI * -1.0,m);
+		arcTurtle(t, x1,y1, rx,ry, Math.PI * -1.0,Math.PI * -0.5,m);
+		myTurtle.add(t);
+		if(isFilled(element)) {
+			var filler = new InfillTurtle();
+			filler.setPenDiameter(myTurtle.getDiameter());
+			myTurtle.add(filler.run(t));
+		}
 	}
 
 	/**
@@ -425,13 +447,21 @@ public class LoadSVG implements TurtleLoader {
 		if(element.hasAttribute("cy")) cy = Double.parseDouble(element.getAttribute("cy"));
 		if(element.hasAttribute("r" )) r  = Double.parseDouble(element.getAttribute("r"));
 		v2 = transform(cx+r,cy,m);
-		myTurtle.jumpTo(v2.x,v2.y);
+
+		var t = new Turtle(myTurtle.getColor(), myTurtle.getDiameter());
+		t.jumpTo(v2.x,v2.y);
 
 		double circ = Math.PI * 2.0 * r;
 		circ = Math.ceil(Math.min(Math.max(3,circ),360));
 
 		//logger.debug("circ={}", circ);
-		printEllipse(m, cx, cy, r, r, circ);
+		printEllipse(t, m, cx, cy, r, r, circ);
+		myTurtle.add(t);
+		if(isFilled(element)) {
+			var filler = new InfillTurtle();
+			filler.setPenDiameter(myTurtle.getDiameter());
+			myTurtle.add(filler.run(t));
+		}
 	}
 
 	private void parseEllipseElement(Element element) {
@@ -444,25 +474,32 @@ public class LoadSVG implements TurtleLoader {
 		if(element.hasAttribute("rx")) rx = Double.parseDouble(element.getAttribute("rx"));
 		if(element.hasAttribute("ry")) ry = Double.parseDouble(element.getAttribute("ry"));
 		v2 = transform(cx+rx,cy,m);
-		myTurtle.jumpTo(v2.x,v2.y);
+		var t = new Turtle(myTurtle.getColor(), myTurtle.getDiameter());
+		t.jumpTo(v2.x,v2.y);
 
 		double perimeterOfAnEllipseApprox = Math.PI * 2.0 * Math.sqrt((ry*ry + rx*rx)/2.0);
 		double steps = Math.max(3,perimeterOfAnEllipseApprox);
 		steps = Math.min(60,steps);
-		printEllipse(m, cx, cy, rx, ry, steps);
+		printEllipse(t, m, cx, cy, rx, ry, steps);
+		myTurtle.add(t);
+		if(isFilled(element)) {
+			var filler = new InfillTurtle();
+			filler.setPenDiameter(myTurtle.getDiameter());
+			myTurtle.add(filler.run(t));
+		}
 	}
 
-	private void printEllipse(Matrix3d m, double cx, double cy, double rx, double ry, double steps) {
+	private void printEllipse(Turtle t, Matrix3d m, double cx, double cy, double rx, double ry, double steps) {
 		Vector3d v2;
 		for(double i = 1; i<steps; ++i) {
 			double v = (Math.PI*2.0) * (i/steps);
 			double s=ry*Math.sin(v);
 			double c=rx*Math.cos(v);
 			v2 = transform(cx+c,cy+s,m);
-			myTurtle.moveTo(v2.x,v2.y);
+			t.moveTo(v2.x,v2.y);
 		}
 		v2 = transform(cx+rx,cy,m);
-		myTurtle.moveTo(v2.x,v2.y);
+		t.moveTo(v2.x,v2.y);
 	}
 
 	/**
@@ -478,23 +515,32 @@ public class LoadSVG implements TurtleLoader {
 		SVGOMPathElement element = (SVGOMPathElement)paths;
 		Matrix3d m = getMatrixFromElement(element);
 
+		var t = new Turtle(myTurtle.getColor(), myTurtle.getDiameter());
+
 		isNewPath=true;
 		SVGPathSegList pathList = element.getNormalizedPathSegList();
 		for(int i=0; i<pathList.getNumberOfItems(); i++) {
 			SVGPathSeg item = pathList.getItem(i);
+
 			switch( item.getPathSegType() ) {
-				case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m);  	// M
-				case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m);  		// m
-				case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m);  	// L H V
-				case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m);  	// l h v
-				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m);	// C c
-				case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(); 			// Z z
+				case SVGPathSeg.PATHSEG_MOVETO_ABS 			-> doMoveToAbs(item,m,t);  	// M
+				case SVGPathSeg.PATHSEG_MOVETO_REL 			-> doMoveRel(item,m,t);  		// m
+				case SVGPathSeg.PATHSEG_LINETO_ABS 			-> doLineToAbs(item,m,t);  	// L H V
+				case SVGPathSeg.PATHSEG_LINETO_REL 			-> doLineToRel(item,m,t);  	// l h v
+				case SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS 	-> doCubicCurveAbs(item,m,t);	// C c
+				case SVGPathSeg.PATHSEG_CLOSEPATH 			-> doClosePath(t); 			// Z z
 				default -> throw new Exception("Found unknown SVGPathSeg type "+((SVGItem)item).getValueAsString());
 			}
 		}
+		myTurtle.add(t);
+		if(isFilled(element)) {
+			var filler = new InfillTurtle();
+			filler.setPenDiameter(myTurtle.getDiameter());
+			myTurtle.add(filler.run(t));
+		}
 	}
 
-	private void doCubicCurveAbs(SVGPathSeg item, Matrix3d m) {
+	private void doCubicCurveAbs(SVGPathSeg item, Matrix3d m,Turtle t) {
 		SVGPathSegCurvetoCubicAbs path = (SVGPathSegCurvetoCubicAbs)item;
 
 		// x0,y0 is the first point
@@ -514,53 +560,53 @@ public class LoadSVG implements TurtleLoader {
 				p2.x,p2.y,
 				p3.x,p3.y);
 		List<Point2d> points = b.generateCurvePoints(0.1);
-		for(Point2d p : points) myTurtle.moveTo(p.x,p.y);
+		for(Point2d p : points) t.moveTo(p.x,p.y);
 		pathPoint.set(p3);
 		isNewPath=true;
 	}
 
-	private void doLineToRel(SVGPathSeg item, Matrix3d m) {
+	private void doLineToRel(SVGPathSeg item, Matrix3d m,Turtle t) {
 		SVGPathSegLinetoRel path = (SVGPathSegLinetoRel)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		logger.debug("Line Rel {}", p);
 		pathPoint.set(myTurtle.getX(),myTurtle.getY(),0);
 		pathPoint.add(p);
-		myTurtle.moveTo(pathPoint.x,pathPoint.y);
+		t.moveTo(pathPoint.x,pathPoint.y);
 		isNewPath=false;
 	}
 
-	private void doLineToAbs(SVGPathSeg item, Matrix3d m) {
+	private void doLineToAbs(SVGPathSeg item, Matrix3d m,Turtle t) {
 		SVGPathSegLinetoAbs path = (SVGPathSegLinetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		//logger.debug("Line Abs {}", p);
 		pathPoint.set(p);
-		myTurtle.moveTo(pathPoint.x,pathPoint.y);
+		t.moveTo(pathPoint.x,pathPoint.y);
 		isNewPath=false;
 	}
 
-	private void doMoveRel(SVGPathSeg item, Matrix3d m) {
+	private void doMoveRel(SVGPathSeg item, Matrix3d m,Turtle t) {
 		SVGPathSegMovetoRel path = (SVGPathSegMovetoRel)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		//logger.debug("Move Rel {}", p);
 		pathPoint.add(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
-		myTurtle.jumpTo(p.x,p.y);
+		t.jumpTo(p.x,p.y);
 		isNewPath=false;
 	}
 
-	private void doMoveToAbs(SVGPathSeg item, Matrix3d m) {
+	private void doMoveToAbs(SVGPathSeg item, Matrix3d m,Turtle t) {
 		SVGPathSegMovetoAbs path = (SVGPathSegMovetoAbs)item;
 		Vector3d p = transform(path.getX(),path.getY(),m);
 		//logger.debug("Move Abs {}", p);
 		pathPoint.set(p);
 		if(isNewPath) pathFirstPoint.set(pathPoint);
-		myTurtle.jumpTo(p.x,p.y);
+		t.jumpTo(p.x,p.y);
 		isNewPath=false;
 	}
 
-	private void doClosePath() {
+	private void doClosePath(Turtle t) {
 		//logger.debug("Close path");
-		myTurtle.moveTo(pathFirstPoint.x,pathFirstPoint.y);
+		t.moveTo(pathFirstPoint.x,pathFirstPoint.y);
 		isNewPath=true;
 	}
 
@@ -568,6 +614,31 @@ public class LoadSVG implements TurtleLoader {
 		Vector3d p = new Vector3d(x,y,1);
 		m.transform(p);
 		return p;
+	}
+
+	private boolean isFilled(Element element) {
+		// Check style attribute first
+		if (element.hasAttribute("style")) {
+			String style = element.getAttribute("style").toLowerCase().replaceAll("\\s+", "");
+			int k = style.indexOf("fill:");
+			if (k >= 0) {
+				String fillValue = style.substring(k + 5);
+				if (fillValue.contains(";")) {
+					fillValue = fillValue.substring(0, fillValue.indexOf(";")).trim();
+				}
+				if(!fillValue.isEmpty() && !fillValue.equals("none") && !fillValue.equals("transparent")) {
+					return true;
+				}
+			}
+		}
+		// Check fill attribute
+		if (element.hasAttribute("fill")) {
+			String fillValue = element.getAttribute("fill").toLowerCase().trim();
+			if (!fillValue.equals("none") && !fillValue.isEmpty() && !fillValue.equals("transparent")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -581,17 +652,16 @@ public class LoadSVG implements TurtleLoader {
 	 */
 	private Matrix3d getMatrixFromElement(Element element) {
 		Matrix3d m = new Matrix3d();
-		m.setIdentity();
+		//m.setIdentity();
 
-		if(element instanceof SVGGraphicsElement svgGE) {
-			try {
-				SVGMatrix svgMatrix = svgGE.getCTM();
-				m.m00 = svgMatrix.getA();	m.m01 = svgMatrix.getC();	m.m02 = svgMatrix.getE();
-				m.m10 = svgMatrix.getB();	m.m11 = svgMatrix.getD();	m.m12 = svgMatrix.getF();
+		GraphicsNode gn = bridgeContext.getGraphicsNode(element);
+		if(gn!=null) {
+			// Get the global transform of the graphics node
+			AffineTransform at = gn.getGlobalTransform();
+			if(at!=null) {
+				m.m00 = at.getScaleX();	m.m01 = at.getShearY();	m.m02 = at.getTranslateX();
+				m.m10 = at.getShearX();	m.m11 = at.getScaleY();	m.m12 = at.getTranslateY();
 				m.m20 = 0;					m.m21 = 0;					m.m22 = 1;
-			}
-			catch(Exception e) {
-				m.setIdentity();
 			}
 		}
 
@@ -609,11 +679,31 @@ public class LoadSVG implements TurtleLoader {
 	private void initSVGDOM(Document document) {
 		UserAgent userAgent = new UserAgentAdapter();
 		DocumentLoader loader = new DocumentLoader(userAgent);
-		BridgeContext bridgeContext = new BridgeContext(userAgent, loader);
-		bridgeContext.setDynamicState(BridgeContext.STATIC);
+		bridgeContext = new BridgeContext(userAgent, loader);
+		bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
 
 		// Enable CSS- and SVG-specific enhancements.
-		(new GVTBuilder()).build(bridgeContext, document);
+		GVTBuilder builder = new GVTBuilder();
+		rootNode = builder.build(bridgeContext, document);
+		countGraphicsNodes(document);
+	}
+
+	private void countGraphicsNodes(Document document) {
+		// walk all elements, count them, and count how many have a GraphicsNode.
+		NodeList nodeList = document.getElementsByTagName("*");
+		int count = 0;
+		int gvtCount = 0;
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node instanceof Element element) {
+				count++;
+				GraphicsNode graphicsNode = bridgeContext.getGraphicsNode(element);
+				if (graphicsNode != null) {
+					gvtCount++;
+				}
+			}
+		}
+		logger.debug("gvtCount=" + gvtCount + " count=" + count);
 	}
 
 	private SVGDocument newDocumentFromInputStream(InputStream in) throws Exception {

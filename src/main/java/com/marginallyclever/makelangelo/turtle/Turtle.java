@@ -17,9 +17,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * A {@link Turtle} is a collection of instructions which, combined, form a drawing on a 2D surface.
+ * <p>A {@link Turtle} is a collection of instructions which, combined, form a drawing on a 2D surface.
  * The name is based on the Commodore 64 turtle from the LOGO programming language, and movement is very similar.
- * Commands include:
+ * Commands include:</p>
  * <ul>
  *     <li>lifting and lowering the turtle's tail</li>
  *     <li>turning relative or absolute amounts</li>
@@ -27,10 +27,15 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>moving relative or absolute amounts regardless of direction</li>
  *     <li>changing the tool (color and diameter)</li>
  * </ul>
- * The turtle's starting angle is 0 degrees, which is to the right.  The turtle starts with the tail down.
- *
- * @author Dan Royer
- * @since 7.0?
+ * <h3>Structure</h3>
+ * <p>A {@link Turtle} is made of {@link StrokeLayer}s which contain a {@link ListOfLines} which extend a
+ * {@link ListOfPoints}.  This way any operation that can be done on a {@link ListOfPoints} can also be done to a
+ * {@link ListOfLines}.  It also means that the underlying structure of the data is well-organized for 3D graphics
+ * video cards.  Each {@link StrokeLayer} defines a new pen diameter or pen color or both.</p>
+ * <h3>Initial State</h3>
+ * <p>The {@link Turtle}'s starting angle is 0 degrees, equivalent to the right or east.  An angle of 90 would be due
+ * north or up. The {@link Turtle} starts with the tail down. The starting pen diameter is 1mm.  The starting color is
+ * black.</p>
  */
 public class Turtle implements Cloneable {
 	public static final double DEFAULT_DIAMETER = 1.0;

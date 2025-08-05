@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
@@ -39,11 +40,14 @@ public class FilterDesaturate extends ImageFilter {
 			int[] pixel = new int[count];
 			for (int x = 0; x < w; ++x) {
 				raster.getPixel(x, y, pixel);
-				double average = (pixel[0]+pixel[1]+pixel[2])/3.0;
+				double average = 0;
+				for (int i = 0; i < count; ++i) {
+					// convert sRGB to linear
+					average += pixel[i];
+				}
+				average /= count;
 				int toned = (int)toneControl(average);
-				pixel[0] = toned;
-				pixel[1] = toned;
-				pixel[2] = toned;
+                Arrays.fill(pixel, toned);
 				afterRaster.setPixel(x,y,pixel);
 			}
 		});
@@ -69,7 +73,7 @@ public class FilterDesaturate extends ImageFilter {
  	 */
 	private double toneControl(double b) {
 		b /= 255.0;
-		b = 0.017 * Math.exp(3.29 * b) + 0.005 * Math.exp(7.27 * b);
+		//b = 0.017 * Math.exp(3.29 * b) + 0.005 * Math.exp(7.27 * b);
 		return Math.min(1, Math.max(0, b)) * 255.0;
 	}
 

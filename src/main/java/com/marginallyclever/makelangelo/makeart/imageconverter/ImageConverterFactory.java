@@ -20,6 +20,7 @@ public class ImageConverterFactory {
 					new Converter_FlowField(),
 					new Converter_Hexxy(),
 					new Converter_IntensityToHeight(),
+					new Converter_Mickymoe1992(),
 					new Converter_Moire(),
 					new Converter_Multipass(),
 					new Converter_Pulse(),

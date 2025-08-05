@@ -6,6 +6,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.marginallyclever.convenience.helpers.ResourceHelper;
 import com.marginallyclever.makelangelo.Mesh;
+import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.texture.TextureFactory;
 import com.marginallyclever.util.PreferencesHelper;
 import org.slf4j.Logger;
@@ -73,6 +74,10 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 			glCanvas = new GLJPanel(capabilities);
 		} catch(GLException e) {
 			logger.error("I failed the very first call to OpenGL.  Are your native libraries missing?", e);
+			JOptionPane.showMessageDialog(null,
+					Translator.get("OpenGLPanel.errorNoGL3"),
+					Translator.get("ErrorTitle"),
+					JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 
@@ -154,7 +159,12 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		setTipXY();
 	}
 
-	private GLCapabilities getCapabilities() {
+	/**
+	 * Get the OpenGL capabilities for this panel.
+	 * @return the OpenGL capabilities
+	 * @throws GLException if the OpenGL profile is below minimum requirements
+	 */
+	private GLCapabilities getCapabilities() throws GLException {
 		GLProfile profile = GLProfile.getMaxProgrammable(true);
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		capabilities.setHardwareAccelerated(true);
@@ -165,6 +175,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		StringBuilder sb = new StringBuilder();
 		capabilities.toString(sb);
 		logger.info("capabilities="+sb);
+		if(!profile.isGL3()) throw new GLException("OpenGL 3.0 or higher is required.");
 		return capabilities;
 	}
 
@@ -207,7 +218,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	@Override
 	public void init(GLAutoDrawable glAutoDrawable) {
 		logger.debug("init");
-
+		glAutoDrawable.getGL().getGL3();
 		activatePipelines(glAutoDrawable);
 
 		var gl = glAutoDrawable.getGL().getGL3();

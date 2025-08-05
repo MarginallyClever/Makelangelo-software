@@ -55,7 +55,7 @@ public class CropTurtle {
 		return newLayer;
 	}
 
-	private static void addIntersectionToLayer(Geometry intersection, StrokeLayer newLayer) {
+	public static void addIntersectionToLayer(Geometry intersection, StrokeLayer newLayer) {
 		// merge the results into the new layer.
 		if (intersection instanceof LineString lineIntersection) {
 			// create a new line from the coordinates
@@ -71,7 +71,7 @@ public class CropTurtle {
 		}
 	}
 
-	private static LineString createLineStringFromLine2d(GeometryFactory gf, Line2d line) {
+	public static LineString createLineStringFromLine2d(GeometryFactory gf, Line2d line) {
 		// convert line to jts format
 		Coordinate[] list = new Coordinate[line.size()];
 		for(int i=0;i<line.size();++i) {
