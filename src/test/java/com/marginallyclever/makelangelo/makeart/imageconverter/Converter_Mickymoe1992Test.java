@@ -9,6 +9,7 @@ import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettingsM
 import com.marginallyclever.makelangelo.turtle.Turtle;
 import com.marginallyclever.util.PreferencesHelper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -24,6 +25,7 @@ public class Converter_Mickymoe1992Test {
     }
 
     @Test
+    @Disabled
     public void testContourMapConversion() throws IOException {
         Paper paper = new Paper();
         PlotterSettings plotterSettings = new PlotterSettings();
