@@ -18,9 +18,9 @@ import java.util.PriorityQueue;
 /**
  * <p>Converts an image into a contour map using the fast marching method.
  * The contours are extracted from the arrival times computed from the image brightness.</p>
- * <p>Style idea by <a href="https://www.reddit.com/r/PlotterArt/comments/1lu3bok/finally_i_have_a_contour_plotting_algorithm/">Mickymoe1992</a>.</p>
+ * <p>Style idea by <a href="https://www.reddit.com/r/PlotterArt/comments/1lu3bok/finally_i_have_a_contour_plotting_algorithm/">Mickeymoe1992</a>.</p>
  */
-public class Converter_Mickymoe1992 extends ImageConverter {
+public class Converter_Mickeymoe1992 extends ImageConverter {
     private static double minSpacing = 10.0;
     private static int seedX = 50, seedY = 50;
     
@@ -29,10 +29,10 @@ public class Converter_Mickymoe1992 extends ImageConverter {
     private boolean recalculateFFM = true;
     private double [][] ffm;
 
-    public Converter_Mickymoe1992() {
+    public Converter_Mickeymoe1992() {
         super();
 
-        var minSpacingSelect = new SelectDouble("minSpacing", Translator.get("Converter_Mickymoe1992.minSpacing"), Converter_Mickymoe1992.minSpacing);
+        var minSpacingSelect = new SelectDouble("minSpacing", Translator.get("Converter_Mickymoe1992.minSpacing"), Converter_Mickeymoe1992.minSpacing);
         minSpacingSelect.addSelectListener((evt) -> {
             minSpacing = (double) evt.getNewValue();
             recalculateFFM=false;
