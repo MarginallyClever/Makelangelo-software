@@ -528,6 +528,7 @@ public class Graphics2DGL extends Graphics2D {
     @Override
     public void dispose() {
         if(isDisposed.getAndSet(true)) return;  // already disposed.
+        mesh.unload(gl);
     }
 
     public void setContext(GL3 context) {
