@@ -119,7 +119,7 @@ jobs:
           APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/")
           sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
           APP_NAME="Makelangelo-${{ matrix.os_label }}"
-          jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.os }}.cfg" \
+          jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.runs_on }}.cfg" \
             --main-jar "$APP_NAME-$APP_VERSION-with-dependencies.jar" \
             --name "$APP_NAME"
           BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '\.msi$|\.deb$|\.dmg$')
