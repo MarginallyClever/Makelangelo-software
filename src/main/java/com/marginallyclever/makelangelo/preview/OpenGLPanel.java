@@ -229,8 +229,11 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 
 		// make things pretty
 		gl.glEnable(GL3.GL_LINE_SMOOTH);
+		gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_NICEST);
+
 		gl.glEnable(GL3.GL_POLYGON_SMOOTH);
 		gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
+
 		gl.glEnable(GL3.GL_MULTISAMPLE);
 
 		try {
@@ -281,10 +284,12 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		if(prefs != null && prefs.getBoolean("antialias", true)) {
 			gl.glEnable(GL3.GL_LINE_SMOOTH);
+			gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_NICEST);
 			gl.glEnable(GL3.GL_POLYGON_SMOOTH);
 			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
 		} else {
 			gl.glDisable(GL3.GL_LINE_SMOOTH);
+			gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_FASTEST);
 			gl.glDisable(GL3.GL_POLYGON_SMOOTH);
 			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_FASTEST);
 		}

@@ -6,6 +6,9 @@ import com.jogamp.opengl.glu.GLU;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A collection of static methods to help with OpenGL.
@@ -15,6 +18,8 @@ public class OpenGLHelper {
 	private static final IntBuffer depthFunc = IntBuffer.allocate(1);
 	private static final FloatBuffer lineWidth = FloatBuffer.allocate(1);
 
+	private static final List<Integer> errorCodes = new ArrayList<>();
+	
 	public static int drawAtopEverythingStart(GL3 gl) {
 		gl.glGetIntegerv(GL3.GL_DEPTH_FUNC, depthFunc);
 		gl.glDepthFunc(GL3.GL_ALWAYS);
@@ -26,6 +31,10 @@ public class OpenGLHelper {
 		if(err != GL.GL_NO_ERROR) {
 			GLU glu = GLU.createGLU(gl3);
 			logger.error("GL error {}: {}", err, glu.gluErrorString(err));
+			if(!errorCodes.contains(err)) {
+				errorCodes.add(err);
+				logger.error("Stack trace: {}", Arrays.toString(Thread.currentThread().getStackTrace()));
+			}
 		}
 	}
 

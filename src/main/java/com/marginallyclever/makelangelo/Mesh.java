@@ -24,8 +24,6 @@ import java.util.List;
 public class Mesh {
 	private static final Logger logger = LoggerFactory.getLogger(Mesh.class);
 	public static final int NUM_BUFFERS=5;  // verts, normals, colors, textureCoordinates, index
-	public static final int BYTES_PER_INT = Integer.SIZE/8;
-	public static final int BYTES_PER_FLOAT = Float.SIZE/8;
 
 	public final transient List<Float> vertexArray = new ArrayList<>();
 	public final transient List<Float> normalArray = new ArrayList<>();
@@ -149,7 +147,7 @@ public class Mesh {
 			data.rewind();
 
 			gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, VBO[4]);
-			gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, (long) indexArray.size() *BYTES_PER_INT, data, GL3.GL_STATIC_DRAW);
+			gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, (long) indexArray.size() * Integer.BYTES, data, GL3.GL_STATIC_DRAW);
 		}
 
 		gl.glBindVertexArray(0);
@@ -183,7 +181,7 @@ public class Mesh {
 		for( Float f : list ) data.put(f);
 		data.rewind();
 		bindArray(gl,attribIndex,size);
-		gl.glBufferData(GL3.GL_ARRAY_BUFFER, numVertexes*size*BYTES_PER_FLOAT, data, GL3.GL_STATIC_DRAW);
+		gl.glBufferData(GL3.GL_ARRAY_BUFFER, numVertexes*size*Float.BYTES, data, GL3.GL_STATIC_DRAW);
 		OpenGLHelper.checkGLError(gl,logger);
 	}
 
