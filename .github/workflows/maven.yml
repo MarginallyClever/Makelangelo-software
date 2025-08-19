@@ -98,10 +98,11 @@ jobs:
           arch: x64
           java_arch: x64
           os_label: windows
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runs_on }}
 
     steps:
-      # YAML
+      - name: Show runner label
+        run: echo "Runner: ${{ matrix.runs_on }}"
       - name: Show arch
         run: uname -m
 
