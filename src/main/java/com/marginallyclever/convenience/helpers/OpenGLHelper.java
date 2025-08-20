@@ -7,7 +7,6 @@ import com.jogamp.opengl.glu.GLU;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,7 +32,8 @@ public class OpenGLHelper {
 			logger.error("GL error {}: {}", err, glu.gluErrorString(err));
 			if(!errorCodes.contains(err)) {
 				errorCodes.add(err);
-				logger.error("Stack trace: {}", Arrays.toString(Thread.currentThread().getStackTrace()));
+				var error = new Exception("GL error %s: %s".formatted(err, glu.gluErrorString(err)));
+				logger.error(error.getMessage(), error);
 			}
 		}
 	}
