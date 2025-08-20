@@ -147,10 +147,13 @@ public class Mesh {
 			data.rewind();
 
 			gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, VBO[4]);
+			OpenGLHelper.checkGLError(gl,logger);
 			gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, (long) indexArray.size() * Integer.BYTES, data, GL3.GL_STATIC_DRAW);
+			OpenGLHelper.checkGLError(gl,logger);
 		}
 
 		gl.glBindVertexArray(0);
+		OpenGLHelper.checkGLError(gl,logger);
 	}
 
 	private void checkBufferSizes() {
@@ -171,7 +174,9 @@ public class Mesh {
 
 	private void bindArray(GL3 gl, int attribIndex, int size) {
 		gl.glEnableVertexAttribArray(attribIndex);
+		OpenGLHelper.checkGLError(gl,logger);
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, VBO[attribIndex]);
+		OpenGLHelper.checkGLError(gl,logger);
 		gl.glVertexAttribPointer(attribIndex,size,GL3.GL_FLOAT,false,0,0);
 		OpenGLHelper.checkGLError(gl,logger);
 	}
