@@ -270,7 +270,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		logger.info("dispose");
 		var gl = glautodrawable.getGL().getGL3();
 		TextureFactory.dispose(gl);
-		shaderProgram.delete(gl);
+		shaderProgram.dispose(gl);
 		for( PreviewListener p : previewListeners ) {
 			p.dispose();
 		}
@@ -311,7 +311,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		paintCamera(gl);
 
 		for( PreviewListener p : previewListeners ) {
-			p.render(shaderProgram);
+			p.render(shaderProgram,gl);
 		}
 
 		//renderTestTriangle(gl);

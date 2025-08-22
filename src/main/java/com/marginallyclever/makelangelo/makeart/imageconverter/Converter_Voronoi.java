@@ -312,7 +312,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
      * @param shader the render context
      */
     @Override
-    public void render(ShaderProgram shader) {/*
+    public void render(ShaderProgram shader, GL3 gl) {/*
         ImageConverterThread thread = getThread();
         if(thread==null || thread.getPaused()) return;
 

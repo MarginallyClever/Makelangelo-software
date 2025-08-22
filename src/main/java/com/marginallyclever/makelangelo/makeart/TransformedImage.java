@@ -127,7 +127,7 @@ public class TransformedImage {
 	
 	/**
 	 * Sample the image, taking into account fractions of pixels.
-	 * @param Box box the area to sample
+	 * @param box the area to sample
 	 * @return greyscale intensity in this region. [0...255]
 	 */
 	private int sample(Box box) {
@@ -142,11 +142,13 @@ public class TransformedImage {
 		for(int y = (int)box.bottom; y <= (int)box.top; ++y) {
 			for(int x = (int)box.left; x <= (int)box.right; ++x) {
 				raster.getPixel(x, y, pixel);
+				// average the intensity of all the color channels
 				double sum = 0;
 				for(int i=0;i<componentCount;++i) {
 					sum += pixel[i];
 				}
 				double intensity = sum / componentCount;
+				// add to the total intensity
 				sampleValue += intensity;
 				count++;
 			}

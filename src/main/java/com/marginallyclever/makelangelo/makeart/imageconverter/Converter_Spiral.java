@@ -14,10 +14,8 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
- * Generate a Gcode file from the BufferedImage supplied.<br>
- * Use the filename given in the constructor as a basis for the gcode filename, but change the extension to .ngc
- *
- * @author Dan
+ * Generate a spiral pattern across the image.
+ * Darken areas of the image by lowering the pen to draw more closely spaced lines.
  */
 public class Converter_Spiral extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_Spiral.class);
@@ -114,6 +112,7 @@ public class Converter_Spiral extends ImageConverter {
 					if(z<level) turtle.penDown();
 					else turtle.penUp();
 				} else turtle.penUp();
+
 				turtle.moveTo(cx + fx, cy + fy);
 			}
 			r -= toolDiameter;

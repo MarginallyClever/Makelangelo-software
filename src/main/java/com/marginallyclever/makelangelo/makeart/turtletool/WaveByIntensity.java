@@ -16,6 +16,7 @@ public class WaveByIntensity {
     private final TransformedImage img;
     private final double halfLineHeight;
     private final double stepSize;
+    // controls the rate of oscillation of the wave.
     private double wavePosition = 0;
 
     /**
@@ -50,13 +51,13 @@ public class WaveByIntensity {
 
     /**
      * Convert a line to a wave based on the intensity of the image.
-     * @param a the start of the line
+     * @param p the start of the line
      * @param b the end of the line
      */
-    public Turtle lineToWave(Point2d a, Point2d b) {
+    public Turtle lineToWave(Point2d p, Point2d b) {
         Turtle turtle = new Turtle();
         // find the length of the line and the unit vector
-        var unitVector = new Vector2d(b.x - a.x,b.y - a.y);
+        var unitVector = new Vector2d(b.x - p.x,b.y - p.y);
         double len = unitVector.length();
         unitVector.scale(1.0/len);
         // find the orthogonal vector
@@ -64,14 +65,19 @@ public class WaveByIntensity {
 
         Point2d interpolated = new Point2d();
         Point2d offset = new Point2d();
-        calculatePoint(a,orthogonal,offset);
+        calculatePoint(p,orthogonal,offset);
         turtle.jumpTo(offset.x,offset.y);
 
-        for (double p = 0; p <= len; p += this.stepSize) {
-            wavePosition += this.stepSize;
+        // controls the frequency of the wave.
+        double i=0;
+        while(i<=len) {
+            double intensity = 1.0-(getIntensityAtPoint(p)/255.0);
+            var safeI = stepSize * ((intensity*0.9)+0.1);
+            i += safeI;
+            wavePosition += stepSize;
             interpolated.set(
-                    a.x + unitVector.x * p,
-                    a.y + unitVector.y * p);
+                    p.x + unitVector.x * i,
+                    p.y + unitVector.y * i);
             calculatePoint(interpolated,orthogonal,offset);
             turtle.moveTo(offset.x,offset.y);
         }
@@ -80,16 +86,21 @@ public class WaveByIntensity {
 
     /**
      * Calculate the point on the wave based on the intensity of the image.
-     * @param a the point on the line
+     * @param p the point on the line
      * @param orthogonal the orthogonal vector to the line (the x-axis of the cos function)
      * @param d the point on the wave
      */
-    private void calculatePoint(Point2d a, Vector2d orthogonal, Point2d d) {
+    private void calculatePoint(Point2d p, Vector2d orthogonal, Point2d d) {
         // read a block of the image and find the average intensity in this block
-        double z = (255.0f - img.sample( a.x, a.y, halfLineHeight));
+        double z = getIntensityAtPoint(p);
         // the sum controls the height of the pulse.
         var h = (z<=1) ? 0 : Math.cos(wavePosition*2.0) * halfLineHeight*(z/255.0);
-        d.x = a.x + orthogonal.x * h;
-        d.y = a.y + orthogonal.y * h;
+        d.x = p.x + orthogonal.x * h;
+        d.y = p.y + orthogonal.y * h;
+    }
+
+    private double getIntensityAtPoint(Point2d p) {
+        // read a block of the image and find the average intensity in this block
+        return ( 255.0f - img.sample( p.x, p.y, halfLineHeight) );
     }
 }

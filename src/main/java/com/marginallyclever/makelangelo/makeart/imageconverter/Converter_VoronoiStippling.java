@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.helpers.DrawingHelper;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.donatello.select.SelectSlider;
@@ -56,8 +57,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 	}
 
 	@Override
-	public void render(ShaderProgram shader) {
-		super.render(shader);
+	public void render(ShaderProgram shader, GL3 gl) {
+		super.render(shader, gl);
 
 		ImageConverterThread thread = getThread();
 		if(thread==null || thread.getPaused()) return;

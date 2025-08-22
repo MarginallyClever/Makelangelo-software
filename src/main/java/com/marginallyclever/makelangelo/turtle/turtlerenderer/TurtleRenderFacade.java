@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.turtle.turtlerenderer;
 
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.preview.PreviewListener;
 import com.marginallyclever.makelangelo.preview.ShaderProgram;
 import com.marginallyclever.makelangelo.turtle.Turtle;
@@ -32,10 +33,10 @@ public class TurtleRenderFacade implements PreviewListener {
 	private int turtleHash = 0;
 
 	@Override
-	public void render(@Nonnull ShaderProgram shader) {
+	public void render(@Nonnull ShaderProgram shader, GL3 gl) {
 		if(turtleHash != myTurtle.hashCode()) {
 			turtleHash = myTurtle.hashCode();
-			g2gl.renderBegin(shader.getContext());
+			g2gl.renderBegin(gl);
 			render(g2gl);
 		}
 

@@ -2,16 +2,17 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
 import com.marginallyclever.donatello.select.SelectDouble;
-import com.marginallyclever.donatello.select.SelectOneOfMany;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.turtletool.CropTurtle;
 import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
 import com.marginallyclever.makelangelo.turtle.Turtle;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Vector2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -22,29 +23,29 @@ import java.awt.geom.Rectangle2D;
  */
 public class Converter_Pulse extends ImageConverter {
 	private static double blockScale = 6.0f;
-	private static int direction = 0;
+	private static double angle = 0;
 	private final String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
-	private double sampleRate = 0.2;
+	private double sampleRate = 0.1;
 
 	public Converter_Pulse() {
 		super();
 
-		SelectDouble    selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
+		SelectDouble selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
 		add(selectSize);
 		selectSize.addSelectListener(evt->{
 			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
 
-		SelectOneOfMany selectDirection = new SelectOneOfMany("direction",Translator.get("Direction"),getDirections(),getDirectionIndex());
-		add(selectDirection);
-		selectDirection.addSelectListener(evt->{
-			setDirectionIndex((int) evt.getNewValue());
+		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),angle);
+		add(selectAngle);
+		selectAngle.addSelectListener(evt->{
+			setAngle((double)evt.getNewValue());
 			fireRestart();
 		});
 
-		SelectDouble    selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
+		SelectDouble selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
 		add(selectSampleRate);
 		selectSampleRate.addSelectListener(evt->{
 			sampleRate = (double) evt.getNewValue();
@@ -64,16 +65,11 @@ public class Converter_Pulse extends ImageConverter {
 		if(value<1) value=1;
 		blockScale = value;
 	}
-	public String[] getDirections() {
-		return directionChoices;
+	public double getAngle() {
+		return angle;
 	}
-	public int getDirectionIndex() {
-		return direction;
-	}
-	public void setDirectionIndex(int value) {
-		if(value<0) value=0;
-		if(value>=directionChoices.length) value=directionChoices.length-1;
-		direction = value;
+	public void setAngle(double value) {
+		angle = value;
 	}
 
 	/**
@@ -103,7 +99,6 @@ public class Converter_Pulse extends ImageConverter {
 
 		// from top to bottom of the image...
 		double x, y = 0;
-		int i=0;
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
@@ -113,33 +108,26 @@ public class Converter_Pulse extends ImageConverter {
 
 		var wave = new WaveByIntensity(img,blockScale/2,sampleRate);
 
-		if (direction == 0) {
-			// horizontal
-			for (y = yBottom; y < yTop; y += blockScale) {
-				++i;
-				if ((i % 2) == 0) {
-					a.set(xLeft,y);
-					b.set(xRight,y);
-				} else {
-					a.set(xRight,y);
-					b.set(xLeft,y);
-				}
-				turtle.add(wave.lineToWave(a,b));
-			}
-		} else {
-			// vertical
-			for (x = xLeft; x < xRight; x += blockScale) {
-				++i;
-				if ((i % 2) == 0) {
-					a.set(x,yBottom);
-					b.set(x,yTop);
-				} else {
-					a.set(x,yTop);
-					b.set(x,yBottom);
-				}
-				turtle.add(wave.lineToWave(a,b));
-			}
+		Vector2d majorAxis = new Vector2d(
+				Math.cos(Math.toRadians(angle)),
+				Math.sin(Math.toRadians(angle))
+		);
+		Vector2d minorAxis = new Vector2d(majorAxis.y, -majorAxis.x); // perpendicular to major axis
+		double height = yTop-yBottom;
+		double width = xRight-xLeft;
+		double r = Math.sqrt(Math.pow(width/2,2) + Math.pow(height/2,2));
+
+		double i=-r;
+		for(double j =-r; j <= r; j+= blockScale) {
+			i = -i;
+			a.scale(j,majorAxis);
+			b.scale(j,majorAxis);
+			a.scaleAdd(-i,minorAxis,a);
+			b.scaleAdd(i,minorAxis,b);
+			turtle.add(wave.lineToWave(a,b));
 		}
+
+		CropTurtle.run(turtle, myPaper.getMarginRectangle());
 	}
 
     public int getCutoff() {

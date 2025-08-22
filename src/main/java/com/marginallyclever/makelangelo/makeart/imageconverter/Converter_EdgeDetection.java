@@ -136,7 +136,8 @@ public class Converter_EdgeDetection extends ImageConverter {
 
 		for(int y=0;y<stepsOnY;++y) {
 			for(int x=0;x<stepsOnX;++x) {
-				marchSquare((int)rect.getMinX() + x*stepSize,
+				marchSquare(
+						(int)rect.getMinX() + x*stepSize,
 						(int)rect.getMinY() + y*stepSize);
 			}
 		}

@@ -98,7 +98,7 @@ public class ShaderProgram {
         gl.glUseProgram(programId);
     }
 
-    public void delete(GL3 gl) {
+    public void dispose(GL3 gl) {
         gl.glDetachShader(programId, vertexShaderId);
         gl.glDetachShader(programId, fragmentShaderId);
         gl.glDeleteShader(vertexShaderId);

@@ -1,8 +1,11 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.marginallyclever.donatello.select.SelectBoolean;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
+import com.marginallyclever.makelangelo.makeart.turtletool.CropTurtle;
+import com.marginallyclever.makelangelo.makeart.turtletool.WaveByIntensity;
 import com.marginallyclever.makelangelo.paper.Paper;
 import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.plotter.plottersettings.PlotterSettings;
@@ -10,6 +13,7 @@ import com.marginallyclever.makelangelo.turtle.Turtle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.vecmath.Point2d;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
@@ -25,21 +29,32 @@ public class Converter_SpiralPulse extends ImageConverter {
 	private static double zigDensity = 1.2f;  // increase to tighten zigzags
 	private static double spacing = 2.5f;
 	private static double height = 4.0f;
+	private static double sampleRate = 0.1;
 
 	public Converter_SpiralPulse() {
 		super();
+
+		SelectBoolean toCorners = new SelectBoolean("toCorners", Translator.get("Spiral.toCorners"), convertToCorners);
+		toCorners.addSelectListener(evt->{
+			convertToCorners = (boolean)evt.getNewValue();
+			fireRestart();
+		});
+		add(toCorners);
+
 		SelectDouble selectIntensity = new SelectDouble("intensity", Translator.get("SpiralPulse.intensity"),getIntensity());
 		add(selectIntensity);
 		selectIntensity.addSelectListener(evt->{
 			setIntensity((double)evt.getNewValue());
 			fireRestart();
 		});
+
 		SelectDouble selectSpacing = new SelectDouble("spacing",Translator.get("SpiralPulse.spacing"),getSpacing());
 		add(selectSpacing);
 		selectSpacing.addSelectListener(evt->{
 			setSpacing((double)evt.getNewValue());
 			fireRestart();
 		});
+
 		SelectDouble selectHeight = new SelectDouble("height",Translator.get("SpiralPulse.height"),getHeight());
 		add(selectHeight);
 		selectHeight.addSelectListener(evt->{
@@ -81,65 +96,46 @@ public class Converter_SpiralPulse extends ImageConverter {
 			maxr = Math.min(h, w);
 		}
 		
-		double r = maxr - toolDiameter*5.0f, f;
-		double fx, fy;
+		double r = maxr - toolDiameter*5.0f;
 		int numRings = 0;
 		double stepSize = toolDiameter * height;
 		double halfStep = stepSize / 2.0f;
-		double zigZagSpacing = toolDiameter;
 		int n=1;
-		double PULSE_MINIMUM = 0.1f;
 		double ringSize = halfStep*spacing;
 		boolean init = false;
-		int i;
-		int z = 0;
-		double r2,scale_z,pulse_size,nx,ny;
 
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
-		double px = myPaper.getCenterX();
-		double py = myPaper.getCenterY();
-		
+
+		var wave = new WaveByIntensity(img,halfStep,sampleRate);
+
+		Point2d a = new Point2d();
+		Point2d b = new Point2d();
+
+		a.set(Math.cos(0) * r, Math.sin(0) * r);
+
 		while (r > toolDiameter) {
 			// find circumference of current circle
-			double circumference =  Math.floor((2.0f * r - toolDiameter) * Math.PI)*zigDensity;
+			double circumference =  Math.floor((2.0f * r - toolDiameter) * Math.PI)*toolDiameter;
 			//if (circumference > 360.0f) circumference = 360.0f;
 			
-			for (i = 0; i <= circumference; ++i) {
+			for (int i = 0; i <= circumference; ++i) {
 				// tweak the diameter to make it look like a spiral
-				r2 = r - ringSize * (float)i / circumference;
+				double r2 = r - ringSize * (float)i / circumference;
 				
-				f = Math.PI * 2.0f * (float)i / circumference;
-				fx = Math.cos(f) * r2;
-				fy = Math.sin(f) * r2;
-				// clip to paper boundaries
-				if( rect.contains(fx, fy) ) {
-					z = img.sample( fx, fy, halfStep);
-					scale_z = (255.0f - z) / 255.0f;
-					pulse_size = halfStep * scale_z;
-					nx = (halfStep+pulse_size*n) * fx / r2;
-					ny = (halfStep+pulse_size*n) * fy / r2;
+				double f = Math.PI * 2.0f * (float)i / circumference;
+				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
 
-					if (!init) {
-						turtle.moveTo(px+fx+nx, py+fy+ny);
-						init = true;
-					}
-					if(pulse_size < PULSE_MINIMUM) turtle.penUp();
-					else turtle.penDown();
-					turtle.moveTo(px+fx+nx, py+fy + ny);
-					n = -n;
-				} else {
-					if (!init) {
-						init = true;
-					}
-					turtle.penUp();
-					turtle.moveTo(px+fx, py+fy);
-				}
+				turtle.add(wave.lineToWave(a,b));
+				a.set(b);
 			}
 			n = -n;
 			r -= ringSize;
 			++numRings;
 		}
+
+		// clip to paper boundaries
+		CropTurtle.run(turtle, myPaper.getMarginRectangle());
 
 		logger.debug("{} rings.", numRings);
 

@@ -56,8 +56,7 @@ public class Paper implements PreviewListener {
 	}
 	
 	@Override
-	public void render(ShaderProgram shader) {
-		var gl = shader.getContext();
+	public void render(ShaderProgram shader, GL3 gl) {
 		renderPaper(gl);
 		renderMargin(gl);
 	}

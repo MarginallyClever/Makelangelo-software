@@ -1,5 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
+import com.jogamp.opengl.GL3;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.paper.Paper;
@@ -90,5 +91,5 @@ public abstract class ImageConverterIterative extends ImageConverter implements 
      * @param shader the render context
      */
     @Override
-    public void render(ShaderProgram shader) {}
+    public void render(ShaderProgram shader, GL3 gl) {}
 }
