@@ -88,8 +88,7 @@ public class DrawingHelper {
      * @param width with of the texture
      * @param height height of the texture
      */
-    public static void paintTexture(ShaderProgram shader, TextureWithMetadata texture, double x, double y, double width, double height) {
-        GL3 gl = shader.getContext();
+    public static void paintTexture(ShaderProgram shader, GL3 gl, TextureWithMetadata texture, double x, double y, double width, double height) {
         texture.bind(gl);
         gl.glEnable(GL3.GL_TEXTURE_2D);
         shader.set1i(gl,"useTexture", 1);

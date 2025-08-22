@@ -213,8 +213,27 @@ public class Converter_Mickeymoe1992 extends ImageConverter {
 
     // 1 + 4
     void case5(int x0,int y0, double[][] T,double level) {
-        case1(x0,y0,T,level);
-        case4(x0,y0,T,level);
+        int x1 = x0 + stepSize;
+        int y1 = y0 + stepSize;
+        double v00 = T[x0][y0];
+        double v10 = T[x1][y0];
+        double v01 = T[x0][y1];
+        double v11 = T[x1][y1];
+
+        // Asymptotic decider: compute saddle value
+        double alpha = (level - v00) / (v11 - v00);
+        double beta = (level - v10) / (v01 - v10);
+        double saddleValue = v00 * v11 - v01 * v10;
+
+        if (saddleValue > 0) {
+            Point2d a = lerpEdge(x0, y0, x0, y1, T, level);
+            Point2d b = lerpEdge(x1, y0, x1, y1, T, level);
+            line(a, b);
+        } else {
+            Point2d a = lerpEdge(x0, y0, x1, y0, T, level);
+            Point2d b = lerpEdge(x0, y1, x1, y1, T, level);
+            line(a, b);
+        }
     }
 
     // 2 + 4

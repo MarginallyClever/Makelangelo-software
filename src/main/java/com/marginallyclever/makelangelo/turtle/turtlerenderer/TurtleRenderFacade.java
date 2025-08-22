@@ -47,6 +47,7 @@ public class TurtleRenderFacade implements PreviewListener {
 	public void dispose() {
 		PreviewListener.super.dispose();
 		g2gl.dispose();
+		turtleHash = -1;  // force a re-render next time
 	}
 
 	public void render(@Nonnull Graphics2D g2d) {

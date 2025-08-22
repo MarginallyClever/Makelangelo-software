@@ -146,7 +146,7 @@ public class PreviewPanel extends JPanel {
         openGLPanel.addListener((shader, gl)->{
             if(myPlotterRenderer!=null) {
                 myTurtleRenderer.setShowTravel(GFXPreferences.getShowPenUp());
-                myPlotterRenderer.render(shader, myPlotter);
+                myPlotterRenderer.render(shader,gl, myPlotter);
             }
         });
     }

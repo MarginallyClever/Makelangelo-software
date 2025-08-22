@@ -224,10 +224,20 @@ public class Converter_EdgeDetection extends ImageConverter {
 		line(a,b);
 	}
 
-	// 1 + 4
-	void case5(int x0,int y0) {
-		case1(x0,y0);
-		case4(x0,y0);
+	// 1 + 4 (ambiguous case - use asymptotic decider)
+	void case5(int x0, int y0) {
+		int x1 = x0 + stepSize;
+		int y1 = y0 + stepSize;
+		float center = brightness(img.sample((x0 + x1) / 2.0, (y0 + y1) / 2.0, sampleSize));
+		if (center < edge) {
+			Point2d a = lerpEdge(x0, y0, x0, y1);
+			Point2d b = lerpEdge(x0, y0, x1, y0);
+			line(a, b);
+		} else {
+			Point2d a = lerpEdge(x1, y1, x0, y1);
+			Point2d b = lerpEdge(x1, y1, x1, y0);
+			line(a, b);
+		}
 	}
 
 	// 2 + 4

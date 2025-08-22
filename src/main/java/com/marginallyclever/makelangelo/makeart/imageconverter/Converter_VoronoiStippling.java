@@ -68,14 +68,14 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 
 		lock.lock();
 		try {
-			renderDots(shader,cx,cy);
+			renderDots(shader,gl,cx,cy);
 		}
 		finally {
 			lock.unlock();
 		}
 	}
 
-	private void renderDots(ShaderProgram shader,float sx,float sy) {
+	private void renderDots(ShaderProgram shader,GL3 gl,float sx,float sy) {
 		int lpc = getLowpassCutoff();
 		float scale = (float)(maxDotSize-minDotSize)/255.0f;
 		float cx = (float)myPaper.getCenterX()+sx;
@@ -86,7 +86,7 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			float r = (float)(c.weight-lpc) * scale;
 			float x = (float)c.center.x;
 			float y = (float)c.center.y;
-			DrawingHelper.drawCircle(shader.getContext(), cx+x, cy+y, r, new Color((float)c.change,0,0));
+			DrawingHelper.drawCircle(gl, cx+x, cy+y, r, new Color((float)c.change,0,0));
 		}
 	}
 

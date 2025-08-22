@@ -24,11 +24,9 @@ public class ShaderProgram {
     private final int fragmentShaderId;
     private final Map<String, Integer> uniformLocations = new HashMap<>();
     private final FloatBuffer matrixBuffer = FloatBuffer.allocate(16);
-    private final GL3 gl;
 
     public ShaderProgram(GL3 gl, String[] vertexCode, String[] fragmentCode) {
         super();
-        this.gl = gl;
         if (vertexCode == null || vertexCode.length == 0) {
             throw new IllegalArgumentException("Vertex shader code cannot be null or empty.");
         }
@@ -188,9 +186,5 @@ public class ShaderProgram {
 
     public void setColor(GL3 gl3, String name, Color color) {
         set4f(gl3,name,color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f,color.getAlpha()/255f);
-    }
-
-    public GL3 getContext() {
-        return gl;
     }
 }

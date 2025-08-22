@@ -23,13 +23,13 @@ public class MakelangeloCustom implements PlotterRenderer {
 	private static TextureWithMetadata controlBoard;
 
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 
-		paintControlBox(shader,settings);
-		paintMotors(shader,settings);
+		paintControlBox(shader, gl, settings);
+		paintMotors(shader, gl, settings);
 		if(robot.getDidFindHome())
-			paintPenHolderToCounterweights(shader,robot);
+			paintPenHolderToCounterweights(shader,gl,robot);
 	}
 
 	/**
@@ -37,8 +37,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 	 * @param shader the render context
 	 * @param settings plottersettings of the robot
 	 */
-	private void paintControlBox(ShaderProgram shader, PlotterSettings settings) {
-		var gl = shader.getContext();
+	private void paintControlBox(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
 		float cy = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -70,25 +69,25 @@ public class MakelangeloCustom implements PlotterRenderer {
             shiftX = 45;
         }
 
-		paintTexture(shader, controlBoard, cx+shiftX, cy-72, 1024 * scale, 1024 * scale);
+		paintTexture(shader, gl, controlBoard, cx+shiftX, cy-72, 1024 * scale, 1024 * scale);
 
-        renderLCD(shader, settings);
+        renderLCD(shader, gl, settings);
 	}
 
 	// draw left & right motor
-	private void paintMotors(ShaderProgram shader, PlotterSettings settings) {
+	private void paintMotors(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
 		double top = settings.getDouble(PlotterSettings.LIMIT_TOP);
 		double right = settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		var c = new Color(0.3f,0.3f,0.3f);
-		var gl = shader.getContext();
+
 		// left motor
 		drawRectangle(gl, top+MOTOR_WIDTH/2, left+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, left-MOTOR_WIDTH/2, c);
 		// right motor
 		drawRectangle(gl, top+MOTOR_WIDTH/2, right+MOTOR_WIDTH/2, top-MOTOR_WIDTH/2, right-MOTOR_WIDTH/2, c);
 	}
 	
-	private void renderLCD(ShaderProgram shader, PlotterSettings settings) {
+	private void renderLCD(ShaderProgram shader, GL3 gl, PlotterSettings settings) {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
@@ -98,8 +97,6 @@ public class MakelangeloCustom implements PlotterRenderer {
 		if (shiftX > -100) {
 			shiftX = -75;
 		}
-
-		var gl = shader.getContext();
 
 		// LCD red
 		float w = 150f/2;
@@ -123,7 +120,7 @@ public class MakelangeloCustom implements PlotterRenderer {
 		drawRectangle(gl, top+shiftY+h, shiftX+w, top+shiftY-h, shiftX-w, new Color(0,0,0.7f));
 	}
 
-	private void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot ) {
+	private void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot ) {
 		PlotterSettings settings = robot.getSettings();
 		Point2d pos = robot.getPos();
 		float gx = (float)pos.x;
@@ -154,7 +151,6 @@ public class MakelangeloCustom implements PlotterRenderer {
 		float right_a = (float)Math.sqrt(dx*dx+dy*dy);
 		float right_b = (suggestedLength - right_a)/2;
 
-		var gl = shader.getContext();
 		paintPlotter(gl,gx,gy);
 
 		// belts
@@ -193,8 +189,8 @@ public class MakelangeloCustom implements PlotterRenderer {
 		cwRight.render(gl);
 	}
 
-	private void paintPlotter(GL3 gl2, float gx, float gy) {
+	private void paintPlotter(GL3 gl, float gx, float gy) {
 		// plotter
-		drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_5, new Color(0f,0f,1f));
+		drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_5, new Color(0f,0f,1f));
 	}
 }
