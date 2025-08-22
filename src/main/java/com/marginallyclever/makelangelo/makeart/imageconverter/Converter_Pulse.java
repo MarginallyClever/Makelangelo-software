@@ -38,10 +38,10 @@ public class Converter_Pulse extends ImageConverter {
 			fireRestart();
 		});
 
-		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),angle);
+		SelectDouble selectAngle = new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),angle);
 		add(selectAngle);
 		selectAngle.addSelectListener(evt->{
-			setAngle((double)evt.getNewValue());
+			angle = (double)evt.getNewValue();
 			fireRestart();
 		});
 
@@ -65,12 +65,6 @@ public class Converter_Pulse extends ImageConverter {
 		if(value<1) value=1;
 		blockScale = value;
 	}
-	public double getAngle() {
-		return angle;
-	}
-	public void setAngle(double value) {
-		angle = value;
-	}
 
 	/**
 	 * Converts images into zigzags in paper space instead of image space
@@ -93,12 +87,6 @@ public class Converter_Pulse extends ImageConverter {
 		double yBottom = rect.getMinY();
 		double xRight  = rect.getMaxX();
 		double yTop    = rect.getMaxY();
-		
-		// figure out how many lines we're going to have on this image.
-		double stepSize = blockScale;
-
-		// from top to bottom of the image...
-		double x, y = 0;
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
@@ -106,7 +94,7 @@ public class Converter_Pulse extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		var wave = new WaveByIntensity(img,blockScale/2,sampleRate);
+		var wave = new WaveByIntensity(img,blockScale/2,sampleRate,2.0);
 
 		Vector2d majorAxis = new Vector2d(
 				Math.cos(Math.toRadians(angle)),

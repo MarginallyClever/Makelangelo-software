@@ -18,6 +18,9 @@ public class TransformedImage {
 	private final BufferedImage sourceImage;
 	private float scaleX, scaleY;
 	private float translateX, translateY;
+	private final int componentCount;
+	private final double [] pixel;
+	private final WritableRaster raster;
 
 	public TransformedImage(BufferedImage src) {
 		sourceImage = deepCopy(src);
@@ -25,6 +28,10 @@ public class TransformedImage {
 		translateY = -src.getHeight() / 2.0f;
 		scaleX = 1;
 		scaleY = 1;
+
+		componentCount = sourceImage.getColorModel().getNumComponents();
+		pixel = new double[componentCount];
+		raster = sourceImage.getRaster();
 	}
 
 	public TransformedImage(TransformedImage copy) {
@@ -33,6 +40,10 @@ public class TransformedImage {
 		translateY = copy.translateY;
 		scaleX = copy.scaleX;
 		scaleY = copy.scaleY;
+
+		componentCount = sourceImage.getColorModel().getNumComponents();
+		pixel = new double[componentCount];
+		raster = sourceImage.getRaster();
 	}
 
 	// https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
@@ -50,8 +61,8 @@ public class TransformedImage {
 	 * @return true if the image can be sampled at this location
 	 */
 	public boolean canSampleAt(double x, double y) {
-		int sampleX = getTransformedX(x);
-		int sampleY = getTransformedY(y);
+		double sampleX = getTransformedX(x);
+		double sampleY = getTransformedY(y);
 
 		if (sampleX < 0 || sampleX >= sourceImage.getWidth ()) return false;
 		if (sampleY < 0 || sampleY >= sourceImage.getHeight()) return false;
@@ -70,12 +81,12 @@ public class TransformedImage {
 		return sourceImage;
 	}
 
-	private int getTransformedX(double x) {
-		return (int) ((x / scaleX) - translateX);
+	private double getTransformedX(double x) {
+		return ((x / scaleX) - translateX);
 	}
 
-	public int getTransformedY(double y) {
-		return (int) ((y / scaleY) - translateY);
+	public double getTransformedY(double y) {
+		return ((y / scaleY) - translateY);
 	}
 
 	class Box {
@@ -107,10 +118,10 @@ public class TransformedImage {
 				top = temp;
 			}
 			// find the bounds of the image once, instead of inside the loops.
-			bottom = Math.max(Math.min(bottom,sourceImage.getHeight()  ),0);
-			top    = Math.max(Math.min(top   ,sourceImage.getHeight()-1),0);
-			left   = Math.max(Math.min(left  ,sourceImage.getWidth()  ),0);
-			right  = Math.max(Math.min(right ,sourceImage.getWidth()-1),0);
+			bottom = Math.max(Math.min(bottom,sourceImage.getHeight()),0);
+			top    = Math.max(Math.min(top   ,sourceImage.getHeight()),0);
+			left   = Math.max(Math.min(left  ,sourceImage.getWidth()),0);
+			right  = Math.max(Math.min(right ,sourceImage.getWidth()),0);
 		}
 	}
 
@@ -124,7 +135,12 @@ public class TransformedImage {
 	public int sample(double cx, double cy, double radius) {
 		return sample(new Box(cx-radius,cy-radius,cx+radius,cy+radius));
 	}
-	
+
+	private class SampleCount {
+		double count = 0;
+		double sum = 0;
+	}
+
 	/**
 	 * Sample the image, taking into account fractions of pixels.
 	 * @param box the area to sample
@@ -134,29 +150,74 @@ public class TransformedImage {
 		box.transform();
 
 		// now sample the entire area to average the intensity
-		int count = 0;
-		var componentCount = sourceImage.getColorModel().getNumComponents();
-		var pixel = new double[componentCount];
-		var raster = sourceImage.getRaster();
-		double sampleValue = 0;
-		for(int y = (int)box.bottom; y <= (int)box.top; ++y) {
-			for(int x = (int)box.left; x <= (int)box.right; ++x) {
-				raster.getPixel(x, y, pixel);
-				// average the intensity of all the color channels
-				double sum = 0;
-				for(int i=0;i<componentCount;++i) {
-					sum += pixel[i];
-				}
-				double intensity = sum / componentCount;
-				// add to the total intensity
-				sampleValue += intensity;
-				count++;
-			}
+		SampleCount c = new SampleCount();
+		int bBottom = (int)box.bottom;
+		int bTop = (int)box.top;
+
+		// if box.bottom is not a whole number, sample the fraction of the pixel
+		if(box.bottom != bBottom) {
+			double fraction = 1.0 - (box.bottom - bBottom);
+			SampleCount b = sampleRow(box,bBottom);
+			c.sum += b.sum*fraction;
+			c.count += b.count*fraction;
+			bBottom++;
 		}
-		if(count==0) return 255;
+		for(int y = bBottom; y < bTop; ++y) {
+			SampleCount b = sampleRow(box,y);
+			c.sum += b.sum;
+			c.count += b.count;
+		}
+		// if box.top is not a whole number, sample the fraction of the pixel
+		if(box.top != bTop) {
+			double fraction = box.top - bTop;
+			SampleCount b = sampleRow(box,bTop);
+			c.sum += b.sum*fraction;
+			c.count += b.count*fraction;
+		}
+
+		if(c.count==0) return 255;
 		// average the intensity
-		double result = sampleValue / (double)count;
+		double result = c.sum / c.count;
 		return (int)Math.min( Math.max(result, 0), 255 );
+	}
+
+	private SampleCount sampleRow(Box box, int y) {
+		SampleCount c = new SampleCount();
+		int bLeft = (int)box.left;
+		int bRight = (int)box.right;
+		// if box.left is not a whole number, sample the fraction of the pixel
+		if(box.left != bLeft) {
+			raster.getPixel(bLeft, y, pixel);
+			double fraction = 1.0 - (box.left - bLeft);
+			c.sum += averageIntensity(pixel) * fraction;
+			c.count += fraction;
+			bLeft++;
+		}
+		// sample whole pixels
+		for(int x = bLeft; x < bRight; ++x) {
+			raster.getPixel(x, y, pixel);
+			c.sum += averageIntensity(pixel);
+			c.count++;
+		}
+
+		// if box.right is not a whole number, sample the fraction of the pixel
+		if(box.right != bRight) {
+			raster.getPixel(bRight, y, pixel);
+			double fraction = box.right - bRight;
+			c.sum += averageIntensity(pixel) * fraction;
+			c.count += fraction;
+		}
+
+		return c;
+	}
+
+	// average intensity of the pixel
+	private double averageIntensity(double[] pixel) {
+		double sum = 0;
+		for(int i=0;i<componentCount;++i) {
+			sum += pixel[i];
+		}
+		return sum / componentCount;
 	}
 
 	/**
@@ -171,7 +232,7 @@ public class TransformedImage {
 
 	/**
 	 * Sample the image, taking into account fractions of pixels.
-	 * @param Box box the area to sample
+	 * @param box the area to sample
 	 * @return the average color in this region.
 	 */
 	private Color sampleColor(Box box) {
@@ -179,12 +240,9 @@ public class TransformedImage {
 
 		// now sample the entire area to average the intensity
 		int count = 0;
-		var componentCount = sourceImage.getColorModel().getNumComponents();
-		var pixel = new double[componentCount];
-		var raster = sourceImage.getRaster();
 		var sum = new double[componentCount];
-		for(int y = (int)box.bottom; y <= (int)box.top; ++y) {
-			for(int x = (int)box.left; x <= (int)box.right; ++x) {
+		for(int y = (int)box.bottom; y <= box.top; ++y) {
+			for(int x = (int)box.left; x <= box.right; ++x) {
 				raster.getPixel(x, y, pixel);
 				for(int i=0;i<componentCount;++i) {
 					sum[i] += pixel[i];
@@ -227,8 +285,8 @@ public class TransformedImage {
 	 * @return 255 if the image cannot be sampled.  The intensity of the color channel [0...255].  the color channel is selected with
 	 */
 	public int sample1x1Unchecked(double x, double y) {
-		int sampleX = getTransformedX(x);
-		int sampleY = getTransformedY(y);
+		int sampleX = (int)getTransformedX(x);
+		int sampleY = (int)getTransformedY(y);
 
 		int c2 = sourceImage.getRGB(sampleX, sampleY);
 		return ImageFilter.decode32bit(c2) & 0xFF;
@@ -245,6 +303,6 @@ public class TransformedImage {
 	}
 
 	public void setRGB(float x, float y, int c) {
-		sourceImage.setRGB(getTransformedX(x), getTransformedY(y), c);
+		sourceImage.setRGB((int)getTransformedX(x), (int)getTransformedY(y), c);
 	}
 }
