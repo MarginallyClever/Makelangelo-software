@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.donatello.select.SelectBoolean;
-import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -28,8 +27,8 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_SpiralPulseCMYK.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
 	private static double zigDensity = 2.0f;  // increase to tighten zigzags
-	private static double spacing = 2.5f;
-	private static double height = 4.0f;
+	private static int spacing = 2;
+	private static int height = 4;
 	private static double sampleRate = 0.1;
 
 	public Converter_SpiralPulseCMYK() {
@@ -49,17 +48,17 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 			fireRestart();
 		});
 
-		SelectDouble selectSpacing = new SelectDouble("spacing",Translator.get("Converter_SpiralPulse.spacing"),getSpacing());
+		SelectSlider selectSpacing = new SelectSlider("spacing",Translator.get("Converter_SpiralPulse.spacing"),40,1,spacing);
 		add(selectSpacing);
 		selectSpacing.addSelectListener(evt->{
-			setSpacing((double)evt.getNewValue());
+			spacing = (int)evt.getNewValue();
 			fireRestart();
 		});
 
-		SelectDouble selectHeight = new SelectDouble("height",Translator.get("Converter_SpiralPulse.height"),getHeight());
+		SelectSlider selectHeight = new SelectSlider("height",Translator.get("Converter_SpiralPulse.height"),40,1,height);
 		add(selectHeight);
 		selectHeight.addSelectListener(evt->{
-			setHeight((double)evt.getNewValue());
+			height = (int)evt.getNewValue();
 			fireRestart();
 		});
 	}
@@ -112,19 +111,18 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 		}
 
 		double r = maxr - toolDiameter * 5.0f;
-		double stepSize = toolDiameter * height;
-		double halfStep = stepSize / 2.0f;
-		int n = 1;
-		double ringSize = halfStep * spacing;
+		double stepSize = height - toolDiameter;
+		double halfWaveHeight = stepSize / 2.0f;
+		double ringSize = spacing;
 
-		var wave = new WaveByIntensity(img,halfStep,sampleRate,zigDensity);
+		var wave = new WaveByIntensity(img,halfWaveHeight,sampleRate,zigDensity);
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
 
 		a.set(Math.cos(0) * r, Math.sin(0) * r);
 
-		while (r > toolDiameter) {
+		while (r > toolDiameter*2) {
 			// find circumference of current circle
 			double circumference =  Math.floor((2.0f * r - toolDiameter) * Math.PI)*toolDiameter;
 			//if (circumference > 360.0f) circumference = 360.0f;
@@ -132,14 +130,12 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 			for (int i = 0; i <= circumference; ++i) {
 				// tweak the diameter to make it look like a spiral
 				double r2 = r - ringSize * (float)i / circumference;
-				
 				double f = Math.PI * 2.0f * (float)i / circumference;
 				b.set(Math.cos(f) * r2, Math.sin(f) * r2);
 
 				newTurtle.add(wave.lineToWave(a,b));
 				a.set(b);
 			}
-			n = -n;
 			r -= ringSize;
 		}
 
@@ -150,23 +146,5 @@ public class Converter_SpiralPulseCMYK extends ImageConverter {
 		CropTurtle.run(newTurtle, myPaper.getMarginRectangle());
 
 		turtle.add(newTurtle);
-	}
-
-	public void setSpacing(double v) {
-		if(v<0.5f) v=0.5f;
-		if(v>10) v=10;
-		spacing=v;
-	}
-	public double getSpacing() {
-		return spacing;
-	}
-
-	public void setHeight(double v) {
-		if(v<0.1) v=1;
-		if(v>10) v=10;
-		height = v;
-	}
-	public double getHeight() {
-		return height;
 	}
 }

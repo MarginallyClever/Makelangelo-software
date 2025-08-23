@@ -1,7 +1,6 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
-import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
@@ -32,10 +31,10 @@ public class Converter_Pulse extends ImageConverter {
 	public Converter_Pulse() {
 		super();
 
-		SelectDouble selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
+		SelectSlider selectSize = new SelectSlider("size",Translator.get("HilbertCurveSize"),40,1,(int)blockScale);
 		add(selectSize);
 		selectSize.addSelectListener(evt->{
-			setScale((double) evt.getNewValue());
+			blockScale = (int)evt.getNewValue();
 			fireRestart();
 		});
 
@@ -53,10 +52,10 @@ public class Converter_Pulse extends ImageConverter {
 			fireRestart();
 		});
 
-		SelectDouble selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
+		SelectSlider selectSampleRate = new SelectSlider("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),20,1,(int)(sampleRate*10));
 		add(selectSampleRate);
 		selectSampleRate.addSelectListener(evt->{
-			sampleRate = (double) evt.getNewValue();
+			sampleRate = (int) evt.getNewValue() / 10.0;
 			fireRestart();
 		});
 	}
@@ -64,14 +63,6 @@ public class Converter_Pulse extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
-	}
-
-	public double getScale() {
-		return blockScale;
-	}
-	public void setScale(double value) {
-		if(value<1) value=1;
-		blockScale = value;
 	}
 
 	/**
