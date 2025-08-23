@@ -136,11 +136,6 @@ public class TransformedImage {
 		return sample(new Box(cx-radius,cy-radius,cx+radius,cy+radius));
 	}
 
-	private class SampleCount {
-		double count = 0;
-		double sum = 0;
-	}
-
 	/**
 	 * Sample the image, taking into account fractions of pixels.
 	 * @param box the area to sample
@@ -150,65 +145,26 @@ public class TransformedImage {
 		box.transform();
 
 		// now sample the entire area to average the intensity
-		SampleCount c = new SampleCount();
 		int bBottom = (int)box.bottom;
 		int bTop = (int)box.top;
-
-		// if box.bottom is not a whole number, sample the fraction of the pixel
-		if(box.bottom != bBottom) {
-			double fraction = 1.0 - (box.bottom - bBottom);
-			SampleCount b = sampleRow(box,bBottom);
-			c.sum += b.sum*fraction;
-			c.count += b.count*fraction;
-			bBottom++;
-		}
-		for(int y = bBottom; y < bTop; ++y) {
-			SampleCount b = sampleRow(box,y);
-			c.sum += b.sum;
-			c.count += b.count;
-		}
-		// if box.top is not a whole number, sample the fraction of the pixel
-		if(box.top != bTop) {
-			double fraction = box.top - bTop;
-			SampleCount b = sampleRow(box,bTop);
-			c.sum += b.sum*fraction;
-			c.count += b.count*fraction;
-		}
-
-		if(c.count==0) return 255;
-		// average the intensity
-		double result = c.sum / c.count;
-		return (int)Math.min( Math.max(result, 0), 255 );
-	}
-
-	private SampleCount sampleRow(Box box, int y) {
-		SampleCount c = new SampleCount();
 		int bLeft = (int)box.left;
 		int bRight = (int)box.right;
-		// if box.left is not a whole number, sample the fraction of the pixel
-		if(box.left != bLeft) {
-			raster.getPixel(bLeft, y, pixel);
-			double fraction = 1.0 - (box.left - bLeft);
-			c.sum += averageIntensity(pixel) * fraction;
-			c.count += fraction;
-			bLeft++;
-		}
-		// sample whole pixels
-		for(int x = bLeft; x < bRight; ++x) {
-			raster.getPixel(x, y, pixel);
-			c.sum += averageIntensity(pixel);
-			c.count++;
+		double count = 0;
+		double sum = 0;
+
+		for(int y = bBottom; y < bTop; ++y) {
+			// sample whole pixels
+			for(int x = bLeft; x < bRight; ++x) {
+				raster.getPixel(x, y, pixel);
+				sum += averageIntensity(pixel);
+				count++;
+			}
 		}
 
-		// if box.right is not a whole number, sample the fraction of the pixel
-		if(box.right != bRight) {
-			raster.getPixel(bRight, y, pixel);
-			double fraction = box.right - bRight;
-			c.sum += averageIntensity(pixel) * fraction;
-			c.count += fraction;
-		}
-
-		return c;
+		if(count==0) return 255;
+		// average the intensity
+		double result = sum / count;
+		return (int)Math.min( Math.max(result, 0), 255 );
 	}
 
 	// average intensity of the pixel

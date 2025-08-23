@@ -86,7 +86,8 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 			float r = (float)(c.weight-lpc) * scale;
 			float x = (float)c.center.x;
 			float y = (float)c.center.y;
-			DrawingHelper.drawCircle(gl, cx+x, cy+y, r, new Color((float)c.change,0,0));
+			float cBounded = (float)Math.clamp(c.change,0,1);
+			DrawingHelper.drawCircle(gl, cx+x, cy+y, r, new Color(cBounded,0,0));
 		}
 	}
 
@@ -115,14 +116,14 @@ public class Converter_VoronoiStippling extends Converter_Voronoi {
 
 		int detail = (int)Math.max(4, Math.min(20,Math.ceil((r) * Math.PI * 2.0)));
 
-		double r2 = r-0.5;
+		double radius = r - settings.getDouble(PlotterSettings.DIAMETER) / 2.0;
 
 		Turtle circle = new Turtle();
 		circle.setStroke(turtle.getColor(),settings.getDouble(PlotterSettings.DIAMETER));
 		for(int j = 0; j <= detail; ++j) {
 			double v = (double)j * 2.0 * Math.PI / (double)detail;
-			double newX = x + r2 * Math.cos(v);
-			double newY = y + r2 * Math.sin(v);
+			double newX = x + Math.cos(v) * radius;
+			double newY = y + Math.sin(v) * radius;
 			if(j==0) circle.jumpTo(newX,newY);
 			else circle.moveTo(newX,newY);
 		}

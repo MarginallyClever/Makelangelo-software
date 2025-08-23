@@ -23,7 +23,11 @@ public class DrawingHelper {
         Mesh mesh = new Mesh();
         mesh.setRenderStyle(GL3.GL_LINE_LOOP);
         for (float f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-            mesh.addColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/255f);
+            mesh.addColor(
+                    color.getRed()/255f,
+                    color.getGreen()/255f,
+                    color.getBlue()/255f,
+                    color.getAlpha()/255f);
             mesh.addVertex(
                     (float)(x + Math.cos(f) * radius),
                     (float)(y + Math.sin(f) * radius),
