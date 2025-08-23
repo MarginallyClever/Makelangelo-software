@@ -21,13 +21,14 @@ public class Generator_FillPage extends TurtleGenerator {
 	public Generator_FillPage() {
 		super();
 		SelectDouble selectAngle = new SelectDouble("order",Translator.get("HilbertCurveOrder"),angle);
-		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),penDiameter);
 		add(selectAngle);
-		add(selectPenDiameter);
 		selectAngle.addSelectListener(evt->{
 			angle = selectAngle.getValue();
 			generate();
 		});
+
+		SelectDouble selectPenDiameter = new SelectDouble("penDiameter",Translator.get("penDiameter"),penDiameter);
+		add(selectPenDiameter);
 		selectPenDiameter.addSelectListener(evt->{
 			penDiameter = selectPenDiameter.getValue();
 			generate();

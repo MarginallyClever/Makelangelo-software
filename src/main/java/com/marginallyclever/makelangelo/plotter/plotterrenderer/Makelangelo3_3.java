@@ -7,11 +7,11 @@ import com.marginallyclever.makelangelo.preview.ShaderProgram;
 public class Makelangelo3_3 implements PlotterRenderer {
 
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
-		paintControlBox(shader,robot);
-		Polargraph.paintMotors(shader,robot);
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
+		paintControlBox(shader,gl,robot);
+		Polargraph.paintMotors(shader,gl,robot);
 		if(robot.getDidFindHome()) 
-			Polargraph.paintPenHolderToCounterweights(shader,robot);
+			Polargraph.paintPenHolderToCounterweights(shader,gl,robot);
 	}
 	
 	/**
@@ -19,7 +19,7 @@ public class Makelangelo3_3 implements PlotterRenderer {
 	 * @param shader the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintControlBox(ShaderProgram shader,Plotter robot) {/*
+	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter robot) {/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);

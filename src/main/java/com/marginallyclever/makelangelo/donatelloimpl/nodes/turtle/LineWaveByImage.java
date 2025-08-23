@@ -48,7 +48,7 @@ public class LineWaveByImage extends Node {
         setComplete(0);
 
         var sourceImage = new TransformedImage(image.getValue());
-        var tool = new WaveByIntensity(sourceImage, thickness.getValue()/2.0, stepSize.getValue());
+        var tool = new WaveByIntensity(sourceImage, thickness.getValue()/2.0, stepSize.getValue(),2.0);
         result.setValue(tool.turtleToWave(myTurtle));
 
         setComplete(100);

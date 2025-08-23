@@ -18,9 +18,9 @@ import java.util.PriorityQueue;
 /**
  * <p>Converts an image into a contour map using the fast marching method.
  * The contours are extracted from the arrival times computed from the image brightness.</p>
- * <p>Style idea by <a href="https://www.reddit.com/r/PlotterArt/comments/1lu3bok/finally_i_have_a_contour_plotting_algorithm/">Mickymoe1992</a>.</p>
+ * <p>Style idea by <a href="https://www.reddit.com/r/PlotterArt/comments/1lu3bok/finally_i_have_a_contour_plotting_algorithm/">Mickeymoe1992</a>.</p>
  */
-public class Converter_Mickymoe1992 extends ImageConverter {
+public class Converter_Mickeymoe1992 extends ImageConverter {
     private static double minSpacing = 10.0;
     private static int seedX = 50, seedY = 50;
     
@@ -28,11 +28,12 @@ public class Converter_Mickymoe1992 extends ImageConverter {
     private TransformedImage img;
     private boolean recalculateFFM = true;
     private double [][] ffm;
+    private int stepSize = 1;
 
-    public Converter_Mickymoe1992() {
+    public Converter_Mickeymoe1992() {
         super();
 
-        var minSpacingSelect = new SelectDouble("minSpacing", Translator.get("Converter_Mickymoe1992.minSpacing"), Converter_Mickymoe1992.minSpacing);
+        var minSpacingSelect = new SelectDouble("minSpacing", Translator.get("Converter_Mickymoe1992.minSpacing"), Converter_Mickeymoe1992.minSpacing);
         minSpacingSelect.addSelectListener((evt) -> {
             minSpacing = (double) evt.getNewValue();
             recalculateFFM=false;
@@ -173,22 +174,21 @@ public class Converter_Mickymoe1992 extends ImageConverter {
     }
 
     void line(Point2d a,Point2d b) {
-        var d = 1;//turtle.getDiameter();
-        turtle.jumpTo(px+a.x*d,py+a.y*d);
-        turtle.moveTo(px+b.x*d,py+b.y*d);
+        turtle.jumpTo(px+a.x,py+a.y);
+        turtle.moveTo(px+b.x,py+b.y);
     }
 
     void case1(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x0,y0,x0,y1,T,level);
         Point2d b = lerpEdge(x0,y0,x1,y0,T,level);
         line(a,b);
     }
 
     void case2(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x1,y0,x0,y0,T,level);
         Point2d b = lerpEdge(x1,y0,x1,y1,T,level);
         line(a,b);
@@ -196,16 +196,16 @@ public class Converter_Mickymoe1992 extends ImageConverter {
 
     // 1 + 2
     void case3(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x0,y0,x0,y1,T,level);
         Point2d b = lerpEdge(x1,y0,x1,y1,T,level);
         line(a,b);
     }
 
     void case4(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x1,y1,x0,y1,T,level);
         Point2d b = lerpEdge(x1,y1,x1,y0,T,level);
         line(a,b);
@@ -213,14 +213,33 @@ public class Converter_Mickymoe1992 extends ImageConverter {
 
     // 1 + 4
     void case5(int x0,int y0, double[][] T,double level) {
-        case1(x0,y0,T,level);
-        case4(x0,y0,T,level);
+        int x1 = x0 + stepSize;
+        int y1 = y0 + stepSize;
+        double v00 = T[x0][y0];
+        double v10 = T[x1][y0];
+        double v01 = T[x0][y1];
+        double v11 = T[x1][y1];
+
+        // Asymptotic decider: compute saddle value
+        double alpha = (level - v00) / (v11 - v00);
+        double beta = (level - v10) / (v01 - v10);
+        double saddleValue = v00 * v11 - v01 * v10;
+
+        if (saddleValue > 0) {
+            Point2d a = lerpEdge(x0, y0, x0, y1, T, level);
+            Point2d b = lerpEdge(x1, y0, x1, y1, T, level);
+            line(a, b);
+        } else {
+            Point2d a = lerpEdge(x0, y0, x1, y0, T, level);
+            Point2d b = lerpEdge(x0, y1, x1, y1, T, level);
+            line(a, b);
+        }
     }
 
     // 2 + 4
     void case6(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x0,y0,x1,y0,T,level);
         Point2d b = lerpEdge(x0,y1,x1,y1,T,level);
         line(a,b);
@@ -228,8 +247,8 @@ public class Converter_Mickymoe1992 extends ImageConverter {
 
     // 1+2+4
     void case7(int x0,int y0, double[][] T,double level) {
-        int x1 = x0+1;
-        int y1 = y0+1;
+        int x1 = x0+stepSize;
+        int y1 = y0+stepSize;
         Point2d a = lerpEdge(x0,y1,x0,y0,T,level);
         Point2d b = lerpEdge(x0,y1,x1,y1,T,level);
         line(a,b);
@@ -257,7 +276,7 @@ public class Converter_Mickymoe1992 extends ImageConverter {
      */
     public double[][] computeArrivalTimes() {
         var rect = myPaper.getMarginRectangle();
-        var d = Math.max(1,turtle.getDiameter());
+        double d = Math.max(0.1,turtle.getDiameter());
         int w = (int)Math.ceil(rect.getWidth()/d);
         int h = (int)Math.ceil(rect.getHeight()/d);
         int minX = (int)rect.getMinX();
@@ -267,7 +286,7 @@ public class Converter_Mickymoe1992 extends ImageConverter {
         double[][] F = new double[w][h];
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                int rgb = img.sample(x*d+minX, y*d+minY,2);
+                int rgb = img.sample(x*d+minX, y*d+minY,1);
                 int gray = rgb & 0xff; // assume grayscale
                 // Normalize: 0.1..1.0 to avoid divide by zero
                 F[x][y] = 0.01 + 0.99 * (gray / 255.0);

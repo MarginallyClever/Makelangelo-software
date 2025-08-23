@@ -81,8 +81,24 @@ jobs:
     needs: delete-nightly-assets
     strategy:
       matrix:
-        os: [windows-latest, macos-13, macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+        include:
+        - runs_on: macos-13
+          arch: x64
+          java_arch: x64
+          os_label: mac-intel
+        - runs_on: macos-latest
+          arch: arm64
+          java_arch: aarch64
+          os_label: mac-arm64
+        - runs_on: ubuntu-latest
+          arch: x64
+          java_arch: x64
+          os_label: ubuntu
+        - runs_on: windows-latest
+          arch: x64
+          java_arch: x64
+          os_label: windows
+    runs-on: ${{ matrix.runs_on }}
 
     steps:
       - uses: actions/checkout@v4.2.2
@@ -90,6 +106,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '22'
+          architecture: ${{ matrix.java_arch }}
 
       - uses: actions/download-artifact@v5.0.0
         with:
@@ -98,22 +115,11 @@ jobs:
       - name: Build installer and rename
         shell: bash
         run: |
-          # Detect current architecture
-          ARCH=$(uname -m)
-          case "$ARCH" in
-          x86_64) ARCH_LABEL="x64" ;;
-          arm64)  ARCH_LABEL="arm64" ;;
-          *)      ARCH_LABEL="$ARCH" ;; # fallback just in case
-          esac
-          
-          # Use this to rename the app and output
-          APP_NAME="Makelangelo-${ARCH_LABEL}"
-          
-          set -x
-          set -o pipefail
+          set -euo pipefail
           APP_VERSION=$(ls -1 target/package/Makelangelo-*-with-dependencies.jar | sed "s/.*Makelangelo-\([^-]*\)-with-dependencies.jar/\1/")
           sed -i.bak "s/\(--app-version\).*/\1 $APP_VERSION/" src/main/package/jpackage.cfg
-          jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.os }}.cfg" \
+          APP_NAME="Makelangelo-${{ matrix.os_label }}"
+          jpackage "@src/main/package/jpackage.cfg" "@src/main/package/jpackage-${{ matrix.runs_on }}.cfg" \
             --main-jar "Makelangelo-$APP_VERSION-with-dependencies.jar" \
             --name "$APP_NAME"
           BINARY=$(find . -maxdepth 1 -iname 'makelangelo*' | grep -E '\.msi$|\.deb$|\.dmg$')

@@ -14,6 +14,6 @@ public interface PreviewListener {
 	 *
 	 * @param shader the render context
 	 */
-	void render(ShaderProgram shader);
+	void render(ShaderProgram shader,GL3 gl);
 	default void dispose() {}
 }

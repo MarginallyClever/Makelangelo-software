@@ -31,8 +31,8 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	private static final Logger logger = LoggerFactory.getLogger(OpenGLPanel.class);
 	
 	// Use debug pipeline?
-	private static final boolean DEBUG_GL_ON = false;
-	private static final boolean TRACE_GL_ON = false;
+	private static boolean DEBUG_GL_ON = true;
+	private static boolean TRACE_GL_ON = true;
 	private GLJPanel glCanvas;
 	private int canvasWidth,canvasHeight;
 
@@ -219,6 +219,13 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 	public void init(GLAutoDrawable glAutoDrawable) {
 		logger.debug("init");
 		glAutoDrawable.getGL().getGL3();
+
+		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
+		if(prefs != null) {
+			DEBUG_GL_ON = prefs.getBoolean("debug GL", false);
+			TRACE_GL_ON = prefs.getBoolean("trace GL", false);
+		}
+
 		activatePipelines(glAutoDrawable);
 
 		var gl = glAutoDrawable.getGL().getGL3();
@@ -229,8 +236,11 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 
 		// make things pretty
 		gl.glEnable(GL3.GL_LINE_SMOOTH);
+		gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_NICEST);
+
 		gl.glEnable(GL3.GL_POLYGON_SMOOTH);
 		gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
+
 		gl.glEnable(GL3.GL_MULTISAMPLE);
 
 		try {
@@ -260,7 +270,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		logger.info("dispose");
 		var gl = glautodrawable.getGL().getGL3();
 		TextureFactory.dispose(gl);
-		shaderProgram.delete(gl);
+		shaderProgram.dispose(gl);
 		for( PreviewListener p : previewListeners ) {
 			p.dispose();
 		}
@@ -281,10 +291,12 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		Preferences prefs = PreferencesHelper.getPreferenceNode(PreferencesHelper.MakelangeloPreferenceKey.GRAPHICS);
 		if(prefs != null && prefs.getBoolean("antialias", true)) {
 			gl.glEnable(GL3.GL_LINE_SMOOTH);
+			gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_NICEST);
 			gl.glEnable(GL3.GL_POLYGON_SMOOTH);
 			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_NICEST);
 		} else {
 			gl.glDisable(GL3.GL_LINE_SMOOTH);
+			gl.glHint(GL3.GL_LINE_SMOOTH_HINT, GL3.GL_FASTEST);
 			gl.glDisable(GL3.GL_POLYGON_SMOOTH);
 			gl.glHint(GL3.GL_POLYGON_SMOOTH_HINT, GL3.GL_FASTEST);
 		}
@@ -299,7 +311,7 @@ public class OpenGLPanel extends JPanel implements GLEventListener, MouseWheelLi
 		paintCamera(gl);
 
 		for( PreviewListener p : previewListeners ) {
-			p.render(shaderProgram);
+			p.render(shaderProgram,gl);
 		}
 
 		//renderTestTriangle(gl);

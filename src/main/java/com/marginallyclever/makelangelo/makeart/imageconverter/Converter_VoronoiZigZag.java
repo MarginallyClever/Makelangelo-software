@@ -85,8 +85,8 @@ public class Converter_VoronoiZigZag extends Converter_Voronoi {
 	public void resume() {}
 
 	@Override
-	public void render(ShaderProgram shader) {
-		super.render(shader);/*
+	public void render(ShaderProgram shader, GL3 gl) {
+		super.render(shader,gl);/*
 		if(getThread().getPaused()) return;
 
 		gl.glPushMatrix();
