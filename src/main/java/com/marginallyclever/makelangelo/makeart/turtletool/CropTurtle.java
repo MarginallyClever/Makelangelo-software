@@ -46,10 +46,17 @@ public class CropTurtle {
 				rectangle.getMinY(), rectangle.getMaxY()));
 
 		for( var line : layer.getAllLines()) {
-			LineString lineString = createLineStringFromLine2d(gf,line);
-			Geometry intersection = lineString.intersection(rectanglePolygon);
-			if (!intersection.isEmpty()) {
-				addIntersectionToLayer(intersection,newLayer);
+			try {
+				LineString lineString = createLineStringFromLine2d(gf, line);
+				if(lineString!=null) {
+					Geometry intersection = lineString.intersection(rectanglePolygon);
+					if (!intersection.isEmpty()) {
+						addIntersectionToLayer(intersection, newLayer);
+					}
+				}
+			} catch( Exception e ) {
+				logger.error("{} causes error creating LineString: {}", line, e.getMessage());
+				break;
 			}
 		}
 		return newLayer;
@@ -73,6 +80,15 @@ public class CropTurtle {
 
 	public static LineString createLineStringFromLine2d(GeometryFactory gf, Line2d line) {
 		// convert line to jts format
+		if(line.size()==1) {
+			// JTS can't handle a single point line, so we make a very small line instead
+			var p = line.getFirst();
+			Coordinate[] list = new Coordinate[2];
+			list[0] = new Coordinate(p.x, p.y);
+			list[1] = new Coordinate(p.x+EPSILON, p.y+EPSILON);
+			return gf.createLineString(list);
+		}
+
 		Coordinate[] list = new Coordinate[line.size()];
 		for(int i=0;i<line.size();++i) {
 			var p = line.get(i);

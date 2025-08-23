@@ -1,6 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 import com.marginallyclever.donatello.select.SelectBoolean;
+import com.marginallyclever.donatello.select.SelectSlider;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -26,7 +27,7 @@ import java.awt.geom.Rectangle2D;
 public class Converter_SpiralPulse extends ImageConverter {
 	private static final Logger logger = LoggerFactory.getLogger(Converter_SpiralPulse.class);
 	private static boolean convertToCorners = false;  // draw the spiral right out to the edges of the square bounds.
-	private static double zigDensity = 1.2f;  // increase to tighten zigzags
+	private static double zigDensity = 2.0f;  // increase to tighten zigzags
 	private static double spacing = 2.5f;
 	private static double height = 4.0f;
 	private static double sampleRate = 0.1;
@@ -41,10 +42,10 @@ public class Converter_SpiralPulse extends ImageConverter {
 		});
 		add(toCorners);
 
-		SelectDouble selectIntensity = new SelectDouble("intensity", Translator.get("Converter_SpiralPulse.intensity"),getIntensity());
+		SelectSlider selectIntensity = new SelectSlider("intensity", Translator.get("Converter_SpiralPulse.intensity"),30,1,(int)(zigDensity*10));
 		add(selectIntensity);
 		selectIntensity.addSelectListener(evt->{
-			setIntensity((double)evt.getNewValue());
+			zigDensity = (int)evt.getNewValue() / 10.0;
 			fireRestart();
 		});
 
@@ -106,7 +107,7 @@ public class Converter_SpiralPulse extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		var wave = new WaveByIntensity(img,halfStep,sampleRate,2.0);
+		var wave = new WaveByIntensity(img,halfStep,sampleRate,zigDensity);
 
 		Point2d a = new Point2d();
 		Point2d b = new Point2d();
@@ -137,15 +138,6 @@ public class Converter_SpiralPulse extends ImageConverter {
 		CropTurtle.run(turtle, myPaper.getMarginRectangle());
 
 		fireConversionFinished();
-	}
-
-	public void setIntensity(double v) {
-		if(v<0.1) v=0.1f;
-		if(v>3.0) v=3.0f;
-		zigDensity=v;
-	}
-	public double getIntensity() {
-		return zigDensity;
 	}
 
 	public void setSpacing(double v) {
