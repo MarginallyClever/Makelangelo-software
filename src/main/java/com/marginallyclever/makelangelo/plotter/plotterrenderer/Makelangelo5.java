@@ -24,7 +24,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	private static TextureWithMetadata textureArm;
 
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
 		if (textureMainBody == null) textureMainBody = TextureFactory.loadTexture("/textures/makelangelo5.png");
 		if (textureMotors == null) textureMotors = TextureFactory.loadTexture("/textures/makelangelo5-motors.png");
 		if (textureLogo == null) textureLogo = TextureFactory.loadTexture("/logo.png");
@@ -33,30 +33,30 @@ public class Makelangelo5 implements PlotterRenderer {
 		if (textureArm == null) textureArm = TextureFactory.loadTexture("/textures/phArm2.png");
 
 		if (textureMainBody == null) {
-			paintControlBoxPlain(shader, robot);
+			paintControlBoxPlain(shader, gl, robot);
 		} else {
-			paintControlBoxFancy(shader, robot, textureMainBody);
+			paintControlBoxFancy(shader, gl, robot, textureMainBody);
 		}
 
-		Polargraph.paintSafeArea(shader, robot);
+		Polargraph.paintSafeArea(shader, gl, robot);
 
 		if (robot.getDidFindHome())
-			paintPenHolderToCounterweights(shader, robot);
+			paintPenHolderToCounterweights(shader, gl, robot);
 
 		if (textureMotors == null) {
-			Polargraph.paintMotors(shader, robot);
+			Polargraph.paintMotors(shader, gl, robot);
 		} else {
-			paintControlBoxFancy(shader, robot, textureMotors);
+			paintControlBoxFancy(shader, gl, robot, textureMotors);
 		}
 
 		if (textureLogo == null) {
 			// paintLogo(gl2,robot);
 		} else {
-			paintLogoFancy(shader, robot);
+			paintLogoFancy(shader, gl, robot);
 		}
 	}
 
-	public void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot) {
+	public void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot) {
 		Point2d pos = robot.getPos();
 		double gx = pos.x;
 		double gy = pos.y;
@@ -82,7 +82,6 @@ public class Makelangelo5 implements PlotterRenderer {
 		double right_a = Math.sqrt(dx * dx + dy * dy);
 		double right_b = (beltLength - right_a) / 2 - 55;
 
-		var gl = shader.getContext();
 		// belt from motor to pen holder left
 		drawBeltMinus10(gl,left,top,gx,gy);
 		// belt from motor to pen holder right
@@ -96,9 +95,9 @@ public class Makelangelo5 implements PlotterRenderer {
 		paintGondola(gl,gx,gy,robot);
 
 		// left
-		paintCounterweight(shader,left,top-left_b);
+		paintCounterweight(shader, gl, left,top-left_b);
 		// right
-		paintCounterweight(shader,right,top-right_b);
+		paintCounterweight(shader, gl, right,top-right_b);
 	}
 
 	private void drawBeltMinus10(GL3 gl2, double cornerX, double cornerY, double penX, double penY) {/*
@@ -161,15 +160,15 @@ public class Makelangelo5 implements PlotterRenderer {
 		paintTexture(gl2,textureGondola,gx-50,gy-50,100,100);*/
 	}
 
-	private void paintCounterweight(ShaderProgram shader,double x,double y) {
+	private void paintCounterweight(ShaderProgram shader, GL3 gl,double x,double y) {
 		if(textureWeight==null) {
 			Polargraph.paintCounterweight(shader,(float)x,(float)y);
 			return;
 		}
-		paintTexture(shader, textureWeight, x-20, y-74, 40,80);
+		paintTexture(shader, gl, textureWeight, x-20, y-74, 40,80);
 	}
 
-	private void paintControlBoxFancy(ShaderProgram shader, Plotter robot,TextureWithMetadata texture) {
+	private void paintControlBoxFancy(ShaderProgram shader, GL3 gl, Plotter robot,TextureWithMetadata texture) {
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		// double top = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 
@@ -179,7 +178,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final double ox = left - 106 * scale; // 106 taken from offset in texture map
 		final double oy = -15 - 190 * scale; // 109 taken from offset in texture map. TODO why -15 instead of top?
 
-		paintTexture(shader, texture, ox, oy, TW, TH);
+		paintTexture(shader, gl, texture, ox, oy, TW, TH);
 	}
 
 	/**
@@ -188,7 +187,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	 * @param shader the render context
 	 * @param robot the machine to draw.
 	 */
-	private void paintLogoFancy(ShaderProgram shader, Plotter robot) {
+	private void paintLogoFancy(ShaderProgram shader, GL3 gl, Plotter robot) {
 		final double scale = 0.5;
 		final double TW = 128 * scale;
 		final double TH = 128 * scale;
@@ -196,7 +195,7 @@ public class Makelangelo5 implements PlotterRenderer {
 		final float LOGO_X = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT) - 65; // bottom left corner of safe Area
 		final float LOGO_Y = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM)+10;
 
-		paintTexture(shader, textureLogo, LOGO_X, LOGO_Y, TW, TH);
+		paintTexture(shader, gl, textureLogo, LOGO_X, LOGO_Y, TW, TH);
 	}
 
 	/**
@@ -205,7 +204,7 @@ public class Makelangelo5 implements PlotterRenderer {
 	 * @param shader the shader program to use for rendering.
 	 * @param robot the machine to draw.
 	 */
-	private void paintControlBoxPlain(ShaderProgram shader, Plotter robot) {/*
+	private void paintControlBoxPlain(ShaderProgram shader, GL3 gl, Plotter robot) {/*
 		double cy = robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double left = robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		double right = robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);

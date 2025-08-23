@@ -19,14 +19,14 @@ public class Zarplotter implements PlotterRenderer {
 	final public float ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
-		paintMotors(shader,robot);
-		paintControlBox(shader,robot);
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
+		paintMotors(shader,gl,robot);
+		paintControlBox(shader,gl,robot);
 		if(robot.getDidFindHome()) 
-			paintPenHolderToCounterweights(shader,robot);
+			paintPenHolderToCounterweights(shader,gl,robot);
 	}
 
-	private void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot) {
+	private void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot) {
 		PlotterSettings settings = robot.getSettings();
 		//double dx, dy;
 		Point2d pos = robot.getPos();
@@ -38,7 +38,6 @@ public class Zarplotter implements PlotterRenderer {
 		float left = (float)settings.getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)settings.getDouble(PlotterSettings.LIMIT_RIGHT);
 
-		var gl = shader.getContext();
 		gl.glEnable(GL3.GL_BLEND);
 		gl.glBlendFunc(GL3.GL_SRC_ALPHA,GL3.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -76,7 +75,7 @@ public class Zarplotter implements PlotterRenderer {
 		belt.render(gl);
 	}
 
-	private void paintMotors(ShaderProgram shader,Plotter plotter) {
+	private void paintMotors(ShaderProgram shader, GL3 gl,Plotter plotter) {
 		/*
 		float top = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float bottom = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_BOTTOM);
@@ -112,7 +111,7 @@ public class Zarplotter implements PlotterRenderer {
 		motor.render(gl);
 	}
 	
-	private void paintControlBox(ShaderProgram shader,Plotter plotter) {
+	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {
 		float cy = (float)plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float cx = 0;
 
@@ -129,6 +128,6 @@ public class Zarplotter implements PlotterRenderer {
 		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx+67.5f, cy-37.5f, 0);
 		mesh.addColor(0.9f,0.9f,0.9f,1.0f);  mesh.addVertex(cx-67.5f, cy-37.5f, 0);
 
-		mesh.render(shader.getContext());
+		mesh.render(gl);
 	}
 }

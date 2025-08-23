@@ -12,13 +12,13 @@ public class Cartesian implements PlotterRenderer {
 	final public double ZAR_MOTOR_BODY_SIZE=42; //cm
 	
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
-		paintGantryAndHead(shader,robot);
-		paintMotors(shader,robot);
-		paintControlBox(shader,robot);
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
+		paintGantryAndHead(shader,gl,robot);
+		paintMotors(shader,gl,robot);
+		paintControlBox(shader,gl,robot);
 	}
 	
-	private void paintGantryAndHead(ShaderProgram shader, Plotter plotter) {/*
+	private void paintGantryAndHead(ShaderProgram shader, GL3 gl, Plotter plotter) {/*
 		//double dx, dy;
 		Point2d pos = plotter.getPos();
 		double gx = pos.x;
@@ -64,7 +64,7 @@ public class Cartesian implements PlotterRenderer {
 		gl2.glEnd();*/
 	}
 	
-	protected void paintMotors(ShaderProgram shader,Plotter plotter) {/*
+	protected void paintMotors(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
 		double top = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double right = plotter.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		double left = plotter.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -98,7 +98,7 @@ public class Cartesian implements PlotterRenderer {
 	 * @param shader the render context
 	 * @param plotter the plotter reference for generating the gcode.
 	 */
-	private void paintControlBox(ShaderProgram shader,Plotter plotter) {/*
+	private void paintControlBox(ShaderProgram shader, GL3 gl,Plotter plotter) {/*
 		double cy = plotter.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		double cx = 0;
 

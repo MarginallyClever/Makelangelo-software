@@ -23,7 +23,11 @@ public class DrawingHelper {
         Mesh mesh = new Mesh();
         mesh.setRenderStyle(GL3.GL_LINE_LOOP);
         for (float f = 0; f < 2.0 * Math.PI; f += 0.3f) {
-            mesh.addColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/255f);
+            mesh.addColor(
+                    color.getRed()/255f,
+                    color.getGreen()/255f,
+                    color.getBlue()/255f,
+                    color.getAlpha()/255f);
             mesh.addVertex(
                     (float)(x + Math.cos(f) * radius),
                     (float)(y + Math.sin(f) * radius),
@@ -88,8 +92,7 @@ public class DrawingHelper {
      * @param width with of the texture
      * @param height height of the texture
      */
-    public static void paintTexture(ShaderProgram shader, TextureWithMetadata texture, double x, double y, double width, double height) {
-        GL3 gl = shader.getContext();
+    public static void paintTexture(ShaderProgram shader, GL3 gl, TextureWithMetadata texture, double x, double y, double width, double height) {
         texture.bind(gl);
         gl.glEnable(GL3.GL_TEXTURE_2D);
         shader.set1i(gl,"useTexture", 1);

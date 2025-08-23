@@ -178,8 +178,7 @@ public class Plotter implements PreviewListener, Cloneable {
 	 * @param shader the render context
 	 */
 	@Override
-	public void render(ShaderProgram shader) {
-		GL3 gl = shader.getContext();
+	public void render(ShaderProgram shader, GL3 gl) {
 		float[] lineWidthBuf = new float[1];
 		gl.glGetFloatv(GL3.GL_LINE_WIDTH, lineWidthBuf, 0);
 

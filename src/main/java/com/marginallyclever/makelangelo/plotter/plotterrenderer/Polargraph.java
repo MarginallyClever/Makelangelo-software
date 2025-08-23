@@ -65,16 +65,15 @@ public abstract class Polargraph implements PlotterRenderer {
 	}
 
 	@Override
-	public void render(ShaderProgram shader, Plotter robot) {
-		paintMotors(shader, robot);
-		paintControlBox(shader, robot);
+	public void render(ShaderProgram shader, GL3 gl, Plotter robot) {
+		paintMotors(shader, gl, robot);
+		paintControlBox(shader, gl, robot);
 		if(robot.getDidFindHome()) {
-			paintPenHolderToCounterweights(shader, robot);
+			paintPenHolderToCounterweights(shader, gl, robot);
 		}
 	}
 
-	static public void paintMotors(ShaderProgram shader,Plotter robot) {
-		var gl = shader.getContext();
+	static public void paintMotors(ShaderProgram shader, GL3 gl,Plotter robot) {
 		float top = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float right = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
 		float left = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
@@ -86,8 +85,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		DrawingHelper.drawRectangle(gl,top+MOTOR_SIZE, right+MOTOR_SIZE, top-MOTOR_SIZE,right-MOTOR_SIZE, c);
 	}
 
-	private void paintControlBox(ShaderProgram shader, Plotter robot) {
-		var gl = shader.getContext();
+	private void paintControlBox(ShaderProgram shader, GL3 gl, Plotter robot) {
 		float cy = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_TOP);
 		float left = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_LEFT);
 		float right = (float)robot.getSettings().getDouble(PlotterSettings.LIMIT_RIGHT);
@@ -119,7 +117,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		DrawingHelper.drawRectangle(gl,cy+30,cx+40,cy-30,cx-40,c2);
 	}
 
-	static public void paintPenHolderToCounterweights(ShaderProgram shader, Plotter robot) {
+	static public void paintPenHolderToCounterweights(ShaderProgram shader, GL3 gl, Plotter robot) {
 		Point2d pos = robot.getPos();
 		float gx = (float)pos.x;
 		float gy = (float)pos.y;
@@ -161,7 +159,6 @@ public abstract class Polargraph implements PlotterRenderer {
 		// belt from motor to counterweight right
 		paintBeltSide(belts,right,top,right_b);
 */
-		var gl = shader.getContext();
 		paintGondola(gl,gx,gy,robot,c);
 
 		// left
@@ -177,10 +174,10 @@ public abstract class Polargraph implements PlotterRenderer {
 		mesh.addVertex(x + 2, y - length, 0);
 	}
 
-	private static void paintGondola(GL3 gl2, float gx, float gy,Plotter robot,Color color) {
-		DrawingHelper.drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2, color);
+	private static void paintGondola(GL3 gl, float gx, float gy,Plotter robot,Color color) {
+		DrawingHelper.drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2, color);
 		if (robot.getPenIsUp()) {
-			DrawingHelper.drawCircle(gl2, gx, gy, PEN_HOLDER_RADIUS_2 + 5, color);
+			DrawingHelper.drawCircle(gl, gx, gy, PEN_HOLDER_RADIUS_2 + 5, color);
 		}
 	}
 
@@ -226,7 +223,7 @@ public abstract class Polargraph implements PlotterRenderer {
 		gl2.glEnd();*/
 	}
 
-	public static void paintSafeArea(ShaderProgram shader, Plotter robot) {/*
+	public static void paintSafeArea(ShaderProgram shader, GL3 gl, Plotter robot) {/*
 		PlotterSettings settings = robot.getSettings();
 		float top = (float)settings.getDouble(PlotterSettings.LIMIT_TOP);
 		float bottom = (float)settings.getDouble(PlotterSettings.LIMIT_BOTTOM);

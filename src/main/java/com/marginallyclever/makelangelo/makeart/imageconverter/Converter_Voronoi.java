@@ -3,6 +3,7 @@ package com.marginallyclever.makelangelo.makeart.imageconverter;
 import com.jogamp.opengl.GL3;
 import com.marginallyclever.convenience.voronoi.VoronoiCell;
 import com.marginallyclever.convenience.voronoi.VoronoiTesselator2;
+import com.marginallyclever.makelangelo.Mesh;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -44,7 +45,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     protected final List<VoronoiCell> cells = new ArrayList<>();
     private int iterations;
     private int lowpassCutoff = 128;
-    private int cellBuffer = 100;
+    private final int cellBuffer = 100;
     private static int seed=0;
     private static final Random random = new Random();
 
@@ -224,8 +225,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
             scaleFactor *= 0.5;
         }
 
-        double stepSize = 1.0/scaleFactor;
-        return stepSize;
+        return 1.0/scaleFactor;
     }
 
     private double findLeftEdge(PreparedPolygon poly,GeometryFactory factory,double y,double minx,double maxx,double stepSize) {
@@ -252,25 +252,26 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
         writeOutCells();
     }
 
-    protected void renderEdges(GL3 gl) {
-/*
-        gl.glColor3d(0.9, 0.9, 0.9);
-
+    protected void renderEdges(ShaderProgram shader, GL3 gl) {
         double cx = myPaper.getCenterX();
         double cy = myPaper.getCenterY();
-        gl.glPushMatrix();
-        gl.glTranslated(cx, cy, 0);
+
+        Mesh mesh = new Mesh(GL3.GL_LINES);
 
         for(int i=0;i<voronoiDiagram.getNumHulls();++i) {
             Polygon poly = voronoiDiagram.getHull(i);
-            gl.glBegin(GL3.GL_LINE_LOOP);
-            for (Coordinate p : poly.getExteriorRing().getCoordinates()) {
-                gl.glVertex2d(p.x, p.y);
+            Coordinate [] list = poly.getExteriorRing().getCoordinates();
+            for(int j=0;j<list.length;++j) {
+                Coordinate p0 = list[j];
+                Coordinate p1 = list[(j+1)%list.length];
+                mesh.addColor(0.9f,0.9f,0.9f,1);
+                mesh.addVertex((float)(p0.x+cx), (float)(p0.y+cy), 0);
+                mesh.addColor(0.9f,0.9f,0.9f,1);
+                mesh.addVertex((float)(p1.x+cx), (float)(p1.y+cy), 0);
             }
-            gl.glEnd();
         }
-        gl.glPopMatrix();
-        */
+
+        mesh.render(gl);
     }
 
     public void setNumCells(int value) {
@@ -300,9 +301,7 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
     }
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     abstract void writeOutCells();
 
@@ -312,19 +311,19 @@ public abstract class Converter_Voronoi extends ImageConverterIterative {
      * @param shader the render context
      */
     @Override
-    public void render(ShaderProgram shader) {/*
+    public void render(ShaderProgram shader, GL3 gl) {
         ImageConverterThread thread = getThread();
-        if(thread==null || thread.getPaused()) return;
+        if(thread==null) return;
 
         if (!drawVoronoi) return;
 
         lock.lock();
         try {
-            renderEdges(gl);
+            renderEdges(shader,gl);
         }
         finally {
             lock.unlock();
-        }*/
+        }
     }
 
     public int getLowpassCutoff() {
