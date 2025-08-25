@@ -1,20 +1,27 @@
 package com.marginallyclever.makelangelo.makeart.io;
 
+import com.marginallyclever.makelangelo.makeart.turtletool.CropTurtle;
 import com.marginallyclever.makelangelo.turtle.Turtle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Point2d;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
-import java.awt.Color;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 /**
  * Load OpenStreetMap (OSM) files and convert them to Turtle graphics commands.
  * Creates one layer (sub-Turtle) per color/category.
  */
 public class LoadOSM implements TurtleLoader {
+    private static final Logger logger = LoggerFactory.getLogger(LoadOSM.class);
     private static final FileNameExtensionFilter filter = new FileNameExtensionFilter("OpenStreetMap", "osm");
 
     @Override
@@ -52,17 +59,33 @@ public class LoadOSM implements TurtleLoader {
         XMLInputFactory f = XMLInputFactory.newFactory();
         XMLStreamReader r = f.createXMLStreamReader(inputStream);
 
+        double boundsMinLat=0, boundsMaxLat=0;
+        double boundsMinLon=0, boundsMaxLon=0;
+        boolean hasBounds=false;
+        Point2d p2 = new Point2d();
+
         OSMWay currentWay = null;
         while (r.hasNext()) {
             int ev = r.next();
             if (ev == XMLStreamConstants.START_ELEMENT) {
                 String name = r.getLocalName();
                 switch (name) {
+                    case "bounds" -> {
+                        boundsMinLat = attrDouble(r,"minlat",Double.NaN);
+                        boundsMinLon = attrDouble(r,"minlon",Double.NaN);
+                        boundsMaxLat = attrDouble(r,"maxlat",Double.NaN);
+                        boundsMaxLon = attrDouble(r,"maxlon",Double.NaN);
+                        hasBounds = true;
+                        logger.info("Bounds detected: lat [{} , {}], lon [{} , {}]",
+                                boundsMinLat,boundsMaxLat,boundsMinLon,boundsMaxLon);
+                    }
                     case "node" -> {
                         long id = attrLong(r, "id", -1);
-                        double lat = attrDouble(r, "lat", 0);
-                        double lon = attrDouble(r, "lon", 0);
-                        if (id >= 0) nodes.put(id, new OSMNode(id, lat, lon));
+                        double latitude = attrDouble(r, "lat", 0);
+                        double longitude = attrDouble(r, "lon", 0);
+
+                        convertLatLong(latitude, longitude, p2);
+                        if (id >= 0) nodes.put(id, new OSMNode(id, p2.y, p2.x));
                     }
                     case "way" -> currentWay = new OSMWay();
                     case "nd" -> {
@@ -107,8 +130,14 @@ public class LoadOSM implements TurtleLoader {
         LinkedHashMap<Integer, Turtle> layers = new LinkedHashMap<>();
 
         for (OSMWay w : ways) {
+            String layerName = layerNameForTags(w.tags);
             int color = pickColor(w.tags);
-            Turtle layer = layers.computeIfAbsent(color, c -> new Turtle(new Color(c)) );
+            Turtle layer = layers.get(color);
+            if (layer == null) {
+                logger.info("New layer: {} (#{}).", layerName, String.format("%06X", color));
+                layer = new Turtle(new Color(color));
+                layers.put(color, layer);
+            }
 
             // Build polyline
             List<double[]> pts = new ArrayList<>();
@@ -145,10 +174,59 @@ public class LoadOSM implements TurtleLoader {
             master.add(e.getValue());
         }
 
-        // rotate 90 degrees and flip vertically
-        master.rotate(-Math.PI / 2);
+        if(hasBounds) {
+            Point2d pMax = new Point2d();
+            Point2d pMin = new Point2d();
+            convertLatLong(boundsMaxLat,boundsMaxLon,pMin);
+            convertLatLong(boundsMinLat,boundsMinLon,pMax);
+            // scale the same as the points
+            pMin.x = (pMin.x - minLon) * scale;
+            pMax.x = (pMax.x - minLon) * scale;
+            pMin.y = -(maxLat - pMin.y) * scale;
+            pMax.y = -(maxLat - pMax.y) * scale;
+            // ensure pMin is the min corner
+            if(pMin.x<pMax.x) {
+                double t = pMin.x;
+                pMin.x = pMax.x;
+                pMax.x = t;
+            }
+            if(pMin.y<pMax.y) {
+                double t = pMin.y;
+                pMin.y = pMax.y;
+                pMax.y = t;
+            }
+            // pMax becomes width/height
+            pMax.sub(pMin);
+            // crop to bounds
+            CropTurtle.run(master, new Rectangle2D.Double(pMin.x,pMin.y,pMax.x,pMax.y));
+        }
 
         return master;
+    }
+
+    // convert lat/lon to Web Mercator (EPSG:3857) x/y in meters
+    private void convertLatLong(double latitude, double longitude, Point2d p) {
+        final double R = 6378137.0;
+        p.x = Math.toRadians(longitude) * R;
+        p.y = Math.log(Math.tan(Math.PI / 4 + Math.toRadians(latitude) / 2)) * R;
+    }
+
+    private String layerNameForTags(Map<String,String> tags) {
+        if (tags.containsKey("water") || "water".equals(tags.get("natural")) || tags.containsKey("waterway"))
+            return "water";
+        if (tags.containsKey("building"))
+            return "building";
+        if (tags.containsKey("highway"))
+            return "highway";
+        if ("forest".equals(tags.get("landuse")) || "wood".equals(tags.get("natural")))
+            return "forest";
+        if ("park".equals(tags.get("leisure")))
+            return "park";
+        if (tags.containsKey("railway"))
+            return "railway";
+        if (tags.containsKey("boundary"))
+            return "boundary";
+        return "other";
     }
 
     // Decide if way is an area
@@ -168,7 +246,7 @@ public class LoadOSM implements TurtleLoader {
         if (tags.containsKey("building"))
             return rgb(80, 80, 80);
         if (tags.containsKey("highway"))
-            return rgb(0, 0, 0);
+            return rgb(255, 128, 0);
         if ("forest".equals(tags.get("landuse")) || "wood".equals(tags.get("natural")))
             return rgb(0, 140, 0);
         if ("park".equals(tags.get("leisure")))
