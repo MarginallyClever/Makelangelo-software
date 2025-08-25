@@ -14,22 +14,20 @@ import javax.vecmath.Vector2d;
  */
 public class WaveByIntensity {
     private final TransformedImage img;
-    // the height of the wave, in mm.
-    private final double halfWaveHeight;
-    // the sampling rate along the line.
+    private final double halfLineHeight;
     private final double stepSize;
-    // controls the rate of oscillation.
+    // controls the rate of oscillation of the wave.
     private double wavePosition = 0;
     private double minimumFrequency = 5.0;
 
     /**
      * @param img the source image to sample from
-     * @param halfWaveHeight the width of the pulse line.
+     * @param halfLineHeight the width of the pulse line.
      * @param stepSize the speed at which to walk the line.
      * @param minimumFrequency the minimum frequency of the wave, in mm.  Should be >= stepSize.
      */
-    public WaveByIntensity(@Nonnull TransformedImage img, double halfWaveHeight, double stepSize, double minimumFrequency) {
-        this.halfWaveHeight = halfWaveHeight;
+    public WaveByIntensity(@Nonnull TransformedImage img, double halfLineHeight, double stepSize, double minimumFrequency) {
+        this.halfLineHeight = halfLineHeight;
         this.stepSize = stepSize;
         this.img = img;
         this.minimumFrequency = minimumFrequency;
@@ -99,13 +97,13 @@ public class WaveByIntensity {
         // read a block of the image and find the average intensity in this block
         double amplitude = getIntensityAtPoint(p);
         // the sum controls the height of the pulse.
-        var h = (amplitude<=1) ? 0 : Math.cos(wavePosition*2.0) * halfWaveHeight *(amplitude/255.0);
+        var h = (amplitude<=1) ? 0 : Math.cos(wavePosition*2.0) * halfLineHeight*(amplitude/255.0);
         d.x = p.x + orthogonal.x * h;
         d.y = p.y + orthogonal.y * h;
     }
 
     private double getIntensityAtPoint(Point2d p) {
         // read a block of the image and find the average intensity in this block
-        return ( 255.0f - img.sample( p.x, p.y, halfWaveHeight) );
+        return ( 255.0f - img.sample( p.x, p.y, halfLineHeight) );
     }
 }

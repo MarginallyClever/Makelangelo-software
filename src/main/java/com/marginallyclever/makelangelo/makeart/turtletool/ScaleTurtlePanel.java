@@ -19,30 +19,23 @@ public class ScaleTurtlePanel extends JPanel {
 	private final String [] unitTypes = new String[]{"mm","%"};
 	private final Turtle turtleToChange;
 	private final Turtle turtleOriginal;
-	private final JSpinner widthSpinner;
-	private final JSpinner heightSpinner;
-	private final JComboBox<String> units = new JComboBox<String>(unitTypes);
-	private int currentUnitType=0; // 0=mm, 1=%
+	private final JSpinner width;
+	private final JSpinner height;
+	private final JComboBox<String> units = new JComboBox<String>(unitTypes); 
 	private final JCheckBox lockRatio = new JCheckBox("🔒");
 	private final Rectangle2D.Double myOriginalBounds;
 
 	private double ratioAtTimeOfLock=1;
 	private boolean ignoreChange=false;
-
-	private double width,height;
 	
 	public ScaleTurtlePanel(Turtle t) {
 		super();
-		setName("ScaleTurtlePanel");
 		turtleToChange = t;
 		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
 		myOriginalBounds = turtleToChange.getBounds();
-		width = myOriginalBounds.width;
-		height = myOriginalBounds.height;
-
-		widthSpinner = new JSpinner(new SpinnerNumberModel(width,null,null,1));
-		heightSpinner = new JSpinner(new SpinnerNumberModel(height,null,null,1));
+		width = new JSpinner(new SpinnerNumberModel(myOriginalBounds.width,null,null,1));
+		height = new JSpinner(new SpinnerNumberModel(myOriginalBounds.height,null,null,1));
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -63,39 +56,35 @@ public class ScaleTurtlePanel extends JPanel {
 		c.gridy=0;
 		c.anchor=GridBagConstants.NORTHWEST;
 		c.fill=GridBagConstants.HORIZONTAL;
-		add(widthSpinner,c);
-		widthSpinner.setName("width");
+		add(width,c);
 
 		c.gridx=1;
 		c.gridy=1;
 		c.anchor=GridBagConstants.NORTHWEST;
 		c.fill=GridBagConstants.HORIZONTAL;
-		add(heightSpinner,c);
-		heightSpinner.setName("height");
+		add(height,c);
 		
 		c.gridx=2;
 		c.gridy=0;
 		c.gridheight=2;
 		c.anchor=GridBagConstants.CENTER;
 		add(lockRatio,c);
-		lockRatio.setName("lockRatio");
 		
 		c.gridx=3;
 		c.gridy=0;
 		c.gridheight=2;
 		c.anchor=GridBagConstants.CENTER;
 		add(units,c);
-		units.setName("units");
 		
-		widthSpinner.addChangeListener(this::onWidthChange);
-		heightSpinner.addChangeListener(this::onHeightChange);
+		width.addChangeListener(this::onWidthChange);
+		height.addChangeListener(this::onHeightChange);
 		units.addActionListener(this::onUnitChange);
-		lockRatio.addActionListener(e -> updateRatioAtTimeOfLock());
+		lockRatio.addActionListener(e -> onLockChange());
 		lockRatio.setSelected(true);
-		updateRatioAtTimeOfLock();
+		onLockChange();
 
-		updateMinimumWidth(widthSpinner);
-		updateMinimumWidth(heightSpinner);
+		updateMinimumWidth(width);
+		updateMinimumWidth(height);
 	}
 	
 	private void updateMinimumWidth(JSpinner spinner) {
@@ -106,31 +95,19 @@ public class ScaleTurtlePanel extends JPanel {
 	}
 
 	private void onWidthChange(ChangeEvent e) {
-		if(ignoreChange) return;
-		ignoreChange = true;
-
 		if(lockRatio.isSelected()) {
-			width = (Double) widthSpinner.getValue();
-			height = width / ratioAtTimeOfLock;
-			heightSpinner.setValue(height);
+			double w1 = (Double)width.getValue();
+			height.setValue(w1 / ratioAtTimeOfLock);
 		}
-
-		ignoreChange = false;
-		scaleNow();
+		if(!ignoreChange) scaleNow();
 	}
 
 	private void onHeightChange(ChangeEvent e) {
-		if(ignoreChange) return;
-		ignoreChange = true;
-
 		if(lockRatio.isSelected()) {
-			height = (Double) heightSpinner.getValue();
-			width = height * ratioAtTimeOfLock;
-			widthSpinner.setValue(width);
+			double h1 = (Double)height.getValue();
+			width.setValue(h1 * ratioAtTimeOfLock);
 		}
-
-		ignoreChange = false;
-		scaleNow();
+		if(!ignoreChange) scaleNow();
 	}
 	
 	private void scaleNow() {
@@ -139,8 +116,8 @@ public class ScaleTurtlePanel extends JPanel {
 		ow = (ow == 0) ? 1 : ow;
 		oh = (oh == 0) ? 1 : oh;
 		
-		double w1 = (Double) widthSpinner.getValue();
-		double h1 = (Double) heightSpinner.getValue();
+		double w1 = (Double)width.getValue();
+		double h1 = (Double)height.getValue();
 		if(units.getSelectedIndex()==0) {
 			// mm
 			w1 /= ow;
@@ -161,35 +138,30 @@ public class ScaleTurtlePanel extends JPanel {
 	}
 	
 	private void onUnitChange(ActionEvent e) {
-		var choice = ((JComboBox)e.getSource()).getSelectedIndex();
-		if(currentUnitType == choice) return;
-		currentUnitType = choice;
+		double ow = myOriginalBounds.getWidth();
+		double oh = myOriginalBounds.getHeight();
+		ow = (ow == 0) ? 1 : ow;
+		oh = (oh == 0) ? 1 : oh;
 
-		width = myOriginalBounds.getWidth();
-		height = myOriginalBounds.getHeight();
-		width = (width == 0) ? 1 : width;
-		height = (height == 0) ? 1 : height;
-
-		double w1 = (Double) widthSpinner.getValue();
-		double h1 = (Double) heightSpinner.getValue();
+		double w1 = (Double)width.getValue();
+		double h1 = (Double)height.getValue();
 
 		ignoreChange=true;
 		if(units.getSelectedIndex()==0) {
-			// switching to mm.  here w1,h1 are in % (0-100)
-			widthSpinner .setValue(w1 * 0.01 * width);
-			heightSpinner.setValue(h1 * 0.01 * height);
+			// switching to mm
+			width.setValue(w1*0.01 * ow);
+			height.setValue(h1*0.01 * oh);
 		} else {
-			// switching to %.  here w1,h1 are in mm
-			widthSpinner.setValue(100.0*(w1 / width));
-			heightSpinner.setValue(100.0*(h1 / height));
+			// switching to %
+			width.setValue(100.0*w1 / ow);
+			height.setValue(100.0*h1 / oh);
 		}
-		updateRatioAtTimeOfLock();
 		ignoreChange=false;
 	}
 
-	private void updateRatioAtTimeOfLock() {
+	private void onLockChange() {
 		if(lockRatio.isSelected()) {
-			ratioAtTimeOfLock = (Double) widthSpinner.getValue() / (Double) heightSpinner.getValue();
+			ratioAtTimeOfLock = (Double)width.getValue() / (Double)height.getValue();
 		}
 	}
 
@@ -238,18 +210,10 @@ public class ScaleTurtlePanel extends JPanel {
 		PreferencesHelper.start();
 		Translator.start();
 
-		// make a Turtle of a rectangle
-		Turtle turtle = new Turtle();
-		turtle.jumpTo(0, 0);
-		turtle.moveTo(100, 0);
-		turtle.moveTo(100, 50);
-		turtle.moveTo(0, 50);
-		turtle.moveTo(0, 0);
-
 		JFrame frame = new JFrame(ScaleTurtlePanel.class.getSimpleName());
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
-		runAsDialog(frame,turtle);
+		runAsDialog(frame,new Turtle());
 	}
 }

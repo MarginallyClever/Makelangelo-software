@@ -1,7 +1,7 @@
 package com.marginallyclever.makelangelo.makeart.imageconverter;
 
 
-import com.marginallyclever.donatello.select.SelectSlider;
+import com.marginallyclever.donatello.select.SelectDouble;
 import com.marginallyclever.makelangelo.Translator;
 import com.marginallyclever.makelangelo.makeart.TransformedImage;
 import com.marginallyclever.makelangelo.makeart.imagefilter.FilterDesaturate;
@@ -24,38 +24,31 @@ import java.awt.geom.Rectangle2D;
 public class Converter_Pulse extends ImageConverter {
 	private static double blockScale = 6.0f;
 	private static double angle = 0;
-	private static double zigDensity = 2.0f;  // increase to tighten zigzags
+	private final String[] directionChoices = new String[]{Translator.get("horizontal"), Translator.get("vertical") };
 	private int cutOff = 16;
 	private double sampleRate = 0.1;
 
 	public Converter_Pulse() {
 		super();
 
-		SelectSlider selectSize = new SelectSlider("size",Translator.get("HilbertCurveSize"),40,1,(int)blockScale);
+		SelectDouble selectSize = new SelectDouble("size",Translator.get("HilbertCurveSize"),getScale());
 		add(selectSize);
 		selectSize.addSelectListener(evt->{
-			blockScale = (int)evt.getNewValue();
+			setScale((double) evt.getNewValue());
 			fireRestart();
 		});
 
-		SelectSlider selectIntensity = new SelectSlider("intensity", Translator.get("Converter_SpiralPulse.intensity"),30,1,(int)(zigDensity*10));
-		add(selectIntensity);
-		selectIntensity.addSelectListener(evt->{
-			zigDensity = (int)evt.getNewValue() / 10.0;
-			fireRestart();
-		});
-
-		SelectSlider selectAngle = new SelectSlider("angle", Translator.get("ConverterMultipassAngle"),90,0,(int)angle);
+		SelectDouble selectAngle = new SelectDouble("angle",Translator.get("ConverterMultipassAngle"),angle);
 		add(selectAngle);
 		selectAngle.addSelectListener(evt->{
-			angle = (int)evt.getNewValue();
+			angle = (double)evt.getNewValue();
 			fireRestart();
 		});
 
-		SelectSlider selectSampleRate = new SelectSlider("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),20,1,(int)(sampleRate*10));
+		SelectDouble selectSampleRate = new SelectDouble("sampleRate",Translator.get("Converter_PulseCMYK.SampleRate"),sampleRate);
 		add(selectSampleRate);
 		selectSampleRate.addSelectListener(evt->{
-			sampleRate = (int) evt.getNewValue() / 10.0;
+			sampleRate = (double) evt.getNewValue();
 			fireRestart();
 		});
 	}
@@ -63,6 +56,14 @@ public class Converter_Pulse extends ImageConverter {
 	@Override
 	public String getName() {
 		return Translator.get("PulseLineName");
+	}
+
+	public double getScale() {
+		return blockScale;
+	}
+	public void setScale(double value) {
+		if(value<1) value=1;
+		blockScale = value;
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class Converter_Pulse extends ImageConverter {
 		turtle = new Turtle();
 		turtle.setStroke(Color.BLACK,settings.getDouble(PlotterSettings.DIAMETER));
 
-		var wave = new WaveByIntensity(img,blockScale/2,sampleRate,zigDensity);
+		var wave = new WaveByIntensity(img,blockScale/2,sampleRate,2.0);
 
 		Vector2d majorAxis = new Vector2d(
 				Math.cos(Math.toRadians(angle)),
