@@ -12,6 +12,7 @@ It pairs really well with [Marlin 3D printer firmware](https://github.com/Margin
 ![screenshot](screenshot.jpg)
 
 ## Installing and running
+[Get the latest nightly build](https://github.com/MarginallyClever/Makelangelo-software/releases/tag/Nightly)
 [How to use Makelangelo Software 7.24.0+](https://mcr.dozuki.com/Guide/1.+How+to+use+Makelangelo+Software+7.24.*/5?lang=en)
 
 ## Where to go from here
