@@ -316,6 +316,10 @@ public class MainMenu extends JMenuBar {
         menu.add(createMover(Translator.get("Scale"),"/com/marginallyclever/makelangelo/icons8-resize-16.png",(e)->runScalePanel()));
         menu.add(createMover(Translator.get("Rotate"),"/com/marginallyclever/makelangelo/icons8-rotate-16.png",(e)->runRotatePanel()));
 
+        menu.add(createMover(Translator.get("Crop"),"/com/marginallyclever/makelangelo/icons8-crop-16.png",(e)-> {
+            CropTurtleAction act = new CropTurtleAction(frame.getPaper());
+            frame.setTurtle(act.run(frame.getTurtle()));
+        }));
         menu.addSeparator();
 
         var a4 = new FlipTurtleAction(1,-1,Translator.get("FlipV"));
@@ -381,7 +385,7 @@ public class MainMenu extends JMenuBar {
     private void runTranslatePanel() {
         TranslateTurtlePanel.runAsDialog(SwingUtilities.getWindowAncestor(this), frame.getTurtle());
     }
-  
+
     private JMenu createRobotMenu() {
         JMenu menu = new JMenu(Translator.get("Robot"));
         menu.setMnemonic('k');

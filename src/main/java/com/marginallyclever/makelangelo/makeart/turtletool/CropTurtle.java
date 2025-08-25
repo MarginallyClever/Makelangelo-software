@@ -15,7 +15,7 @@ public class CropTurtle {
 	private static final double EPSILON = 1e-8;
 	
 	public static void run(Turtle turtle,Rectangle2D.Double rectangle) {
-		logger.debug("crop start @ {}", turtle.countPoints());
+		//logger.debug("crop start @ {}", turtle.countPoints());
 
 		Turtle result = new Turtle();
 		for( var layer : turtle.getLayers() ) {
@@ -27,7 +27,7 @@ public class CropTurtle {
 
 		turtle.set(result);
 
-		logger.debug("crop end @ {}", turtle.countPoints());
+		//logger.debug("crop end @ {}", turtle.countPoints());
 	}
 
 	/**
