@@ -27,8 +27,8 @@ public class TranslateTurtlePanel extends JPanel {
 		turtleOriginal = new Turtle(t);  // make a deep copy of the original.  Doubles memory usage!
 
 		myOriginalBounds = turtleToChange.getBounds();
-		dx = new JSpinner(new SpinnerNumberModel(myOriginalBounds.x,null,null,1));
-		dy = new JSpinner(new SpinnerNumberModel(myOriginalBounds.y,null,null,1));
+		dx = new JSpinner(new SpinnerNumberModel(myOriginalBounds.getCenterX(),null,null,1));
+		dy = new JSpinner(new SpinnerNumberModel(myOriginalBounds.getCenterY(),null,null,1));
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();

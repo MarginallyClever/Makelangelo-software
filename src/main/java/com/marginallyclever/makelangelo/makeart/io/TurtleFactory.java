@@ -23,6 +23,7 @@ public class TurtleFactory {
 			new LoadDXF(),
 			new LoadFactorioMap(),
 			new LoadGCode(),
+			new LoadOSM(),
 			new LoadScratch2(),
 			new LoadScratch3(),
 			new LoadSVG(),
