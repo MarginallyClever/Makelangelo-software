@@ -95,19 +95,29 @@ public class ScaleTurtlePanel extends JPanel {
 	}
 
 	private void onWidthChange(ChangeEvent e) {
+		if(ignoreChange) return;
+		ignoreChange = true;
+
 		if(lockRatio.isSelected()) {
 			double w1 = (Double)width.getValue();
 			height.setValue(w1 / ratioAtTimeOfLock);
 		}
-		if(!ignoreChange) scaleNow();
+
+		ignoreChange = false;
+		scaleNow();
 	}
 
 	private void onHeightChange(ChangeEvent e) {
+		if(ignoreChange) return;
+		ignoreChange = true;
+
 		if(lockRatio.isSelected()) {
 			double h1 = (Double)height.getValue();
 			width.setValue(h1 * ratioAtTimeOfLock);
 		}
-		if(!ignoreChange) scaleNow();
+
+		ignoreChange = false;
+		scaleNow();
 	}
 	
 	private void scaleNow() {
@@ -149,12 +159,12 @@ public class ScaleTurtlePanel extends JPanel {
 		ignoreChange=true;
 		if(units.getSelectedIndex()==0) {
 			// switching to mm
-			width.setValue(w1*0.01 * ow);
-			height.setValue(h1*0.01 * oh);
+			width.setValue(0.01 * w1*ow);
+			height.setValue(0.01 * h1*oh);
 		} else {
 			// switching to %
-			width.setValue(100.0*w1 / ow);
-			height.setValue(100.0*h1 / oh);
+			width.setValue(100.0*(w1 / ow));
+			height.setValue(100.0*(h1 / oh));
 		}
 		ignoreChange=false;
 	}
