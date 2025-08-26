@@ -4,7 +4,7 @@ import glob
 import sys
 import re
 
-FOXYCART_TOKEN_URL = "https://accounts.foxycart.com/token"
+FOXYCART_TOKEN_URL = "https://api.foxycart.com/token"
 FOXYCART_API_BASE = "https://api.foxycart.com"
 STORE_ID = os.environ.get("FOXYCART_STORE_ID", "53596")
 
