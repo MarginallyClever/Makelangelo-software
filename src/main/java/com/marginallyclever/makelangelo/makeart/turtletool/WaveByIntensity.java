@@ -19,7 +19,7 @@ public class WaveByIntensity {
     // the sampling rate along the line.
     private final double stepSize;
     // controls the rate of oscillation.
-    private double wavePosition = 0;
+    private double phase = 0;
     private double minimumFrequency = 5.0;
 
     /**
@@ -38,6 +38,7 @@ public class WaveByIntensity {
     public Turtle turtleToWave(@Nonnull Turtle turtle) {
         Turtle result = new Turtle();
         TurtleIterator it = turtle.getIterator();
+        boolean isFirst=true;
         Point2d prev = null;
         while (it.hasNext()) {
             var next = it.next();
@@ -46,8 +47,8 @@ public class WaveByIntensity {
                 continue;
             }
             assert prev != null;
-            var wave = lineToWave(prev, next);
-            result.add(wave);
+            lineToWave(result,prev, next,isFirst);
+            isFirst=false;
             prev = next;
         }
 
@@ -56,13 +57,15 @@ public class WaveByIntensity {
 
     /**
      * Convert a line to a wave based on the intensity of the image.
+     * @param turtle the turtle to draw with
      * @param start the start of the line
      * @param end the end of the line
+     * @param firstPoint true if this is the first point in the line
      */
-    public Turtle lineToWave(Point2d start, Point2d end) {
-        Turtle turtle = new Turtle();
+    public void lineToWave(Turtle turtle,Point2d start, Point2d end,boolean firstPoint) {
         // find the length of the line and the unit vector
-        var direction = new Vector2d(end.x - start.x,end.y - start.y);
+        var direction = new Vector2d(end);
+        direction.sub(start);
         double len = direction.length();
         direction.scale(1.0/len);
         // find the orthogonal vector
@@ -71,7 +74,9 @@ public class WaveByIntensity {
         Point2d interpolated = new Point2d();
         Point2d offset = new Point2d();
         calculatePoint(start,orthogonal,offset);
-        turtle.jumpTo(offset.x,offset.y);
+        if(firstPoint) {
+            turtle.jumpTo(offset.x, offset.y);
+        }
 
         // controls the frequency of the wave.
         double i=0;
@@ -82,11 +87,10 @@ public class WaveByIntensity {
             double intensity = 1.0-(getIntensityAtPoint(interpolated)/255.0);
             var safeI = stepSize * ((intensity*0.8)+0.2);
             i += safeI * minimumFrequency;
-            wavePosition += stepSize;
+            phase += stepSize;
             calculatePoint(interpolated,orthogonal,offset);
             turtle.moveTo(offset.x,offset.y);
         }
-        return turtle;
     }
 
     /**
@@ -99,7 +103,7 @@ public class WaveByIntensity {
         // read a block of the image and find the average intensity in this block
         double amplitude = getIntensityAtPoint(p);
         // the sum controls the height of the pulse.
-        var h = (amplitude<=1) ? 0 : Math.cos(wavePosition*2.0) * halfWaveHeight *(amplitude/255.0);
+        var h = (amplitude<=1) ? 0 : Math.cos(phase * 2.0) * halfWaveHeight *(amplitude/255.0);
         d.x = p.x + orthogonal.x * h;
         d.y = p.y + orthogonal.y * h;
     }
@@ -107,5 +111,13 @@ public class WaveByIntensity {
     private double getIntensityAtPoint(Point2d p) {
         // read a block of the image and find the average intensity in this block
         return ( 255.0f - img.sample( p.x, p.y, halfWaveHeight) );
+    }
+
+    /**
+     * Set phase in degrees
+     * @param phase the phase offset of the wave.
+     */
+    public void setPhase(double phase) {
+        this.phase = Math.toRadians(phase);
     }
 }

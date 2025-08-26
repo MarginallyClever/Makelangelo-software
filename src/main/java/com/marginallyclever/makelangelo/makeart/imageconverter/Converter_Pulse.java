@@ -103,7 +103,7 @@ public class Converter_Pulse extends ImageConverter {
 		double height = yTop-yBottom;
 		double width = xRight-xLeft;
 		double r = Math.sqrt(Math.pow(width/2,2) + Math.pow(height/2,2));
-
+        boolean isFirst=true;
 		double i=-r;
 		for(double j =-r; j <= r; j+= blockScale) {
 			i = -i;
@@ -111,7 +111,8 @@ public class Converter_Pulse extends ImageConverter {
 			b.scale(j,majorAxis);
 			a.scaleAdd(-i,minorAxis,a);
 			b.scaleAdd(i,minorAxis,b);
-			turtle.add(wave.lineToWave(a,b));
+			wave.lineToWave(turtle,a,b,isFirst);
+            isFirst=false;
 		}
 
 		CropTurtle.run(turtle, myPaper.getMarginRectangle());
