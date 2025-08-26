@@ -8,6 +8,7 @@ on:
 jobs:
   update-foxycart:
     runs-on: ubuntu-latest
+    environment: First
 
     env:
       FOXYCART_CLIENT_ID: ${{ secrets.CLIENT_ID }}
